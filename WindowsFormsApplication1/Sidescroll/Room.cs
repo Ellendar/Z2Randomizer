@@ -376,14 +376,14 @@ namespace Z2Randomizer
             if(palSet == 1)
             {
                 int memAddr = addr - 0x8010;
-                ROMData.put(sideview1 + Newmap * 2, (byte)(memAddr & 0x00FF));
-                ROMData.put(sideview1 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(sideview1 + Newmap * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(sideview1 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else if(palSet == 2)
             {
                 int memAddr = addr - 0x8010;
-                ROMData.put(sideview2 + Newmap * 2, (byte)(memAddr & 0x00FF));
-                ROMData.put(sideview2 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(sideview2 + Newmap * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(sideview2 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else
             {
@@ -392,8 +392,8 @@ namespace Z2Randomizer
                 {
                     memAddr = addr - 0x10010;
                 }
-                ROMData.put(sideview3 + Newmap * 2, (byte)(memAddr & 0x00FF));
-                ROMData.put(sideview3 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(sideview3 + Newmap * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(sideview3 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
 
             }
         }
@@ -410,24 +410,24 @@ namespace Z2Randomizer
                     }
                 }
             }
-            ROMData.put(addr, enemies);
+            ROMData.Put(addr, enemies);
             if (palSet == 1)
             {
                 int memAddr = addr - 0x98b0;
-                ROMData.put(enemyPtr1 + Newmap * 2, (byte)(memAddr & 0x00FF));
-                ROMData.put(enemyPtr1 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(enemyPtr1 + Newmap * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(enemyPtr1 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else if (palSet == 2)
             {
                 int memAddr = addr - 0x98b0;
-                ROMData.put(enemyPtr2 + Newmap * 2, (byte)(memAddr & 0x00FF));
-                ROMData.put(enemyPtr2 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(enemyPtr2 + Newmap * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(enemyPtr2 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else
             {
                 int memAddr = addr - 0xd8b0;
-                ROMData.put(enemyPtr3 + Newmap * 2, (byte)(memAddr & 0x00FF));
-                ROMData.put(enemyPtr3 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(enemyPtr3 + Newmap * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(enemyPtr3 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
 
             }
         }
@@ -446,21 +446,21 @@ namespace Z2Randomizer
             }
             if(Newmap % 2 == 0)
             {
-                byte old = ROMData.getByte(ptr + newmap / 2);
+                byte old = ROMData.GetByte(ptr + newmap / 2);
                 old = (byte)(old & 0x0F);
                 old = (byte)((bitmask << 4) | old);
-                ROMData.put(ptr + newmap / 2, old);
+                ROMData.Put(ptr + newmap / 2, old);
             }
             else
             {
-                byte old = ROMData.getByte(ptr + newmap / 2);
+                byte old = ROMData.GetByte(ptr + newmap / 2);
                 old = (byte)(old & 0xF0);
                 old = (byte)((bitmask) | old);
-                ROMData.put(ptr + newmap / 2, old);
+                ROMData.Put(ptr + newmap / 2, old);
             }
         }
 
-        public void setItem(items it)
+        public void setItem(Items it)
         {
             for(int i = 4; i < sideView.Length; i+=2)
             {
@@ -474,28 +474,28 @@ namespace Z2Randomizer
             }
         }
 
-        public void updateItem(items i, int palSet, ROM ROMData)
+        public void updateItem(Items i, int palSet, ROM ROMData)
         {
-            int sideViewPtr = (ROMData.getByte(sideview1 + newmap * 2) + (ROMData.getByte(sideview1 + 1 + newmap * 2) << 8)) + 0x8010;
+            int sideViewPtr = (ROMData.GetByte(sideview1 + newmap * 2) + (ROMData.GetByte(sideview1 + 1 + newmap * 2) << 8)) + 0x8010;
 
             if (palSet == 2)
             {
-                sideViewPtr = (ROMData.getByte(sideview2 + newmap * 2) + (ROMData.getByte(sideview2 + 1 + newmap * 2) << 8)) + 0x8010;
+                sideViewPtr = (ROMData.GetByte(sideview2 + newmap * 2) + (ROMData.GetByte(sideview2 + 1 + newmap * 2) << 8)) + 0x8010;
             }
             int ptr = sideViewPtr + 4;
-            byte data = ROMData.getByte(ptr);
+            byte data = ROMData.GetByte(ptr);
             data = (byte)(data & 0xF0);
             data = (byte)(data >> 4);
-            byte data2 = ROMData.getByte(ptr+1);
+            byte data2 = ROMData.GetByte(ptr+1);
             while (data >= 13 || data2 != 0x0F)
             {
                 ptr+=2;
-                data = ROMData.getByte(ptr);
+                data = ROMData.GetByte(ptr);
                 data = (byte)(data & 0xF0);
                 data = (byte)(data >> 4);
-                data2 = ROMData.getByte(ptr + 1);
+                data2 = ROMData.GetByte(ptr + 1);
             }
-            ROMData.put(ptr + 2, (byte)i);
+            ROMData.Put(ptr + 2, (byte)i);
 
         }
 
@@ -509,7 +509,7 @@ namespace Z2Randomizer
                 {
                     if (connections[i] < 0xFC || entrance)
                     {
-                        ROMData.put(connectors1 + newmap * 4 + i, connections[i]);
+                        ROMData.Put(connectors1 + newmap * 4 + i, connections[i]);
                     }
                 }
             }
@@ -519,7 +519,7 @@ namespace Z2Randomizer
                 {
                     if (connections[i] < 0xFC || entrance)
                     {
-                        ROMData.put(connectors2 + newmap * 4 + i, connections[i]);
+                        ROMData.Put(connectors2 + newmap * 4 + i, connections[i]);
                     }
                 }
             }
@@ -529,7 +529,7 @@ namespace Z2Randomizer
                 {
                     if (connections[i] < 0xFC || entrance)
                     {
-                        ROMData.put(connectors3 + newmap * 4 + i, connections[i]);
+                        ROMData.Put(connectors3 + newmap * 4 + i, connections[i]);
                     }
                 }
             }

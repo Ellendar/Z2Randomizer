@@ -114,28 +114,28 @@ namespace Z2Randomizer
                     Byte[] connectBytes = new Byte[4];
                     for (int k = 0; k < 4; k++)
                     {
-                        connectBytes[k] = ROMData.getByte(addr + k);
+                        connectBytes[k] = ROMData.GetByte(addr + k);
 
                     }
                     Room r;
-                    int sideViewPtr = (ROMData.getByte(side[j] + i * 2) + (ROMData.getByte(side[j] + 1 + i * 2) << 8)) + 0x8010;
+                    int sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0x8010;
                     if (j == 2)
                     {
-                        sideViewPtr = (ROMData.getByte(side[j] + i * 2) + (ROMData.getByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
+                        sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
                     }
-                    int sideViewLength = ROMData.getByte(sideViewPtr);
-                    Byte[] sideView = ROMData.getBytes(sideViewPtr, sideViewPtr + sideViewLength);
+                    int sideViewLength = ROMData.GetByte(sideViewPtr);
+                    Byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewPtr + sideViewLength);
 
-                    int enemyPtr = ROMData.getByte(enemy[j] + i * 2) + (ROMData.getByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
+                    int enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
                     if (j == 2)
                     {
-                        enemyPtr = ROMData.getByte(enemy[j] + i * 2) + (ROMData.getByte(enemy[j] + 1 + i * 2) << 8) + 0xd8b0;
+                        enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0xd8b0;
                     }
 
-                    int enemyLength = ROMData.getByte(enemyPtr);
-                    Byte[] enemies = ROMData.getBytes(enemyPtr, enemyPtr + enemyLength);
+                    int enemyLength = ROMData.GetByte(enemyPtr);
+                    Byte[] enemies = ROMData.GetBytes(enemyPtr, enemyPtr + enemyLength);
 
-                    Byte bitmask = ROMData.getByte(bit[j] + i / 2);
+                    Byte bitmask = ROMData.GetByte(bit[j] + i / 2);
                 
                     if (i % 2 == 0)
                     {
@@ -287,7 +287,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void updateItem(items i)
+        public void updateItem(Items i)
         {
             if (num == 1 || num == 2 || num == 5)
             {
@@ -801,7 +801,7 @@ namespace Z2Randomizer
                 {
                     if (r.Connections[i] < 0xFC)
                     {
-                        this.ROMData.put(r.MemAddr + i, r.Connections[i]);
+                        this.ROMData.Put(r.MemAddr + i, r.Connections[i]);
                     }
                 }
             }
@@ -1162,17 +1162,17 @@ namespace Z2Randomizer
                 {
                     i = startAddr + (r.Newmap * 2);
                 }
-                int low = ROMData.getByte(i);
-                int hi = ROMData.getByte(i + 1) * 256;
-                int numBytes = ROMData.getByte(hi + low + 16 - 0x8000 + (world * 0x4000));
+                int low = ROMData.GetByte(i);
+                int hi = ROMData.GetByte(i + 1) * 256;
+                int numBytes = ROMData.GetByte(hi + low + 16 - 0x8000 + (world * 0x4000));
                 for (int j = 4; j < numBytes; j = j + 2)
                 {
-                    int yPos = ROMData.getByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
+                    int yPos = ROMData.GetByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
                     yPos = yPos >> 4;
-                    if (ROMData.getByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
+                    if (ROMData.GetByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
                     {
                         int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
-                        int item = ROMData.getByte(addr);
+                        int item = ROMData.GetByte(addr);
                         if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
                         {
                             addresses.Add(addr);
@@ -1194,12 +1194,12 @@ namespace Z2Randomizer
             {
                 if (shuffleSmallItems)
                 {
-                    ROMData.put(addresses[i], (Byte)items[i]);
+                    ROMData.Put(addresses[i], (Byte)items[i]);
                 }
 
                 if (extraKeys && num != 7)
                 {
-                    ROMData.put(addresses[i], (Byte)0x08);
+                    ROMData.Put(addresses[i], (Byte)0x08);
                 }
             }
         }

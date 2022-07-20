@@ -23,13 +23,13 @@ namespace Z2Randomizer
         public bool StartWithKid { get => startWithKid;  }
         public bool StartWithMedicine { get => startWithMedicine;  }
 
-        public Boolean has(items item)
+        public Boolean has(Items item)
         {
             //check item map
             return false;
         }
 
-        public Boolean has(spells spell)
+        public Boolean has(Spells spell)
         {
             return false;
             //check spell map

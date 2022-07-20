@@ -92,7 +92,7 @@ namespace Z2Randomizer
         Random%        
     */
 
-    public enum spells { shield = 0, jump = 1, life = 2, fairy = 3, fire = 4, reflect = 5, spell = 6, thunder = 7, downstab = 8, upstab = 9 }
+    public enum Spells { shield = 0, jump = 1, life = 2, fairy = 3, fire = 4, reflect = 5, spell = 6, thunder = 7, downstab = 8, upstab = 9 }
 
     class Hyrule
     { 
@@ -109,7 +109,7 @@ namespace Z2Randomizer
         private Dictionary<int, int> spellEnters;
         private Dictionary<int, int> spellExits;
         public HashSet<String> reachableAreas;
-        private Dictionary<spells, spells> spellMap; //key is location, value is spell (this is a bad implementation)
+        private Dictionary<Spells, Spells> spellMap; //key is location, value is spell (this is a bad implementation)
         private List<Location> itemLocs;
         private List<Location> pbagHearts;
         protected Dictionary<Location, List<Location>> connections;
@@ -123,8 +123,7 @@ namespace Z2Randomizer
         private int kasutoJars;
         private BackgroundWorker worker;
         
-
-        private Character link;
+        private Character character;
 
         public Boolean[] itemGet;
         private Boolean[] spellGet;
@@ -157,8 +156,8 @@ namespace Z2Randomizer
         private MazeIsland mazeIsland;
         private DeathMountain deathMountain;
 
-        private Shuffler s;
-        private Random r;
+        private Shuffler shuffler;
+        private Random random;
         private RandomizerProperties props;
         private List<World> worlds;
         private List<Palace> palaces;
@@ -188,44 +187,11 @@ namespace Z2Randomizer
             {7, 0x8665 }
         };
 
-        public ROM ROMData
-        {
-            get
-            {
-                return romData;
-            }
+        public ROM ROMData { get; set; }
 
-            set
-            {
-                romData = value;
-            }
-        }
+        public Random R { get; set; }
 
-        public Random R
-        {
-            get
-            {
-                return r;
-            }
-
-            set
-            {
-                r = value;
-            }
-        }
-
-        public RandomizerProperties Props
-        {
-            get
-            {
-                return props;
-            }
-
-            set
-            {
-                props = value;
-            }
-        }
+        public RandomizerProperties Props { get; set; }
 
         public bool[] SpellGet { get => spellGet; set => spellGet = value; }
 
@@ -234,7 +200,7 @@ namespace Z2Randomizer
 
             props = p;
             
-            r = new Random(props.seed);
+            random = new Random(props.seed);
             ROMData = new ROM(props.filename);
             //ROMData.dumpAll("glitch");
             //ROMData.dumpSamus();
@@ -242,8 +208,8 @@ namespace Z2Randomizer
             this.worker = worker;
 
 
-            link = new Character(props);
-            s = new Shuffler(props, ROMData, link, r);
+            character = new Character(props);
+            shuffler = new Shuffler(props, ROMData, character, random);
 
             palaces = new List<Palace>();
             itemGet = new Boolean[] { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
@@ -253,22 +219,20 @@ namespace Z2Randomizer
 
             
 
-            kasutoJars = s.shuffleKasutoJars();
+            kasutoJars = shuffler.ShuffleKasutoJars();
             //ROMData.moveAfterGem();
 
             //Allows casting magic without requeueing a spell
             if (props.fastCast)
             {
-                ROMData.writeFastCastMagic();
+                ROMData.WriteFastCastMagic();
             }
 
             if (props.disableMusic)
             {
-                ROMData.disableMusic();
+                ROMData.DisableMusic();
             }
 
-            
-            
 
             if (props.hiddenPalace.Equals("Random"))
             {
@@ -288,157 +252,151 @@ namespace Z2Randomizer
                 hiddenKasuto = props.hiddenKasuto.Equals("On");
             }
 
-            ROMData.doHackyFixes();
-            s.shuffleDrops();
-            s.shufflePbagAmounts();
+            ROMData.DoHackyFixes();
+            shuffler.ShuffleDrops();
+            shuffler.ShufflePbagAmounts();
 
-            ROMData.fixSoftLock();
-            ROMData.extendMapSize();
-            ROMData.disableTurningPalacesToStone();
-            ROMData.updateMapPointers();
-            ROMData.fixContinentTransitions();
+            ROMData.FixSoftLock();
+            ROMData.ExtendMapSize();
+            ROMData.DisableTurningPalacesToStone();
+            ROMData.UpdateMapPointers();
+            ROMData.FixContinentTransitions();
 
             if (props.dashSpell)
             {
-                ROMData.dashSpell();
+                ROMData.DashSpell();
             }
 
             /*
             Up + A:
-        1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
-
-        1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
-
-        d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
-
-        feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-
-        CAD0(1CAE0): (20bcd3) c902 10
-
-        CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-
-        CF92: (1CFA2): Jump to feb3(20b3fe)
+            1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
+            1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
+            d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
+            feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
+            CAD0(1CAE0): (20bcd3) c902 10
+            CAE3(1CAF3): NOP NOP NOP(EAEAEA)
+            CF92: (1CFA2): Jump to feb3(20b3fe)
 
             */
 
             if(props.upAC1)
             {
-                ROMData.upAController1();
+                ROMData.UpAController1();
             }
             if (props.upaBox)
             {
-                ROMData.put(0x1cbba, 0x20);
-                ROMData.put(0x1cbbb, 0x9a);
-                ROMData.put(0x1cbbc, 0xd3);
+                ROMData.Put(0x1cbba, 0x20);
+                ROMData.Put(0x1cbbb, 0x9a);
+                ROMData.Put(0x1cbbc, 0xd3);
 
-                ROMData.put(0x1d3aa, 0x8d);
-                ROMData.put(0x1d3ab, 0x07);
-                ROMData.put(0x1d3ac, 0x07);
-                ROMData.put(0x1d3ad, 0xad);
-                ROMData.put(0x1d3ae, 0x07);
-                ROMData.put(0x1d3af, 0x07);
-                ROMData.put(0x1d3b0, 0xc9);
-                ROMData.put(0x1d3b1, 0x03);
-                ROMData.put(0x1d3b2, 0x30);
-                ROMData.put(0x1d3b3, 0x12);
-                ROMData.put(0x1d3b4, 0xad);
-                ROMData.put(0x1d3b5, 0xb0);
-                ROMData.put(0x1d3b6, 0x0f);
-                ROMData.put(0x1d3b7, 0xc9);
-                ROMData.put(0x1d3b8, 0x01);
-                ROMData.put(0x1d3b9, 0xf0);
-                ROMData.put(0x1d3ba, 0x0b);
-                ROMData.put(0x1d3bb, 0xad);
-                ROMData.put(0x1d3bc, 0x61);
-                ROMData.put(0x1d3bd, 0x05);
-                ROMData.put(0x1d3be, 0x8d);
-                ROMData.put(0x1d3bf, 0xb1);
-                ROMData.put(0x1d3c0, 0x0f);
-                ROMData.put(0x1d3c1, 0xa9);
-                ROMData.put(0x1d3c2, 0x01);
-                ROMData.put(0x1d3c3, 0x8D);
-                ROMData.put(0x1d3c4, 0xB0);
-                ROMData.put(0x1d3c5, 0x0F);
-                ROMData.put(0x1d3c6, 0xad);
-                ROMData.put(0x1d3c7, 0x07);
-                ROMData.put(0x1d3c8, 0x07);
-                ROMData.put(0x1d3c9, 0x29);
-                ROMData.put(0x1d3ca, 0x07);
-                ROMData.put(0x1d3cb, 0x60);
-                ROMData.put(0x1d3cc, 0xad);
-                ROMData.put(0x1d3cd, 0xb1);
-                ROMData.put(0x1d3ce, 0x0f);
-                ROMData.put(0x1d3cf, 0x8d);
-                ROMData.put(0x1d3d0, 0x61);
-                ROMData.put(0x1d3d1, 0x05);
-                ROMData.put(0x1d3d2, 0x20);
-                ROMData.put(0x1d3d3, 0x57);
-                ROMData.put(0x1d3d4, 0xa0);
-                ROMData.put(0x1d3d5, 0xad);
-                ROMData.put(0x1d3d6, 0x07);
-                ROMData.put(0x1d3d7, 0x07);
-                ROMData.put(0x1d3d8, 0x60);
+                ROMData.Put(0x1d3aa, 0x8d);
+                ROMData.Put(0x1d3ab, 0x07);
+                ROMData.Put(0x1d3ac, 0x07);
+                ROMData.Put(0x1d3ad, 0xad);
+                ROMData.Put(0x1d3ae, 0x07);
+                ROMData.Put(0x1d3af, 0x07);
+                ROMData.Put(0x1d3b0, 0xc9);
+                ROMData.Put(0x1d3b1, 0x03);
+                ROMData.Put(0x1d3b2, 0x30);
+                ROMData.Put(0x1d3b3, 0x12);
+                ROMData.Put(0x1d3b4, 0xad);
+                ROMData.Put(0x1d3b5, 0xb0);
+                ROMData.Put(0x1d3b6, 0x0f);
+                ROMData.Put(0x1d3b7, 0xc9);
+                ROMData.Put(0x1d3b8, 0x01);
+                ROMData.Put(0x1d3b9, 0xf0);
+                ROMData.Put(0x1d3ba, 0x0b);
+                ROMData.Put(0x1d3bb, 0xad);
+                ROMData.Put(0x1d3bc, 0x61);
+                ROMData.Put(0x1d3bd, 0x05);
+                ROMData.Put(0x1d3be, 0x8d);
+                ROMData.Put(0x1d3bf, 0xb1);
+                ROMData.Put(0x1d3c0, 0x0f);
+                ROMData.Put(0x1d3c1, 0xa9);
+                ROMData.Put(0x1d3c2, 0x01);
+                ROMData.Put(0x1d3c3, 0x8D);
+                ROMData.Put(0x1d3c4, 0xB0);
+                ROMData.Put(0x1d3c5, 0x0F);
+                ROMData.Put(0x1d3c6, 0xad);
+                ROMData.Put(0x1d3c7, 0x07);
+                ROMData.Put(0x1d3c8, 0x07);
+                ROMData.Put(0x1d3c9, 0x29);
+                ROMData.Put(0x1d3ca, 0x07);
+                ROMData.Put(0x1d3cb, 0x60);
+                ROMData.Put(0x1d3cc, 0xad);
+                ROMData.Put(0x1d3cd, 0xb1);
+                ROMData.Put(0x1d3ce, 0x0f);
+                ROMData.Put(0x1d3cf, 0x8d);
+                ROMData.Put(0x1d3d0, 0x61);
+                ROMData.Put(0x1d3d1, 0x05);
+                ROMData.Put(0x1d3d2, 0x20);
+                ROMData.Put(0x1d3d3, 0x57);
+                ROMData.Put(0x1d3d4, 0xa0);
+                ROMData.Put(0x1d3d5, 0xad);
+                ROMData.Put(0x1d3d6, 0x07);
+                ROMData.Put(0x1d3d7, 0x07);
+                ROMData.Put(0x1d3d8, 0x60);
 
                 //feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-                ROMData.put(0x1feca, 0x8c);
-                ROMData.put(0x1fecb, 0x07);
-                ROMData.put(0x1fecc, 0x07);
-                ROMData.put(0x1fecd, 0xa9);
-                ROMData.put(0x1fece, 0x00);
-                ROMData.put(0x1fecf, 0x8d);
-                ROMData.put(0x1fed0, 0xb0);
-                ROMData.put(0x1fed1, 0x0f);
-                ROMData.put(0x1fed2, 0x60);
+                ROMData.Put(0x1feca, 0x8c);
+                ROMData.Put(0x1fecb, 0x07);
+                ROMData.Put(0x1fecc, 0x07);
+                ROMData.Put(0x1fecd, 0xa9);
+                ROMData.Put(0x1fece, 0x00);
+                ROMData.Put(0x1fecf, 0x8d);
+                ROMData.Put(0x1fed0, 0xb0);
+                ROMData.Put(0x1fed1, 0x0f);
+                ROMData.Put(0x1fed2, 0x60);
 
                 //CAD0(1CAE0): (20b7d3) c902 10
-                ROMData.put(0x1cae0, 0x20);
-                ROMData.put(0x1cae1, 0xbc);
-                ROMData.put(0x1cae2, 0xd3);
-                ROMData.put(0x1cae3, 0xc9);
-                ROMData.put(0x1cae4, 0x03);
-                ROMData.put(0x1cae5, 0x10);
+                ROMData.Put(0x1cae0, 0x20);
+                ROMData.Put(0x1cae1, 0xbc);
+                ROMData.Put(0x1cae2, 0xd3);
+                ROMData.Put(0x1cae3, 0xc9);
+                ROMData.Put(0x1cae4, 0x03);
+                ROMData.Put(0x1cae5, 0x10);
 
                 //CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-                ROMData.put(0x1caf3, 0xea);
-                ROMData.put(0x1caf4, 0xea);
-                ROMData.put(0x1caf5, 0xea);
+                ROMData.Put(0x1caf3, 0xea);
+                ROMData.Put(0x1caf4, 0xea);
+                ROMData.Put(0x1caf5, 0xea);
 
                 //CF92: (1CFA2): Jump to feba(20bafe)
-                ROMData.put(0x1cfa2, 0x20);
-                ROMData.put(0x1cfa3, 0xba);
-                ROMData.put(0x1cfa4, 0xfe);
+                ROMData.Put(0x1cfa2, 0x20);
+                ROMData.Put(0x1cfa3, 0xba);
+                ROMData.Put(0x1cfa4, 0xfe);
             }
 
             if (props.permanentBeam)
             {
-                ROMData.put(0x186c, 0xEA);
-                ROMData.put(0x186d, 0xEA);
+                ROMData.Put(0x186c, 0xEA);
+                ROMData.Put(0x186d, 0xEA);
             }
 
             if (props.standardizeDrops)
             {
-                ROMData.put(0x1e8bd, 0x20);
-                ROMData.put(0x1e8be, 0x4c);
-                ROMData.put(0x1e8bf, 0xff);
+                ROMData.Put(0x1e8bd, 0x20);
+                ROMData.Put(0x1e8be, 0x4c);
+                ROMData.Put(0x1e8bf, 0xff);
 
-                ROMData.put(0x1ff5c, 0xc0);
-                ROMData.put(0x1ff5d, 0x02);
-                ROMData.put(0x1ff5e, 0xd0);
-                ROMData.put(0x1ff5f, 0x07);
-                ROMData.put(0x1ff60, 0xad);
-                ROMData.put(0x1ff61, 0xfe);
-                ROMData.put(0x1ff62, 0x06);
-                ROMData.put(0x1ff63, 0xee);
-                ROMData.put(0x1ff64, 0xfe);
-                ROMData.put(0x1ff65, 0x06);
-                ROMData.put(0x1ff66, 0x60);
-                ROMData.put(0x1ff67, 0xad);
-                ROMData.put(0x1ff68, 0xff);
-                ROMData.put(0x1ff69, 0x06);
-                ROMData.put(0x1ff6a, 0xee);
-                ROMData.put(0x1ff6b, 0xff);
-                ROMData.put(0x1ff6c, 0x06);
-                ROMData.put(0x1ff6d, 0x60);
+                ROMData.Put(0x1ff5c, 0xc0);
+                ROMData.Put(0x1ff5d, 0x02);
+                ROMData.Put(0x1ff5e, 0xd0);
+                ROMData.Put(0x1ff5f, 0x07);
+                ROMData.Put(0x1ff60, 0xad);
+                ROMData.Put(0x1ff61, 0xfe);
+                ROMData.Put(0x1ff62, 0x06);
+                ROMData.Put(0x1ff63, 0xee);
+                ROMData.Put(0x1ff64, 0xfe);
+                ROMData.Put(0x1ff65, 0x06);
+                ROMData.Put(0x1ff66, 0x60);
+                ROMData.Put(0x1ff67, 0xad);
+                ROMData.Put(0x1ff68, 0xff);
+                ROMData.Put(0x1ff69, 0x06);
+                ROMData.Put(0x1ff6a, 0xee);
+                ROMData.Put(0x1ff6b, 0xff);
+                ROMData.Put(0x1ff6c, 0x06);
+                ROMData.Put(0x1ff6d, 0x60);
 
             }
 
@@ -477,47 +435,47 @@ namespace Z2Randomizer
             spellExits.Add(8, 0xE1);
             spellExits.Add(9, 0xE5);
 
-            shortenWizards();
+            ShortenWizards();
             magContainers = 4;
             visitedEnemies = new List<int>();
 
-            randomizeStartingValues();
-            randomizeEnemies();
+            RandomizeStartingValues();
+            RandomizeEnemies();
 
 
-            palaces = s.createPalaces(worker);
+            palaces = shuffler.CreatePalaces(worker);
             while(palaces == null || palaces.Count != 7)
             {
                 if (palaces == null)
                 {
                     return;
                 }
-                palaces = s.createPalaces(worker);
+                palaces = shuffler.CreatePalaces(worker);
                 
             }
-            Console.WriteLine("Random: " + r.Next(10));
+            Console.WriteLine("Random: " + random.Next(10));
             if (props.shufflePalaceEnemies)
             {
-                shuffleE(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
-                shuffleE(enemyPtr2, enemyAddr1, enemies2, generators2, shorties2, tallGuys2, flyingEnemies2, false);
-                shuffleE(enemyPtr3, enemyAddr2, enemies3, generators3, shorties3, tallGuys3, flyingEnemies3, true);
+                ShuffleE(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
+                ShuffleE(enemyPtr2, enemyAddr1, enemies2, generators2, shorties2, tallGuys2, flyingEnemies2, false);
+                ShuffleE(enemyPtr3, enemyAddr2, enemies3, generators3, shorties3, tallGuys3, flyingEnemies3, true);
             }
 
-            processOverworld();
-            bool f = updateProgress(8);
+            ProcessOverworld();
+            bool f = UpdateProgress(8);
             if(!f)
             {
                 return;
             }
-            s.generateHints(itemLocs, startTrophy, startMed, startKid, spellMap, westHyrule.bagu);
-            f = updateProgress(9);
+            shuffler.GenerateHints(itemLocs, startTrophy, startMed, startKid, spellMap, westHyrule.bagu);
+            f = UpdateProgress(9);
             if (!f)
             {
                 return;
             }
-            updateRom();
+            UpdateRom();
             String newFileName = props.filename.Substring(0, props.filename.LastIndexOf("\\") + 1) + "Z2_" + props.seed + "_" + props.flags + ".nes";
-            ROMData.dump(newFileName);
+            ROMData.Dump(newFileName);
 
 
 
@@ -548,14 +506,14 @@ namespace Z2Randomizer
         */
         
 
-        private void shuffleAttackEffectiveness(bool ohko)
+        private void ShuffleAttackEffectiveness(bool ohko)
         {
             if (!ohko)
             {
                 int[] atk = new int[8];
                 for (int i = 0; i < 8; i++)
                 {
-                    atk[i] = ROMData.getByte(0x1E67D + i);
+                    atk[i] = ROMData.GetByte(0x1E67D + i);
                 }
 
                 for (int i = 0; i < atk.Length; i++)
@@ -566,7 +524,7 @@ namespace Z2Randomizer
 
                     if (props.shuffleAtkEff)
                     {
-                        next = r.Next(minAtk, maxAtk);
+                        next = random.Next(minAtk, maxAtk);
                     }
                     else if (props.highAtk)
                     {
@@ -604,22 +562,22 @@ namespace Z2Randomizer
 
                 for (int i = 0; i < 8; i++)
                 {
-                    ROMData.put(0x1E67D + i, (Byte)atk[i]);
+                    ROMData.Put(0x1E67D + i, (Byte)atk[i]);
                 }
             }
             else
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    ROMData.put(0x1E67D + i, (Byte)192);
+                    ROMData.Put(0x1E67D + i, (Byte)192);
                 }
             }
         }
 
-        private void shuffleItems()
+        private void ShuffleItems()
         {
-            List<items> itemList = new List<items> { items.candle, items.glove, items.raft, items.boots, items.horn, items.cross, items.heartcontainer, items.heartcontainer, items.magiccontainer, items.medicine, items.trophy, items.heartcontainer, items.heartcontainer, items.magiccontainer, items.magickey, items.magiccontainer, items.hammer, items.kid, items.magiccontainer };
-            List<items> replaceList = new List<items> { items.bluejar, items.redjar, items.smallbag, items.hundobag, items.twohundobag, items.fivehundobag, items.oneup, items.key };
+            List<Items> itemList = new List<Items> { Items.candle, Items.glove, Items.raft, Items.boots, Items.horn, Items.cross, Items.heartcontainer, Items.heartcontainer, Items.magiccontainer, Items.medicine, Items.trophy, Items.heartcontainer, Items.heartcontainer, Items.magiccontainer, Items.magickey, Items.magiccontainer, Items.hammer, Items.kid, Items.magiccontainer };
+            List<Items> replaceList = new List<Items> { Items.bluejar, Items.redjar, Items.smallbag, Items.hundobag, Items.twohundobag, Items.fivehundobag, Items.oneup, Items.key };
             Location kidLoc = mazeIsland.kid;
             Location medicineLoc = westHyrule.medCave;
             Location trophyLoc = westHyrule.trophyCave;
@@ -639,37 +597,37 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    bool hasItem = r.NextDouble() > .75;
-                    ROMData.put(0x17B01 + i, hasItem ? (Byte)1 : (Byte)0);
+                    bool hasItem = random.NextDouble() > .75;
+                    ROMData.Put(0x17B01 + i, hasItem ? (Byte)1 : (Byte)0);
                     itemGet[i] = hasItem;
                 }
             }
             else
             {
-                ROMData.put(0x17B01, props.startCandle ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.candle] = props.startCandle;
-                ROMData.put(0x17B02, props.startGlove ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.glove] = props.startGlove;
-                ROMData.put(0x17B03, props.startRaft ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.raft] = props.startRaft;
-                ROMData.put(0x17B04, props.startBoots ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.boots] = props.startBoots;
-                ROMData.put(0x17B05, props.startFlute ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.horn] = props.startFlute;
-                ROMData.put(0x17B06, props.startCross ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.cross] = props.startCross;
-                ROMData.put(0x17B07, props.startHammer ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.hammer] = props.startHammer;
-                ROMData.put(0x17B08, props.startKey ? (Byte)1 : (Byte)0);
-                itemGet[(int)items.magickey] = props.startKey;
+                ROMData.Put(0x17B01, props.startCandle ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.candle] = props.startCandle;
+                ROMData.Put(0x17B02, props.startGlove ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.glove] = props.startGlove;
+                ROMData.Put(0x17B03, props.startRaft ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.raft] = props.startRaft;
+                ROMData.Put(0x17B04, props.startBoots ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.boots] = props.startBoots;
+                ROMData.Put(0x17B05, props.startFlute ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.horn] = props.startFlute;
+                ROMData.Put(0x17B06, props.startCross ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.cross] = props.startCross;
+                ROMData.Put(0x17B07, props.startHammer ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.hammer] = props.startHammer;
+                ROMData.Put(0x17B08, props.startKey ? (Byte)1 : (Byte)0);
+                itemGet[(int)Items.magickey] = props.startKey;
             }
-            itemList = new List<items> { items.candle, items.glove, items.raft, items.boots, items.horn, items.cross, items.heartcontainer, items.heartcontainer, items.magiccontainer, items.medicine, items.trophy, items.heartcontainer, items.heartcontainer, items.magiccontainer, items.magickey, items.magiccontainer, items.hammer, items.kid, items.magiccontainer };
+            itemList = new List<Items> { Items.candle, Items.glove, Items.raft, Items.boots, Items.horn, Items.cross, Items.heartcontainer, Items.heartcontainer, Items.magiccontainer, Items.medicine, Items.trophy, Items.heartcontainer, Items.heartcontainer, Items.magiccontainer, Items.magickey, Items.magiccontainer, Items.hammer, Items.kid, Items.magiccontainer };
 
             if (props.pbagItemShuffle)
             {
-                westHyrule.pbagCave.item = (items)ROMData.getByte(0x4FE2);
-                eastHyrule.pbagCave1.item = (items)ROMData.getByte(0x8ECC);
-                eastHyrule.pbagCave2.item = (items)ROMData.getByte(0x8FB3);
+                westHyrule.pbagCave.item = (Items)ROMData.GetByte(0x4FE2);
+                eastHyrule.pbagCave1.item = (Items)ROMData.GetByte(0x8ECC);
+                eastHyrule.pbagCave2.item = (Items)ROMData.GetByte(0x8FB3);
                 itemList.Add(westHyrule.pbagCave.item);
                 itemList.Add(eastHyrule.pbagCave1.item);
                 itemList.Add(eastHyrule.pbagCave2.item);
@@ -681,8 +639,8 @@ namespace Z2Randomizer
                 int x = 4 - numHContainers;
                 while (x > 0)
                 {
-                    int remove = r.Next(itemList.Count);
-                    if (itemList[remove] == items.heartcontainer)
+                    int remove = random.Next(itemList.Count);
+                    if (itemList[remove] == Items.heartcontainer)
                     {
                         itemList[remove] = replaceList[R.Next(replaceList.Count)];
                         x--;
@@ -697,7 +655,7 @@ namespace Z2Randomizer
                     int x = numHContainers - 4;
                     while (x > 0)
                     {
-                        itemList[22 - x] = items.heartcontainer;
+                        itemList[22 - x] = Items.heartcontainer;
                         x--;
                     }
                 }
@@ -706,28 +664,28 @@ namespace Z2Randomizer
                     int x = numHContainers - 4;
                     while (x > 0)
                     {
-                        int y = r.Next(3);
+                        int y = random.Next(3);
                         if (y == 0 && !pbagHearts.Contains(westHyrule.pbagCave))
                         {
                             pbagHearts.Add(westHyrule.pbagCave);
-                            westHyrule.pbagCave.item = items.heartcontainer;
-                            itemList.Add(items.heartcontainer);
+                            westHyrule.pbagCave.item = Items.heartcontainer;
+                            itemList.Add(Items.heartcontainer);
                             itemLocs.Add(westHyrule.pbagCave);
                             x--;
                         }
                         if (y == 1 && !pbagHearts.Contains(eastHyrule.pbagCave1))
                         {
                             pbagHearts.Add(eastHyrule.pbagCave1);
-                            eastHyrule.pbagCave1.item = items.heartcontainer;
-                            itemList.Add(items.heartcontainer);
+                            eastHyrule.pbagCave1.item = Items.heartcontainer;
+                            itemList.Add(Items.heartcontainer);
                             itemLocs.Add(eastHyrule.pbagCave1);
                             x--;
                         }
                         if (y == 2 && !pbagHearts.Contains(eastHyrule.pbagCave2))
                         {
                             pbagHearts.Add(eastHyrule.pbagCave2);
-                            eastHyrule.pbagCave2.item = items.heartcontainer;
-                            itemList.Add(items.heartcontainer);
+                            eastHyrule.pbagCave2.item = Items.heartcontainer;
+                            itemList.Add(Items.heartcontainer);
                             itemLocs.Add(eastHyrule.pbagCave2);
                             x--;
                         }
@@ -740,30 +698,30 @@ namespace Z2Randomizer
                 itemList[9] = replaceList[R.Next(replaceList.Count)];
                 itemList[10] = replaceList[R.Next(replaceList.Count)];
                 itemList[17] = replaceList[R.Next(replaceList.Count)];
-                itemGet[(int)items.trophy] = true;
-                itemGet[(int)items.medicine] = true;
-                itemGet[(int)items.kid] = true;
+                itemGet[(int)Items.trophy] = true;
+                itemGet[(int)Items.medicine] = true;
+                itemGet[(int)Items.kid] = true;
 
             }
 
-            if (spellGet[(int)spellMap[spells.fairy]])
+            if (spellGet[(int)spellMap[Spells.fairy]])
             {
                 itemList[9] = replaceList[R.Next(replaceList.Count)];
-                itemGet[(int)items.medicine] = true;
+                itemGet[(int)Items.medicine] = true;
                 startMed = true;
             }
 
-            if(spellGet[(int)spellMap[spells.jump]])
+            if(spellGet[(int)spellMap[Spells.jump]])
             {
                 itemList[10] = replaceList[R.Next(replaceList.Count)];
-                itemGet[(int)items.trophy] = true;
+                itemGet[(int)Items.trophy] = true;
                 startTrophy = true;
             }
 
-            if(spellGet[(int)spellMap[spells.reflect]])
+            if(spellGet[(int)spellMap[Spells.reflect]])
             {
                 itemList[17] = replaceList[R.Next(replaceList.Count)];
-                itemGet[(int)items.kid] = true;
+                itemGet[(int)Items.kid] = true;
                 startKid = true;
             }
 
@@ -814,7 +772,7 @@ namespace Z2Randomizer
                 {
 
                     int s = R.Next(i, itemList.Count);
-                    items sl = itemList[s];
+                    Items sl = itemList[s];
                     itemList[s] = itemList[i];
                     itemList[i] = sl;
                 }
@@ -826,7 +784,7 @@ namespace Z2Randomizer
                     for (int i = 0; i < 6; i++)
                     {
                         int s = R.Next(i, 6);
-                        items sl = itemList[s];
+                        Items sl = itemList[s];
                         itemList[s] = itemList[i];
                         itemList[i] = sl;
                     }
@@ -841,7 +799,7 @@ namespace Z2Randomizer
                     for (int i = 6; i < itemList.Count; i++)
                     {
                         int s = R.Next(i, itemList.Count);
-                        items sl = itemList[s];
+                        Items sl = itemList[s];
                         itemList[s] = itemList[i];
                         itemList[i] = sl;
                     }
@@ -853,15 +811,15 @@ namespace Z2Randomizer
             }
             foreach (Location l in itemLocs)
             {
-                if (l.item == items.kid)
+                if (l.item == Items.kid)
                 {
                     kidLoc = l;
                 }
-                else if (l.item == items.trophy)
+                else if (l.item == Items.trophy)
                 {
                     trophyLoc = l;
                 }
-                else if (l.item == items.medicine)
+                else if (l.item == Items.medicine)
                 {
                     medicineLoc = l;
                 }
@@ -869,20 +827,20 @@ namespace Z2Randomizer
 
             for (int i = 0; i < 64; i++)
             {
-                Byte heartByte = ROMData.getByte(0x27810 + i);
-                ROMData.put(0x29810 + i, heartByte);
-                ROMData.put(0x2B810 + i, heartByte);
-                ROMData.put(0x2D810 + i, heartByte);
-                ROMData.put(0x33810 + i, heartByte);
-                ROMData.put(0x35810 + i, heartByte);
-                ROMData.put(0x37810 + i, heartByte);
-                ROMData.put(0x39810 + i, heartByte);
+                Byte heartByte = ROMData.GetByte(0x27810 + i);
+                ROMData.Put(0x29810 + i, heartByte);
+                ROMData.Put(0x2B810 + i, heartByte);
+                ROMData.Put(0x2D810 + i, heartByte);
+                ROMData.Put(0x33810 + i, heartByte);
+                ROMData.Put(0x35810 + i, heartByte);
+                ROMData.Put(0x37810 + i, heartByte);
+                ROMData.Put(0x39810 + i, heartByte);
             }
 
 
         }
 
-        private Boolean everythingReachable()
+        private Boolean EverythingReachable()
         {
             //return true;
             int dm = 0;
@@ -902,20 +860,20 @@ namespace Z2Randomizer
                 prevCount = count;
                 westHyrule.updateVisit();
                 deathMountain.updateVisit();
-                eastHyrule.updateVisit();
+                eastHyrule.UpdateVisit();
                 mazeIsland.updateVisit();
 
-                foreach(World w in worlds)
+                foreach(World world in worlds)
                 {
-                    if(w.raft != null && canGet(w.raft) && itemGet[(int)items.raft])
+                    if(world.raft != null && CanGet(world.raft) && itemGet[(int)Items.raft])
                     {
-                        foreach(World w2 in worlds)
+                        foreach(World world2 in worlds)
                         {
-                            w2.visitRaft();
+                            world2.visitRaft();
                         }
                     }
 
-                    if (w.bridge != null && canGet(w.bridge))
+                    if (world.bridge != null && CanGet(world.bridge))
                     {
                         foreach (World w2 in worlds)
                         {
@@ -923,7 +881,7 @@ namespace Z2Randomizer
                         }
                     }
 
-                    if (w.cave1 != null && canGet(w.cave1))
+                    if (world.cave1 != null && CanGet(world.cave1))
                     {
                         foreach (World w2 in worlds)
                         {
@@ -931,7 +889,7 @@ namespace Z2Randomizer
                         }
                     }
 
-                    if (w.cave2 != null && canGet(w.cave2))
+                    if (world.cave2 != null && CanGet(world.cave2))
                     {
                         foreach (World w2 in worlds)
                         {
@@ -941,11 +899,11 @@ namespace Z2Randomizer
                 }
                 westHyrule.updateVisit();
                 deathMountain.updateVisit();
-                eastHyrule.updateVisit();
+                eastHyrule.UpdateVisit();
                 mazeIsland.updateVisit();
 
-                f = updateItems();
-                g = updateSpells();
+                f = UpdateItems();
+                g = UpdateSpells();
 
                 
                
@@ -1028,10 +986,10 @@ namespace Z2Randomizer
                 }
             }
 
-            return (canGet(westHyrule.Towns) && canGet(eastHyrule.Towns) && canGet(westHyrule.palace1) && canGet(westHyrule.palace2) && canGet(westHyrule.palace3) && canGet(mazeIsland.palace4) && canGet(eastHyrule.palace5) && canGet(eastHyrule.palace6) && canGet(eastHyrule.gp) && canGet(itemLocs) && canGet(westHyrule.bagu) && (!hiddenKasuto || (canGet(eastHyrule.hkLoc))) && (!hiddenPalace || (canGet(eastHyrule.hpLoc))));
+            return (CanGet(westHyrule.Towns) && CanGet(eastHyrule.Towns) && CanGet(westHyrule.palace1) && CanGet(westHyrule.palace2) && CanGet(westHyrule.palace3) && CanGet(mazeIsland.palace4) && CanGet(eastHyrule.palace5) && CanGet(eastHyrule.palace6) && CanGet(eastHyrule.gp) && CanGet(itemLocs) && CanGet(westHyrule.bagu) && (!hiddenKasuto || (CanGet(eastHyrule.hkLoc))) && (!hiddenPalace || (CanGet(eastHyrule.hpLoc))));
         }
 
-        private Boolean canGet(List<Location> l)
+        private Boolean CanGet(List<Location> l)
         {
             foreach (Location ls in l)
             {
@@ -1042,13 +1000,13 @@ namespace Z2Randomizer
             }
             return true;
         }
-        private Boolean canGet(Location l)
+        private Boolean CanGet(Location l)
         {
 
             return l.Reachable;
         }
 
-        private void shortenWizards()
+        private void ShortenWizards()
         {
             /*
             Spell swap notes:
@@ -1065,48 +1023,50 @@ namespace Z2Randomizer
     */
             for (int i = 0; i < 16; i = i + 2)
             {
-                ROMData.put(0xC611 + i, (Byte)0x75);
-                ROMData.put(0xC611 + i + 1, (Byte)0x70);
-                ROMData.put(0xC593 + i, (Byte)0x48);
-                ROMData.put(0xC593 + i + 1, (Byte)0x9B);
+                ROMData.Put(0xC611 + i, (Byte)0x75);
+                ROMData.Put(0xC611 + i + 1, (Byte)0x70);
+                ROMData.Put(0xC593 + i, (Byte)0x48);
+                ROMData.Put(0xC593 + i + 1, (Byte)0x9B);
             }
-            ROMData.put(0xC7BB, (Byte)0x07);
-            ROMData.put(0xC7BF, (Byte)0x13);
-            ROMData.put(0xC7C3, (Byte)0x21);
-            ROMData.put(0xC7C7, (Byte)0x27);
-            ROMData.put(0xC7CB, (Byte)0x37);
-            ROMData.put(0xC7CF, (Byte)0x3F);
-            ROMData.put(0xC850, (Byte)0xB0);
+            ROMData.Put(0xC7BB, (Byte)0x07);
+            ROMData.Put(0xC7BF, (Byte)0x13);
+            ROMData.Put(0xC7C3, (Byte)0x21);
+            ROMData.Put(0xC7C7, (Byte)0x27);
+            ROMData.Put(0xC7CB, (Byte)0x37);
+            ROMData.Put(0xC7CF, (Byte)0x3F);
+            ROMData.Put(0xC850, (Byte)0xB0);
             //ROMData.put(0xC7D3, (Byte)0x4D);
-            ROMData.put(0xC7D7, (Byte)0x5E);
-            ROMData.put(0xC7DF, (Byte)0x43);
-            ROMData.put(0xC870, (Byte)0xB8);
-            ROMData.put(0xC7E3, (Byte)0x49);
-            ROMData.put(0xC874, (Byte)0xA8);
-            ROMData.put(0xC7D3, (Byte)0x4D);
-            ROMData.put(0xC7DB, (Byte)0x29);
+            ROMData.Put(0xC7D7, (Byte)0x5E);
+            ROMData.Put(0xC7DF, (Byte)0x43);
+            ROMData.Put(0xC870, (Byte)0xB8);
+            ROMData.Put(0xC7E3, (Byte)0x49);
+            ROMData.Put(0xC874, (Byte)0xA8);
+            ROMData.Put(0xC7D3, (Byte)0x4D);
+            ROMData.Put(0xC7DB, (Byte)0x29);
             //ROMData.put(0xC7E3, (Byte)0x49);
             // ROMData.put(0xC874, (Byte)0xA8);
             //ROMData.put(0x8560, (Byte)0xBC);
         }
 
-        private Boolean updateSpells()
+        private Boolean UpdateSpells()
         {
-            Location[] t = new Location[11];
-            t[westHyrule.shieldTown.townNum] = westHyrule.shieldTown;
-            t[westHyrule.jump.townNum] = westHyrule.jump;
-            t[westHyrule.lifeNorth.townNum] = westHyrule.lifeNorth;
-            t[westHyrule.lifeSouth.townNum] = westHyrule.lifeSouth;
-            t[westHyrule.fairy.townNum] = westHyrule.fairy;
-            t[eastHyrule.fireTown.townNum] = eastHyrule.fireTown;
-            t[eastHyrule.darunia.townNum] = eastHyrule.darunia;
-            t[eastHyrule.newKasuto.townNum] = eastHyrule.newKasuto;
-            t[eastHyrule.newKasuto2.townNum] = eastHyrule.newKasuto2;
-            t[eastHyrule.oldKasuto.townNum] = eastHyrule.oldKasuto;
+            //Location[] townLocations = new Location[11];
+            Dictionary<Town, Location> townLocations = new Dictionary<Town, Location>();
+            townLocations[westHyrule.shieldTown.TownNum] = westHyrule.shieldTown;
+            townLocations[westHyrule.jump.TownNum] = westHyrule.jump;
+            townLocations[westHyrule.lifeNorth.TownNum] = westHyrule.lifeNorth;
+            townLocations[westHyrule.lifeSouth.TownNum] = westHyrule.lifeSouth;
+            townLocations[westHyrule.fairy.TownNum] = westHyrule.fairy;
+            townLocations[eastHyrule.fireTown.TownNum] = eastHyrule.fireTown;
+            townLocations[eastHyrule.darunia.TownNum] = eastHyrule.darunia;
+            townLocations[eastHyrule.newKasuto.TownNum] = eastHyrule.newKasuto;
+            townLocations[eastHyrule.newKasuto2.TownNum] = eastHyrule.newKasuto2;
+            townLocations[eastHyrule.oldKasuto.TownNum] = eastHyrule.oldKasuto;
+
             Boolean changed = false;
-            foreach (spells s in spellMap.Keys)
+            foreach (Spells s in spellMap.Keys)
             {
-                if (s == spells.fairy && (((itemGet[(int)items.medicine] || props.removeSpellItems) && westHyrule.fairy.townNum == 5) || (westHyrule.fairy.townNum == 10 && (magContainers >= 8 || props.disableMagicRecs))) && canGet(westHyrule.fairy))
+                if (s == Spells.fairy && (((itemGet[(int)Items.medicine] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (magContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
                 {
                     if(!spellGet[(int)spellMap[s]])
                     {
@@ -1114,7 +1074,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.jump && (((itemGet[(int)items.trophy] || props.removeSpellItems) && westHyrule.jump.townNum == 2) || (westHyrule.jump.townNum == 7 && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)items.kid] || props.removeSpellItems))) && canGet(westHyrule.jump))
+                else if (s == Spells.jump && (((itemGet[(int)Items.trophy] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)Items.kid] || props.removeSpellItems))) && CanGet(westHyrule.jump))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1122,7 +1082,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.downstab && (spellGet[(int)spells.jump] || spellGet[(int)spells.fairy]) && canGet(t[5]))
+                else if (s == Spells.downstab && (spellGet[(int)Spells.jump] || spellGet[(int)Spells.fairy]) && CanGet(townLocations[Town.MIDO]))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1130,7 +1090,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.upstab && (spellGet[(int)spells.jump]) && canGet(t[7]))
+                else if (s == Spells.upstab && (spellGet[(int)Spells.jump]) && CanGet(townLocations[Town.DARUNIA]))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1138,7 +1098,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.life && (canGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.townNum == 8) || westHyrule.lifeNorth.townNum == 3))
+                else if (s == Spells.life && (CanGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1146,7 +1106,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.shield && (canGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.townNum == 6) || westHyrule.shieldTown.townNum == 1))
+                else if (s == Spells.shield && (CanGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1154,7 +1114,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.reflect && ((eastHyrule.darunia.townNum == 2 && (itemGet[(int)items.trophy] || props.removeSpellItems)) || ((itemGet[(int)items.kid] || props.removeSpellItems) && eastHyrule.darunia.townNum == 7 && (magContainers >= 6 || props.disableMagicRecs))) && canGet(eastHyrule.darunia))
+                else if (s == Spells.reflect && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[(int)Items.trophy] || props.removeSpellItems)) || ((itemGet[(int)Items.kid] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1162,7 +1122,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.fire && (canGet(eastHyrule.fireTown)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.fireTown.townNum == 6) || eastHyrule.fireTown.townNum == 1))
+                else if (s == Spells.fire && (CanGet(eastHyrule.fireTown)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.fireTown.TownNum == Town.NABOORU) || eastHyrule.fireTown.TownNum == Town.RAURU))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1170,7 +1130,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.spell && (canGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.townNum == 8) || eastHyrule.newKasuto.townNum == 3))
+                else if (s == Spells.spell && (CanGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1178,7 +1138,7 @@ namespace Z2Randomizer
                     }
                     spellGet[(int)spellMap[s]] = true;
                 }
-                else if (s == spells.thunder && (canGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.townNum == 10) || (eastHyrule.oldKasuto.townNum == 5 && (itemGet[(int)items.medicine] || props.removeSpellItems))))
+                else if (s == Spells.thunder && (CanGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[(int)Items.medicine] || props.removeSpellItems))))
                 {
                     if (!spellGet[(int)spellMap[s]])
                     {
@@ -1190,53 +1150,53 @@ namespace Z2Randomizer
             return changed;
         }
 
-        private Boolean updateItems()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Whether any items were marked accessable</returns>
+        private Boolean UpdateItems()
         {
-            
             Boolean changed = false;
-            foreach (Location l in itemLocs)
+            foreach (Location location in itemLocs)
             {
-                Boolean itemGotten = l.itemGet;
-                if (l.PalNum > 0 && l.PalNum < 7)
+                Boolean itemGotten = location.itemGet;
+                if (location.PalNum > 0 && location.PalNum < 7)
                 {
-
-                        
-
-                    Palace p = palaces[l.PalNum - 1];
-                    if (l.PalNum == 4 && l.item == items.kid)
+                    Palace palace = palaces[location.PalNum - 1];
+                    if (location.PalNum == 4 && location.item == Items.kid)
                     {
                         Console.WriteLine("here");
                     }
-                    l.itemGet = itemGet[(int)l.item] = canGet(l) && (spellGet[(int)spells.fairy] || itemGet[(int)items.magickey]) && (!p.NeedDstab || (p.NeedDstab && spellGet[(int)spells.downstab])) && (!p.NeedFairy || (p.NeedFairy && spellGet[(int)spells.fairy])) && (!p.NeedGlove || (p.NeedGlove && itemGet[(int)items.glove])) && (!p.NeedJumpOrFairy || (p.NeedJumpOrFairy && (spellGet[(int)spells.jump]) || spellGet[(int)spells.fairy])) && (!p.NeedReflect || (p.NeedReflect && spellGet[(int)spells.reflect]));
+                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (spellGet[(int)Spells.fairy] || itemGet[(int)Items.magickey]) && (!palace.NeedDstab || (palace.NeedDstab && spellGet[(int)Spells.downstab])) && (!palace.NeedFairy || (palace.NeedFairy && spellGet[(int)Spells.fairy])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[(int)Items.glove])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (spellGet[(int)Spells.jump]) || spellGet[(int)Spells.fairy])) && (!palace.NeedReflect || (palace.NeedReflect && spellGet[(int)Spells.reflect]));
                 }
-                else if (l.townNum == 8)
+                else if (location.TownNum == Town.NEW_KASUTO)
                 {
-                    l.itemGet = itemGet[(int)l.item] = canGet(l) && (magContainers >= kasutoJars) && (!l.Needhammer || itemGet[(int)items.hammer]);
+                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (magContainers >= kasutoJars) && (!location.NeedHammer || itemGet[(int)Items.hammer]);
                 }
-                else if (l.townNum == 9)
+                else if (location.TownNum == Town.NEW_KASUTO_2)
                 {
-                    l.itemGet = itemGet[(int)l.item] = (canGet(l) && spellGet[(int)spells.spell]) && (!l.Needhammer || itemGet[(int)items.hammer]);
+                    location.itemGet = itemGet[(int)location.item] = (CanGet(location) && spellGet[(int)Spells.spell]) && (!location.NeedHammer || itemGet[(int)Items.hammer]);
                 }
                 else
                 {
-                    l.itemGet = itemGet[(int)l.item] = canGet(l) && (!l.Needhammer || itemGet[(int)items.hammer]) && (!l.NeedRecorder || itemGet[(int)items.horn]);
+                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (!location.NeedHammer || itemGet[(int)Items.hammer]) && (!location.NeedRecorder || itemGet[(int)Items.horn]);
                 }
-                if (itemGotten != l.itemGet && l.item == items.magiccontainer)
+                if (itemGotten != location.itemGet && location.item == Items.magiccontainer)
                 {
                     magContainers++;
                 }
-                if (itemGotten != l.itemGet && l.item == items.heartcontainer)
+                if (itemGotten != location.itemGet && location.item == Items.heartcontainer)
                 {
                     heartContainers++;
                 }
-                if(!itemGotten && l.itemGet)
+                if(!itemGotten && location.itemGet)
                 {
                     changed = true;
                 }
             }
             return changed;
         }
-        private void shuffleLifeEffectiveness(bool isMag)
+        private void ShuffleLifeEffectiveness(bool isMag)
         {
 
             int numBanks = 7;
@@ -1251,7 +1211,7 @@ namespace Z2Randomizer
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    int lifeVal = ROMData.getByte(start + (i * 8) + j);
+                    int lifeVal = ROMData.GetByte(start + (i * 8) + j);
                     int highPart = (lifeVal & 0xF0) >> 4;
                     int lowPart = lifeVal & 0x0F;
                     life[i, j] = highPart * 8 + lowPart / 2;
@@ -1273,11 +1233,11 @@ namespace Z2Randomizer
                         }
                         if (j == 0)
                         {
-                            nextVal = r.Next(min, Math.Min(max, 120));
+                            nextVal = random.Next(min, Math.Min(max, 120));
                         }
                         else
                         {
-                            nextVal = r.Next(min, Math.Min(max, 120));
+                            nextVal = random.Next(min, Math.Min(max, 120));
                             if (nextVal > life[i, j - 1])
                             {
                                 nextVal = life[i, j - 1];
@@ -1307,76 +1267,76 @@ namespace Z2Randomizer
                 {
                     int highPart = (life[i, j] / 8) << 4;
                     int lowPart = (life[i, j] % 8);
-                    ROMData.put(start + (i * 8) + j, (Byte)(highPart + (lowPart * 2)));
+                    ROMData.Put(start + (i * 8) + j, (Byte)(highPart + (lowPart * 2)));
                 }
             }
 
         }
 
-        private void randomizeEnemies()
+        private void RandomizeEnemies()
         {
             if (props.shuffleEnemyHP)
             {
-                shuffleHP(0x5434, 0x5453);
-                shuffleHP(0x9434, 0x944E);
-                shuffleHP(0x11435, 0x11435);
-                shuffleHP(0x11437, 0x11454);
-                shuffleHP(0x13C86, 0x13C87);
-                shuffleHP(0x15434, 0x15438);
-                shuffleHP(0x15440, 0x15443);
-                shuffleHP(0x15445, 0x1544B);
-                shuffleHP(0x1544E, 0x1544E);
-                shuffleHP(0x12935, 0x12935);
-                shuffleHP(0x12937, 0x12954);
+                ShuffleHP(0x5434, 0x5453);
+                ShuffleHP(0x9434, 0x944E);
+                ShuffleHP(0x11435, 0x11435);
+                ShuffleHP(0x11437, 0x11454);
+                ShuffleHP(0x13C86, 0x13C87);
+                ShuffleHP(0x15434, 0x15438);
+                ShuffleHP(0x15440, 0x15443);
+                ShuffleHP(0x15445, 0x1544B);
+                ShuffleHP(0x1544E, 0x1544E);
+                ShuffleHP(0x12935, 0x12935);
+                ShuffleHP(0x12937, 0x12954);
             }
 
             if (props.ohkoEnemies)
             {
-                shuffleAttackEffectiveness(true);
-                ROMData.put(0x005432, (Byte)193);
-                ROMData.put(0x009432, (Byte)193);
-                ROMData.put(0x11436, (Byte)193);
-                ROMData.put(0x12936, (Byte)193);
-                ROMData.put(0x15532, (Byte)193);
-                ROMData.put(0x11437, (Byte)192);
-                ROMData.put(0x1143F, (Byte)192);
-                ROMData.put(0x12937, (Byte)192);
-                ROMData.put(0x1293F, (Byte)192);
-                ROMData.put(0x15445, (Byte)192);
-                ROMData.put(0x15446, (Byte)192);
-                ROMData.put(0x15448, (Byte)192);
-                ROMData.put(0x15453, (Byte)193);
-                ROMData.put(0x12951, (Byte)227);
+                ShuffleAttackEffectiveness(true);
+                ROMData.Put(0x005432, (Byte)193);
+                ROMData.Put(0x009432, (Byte)193);
+                ROMData.Put(0x11436, (Byte)193);
+                ROMData.Put(0x12936, (Byte)193);
+                ROMData.Put(0x15532, (Byte)193);
+                ROMData.Put(0x11437, (Byte)192);
+                ROMData.Put(0x1143F, (Byte)192);
+                ROMData.Put(0x12937, (Byte)192);
+                ROMData.Put(0x1293F, (Byte)192);
+                ROMData.Put(0x15445, (Byte)192);
+                ROMData.Put(0x15446, (Byte)192);
+                ROMData.Put(0x15448, (Byte)192);
+                ROMData.Put(0x15453, (Byte)193);
+                ROMData.Put(0x12951, (Byte)227);
 
             }
         }
 
-        private void shuffleHP(int start, int end)
+        private void ShuffleHP(int start, int end)
         {
             for (int i = start; i <= end; i++)
             {
                 int newVal = 0;
-                int val = (int)ROMData.getByte(i);
+                int val = (int)ROMData.GetByte(i);
 
-                newVal = r.Next((int)(val * 0.5), (int)(val * 1.5));
+                newVal = random.Next((int)(val * 0.5), (int)(val * 1.5));
                 if (newVal > 255)
                 {
                     newVal = 255;
                 }
 
-                ROMData.put(i, (Byte)newVal);
+                ROMData.Put(i, (Byte)newVal);
             }
         }
 
-        private void processOverworld()
+        private void ProcessOverworld()
         {
             if (props.shuffleSmallItems)
             {
-                shuffleSmallItems(1, true);
-                shuffleSmallItems(1, false);
-                shuffleSmallItems(2, true);
-                shuffleSmallItems(2, false);
-                shuffleSmallItems(3, true);
+                ShuffleSmallItems(1, true);
+                ShuffleSmallItems(1, false);
+                ShuffleSmallItems(2, true);
+                ShuffleSmallItems(2, false);
+                ShuffleSmallItems(3, true);
                 //shuffleSmallItems(4, true);
                 //shuffleSmallItems(4, false);
             }
@@ -1391,7 +1351,7 @@ namespace Z2Randomizer
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
                 worlds.Add(mazeIsland);
-                shuffleTowns();
+                ShuffleTowns();
 
 
                 //shuffle continent connections
@@ -1416,7 +1376,7 @@ namespace Z2Randomizer
                     worlds.Add(deathMountain);
                     worlds.Add(eastHyrule);
                     worlds.Add(mazeIsland);
-                    shuffleTowns();
+                    ShuffleTowns();
 
                     if (props.continentConnections.Equals("Normal") || props.continentConnections.Equals("R+B Border Shuffle"))
                     {
@@ -1441,7 +1401,7 @@ namespace Z2Randomizer
                             type = 3;
                         }
 
-                        setTransportation(0, 1, type);
+                        SetTransportation(0, 1, type);
                         chosen.Add(type);
                         if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)") || props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
                         {
@@ -1454,7 +1414,7 @@ namespace Z2Randomizer
                                 type = R.Next(4);
                             } while (chosen.Contains(type));
                         }
-                        setTransportation(0, 1, type);
+                        SetTransportation(0, 1, type);
                         chosen.Add(type);
                         if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)") || props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
                         {
@@ -1467,7 +1427,7 @@ namespace Z2Randomizer
                                 type = R.Next(4);
                             } while (chosen.Contains(type));
                         }
-                        setTransportation(0, 2, type);
+                        SetTransportation(0, 2, type);
                         chosen.Add(type);
                         if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)") || props.mazeBiome.Equals("Vanilla") || props.mazeBiome.Equals("Vanilla (shuffled)"))
                         {
@@ -1480,7 +1440,7 @@ namespace Z2Randomizer
                                 type = R.Next(4);
                             } while (chosen.Contains(type));
                         }
-                        setTransportation(2, 3, type);
+                        SetTransportation(2, 3, type);
                     }
                     else
                     {
@@ -1617,13 +1577,13 @@ namespace Z2Randomizer
                         worlds[c2w1].loadCave2(c2w2);
                         worlds[c2w2].loadCave2(c2w1);
                     }
-                } while (!allContinentsHaveConnection(worlds));
+                } while (!AllContinentsHaveConnection(worlds));
 
                 int wtries = 0;
                 int x = 0;
                 do
                 {
-                    bool g = updateProgress(2);
+                    bool g = UpdateProgress(2);
                     if (!g)
                     {
                         return;
@@ -1641,7 +1601,7 @@ namespace Z2Randomizer
                     westHyrule.reset();
 
 
-                    g = updateProgress(3);
+                    g = UpdateProgress(3);
                     if (!g)
                     {
                         return;
@@ -1657,7 +1617,7 @@ namespace Z2Randomizer
 
                         deathMountain.reset();
 
-                    g = updateProgress(4);
+                    g = UpdateProgress(4);
                     if (!g)
                     {
                         return;
@@ -1667,13 +1627,13 @@ namespace Z2Randomizer
                         bool f = false;
                         do
                         {
-                            f = eastHyrule.terraform();
+                            f = eastHyrule.Terraform();
                         } while (!f);
                     }
 
                         eastHyrule.reset();
 
-                    g = updateProgress(5);
+                    g = UpdateProgress(5);
                     if (!g)
                     {
                         return;
@@ -1688,34 +1648,34 @@ namespace Z2Randomizer
                     }
 
                         mazeIsland.reset();
-                    g = updateProgress(6);
+                    g = UpdateProgress(6);
                     if (!g)
                     {
                         return;
                     }
-                    loadItemLocs();
-                    shuffleSpells();
-                    shuffleItems();
+                    LoadItemLocs();
+                    ShuffleSpells();
+                    ShuffleItems();
                     foreach (Location l in itemLocs)
                     {
-                        if (l.PalNum == 4 && l.item == items.kid)
+                        if (l.PalNum == 4 && l.item == Items.kid)
                         {
                             Console.WriteLine("here");
                         }
                     }
-                    shufflePalaces();
-                    loadItemLocs();
+                    ShufflePalaces();
+                    LoadItemLocs();
                     westHyrule.setStart();
-                    g = updateProgress(7);
+                    g = UpdateProgress(7);
                     if (!g)
                     {
                         return;
                     }
                     x = 0;
-                    while (!everythingReachable() && x < 10)
+                    while (!EverythingReachable() && x < 10)
                     {
                         westHyrule.allReachable();
-                        eastHyrule.allReachable();
+                        eastHyrule.AllReachable();
                         mazeIsland.allReachable();
                         deathMountain.allReachable();
                         foreach (Location l in westHyrule.AllLocations)
@@ -1745,20 +1705,20 @@ namespace Z2Randomizer
                         westHyrule.reset();
                         eastHyrule.reset();
                         mazeIsland.reset();
-                        shuffleSpells();
-                        loadItemLocs();
+                        ShuffleSpells();
+                        LoadItemLocs();
                         deathMountain.reset();
                         westHyrule.setStart();
-                        shuffleItems();
+                        ShuffleItems();
                         foreach (Location l in itemLocs)
                         {
-                            if (l.PalNum == 4 && l.item == items.kid)
+                            if (l.PalNum == 4 && l.item == Items.kid)
                             {
                                 Console.WriteLine("here");
                             }
                         }
-                        shufflePalaces();
-                        loadItemLocs();
+                        ShufflePalaces();
+                        LoadItemLocs();
 
                         
 
@@ -1809,12 +1769,12 @@ namespace Z2Randomizer
                     Console.WriteLine("er: " + east + " / " + eastHyrule.AllLocations.Count);
                     Console.WriteLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
                     Console.WriteLine("maze: " + maze + " / " + mazeIsland.AllLocations.Count);
-                } while (wtries < 10 && !everythingReachable());
+                } while (wtries < 10 && !EverythingReachable());
                 if(x != 10 && wtries != 10)
                 {
                     break;
                 }
-            } while (!everythingReachable()) ;
+            } while (!EverythingReachable()) ;
 
             if (props.shuffleOverworldEnemies)
             {
@@ -1825,7 +1785,7 @@ namespace Z2Randomizer
             }
         }
 
-        private bool updateProgress(int v)
+        private bool UpdateProgress(int v)
         {
             if (worker != null)
             {
@@ -1838,7 +1798,7 @@ namespace Z2Randomizer
             return true;
         }
 
-        private void setTransportation(int w1, int w2, int type)
+        private void SetTransportation(int w1, int w2, int type)
         {
             if(type == 1)
             {
@@ -1863,7 +1823,7 @@ namespace Z2Randomizer
             }
         }
 
-        private bool allContinentsHaveConnection(List<World> worlds)
+        private bool AllContinentsHaveConnection(List<World> worlds)
         {
             foreach (World w in worlds)
             {
@@ -1875,33 +1835,33 @@ namespace Z2Randomizer
             return true;
         }
 
-        private void shuffleTowns()
+        private void ShuffleTowns()
         {
-            westHyrule.shieldTown.townNum = 1;
-            westHyrule.jump.townNum = 2;
-            westHyrule.lifeNorth.townNum = 3;
-            westHyrule.lifeSouth.townNum = 4;
-            westHyrule.fairy.townNum = 5;
-            eastHyrule.fireTown.townNum = 6;
-            eastHyrule.darunia.townNum = 7;
-            eastHyrule.newKasuto.townNum = 8;
-            eastHyrule.newKasuto2.townNum = 9;
-            eastHyrule.oldKasuto.townNum = 10;
+            westHyrule.shieldTown.TownNum = Town.RAURU;
+            westHyrule.jump.TownNum = Town.RUTO;
+            westHyrule.lifeNorth.TownNum = Town.SARIA_NORTH;
+            westHyrule.lifeSouth.TownNum = Town.SARIA_SOUTH;
+            westHyrule.fairy.TownNum = Town.MIDO;
+            eastHyrule.fireTown.TownNum = Town.NABOORU;
+            eastHyrule.darunia.TownNum = Town.DARUNIA;
+            eastHyrule.newKasuto.TownNum = Town.NEW_KASUTO;
+            eastHyrule.newKasuto2.TownNum = Town.NEW_KASUTO_2;
+            eastHyrule.oldKasuto.TownNum = Town.OLD_KASUTO;
 
             if(props.townSwap)
             {
                 if(R.NextDouble() > .5)
                 {
-                    Util.swap(westHyrule.shieldTown, eastHyrule.fireTown);
+                    Util.Swap(westHyrule.shieldTown, eastHyrule.fireTown);
                 }
                 if (R.NextDouble() > .5)
                 {
-                    Util.swap(westHyrule.jump, eastHyrule.darunia);
+                    Util.Swap(westHyrule.jump, eastHyrule.darunia);
                 }
                 if (R.NextDouble() > .5)
                 {
-                    Util.swap(westHyrule.lifeNorth, eastHyrule.newKasuto);
-                    Util.swap(westHyrule.lifeSouth, eastHyrule.newKasuto2);
+                    Util.Swap(westHyrule.lifeNorth, eastHyrule.newKasuto);
+                    Util.Swap(westHyrule.lifeSouth, eastHyrule.newKasuto2);
 
                     eastHyrule.newKasuto.NeedBagu = true;
                     eastHyrule.newKasuto2.NeedBagu = true;
@@ -1924,12 +1884,12 @@ namespace Z2Randomizer
                 }
                 if (R.NextDouble() > .5)
                 {
-                    Util.swap(westHyrule.fairy, eastHyrule.oldKasuto);
+                    Util.Swap(westHyrule.fairy, eastHyrule.oldKasuto);
                 }
             }
         }
 
-        private void shufflePalaces()
+        private void ShufflePalaces()
         {
 
             if (props.swapPalaceCont)
@@ -1944,8 +1904,8 @@ namespace Z2Randomizer
 
                 for (int i = 0; i < pals.Count; i++)
                 {
-                    int swapp = r.Next(i, pals.Count);
-                    Util.swap(pals[i], pals[swapp]);
+                    int swapp = random.Next(i, pals.Count);
+                    Util.Swap(pals[i], pals[swapp]);
                 }
 
                 westHyrule.palace1.World = westHyrule.palace1.World & 0xFC;
@@ -1986,40 +1946,40 @@ namespace Z2Randomizer
                     */
 
                 //write subroutine
-                ROMData.put(0x13f70, 0xA9);
+                ROMData.Put(0x13f70, 0xA9);
                 byte helmetRoom = 0x22;
                 if (props.createPalaces)
                 {
                     helmetRoom = (byte)palaces[1].BossRoom.Newmap;
                 }
-                ROMData.put(0x13f71, helmetRoom);
-                ROMData.put(0x13f72, 0x4D);
-                ROMData.put(0x13f73, 0x61);
-                ROMData.put(0x13f74, 0x05);
-                ROMData.put(0x13f75, 0x60);
+                ROMData.Put(0x13f71, helmetRoom);
+                ROMData.Put(0x13f72, 0x4D);
+                ROMData.Put(0x13f73, 0x61);
+                ROMData.Put(0x13f74, 0x05);
+                ROMData.Put(0x13f75, 0x60);
 
                 //jump to subroutine
-                ROMData.put(0x13c93, 0x20);
-                ROMData.put(0x13c94, 0x60);
-                ROMData.put(0x13c95, 0xBF);
+                ROMData.Put(0x13c93, 0x20);
+                ROMData.Put(0x13c94, 0x60);
+                ROMData.Put(0x13c95, 0xBF);
 
-                ROMData.put(0x13d85, 0x20);
-                ROMData.put(0x13d86, 0x60);
-                ROMData.put(0x13d87, 0xBF);
+                ROMData.Put(0x13d85, 0x20);
+                ROMData.Put(0x13d86, 0x60);
+                ROMData.Put(0x13d87, 0xBF);
 
-                ROMData.put(0x13ad3, 0x20);
-                ROMData.put(0x13ad4, 0x60);
-                ROMData.put(0x13ad5, 0xBF);
+                ROMData.Put(0x13ad3, 0x20);
+                ROMData.Put(0x13ad4, 0x60);
+                ROMData.Put(0x13ad5, 0xBF);
 
                 //fix for key glitch
-                ROMData.put(0x11b37, 0xea);
-                ROMData.put(0x11b38, 0xea);
-                ROMData.put(0x11b39, 0xea);
+                ROMData.Put(0x11b37, 0xea);
+                ROMData.Put(0x11b38, 0xea);
+                ROMData.Put(0x11b39, 0xea);
             }
 
         }
 
-        private List<Location> loadItemLocs()
+        private List<Location> LoadItemLocs()
         {
             itemLocs = new List<Location>();
             if (westHyrule.palace1.PalNum != 7)
@@ -2057,7 +2017,7 @@ namespace Z2Randomizer
             itemLocs.Add(westHyrule.trophyCave);
             itemLocs.Add(eastHyrule.heart1);
             itemLocs.Add(eastHyrule.heart2);
-            if (eastHyrule.newKasuto.townNum == 8)
+            if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
             {
                 itemLocs.Add(eastHyrule.newKasuto);
                 itemLocs.Add(eastHyrule.newKasuto2);
@@ -2083,9 +2043,9 @@ namespace Z2Randomizer
             return itemLocs;
         }
 
-        private void shuffleSpells()
+        private void ShuffleSpells()
         {
-            spellMap = new Dictionary<spells, spells>();
+            spellMap = new Dictionary<Spells, Spells>();
             List<int> shuffleThis = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 };
             for (int i = 0; i < spellGet.Count(); i++)
             {
@@ -2104,38 +2064,38 @@ namespace Z2Randomizer
             }
             for (int i = 0; i < shuffleThis.Count; i++)
             {
-                spellMap.Add((spells)i, (spells)shuffleThis[i]);
+                spellMap.Add((Spells)i, (Spells)shuffleThis[i]);
             }
-            spellMap.Add(spells.upstab, spells.upstab);
-            spellMap.Add(spells.downstab, spells.downstab);
+            spellMap.Add(Spells.upstab, Spells.upstab);
+            spellMap.Add(Spells.downstab, Spells.downstab);
 
             if (props.shuffleSpells)
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    bool hasSpell = r.NextDouble() > .75;
-                    ROMData.put(0x17AF7 + i, hasSpell ? (Byte)1 : (Byte)0);
-                    spellGet[(int)spellMap[(spells)i]] = hasSpell;
+                    bool hasSpell = random.NextDouble() > .75;
+                    ROMData.Put(0x17AF7 + i, hasSpell ? (Byte)1 : (Byte)0);
+                    spellGet[(int)spellMap[(Spells)i]] = hasSpell;
                 }
             }
             else
             {
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.shield), props.startShield ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.shield] = props.startShield;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.jump), props.startJump ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.jump] = props.startJump;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.life), props.startLife ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.life] = props.startLife;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.fairy), props.startFairy ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.fairy] = props.startFairy;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.fire), props.startFire ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.fire] = props.startFire;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.reflect), props.startReflect ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.reflect] = props.startReflect;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.spell), props.startSpell ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.spell] = props.startSpell;
-                ROMData.put(0x17AF7 + spellMap.Values.ToList().IndexOf(spells.thunder), props.startThunder ? (Byte)1 : (Byte)0);
-                spellGet[(int)spells.thunder] = props.startThunder;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.shield), props.startShield ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.shield] = props.startShield;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.jump), props.startJump ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.jump] = props.startJump;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.life), props.startLife ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.life] = props.startLife;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.fairy), props.startFairy ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.fairy] = props.startFairy;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.fire), props.startFire ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.fire] = props.startFire;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.reflect), props.startReflect ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.reflect] = props.startReflect;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.spell), props.startSpell ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.spell] = props.startSpell;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.thunder), props.startThunder ? (Byte)1 : (Byte)0);
+                spellGet[(int)Spells.thunder] = props.startThunder;
             }
 
             if (props.combineFire)
@@ -2145,8 +2105,8 @@ namespace Z2Randomizer
                 {
                     newFire++;
                 }
-                Byte newnewFire = (Byte)(0x10 | ROMData.getByte(0xDCB + newFire));
-                ROMData.put(0xDCF, newnewFire);
+                Byte newnewFire = (Byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
+                ROMData.Put(0xDCF, newnewFire);
             }
 
 
@@ -2154,14 +2114,14 @@ namespace Z2Randomizer
 
         }
 
-        private void shuffleExp(int start, int cap)
+        private void ShuffleExp(int start, int cap)
         {
             int[] exp = new int[8];
 
             for (int i = 0; i < exp.Length; i++)
             {
-                exp[i] = ROMData.getByte(start + i) * 256;
-                exp[i] = exp[i] + ROMData.getByte(start + 24 + i);
+                exp[i] = ROMData.GetByte(start + i) * 256;
+                exp[i] = exp[i] + ROMData.GetByte(start + 24 + i);
             }
 
             for (int i = 0; i < exp.Length; i++)
@@ -2170,11 +2130,11 @@ namespace Z2Randomizer
                 int nextMax = (int)(exp[i] + exp[i] * 0.25);
                 if (i == 0)
                 {
-                    exp[i] = r.Next(Math.Max(10, nextMin), nextMax);
+                    exp[i] = random.Next(Math.Max(10, nextMin), nextMax);
                 }
                 else
                 {
-                    exp[i] = r.Next(Math.Max(exp[i - 1], nextMin), Math.Min(nextMax, 9990));
+                    exp[i] = random.Next(Math.Max(exp[i - 1], nextMin), Math.Min(nextMax, 9990));
                 }
             }
 
@@ -2210,22 +2170,22 @@ namespace Z2Randomizer
 
             for (int i = 0; i < exp.Length; i++)
             {
-                ROMData.put(start + i, (Byte)(cappedExp[i] / 256));
-                ROMData.put(start + 24 + i, (Byte)(cappedExp[i] % 256));
+                ROMData.Put(start + i, (Byte)(cappedExp[i] / 256));
+                ROMData.Put(start + 24 + i, (Byte)(cappedExp[i] % 256));
             }
 
             for (int i = 0; i < exp.Length; i++)
             {
 
-                ROMData.put(start + 2057 + i, intToText(cappedExp[i] / 1000));
+                ROMData.Put(start + 2057 + i, IntToText(cappedExp[i] / 1000));
                 cappedExp[i] = cappedExp[i] - ((cappedExp[i] / 1000) * 1000);
-                ROMData.put(start + 2033 + i, intToText(cappedExp[i] / 100));
+                ROMData.Put(start + 2033 + i, IntToText(cappedExp[i] / 100));
                 cappedExp[i] = cappedExp[i] - ((cappedExp[i] / 100) * 100);
-                ROMData.put(start + 2009 + i, intToText(cappedExp[i] / 10));
+                ROMData.Put(start + 2009 + i, IntToText(cappedExp[i] / 10));
             }
         }
 
-        private void shuffleBits(List<int> addr, bool fire)
+        private void ShuffleBits(List<int> addr, bool fire)
         {
             int mask = 0x10;
             int notMask = 0xEF;
@@ -2238,7 +2198,7 @@ namespace Z2Randomizer
             double count = 0;
             foreach (int i in addr)
             {
-                if ((ROMData.getByte(i) & mask) > 0)
+                if ((ROMData.GetByte(i) & mask) > 0)
                 {
                     count++;
                 }
@@ -2249,21 +2209,21 @@ namespace Z2Randomizer
             foreach (int i in addr)
             {
                 int part1 = 0;
-                int part2 = ROMData.getByte(i) & notMask;
-                bool havethis = r.NextDouble() <= fraction;
+                int part2 = ROMData.GetByte(i) & notMask;
+                bool havethis = random.NextDouble() <= fraction;
                 if (havethis)
                 {
                     part1 = mask;
                 }
-                ROMData.put(i, (Byte)(part1 + part2));
+                ROMData.Put(i, (Byte)(part1 + part2));
             }
         }
 
-        private void shuffleEnemyExp(List<int> addr)
+        private void ShuffleEnemyExp(List<int> addr)
         {
             foreach (int i in addr)
             {
-                Byte exp = ROMData.getByte(i);
+                Byte exp = ROMData.GetByte(i);
                 int high = exp & 0xF0;
                 int low = exp & 0x0F;
 
@@ -2278,7 +2238,7 @@ namespace Z2Randomizer
 
                 if (!props.expLevel.Equals("None"))
                 {
-                    low = r.Next(low - 2, low + 3);
+                    low = random.Next(low - 2, low + 3);
                 }
                 if (low < 0)
                 {
@@ -2288,36 +2248,36 @@ namespace Z2Randomizer
                 {
                     low = 15;
                 }
-                ROMData.put(i, (Byte)(high + low));
+                ROMData.Put(i, (Byte)(high + low));
             }
         }
 
-        private void shuffleEncounters(List<int> addr)
+        private void ShuffleEncounters(List<int> addr)
         {
             for (int i = 0; i < addr.Count; i++)
             {
-                int swap = r.Next(i, addr.Count);
-                Byte temp = ROMData.getByte(addr[i]);
-                ROMData.put(addr[i], ROMData.getByte(addr[swap]));
-                ROMData.put(addr[swap], temp);
+                int swap = random.Next(i, addr.Count);
+                Byte temp = ROMData.GetByte(addr[i]);
+                ROMData.Put(addr[i], ROMData.GetByte(addr[swap]));
+                ROMData.Put(addr[swap], temp);
             }
         }
-        private void randomizeStartingValues()
+        private void RandomizeStartingValues()
         {
 
-            ROMData.put(0x17AF3, (byte)props.startAtk);
-            ROMData.put(0x17AF4, (byte)props.startMag);
-            ROMData.put(0x17AF5, (byte)props.startLifeLvl);
+            ROMData.Put(0x17AF3, (byte)props.startAtk);
+            ROMData.Put(0x17AF4, (byte)props.startMag);
+            ROMData.Put(0x17AF5, (byte)props.startLifeLvl);
 
             if(props.removeFlashing)
             {
-                ROMData.disableFlashing();
+                ROMData.DisableFlashing();
             }
 
             if(props.spellEnemy)
             {
                 List<int> enemies = new List<int> { 3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26 };
-                ROMData.put(0x11ef, (byte)enemies[r.Next(enemies.Count())]);
+                ROMData.Put(0x11ef, (byte)enemies[random.Next(enemies.Count())]);
             }
             int opts = 0;
             if (props.westBiome.Equals("Random (no Vanilla)"))
@@ -2330,7 +2290,7 @@ namespace Z2Randomizer
             }
             if(props.bossItem)
             {
-                s.shuffleBossDrop();
+                shuffler.ShuffleBossDrop();
             }
             if(opts != 0) { 
                 int wb = R.Next(opts);
@@ -2451,7 +2411,7 @@ namespace Z2Randomizer
 
             if(props.mazeBiome.Equals("Random (with Vanilla)"))
             {
-                int wb = r.Next(3);
+                int wb = random.Next(3);
                 if(wb == 0)
                 {
                     props.mazeBiome = "Vanilla";
@@ -2492,11 +2452,11 @@ namespace Z2Randomizer
 
             if (props.removeSpellItems)
             {
-                ROMData.put(0xF584, 0xA9);
-                ROMData.put(0xF585, 0x01);
-                ROMData.put(0xF586, 0xEA);
+                ROMData.Put(0xF584, 0xA9);
+                ROMData.Put(0xF585, 0x01);
+                ROMData.Put(0xF586, 0xEA);
             }
-            ROMData.updateSprites(props.charSprite);
+            ROMData.UpdateSprites(props.charSprite);
 
             Dictionary<String, int> colorMap = new Dictionary<String, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
 
@@ -2707,21 +2667,21 @@ namespace Z2Randomizer
 
             if(props.encounterRate.Equals("None"))
             {
-                ROMData.put(0x294, 0x60); //skips the whole routine
+                ROMData.Put(0x294, 0x60); //skips the whole routine
             }
 
             if(props.encounterRate.Equals("50%"))
             {
                 //terrain timers
-                ROMData.put(0x250, 0x40);
-                ROMData.put(0x251, 0x30);
-                ROMData.put(0x252, 0x30);
-                ROMData.put(0x253, 0x40);
-                ROMData.put(0x254, 0x12);
-                ROMData.put(0x255, 0x06);
+                ROMData.Put(0x250, 0x40);
+                ROMData.Put(0x251, 0x30);
+                ROMData.Put(0x252, 0x30);
+                ROMData.Put(0x253, 0x40);
+                ROMData.Put(0x254, 0x12);
+                ROMData.Put(0x255, 0x06);
 
                 //initial overworld timer
-                ROMData.put(0x88A, 0x10);
+                ROMData.Put(0x88A, 0x10);
 
                 /*
                  * insert jump to a8aa at 2a3 (4c AA A8)
@@ -2736,159 +2696,159 @@ namespace Z2Randomizer
                  * jump to encounter spawn 8298 (4C 98 82)
                  * jump to rts 829f (4C 93 82)
                  */
-                ROMData.put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
+                ROMData.Put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
 
-                ROMData.put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
+                ROMData.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
             }
 
             int[] tunicLocs = { 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
 
             foreach (int l in tunicLocs)
             {
-                ROMData.put(0x10ea, (byte)c2);
+                ROMData.Put(0x10ea, (byte)c2);
                 if (props.charSprite.Equals("Iron Knuckle"))
                 {
-                    ROMData.put(0x10ea, (byte)0x30);
-                    ROMData.put(0x2a0a, 0x0D);
-                    ROMData.put(0x2a10, (byte)c2);
-                    ROMData.put(l, 0x20);
-                    ROMData.put(l - 1, (byte)c2);
-                    ROMData.put(l - 2, 0x0D);
+                    ROMData.Put(0x10ea, (byte)0x30);
+                    ROMData.Put(0x2a0a, 0x0D);
+                    ROMData.Put(0x2a10, (byte)c2);
+                    ROMData.Put(l, 0x20);
+                    ROMData.Put(l - 1, (byte)c2);
+                    ROMData.Put(l - 2, 0x0D);
                 }
                 else if(props.charSprite.Equals("Samus"))
                 {
-                    ROMData.put(0x2a0a, 0x16);
-                    ROMData.put(0x2a10, 0x1a);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x1a);
-                    ROMData.put(l - 2, 0x16);
+                    ROMData.Put(0x2a0a, 0x16);
+                    ROMData.Put(0x2a10, 0x1a);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x1a);
+                    ROMData.Put(l - 2, 0x16);
                 }
                 else if (props.charSprite.Equals("Error") || props.charSprite.Equals("Vase Lady"))
                 {
-                    ROMData.put(0x2a0a, 0x0F);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 2, 0x0F);
+                    ROMData.Put(0x2a0a, 0x0F);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 2, 0x0F);
                 }
                 else if(props.charSprite.Equals("Simon"))
                 {
-                    ROMData.put(0x2a0a, 0x07);
-                    ROMData.put(0x2a10, 0x37);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x37);
-                    ROMData.put(l - 2, 0x07);
+                    ROMData.Put(0x2a0a, 0x07);
+                    ROMData.Put(0x2a10, 0x37);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x37);
+                    ROMData.Put(l - 2, 0x07);
                 }
                 else if(props.charSprite.Equals("Stalfos"))
                 {
-                    ROMData.put(0x2a0a, 0x08);
-                    ROMData.put(0x2a10, 0x20);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x20);
-                    ROMData.put(l - 2, 0x08);
+                    ROMData.Put(0x2a0a, 0x08);
+                    ROMData.Put(0x2a10, 0x20);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x20);
+                    ROMData.Put(l - 2, 0x08);
                 }
                 else if(props.charSprite.Equals("Ruto"))
                 {
-                    ROMData.put(0x2a0a, 0x0c);
-                    ROMData.put(0x2a10, 0x1c);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x1c);
-                    ROMData.put(l - 2, 0x0c);
+                    ROMData.Put(0x2a0a, 0x0c);
+                    ROMData.Put(0x2a10, 0x1c);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x1c);
+                    ROMData.Put(l - 2, 0x0c);
                 }
                 else if(props.charSprite.Equals("Yoshi"))
                 {
-                    ROMData.put(0x2a0a, 0x16);
-                    ROMData.put(0x2a10, 0x20);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x20);
-                    ROMData.put(l - 2, 0x16);
+                    ROMData.Put(0x2a0a, 0x16);
+                    ROMData.Put(0x2a10, 0x20);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x20);
+                    ROMData.Put(l - 2, 0x16);
                 }
                 else if(props.charSprite.Equals("Dragonlord"))
                 {
-                    ROMData.put(0x2a0a, 0x28);
-                    ROMData.put(0x2a10, 0x11);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x11);
-                    ROMData.put(l - 2, 0x28);
+                    ROMData.Put(0x2a0a, 0x28);
+                    ROMData.Put(0x2a10, 0x11);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x11);
+                    ROMData.Put(l - 2, 0x28);
                 }
                 else if (props.charSprite.Equals("Miria"))
                 {
-                    ROMData.put(0x2a0a, 0x0D);
-                    ROMData.put(0x2a10, 0x30);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x30);
-                    ROMData.put(l - 2, 0x0D);
+                    ROMData.Put(0x2a0a, 0x0D);
+                    ROMData.Put(0x2a10, 0x30);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x30);
+                    ROMData.Put(l - 2, 0x0D);
                     
                 }
                 else if (props.charSprite.Equals("Crystalis"))
                 {
-                    ROMData.put(0x2a0a, 0x0D);
-                    ROMData.put(0x2a10, 0x36);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x36);
-                    ROMData.put(l - 2, 0x0D);
+                    ROMData.Put(0x2a0a, 0x0D);
+                    ROMData.Put(0x2a10, 0x36);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x36);
+                    ROMData.Put(l - 2, 0x0D);
 
                 }
                 else if (props.charSprite.Equals("Taco"))
                 {
-                    ROMData.put(0x2a0a, 0x18);
-                    ROMData.put(0x2a10, 0x36);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x36);
-                    ROMData.put(l - 2, 0x18);
+                    ROMData.Put(0x2a0a, 0x18);
+                    ROMData.Put(0x2a10, 0x36);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x36);
+                    ROMData.Put(l - 2, 0x18);
 
                 }
                 else if (props.charSprite.Equals("Pyramid"))
                 {
-                    ROMData.put(0x2a0a, 0x12);
-                    ROMData.put(0x2a10, 0x22);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x22);
-                    ROMData.put(l - 2, 0x12);
+                    ROMData.Put(0x2a0a, 0x12);
+                    ROMData.Put(0x2a10, 0x22);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x22);
+                    ROMData.Put(l - 2, 0x12);
 
                 }
                 else if (props.charSprite.Equals("Faxanadu"))
                 {
-                    ROMData.put(0x2a0a, 0x18);
-                    ROMData.put(0x2a10, 0x36);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x36);
-                    ROMData.put(l - 2, 0x18);
+                    ROMData.Put(0x2a0a, 0x18);
+                    ROMData.Put(0x2a10, 0x36);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x36);
+                    ROMData.Put(l - 2, 0x18);
 
                 }
                 else if (props.charSprite.Equals("Lady Link"))
                 {
-                    ROMData.put(0x2a0a, 0x18);
-                    ROMData.put(0x2a10, 0x36);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x36);
-                    ROMData.put(l - 2, 0x18);
+                    ROMData.Put(0x2a0a, 0x18);
+                    ROMData.Put(0x2a10, 0x36);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x36);
+                    ROMData.Put(l - 2, 0x18);
 
                 }
                 else if (props.charSprite.Equals("Hoodie Link"))
                 {
-                    ROMData.put(0x2a0a, 0x18);
-                    ROMData.put(0x2a10, 0x36);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x36);
-                    ROMData.put(l - 2, 0x18);
+                    ROMData.Put(0x2a0a, 0x18);
+                    ROMData.Put(0x2a10, 0x36);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x36);
+                    ROMData.Put(l - 2, 0x18);
 
                 }
                 else if (props.charSprite.Equals("GliitchWiitch"))
                 {
-                    ROMData.put(0x2a0a, 0x08);
-                    ROMData.put(0x2a10, 0x36);
-                    ROMData.put(l, (byte)c2);
-                    ROMData.put(l - 1, 0x36);
-                    ROMData.put(l - 2, 0x08);
+                    ROMData.Put(0x2a0a, 0x08);
+                    ROMData.Put(0x2a10, 0x36);
+                    ROMData.Put(l, (byte)c2);
+                    ROMData.Put(l - 1, 0x36);
+                    ROMData.Put(l - 2, 0x08);
 
                 }
                 else
                 {
-                    ROMData.put(0x10ea, (byte)c2);
-                    ROMData.put(l, (byte)c2);
+                    ROMData.Put(0x10ea, (byte)c2);
+                    ROMData.Put(l, (byte)c2);
                 }
             }
 
-            ROMData.put(0xe9e, (byte)c1);
+            ROMData.Put(0xe9e, (byte)c1);
 
 
 
@@ -2927,20 +2887,20 @@ namespace Z2Randomizer
 
             if (beamType == 0 || beamType == 3 || beamType == 4)
             {
-                ROMData.put(0x18f5, 0xa9);
-                ROMData.put(0x18f6, 0x00);
-                ROMData.put(0x18f7, 0xea);
+                ROMData.Put(0x18f5, 0xa9);
+                ROMData.Put(0x18f6, 0x00);
+                ROMData.Put(0x18f7, 0xea);
             }
             else if(beamType != -1)
             {
-                ROMData.put(0X18FB, 0x84);
+                ROMData.Put(0X18FB, 0x84);
             }
 
             if (beamType == 1)//bubbles
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    Byte next = ROMData.getByte(0x20ab0 + i);
+                    Byte next = ROMData.GetByte(0x20ab0 + i);
                     newSprite[i] = next;
                 }
             }
@@ -2949,7 +2909,7 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    Byte next = ROMData.getByte(0x22af0 + i);
+                    Byte next = ROMData.GetByte(0x22af0 + i);
                     newSprite[i] = next;
                 }
             }
@@ -2958,7 +2918,7 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    Byte next = ROMData.getByte(0x22fb0 + i);
+                    Byte next = ROMData.GetByte(0x22fb0 + i);
                     newSprite[i] = next;
                 }
             }
@@ -2967,7 +2927,7 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    Byte next = ROMData.getByte(0x32ef0 + i);
+                    Byte next = ROMData.GetByte(0x32ef0 + i);
                     newSprite[i] = next;
                 }
             }
@@ -2976,7 +2936,7 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    Byte next = ROMData.getByte(0x34dd0 + i);
+                    Byte next = ROMData.GetByte(0x34dd0 + i);
                     newSprite[i] = next;
                 }
             }
@@ -2988,7 +2948,7 @@ namespace Z2Randomizer
                 {
                     for (int i = 0; i < 32; i++)
                     {
-                        ROMData.put(loc + i, newSprite[i]);
+                        ROMData.Put(loc + i, newSprite[i]);
                     }
                 }
             }
@@ -2996,23 +2956,23 @@ namespace Z2Randomizer
 
             if (props.disableBeep)
             {
-                ROMData.put(0x1D4E4, (Byte)0xEA);
-                ROMData.put(0x1D4E5, (Byte)0x38);
+                ROMData.Put(0x1D4E4, (Byte)0xEA);
+                ROMData.Put(0x1D4E5, (Byte)0x38);
             }
             if (props.shuffleLifeRefill)
             {
-                int lifeRefill = r.Next(1, 6);
-                ROMData.put(0xE7A, (Byte)(lifeRefill * 16));
+                int lifeRefill = random.Next(1, 6);
+                ROMData.Put(0xE7A, (Byte)(lifeRefill * 16));
             }
 
             if (props.shuffleStealExpAmt)
             {
-                int small = ROMData.getByte(0x1E30E);
-                int big = ROMData.getByte(0x1E314);
-                small = r.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
-                big = r.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
-                ROMData.put(0x1E30E, (Byte)small);
-                ROMData.put(0x1E314, (Byte)big);
+                int small = ROMData.GetByte(0x1E30E);
+                int big = ROMData.GetByte(0x1E314);
+                small = random.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
+                big = random.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
+                ROMData.Put(0x1E30E, (Byte)small);
+                ROMData.Put(0x1E314, (Byte)big);
             }
 
             List<int> addr = new List<int>();
@@ -3031,17 +2991,17 @@ namespace Z2Randomizer
 
             if (props.shuffleEnemyStealExp)
             {
-                shuffleBits(addr, false);
+                ShuffleBits(addr, false);
             }
 
             if (props.shuffleSwordImmunity)
             {
-                shuffleBits(addr, true);
+                ShuffleBits(addr, true);
             }
 
             if (!props.expLevel.Equals("Normal"))
             {
-                shuffleEnemyExp(addr);
+                ShuffleEnemyExp(addr);
             }
             addr = new List<int>();
             for (int i = 0x94E8; i < 0x94ED; i++)
@@ -3058,16 +3018,16 @@ namespace Z2Randomizer
             }
             if (props.shuffleEnemyStealExp)
             {
-                shuffleBits(addr, false);
+                ShuffleBits(addr, false);
             }
 
             if (props.shuffleSwordImmunity)
             {
-                shuffleBits(addr, true);
+                ShuffleBits(addr, true);
             }
             if (!props.expLevel.Equals("Normal"))
             {
-                shuffleEnemyExp(addr);
+                ShuffleEnemyExp(addr);
             }
 
             addr = new List<int>();
@@ -3091,16 +3051,16 @@ namespace Z2Randomizer
 
             if (props.shuffleEnemyStealExp)
             {
-                shuffleBits(addr, false);
+                ShuffleBits(addr, false);
             }
 
             if (props.shuffleSwordImmunity)
             {
-                shuffleBits(addr, true);
+                ShuffleBits(addr, true);
             }
             if (!props.expLevel.Equals("Normal"))
             {
-                shuffleEnemyExp(addr);
+                ShuffleEnemyExp(addr);
             }
 
             addr = new List<int>();
@@ -3133,16 +3093,16 @@ namespace Z2Randomizer
 
             if (props.shuffleEnemyStealExp)
             {
-                shuffleBits(addr, false);
+                ShuffleBits(addr, false);
             }
 
             if (props.shuffleSwordImmunity)
             {
-                shuffleBits(addr, true);
+                ShuffleBits(addr, true);
             }
             if (!props.expLevel.Equals("Normal"))
             {
-                shuffleEnemyExp(addr);
+                ShuffleEnemyExp(addr);
             }
 
             addr = new List<int>();
@@ -3168,16 +3128,16 @@ namespace Z2Randomizer
 
             if (props.shuffleEnemyStealExp)
             {
-                shuffleBits(addr, false);
+                ShuffleBits(addr, false);
             }
 
             if (props.shuffleSwordImmunity)
             {
-                shuffleBits(addr, true);
+                ShuffleBits(addr, true);
             }
             if (!props.expLevel.Equals("Normal"))
             {
-                shuffleEnemyExp(addr);
+                ShuffleEnemyExp(addr);
             }
 
             if (!props.expLevel.Equals("Normal"))
@@ -3190,7 +3150,7 @@ namespace Z2Randomizer
                 addr.Add(0x12A06);
                 addr.Add(0x12A07);
                 addr.Add(0x15507);
-                shuffleEnemyExp(addr);
+                ShuffleEnemyExp(addr);
             }
 
             if (props.shuffleEncounters)
@@ -3211,7 +3171,7 @@ namespace Z2Randomizer
                     addr.Add(0x4423);
                 }
 
-                shuffleEncounters(addr);
+                ShuffleEncounters(addr);
 
                 addr = new List<int>();
                 addr.Add(0x841B);
@@ -3229,79 +3189,79 @@ namespace Z2Randomizer
                     addr.Add(0x8424);
                 }
 
-                shuffleEncounters(addr);
+                ShuffleEncounters(addr);
             }
 
             if (props.jumpAlwaysOn)
             {
-                ROMData.put(0x1482, ROMData.getByte(0x1480));
-                ROMData.put(0x1483, ROMData.getByte(0x1481));
-                ROMData.put(0x1486, ROMData.getByte(0x1484));
-                ROMData.put(0x1487, ROMData.getByte(0x1485));
+                ROMData.Put(0x1482, ROMData.GetByte(0x1480));
+                ROMData.Put(0x1483, ROMData.GetByte(0x1481));
+                ROMData.Put(0x1486, ROMData.GetByte(0x1484));
+                ROMData.Put(0x1487, ROMData.GetByte(0x1485));
 
             }
 
             if (props.disableMagicRecs)
             {
-                ROMData.put(0xF539, (Byte)0xC9);
-                ROMData.put(0xF53A, (Byte)0);
+                ROMData.Put(0xF539, (Byte)0xC9);
+                ROMData.Put(0xF53A, (Byte)0);
             }
 
             if (props.shuffleAllExp)
             {
-                shuffleExp(0x1669, props.attackCap);//atk
-                shuffleExp(0x1671, props.magicCap);//mag
-                shuffleExp(0x1679, props.lifeCap);//life
+                ShuffleExp(0x1669, props.attackCap);//atk
+                ShuffleExp(0x1671, props.magicCap);//mag
+                ShuffleExp(0x1679, props.lifeCap);//life
             }
             else
             {
                 if (props.shuffleAtkExp)
                 {
-                    shuffleExp(0x1669, props.attackCap);
+                    ShuffleExp(0x1669, props.attackCap);
                 }
 
                 if (props.shuffleMagicExp)
                 {
-                    shuffleExp(0x1671, props.magicCap);
+                    ShuffleExp(0x1671, props.magicCap);
                 }
 
                 if (props.shuffleLifeExp)
                 {
-                    shuffleExp(0x1679, props.lifeCap);
+                    ShuffleExp(0x1679, props.lifeCap);
                 }
             }
 
-            ROMData.setLevelCap(props.attackCap, props.magicCap, props.lifeCap);
+            ROMData.SetLevelCap(props.attackCap, props.magicCap, props.lifeCap);
 
-            shuffleAttackEffectiveness(false);
+            ShuffleAttackEffectiveness(false);
 
-            shuffleLifeEffectiveness(true);
+            ShuffleLifeEffectiveness(true);
 
-            shuffleLifeEffectiveness(false);
+            ShuffleLifeEffectiveness(false);
 
             if (props.startGems.Equals("Random"))
             {
-                ROMData.put(0x17B10, (Byte)r.Next(0, 7));
+                ROMData.Put(0x17B10, (Byte)random.Next(0, 7));
             }
             else
             {
-                ROMData.put(0x17B10, (Byte)Int32.Parse(props.startGems));
+                ROMData.Put(0x17B10, (Byte)Int32.Parse(props.startGems));
             }
 
             if (props.startHearts.Equals("Random"))
             {
-                startHearts = r.Next(1, 9);
-                ROMData.put(0x17B00, (Byte)startHearts);
+                startHearts = random.Next(1, 9);
+                ROMData.Put(0x17B00, (Byte)startHearts);
             }
             else
             {
                 startHearts = Int32.Parse(props.startHearts);
-                ROMData.put(0x17B00, (Byte)startHearts);
+                ROMData.Put(0x17B00, (Byte)startHearts);
             }
 
             if (props.maxHearts.Equals("Random"))
             {
-                maxHearts = r.Next(startHearts, 9);
+                maxHearts = random.Next(startHearts, 9);
             }
             else
             {
@@ -3312,51 +3272,51 @@ namespace Z2Randomizer
 
             if (props.shuffleLives)
             {
-                ROMData.put(0x1C369, (Byte)r.Next(2, 6));
+                ROMData.Put(0x1C369, (Byte)random.Next(2, 6));
             }
 
             if (props.startTech.Equals("Random"))
             {
-                int swap = r.Next(7);
+                int swap = random.Next(7);
                 if (swap <= 3)
                 {
-                    ROMData.put(0x17B12, (Byte)0);
+                    ROMData.Put(0x17B12, (Byte)0);
                 }
                 else if (swap == 4)
                 {
-                    ROMData.put(0x17B12, (Byte)0x10);
+                    ROMData.Put(0x17B12, (Byte)0x10);
                 }
                 else if (swap == 5)
                 {
-                    ROMData.put(0x17B12, (Byte)0x04);
+                    ROMData.Put(0x17B12, (Byte)0x04);
                 }
                 else
                 {
-                    ROMData.put(0x17B12, (Byte)0x14);
+                    ROMData.Put(0x17B12, (Byte)0x14);
                 }
             }
             else if (props.startTech.Equals("Downstab"))
             {
-                ROMData.put(0x17B12, (Byte)0x10);
+                ROMData.Put(0x17B12, (Byte)0x10);
             }
             else if (props.startTech.Equals("Upstab"))
             {
-                ROMData.put(0x17B12, (Byte)0x04);
+                ROMData.Put(0x17B12, (Byte)0x04);
             }
             else if (props.startTech.Equals("Both"))
             {
-                ROMData.put(0x17B12, (Byte)0x14);
+                ROMData.Put(0x17B12, (Byte)0x14);
             }
             else
             {
-                ROMData.put(0x17B12, (Byte)0x00);
+                ROMData.Put(0x17B12, (Byte)0x00);
             }
 
             if (props.tankMode)
             {
                 for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
                 {
-                    ROMData.put(i, 0);
+                    ROMData.Put(i, 0);
                 }
             }
 
@@ -3364,7 +3324,7 @@ namespace Z2Randomizer
             {
                 for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
                 {
-                    ROMData.put(i, 0xFF);
+                    ROMData.Put(i, 0xFF);
                 }
             }
 
@@ -3372,26 +3332,26 @@ namespace Z2Randomizer
             {
                 for (int i = 0xD8B; i < 0xD8b + 64; i++)
                 {
-                    ROMData.put(i, 0);
+                    ROMData.Put(i, 0);
                 }
             }
 
             if (props.palacePalette)
             {
 
-                s.shufflePalacePalettes();
+                shuffler.ShufflePalacePalettes();
 
             }
 
             if (props.pbagDrop)
             {
-                int drop = r.Next(5) + 4;
-                ROMData.put(0x1E8B0, (Byte)drop);
+                int drop = random.Next(5) + 4;
+                ROMData.Put(0x1E8B0, (Byte)drop);
             }
 
         }
 
-        private Byte intToText(int x)
+        private Byte IntToText(int x)
         {
             switch (x)
             {
@@ -3418,11 +3378,7 @@ namespace Z2Randomizer
             }
         }
 
-        
-
-
-
-        private void updateRom()
+        private void UpdateRom()
         {
             foreach (World w in worlds)
             {
@@ -3430,10 +3386,10 @@ namespace Z2Randomizer
                 foreach (Location l in locs)
                 {
                     l.updateBytes();
-                    ROMData.put(l.MemAddress, l.LocationBytes[0]);
-                    ROMData.put(l.MemAddress + overworldXOff, l.LocationBytes[1]);
-                    ROMData.put(l.MemAddress + overworldMapOff, l.LocationBytes[2]);
-                    ROMData.put(l.MemAddress + overworldWorldOff, l.LocationBytes[3]);
+                    ROMData.Put(l.MemAddress, l.LocationBytes[0]);
+                    ROMData.Put(l.MemAddress + overworldXOff, l.LocationBytes[1]);
+                    ROMData.Put(l.MemAddress + overworldMapOff, l.LocationBytes[2]);
+                    ROMData.Put(l.MemAddress + overworldWorldOff, l.LocationBytes[3]);
                 }
                 w.removeUnusedConnectors();
             }
@@ -3444,15 +3400,15 @@ namespace Z2Randomizer
             Location kidLoc = null;
             foreach (Location l in itemLocs)
             {
-                if (l.item == items.medicine)
+                if (l.item == Items.medicine)
                 {
                     medicineLoc = l;
                 }
-                if (l.item == items.trophy)
+                if (l.item == Items.trophy)
                 {
                     trophyLoc = l;
                 }
-                if (l.item == items.kid)
+                if (l.item == Items.kid)
                 {
                     kidLoc = l;
                 }
@@ -3464,9 +3420,9 @@ namespace Z2Randomizer
 
             for (int i = 0; i < 32; i++)
             {
-                medSprite[i] = ROMData.getByte(0x23310 + i);
-                trophySprite[i] = ROMData.getByte(0x232f0 + i);
-                kidSprite[i] = ROMData.getByte(0x25310 + i);
+                medSprite[i] = ROMData.GetByte(0x23310 + i);
+                trophySprite[i] = ROMData.GetByte(0x232f0 + i);
+                kidSprite[i] = ROMData.GetByte(0x25310 + i);
             }
             bool medEast = (eastHyrule.AllLocations.Contains(medicineLoc) || mazeIsland.AllLocations.Contains(medicineLoc));
             bool trophyEast = (eastHyrule.AllLocations.Contains(trophyLoc) || mazeIsland.AllLocations.Contains(trophyLoc));
@@ -3479,259 +3435,259 @@ namespace Z2Randomizer
             palaceMems.Add(5, 0x37AD0);
             palaceMems.Add(6, 0x39AD0);
 
-            if (medEast && eastHyrule.palace5.item != items.medicine && eastHyrule.palace6.item != items.medicine && mazeIsland.palace4.item != items.medicine)
+            if (medEast && eastHyrule.palace5.item != Items.medicine && eastHyrule.palace6.item != Items.medicine && mazeIsland.palace4.item != Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(0x25430 + i, medSprite[i]);
+                    ROMData.Put(0x25430 + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb9, 0x43);
-                ROMData.put(0x1eeba, 0x43);
+                ROMData.Put(0x1eeb9, 0x43);
+                ROMData.Put(0x1eeba, 0x43);
             }
 
             if (trophyEast)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(0x25410 + i, trophySprite[i]);
+                    ROMData.Put(0x25410 + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0x41);
-                ROMData.put(0x1eeb8, 0x41);
+                ROMData.Put(0x1eeb7, 0x41);
+                ROMData.Put(0x1eeb8, 0x41);
             }
 
-            if (kidWest && westHyrule.palace1.item != items.kid && westHyrule.palace2.item != items.kid && westHyrule.palace3.item != items.kid)
+            if (kidWest && westHyrule.palace1.item != Items.kid && westHyrule.palace2.item != Items.kid && westHyrule.palace3.item != Items.kid)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(0x23570 + i, kidSprite[i]);
+                    ROMData.Put(0x23570 + i, kidSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0x57);
-                ROMData.put(0x1eeb6, 0x57);
+                ROMData.Put(0x1eeb5, 0x57);
+                ROMData.Put(0x1eeb6, 0x57);
             }
 
-            if (eastHyrule.newKasuto.item == items.trophy || eastHyrule.newKasuto2.item == items.trophy || westHyrule.lifeNorth.item == items.trophy || westHyrule.lifeSouth.item == items.trophy)
+            if (eastHyrule.newKasuto.item == Items.trophy || eastHyrule.newKasuto2.item == Items.trophy || westHyrule.lifeNorth.item == Items.trophy || westHyrule.lifeSouth.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(0x27210 + i, trophySprite[i]);
+                    ROMData.Put(0x27210 + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0x21);
-                ROMData.put(0x1eeb8, 0x21);
+                ROMData.Put(0x1eeb7, 0x21);
+                ROMData.Put(0x1eeb8, 0x21);
             }
 
-            if (eastHyrule.newKasuto.item == items.medicine || eastHyrule.newKasuto2.item == items.medicine || westHyrule.lifeNorth.item == items.trophy || westHyrule.lifeSouth.item == items.trophy)
+            if (eastHyrule.newKasuto.item == Items.medicine || eastHyrule.newKasuto2.item == Items.medicine || westHyrule.lifeNorth.item == Items.trophy || westHyrule.lifeSouth.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(0x27230 + i, medSprite[i]);
+                    ROMData.Put(0x27230 + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb9, 0x23);
-                ROMData.put(0x1eeba, 0x23);
+                ROMData.Put(0x1eeb9, 0x23);
+                ROMData.Put(0x1eeba, 0x23);
             }
 
-            if (eastHyrule.newKasuto.item == items.kid || eastHyrule.newKasuto2.item == items.kid || westHyrule.lifeNorth.item == items.trophy || westHyrule.lifeSouth.item == items.trophy)
+            if (eastHyrule.newKasuto.item == Items.kid || eastHyrule.newKasuto2.item == Items.kid || westHyrule.lifeNorth.item == Items.trophy || westHyrule.lifeSouth.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(0x27250 + i, kidSprite[i]);
+                    ROMData.Put(0x27250 + i, kidSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0x25);
-                ROMData.put(0x1eeb6, 0x25);
+                ROMData.Put(0x1eeb5, 0x25);
+                ROMData.Put(0x1eeb6, 0x25);
             }
 
-            if (westHyrule.palace1.item == items.trophy)
+            if (westHyrule.palace1.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[westHyrule.palace1.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[westHyrule.palace1.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (westHyrule.palace2.item == items.trophy)
+            if (westHyrule.palace2.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[westHyrule.palace2.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[westHyrule.palace2.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (westHyrule.palace3.item == items.trophy)
+            if (westHyrule.palace3.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[westHyrule.palace3.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[westHyrule.palace3.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (mazeIsland.palace4.item == items.trophy)
+            if (mazeIsland.palace4.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[mazeIsland.palace4.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[mazeIsland.palace4.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (eastHyrule.palace5.item == items.trophy)
+            if (eastHyrule.palace5.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[eastHyrule.palace5.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[eastHyrule.palace5.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (eastHyrule.palace6.item == items.trophy)
+            if (eastHyrule.palace6.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[eastHyrule.palace6.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[eastHyrule.palace6.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (eastHyrule.gp.item == items.trophy)
+            if (eastHyrule.gp.item == Items.trophy)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[eastHyrule.gp.PalNum] + i, trophySprite[i]);
+                    ROMData.Put(palaceMems[eastHyrule.gp.PalNum] + i, trophySprite[i]);
                 }
-                ROMData.put(0x1eeb7, 0xAD);
-                ROMData.put(0x1eeb8, 0xAD);
-            }
-
-            if (westHyrule.palace1.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[westHyrule.palace1.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
-            }
-            if (westHyrule.palace2.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[westHyrule.palace2.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
-            }
-            if (westHyrule.palace3.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[westHyrule.palace3.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
-            }
-            if (mazeIsland.palace4.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[mazeIsland.palace4.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
-            }
-            if (eastHyrule.palace5.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[eastHyrule.palace5.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
-            }
-            if (eastHyrule.palace6.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[eastHyrule.palace6.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
-            }
-            if (eastHyrule.gp.item == items.medicine)
-            {
-                for (int i = 0; i < 32; i++)
-                {
-                    ROMData.put(palaceMems[eastHyrule.gp.PalNum] + i, medSprite[i]);
-                }
-                ROMData.put(0x1eeb9, 0xAD);
-                ROMData.put(0x1eeba, 0xAD);
+                ROMData.Put(0x1eeb7, 0xAD);
+                ROMData.Put(0x1eeb8, 0xAD);
             }
 
-            if (westHyrule.palace1.item == items.kid)
+            if (westHyrule.palace1.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[westHyrule.palace1.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[westHyrule.palace1.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
-            if (westHyrule.palace2.item == items.kid)
+            if (westHyrule.palace2.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[westHyrule.palace2.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[westHyrule.palace2.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
-            if (westHyrule.palace3.item == items.kid)
+            if (westHyrule.palace3.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[westHyrule.palace3.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[westHyrule.palace3.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
-            if (mazeIsland.palace4.item == items.kid)
+            if (mazeIsland.palace4.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[mazeIsland.palace4.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[mazeIsland.palace4.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
-            if (eastHyrule.palace5.item == items.kid)
+            if (eastHyrule.palace5.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[eastHyrule.palace5.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[eastHyrule.palace5.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
-            if (eastHyrule.palace6.item == items.kid)
+            if (eastHyrule.palace6.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[eastHyrule.palace6.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[eastHyrule.palace6.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
-            if (eastHyrule.gp.item == items.kid)
+            if (eastHyrule.gp.item == Items.medicine)
             {
                 for (int i = 0; i < 32; i++)
                 {
-                    ROMData.put(palaceMems[eastHyrule.gp.PalNum] + i, kidSprite[i]);
+                    ROMData.Put(palaceMems[eastHyrule.gp.PalNum] + i, medSprite[i]);
                 }
-                ROMData.put(0x1eeb5, 0xAD);
-                ROMData.put(0x1eeb6, 0xAD);
+                ROMData.Put(0x1eeb9, 0xAD);
+                ROMData.Put(0x1eeba, 0xAD);
             }
 
-            romData.addCredits();
+            if (westHyrule.palace1.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[westHyrule.palace1.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+            if (westHyrule.palace2.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[westHyrule.palace2.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+            if (westHyrule.palace3.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[westHyrule.palace3.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+            if (mazeIsland.palace4.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[mazeIsland.palace4.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+            if (eastHyrule.palace5.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[eastHyrule.palace5.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+            if (eastHyrule.palace6.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[eastHyrule.palace6.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+            if (eastHyrule.gp.item == Items.kid)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    ROMData.Put(palaceMems[eastHyrule.gp.PalNum] + i, kidSprite[i]);
+                }
+                ROMData.Put(0x1eeb5, 0xAD);
+                ROMData.Put(0x1eeb6, 0xAD);
+            }
+
+            romData.AddCredits();
             //fixes improper exit from p6/new kasuto
             //if (eastHyrule.palace6.PalNum != 7)
             //{
@@ -3743,45 +3699,45 @@ namespace Z2Randomizer
             //}
 
 
-            ROMData.put(0x1CD3A, (Byte)palGraphics[westHyrule.palace1.PalNum]);
+            ROMData.Put(0x1CD3A, (Byte)palGraphics[westHyrule.palace1.PalNum]);
 
 
-            ROMData.put(0x1CD3B, (Byte)palGraphics[westHyrule.palace2.PalNum]);
+            ROMData.Put(0x1CD3B, (Byte)palGraphics[westHyrule.palace2.PalNum]);
 
 
-            ROMData.put(0x1CD3C, (Byte)palGraphics[westHyrule.palace3.PalNum]);
+            ROMData.Put(0x1CD3C, (Byte)palGraphics[westHyrule.palace3.PalNum]);
 
 
-            ROMData.put(0x1CD46, (Byte)palGraphics[mazeIsland.palace4.PalNum]);
+            ROMData.Put(0x1CD46, (Byte)palGraphics[mazeIsland.palace4.PalNum]);
 
 
-            ROMData.put(0x1CD42, (Byte)palGraphics[eastHyrule.palace5.PalNum]);
+            ROMData.Put(0x1CD42, (Byte)palGraphics[eastHyrule.palace5.PalNum]);
 
-            ROMData.put(0x1CD43, (Byte)palGraphics[eastHyrule.palace6.PalNum]);
-            ROMData.put(0x1CD44, (Byte)palGraphics[eastHyrule.gp.PalNum]);
+            ROMData.Put(0x1CD43, (Byte)palGraphics[eastHyrule.palace6.PalNum]);
+            ROMData.Put(0x1CD44, (Byte)palGraphics[eastHyrule.gp.PalNum]);
 
             //if (!props.palacePalette)
             //{
 
-            ROMData.put(0x1FFF4, (Byte)palPalettes[westHyrule.palace1.PalNum]);
+            ROMData.Put(0x1FFF4, (Byte)palPalettes[westHyrule.palace1.PalNum]);
 
-            ROMData.put(0x1FFF5, (Byte)palPalettes[westHyrule.palace2.PalNum]);
+            ROMData.Put(0x1FFF5, (Byte)palPalettes[westHyrule.palace2.PalNum]);
 
-            ROMData.put(0x1FFF6, (Byte)palPalettes[westHyrule.palace3.PalNum]);
+            ROMData.Put(0x1FFF6, (Byte)palPalettes[westHyrule.palace3.PalNum]);
 
-            ROMData.put(0x20000, (Byte)palPalettes[mazeIsland.palace4.PalNum]);
+            ROMData.Put(0x20000, (Byte)palPalettes[mazeIsland.palace4.PalNum]);
 
-            ROMData.put(0x1FFFC, (Byte)palPalettes[eastHyrule.palace5.PalNum]);
+            ROMData.Put(0x1FFFC, (Byte)palPalettes[eastHyrule.palace5.PalNum]);
 
-            ROMData.put(0x1FFFD, (Byte)palPalettes[eastHyrule.palace6.PalNum]);
+            ROMData.Put(0x1FFFD, (Byte)palPalettes[eastHyrule.palace6.PalNum]);
 
-            ROMData.put(0x1FFFE, (Byte)palPalettes[eastHyrule.gp.PalNum]);
+            ROMData.Put(0x1FFFE, (Byte)palPalettes[eastHyrule.gp.PalNum]);
 
             //}
 
             if (props.shuffleDripper)
             {
-                ROMData.put(0x11927, (Byte)enemies1[R.Next(enemies1.Count)]);
+                ROMData.Put(0x11927, (Byte)enemies1[R.Next(enemies1.Count)]);
             }
 
             if (props.shuffleEnemyPalettes)
@@ -3791,33 +3747,33 @@ namespace Z2Randomizer
 
                 foreach (int i in doubleLocs)
                 {
-                    int low = r.Next(12) + 1;
-                    int high = (r.Next(2) + 1) * 16;
+                    int low = random.Next(12) + 1;
+                    int high = (random.Next(2) + 1) * 16;
                     int color = high + low;
-                    ROMData.put(i, (byte)color);
-                    ROMData.put(i + 16, (byte)color);
-                    ROMData.put(i - 1, (byte)(color - 15));
-                    ROMData.put(i + 16 - 1, (byte)(color - 15));
+                    ROMData.Put(i, (byte)color);
+                    ROMData.Put(i + 16, (byte)color);
+                    ROMData.Put(i - 1, (byte)(color - 15));
+                    ROMData.Put(i + 16 - 1, (byte)(color - 15));
                 }
                 foreach (int i in singleLocs)
                 {
-                    int low = r.Next(13);
-                    int high = (r.Next(3)) * 16;
+                    int low = random.Next(13);
+                    int high = (random.Next(3)) * 16;
                     int color = high + low;
-                    ROMData.put(i, (byte)color);
-                    ROMData.put(i + 16, (byte)color);
-                    ROMData.put(i + 16 - 1, (byte)(color - 15));
+                    ROMData.Put(i, (byte)color);
+                    ROMData.Put(i + 16, (byte)color);
+                    ROMData.Put(i + 16 - 1, (byte)(color - 15));
                 }
 
                 for (int i = 0x54e8; i < 0x5508; i++)
                 {
                     if (i != 0x54f8)
                     {
-                        int b = ROMData.getByte(i);
+                        int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = r.Next(4);
+                        int n = random.Next(4);
                         n = n << 6;
-                        ROMData.put(i, (byte)(n + p));
+                        ROMData.Put(i, (byte)(n + p));
                     }
                 }
 
@@ -3825,52 +3781,52 @@ namespace Z2Randomizer
                 {
                     if (i != 0x94f8)
                     {
-                        int b = ROMData.getByte(i);
+                        int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = r.Next(4);
+                        int n = random.Next(4);
                         n = n << 6;
-                        ROMData.put(i, (byte)(n + p));
+                        ROMData.Put(i, (byte)(n + p));
                     }
                 }
                 for (int i = 0x114e8; i < 0x11508; i++)
                 {
                     if (i != 0x114f8)
                     {
-                        int b = ROMData.getByte(i);
+                        int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = r.Next(4);
+                        int n = random.Next(4);
                         n = n << 6;
-                        ROMData.put(i, (byte)(n + p));
+                        ROMData.Put(i, (byte)(n + p));
                     }
                 }
                 for (int i = 0x129e8; i < 0x12a09; i++)
                 {
                     if (i != 0x129f8)
                     {
-                        int b = ROMData.getByte(i);
+                        int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = r.Next(4);
+                        int n = random.Next(4);
                         n = n << 6;
-                        ROMData.put(i, (byte)(n + p));
+                        ROMData.Put(i, (byte)(n + p));
                     }
                 }
                 for (int i = 0x154e8; i < 0x15508; i++)
                 {
                     if (i != 0x154f8)
                     {
-                        int b = ROMData.getByte(i);
+                        int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = r.Next(4);
+                        int n = random.Next(4);
                         n = n << 6;
-                        ROMData.put(i, (byte)(n + p));
+                        ROMData.Put(i, (byte)(n + p));
                     }
                 }
             }
 
             Console.WriteLine("Here");
-            ROMData.put(0x4DEA, (Byte)westHyrule.trophyCave.item);
-            ROMData.put(0x502A, (Byte)westHyrule.jar.item);
-            ROMData.put(0x4DD7, (Byte)westHyrule.heart2.item);
+            ROMData.Put(0x4DEA, (Byte)westHyrule.trophyCave.item);
+            ROMData.Put(0x502A, (Byte)westHyrule.jar.item);
+            ROMData.Put(0x4DD7, (Byte)westHyrule.heart2.item);
             //Console.WriteLine(westHyrule.heart1.item);
             //Console.WriteLine(westHyrule.heart2.item);
             //Console.WriteLine(westHyrule.medCave.item);
@@ -3906,49 +3862,49 @@ namespace Z2Randomizer
             int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 
 
-            ROMData.put(0x5069, (Byte)westHyrule.medCave.item);
-            ROMData.put(0x4ff5, (Byte)westHyrule.heart1.item);
+            ROMData.Put(0x5069, (Byte)westHyrule.medCave.item);
+            ROMData.Put(0x4ff5, (Byte)westHyrule.heart1.item);
             
-            ROMData.put(0x65C3, (Byte)deathMountain.magicCave.item);
-            ROMData.put(0x6512, (Byte)deathMountain.hammerCave.item);
-            ROMData.put(0x8FAA, (Byte)eastHyrule.heart1.item);
-            ROMData.put(0x9011, (Byte)eastHyrule.heart2.item);
+            ROMData.Put(0x65C3, (Byte)deathMountain.magicCave.item);
+            ROMData.Put(0x6512, (Byte)deathMountain.hammerCave.item);
+            ROMData.Put(0x8FAA, (Byte)eastHyrule.heart1.item);
+            ROMData.Put(0x9011, (Byte)eastHyrule.heart2.item);
             if (!props.createPalaces)
             {
                 if (westHyrule.palace1.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[westHyrule.palace1.PalNum - 1], (Byte)westHyrule.palace1.item);
+                    ROMData.Put(itemLocs2[westHyrule.palace1.PalNum - 1], (Byte)westHyrule.palace1.item);
                 }
                 if (westHyrule.palace2.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[westHyrule.palace2.PalNum - 1], (Byte)westHyrule.palace2.item);
+                    ROMData.Put(itemLocs2[westHyrule.palace2.PalNum - 1], (Byte)westHyrule.palace2.item);
                 }
                 if (westHyrule.palace3.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[westHyrule.palace3.PalNum - 1], (Byte)westHyrule.palace3.item);
+                    ROMData.Put(itemLocs2[westHyrule.palace3.PalNum - 1], (Byte)westHyrule.palace3.item);
                 }
                 if (eastHyrule.palace5.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[eastHyrule.palace5.PalNum - 1], (Byte)eastHyrule.palace5.item);
+                    ROMData.Put(itemLocs2[eastHyrule.palace5.PalNum - 1], (Byte)eastHyrule.palace5.item);
                 }
                 if (eastHyrule.palace6.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[eastHyrule.palace6.PalNum - 1], (Byte)eastHyrule.palace6.item);
+                    ROMData.Put(itemLocs2[eastHyrule.palace6.PalNum - 1], (Byte)eastHyrule.palace6.item);
                 }
                 if (mazeIsland.palace4.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[mazeIsland.palace4.PalNum - 1], (Byte)mazeIsland.palace4.item);
+                    ROMData.Put(itemLocs2[mazeIsland.palace4.PalNum - 1], (Byte)mazeIsland.palace4.item);
                 }
 
 
                 if (eastHyrule.gp.PalNum != 7)
                 {
-                    ROMData.put(itemLocs2[eastHyrule.gp.PalNum - 1], (Byte)eastHyrule.gp.item);
+                    ROMData.Put(itemLocs2[eastHyrule.gp.PalNum - 1], (Byte)eastHyrule.gp.item);
                 }
             }
             else
             {
-                ROMData.elevatorBossFix(props.bossItem);
+                ROMData.ElevatorBossFix(props.bossItem);
                 if (westHyrule.palace1.PalNum != 7)
                 {
                     palaces[westHyrule.palace1.PalNum-1].updateItem(westHyrule.palace1.item);
@@ -3980,74 +3936,74 @@ namespace Z2Randomizer
                     palaces[eastHyrule.gp.PalNum - 1].updateItem(eastHyrule.gp.item);
                 }
 
-                ROMData.put(westHyrule.palace1.MemAddress + 0x7e, (byte)palaces[westHyrule.palace1.PalNum - 1].Root.Newmap);
-                ROMData.put(westHyrule.palace2.MemAddress + 0x7e, (byte)palaces[westHyrule.palace2.PalNum - 1].Root.Newmap);
-                ROMData.put(westHyrule.palace3.MemAddress + 0x7e, (byte)palaces[westHyrule.palace3.PalNum - 1].Root.Newmap);
-                ROMData.put(eastHyrule.palace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace5.PalNum - 1].Root.Newmap);
-                ROMData.put(eastHyrule.palace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace6.PalNum - 1].Root.Newmap);
-                ROMData.put(eastHyrule.gp.MemAddress + 0x7e, (byte)palaces[eastHyrule.gp.PalNum - 1].Root.Newmap);
-                ROMData.put(mazeIsland.palace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.palace4.PalNum - 1].Root.Newmap);
+                ROMData.Put(westHyrule.palace1.MemAddress + 0x7e, (byte)palaces[westHyrule.palace1.PalNum - 1].Root.Newmap);
+                ROMData.Put(westHyrule.palace2.MemAddress + 0x7e, (byte)palaces[westHyrule.palace2.PalNum - 1].Root.Newmap);
+                ROMData.Put(westHyrule.palace3.MemAddress + 0x7e, (byte)palaces[westHyrule.palace3.PalNum - 1].Root.Newmap);
+                ROMData.Put(eastHyrule.palace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace5.PalNum - 1].Root.Newmap);
+                ROMData.Put(eastHyrule.palace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace6.PalNum - 1].Root.Newmap);
+                ROMData.Put(eastHyrule.gp.MemAddress + 0x7e, (byte)palaces[eastHyrule.gp.PalNum - 1].Root.Newmap);
+                ROMData.Put(mazeIsland.palace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.palace4.PalNum - 1].Root.Newmap);
 
             }
-            if (eastHyrule.newKasuto.townNum == 8)
+            if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
             {
-                ROMData.put(0xDB95, (Byte)eastHyrule.newKasuto2.item); //map 47
+                ROMData.Put(0xDB95, (Byte)eastHyrule.newKasuto2.item); //map 47
 
-                ROMData.put(0xDB8C, (Byte)eastHyrule.newKasuto.item); //map 46
+                ROMData.Put(0xDB8C, (Byte)eastHyrule.newKasuto.item); //map 46
             }
             else
             {
-                ROMData.put(0xDB95, (Byte)westHyrule.lifeSouth.item); //map 47
+                ROMData.Put(0xDB95, (Byte)westHyrule.lifeSouth.item); //map 47
 
-                ROMData.put(0xDB8C, (Byte)westHyrule.lifeNorth.item); //map 46
+                ROMData.Put(0xDB8C, (Byte)westHyrule.lifeNorth.item); //map 46
             }
 
             if (props.townSwap)
             {
-                if (westHyrule.shieldTown.townNum != 1)
+                if (westHyrule.shieldTown.TownNum != Town.RAURU)
                 {
-                    ROMData.put(westHyrule.shieldTown.MemAddress + 0x7E, (byte)(westHyrule.shieldTown.Map + 0xC0));
-                    ROMData.put(westHyrule.shieldTown.MemAddress + 0xBD, (byte)8);
-                    ROMData.put(eastHyrule.fireTown.MemAddress + 0x7E, (byte)(eastHyrule.fireTown.Map + 0xC0));
-                    ROMData.put(eastHyrule.fireTown.MemAddress + 0xBD, (byte)6);
+                    ROMData.Put(westHyrule.shieldTown.MemAddress + 0x7E, (byte)(westHyrule.shieldTown.Map + 0xC0));
+                    ROMData.Put(westHyrule.shieldTown.MemAddress + 0xBD, (byte)8);
+                    ROMData.Put(eastHyrule.fireTown.MemAddress + 0x7E, (byte)(eastHyrule.fireTown.Map + 0xC0));
+                    ROMData.Put(eastHyrule.fireTown.MemAddress + 0xBD, (byte)6);
                 }
 
-                if (westHyrule.jump.townNum != 2)
+                if (westHyrule.jump.TownNum != Town.RUTO)
                 {
-                    ROMData.put(westHyrule.jump.MemAddress + 0x7E, (byte)(westHyrule.jump.Map + 0xC0));
-                    ROMData.put(westHyrule.jump.MemAddress + 0xBD, (byte)8);
-                    ROMData.put(eastHyrule.darunia.MemAddress + 0x7E, (byte)(eastHyrule.darunia.Map + 0xC0));
-                    ROMData.put(eastHyrule.darunia.MemAddress + 0xBD, (byte)6);
+                    ROMData.Put(westHyrule.jump.MemAddress + 0x7E, (byte)(westHyrule.jump.Map + 0xC0));
+                    ROMData.Put(westHyrule.jump.MemAddress + 0xBD, (byte)8);
+                    ROMData.Put(eastHyrule.darunia.MemAddress + 0x7E, (byte)(eastHyrule.darunia.Map + 0xC0));
+                    ROMData.Put(eastHyrule.darunia.MemAddress + 0xBD, (byte)6);
                 }
 
-                if (westHyrule.lifeNorth.townNum != 3)
+                if (westHyrule.lifeNorth.TownNum != Town.SARIA_NORTH)
                 {
-                    ROMData.put(westHyrule.lifeNorth.MemAddress + 0x7E, (byte)(westHyrule.lifeNorth.Map));
-                    ROMData.put(westHyrule.lifeNorth.MemAddress + 0xBD, (byte)8);
-                    ROMData.put(westHyrule.lifeSouth.MemAddress, (byte)0);
-                    ROMData.put(eastHyrule.newKasuto.MemAddress + 0x7E, (byte)(eastHyrule.newKasuto.Map + 0xC0));
-                    ROMData.put(eastHyrule.newKasuto.MemAddress + 0xBD, (byte)6);
-                    ROMData.put(eastHyrule.newKasuto2.MemAddress + 0x7F, (byte)(eastHyrule.newKasuto2.Map));
-                    ROMData.put(eastHyrule.newKasuto2.MemAddress + 0xBE, (byte)6);
+                    ROMData.Put(westHyrule.lifeNorth.MemAddress + 0x7E, (byte)(westHyrule.lifeNorth.Map));
+                    ROMData.Put(westHyrule.lifeNorth.MemAddress + 0xBD, (byte)8);
+                    ROMData.Put(westHyrule.lifeSouth.MemAddress, (byte)0);
+                    ROMData.Put(eastHyrule.newKasuto.MemAddress + 0x7E, (byte)(eastHyrule.newKasuto.Map + 0xC0));
+                    ROMData.Put(eastHyrule.newKasuto.MemAddress + 0xBD, (byte)6);
+                    ROMData.Put(eastHyrule.newKasuto2.MemAddress + 0x7F, (byte)(eastHyrule.newKasuto2.Map));
+                    ROMData.Put(eastHyrule.newKasuto2.MemAddress + 0xBE, (byte)6);
                 }
 
-                if (westHyrule.fairy.townNum != 5)
+                if (westHyrule.fairy.TownNum != Town.MIDO)
                 {
-                    ROMData.put(westHyrule.fairy.MemAddress + 0x7E, (byte)(westHyrule.fairy.Map + 0xC0));
-                    ROMData.put(westHyrule.fairy.MemAddress + 0xBD, (byte)8);
-                    ROMData.put(eastHyrule.oldKasuto.MemAddress + 0x7E, (byte)(eastHyrule.oldKasuto.Map + 0xC0));
-                    ROMData.put(eastHyrule.oldKasuto.MemAddress + 0xBD, (byte)6);
+                    ROMData.Put(westHyrule.fairy.MemAddress + 0x7E, (byte)(westHyrule.fairy.Map + 0xC0));
+                    ROMData.Put(westHyrule.fairy.MemAddress + 0xBD, (byte)8);
+                    ROMData.Put(eastHyrule.oldKasuto.MemAddress + 0x7E, (byte)(eastHyrule.oldKasuto.Map + 0xC0));
+                    ROMData.Put(eastHyrule.oldKasuto.MemAddress + 0xBD, (byte)6);
                 }
             }
 
-            ROMData.put(0xA5A8, (Byte)mazeIsland.magic.item);
-            ROMData.put(0xA58B, (Byte)mazeIsland.kid.item);
+            ROMData.Put(0xA5A8, (Byte)mazeIsland.magic.item);
+            ROMData.Put(0xA58B, (Byte)mazeIsland.kid.item);
             
             if (props.pbagItemShuffle)
             {
-                ROMData.put(0x4FE2, (Byte)westHyrule.pbagCave.item);
-                ROMData.put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
-                ROMData.put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
+                ROMData.Put(0x4FE2, (Byte)westHyrule.pbagCave.item);
+                ROMData.Put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
+                ROMData.Put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
 
             }
 
@@ -4055,16 +4011,16 @@ namespace Z2Randomizer
             {
                 if (l == westHyrule.pbagCave)
                 {
-                    ROMData.put(0x4FE2, (Byte)westHyrule.pbagCave.item);
+                    ROMData.Put(0x4FE2, (Byte)westHyrule.pbagCave.item);
                 }
 
                 if (l == eastHyrule.pbagCave1)
                 {
-                    ROMData.put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
+                    ROMData.Put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
                 }
                 if (l == eastHyrule.pbagCave2)
                 {
-                    ROMData.put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
+                    ROMData.Put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
                 }
             }
 
@@ -4073,12 +4029,12 @@ namespace Z2Randomizer
             Byte[] fl = hasher.ComputeHash(Encoding.UTF8.GetBytes(props.flags + props.seed + typeof(MainUI).Assembly.GetName().Version.Major + typeof(MainUI).Assembly.GetName().Version.Minor));
             long inthash = BitConverter.ToInt64(fl, 0);
 
-            ROMData.put(0x17C2C, (byte)(((inthash) & 0x1F) + 0xD0));
-            ROMData.put(0x17C2E, (byte)(((inthash >> 5) & 0x1F) + 0xD0));
-            ROMData.put(0x17C30, (byte)(((inthash >> 10) & 0x1F) + 0xD0));
-            ROMData.put(0x17C32, (byte)(((inthash >> 15) & 0x1F) + 0xD0));
-            ROMData.put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
-            ROMData.put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
+            ROMData.Put(0x17C2C, (byte)(((inthash) & 0x1F) + 0xD0));
+            ROMData.Put(0x17C2E, (byte)(((inthash >> 5) & 0x1F) + 0xD0));
+            ROMData.Put(0x17C30, (byte)(((inthash >> 10) & 0x1F) + 0xD0));
+            ROMData.Put(0x17C32, (byte)(((inthash >> 15) & 0x1F) + 0xD0));
+            ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
+            ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
 
             //Update raft animation
             bool firstRaft = false;
@@ -4088,14 +4044,14 @@ namespace Z2Randomizer
                 {
                     if (!firstRaft)
                     {
-                        ROMData.put(0x538, (Byte)w.raft.Xpos);
-                        ROMData.put(0x53A, (Byte)w.raft.Ypos);
+                        ROMData.Put(0x538, (Byte)w.raft.Xpos);
+                        ROMData.Put(0x53A, (Byte)w.raft.Ypos);
                         firstRaft = true;
                     } 
                     else
                     {
-                        ROMData.put(0x539, (Byte)w.raft.Xpos);
-                        ROMData.put(0x53B, (Byte)w.raft.Ypos);
+                        ROMData.Put(0x539, (Byte)w.raft.Xpos);
+                        ROMData.Put(0x53B, (Byte)w.raft.Ypos);
                     }
                 } 
             }
@@ -4108,14 +4064,14 @@ namespace Z2Randomizer
                 {
                     if (!firstRaft)
                     {
-                        ROMData.put(0x565, (Byte)w.bridge.Xpos);
-                        ROMData.put(0x567, (Byte)w.bridge.Ypos);
+                        ROMData.Put(0x565, (Byte)w.bridge.Xpos);
+                        ROMData.Put(0x567, (Byte)w.bridge.Ypos);
                         firstRaft = true;
                     }
                     else
                     {
-                        ROMData.put(0x564, (Byte)w.bridge.Xpos);
-                        ROMData.put(0x566, (Byte)w.bridge.Ypos);
+                        ROMData.Put(0x564, (Byte)w.bridge.Xpos);
+                        ROMData.Put(0x566, (Byte)w.bridge.Ypos);
                     }
                 }
             }
@@ -4123,12 +4079,12 @@ namespace Z2Randomizer
             //Update world check for p7
             if (westHyrule.palace1.PalNum == 7 || westHyrule.palace2.PalNum == 7 || westHyrule.palace3.PalNum == 7)
             {
-                ROMData.put(0x1dd3b, 0x05);
+                ROMData.Put(0x1dd3b, 0x05);
             }
 
             if (mazeIsland.palace4.PalNum == 7)
             {
-                ROMData.put(0x1dd3b, 0x14);
+                ROMData.Put(0x1dd3b, 0x14);
             }
 
             Console.WriteLine("Here");
@@ -4139,60 +4095,60 @@ namespace Z2Randomizer
             int[,] magNames = new int[8, 7];
             int[] magEffects = new int[16];
             int[] magFunction = new int[8];
-            ROMData.updateSpellText(spellMap);
+            ROMData.UpdateSpellText(spellMap);
 
             for (int i = 0; i < magFunction.Count(); i++)
             {
-                magFunction[i] = ROMData.getByte(functionBase + (int)spellMap[(spells)i]);
+                magFunction[i] = ROMData.GetByte(functionBase + (int)spellMap[(Spells)i]);
             }
 
             for (int i = 0; i < magEffects.Count(); i = i + 2)
             {
-                magEffects[i] = ROMData.getByte(effectBase + (int)spellMap[(spells)(i / 2)] * 2);
-                magEffects[i + 1] = ROMData.getByte(effectBase + (int)spellMap[(spells)(i / 2)] * 2 + 1);
+                magEffects[i] = ROMData.GetByte(effectBase + (int)spellMap[(Spells)(i / 2)] * 2);
+                magEffects[i + 1] = ROMData.GetByte(effectBase + (int)spellMap[(Spells)(i / 2)] * 2 + 1);
             }
 
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    magLevels[i, j] = ROMData.getByte(spellCostBase + ((int)spellMap[(spells)i] * 8 + j));
+                    magLevels[i, j] = ROMData.GetByte(spellCostBase + ((int)spellMap[(Spells)i] * 8 + j));
                 }
 
                 for (int j = 0; j < 7; j++)
                 {
-                    magNames[i, j] = ROMData.getByte(spellNameBase + ((int)spellMap[(spells)i] * 0xe + j));
+                    magNames[i, j] = ROMData.GetByte(spellNameBase + ((int)spellMap[(Spells)i] * 0xe + j));
                 }
             }
 
             for (int i = 0; i < magFunction.Count(); i++)
             {
-                ROMData.put(functionBase + i, (Byte)magFunction[i]);
+                ROMData.Put(functionBase + i, (Byte)magFunction[i]);
             }
 
             for (int i = 0; i < magEffects.Count(); i = i + 2)
             {
-                ROMData.put(effectBase + i, (Byte)magEffects[i]);
-                ROMData.put(effectBase + i + 1, (Byte)magEffects[i + 1]);
+                ROMData.Put(effectBase + i, (Byte)magEffects[i]);
+                ROMData.Put(effectBase + i + 1, (Byte)magEffects[i + 1]);
             }
 
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    ROMData.put(spellCostBase + (i * 8) + j, (Byte)magLevels[i, j]);
+                    ROMData.Put(spellCostBase + (i * 8) + j, (Byte)magLevels[i, j]);
                 }
 
                 for (int j = 0; j < 7; j++)
                 {
-                    ROMData.put(spellNameBase + (i * 0xe) + j, (Byte)magNames[i, j]);
+                    ROMData.Put(spellNameBase + (i * 0xe) + j, (Byte)magNames[i, j]);
                 }
             }
 
             //fix for rope graphical glitch
             for (int i = 0; i < 16; i++)
             {
-                ROMData.put(0x32CD0 + i, ROMData.getByte(0x34CD0 + i));
+                ROMData.Put(0x32CD0 + i, ROMData.GetByte(0x34CD0 + i));
             }
 
             //if (hiddenPalace)
@@ -4207,7 +4163,7 @@ namespace Z2Randomizer
 
         }
 
-        public void shuffleE(int enemyPtr, int enemyAddr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool p7)
+        public void ShuffleE(int enemyPtr, int enemyAddr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool p7)
         {
             //refactor this to use enemy arrays in rooms
             int maps = 0;
@@ -4251,31 +4207,31 @@ namespace Z2Randomizer
             }
             foreach(int map in mapsNos) 
             {
-                int low = ROMData.getByte(enemyPtr + map * 2);
-                int high = ROMData.getByte(enemyPtr + map * 2 + 1);
+                int low = ROMData.GetByte(enemyPtr + map * 2);
+                int high = ROMData.GetByte(enemyPtr + map * 2 + 1);
                 high = high << 8;
                 high = high & 0x0FFF;
                 int addr = high + low + enemyAddr;
-                shuffleEnemies(high + low + enemyAddr, enemies, generators, shorties, tallGuys, flyingEnemies, p7);
+                ShuffleEnemies(high + low + enemyAddr, enemies, generators, shorties, tallGuys, flyingEnemies, p7);
             }
         }
 
-        public void shuffleEnemies(int addr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool p7)
+        public void ShuffleEnemies(int addr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool p7)
         {
             if (!visitedEnemies.Contains(addr))
             {
-                int numBytes = ROMData.getByte(addr);
+                int numBytes = ROMData.GetByte(addr);
                 for (int j = addr + 2; j < addr + numBytes; j = j + 2)
                 {
-                    int enemy = ROMData.getByte(j) & 0x3F;
-                    int highPart = ROMData.getByte(j) & 0xC0;
+                    int enemy = ROMData.GetByte(j) & 0x3F;
+                    int highPart = ROMData.GetByte(j) & 0xC0;
                     if (props.mixEnemies)
                     {
                         if (enemies.Contains(enemy))
                         {
-                            int swap = enemies[r.Next(0, enemies.Count)];
-                            int ypos = ROMData.getByte(j - 1) & 0xF0;
-                            int xpos = ROMData.getByte(j - 1) & 0x0F;
+                            int swap = enemies[random.Next(0, enemies.Count)];
+                            int ypos = ROMData.GetByte(j - 1) & 0xF0;
+                            int xpos = ROMData.GetByte(j - 1) & 0x0F;
                             if (shorties.Contains(enemy) && tallGuys.Contains(swap))
                             {
                                 ypos = ypos - 16;
@@ -4293,8 +4249,8 @@ namespace Z2Randomizer
                             }
 
 
-                            ROMData.put(j - 1, (Byte)(ypos + xpos));
-                            ROMData.put(j, (Byte)(swap + highPart));
+                            ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                            ROMData.Put(j, (Byte)(swap + highPart));
                         }
                     }
                     else
@@ -4302,18 +4258,18 @@ namespace Z2Randomizer
                         if (tallGuys.Contains(enemy))
                         {
                             int swap = R.Next(0, tallGuys.Count);
-                            int ypos = ROMData.getByte(j - 1) & 0xF0;
+                            int ypos = ROMData.GetByte(j - 1) & 0xF0;
                             while (tallGuys[swap] == 0x1D && ypos != 0x70 && !p7)
                             {
                                 swap = R.Next(0, tallGuys.Count);
                             }
-                            ROMData.put(j, (Byte)(tallGuys[swap] + highPart));
+                            ROMData.Put(j, (Byte)(tallGuys[swap] + highPart));
                         }
 
                         if (shorties.Contains(enemy))
                         {
                             int swap = R.Next(0, shorties.Count);
-                            ROMData.put(j, (Byte)(shorties[swap] + highPart));
+                            ROMData.Put(j, (Byte)(shorties[swap] + highPart));
                         }
                     }
 
@@ -4325,13 +4281,13 @@ namespace Z2Randomizer
                         {
                             swap = R.Next(0, flyingEnemies.Count);
                         }
-                        ROMData.put(j, (Byte)(flyingEnemies[swap] + highPart));
+                        ROMData.Put(j, (Byte)(flyingEnemies[swap] + highPart));
                     }
 
                     if (generators.Contains(enemy))
                     {
                         int swap = R.Next(0, generators.Count);
-                        ROMData.put(j, (Byte)(generators[swap] + highPart));
+                        ROMData.Put(j, (Byte)(generators[swap] + highPart));
                     }
 
                     if (enemy == 0x0B)
@@ -4339,7 +4295,7 @@ namespace Z2Randomizer
                         int swap = R.Next(0, generators.Count + 1);
                         if (swap != generators.Count)
                         {
-                            ROMData.put(j, (Byte)(generators[swap] + highPart));
+                            ROMData.Put(j, (Byte)(generators[swap] + highPart));
                         }
                     }
                 }
@@ -4347,7 +4303,7 @@ namespace Z2Randomizer
             }
 
         }
-        public void shuffleSmallItems(int world, bool first)
+        public void ShuffleSmallItems(int world, bool first)
         {
             Console.WriteLine("World: " + world);
             List<int> addresses = new List<int>();
@@ -4366,17 +4322,17 @@ namespace Z2Randomizer
             {
 
                 map++;
-                int low = ROMData.getByte(i);
-                int hi = ROMData.getByte(i + 1) * 256;
-                int numBytes = ROMData.getByte(hi + low + 16 - 0x8000 + (world * 0x4000));
+                int low = ROMData.GetByte(i);
+                int hi = ROMData.GetByte(i + 1) * 256;
+                int numBytes = ROMData.GetByte(hi + low + 16 - 0x8000 + (world * 0x4000));
                 for (int j = 4; j < numBytes; j = j + 2)
                 {
-                    int yPos = ROMData.getByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
+                    int yPos = ROMData.GetByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
                     yPos = yPos >> 4;
-                    if (ROMData.getByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
+                    if (ROMData.GetByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
                     {
                         int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
-                        int item = ROMData.getByte(addr);
+                        int item = ROMData.GetByte(addr);
                         if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
                         {
                             Console.WriteLine("Map: " + map);
@@ -4393,14 +4349,14 @@ namespace Z2Randomizer
 
             for (int i = 0; i < items.Count; i++)
             {
-                int swap = r.Next(i, items.Count);
+                int swap = random.Next(i, items.Count);
                 int temp = items[swap];
                 items[swap] = items[i];
                 items[i] = temp;
             }
             for (int i = 0; i < addresses.Count; i++)
             {
-                ROMData.put(addresses[i], (Byte)items[i]);
+                ROMData.Put(addresses[i], (Byte)items[i]);
             }
         }
 

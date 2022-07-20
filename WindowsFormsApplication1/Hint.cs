@@ -15,38 +15,38 @@ namespace Z2Randomizer
             "do you know$why we$stopped$the car?",
             "link...$i am your$father",
             "I like big$bots and i$cannot lie",
-        "why am i$locked in$a basement",
-        "thats just$like your$opinion$man",
-        "the dude$abides",
-        "i hope$this isnt$fire spell",
-        "boy this$is really$expensive",
-        "10th enemy$has the$bomb",
-        "stay$awhile and$listen",
-        "Dude eff$this game",
-        "you teach$me a spell",
-        "you know$nothing",
-        "thats what$she said",
-        "lets throw$a rave",
-        "jump in$lava for$200 rupees",
-        "you wont$be able$to cast$this",
-        "big bucks$no whammys",
-        "bagu owes$me 20$rupees",
-        "you are$the$weakest$link",
-        "link i$am your$father",
-        "theres no$wifi here",
-        "a wild$link$appears",
-        "welcome$to walmart",
-        "whats the$wifi$password",
-        "dont send$me back to$the home",
-        "pull my$finger",
-        "id like$to buy a$vowel",
-        "i only$know one$spell",
-        "i went$to$college$for this",
-        "larry is$still in$northern$palace",
-        "this game$needs more$categories",
-        "who$picked$these$flags",
-        "i found$this in$the$garbage",
-        "have you$heard my$mixtape"
+            "why am i$locked in$a basement",
+            "thats just$like your$opinion$man",
+            "the dude$abides",
+            "i hope$this isnt$fire spell",
+            "boy this$is really$expensive",
+            "10th enemy$has the$bomb",
+            "stay$awhile and$listen",
+            "Dude eff$this game",
+            "you teach$me a spell",
+            "you know$nothing",
+            "thats what$she said",
+            "lets throw$a rave",
+            "jump in$lava for$200 rupees",
+            "you wont$be able$to cast$this",
+            "big bucks$no whammys",
+            "bagu owes$me 20$rupees",
+            "you are$the$weakest$link",
+            "link i$am your$father",
+            "theres no$wifi here",
+            "a wild$link$appears",
+            "welcome$to walmart",
+            "whats the$wifi$password",
+            "dont send$me back to$the home",
+            "pull my$finger",
+            "id like$to buy a$vowel",
+            "i only$know one$spell",
+            "i went$to$college$for this",
+            "larry is$still in$northern$palace",
+            "this game$needs more$categories",
+            "who$picked$these$flags",
+            "i found$this in$the$garbage",
+            "have you$heard my$mixtape"
         };
 
         private readonly String[] bridgetext = {
@@ -111,7 +111,7 @@ namespace Z2Randomizer
 
         public Hint(Shuffler s)
         {
-            text = Util.toGameText("I know$nothing", true);
+            text = Util.ToGameText("I know$nothing", true);
             this.s = s;
         }
 
@@ -122,7 +122,7 @@ namespace Z2Randomizer
 
         }
 
-        public void generateCommunityHint(String type)
+        public void GenerateCommunityHint(String type)
         {
             if (type == "wizard")
             {
@@ -131,35 +131,35 @@ namespace Z2Randomizer
                 {
                     thisone = s.R.Next(wizardTexts.Count());
                 }
-                this.text = Util.toGameText(wizardTexts[thisone], true).ToList();
+                this.text = Util.ToGameText(wizardTexts[thisone], true).ToList();
                 used.Add(thisone);
             }
             else if (type == "bagu")
             {
-                this.text = Util.toGameText(bagutext[s.R.Next(bagutext.Count())], true);
+                this.text = Util.ToGameText(bagutext[s.R.Next(bagutext.Count())], true);
             }
             else if (type == "bridge")
             {
-                this.text = Util.toGameText(bridgetext[s.R.Next(bridgetext.Length)], true);
+                this.text = Util.ToGameText(bridgetext[s.R.Next(bridgetext.Length)], true);
             }
             else if (type == "downstab")
             {
-                this.text = Util.toGameText(downstabtext[s.R.Next(downstabtext.Length)], true);
+                this.text = Util.ToGameText(downstabtext[s.R.Next(downstabtext.Length)], true);
             }
             else //upstab
             {
-                this.text = Util.toGameText(upstabtext[s.R.Next(upstabtext.Length)], true);
+                this.text = Util.ToGameText(upstabtext[s.R.Next(upstabtext.Length)], true);
             }
         }
 
-        public static void reset()
+        public static void Reset()
         {
             used = new List<int>();
         }
 
-        public void generateHelpfulHint(Location location)
+        public void GenerateHelpfulHint(Location location)
         {
-            items hintItem = location.item;
+            Items hintItem = location.item;
             String hint = "";
             if (location.PalNum == 1)
             {
@@ -185,15 +185,15 @@ namespace Z2Randomizer
             {
                 hint += "barba$slithers$with the$";
             }
-            else if (location.Continent == continent.east)
+            else if (location.Continent == Continent.EAST)
             {
                 hint += "go east to$find the$";
             }
-            else if (location.Continent == continent.west)
+            else if (location.Continent == Continent.WEST)
             {
                 hint += "go west to$find the$";
             }
-            else if (location.Continent == continent.dm)
+            else if (location.Continent == Continent.DM)
             {
                 hint += "death$mountain$holds the$";
             }
@@ -204,86 +204,86 @@ namespace Z2Randomizer
 
             switch (hintItem)
             {
-                case (items.bluejar):
+                case (Items.bluejar):
                     hint += "blue jar";
                     break;
-                case (items.boots):
+                case (Items.boots):
                     hint += "boots";
                     break;
-                case (items.candle):
+                case (Items.candle):
                     hint += "candle";
                     break;
-                case (items.cross):
+                case (Items.cross):
                     hint += "cross";
                     break;
-                case (items.fivehundobag):
-                case (items.twohundobag):
-                case (items.hundobag):
-                case (items.smallbag):
+                case (Items.fivehundobag):
+                case (Items.twohundobag):
+                case (Items.hundobag):
+                case (Items.smallbag):
                     hint += "pbag";
                     break;
-                case (items.glove):
+                case (Items.glove):
                     hint += "glove";
                     break;
-                case (items.hammer):
+                case (Items.hammer):
                     hint += "hammer";
                     break;
-                case (items.heartcontainer):
+                case (Items.heartcontainer):
                     hint += "heart";
                     break;
-                case (items.horn):
+                case (Items.horn):
                     hint += "flute";
                     break;
-                case (items.key):
+                case (Items.key):
                     hint += "small key";
                     break;
-                case (items.kid):
+                case (Items.kid):
                     hint += "child";
                     break;
-                case (items.magiccontainer):
+                case (Items.magiccontainer):
                     hint += "magic jar";
                     break;
-                case (items.magickey):
+                case (Items.magickey):
                     hint += "magic key";
                     break;
-                case (items.medicine):
+                case (Items.medicine):
                     hint += "medicine";
                     break;
-                case (items.oneup):
+                case (Items.oneup):
                     hint += "link doll";
                     break;
-                case (items.raft):
+                case (Items.raft):
                     hint += "raft";
                     break;
-                case (items.redjar):
+                case (Items.redjar):
                     hint += "red jar";
                     break;
-                case (items.trophy):
+                case (Items.trophy):
                     hint += "trophy";
                     break;
             }
 
-            text = Util.toGameText(hint, true).ToList();
+            text = Util.ToGameText(hint, true).ToList();
         }
 
-        public void generateTownHint(spells spell)
+        public void GenerateTownHint(Spells spell)
         {
             String text = "";
             switch(spell)
             {
-                case spells.shield:
+                case Spells.shield:
                     text += "shield$";
                     break;
-                case spells.jump:
+                case Spells.jump:
                     text += "jump";
                     break;
-                case spells.life:
+                case Spells.life:
                     text += "life$";
                     break;
-                case spells.fairy:
+                case Spells.fairy:
                     text += "fairy$";
                     break;
-                case spells.fire:
+                case Spells.fire:
                     if (!s.Props.dashSpell)
                     {
                         text += "fire$";
@@ -293,19 +293,19 @@ namespace Z2Randomizer
                         text += "dash$";
                     }
                     break;
-                case spells.reflect:
+                case Spells.reflect:
                     text += "reflect$";
                     break;
-                case spells.spell:
+                case Spells.spell:
                     text += "spell$";
                     break;
-                case spells.thunder:
+                case Spells.thunder:
                     text += "thunder$";
                     break;
 
             }
             text += "town";
-            this.text = Util.toGameText(text, true);
+            this.text = Util.ToGameText(text, true);
         }
 
     }

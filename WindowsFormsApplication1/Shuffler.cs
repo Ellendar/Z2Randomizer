@@ -99,49 +99,49 @@ namespace Z2Randomizer
 
         }
 
-        public void generateHints(List<Location> itemLocs, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid, Dictionary<spells, spells> spellMap, Location bagu)
+        public void GenerateHints(List<Location> itemLocs, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid, Dictionary<Spells, Spells> spellMap, Location bagu)
         {
-            List<Hint> hints = ROMData.getGameText();
+            List<Hint> hints = ROMData.GetGameText();
             if (props.dashSpell)
             {
-                hints[70] = new Hint(Util.toGameText("USE THIS$TO GO$FAST", true), this);
+                hints[70] = new Hint(Util.ToGameText("USE THIS$TO GO$FAST", true), this);
             }
             if (props.community)
             {
-                generatCommunityHints(hints);
+                GenerateCommunityHints(hints);
             }
 
             if (props.spellItemHints)
             {
-                generateSpellHints(itemLocs, hints, startsWithTrophy, startsWithMedicine, startsWithKid);
+                GenerateSpellHints(itemLocs, hints, startsWithTrophy, startsWithMedicine, startsWithKid);
             }
 
             List<int> placedIndex = new List<int>();
             if (props.bagusWoods)
             {
-                hints[baguText] = generateBaguHint(bagu);
+                hints[baguText] = GenerateBaguHint(bagu);
                 sariaHints.Remove(baguText);
 
             }
             if (props.helpfulHints)
             {
-                placedIndex = generateHelpfulHints(hints, itemLocs);
+                placedIndex = GenerateHelpfulHints(hints, itemLocs);
             }
 
             if (props.spellItemHints || props.helpfulHints)
             {
-                generateKnowNothings(hints, placedIndex);
+                GenerateKnowNothings(hints, placedIndex);
             }
 
             if (props.townNameHints)
             {
-                generateTownNameHints(hints, spellMap);
+                GenerateTownNameHints(hints, spellMap);
             }
 
-            ROMData.textToRom(hints);
+            ROMData.TextToRom(hints);
         }
 
-        private Hint generateBaguHint(Location bagu)
+        private Hint GenerateBaguHint(Location bagu)
         {
             int baguy = bagu.Ypos - 30;
             int bagux = bagu.Xpos;
@@ -192,46 +192,46 @@ namespace Z2Randomizer
                 }
             }
             hint += "WOODS";
-            Hint baguH = new Hint(Util.toGameText(hint, true), this);
+            Hint baguH = new Hint(Util.ToGameText(hint, true), this);
             return baguH;
         }
 
-        private void generateTownNameHints(List<Hint> hints, Dictionary<spells, spells> spellMap)
+        private void GenerateTownNameHints(List<Hint> hints, Dictionary<Spells, Spells> spellMap)
         {
             Hint h = new Hint(this);
-            h.generateTownHint(spellMap[spells.shield]);
+            h.GenerateTownHint(spellMap[Spells.shield]);
             hints[rauruSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.jump]);
+            h.GenerateTownHint(spellMap[Spells.jump]);
             hints[rutoSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.life]);
+            h.GenerateTownHint(spellMap[Spells.life]);
             hints[sariaSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.fairy]);
+            h.GenerateTownHint(spellMap[Spells.fairy]);
             hints[midoSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.fire]);
+            h.GenerateTownHint(spellMap[Spells.fire]);
             hints[nabooruSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.reflect]);
+            h.GenerateTownHint(spellMap[Spells.reflect]);
             hints[daruniaSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.spell]);
+            h.GenerateTownHint(spellMap[Spells.spell]);
             hints[newKasutoSign] = h;
 
             h = new Hint(this);
-            h.generateTownHint(spellMap[spells.thunder]);
+            h.GenerateTownHint(spellMap[Spells.thunder]);
             hints[oldKasutoSign] = h;
         }
 
-        private void generateKnowNothings(List<Hint> hints, List<int> placedIndex)
+        private void GenerateKnowNothings(List<Hint> hints, List<int> placedIndex)
         {
             List<int> stationary = new List<int>();
             stationary.AddRange(rauruHints.ToList());
@@ -268,16 +268,16 @@ namespace Z2Randomizer
             }
         }
 
-        private List<int> generateHelpfulHints(List<Hint> hints, List<Location> itemLocs)
+        private List<int> GenerateHelpfulHints(List<Hint> hints, List<Location> itemLocs)
         {
             List<int> placedIndex = new List<int>();
 
-            List<items> placedItems = new List<items>();
+            List<Items> placedItems = new List<Items>();
             bool placedSmall = false;
-            List<items> smallItems = new List<items> { items.bluejar, items.fivehundobag, items.key, items.hundobag, items.magiccontainer, items.heartcontainer, items.oneup, items.redjar, items.smallbag, items.twohundobag };
+            List<Items> smallItems = new List<Items> { Items.bluejar, Items.fivehundobag, Items.key, Items.hundobag, Items.magiccontainer, Items.heartcontainer, Items.oneup, Items.redjar, Items.smallbag, Items.twohundobag };
             List<int> placedTowns = new List<int>();
 
-            List<items> it = new List<items>();
+            List<Items> it = new List<Items>();
             for (int i = 0; i < itemLocs.Count(); i++)
             {
                 it.Add(itemLocs[i].item);
@@ -285,14 +285,14 @@ namespace Z2Randomizer
 
             if (props.spellItemHints)
             {
-                it.Remove(items.trophy);
-                it.Remove(items.kid);
-                it.Remove(items.medicine);
+                it.Remove(Items.trophy);
+                it.Remove(Items.kid);
+                it.Remove(Items.medicine);
             }
 
             for (int i = 0; i < numberOfHints; i++)
             {
-                items doThis = it[R.Next(it.Count())];
+                Items doThis = it[R.Next(it.Count())];
                 int tries = 0;
                 while (((placedSmall && smallItems.Contains(doThis)) || placedItems.Contains(doThis)) && tries < 1000)
                 {
@@ -305,7 +305,7 @@ namespace Z2Randomizer
                     j++;
                 }
                 Hint hint = new Hint(this);
-                hint.generateHelpfulHint(itemLocs[j]);
+                hint.GenerateHelpfulHint(itemLocs[j]);
                 int town = R.Next(9);
                 while (placedTowns.Contains(town))
                 {
@@ -336,67 +336,67 @@ namespace Z2Randomizer
             return placedIndex;
         }
 
-        private void generateSpellHints(List<Location> itemLocs, List<Hint> hints, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid)
+        private void GenerateSpellHints(List<Location> itemLocs, List<Hint> hints, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid)
         {
             int i = 0;
             while (i < itemLocs.Count())
             {
-                if (itemLocs[i].item == items.trophy && !startsWithTrophy)
+                if (itemLocs[i].item == Items.trophy && !startsWithTrophy)
                 {
                     Hint trophyHint = new Hint(this);
-                    trophyHint.generateHelpfulHint(itemLocs[i]);
+                    trophyHint.GenerateHelpfulHint(itemLocs[i]);
                     hints[trophyIndex] = trophyHint;
                 }
-                else if (itemLocs[i].item == items.medicine && !startsWithMedicine)
+                else if (itemLocs[i].item == Items.medicine && !startsWithMedicine)
                 {
                     Hint medHint = new Hint(this);
-                    medHint.generateHelpfulHint(itemLocs[i]);
+                    medHint.GenerateHelpfulHint(itemLocs[i]);
                     hints[medIndex] = medHint;
                 }
-                else if (itemLocs[i].item == items.kid && !startsWithKid)
+                else if (itemLocs[i].item == Items.kid && !startsWithKid)
                 {
                     Hint kidHint = new Hint(this);
-                    kidHint.generateHelpfulHint(itemLocs[i]);
+                    kidHint.GenerateHelpfulHint(itemLocs[i]);
                     hints[kidIndex] = kidHint;
                 }
                 i++;
             }
         }
 
-        private void generatCommunityHints(List<Hint> hints)
+        private void GenerateCommunityHints(List<Hint> hints)
         {
-            Hint.reset();
+            Hint.Reset();
             do
             {
                 for (int i = 0; i < 8; i++)
                 {
                     Hint wizardHint = new Hint(this);
-                    wizardHint.generateCommunityHint("wizard");
+                    wizardHint.GenerateCommunityHint("wizard");
                     hints.RemoveAt(wizardindex[i]);
                     hints.Insert(wizardindex[i], wizardHint);
 
                 }
 
                 Hint baguHint = new Hint(this);
-                baguHint.generateCommunityHint("bagu");
+                baguHint.GenerateCommunityHint("bagu");
                 hints[baguTextIndex] = baguHint;
 
                 Hint bridgeHint = new Hint(this);
-                bridgeHint.generateCommunityHint("bridge");
+                bridgeHint.GenerateCommunityHint("bridge");
                 hints[bridgeTextIndex] = bridgeHint;
 
                 Hint downstabHint = new Hint(this);
-                downstabHint.generateCommunityHint("downstab");
+                downstabHint.GenerateCommunityHint("downstab");
                 hints[downstabTextIndex] = downstabHint;
 
                 Hint upstabHint = new Hint(this);
-                upstabHint.generateCommunityHint("upstab");
+                upstabHint.GenerateCommunityHint("upstab");
                 hints[upstabTextIndex] = upstabHint;
 
-            } while (textLength(hints) > maxTextLength);
+            } while (TextLength(hints) > maxTextLength);
         }
 
-        private static int textLength(List<Hint> texts)
+        private static int TextLength(List<Hint> texts)
         {
             int sum = 0;
             for (int i = 0; i < texts.Count(); i++)
@@ -406,7 +406,7 @@ namespace Z2Randomizer
             return sum;
         }
 
-        public void shufflePalacePalettes()
+        public void ShufflePalacePalettes()
         {
             List<int[]> brickList = new List<int[]>();
             List<int[]> curtainList = new List<int[]>();
@@ -433,10 +433,10 @@ namespace Z2Randomizer
                 binRows.Add(R.Next(7));
             }
 
-            ROMData.writePalacePalettes(brickList, curtainList, bRows, binRows);
+            ROMData.WritePalacePalettes(brickList, curtainList, bRows, binRows);
         }
 
-        public void shuffleDrops()
+        public void ShuffleDrops()
         {
             List<int> small = new List<int>();
             List<int> large = new List<int>();
@@ -466,7 +466,7 @@ namespace Z2Randomizer
                 }
             }
 
-            if (props.shuffleEnemyDrops)
+            if (props.ShuffleEnemyDrops)
             {
                 //private readonly int[] drops = { 0x8a, 0x8b, 0x8c, 0x8d, 0x90, 0x91, 0x92, 0x88 };
 
@@ -536,7 +536,7 @@ namespace Z2Randomizer
                 }
             }
 
-            if (props.randoDrops || props.shuffleEnemyDrops)
+            if (props.randoDrops || props.ShuffleEnemyDrops)
             {
                 for (int i = 0; i < small.Count(); i++)
                 {
@@ -557,50 +557,50 @@ namespace Z2Randomizer
                 {
                     if (i < small.Count())
                     {
-                        ROMData.put(0x1E880 + i, (byte)small[i]);
+                        ROMData.Put(0x1E880 + i, (byte)small[i]);
                     }
                     else
                     {
-                        ROMData.put(0x1E880 + i, (byte)small[R.Next(small.Count())]);
+                        ROMData.Put(0x1E880 + i, (byte)small[R.Next(small.Count())]);
                     }
                     if (i < large.Count())
                     {
-                        ROMData.put(0x1E888 + i, (byte)large[i]);
+                        ROMData.Put(0x1E888 + i, (byte)large[i]);
                     }
                     else
                     {
-                        ROMData.put(0x1E888 + i, (byte)large[R.Next(large.Count())]);
+                        ROMData.Put(0x1E888 + i, (byte)large[R.Next(large.Count())]);
                     }
                 }
             }
         }
 
-        public void shufflePbagAmounts()
+        public void ShufflePbagAmounts()
         {
             if (props.shufflePbagXp)
             {
-                ROMData.put(0x1e800, (byte)R.Next(5, 10));
-                ROMData.put(0x1e801, (byte)R.Next(7, 12));
-                ROMData.put(0x1e802, (byte)R.Next(9, 14));
-                ROMData.put(0x1e803, (byte)R.Next(11, 16));
+                ROMData.Put(0x1e800, (byte)R.Next(5, 10));
+                ROMData.Put(0x1e801, (byte)R.Next(7, 12));
+                ROMData.Put(0x1e802, (byte)R.Next(9, 14));
+                ROMData.Put(0x1e803, (byte)R.Next(11, 16));
             }
         }
 
-        public int shuffleKasutoJars()
+        public int ShuffleKasutoJars()
         {
             int kasutoJars = 7;
             if (props.kasutoJars)
             {
                 kasutoJars = R.Next(5, 8);
-                ROMData.writeKasutoJarAmount(kasutoJars);
+                ROMData.WriteKasutoJarAmount(kasutoJars);
             }
             return kasutoJars;
         }
 
-        public void shuffleBossDrop()
+        public void ShuffleBossDrop()
         {
             int drop = drops[R.Next(drops.Count())];
-            ROMData.put(0x1de29, (byte)(drop - 0x80));
+            ROMData.Put(0x1de29, (byte)(drop - 0x80));
 
             /*
              * LE79A                                                                          ;
@@ -621,11 +621,11 @@ namespace Z2Randomizer
                 inc      $0793                         ; 0x1e7c5 $E7B5 EE 93 07                ; Number of Keys
                 jmp      LE797                         ; 0x1e7c8 $E7B8 4C 97 E7    
             */
-            ROMData.put(0x1e7aa, new byte[] { 0xAD, 0x28, 0x07, 0xF0, 0x0E, 0xA9, 0x00, 0x8D, 0x28, 0x07, 0xAD, 0xFB, 0x07, 0xD0, 0x04, 0xa9, 0x02, 0x85, 0xeb, 0xa9, 0x08, 0x85, 0xef, 0xc0, 0x08, 0xd0, 0x06, 0xee, 0x93, 0x07, 0x4c, 0x97, 0xe7 });
+            ROMData.Put(0x1e7aa, new byte[] { 0xAD, 0x28, 0x07, 0xF0, 0x0E, 0xA9, 0x00, 0x8D, 0x28, 0x07, 0xAD, 0xFB, 0x07, 0xD0, 0x04, 0xa9, 0x02, 0x85, 0xeb, 0xa9, 0x08, 0x85, 0xef, 0xc0, 0x08, 0xd0, 0x06, 0xee, 0x93, 0x07, 0x4c, 0x97, 0xe7 });
 
             //jump to 1f33a
-            ROMData.put(0x1e81c, new byte[] { 0x20, 0x2a, 0xf3, 0xea });
-            ROMData.put(0x1e85b, new byte[] { 0x20, 0x35, 0xf3, 0xea });
+            ROMData.Put(0x1e81c, new byte[] { 0x20, 0x2a, 0xf3, 0xea });
+            ROMData.Put(0x1e85b, new byte[] { 0x20, 0x35, 0xf3, 0xea });
 
             //1f33a
 
@@ -637,13 +637,13 @@ namespace Z2Randomizer
             //A9 10
             //85 eb
             //60
-            ROMData.put(0x1f33a, new byte[] { 0xA5, 0xEB, 0xC9, 0x02, 0xf0, 0x04, 0xa9, 0x10, 0x85, 0xeb, 0x60 });
+            ROMData.Put(0x1f33a, new byte[] { 0xA5, 0xEB, 0xC9, 0x02, 0xf0, 0x04, 0xa9, 0x10, 0x85, 0xeb, 0x60 });
 
             //1f345
-            ROMData.put(0x1f345, new byte[] { 0xA5, 0xEB, 0xC9, 0x02, 0xf0, 0x04, 0xa9, 0x00, 0x85, 0xeb, 0x60 });
+            ROMData.Put(0x1f345, new byte[] { 0xA5, 0xEB, 0xC9, 0x02, 0xf0, 0x04, 0xa9, 0x00, 0x85, 0xeb, 0x60 });
         }
 
-        public List<Palace> createPalaces(BackgroundWorker worker)
+        public List<Palace> CreatePalaces(BackgroundWorker worker)
         {
             List<Palace> palaces = new List<Palace>();
             Dictionary<Byte[], List<Room>> sideviews = new Dictionary<Byte[], List<Room>>(new Util.MyEqualityComparer());
@@ -747,14 +747,14 @@ namespace Z2Randomizer
                             p = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                             p.Root = PalaceRooms.entrances[i - 1].deepCopy();
 
-                            p.BossRoom = selectBossRoom(i);
+                            p.BossRoom = SelectBossRoom(i);
 
                             p.AllRooms.Add(p.Root);
 
                             p.AllRooms.Add(p.BossRoom);
                             if (i < 7)
                             {
-                                p.ItemRoom = selectItemRoom();
+                                p.ItemRoom = SelectItemRoom();
                                 if((i == 1 || i == 2 || i == 5) && p.ItemRoom.HasBoss)
                                 {
                                     p.ItemRoom.Enemies[1] = 0x6C;
@@ -763,21 +763,21 @@ namespace Z2Randomizer
                                 p.AllRooms.Add(p.ItemRoom);
 
                                 p.Root.Newmap = mapNo;
-                                incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.BossRoom.Newmap = mapNo;
                                 if (props.bossRoomConnect)
                                 {
                                     p.BossRoom.RightByte = 0x69;
                                 }
-                                incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.ItemRoom.Newmap = mapNo;
-                                p.ItemRoom.setItem((items)i);
-                                incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                p.ItemRoom.setItem((Items)i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 if (p.ItemRoom.Map == 69)
                                 {
                                     Room extra = PalaceRooms.maxBonusItemRoom.deepCopy();
                                     extra.Newmap = p.ItemRoom.Newmap;
-                                    extra.setItem((items)i);
+                                    extra.setItem((Items)i);
                                     p.AllRooms.Add(extra);
                                     p.sortRoom(extra);
                                     p.setOpenRoom(extra);
@@ -790,9 +790,9 @@ namespace Z2Randomizer
                             else
                             {
                                 p.Root.Newmap = mapNoGp;
-                                incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.BossRoom.Newmap = mapNoGp;
-                                incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.sortRoom(p.Root);
                                 p.sortRoom(p.BossRoom);
                                 //thunderbird?
@@ -800,7 +800,7 @@ namespace Z2Randomizer
                                 {
                                     p.Tbird = PalaceRooms.tbirdRooms[R.Next(PalaceRooms.tbirdRooms.Count)].deepCopy();
                                     p.Tbird.Newmap = mapNoGp;
-                                    incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                    IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                     p.sortRoom(p.Tbird);
                                     p.AllRooms.Add(p.Tbird);
                                 }
@@ -843,7 +843,7 @@ namespace Z2Randomizer
                                 bool added = p.addRoom(addThis, props.blockersAnywhere);
                                 if (added)
                                 {
-                                    incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                    IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                     if(addThis.HasDrop && !dropped)
                                     {
                                         int numDrops = R.Next(Math.Min(3, p.MaxRooms - p.AllRooms.Count), Math.Min(6, p.MaxRooms - p.AllRooms.Count));
@@ -871,7 +871,7 @@ namespace Z2Randomizer
                                             bool added2 = p.addRoom(r, props.blockersAnywhere);
                                             if(added2)
                                             {
-                                                incrementMapNo(ref mapNo, ref mapNoGp, i);
+                                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                                 lastDrop = r.HasDrop;
                                                 j++;
                                             }
@@ -1020,7 +1020,7 @@ namespace Z2Randomizer
             //update pointers
             if (props.createPalaces)
             {
-                Dictionary<int, int> freeSpace = setupFreeSpace(true, 0);
+                Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
                 if (enemyBytes > 0x400 || enemyBytesgp > 681)
                 {
                     return new List<Palace>();
@@ -1029,15 +1029,15 @@ namespace Z2Randomizer
                 int enemyPtrgp = 0x148B0;
                 foreach (byte[] sv in sideviews.Keys)
                 {
-                    int addr = findFreeSpace(freeSpace, sv);
+                    int addr = FindFreeSpace(freeSpace, sv);
                     if (addr == -1) //not enough space
                     {
                         return new List<Palace>();
                     }
-                    ROMData.put(addr, sv);
-                    if(ROMData.getByte(addr + sv.Length) >= 0xD0)
+                    ROMData.Put(addr, sv);
+                    if(ROMData.GetByte(addr + sv.Length) >= 0xD0)
                     {
-                        ROMData.put(addr + sv.Length, 0x00);
+                        ROMData.Put(addr + sv.Length, 0x00);
                     }
                     List<Room> rooms = sideviews[sv];
                     foreach (Room r in rooms)
@@ -1067,18 +1067,18 @@ namespace Z2Randomizer
                     }
 
                 }
-                freeSpace = setupFreeSpace(false, enemyBytesgp);
+                freeSpace = SetupFreeSpace(false, enemyBytesgp);
                 foreach (byte[] sv in sideviewsgp.Keys)
                 {
-                    int addr = findFreeSpace(freeSpace, sv);
+                    int addr = FindFreeSpace(freeSpace, sv);
                     if (addr == -1) //not enough space
                     {
                         return new List<Palace>();
                     }
-                    ROMData.put(addr, sv);
-                    if (ROMData.getByte(addr + sv.Length) >= 0xD0)
+                    ROMData.Put(addr, sv);
+                    if (ROMData.GetByte(addr + sv.Length) >= 0xD0)
                     {
-                        ROMData.put(addr + sv.Length, 0x00);
+                        ROMData.Put(addr + sv.Length, 0x00);
                     }
                     List<Room> rooms = sideviewsgp[sv];
                     foreach (Room r in rooms)
@@ -1116,7 +1116,7 @@ namespace Z2Randomizer
             return palaces;
         }
 
-        private Room selectBossRoom(int pal)
+        private Room SelectBossRoom(int pal)
         {
             if(pal == 7)
             {
@@ -1131,7 +1131,7 @@ namespace Z2Randomizer
             return r;
         }
 
-        private static void incrementMapNo(ref int mapNo, ref int mapNoGp, int i)
+        private static void IncrementMapNo(ref int mapNo, ref int mapNoGp, int i)
         {
             if (i < 7)
             {
@@ -1155,7 +1155,7 @@ namespace Z2Randomizer
             }
         }
 
-        private Dictionary<int, int> setupFreeSpace(bool bank4, int enemyData)
+        private Dictionary<int, int> SetupFreeSpace(bool bank4, int enemyData)
         {
             Dictionary<int, int> freeSpace = new Dictionary<int, int>();
             if (bank4)
@@ -1182,7 +1182,7 @@ namespace Z2Randomizer
             }
             return freeSpace;
         }
-        public Room selectItemRoom()
+        public Room SelectItemRoom()
         {
             int dir = R.Next(5);
             if(dir == 0)
@@ -1210,7 +1210,7 @@ namespace Z2Randomizer
 
             }
         }
-        private int findFreeSpace(Dictionary<int, int> freeSpace, byte[] sv)
+        private int FindFreeSpace(Dictionary<int, int> freeSpace, byte[] sv)
         {
             foreach (int addr in freeSpace.Keys)
             {
