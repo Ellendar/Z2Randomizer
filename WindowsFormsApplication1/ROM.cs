@@ -116,27 +116,27 @@ namespace Z2Randomizer
             }
         }
 
-        public Byte getByte(int index)
+        public Byte GetByte(int index)
         {
             return ROMData[index];
         }
 
-        public Byte[] getBytes(int start, int end)
+        public Byte[] GetBytes(int start, int end)
         {
             Byte[] bytes = new byte[end - start];
             for(int i = start; i < end; i++)
             {
-                bytes[i - start] = getByte(i);
+                bytes[i - start] = GetByte(i);
             }
             return bytes;
         }
 
-        public void put(int index, Byte data)
+        public void Put(int index, Byte data)
         {
             ROMData[index] = data;
         }
 
-        public void put(int index, Byte[] data)
+        public void Put(int index, Byte[] data)
         {
             for (int i = 0; i < data.Length; i++)
             {
@@ -144,26 +144,26 @@ namespace Z2Randomizer
             }
         }
 
-        public void dump(String filename)
+        public void Dump(String filename)
         {
             File.WriteAllBytes(filename, ROMData);
         }
 
-        public List<Hint> getGameText()
+        public List<Hint> GetGameText()
         {
             List<Hint> texts = new List<Hint>();
             for (int i = textAddrStartinROM; i <= textAddrEndinROM; i += 2)
             {
                 List<char> t = new List<char>();
-                int addr = getByte(i);
-                addr += (getByte(i + 1) << 8);
+                int addr = GetByte(i);
+                addr += (GetByte(i + 1) << 8);
                 addr += textAddrOffset;
-                int c = getByte(addr);
+                int c = GetByte(addr);
                 while (c != textEndByte)
                 {
                     addr++;
                     t.Add((char)c);
-                    c = getByte(addr);
+                    c = GetByte(addr);
                 }
                 t.Add((char)0xFF);
                 texts.Add(new Hint(t, null));
@@ -172,7 +172,7 @@ namespace Z2Randomizer
             return texts;
         }
 
-        public void textToRom(List<Hint> texts)
+        public void TextToRom(List<Hint> texts)
         {
             int textptr = 0xE390;
             int ptr = 0xE390 - 0x4010;
@@ -182,19 +182,19 @@ namespace Z2Randomizer
             {
                 int high = (ptr & 0xff00) >> 8;
                 int low = (ptr & 0xff);
-                put(ptrptr, (byte)low);
-                put(ptrptr + 1, (byte)high);
+                Put(ptrptr, (byte)low);
+                Put(ptrptr + 1, (byte)high);
                 ptrptr = ptrptr + 2;
                 for (int j = 0; j < texts[i].Text.Count; j++)
                 {
-                    put(textptr, (Byte)texts[i].Text[j]);
+                    Put(textptr, (Byte)texts[i].Text[j]);
                     textptr++;
                     ptr++;
                 }
             }
         }
 
-        public void writePalacePalettes(List<int[]> bricks, List<int[]> curtains, List<int> bRows, List<int> binRows)
+        public void WritePalacePalettes(List<int[]> bricks, List<int[]> curtains, List<int> bRows, List<int> binRows)
         {
             int[,] bSprites = new int[7, 32];
             int[,] binSprites = new int[7, 32];
@@ -202,47 +202,47 @@ namespace Z2Randomizer
             {
                 for (int j = 0; j < 32; j++)
                 {
-                    bSprites[i, j] = (int)getByte(brickSprites[i] + j);
-                    binSprites[i, j] = (int)getByte(inBrickSprites[i] + j);
+                    bSprites[i, j] = (int)GetByte(brickSprites[i] + j);
+                    binSprites[i, j] = (int)GetByte(inBrickSprites[i] + j);
                 }
             }
             for (int i = 0; i < 7; i++)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    put(outBricks[i] + j, (Byte)bricks[i][j]);
-                    put(inBricks[i] + j, (Byte)bricks[i][j]);
-                    put(inCurtains[i] + j, (Byte)curtains[i][j]);
+                    Put(outBricks[i] + j, (Byte)bricks[i][j]);
+                    Put(inBricks[i] + j, (Byte)bricks[i][j]);
+                    Put(inCurtains[i] + j, (Byte)curtains[i][j]);
                     if (j == 0)
                     {
-                        put(inWindows[i] + j, (Byte)bricks[i][j]);
+                        Put(inWindows[i] + j, (Byte)bricks[i][j]);
                     }
                 }
 
                 for (int j = 0; j < 32; j++)
                 {
-                    put(brickSprites[i] + j, (Byte)bSprites[bRows[i], j]);
-                    put(inBrickSprites[i] + j, (Byte)binSprites[binRows[i], j]);
+                    Put(brickSprites[i] + j, (Byte)bSprites[bRows[i], j]);
+                    Put(inBrickSprites[i] + j, (Byte)binSprites[binRows[i], j]);
                 }
             }
         }
 
-        public void addCredits()
+        public void AddCredits()
         {
-            List<char> randoby = Util.toGameText("RANDO BY  ", false);
+            List<char> randoby = Util.ToGameText("RANDO BY  ", false);
             for (int i = 0; i < randoby.Count; i++)
             {
-                put(creditsLineOneAddr + i, (Byte)randoby[i]);
+                Put(creditsLineOneAddr + i, (Byte)randoby[i]);
             }
 
-            List<char> digshake = Util.toGameText("DIGSHAKE ", true);
+            List<char> digshake = Util.ToGameText("DIGSHAKE ", true);
             for (int i = 0; i < digshake.Count; i++)
             {
-                put(creditsLineTwoAddr + i, (Byte)digshake[i]);
+                Put(creditsLineTwoAddr + i, (Byte)digshake[i]);
             }
         }
 
-        public void updateSprites(String charSprite)
+        public void UpdateSprites(String charSprite)
         {
             /*
              * Dear future digshake,
@@ -354,107 +354,107 @@ namespace Z2Randomizer
 
                 for (int i = 0; i < sprite.Count() * 3 / 8; i++)
                 {
-                    put(0x20010 + i, (byte)sprite[i]);
-                    put(0x22010 + i, (byte)sprite[i]);
-                    put(0x24010 + i, (byte)sprite[i]);
-                    put(0x26010 + i, (byte)sprite[i]);
-                    put(0x28010 + i, (byte)sprite[i]);
-                    put(0x2a010 + i, (byte)sprite[i]);
-                    put(0x2c010 + i, (byte)sprite[i]);
-                    put(0x2e010 + i, (byte)sprite[i]);
-                    put(0x30010 + i, (byte)sprite[i]);
-                    put(0x32010 + i, (byte)sprite[i]);
-                    put(0x34010 + i, (byte)sprite[i]);
+                    Put(0x20010 + i, (byte)sprite[i]);
+                    Put(0x22010 + i, (byte)sprite[i]);
+                    Put(0x24010 + i, (byte)sprite[i]);
+                    Put(0x26010 + i, (byte)sprite[i]);
+                    Put(0x28010 + i, (byte)sprite[i]);
+                    Put(0x2a010 + i, (byte)sprite[i]);
+                    Put(0x2c010 + i, (byte)sprite[i]);
+                    Put(0x2e010 + i, (byte)sprite[i]);
+                    Put(0x30010 + i, (byte)sprite[i]);
+                    Put(0x32010 + i, (byte)sprite[i]);
+                    Put(0x34010 + i, (byte)sprite[i]);
                     if (i < 0x4E0 || i >= 0x520)
                     {
-                        put(0x36010 + i, (byte)sprite[i]);
+                        Put(0x36010 + i, (byte)sprite[i]);
                     }
-                    put(0x38010 + i, (byte)sprite[i]);
+                    Put(0x38010 + i, (byte)sprite[i]);
 
                 }
 
                 for (int i = 0; i < 0x20; i++)
                 {
-                    put(0x206d0 + i, (byte)sprite[0x6c0 + i]);
-                    put(0x2e6d0 + i, (byte)sprite[0x6c0 + i]);
-                    put(0x306d0 + i, (byte)sprite[0x6c0 + i]);
+                    Put(0x206d0 + i, (byte)sprite[0x6c0 + i]);
+                    Put(0x2e6d0 + i, (byte)sprite[0x6c0 + i]);
+                    Put(0x306d0 + i, (byte)sprite[0x6c0 + i]);
                 }
 
                 for (int i = 0; i < s1up.Count(); i++)
                 {
-                    put(0x20a90 + i, (byte)s1up[i]);
-                    put(0x22a90 + i, (byte)s1up[i]);
-                    put(0x24a90 + i, (byte)s1up[i]);
-                    put(0x26a90 + i, (byte)s1up[i]);
-                    put(0x28a90 + i, (byte)s1up[i]);
-                    put(0x2aa90 + i, (byte)s1up[i]);
-                    put(0x2ca90 + i, (byte)s1up[i]);
-                    put(0x2ea90 + i, (byte)s1up[i]);
-                    put(0x30a90 + i, (byte)s1up[i]);
-                    put(0x32a90 + i, (byte)s1up[i]);
-                    put(0x34a90 + i, (byte)s1up[i]);
-                    put(0x36a90 + i, (byte)s1up[i]);
-                    put(0x38a90 + i, (byte)s1up[i]);
+                    Put(0x20a90 + i, (byte)s1up[i]);
+                    Put(0x22a90 + i, (byte)s1up[i]);
+                    Put(0x24a90 + i, (byte)s1up[i]);
+                    Put(0x26a90 + i, (byte)s1up[i]);
+                    Put(0x28a90 + i, (byte)s1up[i]);
+                    Put(0x2aa90 + i, (byte)s1up[i]);
+                    Put(0x2ca90 + i, (byte)s1up[i]);
+                    Put(0x2ea90 + i, (byte)s1up[i]);
+                    Put(0x30a90 + i, (byte)s1up[i]);
+                    Put(0x32a90 + i, (byte)s1up[i]);
+                    Put(0x34a90 + i, (byte)s1up[i]);
+                    Put(0x36a90 + i, (byte)s1up[i]);
+                    Put(0x38a90 + i, (byte)s1up[i]);
 
 
                 }
 
                 for (int i = 0; i < sOW.Count(); i++)
                 {
-                    put(0x31750 + i, (byte)sOW[i]);
+                    Put(0x31750 + i, (byte)sOW[i]);
                 }
 
                 for (int i = 0; i < sTitle.Count(); i++)
                 {
-                    put(0x20D10 + i, (byte)sTitle[i]);
-                    put(0x2ED10 + i, (byte)sTitle[i]);
+                    Put(0x20D10 + i, (byte)sTitle[i]);
+                    Put(0x2ED10 + i, (byte)sTitle[i]);
 
                 }
 
                 for (int i = 0; i < sleeper.Count(); i++)
                 {
-                    put(0x21010 + i, (byte)sleeper[i]);
+                    Put(0x21010 + i, (byte)sleeper[i]);
                     if (i > 31)
                     {
-                        put(0x23270 + i, (byte)sleeper[i]);
+                        Put(0x23270 + i, (byte)sleeper[i]);
                     }
                 }
 
                 for (int i = 0; i < end1.Count(); i++)
                 {
-                    put(0x2ed90 + i, (byte)end1[i]);
+                    Put(0x2ed90 + i, (byte)end1[i]);
                 }
 
                 for (int i = 0; i < end2.Count(); i++)
                 {
-                    put(0x2f010 + i, (byte)end2[i]);
+                    Put(0x2f010 + i, (byte)end2[i]);
                 }
 
                 for (int i = 0; i < end3.Count(); i++)
                 {
-                    put(0x2d010 + i, (byte)end3[i]);
+                    Put(0x2d010 + i, (byte)end3[i]);
                 }
 
                 for (int i = 0; i < head.Count(); i++)
                 {
-                    put(0x21970 + i, (byte)head[i]);
-                    put(0x23970 + i, (byte)head[i]);
-                    put(0x25970 + i, (byte)head[i]);
-                    put(0x27970 + i, (byte)head[i]);
-                    put(0x29970 + i, (byte)head[i]);
-                    put(0x2B970 + i, (byte)head[i]);
-                    put(0x2D970 + i, (byte)head[i]);
-                    put(0x2F970 + i, (byte)head[i]);
-                    put(0x31970 + i, (byte)head[i]);
-                    put(0x33970 + i, (byte)head[i]);
-                    put(0x35970 + i, (byte)head[i]);
-                    put(0x37970 + i, (byte)head[i]);
-                    put(0x39970 + i, (byte)head[i]);
+                    Put(0x21970 + i, (byte)head[i]);
+                    Put(0x23970 + i, (byte)head[i]);
+                    Put(0x25970 + i, (byte)head[i]);
+                    Put(0x27970 + i, (byte)head[i]);
+                    Put(0x29970 + i, (byte)head[i]);
+                    Put(0x2B970 + i, (byte)head[i]);
+                    Put(0x2D970 + i, (byte)head[i]);
+                    Put(0x2F970 + i, (byte)head[i]);
+                    Put(0x31970 + i, (byte)head[i]);
+                    Put(0x33970 + i, (byte)head[i]);
+                    Put(0x35970 + i, (byte)head[i]);
+                    Put(0x37970 + i, (byte)head[i]);
+                    Put(0x39970 + i, (byte)head[i]);
                 }
 
                 for (int i = 0; i < raft.Count(); i++)
                 {
-                    put(0x31450 + i, (byte)raft[i]);
+                    Put(0x31450 + i, (byte)raft[i]);
                 }
             }
 
@@ -462,70 +462,70 @@ namespace Z2Randomizer
             {
                 for(int i = 0; i < Graphics.samusEnd.Count; i++)
                 {
-                    put(0x20010, (byte)Graphics.samusEnd[i]);
+                    Put(0x20010, (byte)Graphics.samusEnd[i]);
                 }
             }
 
         }
 
-        public void updateSpellText(Dictionary<spells, spells> spellMap)
+        public void UpdateSpellText(Dictionary<Spells, Spells> spellMap)
         {
             int[,] textPointers = new int[8, 2];
             for (int i = 0; i < spellTextPointers.Length; i++)
             {
-                textPointers[i, 0] = getByte(spellTextPointers[i]);
-                textPointers[i, 1] = getByte(spellTextPointers[i] + 1);
+                textPointers[i, 0] = GetByte(spellTextPointers[i]);
+                textPointers[i, 1] = GetByte(spellTextPointers[i] + 1);
             }
 
             for (int i = 0; i < spellTextPointers.Length; i++)
             {
-                put(spellTextPointers[i], (byte)textPointers[(int)spellMap[(spells)i], 0]);
-                put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[(spells)i], 1]);
+                Put(spellTextPointers[i], (byte)textPointers[(int)spellMap[(Spells)i], 0]);
+                Put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[(Spells)i], 1]);
             }
         }
 
-        public void doHackyFixes()
+        public void DoHackyFixes()
         {
             //Hacky fix for palace connections
-            put(0x1074A, 0xFC);
-            put(0x1477D, 0xFC);
+            Put(0x1074A, 0xFC);
+            Put(0x1477D, 0xFC);
 
             //Hacky fix for new kasuto
 
-            put(0x8660, 0x51);
-            put(0x924D, 0x00);
+            Put(0x8660, 0x51);
+            Put(0x924D, 0x00);
             
             //Hack fix for palace 6
-            put(0x8664, 0xE6);
+            Put(0x8664, 0xE6);
             //put(0x935E, 0x02);
            
             //Fix for extra battle scene
-            put(0x8645, 0x00);
+            Put(0x8645, 0x00);
 
             //Disable hold over head animation
-            put(0x1E54C, (Byte)0);
+            Put(0x1E54C, (Byte)0);
 
             //Make text go fast
-            put(0xF75E, 0x00);
-            put(0xF625, 0x00);
-            put(0xF667, 0x00);
+            Put(0xF75E, 0x00);
+            Put(0xF625, 0x00);
+            Put(0xF667, 0x00);
         }
 
-        public void writeKasutoJarAmount(int kasutoJars)
+        public void WriteKasutoJarAmount(int kasutoJars)
         {
-            put(kasutoJarTextAddr, (Byte)(0xD0 + kasutoJars));
-            put(kasutoJarAddr, (Byte)kasutoJars);
+            Put(kasutoJarTextAddr, (Byte)(0xD0 + kasutoJars));
+            Put(kasutoJarAddr, (Byte)kasutoJars);
         }
 
-        public void writeFastCastMagic()
+        public void WriteFastCastMagic()
         {
             foreach (int addr in fastCastMagicAddr)
             {
-                put(addr, 0xEA);
+                Put(addr, 0xEA);
             }
         }
 
-        public void disableMusic()
+        public void DisableMusic()
         {
             /*
              * This method needs some more refactoring to eliminate those magic numbers
@@ -533,75 +533,78 @@ namespace Z2Randomizer
              */
             for (int i = 0; i < 4; i++)
             {
-                put(0x1a010 + i, 08);
-                put(0x1a3da + i, 08);
-                put(0x1a63f + i, 08);
+                Put(0x1a010 + i, 08);
+                Put(0x1a3da + i, 08);
+                Put(0x1a63f + i, 08);
             }
 
-            put(0x1a946, 08);
-            put(0x1a947, 08);
-            put(0x1a94c, 08);
+            Put(0x1a946, 08);
+            Put(0x1a947, 08);
+            Put(0x1a94c, 08);
 
-            put(0x1a02f, 0);
-            put(0x1a030, 0x44);
-            put(0x1a031, 0xA3);
-            put(0x1a032, 0);
-            put(0x1a033, 0);
-            put(0x1a034, 0);
+            Put(0x1a02f, 0);
+            Put(0x1a030, 0x44);
+            Put(0x1a031, 0xA3);
+            Put(0x1a032, 0);
+            Put(0x1a033, 0);
+            Put(0x1a034, 0);
 
-            put(0x1a3f4, 0);
-            put(0x1a3f5, 0x44);
-            put(0x1a3f6, 0xA3);
-            put(0x1a3f7, 0);
-            put(0x1a3f8, 0);
-            put(0x1a3f9, 0);
+            Put(0x1a3f4, 0);
+            Put(0x1a3f5, 0x44);
+            Put(0x1a3f6, 0xA3);
+            Put(0x1a3f7, 0);
+            Put(0x1a3f8, 0);
+            Put(0x1a3f9, 0);
 
-            put(0x1a66e, 0);
-            put(0x1a66f, 0x44);
-            put(0x1a670, 0xA3);
-            put(0x1a671, 0);
-            put(0x1a672, 0);
-            put(0x1a673, 0);
+            Put(0x1a66e, 0);
+            Put(0x1a66f, 0x44);
+            Put(0x1a670, 0xA3);
+            Put(0x1a671, 0);
+            Put(0x1a672, 0);
+            Put(0x1a673, 0);
 
-            put(0x1a970, 0);
-            put(0x1a971, 0x44);
-            put(0x1a972, 0xA3);
-            put(0x1a973, 0);
-            put(0x1a974, 0);
-            put(0x1a975, 0);
+            Put(0x1a970, 0);
+            Put(0x1a971, 0x44);
+            Put(0x1a972, 0xA3);
+            Put(0x1a973, 0);
+            Put(0x1a974, 0);
+            Put(0x1a975, 0);
         }
 
-        public void fixSoftLock()
+        /// <summary>
+        /// I assume this fixes the XP on screen transition softlock, but who knows with all these magic bytes.
+        /// </summary>
+        public void FixSoftLock()
         {
-            put(0x1E19A, (Byte)0x20);
-            put(0x1E19B, (Byte)0xAA);
-            put(0x1E19C, (Byte)0xFE);
+            Put(0x1E19A, (Byte)0x20);
+            Put(0x1E19B, (Byte)0xAA);
+            Put(0x1E19C, (Byte)0xFE);
 
-            put(0x1FEBA, (Byte)0xEE);
-            put(0x1FEBB, (Byte)0x26);
-            put(0x1FEBC, (Byte)0x07);
-            put(0x1FEBD, (Byte)0xAD);
-            put(0x1FEBE, (Byte)0x4C);
-            put(0x1FEBF, (Byte)0x07);
-            put(0x1FEC0, (Byte)0xC9);
-            put(0x1FEC1, (Byte)0x02);
-            put(0x1FEC2, (Byte)0xF0);
-            put(0x1FEC3, (Byte)0x05);
-            put(0x1FEC4, (Byte)0xA2);
-            put(0x1FEC5, (Byte)0x00);
-            put(0x1FEC6, (Byte)0x8E);
-            put(0x1FEC7, (Byte)0x4C);
-            put(0x1FEC8, (Byte)0x07);
-            put(0x1FEC9, (Byte)0x60);
+            Put(0x1FEBA, (Byte)0xEE);
+            Put(0x1FEBB, (Byte)0x26);
+            Put(0x1FEBC, (Byte)0x07);
+            Put(0x1FEBD, (Byte)0xAD);
+            Put(0x1FEBE, (Byte)0x4C);
+            Put(0x1FEBF, (Byte)0x07);
+            Put(0x1FEC0, (Byte)0xC9);
+            Put(0x1FEC1, (Byte)0x02);
+            Put(0x1FEC2, (Byte)0xF0);
+            Put(0x1FEC3, (Byte)0x05);
+            Put(0x1FEC4, (Byte)0xA2);
+            Put(0x1FEC5, (Byte)0x00);
+            Put(0x1FEC6, (Byte)0x8E);
+            Put(0x1FEC7, (Byte)0x4C);
+            Put(0x1FEC8, (Byte)0x07);
+            Put(0x1FEC9, (Byte)0x60);
         }
 
-        public void setLevelCap(int atkMax, int magicMax, int lifeMax)
+        public void SetLevelCap(int atkMax, int magicMax, int lifeMax)
         {
 
             //jump to check which attribute is levelling up
-            put(0x1f8a, 0x4C);
-            put(0x1f8b, 0x9e);
-            put(0x1f8c, 0xa8);
+            Put(0x1f8a, 0x4C);
+            Put(0x1f8b, 0x9e);
+            Put(0x1f8c, 0xa8);
 
             ////x = 2 life, x = 1 magic, x = 0 attack
             //load current level for (attack, magic, life)
@@ -612,25 +615,25 @@ namespace Z2Randomizer
             //DD A7 A8
             //4C 7F 9F
 
-            put(0x28AE, 0xBD);
-            put(0x28AF, 0x77);
-            put(0x28B0, 0x07);
-            put(0x28B1, 0xDD);
-            put(0x28B2, 0xA7);
-            put(0x28B3, 0xA8);
-            put(0x28B4, 0x4C);
-            put(0x28B5, 0x7F);
-            put(0x28B6, 0x9F);
+            Put(0x28AE, 0xBD);
+            Put(0x28AF, 0x77);
+            Put(0x28B0, 0x07);
+            Put(0x28B1, 0xDD);
+            Put(0x28B2, 0xA7);
+            Put(0x28B3, 0xA8);
+            Put(0x28B4, 0x4C);
+            Put(0x28B5, 0x7F);
+            Put(0x28B6, 0x9F);
 
             //these are the actual caps
-            put(0x28B7, (byte)atkMax);
-            put(0x28B8, (byte)magicMax);
-            put(0x28B9, (byte)lifeMax);
+            Put(0x28B7, (byte)atkMax);
+            Put(0x28B8, (byte)magicMax);
+            Put(0x28B9, (byte)lifeMax);
 
 
         }
 
-        public void extendMapSize()
+        public void ExtendMapSize()
         {
             //Implements CF's map size hack:
             //https://github.com/cfrantz/z2doc/wiki/bigger-overworlds
@@ -654,12 +657,12 @@ namespace Z2Randomizer
             cdb5: 60            RTS                   # return to caller
             */
 
-            put(0x1cda8, new Byte[] { 0x4c, 0xc6, 0xcd, 0xa0, 0x00, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0x10, 0xf9, 0xca, 0xf0, 0x0e, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0xd0, 0xf9, 0xe6, 0x03, 0xe6, 0x21, 0xca, 0xd0, 0xe8, 0x60 });
+            Put(0x1cda8, new Byte[] { 0x4c, 0xc6, 0xcd, 0xa0, 0x00, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0x10, 0xf9, 0xca, 0xf0, 0x0e, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0xd0, 0xf9, 0xe6, 0x03, 0xe6, 0x21, 0xca, 0xd0, 0xe8, 0x60 });
 
             //# Fill with NOPs all the way to $cdc6
             for (int i = 0x1cdc6; i < 0x1cdd6; i++)
             {
-                put(i, 0xea);
+                Put(i, 0xea);
             }
 
             /*
@@ -671,7 +674,7 @@ namespace Z2Randomizer
                 cdd2: bd0985        LDA $8509,X
                 cdd5: 8503          STA $03
             */
-            put(0x1cdd6, new byte[] { 0xae, 0x06, 0x07, 0xbd, 0xf1, 0xff, 0xaa, 0xbd, 0x08, 0x85, 0x85, 0x02, 0xbd, 0x09, 0x85, 0x85, 0x03 });
+            Put(0x1cdd6, new byte[] { 0xae, 0x06, 0x07, 0xbd, 0xf1, 0xff, 0xaa, 0xbd, 0x08, 0x85, 0x85, 0x02, 0xbd, 0x09, 0x85, 0x85, 0x03 });
 
             /*
              * cdd7: a900          LDA #$00        # put destination $7c00 into $20-$21
@@ -682,7 +685,7 @@ namespace Z2Randomizer
                 cde1: 209bcd        JSR $cd9b       # copy
             */
 
-            put(0x1cde7, new byte[] { 0xa9, 0x00, 0x85, 0x20, 0xa9, 0x7a, 0x85, 0x21, 0xa2, 0x0b, 0x20, 0x9b, 0xcd });
+            Put(0x1cde7, new byte[] { 0xa9, 0x00, 0x85, 0x20, 0xa9, 0x7a, 0x85, 0x21, 0xa2, 0x0b, 0x20, 0x9b, 0xcd });
 
             /*
              * cde4: a9a0          LDA #$a0        # load source $88a0 into $02-$03
@@ -695,30 +698,30 @@ namespace Z2Randomizer
                 cdf2: 209bcd        JSR $cd9b       # copy
             */
 
-            put(0x1cdf4, new byte[] { 0xa9, 0xa0, 0x85, 0x02, 0xa9, 0x88, 0x85, 0x03, 0xa9, 0x70, 0x85, 0x21, 0xa2, 0x08, 0x20, 0x9b, 0xcd });
+            Put(0x1cdf4, new byte[] { 0xa9, 0xa0, 0x85, 0x02, 0xa9, 0x88, 0x85, 0x03, 0xa9, 0x70, 0x85, 0x21, 0xa2, 0x08, 0x20, 0x9b, 0xcd });
 
-            put(0x808, 0x7a);
+            Put(0x808, 0x7a);
         }
 
-        public void disableTurningPalacesToStone()
+        public void DisableTurningPalacesToStone()
         {
-            put(0x87b3, new byte[] { 0xea, 0xea, 0xea });
-            put(0x47ba, new byte[] { 0xea, 0xea, 0xea });
-            put(0x1e02e, new byte[] { 0xea, 0xea, 0xea });
+            Put(0x87b3, new byte[] { 0xea, 0xea, 0xea });
+            Put(0x47ba, new byte[] { 0xea, 0xea, 0xea });
+            Put(0x1e02e, new byte[] { 0xea, 0xea, 0xea });
         }
 
-        public void updateMapPointers()
+        public void UpdateMapPointers()
         {
-            put(0x4518, new byte[] { 0x70, 0xb4 }); //west
-            put(0x451a, new byte[] { 0xf0, 0xb9 }); //dm
-            put(0x8518, new byte[] { 0x70, 0xb4 }); //east
-            put(0x851a, new byte[] { 0xf0, 0xb9 }); //maze island
+            Put(0x4518, new byte[] { 0x70, 0xb4 }); //west
+            Put(0x451a, new byte[] { 0xf0, 0xb9 }); //dm
+            Put(0x8518, new byte[] { 0x70, 0xb4 }); //east
+            Put(0x851a, new byte[] { 0xf0, 0xb9 }); //maze island
         }
 
-        public void fixContinentTransitions()
+        public void FixContinentTransitions()
         {
             //https://github.com/cfrantz/z2doc/wiki/add-an-extra-overworld
-            put(0x1FFF0, new byte[] { 0x01, 0x01, 0x02, 0x02, 0x00, 0x10, 0x20, 0x20, 0x30, 0x30, 0x30, 0x30, 0x40, 0x50, 0x60, 0x60, 0x30 });
+            Put(0x1FFF0, new byte[] { 0x01, 0x01, 0x02, 0x02, 0x00, 0x10, 0x20, 0x20, 0x30, 0x30, 0x30, 0x30, 0x40, 0x50, 0x60, 0x60, 0x30 });
 
             /*
              * cd4a: ad0607        LDA $0706     # Get overworld number
@@ -732,42 +735,42 @@ namespace Z2Randomizer
                 cd5c: 20ccff        JSR $ffcc     # load bank
                 cd5f: ade0bf        LDA $bfe0     # load pseudo-bank
             */
-            put(0x1cd5a, new byte[] { 0xad, 0x06, 0x07, 0xea, 0xea, 0xea, 0xea, 0xea, 0xa8, 0xb9, 0xe0, 0xff, 0x8d, 0x69, 0x07, 0x8d, 0x69, 0x07, 0x020, 0xcc, 0xff });
+            Put(0x1cd5a, new byte[] { 0xad, 0x06, 0x07, 0xea, 0xea, 0xea, 0xea, 0xea, 0xa8, 0xb9, 0xe0, 0xff, 0x8d, 0x69, 0x07, 0x8d, 0x69, 0x07, 0x020, 0xcc, 0xff });
 
-            put(0x1cd94, new byte[] { 0xa8, 0xb9, 0xf1, 0xff, 0x0a, 0xa8 });
-            put(0x1c516, new byte[] { 0xa8, 0xb9, 0xf1, 0xff, 0x0a, 0xa8 });
-            put(0x20001, new byte[] { 0x00, 0x02, 0x00, 0x02 });
-            put(0x1ce43, new byte[] { 0xe4, 0xff });
+            Put(0x1cd94, new byte[] { 0xa8, 0xb9, 0xf1, 0xff, 0x0a, 0xa8 });
+            Put(0x1c516, new byte[] { 0xa8, 0xb9, 0xf1, 0xff, 0x0a, 0xa8 });
+            Put(0x20001, new byte[] { 0x00, 0x02, 0x00, 0x02 });
+            Put(0x1ce43, new byte[] { 0xe4, 0xff });
             //put(0x1cdd2, new byte[] { 0xf0, 0xff });
 
             //update item memory locations:
-            put(0x1f310, getBytes(0x1c275, 0x1c295));
-            put(0x1f330, new byte[] { 0x60, 0x06, 0x60, 0x06, 0x80, 0x06, 0xa0, 0x06, 0xc0, 0x06 });
-            put(0x1c2c9, new byte[] { 0x00, 0xF3 });
-            put(0x1c2ce, new byte[] { 0x01, 0xF3 });
+            Put(0x1f310, GetBytes(0x1c275, 0x1c295));
+            Put(0x1f330, new byte[] { 0x60, 0x06, 0x60, 0x06, 0x80, 0x06, 0xa0, 0x06, 0xc0, 0x06 });
+            Put(0x1c2c9, new byte[] { 0x00, 0xF3 });
+            Put(0x1c2ce, new byte[] { 0x01, 0xF3 });
 
             //fix raft check
-            put(0x5b2, new byte[] { 0xea, 0xea });
+            Put(0x5b2, new byte[] { 0xea, 0xea });
         }
 
-        public void upAController1()
+        public void UpAController1()
         {
-            put(0x21B0, 0xF7);
-            put(0x21B2, 0x28);
-            put(0x21EE, 0xF7);
-            put(0x21F0, 0x28);
+            Put(0x21B0, 0xF7);
+            Put(0x21B2, 0x28);
+            Put(0x21EE, 0xF7);
+            Put(0x21F0, 0x28);
         }
 
-        public void disableFlashing()
+        public void DisableFlashing()
         {
-            put(0x2A01, 0x12);
-            put(0x2A02, 0x12);
-            put(0x2A03, 0x12);
-            put(0x1C9FA, 0x16);
-            put(0x1C9FC, 0x16);
+            Put(0x2A01, 0x12);
+            Put(0x2A02, 0x12);
+            Put(0x2A03, 0x12);
+            Put(0x1C9FA, 0x16);
+            Put(0x1C9FC, 0x16);
         }
 
-        public void dashSpell()
+        public void DashSpell()
         {
             /*
              * push accumulator to stack (48)
@@ -782,29 +785,29 @@ namespace Z2Randomizer
              * return (60)
              * two bytes for dash table
              */
-            put(0x2a50, new Byte[] { 0x48, 0xad, 0x6f, 0x07, 0x29, 0x10, 0xd0, 0x05, 0x68, 0xd9, 0xb3, 0x93, 0x60, 0x68, 0xd9, 0x52, 0xaa, 0x60, 0x30, 0xd0}); //, 0x20, 0xFD, 0x93, 0xa9, 0x18, 0x8d, 0xb3, 0x93, 0xa9, 0xE8, 0x8d, 0xb4, 0x93, 0x60 });
+            Put(0x2a50, new Byte[] { 0x48, 0xad, 0x6f, 0x07, 0x29, 0x10, 0xd0, 0x05, 0x68, 0xd9, 0xb3, 0x93, 0x60, 0x68, 0xd9, 0x52, 0xaa, 0x60, 0x30, 0xd0}); //, 0x20, 0xFD, 0x93, 0xa9, 0x18, 0x8d, 0xb3, 0x93, 0xa9, 0xE8, 0x8d, 0xb4, 0x93, 0x60 });
 
             //Jump to 97f1 
-            put(0x140f, new Byte[] { 0x20, 0x40, 0xAA });
+            Put(0x140f, new Byte[] { 0x20, 0x40, 0xAA });
 
             //put values back
-            put(0xe60, new Byte[] { 0x14, 0x98 });
-            List<char> dash = Util.toGameText("DASH", false);
+            Put(0xe60, new Byte[] { 0x14, 0x98 });
+            List<char> dash = Util.ToGameText("DASH", false);
 
             for(int i = 0; i < dash.Count; i++)
             {
-                put(0x1c72 + i, (byte)dash[i]);
+                Put(0x1c72 + i, (byte)dash[i]);
             }
         }
 
-        public void moveAfterGem()
+        public void MoveAfterGem()
         {
-            put(0x11b15, new Byte[] { 0xea, 0xea });
+            Put(0x11b15, new Byte[] { 0xea, 0xea });
 
-            put(0x11af5, new Byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
+            Put(0x11af5, new Byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
         }
 
-        public void elevatorBossFix(bool bossItem)
+        public void ElevatorBossFix(bool bossItem)
         {
             /*
              * Notes:
@@ -833,166 +836,166 @@ namespace Z2Randomizer
              * return (60)
              */
 
-            put(0x13ea9, new byte[] { 0x20, 0x40, 0xF3 });
-            put(0x16373, new byte[] { 0x20, 0x40, 0xF3 });
-            put(0x13230, new byte[] { 0x20, 0x40, 0xF3 });
+            Put(0x13ea9, new byte[] { 0x20, 0x40, 0xF3 });
+            Put(0x16373, new byte[] { 0x20, 0x40, 0xF3 });
+            Put(0x13230, new byte[] { 0x20, 0x40, 0xF3 });
 
             if (!bossItem)
             {
-                put(0x1e7b9, new byte[] { 0x20, 0x40, 0xF3 });
+                Put(0x1e7b9, new byte[] { 0x20, 0x40, 0xF3 });
             }
             else
             {
-                put(0x1e7b1, new byte[] { 0x20, 0x40, 0xF3 });
+                Put(0x1e7b1, new byte[] { 0x20, 0x40, 0xF3 });
             }
 
-            put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
+            Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
         }
 
-        public void dumpAll(String name)
+        public void DumpAll(String name)
         {
-            dumpSprite(name);
-            dump1up(name);
-            dumpOW(name);
-            dumpSleeper(name);
-            dumpTitle(name);
-            ending1(name);
-            ending2(name);
-            ending3(name);
-            dumpHead(name);
-            dumpRaft(name);
-            dumpBeam(name);
-            dumpColors(name);
+            DumpSprite(name);
+            Dump1up(name);
+            DumpOW(name);
+            DumpSleeper(name);
+            DumpTitle(name);
+            Ending1(name);
+            Ending2(name);
+            Ending3(name);
+            DumpHead(name);
+            DumpRaft(name);
+            DumpBeam(name);
+            DumpColors(name);
         }
 
-        public void dumpTitle(String name)
+        public void DumpTitle(String name)
         {
             Console.Write("private static readonly int[] " + name + "Title = {");
             for (int i = titleSpriteStartAddr; i < titleSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpBeam(String name)
+        public void DumpBeam(String name)
         {
             Console.Write("private static readonly int[] " + name + "Beam = {");
             for (int i = beamSpriteStartAddr; i < beamSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpRaft(String name)
+        public void DumpRaft(String name)
         {
             Console.Write("private static readonly int[] " + name + "Raft = {");
             for (int i = raftSpriteStartAddr; i < raftSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpOW(String name)
+        public void DumpOW(String name)
         {
             Console.Write("private static readonly int[] " + name + "OW = {");
             for (int i = OWSpriteStartAddr; i < OWSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpSleeper(String name)
+        public void DumpSleeper(String name)
         {
             Console.Write("private static readonly int[] " + name + "Sleeper = {");
             for (int i = sleeperSpriteStartAddr; i < sleeperSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dump1up(String name)
+        public void Dump1up(String name)
         {
             Console.Write("private static readonly int[] " + name + "1up = {");
             for (int i = oneUpSpriteStartAddr; i < oneUpSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void ending1(String name)
+        public void Ending1(String name)
         {
             Console.Write("private static readonly int[] " + name + "End1 = {");
             for (int i = endSprite1StartAddr; i < endSprite1EndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void ending2(String name)
+        public void Ending2(String name)
         {
             Console.Write("private static readonly int[] " + name + "End2 = {");
             for (int i = endSprite2StartAddr; i < endSprite2EndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void ending3(String name)
+        public void Ending3(String name)
         {
             Console.Write("private static readonly int[] " + name + "End3 = {");
             for (int i = endSprite3StartAddr; i < endSprite3EndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpHead(String name)
+        public void DumpHead(String name)
         {
             Console.Write("private static readonly int[] " + name + "Head = {");
             for (int i = headSpriteStartAddr; i < headSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpSprite(String name)
+        public void DumpSprite(String name)
         {
             Console.Write("private static readonly int[] " + name + "Sprite = {");
             for (int i = playerSpriteStartAddr; i < playerSpriteEndAddr; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }
 
-        public void dumpColors(String name)
+        public void DumpColors(String name)
         {
             Console.WriteLine("private static readonly List<int[]> " + name + " = new List<int[]> { " + name + "Sprite, " + name + "1up, " + name + "OW, " + name + "Sleeper, " + name + "Title, " + name + "End1, " + name + "End2, " + name + "End3, " + name + "Head, " + name + "Raft, " + name + "Beam };");
-            Console.WriteLine("0x2a0a: " + getByte(0x2a0a));
-            Console.WriteLine("0x2a10: " + getByte(0x2a10));
-            Console.WriteLine("Tunic: " + getByte(0x285c));
-            Console.WriteLine("Tunic2: " + getByte(0x285b));
-            Console.WriteLine("Tunic3: " + getByte(0x285a));
-            Console.WriteLine("Shield: " + getByte(0xe9e));
+            Console.WriteLine("0x2a0a: " + GetByte(0x2a0a));
+            Console.WriteLine("0x2a10: " + GetByte(0x2a10));
+            Console.WriteLine("Tunic: " + GetByte(0x285c));
+            Console.WriteLine("Tunic2: " + GetByte(0x285b));
+            Console.WriteLine("Tunic3: " + GetByte(0x285a));
+            Console.WriteLine("Shield: " + GetByte(0xe9e));
             
         }
 
-        public void dumpSamus()
+        public void DumpSamus()
         {
             Console.Write("private static readonly List<int> samusEnd = new List<int[]> { ");
             for(int i = 0x20010; i < 0x21010; i++)
             {
-                Console.Write(getByte(i) + ", ");
+                Console.Write(GetByte(i) + ", ");
             }
             Console.WriteLine("};");
         }

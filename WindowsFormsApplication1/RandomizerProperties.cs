@@ -135,7 +135,7 @@ namespace Z2Randomizer
 
         //Drops
         public Boolean pbagDrop;
-        public Boolean shuffleEnemyDrops;
+        public Boolean ShuffleEnemyDrops;
         public Boolean smallbluejar;
         public Boolean smallredjar;
         public Boolean small50;

@@ -2,35 +2,6 @@
 
 namespace Z2Randomizer
 {
-    public enum terrain
-    {
-        town = 0,
-        cave = 1,
-        palace = 2,
-        bridge = 3,
-        desert = 4,
-        grass = 5,
-        forest = 6,
-        swamp = 7,
-        grave = 8,
-        road = 9,
-        lava = 10,
-        mountain = 11,
-        water = 12,
-        walkablewater = 13,
-        rock = 14,
-        spider = 15,
-        none = 16
-    }
-
-    public enum continent
-    {
-        west = 0,
-        dm = 1,
-        east = 2,
-        maze = 3
-    }
-
     class Location
     {
         private Byte[] locationBytes;
@@ -45,7 +16,7 @@ namespace Z2Randomizer
         private int passThrough;
         private int fallInHole;
         private int world;
-        private terrain terrainType;
+        private Terrain terrainType;
         private Boolean needFairy;
         private Boolean needhammer;
         private Boolean needjump;
@@ -55,115 +26,24 @@ namespace Z2Randomizer
         private int memAddress;
         private Tuple<int, int> coords;
         private Boolean canShuffle;
-        public items item;
+        public Items item;
         public Boolean itemGet;
         private Boolean reachable;
         private int palNum;
-        private continent continent;
+        private Continent continent;
 
-        public terrain TerrainType
-        {
-            get
-            {
-                return terrainType;
-            }
+        public Terrain TerrainType { get; set; }
+        public int Ypos { get; set; }
+        public int Xpos { get; set; }
+        public byte[] LocationBytes { get; set; }
 
-            set
-            {
-                terrainType = value;
-            }
-        }
+        public int MemAddress { get; set; }
 
-        public int Ypos
-        {
-            get
-            {
-                return ypos;
-            }
+        public int PassThrough { get; set; }
 
-            set
-            {
-                ypos = value;
-            }
-        }
+        public int Map { get; set; }
 
-        public int Xpos
-        {
-            get
-            {
-                return xpos;
-            }
-
-            set
-            {
-                xpos = value;
-            }
-        }
-
-        public byte[] LocationBytes
-        {
-            get
-            {
-                return locationBytes;
-            }
-
-            set
-            {
-                locationBytes = value;
-            }
-        }
-
-        public int MemAddress
-        {
-            get
-            {
-                return memAddress;
-            }
-
-            set
-            {
-                memAddress = value;
-            }
-        }
-
-        public int PassThrough
-        {
-            get
-            {
-                return passThrough;
-            }
-
-            set
-            {
-                passThrough = value;
-            }
-        }
-
-        public int Map
-        {
-            get
-            {
-                return map;
-            }
-
-            set
-            {
-                map = value;
-            }
-        }
-
-        public int World
-        {
-            get
-            {
-                return world;
-            }
-
-            set
-            {
-                world = value;
-            }
-        }
+        public int World { get; set; }
 
         public Tuple<int, int> Coords
         {
@@ -178,148 +58,28 @@ namespace Z2Randomizer
             }
         }
 
-        public bool Needjump
-        {
-            get
-            {
-                return needjump;
-            }
+        public bool NeedJump { get; set; }
 
-            set
-            {
-                needjump = value;
-            }
-        }
+        public bool NeedHammer { get; set; }
+        public Boolean Needboots { get; set; }
+        public bool NeedFairy { get; set; }
 
-        public bool Needhammer
-        {
-            get
-            {
-                return needhammer;
-            }
+        public bool NeedRecorder { get; set; }
 
-            set
-            {
-                needhammer = value;
-            }
-        }
-        public Boolean Needboots
-        {
-            get
-            {
-                return needBoots;
-            }
-            set
-            {
-                needBoots = value;
-            }
-        }
-        public bool NeedFairy
-        {
-            get
-            {
-                return needFairy;
-            }
+        public bool NeedBagu { get; set; }
 
-            set
-            {
-                needFairy = value;
-            }
-        }
+        public bool CanShuffle { get; set; }
 
-        public bool NeedRecorder
-        {
-            get
-            {
-                return needRecorder;
-            }
+        public int HorizontalPos { get; set; }
 
-            set
-            {
-                needRecorder = value;
-            }
-        }
+        public int ExternalWorld { get; set; }
 
-        public bool NeedBagu
-        {
-            get
-            {
-                return needBagu;
-            }
+        public bool Reachable { get; set; }
 
-            set
-            {
-                needBagu = value;
-            }
-        }
+        public int PalNum { get; set; }
 
-        public bool CanShuffle
-        {
-            get
-            {
-                return canShuffle;
-            }
-
-            set
-            {
-                canShuffle = value;
-            }
-        }
-
-        public int HorizontalPos
-        {
-            get
-            {
-                return horizontalPos;
-            }
-
-            set
-            {
-                horizontalPos = value;
-            }
-        }
-
-        public int ExternalWorld
-        {
-            get
-            {
-                return externalWorld;
-            }
-
-            set
-            {
-                externalWorld = value;
-            }
-        }
-
-        public bool Reachable
-        {
-            get
-            {
-                return reachable;
-            }
-
-            set
-            {
-                reachable = value;
-            }
-        }
-
-        public int PalNum
-        {
-            get
-            {
-                return palNum;
-            }
-
-            set
-            {
-                palNum = value;
-            }
-        }
-
-        public int townNum { get; set; }
-        public continent Continent { get => continent; set => continent = value; }
+        public Town TownNum { get; set; }
+        public Continent Continent { get => continent; set => continent = value; }
         public int FallInHole { get => fallInHole; set => fallInHole = value; }
         public int ForceEnterRight { get => forceEnterRight; set => forceEnterRight = value; }
         public int Secondpartofcave { get => secondpartofcave; set => secondpartofcave = value; }
@@ -352,7 +112,7 @@ namespace Z2Randomizer
         .x.. .... - Pass through
         x... .... - Fall in hole
         */
-        public Location(Byte[] bytes, terrain t, int mem, continent c)
+        public Location(Byte[] bytes, Terrain t, int mem, Continent c)
         {
             locationBytes = bytes;
             externalWorld = bytes[0] & 128;
@@ -369,11 +129,11 @@ namespace Z2Randomizer
             terrainType = t;
             memAddress = mem;
             canShuffle = true;
-            item = items.donotuse;
+            item = Items.donotuse;
             itemGet = false;
             reachable = false;
             palNum = 0;
-            townNum = 0;
+            TownNum = 0;
             Continent = c;
         }
 

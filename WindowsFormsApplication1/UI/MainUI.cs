@@ -1351,7 +1351,7 @@ namespace Z2Randomizer
             props.hiddenPalace = hpCmbo.GetItemText(hpCmbo.SelectedItem);
             props.disableMusic = disableMusicBox.Checked;
             props.hiddenKasuto = hideKasutoBox.GetItemText(hideKasutoBox.SelectedItem);
-            props.shuffleEnemyDrops = enemyDropBox.Checked;
+            props.ShuffleEnemyDrops = enemyDropBox.Checked;
             props.charSprite = spriteCmbo.GetItemText(spriteCmbo.SelectedItem);
             props.tunicColor = tunicColor.GetItemText(tunicColor.SelectedItem);
             props.shieldColor = shieldColor.GetItemText(shieldColor.SelectedItem);

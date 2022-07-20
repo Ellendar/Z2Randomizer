@@ -9,12 +9,12 @@ namespace Z2Randomizer
     class Util
     {
         private const int textEndByte = 0xFF;
-        public static byte reverseByte(byte b)
+        public static byte ReverseByte(byte b)
         {
             return (byte)(((b * 0x80200802ul) & 0x0884422110ul) * 0x0101010101ul >> 32);
         }
 
-        public static List<char> toGameText(string s2, Boolean endByte)
+        public static List<char> ToGameText(string s2, Boolean endByte)
         {
             s2 = s2.ToUpper();
             List<char> s = s2.ToCharArray().ToList();
@@ -50,7 +50,7 @@ namespace Z2Randomizer
 
             return s;
         }
-        public static void swap(Location p1, Location p2)
+        public static void Swap(Location p1, Location p2)
         {
             int tempw = p1.World;
             p1.World = p2.World;
@@ -64,17 +64,16 @@ namespace Z2Randomizer
             p1.PalNum = p2.PalNum;
             p2.PalNum = tempw;
 
-            tempw = p1.townNum;
-            p1.townNum = p2.townNum;
-            p2.townNum = tempw;
+            Town tempTown = p1.TownNum;
+            p1.TownNum = p2.TownNum;
+            p2.TownNum = tempTown;
 
-            items i = p1.item;
+            Items i = p1.item;
             p1.item = p2.item;
             p2.item = i;
-
-
         }
 
+        //TODO: Name this better
         public class MyEqualityComparer : IEqualityComparer<byte[]>
         {
             public bool Equals(byte[] x, byte[] y)
