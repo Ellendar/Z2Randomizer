@@ -122,32 +122,32 @@ namespace Z2Randomizer
 
             if (hy.Props.dmBiome.Equals("Islands"))
             {
-                this.bio = Biome.islands;
+                this.biome = Biome.islands;
             }
             else if (hy.Props.dmBiome.Equals("Canyon") || hy.Props.dmBiome.Equals("CanyonD"))
             {
-                this.bio = Biome.canyon;
+                this.biome = Biome.canyon;
                 //MAP_ROWS = 75;
             }
             else if(hy.Props.dmBiome.Equals("Caldera"))
             {
-                this.bio = Biome.caldera;
+                this.biome = Biome.caldera;
             }
             else if(hy.Props.dmBiome.Equals("Mountainous"))
             {
-                this.bio = Biome.mountainous;
+                this.biome = Biome.mountainous;
             }
             else if(hy.Props.dmBiome.Equals("Vanilla"))
             {
-                this.bio = Biome.vanilla;
+                this.biome = Biome.vanilla;
             }
             else if(hy.Props.dmBiome.Equals("Vanilla (shuffled)"))
             {
-                this.bio = Biome.vanillaShuffle;
+                this.biome = Biome.vanillaShuffle;
             }
             else
             {
-                this.bio = Biome.vanillalike;
+                this.biome = Biome.vanillalike;
             }
             walkable = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
             randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNAIN, Terrain.WALKABLEWATER, Terrain.WATER };
@@ -155,7 +155,7 @@ namespace Z2Randomizer
             
         }
 
-        public bool terraform()
+        public bool Terraform()
         {
             Terrain water = Terrain.WATER;
             if (hy.Props.bootsWater)
@@ -165,37 +165,37 @@ namespace Z2Randomizer
             walkable = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
             randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNAIN, water };
 
-            foreach (Location l in AllLocations)
+            foreach (Location location in AllLocations)
             {
-                l.CanShuffle = true;
+                location.CanShuffle = true;
             }
-            if (this.bio == Biome.vanilla || this.bio == Biome.vanillaShuffle)
+            if (this.biome == Biome.vanilla || this.biome == Biome.vanillaShuffle)
             {
                 MAP_ROWS = 75;
                 MAP_COLS = 64;
                 ReadVanillaMap();
-                if (this.bio == Biome.vanillaShuffle)
+                if (this.biome == Biome.vanillaShuffle)
                 {
                     ShuffleLocations(AllLocations);
                     if (hy.Props.vanillaOriginal)
                     {
                         magicCave.TerrainType = Terrain.ROCK;
-                        foreach (Location l in AllLocations)
+                        foreach (Location location in AllLocations)
                         {
-                            map[l.Ypos - 30, l.Xpos] = l.TerrainType;
+                            map[location.Ypos - 30, location.Xpos] = location.TerrainType;
                         }
                     }
-                    foreach (Location l in Locations[Terrain.CAVE])
+                    foreach (Location location in Locations[Terrain.CAVE])
                     {
-                        l.PassThrough = 0;
+                        location.PassThrough = 0;
                     }
-                    foreach (Location l in Locations[Terrain.TOWN])
+                    foreach (Location location in Locations[Terrain.TOWN])
                     {
-                        l.PassThrough = 0;
+                        location.PassThrough = 0;
                     }
-                    foreach (Location l in Locations[Terrain.PALACE])
+                    foreach (Location location in Locations[Terrain.PALACE])
                     {
-                        l.PassThrough = 0;
+                        location.PassThrough = 0;
                     }
                 }
             }
@@ -209,7 +209,7 @@ namespace Z2Randomizer
                 {
                     map = new Terrain[MAP_ROWS, MAP_COLS];
                     Terrain riverT = Terrain.MOUNAIN;
-                    if (this.bio != Biome.canyon && this.bio != Biome.caldera && this.bio != Biome.islands)
+                    if (this.biome != Biome.canyon && this.biome != Biome.caldera && this.biome != Biome.islands)
                     {
                         for (int i = 0; i < MAP_ROWS; i++)
                         {
@@ -234,7 +234,7 @@ namespace Z2Randomizer
                         }
                     }
 
-                    if (this.bio == Biome.islands)
+                    if (this.biome == Biome.islands)
                     {
                         riverT = water;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -300,7 +300,7 @@ namespace Z2Randomizer
 
 
                     }
-                    else if (this.bio == Biome.canyon)
+                    else if (this.biome == Biome.canyon)
                     {
                         riverT = water;
                         horizontal = hy.RNG.NextDouble() > 0.5;
@@ -325,12 +325,12 @@ namespace Z2Randomizer
                         //this.randomTerrains.Add(terrain.lava);
 
                     }
-                    else if (this.bio == Biome.caldera)
+                    else if (this.biome == Biome.caldera)
                     {
                         this.horizontal = hy.RNG.NextDouble() > .5;
                         DrawCenterMountain();
                     }
-                    else if (this.bio == Biome.mountainous)
+                    else if (this.biome == Biome.mountainous)
                     {
                         riverT = Terrain.MOUNAIN;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -387,7 +387,7 @@ namespace Z2Randomizer
                     }
 
                     Direction rDir = (Direction)hy.RNG.Next(4);
-                    if (this.bio == Biome.canyon)
+                    if (this.biome == Biome.canyon)
                     {
                         rDir = (Direction)hy.RNG.Next(2);
                         if (horizontal)
@@ -397,7 +397,7 @@ namespace Z2Randomizer
                     }
                     if (raft != null)
                     {
-                        if (this.bio != Biome.canyon && this.bio != Biome.caldera)
+                        if (this.biome != Biome.canyon && this.biome != Biome.caldera)
                         {
                             MAP_COLS = 29;
                         }
@@ -411,7 +411,7 @@ namespace Z2Randomizer
                     Direction bDir = (Direction)hy.RNG.Next(4);
                     do
                     {
-                        if (this.bio != Biome.canyon)
+                        if (this.biome != Biome.canyon)
                         {
                             bDir = (Direction)hy.RNG.Next(4);
                         }
@@ -426,7 +426,7 @@ namespace Z2Randomizer
                     } while (bDir == rDir);
                     if (bridge != null)
                     {
-                        if (this.bio != Biome.canyon && this.bio != Biome.caldera)
+                        if (this.biome != Biome.canyon && this.biome != Biome.caldera)
                         {
                             MAP_COLS = 29;
                         }
@@ -435,9 +435,9 @@ namespace Z2Randomizer
                     }
                     int x = 0;
                     int y = 0;
-                    foreach (Location l in AllLocations)
+                    foreach (Location location in AllLocations)
                     {
-                        if (l.TerrainType != Terrain.BRIDGE && l != magicCave && l.CanShuffle)
+                        if (location.TerrainType != Terrain.BRIDGE && location != magicCave && location.CanShuffle)
                         {
                             int tries = 0;
                             do
@@ -451,26 +451,26 @@ namespace Z2Randomizer
                                 return false;
                             }
 
-                            map[y, x] = l.TerrainType;
-                            l.Xpos = x;
-                            l.Ypos = y + 30;
-                            if (l.TerrainType == Terrain.CAVE)
+                            map[y, x] = location.TerrainType;
+                            location.Xpos = x;
+                            location.Ypos = y + 30;
+                            if (location.TerrainType == Terrain.CAVE)
                             {
 
                                 int dir = hy.RNG.Next(4);
 
                                 Terrain s = walkable[hy.RNG.Next(walkable.Count)];
-                                if (this.bio == Biome.vanillalike)
+                                if (this.biome == Biome.vanillalike)
                                 {
                                     s = Terrain.ROAD;
                                 }
-                                if (!hy.Props.saneCaves || !connectionsDM.ContainsKey(l))
+                                if (!hy.Props.saneCaves || !connectionsDM.ContainsKey(location))
                                 {
                                     PlaceCave(x, y, dir, s);
                                 }
                                 else
                                 {
-                                    if ((l.HorizontalPos == 0 || l.FallInHole != 0) && l.ForceEnterRight == 0)
+                                    if ((location.HorizontalPos == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
                                     {
                                         if (dir == 0)
                                         {
@@ -513,7 +513,7 @@ namespace Z2Randomizer
                                         dir = hy.RNG.Next(4);
                                     }
                                     int otherdir = (dir + 2) % 4;
-                                    if (connectionsDM[l].Count == 1)
+                                    if (connectionsDM[location].Count == 1)
                                     {
                                         int otherx = 0;
                                         int othery = 0;
@@ -523,7 +523,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (bio == Biome.islands)
+                                            if (biome == Biome.islands)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -561,10 +561,10 @@ namespace Z2Randomizer
                                             return false;
                                         }
 
-                                        List<Location> l2 = connectionsDM[l];
-                                        l.CanShuffle = false;
-                                        l.Xpos = x;
-                                        l.Ypos = y + 30;
+                                        List<Location> l2 = connectionsDM[location];
+                                        location.CanShuffle = false;
+                                        location.Xpos = x;
+                                        location.Ypos = y + 30;
                                         l2[0].CanShuffle = false;
                                         l2[0].Xpos = otherx;
                                         l2[0].Ypos = othery + 30;
@@ -581,7 +581,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (bio == Biome.islands)
+                                            if (biome == Biome.islands)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -618,10 +618,10 @@ namespace Z2Randomizer
                                             return false;
                                         }
 
-                                        List<Location> l2 = connectionsDM[l];
-                                        l.CanShuffle = false;
-                                        l.Xpos = x;
-                                        l.Ypos = y + 30;
+                                        List<Location> l2 = connectionsDM[location];
+                                        location.CanShuffle = false;
+                                        location.Xpos = x;
+                                        location.Ypos = y + 30;
                                         l2[0].CanShuffle = false;
                                         l2[0].Xpos = otherx;
                                         l2[0].Ypos = othery + 30;
@@ -652,7 +652,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (bio == Biome.islands)
+                                            if (biome == Biome.islands)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -689,7 +689,7 @@ namespace Z2Randomizer
                                             return false;
                                         }
 
-                                        l.CanShuffle = false;
+                                        location.CanShuffle = false;
                                         l2[2].CanShuffle = false;
                                         l2[2].Xpos = otherx;
                                         l2[2].Ypos = othery + 30;
@@ -702,7 +702,7 @@ namespace Z2Randomizer
                     }
 
 
-                    if (this.bio == Biome.vanillalike)
+                    if (this.biome == Biome.vanillalike)
                     {
                         PlaceRandomTerrain(5);
                     }
@@ -711,9 +711,9 @@ namespace Z2Randomizer
                     {
                         return false;
                     }
-                    if (this.bio == Biome.caldera)
+                    if (this.biome == Biome.caldera)
                     {
-                        bool f = makeCaldera();
+                        bool f = MakeCaldera();
                         if (!f)
                         {
                             return false;
@@ -722,7 +722,7 @@ namespace Z2Randomizer
                     walkable.Add(Terrain.ROAD);
                     if (raft != null)
                     {
-                        if (this.bio != Biome.caldera && this.bio != Biome.canyon)
+                        if (this.biome != Biome.caldera && this.biome != Biome.canyon)
                         {
                             MAP_COLS = 29;
                         }
@@ -736,7 +736,7 @@ namespace Z2Randomizer
 
                     if (bridge != null)
                     {
-                        if (this.bio != Biome.caldera && this.bio != Biome.canyon)
+                        if (this.biome != Biome.caldera && this.biome != Biome.canyon)
                         {
                             MAP_COLS = 29;
                         }
@@ -760,7 +760,7 @@ namespace Z2Randomizer
                     magicCave.Xpos = x;
 
 
-                    if (this.bio == Biome.canyon || this.bio == Biome.islands)
+                    if (this.biome == Biome.canyon || this.biome == Biome.islands)
                     {
                         ConnectIslands(25, false, riverT, false, false, false);
                     }
@@ -790,7 +790,7 @@ namespace Z2Randomizer
             }
             return true;
         }
-        private bool makeCaldera()
+        private bool MakeCaldera()
         {
             Terrain water = Terrain.WATER;
             if (hy.Props.bootsWater)
@@ -1062,18 +1062,18 @@ namespace Z2Randomizer
             }
             return true;
         }
-        public void updateVisit()
+        public void UpdateVisit()
         {
             UpdateReachable();
 
-            foreach (Location l in AllLocations)
+            foreach (Location location in AllLocations)
             {
-                if (v[l.Ypos - 30, l.Xpos])
+                if (v[location.Ypos - 30, location.Xpos])
                 {
-                    l.Reachable = true;
-                    if (connectionsDM.Keys.Contains(l))
+                    location.Reachable = true;
+                    if (connectionsDM.Keys.Contains(location))
                     {
-                        List<Location> l2 = connectionsDM[l];
+                        List<Location> l2 = connectionsDM[location];
 
                         foreach(Location l3 in l2)
                         { 

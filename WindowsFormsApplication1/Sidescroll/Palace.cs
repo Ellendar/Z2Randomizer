@@ -13,7 +13,6 @@ namespace Z2Randomizer
     class Palace
     {
 
-
         private int num;
         private Room root;
         private Room itemRoom;
@@ -100,7 +99,7 @@ namespace Z2Randomizer
             }
         }
 
-        public static void dumpMaps(ROM ROMData)
+        public static void DumpMaps(ROM ROMData)
         {
             int[] connAddr = new int[] { 0x1072B, 0x12208, 0x1472B };
             int[] side = new int[] { 0x10533, 0x12010, 0x14533 };
@@ -161,13 +160,13 @@ namespace Z2Randomizer
 
         }
 
-        public int getOpenRooms()
+        public int GetOpenRooms()
         {
             return openRooms.Count;
         }
-        public void updateBlocks()
+        public void UpdateBlocks()
         {
-            List<Room> itemPath = checkBlocks();
+            List<Room> itemPath = CheckBlocks();
             foreach (Room r in itemPath)
             {
                 if (num == 4 && r == BossRoom)
@@ -197,7 +196,7 @@ namespace Z2Randomizer
             }
         }
 
-        public bool addRoom(Room r, bool blocker)
+        public bool AddRoom(Room r, bool blocker)
         {
             Boolean placed = false;
 
@@ -213,7 +212,7 @@ namespace Z2Randomizer
                 return false;
             }
 
-            if (!appropriateBlocker(r, blocker))
+            if (!AppropriateBlocker(r, blocker))
             {
                 return false;
             }
@@ -221,16 +220,16 @@ namespace Z2Randomizer
             if (openRooms.Count == 0)
             {
                 openRooms.Add(r);
-                processRoom(r);
+                ProcessRoom(r);
                 return true;
             }
             foreach (Room open in openRooms)
             {
-                placed = attachToOpen(r, open);
+                placed = AttachToOpen(r, open);
 
                 if (placed)
                 {
-                    processRoom(r);
+                    ProcessRoom(r);
                     return true;
                 }
 
@@ -238,7 +237,7 @@ namespace Z2Randomizer
             return false;
         }
 
-        private void processRoom(Room r)
+        private void ProcessRoom(Room r)
         {
             if (r.IsDeadEnd)
             {
@@ -249,14 +248,14 @@ namespace Z2Randomizer
                 netDeadEnds--;
             }
             allRooms.Add(r);
-            sortRoom(r);
+            SortRoom(r);
             numRooms++;
 
             if (num != 7 && openRooms.Count > 1 && itemRoom.getOpenExits() > 0)
             {
                 foreach (Room open2 in openRooms)
                 {
-                    bool item = attachToOpen(open2, itemRoom);
+                    bool item = AttachToOpen(open2, itemRoom);
                     if (item)
                     {
                         break;
@@ -267,7 +266,7 @@ namespace Z2Randomizer
             {
                 foreach (Room open2 in openRooms)
                 {
-                    bool boss = attachToOpen(open2, bossRoom);
+                    bool boss = AttachToOpen(open2, bossRoom);
                     if (boss)
                     {
                         break;
@@ -278,7 +277,7 @@ namespace Z2Randomizer
             {
                 foreach (Room open2 in openRooms)
                 {
-                    bool boss = attachToOpen(open2, tbird);
+                    bool boss = AttachToOpen(open2, tbird);
                     if (boss)
                     {
                         break;
@@ -287,7 +286,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void updateItem(Items i)
+        public void UpdateItem(Items i)
         {
             if (num == 1 || num == 2 || num == 5)
             {
@@ -299,7 +298,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void consolidate()
+        public void Consolidate()
         {
             Room[] openCopy = new Room[openRooms.Count];
             openRooms.CopyTo(openCopy);
@@ -309,13 +308,13 @@ namespace Z2Randomizer
                 {
                     if (r2 != r3 && openRooms.Contains(r2) && openRooms.Contains(r3))
                     {
-                        attachToOpen(r2, r3);
+                        AttachToOpen(r2, r3);
                     }
                 }
             }
         }
 
-        private bool appropriateBlocker(Room r, bool blockers)
+        private bool AppropriateBlocker(Room r, bool blockers)
         {
             if (!blockers)
             {
@@ -377,7 +376,7 @@ namespace Z2Randomizer
             return true;
         }
 
-        private bool attachToOpen(Room r, Room open)
+        private bool AttachToOpen(Room r, Room open)
         {
             bool placed = false;
             if (!placed && open.hasRightExit() && open.Right == null && r.hasLeftExit() && r.Left == null)
@@ -467,7 +466,7 @@ namespace Z2Randomizer
 
 
 
-        public void sortRoom(Room r)
+        public void SortRoom(Room r)
         {
             if (r.hasDownExit())
             {
@@ -497,13 +496,13 @@ namespace Z2Randomizer
             }
         }
 
-        public Boolean requiresThunderbird()
+        public Boolean RequiresThunderbird()
         {
-            checkSpecialPaths(root, 2);
+            CheckSpecialPaths(root, 2);
             return !bossRoom.BeforeTbird;
         }
 
-        public Boolean hasDeadEnd()
+        public Boolean HasDeadEnd()
         {
             if (onlyDownExits.Count == 0)
             {
@@ -552,7 +551,7 @@ namespace Z2Randomizer
 
 
 
-        private void checkSpecialPaths(Room r, int dir)
+        private void CheckSpecialPaths(Room r, int dir)
         {
             if (!r.BeforeTbird)
             {
@@ -565,36 +564,36 @@ namespace Z2Randomizer
                 r.BeforeTbird = true;
                 if (r.Left != null)
                 {
-                    checkSpecialPaths(r.Left, 3);
+                    CheckSpecialPaths(r.Left, 3);
                 }
 
                 if (r.Right != null)
                 {
-                    checkSpecialPaths(r.Right, 2);
+                    CheckSpecialPaths(r.Right, 2);
                 }
 
                 if (r.Up != null)
                 {
-                    checkSpecialPaths(r.Up, 1);
+                    CheckSpecialPaths(r.Up, 1);
                 }
 
                 if (r.Down != null)
                 {
-                    checkSpecialPaths(r.Down, 0);
+                    CheckSpecialPaths(r.Down, 0);
                 }
             }
         }
 
-        public Boolean allReachable()
+        public Boolean AllReachable()
         {
             foreach (Room r in AllRooms)
             {
-                if (r.HasBoss && canEnterBossFromLeft(r))
+                if (r.HasBoss && CanEnterBossFromLeft(r))
                 {
                     return false;
                 }
             }
-            checkPaths(root, 2);
+            CheckPaths(root, 2);
             foreach (Room r in allRooms)
             {
                 if (!r.IsPlaced)
@@ -605,7 +604,7 @@ namespace Z2Randomizer
             return true;
         }
         //0 = up, 1 = down, 2 = left, 3 = right
-        private void checkPaths(Room r, int dir)
+        private void CheckPaths(Room r, int dir)
         {
             if (!r.IsPlaced)
             {
@@ -620,27 +619,27 @@ namespace Z2Randomizer
                 r.IsPlaced = true;
                 if (r.Left != null)
                 {
-                    checkPaths(r.Left, 3);
+                    CheckPaths(r.Left, 3);
                 }
 
                 if (r.Right != null)
                 {
-                    checkPaths(r.Right, 2);
+                    CheckPaths(r.Right, 2);
                 }
 
                 if (r.Up != null)
                 {
-                    checkPaths(r.Up, 1);
+                    CheckPaths(r.Up, 1);
                 }
 
                 if (r.Down != null)
                 {
-                    checkPaths(r.Down, 0);
+                    CheckPaths(r.Down, 0);
                 }
             }
         }
 
-        private Boolean canEnterBossFromLeft(Room b)
+        private Boolean CanEnterBossFromLeft(Room b)
         {
             List<Room> reachable = new List<Room>();
             List<Room> roomsToCheck = new List<Room>();
@@ -679,7 +678,7 @@ namespace Z2Randomizer
             return false;
         }
 
-        public void shuffleRooms(Random R)
+        public void ShuffleRooms(Random R)
         {
             //This method is so ugly and i hate it.
             for (int i = 0; i < upExits.Count; i++)
@@ -787,12 +786,12 @@ namespace Z2Randomizer
             }
         }
 
-        public void setOpenRoom(Room r)
+        public void SetOpenRoom(Room r)
         {
             openRooms.Add(r);
         }
 
-        public void updateRom()
+        public void UpdateRom()
         {
             foreach (Room r in allRooms)
             {
@@ -807,7 +806,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void createTree(bool removeTbird)
+        public void CreateTree(bool removeTbird)
         {
             foreach (Room r in allRooms)
             {
@@ -823,7 +822,7 @@ namespace Z2Randomizer
                     List<Room> l = new List<Room> { r };
                     rooms.Add(r.Map * 4, l);
                 }
-                sortRoom(r);
+                SortRoom(r);
             }
             foreach (Room r in allRooms)
             {
@@ -891,7 +890,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void shorten(Random R)
+        public void Shorten(Random R)
         {
             int target = R.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
             int rooms = numRooms;
@@ -1137,7 +1136,7 @@ namespace Z2Randomizer
             Console.WriteLine("Target: " + target + " Rooms: " + rooms);
         }
 
-        public void shuffleSmallItems(int world, bool first, Random R, bool shuffleSmallItems, bool extraKeys, bool newMap)
+        public void ShuffleSmallItems(int world, bool first, Random R, bool shuffleSmallItems, bool extraKeys, bool newMap)
         {
             List<int> addresses = new List<int>();
             List<int> items = new List<int>();
@@ -1204,12 +1203,12 @@ namespace Z2Randomizer
             }
         }
 
-        public List<Room> checkBlocks()
+        public List<Room> CheckBlocks()
         {
-            return checkBlocksHelper(new List<Room>(), new List<Room>(), root);
+            return CheckBlocksHelper(new List<Room>(), new List<Room>(), root);
         }
 
-        private List<Room> checkBlocksHelper(List<Room> c, List<Room> blockers, Room r)
+        private List<Room> CheckBlocksHelper(List<Room> c, List<Room> blockers, Room r)
         {
             if (c.Contains(this.itemRoom))
             {
@@ -1218,24 +1217,24 @@ namespace Z2Randomizer
             c.Add(r);
             if (r.Up != null && !c.Contains(r.Up))
             {
-                checkBlocksHelper(c, blockers, r.Up);
+                CheckBlocksHelper(c, blockers, r.Up);
             }
             if (r.Down != null && !c.Contains(r.Down))
             {
-                checkBlocksHelper(c, blockers, r.Down);
+                CheckBlocksHelper(c, blockers, r.Down);
             }
             if (r.Left != null && !c.Contains(r.Left))
             {
-                checkBlocksHelper(c, blockers, r.Left);
+                CheckBlocksHelper(c, blockers, r.Left);
             }
             if (r.Right != null && !c.Contains(r.Right))
             {
-                checkBlocksHelper(c, blockers, r.Right);
+                CheckBlocksHelper(c, blockers, r.Right);
             }
             return c;
         }
 
-        public void resetRooms()
+        public void ResetRooms()
         {
             foreach (Room r in AllRooms)
             {

@@ -776,13 +776,13 @@ namespace Z2Randomizer
                                     extra.Newmap = p.ItemRoom.Newmap;
                                     extra.setItem((Items)i);
                                     p.AllRooms.Add(extra);
-                                    p.sortRoom(extra);
-                                    p.setOpenRoom(extra);
+                                    p.SortRoom(extra);
+                                    p.SetOpenRoom(extra);
                                 }
-                                p.sortRoom(p.Root);
-                                p.sortRoom(p.BossRoom);
-                                p.sortRoom(p.ItemRoom);
-                                p.setOpenRoom(p.Root);
+                                p.SortRoom(p.Root);
+                                p.SortRoom(p.BossRoom);
+                                p.SortRoom(p.ItemRoom);
+                                p.SetOpenRoom(p.Root);
                             }
                             else
                             {
@@ -790,18 +790,18 @@ namespace Z2Randomizer
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.BossRoom.Newmap = mapNoGp;
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                                p.sortRoom(p.Root);
-                                p.sortRoom(p.BossRoom);
+                                p.SortRoom(p.Root);
+                                p.SortRoom(p.BossRoom);
                                 //thunderbird?
                                 if (!props.removeTbird)
                                 {
                                     p.Tbird = PalaceRooms.tbirdRooms[R.Next(PalaceRooms.tbirdRooms.Count)].deepCopy();
                                     p.Tbird.Newmap = mapNoGp;
                                     IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                                    p.sortRoom(p.Tbird);
+                                    p.SortRoom(p.Tbird);
                                     p.AllRooms.Add(p.Tbird);
                                 }
-                                p.setOpenRoom(p.Root);
+                                p.SetOpenRoom(p.Root);
 
                             }
 
@@ -837,7 +837,7 @@ namespace Z2Randomizer
                                 {
                                     addThis.Newmap = mapNoGp;
                                 }
-                                bool added = p.addRoom(addThis, props.blockersAnywhere);
+                                bool added = p.AddRoom(addThis, props.blockersAnywhere);
                                 if (added)
                                 {
                                     IncrementMapNo(ref mapNo, ref mapNoGp, i);
@@ -865,7 +865,7 @@ namespace Z2Randomizer
                                             {
                                                 r.Newmap = mapNoGp;
                                             }
-                                            bool added2 = p.addRoom(r, props.blockersAnywhere);
+                                            bool added2 = p.AddRoom(r, props.blockersAnywhere);
                                             if(added2)
                                             {
                                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
@@ -876,9 +876,9 @@ namespace Z2Randomizer
                                     }
                                 }
 
-                                if (p.getOpenRooms() >= p.MaxRooms - p.AllRooms.Count) //consolidate
+                                if (p.GetOpenRooms() >= p.MaxRooms - p.AllRooms.Count) //consolidate
                                 {
-                                    p.consolidate();
+                                    p.Consolidate();
                                 }
 
                             }
@@ -893,18 +893,18 @@ namespace Z2Randomizer
 
                         } while (!done);
 
-                        p.shuffleRooms(R);
-                        bool reachable = p.allReachable();
+                        p.ShuffleRooms(R);
+                        bool reachable = p.AllReachable();
                         bool keepgoing = reachable;
-                        while ((!reachable || (i == 7 && (props.requireTbird && !p.requiresThunderbird())) || p.hasDeadEnd()) && (tries < 10000))
+                        while ((!reachable || (i == 7 && (props.requireTbird && !p.RequiresThunderbird())) || p.HasDeadEnd()) && (tries < 10000))
                         {
-                            p.resetRooms();
-                            p.shuffleRooms(R);
+                            p.ResetRooms();
+                            p.ShuffleRooms(R);
                             if(i == 5 && tries == 16)
                             {
                                 Console.WriteLine("here");
                             }
-                            reachable = p.allReachable();
+                            reachable = p.AllReachable();
                             if(reachable)
                             {
                                 keepgoing = true;
@@ -977,22 +977,22 @@ namespace Z2Randomizer
                         p.AllRooms.Add(v.deepCopy());
                     }
                     Boolean removeTbird = (i == 7 && props.removeTbird);
-                    p.createTree(removeTbird);
+                    p.CreateTree(removeTbird);
 
                     if (i == 7 && props.shortenGP)
                     {
-                        p.shorten(R);
+                        p.Shorten(R);
                     }
                     if (props.shufflePalaceRooms)
                     {
-                        p.shuffleRooms(R);
+                        p.ShuffleRooms(R);
                     }
-                    while (!p.allReachable() || (i == 7 && (props.requireTbird && !p.requiresThunderbird())) || p.hasDeadEnd())
+                    while (!p.AllReachable() || (i == 7 && (props.requireTbird && !p.RequiresThunderbird())) || p.HasDeadEnd())
                     {
-                        p.resetRooms();
+                        p.ResetRooms();
                         if (props.shufflePalaceRooms)
                         {
-                            p.shuffleRooms(R);
+                            p.ShuffleRooms(R);
                         }
                     }
                     palaces.Add(p);
@@ -1002,7 +1002,7 @@ namespace Z2Randomizer
 
             for (int i = 0; i < 6; i++)
             {
-                palaces[i].updateBlocks();
+                palaces[i].UpdateBlocks();
             }
 
             if (palaces[1].NeedGlove && !props.shufflePalaceItems && (props.shufflePalaceRooms || props.createPalaces))
@@ -1096,19 +1096,19 @@ namespace Z2Randomizer
             {
                 foreach (Palace p in palaces)
                 {
-                    p.updateRom();
+                    p.UpdateRom();
                 }
             }
 
             if (props.shuffleSmallItems || props.extraKeys)
             {
-                palaces[0].shuffleSmallItems(4, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
-                palaces[1].shuffleSmallItems(4, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
-                palaces[2].shuffleSmallItems(4, false, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
-                palaces[3].shuffleSmallItems(4, false, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
-                palaces[4].shuffleSmallItems(4, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
-                palaces[5].shuffleSmallItems(4, false, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
-                palaces[6].shuffleSmallItems(5, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[0].ShuffleSmallItems(4, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[1].ShuffleSmallItems(4, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[2].ShuffleSmallItems(4, false, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[3].ShuffleSmallItems(4, false, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[4].ShuffleSmallItems(4, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[5].ShuffleSmallItems(4, false, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
+                palaces[6].ShuffleSmallItems(5, true, R, props.shuffleSmallItems, props.extraKeys, props.createPalaces);
             }
             return palaces;
         }

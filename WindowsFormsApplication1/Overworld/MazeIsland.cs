@@ -60,47 +60,47 @@ namespace Z2Randomizer
             VANILLA_MAP_ADDR = 0xa65c;
             if(hy.Props.mazeBiome.Equals("Vanilla"))
             {
-                this.bio = Biome.vanilla;
+                this.biome = Biome.vanilla;
             }
             else if(hy.Props.mazeBiome.Equals("Vanilla (shuffled)"))
             {
-                this.bio = Biome.vanillaShuffle;
+                this.biome = Biome.vanillaShuffle;
             }
             else
             {
-                this.bio = Biome.vanillalike;
+                this.biome = Biome.vanillalike;
             }
     }
 
         public Boolean terraform()
         {
-            if (this.bio == Biome.vanilla || this.bio == Biome.vanillaShuffle)
+            if (this.biome == Biome.vanilla || this.biome == Biome.vanillaShuffle)
             {
                 MAP_ROWS = 75;
                 MAP_COLS = 64;
                 ReadVanillaMap();
-                if (this.bio == Biome.vanillaShuffle)
+                if (this.biome == Biome.vanillaShuffle)
                 {
                     ShuffleLocations(AllLocations);
                     if (hy.Props.vanillaOriginal)
                     {
-                        foreach (Location l in AllLocations)
+                        foreach (Location location in AllLocations)
                         {
-                            map[l.Ypos - 30, l.Xpos] = l.TerrainType;
-                            l.PassThrough = 64;
+                            map[location.Ypos - 30, location.Xpos] = location.TerrainType;
+                            location.PassThrough = 64;
                         }
                     }
-                    foreach (Location l in Locations[Terrain.CAVE])
+                    foreach (Location location in Locations[Terrain.CAVE])
                     {
-                        l.PassThrough = 0;
+                        location.PassThrough = 0;
                     }
-                    foreach (Location l in Locations[Terrain.TOWN])
+                    foreach (Location location in Locations[Terrain.TOWN])
                     {
-                        l.PassThrough = 0;
+                        location.PassThrough = 0;
                     }
-                    foreach (Location l in Locations[Terrain.PALACE])
+                    foreach (Location location in Locations[Terrain.PALACE])
                     {
-                        l.PassThrough = 0;
+                        location.PassThrough = 0;
                     }
                     bridge.PassThrough = 0;
                     magic.PassThrough = 0;
@@ -112,9 +112,9 @@ namespace Z2Randomizer
                 MAP_ROWS = 23;
                 MAP_COLS = 23;
                 bcount = 2000;
-                foreach (Location l in AllLocations)
+                foreach (Location location in AllLocations)
                 {
-                    l.CanShuffle = true;
+                    location.CanShuffle = true;
                 }
                 while (bcount > MAP_SIZE_BYTES)
                 {
@@ -548,13 +548,13 @@ namespace Z2Randomizer
                     }
 
 
-                    foreach (Location l in AllLocations)
+                    foreach (Location location in AllLocations)
                     {
-                        if (l.TerrainType == Terrain.ROAD)
+                        if (location.TerrainType == Terrain.ROAD)
                         {
                             int x = 0;
                             int y = 0;
-                            if (l != magic && l != kid)
+                            if (location != magic && location != kid)
                             {
                                 do
                                 {
@@ -571,8 +571,8 @@ namespace Z2Randomizer
                                 } while (map[y, x] != Terrain.ROAD || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
                             }
 
-                            l.Xpos = x;
-                            l.Ypos = y + 30;
+                            location.Xpos = x;
+                            location.Ypos = y + 30;
                         }
                     }
 
@@ -833,11 +833,11 @@ namespace Z2Randomizer
                 }
             }
 
-            foreach (Location l in AllLocations)
+            foreach (Location location in AllLocations)
             {
-                if (v[l.Ypos - 30, l.Xpos])
+                if (v[location.Ypos - 30, location.Xpos])
                 {
-                    l.Reachable = true;
+                    location.Reachable = true;
                 }
             }
         }

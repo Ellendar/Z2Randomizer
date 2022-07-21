@@ -4,25 +4,25 @@ namespace Z2Randomizer
 {
     class Location
     {
-        private int externalWorld;
-        private int secondpartofcave;
+        //private int externalWorld;
+        //private int secondpartofcave;
         private int appear2loweruponexit;
-        private int horizontalPos;
-        private int forceEnterRight;
-        private int fallInHole;
-        private Terrain terrainType;
-        private Boolean needFairy;
-        private Boolean needhammer;
-        private Boolean needjump;
-        private Boolean needRecorder;
-        private Boolean needBagu;
-        private Boolean needBoots;
+        //private int horizontalPos;
+        //private int forceEnterRight;
+        //private int fallInHole;
+        //private Terrain terrainType;
+        //private Boolean needFairy;
+        //private Boolean needhammer;
+        //private Boolean needjump;
+        //private Boolean needRecorder;
+        //private Boolean needBagu;
+        //private Boolean needBoots;
         private Tuple<int, int> coords;
-        private Boolean canShuffle;
+        //private Boolean canShuffle;
         public Items item;
         public Boolean itemGet;
-        private Boolean reachable;
-        private int palNum;
+        //private Boolean reachable;
+        //private int palNum;
         private Continent continent;
 
         public Terrain TerrainType { get; set; }
@@ -72,10 +72,10 @@ namespace Z2Randomizer
         public int PalNum { get; set; }
 
         public Town TownNum { get; set; }
-        public Continent Continent { get => continent; set => continent = value; }
-        public int FallInHole { get => fallInHole; set => fallInHole = value; }
-        public int ForceEnterRight { get => forceEnterRight; set => forceEnterRight = value; }
-        public int Secondpartofcave { get => secondpartofcave; set => secondpartofcave = value; }
+        public Continent Continent { get; set; }
+        public int FallInHole { get; set; }
+        public int ForceEnterRight { get; set; }
+        public int Secondpartofcave { get; set; }
 
         /*
         Byte 0
@@ -108,44 +108,45 @@ namespace Z2Randomizer
         public Location(Byte[] bytes, Terrain t, int mem, Continent c)
         {
             LocationBytes = bytes;
-            externalWorld = bytes[0] & 128;
+            ExternalWorld = bytes[0] & 128;
             Ypos = bytes[0] & 127;
             appear2loweruponexit = bytes[1] & 128;
-            secondpartofcave = bytes[1] & 64;
+            Secondpartofcave = bytes[1] & 64;
             Xpos = bytes[1] & 63;
-            horizontalPos = bytes[2] & 192;
+            HorizontalPos = bytes[2] & 192;
             Map = bytes[2] & 63;
             FallInHole = bytes[3] & 128;
             PassThrough = bytes[3] & 64;
             ForceEnterRight = bytes[3] & 32;
             World = bytes[3] & 31;
-            terrainType = t;
+            TerrainType = t;
             MemAddress = mem;
-            canShuffle = true;
+            CanShuffle = true;
             item = Items.donotuse;
             itemGet = false;
-            reachable = false;
-            palNum = 0;
+            Reachable = false;
+            PalNum = 0;
             TownNum = 0;
             Continent = c;
         }
 
+        //Why does this empty constructor work. Don't want to delete it if it's needed for serialization magic of some kind.
         public Location()
         {
 
         }
-        public void updateBytes()
+        public void UpdateBytes()
         {
-            if (needhammer || NeedRecorder)
+            if (NeedHammer || NeedRecorder)
             {
                 LocationBytes[0] = 0;
             }
             else
             {
-                LocationBytes[0] = (Byte)(externalWorld + Ypos);
+                LocationBytes[0] = (Byte)(ExternalWorld + Ypos);
             }
-            LocationBytes[1] = (Byte)(appear2loweruponexit + secondpartofcave + Xpos);
-            LocationBytes[2] = (Byte)(horizontalPos + Map);
+            LocationBytes[1] = (Byte)(appear2loweruponexit + Secondpartofcave + Xpos);
+            LocationBytes[2] = (Byte)(HorizontalPos + Map);
             LocationBytes[3] = (Byte)(FallInHole + PassThrough + ForceEnterRight + World);
         }
     }
