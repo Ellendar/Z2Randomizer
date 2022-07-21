@@ -100,10 +100,10 @@ namespace Z2Randomizer
         private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
      
-        private ROM romData;
-        private int overworldXOff = 0x3F;
-        private int overworldMapOff = 0x7E;
-        private int overworldWorldOff = 0xBD;
+        //private ROM romData;
+        private const int overworldXOff = 0x3F;
+        private const int overworldMapOff = 0x7E;
+        private const int overworldWorldOff = 0xBD;
         private Dictionary<int, int> spellEnters;
         private Dictionary<int, int> spellExits;
         public HashSet<String> reachableAreas;
@@ -208,7 +208,7 @@ namespace Z2Randomizer
             ROMData = new ROM(props.filename);
             //ROMData.dumpAll("glitch");
             //ROMData.dumpSamus();
-            Palace.dumpMaps(ROMData);
+            Palace.DumpMaps(ROMData);
             this.worker = worker;
 
 
@@ -591,9 +591,9 @@ namespace Z2Randomizer
             {
                 itemGet[i] = false;
             }
-            foreach (Location l in itemLocs)
+            foreach (Location location in itemLocs)
             {
-                l.itemGet = false;
+                location.itemGet = false;
             }
             westHyrule.pbagCave.itemGet = false;
             eastHyrule.pbagCave1.itemGet = false;
@@ -814,19 +814,19 @@ namespace Z2Randomizer
             {
                 itemLocs[i].item = itemList[i];
             }
-            foreach (Location l in itemLocs)
+            foreach (Location location in itemLocs)
             {
-                if (l.item == Items.kid)
+                if (location.item == Items.kid)
                 {
-                    kidLoc = l;
+                    kidLoc = location;
                 }
-                else if (l.item == Items.trophy)
+                else if (location.item == Items.trophy)
                 {
-                    trophyLoc = l;
+                    trophyLoc = location;
                 }
-                else if (l.item == Items.medicine)
+                else if (location.item == Items.medicine)
                 {
-                    medicineLoc = l;
+                    medicineLoc = location;
                 }
             }
 
@@ -864,7 +864,7 @@ namespace Z2Randomizer
             {
                 prevCount = count;
                 westHyrule.updateVisit();
-                deathMountain.updateVisit();
+                deathMountain.UpdateVisit();
                 eastHyrule.updateVisit();
                 mazeIsland.updateVisit();
 
@@ -903,7 +903,7 @@ namespace Z2Randomizer
                     }
                 }
                 westHyrule.updateVisit();
-                deathMountain.updateVisit();
+                deathMountain.UpdateVisit();
                 eastHyrule.updateVisit();
                 mazeIsland.updateVisit();
 
@@ -919,36 +919,36 @@ namespace Z2Randomizer
                 wh = 0;
                 eh = 0;
 
-                foreach (Location l in westHyrule.AllLocations)
+                foreach (Location location in westHyrule.AllLocations)
                 {
-                    if (l.Reachable)
+                    if (location.Reachable)
                     {
                         count++;
                         wh++;
                     }
                 }
 
-                foreach (Location l in eastHyrule.AllLocations)
+                foreach (Location location in eastHyrule.AllLocations)
                 {
-                    if (l.Reachable)
+                    if (location.Reachable)
                     {
                         count++;
                         eh++;
                     }
                 }
 
-                foreach (Location l in deathMountain.AllLocations)
+                foreach (Location location in deathMountain.AllLocations)
                 {
-                    if (l.Reachable)
+                    if (location.Reachable)
                     {
                         count++;
                         dm++;
                     }
                 }
 
-                foreach (Location l in mazeIsland.AllLocations)
+                foreach (Location location in mazeIsland.AllLocations)
                 {
-                    if (l.Reachable)
+                    if (location.Reachable)
                     {
                         count++;
                         mi++;
@@ -1014,10 +1014,10 @@ namespace Z2Randomizer
             }
             return true;
         }
-        private Boolean CanGet(Location l)
+        private Boolean CanGet(Location location)
         {
 
-            return l.Reachable;
+            return location.Reachable;
         }
 
         private void ShortenWizards()
@@ -1625,7 +1625,7 @@ namespace Z2Randomizer
                         bool f = false;
                         do
                         {
-                            f = deathMountain.terraform();
+                            f = deathMountain.Terraform();
                         } while (!f);
                     }
 
@@ -1670,9 +1670,9 @@ namespace Z2Randomizer
                     LoadItemLocs();
                     ShuffleSpells();
                     ShuffleItems();
-                    foreach (Location l in itemLocs)
+                    foreach (Location location in itemLocs)
                     {
-                        if (l.PalNum == 4 && l.item == Items.kid)
+                        if (location.PalNum == 4 && location.item == Items.kid)
                         {
                             Console.WriteLine("here");
                         }
@@ -1692,24 +1692,24 @@ namespace Z2Randomizer
                         eastHyrule.AllReachable();
                         mazeIsland.AllReachable();
                         deathMountain.AllReachable();
-                        foreach (Location l in westHyrule.AllLocations)
+                        foreach (Location location in westHyrule.AllLocations)
                         {
-                            l.Reachable = false;
+                            location.Reachable = false;
                         }
 
-                        foreach (Location l in eastHyrule.AllLocations)
+                        foreach (Location location in eastHyrule.AllLocations)
                         {
-                            l.Reachable = false;
+                            location.Reachable = false;
                         }
 
-                        foreach (Location l in mazeIsland.AllLocations)
+                        foreach (Location location in mazeIsland.AllLocations)
                         {
-                            l.Reachable = false;
+                            location.Reachable = false;
                         }
 
-                        foreach (Location l in deathMountain.AllLocations)
+                        foreach (Location location in deathMountain.AllLocations)
                         {
-                            l.Reachable = false;
+                            location.Reachable = false;
                         }
                         eastHyrule.newKasuto2.Reachable = false;
                         //eastHyrule.bridge.Reachable = false;
@@ -1724,9 +1724,9 @@ namespace Z2Randomizer
                         deathMountain.reset();
                         westHyrule.setStart();
                         ShuffleItems();
-                        foreach (Location l in itemLocs)
+                        foreach (Location location in itemLocs)
                         {
-                            if (l.PalNum == 4 && l.item == Items.kid)
+                            if (location.PalNum == 4 && location.item == Items.kid)
                             {
                                 Console.WriteLine("here");
                             }
@@ -1744,36 +1744,36 @@ namespace Z2Randomizer
                     {
                         break;
                     }
-                    foreach (Location l in westHyrule.AllLocations)
+                    foreach (Location location in westHyrule.AllLocations)
                     {
-                        if (l.Reachable)
+                        if (location.Reachable)
                         {
                             west++;
                         }
                     }
 
                     int east = 0;
-                    foreach (Location l in eastHyrule.AllLocations)
+                    foreach (Location location in eastHyrule.AllLocations)
                     {
-                        if (l.Reachable)
+                        if (location.Reachable)
                         {
                             east++;
                         }
                     }
 
                     int maze = 0;
-                    foreach (Location l in mazeIsland.AllLocations)
+                    foreach (Location location in mazeIsland.AllLocations)
                     {
-                        if (l.Reachable)
+                        if (location.Reachable)
                         {
                             maze++;
                         }
                     }
 
                     int dm = 0;
-                    foreach (Location l in deathMountain.AllLocations)
+                    foreach (Location location in deathMountain.AllLocations)
                     {
-                        if (l.Reachable)
+                        if (location.Reachable)
                         {
                             dm++;
                         }
@@ -3404,13 +3404,13 @@ namespace Z2Randomizer
             foreach (World w in worlds)
             {
                 List<Location> locs = w.AllLocations;
-                foreach (Location l in locs)
+                foreach (Location location in locs)
                 {
-                    l.updateBytes();
-                    ROMData.Put(l.MemAddress, l.LocationBytes[0]);
-                    ROMData.Put(l.MemAddress + overworldXOff, l.LocationBytes[1]);
-                    ROMData.Put(l.MemAddress + overworldMapOff, l.LocationBytes[2]);
-                    ROMData.Put(l.MemAddress + overworldWorldOff, l.LocationBytes[3]);
+                    location.UpdateBytes();
+                    ROMData.Put(location.MemAddress, location.LocationBytes[0]);
+                    ROMData.Put(location.MemAddress + overworldXOff, location.LocationBytes[1]);
+                    ROMData.Put(location.MemAddress + overworldMapOff, location.LocationBytes[2]);
+                    ROMData.Put(location.MemAddress + overworldWorldOff, location.LocationBytes[3]);
                 }
                 w.RemoveUnusedConnectors();
             }
@@ -3419,19 +3419,19 @@ namespace Z2Randomizer
             Location medicineLoc = null;
             Location trophyLoc = null;
             Location kidLoc = null;
-            foreach (Location l in itemLocs)
+            foreach (Location location in itemLocs)
             {
-                if (l.item == Items.medicine)
+                if (location.item == Items.medicine)
                 {
-                    medicineLoc = l;
+                    medicineLoc = location;
                 }
-                if (l.item == Items.trophy)
+                if (location.item == Items.trophy)
                 {
-                    trophyLoc = l;
+                    trophyLoc = location;
                 }
-                if (l.item == Items.kid)
+                if (location.item == Items.kid)
                 {
-                    kidLoc = l;
+                    kidLoc = location;
                 }
             }
 
@@ -3708,7 +3708,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb6, 0xAD);
             }
 
-            romData.AddCredits();
+            ROMData.AddCredits();
             //fixes improper exit from p6/new kasuto
             //if (eastHyrule.palace6.PalNum != 7)
             //{
@@ -3928,33 +3928,33 @@ namespace Z2Randomizer
                 ROMData.ElevatorBossFix(props.bossItem);
                 if (westHyrule.palace1.PalNum != 7)
                 {
-                    palaces[westHyrule.palace1.PalNum-1].updateItem(westHyrule.palace1.item);
+                    palaces[westHyrule.palace1.PalNum-1].UpdateItem(westHyrule.palace1.item);
                 }
                 if (westHyrule.palace2.PalNum != 7)
                 {
-                    palaces[westHyrule.palace2.PalNum - 1].updateItem(westHyrule.palace2.item);
+                    palaces[westHyrule.palace2.PalNum - 1].UpdateItem(westHyrule.palace2.item);
                 }
                 if (westHyrule.palace3.PalNum != 7)
                 {
-                    palaces[westHyrule.palace3.PalNum - 1].updateItem(westHyrule.palace3.item);
+                    palaces[westHyrule.palace3.PalNum - 1].UpdateItem(westHyrule.palace3.item);
                 }
                 if (eastHyrule.palace5.PalNum != 7)
                 {
-                    palaces[eastHyrule.palace5.PalNum - 1].updateItem(eastHyrule.palace5.item);
+                    palaces[eastHyrule.palace5.PalNum - 1].UpdateItem(eastHyrule.palace5.item);
                 }
                 if (eastHyrule.palace6.PalNum != 7)
                 {
-                    palaces[eastHyrule.palace6.PalNum - 1].updateItem(eastHyrule.palace6.item);
+                    palaces[eastHyrule.palace6.PalNum - 1].UpdateItem(eastHyrule.palace6.item);
                 }
                 if (mazeIsland.palace4.PalNum != 7)
                 {
-                    palaces[mazeIsland.palace4.PalNum - 1].updateItem(mazeIsland.palace4.item);
+                    palaces[mazeIsland.palace4.PalNum - 1].UpdateItem(mazeIsland.palace4.item);
                 }
 
 
                 if (eastHyrule.gp.PalNum != 7)
                 {
-                    palaces[eastHyrule.gp.PalNum - 1].updateItem(eastHyrule.gp.item);
+                    palaces[eastHyrule.gp.PalNum - 1].UpdateItem(eastHyrule.gp.item);
                 }
 
                 ROMData.Put(westHyrule.palace1.MemAddress + 0x7e, (byte)palaces[westHyrule.palace1.PalNum - 1].Root.Newmap);
@@ -4028,18 +4028,18 @@ namespace Z2Randomizer
 
             }
 
-            foreach (Location l in pbagHearts)
+            foreach (Location location in pbagHearts)
             {
-                if (l == westHyrule.pbagCave)
+                if (location == westHyrule.pbagCave)
                 {
                     ROMData.Put(0x4FE2, (Byte)westHyrule.pbagCave.item);
                 }
 
-                if (l == eastHyrule.pbagCave1)
+                if (location == eastHyrule.pbagCave1)
                 {
                     ROMData.Put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
                 }
-                if (l == eastHyrule.pbagCave2)
+                if (location == eastHyrule.pbagCave2)
                 {
                     ROMData.Put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
                 }
