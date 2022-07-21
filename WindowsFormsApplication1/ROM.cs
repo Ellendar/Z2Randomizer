@@ -468,7 +468,7 @@ namespace Z2Randomizer
 
         }
 
-        public void UpdateSpellText(Dictionary<Spells, Spells> spellMap)
+        public void UpdateSpellText(Dictionary<Spell, Spell> spellMap)
         {
             int[,] textPointers = new int[8, 2];
             for (int i = 0; i < spellTextPointers.Length; i++)
@@ -479,8 +479,8 @@ namespace Z2Randomizer
 
             for (int i = 0; i < spellTextPointers.Length; i++)
             {
-                Put(spellTextPointers[i], (byte)textPointers[(int)spellMap[(Spells)i], 0]);
-                Put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[(Spells)i], 1]);
+                Put(spellTextPointers[i], (byte)textPointers[(int)spellMap[(Spell)i], 0]);
+                Put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[(Spell)i], 1]);
             }
         }
 

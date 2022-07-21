@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer
 {
+    //This isn't actually used for anything. Should it be?
     class Character
     {
         private Boolean[] itemGet;
@@ -23,16 +24,16 @@ namespace Z2Randomizer
         public bool StartWithKid { get => startWithKid;  }
         public bool StartWithMedicine { get => startWithMedicine;  }
 
-        public Boolean has(Items item)
+        public Boolean Has(Items item)
         {
             //check item map
-            return false;
+            throw new NotImplementedException();
         }
 
-        public Boolean has(Spells spell)
+        public Boolean Has(Spell spell)
         {
-            return false;
             //check spell map
+            throw new NotImplementedException();
         }
 
     }

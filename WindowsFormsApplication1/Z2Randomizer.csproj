@@ -95,6 +95,7 @@
     <Compile Include="Shuffler.cs" />
     <Compile Include="Sidescroll\PalaceRooms.cs" />
     <Compile Include="Continent.cs" />
+    <Compile Include="Spell.cs" />
     <Compile Include="Town.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="UI\GenerateBatchForm.cs">

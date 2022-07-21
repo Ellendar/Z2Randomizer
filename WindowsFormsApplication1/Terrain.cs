@@ -23,7 +23,7 @@ namespace Z2Randomizer
         WATER = 12,
         WALKABLEWATER = 13,
         ROCK = 14,
-        RIVER_DEVIL = 15,
+        SPIDER = 15,
         NONE = 16
     }
 }

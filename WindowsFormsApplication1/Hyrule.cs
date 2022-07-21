@@ -92,8 +92,6 @@ namespace Z2Randomizer
         Random%        
     */
 
-    public enum Spells { shield = 0, jump = 1, life = 2, fairy = 3, fire = 4, reflect = 5, spell = 6, thunder = 7, downstab = 8, upstab = 9 }
-
     class Hyrule
     { 
         private readonly int[] fireLocs = { 0x20850, 0x22850, 0x24850, 0x26850, 0x28850, 0x2a850, 0x2c850, 0x2e850, 0x36850, 0x32850, 0x34850, 0x38850 };
@@ -109,7 +107,7 @@ namespace Z2Randomizer
         private Dictionary<int, int> spellEnters;
         private Dictionary<int, int> spellExits;
         public HashSet<String> reachableAreas;
-        private Dictionary<Spells, Spells> spellMap; //key is location, value is spell (this is a bad implementation)
+        private Dictionary<Spell, Spell> spellMap; //key is location, value is spell (this is a bad implementation)
         private List<Location> itemLocs;
         private List<Location> pbagHearts;
         protected Dictionary<Location, List<Location>> connections;
@@ -123,10 +121,10 @@ namespace Z2Randomizer
         private int kasutoJars;
         private BackgroundWorker worker;
         
-        private Character character;
+        //private Character character;
 
         public Boolean[] itemGet;
-        private Boolean[] spellGet;
+        //private Boolean[] spellGet;
         public Boolean hiddenPalace;
         public Boolean hiddenKasuto;
         private readonly int enemyAddr1 = 0x108B0;
@@ -157,7 +155,6 @@ namespace Z2Randomizer
         private DeathMountain deathMountain;
 
         private Shuffler shuffler;
-        private Random random;
         private RandomizerProperties props;
         private List<World> worlds;
         private List<Palace> palaces;
@@ -188,19 +185,26 @@ namespace Z2Randomizer
         };
 
         public ROM ROMData { get; set; }
+        public Dictionary<Spell, bool> SpellGet { get; set; }
+        public Random RNG { get; set; }
+        public RandomizerProperties Props
+        {
+            get
+            {
+                return props;
+            }
 
-        public Random R { get; set; }
-
-        public RandomizerProperties Props { get; set; }
-
-        public bool[] SpellGet { get => spellGet; set => spellGet = value; }
+            set
+            {
+                props = value;
+            }
+        }
 
         public Hyrule(RandomizerProperties p, BackgroundWorker worker)
         {
-
             props = p;
             
-            random = new Random(props.seed);
+            RNG = new Random(props.seed);
             ROMData = new ROM(props.filename);
             //ROMData.dumpAll("glitch");
             //ROMData.dumpSamus();
@@ -208,16 +212,18 @@ namespace Z2Randomizer
             this.worker = worker;
 
 
-            character = new Character(props);
-            shuffler = new Shuffler(props, ROMData, character, random);
+            //character = new Character(props);
+            shuffler = new Shuffler(props, ROMData, RNG);
 
             palaces = new List<Palace>();
             itemGet = new Boolean[] { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
-            spellGet = new Boolean[] { false, false, false, false, false, false, false, false, false, false };
+            SpellGet = new Dictionary<Spell, bool>();
+            foreach(Spell spell in Enum.GetValues(typeof(Spell)))
+            {
+                SpellGet.Add(spell, false);
+            }
             reachableAreas = new HashSet<string>();
             areasByLocation = new SortedDictionary<string, List<Location>>();
-
-            
 
             kasutoJars = shuffler.ShuffleKasutoJars();
             //ROMData.moveAfterGem();
@@ -233,10 +239,9 @@ namespace Z2Randomizer
                 ROMData.DisableMusic();
             }
 
-
             if (props.hiddenPalace.Equals("Random"))
             {
-                hiddenPalace = R.NextDouble() > .5;
+                hiddenPalace = RNG.NextDouble() > .5;
             }
             else
             {
@@ -245,7 +250,7 @@ namespace Z2Randomizer
 
             if (props.hiddenKasuto.Equals("Random"))
             {
-                hiddenKasuto = R.NextDouble() > .5;
+                hiddenKasuto = RNG.NextDouble() > .5;
             }
             else
             {
@@ -453,12 +458,12 @@ namespace Z2Randomizer
                 palaces = shuffler.CreatePalaces(worker);
                 
             }
-            Console.WriteLine("Random: " + random.Next(10));
+            Console.WriteLine("Random: " + RNG.Next(10));
             if (props.shufflePalaceEnemies)
             {
-                ShuffleE(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
-                ShuffleE(enemyPtr2, enemyAddr1, enemies2, generators2, shorties2, tallGuys2, flyingEnemies2, false);
-                ShuffleE(enemyPtr3, enemyAddr2, enemies3, generators3, shorties3, tallGuys3, flyingEnemies3, true);
+                ShuffleEnemies(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
+                ShuffleEnemies(enemyPtr2, enemyAddr1, enemies2, generators2, shorties2, tallGuys2, flyingEnemies2, false);
+                ShuffleEnemies(enemyPtr3, enemyAddr2, enemies3, generators3, shorties3, tallGuys3, flyingEnemies3, true);
             }
 
             ProcessOverworld();
@@ -524,7 +529,7 @@ namespace Z2Randomizer
 
                     if (props.shuffleAtkEff)
                     {
-                        next = random.Next(minAtk, maxAtk);
+                        next = RNG.Next(minAtk, maxAtk);
                     }
                     else if (props.highAtk)
                     {
@@ -597,7 +602,7 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    bool hasItem = random.NextDouble() > .75;
+                    bool hasItem = RNG.NextDouble() > .75;
                     ROMData.Put(0x17B01 + i, hasItem ? (Byte)1 : (Byte)0);
                     itemGet[i] = hasItem;
                 }
@@ -639,10 +644,10 @@ namespace Z2Randomizer
                 int x = 4 - numHContainers;
                 while (x > 0)
                 {
-                    int remove = random.Next(itemList.Count);
+                    int remove = RNG.Next(itemList.Count);
                     if (itemList[remove] == Items.heartcontainer)
                     {
-                        itemList[remove] = replaceList[R.Next(replaceList.Count)];
+                        itemList[remove] = replaceList[RNG.Next(replaceList.Count)];
                         x--;
                     }
                 }
@@ -664,7 +669,7 @@ namespace Z2Randomizer
                     int x = numHContainers - 4;
                     while (x > 0)
                     {
-                        int y = random.Next(3);
+                        int y = RNG.Next(3);
                         if (y == 0 && !pbagHearts.Contains(westHyrule.pbagCave))
                         {
                             pbagHearts.Add(westHyrule.pbagCave);
@@ -695,74 +700,74 @@ namespace Z2Randomizer
 
             if(props.removeSpellItems)
             {
-                itemList[9] = replaceList[R.Next(replaceList.Count)];
-                itemList[10] = replaceList[R.Next(replaceList.Count)];
-                itemList[17] = replaceList[R.Next(replaceList.Count)];
+                itemList[9] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[10] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[17] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.trophy] = true;
                 itemGet[(int)Items.medicine] = true;
                 itemGet[(int)Items.kid] = true;
 
             }
 
-            if (spellGet[(int)spellMap[Spells.fairy]])
+            if (SpellGet[spellMap[Spell.fairy]])
             {
-                itemList[9] = replaceList[R.Next(replaceList.Count)];
+                itemList[9] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.medicine] = true;
                 startMed = true;
             }
 
-            if(spellGet[(int)spellMap[Spells.jump]])
+            if(SpellGet[spellMap[Spell.jump]])
             {
-                itemList[10] = replaceList[R.Next(replaceList.Count)];
+                itemList[10] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.trophy] = true;
                 startTrophy = true;
             }
 
-            if(spellGet[(int)spellMap[Spells.reflect]])
+            if(SpellGet[spellMap[Spell.reflect]])
             {
-                itemList[17] = replaceList[R.Next(replaceList.Count)];
+                itemList[17] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.kid] = true;
                 startKid = true;
             }
 
             if (itemGet[0])
             {
-                itemList[0] = replaceList[R.Next(replaceList.Count)];
+                itemList[0] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[1])
             {
-                itemList[1] = replaceList[R.Next(replaceList.Count)];
+                itemList[1] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[2])
             {
-                itemList[2] = replaceList[R.Next(replaceList.Count)];
+                itemList[2] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[3])
             {
-                itemList[3] = replaceList[R.Next(replaceList.Count)];
+                itemList[3] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[4])
             {
-                itemList[4] = replaceList[R.Next(replaceList.Count)];
+                itemList[4] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[5])
             {
-                itemList[5] = replaceList[R.Next(replaceList.Count)];
+                itemList[5] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[7])
             {
-                itemList[14] = replaceList[R.Next(replaceList.Count)];
+                itemList[14] = replaceList[RNG.Next(replaceList.Count)];
             }
 
             if (itemGet[6])
             {
-                itemList[16] = replaceList[R.Next(replaceList.Count)];
+                itemList[16] = replaceList[RNG.Next(replaceList.Count)];
             }
 
 
@@ -771,7 +776,7 @@ namespace Z2Randomizer
                 for (int i = 0; i < itemList.Count; i++)
                 {
 
-                    int s = R.Next(i, itemList.Count);
+                    int s = RNG.Next(i, itemList.Count);
                     Items sl = itemList[s];
                     itemList[s] = itemList[i];
                     itemList[i] = sl;
@@ -783,7 +788,7 @@ namespace Z2Randomizer
                 {
                     for (int i = 0; i < 6; i++)
                     {
-                        int s = R.Next(i, 6);
+                        int s = RNG.Next(i, 6);
                         Items sl = itemList[s];
                         itemList[s] = itemList[i];
                         itemList[i] = sl;
@@ -798,7 +803,7 @@ namespace Z2Randomizer
                 {
                     for (int i = 6; i < itemList.Count; i++)
                     {
-                        int s = R.Next(i, itemList.Count);
+                        int s = RNG.Next(i, itemList.Count);
                         Items sl = itemList[s];
                         itemList[s] = itemList[i];
                         itemList[i] = sl;
@@ -860,7 +865,7 @@ namespace Z2Randomizer
                 prevCount = count;
                 westHyrule.updateVisit();
                 deathMountain.updateVisit();
-                eastHyrule.UpdateVisit();
+                eastHyrule.updateVisit();
                 mazeIsland.updateVisit();
 
                 foreach(World world in worlds)
@@ -869,7 +874,7 @@ namespace Z2Randomizer
                     {
                         foreach(World world2 in worlds)
                         {
-                            world2.visitRaft();
+                            world2.VisitRaft();
                         }
                     }
 
@@ -877,7 +882,7 @@ namespace Z2Randomizer
                     {
                         foreach (World w2 in worlds)
                         {
-                            w2.visitBridge();
+                            w2.VisitBridge();
                         }
                     }
 
@@ -885,7 +890,7 @@ namespace Z2Randomizer
                     {
                         foreach (World w2 in worlds)
                         {
-                            w2.visitCave1();
+                            w2.VisitCave1();
                         }
                     }
 
@@ -893,13 +898,13 @@ namespace Z2Randomizer
                     {
                         foreach (World w2 in worlds)
                         {
-                            w2.visitCave2();
+                            w2.VisitCave2();
                         }
                     }
                 }
                 westHyrule.updateVisit();
                 deathMountain.updateVisit();
-                eastHyrule.UpdateVisit();
+                eastHyrule.updateVisit();
                 mazeIsland.updateVisit();
 
                 f = UpdateItems();
@@ -978,15 +983,24 @@ namespace Z2Randomizer
             {
                 return false;
             }
-            for (int i = 0; i < spellGet.Count(); i++)
+            if(SpellGet.Values.Any(i => i == false))
             {
-                if (!spellGet[i])
-                {
-                    return false;
-                }
+                return false;
             }
 
-            return (CanGet(westHyrule.Towns) && CanGet(eastHyrule.Towns) && CanGet(westHyrule.palace1) && CanGet(westHyrule.palace2) && CanGet(westHyrule.palace3) && CanGet(mazeIsland.palace4) && CanGet(eastHyrule.palace5) && CanGet(eastHyrule.palace6) && CanGet(eastHyrule.gp) && CanGet(itemLocs) && CanGet(westHyrule.bagu) && (!hiddenKasuto || (CanGet(eastHyrule.hkLoc))) && (!hiddenPalace || (CanGet(eastHyrule.hpLoc))));
+            return (CanGet(westHyrule.Locations[Terrain.TOWN]) 
+                && CanGet(eastHyrule.Locations[Terrain.TOWN]) 
+                && CanGet(westHyrule.palace1) 
+                && CanGet(westHyrule.palace2) 
+                && CanGet(westHyrule.palace3) 
+                && CanGet(mazeIsland.palace4) 
+                && CanGet(eastHyrule.palace5) 
+                && CanGet(eastHyrule.palace6) 
+                && CanGet(eastHyrule.gp) 
+                && CanGet(itemLocs) 
+                && CanGet(westHyrule.bagu) 
+                && (!hiddenKasuto || (CanGet(eastHyrule.hkLoc))) 
+                && (!hiddenPalace || (CanGet(eastHyrule.hpLoc))));
         }
 
         private Boolean CanGet(List<Location> l)
@@ -1064,87 +1078,87 @@ namespace Z2Randomizer
             townLocations[eastHyrule.oldKasuto.TownNum] = eastHyrule.oldKasuto;
 
             Boolean changed = false;
-            foreach (Spells s in spellMap.Keys)
+            foreach (Spell s in spellMap.Keys)
             {
-                if (s == Spells.fairy && (((itemGet[(int)Items.medicine] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (magContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
+                if (s == Spell.fairy && (((itemGet[(int)Items.medicine] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (magContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
                 {
-                    if(!spellGet[(int)spellMap[s]])
+                    if(!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.jump && (((itemGet[(int)Items.trophy] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)Items.kid] || props.removeSpellItems))) && CanGet(westHyrule.jump))
+                else if (s == Spell.jump && (((itemGet[(int)Items.trophy] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)Items.kid] || props.removeSpellItems))) && CanGet(westHyrule.jump))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.downstab && (spellGet[(int)Spells.jump] || spellGet[(int)Spells.fairy]) && CanGet(townLocations[Town.MIDO]))
+                else if (s == Spell.downstab && (SpellGet[Spell.jump] || SpellGet[Spell.fairy]) && CanGet(townLocations[Town.MIDO]))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.upstab && (spellGet[(int)Spells.jump]) && CanGet(townLocations[Town.DARUNIA]))
+                else if (s == Spell.upstab && (SpellGet[Spell.jump]) && CanGet(townLocations[Town.DARUNIA]))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.life && (CanGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
+                else if (s == Spell.life && (CanGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.shield && (CanGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
+                else if (s == Spell.shield && (CanGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.reflect && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[(int)Items.trophy] || props.removeSpellItems)) || ((itemGet[(int)Items.kid] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
+                else if (s == Spell.reflect && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[(int)Items.trophy] || props.removeSpellItems)) || ((itemGet[(int)Items.kid] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.fire && (CanGet(eastHyrule.fireTown)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.fireTown.TownNum == Town.NABOORU) || eastHyrule.fireTown.TownNum == Town.RAURU))
+                else if (s == Spell.fire && (CanGet(eastHyrule.fireTown)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.fireTown.TownNum == Town.NABOORU) || eastHyrule.fireTown.TownNum == Town.RAURU))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.spell && (CanGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
+                else if (s == Spell.spell && (CanGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spells.thunder && (CanGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[(int)Items.medicine] || props.removeSpellItems))))
+                else if (s == Spell.thunder && (CanGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[(int)Items.medicine] || props.removeSpellItems))))
                 {
-                    if (!spellGet[(int)spellMap[s]])
+                    if (!SpellGet[spellMap[s]])
                     {
                         changed = true;
                     }
-                    spellGet[(int)spellMap[s]] = true;
+                    SpellGet[spellMap[s]] = true;
                 }
             }
             return changed;
@@ -1167,7 +1181,7 @@ namespace Z2Randomizer
                     {
                         Console.WriteLine("here");
                     }
-                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (spellGet[(int)Spells.fairy] || itemGet[(int)Items.magickey]) && (!palace.NeedDstab || (palace.NeedDstab && spellGet[(int)Spells.downstab])) && (!palace.NeedFairy || (palace.NeedFairy && spellGet[(int)Spells.fairy])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[(int)Items.glove])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (spellGet[(int)Spells.jump]) || spellGet[(int)Spells.fairy])) && (!palace.NeedReflect || (palace.NeedReflect && spellGet[(int)Spells.reflect]));
+                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (SpellGet[Spell.fairy] || itemGet[(int)Items.magickey]) && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.downstab])) && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.fairy])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[(int)Items.glove])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.jump]) || SpellGet[Spell.fairy])) && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.reflect]));
                 }
                 else if (location.TownNum == Town.NEW_KASUTO)
                 {
@@ -1175,7 +1189,7 @@ namespace Z2Randomizer
                 }
                 else if (location.TownNum == Town.NEW_KASUTO_2)
                 {
-                    location.itemGet = itemGet[(int)location.item] = (CanGet(location) && spellGet[(int)Spells.spell]) && (!location.NeedHammer || itemGet[(int)Items.hammer]);
+                    location.itemGet = itemGet[(int)location.item] = (CanGet(location) && SpellGet[Spell.spell]) && (!location.NeedHammer || itemGet[(int)Items.hammer]);
                 }
                 else
                 {
@@ -1233,11 +1247,11 @@ namespace Z2Randomizer
                         }
                         if (j == 0)
                         {
-                            nextVal = random.Next(min, Math.Min(max, 120));
+                            nextVal = RNG.Next(min, Math.Min(max, 120));
                         }
                         else
                         {
-                            nextVal = random.Next(min, Math.Min(max, 120));
+                            nextVal = RNG.Next(min, Math.Min(max, 120));
                             if (nextVal > life[i, j - 1])
                             {
                                 nextVal = life[i, j - 1];
@@ -1318,7 +1332,7 @@ namespace Z2Randomizer
                 int newVal = 0;
                 int val = (int)ROMData.GetByte(i);
 
-                newVal = random.Next((int)(val * 0.5), (int)(val * 1.5));
+                newVal = RNG.Next((int)(val * 0.5), (int)(val * 1.5));
                 if (newVal > 255)
                 {
                     newVal = 255;
@@ -1380,22 +1394,22 @@ namespace Z2Randomizer
 
                     if (props.continentConnections.Equals("Normal") || props.continentConnections.Equals("R+B Border Shuffle"))
                     {
-                        westHyrule.loadCave1(1);
-                        westHyrule.loadCave2(1);
-                        westHyrule.loadRaft(2);
+                        westHyrule.LoadCave1(1);
+                        westHyrule.LoadCave2(1);
+                        westHyrule.LoadRaft(2);
 
-                        deathMountain.loadCave1(0);
-                        deathMountain.loadCave2(0);
+                        deathMountain.LoadCave1(0);
+                        deathMountain.LoadCave2(0);
 
-                        eastHyrule.loadRaft(0);
-                        eastHyrule.loadBridge(3);
+                        eastHyrule.LoadRaft(0);
+                        eastHyrule.LoadBridge(3);
 
-                        mazeIsland.loadBridge(2);
+                        mazeIsland.LoadBridge(2);
                     }
                     else if (props.continentConnections.Equals("Transportation Shuffle"))
                     {
                         List<int> chosen = new List<int>();
-                        int type = R.Next(4);
+                        int type = RNG.Next(4);
                         if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)") || props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
                         {
                             type = 3;
@@ -1411,7 +1425,7 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                type = R.Next(4);
+                                type = RNG.Next(4);
                             } while (chosen.Contains(type));
                         }
                         SetTransportation(0, 1, type);
@@ -1424,7 +1438,7 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                type = R.Next(4);
+                                type = RNG.Next(4);
                             } while (chosen.Contains(type));
                         }
                         SetTransportation(0, 2, type);
@@ -1437,7 +1451,7 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                type = R.Next(4);
+                                type = RNG.Next(4);
                             } while (chosen.Contains(type));
                         }
                         SetTransportation(2, 3, type);
@@ -1462,7 +1476,7 @@ namespace Z2Randomizer
                             doNotPick.Add(3);
                         }
 
-                        int raftw1 = R.Next(worlds.Count);
+                        int raftw1 = RNG.Next(worlds.Count);
 
                         if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
                         {
@@ -1472,12 +1486,12 @@ namespace Z2Randomizer
                         {
                             while (doNotPick.Contains(raftw1))
                             {
-                                raftw1 = R.Next(worlds.Count);
+                                raftw1 = RNG.Next(worlds.Count);
                             }
                         }
 
 
-                        int raftw2 = R.Next(worlds.Count);
+                        int raftw2 = RNG.Next(worlds.Count);
                         if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
                         {
                             raftw2 = 2;
@@ -1486,14 +1500,14 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                raftw2 = R.Next(worlds.Count);
+                                raftw2 = RNG.Next(worlds.Count);
                             } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                         }
 
-                        worlds[raftw1].loadRaft(raftw2);
-                        worlds[raftw2].loadRaft(raftw1);
+                        worlds[raftw1].LoadRaft(raftw2);
+                        worlds[raftw2].LoadRaft(raftw1);
 
-                        int bridgew1 = R.Next(worlds.Count);
+                        int bridgew1 = RNG.Next(worlds.Count);
                         if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
                         {
                             bridgew1 = 2;
@@ -1502,10 +1516,10 @@ namespace Z2Randomizer
                         {
                             while (doNotPick.Contains(bridgew1))
                             {
-                                bridgew1 = R.Next(worlds.Count);
+                                bridgew1 = RNG.Next(worlds.Count);
                             }
                         }
-                        int bridgew2 = R.Next(worlds.Count);
+                        int bridgew2 = RNG.Next(worlds.Count);
                         if (props.mazeBiome.Equals("Vanilla") || props.mazeBiome.Equals("Vanilla (shuffled)"))
                         {
                             bridgew2 = 3;
@@ -1514,14 +1528,14 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                bridgew2 = R.Next(worlds.Count);
+                                bridgew2 = RNG.Next(worlds.Count);
                             } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                         }
 
-                        worlds[bridgew1].loadBridge(bridgew2);
-                        worlds[bridgew2].loadBridge(bridgew1);
+                        worlds[bridgew1].LoadBridge(bridgew2);
+                        worlds[bridgew2].LoadBridge(bridgew1);
 
-                        int c1w1 = R.Next(worlds.Count);
+                        int c1w1 = RNG.Next(worlds.Count);
                         if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
                         {
                             c1w1 = 0;
@@ -1530,10 +1544,10 @@ namespace Z2Randomizer
                         {
                             while (doNotPick.Contains(c1w1))
                             {
-                                c1w1 = R.Next(worlds.Count);
+                                c1w1 = RNG.Next(worlds.Count);
                             }
                         }
-                        int c1w2 = R.Next(worlds.Count);
+                        int c1w2 = RNG.Next(worlds.Count);
                         if (props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
                         {
                             c1w2 = 1;
@@ -1542,14 +1556,14 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                c1w2 = R.Next(worlds.Count);
+                                c1w2 = RNG.Next(worlds.Count);
                             } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                         }
 
-                        worlds[c1w1].loadCave1(c1w2);
-                        worlds[c1w2].loadCave1(c1w1);
+                        worlds[c1w1].LoadCave1(c1w2);
+                        worlds[c1w2].LoadCave1(c1w1);
 
-                        int c2w1 = R.Next(worlds.Count);
+                        int c2w1 = RNG.Next(worlds.Count);
                         if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
                         {
                             c2w1 = 0;
@@ -1558,10 +1572,10 @@ namespace Z2Randomizer
                         {
                             while (doNotPick.Contains(c2w1))
                             {
-                                c2w1 = R.Next(worlds.Count);
+                                c2w1 = RNG.Next(worlds.Count);
                             }
                         }
-                        int c2w2 = R.Next(worlds.Count);
+                        int c2w2 = RNG.Next(worlds.Count);
                         if (props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
                         {
                             c2w2 = 1;
@@ -1570,12 +1584,12 @@ namespace Z2Randomizer
                         {
                             do
                             {
-                                c2w2 = R.Next(worlds.Count);
+                                c2w2 = RNG.Next(worlds.Count);
                             } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                         }
 
-                        worlds[c2w1].loadCave2(c2w2);
-                        worlds[c2w2].loadCave2(c2w1);
+                        worlds[c2w1].LoadCave2(c2w2);
+                        worlds[c2w2].LoadCave2(c2w1);
                     }
                 } while (!AllContinentsHaveConnection(worlds));
 
@@ -1674,10 +1688,10 @@ namespace Z2Randomizer
                     x = 0;
                     while (!EverythingReachable() && x < 10)
                     {
-                        westHyrule.allReachable();
+                        westHyrule.AllReachable();
                         eastHyrule.AllReachable();
-                        mazeIsland.allReachable();
-                        deathMountain.allReachable();
+                        mazeIsland.AllReachable();
+                        deathMountain.AllReachable();
                         foreach (Location l in westHyrule.AllLocations)
                         {
                             l.Reachable = false;
@@ -1780,7 +1794,7 @@ namespace Z2Randomizer
             {
                 foreach (World w in worlds)
                 {
-                    w.shuffleE();
+                    w.ShuffleE();
                 }
             }
         }
@@ -1802,24 +1816,24 @@ namespace Z2Randomizer
         {
             if(type == 1)
             {
-                worlds[w1].loadRaft(w2);
-                worlds[w2].loadRaft(w1);
+                worlds[w1].LoadRaft(w2);
+                worlds[w2].LoadRaft(w1);
             }
             else if (type == 2)
             {
-                worlds[w1].loadBridge(w2);
-                worlds[w2].loadBridge(w1);
+                worlds[w1].LoadBridge(w2);
+                worlds[w2].LoadBridge(w1);
             }
             else if(type == 3)
             {
-                worlds[w1].loadCave1(w2);
-                worlds[w2].loadCave1(w1);
+                worlds[w1].LoadCave1(w2);
+                worlds[w2].LoadCave1(w1);
 
             }
             else
             {
-                worlds[w1].loadCave2(w2);
-                worlds[w2].loadCave2(w1);
+                worlds[w1].LoadCave2(w2);
+                worlds[w2].LoadCave2(w1);
             }
         }
 
@@ -1827,7 +1841,7 @@ namespace Z2Randomizer
         {
             foreach (World w in worlds)
             {
-                if (!w.hasConnections())
+                if (!w.HasConnections())
                 {
                     return false;
                 }
@@ -1850,15 +1864,15 @@ namespace Z2Randomizer
 
             if(props.townSwap)
             {
-                if(R.NextDouble() > .5)
+                if(RNG.NextDouble() > .5)
                 {
                     Util.Swap(westHyrule.shieldTown, eastHyrule.fireTown);
                 }
-                if (R.NextDouble() > .5)
+                if (RNG.NextDouble() > .5)
                 {
                     Util.Swap(westHyrule.jump, eastHyrule.darunia);
                 }
-                if (R.NextDouble() > .5)
+                if (RNG.NextDouble() > .5)
                 {
                     Util.Swap(westHyrule.lifeNorth, eastHyrule.newKasuto);
                     Util.Swap(westHyrule.lifeSouth, eastHyrule.newKasuto2);
@@ -1882,7 +1896,7 @@ namespace Z2Randomizer
 
 
                 }
-                if (R.NextDouble() > .5)
+                if (RNG.NextDouble() > .5)
                 {
                     Util.Swap(westHyrule.fairy, eastHyrule.oldKasuto);
                 }
@@ -1904,7 +1918,7 @@ namespace Z2Randomizer
 
                 for (int i = 0; i < pals.Count; i++)
                 {
-                    int swapp = random.Next(i, pals.Count);
+                    int swapp = RNG.Next(i, pals.Count);
                     Util.Swap(pals[i], pals[swapp]);
                 }
 
@@ -2045,18 +2059,23 @@ namespace Z2Randomizer
 
         private void ShuffleSpells()
         {
-            spellMap = new Dictionary<Spells, Spells>();
+            spellMap = new Dictionary<Spell, Spell>();
             List<int> shuffleThis = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 };
-            for (int i = 0; i < spellGet.Count(); i++)
+            SpellGet.Clear();
+            foreach (Spell spell in Enum.GetValues(typeof(Spell)))
+            {
+                SpellGet.Add(spell, false);
+            }
+            /*for (int i = 0; i < spellGet.Count(); i++)
             {
                 spellGet[i] = false;
-            }
+            }*/
             if (props.shuffleSpellLocations)
             {
                 for (int i = 0; i < shuffleThis.Count; i++)
                 {
 
-                    int s = R.Next(i, shuffleThis.Count);
+                    int s = RNG.Next(i, shuffleThis.Count);
                     int sl = shuffleThis[s];
                     shuffleThis[s] = shuffleThis[i];
                     shuffleThis[i] = sl;
@@ -2064,43 +2083,43 @@ namespace Z2Randomizer
             }
             for (int i = 0; i < shuffleThis.Count; i++)
             {
-                spellMap.Add((Spells)i, (Spells)shuffleThis[i]);
+                spellMap.Add((Spell)i, (Spell)shuffleThis[i]);
             }
-            spellMap.Add(Spells.upstab, Spells.upstab);
-            spellMap.Add(Spells.downstab, Spells.downstab);
+            spellMap.Add(Spell.upstab, Spell.upstab);
+            spellMap.Add(Spell.downstab, Spell.downstab);
 
             if (props.shuffleSpells)
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    bool hasSpell = random.NextDouble() > .75;
+                    bool hasSpell = RNG.NextDouble() > .75;
                     ROMData.Put(0x17AF7 + i, hasSpell ? (Byte)1 : (Byte)0);
-                    spellGet[(int)spellMap[(Spells)i]] = hasSpell;
+                    SpellGet[spellMap[(Spell)i]] = hasSpell;
                 }
             }
             else
             {
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.shield), props.startShield ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.shield] = props.startShield;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.jump), props.startJump ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.jump] = props.startJump;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.life), props.startLife ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.life] = props.startLife;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.fairy), props.startFairy ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.fairy] = props.startFairy;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.fire), props.startFire ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.fire] = props.startFire;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.reflect), props.startReflect ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.reflect] = props.startReflect;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.spell), props.startSpell ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.spell] = props.startSpell;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spells.thunder), props.startThunder ? (Byte)1 : (Byte)0);
-                spellGet[(int)Spells.thunder] = props.startThunder;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.shield), props.startShield ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.shield] = props.startShield;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.jump), props.startJump ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.jump] = props.startJump;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.life), props.startLife ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.life] = props.startLife;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.fairy), props.startFairy ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.fairy] = props.startFairy;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.fire), props.startFire ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.fire] = props.startFire;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.reflect), props.startReflect ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.reflect] = props.startReflect;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.spell), props.startSpell ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.spell] = props.startSpell;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.thunder), props.startThunder ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.thunder] = props.startThunder;
             }
 
             if (props.combineFire)
             {
-                int newFire = R.Next(7);
+                int newFire = RNG.Next(7);
                 if (newFire > 3)
                 {
                     newFire++;
@@ -2130,11 +2149,11 @@ namespace Z2Randomizer
                 int nextMax = (int)(exp[i] + exp[i] * 0.25);
                 if (i == 0)
                 {
-                    exp[i] = random.Next(Math.Max(10, nextMin), nextMax);
+                    exp[i] = RNG.Next(Math.Max(10, nextMin), nextMax);
                 }
                 else
                 {
-                    exp[i] = random.Next(Math.Max(exp[i - 1], nextMin), Math.Min(nextMax, 9990));
+                    exp[i] = RNG.Next(Math.Max(exp[i - 1], nextMin), Math.Min(nextMax, 9990));
                 }
             }
 
@@ -2210,7 +2229,7 @@ namespace Z2Randomizer
             {
                 int part1 = 0;
                 int part2 = ROMData.GetByte(i) & notMask;
-                bool havethis = random.NextDouble() <= fraction;
+                bool havethis = RNG.NextDouble() <= fraction;
                 if (havethis)
                 {
                     part1 = mask;
@@ -2238,7 +2257,7 @@ namespace Z2Randomizer
 
                 if (!props.expLevel.Equals("None"))
                 {
-                    low = random.Next(low - 2, low + 3);
+                    low = RNG.Next(low - 2, low + 3);
                 }
                 if (low < 0)
                 {
@@ -2256,7 +2275,7 @@ namespace Z2Randomizer
         {
             for (int i = 0; i < addr.Count; i++)
             {
-                int swap = random.Next(i, addr.Count);
+                int swap = RNG.Next(i, addr.Count);
                 Byte temp = ROMData.GetByte(addr[i]);
                 ROMData.Put(addr[i], ROMData.GetByte(addr[swap]));
                 ROMData.Put(addr[swap], temp);
@@ -2277,8 +2296,10 @@ namespace Z2Randomizer
             if(props.spellEnemy)
             {
                 List<int> enemies = new List<int> { 3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26 };
-                ROMData.Put(0x11ef, (byte)enemies[random.Next(enemies.Count())]);
+                ROMData.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count())]);
             }
+            //TODO: De-Magic these biome strings
+            //TODO: Hyrule shouldn't be responsible for setting properties, only reading them.
             int opts = 0;
             if (props.westBiome.Equals("Random (no Vanilla)"))
             {
@@ -2293,7 +2314,7 @@ namespace Z2Randomizer
                 shuffler.ShuffleBossDrop();
             }
             if(opts != 0) { 
-                int wb = R.Next(opts);
+                int wb = RNG.Next(opts);
                 if(wb == 0)
                 {
                     props.westBiome = "Vanilla-Like";
@@ -2335,7 +2356,7 @@ namespace Z2Randomizer
             }
             if (opts != 0)
             {
-                int wb = R.Next(opts);
+                int wb = RNG.Next(opts);
 
                 if (wb == 0)
                 {
@@ -2378,7 +2399,7 @@ namespace Z2Randomizer
             }
             if (opts != 0)
             {
-                int wb = R.Next(opts);
+                int wb = RNG.Next(opts);
                 if (wb == 0)
                 {
                     props.dmBiome = "Vanilla-Like";
@@ -2411,7 +2432,7 @@ namespace Z2Randomizer
 
             if(props.mazeBiome.Equals("Random (with Vanilla)"))
             {
-                int wb = random.Next(3);
+                int wb = RNG.Next(3);
                 if(wb == 0)
                 {
                     props.mazeBiome = "Vanilla";
@@ -2428,7 +2449,7 @@ namespace Z2Randomizer
 
             if (props.westBiome.Equals("Canyon"))
             {
-                if(R.NextDouble() > 0.5)
+                if(RNG.NextDouble() > 0.5)
                 {
                     props.westBiome = "CanyonD";
                 }
@@ -2436,7 +2457,7 @@ namespace Z2Randomizer
 
             if (props.eastBiome.Equals("Canyon"))
             {
-                if (R.NextDouble() > 0.5)
+                if (RNG.NextDouble() > 0.5)
                 {
                     props.eastBiome = "CanyonD";
                 }
@@ -2444,7 +2465,7 @@ namespace Z2Randomizer
 
             if (props.dmBiome.Equals("Canyon"))
             {
-                if (R.NextDouble() > 0.5)
+                if (RNG.NextDouble() > 0.5)
                 {
                     props.dmBiome = "CanyonD";
                 }
@@ -2961,7 +2982,7 @@ namespace Z2Randomizer
             }
             if (props.shuffleLifeRefill)
             {
-                int lifeRefill = random.Next(1, 6);
+                int lifeRefill = RNG.Next(1, 6);
                 ROMData.Put(0xE7A, (Byte)(lifeRefill * 16));
             }
 
@@ -2969,8 +2990,8 @@ namespace Z2Randomizer
             {
                 int small = ROMData.GetByte(0x1E30E);
                 int big = ROMData.GetByte(0x1E314);
-                small = random.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
-                big = random.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
+                small = RNG.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
+                big = RNG.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
                 ROMData.Put(0x1E30E, (Byte)small);
                 ROMData.Put(0x1E314, (Byte)big);
             }
@@ -3241,7 +3262,7 @@ namespace Z2Randomizer
 
             if (props.startGems.Equals("Random"))
             {
-                ROMData.Put(0x17B10, (Byte)random.Next(0, 7));
+                ROMData.Put(0x17B10, (Byte)RNG.Next(0, 7));
             }
             else
             {
@@ -3250,7 +3271,7 @@ namespace Z2Randomizer
 
             if (props.startHearts.Equals("Random"))
             {
-                startHearts = random.Next(1, 9);
+                startHearts = RNG.Next(1, 9);
                 ROMData.Put(0x17B00, (Byte)startHearts);
             }
             else
@@ -3261,7 +3282,7 @@ namespace Z2Randomizer
 
             if (props.maxHearts.Equals("Random"))
             {
-                maxHearts = random.Next(startHearts, 9);
+                maxHearts = RNG.Next(startHearts, 9);
             }
             else
             {
@@ -3272,12 +3293,12 @@ namespace Z2Randomizer
 
             if (props.shuffleLives)
             {
-                ROMData.Put(0x1C369, (Byte)random.Next(2, 6));
+                ROMData.Put(0x1C369, (Byte)RNG.Next(2, 6));
             }
 
             if (props.startTech.Equals("Random"))
             {
-                int swap = random.Next(7);
+                int swap = RNG.Next(7);
                 if (swap <= 3)
                 {
                     ROMData.Put(0x17B12, (Byte)0);
@@ -3345,7 +3366,7 @@ namespace Z2Randomizer
 
             if (props.pbagDrop)
             {
-                int drop = random.Next(5) + 4;
+                int drop = RNG.Next(5) + 4;
                 ROMData.Put(0x1E8B0, (Byte)drop);
             }
 
@@ -3391,7 +3412,7 @@ namespace Z2Randomizer
                     ROMData.Put(l.MemAddress + overworldMapOff, l.LocationBytes[2]);
                     ROMData.Put(l.MemAddress + overworldWorldOff, l.LocationBytes[3]);
                 }
-                w.removeUnusedConnectors();
+                w.RemoveUnusedConnectors();
             }
 
 
@@ -3737,7 +3758,7 @@ namespace Z2Randomizer
 
             if (props.shuffleDripper)
             {
-                ROMData.Put(0x11927, (Byte)enemies1[R.Next(enemies1.Count)]);
+                ROMData.Put(0x11927, (Byte)enemies1[RNG.Next(enemies1.Count)]);
             }
 
             if (props.shuffleEnemyPalettes)
@@ -3747,8 +3768,8 @@ namespace Z2Randomizer
 
                 foreach (int i in doubleLocs)
                 {
-                    int low = random.Next(12) + 1;
-                    int high = (random.Next(2) + 1) * 16;
+                    int low = RNG.Next(12) + 1;
+                    int high = (RNG.Next(2) + 1) * 16;
                     int color = high + low;
                     ROMData.Put(i, (byte)color);
                     ROMData.Put(i + 16, (byte)color);
@@ -3757,8 +3778,8 @@ namespace Z2Randomizer
                 }
                 foreach (int i in singleLocs)
                 {
-                    int low = random.Next(13);
-                    int high = (random.Next(3)) * 16;
+                    int low = RNG.Next(13);
+                    int high = (RNG.Next(3)) * 16;
                     int color = high + low;
                     ROMData.Put(i, (byte)color);
                     ROMData.Put(i + 16, (byte)color);
@@ -3771,7 +3792,7 @@ namespace Z2Randomizer
                     {
                         int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = random.Next(4);
+                        int n = RNG.Next(4);
                         n = n << 6;
                         ROMData.Put(i, (byte)(n + p));
                     }
@@ -3783,7 +3804,7 @@ namespace Z2Randomizer
                     {
                         int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = random.Next(4);
+                        int n = RNG.Next(4);
                         n = n << 6;
                         ROMData.Put(i, (byte)(n + p));
                     }
@@ -3794,7 +3815,7 @@ namespace Z2Randomizer
                     {
                         int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = random.Next(4);
+                        int n = RNG.Next(4);
                         n = n << 6;
                         ROMData.Put(i, (byte)(n + p));
                     }
@@ -3805,7 +3826,7 @@ namespace Z2Randomizer
                     {
                         int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = random.Next(4);
+                        int n = RNG.Next(4);
                         n = n << 6;
                         ROMData.Put(i, (byte)(n + p));
                     }
@@ -3816,7 +3837,7 @@ namespace Z2Randomizer
                     {
                         int b = ROMData.GetByte(i);
                         int p = b & 0x3F;
-                        int n = random.Next(4);
+                        int n = RNG.Next(4);
                         n = n << 6;
                         ROMData.Put(i, (byte)(n + p));
                     }
@@ -4099,25 +4120,25 @@ namespace Z2Randomizer
 
             for (int i = 0; i < magFunction.Count(); i++)
             {
-                magFunction[i] = ROMData.GetByte(functionBase + (int)spellMap[(Spells)i]);
+                magFunction[i] = ROMData.GetByte(functionBase + (int)spellMap[(Spell)i]);
             }
 
             for (int i = 0; i < magEffects.Count(); i = i + 2)
             {
-                magEffects[i] = ROMData.GetByte(effectBase + (int)spellMap[(Spells)(i / 2)] * 2);
-                magEffects[i + 1] = ROMData.GetByte(effectBase + (int)spellMap[(Spells)(i / 2)] * 2 + 1);
+                magEffects[i] = ROMData.GetByte(effectBase + (int)spellMap[(Spell)(i / 2)] * 2);
+                magEffects[i + 1] = ROMData.GetByte(effectBase + (int)spellMap[(Spell)(i / 2)] * 2 + 1);
             }
 
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    magLevels[i, j] = ROMData.GetByte(spellCostBase + ((int)spellMap[(Spells)i] * 8 + j));
+                    magLevels[i, j] = ROMData.GetByte(spellCostBase + ((int)spellMap[(Spell)i] * 8 + j));
                 }
 
                 for (int j = 0; j < 7; j++)
                 {
-                    magNames[i, j] = ROMData.GetByte(spellNameBase + ((int)spellMap[(Spells)i] * 0xe + j));
+                    magNames[i, j] = ROMData.GetByte(spellNameBase + ((int)spellMap[(Spell)i] * 0xe + j));
                 }
             }
 
@@ -4163,7 +4184,7 @@ namespace Z2Randomizer
 
         }
 
-        public void ShuffleE(int enemyPtr, int enemyAddr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool p7)
+        public void ShuffleEnemies(int enemyPtr, int enemyAddr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool p7)
         {
             //refactor this to use enemy arrays in rooms
             int maps = 0;
@@ -4229,7 +4250,7 @@ namespace Z2Randomizer
                     {
                         if (enemies.Contains(enemy))
                         {
-                            int swap = enemies[random.Next(0, enemies.Count)];
+                            int swap = enemies[RNG.Next(0, enemies.Count)];
                             int ypos = ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = ROMData.GetByte(j - 1) & 0x0F;
                             if (shorties.Contains(enemy) && tallGuys.Contains(swap))
@@ -4237,14 +4258,14 @@ namespace Z2Randomizer
                                 ypos = ypos - 16;
                                 while (swap == 0x1D && ypos != 0x70 && !p7)
                                 {
-                                    swap = tallGuys[R.Next(0, tallGuys.Count)];
+                                    swap = tallGuys[RNG.Next(0, tallGuys.Count)];
                                 }
                             }
                             else
                             {
                                 while (swap == 0x1D && ypos != 0x70 && !p7)
                                 {
-                                    swap = enemies[R.Next(0, enemies.Count)];
+                                    swap = enemies[RNG.Next(0, enemies.Count)];
                                 }
                             }
 
@@ -4257,18 +4278,18 @@ namespace Z2Randomizer
                     {
                         if (tallGuys.Contains(enemy))
                         {
-                            int swap = R.Next(0, tallGuys.Count);
+                            int swap = RNG.Next(0, tallGuys.Count);
                             int ypos = ROMData.GetByte(j - 1) & 0xF0;
                             while (tallGuys[swap] == 0x1D && ypos != 0x70 && !p7)
                             {
-                                swap = R.Next(0, tallGuys.Count);
+                                swap = RNG.Next(0, tallGuys.Count);
                             }
                             ROMData.Put(j, (Byte)(tallGuys[swap] + highPart));
                         }
 
                         if (shorties.Contains(enemy))
                         {
-                            int swap = R.Next(0, shorties.Count);
+                            int swap = RNG.Next(0, shorties.Count);
                             ROMData.Put(j, (Byte)(shorties[swap] + highPart));
                         }
                     }
@@ -4276,23 +4297,23 @@ namespace Z2Randomizer
 
                     if (flyingEnemies.Contains(enemy))
                     {
-                        int swap = R.Next(0, flyingEnemies.Count);
+                        int swap = RNG.Next(0, flyingEnemies.Count);
                         while (enemy == 0x07 && (flyingEnemies[swap] == 0x06 || flyingEnemies[swap] == 0x0E))
                         {
-                            swap = R.Next(0, flyingEnemies.Count);
+                            swap = RNG.Next(0, flyingEnemies.Count);
                         }
                         ROMData.Put(j, (Byte)(flyingEnemies[swap] + highPart));
                     }
 
                     if (generators.Contains(enemy))
                     {
-                        int swap = R.Next(0, generators.Count);
+                        int swap = RNG.Next(0, generators.Count);
                         ROMData.Put(j, (Byte)(generators[swap] + highPart));
                     }
 
                     if (enemy == 0x0B)
                     {
-                        int swap = R.Next(0, generators.Count + 1);
+                        int swap = RNG.Next(0, generators.Count + 1);
                         if (swap != generators.Count)
                         {
                             ROMData.Put(j, (Byte)(generators[swap] + highPart));
@@ -4346,10 +4367,9 @@ namespace Z2Randomizer
                 }
             }
 
-
             for (int i = 0; i < items.Count; i++)
             {
-                int swap = random.Next(i, items.Count);
+                int swap = RNG.Next(i, items.Count);
                 int temp = items[swap];
                 items[swap] = items[i];
                 items[i] = temp;

@@ -4,18 +4,12 @@ namespace Z2Randomizer
 {
     class Location
     {
-        private Byte[] locationBytes;
         private int externalWorld;
-        private int ypos;
-        private int xpos;
         private int secondpartofcave;
         private int appear2loweruponexit;
         private int horizontalPos;
-        private int map;
         private int forceEnterRight;
-        private int passThrough;
         private int fallInHole;
-        private int world;
         private Terrain terrainType;
         private Boolean needFairy;
         private Boolean needhammer;
@@ -23,7 +17,6 @@ namespace Z2Randomizer
         private Boolean needRecorder;
         private Boolean needBagu;
         private Boolean needBoots;
-        private int memAddress;
         private Tuple<int, int> coords;
         private Boolean canShuffle;
         public Items item;
@@ -49,7 +42,7 @@ namespace Z2Randomizer
         {
             get
             {
-                return Tuple.Create(ypos, xpos);
+                return Tuple.Create(Ypos, Xpos);
             }
 
             set
@@ -114,20 +107,20 @@ namespace Z2Randomizer
         */
         public Location(Byte[] bytes, Terrain t, int mem, Continent c)
         {
-            locationBytes = bytes;
+            LocationBytes = bytes;
             externalWorld = bytes[0] & 128;
-            ypos = bytes[0] & 127;
+            Ypos = bytes[0] & 127;
             appear2loweruponexit = bytes[1] & 128;
             secondpartofcave = bytes[1] & 64;
-            xpos = bytes[1] & 63;
+            Xpos = bytes[1] & 63;
             horizontalPos = bytes[2] & 192;
-            map = bytes[2] & 63;
+            Map = bytes[2] & 63;
             FallInHole = bytes[3] & 128;
-            passThrough = bytes[3] & 64;
+            PassThrough = bytes[3] & 64;
             ForceEnterRight = bytes[3] & 32;
-            world = bytes[3] & 31;
+            World = bytes[3] & 31;
             terrainType = t;
-            memAddress = mem;
+            MemAddress = mem;
             canShuffle = true;
             item = Items.donotuse;
             itemGet = false;
@@ -149,11 +142,11 @@ namespace Z2Randomizer
             }
             else
             {
-                LocationBytes[0] = (Byte)(externalWorld + ypos);
+                LocationBytes[0] = (Byte)(externalWorld + Ypos);
             }
-            LocationBytes[1] = (Byte)(appear2loweruponexit + secondpartofcave + xpos);
-            LocationBytes[2] = (Byte)(horizontalPos + map);
-            LocationBytes[3] = (Byte)(FallInHole + passThrough + ForceEnterRight + world);
+            LocationBytes[1] = (Byte)(appear2loweruponexit + secondpartofcave + Xpos);
+            LocationBytes[2] = (Byte)(horizontalPos + Map);
+            LocationBytes[3] = (Byte)(FallInHole + PassThrough + ForceEnterRight + World);
         }
     }
 }
