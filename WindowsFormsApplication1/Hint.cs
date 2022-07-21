@@ -266,24 +266,24 @@ namespace Z2Randomizer
             text = Util.ToGameText(hint, true).ToList();
         }
 
-        public void GenerateTownHint(Spells spell)
+        public void GenerateTownHint(Spell spell)
         {
             String text = "";
             switch(spell)
             {
-                case Spells.shield:
+                case Spell.shield:
                     text += "shield$";
                     break;
-                case Spells.jump:
+                case Spell.jump:
                     text += "jump";
                     break;
-                case Spells.life:
+                case Spell.life:
                     text += "life$";
                     break;
-                case Spells.fairy:
+                case Spell.fairy:
                     text += "fairy$";
                     break;
-                case Spells.fire:
+                case Spell.fire:
                     if (!s.Props.dashSpell)
                     {
                         text += "fire$";
@@ -293,13 +293,13 @@ namespace Z2Randomizer
                         text += "dash$";
                     }
                     break;
-                case Spells.reflect:
+                case Spell.reflect:
                     text += "reflect$";
                     break;
-                case Spells.spell:
+                case Spell.spell:
                     text += "spell$";
                     break;
-                case Spells.thunder:
+                case Spell.thunder:
                     text += "thunder$";
                     break;
 

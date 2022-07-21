@@ -33,10 +33,10 @@ namespace Z2Randomizer
         public MazeIsland(Hyrule hy)
             : base(hy)
         {
-            loadLocations(0xA131, 3, terrains, Continent.MAZE);
-            loadLocations(0xA140, 1, terrains, Continent.MAZE);
-            loadLocations(0xA143, 1, terrains, Continent.MAZE);
-            loadLocations(0xA145, 5, terrains, Continent.MAZE);
+            LoadLocations(0xA131, 3, terrains, Continent.MAZE);
+            LoadLocations(0xA140, 1, terrains, Continent.MAZE);
+            LoadLocations(0xA143, 1, terrains, Continent.MAZE);
+            LoadLocations(0xA145, 5, terrains, Continent.MAZE);
             walkable = new List<Terrain>();
             walkable.Add(Terrain.MOUNAIN);
             enemyAddr = 0x88B0;
@@ -48,9 +48,9 @@ namespace Z2Randomizer
             enemyPtr = 0xA08E;
             overworldMaps = new List<int>();
 
-            kid = getLocationByMem(0xA143);
-            magic = getLocationByMem(0xA133);
-            palace4 = getLocationByMem(0xA140);
+            kid = GetLocationByMem(0xA143);
+            magic = GetLocationByMem(0xA133);
+            palace4 = GetLocationByMem(0xA140);
             palace4.PalNum = 4;
             palace4.World = palace4.World | 0x03;
             MAP_ROWS = 23;
@@ -60,28 +60,28 @@ namespace Z2Randomizer
             VANILLA_MAP_ADDR = 0xa65c;
             if(hy.Props.mazeBiome.Equals("Vanilla"))
             {
-                this.bio = biome.vanilla;
+                this.bio = Biome.vanilla;
             }
             else if(hy.Props.mazeBiome.Equals("Vanilla (shuffled)"))
             {
-                this.bio = biome.vanillaShuffle;
+                this.bio = Biome.vanillaShuffle;
             }
             else
             {
-                this.bio = biome.vanillalike;
+                this.bio = Biome.vanillalike;
             }
     }
 
         public Boolean terraform()
         {
-            if (this.bio == biome.vanilla || this.bio == biome.vanillaShuffle)
+            if (this.bio == Biome.vanilla || this.bio == Biome.vanillaShuffle)
             {
                 MAP_ROWS = 75;
                 MAP_COLS = 64;
-                readVanillaMap();
-                if (this.bio == biome.vanillaShuffle)
+                ReadVanillaMap();
+                if (this.bio == Biome.vanillaShuffle)
                 {
-                    shuffleLocations(AllLocations);
+                    ShuffleLocations(AllLocations);
                     if (hy.Props.vanillaOriginal)
                     {
                         foreach (Location l in AllLocations)
@@ -90,15 +90,15 @@ namespace Z2Randomizer
                             l.PassThrough = 64;
                         }
                     }
-                    foreach (Location l in Caves)
+                    foreach (Location l in Locations[Terrain.CAVE])
                     {
                         l.PassThrough = 0;
                     }
-                    foreach (Location l in Towns)
+                    foreach (Location l in Locations[Terrain.TOWN])
                     {
                         l.PassThrough = 0;
                     }
-                    foreach (Location l in Palaces)
+                    foreach (Location l in Locations[Terrain.PALACE])
                     {
                         l.PassThrough = 0;
                     }
@@ -182,7 +182,7 @@ namespace Z2Randomizer
                         }
                     }
                     //choose starting position
-                    int starty = hy.R.Next(2, MAP_ROWS);
+                    int starty = hy.RNG.Next(2, MAP_ROWS);
                     if (starty == 0)
                     {
                         starty++;
@@ -205,7 +205,7 @@ namespace Z2Randomizer
                         if (n.Count > 0)
                         {
                             canPlaceCave = true;
-                            Tuple<int, int> next = n[hy.R.Next(n.Count)];
+                            Tuple<int, int> next = n[hy.RNG.Next(n.Count)];
                             s.Push(next);
                             if (next.Item1 > currx)
                             {
@@ -229,7 +229,7 @@ namespace Z2Randomizer
                         }
                         else if (s.Count > 0)
                         {
-                            if (cave1 != null && cave1.CanShuffle && getLocationByCoords(Tuple.Create(curry + 30, currx)) == null)
+                            if (cave1 != null && cave1.CanShuffle && GetLocationByCoords(Tuple.Create(curry + 30, currx)) == null)
                             {
                                 map[curry, currx] = Terrain.CAVE;
                                 cave1.Ypos = curry + 30;
@@ -238,7 +238,7 @@ namespace Z2Randomizer
                                 canPlaceCave = false;
                                 sealDeadEnd(curry, currx);
                             }
-                            else if (cave2 != null && cave2.CanShuffle && getLocationByCoords(Tuple.Create(curry + 30, currx)) == null && canPlaceCave)
+                            else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords(Tuple.Create(curry + 30, currx)) == null && canPlaceCave)
                             {
                                 map[curry, currx] = Terrain.CAVE;
                                 cave2.Ypos = curry + 30;
@@ -257,12 +257,12 @@ namespace Z2Randomizer
 
                     Boolean canPlace = false;
 
-                    int p4x = hy.R.Next(15) + 3;
-                    int p4y = hy.R.Next(MAP_ROWS - 6) + 3;
+                    int p4x = hy.RNG.Next(15) + 3;
+                    int p4y = hy.RNG.Next(MAP_ROWS - 6) + 3;
                     while (!canPlace)
                     {
-                        p4x = hy.R.Next(15) + 3;
-                        p4y = hy.R.Next(MAP_ROWS - 6) + 3;
+                        p4x = hy.RNG.Next(15) + 3;
+                        p4y = hy.RNG.Next(MAP_ROWS - 6) + 3;
                         canPlace = true;
                         if (map[p4y, p4x] != Terrain.ROAD)
                         {
@@ -273,7 +273,7 @@ namespace Z2Randomizer
                         {
                             for (int j = -1; j < 2; j++)
                             {
-                                if (getLocationByCoords(Tuple.Create(p4y + i + 30, p4x + j)) != null)
+                                if (GetLocationByCoords(Tuple.Create(p4y + i + 30, p4x + j)) != null)
                                 {
                                     canPlace = false;
                                 }
@@ -296,10 +296,10 @@ namespace Z2Randomizer
                     int riverstart = starty;
                     while (riverstart == starty)
                     {
-                        riverstart = hy.R.Next(10) * 2 + 1;
+                        riverstart = hy.RNG.Next(10) * 2 + 1;
                     }
 
-                    int riverend = hy.R.Next(10) * 2 + 1;
+                    int riverend = hy.RNG.Next(10) * 2 + 1;
 
                     Location rs = new Location();
                     rs.Xpos = 1;
@@ -310,21 +310,21 @@ namespace Z2Randomizer
                     re.Ypos = riverend + 30;
                     drawLine(rs, re, Terrain.WALKABLEWATER);
 
-                    direction rDir = direction.east;
+                    Direction rDir = Direction.east;
                     if (raft != null)
                     {
 
-                        rDir = (direction)hy.R.Next(4);
+                        rDir = (Direction)hy.RNG.Next(4);
 
                         int bx = 0;
                         int by = 0;
-                        if (rDir == direction.north)
+                        if (rDir == Direction.north)
                         {
 
-                            bx = hy.R.Next(2, MAP_COLS - 1);
+                            bx = hy.RNG.Next(2, MAP_COLS - 1);
                             while (by != 2)
                             {
-                                bx = hy.R.Next(2, MAP_COLS - 1);
+                                bx = hy.RNG.Next(2, MAP_COLS - 1);
                                 by = 0;
                                 while (by < MAP_ROWS && map[by, bx] != Terrain.ROAD)
                                 {
@@ -347,14 +347,14 @@ namespace Z2Randomizer
                                 by--;
                             }
                         }
-                        else if (rDir == direction.south)
+                        else if (rDir == Direction.south)
                         {
                             by = MAP_ROWS - 1;
-                            bx = hy.R.Next(2, MAP_COLS - 1);
+                            bx = hy.RNG.Next(2, MAP_COLS - 1);
                             while (by != MAP_ROWS - 3)
                             {
                                 by = MAP_ROWS - 1;
-                                bx = hy.R.Next(2, MAP_COLS - 1);
+                                bx = hy.RNG.Next(2, MAP_COLS - 1);
                                 while (by > 0 && map[by, bx] != Terrain.ROAD)
                                 {
                                     by--;
@@ -376,12 +376,12 @@ namespace Z2Randomizer
                                 by++;
                             }
                         }
-                        else if (rDir == direction.west)
+                        else if (rDir == Direction.west)
                         {
                             while (bx != 2)
                             {
                                 bx = 0;
-                                by = hy.R.Next(2, MAP_ROWS - 2);
+                                by = hy.RNG.Next(2, MAP_ROWS - 2);
                                 while (bx < MAP_COLS && map[by, bx] != Terrain.ROAD)
                                 {
                                     bx++;
@@ -409,7 +409,7 @@ namespace Z2Randomizer
                             while (bx != MAP_COLS - 3)
                             {
                                 bx = MAP_COLS - 1;
-                                by = hy.R.Next(2, MAP_ROWS - 2);
+                                by = hy.RNG.Next(2, MAP_ROWS - 2);
                                 while (bx > 0 && map[by, bx] != Terrain.ROAD)
                                 {
                                     bx--;
@@ -433,18 +433,18 @@ namespace Z2Randomizer
                     }
 
 
-                    direction bDir = direction.west;
+                    Direction bDir = Direction.west;
                     while (bDir == rDir)
                     {
-                        bDir = (direction)hy.R.Next(4);
+                        bDir = (Direction)hy.RNG.Next(4);
                     }
                     if (bridge != null)
                     {
                         int bx = 0;
                         int by = 0;
-                        if (bDir == direction.north)
+                        if (bDir == Direction.north)
                         {
-                            bx = hy.R.Next(2, MAP_COLS - 1);
+                            bx = hy.RNG.Next(2, MAP_COLS - 1);
                             while (by < MAP_ROWS && map[by, bx] != Terrain.ROAD)
                             {
                                 by++;
@@ -465,10 +465,10 @@ namespace Z2Randomizer
                                 by--;
                             }
                         }
-                        else if (bDir == direction.south)
+                        else if (bDir == Direction.south)
                         {
                             by = MAP_ROWS - 1;
-                            bx = hy.R.Next(2, MAP_COLS - 1);
+                            bx = hy.RNG.Next(2, MAP_COLS - 1);
                             while (by > 0 && map[by, bx] != Terrain.ROAD)
                             {
                                 by--;
@@ -489,12 +489,12 @@ namespace Z2Randomizer
                                 by++;
                             }
                         }
-                        else if (bDir == direction.west)
+                        else if (bDir == Direction.west)
                         {
-                            by = hy.R.Next(2, MAP_ROWS - 2);
+                            by = hy.RNG.Next(2, MAP_ROWS - 2);
                             while(by == riverend || by == riverstart)
                             {
-                                by = hy.R.Next(2, MAP_ROWS - 2);
+                                by = hy.RNG.Next(2, MAP_ROWS - 2);
 
                             }
                             while (bx < MAP_COLS && map[by, bx] != Terrain.ROAD)
@@ -520,10 +520,10 @@ namespace Z2Randomizer
                         else
                         {
                             bx = MAP_COLS + 3;
-                            by = hy.R.Next(2, MAP_ROWS - 2);
+                            by = hy.RNG.Next(2, MAP_ROWS - 2);
                             while (by == riverend || by == riverstart)
                             {
-                                by = hy.R.Next(2, MAP_ROWS - 2);
+                                by = hy.RNG.Next(2, MAP_ROWS - 2);
 
                             }
                             while (bx > 0 && map[by, bx] != Terrain.ROAD)
@@ -558,17 +558,17 @@ namespace Z2Randomizer
                             {
                                 do
                                 {
-                                    x = hy.R.Next(19) + 2;
-                                    y = hy.R.Next(MAP_ROWS - 4) + 2;
-                                } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNAIN && map[y, x - 1] == Terrain.MOUNAIN) || (map[y + 1, x] == Terrain.MOUNAIN && map[y - 1, x] == Terrain.MOUNAIN)) || getLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || getLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || getLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || getLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || getLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
+                                    x = hy.RNG.Next(19) + 2;
+                                    y = hy.RNG.Next(MAP_ROWS - 4) + 2;
+                                } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNAIN && map[y, x - 1] == Terrain.MOUNAIN) || (map[y + 1, x] == Terrain.MOUNAIN && map[y - 1, x] == Terrain.MOUNAIN)) || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
                             }
                             else
                             {
                                 do
                                 {
-                                    x = hy.R.Next(19) + 2;
-                                    y = hy.R.Next(MAP_ROWS - 4) + 2;
-                                } while (map[y, x] != Terrain.ROAD || getLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || getLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || getLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || getLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || getLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
+                                    x = hy.RNG.Next(19) + 2;
+                                    y = hy.RNG.Next(MAP_ROWS - 4) + 2;
+                                } while (map[y, x] != Terrain.ROAD || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
                             }
 
                             l.Xpos = x;
@@ -578,13 +578,13 @@ namespace Z2Randomizer
 
                     //check bytes and adjust
                     MAP_COLS = 64;
-                    writeBytes(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+                    WriteBytes(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
                     MAP_COLS = 23;
                     
                 }
             }
             MAP_COLS = 64;
-            writeBytes(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+            WriteBytes(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
             for (int i = 0xA10C; i < 0xA149; i++)
             {
                 if(!terrains.Keys.Contains(i))
@@ -696,17 +696,17 @@ namespace Z2Randomizer
             int y = from.Ypos - 30;
             while (x != to.Xpos)
             {
-                if (x == 21 || (hy.R.NextDouble() > .5 && x != to.Xpos))
+                if (x == 21 || (hy.RNG.NextDouble() > .5 && x != to.Xpos))
                 {
                     int diff = to.Xpos - x;
-                    int move = (hy.R.Next(Math.Abs(diff / 2)) + 1) * 2;
+                    int move = (hy.RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
 
      
                     while (Math.Abs(move) > 0 && !(x == to.Xpos && y == to.Ypos - 30))
                     {
                         for (int i = 0; i < 2; i++)
                         {
-                            if ((x != to.Xpos || y != (to.Ypos - 30)) && getLocationByCoords(new Tuple<int, int>(y + 30, x)) == null)
+                            if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords(new Tuple<int, int>(y + 30, x)) == null)
                             {
                                 if(map[y, x] == Terrain.MOUNAIN)
                                 {
@@ -740,12 +740,12 @@ namespace Z2Randomizer
                 else if(y != to.Ypos - 30)
                 {
                     int diff = to.Ypos - 30 - y;
-                    int move = (hy.R.Next(Math.Abs(diff / 2)) + 1) * 2;
+                    int move = (hy.RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
                     while (Math.Abs(move) > 0 && !(x == to.Xpos && y == to.Ypos - 30))
                     {
                         for (int i = 0; i < 2; i++)
                         {
-                            if ((x != to.Xpos || y != (to.Ypos - 30)) && getLocationByCoords(new Tuple<int, int>(y + 30, x)) == null)
+                            if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords(new Tuple<int, int>(y + 30, x)) == null)
                             {
                                 if (map[y, x] == Terrain.MOUNAIN)
                                 {

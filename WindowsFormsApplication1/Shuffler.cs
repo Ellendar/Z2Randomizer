@@ -83,23 +83,20 @@ namespace Z2Randomizer
         //instance variables
         private RandomizerProperties props;
         private ROM ROMData;
-        private Character link;
+        //private Character link;
         private Random R1;
         public Random R { get => R1; set => R1 = value; }
         public RandomizerProperties Props { get => props; set => props = value; }
 
-        public Shuffler(RandomizerProperties props, ROM ROMData, Character link, Random R)
+        public Shuffler(RandomizerProperties props, ROM ROMData, Random R)
         {
-
             this.R1 = R;
 
             this.props = props;
             this.ROMData = ROMData;
-            this.link = link;
-
         }
 
-        public void GenerateHints(List<Location> itemLocs, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid, Dictionary<Spells, Spells> spellMap, Location bagu)
+        public void GenerateHints(List<Location> itemLocs, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid, Dictionary<Spell, Spell> spellMap, Location bagu)
         {
             List<Hint> hints = ROMData.GetGameText();
             if (props.dashSpell)
@@ -196,38 +193,38 @@ namespace Z2Randomizer
             return baguH;
         }
 
-        private void GenerateTownNameHints(List<Hint> hints, Dictionary<Spells, Spells> spellMap)
+        private void GenerateTownNameHints(List<Hint> hints, Dictionary<Spell, Spell> spellMap)
         {
             Hint h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.shield]);
+            h.GenerateTownHint(spellMap[Spell.shield]);
             hints[rauruSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.jump]);
+            h.GenerateTownHint(spellMap[Spell.jump]);
             hints[rutoSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.life]);
+            h.GenerateTownHint(spellMap[Spell.life]);
             hints[sariaSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.fairy]);
+            h.GenerateTownHint(spellMap[Spell.fairy]);
             hints[midoSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.fire]);
+            h.GenerateTownHint(spellMap[Spell.fire]);
             hints[nabooruSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.reflect]);
+            h.GenerateTownHint(spellMap[Spell.reflect]);
             hints[daruniaSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.spell]);
+            h.GenerateTownHint(spellMap[Spell.spell]);
             hints[newKasutoSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spells.thunder]);
+            h.GenerateTownHint(spellMap[Spell.thunder]);
             hints[oldKasutoSign] = h;
         }
 

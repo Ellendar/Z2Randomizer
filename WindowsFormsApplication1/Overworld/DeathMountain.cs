@@ -62,48 +62,48 @@ namespace Z2Randomizer
         public DeathMountain(Hyrule hy)
             : base(hy)
         {
-            loadLocations(0x610C, 37, terrains, Continent.DM);
+            LoadLocations(0x610C, 37, terrains, Continent.DM);
             //loadLocations(0x6136, 2, terrains, continent.dm);
-            loadLocations(0x6144, 1, terrains, Continent.DM);
+            LoadLocations(0x6144, 1, terrains, Continent.DM);
 
-            hammerCave = getLocationByMem(0x6128);
-            magicCave = getLocationByMem(0x6144);
+            hammerCave = GetLocationByMem(0x6128);
+            magicCave = GetLocationByMem(0x6144);
 
             reachableAreas = new HashSet<string>();
             connectionsDM = new Dictionary<Location, List<Location>>();
-            connectionsDM.Add(getLocationByMem(0x610C), new List<Location>() { getLocationByMem(0x610D) });
-            connectionsDM.Add(getLocationByMem(0x610D), new List<Location>() { getLocationByMem(0x610C) });
-            connectionsDM.Add(getLocationByMem(0x610E), new List<Location>() { getLocationByMem(0x610F) });
-            connectionsDM.Add(getLocationByMem(0x610F), new List<Location>() { getLocationByMem(0x610E) });
-            connectionsDM.Add(getLocationByMem(0x6110), new List<Location>() { getLocationByMem(0x6111) });
-            connectionsDM.Add(getLocationByMem(0x6111), new List<Location>() { getLocationByMem(0x6110) });
-            connectionsDM.Add(getLocationByMem(0x6112), new List<Location>() { getLocationByMem(0x6113) });
-            connectionsDM.Add(getLocationByMem(0x6113), new List<Location>() { getLocationByMem(0x6112) });
-            connectionsDM.Add(getLocationByMem(0x6114), new List<Location>() { getLocationByMem(0x6115) });
-            connectionsDM.Add(getLocationByMem(0x6115), new List<Location>() { getLocationByMem(0x6114) });
-            connectionsDM.Add(getLocationByMem(0x6116), new List<Location>() { getLocationByMem(0x6117) });
-            connectionsDM.Add(getLocationByMem(0x6117), new List<Location>() { getLocationByMem(0x6116) });
-            connectionsDM.Add(getLocationByMem(0x6118), new List<Location>() { getLocationByMem(0x6119) });
-            connectionsDM.Add(getLocationByMem(0x6119), new List<Location>() { getLocationByMem(0x6118) });
-            connectionsDM.Add(getLocationByMem(0x611A), new List<Location>() { getLocationByMem(0x611B) });
-            connectionsDM.Add(getLocationByMem(0x611B), new List<Location>() { getLocationByMem(0x611A) });
-            connectionsDM.Add(getLocationByMem(0x611C), new List<Location>() { getLocationByMem(0x611D) });
-            connectionsDM.Add(getLocationByMem(0x611D), new List<Location>() { getLocationByMem(0x611C) });
-            connectionsDM.Add(getLocationByMem(0x611E), new List<Location>() { getLocationByMem(0x611F) });
-            connectionsDM.Add(getLocationByMem(0x611F), new List<Location>() { getLocationByMem(0x611E) });
-            connectionsDM.Add(getLocationByMem(0x6120), new List<Location>() { getLocationByMem(0x6121) });
-            connectionsDM.Add(getLocationByMem(0x6121), new List<Location>() { getLocationByMem(0x6120) });
-            connectionsDM.Add(getLocationByMem(0x6122), new List<Location>() { getLocationByMem(0x6123) });
-            connectionsDM.Add(getLocationByMem(0x6123), new List<Location>() { getLocationByMem(0x6122) });
-            connectionsDM.Add(getLocationByMem(0x6124), new List<Location>() { getLocationByMem(0x6125) });
-            connectionsDM.Add(getLocationByMem(0x6125), new List<Location>() { getLocationByMem(0x6124) });
-            connectionsDM.Add(getLocationByMem(0x6126), new List<Location>() { getLocationByMem(0x6127) });
-            connectionsDM.Add(getLocationByMem(0x6127), new List<Location>() { getLocationByMem(0x6126) });
-            connectionsDM.Add(getLocationByMem(0x6129), new List<Location>() { getLocationByMem(0x612A), getLocationByMem(0x612B), getLocationByMem(0x612C) });
-            connectionsDM.Add(getLocationByMem(0x612D), new List<Location>() { getLocationByMem(0x612E), getLocationByMem(0x612F), getLocationByMem(0x6130) });
-            connectionsDM.Add(getLocationByMem(0x612E), new List<Location>() { getLocationByMem(0x612D), getLocationByMem(0x612F), getLocationByMem(0x6130) });
-            connectionsDM.Add(getLocationByMem(0x612F), new List<Location>() { getLocationByMem(0x612E), getLocationByMem(0x612D), getLocationByMem(0x6130) });
-            connectionsDM.Add(getLocationByMem(0x6130), new List<Location>() { getLocationByMem(0x612E), getLocationByMem(0x612F), getLocationByMem(0x612D) });
+            connectionsDM.Add(GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) });
+            connectionsDM.Add(GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) });
+            connectionsDM.Add(GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) });
+            connectionsDM.Add(GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) });
+            connectionsDM.Add(GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) });
+            connectionsDM.Add(GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) });
+            connectionsDM.Add(GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) });
+            connectionsDM.Add(GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) });
+            connectionsDM.Add(GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) });
+            connectionsDM.Add(GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) });
+            connectionsDM.Add(GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) });
+            connectionsDM.Add(GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) });
+            connectionsDM.Add(GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) });
+            connectionsDM.Add(GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) });
+            connectionsDM.Add(GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) });
+            connectionsDM.Add(GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) });
+            connectionsDM.Add(GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) });
+            connectionsDM.Add(GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) });
+            connectionsDM.Add(GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) });
+            connectionsDM.Add(GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) });
+            connectionsDM.Add(GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) });
+            connectionsDM.Add(GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) });
+            connectionsDM.Add(GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) });
+            connectionsDM.Add(GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) });
+            connectionsDM.Add(GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) });
+            connectionsDM.Add(GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) });
+            connectionsDM.Add(GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) });
+            connectionsDM.Add(GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) });
+            connectionsDM.Add(GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) });
+            connectionsDM.Add(GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
+            connectionsDM.Add(GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
+            connectionsDM.Add(GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) });
+            connectionsDM.Add(GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) });
 
             enemies = new List<int> { 3, 4, 5, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
             flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
@@ -122,32 +122,32 @@ namespace Z2Randomizer
 
             if (hy.Props.dmBiome.Equals("Islands"))
             {
-                this.bio = biome.islands;
+                this.bio = Biome.islands;
             }
             else if (hy.Props.dmBiome.Equals("Canyon") || hy.Props.dmBiome.Equals("CanyonD"))
             {
-                this.bio = biome.canyon;
+                this.bio = Biome.canyon;
                 //MAP_ROWS = 75;
             }
             else if(hy.Props.dmBiome.Equals("Caldera"))
             {
-                this.bio = biome.caldera;
+                this.bio = Biome.caldera;
             }
             else if(hy.Props.dmBiome.Equals("Mountainous"))
             {
-                this.bio = biome.mountainous;
+                this.bio = Biome.mountainous;
             }
             else if(hy.Props.dmBiome.Equals("Vanilla"))
             {
-                this.bio = biome.vanilla;
+                this.bio = Biome.vanilla;
             }
             else if(hy.Props.dmBiome.Equals("Vanilla (shuffled)"))
             {
-                this.bio = biome.vanillaShuffle;
+                this.bio = Biome.vanillaShuffle;
             }
             else
             {
-                this.bio = biome.vanillalike;
+                this.bio = Biome.vanillalike;
             }
             walkable = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
             randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNAIN, Terrain.WALKABLEWATER, Terrain.WATER };
@@ -169,14 +169,14 @@ namespace Z2Randomizer
             {
                 l.CanShuffle = true;
             }
-            if (this.bio == biome.vanilla || this.bio == biome.vanillaShuffle)
+            if (this.bio == Biome.vanilla || this.bio == Biome.vanillaShuffle)
             {
                 MAP_ROWS = 75;
                 MAP_COLS = 64;
-                readVanillaMap();
-                if (this.bio == biome.vanillaShuffle)
+                ReadVanillaMap();
+                if (this.bio == Biome.vanillaShuffle)
                 {
-                    shuffleLocations(AllLocations);
+                    ShuffleLocations(AllLocations);
                     if (hy.Props.vanillaOriginal)
                     {
                         magicCave.TerrainType = Terrain.ROCK;
@@ -185,15 +185,15 @@ namespace Z2Randomizer
                             map[l.Ypos - 30, l.Xpos] = l.TerrainType;
                         }
                     }
-                    foreach (Location l in Caves)
+                    foreach (Location l in Locations[Terrain.CAVE])
                     {
                         l.PassThrough = 0;
                     }
-                    foreach (Location l in Towns)
+                    foreach (Location l in Locations[Terrain.TOWN])
                     {
                         l.PassThrough = 0;
                     }
-                    foreach (Location l in Palaces)
+                    foreach (Location l in Locations[Terrain.PALACE])
                     {
                         l.PassThrough = 0;
                     }
@@ -209,7 +209,7 @@ namespace Z2Randomizer
                 {
                     map = new Terrain[MAP_ROWS, MAP_COLS];
                     Terrain riverT = Terrain.MOUNAIN;
-                    if (this.bio != biome.canyon && this.bio != biome.caldera && this.bio != biome.islands)
+                    if (this.bio != Biome.canyon && this.bio != Biome.caldera && this.bio != Biome.islands)
                     {
                         for (int i = 0; i < MAP_ROWS; i++)
                         {
@@ -234,7 +234,7 @@ namespace Z2Randomizer
                         }
                     }
 
-                    if (this.bio == biome.islands)
+                    if (this.bio == Biome.islands)
                     {
                         riverT = water;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -249,14 +249,14 @@ namespace Z2Randomizer
                             map[i, MAP_COLS - 1] = water;
                         }
 
-                        int cols = hy.R.Next(2, 4);
-                        int rows = hy.R.Next(2, 4);
+                        int cols = hy.RNG.Next(2, 4);
+                        int rows = hy.RNG.Next(2, 4);
                         List<int> pickedC = new List<int>();
                         List<int> pickedR = new List<int>();
 
                         while (cols > 0)
                         {
-                            int col = hy.R.Next(1, MAP_COLS);
+                            int col = hy.RNG.Next(1, MAP_COLS);
                             if (!pickedC.Contains(col))
                             {
                                 for (int i = 0; i < MAP_ROWS; i++)
@@ -273,7 +273,7 @@ namespace Z2Randomizer
 
                         while (rows > 0)
                         {
-                            int row = hy.R.Next(5, MAP_ROWS - 6);
+                            int row = hy.RNG.Next(5, MAP_ROWS - 6);
                             if (!pickedR.Contains(row))
                             {
                                 for (int i = 0; i < MAP_COLS; i++)
@@ -284,10 +284,10 @@ namespace Z2Randomizer
                                     }
                                     else if (map[row, i] == water)
                                     {
-                                        int adjust = hy.R.Next(-3, 4);
+                                        int adjust = hy.RNG.Next(-3, 4);
                                         while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
                                         {
-                                            adjust = hy.R.Next(-3, 4);
+                                            adjust = hy.RNG.Next(-3, 4);
                                         }
                                         row += adjust;
                                     }
@@ -300,10 +300,10 @@ namespace Z2Randomizer
 
 
                     }
-                    else if (this.bio == biome.canyon)
+                    else if (this.bio == Biome.canyon)
                     {
                         riverT = water;
-                        horizontal = hy.R.NextDouble() > 0.5;
+                        horizontal = hy.RNG.NextDouble() > 0.5;
 
                         if (hy.Props.westBiome.Equals("CanyonD"))
                         {
@@ -318,19 +318,19 @@ namespace Z2Randomizer
                         this.walkable.Add(Terrain.MOUNAIN);
 
                         this.randomTerrains.Remove(Terrain.SWAMP);
-                        drawCanyon(riverT);
+                        DrawCanyon(riverT);
                         this.walkable.Remove(Terrain.MOUNAIN);
 
                         this.randomTerrains.Remove(Terrain.SWAMP);
                         //this.randomTerrains.Add(terrain.lava);
 
                     }
-                    else if (this.bio == biome.caldera)
+                    else if (this.bio == Biome.caldera)
                     {
-                        this.horizontal = hy.R.NextDouble() > .5;
-                        drawCenterMountain();
+                        this.horizontal = hy.RNG.NextDouble() > .5;
+                        DrawCenterMountain();
                     }
-                    else if (this.bio == biome.mountainous)
+                    else if (this.bio == Biome.mountainous)
                     {
                         riverT = Terrain.MOUNAIN;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -346,14 +346,14 @@ namespace Z2Randomizer
                         }
 
 
-                        int cols = hy.R.Next(2, 4);
-                        int rows = hy.R.Next(2, 4);
+                        int cols = hy.RNG.Next(2, 4);
+                        int rows = hy.RNG.Next(2, 4);
                         List<int> pickedC = new List<int>();
                         List<int> pickedR = new List<int>();
 
                         while (cols > 0)
                         {
-                            int col = hy.R.Next(10, MAP_COLS - 11);
+                            int col = hy.RNG.Next(10, MAP_COLS - 11);
                             if (!pickedC.Contains(col))
                             {
                                 for (int i = 0; i < MAP_ROWS; i++)
@@ -370,7 +370,7 @@ namespace Z2Randomizer
 
                         while (rows > 0)
                         {
-                            int row = hy.R.Next(10, MAP_ROWS - 11);
+                            int row = hy.RNG.Next(10, MAP_ROWS - 11);
                             if (!pickedR.Contains(row))
                             {
                                 for (int i = 0; i < MAP_COLS; i++)
@@ -386,10 +386,10 @@ namespace Z2Randomizer
                         }
                     }
 
-                    direction rDir = (direction)hy.R.Next(4);
-                    if (this.bio == biome.canyon)
+                    Direction rDir = (Direction)hy.RNG.Next(4);
+                    if (this.bio == Biome.canyon)
                     {
-                        rDir = (direction)hy.R.Next(2);
+                        rDir = (Direction)hy.RNG.Next(2);
                         if (horizontal)
                         {
                             rDir += 2;
@@ -397,27 +397,27 @@ namespace Z2Randomizer
                     }
                     if (raft != null)
                     {
-                        if (this.bio != biome.canyon && this.bio != biome.caldera)
+                        if (this.bio != Biome.canyon && this.bio != Biome.caldera)
                         {
                             MAP_COLS = 29;
                         }
-                        drawOcean(rDir);
+                        DrawOcean(rDir);
                         MAP_COLS = 64;
                     }
 
 
 
 
-                    direction bDir = (direction)hy.R.Next(4);
+                    Direction bDir = (Direction)hy.RNG.Next(4);
                     do
                     {
-                        if (this.bio != biome.canyon)
+                        if (this.bio != Biome.canyon)
                         {
-                            bDir = (direction)hy.R.Next(4);
+                            bDir = (Direction)hy.RNG.Next(4);
                         }
                         else
                         {
-                            bDir = (direction)hy.R.Next(2);
+                            bDir = (Direction)hy.RNG.Next(2);
                             if (horizontal)
                             {
                                 bDir += 2;
@@ -426,11 +426,11 @@ namespace Z2Randomizer
                     } while (bDir == rDir);
                     if (bridge != null)
                     {
-                        if (this.bio != biome.canyon && this.bio != biome.caldera)
+                        if (this.bio != Biome.canyon && this.bio != Biome.caldera)
                         {
                             MAP_COLS = 29;
                         }
-                        drawOcean(bDir);
+                        DrawOcean(bDir);
                         MAP_COLS = 64;
                     }
                     int x = 0;
@@ -442,8 +442,8 @@ namespace Z2Randomizer
                             int tries = 0;
                             do
                             {
-                                x = hy.R.Next(MAP_COLS - 2) + 1;
-                                y = hy.R.Next(MAP_ROWS - 2) + 1;
+                                x = hy.RNG.Next(MAP_COLS - 2) + 1;
+                                y = hy.RNG.Next(MAP_ROWS - 2) + 1;
                                 tries++;
                             } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
                             if (tries >= 100)
@@ -457,16 +457,16 @@ namespace Z2Randomizer
                             if (l.TerrainType == Terrain.CAVE)
                             {
 
-                                int dir = hy.R.Next(4);
+                                int dir = hy.RNG.Next(4);
 
-                                Terrain s = walkable[hy.R.Next(walkable.Count)];
-                                if (this.bio == biome.vanillalike)
+                                Terrain s = walkable[hy.RNG.Next(walkable.Count)];
+                                if (this.bio == Biome.vanillalike)
                                 {
                                     s = Terrain.ROAD;
                                 }
                                 if (!hy.Props.saneCaves || !connectionsDM.ContainsKey(l))
                                 {
-                                    placeCave(x, y, dir, s);
+                                    PlaceCave(x, y, dir, s);
                                 }
                                 else
                                 {
@@ -499,8 +499,8 @@ namespace Z2Randomizer
                                     tries = 0;
                                     do
                                     {
-                                        x = hy.R.Next(MAP_COLS - 2) + 1;
-                                        y = hy.R.Next(MAP_ROWS - 2) + 1;
+                                        x = hy.RNG.Next(MAP_COLS - 2) + 1;
+                                        y = hy.RNG.Next(MAP_ROWS - 2) + 1;
                                         tries++;
                                     } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
                                     if (tries >= 100)
@@ -510,7 +510,7 @@ namespace Z2Randomizer
 
                                     while ((dir == 0 && y < 15) || (dir == 1 && x > MAP_COLS - 15) || (dir == 2 && y > MAP_ROWS - 15) || (dir == 3 && x < 15))
                                     {
-                                        dir = hy.R.Next(4);
+                                        dir = hy.RNG.Next(4);
                                     }
                                     int otherdir = (dir + 2) % 4;
                                     if (connectionsDM[l].Count == 1)
@@ -523,7 +523,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (bio == biome.islands)
+                                            if (bio == Biome.islands)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -531,23 +531,23 @@ namespace Z2Randomizer
                                             crossing = true;
                                             if (dir == 0) //south
                                             {
-                                                otherx = x + (hy.R.Next(7) - 3);
-                                                othery = y - (hy.R.Next(range) + offset);
+                                                otherx = x + (hy.RNG.Next(7) - 3);
+                                                othery = y - (hy.RNG.Next(range) + offset);
                                             }
                                             else if (dir == 1) //west
                                             {
-                                                otherx = x + (hy.R.Next(range) + offset);
-                                                othery = y + (hy.R.Next(7) - 3);
+                                                otherx = x + (hy.RNG.Next(range) + offset);
+                                                othery = y + (hy.RNG.Next(7) - 3);
                                             }
                                             else if (dir == 2) //north
                                             {
-                                                otherx = x + (hy.R.Next(7) - 3);
-                                                othery = y + (hy.R.Next(range) + offset);
+                                                otherx = x + (hy.RNG.Next(7) - 3);
+                                                othery = y + (hy.RNG.Next(range) + offset);
                                             }
                                             else //east
                                             {
-                                                otherx = x - (hy.R.Next(range) + offset);
-                                                othery = y + (hy.R.Next(7) - 3);
+                                                otherx = x - (hy.RNG.Next(range) + offset);
+                                                othery = y + (hy.RNG.Next(7) - 3);
                                             }
                                             tries++;
 
@@ -568,8 +568,8 @@ namespace Z2Randomizer
                                         l2[0].CanShuffle = false;
                                         l2[0].Xpos = otherx;
                                         l2[0].Ypos = othery + 30;
-                                        placeCave(x, y, dir, s);
-                                        placeCave(otherx, othery, otherdir, s);
+                                        PlaceCave(x, y, dir, s);
+                                        PlaceCave(otherx, othery, otherdir, s);
                                     }
                                     else
                                     {
@@ -581,7 +581,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (bio == biome.islands)
+                                            if (bio == Biome.islands)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -589,23 +589,23 @@ namespace Z2Randomizer
                                             crossing = true;
                                             if (dir == 0) //south
                                             {
-                                                otherx = x + (hy.R.Next(7) - 3);
-                                                othery = y - (hy.R.Next(range) + offset);
+                                                otherx = x + (hy.RNG.Next(7) - 3);
+                                                othery = y - (hy.RNG.Next(range) + offset);
                                             }
                                             else if (dir == 1) //west
                                             {
-                                                otherx = x + (hy.R.Next(range) + offset);
-                                                othery = y + (hy.R.Next(7) - 3);
+                                                otherx = x + (hy.RNG.Next(range) + offset);
+                                                othery = y + (hy.RNG.Next(7) - 3);
                                             }
                                             else if (dir == 2) //north
                                             {
-                                                otherx = x + (hy.R.Next(7) - 3);
-                                                othery = y + (hy.R.Next(range) + offset);
+                                                otherx = x + (hy.RNG.Next(7) - 3);
+                                                othery = y + (hy.RNG.Next(range) + offset);
                                             }
                                             else //east
                                             {
-                                                otherx = x - (hy.R.Next(range) + offset);
-                                                othery = y + (hy.R.Next(7) - 3);
+                                                otherx = x - (hy.RNG.Next(range) + offset);
+                                                othery = y + (hy.RNG.Next(7) - 3);
                                             }
                                             tries++;
 
@@ -625,15 +625,15 @@ namespace Z2Randomizer
                                         l2[0].CanShuffle = false;
                                         l2[0].Xpos = otherx;
                                         l2[0].Ypos = othery + 30;
-                                        placeCave(x, y, dir, s);
-                                        placeCave(otherx, othery, otherdir, s);
+                                        PlaceCave(x, y, dir, s);
+                                        PlaceCave(otherx, othery, otherdir, s);
                                         int newx = 0;
                                         int newy = 0;
                                         tries = 0;
                                         do
                                         {
-                                            newx = x + hy.R.Next(7) - 3;
-                                            newy = y + hy.R.Next(7) - 3;
+                                            newx = x + hy.RNG.Next(7) - 3;
+                                            newy = y + hy.RNG.Next(7) - 3;
                                             tries++;
                                         } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
                                         if (tries >= 100)
@@ -643,7 +643,7 @@ namespace Z2Randomizer
                                         l2[1].Xpos = newx;
                                         l2[1].Ypos = newy + 30;
                                         l2[1].CanShuffle = false;
-                                        placeCave(newx, newy, dir, s);
+                                        PlaceCave(newx, newy, dir, s);
                                         y = newy;
                                         x = newx;
 
@@ -652,7 +652,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (bio == biome.islands)
+                                            if (bio == Biome.islands)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -660,23 +660,23 @@ namespace Z2Randomizer
                                             crossing = true;
                                             if (dir == 0) //south
                                             {
-                                                otherx = x + (hy.R.Next(7) - 3);
-                                                othery = y - (hy.R.Next(range) + offset);
+                                                otherx = x + (hy.RNG.Next(7) - 3);
+                                                othery = y - (hy.RNG.Next(range) + offset);
                                             }
                                             else if (dir == 1) //west
                                             {
-                                                otherx = x + (hy.R.Next(range) + offset);
-                                                othery = y + (hy.R.Next(7) - 3);
+                                                otherx = x + (hy.RNG.Next(range) + offset);
+                                                othery = y + (hy.RNG.Next(7) - 3);
                                             }
                                             else if (dir == 2) //north
                                             {
-                                                otherx = x + (hy.R.Next(7) - 3);
-                                                othery = y + (hy.R.Next(range) + offset);
+                                                otherx = x + (hy.RNG.Next(7) - 3);
+                                                othery = y + (hy.RNG.Next(range) + offset);
                                             }
                                             else //east
                                             {
-                                                otherx = x - (hy.R.Next(range) + offset);
-                                                othery = y + (hy.R.Next(7) - 3);
+                                                otherx = x - (hy.RNG.Next(range) + offset);
+                                                othery = y + (hy.RNG.Next(7) - 3);
                                             }
                                             tries++;
 
@@ -693,7 +693,7 @@ namespace Z2Randomizer
                                         l2[2].CanShuffle = false;
                                         l2[2].Xpos = otherx;
                                         l2[2].Ypos = othery + 30;
-                                        placeCave(otherx, othery, otherdir, s);
+                                        PlaceCave(otherx, othery, otherdir, s);
                                     }
 
                                 }
@@ -702,16 +702,16 @@ namespace Z2Randomizer
                     }
 
 
-                    if (this.bio == biome.vanillalike)
+                    if (this.bio == Biome.vanillalike)
                     {
-                        placeRandomTerrain(5);
+                        PlaceRandomTerrain(5);
                     }
                     randomTerrains.Add(Terrain.ROAD);
-                    if (!growTerrain())
+                    if (!GrowTerrain())
                     {
                         return false;
                     }
-                    if (this.bio == biome.caldera)
+                    if (this.bio == Biome.caldera)
                     {
                         bool f = makeCaldera();
                         if (!f)
@@ -722,11 +722,11 @@ namespace Z2Randomizer
                     walkable.Add(Terrain.ROAD);
                     if (raft != null)
                     {
-                        if (this.bio != biome.caldera && this.bio != biome.canyon)
+                        if (this.bio != Biome.caldera && this.bio != Biome.canyon)
                         {
                             MAP_COLS = 29;
                         }
-                        Boolean r = drawRaft(false, rDir);
+                        Boolean r = DrawRaft(false, rDir);
                         MAP_COLS = 64;
                         if (!r)
                         {
@@ -736,11 +736,11 @@ namespace Z2Randomizer
 
                     if (bridge != null)
                     {
-                        if (this.bio != biome.caldera && this.bio != biome.canyon)
+                        if (this.bio != Biome.caldera && this.bio != Biome.canyon)
                         {
                             MAP_COLS = 29;
                         }
-                        Boolean b = drawRaft(true, bDir);
+                        Boolean b = DrawRaft(true, bDir);
                         MAP_COLS = 64;
                         if (!b)
                         {
@@ -751,8 +751,8 @@ namespace Z2Randomizer
 
                     do
                     {
-                        x = hy.R.Next(MAP_COLS - 2) + 1;
-                        y = hy.R.Next(MAP_ROWS - 2) + 1;
+                        x = hy.RNG.Next(MAP_COLS - 2) + 1;
+                        y = hy.RNG.Next(MAP_ROWS - 2) + 1;
                     } while (!walkable.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
 
                     map[y, x] = Terrain.ROCK;
@@ -760,16 +760,16 @@ namespace Z2Randomizer
                     magicCave.Xpos = x;
 
 
-                    if (this.bio == biome.canyon || this.bio == biome.islands)
+                    if (this.bio == Biome.canyon || this.bio == Biome.islands)
                     {
-                        connectIslands(25, false, riverT, false, false, false);
+                        ConnectIslands(25, false, riverT, false, false, false);
                     }
 
                     //check bytes and adjust
-                    writeBytes(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+                    WriteBytes(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
                 }
             }
-            writeBytes(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+            WriteBytes(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
             
 
             v = new bool[MAP_ROWS, MAP_COLS];
@@ -797,12 +797,12 @@ namespace Z2Randomizer
             {
                 water = Terrain.WALKABLEWATER;
             }
-            int centerx = hy.R.Next(21, 41);
-            int centery = hy.R.Next(17, 27);
+            int centerx = hy.RNG.Next(21, 41);
+            int centery = hy.RNG.Next(17, 27);
             if (horizontal)
             {
-                centerx = hy.R.Next(27, 37);
-                centery = hy.R.Next(17, 27);
+                centerx = hy.RNG.Next(27, 37);
+                centery = hy.RNG.Next(17, 27);
             }
 
             bool placeable = false;
@@ -810,13 +810,13 @@ namespace Z2Randomizer
             {
                 if (horizontal)
                 {
-                    centerx = hy.R.Next(27, 37);
-                    centery = hy.R.Next(17, 27);
+                    centerx = hy.RNG.Next(27, 37);
+                    centery = hy.RNG.Next(17, 27);
                 }
                 else
                 {
-                    centerx = hy.R.Next(21, 41);
-                    centery = hy.R.Next(17, 27);
+                    centerx = hy.RNG.Next(21, 41);
+                    centery = hy.RNG.Next(17, 27);
                 }
                 placeable = true;
                 for (int i = centery - 7; i < centery + 8; i++)
@@ -844,10 +844,10 @@ namespace Z2Randomizer
             }
             for (int i = 0; i < 10; i++)
             {
-                int lake = hy.R.Next(7, 11);
+                int lake = hy.RNG.Next(7, 11);
                 if (i == 0 || i == 9)
                 {
-                    lake = hy.R.Next(3, 6);
+                    lake = hy.RNG.Next(3, 6);
                 }
                 if (horizontal)
                 {
@@ -992,14 +992,14 @@ namespace Z2Randomizer
 
             do
             {
-                int cavenum1 = hy.R.Next(connectionsDM.Keys.Count);
+                int cavenum1 = hy.RNG.Next(connectionsDM.Keys.Count);
                 cave1l = connectionsDM.Keys.ToList()[cavenum1];
                 cave1r = connectionsDM[cave1l][0];
             } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
 
             do
             {
-                int cavenum1 = hy.R.Next(connectionsDM.Keys.Count);
+                int cavenum1 = hy.RNG.Next(connectionsDM.Keys.Count);
                 cave2l = connectionsDM.Keys.ToList()[cavenum1];
                 cave2r = connectionsDM[cave2l][0];
             } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
@@ -1015,10 +1015,10 @@ namespace Z2Randomizer
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNAIN;
 
 
-            int caveDir = hy.R.Next(2);
+            int caveDir = hy.RNG.Next(2);
             if (horizontal)
             {
-                bool f = horizontalCave(caveDir, centerx, centery, cave1l, cave1r);
+                bool f = HorizontalCave(caveDir, centerx, centery, cave1l, cave1r);
                 if (!f)
                 {
                     return false;
@@ -1032,7 +1032,7 @@ namespace Z2Randomizer
                 {
                     caveDir = 0;
                 }
-                f = horizontalCave(caveDir, centerx, centery, cave2l, cave2r);
+                f = HorizontalCave(caveDir, centerx, centery, cave2l, cave2r);
                 if (!f)
                 {
                     return false;
@@ -1040,7 +1040,7 @@ namespace Z2Randomizer
             }
             else
             {
-                bool f = verticalCave(caveDir, centerx, centery, cave1l, cave1r);
+                bool f = VerticalCave(caveDir, centerx, centery, cave1l, cave1r);
                 if (!f)
                 {
                     return false;
@@ -1053,7 +1053,7 @@ namespace Z2Randomizer
                 {
                     caveDir = 0;
                 }
-                f = verticalCave(caveDir, centerx, centery, cave2l, cave2r);
+                f = VerticalCave(caveDir, centerx, centery, cave2l, cave2r);
                 if (!f)
                 {
                     return false;
@@ -1064,7 +1064,7 @@ namespace Z2Randomizer
         }
         public void updateVisit()
         {
-            updateReachable();
+            UpdateReachable();
 
             foreach (Location l in AllLocations)
             {

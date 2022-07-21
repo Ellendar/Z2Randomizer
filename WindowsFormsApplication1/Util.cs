@@ -71,9 +71,10 @@ namespace Z2Randomizer
             Items i = p1.item;
             p1.item = p2.item;
             p2.item = i;
+
+
         }
 
-        //TODO: Name this better
         public class MyEqualityComparer : IEqualityComparer<byte[]>
         {
             public bool Equals(byte[] x, byte[] y)
