@@ -2689,7 +2689,7 @@
             this.button1.Text = "Batch...";
             this.toolTip1.SetToolTip(this.button1, "Visit the website");
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Bulk_Generate_Click);
             // 
             // customBox1
             // 

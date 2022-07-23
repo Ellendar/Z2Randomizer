@@ -122,32 +122,32 @@ namespace Z2Randomizer
 
             if (hy.Props.dmBiome.Equals("Islands"))
             {
-                this.biome = Biome.islands;
+                this.biome = Biome.ISLANDS;
             }
             else if (hy.Props.dmBiome.Equals("Canyon") || hy.Props.dmBiome.Equals("CanyonD"))
             {
-                this.biome = Biome.canyon;
+                this.biome = Biome.CANYON;
                 //MAP_ROWS = 75;
             }
             else if(hy.Props.dmBiome.Equals("Caldera"))
             {
-                this.biome = Biome.caldera;
+                this.biome = Biome.CALDERA;
             }
             else if(hy.Props.dmBiome.Equals("Mountainous"))
             {
-                this.biome = Biome.mountainous;
+                this.biome = Biome.MOUNTAINOUS;
             }
             else if(hy.Props.dmBiome.Equals("Vanilla"))
             {
-                this.biome = Biome.vanilla;
+                this.biome = Biome.VANILLA;
             }
             else if(hy.Props.dmBiome.Equals("Vanilla (shuffled)"))
             {
-                this.biome = Biome.vanillaShuffle;
+                this.biome = Biome.VANILLA_SHUFFLE;
             }
             else
             {
-                this.biome = Biome.vanillalike;
+                this.biome = Biome.VANILLALIKE;
             }
             walkable = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
             randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNAIN, Terrain.WALKABLEWATER, Terrain.WATER };
@@ -158,7 +158,7 @@ namespace Z2Randomizer
         public bool Terraform()
         {
             Terrain water = Terrain.WATER;
-            if (hy.Props.bootsWater)
+            if (hyrule.Props.bootsWater)
             {
                 water = Terrain.WALKABLEWATER;
             }
@@ -169,15 +169,15 @@ namespace Z2Randomizer
             {
                 location.CanShuffle = true;
             }
-            if (this.biome == Biome.vanilla || this.biome == Biome.vanillaShuffle)
+            if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
             {
                 MAP_ROWS = 75;
                 MAP_COLS = 64;
                 ReadVanillaMap();
-                if (this.biome == Biome.vanillaShuffle)
+                if (this.biome == Biome.VANILLA_SHUFFLE)
                 {
                     ShuffleLocations(AllLocations);
-                    if (hy.Props.vanillaOriginal)
+                    if (hyrule.Props.vanillaOriginal)
                     {
                         magicCave.TerrainType = Terrain.ROCK;
                         foreach (Location location in AllLocations)
@@ -203,13 +203,13 @@ namespace Z2Randomizer
             {
 
 
-                bcount = 2000;
+                bytesWritten = 2000;
                 bool horizontal = false;
-                while (bcount > MAP_SIZE_BYTES)
+                while (bytesWritten > MAP_SIZE_BYTES)
                 {
                     map = new Terrain[MAP_ROWS, MAP_COLS];
                     Terrain riverT = Terrain.MOUNAIN;
-                    if (this.biome != Biome.canyon && this.biome != Biome.caldera && this.biome != Biome.islands)
+                    if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA && this.biome != Biome.ISLANDS)
                     {
                         for (int i = 0; i < MAP_ROWS; i++)
                         {
@@ -234,7 +234,7 @@ namespace Z2Randomizer
                         }
                     }
 
-                    if (this.biome == Biome.islands)
+                    if (this.biome == Biome.ISLANDS)
                     {
                         riverT = water;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -249,14 +249,14 @@ namespace Z2Randomizer
                             map[i, MAP_COLS - 1] = water;
                         }
 
-                        int cols = hy.RNG.Next(2, 4);
-                        int rows = hy.RNG.Next(2, 4);
+                        int cols = hyrule.RNG.Next(2, 4);
+                        int rows = hyrule.RNG.Next(2, 4);
                         List<int> pickedC = new List<int>();
                         List<int> pickedR = new List<int>();
 
                         while (cols > 0)
                         {
-                            int col = hy.RNG.Next(1, MAP_COLS);
+                            int col = hyrule.RNG.Next(1, MAP_COLS);
                             if (!pickedC.Contains(col))
                             {
                                 for (int i = 0; i < MAP_ROWS; i++)
@@ -273,7 +273,7 @@ namespace Z2Randomizer
 
                         while (rows > 0)
                         {
-                            int row = hy.RNG.Next(5, MAP_ROWS - 6);
+                            int row = hyrule.RNG.Next(5, MAP_ROWS - 6);
                             if (!pickedR.Contains(row))
                             {
                                 for (int i = 0; i < MAP_COLS; i++)
@@ -284,10 +284,10 @@ namespace Z2Randomizer
                                     }
                                     else if (map[row, i] == water)
                                     {
-                                        int adjust = hy.RNG.Next(-3, 4);
+                                        int adjust = hyrule.RNG.Next(-3, 4);
                                         while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
                                         {
-                                            adjust = hy.RNG.Next(-3, 4);
+                                            adjust = hyrule.RNG.Next(-3, 4);
                                         }
                                         row += adjust;
                                     }
@@ -300,12 +300,12 @@ namespace Z2Randomizer
 
 
                     }
-                    else if (this.biome == Biome.canyon)
+                    else if (this.biome == Biome.CANYON)
                     {
                         riverT = water;
-                        horizontal = hy.RNG.NextDouble() > 0.5;
+                        horizontal = hyrule.RNG.NextDouble() > 0.5;
 
-                        if (hy.Props.westBiome.Equals("CanyonD"))
+                        if (hyrule.Props.westBiome.Equals("CanyonD"))
                         {
                             riverT = Terrain.DESERT;
                         }
@@ -325,12 +325,12 @@ namespace Z2Randomizer
                         //this.randomTerrains.Add(terrain.lava);
 
                     }
-                    else if (this.biome == Biome.caldera)
+                    else if (this.biome == Biome.CALDERA)
                     {
-                        this.horizontal = hy.RNG.NextDouble() > .5;
+                        this.horizontal = hyrule.RNG.NextDouble() > .5;
                         DrawCenterMountain();
                     }
-                    else if (this.biome == Biome.mountainous)
+                    else if (this.biome == Biome.MOUNTAINOUS)
                     {
                         riverT = Terrain.MOUNAIN;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -346,14 +346,14 @@ namespace Z2Randomizer
                         }
 
 
-                        int cols = hy.RNG.Next(2, 4);
-                        int rows = hy.RNG.Next(2, 4);
+                        int cols = hyrule.RNG.Next(2, 4);
+                        int rows = hyrule.RNG.Next(2, 4);
                         List<int> pickedC = new List<int>();
                         List<int> pickedR = new List<int>();
 
                         while (cols > 0)
                         {
-                            int col = hy.RNG.Next(10, MAP_COLS - 11);
+                            int col = hyrule.RNG.Next(10, MAP_COLS - 11);
                             if (!pickedC.Contains(col))
                             {
                                 for (int i = 0; i < MAP_ROWS; i++)
@@ -370,7 +370,7 @@ namespace Z2Randomizer
 
                         while (rows > 0)
                         {
-                            int row = hy.RNG.Next(10, MAP_ROWS - 11);
+                            int row = hyrule.RNG.Next(10, MAP_ROWS - 11);
                             if (!pickedR.Contains(row))
                             {
                                 for (int i = 0; i < MAP_COLS; i++)
@@ -386,10 +386,10 @@ namespace Z2Randomizer
                         }
                     }
 
-                    Direction rDir = (Direction)hy.RNG.Next(4);
-                    if (this.biome == Biome.canyon)
+                    Direction rDir = (Direction)hyrule.RNG.Next(4);
+                    if (this.biome == Biome.CANYON)
                     {
-                        rDir = (Direction)hy.RNG.Next(2);
+                        rDir = (Direction)hyrule.RNG.Next(2);
                         if (horizontal)
                         {
                             rDir += 2;
@@ -397,7 +397,7 @@ namespace Z2Randomizer
                     }
                     if (raft != null)
                     {
-                        if (this.biome != Biome.canyon && this.biome != Biome.caldera)
+                        if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
                         {
                             MAP_COLS = 29;
                         }
@@ -408,16 +408,16 @@ namespace Z2Randomizer
 
 
 
-                    Direction bDir = (Direction)hy.RNG.Next(4);
+                    Direction bDir = (Direction)hyrule.RNG.Next(4);
                     do
                     {
-                        if (this.biome != Biome.canyon)
+                        if (this.biome != Biome.CANYON)
                         {
-                            bDir = (Direction)hy.RNG.Next(4);
+                            bDir = (Direction)hyrule.RNG.Next(4);
                         }
                         else
                         {
-                            bDir = (Direction)hy.RNG.Next(2);
+                            bDir = (Direction)hyrule.RNG.Next(2);
                             if (horizontal)
                             {
                                 bDir += 2;
@@ -426,7 +426,7 @@ namespace Z2Randomizer
                     } while (bDir == rDir);
                     if (bridge != null)
                     {
-                        if (this.biome != Biome.canyon && this.biome != Biome.caldera)
+                        if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
                         {
                             MAP_COLS = 29;
                         }
@@ -442,8 +442,8 @@ namespace Z2Randomizer
                             int tries = 0;
                             do
                             {
-                                x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                                y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                                x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                                y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                                 tries++;
                             } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
                             if (tries >= 100)
@@ -457,14 +457,14 @@ namespace Z2Randomizer
                             if (location.TerrainType == Terrain.CAVE)
                             {
 
-                                int dir = hy.RNG.Next(4);
+                                int dir = hyrule.RNG.Next(4);
 
-                                Terrain s = walkable[hy.RNG.Next(walkable.Count)];
-                                if (this.biome == Biome.vanillalike)
+                                Terrain s = walkable[hyrule.RNG.Next(walkable.Count)];
+                                if (this.biome == Biome.VANILLALIKE)
                                 {
                                     s = Terrain.ROAD;
                                 }
-                                if (!hy.Props.saneCaves || !connectionsDM.ContainsKey(location))
+                                if (!hyrule.Props.saneCaves || !connectionsDM.ContainsKey(location))
                                 {
                                     PlaceCave(x, y, dir, s);
                                 }
@@ -499,8 +499,8 @@ namespace Z2Randomizer
                                     tries = 0;
                                     do
                                     {
-                                        x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                                        y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                                        x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                                        y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                                         tries++;
                                     } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
                                     if (tries >= 100)
@@ -510,7 +510,7 @@ namespace Z2Randomizer
 
                                     while ((dir == 0 && y < 15) || (dir == 1 && x > MAP_COLS - 15) || (dir == 2 && y > MAP_ROWS - 15) || (dir == 3 && x < 15))
                                     {
-                                        dir = hy.RNG.Next(4);
+                                        dir = hyrule.RNG.Next(4);
                                     }
                                     int otherdir = (dir + 2) % 4;
                                     if (connectionsDM[location].Count == 1)
@@ -523,7 +523,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (biome == Biome.islands)
+                                            if (biome == Biome.ISLANDS)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -531,23 +531,23 @@ namespace Z2Randomizer
                                             crossing = true;
                                             if (dir == 0) //south
                                             {
-                                                otherx = x + (hy.RNG.Next(7) - 3);
-                                                othery = y - (hy.RNG.Next(range) + offset);
+                                                otherx = x + (hyrule.RNG.Next(7) - 3);
+                                                othery = y - (hyrule.RNG.Next(range) + offset);
                                             }
                                             else if (dir == 1) //west
                                             {
-                                                otherx = x + (hy.RNG.Next(range) + offset);
-                                                othery = y + (hy.RNG.Next(7) - 3);
+                                                otherx = x + (hyrule.RNG.Next(range) + offset);
+                                                othery = y + (hyrule.RNG.Next(7) - 3);
                                             }
                                             else if (dir == 2) //north
                                             {
-                                                otherx = x + (hy.RNG.Next(7) - 3);
-                                                othery = y + (hy.RNG.Next(range) + offset);
+                                                otherx = x + (hyrule.RNG.Next(7) - 3);
+                                                othery = y + (hyrule.RNG.Next(range) + offset);
                                             }
                                             else //east
                                             {
-                                                otherx = x - (hy.RNG.Next(range) + offset);
-                                                othery = y + (hy.RNG.Next(7) - 3);
+                                                otherx = x - (hyrule.RNG.Next(range) + offset);
+                                                othery = y + (hyrule.RNG.Next(7) - 3);
                                             }
                                             tries++;
 
@@ -581,7 +581,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (biome == Biome.islands)
+                                            if (biome == Biome.ISLANDS)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -589,23 +589,23 @@ namespace Z2Randomizer
                                             crossing = true;
                                             if (dir == 0) //south
                                             {
-                                                otherx = x + (hy.RNG.Next(7) - 3);
-                                                othery = y - (hy.RNG.Next(range) + offset);
+                                                otherx = x + (hyrule.RNG.Next(7) - 3);
+                                                othery = y - (hyrule.RNG.Next(range) + offset);
                                             }
                                             else if (dir == 1) //west
                                             {
-                                                otherx = x + (hy.RNG.Next(range) + offset);
-                                                othery = y + (hy.RNG.Next(7) - 3);
+                                                otherx = x + (hyrule.RNG.Next(range) + offset);
+                                                othery = y + (hyrule.RNG.Next(7) - 3);
                                             }
                                             else if (dir == 2) //north
                                             {
-                                                otherx = x + (hy.RNG.Next(7) - 3);
-                                                othery = y + (hy.RNG.Next(range) + offset);
+                                                otherx = x + (hyrule.RNG.Next(7) - 3);
+                                                othery = y + (hyrule.RNG.Next(range) + offset);
                                             }
                                             else //east
                                             {
-                                                otherx = x - (hy.RNG.Next(range) + offset);
-                                                othery = y + (hy.RNG.Next(7) - 3);
+                                                otherx = x - (hyrule.RNG.Next(range) + offset);
+                                                othery = y + (hyrule.RNG.Next(7) - 3);
                                             }
                                             tries++;
 
@@ -632,8 +632,8 @@ namespace Z2Randomizer
                                         tries = 0;
                                         do
                                         {
-                                            newx = x + hy.RNG.Next(7) - 3;
-                                            newy = y + hy.RNG.Next(7) - 3;
+                                            newx = x + hyrule.RNG.Next(7) - 3;
+                                            newy = y + hyrule.RNG.Next(7) - 3;
                                             tries++;
                                         } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
                                         if (tries >= 100)
@@ -652,7 +652,7 @@ namespace Z2Randomizer
                                         {
                                             int range = 7;
                                             int offset = 3;
-                                            if (biome == Biome.islands)
+                                            if (biome == Biome.ISLANDS)
                                             {
                                                 range = 7;
                                                 offset = 5;
@@ -660,23 +660,23 @@ namespace Z2Randomizer
                                             crossing = true;
                                             if (dir == 0) //south
                                             {
-                                                otherx = x + (hy.RNG.Next(7) - 3);
-                                                othery = y - (hy.RNG.Next(range) + offset);
+                                                otherx = x + (hyrule.RNG.Next(7) - 3);
+                                                othery = y - (hyrule.RNG.Next(range) + offset);
                                             }
                                             else if (dir == 1) //west
                                             {
-                                                otherx = x + (hy.RNG.Next(range) + offset);
-                                                othery = y + (hy.RNG.Next(7) - 3);
+                                                otherx = x + (hyrule.RNG.Next(range) + offset);
+                                                othery = y + (hyrule.RNG.Next(7) - 3);
                                             }
                                             else if (dir == 2) //north
                                             {
-                                                otherx = x + (hy.RNG.Next(7) - 3);
-                                                othery = y + (hy.RNG.Next(range) + offset);
+                                                otherx = x + (hyrule.RNG.Next(7) - 3);
+                                                othery = y + (hyrule.RNG.Next(range) + offset);
                                             }
                                             else //east
                                             {
-                                                otherx = x - (hy.RNG.Next(range) + offset);
-                                                othery = y + (hy.RNG.Next(7) - 3);
+                                                otherx = x - (hyrule.RNG.Next(range) + offset);
+                                                othery = y + (hyrule.RNG.Next(7) - 3);
                                             }
                                             tries++;
 
@@ -702,7 +702,7 @@ namespace Z2Randomizer
                     }
 
 
-                    if (this.biome == Biome.vanillalike)
+                    if (this.biome == Biome.VANILLALIKE)
                     {
                         PlaceRandomTerrain(5);
                     }
@@ -711,7 +711,7 @@ namespace Z2Randomizer
                     {
                         return false;
                     }
-                    if (this.biome == Biome.caldera)
+                    if (this.biome == Biome.CALDERA)
                     {
                         bool f = MakeCaldera();
                         if (!f)
@@ -722,7 +722,7 @@ namespace Z2Randomizer
                     walkable.Add(Terrain.ROAD);
                     if (raft != null)
                     {
-                        if (this.biome != Biome.caldera && this.biome != Biome.canyon)
+                        if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
                         {
                             MAP_COLS = 29;
                         }
@@ -736,7 +736,7 @@ namespace Z2Randomizer
 
                     if (bridge != null)
                     {
-                        if (this.biome != Biome.caldera && this.biome != Biome.canyon)
+                        if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
                         {
                             MAP_COLS = 29;
                         }
@@ -751,8 +751,8 @@ namespace Z2Randomizer
 
                     do
                     {
-                        x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                        y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                        x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                        y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                     } while (!walkable.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
 
                     map[y, x] = Terrain.ROCK;
@@ -760,16 +760,16 @@ namespace Z2Randomizer
                     magicCave.Xpos = x;
 
 
-                    if (this.biome == Biome.canyon || this.biome == Biome.islands)
+                    if (this.biome == Biome.CANYON || this.biome == Biome.ISLANDS)
                     {
                         ConnectIslands(25, false, riverT, false, false, false);
                     }
 
                     //check bytes and adjust
-                    WriteBytes(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+                    WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
                 }
             }
-            WriteBytes(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+            WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
             
 
             v = new bool[MAP_ROWS, MAP_COLS];
@@ -785,7 +785,7 @@ namespace Z2Randomizer
             {
                 if (!terrains.Keys.Contains(i))
                 {
-                    hy.ROMData.Put(i, 0x00);
+                    hyrule.ROMData.Put(i, 0x00);
                 }
             }
             return true;
@@ -793,16 +793,16 @@ namespace Z2Randomizer
         private bool MakeCaldera()
         {
             Terrain water = Terrain.WATER;
-            if (hy.Props.bootsWater)
+            if (hyrule.Props.bootsWater)
             {
                 water = Terrain.WALKABLEWATER;
             }
-            int centerx = hy.RNG.Next(21, 41);
-            int centery = hy.RNG.Next(17, 27);
+            int centerx = hyrule.RNG.Next(21, 41);
+            int centery = hyrule.RNG.Next(17, 27);
             if (horizontal)
             {
-                centerx = hy.RNG.Next(27, 37);
-                centery = hy.RNG.Next(17, 27);
+                centerx = hyrule.RNG.Next(27, 37);
+                centery = hyrule.RNG.Next(17, 27);
             }
 
             bool placeable = false;
@@ -810,13 +810,13 @@ namespace Z2Randomizer
             {
                 if (horizontal)
                 {
-                    centerx = hy.RNG.Next(27, 37);
-                    centery = hy.RNG.Next(17, 27);
+                    centerx = hyrule.RNG.Next(27, 37);
+                    centery = hyrule.RNG.Next(17, 27);
                 }
                 else
                 {
-                    centerx = hy.RNG.Next(21, 41);
-                    centery = hy.RNG.Next(17, 27);
+                    centerx = hyrule.RNG.Next(21, 41);
+                    centery = hyrule.RNG.Next(17, 27);
                 }
                 placeable = true;
                 for (int i = centery - 7; i < centery + 8; i++)
@@ -844,10 +844,10 @@ namespace Z2Randomizer
             }
             for (int i = 0; i < 10; i++)
             {
-                int lake = hy.RNG.Next(7, 11);
+                int lake = hyrule.RNG.Next(7, 11);
                 if (i == 0 || i == 9)
                 {
-                    lake = hy.RNG.Next(3, 6);
+                    lake = hyrule.RNG.Next(3, 6);
                 }
                 if (horizontal)
                 {
@@ -992,14 +992,14 @@ namespace Z2Randomizer
 
             do
             {
-                int cavenum1 = hy.RNG.Next(connectionsDM.Keys.Count);
+                int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
                 cave1l = connectionsDM.Keys.ToList()[cavenum1];
                 cave1r = connectionsDM[cave1l][0];
             } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
 
             do
             {
-                int cavenum1 = hy.RNG.Next(connectionsDM.Keys.Count);
+                int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
                 cave2l = connectionsDM.Keys.ToList()[cavenum1];
                 cave2r = connectionsDM[cave2l][0];
             } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
@@ -1015,7 +1015,7 @@ namespace Z2Randomizer
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNAIN;
 
 
-            int caveDir = hy.RNG.Next(2);
+            int caveDir = hyrule.RNG.Next(2);
             if (horizontal)
             {
                 bool f = HorizontalCave(caveDir, centerx, centery, cave1l, cave1r);

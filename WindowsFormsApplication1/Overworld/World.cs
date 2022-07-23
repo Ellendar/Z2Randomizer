@@ -12,8 +12,8 @@ namespace Z2Randomizer
 {
     abstract class World
     {
-        protected enum Biome { vanilla, vanillaShuffle, vanillalike, islands, canyon, mountainous, volcano, caldera };
-        protected enum Direction { north, south, east, west };
+        protected enum Biome { VANILLA, VANILLA_SHUFFLE, VANILLALIKE, ISLANDS, CANYON, MOUNTAINOUS, VOLCANO, CALDERA };
+        protected enum Direction { NORTH, SOUTH, EAST, WEST };
         protected SortedDictionary<String, List<Location>> areasByLocation;
         /*private List<Location> caves;
         private List<Location> towns;
@@ -39,7 +39,7 @@ namespace Z2Randomizer
         protected int enemyPtr;
         protected List<int> overworldMaps;
         protected SortedDictionary<Tuple<int, int>, Location> locsByCoords;
-        protected Hyrule hy;
+        protected Hyrule hyrule;
         protected Terrain[,] map;
         private const int overworldXOff = 0x3F;
         private const int overworldMapOff = 0x7E;
@@ -47,9 +47,12 @@ namespace Z2Randomizer
         private List<int> visitedEnemies;
         protected int MAP_ROWS;
         protected int MAP_COLS;
-        protected int bcount;
+        protected int bytesWritten;
         protected List<Terrain> randomTerrains;
         protected List<Terrain> walkable;
+        /// <summary>
+        /// This name is A W F U L. Figure out what this is supposed to represent and rename it
+        /// </summary>
         protected bool[,] v;
         protected const int MAP_SIZE_BYTES = 1408;
         protected List<Location> unimportantLocs;
@@ -95,7 +98,7 @@ namespace Z2Randomizer
 
         public World(Hyrule parent)
         {
-            hy = parent;
+            hyrule = parent;
             connections = new Dictionary<Location, Location>();
             Locations = new Dictionary<Terrain, List<Location>>();
             foreach(Terrain terrain in Enum.GetValues(typeof(Terrain)))
@@ -126,16 +129,18 @@ namespace Z2Randomizer
             //locsByCoords.Add(l.Coords, l);
         }
 
-        protected void ShuffleLocations(List<Location> westLocs)
+        protected void ShuffleLocations(List<Location> locationsToShuffle)
         {
-            for (int i = 0; i < westLocs.Count; i++)
+            //This only swaps elements in a list a number of times equal to the number of elements in the list.
+            //This is an extremely biased shuffle (see https://blog.codinghorror.com/the-danger-of-naivete/)
+            //TODO: Replace this with the knuth-fisher-yates Extension, which will break seed compatibility
+            for (int i = 0; i < locationsToShuffle.Count; i++)
             {
-
-                int s = hy.RNG.Next(i, westLocs.Count);
-                Location sl = westLocs[s];
-                if (sl.CanShuffle && westLocs[i].CanShuffle)
+                int s = hyrule.RNG.Next(i, locationsToShuffle.Count);
+                Location sl = locationsToShuffle[s];
+                if (sl.CanShuffle && locationsToShuffle[i].CanShuffle)
                 {
-                    Swap(westLocs[i], westLocs[s]);
+                    Swap(locationsToShuffle[i], locationsToShuffle[s]);
                 }
             }
         }
@@ -152,48 +157,47 @@ namespace Z2Randomizer
             l2.Xpos = tempX;
             l2.Ypos = tempY;
             l2.PassThrough = tempPass;
-
         }
 
         public void ShuffleEnemies(int addr, bool isOver)
         {
             if (isOver)
             {
-                addr = addr + hy.ROMData.GetByte(addr);
+                addr = addr + hyrule.ROMData.GetByte(addr);
             }
             if (!visitedEnemies.Contains(addr) && addr != 0x95A4)
             {
-                int numBytes = hy.ROMData.GetByte(addr);
+                int numBytes = hyrule.ROMData.GetByte(addr);
                 for (int j = addr + 2; j < addr + numBytes; j = j + 2)
                 {
-                    int enemy = hy.ROMData.GetByte(j) & 0x3F;
-                    int highPart = hy.ROMData.GetByte(j) & 0xC0;
-                    if (hy.Props.mixEnemies)
+                    int enemy = hyrule.ROMData.GetByte(j) & 0x3F;
+                    int highPart = hyrule.ROMData.GetByte(j) & 0xC0;
+                    if (hyrule.Props.mixEnemies)
                     {
                         if (enemies.Contains(enemy))
                         {
-                            int swap = enemies[hy.RNG.Next(0, enemies.Count)];
-                            hy.ROMData.Put(j, (Byte)(swap + highPart));
+                            int swap = enemies[hyrule.RNG.Next(0, enemies.Count)];
+                            hyrule.ROMData.Put(j, (Byte)(swap + highPart));
                             if ((shorties.Contains(enemy) && tallGuys.Contains(swap) && swap != 0x20))
                             {
-                                int ypos = hy.ROMData.GetByte(j - 1) & 0xF0;
-                                int xpos = hy.ROMData.GetByte(j - 1) & 0x0F;
+                                int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
+                                int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                                 ypos = ypos - 32;
-                                hy.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                                hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
                             }
                             else if (swap == 0x20 && swap != enemy)
                             {
-                                int ypos = hy.ROMData.GetByte(j - 1) & 0xF0;
-                                int xpos = hy.ROMData.GetByte(j - 1) & 0x0F;
+                                int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
+                                int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                                 ypos = ypos - 48;
-                                hy.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                                hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
                             }
                             else if (enemy == 0x1F && swap != enemy)
                             {
-                                int ypos = hy.ROMData.GetByte(j - 1) & 0xF0;
-                                int xpos = hy.ROMData.GetByte(j - 1) & 0x0F;
+                                int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
+                                int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                                 ypos = ypos - 16;
-                                hy.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                                hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
                             }
                         }
                     }
@@ -202,49 +206,49 @@ namespace Z2Randomizer
 
                         if (tallGuys.Contains(enemy))
                         {
-                            int swap = hy.RNG.Next(0, tallGuys.Count);
+                            int swap = hyrule.RNG.Next(0, tallGuys.Count);
                             if (tallGuys[swap] == 0x20 && tallGuys[swap] != enemy)
                             {
-                                int ypos = hy.ROMData.GetByte(j - 1) & 0xF0;
-                                int xpos = hy.ROMData.GetByte(j - 1) & 0x0F;
+                                int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
+                                int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                                 ypos = ypos - 48;
-                                hy.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                                hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
                             }
-                            hy.ROMData.Put(j, (Byte)(tallGuys[swap] + highPart));
+                            hyrule.ROMData.Put(j, (Byte)(tallGuys[swap] + highPart));
                         }
 
                         if (shorties.Contains(enemy))
                         {
-                            int swap = hy.RNG.Next(0, shorties.Count);
-                            hy.ROMData.Put(j, (Byte)(shorties[swap] + highPart));
+                            int swap = hyrule.RNG.Next(0, shorties.Count);
+                            hyrule.ROMData.Put(j, (Byte)(shorties[swap] + highPart));
                         }
                     }
 
                     if (flyingEnemies.Contains(enemy))
                     {
-                        int swap = hy.RNG.Next(0, flyingEnemies.Count);
-                        hy.ROMData.Put(j, (Byte)(flyingEnemies[swap] + highPart));
+                        int swap = hyrule.RNG.Next(0, flyingEnemies.Count);
+                        hyrule.ROMData.Put(j, (Byte)(flyingEnemies[swap] + highPart));
 
                         if (flyingEnemies[swap] == 0x07 || flyingEnemies[swap] == 0x0a || flyingEnemies[swap] == 0x0d || flyingEnemies[swap] == 0x0e)
                         {
                             int ypos = 0x00;
-                            int xpos = hy.ROMData.GetByte(j - 1) & 0x0F;
-                            hy.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                            int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
+                            hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
                         }
                     }
 
                     if (generators.Contains(enemy))
                     {
-                        int swap = hy.RNG.Next(0, generators.Count);
-                        hy.ROMData.Put(j, (Byte)(generators[swap] + highPart));
+                        int swap = hyrule.RNG.Next(0, generators.Count);
+                        hyrule.ROMData.Put(j, (Byte)(generators[swap] + highPart));
                     }
 
                     if (enemy == 33)
                     {
-                        int swap = hy.RNG.Next(0, generators.Count + 1);
+                        int swap = hyrule.RNG.Next(0, generators.Count + 1);
                         if (swap != generators.Count)
                         {
-                            hy.ROMData.Put(j, (Byte)(generators[swap] + highPart));
+                            hyrule.ROMData.Put(j, (Byte)(generators[swap] + highPart));
                         }
                     }
                 }
@@ -256,16 +260,16 @@ namespace Z2Randomizer
         {
             if (co.Count > 0)
             {
-                int start = hy.RNG.Next(areasByLocation[section].Count);
+                int start = hyrule.RNG.Next(areasByLocation[section].Count);
                 Location s = areasByLocation[section][start];
-                int conn = hy.RNG.Next(co.Count);
+                int conn = hyrule.RNG.Next(co.Count);
                 Location c = co.Keys.ElementAt(conn);
                 int count = 0;
                 while ((!c.CanShuffle || !s.CanShuffle || (!changeType && (c.TerrainType != s.TerrainType))) && count < co.Count)
                 {
-                    start = hy.RNG.Next(areasByLocation[section].Count);
+                    start = hyrule.RNG.Next(areasByLocation[section].Count);
                     s = areasByLocation[section][start];
-                    conn = hy.RNG.Next(co.Count);
+                    conn = hyrule.RNG.Next(co.Count);
                     c = co.Keys.ElementAt(conn);
                     count++;
                 }
@@ -274,12 +278,12 @@ namespace Z2Randomizer
             }
         }
 
-        protected void LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> terrains, Continent c)
+        protected void LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> terrains, Continent continent)
         {
             for (int i = 0; i < locNum; i++)
             {
-                Byte[] bytes = new Byte[4] { hy.ROMData.GetByte(startAddr + i), hy.ROMData.GetByte(startAddr + overworldXOff + i), hy.ROMData.GetByte(startAddr + overworldMapOff + i), hy.ROMData.GetByte(startAddr + overworldWorldOff + i) };
-                AddLocation(new Location(bytes, terrains[startAddr + i], startAddr + i, c));
+                Byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(startAddr + i), hyrule.ROMData.GetByte(startAddr + overworldXOff + i), hyrule.ROMData.GetByte(startAddr + overworldMapOff + i), hyrule.ROMData.GetByte(startAddr + overworldWorldOff + i) };
+                AddLocation(new Location(bytes, terrains[startAddr + i], startAddr + i, continent));
             }
         }
 
@@ -308,7 +312,7 @@ namespace Z2Randomizer
                 j = 0;
                 while(j < MAP_COLS)
                 {
-                    byte data = hy.ROMData.GetByte(addr);
+                    byte data = hyrule.ROMData.GetByte(addr);
                     int count = (data & 0xF0) >> 4;
                     count++;
                     Terrain t = (Terrain)(data & 0x0F);
@@ -334,7 +338,7 @@ namespace Z2Randomizer
                 Allreached = true;
                 foreach(Location location in AllLocations)
                 {
-                    if(location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Items.donotuse)
+                    if(location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Items.DO_NOT_USE)
                     {
                         if(!location.Reachable)
                         {
@@ -347,42 +351,42 @@ namespace Z2Randomizer
 
         protected Location GetLocationByCoords(Tuple<int, int> coords)
         {
-            Location l = null;
+            Location location = null;
             foreach (Location loc in AllLocations)
             {
                 if (loc.Coords.Equals(coords))
                 {
-                    l = loc;
+                    location = loc;
                     break;
                 }
             }
-            if (l == null)
+            if (location == null)
             {
                 //Console.Write(coords);
             }
-            return l;
+            return location;
         }
 
         protected Location GetLocationByMem(int mem)
         {
-            Location l = null;
+            Location location = null;
             foreach (Location loc in AllLocations)
             {
                 if (loc.MemAddress == mem)
                 {
-                    l = loc;
+                    location = loc;
                     break;
                 }
             }
-            return l;
+            return location;
         }
 
         public void ShuffleE()
         {
             for (int i = enemyPtr; i < enemyPtr + 126; i = i + 2)
             {
-                int low = hy.ROMData.GetByte(i);
-                int high = hy.ROMData.GetByte(i + 1);
+                int low = hyrule.ROMData.GetByte(i);
+                int high = hyrule.ROMData.GetByte(i + 1);
                 high = high << 8;
                 high = high & 0x0FFF;
                 int addr = high + low + enemyAddr;
@@ -392,8 +396,8 @@ namespace Z2Randomizer
             foreach (int i in overworldMaps)
             {
                 int ptrAddr = enemyPtr + i * 2;
-                int low = hy.ROMData.GetByte(ptrAddr);
-                int high = hy.ROMData.GetByte(ptrAddr + 1);
+                int low = hyrule.ROMData.GetByte(ptrAddr);
+                int high = hyrule.ROMData.GetByte(ptrAddr + 1);
                 high = high << 8;
                 high = high & 0x0FFF;
                 int addr = high + low + enemyAddr;
@@ -411,16 +415,16 @@ namespace Z2Randomizer
                     int y = 0;
                     do
                     {
-                        x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                        y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                        x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                        y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                     } while (map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
 
                     map[y, x] = location.TerrainType;
                     if (location.TerrainType == Terrain.CAVE)
                     {
-                        int dir = hy.RNG.Next(4);
-                        Terrain s = walkable[hy.RNG.Next(walkable.Count)];
-                        if (!hy.Props.saneCaves || !connections.ContainsKey(location))
+                        int dir = hyrule.RNG.Next(4);
+                        Terrain s = walkable[hyrule.RNG.Next(walkable.Count)];
+                        if (!hyrule.Props.saneCaves || !connections.ContainsKey(location))
                         {
                             PlaceCave(x, y, dir, s);
                         }
@@ -453,13 +457,13 @@ namespace Z2Randomizer
                             map[y, x] = Terrain.NONE;
                             do
                             {
-                                x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                                y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                                x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                                y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                             } while (x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
 
                             while ((dir == 0 && y < 15) || (dir == 1 && x > MAP_COLS - 15) || (dir == 2 && y > MAP_ROWS - 15) || (dir == 3 && x < 15))
                             {
-                                dir = hy.RNG.Next(4);
+                                dir = hyrule.RNG.Next(4);
                             }
                             int otherdir = (dir + 2) % 4;
                             int otherx = 0;
@@ -470,12 +474,12 @@ namespace Z2Randomizer
                             {
                                 int range = 12;
                                 int offset = 6;
-                                if(biome == Biome.islands)
+                                if(biome == Biome.ISLANDS)
                                 {
                                     range = 10;
                                     offset = 10;
                                 }
-                                else if(biome == Biome.volcano)
+                                else if(biome == Biome.VOLCANO)
                                 {
                                     range = 10;
                                     offset = 20;
@@ -483,26 +487,26 @@ namespace Z2Randomizer
                                 crossing = true;
                                 if(dir == 0) //south
                                 {
-                                    otherx = x + (hy.RNG.Next(7) - 3);
-                                    othery = y - (hy.RNG.Next(range) + offset);
+                                    otherx = x + (hyrule.RNG.Next(7) - 3);
+                                    othery = y - (hyrule.RNG.Next(range) + offset);
                                 } 
                                 else if(dir == 1) //west
                                 {
-                                    otherx = x + (hy.RNG.Next(range) + offset);
-                                    othery = y + (hy.RNG.Next(7) - 3);
+                                    otherx = x + (hyrule.RNG.Next(range) + offset);
+                                    othery = y + (hyrule.RNG.Next(7) - 3);
                                 }
                                 else if(dir == 2) //north
                                 {
-                                    otherx = x + (hy.RNG.Next(7) - 3);
-                                    othery = y + (hy.RNG.Next(range) + offset);
+                                    otherx = x + (hyrule.RNG.Next(7) - 3);
+                                    othery = y + (hyrule.RNG.Next(range) + offset);
                                 }
                                 else //east
                                 {
-                                    otherx = x - (hy.RNG.Next(range) + offset);
-                                    othery = y + (hy.RNG.Next(7) - 3);
+                                    otherx = x - (hyrule.RNG.Next(range) + offset);
+                                    othery = y + (hyrule.RNG.Next(7) - 3);
                                 }
                                 tries++;
-                                if(this.biome != Biome.volcano)
+                                if(this.biome != Biome.VOLCANO)
                                 {
                                     if(!CrossingWater(x, otherx, y, othery, riverT))
                                     {
@@ -520,13 +524,13 @@ namespace Z2Randomizer
                             l2.CanShuffle = false;
                             l2.Xpos = otherx;
                             l2.Ypos = othery + 30;
-                            PlaceCave(x, y, dir, walkable[hy.RNG.Next(walkable.Count)]);
-                            PlaceCave(otherx, othery, otherdir, walkable[hy.RNG.Next(walkable.Count)]);
+                            PlaceCave(x, y, dir, walkable[hyrule.RNG.Next(walkable.Count)]);
+                            PlaceCave(otherx, othery, otherdir, walkable[hyrule.RNG.Next(walkable.Count)]);
                         }
                     }
                     else if (location.TerrainType == Terrain.PALACE)
                     {
-                        Terrain s = walkable[hy.RNG.Next(walkable.Count)];
+                        Terrain s = walkable[hyrule.RNG.Next(walkable.Count)];
                         map[y + 1, x] = s;
                         map[y + 1, x + 1] = s;
                         map[y + 1, x - 1] = s;
@@ -541,7 +545,7 @@ namespace Z2Randomizer
                         Terrain t = Terrain.NONE;
                         do
                         {
-                            t = walkable[hy.RNG.Next(walkable.Count)];
+                            t = walkable[hyrule.RNG.Next(walkable.Count)];
                         } while (t == location.TerrainType);
                         map[y + 1, x] = t;
                         map[y + 1, x + 1] = t;
@@ -652,8 +656,8 @@ namespace Z2Randomizer
                     int y = 0;
                     do
                     {
-                        x = hy.RNG.Next(MAP_COLS);
-                        y = hy.RNG.Next(MAP_ROWS);
+                        x = hyrule.RNG.Next(MAP_COLS);
+                        y = hyrule.RNG.Next(MAP_ROWS);
                         tries++;
                     } while ((map[y, x] != location.TerrainType || GetLocationByCoords(Tuple.Create(y + 30, x)) != null) && tries < 2000);
 
@@ -682,14 +686,14 @@ namespace Z2Randomizer
             while (bridges > 0 && tries < 2000)
             {
                 tries++;
-                int x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                int y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                int x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                int y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                 int waterDir = NextToWater(x, y, riverT);
                 int waterTries = 0;
                 while (waterDir == -1 && waterTries < 2000)// || (this.bio == biome.canyon && (waterDir == 0 || waterDir == 1)))
                 {
-                    x = hy.RNG.Next(MAP_COLS - 2) + 1;
-                    y = hy.RNG.Next(MAP_ROWS - 2) + 1;
+                    x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                    y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                     waterDir = NextToWater(x, y, riverT);
                     waterTries++;
                 }
@@ -831,7 +835,7 @@ namespace Z2Randomizer
                     endMass = mass[y, x];
                 }
                 
-                if((riverT != Terrain.DESERT && this.biome != Biome.caldera && this.biome != Biome.volcano) && (startMass == 0 || endMass == 0 || endMass == startMass || (connectMass.ContainsKey(startMass) && connectMass[startMass].Contains(endMass))))
+                if((riverT != Terrain.DESERT && this.biome != Biome.CALDERA && this.biome != Biome.VOLCANO) && (startMass == 0 || endMass == 0 || endMass == startMass || (connectMass.ContainsKey(startMass) && connectMass[startMass].Contains(endMass))))
                 {
                     length = 100;
                 }
@@ -1011,7 +1015,7 @@ namespace Z2Randomizer
                             while (map[y, x] == riverT)
                             {
 
-                                if (this.biome != Biome.mountainous && this.biome != Biome.vanillalike)
+                                if (this.biome != Biome.MOUNTAINOUS && this.biome != Biome.VANILLALIKE)
                                 {
                                     if (terrainCycle == 0)
                                     {
@@ -1069,7 +1073,7 @@ namespace Z2Randomizer
                                 }
                                 else
                                 {
-                                    if (this.biome == Biome.vanillalike)
+                                    if (this.biome == Biome.VANILLALIKE)
                                     {
                                         if (riverT == Terrain.WALKABLEWATER || riverT == Terrain.WATER)
                                         {
@@ -1111,7 +1115,7 @@ namespace Z2Randomizer
                             }
                         }
                         terrainCycle++;
-                        if (riverT != Terrain.MOUNAIN && riverT != Terrain.DESERT && !hy.Props.bootsWater)
+                        if (riverT != Terrain.MOUNAIN && riverT != Terrain.DESERT && !hyrule.Props.bootsWater)
                         {
                             terrainCycle = terrainCycle % 3;
                         }
@@ -1274,7 +1278,7 @@ namespace Z2Randomizer
                                 choices.Add(map[t.Item1, t.Item2]);
                             }
                         }
-                        mapCopy[i, j] = choices[hy.RNG.Next(choices.Count)];
+                        mapCopy[i, j] = choices[hyrule.RNG.Next(choices.Count)];
                     }
                 }
             }
@@ -1301,98 +1305,110 @@ namespace Z2Randomizer
             {
                 int x = 0;
                 int y = 0;
-                Terrain t = randomTerrains[hy.RNG.Next(randomTerrains.Count)];
+                Terrain t = randomTerrains[hyrule.RNG.Next(randomTerrains.Count)];
                 do
                 {
-                    x = hy.RNG.Next(MAP_COLS);
-                    y = hy.RNG.Next(MAP_ROWS);
+                    x = hyrule.RNG.Next(MAP_COLS);
+                    y = hyrule.RNG.Next(MAP_ROWS);
                 } while (map[y, x] != Terrain.NONE);
                 map[y, x] = t;
                 placed++;
             }
         }
 
-        protected void WriteBytes(bool doWrite, int loc, int total, int h1, int h2)
+        /// <summary>
+        /// Writes the map data to the rom
+        /// </summary>
+        /// <param name="doWrite">If true, actually write the map data, otherwise just bulk fill the whole map</param>
+        /// <param name="loc">Start address of the map data in the rom (usually 0xB480)</param>
+        /// <param name="total">Total number of bytes to write</param>
+        /// <param name="h1">For east: Hidden Palace Y - 30</param>
+        /// <param name="h2">For east: Hidden palace X</param>
+        protected void WriteMapToRom(bool doWrite, int loc, int total, int h1, int h2)
         {
-            bcount = 0;
-            Terrain curr2 = map[0, 0];
-            int count2 = 0;
-            for (int i = 0; i < MAP_ROWS; i++)
+            bytesWritten = 0; //Number of bytes written so far
+            Terrain currentTerrain = map[0, 0];
+            int currentTerrainCount = 0;
+            for (int y = 0; y < MAP_ROWS; y++)
             {
-                for (int j = 0; j < MAP_COLS; j++)
+                for (int x = 0; x < MAP_COLS; x++)
                 {
-                    if(hy.hiddenPalace && i == h1 && j == h2 && i != 0 && j != 0)
+                    if(hyrule.hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
                     {
-                        count2--;
-                        int b = count2 * 16 + (int)curr2;
+                        currentTerrainCount--;
+                        int b = currentTerrainCount * 16 + (int)currentTerrain;
                         //Console.WriteLine("Hex: {0:X}", b);
                         if (doWrite)
                         {
-                            hy.ROMData.Put(loc, (Byte)b);
-                            hy.ROMData.Put(loc + 1, (byte)curr2);
+                            hyrule.ROMData.Put(loc, (Byte)b);
+                            hyrule.ROMData.Put(loc + 1, (byte)currentTerrain);
                         }
-                        count2 = 0;
+                        currentTerrainCount = 0;
                         loc += 2;
-                        bcount += 2;
+                        bytesWritten += 2;
                         continue;
                     }
-                    if (hy.hiddenKasuto && i == 51 && j == 61 && i != 0 && j != 0 && (this.biome == Biome.vanilla || this.biome == Biome.vanillaShuffle))
+                    if (hyrule.hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE))
                     {
-                        count2--;
-                        int b = count2 * 16 + (int)curr2;
+                        currentTerrainCount--;
+                        int b = currentTerrainCount * 16 + (int)currentTerrain;
                         //Console.WriteLine("Hex: {0:X}", b);
                         if (doWrite)
                         {
-                            hy.ROMData.Put(loc, (Byte)b);
-                            hy.ROMData.Put(loc + 1, (byte)curr2);
+                            hyrule.ROMData.Put(loc, (Byte)b);
+                            hyrule.ROMData.Put(loc + 1, (byte)currentTerrain);
                         }
-                        count2 = 0;
+                        currentTerrainCount = 0;
                         loc += 2;
-                        bcount += 2;
+                        bytesWritten += 2;
                         continue;
                     }
                     
-                    if (map[i, j] == curr2 && count2 < 16)
+                    if (map[y, x] == currentTerrain && currentTerrainCount < 16)
                     {
-                        count2++;
+                        currentTerrainCount++;
                     }
                     else
                     {
-                        count2--;
-                        int b = count2 * 16 + (int)curr2;
+                        currentTerrainCount--;
+                        //First 4 bits are the number of tiles to draw with that terrain type. Last 4 are the terrain type.
+                        int b = currentTerrainCount * 16 + (int)currentTerrain;
                         //Console.WriteLine("Hex: {0:X}", b);
                         if (doWrite)
                         {
-                            hy.ROMData.Put(loc, (Byte)b);
+                            hyrule.ROMData.Put(loc, (Byte)b);
                         }
 
-                        curr2 = map[i, j];
-                        count2 = 1;
+                        currentTerrain = map[y, x];
+                        //This is almost certainly an off by one error, but very very unlikely to matter
+                        currentTerrainCount = 1;
                         loc++;
-                        bcount++;
+                        bytesWritten++;
                     }
                 }
-                count2--;
-                int b2 = count2 * 16 + (int)curr2;
+                //Write the last terrain segment for this row
+                currentTerrainCount--;
+                int b2 = currentTerrainCount * 16 + (int)currentTerrain;
                 //Console.WriteLine("Hex: {0:X}", b2);
                 if (doWrite)
                 {
-                    hy.ROMData.Put(loc, (Byte)b2);
+                    hyrule.ROMData.Put(loc, (Byte)b2);
                 }
 
-                if (i < MAP_ROWS - 1)
+                if (y < MAP_ROWS - 1)
                 {
-                    curr2 = map[i + 1, 0];
+                    currentTerrain = map[y + 1, 0];
                 }
-                count2 = 0;
+                currentTerrainCount = 0;
                 loc++;
-                bcount++;
+                bytesWritten++;
             }
 
-            while (bcount < total)
+            //Fill any remaining map space in the rom with filler. (Replace 0x0B with a constant)
+            while (bytesWritten < total)
             {
-                hy.ROMData.Put(loc, (Byte)0x0B);
-                bcount++;
+                hyrule.ROMData.Put(loc, (Byte)0x0B);
+                bytesWritten++;
                 loc++;
             }
         }
@@ -1400,7 +1416,7 @@ namespace Z2Randomizer
         protected void DrawOcean(Direction d)
         {
             Terrain water = Terrain.WATER;
-            if (hy.Props.bootsWater)
+            if (hyrule.Props.bootsWater)
             {
                 water = Terrain.WALKABLEWATER;
             }
@@ -1408,37 +1424,37 @@ namespace Z2Randomizer
             int y = 0;
             int olength = 0;
 
-            if(d == Direction.west)
+            if(d == Direction.WEST)
             {
-                y = hy.RNG.Next(MAP_ROWS);
-                olength = hy.RNG.Next(Math.Max(y, MAP_ROWS - y));
+                y = hyrule.RNG.Next(MAP_ROWS);
+                olength = hyrule.RNG.Next(Math.Max(y, MAP_ROWS - y));
             } 
-            else if(d == Direction.east)
+            else if(d == Direction.EAST)
             {
                 x = MAP_COLS - 1;
-                y = hy.RNG.Next(MAP_ROWS);
-                olength = hy.RNG.Next(Math.Max(y, MAP_ROWS - y));
+                y = hyrule.RNG.Next(MAP_ROWS);
+                olength = hyrule.RNG.Next(Math.Max(y, MAP_ROWS - y));
             }
-            else if(d == Direction.north)
+            else if(d == Direction.NORTH)
             {
-                x = hy.RNG.Next(MAP_COLS);
-                olength = hy.RNG.Next(Math.Max(x, MAP_COLS - x));
+                x = hyrule.RNG.Next(MAP_COLS);
+                olength = hyrule.RNG.Next(Math.Max(x, MAP_COLS - x));
             }
             else
             {
-                x = hy.RNG.Next(MAP_COLS);
+                x = hyrule.RNG.Next(MAP_COLS);
                 y = MAP_ROWS - 1;
-                olength = hy.RNG.Next(Math.Max(x, MAP_COLS - x));
+                olength = hyrule.RNG.Next(Math.Max(x, MAP_COLS - x));
             }
             //draw ocean on right side
             
-            if (d == Direction.east || d == Direction.west)
+            if (d == Direction.EAST || d == Direction.WEST)
             {
                 if (y < MAP_ROWS / 2)
                 {
                     for (int i = 0; i < olength; i++)
                     {
-                        if(map[y + i, x] != Terrain.NONE && this.biome != Biome.mountainous)
+                        if(map[y + i, x] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
                         {
                             return;
                         }
@@ -1449,7 +1465,7 @@ namespace Z2Randomizer
                 {
                     for (int i = 0; i < olength; i++)
                     {
-                        if (map[y - i, x] != Terrain.NONE && this.biome != Biome.mountainous)
+                        if (map[y - i, x] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
                         {
                             return;
                         }
@@ -1463,7 +1479,7 @@ namespace Z2Randomizer
                 {
                     for (int i = 0; i < olength; i++)
                     {
-                        if (map[y, x + i] != Terrain.NONE && this.biome != Biome.mountainous)
+                        if (map[y, x + i] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
                         {
                             return;
                         }
@@ -1474,7 +1490,7 @@ namespace Z2Randomizer
                 {
                     for (int i = 0; i < olength; i++)
                     {
-                        if (map[y, x - 1] != Terrain.NONE && this.biome != Biome.mountainous)
+                        if (map[y, x - 1] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
                         {
                             return;
                         }
@@ -1522,7 +1538,7 @@ namespace Z2Randomizer
                         {
                             needJump = location.NeedJump;
                         }
-                        if (!v[i, j] && !(needJump && dy == i && dx == j && (!hy.SpellGet[Spell.jump] && !hy.SpellGet[Spell.fairy])) && !(needFairy && sy == i && sx == j && !hy.SpellGet[Spell.fairy]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hy.itemGet[(int)Items.boots]) || walkable.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hy.itemGet[(int)Items.hammer]) || (map[i, j] == Terrain.SPIDER && hy.itemGet[(int)Items.horn])))
+                        if (!v[i, j] && !(needJump && dy == i && dx == j && (!hyrule.SpellGet[Spell.jump] && !hyrule.SpellGet[Spell.fairy])) && !(needFairy && sy == i && sx == j && !hyrule.SpellGet[Spell.fairy]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[(int)Items.BOOTS]) || walkable.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hyrule.itemGet[(int)Items.HAMMER]) || (map[i, j] == Terrain.SPIDER && hyrule.itemGet[(int)Items.HORN])))
                         {
                             if (i - 1 >= 0)
                             {
@@ -1599,7 +1615,7 @@ namespace Z2Randomizer
             int raftx = 0;
             int deltax = 1;
             int deltay = 0;
-            int rafty = hy.RNG.Next(0, MAP_ROWS);
+            int rafty = hyrule.RNG.Next(0, MAP_ROWS);
 
             int tries = 0;
             int length = 0;
@@ -1612,13 +1628,13 @@ namespace Z2Randomizer
                 {
                     return false;
                 }
-                if (d == Direction.west)
+                if (d == Direction.WEST)
                 {
                     raftx = 0;
                     int rtries = 0;
                     do
                     {
-                        rafty = hy.RNG.Next(0, MAP_ROWS);
+                        rafty = hyrule.RNG.Next(0, MAP_ROWS);
                         rtries++;
                         if(rtries > 100)
                         {
@@ -1627,14 +1643,14 @@ namespace Z2Randomizer
                     } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
                     deltax = 1;
                 }
-                else if (d == Direction.north)
+                else if (d == Direction.NORTH)
                 {
                     rafty = 0;
                     int rtries = 0;
 
                     do
                     {
-                        raftx = hy.RNG.Next(0, MAP_COLS);
+                        raftx = hyrule.RNG.Next(0, MAP_COLS);
                         rtries++;
                         if (rtries > 100)
                         {
@@ -1644,14 +1660,14 @@ namespace Z2Randomizer
                     deltax = 0;
                     deltay = 1;
                 }
-                else if (d == Direction.south)
+                else if (d == Direction.SOUTH)
                 {
                     rafty = MAP_ROWS - 1;
                     int rtries = 0;
 
                     do
                     { 
-                        raftx = hy.RNG.Next(0, MAP_COLS);
+                        raftx = hyrule.RNG.Next(0, MAP_COLS);
                         rtries++;
                         if (rtries > 100)
                         {
@@ -1668,7 +1684,7 @@ namespace Z2Randomizer
 
                     do
                     {
-                        rafty = hy.RNG.Next(0, MAP_ROWS);
+                        rafty = hyrule.RNG.Next(0, MAP_ROWS);
                         rtries++;
                         if (rtries > 100)
                         {
@@ -1704,28 +1720,28 @@ namespace Z2Randomizer
                 this.bridge.Ypos = rafty + 30;
                 this.bridge.PassThrough = 0;
                 this.bridge.CanShuffle = false;
-                if (d == Direction.east)
+                if (d == Direction.EAST)
                 {
                     for (int i = raftx + 1; i < MAP_COLS; i++)
                     {
                         map[rafty, i] = Terrain.BRIDGE;
                     }
                 }
-                else if(d == Direction.west)
+                else if(d == Direction.WEST)
                 {
                     for (int i = raftx - 1; i >= 0; i--)
                     {
                         map[rafty, i] = Terrain.BRIDGE;
                     }
                 }
-                else if (d == Direction.south)
+                else if (d == Direction.SOUTH)
                 {
                     for (int i = rafty + 1; i < MAP_ROWS; i++)
                     {
                         map[i, raftx] = Terrain.BRIDGE;
                     }
                 }
-                else if (d == Direction.north)
+                else if (d == Direction.NORTH)
                 {
                     for (int i = rafty - 1; i >= 0; i--)
                     {
@@ -1739,7 +1755,7 @@ namespace Z2Randomizer
 
         private void LoadLocation(int addr, Terrain t, Continent c)
         {
-            Byte[] bytes = new Byte[4] { hy.ROMData.GetByte(addr), hy.ROMData.GetByte(addr + overworldXOff), hy.ROMData.GetByte(addr + overworldMapOff), hy.ROMData.GetByte(addr + overworldWorldOff) };
+            Byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(addr), hyrule.ROMData.GetByte(addr + overworldXOff), hyrule.ROMData.GetByte(addr + overworldMapOff), hyrule.ROMData.GetByte(addr + overworldWorldOff) };
             AddLocation(new Location(bytes, t, addr, c));
         }
 
@@ -1827,37 +1843,37 @@ namespace Z2Randomizer
         {
             if(this.raft == null)
             {
-                hy.ROMData.Put(baseAddr + 41, 0x00);
+                hyrule.ROMData.Put(baseAddr + 41, 0x00);
             }
 
             if(this.bridge == null)
             {
-                hy.ROMData.Put(baseAddr + 40, 0x00);
+                hyrule.ROMData.Put(baseAddr + 40, 0x00);
             }
 
             if(this.cave1 == null)
             {
-                hy.ROMData.Put(baseAddr + 42, 0x00);
+                hyrule.ROMData.Put(baseAddr + 42, 0x00);
             }
 
             if(this.cave2 == null)
             {
-                hy.ROMData.Put(baseAddr + 43, 0x00);
+                hyrule.ROMData.Put(baseAddr + 43, 0x00);
             }
         }
 
         protected void DrawRiver(List<Location> bridges)
         {
             Terrain water = Terrain.WATER;
-            if (hy.Props.bootsWater)
+            if (hyrule.Props.bootsWater)
             {
                 water = Terrain.WALKABLEWATER;
             }
-            int dirr = hy.RNG.Next(4);
+            int dirr = hyrule.RNG.Next(4);
             int dirr2 = dirr;
             while (dirr == dirr2)
             {
-                dirr2 = hy.RNG.Next(4);
+                dirr2 = hyrule.RNG.Next(4);
             }
 
             int deltax = 0;
@@ -1867,32 +1883,32 @@ namespace Z2Randomizer
             if(dirr == 0) //north
             {
                 deltay = 1;
-                startx = hy.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+                startx = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
                 starty = 0;
             }
             else if(dirr == 1) //east
             {
                 deltax = -1;
                 startx = MAP_COLS - 1;
-                starty = hy.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+                starty = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
             }
             else if(dirr == 2) //south
             {
                 deltay = -1;
-                startx = hy.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+                startx = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
                 starty = MAP_ROWS - 1;
             }
             else //west
             {
                 deltax = 1;
                 startx = 0;
-                starty = hy.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+                starty = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
             }
 
-            int stopping = hy.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+            int stopping = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
             if(deltay != 0)
             {
-                stopping = hy.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+                stopping = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
             }
             int curr = 0;
             while(curr < stopping)
@@ -1901,14 +1917,14 @@ namespace Z2Randomizer
                 if(map[starty, startx] == Terrain.NONE)
                 {
                     map[starty, startx] = water;
-                    int adjust = hy.RNG.Next(-1, 2);
+                    int adjust = hyrule.RNG.Next(-1, 2);
                     if ((deltax == 0 && startx == 1) || (deltay == 0 && starty == 1))
                     {
-                        adjust = hy.RNG.Next(0, 2);
+                        adjust = hyrule.RNG.Next(0, 2);
                     }
                     else if((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
                     {
-                        adjust = hy.RNG.Next(-1, 1);
+                        adjust = hyrule.RNG.Next(-1, 1);
                     }
                     
                     if (adjust < 0)
@@ -1964,14 +1980,14 @@ namespace Z2Randomizer
                 if (map[starty, startx] == Terrain.NONE)
                 {
                     map[starty, startx] = water;
-                    int adjust = hy.RNG.Next(-1, 2);
+                    int adjust = hyrule.RNG.Next(-1, 2);
                     if ((deltax == 0 && startx == 1) || (deltay == 0 && starty == 1))
                     {
-                        adjust = hy.RNG.Next(0, 2);
+                        adjust = hyrule.RNG.Next(0, 2);
                     }
                     else if ((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
                     {
-                        adjust = hy.RNG.Next(-1, 1);
+                        adjust = hyrule.RNG.Next(-1, 1);
                     }
                     if (adjust < 0)
                     {
@@ -2004,35 +2020,35 @@ namespace Z2Randomizer
 
         public void DrawCanyon(Terrain riverT)
         {
-            int drawLeft = hy.RNG.Next(0, 5);
-            int drawRight = hy.RNG.Next(0, 5);
-            Terrain tleft = walkable[hy.RNG.Next(walkable.Count)];
-            Terrain tright = walkable[hy.RNG.Next(walkable.Count)];
+            int drawLeft = hyrule.RNG.Next(0, 5);
+            int drawRight = hyrule.RNG.Next(0, 5);
+            Terrain tleft = walkable[hyrule.RNG.Next(walkable.Count)];
+            Terrain tright = walkable[hyrule.RNG.Next(walkable.Count)];
             if (!horizontal)
             {
-                int riverx = hy.RNG.Next(15, MAP_COLS - 15);
+                int riverx = hyrule.RNG.Next(15, MAP_COLS - 15);
                 for (int y = 0; y < MAP_ROWS; y++)
                 {
                     drawLeft++;
                     drawRight++;
                     map[y, riverx] = riverT;
                     map[y, riverx + 1] = riverT;
-                    int adjust = hy.RNG.Next(-3, 4);
-                    int leftM = hy.RNG.Next(14, 17);
+                    int adjust = hyrule.RNG.Next(-3, 4);
+                    int leftM = hyrule.RNG.Next(14, 17);
                     if (riverx - leftM > 0)
                     {
                         map[y, riverx - leftM + 3] = tleft;
                     }
                     if (drawLeft % 5 == 0)
                     {
-                        tleft = walkable[hy.RNG.Next(walkable.Count)];
+                        tleft = walkable[hyrule.RNG.Next(walkable.Count)];
                     }
                     for (int i = riverx - leftM; i >= 0; i--)
                     {
                         map[y, i] = Terrain.MOUNAIN;
                     }
 
-                    int rightM = hy.RNG.Next(14, 17);
+                    int rightM = hyrule.RNG.Next(14, 17);
                     
                     if (riverx + rightM < MAP_COLS)
                     {
@@ -2041,7 +2057,7 @@ namespace Z2Randomizer
                     
                     if (drawRight % 5 == 0)
                     {
-                        tright = walkable[hy.RNG.Next(walkable.Count)];
+                        tright = walkable[hyrule.RNG.Next(walkable.Count)];
                     }
                     for (int i = riverx + 1 + rightM; i < MAP_COLS; i++)
                     {
@@ -2049,7 +2065,7 @@ namespace Z2Randomizer
                     }
                     while (riverx + adjust + 1 > MAP_COLS - 15 || riverx + adjust < 15)
                     {
-                        adjust = hy.RNG.Next(-1, 2);
+                        adjust = hyrule.RNG.Next(-1, 2);
                     }
                     if (adjust > 0)
                     {
@@ -2075,29 +2091,29 @@ namespace Z2Randomizer
             }
             else
             {
-                int rivery = hy.RNG.Next(15, MAP_ROWS - 15);
+                int rivery = hyrule.RNG.Next(15, MAP_ROWS - 15);
                 for (int x = 0; x < MAP_COLS; x++)
                 {
                     drawLeft++;
                     drawRight++;
                     map[rivery, x] = riverT;
                     map[rivery + 1, x] = riverT;
-                    int adjust = hy.RNG.Next(-3, 3);
-                    int leftM = hy.RNG.Next(14, 17);
+                    int adjust = hyrule.RNG.Next(-3, 3);
+                    int leftM = hyrule.RNG.Next(14, 17);
                     if (rivery - leftM > 0)
                     {
                         map[rivery - leftM + 3, x] = tleft;
                     }
                     if (drawLeft % 5 == 0)
                     {
-                        tleft = walkable[hy.RNG.Next(walkable.Count)];
+                        tleft = walkable[hyrule.RNG.Next(walkable.Count)];
                     }
                     for (int i = rivery - leftM; i >= 0; i--)
                     {
                         map[i, x] = Terrain.MOUNAIN;
                     }
 
-                    int rightM = hy.RNG.Next(14, 17);
+                    int rightM = hyrule.RNG.Next(14, 17);
                     
                     if (rivery + rightM < MAP_ROWS)
                     {
@@ -2106,7 +2122,7 @@ namespace Z2Randomizer
                     
                     if (drawRight % 5 == 0)
                     {
-                        tright = walkable[hy.RNG.Next(walkable.Count)];
+                        tright = walkable[hyrule.RNG.Next(walkable.Count)];
                     }
                     for (int i = rivery + 1 + rightM; i < MAP_ROWS; i++)
                     {
@@ -2114,7 +2130,7 @@ namespace Z2Randomizer
                     }
                     while (rivery + adjust + 1 > MAP_ROWS - 15 || rivery + adjust < 15)
                     {
-                        adjust = hy.RNG.Next(-1, 2);
+                        adjust = hyrule.RNG.Next(-1, 2);
                     }
                     if (adjust > 0)
                     {
@@ -2142,7 +2158,7 @@ namespace Z2Randomizer
 
         public void DrawCenterMountain()
         {
-            horizontal = hy.RNG.NextDouble() > 0.5;
+            horizontal = hyrule.RNG.NextDouble() > 0.5;
             int top = (MAP_ROWS - 35) / 2;
             int bottom = MAP_ROWS - top;
             if (horizontal)
@@ -2247,7 +2263,7 @@ namespace Z2Randomizer
         {
             if (caveDir == 0) //first cave left
             {
-                int cavey = hy.RNG.Next(centery - 2, centery + 3);
+                int cavey = hyrule.RNG.Next(centery - 2, centery + 3);
                 int cavex = centerx;
                 while (map[cavey, cavex] != Terrain.MOUNAIN)
                 {
@@ -2293,7 +2309,7 @@ namespace Z2Randomizer
             }
             else
             {
-                int cavey = hy.RNG.Next(centery - 2, centery + 3);
+                int cavey = hyrule.RNG.Next(centery - 2, centery + 3);
                 int cavex = centerx;
                 while (map[cavey, cavex] != Terrain.MOUNAIN)
                 {
@@ -2344,7 +2360,7 @@ namespace Z2Randomizer
             if (caveDir == 0) //first cave up
             {
                 int cavey = centery;
-                int cavex = hy.RNG.Next(centerx - 2, centerx + 3);
+                int cavex = hyrule.RNG.Next(centerx - 2, centerx + 3);
                 while (map[cavey, cavex] != Terrain.MOUNAIN)
                 {
                     cavey--;
@@ -2389,7 +2405,7 @@ namespace Z2Randomizer
             else
             {
                 int cavey = centery;
-                int cavex = hy.RNG.Next(centerx - 2, centerx + 3);
+                int cavex = hyrule.RNG.Next(centerx - 2, centerx + 3);
                 while (map[cavey, cavex] != Terrain.MOUNAIN)
                 {
                     cavey++;
