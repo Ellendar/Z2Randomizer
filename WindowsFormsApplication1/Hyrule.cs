@@ -709,21 +709,21 @@ namespace Z2Randomizer
 
             }
 
-            if (SpellGet[spellMap[Spell.fairy]])
+            if (SpellGet[spellMap[Spell.FAIRY]])
             {
                 itemList[9] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.MEDICINE] = true;
                 startMed = true;
             }
 
-            if(SpellGet[spellMap[Spell.jump]])
+            if(SpellGet[spellMap[Spell.JUMP]])
             {
                 itemList[10] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.TROPHY] = true;
                 startTrophy = true;
             }
 
-            if(SpellGet[spellMap[Spell.reflect]])
+            if(SpellGet[spellMap[Spell.REFLECT]])
             {
                 itemList[17] = replaceList[RNG.Next(replaceList.Count)];
                 itemGet[(int)Items.CHILD] = true;
@@ -845,7 +845,7 @@ namespace Z2Randomizer
 
         }
 
-        private Boolean EverythingReachable()
+        private Boolean IsEverythingReachable()
         {
             //return true;
             int dm = 0;
@@ -1080,7 +1080,7 @@ namespace Z2Randomizer
             Boolean changed = false;
             foreach (Spell s in spellMap.Keys)
             {
-                if (s == Spell.fairy && (((itemGet[(int)Items.MEDICINE] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (magContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
+                if (s == Spell.FAIRY && (((itemGet[(int)Items.MEDICINE] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (magContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
                 {
                     if(!SpellGet[spellMap[s]])
                     {
@@ -1088,7 +1088,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.jump && (((itemGet[(int)Items.TROPHY] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)Items.CHILD] || props.removeSpellItems))) && CanGet(westHyrule.jump))
+                else if (s == Spell.JUMP && (((itemGet[(int)Items.TROPHY] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)Items.CHILD] || props.removeSpellItems))) && CanGet(westHyrule.jump))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1096,7 +1096,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.downstab && (SpellGet[Spell.jump] || SpellGet[Spell.fairy]) && CanGet(townLocations[Town.MIDO]))
+                else if (s == Spell.DOWNSTAB && (SpellGet[Spell.JUMP] || SpellGet[Spell.FAIRY]) && CanGet(townLocations[Town.MIDO]))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1104,7 +1104,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.upstab && (SpellGet[Spell.jump]) && CanGet(townLocations[Town.DARUNIA]))
+                else if (s == Spell.UPSTAB && (SpellGet[Spell.JUMP]) && CanGet(townLocations[Town.DARUNIA]))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1112,7 +1112,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.life && (CanGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
+                else if (s == Spell.LIFE && (CanGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1120,7 +1120,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.shield && (CanGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
+                else if (s == Spell.SHIELD && (CanGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1128,7 +1128,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.reflect && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[(int)Items.TROPHY] || props.removeSpellItems)) || ((itemGet[(int)Items.CHILD] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
+                else if (s == Spell.REFLECT && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[(int)Items.TROPHY] || props.removeSpellItems)) || ((itemGet[(int)Items.CHILD] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1136,7 +1136,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.fire && (CanGet(eastHyrule.nabooru)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
+                else if (s == Spell.FIRE && (CanGet(eastHyrule.nabooru)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1144,7 +1144,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.spell && (CanGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
+                else if (s == Spell.SPELL && (CanGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1152,7 +1152,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.thunder && (CanGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[(int)Items.MEDICINE] || props.removeSpellItems))))
+                else if (s == Spell.THUNDER && (CanGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[(int)Items.MEDICINE] || props.removeSpellItems))))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1181,7 +1181,7 @@ namespace Z2Randomizer
                     {
                         Console.WriteLine("here");
                     }
-                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (SpellGet[Spell.fairy] || itemGet[(int)Items.MAGIC_KEY]) && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.downstab])) && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.fairy])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[(int)Items.GLOVE])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.jump]) || SpellGet[Spell.fairy])) && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.reflect]));
+                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (SpellGet[Spell.FAIRY] || itemGet[(int)Items.MAGIC_KEY]) && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[(int)Items.GLOVE])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY])) && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
                 }
                 else if (location.TownNum == Town.NEW_KASUTO)
                 {
@@ -1189,7 +1189,7 @@ namespace Z2Randomizer
                 }
                 else if (location.TownNum == Town.NEW_KASUTO_2)
                 {
-                    location.itemGet = itemGet[(int)location.item] = (CanGet(location) && SpellGet[Spell.spell]) && (!location.NeedHammer || itemGet[(int)Items.HAMMER]);
+                    location.itemGet = itemGet[(int)location.item] = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || itemGet[(int)Items.HAMMER]);
                 }
                 else
                 {
@@ -1354,7 +1354,7 @@ namespace Z2Randomizer
                 //shuffleSmallItems(4, true);
                 //shuffleSmallItems(4, false);
             }
-            do
+            do //while (!EverythingReachable()) ;
             {
                 worlds = new List<World>();
                 westHyrule = new WestHyrule(this);
@@ -1367,20 +1367,9 @@ namespace Z2Randomizer
                 worlds.Add(mazeIsland);
                 ShuffleTowns();
 
-
-                //shuffle continent connections
-                //westHyrule.loadRaft(2);
-                //eastHyrule.loadRaft(0);
-                //westHyrule.loadCave1(1);
-                //deathMountain.loadCave1(0);
-                //westHyrule.loadCave2(1);
-                //deathMountain.loadCave2(0);
-                //eastHyrule.loadBridge(3);
-                //mazeIsland.loadBridge(2);
-
-                do
+                //Generate a pathable set of continents
+                do // } while (!AllContinentsHaveConnection(worlds));
                 {
-
                     worlds = new List<World>();
                     westHyrule = new WestHyrule(this);
                     deathMountain = new DeathMountain(this);
@@ -1593,46 +1582,39 @@ namespace Z2Randomizer
                     }
                 } while (!AllContinentsHaveConnection(worlds));
 
-                int wtries = 0;
-                int x = 0;
-                do
+                int nonContinentGenerationAttempts = 0;
+                int nonTerrainShuffleAttempt = 0;
+                //Shuffle everything else
+                do //while (wtries < 10 && !EverythingReachable());
                 {
-                    bool g = UpdateProgress(2);
-                    if (!g)
+                    //GENERATE WEST
+                    bool shouldContinue = UpdateProgress(2);
+                    if (!shouldContinue)
                     {
                         return;
                     }
-                    wtries++;
+                    nonContinentGenerationAttempts++;
                     if (!westHyrule.Allreached)
                     {
-                        bool f = false;
-                        do
-                        {
-                            f = westHyrule.Terraform();
-                        } while (!f);
+                        while (!westHyrule.Terraform());
                     }
-                    
-                    westHyrule.reset();
+                    westHyrule.ResetVisitabilityState();
 
-
-                    g = UpdateProgress(3);
-                    if (!g)
+                    //GENERATE DM
+                    shouldContinue = UpdateProgress(3);
+                    if (!shouldContinue)
                     {
                         return;
                     }
                     if (!deathMountain.Allreached)
                     {
-                        bool f = false;
-                        do
-                        {
-                            f = deathMountain.Terraform();
-                        } while (!f);
+                        while (!deathMountain.Terraform());
                     }
+                    deathMountain.ResetVisitabilityState();
 
-                        deathMountain.reset();
-
-                    g = UpdateProgress(4);
-                    if (!g)
+                    //GENERATE EAST
+                    shouldContinue = UpdateProgress(4);
+                    if (!shouldContinue)
                     {
                         return;
                     }
@@ -1644,11 +1626,11 @@ namespace Z2Randomizer
                             f = eastHyrule.Terraform();
                         } while (!f);
                     }
+                    eastHyrule.ResetVisitabilityState();
 
-                        eastHyrule.reset();
-
-                    g = UpdateProgress(5);
-                    if (!g)
+                    //GENERATE MAZE ISLAND
+                    shouldContinue = UpdateProgress(5);
+                    if (!shouldContinue)
                     {
                         return;
                     }
@@ -1660,38 +1642,35 @@ namespace Z2Randomizer
                             f = mazeIsland.Terraform();
                         } while (!f);
                     }
+                    mazeIsland.ResetVisitabilityState();
 
-                        mazeIsland.reset();
-                    g = UpdateProgress(6);
-                    if (!g)
+                    shouldContinue = UpdateProgress(6);
+                    if (!shouldContinue)
                     {
                         return;
                     }
+
+                    //Do an initial generation of the non-terrain shuffle
                     LoadItemLocs();
                     ShuffleSpells();
                     ShuffleItems();
-                    foreach (Location location in itemLocs)
-                    {
-                        if (location.PalNum == 4 && location.item == Items.CHILD)
-                        {
-                            Console.WriteLine("here");
-                        }
-                    }
                     ShufflePalaces();
                     LoadItemLocs();
                     westHyrule.setStart();
-                    g = UpdateProgress(7);
-                    if (!g)
+                    shouldContinue = UpdateProgress(7);
+                    if (!shouldContinue)
                     {
                         return;
                     }
-                    x = 0;
-                    while (!EverythingReachable() && x < 10)
+
+                    //Then perform up to 10 additional non-terrain shuffles looking for one that works.
+                    nonTerrainShuffleAttempt = 0;
+                    while (!IsEverythingReachable() && nonTerrainShuffleAttempt < 10)
                     {
-                        westHyrule.AllReachable();
+                        westHyrule.UpdateAllReachability();
                         eastHyrule.AllReachable();
-                        mazeIsland.AllReachable();
-                        deathMountain.AllReachable();
+                        mazeIsland.UpdateAllReachability();
+                        deathMountain.UpdateAllReachability();
                         foreach (Location location in westHyrule.AllLocations)
                         {
                             location.Reachable = false;
@@ -1711,36 +1690,28 @@ namespace Z2Randomizer
                         {
                             location.Reachable = false;
                         }
+
                         eastHyrule.newKasuto2.Reachable = false;
                         //eastHyrule.bridge.Reachable = false;
                         startMed = false;
                         startTrophy = false;
                         startKid = false;
-                        westHyrule.reset();
-                        eastHyrule.reset();
-                        mazeIsland.reset();
+                        westHyrule.ResetVisitabilityState();
+                        eastHyrule.ResetVisitabilityState();
+                        mazeIsland.ResetVisitabilityState();
                         ShuffleSpells();
                         LoadItemLocs();
-                        deathMountain.reset();
+                        deathMountain.ResetVisitabilityState();
                         westHyrule.setStart();
                         ShuffleItems();
-                        foreach (Location location in itemLocs)
-                        {
-                            if (location.PalNum == 4 && location.item == Items.CHILD)
-                            {
-                                Console.WriteLine("here");
-                            }
-                        }
                         ShufflePalaces();
                         LoadItemLocs();
 
-                        
-
-                        x++;
-
+                        nonTerrainShuffleAttempt++;
                     }
+
                     int west = 0;
-                    if (x != 10)
+                    if (nonTerrainShuffleAttempt != 10)
                     {
                         break;
                     }
@@ -1783,12 +1754,12 @@ namespace Z2Randomizer
                     Console.WriteLine("er: " + east + " / " + eastHyrule.AllLocations.Count);
                     Console.WriteLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
                     Console.WriteLine("maze: " + maze + " / " + mazeIsland.AllLocations.Count);
-                } while (wtries < 10 && !EverythingReachable());
-                if(x != 10 && wtries != 10)
+                } while (nonContinentGenerationAttempts < 10 && !IsEverythingReachable());
+                if(nonTerrainShuffleAttempt != 10 && nonContinentGenerationAttempts != 10)
                 {
                     break;
                 }
-            } while (!EverythingReachable()) ;
+            } while (!IsEverythingReachable()) ;
 
             if (props.shuffleOverworldEnemies)
             {
@@ -2085,8 +2056,8 @@ namespace Z2Randomizer
             {
                 spellMap.Add((Spell)i, (Spell)shuffleThis[i]);
             }
-            spellMap.Add(Spell.upstab, Spell.upstab);
-            spellMap.Add(Spell.downstab, Spell.downstab);
+            spellMap.Add(Spell.UPSTAB, Spell.UPSTAB);
+            spellMap.Add(Spell.DOWNSTAB, Spell.DOWNSTAB);
 
             if (props.shuffleSpells)
             {
@@ -2099,22 +2070,22 @@ namespace Z2Randomizer
             }
             else
             {
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.shield), props.startShield ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.shield] = props.startShield;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.jump), props.startJump ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.jump] = props.startJump;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.life), props.startLife ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.life] = props.startLife;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.fairy), props.startFairy ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.fairy] = props.startFairy;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.fire), props.startFire ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.fire] = props.startFire;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.reflect), props.startReflect ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.reflect] = props.startReflect;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.spell), props.startSpell ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.spell] = props.startSpell;
-                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.thunder), props.startThunder ? (Byte)1 : (Byte)0);
-                SpellGet[Spell.thunder] = props.startThunder;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.startShield ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.SHIELD] = props.startShield;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.JUMP), props.startJump ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.JUMP] = props.startJump;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.LIFE), props.startLife ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.LIFE] = props.startLife;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FAIRY), props.startFairy ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.FAIRY] = props.startFairy;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FIRE), props.startFire ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.FIRE] = props.startFire;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.REFLECT), props.startReflect ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.REFLECT] = props.startReflect;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SPELL), props.startSpell ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.SPELL] = props.startSpell;
+                ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.THUNDER), props.startThunder ? (Byte)1 : (Byte)0);
+                SpellGet[Spell.THUNDER] = props.startThunder;
             }
 
             if (props.combineFire)

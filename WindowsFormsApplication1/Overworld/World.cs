@@ -327,7 +327,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void AllReachable()
+        public void UpdateAllReachability()
         {
             if(Allreached)
             {
@@ -1538,7 +1538,7 @@ namespace Z2Randomizer
                         {
                             needJump = location.NeedJump;
                         }
-                        if (!v[i, j] && !(needJump && dy == i && dx == j && (!hyrule.SpellGet[Spell.jump] && !hyrule.SpellGet[Spell.fairy])) && !(needFairy && sy == i && sx == j && !hyrule.SpellGet[Spell.fairy]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[(int)Items.BOOTS]) || walkable.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hyrule.itemGet[(int)Items.HAMMER]) || (map[i, j] == Terrain.SPIDER && hyrule.itemGet[(int)Items.HORN])))
+                        if (!v[i, j] && !(needJump && dy == i && dx == j && (!hyrule.SpellGet[Spell.JUMP] && !hyrule.SpellGet[Spell.FAIRY])) && !(needFairy && sy == i && sx == j && !hyrule.SpellGet[Spell.FAIRY]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[(int)Items.BOOTS]) || walkable.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hyrule.itemGet[(int)Items.HAMMER]) || (map[i, j] == Terrain.SPIDER && hyrule.itemGet[(int)Items.HORN])))
                         {
                             if (i - 1 >= 0)
                             {
@@ -1589,7 +1589,8 @@ namespace Z2Randomizer
             }
         }
 
-        public void reset()
+        //Should the visibility calculation table even be persistent? Why is this not just in scope of the calculation itself?
+        public void ResetVisitabilityState()
         {
             for(int i = 0; i < MAP_ROWS; i++)
             {

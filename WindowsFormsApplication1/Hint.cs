@@ -271,19 +271,19 @@ namespace Z2Randomizer
             String text = "";
             switch(spell)
             {
-                case Spell.shield:
+                case Spell.SHIELD:
                     text += "shield$";
                     break;
-                case Spell.jump:
+                case Spell.JUMP:
                     text += "jump";
                     break;
-                case Spell.life:
+                case Spell.LIFE:
                     text += "life$";
                     break;
-                case Spell.fairy:
+                case Spell.FAIRY:
                     text += "fairy$";
                     break;
-                case Spell.fire:
+                case Spell.FIRE:
                     if (!s.Props.dashSpell)
                     {
                         text += "fire$";
@@ -293,13 +293,13 @@ namespace Z2Randomizer
                         text += "dash$";
                     }
                     break;
-                case Spell.reflect:
+                case Spell.REFLECT:
                     text += "reflect$";
                     break;
-                case Spell.spell:
+                case Spell.SPELL:
                     text += "spell$";
                     break;
-                case Spell.thunder:
+                case Spell.THUNDER:
                     text += "thunder$";
                     break;
 
