@@ -196,35 +196,35 @@ namespace Z2Randomizer
         private void GenerateTownNameHints(List<Hint> hints, Dictionary<Spell, Spell> spellMap)
         {
             Hint h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.shield]);
+            h.GenerateTownHint(spellMap[Spell.SHIELD]);
             hints[rauruSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.jump]);
+            h.GenerateTownHint(spellMap[Spell.JUMP]);
             hints[rutoSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.life]);
+            h.GenerateTownHint(spellMap[Spell.LIFE]);
             hints[sariaSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.fairy]);
+            h.GenerateTownHint(spellMap[Spell.FAIRY]);
             hints[midoSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.fire]);
+            h.GenerateTownHint(spellMap[Spell.FIRE]);
             hints[nabooruSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.reflect]);
+            h.GenerateTownHint(spellMap[Spell.REFLECT]);
             hints[daruniaSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.spell]);
+            h.GenerateTownHint(spellMap[Spell.SPELL]);
             hints[newKasutoSign] = h;
 
             h = new Hint(this);
-            h.GenerateTownHint(spellMap[Spell.thunder]);
+            h.GenerateTownHint(spellMap[Spell.THUNDER]);
             hints[oldKasutoSign] = h;
         }
 
@@ -335,28 +335,27 @@ namespace Z2Randomizer
 
         private void GenerateSpellHints(List<Location> itemLocs, List<Hint> hints, Boolean startsWithTrophy, Boolean startsWithMedicine, Boolean startsWithKid)
         {
-            int i = 0;
-            while (i < itemLocs.Count())
+           
+            foreach(Location itemLocation in itemLocs)
             {
-                if (itemLocs[i].item == Items.TROPHY && !startsWithTrophy)
+                if (itemLocation.item == Items.TROPHY && !startsWithTrophy)
                 {
                     Hint trophyHint = new Hint(this);
-                    trophyHint.GenerateHelpfulHint(itemLocs[i]);
+                    trophyHint.GenerateHelpfulHint(itemLocation);
                     hints[trophyIndex] = trophyHint;
                 }
-                else if (itemLocs[i].item == Items.MEDICINE && !startsWithMedicine)
+                else if (itemLocation.item == Items.MEDICINE && !startsWithMedicine)
                 {
                     Hint medHint = new Hint(this);
-                    medHint.GenerateHelpfulHint(itemLocs[i]);
+                    medHint.GenerateHelpfulHint(itemLocation);
                     hints[medIndex] = medHint;
                 }
-                else if (itemLocs[i].item == Items.CHILD && !startsWithKid)
+                else if (itemLocation.item == Items.CHILD && !startsWithKid)
                 {
                     Hint kidHint = new Hint(this);
-                    kidHint.GenerateHelpfulHint(itemLocs[i]);
+                    kidHint.GenerateHelpfulHint(itemLocation);
                     hints[kidIndex] = kidHint;
                 }
-                i++;
             }
         }
 

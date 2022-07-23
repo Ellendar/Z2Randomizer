@@ -1374,19 +1374,19 @@ namespace Z2Randomizer
                         if (connections.Keys.Contains(location))
                         {
                             Location l2 = connections[location];
-                            if ((location.NeedBagu && (bagu.Reachable || hyrule.SpellGet[Spell.fairy])))
+                            if ((location.NeedBagu && (bagu.Reachable || hyrule.SpellGet[Spell.FAIRY])))
                             {
                                 l2.Reachable = true;
                                 v[l2.Ypos - 30, l2.Xpos] = true;
                             }
 
-                            if (location.NeedFairy && hyrule.SpellGet[Spell.fairy])
+                            if (location.NeedFairy && hyrule.SpellGet[Spell.FAIRY])
                             {
                                 l2.Reachable = true;
                                 v[l2.Ypos - 30, l2.Xpos] = true;
                             }
 
-                            if (location.NeedJump && (hyrule.SpellGet[Spell.jump] || hyrule.SpellGet[Spell.fairy]))
+                            if (location.NeedJump && (hyrule.SpellGet[Spell.JUMP] || hyrule.SpellGet[Spell.FAIRY]))
                             {
                                 l2.Reachable = true;
                                 v[l2.Ypos - 30, l2.Xpos] = true;

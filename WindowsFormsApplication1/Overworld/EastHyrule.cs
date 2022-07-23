@@ -319,6 +319,8 @@ namespace Z2Randomizer
                     }
                     raft.PassThrough = 0;
                     bridge.PassThrough = 0;
+                    //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
+                    desertTile.PassThrough = 0;
                     Location desert = GetLocationByMem(0x8646);
                     Location swamp = GetLocationByMem(0x8644);
                     if (desert.PassThrough != 0)
@@ -1547,7 +1549,7 @@ namespace Z2Randomizer
         {
             if (!Allreached)
             {
-                base.AllReachable();
+                base.UpdateAllReachability();
                 if (!hpLoc.Reachable || !hkLoc.Reachable || !newKasuto2.Reachable)
                 {
                     Allreached = false;
@@ -1706,19 +1708,19 @@ namespace Z2Randomizer
                             {
                                 Location l2 = connections[location];
 
-                                if ((location.NeedBagu && (hyrule.westHyrule.bagu.Reachable || hyrule.SpellGet[Spell.fairy])))
+                                if ((location.NeedBagu && (hyrule.westHyrule.bagu.Reachable || hyrule.SpellGet[Spell.FAIRY])))
                                 {
                                     l2.Reachable = true;
                                     v[l2.Ypos - 30, l2.Xpos] = true;
                                 }
 
-                                if (location.NeedFairy && hyrule.SpellGet[Spell.fairy])
+                                if (location.NeedFairy && hyrule.SpellGet[Spell.FAIRY])
                                 {
                                     l2.Reachable = true;
                                     v[l2.Ypos - 30, l2.Xpos] = true;
                                 }
 
-                                if (location.NeedJump && (hyrule.SpellGet[Spell.jump] || hyrule.SpellGet[Spell.fairy]))
+                                if (location.NeedJump && (hyrule.SpellGet[Spell.JUMP] || hyrule.SpellGet[Spell.FAIRY]))
                                 {
                                     l2.Reachable = true;
                                     v[l2.Ypos - 30, l2.Xpos] = true;

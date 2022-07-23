@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer
 {
-    public enum Spell { shield = 0, jump = 1, life = 2, fairy = 3, fire = 4, reflect = 5, spell = 6, thunder = 7, downstab = 8, upstab = 9 }
+    public enum Spell { SHIELD = 0, JUMP = 1, LIFE = 2, FAIRY = 3, FIRE = 4, REFLECT = 5, SPELL = 6, THUNDER = 7, DOWNSTAB = 8, UPSTAB = 9 }
 }
