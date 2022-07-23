@@ -1182,7 +1182,7 @@ namespace Z2Randomizer
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Bulk_Generate_Click(object sender, EventArgs e)
         {
             String flagString = flagBox.Text;
 
@@ -1683,8 +1683,6 @@ namespace Z2Randomizer
                 f3.setText("Finishing up");
             }
         }
-
-       
 
         private void palaceBox_SelectedIndexChanged(object sender, EventArgs e)
         {

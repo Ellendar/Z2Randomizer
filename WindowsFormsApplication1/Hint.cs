@@ -204,61 +204,61 @@ namespace Z2Randomizer
 
             switch (hintItem)
             {
-                case (Items.bluejar):
+                case (Items.BLUE_JAR):
                     hint += "blue jar";
                     break;
-                case (Items.boots):
+                case (Items.BOOTS):
                     hint += "boots";
                     break;
-                case (Items.candle):
+                case (Items.CANDLE):
                     hint += "candle";
                     break;
-                case (Items.cross):
+                case (Items.CROSS):
                     hint += "cross";
                     break;
-                case (Items.fivehundobag):
-                case (Items.twohundobag):
-                case (Items.hundobag):
-                case (Items.smallbag):
+                case (Items.XL_BAG):
+                case (Items.LARGE_BAG):
+                case (Items.MEDIUM_BAG):
+                case (Items.SMALL_BAG):
                     hint += "pbag";
                     break;
-                case (Items.glove):
+                case (Items.GLOVE):
                     hint += "glove";
                     break;
-                case (Items.hammer):
+                case (Items.HAMMER):
                     hint += "hammer";
                     break;
-                case (Items.heartcontainer):
+                case (Items.HEART_CONTAINER):
                     hint += "heart";
                     break;
-                case (Items.horn):
+                case (Items.HORN):
                     hint += "flute";
                     break;
-                case (Items.key):
+                case (Items.KEY):
                     hint += "small key";
                     break;
-                case (Items.kid):
+                case (Items.CHILD):
                     hint += "child";
                     break;
-                case (Items.magiccontainer):
+                case (Items.MAGIC_CONTAINER):
                     hint += "magic jar";
                     break;
-                case (Items.magickey):
+                case (Items.MAGIC_KEY):
                     hint += "magic key";
                     break;
-                case (Items.medicine):
+                case (Items.MEDICINE):
                     hint += "medicine";
                     break;
-                case (Items.oneup):
+                case (Items.ONEUP):
                     hint += "link doll";
                     break;
-                case (Items.raft):
+                case (Items.RAFT):
                     hint += "raft";
                     break;
-                case (Items.redjar):
+                case (Items.RED_JAR):
                     hint += "red jar";
                     break;
-                case (Items.trophy):
+                case (Items.TROPHY):
                     hint += "trophy";
                     break;
             }

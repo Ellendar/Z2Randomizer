@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Z2Randomizer
 {
+    [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     class Location
     {
         //private int externalWorld;
@@ -23,7 +25,7 @@ namespace Z2Randomizer
         public Boolean itemGet;
         //private Boolean reachable;
         //private int palNum;
-        private Continent continent;
+        //private Continent continent;
 
         public Terrain TerrainType { get; set; }
         public int Ypos { get; set; }
@@ -122,7 +124,7 @@ namespace Z2Randomizer
             TerrainType = t;
             MemAddress = mem;
             CanShuffle = true;
-            item = Items.donotuse;
+            item = Items.DO_NOT_USE;
             itemGet = false;
             Reachable = false;
             PalNum = 0;
@@ -130,7 +132,7 @@ namespace Z2Randomizer
             Continent = c;
         }
 
-        //Why does this empty constructor work. Don't want to delete it if it's needed for serialization magic of some kind.
+        //Why does this empty constructor exist. Don't want to delete it if it's needed for serialization magic of some kind.
         public Location()
         {
 
@@ -148,6 +150,11 @@ namespace Z2Randomizer
             LocationBytes[1] = (Byte)(appear2loweruponexit + Secondpartofcave + Xpos);
             LocationBytes[2] = (Byte)(HorizontalPos + Map);
             LocationBytes[3] = (Byte)(FallInHole + PassThrough + ForceEnterRight + World);
+        }
+
+        private string GetDebuggerDisplay()
+        {
+            return Continent.ToString() + " " + TerrainType.ToString() + " (" + Xpos + "," + Ypos + ")";
         }
     }
 }

@@ -271,7 +271,7 @@ namespace Z2Randomizer
 
             List<Items> placedItems = new List<Items>();
             bool placedSmall = false;
-            List<Items> smallItems = new List<Items> { Items.bluejar, Items.fivehundobag, Items.key, Items.hundobag, Items.magiccontainer, Items.heartcontainer, Items.oneup, Items.redjar, Items.smallbag, Items.twohundobag };
+            List<Items> smallItems = new List<Items> { Items.BLUE_JAR, Items.XL_BAG, Items.KEY, Items.MEDIUM_BAG, Items.MAGIC_CONTAINER, Items.HEART_CONTAINER, Items.ONEUP, Items.RED_JAR, Items.SMALL_BAG, Items.LARGE_BAG };
             List<int> placedTowns = new List<int>();
 
             List<Items> it = new List<Items>();
@@ -282,9 +282,9 @@ namespace Z2Randomizer
 
             if (props.spellItemHints)
             {
-                it.Remove(Items.trophy);
-                it.Remove(Items.kid);
-                it.Remove(Items.medicine);
+                it.Remove(Items.TROPHY);
+                it.Remove(Items.CHILD);
+                it.Remove(Items.MEDICINE);
             }
 
             for (int i = 0; i < numberOfHints; i++)
@@ -338,19 +338,19 @@ namespace Z2Randomizer
             int i = 0;
             while (i < itemLocs.Count())
             {
-                if (itemLocs[i].item == Items.trophy && !startsWithTrophy)
+                if (itemLocs[i].item == Items.TROPHY && !startsWithTrophy)
                 {
                     Hint trophyHint = new Hint(this);
                     trophyHint.GenerateHelpfulHint(itemLocs[i]);
                     hints[trophyIndex] = trophyHint;
                 }
-                else if (itemLocs[i].item == Items.medicine && !startsWithMedicine)
+                else if (itemLocs[i].item == Items.MEDICINE && !startsWithMedicine)
                 {
                     Hint medHint = new Hint(this);
                     medHint.GenerateHelpfulHint(itemLocs[i]);
                     hints[medIndex] = medHint;
                 }
-                else if (itemLocs[i].item == Items.kid && !startsWithKid)
+                else if (itemLocs[i].item == Items.CHILD && !startsWithKid)
                 {
                     Hint kidHint = new Hint(this);
                     kidHint.GenerateHelpfulHint(itemLocs[i]);

@@ -86,12 +86,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
     <Compile Include="Graphics.cs" />
     <Compile Include="Hint.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="Overworld\DeathMountain.cs" />
     <Compile Include="Overworld\EastHyrule.cs" />
+    <Compile Include="RomMap.cs" />
     <Compile Include="Shuffler.cs" />
     <Compile Include="Sidescroll\PalaceRooms.cs" />
     <Compile Include="Continent.cs" />
