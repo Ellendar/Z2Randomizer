@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Z2Randomizer
 {
     class WestHyrule : World
     {
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         public Location start;
         public Location fairy;
         public Location bagu;
@@ -723,7 +726,7 @@ namespace Z2Randomizer
 
                     //check bytes and adjust
                     WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
-                    Console.WriteLine("West:" + bytesWritten);
+                    logger.Debug("West:" + bytesWritten);
                 }
             }
             WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);

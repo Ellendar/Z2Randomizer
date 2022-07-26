@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
@@ -93,7 +94,14 @@ namespace Z2Randomizer
     */
 
     class Hyrule
-    { 
+    {
+        private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 10;
+        private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
+
+        private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
+
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private readonly int[] fireLocs = { 0x20850, 0x22850, 0x24850, 0x26850, 0x28850, 0x2a850, 0x2c850, 0x2e850, 0x36850, 0x32850, 0x34850, 0x38850 };
 
         private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
@@ -113,7 +121,7 @@ namespace Z2Randomizer
         protected Dictionary<Location, List<Location>> connections;
         public SortedDictionary<String, List<Location>> areasByLocation;
         public Dictionary<Location, String> section;
-        private int magContainers;
+        private int accessibleMagicContainers;
         private int heartContainers;
         private int startHearts;
         private int maxHearts;
@@ -123,7 +131,7 @@ namespace Z2Randomizer
         
         //private Character character;
 
-        public Boolean[] itemGet;
+        public Dictionary<Item, Boolean> itemGet = new Dictionary<Item, bool>();
         //private Boolean[] spellGet;
         public Boolean hiddenPalace;
         public Boolean hiddenKasuto;
@@ -202,13 +210,14 @@ namespace Z2Randomizer
 
         public Hyrule(RandomizerProperties p, BackgroundWorker worker)
         {
+            logger.Info("Started generation for " + props.flags + " / " + props.seed);
             props = p;
             
             RNG = new Random(props.seed);
             ROMData = new ROM(props.filename);
             //ROMData.dumpAll("glitch");
             //ROMData.dumpSamus();
-            Palace.DumpMaps(ROMData);
+            //Palace.DumpMaps(ROMData);
             this.worker = worker;
 
 
@@ -216,7 +225,11 @@ namespace Z2Randomizer
             shuffler = new Shuffler(props, ROMData, RNG);
 
             palaces = new List<Palace>();
-            itemGet = new Boolean[] { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
+            itemGet = new Dictionary<Item, bool>();
+            foreach(Item item in Enum.GetValues(typeof(Item)))
+            {
+                itemGet.Add(item, false);
+            }
             SpellGet = new Dictionary<Spell, bool>();
             foreach(Spell spell in Enum.GetValues(typeof(Spell)))
             {
@@ -441,7 +454,7 @@ namespace Z2Randomizer
             spellExits.Add(9, 0xE5);
 
             ShortenWizards();
-            magContainers = 4;
+            accessibleMagicContainers = 4;
             visitedEnemies = new List<int>();
 
             RandomizeStartingValues();
@@ -458,7 +471,8 @@ namespace Z2Randomizer
                 palaces = shuffler.CreatePalaces(worker);
                 
             }
-            Console.WriteLine("Random: " + RNG.Next(10));
+            //This is a load-bearing debug statement :(
+            logger.Trace("Random: " + RNG.Next(10));
             if (props.shufflePalaceEnemies)
             {
                 ShuffleEnemies(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
@@ -581,15 +595,16 @@ namespace Z2Randomizer
 
         private void ShuffleItems()
         {
-            List<Items> itemList = new List<Items> { Items.CANDLE, Items.GLOVE, Items.RAFT, Items.BOOTS, Items.HORN, Items.CROSS, Items.HEART_CONTAINER, Items.HEART_CONTAINER, Items.MAGIC_CONTAINER, Items.MEDICINE, Items.TROPHY, Items.HEART_CONTAINER, Items.HEART_CONTAINER, Items.MAGIC_CONTAINER, Items.MAGIC_KEY, Items.MAGIC_CONTAINER, Items.HAMMER, Items.CHILD, Items.MAGIC_CONTAINER };
-            List<Items> replaceList = new List<Items> { Items.BLUE_JAR, Items.RED_JAR, Items.SMALL_BAG, Items.MEDIUM_BAG, Items.LARGE_BAG, Items.XL_BAG, Items.ONEUP, Items.KEY };
+            List<Item> itemList = new List<Item> { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MEDICINE, Item.TROPHY, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MAGIC_KEY, Item.MAGIC_CONTAINER, Item.HAMMER, Item.CHILD, Item.MAGIC_CONTAINER };
+            List<Item> smallItems = new List<Item> { Item.BLUE_JAR, Item.RED_JAR, Item.SMALL_BAG, Item.MEDIUM_BAG, Item.LARGE_BAG, Item.XL_BAG, Item.ONEUP, Item.KEY };
             Location kidLoc = mazeIsland.kid;
             Location medicineLoc = westHyrule.medCave;
             Location trophyLoc = westHyrule.trophyCave;
             numHContainers = maxHearts - startHearts;
-            for (int i = 0; i < itemGet.Count(); i++)
+            
+            foreach(Item item in itemGet.Keys.ToList())
             {
-                itemGet[i] = false;
+                itemGet[item] = false;
             }
             foreach (Location location in itemLocs)
             {
@@ -600,39 +615,39 @@ namespace Z2Randomizer
             eastHyrule.pbagCave2.itemGet = false;
             if (props.shuffleItems)
             {
-                for (int i = 0; i < 8; i++)
+                foreach(Item item in SHUFFLABLE_STARTING_ITEMS)
                 {
                     bool hasItem = RNG.NextDouble() > .75;
-                    ROMData.Put(0x17B01 + i, hasItem ? (Byte)1 : (Byte)0);
-                    itemGet[i] = hasItem;
+                    ROMData.Put(0x17B01 + (int)item, hasItem ? (Byte)1 : (Byte)0);
+                    itemGet[item] = hasItem;
                 }
             }
             else
             {
                 ROMData.Put(RomMap.START_CANDLE, props.startCandle ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.CANDLE] = props.startCandle;
+                itemGet[Item.CANDLE] = props.startCandle;
                 ROMData.Put(RomMap.START_GLOVE, props.startGlove ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.GLOVE] = props.startGlove;
+                itemGet[Item.GLOVE] = props.startGlove;
                 ROMData.Put(RomMap.START_RAFT, props.startRaft ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.RAFT] = props.startRaft;
+                itemGet[Item.RAFT] = props.startRaft;
                 ROMData.Put(RomMap.START_BOOTS, props.startBoots ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.BOOTS] = props.startBoots;
+                itemGet[Item.BOOTS] = props.startBoots;
                 ROMData.Put(RomMap.START_FLUTE, props.startFlute ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.HORN] = props.startFlute;
+                itemGet[Item.FLUTE] = props.startFlute;
                 ROMData.Put(RomMap.START_CROSS, props.startCross ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.CROSS] = props.startCross;
+                itemGet[Item.CROSS] = props.startCross;
                 ROMData.Put(RomMap.START_HAMMER, props.startHammer ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.HAMMER] = props.startHammer;
+                itemGet[Item.HAMMER] = props.startHammer;
                 ROMData.Put(RomMap.START_MAGICAL_KEY, props.startKey ? (Byte)1 : (Byte)0);
-                itemGet[(int)Items.MAGIC_KEY] = props.startKey;
+                itemGet[Item.MAGIC_KEY] = props.startKey;
             }
-            itemList = new List<Items> { Items.CANDLE, Items.GLOVE, Items.RAFT, Items.BOOTS, Items.HORN, Items.CROSS, Items.HEART_CONTAINER, Items.HEART_CONTAINER, Items.MAGIC_CONTAINER, Items.MEDICINE, Items.TROPHY, Items.HEART_CONTAINER, Items.HEART_CONTAINER, Items.MAGIC_CONTAINER, Items.MAGIC_KEY, Items.MAGIC_CONTAINER, Items.HAMMER, Items.CHILD, Items.MAGIC_CONTAINER };
+            itemList = new List<Item> { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MEDICINE, Item.TROPHY, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MAGIC_KEY, Item.MAGIC_CONTAINER, Item.HAMMER, Item.CHILD, Item.MAGIC_CONTAINER };
 
             if (props.pbagItemShuffle)
             {
-                westHyrule.pbagCave.item = (Items)ROMData.GetByte(0x4FE2);
-                eastHyrule.pbagCave1.item = (Items)ROMData.GetByte(0x8ECC);
-                eastHyrule.pbagCave2.item = (Items)ROMData.GetByte(0x8FB3);
+                westHyrule.pbagCave.item = (Item)ROMData.GetByte(0x4FE2);
+                eastHyrule.pbagCave1.item = (Item)ROMData.GetByte(0x8ECC);
+                eastHyrule.pbagCave2.item = (Item)ROMData.GetByte(0x8FB3);
                 itemList.Add(westHyrule.pbagCave.item);
                 itemList.Add(eastHyrule.pbagCave1.item);
                 itemList.Add(eastHyrule.pbagCave2.item);
@@ -645,9 +660,9 @@ namespace Z2Randomizer
                 while (x > 0)
                 {
                     int remove = RNG.Next(itemList.Count);
-                    if (itemList[remove] == Items.HEART_CONTAINER)
+                    if (itemList[remove] == Item.HEART_CONTAINER)
                     {
-                        itemList[remove] = replaceList[RNG.Next(replaceList.Count)];
+                        itemList[remove] = smallItems[RNG.Next(smallItems.Count)];
                         x--;
                     }
                 }
@@ -660,7 +675,7 @@ namespace Z2Randomizer
                     int x = numHContainers - 4;
                     while (x > 0)
                     {
-                        itemList[22 - x] = Items.HEART_CONTAINER;
+                        itemList[22 - x] = Item.HEART_CONTAINER;
                         x--;
                     }
                 }
@@ -673,24 +688,24 @@ namespace Z2Randomizer
                         if (y == 0 && !pbagHearts.Contains(westHyrule.pbagCave))
                         {
                             pbagHearts.Add(westHyrule.pbagCave);
-                            westHyrule.pbagCave.item = Items.HEART_CONTAINER;
-                            itemList.Add(Items.HEART_CONTAINER);
+                            westHyrule.pbagCave.item = Item.HEART_CONTAINER;
+                            itemList.Add(Item.HEART_CONTAINER);
                             itemLocs.Add(westHyrule.pbagCave);
                             x--;
                         }
                         if (y == 1 && !pbagHearts.Contains(eastHyrule.pbagCave1))
                         {
                             pbagHearts.Add(eastHyrule.pbagCave1);
-                            eastHyrule.pbagCave1.item = Items.HEART_CONTAINER;
-                            itemList.Add(Items.HEART_CONTAINER);
+                            eastHyrule.pbagCave1.item = Item.HEART_CONTAINER;
+                            itemList.Add(Item.HEART_CONTAINER);
                             itemLocs.Add(eastHyrule.pbagCave1);
                             x--;
                         }
                         if (y == 2 && !pbagHearts.Contains(eastHyrule.pbagCave2))
                         {
                             pbagHearts.Add(eastHyrule.pbagCave2);
-                            eastHyrule.pbagCave2.item = Items.HEART_CONTAINER;
-                            itemList.Add(Items.HEART_CONTAINER);
+                            eastHyrule.pbagCave2.item = Item.HEART_CONTAINER;
+                            itemList.Add(Item.HEART_CONTAINER);
                             itemLocs.Add(eastHyrule.pbagCave2);
                             x--;
                         }
@@ -700,74 +715,75 @@ namespace Z2Randomizer
 
             if(props.removeSpellItems)
             {
-                itemList[9] = replaceList[RNG.Next(replaceList.Count)];
-                itemList[10] = replaceList[RNG.Next(replaceList.Count)];
-                itemList[17] = replaceList[RNG.Next(replaceList.Count)];
-                itemGet[(int)Items.TROPHY] = true;
-                itemGet[(int)Items.MEDICINE] = true;
-                itemGet[(int)Items.CHILD] = true;
+                itemList[9] = smallItems[RNG.Next(smallItems.Count)];
+                itemList[10] = smallItems[RNG.Next(smallItems.Count)];
+                itemList[17] = smallItems[RNG.Next(smallItems.Count)];
+                itemGet[Item.TROPHY] = true;
+                itemGet[Item.MEDICINE] = true;
+                itemGet[Item.CHILD] = true;
 
             }
 
             if (SpellGet[spellMap[Spell.FAIRY]])
             {
-                itemList[9] = replaceList[RNG.Next(replaceList.Count)];
-                itemGet[(int)Items.MEDICINE] = true;
+                itemList[9] = smallItems[RNG.Next(smallItems.Count)];
+                itemGet[Item.MEDICINE] = true;
                 startMed = true;
             }
 
             if(SpellGet[spellMap[Spell.JUMP]])
             {
-                itemList[10] = replaceList[RNG.Next(replaceList.Count)];
-                itemGet[(int)Items.TROPHY] = true;
+                itemList[10] = smallItems[RNG.Next(smallItems.Count)];
+                itemGet[Item.TROPHY] = true;
                 startTrophy = true;
             }
 
             if(SpellGet[spellMap[Spell.REFLECT]])
             {
-                itemList[17] = replaceList[RNG.Next(replaceList.Count)];
-                itemGet[(int)Items.CHILD] = true;
+                itemList[17] = smallItems[RNG.Next(smallItems.Count)];
+                itemGet[Item.CHILD] = true;
                 startKid = true;
             }
 
-            if (itemGet[0])
+            //TODO: Clean up the readability of this logic
+            if (itemGet[(Item)0])
             {
-                itemList[0] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[0] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[1])
+            if (itemGet[(Item)1])
             {
-                itemList[1] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[1] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[2])
+            if (itemGet[(Item)2])
             {
-                itemList[2] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[2] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[3])
+            if (itemGet[(Item)3])
             {
-                itemList[3] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[3] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[4])
+            if (itemGet[(Item)4])
             {
-                itemList[4] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[4] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[5])
+            if (itemGet[(Item)5])
             {
-                itemList[5] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[5] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[7])
+            if (itemGet[(Item)7])
             {
-                itemList[14] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[14] = smallItems[RNG.Next(smallItems.Count)];
             }
 
-            if (itemGet[6])
+            if (itemGet[(Item)6])
             {
-                itemList[16] = replaceList[RNG.Next(replaceList.Count)];
+                itemList[16] = smallItems[RNG.Next(smallItems.Count)];
             }
 
 
@@ -775,9 +791,8 @@ namespace Z2Randomizer
             {
                 for (int i = 0; i < itemList.Count; i++)
                 {
-
                     int s = RNG.Next(i, itemList.Count);
-                    Items sl = itemList[s];
+                    Item sl = itemList[s];
                     itemList[s] = itemList[i];
                     itemList[i] = sl;
                 }
@@ -789,14 +804,14 @@ namespace Z2Randomizer
                     for (int i = 0; i < 6; i++)
                     {
                         int s = RNG.Next(i, 6);
-                        Items sl = itemList[s];
+                        Item sl = itemList[s];
                         itemList[s] = itemList[i];
                         itemList[i] = sl;
                     }
                 }
                 else
                 {
-
+                    //Was this place intentionally left blank? If so why the else?
                 }
 
                 if (props.shuffleOverworldItems)
@@ -804,7 +819,7 @@ namespace Z2Randomizer
                     for (int i = 6; i < itemList.Count; i++)
                     {
                         int s = RNG.Next(i, itemList.Count);
-                        Items sl = itemList[s];
+                        Item sl = itemList[s];
                         itemList[s] = itemList[i];
                         itemList[i] = sl;
                     }
@@ -816,15 +831,15 @@ namespace Z2Randomizer
             }
             foreach (Location location in itemLocs)
             {
-                if (location.item == Items.CHILD)
+                if (location.item == Item.CHILD)
                 {
                     kidLoc = location;
                 }
-                else if (location.item == Items.TROPHY)
+                else if (location.item == Item.TROPHY)
                 {
                     trophyLoc = location;
                 }
-                else if (location.item == Items.MEDICINE)
+                else if (location.item == Item.MEDICINE)
                 {
                     medicineLoc = location;
                 }
@@ -854,13 +869,14 @@ namespace Z2Randomizer
             int eh = 0;
             int count = 1;
             int prevCount = 0;
-            magContainers = 4;
-            heartContainers = startHearts;
 
-            int total = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
-            Boolean f = false;
-            Boolean g = false;
-            while (prevCount != count || f || g)
+            int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
+            logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
+               " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
+            bool updateItemsResult = false;
+            bool updateSpellsResult = false;
+            int loopCount = 0;
+            while (prevCount != count || updateItemsResult || updateSpellsResult)
             {
                 prevCount = count;
                 westHyrule.updateVisit();
@@ -870,36 +886,24 @@ namespace Z2Randomizer
 
                 foreach(World world in worlds)
                 {
-                    if(world.raft != null && CanGet(world.raft) && itemGet[(int)Items.RAFT])
+                    if(world.raft != null && CanGet(world.raft) && itemGet[Item.RAFT])
                     {
-                        foreach(World world2 in worlds)
-                        {
-                            world2.VisitRaft();
-                        }
+                        worlds.ForEach(i => i.VisitRaft());
                     }
 
                     if (world.bridge != null && CanGet(world.bridge))
                     {
-                        foreach (World w2 in worlds)
-                        {
-                            w2.VisitBridge();
-                        }
+                        worlds.ForEach(i => i.VisitBridge());
                     }
 
                     if (world.cave1 != null && CanGet(world.cave1))
                     {
-                        foreach (World w2 in worlds)
-                        {
-                            w2.VisitCave1();
-                        }
+                        worlds.ForEach(i => i.VisitCave1());
                     }
 
                     if (world.cave2 != null && CanGet(world.cave2))
                     {
-                        foreach (World w2 in worlds)
-                        {
-                            w2.VisitCave2();
-                        }
+                        worlds.ForEach(i => i.VisitCave2());
                     }
                 }
                 westHyrule.updateVisit();
@@ -907,11 +911,9 @@ namespace Z2Randomizer
                 eastHyrule.updateVisit();
                 mazeIsland.UpdateVisit();
 
-                f = UpdateItems();
-                g = UpdateSpells();
+                updateItemsResult = UpdateItemGets();
+                updateSpellsResult = UpdateSpells();
 
-                
-               
 
                 count = 0;
                 dm = 0;
@@ -919,50 +921,27 @@ namespace Z2Randomizer
                 wh = 0;
                 eh = 0;
 
-                foreach (Location location in westHyrule.AllLocations)
-                {
-                    if (location.Reachable)
-                    {
-                        count++;
-                        wh++;
-                    }
-                }
+                wh = westHyrule.AllLocations.Count(i => i.Reachable);
+                eh = eastHyrule.AllLocations.Count(i => i.Reachable);
+                dm = deathMountain.AllLocations.Count(i => i.Reachable);
+                mi = mazeIsland.AllLocations.Count(i => i.Reachable);
+                count = wh + eh + dm + mi;
 
-                foreach (Location location in eastHyrule.AllLocations)
-                {
-                    if (location.Reachable)
-                    {
-                        count++;
-                        eh++;
-                    }
-                }
-
-                foreach (Location location in deathMountain.AllLocations)
-                {
-                    if (location.Reachable)
-                    {
-                        count++;
-                        dm++;
-                    }
-                }
-
-                foreach (Location location in mazeIsland.AllLocations)
-                {
-                    if (location.Reachable)
-                    {
-                        count++;
-                        mi++;
-                    }
-                }
+                logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
+                + " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
             }
-            Console.WriteLine("Reached: " + count);
-            Console.WriteLine("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-            Console.WriteLine("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-            Console.WriteLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-            Console.WriteLine("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
-            for (int i = 0; i < 8; i++)
+            logger.Info("Reached: " + count);
+            logger.Info("wh: " + wh + " / " + westHyrule.AllLocations.Count);
+            logger.Info("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
+            logger.Info("dm: " + dm + " / " + deathMountain.AllLocations.Count);
+            logger.Info("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
+
+            //return true;
+            logger.Trace("-");
+
+            foreach (Item item in SHUFFLABLE_STARTING_ITEMS)
             {
-                if (itemGet[i] == false)
+                if(itemGet[item] == false)
                 {
                     return false;
                 }
@@ -970,12 +949,12 @@ namespace Z2Randomizer
 
             for (int i = 19; i < 22; i++)
             {
-                if (itemGet[i] == false)
+                if (itemGet[(Item)i] == false)
                 {
                     return false;
                 }
             }
-            if (magContainers != 8)
+            if (accessibleMagicContainers != 8)
             {
                 return false;
             }
@@ -988,7 +967,7 @@ namespace Z2Randomizer
                 return false;
             }
 
-            return (CanGet(westHyrule.Locations[Terrain.TOWN]) 
+            bool retval = (CanGet(westHyrule.Locations[Terrain.TOWN]) 
                 && CanGet(eastHyrule.Locations[Terrain.TOWN]) 
                 && CanGet(westHyrule.palace1) 
                 && CanGet(westHyrule.palace2) 
@@ -1001,22 +980,15 @@ namespace Z2Randomizer
                 && CanGet(westHyrule.bagu) 
                 && (!hiddenKasuto || (CanGet(eastHyrule.hkLoc))) 
                 && (!hiddenPalace || (CanGet(eastHyrule.hpLoc))));
+            return retval;
         }
 
         private Boolean CanGet(List<Location> l)
         {
-            foreach (Location ls in l)
-            {
-                if (ls.Reachable == false)
-                {
-                    return false;
-                }
-            }
-            return true;
+            return l.All(i => i.Reachable == true);
         }
         private Boolean CanGet(Location location)
         {
-
             return location.Reachable;
         }
 
@@ -1025,16 +997,16 @@ namespace Z2Randomizer
             /*
             Spell swap notes:
             Shield exit: 0xC7BB, 0xC1; enter: 0xC7EC, 0x90 //change map 48 pointer to map 40 pointer
-        Jump exit: 0xC7BF, 0xC5; enter: 0xC7F0, 0x94 //change map 49 pointer to map 41 pointer
-        Life exit: 0xC7C3, 0xC9; enter 0xC7F4, 0x98 //change map 50 pointer to map 42 pointer
-        Fairy exit: 0xC7C7, 0xCD; enter 0xC7F8, 0x9C //change map 51 pointer to map 43 pointer
-        Fire exit: 0xC7Cb, 0xD1; enter 0xC7FC, 0xA0 //change map 52 pointer to map 44 pointer
-        Reflect exit: 0xC7Cf, 0xD5; enter 0xC800, 0xA4 //change map 53 pointer to map 45 pointer
-        Spell exit: 0xC7D3, 0x6A; enter 0xC795, 0xC796, 0x4D //new kasuto item?
-        Thunder exit: 0xC7D7, 0xDD; enter 0xC808, 0xAC
-        Downstab exit: 0xC7DB, 0xE1; enter 0xC80C, 0xB0
-        Upstab exit: 0xC7DF, 0xE5; enter 0xC810, 0xB4
-    */
+            Jump exit: 0xC7BF, 0xC5; enter: 0xC7F0, 0x94 //change map 49 pointer to map 41 pointer
+            Life exit: 0xC7C3, 0xC9; enter 0xC7F4, 0x98 //change map 50 pointer to map 42 pointer
+            Fairy exit: 0xC7C7, 0xCD; enter 0xC7F8, 0x9C //change map 51 pointer to map 43 pointer
+            Fire exit: 0xC7Cb, 0xD1; enter 0xC7FC, 0xA0 //change map 52 pointer to map 44 pointer
+            Reflect exit: 0xC7Cf, 0xD5; enter 0xC800, 0xA4 //change map 53 pointer to map 45 pointer
+            Spell exit: 0xC7D3, 0x6A; enter 0xC795, 0xC796, 0x4D //new kasuto item?
+            Thunder exit: 0xC7D7, 0xDD; enter 0xC808, 0xAC
+            Downstab exit: 0xC7DB, 0xE1; enter 0xC80C, 0xB0
+            Upstab exit: 0xC7DF, 0xE5; enter 0xC810, 0xB4
+            */
             for (int i = 0; i < 16; i = i + 2)
             {
                 ROMData.Put(0xC611 + i, (Byte)0x75);
@@ -1080,7 +1052,7 @@ namespace Z2Randomizer
             Boolean changed = false;
             foreach (Spell s in spellMap.Keys)
             {
-                if (s == Spell.FAIRY && (((itemGet[(int)Items.MEDICINE] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (magContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
+                if (s == Spell.FAIRY && (((itemGet[Item.MEDICINE] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (accessibleMagicContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
                 {
                     if(!SpellGet[spellMap[s]])
                     {
@@ -1088,7 +1060,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.JUMP && (((itemGet[(int)Items.TROPHY] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs) && (itemGet[(int)Items.CHILD] || props.removeSpellItems))) && CanGet(westHyrule.jump))
+                else if (s == Spell.JUMP && (((itemGet[Item.TROPHY] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.disableMagicRecs) && (itemGet[Item.CHILD] || props.removeSpellItems))) && CanGet(westHyrule.jump))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1112,7 +1084,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.LIFE && (CanGet(westHyrule.lifeNorth)) && (((magContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
+                else if (s == Spell.LIFE && (CanGet(westHyrule.lifeNorth)) && (((accessibleMagicContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1120,7 +1092,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.SHIELD && (CanGet(westHyrule.shieldTown)) && (((magContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
+                else if (s == Spell.SHIELD && (CanGet(westHyrule.shieldTown)) && (((accessibleMagicContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1128,7 +1100,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.REFLECT && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[(int)Items.TROPHY] || props.removeSpellItems)) || ((itemGet[(int)Items.CHILD] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (magContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
+                else if (s == Spell.REFLECT && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[Item.TROPHY] || props.removeSpellItems)) || ((itemGet[Item.CHILD] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1136,7 +1108,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.FIRE && (CanGet(eastHyrule.nabooru)) && (((magContainers >= 5 || props.disableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
+                else if (s == Spell.FIRE && (CanGet(eastHyrule.nabooru)) && (((accessibleMagicContainers >= 5 || props.disableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1144,7 +1116,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.SPELL && (CanGet(eastHyrule.newKasuto)) && (((magContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
+                else if (s == Spell.SPELL && (CanGet(eastHyrule.newKasuto)) && (((accessibleMagicContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1152,7 +1124,7 @@ namespace Z2Randomizer
                     }
                     SpellGet[spellMap[s]] = true;
                 }
-                else if (s == Spell.THUNDER && (CanGet(eastHyrule.oldKasuto)) && (((magContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[(int)Items.MEDICINE] || props.removeSpellItems))))
+                else if (s == Spell.THUNDER && (CanGet(eastHyrule.oldKasuto)) && (((accessibleMagicContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[Item.MEDICINE] || props.removeSpellItems))))
                 {
                     if (!SpellGet[spellMap[s]])
                     {
@@ -1168,42 +1140,48 @@ namespace Z2Randomizer
         /// 
         /// </summary>
         /// <returns>Whether any items were marked accessable</returns>
-        private Boolean UpdateItems()
+        private Boolean UpdateItemGets()
         {
+            accessibleMagicContainers = 4;
+            heartContainers = startHearts;
             Boolean changed = false;
             foreach (Location location in itemLocs)
             {
-                Boolean itemGotten = location.itemGet;
+                Boolean hadItemPreviously = location.itemGet;
+                Boolean hasItemNow;
                 if (location.PalNum > 0 && location.PalNum < 7)
                 {
                     Palace palace = palaces[location.PalNum - 1];
-                    if (location.PalNum == 4 && location.item == Items.CHILD)
-                    {
-                        Console.WriteLine("here");
-                    }
-                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (SpellGet[Spell.FAIRY] || itemGet[(int)Items.MAGIC_KEY]) && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[(int)Items.GLOVE])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY])) && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
+                    hasItemNow = CanGet(location) && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY]) && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) && (!palace.NeedGlove || (palace.NeedGlove && itemGet[Item.GLOVE])) && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY])) && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
                 }
                 else if (location.TownNum == Town.NEW_KASUTO)
                 {
-                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (magContainers >= kasutoJars) && (!location.NeedHammer || itemGet[(int)Items.HAMMER]);
+                    hasItemNow = CanGet(location) && (accessibleMagicContainers >= kasutoJars) && (!location.NeedHammer || itemGet[Item.HAMMER]);
                 }
                 else if (location.TownNum == Town.NEW_KASUTO_2)
                 {
-                    location.itemGet = itemGet[(int)location.item] = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || itemGet[(int)Items.HAMMER]);
+                    hasItemNow = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || itemGet[Item.HAMMER]);
                 }
                 else
                 {
-                    location.itemGet = itemGet[(int)location.item] = CanGet(location) && (!location.NeedHammer || itemGet[(int)Items.HAMMER]) && (!location.NeedRecorder || itemGet[(int)Items.HORN]);
+                    hasItemNow = CanGet(location) && (!location.NeedHammer || itemGet[Item.HAMMER]) && (!location.NeedRecorder || itemGet[Item.FLUTE]);
                 }
-                if (itemGotten != location.itemGet && location.item == Items.MAGIC_CONTAINER)
+
+                //Issue #3: Previously running UpdateItemGets multiple times could produce different results based on the sequence of times it ran
+                //For items that were blocked by MC requirements, different orders of parsing the same world could check the MCs at different times
+                //producing different results. Now it's not possible to "go back" in logic and call previously accessed items inaccesable.
+                location.itemGet = hasItemNow || hadItemPreviously;
+                itemGet[location.item] = hasItemNow || hadItemPreviously;
+
+                if (location.itemGet && location.item == Item.MAGIC_CONTAINER)
                 {
-                    magContainers++;
+                    accessibleMagicContainers++;
                 }
-                if (itemGotten != location.itemGet && location.item == Items.HEART_CONTAINER)
+                if (location.itemGet && location.item == Item.HEART_CONTAINER)
                 {
                     heartContainers++;
                 }
-                if(!itemGotten && location.itemGet)
+                if(!hadItemPreviously && location.itemGet)
                 {
                     changed = true;
                 }
@@ -1620,11 +1598,7 @@ namespace Z2Randomizer
                     }
                     if (!eastHyrule.Allreached)
                     {
-                        bool f = false;
-                        do
-                        {
-                            f = eastHyrule.Terraform();
-                        } while (!f);
+                        while (!eastHyrule.Terraform());
                     }
                     eastHyrule.ResetVisitabilityState();
 
@@ -1636,11 +1610,7 @@ namespace Z2Randomizer
                     }
                     if (!mazeIsland.Allreached)
                     {
-                        bool f = false;
-                        do
-                        {
-                            f = mazeIsland.Terraform();
-                        } while (!f);
+                        while (!mazeIsland.Terraform());
                     }
                     mazeIsland.ResetVisitabilityState();
 
@@ -1650,27 +1620,10 @@ namespace Z2Randomizer
                         return;
                     }
 
-                    //Do an initial generation of the non-terrain shuffle
-                    LoadItemLocs();
-                    ShuffleSpells();
-                    ShuffleItems();
-                    ShufflePalaces();
-                    LoadItemLocs();
-                    westHyrule.setStart();
-                    shouldContinue = UpdateProgress(7);
-                    if (!shouldContinue)
-                    {
-                        return;
-                    }
-
-                    //Then perform up to 10 additional non-terrain shuffles looking for one that works.
+                    //Then perform up to 11 non-terrain shuffles looking for one that works.
                     nonTerrainShuffleAttempt = 0;
-                    while (!IsEverythingReachable() && nonTerrainShuffleAttempt < 10)
+                    do
                     {
-                        westHyrule.UpdateAllReachability();
-                        eastHyrule.AllReachable();
-                        mazeIsland.UpdateAllReachability();
-                        deathMountain.UpdateAllReachability();
                         foreach (Location location in westHyrule.AllLocations)
                         {
                             location.Reachable = false;
@@ -1685,7 +1638,6 @@ namespace Z2Randomizer
                         {
                             location.Reachable = false;
                         }
-
                         foreach (Location location in deathMountain.AllLocations)
                         {
                             location.Reachable = false;
@@ -1699,6 +1651,7 @@ namespace Z2Randomizer
                         westHyrule.ResetVisitabilityState();
                         eastHyrule.ResetVisitabilityState();
                         mazeIsland.ResetVisitabilityState();
+
                         ShuffleSpells();
                         LoadItemLocs();
                         deathMountain.ResetVisitabilityState();
@@ -1706,60 +1659,36 @@ namespace Z2Randomizer
                         ShuffleItems();
                         ShufflePalaces();
                         LoadItemLocs();
+                        shouldContinue = UpdateProgress(7);
+                        if (!shouldContinue)
+                        {
+                            return;
+                        }
+
+                        westHyrule.UpdateAllReachability();
+                        eastHyrule.UpdateAllReachability();
+                        mazeIsland.UpdateAllReachability();
+                        deathMountain.UpdateAllReachability();
 
                         nonTerrainShuffleAttempt++;
-                    }
+                    } while (!IsEverythingReachable() && nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT);
 
-                    int west = 0;
-                    if (nonTerrainShuffleAttempt != 10)
+                    if (nonTerrainShuffleAttempt != NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT)
                     {
                         break;
                     }
-                    foreach (Location location in westHyrule.AllLocations)
-                    {
-                        if (location.Reachable)
-                        {
-                            west++;
-                        }
-                    }
 
-                    int east = 0;
-                    foreach (Location location in eastHyrule.AllLocations)
-                    {
-                        if (location.Reachable)
-                        {
-                            east++;
-                        }
-                    }
+                    int west = westHyrule.AllLocations.Count(i => i.Reachable);
+                    int east = eastHyrule.AllLocations.Count(i => i.Reachable);
+                    int maze = mazeIsland.AllLocations.Count(i => i.Reachable);
+                    int dm = deathMountain.AllLocations.Count(i => i.Reachable);
 
-                    int maze = 0;
-                    foreach (Location location in mazeIsland.AllLocations)
-                    {
-                        if (location.Reachable)
-                        {
-                            maze++;
-                        }
-                    }
-
-                    int dm = 0;
-                    foreach (Location location in deathMountain.AllLocations)
-                    {
-                        if (location.Reachable)
-                        {
-                            dm++;
-                        }
-                    }
-
-                    Console.WriteLine("wr: " + west + " / " + westHyrule.AllLocations.Count);
-                    Console.WriteLine("er: " + east + " / " + eastHyrule.AllLocations.Count);
-                    Console.WriteLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-                    Console.WriteLine("maze: " + maze + " / " + mazeIsland.AllLocations.Count);
-                } while (nonContinentGenerationAttempts < 10 && !IsEverythingReachable());
-                if(nonTerrainShuffleAttempt != 10 && nonContinentGenerationAttempts != 10)
-                {
-                    break;
-                }
-            } while (!IsEverythingReachable()) ;
+                    logger.Trace("wr: " + west + " / " + westHyrule.AllLocations.Count);
+                    logger.Trace("er: " + east + " / " + eastHyrule.AllLocations.Count);
+                    logger.Trace("dm: " + dm + " / " + deathMountain.AllLocations.Count);
+                    logger.Trace("maze: " + maze + " / " + mazeIsland.AllLocations.Count);
+                } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
+            } while (!IsEverythingReachable());
 
             if (props.shuffleOverworldEnemies)
             {
@@ -3392,15 +3321,15 @@ namespace Z2Randomizer
             Location kidLoc = null;
             foreach (Location location in itemLocs)
             {
-                if (location.item == Items.MEDICINE)
+                if (location.item == Item.MEDICINE)
                 {
                     medicineLoc = location;
                 }
-                if (location.item == Items.TROPHY)
+                if (location.item == Item.TROPHY)
                 {
                     trophyLoc = location;
                 }
-                if (location.item == Items.CHILD)
+                if (location.item == Item.CHILD)
                 {
                     kidLoc = location;
                 }
@@ -3427,7 +3356,7 @@ namespace Z2Randomizer
             palaceMems.Add(5, 0x37AD0);
             palaceMems.Add(6, 0x39AD0);
 
-            if (medEast && eastHyrule.palace5.item != Items.MEDICINE && eastHyrule.palace6.item != Items.MEDICINE && mazeIsland.palace4.item != Items.MEDICINE)
+            if (medEast && eastHyrule.palace5.item != Item.MEDICINE && eastHyrule.palace6.item != Item.MEDICINE && mazeIsland.palace4.item != Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3447,7 +3376,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb8, 0x41);
             }
 
-            if (kidWest && westHyrule.palace1.item != Items.CHILD && westHyrule.palace2.item != Items.CHILD && westHyrule.palace3.item != Items.CHILD)
+            if (kidWest && westHyrule.palace1.item != Item.CHILD && westHyrule.palace2.item != Item.CHILD && westHyrule.palace3.item != Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3457,7 +3386,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb6, 0x57);
             }
 
-            if (eastHyrule.newKasuto.item == Items.TROPHY || eastHyrule.newKasuto2.item == Items.TROPHY || westHyrule.lifeNorth.item == Items.TROPHY || westHyrule.lifeSouth.item == Items.TROPHY)
+            if (eastHyrule.newKasuto.item == Item.TROPHY || eastHyrule.newKasuto2.item == Item.TROPHY || westHyrule.lifeNorth.item == Item.TROPHY || westHyrule.lifeSouth.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3467,7 +3396,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb8, 0x21);
             }
 
-            if (eastHyrule.newKasuto.item == Items.MEDICINE || eastHyrule.newKasuto2.item == Items.MEDICINE || westHyrule.lifeNorth.item == Items.TROPHY || westHyrule.lifeSouth.item == Items.TROPHY)
+            if (eastHyrule.newKasuto.item == Item.MEDICINE || eastHyrule.newKasuto2.item == Item.MEDICINE || westHyrule.lifeNorth.item == Item.TROPHY || westHyrule.lifeSouth.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3477,7 +3406,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeba, 0x23);
             }
 
-            if (eastHyrule.newKasuto.item == Items.CHILD || eastHyrule.newKasuto2.item == Items.CHILD || westHyrule.lifeNorth.item == Items.TROPHY || westHyrule.lifeSouth.item == Items.TROPHY)
+            if (eastHyrule.newKasuto.item == Item.CHILD || eastHyrule.newKasuto2.item == Item.CHILD || westHyrule.lifeNorth.item == Item.TROPHY || westHyrule.lifeSouth.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3487,7 +3416,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb6, 0x25);
             }
 
-            if (westHyrule.palace1.item == Items.TROPHY)
+            if (westHyrule.palace1.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3496,7 +3425,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb7, 0xAD);
                 ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (westHyrule.palace2.item == Items.TROPHY)
+            if (westHyrule.palace2.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3505,7 +3434,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb7, 0xAD);
                 ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (westHyrule.palace3.item == Items.TROPHY)
+            if (westHyrule.palace3.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3514,7 +3443,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb7, 0xAD);
                 ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (mazeIsland.palace4.item == Items.TROPHY)
+            if (mazeIsland.palace4.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3523,7 +3452,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb7, 0xAD);
                 ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (eastHyrule.palace5.item == Items.TROPHY)
+            if (eastHyrule.palace5.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3532,7 +3461,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb7, 0xAD);
                 ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (eastHyrule.palace6.item == Items.TROPHY)
+            if (eastHyrule.palace6.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3541,7 +3470,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb7, 0xAD);
                 ROMData.Put(0x1eeb8, 0xAD);
             }
-            if (eastHyrule.gp.item == Items.TROPHY)
+            if (eastHyrule.gp.item == Item.TROPHY)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3551,7 +3480,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb8, 0xAD);
             }
 
-            if (westHyrule.palace1.item == Items.MEDICINE)
+            if (westHyrule.palace1.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3560,7 +3489,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb9, 0xAD);
                 ROMData.Put(0x1eeba, 0xAD);
             }
-            if (westHyrule.palace2.item == Items.MEDICINE)
+            if (westHyrule.palace2.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3569,7 +3498,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb9, 0xAD);
                 ROMData.Put(0x1eeba, 0xAD);
             }
-            if (westHyrule.palace3.item == Items.MEDICINE)
+            if (westHyrule.palace3.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3578,7 +3507,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb9, 0xAD);
                 ROMData.Put(0x1eeba, 0xAD);
             }
-            if (mazeIsland.palace4.item == Items.MEDICINE)
+            if (mazeIsland.palace4.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3587,7 +3516,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb9, 0xAD);
                 ROMData.Put(0x1eeba, 0xAD);
             }
-            if (eastHyrule.palace5.item == Items.MEDICINE)
+            if (eastHyrule.palace5.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3596,7 +3525,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb9, 0xAD);
                 ROMData.Put(0x1eeba, 0xAD);
             }
-            if (eastHyrule.palace6.item == Items.MEDICINE)
+            if (eastHyrule.palace6.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3605,7 +3534,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb9, 0xAD);
                 ROMData.Put(0x1eeba, 0xAD);
             }
-            if (eastHyrule.gp.item == Items.MEDICINE)
+            if (eastHyrule.gp.item == Item.MEDICINE)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3615,7 +3544,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeba, 0xAD);
             }
 
-            if (westHyrule.palace1.item == Items.CHILD)
+            if (westHyrule.palace1.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3624,7 +3553,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb5, 0xAD);
                 ROMData.Put(0x1eeb6, 0xAD);
             }
-            if (westHyrule.palace2.item == Items.CHILD)
+            if (westHyrule.palace2.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3633,7 +3562,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb5, 0xAD);
                 ROMData.Put(0x1eeb6, 0xAD);
             }
-            if (westHyrule.palace3.item == Items.CHILD)
+            if (westHyrule.palace3.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3642,7 +3571,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb5, 0xAD);
                 ROMData.Put(0x1eeb6, 0xAD);
             }
-            if (mazeIsland.palace4.item == Items.CHILD)
+            if (mazeIsland.palace4.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3651,7 +3580,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb5, 0xAD);
                 ROMData.Put(0x1eeb6, 0xAD);
             }
-            if (eastHyrule.palace5.item == Items.CHILD)
+            if (eastHyrule.palace5.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3660,7 +3589,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb5, 0xAD);
                 ROMData.Put(0x1eeb6, 0xAD);
             }
-            if (eastHyrule.palace6.item == Items.CHILD)
+            if (eastHyrule.palace6.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3669,7 +3598,7 @@ namespace Z2Randomizer
                 ROMData.Put(0x1eeb5, 0xAD);
                 ROMData.Put(0x1eeb6, 0xAD);
             }
-            if (eastHyrule.gp.item == Items.CHILD)
+            if (eastHyrule.gp.item == Item.CHILD)
             {
                 for (int i = 0; i < 32; i++)
                 {
@@ -3815,41 +3744,40 @@ namespace Z2Randomizer
                 }
             }
 
-            Console.WriteLine("Here");
             ROMData.Put(0x4DEA, (Byte)westHyrule.trophyCave.item);
             ROMData.Put(0x502A, (Byte)westHyrule.jar.item);
             ROMData.Put(0x4DD7, (Byte)westHyrule.heart2.item);
-            //Console.WriteLine(westHyrule.heart1.item);
-            //Console.WriteLine(westHyrule.heart2.item);
-            //Console.WriteLine(westHyrule.medCave.item);
-            //Console.WriteLine(westHyrule.trophyCave.item);
-            //Console.WriteLine(westHyrule.jar.item);
-            //Console.WriteLine(deathMountain.magicCave.item);
-            //Console.WriteLine(deathMountain.hammerCave.item);
-            //Console.WriteLine(westHyrule.palace1.PalNum + " " + westHyrule.palace1.item);
-            //Console.WriteLine(westHyrule.palace2.PalNum + " " + westHyrule.palace2.item);
-            //Console.WriteLine(westHyrule.palace3.PalNum + " " + westHyrule.palace3.item);
-            //Console.WriteLine(mazeIsland.palace4.PalNum + " " + mazeIsland.palace4.item);
-            //Console.WriteLine(eastHyrule.palace5.PalNum + " " + eastHyrule.palace5.item);
-            //Console.WriteLine(eastHyrule.palace6.PalNum + " " + eastHyrule.palace6.item);
-            //Console.WriteLine(eastHyrule.gp.PalNum + " " + eastHyrule.gp.item);
-            //Console.WriteLine(eastHyrule.heart1.item);
-            //Console.WriteLine(eastHyrule.heart2.item);
-            //Console.WriteLine(mazeIsland.magic.item);
-            //Console.WriteLine(mazeIsland.kid.item);
-            //Console.WriteLine(eastHyrule.newKasuto.item);
-            //Console.WriteLine(eastHyrule.newKasuto2.item);
-            //Console.WriteLine(eastHyrule.pbagCave1.item);
-            //Console.WriteLine(eastHyrule.pbagCave2.item);
-            //Console.WriteLine(eastHyrule.gp.item);
-            //Console.WriteLine(spellMap[spells.life]);
-            //Console.WriteLine(spellMap[spells.shield]);
-            //Console.WriteLine(spellMap[spells.fire]);
-            //Console.WriteLine(spellMap[spells.reflect]);
-            //Console.WriteLine(spellMap[spells.jump]);
-            //Console.WriteLine(spellMap[spells.thunder]);
-            //Console.WriteLine(spellMap[spells.fairy]);
-            //Console.WriteLine(spellMap[spells.spell]);
+            //logger.WriteLine(westHyrule.heart1.item);
+            //logger.WriteLine(westHyrule.heart2.item);
+            //logger.WriteLine(westHyrule.medCave.item);
+            //logger.WriteLine(westHyrule.trophyCave.item);
+            //logger.WriteLine(westHyrule.jar.item);
+            //logger.WriteLine(deathMountain.magicCave.item);
+            //logger.WriteLine(deathMountain.hammerCave.item);
+            //logger.WriteLine(westHyrule.palace1.PalNum + " " + westHyrule.palace1.item);
+            //logger.WriteLine(westHyrule.palace2.PalNum + " " + westHyrule.palace2.item);
+            //logger.WriteLine(westHyrule.palace3.PalNum + " " + westHyrule.palace3.item);
+            //logger.WriteLine(mazeIsland.palace4.PalNum + " " + mazeIsland.palace4.item);
+            //logger.WriteLine(eastHyrule.palace5.PalNum + " " + eastHyrule.palace5.item);
+            //logger.WriteLine(eastHyrule.palace6.PalNum + " " + eastHyrule.palace6.item);
+            //logger.WriteLine(eastHyrule.gp.PalNum + " " + eastHyrule.gp.item);
+            //logger.WriteLine(eastHyrule.heart1.item);
+            //logger.WriteLine(eastHyrule.heart2.item);
+            //logger.WriteLine(mazeIsland.magic.item);
+            //logger.WriteLine(mazeIsland.kid.item);
+            //logger.WriteLine(eastHyrule.newKasuto.item);
+            //logger.WriteLine(eastHyrule.newKasuto2.item);
+            //logger.WriteLine(eastHyrule.pbagCave1.item);
+            //logger.WriteLine(eastHyrule.pbagCave2.item);
+            //logger.WriteLine(eastHyrule.gp.item);
+            //logger.WriteLine(spellMap[spells.life]);
+            //logger.WriteLine(spellMap[spells.shield]);
+            //logger.WriteLine(spellMap[spells.fire]);
+            //logger.WriteLine(spellMap[spells.reflect]);
+            //logger.WriteLine(spellMap[spells.jump]);
+            //logger.WriteLine(spellMap[spells.thunder]);
+            //logger.WriteLine(spellMap[spells.fairy]);
+            //logger.WriteLine(spellMap[spells.spell]);
 
             int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 
@@ -4079,8 +4007,6 @@ namespace Z2Randomizer
                 ROMData.Put(0x1dd3b, 0x14);
             }
 
-            Console.WriteLine("Here");
-
             int spellNameBase = 0x1c3a, effectBase = 0x00e58, spellCostBase = 0xd8b, functionBase = 0xdcb;
 
             int[,] magLevels = new int[8, 8];
@@ -4297,7 +4223,7 @@ namespace Z2Randomizer
         }
         public void ShuffleSmallItems(int world, bool first)
         {
-            Console.WriteLine("World: " + world);
+            logger.Debug("World: " + world);
             List<int> addresses = new List<int>();
             List<int> items = new List<int>();
             int startAddr;
@@ -4327,9 +4253,9 @@ namespace Z2Randomizer
                         int item = ROMData.GetByte(addr);
                         if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
                         {
-                            Console.WriteLine("Map: " + map);
-                            Console.WriteLine("Item: " + item);
-                            Console.WriteLine("Address: {0:X}", addr);
+                            logger.Debug("Map: " + map);
+                            logger.Debug("Item: " + item);
+                            logger.Debug("Address: {0:X}", addr);
                             addresses.Add(addr);
                             items.Add(item);
                         }

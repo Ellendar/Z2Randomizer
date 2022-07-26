@@ -21,7 +21,7 @@ namespace Z2Randomizer
         //private Boolean needBoots;
         private Tuple<int, int> coords;
         //private Boolean canShuffle;
-        public Items item;
+        public Item item;
         public Boolean itemGet;
         //private Boolean reachable;
         //private int palNum;
@@ -124,7 +124,7 @@ namespace Z2Randomizer
             TerrainType = t;
             MemAddress = mem;
             CanShuffle = true;
-            item = Items.DO_NOT_USE;
+            item = Item.DO_NOT_USE;
             itemGet = false;
             Reachable = false;
             PalNum = 0;
@@ -154,7 +154,7 @@ namespace Z2Randomizer
 
         private string GetDebuggerDisplay()
         {
-            return Continent.ToString() + " " + TerrainType.ToString() + " (" + Xpos + "," + Ypos + ")";
+            return Continent.ToString() + " " + TerrainType.ToString() + " (" + Xpos + "," + Ypos + ") _" + (Reachable ? "Reachable" : "Unreachable");
         }
     }
 }

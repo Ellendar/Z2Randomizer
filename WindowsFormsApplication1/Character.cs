@@ -24,7 +24,7 @@ namespace Z2Randomizer
         public bool StartWithKid { get => startWithKid;  }
         public bool StartWithMedicine { get => startWithMedicine;  }
 
-        public Boolean Has(Items item)
+        public Boolean Has(Item item)
         {
             //check item map
             throw new NotImplementedException();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,6 +45,8 @@ namespace Z2Randomizer
     */
     class ROM
     {
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private const int textAddrStartinROM = 0xEFCE;
         private const int textAddrEndinROM = 0xF090;
         private const int textAddrOffset = 0x4010;
@@ -852,6 +855,7 @@ namespace Z2Randomizer
             Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
         }
 
+        //Not sure what the point of any of this metaprogramming/debugging is, but there's a strong chance it gets removed in the future.
         public void DumpAll(String name)
         {
             DumpSprite(name);
@@ -870,134 +874,161 @@ namespace Z2Randomizer
 
         public void DumpTitle(String name)
         {
+            logger.Trace("DumpTitle");
+            /*
             Console.Write("private static readonly int[] " + name + "Title = {");
             for (int i = titleSpriteStartAddr; i < titleSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.Trace("};");
+            */
         }
 
         public void DumpBeam(String name)
         {
+            logger.Trace("DumpTitle");
+            /*
             Console.Write("private static readonly int[] " + name + "Beam = {");
             for (int i = beamSpriteStartAddr; i < beamSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void DumpRaft(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "Raft = {");
             for (int i = raftSpriteStartAddr; i < raftSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void DumpOW(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "OW = {");
             for (int i = OWSpriteStartAddr; i < OWSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void DumpSleeper(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "Sleeper = {");
             for (int i = sleeperSpriteStartAddr; i < sleeperSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void Dump1up(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "1up = {");
             for (int i = oneUpSpriteStartAddr; i < oneUpSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void Ending1(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "End1 = {");
             for (int i = endSprite1StartAddr; i < endSprite1EndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void Ending2(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "End2 = {");
             for (int i = endSprite2StartAddr; i < endSprite2EndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void Ending3(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "End3 = {");
             for (int i = endSprite3StartAddr; i < endSprite3EndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void DumpHead(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "Head = {");
             for (int i = headSpriteStartAddr; i < headSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void DumpSprite(String name)
         {
+            /*
             Console.Write("private static readonly int[] " + name + "Sprite = {");
             for (int i = playerSpriteStartAddr; i < playerSpriteEndAddr; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
 
         public void DumpColors(String name)
         {
-            Console.WriteLine("private static readonly List<int[]> " + name + " = new List<int[]> { " + name + "Sprite, " + name + "1up, " + name + "OW, " + name + "Sleeper, " + name + "Title, " + name + "End1, " + name + "End2, " + name + "End3, " + name + "Head, " + name + "Raft, " + name + "Beam };");
-            Console.WriteLine("0x2a0a: " + GetByte(0x2a0a));
-            Console.WriteLine("0x2a10: " + GetByte(0x2a10));
-            Console.WriteLine("Tunic: " + GetByte(0x285c));
-            Console.WriteLine("Tunic2: " + GetByte(0x285b));
-            Console.WriteLine("Tunic3: " + GetByte(0x285a));
-            Console.WriteLine("Shield: " + GetByte(0xe9e));
-            
+            /*
+            logger.WriteLine("private static readonly List<int[]> " + name + " = new List<int[]> { " + name + "Sprite, " + name + "1up, " + name + "OW, " + name + "Sleeper, " + name + "Title, " + name + "End1, " + name + "End2, " + name + "End3, " + name + "Head, " + name + "Raft, " + name + "Beam };");
+            logger.WriteLine("0x2a0a: " + GetByte(0x2a0a));
+            logger.WriteLine("0x2a10: " + GetByte(0x2a10));
+            logger.WriteLine("Tunic: " + GetByte(0x285c));
+            logger.WriteLine("Tunic2: " + GetByte(0x285b));
+            logger.WriteLine("Tunic3: " + GetByte(0x285a));
+            logger.WriteLine("Shield: " + GetByte(0xe9e));
+            */
         }
 
         public void DumpSamus()
         {
+            /*
             Console.Write("private static readonly List<int> samusEnd = new List<int[]> { ");
             for(int i = 0x20010; i < 0x21010; i++)
             {
                 Console.Write(GetByte(i) + ", ");
             }
-            Console.WriteLine("};");
+            logger.WriteLine("};");
+            */
         }
     }
 }
