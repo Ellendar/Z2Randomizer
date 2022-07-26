@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace Z2Randomizer
 {
     class Shuffler
     {
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         private const int maxTextLength = 3134;
         private const int numberOfTextEntries = 98;
         private const int baguTextIndex = 48;
@@ -269,12 +272,12 @@ namespace Z2Randomizer
         {
             List<int> placedIndex = new List<int>();
 
-            List<Items> placedItems = new List<Items>();
+            List<Item> placedItems = new List<Item>();
             bool placedSmall = false;
-            List<Items> smallItems = new List<Items> { Items.BLUE_JAR, Items.XL_BAG, Items.KEY, Items.MEDIUM_BAG, Items.MAGIC_CONTAINER, Items.HEART_CONTAINER, Items.ONEUP, Items.RED_JAR, Items.SMALL_BAG, Items.LARGE_BAG };
+            List<Item> smallItems = new List<Item> { Item.BLUE_JAR, Item.XL_BAG, Item.KEY, Item.MEDIUM_BAG, Item.MAGIC_CONTAINER, Item.HEART_CONTAINER, Item.ONEUP, Item.RED_JAR, Item.SMALL_BAG, Item.LARGE_BAG };
             List<int> placedTowns = new List<int>();
 
-            List<Items> it = new List<Items>();
+            List<Item> it = new List<Item>();
             for (int i = 0; i < itemLocs.Count(); i++)
             {
                 it.Add(itemLocs[i].item);
@@ -282,14 +285,14 @@ namespace Z2Randomizer
 
             if (props.spellItemHints)
             {
-                it.Remove(Items.TROPHY);
-                it.Remove(Items.CHILD);
-                it.Remove(Items.MEDICINE);
+                it.Remove(Item.TROPHY);
+                it.Remove(Item.CHILD);
+                it.Remove(Item.MEDICINE);
             }
 
             for (int i = 0; i < numberOfHints; i++)
             {
-                Items doThis = it[R.Next(it.Count())];
+                Item doThis = it[R.Next(it.Count())];
                 int tries = 0;
                 while (((placedSmall && smallItems.Contains(doThis)) || placedItems.Contains(doThis)) && tries < 1000)
                 {
@@ -338,19 +341,19 @@ namespace Z2Randomizer
            
             foreach(Location itemLocation in itemLocs)
             {
-                if (itemLocation.item == Items.TROPHY && !startsWithTrophy)
+                if (itemLocation.item == Item.TROPHY && !startsWithTrophy)
                 {
                     Hint trophyHint = new Hint(this);
                     trophyHint.GenerateHelpfulHint(itemLocation);
                     hints[trophyIndex] = trophyHint;
                 }
-                else if (itemLocation.item == Items.MEDICINE && !startsWithMedicine)
+                else if (itemLocation.item == Item.MEDICINE && !startsWithMedicine)
                 {
                     Hint medHint = new Hint(this);
                     medHint.GenerateHelpfulHint(itemLocation);
                     hints[medIndex] = medHint;
                 }
-                else if (itemLocation.item == Items.CHILD && !startsWithKid)
+                else if (itemLocation.item == Item.CHILD && !startsWithKid)
                 {
                     Hint kidHint = new Hint(this);
                     kidHint.GenerateHelpfulHint(itemLocation);
@@ -767,13 +770,13 @@ namespace Z2Randomizer
                                 }
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.ItemRoom.Newmap = mapNo;
-                                p.ItemRoom.setItem((Items)i);
+                                p.ItemRoom.setItem((Item)i);
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 if (p.ItemRoom.Map == 69)
                                 {
                                     Room extra = PalaceRooms.maxBonusItemRoom.deepCopy();
                                     extra.Newmap = p.ItemRoom.Newmap;
-                                    extra.setItem((Items)i);
+                                    extra.setItem((Item)i);
                                     p.AllRooms.Add(extra);
                                     p.SortRoom(extra);
                                     p.SetOpenRoom(extra);
@@ -852,10 +855,6 @@ namespace Z2Randomizer
                                             {
                                                 r = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].deepCopy();
                                             }
-                                            if(r.Map == 34 && i == 5 && mapNo == 53)
-                                            {
-                                                Console.WriteLine("here");
-                                            }
                                             if (i < 7)
                                             {
                                                 r.Newmap = mapNo;
@@ -899,17 +898,13 @@ namespace Z2Randomizer
                         {
                             p.ResetRooms();
                             p.ShuffleRooms(R);
-                            if(i == 5 && tries == 16)
-                            {
-                                Console.WriteLine("here");
-                            }
                             reachable = p.AllReachable();
                             if(reachable)
                             {
                                 keepgoing = true;
                             }
                             tries++;
-                            Console.WriteLine(tries);
+                            logger.Trace(tries);
                         }
                     } while (tries >= 10000);
                     palaces.Add(p);

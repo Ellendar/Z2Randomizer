@@ -159,7 +159,7 @@ namespace Z2Randomizer
 
         public void GenerateHelpfulHint(Location location)
         {
-            Items hintItem = location.item;
+            Item hintItem = location.item;
             String hint = "";
             if (location.PalNum == 1)
             {
@@ -204,61 +204,61 @@ namespace Z2Randomizer
 
             switch (hintItem)
             {
-                case (Items.BLUE_JAR):
+                case (Item.BLUE_JAR):
                     hint += "blue jar";
                     break;
-                case (Items.BOOTS):
+                case (Item.BOOTS):
                     hint += "boots";
                     break;
-                case (Items.CANDLE):
+                case (Item.CANDLE):
                     hint += "candle";
                     break;
-                case (Items.CROSS):
+                case (Item.CROSS):
                     hint += "cross";
                     break;
-                case (Items.XL_BAG):
-                case (Items.LARGE_BAG):
-                case (Items.MEDIUM_BAG):
-                case (Items.SMALL_BAG):
+                case (Item.XL_BAG):
+                case (Item.LARGE_BAG):
+                case (Item.MEDIUM_BAG):
+                case (Item.SMALL_BAG):
                     hint += "pbag";
                     break;
-                case (Items.GLOVE):
+                case (Item.GLOVE):
                     hint += "glove";
                     break;
-                case (Items.HAMMER):
+                case (Item.HAMMER):
                     hint += "hammer";
                     break;
-                case (Items.HEART_CONTAINER):
+                case (Item.HEART_CONTAINER):
                     hint += "heart";
                     break;
-                case (Items.HORN):
+                case (Item.FLUTE):
                     hint += "flute";
                     break;
-                case (Items.KEY):
+                case (Item.KEY):
                     hint += "small key";
                     break;
-                case (Items.CHILD):
+                case (Item.CHILD):
                     hint += "child";
                     break;
-                case (Items.MAGIC_CONTAINER):
+                case (Item.MAGIC_CONTAINER):
                     hint += "magic jar";
                     break;
-                case (Items.MAGIC_KEY):
+                case (Item.MAGIC_KEY):
                     hint += "magic key";
                     break;
-                case (Items.MEDICINE):
+                case (Item.MEDICINE):
                     hint += "medicine";
                     break;
-                case (Items.ONEUP):
+                case (Item.ONEUP):
                     hint += "link doll";
                     break;
-                case (Items.RAFT):
+                case (Item.RAFT):
                     hint += "raft";
                     break;
-                case (Items.RED_JAR):
+                case (Item.RED_JAR):
                     hint += "red jar";
                     break;
-                case (Items.TROPHY):
+                case (Item.TROPHY):
                     hint += "trophy";
                     break;
             }

@@ -68,7 +68,7 @@ namespace Z2Randomizer
             p1.TownNum = p2.TownNum;
             p2.TownNum = tempTown;
 
-            Items i = p1.item;
+            Item i = p1.item;
             p1.item = p2.item;
             p2.item = i;
 

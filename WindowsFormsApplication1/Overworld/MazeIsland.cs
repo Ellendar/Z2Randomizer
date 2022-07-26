@@ -786,7 +786,7 @@ namespace Z2Randomizer
                 {
                     for (int j = 0; j < MAP_COLS; j++)
                     {
-                        if (!v[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[(int)Items.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
+                        if (!v[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
                         {
                             if (i - 1 >= 0)
                             {

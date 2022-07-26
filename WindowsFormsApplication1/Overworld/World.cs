@@ -133,8 +133,10 @@ namespace Z2Randomizer
         {
             //This only swaps elements in a list a number of times equal to the number of elements in the list.
             //This is an extremely biased shuffle (see https://blog.codinghorror.com/the-danger-of-naivete/)
+            //ALSO, it has a bias towards things in their vanilla locations by just not shuffling when one of
+            //the locations can't shuffle instead of ignoring such locations in the shuffling
             //TODO: Replace this with the knuth-fisher-yates Extension, which will break seed compatibility
-            for (int i = 0; i < locationsToShuffle.Count; i++)
+            /*for (int i = 0; i < locationsToShuffle.Count; i++)
             {
                 int s = hyrule.RNG.Next(i, locationsToShuffle.Count);
                 Location sl = locationsToShuffle[s];
@@ -142,6 +144,13 @@ namespace Z2Randomizer
                 {
                     Swap(locationsToShuffle[i], locationsToShuffle[s]);
                 }
+            }*/
+
+            List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle).ToList();
+            for (int i = shufflableLocations.Count() - 1; i > 0; i--)
+            {
+                int n = hyrule.RNG.Next(i + 1);
+                Swap(shufflableLocations[i], shufflableLocations[n]);
             }
         }
 
@@ -338,7 +347,7 @@ namespace Z2Randomizer
                 Allreached = true;
                 foreach(Location location in AllLocations)
                 {
-                    if(location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Items.DO_NOT_USE)
+                    if(location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Item.DO_NOT_USE)
                     {
                         if(!location.Reachable)
                         {
@@ -1337,7 +1346,7 @@ namespace Z2Randomizer
                     {
                         currentTerrainCount--;
                         int b = currentTerrainCount * 16 + (int)currentTerrain;
-                        //Console.WriteLine("Hex: {0:X}", b);
+                        //logger.WriteLine("Hex: {0:X}", b);
                         if (doWrite)
                         {
                             hyrule.ROMData.Put(loc, (Byte)b);
@@ -1352,7 +1361,7 @@ namespace Z2Randomizer
                     {
                         currentTerrainCount--;
                         int b = currentTerrainCount * 16 + (int)currentTerrain;
-                        //Console.WriteLine("Hex: {0:X}", b);
+                        //logger.WriteLine("Hex: {0:X}", b);
                         if (doWrite)
                         {
                             hyrule.ROMData.Put(loc, (Byte)b);
@@ -1373,7 +1382,7 @@ namespace Z2Randomizer
                         currentTerrainCount--;
                         //First 4 bits are the number of tiles to draw with that terrain type. Last 4 are the terrain type.
                         int b = currentTerrainCount * 16 + (int)currentTerrain;
-                        //Console.WriteLine("Hex: {0:X}", b);
+                        //logger.WriteLine("Hex: {0:X}", b);
                         if (doWrite)
                         {
                             hyrule.ROMData.Put(loc, (Byte)b);
@@ -1389,7 +1398,7 @@ namespace Z2Randomizer
                 //Write the last terrain segment for this row
                 currentTerrainCount--;
                 int b2 = currentTerrainCount * 16 + (int)currentTerrain;
-                //Console.WriteLine("Hex: {0:X}", b2);
+                //logger.WriteLine("Hex: {0:X}", b2);
                 if (doWrite)
                 {
                     hyrule.ROMData.Put(loc, (Byte)b2);
@@ -1538,7 +1547,7 @@ namespace Z2Randomizer
                         {
                             needJump = location.NeedJump;
                         }
-                        if (!v[i, j] && !(needJump && dy == i && dx == j && (!hyrule.SpellGet[Spell.JUMP] && !hyrule.SpellGet[Spell.FAIRY])) && !(needFairy && sy == i && sx == j && !hyrule.SpellGet[Spell.FAIRY]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[(int)Items.BOOTS]) || walkable.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hyrule.itemGet[(int)Items.HAMMER]) || (map[i, j] == Terrain.SPIDER && hyrule.itemGet[(int)Items.HORN])))
+                        if (!v[i, j] && !(needJump && dy == i && dx == j && (!hyrule.SpellGet[Spell.JUMP] && !hyrule.SpellGet[Spell.FAIRY])) && !(needFairy && sy == i && sx == j && !hyrule.SpellGet[Spell.FAIRY]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS]) || walkable.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hyrule.itemGet[Item.HAMMER]) || (map[i, j] == Terrain.SPIDER && hyrule.itemGet[Item.FLUTE])))
                         {
                             if (i - 1 >= 0)
                             {

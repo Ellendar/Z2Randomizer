@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ namespace Z2Randomizer
     class EastHyrule : World
     {
         private int bridgeCount;
+
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
             {
@@ -144,7 +147,7 @@ namespace Z2Randomizer
             oldKasuto = GetLocationByMem(0x8662);
             gp = GetLocationByMem(0x8665);
             gp.PalNum = 7;
-            gp.item = Items.DO_NOT_USE;
+            gp.item = Item.DO_NOT_USE;
             pbagCave1 = GetLocationByMem(0x863C);
             pbagCave2 = GetLocationByMem(0x863D);
             VANILLA_MAP_ADDR = 0x9056;
@@ -682,7 +685,7 @@ namespace Z2Randomizer
                         }
                     }
                     WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, hpLoc.Ypos - 30, hpLoc.Xpos);
-                    Console.WriteLine("East:" + bytesWritten);
+                    logger.Debug("East:" + bytesWritten);
                 }
                 
             }
@@ -1545,7 +1548,7 @@ namespace Z2Randomizer
             return true;
         }
 
-        public void AllReachable()
+        public void UpdateAllReachability()
         {
             if (!Allreached)
             {
@@ -1701,7 +1704,7 @@ namespace Z2Randomizer
                 {
                     if (v[location.Ypos - 30, location.Xpos])
                     {
-                        if ((!location.NeedRecorder || (location.NeedRecorder && hyrule.itemGet[(int)Items.HORN]) ) && (!location.NeedHammer || (location.NeedHammer && hyrule.itemGet[(int)Items.HAMMER]) )&& (!location.Needboots || (location.Needboots && hyrule.itemGet[(int)Items.BOOTS])))
+                        if ((!location.NeedRecorder || (location.NeedRecorder && hyrule.itemGet[Item.FLUTE]) ) && (!location.NeedHammer || (location.NeedHammer && hyrule.itemGet[Item.HAMMER]) )&& (!location.Needboots || (location.Needboots && hyrule.itemGet[Item.BOOTS])))
                         {
                             location.Reachable = true;
                             if (connections.Keys.Contains(location))

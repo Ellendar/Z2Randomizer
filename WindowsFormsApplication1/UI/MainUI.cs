@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.CodeDom;
 using System.Collections;
 using System.ComponentModel;
@@ -11,7 +12,7 @@ namespace Z2Randomizer
 {
     public partial class MainUI : Form
     {
-
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private Random r;
         private bool dontrunhandler;
         private readonly String flags = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#$";
@@ -213,7 +214,7 @@ namespace Z2Randomizer
 
 
             string path = Directory.GetCurrentDirectory();
-            Console.WriteLine(path);
+            logger.Debug(path);
             WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
             //WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
             WinSparkle.win_sparkle_init();
@@ -383,7 +384,7 @@ namespace Z2Randomizer
             else
             {
                 MessageBox.Show("An exception occurred generating the rom");
-                Console.WriteLine(generationException.StackTrace);
+                logger.Error(generationException.StackTrace);
             }
         }
 

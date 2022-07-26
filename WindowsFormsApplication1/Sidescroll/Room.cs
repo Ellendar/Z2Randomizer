@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.OleDb;
@@ -10,6 +11,7 @@ namespace Z2Randomizer
 {
     class Room
     {
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private int map;
         private Byte[] connections;
         private Byte[] enemies;
@@ -190,14 +192,6 @@ namespace Z2Randomizer
                 connections = value;
             }
         }
-
-
-
-
-
-
-
-
 
         public bool IsDeadEnd
         {
@@ -460,7 +454,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void setItem(Items it)
+        public void setItem(Item it)
         {
             for(int i = 4; i < sideView.Length; i+=2)
             {
@@ -474,7 +468,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void updateItem(Items i, int palSet, ROM ROMData)
+        public void updateItem(Item i, int palSet, ROM ROMData)
         {
             int sideViewPtr = (ROMData.GetByte(sideview1 + newmap * 2) + (ROMData.GetByte(sideview1 + 1 + newmap * 2) << 8)) + 0x8010;
 
@@ -535,7 +529,8 @@ namespace Z2Randomizer
             }
         }
 
-        public void dump()
+        /*
+        public void Dump()
         {
             Console.Write("new Room(" + map + ", " + "new Byte[] {" );
             
@@ -569,9 +564,9 @@ namespace Z2Randomizer
             Console.Write("0x{0:X}", bitmask); 
             Console.Write(", " + fairyBlocked.ToString().ToLower() + ", " + gloveBlocked.ToString().ToLower() + ", " + downstabBlocked.ToString().ToLower() + ", " + upstabBlocked.ToString().ToLower() + ", " + jumpBlocked.ToString().ToLower() + ", " + hasItem.ToString().ToLower() + ", " + hasBoss.ToString().ToLower() + ", " + hasDrop.ToString().ToLower() + ", " + elevatorScreen + ", ");
             Console.Write("0x{0:X}", memAddr);
-            Console.WriteLine(", " + udRev.ToString().ToLower() + ", " + dropZone.ToString().ToLower() + "),");
-
+            logger.WriteLine(", " + udRev.ToString().ToLower() + ", " + dropZone.ToString().ToLower() + "),");
         }
+        */
 
         public bool hasUpExit()
         {

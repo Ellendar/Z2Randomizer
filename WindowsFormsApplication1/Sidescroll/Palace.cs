@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Z2Randomizer
 {
     class Palace
     {
-
+        private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private int num;
         private Room root;
         private Room itemRoom;
@@ -116,7 +117,7 @@ namespace Z2Randomizer
                         connectBytes[k] = ROMData.GetByte(addr + k);
 
                     }
-                    Room r;
+                    Room room;
                     int sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0x8010;
                     if (j == 2)
                     {
@@ -147,14 +148,9 @@ namespace Z2Randomizer
                     }
 
 
-                    r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, false, false, false, false, false, -1, addr, false, false);
+                    //room = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, false, false, false, false, false, -1, addr, false, false);
 
-                    r.dump();
-
-
-
-
-
+                    //room.Dump();
                 }
             }
 
@@ -286,7 +282,7 @@ namespace Z2Randomizer
             }
         }
 
-        public void UpdateItem(Items i)
+        public void UpdateItem(Item i)
         {
             if (num == 1 || num == 2 || num == 5)
             {
@@ -944,7 +940,7 @@ namespace Z2Randomizer
                     n = hasUp ? n + 1 : n;
                     n = hasDown ? n + 1 : n;
 
-                    //Console.WriteLine(n);
+                    //logger.WriteLine(n);
 
                     if (n >= 3 || n == 1)
                     {
@@ -959,7 +955,7 @@ namespace Z2Randomizer
                         remove.Left.RightByte = remove.RightByte;
                         remove.Right.LeftByte = remove.LeftByte;
                         rooms--;
-                        //Console.WriteLine("removed 1 room");
+                        //logger.WriteLine("removed 1 room");
                         leftExits.Remove(remove);
                         rightExits.Remove(remove);
                         allRooms.Remove(remove);
@@ -973,7 +969,7 @@ namespace Z2Randomizer
                         remove.Down.Up = remove.Up;
                         remove.Up.DownByte = remove.DownByte;
                         remove.Down.UpByte = remove.UpByte;
-                        //Console.WriteLine("removed 1 room");
+                        //logger.WriteLine("removed 1 room");
                         rooms--;
                         upExits.Remove(remove);
                         downExits.Remove(remove);
@@ -1013,7 +1009,7 @@ namespace Z2Randomizer
                             upExits.Remove(remove.Left);
                             allRooms.Remove(remove);
                             allRooms.Remove(remove.Left);
-                            //Console.WriteLine("removed 2 room");
+                            //logger.WriteLine("removed 2 room");
                             rooms = rooms - 2;
                             tries = 0;
                             continue;
@@ -1047,7 +1043,7 @@ namespace Z2Randomizer
                             upExits.Remove(remove.Right);
                             allRooms.Remove(remove);
                             allRooms.Remove(remove.Right);
-                            //Console.WriteLine("removed 2 room");
+                            //logger.WriteLine("removed 2 room");
 
                             rooms = rooms - 2;
                             tries = 0;
@@ -1085,7 +1081,7 @@ namespace Z2Randomizer
                             downExits.Remove(remove.Left);
                             allRooms.Remove(remove);
                             allRooms.Remove(remove.Left);
-                            //Console.WriteLine("removed 2 room");
+                            //logger.WriteLine("removed 2 room");
 
                             rooms = rooms - 2;
                             tries = 0;
@@ -1120,7 +1116,7 @@ namespace Z2Randomizer
                             downExits.Remove(remove.Right);
                             allRooms.Remove(remove);
                             allRooms.Remove(remove.Right);
-                            //Console.WriteLine("removed 2 room");
+                            //logger.WriteLine("removed 2 room");
 
                             rooms = rooms - 2;
                             tries = 0;
@@ -1133,7 +1129,7 @@ namespace Z2Randomizer
 
                 }
             }
-            Console.WriteLine("Target: " + target + " Rooms: " + rooms);
+            logger.Debug("Target: " + target + " Rooms: " + rooms);
         }
 
         public void ShuffleSmallItems(int world, bool first, Random R, bool shuffleSmallItems, bool extraKeys, bool newMap)
@@ -1152,10 +1148,6 @@ namespace Z2Randomizer
             
             foreach (Room r in allRooms)
             {
-                if(r.Map == 102)
-                {
-                    Console.WriteLine("Here");
-                }
                 int i = startAddr + (r.Map * 2);
                 if(newMap)
                 {
