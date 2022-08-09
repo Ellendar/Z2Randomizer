@@ -93,7 +93,7 @@ namespace Z2Randomizer
         Random%        
     */
 
-    class Hyrule
+    public class Hyrule
     {
         private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 10;
         private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
@@ -112,20 +112,28 @@ namespace Z2Randomizer
         private const int overworldXOff = 0x3F;
         private const int overworldMapOff = 0x7E;
         private const int overworldWorldOff = 0xBD;
+
+        //Unused
         private Dictionary<int, int> spellEnters;
+        //Unused
         private Dictionary<int, int> spellExits;
+        //Unused
         public HashSet<String> reachableAreas;
+        //Which vanilla spell corresponds with which shuffled spell
         private Dictionary<Spell, Spell> spellMap; //key is location, value is spell (this is a bad implementation)
+        //Locations that contain an item
         private List<Location> itemLocs;
+        //Locations that are pbags in vanilla that are turned into hearts because maxhearts - startinghearts > 4
         private List<Location> pbagHearts;
+        //Continent connectors
         protected Dictionary<Location, List<Location>> connections;
-        public SortedDictionary<String, List<Location>> areasByLocation;
-        public Dictionary<Location, String> section;
+        //public SortedDictionary<String, List<Location>> areasByLocation;
+        //public Dictionary<Location, String> section;
         private int accessibleMagicContainers;
         private int heartContainers;
         private int startHearts;
         private int maxHearts;
-        private int numHContainers;
+        private int heartContainersInItemPool;
         private int kasutoJars;
         private BackgroundWorker worker;
         
@@ -236,7 +244,7 @@ namespace Z2Randomizer
                 SpellGet.Add(spell, false);
             }
             reachableAreas = new HashSet<string>();
-            areasByLocation = new SortedDictionary<string, List<Location>>();
+            //areasByLocation = new SortedDictionary<string, List<Location>>();
 
             kasutoJars = shuffler.ShuffleKasutoJars();
             //ROMData.moveAfterGem();
@@ -496,9 +504,6 @@ namespace Z2Randomizer
             String newFileName = props.filename.Substring(0, props.filename.LastIndexOf("\\") + 1) + "Z2_" + props.seed + "_" + props.flags + ".nes";
             ROMData.Dump(newFileName);
 
-
-
-
         }
 
 
@@ -600,7 +605,7 @@ namespace Z2Randomizer
             Location kidLoc = mazeIsland.kid;
             Location medicineLoc = westHyrule.medCave;
             Location trophyLoc = westHyrule.trophyCave;
-            numHContainers = maxHearts - startHearts;
+            heartContainersInItemPool = maxHearts - startHearts;
             
             foreach(Item item in itemGet.Keys.ToList())
             {
@@ -654,34 +659,35 @@ namespace Z2Randomizer
 
             }
             pbagHearts = new List<Location>();
-            if (numHContainers < 4)
+            //Replace any unused heart containers with small items
+            if (heartContainersInItemPool < 4)
             {
-                int x = 4 - numHContainers;
-                while (x > 0)
+                int heartContainersToAdd = 4 - heartContainersInItemPool;
+                while (heartContainersToAdd > 0)
                 {
                     int remove = RNG.Next(itemList.Count);
                     if (itemList[remove] == Item.HEART_CONTAINER)
                     {
                         itemList[remove] = smallItems[RNG.Next(smallItems.Count)];
-                        x--;
+                        heartContainersToAdd--;
                     }
                 }
             }
 
-            if (numHContainers > 4)
+            if (heartContainersInItemPool > 4)
             {
                 if (props.pbagItemShuffle)
                 {
-                    int x = numHContainers - 4;
-                    while (x > 0)
+                    int heartContainersToAdd = heartContainersInItemPool - 4;
+                    while (heartContainersToAdd > 0)
                     {
-                        itemList[22 - x] = Item.HEART_CONTAINER;
-                        x--;
+                        itemList[22 - heartContainersToAdd] = Item.HEART_CONTAINER;
+                        heartContainersToAdd--;
                     }
                 }
                 else
                 {
-                    int x = numHContainers - 4;
+                    int x = heartContainersInItemPool - 4;
                     while (x > 0)
                     {
                         int y = RNG.Next(3);
@@ -3189,7 +3195,7 @@ namespace Z2Randomizer
                 maxHearts = Int32.Parse(props.maxHearts);
             }
 
-            numHContainers = maxHearts - startHearts;
+            heartContainersInItemPool = maxHearts - startHearts;
 
             if (props.shuffleLives)
             {

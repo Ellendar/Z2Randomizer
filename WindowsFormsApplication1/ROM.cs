@@ -43,7 +43,7 @@ namespace Z2Randomizer
         * Enemies?
         * Rooms
     */
-    class ROM
+    public class ROM
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 

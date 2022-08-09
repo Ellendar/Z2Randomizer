@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer
 {
-    class Hint
+    public class Hint
     {
         private static List<int> used = new List<int>();
 

@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Z2Randomizer
 {
     [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-    class Location
+    public class Location
     {
         //private int externalWorld;
         //private int secondpartofcave;

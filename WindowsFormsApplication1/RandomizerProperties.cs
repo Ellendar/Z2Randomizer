@@ -43,7 +43,7 @@ namespace Z2Randomizer
         public String startTech;
         public Boolean shuffleLives;
         public Boolean permanentBeam;
-        public Boolean community;
+        public Boolean useCommunityHints;
         public int startAtk;
         public int startMag;
         public int startLifeLvl;

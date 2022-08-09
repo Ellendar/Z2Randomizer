@@ -11,7 +11,7 @@ namespace Z2Randomizer
 {
     //6A31 - address in memory of kasuto y coord;
     //6A35 - address in memory of palace 6 y coord
-    class EastHyrule : World
+    public class EastHyrule : World
     {
         private int bridgeCount;
 
