@@ -596,13 +596,12 @@ namespace Z2Randomizer
                 v.CopyTo(array, 0);
                 flagStr = flagStr + flags[array[0]];
 
-                v[0] = shufflePbagExp.Checked;
 
+                v[0] = shufflePbagExp.Checked;
                 w = new BitArray(new int[] { atkCapBox.SelectedIndex });
                 v[1] = w[0];
                 v[2] = w[1];
                 v[3] = w[2];
-
                 w = new BitArray(new int[] { magCapBox.SelectedIndex });
                 v[4] = w[0];
                 v[5] = w[1];
@@ -611,7 +610,6 @@ namespace Z2Randomizer
                 flagStr = flagStr + flags[array[0]];
 
                 v[0] = w[2];
-
                 w = new BitArray(new int[] { lifeCapBox.SelectedIndex });
                 v[1] = w[0];
                 v[2] = w[1];
@@ -1340,7 +1338,7 @@ namespace Z2Randomizer
             props.shortenGP = gpBox.Checked;
             props.fastCast = fastSpellBox.Checked;
             props.kasutoJars = kasutoBox.Checked;
-            props.community = communityBox.Checked;
+            props.useCommunityHints = communityBox.Checked;
             props.combineFire = combineFireBox.Checked;
             props.removeTbird = removeTbird.Checked;
             props.permanentBeam = beamBox.Checked;
@@ -1505,18 +1503,18 @@ namespace Z2Randomizer
             }
         }
 
-        private void townSwap_CheckedChanged(object sender, EventArgs e)
+        /*private void townSwap_CheckedChanged(object sender, EventArgs e)
         {
-            //if(townSwap.Checked)
-            //{
-            //    hideKasutoBox.SelectedIndex = 0;
-            //    hideKasutoBox.Enabled = false;
-            //}
-            //else
-            //{
-            //    hideKasutoBox.Enabled = true;
-            //}
-        }
+            if(townSwap.Checked)
+            {
+                hideKasutoBox.SelectedIndex = 0;
+                hideKasutoBox.Enabled = false;
+            }
+            else
+            {
+                hideKasutoBox.Enabled = true;
+            }
+        }*/
 
         private void enableLevelScaling(object sender, EventArgs e)
         {

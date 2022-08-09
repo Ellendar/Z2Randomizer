@@ -10,7 +10,7 @@ using Z2Randomizer.Sidescroll;
 
 namespace Z2Randomizer
 {
-    class Shuffler
+    public class Shuffler
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -106,7 +106,7 @@ namespace Z2Randomizer
             {
                 hints[70] = new Hint(Util.ToGameText("USE THIS$TO GO$FAST", true), this);
             }
-            if (props.community)
+            if (props.useCommunityHints)
             {
                 GenerateCommunityHints(hints);
             }

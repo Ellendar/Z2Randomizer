@@ -10,7 +10,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer
 {
-    abstract class World
+    public abstract class World
     {
         protected enum Biome { VANILLA, VANILLA_SHUFFLE, VANILLALIKE, ISLANDS, CANYON, MOUNTAINOUS, VOLCANO, CALDERA };
         protected enum Direction { NORTH, SOUTH, EAST, WEST };
@@ -135,7 +135,7 @@ namespace Z2Randomizer
             //This is an extremely biased shuffle (see https://blog.codinghorror.com/the-danger-of-naivete/)
             //ALSO, it has a bias towards things in their vanilla locations by just not shuffling when one of
             //the locations can't shuffle instead of ignoring such locations in the shuffling
-            //TODO: Replace this with the knuth-fisher-yates Extension, which will break seed compatibility
+            //TODO: Replace this with knuth-fisher-yates, which will break seed compatibility
             /*for (int i = 0; i < locationsToShuffle.Count; i++)
             {
                 int s = hyrule.RNG.Next(i, locationsToShuffle.Count);

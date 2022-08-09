@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer
 {
-    class Room
+    public class Room
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private int map;

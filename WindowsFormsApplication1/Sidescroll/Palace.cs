@@ -11,7 +11,7 @@ using Z2Randomizer.Sidescroll;
 
 namespace Z2Randomizer
 {
-    class Palace
+    public class Palace
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
         private int num;

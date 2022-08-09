@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Z2Randomizer
 {
-    class WestHyrule : World
+    public class WestHyrule : World
     {
         private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
