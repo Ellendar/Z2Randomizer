@@ -75,7 +75,10 @@ namespace Z2Randomizer
 
         }
 
-        public class MyEqualityComparer : IEqualityComparer<byte[]>
+        /// <summary>
+        /// Comparer where two byte arrays are equal iff their length is the same, and at each index, the arrays contain the same value
+        /// </summary>
+        public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
         {
             public bool Equals(byte[] x, byte[] y)
             {
@@ -106,7 +109,5 @@ namespace Z2Randomizer
                 return result;
             }
         }
-    }
-
-    
+    } 
 }
