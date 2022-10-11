@@ -215,9 +215,9 @@ namespace Z2Randomizer
 
             string path = Directory.GetCurrentDirectory();
             logger.Debug(path);
-            WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
+            //WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
             //WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
-            WinSparkle.win_sparkle_init();
+            //WinSparkle.win_sparkle_init();
         }
 
         private void shuffleItemBox_CheckedChanged(object sender, EventArgs e)

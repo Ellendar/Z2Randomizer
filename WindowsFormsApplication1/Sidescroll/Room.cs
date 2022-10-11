@@ -606,7 +606,7 @@ namespace Z2Randomizer
 
         }
 
-        public int getOpenExits()
+        public int countOpenExits()
         {
             int exits = 0;
             if(hasRightExit() && Right == null)

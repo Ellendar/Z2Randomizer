@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore.Storage;
+using NLog;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -94,21 +99,36 @@ namespace Z2Randomizer
         };
 
 
-        private static readonly string FLAGS = "hAhhA$w9$78$Jp5$$gAhOAdEScuA";
+        private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOAdEScuA";
         private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda II - The Adventure of Link (USA).nes";
-        private static readonly int LIMIT = 1;
+        private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
+        private static readonly int LIMIT = 10;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()
         {
+            StatisticsDbContext dbContext = new StatisticsDbContext(DB_PATH);
+
             Random random = new Random();
-            for(int i = 0; i < LIMIT; i++)
+            logger.Info("Started statistics generation with limit: " + LIMIT);
+            for (int i = 0; i < LIMIT; i++)
             {
                 RandomizerProperties properties = GetPropertiesFromFlags(FLAGS);
                 properties.flags = FLAGS;
                 properties.seed = random.Next(1000000000);
                 properties.filename = VANILLA_ROM_PATH;
-                Hyrule hyrule = new Hyrule(properties, new BackgroundWorker());
+                BackgroundWorker backgroundWorker = new BackgroundWorker()
+                {
+                    WorkerReportsProgress = true,
+                    WorkerSupportsCancellation = true
+                };
+                DateTime startTime = DateTime.Now;
+                Hyrule hyrule = new Hyrule(properties, backgroundWorker);
+                DateTime endTime = DateTime.Now;
                 Result result = new Result(hyrule, properties);
-
+                result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
+                dbContext.Add(result);
+                logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
+                dbContext.SaveChanges();
             }
         }
 
@@ -130,15 +150,6 @@ namespace Z2Randomizer
             properties.startBoots = bits[4];
             properties.shuffleOverworldEnemies = bits[5];
 
-            /*
-            v[0] = shuffleItemBox.Checked;
-            bits[1] = candleBox.Checked;
-            bits[2] = gloveBox.Checked;
-            bits[3] = raftBox.Checked;
-            bits[4] = bootsBox.Checked;
-            bits[5] = shuffleOverworldEnemies.Checked;
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.startFlute = bits[0];
             properties.startCross = bits[1];
@@ -146,15 +157,6 @@ namespace Z2Randomizer
             properties.startKey = bits[3];
             properties.shuffleSpells = bits[4];
             properties.hideLocs = bits[5];
-
-            /*
-            bits[0] = fluteBox.Checked;
-            bits[1] = crossBox.Checked;
-            bits[2] = hammerBox.Checked;
-            bits[3] = keyBox.Checked;
-            bits[4] = spellShuffleBox.Checked;
-            bits[5] = hideLocsBox.Checked;
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.startShield = bits[0];
@@ -164,15 +166,6 @@ namespace Z2Randomizer
             properties.startFire = bits[4];
             properties.combineFire = bits[5];
 
-            /*
-            bits[0] = shieldBox.Checked;
-            bits[1] = jumpBox.Checked;
-            bits[2] = lifeBox.Checked;
-            bits[3] = fairyBox.Checked;
-            bits[4] = fireBox.Checked;
-            bits[5] = combineFireBox.Checked;
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.startReflect = bits[0];
             properties.startSpell = bits[1];
@@ -180,15 +173,6 @@ namespace Z2Randomizer
             properties.shuffleLives = bits[3];
             properties.removeTbird = bits[4];
             properties.saneCaves = bits[5];
-
-            /*
-            bits[0] = reflectBox.Checked;
-            bits[1] = spellBox.Checked;
-            bits[2] = thunderBox.Checked;
-            bits[3] = livesBox.Checked;
-            bits[4] = removeTbird.Checked;
-            bits[5] = saneCaveShuffleBox.Checked;
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             //For some reason the low 3 bits of the heart container start setting are stored on one byte and the 4th bit is disjointed on the next bite...
@@ -217,36 +201,11 @@ namespace Z2Randomizer
                     break;
             }
 
-            /*
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            BitArray w = new BitArray(new int[] { heartCmbo.SelectedIndex, techCmbo.SelectedIndex });
-            bits[0] = w[0];
-            bits[1] = w[1];
-            bits[2] = w[2];
-            bits[3] = w[32];
-            bits[4] = w[33];
-            bits[5] = w[34];
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];*/
-
-
             properties.pbagDrop = nextBits[0];
             properties.pbagItemShuffle = nextBits[1];
             properties.p7shuffle = nextBits[3];
             properties.palacePalette = nextBits[4];
             properties.shuffleEncounters = nextBits[5];
-
-            /*
-            bits[0] = pbagDrop.Checked;
-            bits[1] = pbagItemShuffleBox.Checked;
-            bits[2] = w[3];
-            bits[3] = p7Shuffle.Checked;
-            bits[4] = palacePalette.Checked;
-            bits[5] = shuffleEncounters.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.extraKeys = bits[0];
@@ -271,18 +230,6 @@ namespace Z2Randomizer
             }
             properties.allowPathEnemies = bits[5];
 
-            /*
-            bits[0] = palaceKeys.Checked;
-            bits[1] = palaceSwapBox.Checked;
-            w = new BitArray(new int[] { atkEffBox.SelectedIndex });
-            bits[2] = w[0];
-            bits[3] = w[1];
-            bits[4] = w[2];
-            bits[5] = allowPathEnemies.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.permanentBeam = bits[0];
             properties.shuffleDripper = bits[1];
@@ -291,17 +238,6 @@ namespace Z2Randomizer
             properties.shuffleAllExp = bits[4];
             properties.shufflePalaceEnemies = bits[5];
 
-            /*
-            bits[0] = beamBox.Checked;
-            bits[1] = shuffleDripper.Checked;
-            bits[2] = dashBox.Checked;
-            bits[3] = shuffleEnemyHPBox.Checked;
-            bits[4] = shuffleAllExp.Checked;
-            bits[5] = shufflePalaceEnemies.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.shuffleAtkExp = bits[0];
             properties.shuffleLifeExp = bits[1];
@@ -309,17 +245,6 @@ namespace Z2Randomizer
             properties.upaBox = bits[3];
             properties.shortenGP = bits[4];
             properties.requireTbird = bits[5];
-
-            /*
-            bits[0] = shuffleAtkExp.Checked;
-            bits[1] = lifeExpNeeded.Checked;
-            bits[2] = magicExpNeeded.Checked;
-            bits[3] = upaBox.Checked;
-            bits[4] = gpBox.Checked;
-            bits[5] = tbirdBox.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0))
@@ -344,18 +269,6 @@ namespace Z2Randomizer
             properties.shuffleStealExpAmt = bits[4];
             properties.shuffleLifeRefill = bits[5];
 
-            /*
-            w = new BitArray(new int[] { magEffBox.SelectedIndex });
-            bits[0] = w[0];
-            bits[1] = w[1];
-            bits[2] = w[2];
-            bits[3] = stealExpBox.Checked;
-            bits[4] = stealExpAmt.Checked;
-            bits[5] = lifeRefilBox.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.shuffleSwordImmunity = bits[0];
             properties.jumpAlwaysOn = bits[1];
@@ -366,20 +279,6 @@ namespace Z2Randomizer
             }
             properties.mixEnemies = bits[5];
 
-            /*
-            bits[0] = swordImmuneBox.Checked;
-            bits[1] = jumpNormalbox.Checked;
-
-            w = new BitArray(new int[] { numGemsCbo.SelectedIndex });
-            bits[2] = w[0];
-            bits[3] = w[1];
-            bits[4] = w[2];
-            bits[5] = mixEnemies.Checked;
-
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.shufflePalaceItems = bits[0];
             properties.shuffleOverworldItems = bits[1];
@@ -387,17 +286,6 @@ namespace Z2Randomizer
             properties.shuffleSmallItems = bits[3];
             properties.shuffleSpellLocations = bits[4];
             properties.disableMagicRecs = bits[5];
-
-            /*
-            bits[0] = palaceItemBox.Checked;
-            bits[1] = overworldItemBox.Checked;
-            bits[2] = mixItemBox.Checked;
-            bits[3] = shuffleSmallItemsBox.Checked;
-            bits[4] = shuffleSpellLocationsBox.Checked;
-            bits[5] = disableJarBox.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0))
@@ -422,18 +310,6 @@ namespace Z2Randomizer
             properties.useCommunityHints = bits[4];
             properties.shuffleEnemyPalettes = bits[5];
 
-            /*
-            w = new BitArray(new int[] { lifeEffBox.SelectedIndex });
-            bits[0] = w[0];
-            bits[1] = w[1];
-            bits[2] = w[2];
-            bits[3] = kasutoBox.Checked;
-            bits[4] = communityBox.Checked;
-            bits[5] = enemyPalette.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.maxHearts = ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0) + (bits[3] ? 8 : 0) + 1).ToString();
             if (properties.maxHearts == "9")
@@ -453,20 +329,6 @@ namespace Z2Randomizer
                     break;
             }
 
-            /*
-            w = new BitArray(new int[] { maxHeartsBox.SelectedIndex });
-            bits[0] = w[0];
-            bits[1] = w[1];
-            bits[2] = w[2];
-            bits[3] = w[3];
-            w = new BitArray(new int[] { hpCmbo.SelectedIndex });
-            bits[4] = w[0];
-            bits[5] = w[1];
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0))
             {
@@ -485,18 +347,6 @@ namespace Z2Randomizer
             properties.smallbluejar = bits[4];
             properties.smallredjar = bits[5];
 
-            /*
-            w = new BitArray(new int[] { hideKasutoBox.SelectedIndex });
-            bits[0] = w[0];
-            bits[1] = w[1];
-            bits[2] = enemyDropBox.Checked;
-            bits[3] = spellItemBox.Checked;
-            bits[4] = smallBlueJar.Checked;
-            bits[5] = smallRedJar.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.small50 = bits[0];
             properties.small100 = bits[1];
@@ -504,17 +354,6 @@ namespace Z2Randomizer
             properties.small500 = bits[3];
             properties.small1up = bits[4];
             properties.smallkey = bits[5];
-
-            /*
-            bits[0] = small50.Checked;
-            bits[1] = small100.Checked;
-            bits[2] = small200.Checked;
-            bits[3] = small500.Checked;
-            bits[4] = small1up.Checked;
-            bits[5] = smallKey.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.largebluejar = bits[0];
@@ -524,17 +363,6 @@ namespace Z2Randomizer
             properties.large200 = bits[4];
             properties.large500 = bits[5];
 
-            /*
-            bits[0] = largeBlueJar.Checked;
-            bits[1] = largeRedJar.Checked;
-            bits[2] = large50.Checked;
-            bits[3] = large100.Checked;
-            bits[4] = large200.Checked;
-            bits[5] = large500.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.large1up = bits[0];
             properties.largekey = bits[1];
@@ -542,17 +370,6 @@ namespace Z2Randomizer
             properties.spellItemHints = bits[3];
             properties.standardizeDrops = bits[4];
             properties.randoDrops = bits[5];
-
-            /*
-            bits[0] = large1up.Checked;
-            bits[1] = largeKey.Checked;
-            bits[2] = helpfulHints.Checked;
-            bits[3] = spellItemHints.Checked;
-            bits[4] = standardDrops.Checked;
-            bits[5] = randoDrops.Checked;
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             nextBits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
@@ -562,26 +379,7 @@ namespace Z2Randomizer
             properties.lifeCap = (8 - (nextBits[1] ? 1 : 0) + (nextBits[2] ? 2 : 0) + (nextBits[3] ? 4 : 0));
             properties.scaleLevels = bits[4];
             properties.townNameHints = bits[5];
-            /*
-            bits[0] = shufflePbagExp.Checked;
 
-            w = new BitArray(new int[] { atkCapBox.SelectedIndex });
-            bits[1] = w[0];
-            bits[2] = w[1];
-            bits[3] = w[2];
-
-            w = new BitArray(new int[] { magCapBox.SelectedIndex });
-            bits[4] = w[0];
-            bits[5] = w[1];
-
-            bits[0] = w[2];
-            w = new BitArray(new int[] { lifeCapBox.SelectedIndex });
-            bits[1] = w[0];
-            bits[2] = w[1];
-            bits[3] = w[2];
-            bits[4] = scaleLevels.Checked;
-            bits[5] = townSpellHints.Checked;
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0))
@@ -616,46 +414,11 @@ namespace Z2Randomizer
             }
             bool startAttackLowBit = bits[5];
 
-            /*
-            w = new BitArray(new int[] { encounterBox.SelectedIndex });
-            bits[0] = w[0];
-            bits[1] = w[1];
-            w = new BitArray(new int[] { expDropBox.SelectedIndex });
-            bits[2] = w[0];
-            bits[3] = w[1];
-            bits[4] = w[2];
-            w = new BitArray(new int[] { startAtkBox.SelectedIndex });
-            bits[5] = w[0];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.startAtk = (startAttackLowBit ? 1 : 0) + (bits[0] ? 2 : 0) + (bits[1] ? 4 : 0) + 1;
             properties.startMag = (bits[2] ? 1 : 0) + (bits[3] ? 2 : 0) + (bits[4] ? 4 : 0) + 1;
             bool startLifeLowBit = bits[5];
 
-            /*
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-
-            bits[0] = w[1];
-            bits[1] = w[2];
-            w = new BitArray(new int[] { startMagBox.SelectedIndex });
-            bits[2] = w[0];
-            bits[3] = w[1];
-            bits[4] = w[2];
-            w = new BitArray(new int[] { startLifeBox.SelectedIndex });
-            bits[5] = w[0];
-
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
-            /*
-            "Normal",
-            "R+B Border Shuffle",
-            "Transportation Shuffle",
-            "Anything Goes"});
-            */
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.startLifeLvl = (startLifeLowBit ? 1 : 0) + (bits[0] ? 2 : 0) + (bits[1] ? 4 : 0) + 1;
             switch((bits[2] ? 1 : 0) + (bits[3] ? 2 : 0))
@@ -675,18 +438,6 @@ namespace Z2Randomizer
             }
             properties.boulderBlockConnections = bits[4];
             bool westBiomeLowBit = bits[5];
-
-            /*
-            bits[0] = w[1];
-            bits[1] = w[2];
-
-            w = new BitArray(new int[] { continentConnectionBox.SelectedIndex });
-            bits[2] = w[0];
-            bits[3] = w[1];
-            bits[4] = boulderConnectionBox.Checked;
-            w = new BitArray(new int[] { westBiome.SelectedIndex });
-            bits[5] = w[0];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch ((westBiomeLowBit ? 1 : 0) + (bits[0] ? 2 : 0) + (bits[1] ? 4 : 0) + (bits[2] ? 8 : 0))
@@ -720,20 +471,6 @@ namespace Z2Randomizer
                     break;
             }
             int dmBiome = (bits[3] ? 1 : 0) + (bits[4] ? 2 : 0) + (bits[5] ? 4 : 0);
-
-            /*
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-
-            bits[0] = w[1];
-            bits[1] = w[2];
-
-            bits[2] = w[3];
-            w = new BitArray(new int[] { dmBiome.SelectedIndex });
-            bits[3] = w[0];
-            bits[4] = w[1];
-            bits[5] = w[2];
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch (dmBiome + (bits[0] ? 8 : 0))
@@ -799,24 +536,6 @@ namespace Z2Randomizer
             }
             bool mazeBiomeLowBit = bits[5];
 
-            /*
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-
-            bits[0] = w[3];
-            w = new BitArray(new int[] { eastBiome.SelectedIndex });
-            bits[1] = w[0];
-
-            bits[2] = w[1];
-            bits[3] = w[2];
-            bits[4] = w[3];
-            w = new BitArray(new int[] { mazeBiome.SelectedIndex });
-            bits[5] = w[0];
-
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-            */
-
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             switch ((mazeBiomeLowBit ? 1 : 0) + (bits[0] ? 2 : 0))
             {
@@ -838,14 +557,6 @@ namespace Z2Randomizer
             properties.bossItem = bits[3];
             properties.bootsWater = bits[4];
             properties.spellEnemy = bits[5];
-            /*
-            bits[0] = w[1];
-            bits[1] = vanillaOriginalTerrain.Checked;
-            bits[2] = shuffleHidden.Checked;
-            bits[3] = bossItem.Checked;
-            bits[4] = waterBoots.Checked;
-            bits[5] = spellEnemy.Checked;
-            */
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
             properties.bagusWoods = bits[0];
@@ -864,18 +575,6 @@ namespace Z2Randomizer
             properties.customRooms = bits[2];
             properties.blockersAnywhere = bits[3];
             properties.bossRoomConnect = bits[4];
-            /*
-            bits.CopyTo(array, 0);
-            flagStr = flagStr + flags[array[0]];
-
-            w = new BitArray(new int[] { palaceBox.SelectedIndex });
-            bits[0] = baguBox.Checked;
-            bits[1] = w[0];
-            bits[2] = customRooms.Checked;
-            bits[3] = blockerBox.Checked;
-            bits[4] = bossRoomBox.Checked;
-            bits[5] = w[1];
-            */
 
             //These properties aren't stored in the flags, but aren't defaulted out in properties and will break if they are null.
             //Probably properties at some point should stop being a struct and default these in the right place

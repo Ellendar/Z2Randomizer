@@ -172,11 +172,22 @@ namespace Z2Randomizer
 
         private Shuffler shuffler;
         private RandomizerProperties props;
-        private List<World> worlds;
-        private List<Palace> palaces;
-        private bool startKid;
-        private bool startTrophy;
-        private bool startMed;
+        public List<World> worlds;
+        public List<Palace> palaces;
+        public bool startKid;
+        public bool startTrophy;
+        public bool startMed;
+
+        //DEBUG
+        public DateTime startTime = DateTime.Now;
+        public DateTime updateProgress2Timestamp = DateTime.Now;
+        public DateTime updateProgress3Timestamp = DateTime.Now;
+        public DateTime updateProgress4Timestamp = DateTime.Now;
+        public DateTime updateProgress5Timestamp = DateTime.Now;
+        public DateTime updateProgress6Timestamp = DateTime.Now;
+        //DateTime updateProgress7Timestamp = DateTime.Now; There is no progress state 7
+        public DateTime updateProgress8Timestamp = DateTime.Now;
+        public DateTime updateProgress9Timestamp = DateTime.Now;
 
         private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
         {
@@ -218,9 +229,9 @@ namespace Z2Randomizer
 
         public Hyrule(RandomizerProperties p, BackgroundWorker worker)
         {
-            logger.Info("Started generation for " + props.flags + " / " + props.seed);
             props = p;
-            
+            logger.Info("Started generation for " + props.flags + " / " + props.seed);
+
             RNG = new Random(props.seed);
             ROMData = new ROM(props.filename);
             //ROMData.dumpAll("glitch");
@@ -465,6 +476,7 @@ namespace Z2Randomizer
             accessibleMagicContainers = 4;
             visitedEnemies = new List<int>();
 
+            //JEFF START HERE
             RandomizeStartingValues();
             RandomizeEnemies();
 
@@ -490,12 +502,14 @@ namespace Z2Randomizer
 
             ProcessOverworld();
             bool f = UpdateProgress(8);
-            if(!f)
+            updateProgress8Timestamp = DateTime.Now;
+            if (!f)
             {
                 return;
             }
             shuffler.GenerateHints(itemLocs, startTrophy, startMed, startKid, spellMap, westHyrule.bagu);
             f = UpdateProgress(9);
+            updateProgress9Timestamp = DateTime.Now;
             if (!f)
             {
                 return;
@@ -936,11 +950,11 @@ namespace Z2Randomizer
                 logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
                 + " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
             }
-            logger.Info("Reached: " + count);
-            logger.Info("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-            logger.Info("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-            logger.Info("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-            logger.Info("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
+            logger.Debug("Reached: " + count);
+            logger.Debug("wh: " + wh + " / " + westHyrule.AllLocations.Count);
+            logger.Debug("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
+            logger.Debug("dm: " + dm + " / " + deathMountain.AllLocations.Count);
+            logger.Debug("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
 
             //return true;
             logger.Trace("-");
@@ -998,6 +1012,9 @@ namespace Z2Randomizer
             return location.Reachable;
         }
 
+        /// <summary>
+        /// Removes the intermediate room between entering the spell house and reaching the old man's basement
+        /// </summary>
         private void ShortenWizards()
         {
             /*
@@ -1573,6 +1590,7 @@ namespace Z2Randomizer
                 {
                     //GENERATE WEST
                     bool shouldContinue = UpdateProgress(2);
+                    updateProgress2Timestamp = DateTime.Now;
                     if (!shouldContinue)
                     {
                         return;
@@ -1586,6 +1604,7 @@ namespace Z2Randomizer
 
                     //GENERATE DM
                     shouldContinue = UpdateProgress(3);
+                    updateProgress3Timestamp = DateTime.Now;
                     if (!shouldContinue)
                     {
                         return;
@@ -1598,6 +1617,7 @@ namespace Z2Randomizer
 
                     //GENERATE EAST
                     shouldContinue = UpdateProgress(4);
+                    updateProgress4Timestamp = DateTime.Now;
                     if (!shouldContinue)
                     {
                         return;
@@ -1610,6 +1630,7 @@ namespace Z2Randomizer
 
                     //GENERATE MAZE ISLAND
                     shouldContinue = UpdateProgress(5);
+                    updateProgress5Timestamp = DateTime.Now;
                     if (!shouldContinue)
                     {
                         return;
@@ -1621,10 +1642,12 @@ namespace Z2Randomizer
                     mazeIsland.ResetVisitabilityState();
 
                     shouldContinue = UpdateProgress(6);
+                    updateProgress6Timestamp = DateTime.Now;
                     if (!shouldContinue)
                     {
                         return;
                     }
+
 
                     //Then perform up to 11 non-terrain shuffles looking for one that works.
                     nonTerrainShuffleAttempt = 0;
@@ -1661,15 +1684,13 @@ namespace Z2Randomizer
                         ShuffleSpells();
                         LoadItemLocs();
                         deathMountain.ResetVisitabilityState();
+
                         westHyrule.setStart();
                         ShuffleItems();
+
                         ShufflePalaces();
                         LoadItemLocs();
-                        shouldContinue = UpdateProgress(7);
-                        if (!shouldContinue)
-                        {
-                            return;
-                        }
+
 
                         westHyrule.UpdateAllReachability();
                         eastHyrule.UpdateAllReachability();
@@ -1700,7 +1721,7 @@ namespace Z2Randomizer
             {
                 foreach (World w in worlds)
                 {
-                    w.ShuffleE();
+                    w.ShuffleEnemies();
                 }
             }
         }
@@ -2219,36 +2240,18 @@ namespace Z2Randomizer
             {
                 shuffler.ShuffleBossDrop();
             }
-            if(opts != 0) { 
-                int wb = RNG.Next(opts);
-                if(wb == 0)
+            if(opts != 0) {
+                props.westBiome = RNG.Next(opts) switch
                 {
-                    props.westBiome = "Vanilla-Like";
-                }
-                else if(wb == 1)
-                {
-                    props.westBiome = "Islands";
-                }
-                else if(wb == 2)
-                {
-                    props.westBiome = "Canyon";
-                }
-                else if (wb == 3)
-                {
-                    props.westBiome = "Caldera";
-                }
-                else if (wb == 4)
-                {
-                    props.westBiome = "Mountainous";
-                }
-                else if (wb == 5)
-                {
-                    props.westBiome = "Vanilla";
-                }
-                else if (wb == 6)
-                {
-                    props.westBiome = "Vanilla (shuffled)";
-                }
+                    0 => "Vanilla-Like",
+                    1 => "Islands",
+                    2 => "Canyon",
+                    3 => "Caldera",
+                    4 => "Mountainous",
+                    5 => "Vanilla",
+                    6 => "Vanilla (shuffled)",
+                    _ => throw new Exception("West biome shuffle out of range.")
+                };
             }
 
             opts = 0;

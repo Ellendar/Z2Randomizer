@@ -13,4 +13,15 @@
   <PropertyGroup>
     <EnableSecurityDebugging>false</EnableSecurityDebugging>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="UI\GenerateBatchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\GeneratingSeedsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\MainUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

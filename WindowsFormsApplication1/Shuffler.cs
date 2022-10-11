@@ -91,6 +91,13 @@ namespace Z2Randomizer
         public Random R { get => R1; set => R1 = value; }
         public RandomizerProperties Props { get => props; set => props = value; }
 
+        //DEBUG FLAGS
+        private static int roomaddIteration = 0;
+
+        //CONSTANTS
+        private const int PALACE_SHUFFLE_ATTEMPT_LIMIT = 100;
+
+
         public Shuffler(RandomizerProperties props, ROM ROMData, Random R)
         {
             this.R1 = R;
@@ -645,10 +652,10 @@ namespace Z2Randomizer
         public List<Palace> CreatePalaces(BackgroundWorker worker)
         {
             List<Palace> palaces = new List<Palace>();
-            Dictionary<Byte[], List<Room>> sideviews = new Dictionary<Byte[], List<Room>>(new Util.MyEqualityComparer());
-            Dictionary<Byte[], List<Room>> sideviewsgp = new Dictionary<Byte[], List<Room>>(new Util.MyEqualityComparer());
+            Dictionary<Byte[], List<Room>> sideviews = new Dictionary<Byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
+            Dictionary<Byte[], List<Room>> sideviewsgp = new Dictionary<Byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
             int enemyBytes = 0;
-            int enemyBytesgp = 0;
+            int enemyBytesGP = 0;
             int mapNo = 0;
             int mapNoGp = 0;
             if (props.createPalaces)
@@ -692,10 +699,10 @@ namespace Z2Randomizer
                     sizes[6] = R.Next(54, 60);
                 }
                 
-                for (int i = 1; i < 8; i++) //everything but gp
+                for (int i = 1; i < 8; i++)
                 {
-                    
-                    Palace p = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
+
+                    Palace p;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                     int tries = 0;
                     
                     do
@@ -709,34 +716,16 @@ namespace Z2Randomizer
                         bool done = false;
                         do
                         {
-                            if (i == 1)
+                            mapNo = i switch
                             {
-                                mapNo = 0;
-                            }
-                            if (i == 2)
-                            {
-                                mapNo = palaces[0].AllRooms.Count;
-                            }
-                            if (i == 3)
-                            {
-                                mapNo = 0;
-                            }
-                            if (i == 4)
-                            {
-                                mapNo = palaces[2].AllRooms.Count;
-
-                            }
-                            if (i == 5)
-                            {
-                                mapNo = palaces[0].AllRooms.Count + palaces[1].AllRooms.Count;
-
-                            }
-                            if (i == 6)
-                            {
-                                mapNo = palaces[2].AllRooms.Count + palaces[3].AllRooms.Count;
-
-                            }
-
+                                1 => 0,
+                                2 => palaces[0].AllRooms.Count,
+                                3 => 0,
+                                4 => palaces[2].AllRooms.Count,
+                                5 => palaces[0].AllRooms.Count + palaces[1].AllRooms.Count,
+                                6 => mapNo = palaces[2].AllRooms.Count + palaces[3].AllRooms.Count,
+                                _ => 0
+                            };
 
                             if (i == 7)
                             {
@@ -751,7 +740,7 @@ namespace Z2Randomizer
                             p.AllRooms.Add(p.Root);
 
                             p.AllRooms.Add(p.BossRoom);
-                            if (i < 7)
+                            if (i < 7) //Not GP
                             {
                                 p.ItemRoom = SelectItemRoom();
                                 if((i == 1 || i == 2 || i == 5) && p.ItemRoom.HasBoss)
@@ -786,7 +775,7 @@ namespace Z2Randomizer
                                 p.SortRoom(p.ItemRoom);
                                 p.SetOpenRoom(p.Root);
                             }
-                            else
+                            else //GP
                             {
                                 p.Root.Newmap = mapNoGp;
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
@@ -840,6 +829,7 @@ namespace Z2Randomizer
                                     addThis.Newmap = mapNoGp;
                                 }
                                 bool added = p.AddRoom(addThis, props.blockersAnywhere);
+                                roomaddIteration++;
                                 if (added)
                                 {
                                     IncrementMapNo(ref mapNo, ref mapNoGp, i);
@@ -883,7 +873,7 @@ namespace Z2Randomizer
                             done = true;
                             foreach (Room r in p.AllRooms)
                             {
-                                if (r.getOpenExits() > 0)
+                                if (r.countOpenExits() > 0)
                                 {
                                     done = false;
                                 }
@@ -893,20 +883,16 @@ namespace Z2Randomizer
 
                         p.ShuffleRooms(R);
                         bool reachable = p.AllReachable();
-                        bool keepgoing = reachable;
-                        while ((!reachable || (i == 7 && (props.requireTbird && !p.RequiresThunderbird())) || p.HasDeadEnd()) && (tries < 10000))
+                        while ((!reachable || (i == 7 && (props.requireTbird && !p.RequiresThunderbird())) || p.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
                         {
                             p.ResetRooms();
                             p.ShuffleRooms(R);
                             reachable = p.AllReachable();
-                            if(reachable)
-                            {
-                                keepgoing = true;
-                            }
                             tries++;
-                            logger.Trace(tries);
+                            logger.Debug("Palace room shuffle attempt #" + tries);
                         }
-                    } while (tries >= 10000);
+                    } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
+                    p.Generations += tries;
                     palaces.Add(p);
                     foreach (Room r in p.AllRooms)
                     {
@@ -927,7 +913,7 @@ namespace Z2Randomizer
 
                         else
                         {
-                            enemyBytesgp += r.Enemies.Length;
+                            enemyBytesGP += r.Enemies.Length;
                             if (sideviewsgp.ContainsKey(r.SideView))
                             {
                                 sideviewsgp[r.SideView].Add(r);
@@ -1012,7 +998,7 @@ namespace Z2Randomizer
             if (props.createPalaces)
             {
                 Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
-                if (enemyBytes > 0x400 || enemyBytesgp > 681)
+                if (enemyBytes > 0x400 || enemyBytesGP > 681)
                 {
                     return new List<Palace>();
                 }
@@ -1035,7 +1021,7 @@ namespace Z2Randomizer
                     {
                         if(r.Newmap == 45)
                         {
-                            Console.Write("here");
+                            logger.Trace("here");
                         }
                         int palSet = 1;
                         if (palaces[2].AllRooms.Contains(r) || palaces[3].AllRooms.Contains(r) || palaces[5].AllRooms.Contains(r))
@@ -1058,7 +1044,7 @@ namespace Z2Randomizer
                     }
 
                 }
-                freeSpace = SetupFreeSpace(false, enemyBytesgp);
+                freeSpace = SetupFreeSpace(false, enemyBytesGP);
                 foreach (byte[] sv in sideviewsgp.Keys)
                 {
                     int addr = FindFreeSpace(freeSpace, sv);

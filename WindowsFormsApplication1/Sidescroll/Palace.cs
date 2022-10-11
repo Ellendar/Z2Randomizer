@@ -67,6 +67,9 @@ namespace Z2Randomizer
         internal Room Tbird { get => tbird; set => tbird = value; }
         public bool NeedReflect { get => needReflect; set => needReflect = value; }
 
+        //DEBUG
+        public int Generations { get; set; }
+
         public Palace(int number, int b, int c, ROM ROMData)
         {
             num = number;
@@ -203,7 +206,7 @@ namespace Z2Randomizer
                 return false;
             }
 
-            if (netDeadEnds < -3 && r.getOpenExits() > 2)
+            if (netDeadEnds < -3 && r.countOpenExits() > 2)
             {
                 return false;
             }
@@ -219,7 +222,8 @@ namespace Z2Randomizer
                 ProcessRoom(r);
                 return true;
             }
-            foreach (Room open in openRooms)
+            //#13: Iterate over a copy of the open rooms list to prevent concurrent modification if AttachToOpen both removes an entry from openRooms and returns false
+            foreach (Room open in openRooms.ToList())
             {
                 placed = AttachToOpen(r, open);
 
@@ -239,7 +243,7 @@ namespace Z2Randomizer
             {
                 netDeadEnds++;
             }
-            else if (r.getOpenExits() > 1)
+            else if (r.countOpenExits() > 1)
             {
                 netDeadEnds--;
             }
@@ -247,7 +251,7 @@ namespace Z2Randomizer
             SortRoom(r);
             numRooms++;
 
-            if (num != 7 && openRooms.Count > 1 && itemRoom.getOpenExits() > 0)
+            if (num != 7 && openRooms.Count > 1 && itemRoom.countOpenExits() > 0)
             {
                 foreach (Room open2 in openRooms)
                 {
@@ -258,7 +262,7 @@ namespace Z2Randomizer
                     }
                 }
             }
-            if (openRooms.Count > 1 && bossRoom.getOpenExits() > 0)
+            if (openRooms.Count > 1 && bossRoom.countOpenExits() > 0)
             {
                 foreach (Room open2 in openRooms)
                 {
@@ -269,7 +273,7 @@ namespace Z2Randomizer
                     }
                 }
             }
-            if (num == 7 && openRooms.Count > 1 && Tbird != null && Tbird.getOpenExits() > 1)
+            if (num == 7 && openRooms.Count > 1 && Tbird != null && Tbird.countOpenExits() > 1)
             {
                 foreach (Room open2 in openRooms)
                 {
@@ -372,9 +376,17 @@ namespace Z2Randomizer
             return true;
         }
 
+        /// <summary>
+        /// Attach the provided room to the open room if there is a compatable pair of exits between the two rooms.
+        /// Rooms attempt to use the exits in the following order (from the perspective of open):  
+        /// </summary>
+        /// <param name="r"></param> The room to be attached
+        /// <param name="open"></param> The room onto which R is attached
+        /// <returns>Whether or not the room was actually able to be attached.</returns>
         private bool AttachToOpen(Room r, Room open)
         {
             bool placed = false;
+            //Right from open into r
             if (!placed && open.hasRightExit() && open.Right == null && r.hasLeftExit() && r.Left == null)
             {
                 open.Right = r;
@@ -385,7 +397,7 @@ namespace Z2Randomizer
 
                 placed = true;
             }
-
+            //Left open into r
             if (!placed && open.hasLeftExit() && open.Left == null && r.hasRightExit() && r.Right == null)
             {
                 open.Left = r;
@@ -396,7 +408,7 @@ namespace Z2Randomizer
 
                 placed = true;
             }
-
+            //Elevator Up from open
             if (!placed && open.hasUpExit() && open.Up == null && r.hasDownExit() && r.Down == null && !r.HasDrop)
             {
                 open.Up = r;
@@ -407,7 +419,7 @@ namespace Z2Randomizer
 
                 placed = true;
             }
-
+            //Down Elevator from open
             if (!placed && open.hasDownExit() && !open.HasDrop && open.Down == null && r.hasUpExit() && r.Up == null)
             {
 
@@ -419,7 +431,7 @@ namespace Z2Randomizer
 
                 placed = true;
             }
-
+            //Drop from open into r
             if (!placed && open.hasDownExit() && open.HasDrop && open.Down == null && r.DropZone)
             {
 
@@ -428,7 +440,7 @@ namespace Z2Randomizer
                 r.DropZone = false;
                 placed = true;
             }
-
+            //Drop from r into open 
             if (!placed && open.DropZone && r.HasDrop && r.Down == null && r.hasDownExit())
             {
 
@@ -437,20 +449,25 @@ namespace Z2Randomizer
                 open.DropZone = false;
                 placed = true;
             }
-
-            if (open.getOpenExits() == 0)
+            //If the room doesn't have any open exits anymore, remove it from the list
+            //#13: If the room doesn't have any open exits, how did it get into the 
+            if (open.countOpenExits() == 0)
             {
                 openRooms.Remove(open);
             }
+            //Otherwise, if the open room isn't in the open rooms list (What? How?) and the pending openings hasn't been met,
+            //put the open room in openRooms where it belongs, and then for some reason mark that we successfully placed the room even though we didn't.
             else if (!openRooms.Contains(open) && (openRooms.Count < 3 || placed))
             {
                 openRooms.Add(open);
                 placed = true;
             }
-            if (r.getOpenExits() == 0)
+            //If the room itself is already in the open rooms list (How?), but we filled the last exit, remove it from the open rooms list.
+            if (r.countOpenExits() == 0)
             {
                 openRooms.Remove(r);
             }
+            //Otherwise, if the room being added still has unmatched openings, and the maximum pending openings hasn't been met, add this room to the open rooms list
             else if (!openRooms.Contains(r) && (openRooms.Count < 3 || placed))
             {
                 openRooms.Add(r);
@@ -674,12 +691,12 @@ namespace Z2Randomizer
             return false;
         }
 
-        public void ShuffleRooms(Random R)
+        public void ShuffleRooms(Random r)
         {
-            //This method is so ugly and i hate it.
+            //Digshake - This method is so ugly and i hate it.
             for (int i = 0; i < upExits.Count; i++)
             {
-                int swap = R.Next(i, upExits.Count);
+                int swap = r.Next(i, upExits.Count);
                 Room temp = upExits[i].Up;
                 Room down1 = upExits[swap].Up;
                 temp.Down = upExits[swap];
@@ -697,7 +714,7 @@ namespace Z2Randomizer
             }
             for (int i = 0; i < onlyDownExits.Count; i++)
             {
-                int swap = R.Next(i, onlyDownExits.Count);
+                int swap = r.Next(i, onlyDownExits.Count);
 
                 Room temp = onlyDownExits[i].Down;
                 int tempByte = onlyDownExits[i].DownByte;
@@ -710,7 +727,7 @@ namespace Z2Randomizer
 
             for (int i = 0; i < downExits.Count; i++)
             {
-                int swap = R.Next(i, downExits.Count);
+                int swap = r.Next(i, downExits.Count);
                 Room temp = downExits[i].Down;
                 Room down1 = downExits[swap].Down;
                 temp.Up = downExits[swap];
@@ -729,7 +746,7 @@ namespace Z2Randomizer
 
             for (int i = 0; i < leftExits.Count; i++)
             {
-                int swap = R.Next(i, leftExits.Count);
+                int swap = r.Next(i, leftExits.Count);
                 Room temp = leftExits[i].Left;
                 Room down1 = leftExits[swap].Left;
                 temp.Right = leftExits[swap];
@@ -748,7 +765,7 @@ namespace Z2Randomizer
 
             for (int i = 0; i < rightExits.Count; i++)
             {
-                int swap = R.Next(i, rightExits.Count);
+                int swap = r.Next(i, rightExits.Count);
                 Room temp = rightExits[i].Right;
                 Room down1 = rightExits[swap].Right;
                 temp.Left = rightExits[swap];
@@ -766,17 +783,17 @@ namespace Z2Randomizer
             }
             if (num == 6)
             {
-                foreach (Room r in onlyDownExits)
+                foreach (Room room in onlyDownExits)
                 {
-                    if (r.Down.Map != 0xBC)
+                    if (room.Down.Map != 0xBC)
                     {
-                        int db = r.DownByte;
-                        r.DownByte = (db & 0xFC) + 1;
+                        int db = room.DownByte;
+                        room.DownByte = (db & 0xFC) + 1;
                     }
                     else
                     {
-                        int db = r.DownByte;
-                        r.DownByte = (db & 0xFC) + 2;
+                        int db = room.DownByte;
+                        room.DownByte = (db & 0xFC) + 2;
                     }
                 }
             }

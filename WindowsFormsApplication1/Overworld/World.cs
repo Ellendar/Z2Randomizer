@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.WindowsRuntime;
+//using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer
 {
@@ -390,7 +390,7 @@ namespace Z2Randomizer
             return location;
         }
 
-        public void ShuffleE()
+        public void ShuffleEnemies()
         {
             for (int i = enemyPtr; i < enemyPtr + 126; i = i + 2)
             {
