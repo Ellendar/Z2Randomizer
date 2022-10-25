@@ -178,16 +178,27 @@ namespace Z2Randomizer
         public bool startTrophy;
         public bool startMed;
 
-        //DEBUG
+        //DEBUG/STATS
         public DateTime startTime = DateTime.Now;
-        public DateTime updateProgress2Timestamp = DateTime.Now;
-        public DateTime updateProgress3Timestamp = DateTime.Now;
-        public DateTime updateProgress4Timestamp = DateTime.Now;
-        public DateTime updateProgress5Timestamp = DateTime.Now;
-        public DateTime updateProgress6Timestamp = DateTime.Now;
+        public DateTime updateProgress2Timestamp;
+        public DateTime updateProgress3Timestamp;
+        public DateTime updateProgress4Timestamp;
+        public DateTime updateProgress5Timestamp;
+        public DateTime updateProgress6Timestamp;
         //DateTime updateProgress7Timestamp = DateTime.Now; There is no progress state 7
-        public DateTime updateProgress8Timestamp = DateTime.Now;
-        public DateTime updateProgress9Timestamp = DateTime.Now;
+        public DateTime updateProgress8Timestamp;
+        public DateTime updateProgress9Timestamp;
+        public DateTime startRandomizeStartingValuesTimestamp;
+        public DateTime startRandomizeEnemiesTimestamp;
+        public DateTime firstProcessOverworldTimestamp;
+
+        public int totalReachabilityOverworldAttempts = 0;
+        public int totalContinentConnectionOverworldAttempts = 0;
+        public int totalWestGenerationAttempts = 0;
+        public int totalEastGenerationAttempts = 0;
+        public int totalMazeIslandGenerationAttempts = 0;
+        public int totalDeathMountainGenrationAttempts = 0;
+
 
         private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
         {
@@ -477,7 +488,9 @@ namespace Z2Randomizer
             visitedEnemies = new List<int>();
 
             //JEFF START HERE
+            startRandomizeStartingValuesTimestamp = DateTime.Now;
             RandomizeStartingValues();
+            startRandomizeEnemiesTimestamp = DateTime.Now;
             RandomizeEnemies();
 
 
@@ -500,6 +513,7 @@ namespace Z2Randomizer
                 ShuffleEnemies(enemyPtr3, enemyAddr2, enemies3, generators3, shorties3, tallGuys3, flyingEnemies3, true);
             }
 
+            firstProcessOverworldTimestamp = DateTime.Now;
             ProcessOverworld();
             bool f = UpdateProgress(8);
             updateProgress8Timestamp = DateTime.Now;
@@ -1357,6 +1371,7 @@ namespace Z2Randomizer
             }
             do //while (!EverythingReachable()) ;
             {
+                totalReachabilityOverworldAttempts++;
                 worlds = new List<World>();
                 westHyrule = new WestHyrule(this);
                 deathMountain = new DeathMountain(this);
@@ -1371,6 +1386,7 @@ namespace Z2Randomizer
                 //Generate a pathable set of continents
                 do // } while (!AllContinentsHaveConnection(worlds));
                 {
+                    totalContinentConnectionOverworldAttempts++;
                     worlds = new List<World>();
                     westHyrule = new WestHyrule(this);
                     deathMountain = new DeathMountain(this);
@@ -1598,7 +1614,8 @@ namespace Z2Randomizer
                     nonContinentGenerationAttempts++;
                     if (!westHyrule.Allreached)
                     {
-                        while (!westHyrule.Terraform());
+                        while (!westHyrule.Terraform()) { totalWestGenerationAttempts++; }
+                        totalWestGenerationAttempts++;
                     }
                     westHyrule.ResetVisitabilityState();
 
@@ -1611,7 +1628,8 @@ namespace Z2Randomizer
                     }
                     if (!deathMountain.Allreached)
                     {
-                        while (!deathMountain.Terraform());
+                        while (!deathMountain.Terraform()) { totalDeathMountainGenrationAttempts++; }
+                        totalDeathMountainGenrationAttempts++;
                     }
                     deathMountain.ResetVisitabilityState();
 
@@ -1624,7 +1642,8 @@ namespace Z2Randomizer
                     }
                     if (!eastHyrule.Allreached)
                     {
-                        while (!eastHyrule.Terraform());
+                        while (!eastHyrule.Terraform()) { totalEastGenerationAttempts++; }
+                        totalEastGenerationAttempts++;
                     }
                     eastHyrule.ResetVisitabilityState();
 
@@ -1637,7 +1656,8 @@ namespace Z2Randomizer
                     }
                     if (!mazeIsland.Allreached)
                     {
-                        while (!mazeIsland.Terraform());
+                        while (!mazeIsland.Terraform()) { totalMazeIslandGenerationAttempts++; }
+                        totalMazeIslandGenerationAttempts++;
                     }
                     mazeIsland.ResetVisitabilityState();
 

@@ -40,6 +40,19 @@ namespace Z2Randomizer
         public int Progress6To8 { get; set; }
         public int Progress8To9 { get; set; }
 
+        public int ProgressStartToGenerateStartingValues { get; set; }
+        public int ProgressStartingValuesToGenerateEnemies { get; set; }
+        public int ProgressGenerateEnemiesToProcessOverworld { get; set; }
+
+        public int TotalReachabilityOverworldAttempts { get; set; }
+        public int TotalContinentConnectionOverworldAttempts { get; set; }
+        public int TotalWestGenerationAttempts { get; set; }
+        public int TotalEastGenerationAttempts { get; set; }
+        public int TotalMazeIslandGenerationAttempts { get; set; }
+        public int TotalDeathMountainGenrationAttempts { get; set; }
+
+
+
         //Spell costs
         //XP thresholds
         //Which items are required (is this cleanly saved?)
@@ -74,6 +87,17 @@ namespace Z2Randomizer
             Progress5To6 = (int)hyrule.updateProgress6Timestamp.Subtract(hyrule.updateProgress5Timestamp).TotalMilliseconds;
             Progress6To8 = (int)hyrule.updateProgress8Timestamp.Subtract(hyrule.updateProgress6Timestamp).TotalMilliseconds;
             Progress8To9 = (int)hyrule.updateProgress9Timestamp.Subtract(hyrule.updateProgress8Timestamp).TotalMilliseconds;
+
+            ProgressStartToGenerateStartingValues = (int)hyrule.startRandomizeStartingValuesTimestamp.Subtract(hyrule.startTime).TotalMilliseconds;
+            ProgressStartingValuesToGenerateEnemies = (int)hyrule.startRandomizeEnemiesTimestamp.Subtract(hyrule.startRandomizeStartingValuesTimestamp).TotalMilliseconds;
+            ProgressGenerateEnemiesToProcessOverworld = (int)hyrule.firstProcessOverworldTimestamp.Subtract(hyrule.startRandomizeEnemiesTimestamp).TotalMilliseconds;
+
+            TotalReachabilityOverworldAttempts = hyrule.totalReachabilityOverworldAttempts;
+            TotalContinentConnectionOverworldAttempts = hyrule.totalContinentConnectionOverworldAttempts;
+            TotalWestGenerationAttempts = hyrule.totalWestGenerationAttempts;
+            TotalEastGenerationAttempts = hyrule.totalEastGenerationAttempts;
+            TotalMazeIslandGenerationAttempts = hyrule.totalMazeIslandGenerationAttempts;
+            TotalDeathMountainGenrationAttempts = hyrule.totalDeathMountainGenrationAttempts;
         }
     }
 }
