@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer
 {
-    public struct RandomizerProperties
+    public class RandomizerProperties
     {
+        public RandomizerProperties()
+        {
+
+        }
+
         //ROM Info
         public String filename;
         public int seed;
         public String flags;
+        public bool saveRom = true;
 
         //Items
         public Boolean shuffleItems;
@@ -65,7 +71,7 @@ namespace Z2Randomizer
         public String dmBiome;
         public Boolean vanillaOriginal;
         public Boolean shuffleHidden;
-        public Boolean bootsWater;
+        public Boolean canWalkOnWaterWithBoots;
         public Boolean bagusWoods;
 
         //Palaces

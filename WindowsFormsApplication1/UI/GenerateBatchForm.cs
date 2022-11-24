@@ -43,5 +43,10 @@ namespace Z2Randomizer
         {
             return numSeeds;
         }
+
+        private void GenerateBatchForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

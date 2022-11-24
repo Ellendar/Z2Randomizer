@@ -4,1082 +4,1067 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer
+namespace Z2Randomizer.Overworld;
+
+class DeathMountain : World
 {
-    class DeathMountain : World
+
+    private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
+        {
+            { 0x610C, Terrain.CAVE },
+            { 0x610D, Terrain.CAVE },
+            { 0x610E, Terrain.CAVE },
+            { 0x610F, Terrain.CAVE },
+            { 0x6110, Terrain.CAVE },
+            { 0x6111, Terrain.CAVE },
+            { 0x6112, Terrain.CAVE },
+            { 0x6113, Terrain.CAVE },
+            { 0x6114, Terrain.CAVE },
+            { 0x6115, Terrain.CAVE },
+            { 0x6116, Terrain.CAVE },
+            { 0x6117, Terrain.CAVE },
+            { 0x6118, Terrain.CAVE },
+            { 0x6119, Terrain.CAVE },
+            { 0x611A, Terrain.CAVE },
+            { 0x611B, Terrain.CAVE },
+            { 0x611C, Terrain.CAVE },
+            { 0x611D, Terrain.CAVE },
+            { 0x611E, Terrain.CAVE },
+            { 0x611F, Terrain.CAVE },
+            { 0x6120, Terrain.CAVE },
+            { 0x6121, Terrain.CAVE },
+            { 0x6122, Terrain.CAVE },
+            { 0x6123, Terrain.CAVE },
+            { 0x6124, Terrain.CAVE },
+            { 0x6125, Terrain.CAVE },
+            { 0x6126, Terrain.CAVE },
+            { 0x6127, Terrain.CAVE },
+            { 0x6128, Terrain.CAVE },
+            { 0x6129, Terrain.CAVE },
+            { 0x612A, Terrain.CAVE },
+            { 0x612B, Terrain.CAVE },
+            { 0x612C, Terrain.CAVE },
+            { 0x612D, Terrain.CAVE },
+            { 0x612E, Terrain.CAVE },
+            { 0x612F, Terrain.CAVE },
+            { 0x6130, Terrain.CAVE },
+            { 0x6136, Terrain.CAVE },
+            { 0x6137, Terrain.CAVE },
+            { 0x6144, Terrain.CAVE }
+    };
+
+    public Dictionary<Location, List<Location>> connectionsDM;
+    public Location hammerCave;
+    public Location magicCave;
+
+    private const int MAP_ADDR = 0x7a00;
+
+    public DeathMountain(Hyrule hy)
+        : base(hy)
     {
+        LoadLocations(0x610C, 37, terrains, Continent.DM);
+        //loadLocations(0x6136, 2, terrains, continent.dm);
+        LoadLocations(0x6144, 1, terrains, Continent.DM);
 
-        private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
-            {
-                { 0x610C, Terrain.CAVE },
-                { 0x610D, Terrain.CAVE },
-                { 0x610E, Terrain.CAVE },
-                { 0x610F, Terrain.CAVE },
-                { 0x6110, Terrain.CAVE },
-                { 0x6111, Terrain.CAVE },
-                { 0x6112, Terrain.CAVE },
-                { 0x6113, Terrain.CAVE },
-                { 0x6114, Terrain.CAVE },
-                { 0x6115, Terrain.CAVE },
-                { 0x6116, Terrain.CAVE },
-                { 0x6117, Terrain.CAVE },
-                { 0x6118, Terrain.CAVE },
-                { 0x6119, Terrain.CAVE },
-                { 0x611A, Terrain.CAVE },
-                { 0x611B, Terrain.CAVE },
-                { 0x611C, Terrain.CAVE },
-                { 0x611D, Terrain.CAVE },
-                { 0x611E, Terrain.CAVE },
-                { 0x611F, Terrain.CAVE },
-                { 0x6120, Terrain.CAVE },
-                { 0x6121, Terrain.CAVE },
-                { 0x6122, Terrain.CAVE },
-                { 0x6123, Terrain.CAVE },
-                { 0x6124, Terrain.CAVE },
-                { 0x6125, Terrain.CAVE },
-                { 0x6126, Terrain.CAVE },
-                { 0x6127, Terrain.CAVE },
-                { 0x6128, Terrain.CAVE },
-                { 0x6129, Terrain.CAVE },
-                { 0x612A, Terrain.CAVE },
-                { 0x612B, Terrain.CAVE },
-                { 0x612C, Terrain.CAVE },
-                { 0x612D, Terrain.CAVE },
-                { 0x612E, Terrain.CAVE },
-                { 0x612F, Terrain.CAVE },
-                { 0x6130, Terrain.CAVE },
-                { 0x6136, Terrain.CAVE },
-                { 0x6137, Terrain.CAVE },
-                { 0x6144, Terrain.CAVE }
-        };
+        hammerCave = GetLocationByMem(0x6128);
+        magicCave = GetLocationByMem(0x6144);
 
-        public Dictionary<Location, List<Location>> connectionsDM;
-        public Location hammerCave;
-        public Location magicCave;
+        reachableAreas = new HashSet<string>();
+        connectionsDM = new Dictionary<Location, List<Location>>();
+        connectionsDM.Add(GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) });
+        connectionsDM.Add(GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) });
+        connectionsDM.Add(GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) });
+        connectionsDM.Add(GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) });
+        connectionsDM.Add(GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) });
+        connectionsDM.Add(GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) });
+        connectionsDM.Add(GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) });
+        connectionsDM.Add(GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) });
+        connectionsDM.Add(GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) });
+        connectionsDM.Add(GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) });
+        connectionsDM.Add(GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) });
+        connectionsDM.Add(GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) });
+        connectionsDM.Add(GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) });
+        connectionsDM.Add(GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) });
+        connectionsDM.Add(GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) });
+        connectionsDM.Add(GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) });
+        connectionsDM.Add(GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) });
+        connectionsDM.Add(GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) });
+        connectionsDM.Add(GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) });
+        connectionsDM.Add(GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) });
+        connectionsDM.Add(GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) });
+        connectionsDM.Add(GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) });
+        connectionsDM.Add(GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) });
+        connectionsDM.Add(GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) });
+        connectionsDM.Add(GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) });
+        connectionsDM.Add(GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) });
+        connectionsDM.Add(GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) });
+        connectionsDM.Add(GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) });
+        connectionsDM.Add(GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) });
+        connectionsDM.Add(GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
+        connectionsDM.Add(GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
+        connectionsDM.Add(GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) });
+        connectionsDM.Add(GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) });
 
-        private const int MAP_ADDR = 0x7a00;
+        enemies = new List<int> { 3, 4, 5, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
+        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
+        generators = new List<int> { 11, 12, 15, 29 };
+        shorties = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
+        tallGuys = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
+        enemyAddr = 0x48B0;
+        enemyPtr = 0x608E;
 
-        public DeathMountain(Hyrule hy)
-            : base(hy)
+        overworldMaps = new List<int>();
+        MAP_ROWS = 45;
+        MAP_COLS = 64;
+
+        baseAddr = 0x610C;
+        VANILLA_MAP_ADDR = 0x665c;
+
+        if (hy.Props.dmBiome.Equals("Islands"))
         {
-            LoadLocations(0x610C, 37, terrains, Continent.DM);
-            //loadLocations(0x6136, 2, terrains, continent.dm);
-            LoadLocations(0x6144, 1, terrains, Continent.DM);
-
-            hammerCave = GetLocationByMem(0x6128);
-            magicCave = GetLocationByMem(0x6144);
-
-            reachableAreas = new HashSet<string>();
-            connectionsDM = new Dictionary<Location, List<Location>>();
-            connectionsDM.Add(GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) });
-            connectionsDM.Add(GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) });
-            connectionsDM.Add(GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) });
-            connectionsDM.Add(GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) });
-            connectionsDM.Add(GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) });
-            connectionsDM.Add(GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) });
-            connectionsDM.Add(GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) });
-            connectionsDM.Add(GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) });
-            connectionsDM.Add(GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) });
-            connectionsDM.Add(GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) });
-            connectionsDM.Add(GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) });
-            connectionsDM.Add(GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) });
-            connectionsDM.Add(GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) });
-            connectionsDM.Add(GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) });
-            connectionsDM.Add(GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) });
-            connectionsDM.Add(GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) });
-            connectionsDM.Add(GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) });
-            connectionsDM.Add(GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) });
-            connectionsDM.Add(GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) });
-            connectionsDM.Add(GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) });
-            connectionsDM.Add(GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) });
-            connectionsDM.Add(GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) });
-            connectionsDM.Add(GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) });
-            connectionsDM.Add(GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) });
-            connectionsDM.Add(GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) });
-            connectionsDM.Add(GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) });
-            connectionsDM.Add(GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) });
-            connectionsDM.Add(GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) });
-            connectionsDM.Add(GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) });
-            connectionsDM.Add(GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
-            connectionsDM.Add(GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
-            connectionsDM.Add(GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) });
-            connectionsDM.Add(GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) });
-
-            enemies = new List<int> { 3, 4, 5, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
-            flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-            generators = new List<int> { 11, 12, 15, 29 };
-            shorties = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
-            tallGuys = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
-            enemyAddr = 0x48B0;
-            enemyPtr = 0x608E;
-
-            overworldMaps = new List<int>();
-            MAP_ROWS = 45;
-            MAP_COLS = 64;
-
-            baseAddr = 0x610C;
-            VANILLA_MAP_ADDR = 0x665c;
-
-            if (hy.Props.dmBiome.Equals("Islands"))
-            {
-                this.biome = Biome.ISLANDS;
-            }
-            else if (hy.Props.dmBiome.Equals("Canyon") || hy.Props.dmBiome.Equals("CanyonD"))
-            {
-                this.biome = Biome.CANYON;
-                //MAP_ROWS = 75;
-            }
-            else if(hy.Props.dmBiome.Equals("Caldera"))
-            {
-                this.biome = Biome.CALDERA;
-            }
-            else if(hy.Props.dmBiome.Equals("Mountainous"))
-            {
-                this.biome = Biome.MOUNTAINOUS;
-            }
-            else if(hy.Props.dmBiome.Equals("Vanilla"))
-            {
-                this.biome = Biome.VANILLA;
-            }
-            else if(hy.Props.dmBiome.Equals("Vanilla (shuffled)"))
-            {
-                this.biome = Biome.VANILLA_SHUFFLE;
-            }
-            else
-            {
-                this.biome = Biome.VANILLALIKE;
-            }
-            walkable = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
-            randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNAIN, Terrain.WALKABLEWATER, Terrain.WATER };
-        
-            
+            this.biome = Biome.ISLANDS;
         }
-
-        public bool Terraform()
+        else if (hy.Props.dmBiome.Equals("Canyon") || hy.Props.dmBiome.Equals("CanyonD"))
         {
-            Terrain water = Terrain.WATER;
-            if (hyrule.Props.bootsWater)
-            {
-                water = Terrain.WALKABLEWATER;
-            }
-            walkable = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
-            randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNAIN, water };
+            this.biome = Biome.CANYON;
+            //MAP_ROWS = 75;
+        }
+        else if(hy.Props.dmBiome.Equals("Caldera"))
+        {
+            this.biome = Biome.CALDERA;
+        }
+        else if(hy.Props.dmBiome.Equals("Mountainous"))
+        {
+            this.biome = Biome.MOUNTAINOUS;
+        }
+        else if(hy.Props.dmBiome.Equals("Vanilla"))
+        {
+            this.biome = Biome.VANILLA;
+        }
+        else if(hy.Props.dmBiome.Equals("Vanilla (shuffled)"))
+        {
+            this.biome = Biome.VANILLA_SHUFFLE;
+        }
+        else
+        {
+            this.biome = Biome.VANILLALIKE;
+        }
+        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
+        randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
+    
+        
+    }
 
-            foreach (Location location in AllLocations)
+    public bool Terraform()
+    {
+        Terrain water = Terrain.WATER;
+        if (hyrule.Props.canWalkOnWaterWithBoots)
+        {
+            water = Terrain.WALKABLEWATER;
+        }
+        walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
+        randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+
+        foreach (Location location in AllLocations)
+        {
+            location.CanShuffle = true;
+        }
+        if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
+        {
+            MAP_ROWS = 75;
+            MAP_COLS = 64;
+            ReadVanillaMap();
+            if (this.biome == Biome.VANILLA_SHUFFLE)
             {
-                location.CanShuffle = true;
-            }
-            if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
-            {
-                MAP_ROWS = 75;
-                MAP_COLS = 64;
-                ReadVanillaMap();
-                if (this.biome == Biome.VANILLA_SHUFFLE)
+                ShuffleLocations(AllLocations);
+                if (hyrule.Props.vanillaOriginal)
                 {
-                    ShuffleLocations(AllLocations);
-                    if (hyrule.Props.vanillaOriginal)
+                    magicCave.TerrainType = Terrain.ROCK;
+                    foreach (Location location in AllLocations)
                     {
-                        magicCave.TerrainType = Terrain.ROCK;
-                        foreach (Location location in AllLocations)
-                        {
-                            map[location.Ypos - 30, location.Xpos] = location.TerrainType;
-                        }
-                    }
-                    foreach (Location location in Locations[Terrain.CAVE])
-                    {
-                        location.PassThrough = 0;
-                    }
-                    foreach (Location location in Locations[Terrain.TOWN])
-                    {
-                        location.PassThrough = 0;
-                    }
-                    foreach (Location location in Locations[Terrain.PALACE])
-                    {
-                        location.PassThrough = 0;
+                        map[location.Ypos - 30, location.Xpos] = location.TerrainType;
                     }
                 }
-            }
-            else
-            {
-
-
-                bytesWritten = 2000;
-                bool horizontal = false;
-                while (bytesWritten > MAP_SIZE_BYTES)
+                foreach (Location location in Locations[Terrain.CAVE])
                 {
-                    map = new Terrain[MAP_ROWS, MAP_COLS];
-                    Terrain riverT = Terrain.MOUNAIN;
-                    if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA && this.biome != Biome.ISLANDS)
+                    location.PassThrough = 0;
+                }
+                foreach (Location location in Locations[Terrain.TOWN])
+                {
+                    location.PassThrough = 0;
+                }
+                foreach (Location location in Locations[Terrain.PALACE])
+                {
+                    location.PassThrough = 0;
+                }
+            }
+        }
+        else
+        {
+            bytesWritten = 2000;
+            bool horizontal = false;
+            while (bytesWritten > MAP_SIZE_BYTES)
+            {
+                map = new Terrain[MAP_ROWS, MAP_COLS];
+                Terrain riverT = Terrain.MOUNTAIN;
+                if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA && this.biome != Biome.ISLANDS)
+                {
+                    for (int i = 0; i < MAP_ROWS; i++)
                     {
-                        for (int i = 0; i < MAP_ROWS; i++)
+                        for (int j = 0; j < 29; j++)
                         {
-                            for (int j = 0; j < 29; j++)
-                            {
-                                map[i, j] = Terrain.NONE;
-                            }
-                            for (int j = 29; j < MAP_COLS; j++)
-                            {
-                                map[i, j] = water;
-                            }
+                            map[i, j] = Terrain.NONE;
                         }
+                        for (int j = 29; j < MAP_COLS; j++)
+                        {
+                            map[i, j] = water;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < MAP_ROWS; i++)
+                    {
+                        for (int j = 0; j < MAP_COLS; j++)
+                        {
+                            map[i, j] = Terrain.NONE;
+                        }
+                    }
+                }
+
+                if (this.biome == Biome.ISLANDS)
+                {
+                    riverT = water;
+                    for (int i = 0; i < MAP_COLS; i++)
+                    {
+                        map[0, i] = water;
+                        map[MAP_ROWS - 1, i] = water;
+                    }
+
+                    for (int i = 0; i < MAP_ROWS; i++)
+                    {
+                        map[i, 0] = water;
+                        map[i, MAP_COLS - 1] = water;
+                    }
+
+                    int cols = hyrule.RNG.Next(2, 4);
+                    int rows = hyrule.RNG.Next(2, 4);
+                    List<int> pickedC = new List<int>();
+                    List<int> pickedR = new List<int>();
+
+                    while (cols > 0)
+                    {
+                        int col = hyrule.RNG.Next(1, MAP_COLS);
+                        if (!pickedC.Contains(col))
+                        {
+                            for (int i = 0; i < MAP_ROWS; i++)
+                            {
+                                if (map[i, col] == Terrain.NONE)
+                                {
+                                    map[i, col] = water;
+                                }
+                            }
+                            pickedC.Add(col);
+                            cols--;
+                        }
+                    }
+
+                    while (rows > 0)
+                    {
+                        int row = hyrule.RNG.Next(5, MAP_ROWS - 6);
+                        if (!pickedR.Contains(row))
+                        {
+                            for (int i = 0; i < MAP_COLS; i++)
+                            {
+                                if (map[row, i] == Terrain.NONE)
+                                {
+                                    map[row, i] = water;
+                                }
+                                else if (map[row, i] == water)
+                                {
+                                    int adjust = hyrule.RNG.Next(-3, 4);
+                                    while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
+                                    {
+                                        adjust = hyrule.RNG.Next(-3, 4);
+                                    }
+                                    row += adjust;
+                                }
+                            }
+                            pickedR.Add(row);
+                            rows--;
+                        }
+                    }
+
+
+
+                }
+                else if (this.biome == Biome.CANYON)
+                {
+                    riverT = water;
+                    horizontal = hyrule.RNG.NextDouble() > 0.5;
+
+                    if (hyrule.Props.westBiome.Equals("CanyonD"))
+                    {
+                        riverT = Terrain.DESERT;
+                    }
+
+                    this.walkableTerrains.Clear();
+                    this.walkableTerrains.Add(Terrain.GRASS);
+                    this.walkableTerrains.Add(Terrain.GRAVE);
+                    this.walkableTerrains.Add(Terrain.FOREST);
+                    this.walkableTerrains.Add(Terrain.DESERT);
+                    this.walkableTerrains.Add(Terrain.MOUNTAIN);
+
+                    this.randomTerrains.Remove(Terrain.SWAMP);
+                    DrawCanyon(riverT);
+                    this.walkableTerrains.Remove(Terrain.MOUNTAIN);
+
+                    this.randomTerrains.Remove(Terrain.SWAMP);
+                    //this.randomTerrains.Add(terrain.lava);
+
+                }
+                else if (this.biome == Biome.CALDERA)
+                {
+                    this.isHorizontal = hyrule.RNG.NextDouble() > .5;
+                    DrawCenterMountain();
+                }
+                else if (this.biome == Biome.MOUNTAINOUS)
+                {
+                    riverT = Terrain.MOUNTAIN;
+                    for (int i = 0; i < MAP_COLS; i++)
+                    {
+                        map[0, i] = Terrain.MOUNTAIN;
+                        map[MAP_ROWS - 1, i] = Terrain.MOUNTAIN;
+                    }
+
+                    for (int i = 0; i < MAP_ROWS; i++)
+                    {
+                        map[i, 0] = Terrain.MOUNTAIN;
+                        map[i, MAP_COLS - 1] = Terrain.MOUNTAIN;
+                    }
+
+
+                    int cols = hyrule.RNG.Next(2, 4);
+                    int rows = hyrule.RNG.Next(2, 4);
+                    List<int> pickedC = new List<int>();
+                    List<int> pickedR = new List<int>();
+
+                    while (cols > 0)
+                    {
+                        int col = hyrule.RNG.Next(10, MAP_COLS - 11);
+                        if (!pickedC.Contains(col))
+                        {
+                            for (int i = 0; i < MAP_ROWS; i++)
+                            {
+                                if (map[i, col] == Terrain.NONE)
+                                {
+                                    map[i, col] = Terrain.MOUNTAIN;
+                                }
+                            }
+                            pickedC.Add(col);
+                            cols--;
+                        }
+                    }
+
+                    while (rows > 0)
+                    {
+                        int row = hyrule.RNG.Next(10, MAP_ROWS - 11);
+                        if (!pickedR.Contains(row))
+                        {
+                            for (int i = 0; i < MAP_COLS; i++)
+                            {
+                                if (map[row, i] == Terrain.NONE)
+                                {
+                                    map[row, i] = Terrain.MOUNTAIN;
+                                }
+                            }
+                            pickedR.Add(row);
+                            rows--;
+                        }
+                    }
+                }
+
+                Direction raftDirection = (Direction)hyrule.RNG.Next(4);
+                if (this.biome == Biome.CANYON)
+                {
+                    raftDirection = horizontal ? DirectionExtensions.RandomHorizontal(hyrule.RNG) : DirectionExtensions.RandomVertical(hyrule.RNG);
+                }
+                if (raft != null)
+                {
+                    if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
+                    {
+                        MAP_COLS = 29;
+                    }
+                    DrawOcean(raftDirection);
+                    MAP_COLS = 64;
+                }
+
+                Direction bridgeDirection = (Direction)hyrule.RNG.Next(4);
+                do
+                {
+                    if (this.biome != Biome.CANYON)
+                    {
+                        bridgeDirection = (Direction)hyrule.RNG.Next(4);
                     }
                     else
                     {
-                        for (int i = 0; i < MAP_ROWS; i++)
-                        {
-                            for (int j = 0; j < MAP_COLS; j++)
-                            {
-                                map[i, j] = Terrain.NONE;
-                            }
-                        }
+                        bridgeDirection = horizontal ? DirectionExtensions.RandomHorizontal(hyrule.RNG) : DirectionExtensions.RandomVertical(hyrule.RNG);
                     }
-
-                    if (this.biome == Biome.ISLANDS)
+                } while (bridgeDirection == raftDirection);
+                if (bridge != null)
+                {
+                    if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
                     {
-                        riverT = water;
-                        for (int i = 0; i < MAP_COLS; i++)
+                        MAP_COLS = 29;
+                    }
+                    DrawOcean(bridgeDirection);
+                    MAP_COLS = 64;
+                }
+                int x = 0;
+                int y = 0;
+                foreach (Location location in AllLocations)
+                {
+                    if (location.TerrainType != Terrain.BRIDGE && location != magicCave && location.CanShuffle)
+                    {
+                        int tries = 0;
+                        do
                         {
-                            map[0, i] = water;
-                            map[MAP_ROWS - 1, i] = water;
+                            x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                            y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                            tries++;
+                        } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
+                        if (tries >= 100)
+                        {
+                            return false;
                         }
 
-                        for (int i = 0; i < MAP_ROWS; i++)
+                        map[y, x] = location.TerrainType;
+                        location.Xpos = x;
+                        location.Ypos = y + 30;
+                        if (location.TerrainType == Terrain.CAVE)
                         {
-                            map[i, 0] = water;
-                            map[i, MAP_COLS - 1] = water;
-                        }
 
-                        int cols = hyrule.RNG.Next(2, 4);
-                        int rows = hyrule.RNG.Next(2, 4);
-                        List<int> pickedC = new List<int>();
-                        List<int> pickedR = new List<int>();
+                            Direction direction = (Direction)hyrule.RNG.Next(4);
 
-                        while (cols > 0)
-                        {
-                            int col = hyrule.RNG.Next(1, MAP_COLS);
-                            if (!pickedC.Contains(col))
+                            Terrain s = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                            if (this.biome == Biome.VANILLALIKE)
                             {
-                                for (int i = 0; i < MAP_ROWS; i++)
+                                s = Terrain.ROAD;
+                            }
+                            if (!hyrule.Props.saneCaves || !connectionsDM.ContainsKey(location))
+                            {
+                                PlaceCave(x, y, direction, s);
+                            }
+                            else
+                            {
+                                if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
                                 {
-                                    if (map[i, col] == Terrain.NONE)
+                                    if (direction == Direction.NORTH)
                                     {
-                                        map[i, col] = water;
+                                        direction = Direction.SOUTH;
                                     }
-                                }
-                                pickedC.Add(col);
-                                cols--;
-                            }
-                        }
 
-                        while (rows > 0)
-                        {
-                            int row = hyrule.RNG.Next(5, MAP_ROWS - 6);
-                            if (!pickedR.Contains(row))
-                            {
-                                for (int i = 0; i < MAP_COLS; i++)
-                                {
-                                    if (map[row, i] == Terrain.NONE)
+                                    if (direction == Direction.WEST)
                                     {
-                                        map[row, i] = water;
+                                        direction = Direction.EAST;
                                     }
-                                    else if (map[row, i] == water)
-                                    {
-                                        int adjust = hyrule.RNG.Next(-3, 4);
-                                        while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
-                                        {
-                                            adjust = hyrule.RNG.Next(-3, 4);
-                                        }
-                                        row += adjust;
-                                    }
-                                }
-                                pickedR.Add(row);
-                                rows--;
-                            }
-                        }
-
-
-
-                    }
-                    else if (this.biome == Biome.CANYON)
-                    {
-                        riverT = water;
-                        horizontal = hyrule.RNG.NextDouble() > 0.5;
-
-                        if (hyrule.Props.westBiome.Equals("CanyonD"))
-                        {
-                            riverT = Terrain.DESERT;
-                        }
-
-                        this.walkable.Clear();
-                        this.walkable.Add(Terrain.GRASS);
-                        this.walkable.Add(Terrain.GRAVE);
-                        this.walkable.Add(Terrain.FOREST);
-                        this.walkable.Add(Terrain.DESERT);
-                        this.walkable.Add(Terrain.MOUNAIN);
-
-                        this.randomTerrains.Remove(Terrain.SWAMP);
-                        DrawCanyon(riverT);
-                        this.walkable.Remove(Terrain.MOUNAIN);
-
-                        this.randomTerrains.Remove(Terrain.SWAMP);
-                        //this.randomTerrains.Add(terrain.lava);
-
-                    }
-                    else if (this.biome == Biome.CALDERA)
-                    {
-                        this.horizontal = hyrule.RNG.NextDouble() > .5;
-                        DrawCenterMountain();
-                    }
-                    else if (this.biome == Biome.MOUNTAINOUS)
-                    {
-                        riverT = Terrain.MOUNAIN;
-                        for (int i = 0; i < MAP_COLS; i++)
-                        {
-                            map[0, i] = Terrain.MOUNAIN;
-                            map[MAP_ROWS - 1, i] = Terrain.MOUNAIN;
-                        }
-
-                        for (int i = 0; i < MAP_ROWS; i++)
-                        {
-                            map[i, 0] = Terrain.MOUNAIN;
-                            map[i, MAP_COLS - 1] = Terrain.MOUNAIN;
-                        }
-
-
-                        int cols = hyrule.RNG.Next(2, 4);
-                        int rows = hyrule.RNG.Next(2, 4);
-                        List<int> pickedC = new List<int>();
-                        List<int> pickedR = new List<int>();
-
-                        while (cols > 0)
-                        {
-                            int col = hyrule.RNG.Next(10, MAP_COLS - 11);
-                            if (!pickedC.Contains(col))
-                            {
-                                for (int i = 0; i < MAP_ROWS; i++)
-                                {
-                                    if (map[i, col] == Terrain.NONE)
-                                    {
-                                        map[i, col] = Terrain.MOUNAIN;
-                                    }
-                                }
-                                pickedC.Add(col);
-                                cols--;
-                            }
-                        }
-
-                        while (rows > 0)
-                        {
-                            int row = hyrule.RNG.Next(10, MAP_ROWS - 11);
-                            if (!pickedR.Contains(row))
-                            {
-                                for (int i = 0; i < MAP_COLS; i++)
-                                {
-                                    if (map[row, i] == Terrain.NONE)
-                                    {
-                                        map[row, i] = Terrain.MOUNAIN;
-                                    }
-                                }
-                                pickedR.Add(row);
-                                rows--;
-                            }
-                        }
-                    }
-
-                    Direction rDir = (Direction)hyrule.RNG.Next(4);
-                    if (this.biome == Biome.CANYON)
-                    {
-                        rDir = (Direction)hyrule.RNG.Next(2);
-                        if (horizontal)
-                        {
-                            rDir += 2;
-                        }
-                    }
-                    if (raft != null)
-                    {
-                        if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
-                        {
-                            MAP_COLS = 29;
-                        }
-                        DrawOcean(rDir);
-                        MAP_COLS = 64;
-                    }
-
-
-
-
-                    Direction bDir = (Direction)hyrule.RNG.Next(4);
-                    do
-                    {
-                        if (this.biome != Biome.CANYON)
-                        {
-                            bDir = (Direction)hyrule.RNG.Next(4);
-                        }
-                        else
-                        {
-                            bDir = (Direction)hyrule.RNG.Next(2);
-                            if (horizontal)
-                            {
-                                bDir += 2;
-                            }
-                        }
-                    } while (bDir == rDir);
-                    if (bridge != null)
-                    {
-                        if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
-                        {
-                            MAP_COLS = 29;
-                        }
-                        DrawOcean(bDir);
-                        MAP_COLS = 64;
-                    }
-                    int x = 0;
-                    int y = 0;
-                    foreach (Location location in AllLocations)
-                    {
-                        if (location.TerrainType != Terrain.BRIDGE && location != magicCave && location.CanShuffle)
-                        {
-                            int tries = 0;
-                            do
-                            {
-                                x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                                y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
-                                tries++;
-                            } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
-                            if (tries >= 100)
-                            {
-                                return false;
-                            }
-
-                            map[y, x] = location.TerrainType;
-                            location.Xpos = x;
-                            location.Ypos = y + 30;
-                            if (location.TerrainType == Terrain.CAVE)
-                            {
-
-                                int dir = hyrule.RNG.Next(4);
-
-                                Terrain s = walkable[hyrule.RNG.Next(walkable.Count)];
-                                if (this.biome == Biome.VANILLALIKE)
-                                {
-                                    s = Terrain.ROAD;
-                                }
-                                if (!hyrule.Props.saneCaves || !connectionsDM.ContainsKey(location))
-                                {
-                                    PlaceCave(x, y, dir, s);
                                 }
                                 else
                                 {
-                                    if ((location.HorizontalPos == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
+                                    if (direction == Direction.SOUTH)
                                     {
-                                        if (dir == 0)
-                                        {
-                                            dir = 1;
-                                        }
-
-                                        if (dir == 3)
-                                        {
-                                            dir = 2;
-                                        }
+                                        direction = Direction.NORTH;
                                     }
-                                    else
+
+                                    if (direction == Direction.EAST)
                                     {
-                                        if (dir == 1)
-                                        {
-                                            dir = 0;
-                                        }
-
-                                        if (dir == 2)
-                                        {
-                                            dir = 3;
-                                        }
+                                        direction = Direction.WEST;
                                     }
-                                    map[y, x] = Terrain.NONE;
+                                }
+                                map[y, x] = Terrain.NONE;
 
+                                tries = 0;
+                                do
+                                {
+                                    x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                                    y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                                    tries++;
+                                } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
+                                if (tries >= 100)
+                                {
+                                    return false;
+                                }
+
+                                while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
+                                {
+                                    direction = (Direction)hyrule.RNG.Next(4);
+                                }
+                                if (connectionsDM[location].Count == 1)
+                                {
+                                    int otherx = 0;
+                                    int othery = 0;
                                     tries = 0;
+                                    Boolean crossing = true;
                                     do
                                     {
-                                        x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                                        y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                                        int range = 7;
+                                        int offset = 3;
+                                        if (biome == Biome.ISLANDS)
+                                        {
+                                            range = 7;
+                                            offset = 5;
+                                        }
+                                        crossing = true;
+                                        if (direction == Direction.NORTH)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(7) - 3);
+                                            othery = y - (hyrule.RNG.Next(range) + offset);
+                                        }
+                                        else if (direction == Direction.EAST)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(range) + offset);
+                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                        }
+                                        else if (direction == Direction.SOUTH)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(7) - 3);
+                                            othery = y + (hyrule.RNG.Next(range) + offset);
+                                        }
+                                        else //west
+                                        {
+                                            otherx = x - (hyrule.RNG.Next(range) + offset);
+                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                        }
                                         tries++;
-                                    } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
+
+                                        if (tries >= 100)
+                                        {
+                                            return false;
+                                        }
+                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE);
                                     if (tries >= 100)
                                     {
                                         return false;
                                     }
 
-                                    while ((dir == 0 && y < 15) || (dir == 1 && x > MAP_COLS - 15) || (dir == 2 && y > MAP_ROWS - 15) || (dir == 3 && x < 15))
-                                    {
-                                        dir = hyrule.RNG.Next(4);
-                                    }
-                                    int otherdir = (dir + 2) % 4;
-                                    if (connectionsDM[location].Count == 1)
-                                    {
-                                        int otherx = 0;
-                                        int othery = 0;
-                                        tries = 0;
-                                        Boolean crossing = true;
-                                        do
-                                        {
-                                            int range = 7;
-                                            int offset = 3;
-                                            if (biome == Biome.ISLANDS)
-                                            {
-                                                range = 7;
-                                                offset = 5;
-                                            }
-                                            crossing = true;
-                                            if (dir == 0) //south
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(7) - 3);
-                                                othery = y - (hyrule.RNG.Next(range) + offset);
-                                            }
-                                            else if (dir == 1) //west
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(range) + offset);
-                                                othery = y + (hyrule.RNG.Next(7) - 3);
-                                            }
-                                            else if (dir == 2) //north
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(7) - 3);
-                                                othery = y + (hyrule.RNG.Next(range) + offset);
-                                            }
-                                            else //east
-                                            {
-                                                otherx = x - (hyrule.RNG.Next(range) + offset);
-                                                othery = y + (hyrule.RNG.Next(7) - 3);
-                                            }
-                                            tries++;
-
-                                            if (tries >= 100)
-                                            {
-                                                return false;
-                                            }
-                                        } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE);
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-
-                                        List<Location> l2 = connectionsDM[location];
-                                        location.CanShuffle = false;
-                                        location.Xpos = x;
-                                        location.Ypos = y + 30;
-                                        l2[0].CanShuffle = false;
-                                        l2[0].Xpos = otherx;
-                                        l2[0].Ypos = othery + 30;
-                                        PlaceCave(x, y, dir, s);
-                                        PlaceCave(otherx, othery, otherdir, s);
-                                    }
-                                    else
-                                    {
-                                        int otherx = 0;
-                                        int othery = 0;
-                                        tries = 0;
-                                        Boolean crossing = true;
-                                        do
-                                        {
-                                            int range = 7;
-                                            int offset = 3;
-                                            if (biome == Biome.ISLANDS)
-                                            {
-                                                range = 7;
-                                                offset = 5;
-                                            }
-                                            crossing = true;
-                                            if (dir == 0) //south
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(7) - 3);
-                                                othery = y - (hyrule.RNG.Next(range) + offset);
-                                            }
-                                            else if (dir == 1) //west
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(range) + offset);
-                                                othery = y + (hyrule.RNG.Next(7) - 3);
-                                            }
-                                            else if (dir == 2) //north
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(7) - 3);
-                                                othery = y + (hyrule.RNG.Next(range) + offset);
-                                            }
-                                            else //east
-                                            {
-                                                otherx = x - (hyrule.RNG.Next(range) + offset);
-                                                othery = y + (hyrule.RNG.Next(7) - 3);
-                                            }
-                                            tries++;
-
-                                            if (tries >= 100)
-                                            {
-                                                return false;
-                                            }
-                                        } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-
-                                        List<Location> l2 = connectionsDM[location];
-                                        location.CanShuffle = false;
-                                        location.Xpos = x;
-                                        location.Ypos = y + 30;
-                                        l2[0].CanShuffle = false;
-                                        l2[0].Xpos = otherx;
-                                        l2[0].Ypos = othery + 30;
-                                        PlaceCave(x, y, dir, s);
-                                        PlaceCave(otherx, othery, otherdir, s);
-                                        int newx = 0;
-                                        int newy = 0;
-                                        tries = 0;
-                                        do
-                                        {
-                                            newx = x + hyrule.RNG.Next(7) - 3;
-                                            newy = y + hyrule.RNG.Next(7) - 3;
-                                            tries++;
-                                        } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                        l2[1].Xpos = newx;
-                                        l2[1].Ypos = newy + 30;
-                                        l2[1].CanShuffle = false;
-                                        PlaceCave(newx, newy, dir, s);
-                                        y = newy;
-                                        x = newx;
-
-                                        tries = 0;
-                                        do
-                                        {
-                                            int range = 7;
-                                            int offset = 3;
-                                            if (biome == Biome.ISLANDS)
-                                            {
-                                                range = 7;
-                                                offset = 5;
-                                            }
-                                            crossing = true;
-                                            if (dir == 0) //south
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(7) - 3);
-                                                othery = y - (hyrule.RNG.Next(range) + offset);
-                                            }
-                                            else if (dir == 1) //west
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(range) + offset);
-                                                othery = y + (hyrule.RNG.Next(7) - 3);
-                                            }
-                                            else if (dir == 2) //north
-                                            {
-                                                otherx = x + (hyrule.RNG.Next(7) - 3);
-                                                othery = y + (hyrule.RNG.Next(range) + offset);
-                                            }
-                                            else //east
-                                            {
-                                                otherx = x - (hyrule.RNG.Next(range) + offset);
-                                                othery = y + (hyrule.RNG.Next(7) - 3);
-                                            }
-                                            tries++;
-
-                                            if (tries >= 100)
-                                            {
-                                                return false;
-                                            }
-                                        } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-
-                                        location.CanShuffle = false;
-                                        l2[2].CanShuffle = false;
-                                        l2[2].Xpos = otherx;
-                                        l2[2].Ypos = othery + 30;
-                                        PlaceCave(otherx, othery, otherdir, s);
-                                    }
-
+                                    List<Location> l2 = connectionsDM[location];
+                                    location.CanShuffle = false;
+                                    location.Xpos = x;
+                                    location.Ypos = y + 30;
+                                    l2[0].CanShuffle = false;
+                                    l2[0].Xpos = otherx;
+                                    l2[0].Ypos = othery + 30;
+                                    PlaceCave(x, y, direction, s);
+                                    PlaceCave(otherx, othery, direction.Reverse(), s);
                                 }
+                                else
+                                {
+                                    int otherx = 0;
+                                    int othery = 0;
+                                    tries = 0;
+                                    Boolean crossing = true;
+                                    do
+                                    {
+                                        int range = 7;
+                                        int offset = 3;
+                                        if (biome == Biome.ISLANDS)
+                                        {
+                                            range = 7;
+                                            offset = 5;
+                                        }
+                                        crossing = true;
+                                        if (direction == Direction.NORTH)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(7) - 3);
+                                            othery = y - (hyrule.RNG.Next(range) + offset);
+                                        }
+                                        else if (direction == Direction.EAST)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(range) + offset);
+                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                        }
+                                        else if (direction == Direction.SOUTH)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(7) - 3);
+                                            othery = y + (hyrule.RNG.Next(range) + offset);
+                                        }
+                                        else //west
+                                        {
+                                            otherx = x - (hyrule.RNG.Next(range) + offset);
+                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                        }
+                                        tries++;
+
+                                        if (tries >= 100)
+                                        {
+                                            return false;
+                                        }
+                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
+                                    {
+                                        return false;
+                                    }
+
+                                    List<Location> l2 = connectionsDM[location];
+                                    location.CanShuffle = false;
+                                    location.Xpos = x;
+                                    location.Ypos = y + 30;
+                                    l2[0].CanShuffle = false;
+                                    l2[0].Xpos = otherx;
+                                    l2[0].Ypos = othery + 30;
+                                    PlaceCave(x, y, direction, s);
+                                    PlaceCave(otherx, othery, direction.Reverse(), s);
+                                    int newx = 0;
+                                    int newy = 0;
+                                    tries = 0;
+                                    do
+                                    {
+                                        newx = x + hyrule.RNG.Next(7) - 3;
+                                        newy = y + hyrule.RNG.Next(7) - 3;
+                                        tries++;
+                                    } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
+                                    if (tries >= 100)
+                                    {
+                                        return false;
+                                    }
+                                    l2[1].Xpos = newx;
+                                    l2[1].Ypos = newy + 30;
+                                    l2[1].CanShuffle = false;
+                                    PlaceCave(newx, newy, direction, s);
+                                    y = newy;
+                                    x = newx;
+
+                                    tries = 0;
+                                    do
+                                    {
+                                        int range = 7;
+                                        int offset = 3;
+                                        if (biome == Biome.ISLANDS)
+                                        {
+                                            range = 7;
+                                            offset = 5;
+                                        }
+                                        crossing = true;
+                                        if (direction == Direction.NORTH)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(7) - 3);
+                                            othery = y - (hyrule.RNG.Next(range) + offset);
+                                        }
+                                        else if (direction == Direction.EAST)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(range) + offset);
+                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                        }
+                                        else if (direction == Direction.EAST)
+                                        {
+                                            otherx = x + (hyrule.RNG.Next(7) - 3);
+                                            othery = y + (hyrule.RNG.Next(range) + offset);
+                                        }
+                                        else //east
+                                        {
+                                            otherx = x - (hyrule.RNG.Next(range) + offset);
+                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                        }
+                                        tries++;
+
+                                        if (tries >= 100)
+                                        {
+                                            return false;
+                                        }
+                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
+                                    {
+                                        return false;
+                                    }
+
+                                    location.CanShuffle = false;
+                                    l2[2].CanShuffle = false;
+                                    l2[2].Xpos = otherx;
+                                    l2[2].Ypos = othery + 30;
+                                    PlaceCave(otherx, othery, direction.Reverse(), s);
+                                }
+
                             }
                         }
                     }
+                }
 
 
-                    if (this.biome == Biome.VANILLALIKE)
-                    {
-                        PlaceRandomTerrain(5);
-                    }
-                    randomTerrains.Add(Terrain.ROAD);
-                    if (!GrowTerrain())
+                if (this.biome == Biome.VANILLALIKE)
+                {
+                    PlaceRandomTerrain(5);
+                }
+                randomTerrains.Add(Terrain.ROAD);
+                if (!GrowTerrain())
+                {
+                    return false;
+                }
+                if (this.biome == Biome.CALDERA)
+                {
+                    bool f = MakeCaldera();
+                    if (!f)
                     {
                         return false;
                     }
-                    if (this.biome == Biome.CALDERA)
-                    {
-                        bool f = MakeCaldera();
-                        if (!f)
-                        {
-                            return false;
-                        }
-                    }
-                    walkable.Add(Terrain.ROAD);
-                    if (raft != null)
-                    {
-                        if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
-                        {
-                            MAP_COLS = 29;
-                        }
-                        Boolean r = DrawRaft(false, rDir);
-                        MAP_COLS = 64;
-                        if (!r)
-                        {
-                            return false;
-                        }
-                    }
-
-                    if (bridge != null)
-                    {
-                        if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
-                        {
-                            MAP_COLS = 29;
-                        }
-                        Boolean b = DrawRaft(true, bDir);
-                        MAP_COLS = 64;
-                        if (!b)
-                        {
-                            return false;
-                        }
-                    }
-
-
-                    do
-                    {
-                        x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                        y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
-                    } while (!walkable.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
-
-                    map[y, x] = Terrain.ROCK;
-                    magicCave.Ypos = y + 30;
-                    magicCave.Xpos = x;
-
-
-                    if (this.biome == Biome.CANYON || this.biome == Biome.ISLANDS)
-                    {
-                        ConnectIslands(25, false, riverT, false, false, false);
-                    }
-
-                    //check bytes and adjust
-                    WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
                 }
-            }
-            WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
-            
-
-            v = new bool[MAP_ROWS, MAP_COLS];
-            for (int i = 0; i < MAP_ROWS; i++)
-            {
-                for (int j = 0; j < MAP_COLS; j++)
+                walkableTerrains.Add(Terrain.ROAD);
+                if (raft != null)
                 {
-                    v[i, j] = false;
+                    if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
+                    {
+                        MAP_COLS = 29;
+                    }
+                    Boolean r = DrawRaft(false, raftDirection);
+                    MAP_COLS = 64;
+                    if (!r)
+                    {
+                        return false;
+                    }
                 }
-            }
 
-            for (int i = 0x610C; i < 0x614B; i++)
-            {
-                if (!terrains.Keys.Contains(i))
+                if (bridge != null)
                 {
-                    hyrule.ROMData.Put(i, 0x00);
+                    if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
+                    {
+                        MAP_COLS = 29;
+                    }
+                    Boolean b = DrawRaft(true, bridgeDirection);
+                    MAP_COLS = 64;
+                    if (!b)
+                    {
+                        return false;
+                    }
                 }
+
+
+                do
+                {
+                    x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
+                    y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                } while (!walkableTerrains.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
+
+                map[y, x] = Terrain.ROCK;
+                magicCave.Ypos = y + 30;
+                magicCave.Xpos = x;
+
+
+                if (this.biome == Biome.CANYON || this.biome == Biome.ISLANDS)
+                {
+                    ConnectIslands(25, false, riverT, false, false, false);
+                }
+
+                //check bytes and adjust
+                WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
             }
-            return true;
         }
-        private bool MakeCaldera()
+        WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+        
+
+        v = new bool[MAP_ROWS, MAP_COLS];
+        for (int i = 0; i < MAP_ROWS; i++)
         {
-            Terrain water = Terrain.WATER;
-            if (hyrule.Props.bootsWater)
+            for (int j = 0; j < MAP_COLS; j++)
             {
-                water = Terrain.WALKABLEWATER;
+                v[i, j] = false;
             }
-            int centerx = hyrule.RNG.Next(21, 41);
-            int centery = hyrule.RNG.Next(17, 27);
-            if (horizontal)
+        }
+
+        for (int i = 0x610C; i < 0x614B; i++)
+        {
+            if (!terrains.Keys.Contains(i))
+            {
+                hyrule.ROMData.Put(i, 0x00);
+            }
+        }
+        return true;
+    }
+    private bool MakeCaldera()
+    {
+        Terrain water = Terrain.WATER;
+        if (hyrule.Props.canWalkOnWaterWithBoots)
+        {
+            water = Terrain.WALKABLEWATER;
+        }
+        int centerx = hyrule.RNG.Next(21, 41);
+        int centery = hyrule.RNG.Next(17, 27);
+        if (isHorizontal)
+        {
+            centerx = hyrule.RNG.Next(27, 37);
+            centery = hyrule.RNG.Next(17, 27);
+        }
+
+        bool placeable = false;
+        do
+        {
+            if (isHorizontal)
             {
                 centerx = hyrule.RNG.Next(27, 37);
                 centery = hyrule.RNG.Next(17, 27);
             }
-
-            bool placeable = false;
-            do
+            else
             {
-                if (horizontal)
-                {
-                    centerx = hyrule.RNG.Next(27, 37);
-                    centery = hyrule.RNG.Next(17, 27);
-                }
-                else
-                {
-                    centerx = hyrule.RNG.Next(21, 41);
-                    centery = hyrule.RNG.Next(17, 27);
-                }
-                placeable = true;
-                for (int i = centery - 7; i < centery + 8; i++)
-                {
-                    for (int j = centerx - 7; j < centerx + 8; j++)
-                    {
-                        if (map[i, j] != Terrain.MOUNAIN)
-                        {
-                            placeable = false;
-                        }
-                    }
-                }
-            } while (!placeable);
-
-            int startx = centerx - 5;
-            int starty = centery;
-            int deltax = 1;
-            int deltay = 0;
-            if (!horizontal)
-            {
-                startx = centerx;
-                starty = centery - 5;
-                deltax = 0;
-                deltay = 1;
+                centerx = hyrule.RNG.Next(21, 41);
+                centery = hyrule.RNG.Next(17, 27);
             }
-            for (int i = 0; i < 10; i++)
+            placeable = true;
+            for (int i = centery - 7; i < centery + 8; i++)
             {
-                int lake = hyrule.RNG.Next(7, 11);
-                if (i == 0 || i == 9)
+                for (int j = centerx - 7; j < centerx + 8; j++)
                 {
-                    lake = hyrule.RNG.Next(3, 6);
+                    if (map[i, j] != Terrain.MOUNTAIN)
+                    {
+                        placeable = false;
+                    }
                 }
-                if (horizontal)
+            }
+        } while (!placeable);
+
+        int startx = centerx - 5;
+        int starty = centery;
+        int deltax = 1;
+        int deltay = 0;
+        if (!isHorizontal)
+        {
+            startx = centerx;
+            starty = centery - 5;
+            deltax = 0;
+            deltay = 1;
+        }
+        for (int i = 0; i < 10; i++)
+        {
+            int lake = hyrule.RNG.Next(7, 11);
+            if (i == 0 || i == 9)
+            {
+                lake = hyrule.RNG.Next(3, 6);
+            }
+            if (isHorizontal)
+            {
+                for (int j = 0; j < lake / 2; j++)
                 {
-                    for (int j = 0; j < lake / 2; j++)
-                    {
-                        map[starty + j, startx] = water;
-                        if (i == 0)
-                        {
-                            map[starty + j, startx - 1] = Terrain.FOREST;
-                        }
-                        if (i == 9)
-                        {
-                            map[starty + j, startx + 1] = Terrain.FOREST;
-                        }
-
-                    }
-                    int top = starty + lake / 2;
-                    while (map[top, startx - 1] == Terrain.MOUNAIN)
-                    {
-                        map[top, startx - 1] = Terrain.FOREST;
-                        top--;
-                    }
-                    top = starty + lake / 2;
-                    while (map[top, startx - 1] != Terrain.MOUNAIN)
-                    {
-                        map[top, startx] = Terrain.FOREST;
-                        top++;
-                    }
-
-                    for (int j = 0; j < lake - (lake / 2); j++)
-                    {
-                        map[starty - j, startx] = water;
-                        if (i == 0)
-                        {
-                            map[starty - j, startx - 1] = Terrain.FOREST;
-                        }
-                        if (i == 9)
-                        {
-                            map[starty - j, startx + 1] = Terrain.FOREST;
-                        }
-
-                    }
-                    top = starty - (lake - (lake / 2));
-                    while (map[top, startx - 1] == Terrain.MOUNAIN)
-                    {
-                        map[top, startx - 1] = Terrain.FOREST;
-                        top++;
-                    }
-                    top = starty - (lake - (lake / 2));
-                    while (map[top, startx - 1] != Terrain.MOUNAIN)
-                    {
-                        map[top, startx] = Terrain.FOREST;
-                        top--;
-                    }
-
-                    //map[starty + lake / 2, startx] = terrain.forest;
-                    // map[starty - (lake - (lake / 2)), startx] = terrain.forest;
+                    map[starty + j, startx] = water;
                     if (i == 0)
                     {
-                        map[starty + lake / 2, startx + 1] = Terrain.FOREST;
-                        map[starty - (lake - (lake / 2)), startx - 1] = Terrain.FOREST;
+                        map[starty + j, startx - 1] = Terrain.FOREST;
                     }
                     if (i == 9)
                     {
-                        map[starty + lake / 2, startx + 1] = Terrain.FOREST;
-                        map[starty - (lake - (lake / 2)), startx + 1] = Terrain.FOREST;
+                        map[starty + j, startx + 1] = Terrain.FOREST;
                     }
 
                 }
-                else
+                int top = starty + lake / 2;
+                while (map[top, startx - 1] == Terrain.MOUNTAIN)
                 {
-                    for (int j = 0; j < lake / 2; j++)
-                    {
-                        map[starty, startx + j] = water;
-                        if (i == 0)
-                        {
-                            map[starty - 1, startx + j] = Terrain.FOREST;
-                        }
-                        if (i == 9)
-                        {
-                            map[starty + 1, startx + j] = Terrain.FOREST;
-                        }
-                    }
-                    int top = startx + lake / 2;
-                    while (map[starty - 1, top] == Terrain.MOUNAIN && i != 0)
-                    {
-                        map[starty - 1, top] = Terrain.FOREST;
-                        top--;
-                    }
-                    top = startx + lake / 2;
-                    while (map[starty - 1, top] != Terrain.MOUNAIN && i != 0)
-                    {
-                        map[starty, top] = Terrain.FOREST;
-                        top++;
-                    }
+                    map[top, startx - 1] = Terrain.FOREST;
+                    top--;
+                }
+                top = starty + lake / 2;
+                while (map[top, startx - 1] != Terrain.MOUNTAIN)
+                {
+                    map[top, startx] = Terrain.FOREST;
+                    top++;
+                }
 
-                    for (int j = 0; j < lake - (lake / 2); j++)
-                    {
-                        map[starty, startx - j] = water;
-                        if (i == 0)
-                        {
-                            map[starty - 1, startx - j] = Terrain.FOREST;
-                        }
-                        if (i == 9)
-                        {
-                            map[starty + 1, startx - j] = Terrain.FOREST;
-                        }
-                    }
-                    top = startx - (lake - (lake / 2));
-                    while (map[starty - 1, top] == Terrain.MOUNAIN && i != 0)
-                    {
-                        map[starty - 1, top] = Terrain.FOREST;
-                        top++;
-                    }
-                    top = startx - (lake - (lake / 2));
-                    while (map[starty - 1, top] != Terrain.MOUNAIN && i != 0)
-                    {
-                        map[starty, top] = Terrain.FOREST;
-                        top--;
-                    }
-                    //map[starty, startx + lake / 2] = terrain.forest;
-                    //map[starty, startx - (lake - (lake / 2))] = terrain.forest;
+                for (int j = 0; j < lake - (lake / 2); j++)
+                {
+                    map[starty - j, startx] = water;
                     if (i == 0)
                     {
-                        map[starty - 1, startx + lake / 2] = Terrain.FOREST;
-                        map[starty - 1, startx - (lake - (lake / 2))] = Terrain.FOREST;
+                        map[starty - j, startx - 1] = Terrain.FOREST;
                     }
                     if (i == 9)
                     {
-                        map[starty + 1, startx + lake / 2] = Terrain.FOREST;
-                        map[starty + 1, startx - (lake - (lake / 2))] = Terrain.FOREST;
+                        map[starty - j, startx + 1] = Terrain.FOREST;
                     }
+
                 }
-                startx += deltax;
-                starty += deltay;
-            }
-
-            Location cave1l = new Location();
-            Location cave1r = new Location();
-            Location cave2l = new Location();
-            Location cave2r = new Location();
-
-            do
-            {
-                int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
-                cave1l = connectionsDM.Keys.ToList()[cavenum1];
-                cave1r = connectionsDM[cave1l][0];
-            } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
-
-            do
-            {
-                int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
-                cave2l = connectionsDM.Keys.ToList()[cavenum1];
-                cave2r = connectionsDM[cave2l][0];
-            } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
-            cave1l.CanShuffle = false;
-            cave1r.CanShuffle = false;
-            cave2l.CanShuffle = false;
-            cave2r.CanShuffle = false;
-            map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNAIN;
-            map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNAIN;
-
-            map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNAIN;
-
-            map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNAIN;
-
-
-            int caveDir = hyrule.RNG.Next(2);
-            if (horizontal)
-            {
-                bool f = HorizontalCave(caveDir, centerx, centery, cave1l, cave1r);
-                if (!f)
+                top = starty - (lake - (lake / 2));
+                while (map[top, startx - 1] == Terrain.MOUNTAIN)
                 {
-                    return false;
+                    map[top, startx - 1] = Terrain.FOREST;
+                    top++;
+                }
+                top = starty - (lake - (lake / 2));
+                while (map[top, startx - 1] != Terrain.MOUNTAIN)
+                {
+                    map[top, startx] = Terrain.FOREST;
+                    top--;
                 }
 
-                if (caveDir == 0)
+                //map[starty + lake / 2, startx] = terrain.forest;
+                // map[starty - (lake - (lake / 2)), startx] = terrain.forest;
+                if (i == 0)
                 {
-                    caveDir = 1;
+                    map[starty + lake / 2, startx + 1] = Terrain.FOREST;
+                    map[starty - (lake - (lake / 2)), startx - 1] = Terrain.FOREST;
                 }
-                else
+                if (i == 9)
                 {
-                    caveDir = 0;
+                    map[starty + lake / 2, startx + 1] = Terrain.FOREST;
+                    map[starty - (lake - (lake / 2)), startx + 1] = Terrain.FOREST;
                 }
-                f = HorizontalCave(caveDir, centerx, centery, cave2l, cave2r);
-                if (!f)
-                {
-                    return false;
-                }
+
             }
             else
             {
-                bool f = VerticalCave(caveDir, centerx, centery, cave1l, cave1r);
-                if (!f)
+                for (int j = 0; j < lake / 2; j++)
                 {
-                    return false;
-                }
-                if (caveDir == 0)
-                {
-                    caveDir = 1;
-                }
-                else
-                {
-                    caveDir = 0;
-                }
-                f = VerticalCave(caveDir, centerx, centery, cave2l, cave2r);
-                if (!f)
-                {
-                    return false;
-                }
-                
-            }
-            return true;
-        }
-        public void UpdateVisit()
-        {
-            UpdateReachable();
-
-            foreach (Location location in AllLocations)
-            {
-                if (v[location.Ypos - 30, location.Xpos])
-                {
-                    location.Reachable = true;
-                    if (connectionsDM.Keys.Contains(location))
+                    map[starty, startx + j] = water;
+                    if (i == 0)
                     {
-                        List<Location> l2 = connectionsDM[location];
+                        map[starty - 1, startx + j] = Terrain.FOREST;
+                    }
+                    if (i == 9)
+                    {
+                        map[starty + 1, startx + j] = Terrain.FOREST;
+                    }
+                }
+                int top = startx + lake / 2;
+                while (map[starty - 1, top] == Terrain.MOUNTAIN && i != 0)
+                {
+                    map[starty - 1, top] = Terrain.FOREST;
+                    top--;
+                }
+                top = startx + lake / 2;
+                while (map[starty - 1, top] != Terrain.MOUNTAIN && i != 0)
+                {
+                    map[starty, top] = Terrain.FOREST;
+                    top++;
+                }
 
-                        foreach(Location l3 in l2)
-                        { 
-                            l3.Reachable = true;
-                            v[l3.Ypos - 30, l3.Xpos] = true;
-                        }
+                for (int j = 0; j < lake - (lake / 2); j++)
+                {
+                    map[starty, startx - j] = water;
+                    if (i == 0)
+                    {
+                        map[starty - 1, startx - j] = Terrain.FOREST;
+                    }
+                    if (i == 9)
+                    {
+                        map[starty + 1, startx - j] = Terrain.FOREST;
+                    }
+                }
+                top = startx - (lake - (lake / 2));
+                while (map[starty - 1, top] == Terrain.MOUNTAIN && i != 0)
+                {
+                    map[starty - 1, top] = Terrain.FOREST;
+                    top++;
+                }
+                top = startx - (lake - (lake / 2));
+                while (map[starty - 1, top] != Terrain.MOUNTAIN && i != 0)
+                {
+                    map[starty, top] = Terrain.FOREST;
+                    top--;
+                }
+                //map[starty, startx + lake / 2] = terrain.forest;
+                //map[starty, startx - (lake - (lake / 2))] = terrain.forest;
+                if (i == 0)
+                {
+                    map[starty - 1, startx + lake / 2] = Terrain.FOREST;
+                    map[starty - 1, startx - (lake - (lake / 2))] = Terrain.FOREST;
+                }
+                if (i == 9)
+                {
+                    map[starty + 1, startx + lake / 2] = Terrain.FOREST;
+                    map[starty + 1, startx - (lake - (lake / 2))] = Terrain.FOREST;
+                }
+            }
+            startx += deltax;
+            starty += deltay;
+        }
+
+        Location cave1l = new Location();
+        Location cave1r = new Location();
+        Location cave2l = new Location();
+        Location cave2r = new Location();
+
+        do
+        {
+            int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
+            cave1l = connectionsDM.Keys.ToList()[cavenum1];
+            cave1r = connectionsDM[cave1l][0];
+        } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
+
+        do
+        {
+            int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
+            cave2l = connectionsDM.Keys.ToList()[cavenum1];
+            cave2r = connectionsDM[cave2l][0];
+        } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
+        cave1l.CanShuffle = false;
+        cave1r.CanShuffle = false;
+        cave2l.CanShuffle = false;
+        cave2r.CanShuffle = false;
+        map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
+        map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
+
+        map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
+
+        map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
+
+
+        int caveType = hyrule.RNG.Next(2);
+        if (isHorizontal)
+        {
+            bool f = HorizontalCave(caveType, centerx, centery, cave1l, cave1r);
+            if (!f)
+            {
+                return false;
+            }
+
+            if (caveType == 0)
+            {
+                caveType = 1;
+            }
+            else
+            {
+                caveType = 0;
+            }
+            f = HorizontalCave(caveType, centerx, centery, cave2l, cave2r);
+            if (!f)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            bool f = VerticalCave(caveType, centerx, centery, cave1l, cave1r);
+            if (!f)
+            {
+                return false;
+            }
+            if (caveType == 0)
+            {
+                caveType = 1;
+            }
+            else
+            {
+                caveType = 0;
+            }
+            f = VerticalCave(caveType, centerx, centery, cave2l, cave2r);
+            if (!f)
+            {
+                return false;
+            }
+            
+        }
+        return true;
+    }
+    public void UpdateVisit()
+    {
+        UpdateReachable();
+
+        foreach (Location location in AllLocations)
+        {
+            if (v[location.Ypos - 30, location.Xpos])
+            {
+                location.Reachable = true;
+                if (connectionsDM.Keys.Contains(location))
+                {
+                    List<Location> l2 = connectionsDM[location];
+
+                    foreach(Location l3 in l2)
+                    { 
+                        l3.Reachable = true;
+                        v[l3.Ypos - 30, l3.Xpos] = true;
                     }
                 }
             }

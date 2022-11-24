@@ -21,32 +21,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2018E86715DD4BA79D5F812FF6694139"
+        "MsmKey" = "8:_94EC71DD165A43C09436F29102CAC5DA"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E528AFF0F3E8DF8DE4302F39054F9F9B"
-        "OwnerKey" = "8:_2018E86715DD4BA79D5F812FF6694139"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_E71669A5A7DF467591F5CD12F54CFAD2"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E528AFF0F3E8DF8DE4302F39054F9F9B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_2018E86715DD4BA79D5F812FF6694139"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -108,10 +90,10 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.6.0.x64"
                     {
-                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
-                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    "Name" = "8:.NET Runtime 6.0.7 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.6.0.x64"
                     }
                 }
             }
@@ -140,6 +122,16 @@
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
+                "{A06ECF26-33A3-4562-8140-9B0E340D4F24}:_E735F2C077FD476A8A5CAB3269DC0F81"
+                {
+                "Name" = "8:.NET Core"
+                "Message" = "8:[VSDNETCOREMSG]"
+                "AllowLaterVersions" = "11:FALSE"
+                "InstallUrl" = "8:https://dotnet.microsoft.com/download/dotnet-core/[NetCoreVerMajorDotMinor]"
+                "IsNETCore" = "11:TRUE"
+                "Architecture" = "2:0"
+                "Runtime" = "2:0"
+                }
             }
         }
         "File"
@@ -162,37 +154,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E528AFF0F3E8DF8DE4302F39054F9F9B"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-                "ScatterAssemblies"
-                {
-                    "_E528AFF0F3E8DF8DE4302F39054F9F9B"
-                    {
-                    "Name" = "8:System.Net.Http.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:System.Net.Http.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E71669A5A7DF467591F5CD12F54CFAD2"
@@ -281,16 +242,16 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Z2Randomizer"
-        "ProductCode" = "8:{72B1EE4B-CE9F-4378-8E32-A9295BED3EFD}"
-        "PackageCode" = "8:{34FC621E-051E-471D-A928-722A30D128FB}"
+        "ProductName" = "8:Z2Randomizer_Test"
+        "ProductCode" = "8:{935E97AA-E281-4D97-AD6D-B3E81E38140C}"
+        "PackageCode" = "8:{1C05EF3D-BD9A-428C-A045-F9727A54C951}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:TRUE"
+        "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.0.3"
+        "ProductVersion" = "8:4.1.0"
         "Manufacturer" = "8: digshake"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -411,7 +372,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_2018E86715DD4BA79D5F812FF6694139"
+            "Target" = "8:_94EC71DD165A43C09436F29102CAC5DA"
             "Folder" = "8:_2836974F02AE481582FD5BD51CDF1670"
             "WorkingFolder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
             "Icon" = "8:_1CCB6BD983624AEB9B091031D25B8DA1"
@@ -816,9 +777,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2018E86715DD4BA79D5F812FF6694139"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_94EC71DD165A43C09436F29102CAC5DA"
             {
-            "SourcePath" = "8:..\\WindowsFormsApplication1\\obj\\Debug\\Z2Randomizer.exe"
+            "SourcePath" = "8:..\\WindowsFormsApplication1\\obj\\Release\\net6.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -837,9 +798,10 @@
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
+            "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}"
             "ShowKeyOutput" = "11:TRUE"
+            "PublishProfilePath" = "8:Properties\\PublishProfiles\\ProdPublishProfile.pubxml"
                 "ExcludeFilters"
                 {
                 }

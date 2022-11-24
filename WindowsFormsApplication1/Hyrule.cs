@@ -1,4 +1,5 @@
 ﻿using NLog;
+using NLog.Fluent;
 using System;
 using System.CodeDom;
 using System.Collections;
@@ -9,6 +10,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Z2Randomizer.Overworld;
+using Z2Randomizer.Sidescroll;
 
 namespace Z2Randomizer
 {
@@ -197,7 +200,8 @@ namespace Z2Randomizer
         public int totalWestGenerationAttempts = 0;
         public int totalEastGenerationAttempts = 0;
         public int totalMazeIslandGenerationAttempts = 0;
-        public int totalDeathMountainGenrationAttempts = 0;
+        public int totalDeathMountainGenerationAttempts = 0;
+        public int isEverythingReachableFailures = 0;
 
 
         private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
@@ -240,6 +244,7 @@ namespace Z2Randomizer
 
         public Hyrule(RandomizerProperties p, BackgroundWorker worker)
         {
+            WestHyrule.ResetStats();
             props = p;
             logger.Info("Started generation for " + props.flags + " / " + props.seed);
 
@@ -487,7 +492,6 @@ namespace Z2Randomizer
             accessibleMagicContainers = 4;
             visitedEnemies = new List<int>();
 
-            //JEFF START HERE
             startRandomizeStartingValuesTimestamp = DateTime.Now;
             RandomizeStartingValues();
             startRandomizeEnemiesTimestamp = DateTime.Now;
@@ -530,7 +534,11 @@ namespace Z2Randomizer
             }
             UpdateRom();
             String newFileName = props.filename.Substring(0, props.filename.LastIndexOf("\\") + 1) + "Z2_" + props.seed + "_" + props.flags + ".nes";
-            ROMData.Dump(newFileName);
+            if(props.saveRom)
+            {
+                ROMData.Dump(newFileName);
+            }
+            PrintSpoiler(LogLevel.Info);
 
         }
 
@@ -913,9 +921,9 @@ namespace Z2Randomizer
             while (prevCount != count || updateItemsResult || updateSpellsResult)
             {
                 prevCount = count;
-                westHyrule.updateVisit();
+                westHyrule.UpdateVisit();
                 deathMountain.UpdateVisit();
-                eastHyrule.updateVisit();
+                eastHyrule.UpdateVisit();
                 mazeIsland.UpdateVisit();
 
                 foreach(World world in worlds)
@@ -940,9 +948,12 @@ namespace Z2Randomizer
                         worlds.ForEach(i => i.VisitCave2());
                     }
                 }
-                westHyrule.updateVisit();
+                updateItemsResult = UpdateItemGets();
+                updateSpellsResult = UpdateSpells();
+
+                westHyrule.UpdateVisit();
                 deathMountain.UpdateVisit();
-                eastHyrule.updateVisit();
+                eastHyrule.UpdateVisit();
                 mazeIsland.UpdateVisit();
 
                 updateItemsResult = UpdateItemGets();
@@ -977,6 +988,7 @@ namespace Z2Randomizer
             {
                 if(itemGet[item] == false)
                 {
+                    isEverythingReachableFailures++;
                     return false;
                 }
             }
@@ -985,19 +997,23 @@ namespace Z2Randomizer
             {
                 if (itemGet[(Item)i] == false)
                 {
+                    isEverythingReachableFailures++;
                     return false;
                 }
             }
             if (accessibleMagicContainers != 8)
             {
+                isEverythingReachableFailures++;
                 return false;
             }
             if (heartContainers != maxHearts)
             {
+                isEverythingReachableFailures++;
                 return false;
             }
             if(SpellGet.Values.Any(i => i == false))
             {
+                isEverythingReachableFailures++;
                 return false;
             }
 
@@ -1012,14 +1028,18 @@ namespace Z2Randomizer
                 && CanGet(eastHyrule.gp) 
                 && CanGet(itemLocs) 
                 && CanGet(westHyrule.bagu) 
-                && (!hiddenKasuto || (CanGet(eastHyrule.hkLoc))) 
-                && (!hiddenPalace || (CanGet(eastHyrule.hpLoc))));
+                && (!hiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation))) 
+                && (!hiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
+            if(retval == false)
+            {
+                isEverythingReachableFailures++;
+            }
             return retval;
         }
 
         private Boolean CanGet(List<Location> l)
         {
-            return l.All(i => i.Reachable == true);
+            return l.All(i => i.Reachable);
         }
         private Boolean CanGet(Location location)
         {
@@ -1628,8 +1648,8 @@ namespace Z2Randomizer
                     }
                     if (!deathMountain.Allreached)
                     {
-                        while (!deathMountain.Terraform()) { totalDeathMountainGenrationAttempts++; }
-                        totalDeathMountainGenrationAttempts++;
+                        while (!deathMountain.Terraform()) { totalDeathMountainGenerationAttempts++; }
+                        totalDeathMountainGenerationAttempts++;
                     }
                     deathMountain.ResetVisitabilityState();
 
@@ -1705,7 +1725,7 @@ namespace Z2Randomizer
                         LoadItemLocs();
                         deathMountain.ResetVisitabilityState();
 
-                        westHyrule.setStart();
+                        westHyrule.SetStart();
                         ShuffleItems();
 
                         ShufflePalaces();
@@ -4303,6 +4323,14 @@ namespace Z2Randomizer
             for (int i = 0; i < addresses.Count; i++)
             {
                 ROMData.Put(addresses[i], (Byte)items[i]);
+            }
+        }
+
+        public void PrintSpoiler(LogLevel logLevel)
+        {
+            logger.Log(logLevel, "ITEMS:");
+            foreach (Item item in SHUFFLABLE_STARTING_ITEMS) {
+                logger.Log(logLevel, item.ToString() + "(" + itemGet[item] + ") : " + itemLocs.Where(i => i.item == item).FirstOrDefault()?.Name);
             }
         }
 

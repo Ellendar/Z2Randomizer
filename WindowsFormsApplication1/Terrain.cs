@@ -19,7 +19,7 @@ namespace Z2Randomizer
         GRAVE = 8,
         ROAD = 9,
         LAVA = 10,
-        MOUNAIN = 11,
+        MOUNTAIN = 11,
         WATER = 12,
         WALKABLEWATER = 13,
         ROCK = 14,

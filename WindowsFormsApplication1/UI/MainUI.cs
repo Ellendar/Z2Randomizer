@@ -1256,7 +1256,7 @@ namespace Z2Randomizer
 
         private RandomizerProperties generateProps()
         {
-            RandomizerProperties props;
+            RandomizerProperties props = new RandomizerProperties();
             props.filename = fileTextBox.Text;
 
             try
@@ -1400,7 +1400,7 @@ namespace Z2Randomizer
             props.vanillaOriginal = vanillaOriginalTerrain.Checked;
             props.shuffleHidden = shuffleHidden.Checked;
             props.bossItem = bossItem.Checked;
-            props.bootsWater = waterBoots.Checked;
+            props.canWalkOnWaterWithBoots = waterBoots.Checked;
             props.spellEnemy = spellEnemy.Checked;
             props.bagusWoods = baguBox.Checked;
             props.createPalaces = palaceBox.SelectedIndex == 2;
