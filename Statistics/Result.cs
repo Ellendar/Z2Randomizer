@@ -4,8 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Z2Randomizer.Overworld;
 
-namespace Z2Randomizer
+namespace Z2Randomizer.Statistics
 {
     class Result
     {
@@ -49,7 +50,18 @@ namespace Z2Randomizer
         public int TotalWestGenerationAttempts { get; set; }
         public int TotalEastGenerationAttempts { get; set; }
         public int TotalMazeIslandGenerationAttempts { get; set; }
-        public int TotalDeathMountainGenrationAttempts { get; set; }
+        public int TotalDeathMountainGenerationAttempts { get; set; }
+        public int IsEverythingReachableFailures { get; set; }
+
+        //West Contient failure causes
+        public int WestFailedOnLocationPlacement { get; set; }
+        public int WestFailedOnBaguPlacement { get; set; }
+        public int WestTerrainGrowthAttempts { get; set; }
+        public int WestFailedOnRaftPlacement { get; set; }
+        public int WestFailedOnBridgePlacement { get; set; }
+        public int WestFailedOnIslandConnection { get; set; }
+        public int WestFailedOnMakeCaldera { get; set; }
+        public int WestFailedOnConnectIslands { get; set; }
 
 
 
@@ -97,7 +109,18 @@ namespace Z2Randomizer
             TotalWestGenerationAttempts = hyrule.totalWestGenerationAttempts;
             TotalEastGenerationAttempts = hyrule.totalEastGenerationAttempts;
             TotalMazeIslandGenerationAttempts = hyrule.totalMazeIslandGenerationAttempts;
-            TotalDeathMountainGenrationAttempts = hyrule.totalDeathMountainGenrationAttempts;
+            TotalDeathMountainGenerationAttempts = hyrule.totalDeathMountainGenerationAttempts;
+            IsEverythingReachableFailures = hyrule.isEverythingReachableFailures;
+
+            //West Contient failure causes
+            WestFailedOnLocationPlacement = WestHyrule.failedOnPlaceLocations;
+            WestFailedOnBaguPlacement = WestHyrule.failedOnBaguPlacement;
+            //WestTerrainGrowthAttempts = WestHyrule.terrainGrowthAttempts;
+            WestFailedOnRaftPlacement = WestHyrule.failedOnRaftPlacement;
+            WestFailedOnBridgePlacement = WestHyrule.failedOnBridgePlacement;
+            WestFailedOnIslandConnection = WestHyrule.failedOnIslandConnection;
+            WestFailedOnMakeCaldera = WestHyrule.failedOnMakeCaldera;
+            WestFailedOnConnectIslands = WestHyrule.failedOnConnectIslands;
         }
     }
 }

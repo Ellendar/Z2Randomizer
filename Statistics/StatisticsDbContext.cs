@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer
+namespace Z2Randomizer.Statistics
 {
     internal class StatisticsDbContext : DbContext
     {

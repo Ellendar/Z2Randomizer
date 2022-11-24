@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer
+namespace Z2Randomizer.Statistics
 {
     /// <summary>
     /// This is a hacky version of how this should work. EVENTUALLY the entirety of the options from the config should
@@ -99,10 +99,15 @@ namespace Z2Randomizer
         };
 
 
-        private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOAdEScuA";
+        //private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOAdEScuA";
+        //private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOA!CScu"; //Force west caldera 
+        //private static readonly string FLAGS = "iRhqh$j9g7z$Zq5#0gAhOAdjJ@!A"; //Oops all canyons
+        private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOAd2Nau"; //All mountains
+        //private static readonly string FLAGS = "iRhqh$j9g7@$Zq5#0gAhOA!BSg!"; //Mirai's seed
+        //private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOA!aGKu"; //Bad boots islands
         private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda II - The Adventure of Link (USA).nes";
         private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-        private static readonly int LIMIT = 1000;
+        private static readonly int LIMIT = 1;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()
         {
@@ -110,26 +115,34 @@ namespace Z2Randomizer
 
             Random random = new Random();
             logger.Info("Started statistics generation with limit: " + LIMIT);
-            for (int i = 0; i < LIMIT; i++)
+            try
             {
-                RandomizerProperties properties = GetPropertiesFromFlags(FLAGS);
-                properties.flags = FLAGS;
-                properties.seed = random.Next(1000000000);
-                properties.filename = VANILLA_ROM_PATH;
-                BackgroundWorker backgroundWorker = new BackgroundWorker()
+                for (int i = 0; i < LIMIT; i++)
                 {
-                    WorkerReportsProgress = true,
-                    WorkerSupportsCancellation = true
-                };
-                DateTime startTime = DateTime.Now;
-                Hyrule hyrule = new Hyrule(properties, backgroundWorker);
-                DateTime endTime = DateTime.Now;
-                Result result = new Result(hyrule, properties);
-                result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
-                dbContext.Add(result);
-                logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
+                    RandomizerProperties properties = GetPropertiesFromFlags(FLAGS);
+                    properties.flags = FLAGS;
+                    properties.seed = random.Next(1000000000);
+                    //properties.seed = 2955027;
+                    properties.filename = VANILLA_ROM_PATH;
+                    properties.saveRom = false;
+                    BackgroundWorker backgroundWorker = new BackgroundWorker()
+                    {
+                        WorkerReportsProgress = true,
+                        WorkerSupportsCancellation = true
+                    };
+                    DateTime startTime = DateTime.Now;
+                    Hyrule hyrule = new Hyrule(properties, backgroundWorker);
+                    DateTime endTime = DateTime.Now;
+                    Result result = new Result(hyrule, properties);
+                    result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
+                    dbContext.Add(result);
+                    logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
+                    //dbContext.SaveChanges();`
+                }
+                int k = 0;
                 dbContext.SaveChanges();
             }
+            catch(Exception e) { logger.Error(e); }
         }
 
         //TODO: Why is RandomizerProperties a struct? Shouldn't this just be a constructor? If C#6 ended up adding value constructors
@@ -555,7 +568,7 @@ namespace Z2Randomizer
             properties.vanillaOriginal = bits[1];
             properties.shuffleHidden = bits[2];
             properties.bossItem = bits[3];
-            properties.bootsWater = bits[4];
+            properties.canWalkOnWaterWithBoots = bits[4];
             properties.spellEnemy = bits[5];
 
             bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));

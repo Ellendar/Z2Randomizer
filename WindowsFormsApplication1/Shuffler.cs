@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Z2Randomizer;
+using Z2Randomizer.Overworld;
 using Z2Randomizer.Sidescroll;
 
 namespace Z2Randomizer
@@ -1161,31 +1162,20 @@ namespace Z2Randomizer
         }
         public Room SelectItemRoom()
         {
-            int dir = R.Next(5);
-            if(dir == 0)
+            return R.Next(5) switch
             {
-                return PalaceRooms.leftOpenItemRooms[R.Next(PalaceRooms.leftOpenItemRooms.Count)].deepCopy();
-            }
-            else if(dir == 1)
-            {
-                return PalaceRooms.rightOpenItemRooms[R.Next(PalaceRooms.rightOpenItemRooms.Count)].deepCopy();
-
-            }
-            else if(dir == 2)
-            {
-                return PalaceRooms.upOpenItemRooms[R.Next(PalaceRooms.upOpenItemRooms.Count)].deepCopy();
-
-            }
-            else if(dir == 3)
-            {
-                return PalaceRooms.downOpenItemRooms[R.Next(PalaceRooms.downOpenItemRooms.Count)].deepCopy();
-
-            }
-            else
-            {
-                return PalaceRooms.throughItemRooms[R.Next(PalaceRooms.throughItemRooms.Count)].deepCopy();
-
-            }
+                //left
+                0 => PalaceRooms.leftOpenItemRooms[R.Next(PalaceRooms.leftOpenItemRooms.Count)].deepCopy(),
+                //right
+                1 => PalaceRooms.rightOpenItemRooms[R.Next(PalaceRooms.rightOpenItemRooms.Count)].deepCopy(),
+                //up
+                2 => PalaceRooms.upOpenItemRooms[R.Next(PalaceRooms.upOpenItemRooms.Count)].deepCopy(),
+                //down
+                3 => PalaceRooms.downOpenItemRooms[R.Next(PalaceRooms.downOpenItemRooms.Count)].deepCopy(),
+                //Through
+                4 => PalaceRooms.throughItemRooms[R.Next(PalaceRooms.throughItemRooms.Count)].deepCopy(),
+                _ => throw new Exception("Invalid item room direction selection."),
+            };
         }
         private int FindFreeSpace(Dictionary<int, int> freeSpace, byte[] sv)
         {
