@@ -3,179 +3,192 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Z2Randomizer.Overworld;
 
-namespace Z2Randomizer
+namespace Z2Randomizer;
+
+/// <summary>
+/// Originally this class corresponded to the flags and controlled the logic, with all the actual configuration randomization
+/// logic scattershot all over the rando. Now this class should (as much as possible) represent what the actual net configuration
+/// was, and RandomizerConfiguration should represent the flags/interface, with the configuration randomization done entirly
+/// in the interface between them. This migration is still a work in progress.
+/// </summary>
+public class RandomizerProperties
 {
-    public class RandomizerProperties
+    public RandomizerProperties()
     {
-        public RandomizerProperties()
-        {
 
-        }
-
-        //ROM Info
-        public String filename;
-        public int seed;
-        public String flags;
-        public bool saveRom = true;
-
-        //Items
-        public Boolean shuffleItems;
-        public Boolean startCandle;
-        public Boolean startGlove;
-        public Boolean startRaft;
-        public Boolean startBoots;
-        public Boolean startFlute;
-        public Boolean startCross;
-        public Boolean startHammer;
-        public Boolean startKey;
-
-        //Spells
-        public Boolean shuffleSpells;
-        public Boolean startShield;
-        public Boolean startJump;
-        public Boolean startLife;
-        public Boolean startFairy;
-        public Boolean startFire;
-        public Boolean startReflect;
-        public Boolean startSpell;
-        public Boolean startThunder;
-        public Boolean combineFire;
-        public Boolean dashSpell;
-
-        //Other starting attributes
-        public String startHearts;
-        public String maxHearts;
-        public String startTech;
-        public Boolean shuffleLives;
-        public Boolean permanentBeam;
-        public Boolean useCommunityHints;
-        public int startAtk;
-        public int startMag;
-        public int startLifeLvl;
-
-        //Overworld
-        public Boolean shuffleEncounters;
-        public Boolean allowPathEnemies;
-        public Boolean swapPalaceCont;
-        public Boolean p7shuffle;
-        public String hiddenPalace;
-        public String hiddenKasuto;
-        public Boolean townSwap;
-        public String encounterRate;
-        public String continentConnections;
-        public Boolean boulderBlockConnections;
-        public String westBiome;
-        public String eastBiome;
-        public String mazeBiome;
-        public String dmBiome;
-        public Boolean vanillaOriginal;
-        public Boolean shuffleHidden;
-        public Boolean canWalkOnWaterWithBoots;
-        public Boolean bagusWoods;
-
-        //Palaces
-        public Boolean shufflePalaceRooms;
-        public String startGems;
-        public Boolean requireTbird;
-        public Boolean palacePalette;
-        public Boolean upaBox;
-        public Boolean shortenGP;
-        public Boolean removeTbird;
-        public Boolean bossItem;
-        public Boolean createPalaces;
-        public Boolean customRooms;
-        public Boolean blockersAnywhere;
-        public Boolean bossRoomConnect;
-
-        //Enemies
-        public Boolean shuffleEnemyHP;
-        public Boolean shuffleEnemyStealExp;
-        public Boolean shuffleStealExpAmt;
-        public Boolean shuffleSwordImmunity;
-        public Boolean shuffleOverworldEnemies;
-        public Boolean shufflePalaceEnemies;
-        public Boolean mixEnemies;
-        public Boolean shuffleDripper;
-        public Boolean shuffleEnemyPalettes;
-        public String expLevel;
-
-        //Levels
-        public Boolean shuffleAllExp;
-        public Boolean shuffleAtkExp;
-        public Boolean shuffleMagicExp;
-        public Boolean shuffleLifeExp;
-        public Boolean shuffleAtkEff;
-        public Boolean shuffleMagEff;
-        public Boolean shuffleLifeEff;
-        public Boolean shuffleLifeRefill;
-        public Boolean shuffleSpellLocations;
-        public Boolean disableMagicRecs;
-        public Boolean ohkoEnemies;
-        public Boolean tankMode;
-        public Boolean ohkoLink;
-        public Boolean wizardMode;
-        public Boolean highAtk;
-        public Boolean lowAtk;
-        public Boolean highDef;
-        public Boolean highMag;
-        public Boolean lowMag;
-        public int attackCap;
-        public int magicCap;
-        public int lifeCap;
-        public Boolean scaleLevels;
-        public Boolean hideLocs;
-        public Boolean saneCaves;
-        public Boolean spellEnemy;
-
-        //Items
-        public Boolean shuffleOverworldItems;
-        public Boolean shufflePalaceItems;
-        public Boolean mixOverworldPalaceItems;
-        public Boolean shuffleSmallItems;
-        public Boolean extraKeys;
-        public Boolean kasutoJars;
-        public Boolean pbagItemShuffle;
-        public Boolean removeSpellItems;
-        public Boolean shufflePbagXp;
-
-        //Drops
-        public Boolean pbagDrop;
-        public Boolean ShuffleEnemyDrops;
-        public Boolean smallbluejar;
-        public Boolean smallredjar;
-        public Boolean small50;
-        public Boolean small100;
-        public Boolean small200;
-        public Boolean small500;
-        public Boolean small1up;
-        public Boolean smallkey;
-        public Boolean largebluejar;
-        public Boolean largeredjar;
-        public Boolean large50;
-        public Boolean large100;
-        public Boolean large200;
-        public Boolean large500;
-        public Boolean large1up;
-        public Boolean largekey;
-        public Boolean standardizeDrops;
-        public Boolean randoDrops;
-
-        //Hints
-        public Boolean spellItemHints;
-        public Boolean helpfulHints;
-        public Boolean townNameHints;
-
-        //Misc.
-        public Boolean disableBeep;
-        public Boolean jumpAlwaysOn;
-        public Boolean fastCast;
-        public String beamSprite;
-        public Boolean disableMusic;
-        public String charSprite;
-        public String tunicColor;
-        public String shieldColor;
-        public Boolean upAC1;
-        public Boolean removeFlashing;
     }
+
+    //ROM Info
+    public String filename;
+    //public int seed;
+    //public String flags;
+    public bool saveRom = true;
+
+    //Items
+    //public bool shuffleItems;
+    public bool startCandle;
+    public bool startGlove;
+    public bool startRaft;
+    public bool startBoots;
+    public bool startFlute;
+    public bool startCross;
+    public bool startHammer;
+    public bool startKey;
+
+    //Spells
+    //public bool shuffleSpells;
+    public bool startShield;
+    public bool startJump;
+    public bool startLife;
+    public bool startFairy;
+    public bool startFire;
+    public bool startReflect;
+    public bool startSpell;
+    public bool startThunder;
+    public bool combineFire;
+    public bool dashSpell;
+
+    //Other starting attributes
+    public int startHearts;
+    public int maxHearts;
+    public bool startWithUpstab;
+    public bool startWithDownstab;
+    public int startLives;
+    public bool permanentBeam;
+    public bool useCommunityHints;
+    public int startAtk;
+    public int startMag;
+    public int startLifeLvl;
+
+    //Overworld
+    public bool shuffleEncounters;
+    public bool allowPathEnemies;
+    public bool swapPalaceCont;
+    public bool p7shuffle;
+    public bool hiddenPalace;
+    public bool hiddenKasuto;
+    public bool townSwap;
+    public EncounterRate encounterRate;
+    public ContinentConnectionType continentConnections;
+    public bool boulderBlockConnections;
+    public Biome westBiome;
+    public Biome eastBiome;
+    public Biome mazeBiome;
+    public Biome dmBiome;
+    public bool vanillaOriginal;
+    public bool shuffleHidden;
+    public bool canWalkOnWaterWithBoots;
+    public bool bagusWoods;
+
+    //Palaces
+    //public bool shufflePalaceRooms;
+    public PalaceStyle palaceStyle;
+    public int startGems;
+    public bool requireTbird;
+    public bool palacePalette;
+    public bool upaBox;
+    public bool shortenGP;
+    public bool removeTbird;
+    public bool bossItem;
+    //public bool createPalaces;
+    public bool customRooms;
+    public bool blockersAnywhere;
+    public bool bossRoomConnect;
+
+    //Enemies
+    public bool shuffleEnemyHP;
+    public bool shuffleEnemyStealExp;
+    public bool shuffleStealExpAmt;
+    public bool shuffleSwordImmunity;
+    public bool shuffleOverworldEnemies;
+    public bool shufflePalaceEnemies;
+    public bool mixEnemies;
+    public bool shuffleDripper;
+    public bool shuffleEnemyPalettes;
+    public StatEffectiveness expLevel;
+
+    //Levels
+    //public bool shuffleAllExp;
+    public bool shuffleAtkExp;
+    public bool shuffleMagicExp;
+    public bool shuffleLifeExp;
+    //public bool shuffleAtkEff;
+    //public bool shuffleMagEff;
+    //public bool shuffleLifeEff;
+    public bool shuffleLifeRefill;
+    public bool shuffleSpellLocations;
+    public bool disableMagicRecs;
+    /*
+    public bool ohkoEnemies;
+    public bool tankMode;
+    public bool ohkoLink;
+    public bool wizardMode;
+    public bool highAtk;
+    public bool lowAtk;
+    public bool highDef;
+    public bool highMag;
+    public bool lowMag;
+    */
+    public StatEffectiveness attackEffectiveness;
+    public StatEffectiveness magicEffectiveness;
+    public StatEffectiveness lifeEffectiveness;
+    public int attackCap;
+    public int magicCap;
+    public int lifeCap;
+    public bool scaleLevels;
+    public bool hideLocs;
+    public bool saneCaves;
+    public bool spellEnemy;
+
+    //Items
+    public bool shuffleOverworldItems;
+    public bool shufflePalaceItems;
+    public bool mixOverworldPalaceItems;
+    public bool shuffleSmallItems;
+    public bool extraKeys;
+    public bool kasutoJars;
+    public bool pbagItemShuffle;
+    public bool removeSpellItems;
+    public bool shufflePbagXp;
+
+    //Drops
+    public bool shuffleItemDropFrequency;
+    //public bool shuffleEnemyDrops;
+    public bool smallbluejar;
+    public bool smallredjar;
+    public bool small50;
+    public bool small100;
+    public bool small200;
+    public bool small500;
+    public bool small1up;
+    public bool smallkey;
+
+    public bool largebluejar;
+    public bool largeredjar;
+    public bool large50;
+    public bool large100;
+    public bool large200;
+    public bool large500;
+    public bool large1up;
+    public bool largekey;
+    public bool standardizeDrops;
+
+    //Hints
+    public bool spellItemHints;
+    public bool helpfulHints;
+    public bool townNameHints;
+
+    //Misc.
+    public bool disableBeep;
+    public bool jumpAlwaysOn;
+    public bool fastCast;
+    public String beamSprite;
+    public bool disableMusic;
+    public CharacterSprite charSprite;
+    public String tunicColor;
+    public String shieldColor;
+    public bool upAC1;
+    public bool removeFlashing;
 }

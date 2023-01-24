@@ -73,14 +73,15 @@ namespace Z2Randomizer.Statistics
 
         }
 
-        public Result(Hyrule hyrule, RandomizerProperties properties)
+        public Result(Hyrule hyrule)
         {
-            Flags = properties.flags;
-            Seed = properties.seed;
-            WestBiome = hyrule.Props.westBiome;
-            EastBiome = hyrule.Props.eastBiome;
-            MazeBiome = hyrule.Props.mazeBiome;
-            DMBiome = hyrule.Props.dmBiome;
+            RandomizerProperties properties = hyrule.Props;
+            Flags = hyrule.Flags;
+            Seed = hyrule.Seed;
+            WestBiome = hyrule.Props.westBiome.ToString();
+            EastBiome = hyrule.Props.eastBiome.ToString();
+            MazeBiome = hyrule.Props.mazeBiome.ToString();
+            DMBiome = hyrule.Props.dmBiome.ToString();
 
             //Palace Generation Attempts
             P1GenerationAttempts = hyrule.palaces[0].Generations;
