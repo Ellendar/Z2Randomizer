@@ -3,1742 +3,1633 @@ using System;
 using System.CodeDom;
 using System.Collections;
 using System.ComponentModel;
+using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.Windows.Forms;
+using Z2Randomizer.Overworld;
 
-namespace Z2Randomizer
+namespace Z2Randomizer;
+
+public partial class MainUI : Form
 {
-    public partial class MainUI : Form
+    private readonly Logger logger = LogManager.GetCurrentClassLogger();
+    private Random r;
+    private bool dontrunhandler;
+    private readonly String flags = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#$";
+    private bool spawnNextSeed;
+    private Thread t;
+    private CheckBox[] small;
+    private CheckBox[] large;
+    private String oldFlags;
+    private GeneratingSeedsForm f3;
+    private RandomizerConfiguration config;
+
+    private int validFlagStringLength;
+
+    public MainUI()
     {
-        private readonly Logger logger = LogManager.GetCurrentClassLogger();
-        private Random r;
-        private bool dontrunhandler;
-        private readonly String flags = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#$";
-        private bool spawnNextSeed;
-        private Thread t;
-        private CheckBox[] small;
-        private CheckBox[] large;
-        private String oldFlags;
-        private GeneratingSeedsForm f3;
-        private RandomizerProperties props;
-
-        private const int numFlags = 27;
-
-
-        public MainUI()
+        if (Properties.Settings.Default.update)
         {
-            if (Properties.Settings.Default.update)
-            {
-                Properties.Settings.Default.Upgrade();
-                Properties.Settings.Default.update = false;
-                Properties.Settings.Default.Save();
-            }
-            InitializeComponent();
-            r = new Random();
-            heartCmbo.SelectedIndex = 3;
-            maxHeartsBox.SelectedIndex = 7;
-            numGemsCbo.SelectedIndex = 6;
-            techCmbo.SelectedIndex = 0;
-            allowPathEnemies.Enabled = false;
-            fileTextBox.Text = Properties.Settings.Default.filePath;
-            tunicColor.SelectedIndex = Properties.Settings.Default.tunic;
-            shieldColor.SelectedIndex = Properties.Settings.Default.shield;
-            fastSpellBox.Checked = Properties.Settings.Default.spells;
-            disableLowHealthBeep.Checked = Properties.Settings.Default.beep;
-            beamCmbo.SelectedIndex = Properties.Settings.Default.beams;
-            disableMusicBox.Checked = Properties.Settings.Default.music;
-            upAC1.Checked = Properties.Settings.Default.upac1;
-            customBox1.Text = Properties.Settings.Default.custom1;
-            customBox2.Text = Properties.Settings.Default.custom2;
-            customBox3.Text = Properties.Settings.Default.custom3;
-            seedTextBox.Text = Properties.Settings.Default.lastseed;
-            flashingOff.Checked = Properties.Settings.Default.noflash;
+            Properties.Settings.Default.Upgrade();
+            Properties.Settings.Default.update = false;
+            Properties.Settings.Default.Save();
+        }
+
+        validFlagStringLength = new RandomizerConfiguration().Serialize().Length;
+
+        InitializeComponent();
+        r = new Random();
+        startingHeartsList.SelectedIndex = 3;
+        maxHeartsList.SelectedIndex = 7;
+        startingGemsList.SelectedIndex = 6;
+        startingTechsList.SelectedIndex = 0;
+        allowPathEnemiesCheckbox.Enabled = false;
+        romFileTextBox.Text = Properties.Settings.Default.filePath;
+        tunicColorList.SelectedIndex = Properties.Settings.Default.tunic;
+        shieldColorList.SelectedIndex = Properties.Settings.Default.shield;
+        fastSpellCheckbox.Checked = Properties.Settings.Default.spells;
+        disableLowHealthBeepCheckbox.Checked = Properties.Settings.Default.beep;
+        beamSpriteList.SelectedIndex = Properties.Settings.Default.beams;
+        disableMusicCheckbox.Checked = Properties.Settings.Default.music;
+        upAOnController1Checkbox.Checked = Properties.Settings.Default.upac1;
+        customFlags1TextBox.Text = Properties.Settings.Default.custom1;
+        customFlags2TextBox.Text = Properties.Settings.Default.custom2;
+        customFlags3TextBox.Text = Properties.Settings.Default.custom3;
+        seedTextBox.Text = Properties.Settings.Default.lastseed;
+        flashingOffCheckbox.Checked = Properties.Settings.Default.noflash;
 
 
-            customBox1.TextChanged += new System.EventHandler(this.customSave1_Click);
-            customBox2.TextChanged += new System.EventHandler(this.customSave2_Click);
+        customFlags1TextBox.TextChanged += new System.EventHandler(this.customSave1_Click);
+        customFlags2TextBox.TextChanged += new System.EventHandler(this.customSave2_Click);
+        customFlags3TextBox.TextChanged += new System.EventHandler(this.customSave3_Click);
 
-            customBox3.TextChanged += new System.EventHandler(this.customSave3_Click);
+
+        dontrunhandler = false;
+        mixLargeAndSmallCheckbox.Enabled = false;
+        mixOverworldPalaceItemsCheckbox.Enabled = false;
+        shortGPCheckbox.Enabled = false;
+        includePbagCavesInShuffleCheckbox.Enabled = false;
+        includeGPinShuffleCheckbox.Enabled = false;
+        tbirdRequiredCheckbox.Checked = true;
+        hiddenPalaceList.SelectedIndex = 0;
+        hideKasutoList.SelectedIndex = 0;
+        characterSpriteList.SelectedIndex = Properties.Settings.Default.sprite;
+        CheckBox[] temp = { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox, smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
+        small = temp;
+        CheckBox[] temp2 = { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox, largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
+        large = temp2;
 
 
+        this.Text = "Zelda 2 Randomizer Version " + typeof(MainUI).Assembly.GetName().Version.Major + "." + typeof(MainUI).Assembly.GetName().Version.Minor + "." + typeof(MainUI).Assembly.GetName().Version.Build;
+
+        flagsTextBox.DoubleClick += new System.EventHandler(this.flagBox_Clicked);
+        oldFlagsTextbox.DoubleClick += new System.EventHandler(this.oldFlagsTextbox_Clicked);
+
+        shuffleStartingItemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithCandleCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithGloveCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithRaftCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithBootsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithFluteCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithCrossCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithHammerCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithMagicKeyCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleStartingSpellsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithShieldCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithJumpCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithLifeCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithFairyCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithFireCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithReflectCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWithSpellCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startWIthThunderCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingHeartsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        maxHeartsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingTechsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingGemsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        randomizeLivesBox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleEnemyHPBox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleAllExpCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleAtkExpNeededCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        lifeExpNeededCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        magicExpNeededCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleXPStealersCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleStealXPAmountCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleSwordImmunityBox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        jumpAlwaysOnCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleLifeRefillCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        disableLowHealthBeepCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        tbirdRequiredCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        experienceDropsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleEncountersCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        allowPathEnemiesCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleOverworldEnemiesCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shufflePalaceEnemiesCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        mixLargeAndSmallCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shufflePalaceItemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleOverworldItemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        mixOverworldPalaceItemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleSmallItemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleSpellLocationsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        disableMagicContainerRequirementCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        palacesHaveExtraKeysCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleDropFrequencyCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        palacePaletteCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        allowPalaceContinentSwapCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        attackEffectivenessList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        magicEffectivenessList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        lifeEffectivenessList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        restartAtPalacesCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shortGPCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        randomizeJarRequirementsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        combineFireCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        removeTbirdCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        alwaysBeamCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includePbagCavesInShuffleCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeGPinShuffleCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleDripperEnemyCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleEnemyPalettesCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        hideKasutoList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        manuallySelectDropsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        removeSpellitemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        useCommunityHintsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        standardizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shufflePbagAmountsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        atkCapList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        magCapList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        lifeCapList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        scaleLevelRequirementsToCapCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        enableTownNameHintsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        enableHelpfulHintsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        enableSpellItemHintsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        encounterRateBox.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingAttackLevelList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingMagicLevelList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingLifeLevelList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        continentConnectionBox.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        saneCaveShuffleBox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        hideLessImportantLocationsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        allowBoulderBlockedConnectionsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        westBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        dmBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        eastBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        mazeBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffledBasnill.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffleWhichLocationsAreHiddenCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        randomizeBossItemCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        useGoodBootsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        randomizeSpellSpellEnemyCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        generateBaguWoodsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        palaceStyleList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeCommunityRoomsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        blockingRoomsInAnyPalaceCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        bossRoomsExitToPalaceCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        useDashCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        dashAlwaysOnCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+
+        //townSwap.CheckedChanged += new System.EventHandler(this.updateFlags);
+
+        enableLevelScaling(null, null);
+        eastBiome_SelectedIndexChanged(null, null);
+        for (int i = 0; i < small.Count(); i++)
+        {
+            small[i].CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+            small[i].CheckedChanged += new System.EventHandler(this.AtLeastOneChecked);
+            large[i].CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+            large[i].CheckedChanged += new System.EventHandler(this.AtLeastOneChecked);
+        }
+        String lastUsed = Properties.Settings.Default.lastused;
+        if (lastUsed.Equals(""))
+        {
+            //updateFlags(null, null);
+            BeginnerFlags(null, null);
+        }
+        else
+        {
+            dontrunhandler = true;
+            flagsTextBox.Text = lastUsed;
             dontrunhandler = false;
-            mixEnemies.Enabled = false;
-            mixItemBox.Enabled = false;
-            gpBox.Enabled = false;
-            pbagItemShuffleBox.Enabled = false;
-            p7Shuffle.Enabled = false;
-            tbirdBox.Checked = true;
-            hpCmbo.SelectedIndex = 0;
-            hideKasutoBox.SelectedIndex = 0;
-            spriteCmbo.SelectedIndex = Properties.Settings.Default.sprite;
-            CheckBox[] temp = { smallBlueJar, smallRedJar, small50, small100, small200, small500, small1up, smallKey };
-            small = temp;
-            CheckBox[] temp2 = { largeBlueJar, largeRedJar, large50, large100, large200, large500, large1up, largeKey };
-            large = temp2;
-
-
-            this.Text = "Zelda 2 Randomizer Version " + typeof(MainUI).Assembly.GetName().Version.Major + "." + typeof(MainUI).Assembly.GetName().Version.Minor + "." + typeof(MainUI).Assembly.GetName().Version.Build;
-
-            flagBox.DoubleClick += new System.EventHandler(this.flagBox_Clicked);
-
-            shuffleItemBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            candleBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            gloveBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            raftBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            bootsBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            fluteBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            crossBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            hammerBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            keyBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            spellShuffleBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shieldBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            jumpBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            lifeBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            fairyBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            fireBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            reflectBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            spellBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            thunderBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            heartCmbo.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            maxHeartsBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            techCmbo.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            numGemsCbo.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            livesBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleEnemyHPBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleAllExp.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleAtkExp.CheckedChanged += new System.EventHandler(this.updateFlags);
-            lifeExpNeeded.CheckedChanged += new System.EventHandler(this.updateFlags);
-            magicExpNeeded.CheckedChanged += new System.EventHandler(this.updateFlags);
-            stealExpBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            stealExpAmt.CheckedChanged += new System.EventHandler(this.updateFlags);
-            swordImmuneBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            jumpNormalbox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            lifeRefilBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            disableLowHealthBeep.CheckedChanged += new System.EventHandler(this.updateFlags);
-            tbirdBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            expDropBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            shuffleEncounters.CheckedChanged += new System.EventHandler(this.updateFlags);
-            allowPathEnemies.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleOverworldEnemies.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shufflePalaceEnemies.CheckedChanged += new System.EventHandler(this.updateFlags);
-            mixEnemies.CheckedChanged += new System.EventHandler(this.updateFlags);
-            palaceItemBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            overworldItemBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            mixItemBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleSmallItemsBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleSpellLocationsBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            disableJarBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            palaceKeys.CheckedChanged += new System.EventHandler(this.updateFlags);
-            pbagDrop.CheckedChanged += new System.EventHandler(this.updateFlags);
-            palacePalette.CheckedChanged += new System.EventHandler(this.updateFlags);
-            palaceSwapBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            atkEffBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            magEffBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            lifeEffBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            upaBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            gpBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            kasutoBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            combineFireBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            removeTbird.CheckedChanged += new System.EventHandler(this.updateFlags);
-            beamBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            pbagItemShuffleBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            p7Shuffle.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleDripper.CheckedChanged += new System.EventHandler(this.updateFlags);
-            enemyPalette.CheckedChanged += new System.EventHandler(this.updateFlags);
-            hpCmbo.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            hideKasutoBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            enemyDropBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            spellItemBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            communityBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            standardDrops.CheckedChanged += new System.EventHandler(this.updateFlags);
-            randoDrops.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shufflePbagExp.CheckedChanged += new System.EventHandler(this.updateFlags);
-            atkCapBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            magCapBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            lifeCapBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            scaleLevels.CheckedChanged += new System.EventHandler(this.updateFlags);
-            townSpellHints.CheckedChanged += new System.EventHandler(this.updateFlags);
-            helpfulHints.CheckedChanged += new System.EventHandler(this.updateFlags);
-            spellItemHints.CheckedChanged += new System.EventHandler(this.updateFlags);
-            encounterBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            startAtkBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            startMagBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            startLifeBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            continentConnectionBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            saneCaveShuffleBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            hideLocsBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            boulderConnectionBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            westBiome.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            dmBiome.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            eastBiome.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            mazeBiome.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            vanillaOriginalTerrain.CheckedChanged += new System.EventHandler(this.updateFlags);
-            shuffleHidden.CheckedChanged += new System.EventHandler(this.updateFlags);
-            bossItem.CheckedChanged += new System.EventHandler(this.updateFlags);
-            waterBoots.CheckedChanged += new System.EventHandler(this.updateFlags);
-            spellEnemy.CheckedChanged += new System.EventHandler(this.updateFlags);
-            baguBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            palaceBox.SelectedIndexChanged += new System.EventHandler(this.updateFlags);
-            customRooms.CheckedChanged += new System.EventHandler(this.updateFlags);
-            blockerBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            bossRoomBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-            dashBox.CheckedChanged += new System.EventHandler(this.updateFlags);
-
-
-
-            //townSwap.CheckedChanged += new System.EventHandler(this.updateFlags);
-
-            enableLevelScaling(null, null);
-            eastBiome_SelectedIndexChanged(null, null);
-            for (int i = 0; i < small.Count(); i++)
-            {
-                small[i].CheckedChanged += new System.EventHandler(this.updateFlags);
-                small[i].CheckedChanged += new System.EventHandler(this.atLeastOneChecked);
-                large[i].CheckedChanged += new System.EventHandler(this.updateFlags);
-                large[i].CheckedChanged += new System.EventHandler(this.atLeastOneChecked);
-            }
-            String f = Properties.Settings.Default.lastused;
-            if (!f.Equals(""))
-            {
-                dontrunhandler = true;
-                flagBox.Text = f;
-                dontrunhandler = false;
-            }
-            else
-            {
-                //updateFlags(null, null);
-                beginnerFlags(null, null);
-            }
-
-
-            string path = Directory.GetCurrentDirectory();
-            logger.Debug(path);
-            //WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
-            //WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
-            //WinSparkle.win_sparkle_init();
         }
 
-        private void shuffleItemBox_CheckedChanged(object sender, EventArgs e)
-        {
-            candleBox.Enabled = !shuffleItemBox.Checked;
-            gloveBox.Enabled = !shuffleItemBox.Checked;
-            raftBox.Enabled = !shuffleItemBox.Checked;
-            bootsBox.Enabled = !shuffleItemBox.Checked;
-            fluteBox.Enabled = !shuffleItemBox.Checked;
-            crossBox.Enabled = !shuffleItemBox.Checked;
-            hammerBox.Enabled = !shuffleItemBox.Checked;
-            keyBox.Enabled = !shuffleItemBox.Checked;
 
-            if (shuffleItemBox.Checked)
-            {
-                candleBox.Checked = false;
-                gloveBox.Checked = false;
-                raftBox.Checked = false;
-                bootsBox.Checked = false;
-                fluteBox.Checked = false;
-                crossBox.Checked = false;
-                hammerBox.Checked = false;
-                keyBox.Checked = false;
-            }
+        string path = Directory.GetCurrentDirectory();
+        logger.Debug(path);
+        //WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
+        //WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
+        //WinSparkle.win_sparkle_init();
+    }
+
+    private void shuffleItemBox_CheckedChanged(object sender, EventArgs e)
+    {
+        startWithCandleCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithGloveCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithRaftCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithBootsCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithFluteCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithCrossCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithHammerCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+        startWithMagicKeyCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
+
+        if (shuffleStartingItemsCheckbox.Checked)
+        {
+            startWithCandleCheckbox.Checked = false;
+            startWithGloveCheckbox.Checked = false;
+            startWithRaftCheckbox.Checked = false;
+            startWithBootsCheckbox.Checked = false;
+            startWithFluteCheckbox.Checked = false;
+            startWithCrossCheckbox.Checked = false;
+            startWithHammerCheckbox.Checked = false;
+            startWithMagicKeyCheckbox.Checked = false;
+        }
+    }
+
+    private void fileBtn_Click(object sender, EventArgs e)
+    {
+        var FD = new System.Windows.Forms.OpenFileDialog();
+        if (FD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        {
+            romFileTextBox.Text = FD.FileName;
+        }
+    }
+
+    private void createSeedButton_Click(object sender, EventArgs e)
+    {
+        seedTextBox.Text = r.Next(1000000000).ToString();
+    }
+
+    private void spellShuffleBox_CheckedChanged(object sender, EventArgs e)
+    {
+        startWithShieldCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWithJumpCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWithLifeCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWithFairyCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWithFireCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWithReflectCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWithSpellCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+        startWIthThunderCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
+
+        if (shuffleStartingSpellsCheckbox.Checked)
+        {
+            startWithShieldCheckbox.Checked = false;
+            startWithJumpCheckbox.Checked = false;
+            startWithLifeCheckbox.Checked = false;
+            startWithFairyCheckbox.Checked = false;
+            startWithFireCheckbox.Checked = false;
+            startWithReflectCheckbox.Checked = false;
+            startWithSpellCheckbox.Checked = false;
+            startWIthThunderCheckbox.Checked = false;
+        }
+    }
+
+    private void generateBtn_Click(object sender, EventArgs e)
+    {
+        String flagString = flagsTextBox.Text;
+
+        if (flagString.Length != validFlagStringLength)
+        {
+            MessageBox.Show("Invalid flags. Aborting seed generation.");
+            return;
         }
 
-        private void fileBtn_Click(object sender, EventArgs e)
+        for (int i = 0; i < flagString.Length; i++)
         {
-            var FD = new System.Windows.Forms.OpenFileDialog();
-            if (FD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                fileTextBox.Text = FD.FileName;
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            seedTextBox.Text = r.Next(1000000000).ToString();
-        }
-
-        private void spellShuffleBox_CheckedChanged(object sender, EventArgs e)
-        {
-            shieldBox.Enabled = !spellShuffleBox.Checked;
-            jumpBox.Enabled = !spellShuffleBox.Checked;
-            lifeBox.Enabled = !spellShuffleBox.Checked;
-            fairyBox.Enabled = !spellShuffleBox.Checked;
-            fireBox.Enabled = !spellShuffleBox.Checked;
-            reflectBox.Enabled = !spellShuffleBox.Checked;
-            spellBox.Enabled = !spellShuffleBox.Checked;
-            thunderBox.Enabled = !spellShuffleBox.Checked;
-
-            if (spellShuffleBox.Checked)
-            {
-                shieldBox.Checked = false;
-                jumpBox.Checked = false;
-                lifeBox.Checked = false;
-                fairyBox.Checked = false;
-                fireBox.Checked = false;
-                reflectBox.Checked = false;
-                spellBox.Checked = false;
-                thunderBox.Checked = false;
-            }
-        }
-
-        private void generateBtn_Click(object sender, EventArgs e)
-        {
-            String flagString = flagBox.Text;
-
-            if (flagString.Length != numFlags)
+            if (!flags.Contains(flagString[i]))
             {
                 MessageBox.Show("Invalid flags. Aborting seed generation.");
                 return;
             }
+        }
+        if (startingHeartsList.SelectedIndex != 8 && startingHeartsList.SelectedIndex > maxHeartsList.SelectedIndex && maxHeartsList.SelectedIndex != 8)
+        {
+            MessageBox.Show("Max hearts must be greater than or equal to starting hearts!");
+            return;
+        }
+        Properties.Settings.Default.filePath = romFileTextBox.Text;
+        Properties.Settings.Default.beep = disableLowHealthBeepCheckbox.Checked;
+        Properties.Settings.Default.beams = beamSpriteList.SelectedIndex;
+        Properties.Settings.Default.spells = fastSpellCheckbox.Checked;
+        Properties.Settings.Default.tunic = tunicColorList.SelectedIndex;
+        Properties.Settings.Default.shield = shieldColorList.SelectedIndex;
+        Properties.Settings.Default.music = disableMusicCheckbox.Checked;
+        Properties.Settings.Default.sprite = characterSpriteList.SelectedIndex;
+        Properties.Settings.Default.upac1 = upAOnController1Checkbox.Checked;
+        Properties.Settings.Default.noflash = flashingOffCheckbox.Checked;
+        Properties.Settings.Default.lastused = flagsTextBox.Text;
+        Properties.Settings.Default.lastseed = seedTextBox.Text;
+        Properties.Settings.Default.Save();
+        try
+        {
+            Int32.Parse(seedTextBox.Text);
+        }
+        catch (Exception)
+        {
+            MessageBox.Show("Invalid Seed!");
+            return;
+        }
+        config = ExportConfig();
+        // f3 = new GeneratingSeedsForm();
+        //f3.Show();
 
-            for (int i = 0; i < flagString.Length; i++)
+        //f3.setText("Generating seed. This may take a moment.");
+        //f3.Width = 250;
+
+        //t = new Thread(() => new Hyrule(props));
+        //t.IsBackground = true;
+        //t.Start();
+
+        //while (t.IsAlive)
+        //{
+        //    Application.DoEvents();
+        //    if (f3.isClosed)
+        //    {
+        //        t.Abort();
+        //        return;
+        //    }
+        //}
+
+        //new Hyrule(props, null);
+        f3 = new GeneratingSeedsForm();
+        f3.Show();
+
+        f3.setText("Generating Palaces");
+        f3.Width = 250;
+        Exception generationException = null;
+        backgroundWorker1 = new BackgroundWorker();
+        backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
+        backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
+        backgroundWorker1.WorkerReportsProgress = true;
+        backgroundWorker1.WorkerSupportsCancellation = true;
+        backgroundWorker1.RunWorkerCompleted += (completed_sender, completed_event) => {
+            generationException = completed_event.Error;
+        };
+        backgroundWorker1.RunWorkerAsync();
+        
+
+        while (backgroundWorker1.IsBusy)
+        {
+            Application.DoEvents();
+            if (f3.isClosed)
             {
-                if (!flags.Contains(flagString[i]))
-                {
-                    MessageBox.Show("Invalid flags. Aborting seed generation.");
-                    return;
-                }
-            }
-            if (heartCmbo.SelectedIndex != 8 && heartCmbo.SelectedIndex > maxHeartsBox.SelectedIndex && maxHeartsBox.SelectedIndex != 8)
-            {
-                MessageBox.Show("Max hearts must be greater than or equal to starting hearts!");
+                backgroundWorker1.CancelAsync();
                 return;
             }
-            Properties.Settings.Default.filePath = fileTextBox.Text;
-            Properties.Settings.Default.beep = disableLowHealthBeep.Checked;
-            Properties.Settings.Default.beams = beamCmbo.SelectedIndex;
-            Properties.Settings.Default.spells = fastSpellBox.Checked;
-            Properties.Settings.Default.tunic = tunicColor.SelectedIndex;
-            Properties.Settings.Default.shield = shieldColor.SelectedIndex;
-            Properties.Settings.Default.music = disableMusicBox.Checked;
-            Properties.Settings.Default.sprite = spriteCmbo.SelectedIndex;
-            Properties.Settings.Default.upac1 = upAC1.Checked;
-            Properties.Settings.Default.noflash = flashingOff.Checked;
-            Properties.Settings.Default.lastused = flagBox.Text;
-            Properties.Settings.Default.lastseed = seedTextBox.Text;
-            Properties.Settings.Default.Save();
-            try
+        }
+
+        f3.Close();
+        if (generationException == null)
+        {
+            MessageBox.Show("File " + "Z2_" + seedTextBox.Text + "_" + flagsTextBox.Text + ".nes" + " has been created!");
+        }
+        else
+        {
+            MessageBox.Show("An exception occurred generating the rom");
+            logger.Error(generationException.StackTrace);
+        }
+    }
+
+
+    private void shuffleAllExp_CheckedChanged(object sender, EventArgs e)
+    {
+        shuffleAtkExpNeededCheckbox.Checked = shuffleAllExpCheckbox.Checked;
+        shuffleAtkExpNeededCheckbox.Enabled = !shuffleAllExpCheckbox.Checked;
+
+        magicExpNeededCheckbox.Checked = shuffleAllExpCheckbox.Checked;
+        magicExpNeededCheckbox.Enabled = !shuffleAllExpCheckbox.Checked;
+
+        lifeExpNeededCheckbox.Checked = shuffleAllExpCheckbox.Checked;
+        lifeExpNeededCheckbox.Enabled = !shuffleAllExpCheckbox.Checked;
+    }
+
+
+    private void shuffleEncounters_CheckedChanged(object sender, EventArgs e)
+    {
+        allowPathEnemiesCheckbox.Enabled = shuffleEncountersCheckbox.Checked;
+        if (!shuffleEncountersCheckbox.Checked)
+        {
+            allowPathEnemiesCheckbox.Checked = false;
+        }
+    }
+
+    private void UpdateFlagsTextbox(object sender, EventArgs e)
+    {
+        if (!dontrunhandler)
+        {
+            RandomizerConfiguration config = ExportConfig();
+            String flags = config.Serialize();
+            flagsTextBox.Text = flags;
+        }
+    }
+
+    private RandomizerConfiguration ExportConfig()
+    {
+        RandomizerConfiguration configuration= new RandomizerConfiguration();
+
+        configuration.FileName = romFileTextBox.Text;
+        configuration.Seed = Int32.Parse(seedTextBox.Text);
+
+        //Start Configuration
+        configuration.ShuffleStartingItems = shuffleStartingItemsCheckbox.Checked;
+        configuration.StartWithCandle = startWithCandleCheckbox.Checked;
+        configuration.StartWithGlove = startWithGloveCheckbox.Checked;
+        configuration.StartWithRaft = startWithRaftCheckbox.Checked;
+        configuration.StartWithBoots = startWithBootsCheckbox.Checked;
+        configuration.StartWithFlute = startWithFluteCheckbox.Checked;
+        configuration.StartWithCross = startWithCrossCheckbox.Checked;
+        configuration.StartWithHammer = startWithHammerCheckbox.Checked;
+        configuration.StartWithMagicKey = startWithMagicKeyCheckbox.Checked;
+
+        configuration.ShuffleStartingSpells = shuffleStartingSpellsCheckbox.Checked;
+        configuration.StartWithShield = startWithShieldCheckbox.Checked;
+        configuration.StartWithJump = startWithJumpCheckbox.Checked;
+        configuration.StartWithLife = startWithLifeCheckbox.Checked;
+        configuration.StartWithFairy = startWithFairyCheckbox.Checked;
+        configuration.StartWithFire = startWithFireCheckbox.Checked;
+        configuration.StartWithReflect = startWithReflectCheckbox.Checked;
+        configuration.StartWithSpell = startWithSpellCheckbox.Checked;
+        configuration.StartWithThunder = startWIthThunderCheckbox.Checked;
+
+        configuration.StartingHeartContainers =
+        configuration.MaxHeartContainers = maxHeartsList.SelectedIndex switch
+        {
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+            4 => 5,
+            5 => 6,
+            6 => 7,
+            7 => 8,
+            8 => null,
+            _ => throw new Exception("Invalid MaxHearts setting")
+        };
+        switch(startingTechsList.SelectedIndex)
+        {
+            case 0:
+                configuration.StartWithDownstab = false;
+                configuration.StartWithUpstab = false;
+                break;
+            case 1:
+                configuration.StartWithDownstab = true;
+                configuration.StartWithUpstab = false;
+                break;
+            case 2:
+                configuration.StartWithDownstab = false;
+                configuration.StartWithUpstab = true;
+                break;
+            case 3:
+                configuration.StartWithDownstab = true;
+                configuration.StartWithUpstab = true;
+                break;
+            case 4:
+                configuration.StartWithDownstab = null;
+                configuration.StartWithUpstab = null;
+                break;
+            default:
+                throw new Exception("Invalid Techs setting");
+        }
+        configuration.ShuffleStartingLives = randomizeLivesBox.Checked;
+        configuration.StartingAttackLevel = startingAttackLevelList.SelectedIndex + 1;
+        configuration.StartingMagicLevel = startingMagicLevelList.SelectedIndex + 1;
+        configuration.StartingLifeLevel = startingLifeLevelList.SelectedIndex + 1;
+
+        //Overworld
+        configuration.PalacesCanSwapContinents = allowPalaceContinentSwapCheckbox.Checked;
+        configuration.ShuffleGP = shortGPCheckbox.Checked;
+        configuration.ShuffleEncounters = shuffleEncountersCheckbox.Checked;
+        configuration.AllowUnsafePathEncounters = allowPathEnemiesCheckbox.Checked;
+        configuration.EncounterRate = encounterRateBox.SelectedIndex switch
+        {
+            0 => EncounterRate.NORMAL,
+            1 => EncounterRate.HALF,
+            2 => EncounterRate.NONE,
+            _ => throw new Exception("Invalid EncounterRate setting")
+        };
+        configuration.HidePalace = hiddenPalaceList.SelectedIndex switch
+        {
+            0 => false,
+            1 => true,
+            2 => null,
+            _ => throw new Exception("Invalid HidePalace setting")
+        };
+        configuration.HideKasuto = hideKasutoList.SelectedIndex switch
+        {
+            0 => false,
+            1 => true,
+            2 => null,
+            _ => throw new Exception("Invalid HideKasuto setting")
+        };
+        configuration.ShuffleWhichLocationIsHidden = shuffleWhichLocationsAreHiddenCheckbox.Checked;
+        configuration.HideLessImportantLocations = hideLessImportantLocationsCheckbox.Checked;
+        configuration.RestrictConnectionCaveShuffle = saneCaveShuffleBox.Checked;
+        configuration.AllowConnectionCavesToBeBoulderBlocked = allowBoulderBlockedConnectionsCheckbox.Checked;
+        configuration.GoodBoots = useGoodBootsCheckbox.Checked;
+        configuration.GenerateBaguWoods = generateBaguWoodsCheckbox.Checked;
+        configuration.ContinentConnectionType = continentConnectionBox.SelectedIndex switch
+        {
+            0 => ContinentConnectionType.NORMAL,
+            1 => ContinentConnectionType.RB_BORDER_SHUFFLE,
+            2 => ContinentConnectionType.TRANSPORTATION_SHUFFLE,
+            3 => ContinentConnectionType.ANYTHING_GOES,
+            _ => throw new Exception("Invalid ContinentConnection setting")
+        };
+        configuration.WestBiome = westBiome.SelectedIndex switch
+        {
+            0 => Biome.VANILLA,
+            1 => Biome.VANILLA_SHUFFLE,
+            2 => Biome.VANILLALIKE,
+            3 => Biome.ISLANDS,
+            4 => Biome.CANYON,
+            5 => Biome.CALDERA,
+            6 => Biome.MOUNTAINOUS,
+            7 => Biome.RANDOM_NO_VANILLA,
+            8 => Biome.RANDOM,
+            _ => throw new Exception("Invalid WestBiome setting")
+        };
+        configuration.EastBiome = eastBiome.SelectedIndex switch
+        {
+            0 => Biome.VANILLA,
+            1 => Biome.VANILLA_SHUFFLE,
+            2 => Biome.VANILLALIKE,
+            3 => Biome.ISLANDS,
+            4 => Biome.CANYON,
+            5 => Biome.CALDERA,
+            6 => Biome.MOUNTAINOUS,
+            7 => Biome.RANDOM_NO_VANILLA,
+            8 => Biome.RANDOM,
+            _ => throw new Exception("Invalid EastBiome setting")
+        };
+        configuration.DMBiome = dmBiome.SelectedIndex switch
+        {
+            0 => Biome.VANILLA,
+            1 => Biome.VANILLA_SHUFFLE,
+            2 => Biome.VANILLALIKE,
+            3 => Biome.ISLANDS,
+            4 => Biome.CANYON,
+            5 => Biome.CALDERA,
+            6 => Biome.MOUNTAINOUS,
+            7 => Biome.RANDOM_NO_VANILLA,
+            8 => Biome.RANDOM,
+            _ => throw new Exception("Invalid DMBiome setting")
+        };
+        configuration.MazeBiome = mazeBiome.SelectedIndex switch
+        {
+            0 => Biome.VANILLA,
+            1 => Biome.VANILLA_SHUFFLE,
+            2 => Biome.VANILLALIKE,
+            3 => Biome.RANDOM,
+            _ => throw new Exception("Invalid MazeBiome setting")
+        };
+        configuration.VanillaShuffleUsesActualTerrain = shuffledBasnill.Checked;
+
+        //Palaces
+        configuration.PalaceStyle = palaceStyleList.SelectedIndex switch
+        {
+            0 => PalaceStyle.VANILLA,
+            1 => PalaceStyle.SHUFFLED,
+            2 => PalaceStyle.RECONSTRUCTED,
+            _ => throw new Exception("Invalid PalaceStyle setting")
+        };
+        configuration.IncludeCommunityRooms = useCommunityHintsCheckbox.Checked;
+        configuration.BlockingRoomsInAnyPalace = blockingRoomsInAnyPalaceCheckbox.Checked;
+        configuration.BossRoomsExitToPalace = bossRoomsExitToPalaceCheckbox.Checked;
+        configuration.ShortGP = shortGPCheckbox.Checked;
+        configuration.TBirdRequired = tbirdRequiredCheckbox.Checked;
+        configuration.RemoveTBird = removeTbirdCheckbox.Checked;
+        configuration.RestartAtPalacesOnGameOver = restartAtPalacesCheckbox.Checked;
+        configuration.ChangePalacePallettes = palacePaletteCheckbox.Checked;
+        configuration.RandomizeBossItemDrop = randomizeBossItemCheckbox.Checked;
+        configuration.StartingGems = startingGemsList.SelectedIndex <= 6 ? startingGemsList.SelectedIndex : null;
+
+        //Levels
+        configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
+        configuration.ShuffleMagicExperience = magicExpNeededCheckbox.Checked;
+        configuration.ShuffleLifeExperience = lifeExpNeededCheckbox.Checked;
+        if(shuffleAllExpCheckbox.Checked)
+        {
+            configuration.ShuffleAttackExperience = true;
+            configuration.ShuffleMagicExperience = true;
+            configuration.ShuffleLifeExperience = true;
+        }
+        configuration.AttackLevelCap = 8 - atkCapList.SelectedIndex;
+        configuration.MagicLevelCap = 8 - magCapList.SelectedIndex;
+        configuration.LifeLevelCap = 8 - lifeCapList.SelectedIndex;
+        configuration.ScaleLevelRequirementsToCap = scaleLevelRequirementsToCapCheckbox.Checked;
+        configuration.AttackEffectiveness = attackEffectivenessList.SelectedIndex switch
+        {
+            0 => StatEffectiveness.AVERAGE,
+            1 => StatEffectiveness.LOW,
+            2 => StatEffectiveness.VANILLA,
+            3 => StatEffectiveness.HIGH,
+            4 => StatEffectiveness.MAX,
+            _ => throw new Exception("Invalid AttackEffectiveness setting")
+        };
+        configuration.MagicEffectiveness = magicEffectivenessList.SelectedIndex switch
+        {
+            0 => StatEffectiveness.AVERAGE,
+            1 => StatEffectiveness.LOW,
+            2 => StatEffectiveness.VANILLA,
+            3 => StatEffectiveness.HIGH,
+            4 => StatEffectiveness.MAX,
+            _ => throw new Exception("Invalid MagicEffectiveness setting")
+        };
+        configuration.LifeEffectiveness =lifeEffectivenessList.SelectedIndex switch
+        {
+            0 => StatEffectiveness.AVERAGE,
+            1 => StatEffectiveness.NONE,
+            2 => StatEffectiveness.VANILLA,
+            3 => StatEffectiveness.HIGH,
+            4 => StatEffectiveness.MAX,
+            _ => throw new Exception("Invalid LifeEffectiveness setting")
+        };
+
+        //Spells
+        configuration.ShuffleLifeRefillAmount = shuffleLifeRefillCheckbox.Checked;
+        configuration.ShuffleSpellLocations = shuffleStartingSpellsCheckbox.Checked;
+        configuration.DisableMagicContainerRequirements = disableMagicContainerRequirementCheckbox.Checked;
+        configuration.CombineFireWithRandomSpell = combineFireCheckbox.Checked;
+        configuration.RandomizeSpellSpellEnemy = randomizeSpellSpellEnemyCheckbox.Checked;
+        configuration.ReplaceFireWithDash = useDashCheckbox.Checked;
+
+        //Enemies
+        configuration.ShuffleOverworldEnemies = shuffleOverworldEnemiesCheckbox.Checked;
+        configuration.ShufflePalaceEnemies = shufflePalaceEnemiesCheckbox.Checked;
+        configuration.ShuffleDripperEnemy = shuffleDripperEnemyCheckbox.Checked;
+        configuration.MixLargeAndSmallEnemies = mixLargeAndSmallCheckbox.Checked;
+        configuration.ShuffleEnemyHP = shuffleEnemyHPBox.Checked;
+        configuration.ShuffleXPStealers = shuffleXPStealersCheckbox.Checked;
+        configuration.ShuffleXPStolenAmount = shuffleStealXPAmountCheckbox.Checked;
+        configuration.ShuffleSwordImmunity = shuffleSwordImmunityBox.Checked;
+        configuration.EnemyXPDrops = experienceDropsList.SelectedIndex switch
+        {
+            0 => StatEffectiveness.VANILLA,
+            1 => StatEffectiveness.NONE,
+            2 => StatEffectiveness.LOW,
+            3 => StatEffectiveness.AVERAGE,
+            4 => StatEffectiveness.HIGH,
+            _ => throw new Exception("Invalid EnemyXPDrops setting")
+        };
+
+        //Items
+        configuration.ShufflePalaceItems = shufflePalaceItemsCheckbox.Checked;
+        configuration.ShuffleOverworldItems = shuffleOverworldItemsCheckbox.Checked;
+        configuration.MixOverworldAndPalaceItems = mixOverworldPalaceItemsCheckbox.Checked;
+        configuration.IncludePBagCavesInItemShuffle = includePbagCavesInShuffleCheckbox.Checked;
+        configuration.ShuffleSmallItems = shuffleSmallItemsCheckbox.Checked;
+        configuration.PalacesContainExtraKeys = palacesHaveExtraKeysCheckbox.Checked;
+        configuration.RandomizeNewKasutoJarRequirements = randomizeJarRequirementsCheckbox.Checked;
+        configuration.RemoveSpellItems = removeSpellitemsCheckbox.Checked;
+        configuration.ShufflePBagAmounts = shufflePbagAmountsCheckbox.Checked;
+
+        //Drops
+        configuration.ShuffleItemDropFrequency = shuffleDropFrequencyCheckbox.Checked;
+        configuration.RandomizeDrops = randomizeDropsCheckbox.Checked;
+        configuration.StandardizeDrops = standardizeDropsCheckbox.Checked;
+        if(manuallySelectDropsCheckbox.Checked)
+        {
+            configuration.SmallEnemiesCanDropBlueJar = smallEnemiesBlueJarCheckbox.Checked;
+            configuration.SmallEnemiesCanDropRedJar = smallEnemiesRedJarCheckbox.Checked;
+            configuration.SmallEnemiesCanDropSmallBag = smallEnemiesSmallBagCheckbox.Checked;
+            configuration.SmallEnemiesCanDropMediumBag = smallEnemiesMediumBagCheckbox.Checked;
+            configuration.SmallEnemiesCanDropLargeBag = smallEnemiesLargeBagCheckbox.Checked;
+            configuration.SmallEnemiesCanDropXLBag = smallEnemiesXLBagCheckbox.Checked;
+            configuration.SmallEnemiesCanDrop1up = smallEnemies1UpCheckbox.Checked;
+            configuration.SmallEnemiesCanDropKey = smallEnemiesKeyCheckbox.Checked;
+            configuration.LargeEnemiesCanDropBlueJar = largeEnemiesBlueJarCheckbox.Checked;
+            configuration.LargeEnemiesCanDropRedJar = largeEnemiesRedJarCheckbox.Checked;
+            configuration.LargeEnemiesCanDropSmallBag = largeEnemiesSmallBagCheckbox.Checked;
+            configuration.LargeEnemiesCanDropMediumBag = largeEnemiesMediumBagCheckbox.Checked;
+            configuration.LargeEnemiesCanDropLargeBag = largeEnemiesLargeBagCheckbox.Checked;
+            configuration.LargeEnemiesCanDropXLBag = largeEnemiesXLBagCheckbox.Checked;
+            configuration.LargeEnemiesCanDrop1up = largeEnemies1UpCheckbox.Checked;
+            configuration.LargeEnemiesCanDropKey = largeEnemiesKeyCheckbox.Checked;
+        }
+
+
+        //Hints
+        configuration.EnableHelpfulHints = enableHelpfulHintsCheckbox.Checked;
+        configuration.EnableSpellItemHints = enableSpellItemHintsCheckbox.Checked;
+        configuration.EnableTownNameHints = enableTownNameHintsCheckbox.Checked;
+        configuration.UseCommunityHints = useCommunityHintsCheckbox.Checked;
+
+        //Misc
+        configuration.DisableLowHealthBeep = disableLowHealthBeepCheckbox.Checked;
+        configuration.DisableMusic = disableMusicCheckbox.Checked;
+        configuration.JumpAlwaysOn = jumpAlwaysOnCheckbox.Checked;
+        configuration.DashAlwaysOn = dashAlwaysOnCheckbox.Checked;
+        configuration.FastSpellCasting = fastSpellCheckbox.Checked;
+        configuration.ShuffleSpritePalettes = shuffleEnemyPalettesCheckbox.Checked;
+        configuration.PermanmentBeamSword = alwaysBeamCheckbox.Checked;
+        configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
+        configuration.RemoveFlashing = flashingOffCheckbox.Checked;
+        configuration.Sprite = characterSpriteList.SelectedIndex switch
+        {
+            0 => CharacterSprite.LINK,
+            1 => CharacterSprite.ZELDA,
+            2 => CharacterSprite.IRON_KNUCKLE,
+            3 => CharacterSprite.ERROR,
+            4 => CharacterSprite.SAMUS,
+            5 => CharacterSprite.SIMON,
+            6 => CharacterSprite.STALFOS,
+            7 => CharacterSprite.VASE_LADY,
+            8 => CharacterSprite.RUTO,
+            9 => CharacterSprite.YOSHI,
+            10 => CharacterSprite.DRAGONLORD,
+            11 => CharacterSprite.MIRIA,
+            12 => CharacterSprite.CRYSTALIS,
+            13 => CharacterSprite.TACO,
+            14 => CharacterSprite.PYRAMID,
+            15 => CharacterSprite.LADY_LINK,
+            16 => CharacterSprite.HOODIE_LINK,
+            17 => CharacterSprite.GLITCH_WITCH,
+            _ => CharacterSprite.LINK
+        };
+        configuration.Tunic = tunicColorList.GetItemText(tunicColorList.SelectedItem);
+        configuration.ShieldTunic = shieldColorList.GetItemText(shieldColorList.SelectedItem);
+        configuration.BeamSprite = beamSpriteList.GetItemText(beamSpriteList.SelectedItem);
+
+        return configuration;
+    }
+
+    private void flagBox_Clicked(object send, EventArgs e)
+    {
+        flagsTextBox.SelectAll();
+    }
+    private void oldFlagsTextbox_Clicked(object send, EventArgs e)
+    {
+        oldFlagsTextbox.SelectAll();
+    }
+
+    private void convertButton_Click(object send, EventArgs e)
+    {
+        String oldFlags = oldFlagsTextbox.Text;
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
+        flagsTextBox.Text = config.Serialize();
+    }
+
+    private void FlagBox_TextChanged(object sender, EventArgs eventArgs)
+    {
+        dontrunhandler = true;
+        try
+        {
+            RandomizerConfiguration configuration = new RandomizerConfiguration(flagsTextBox.Text);
+
+            //Start Configuration
+            shuffleStartingItemsCheckbox.Checked = configuration.ShuffleStartingItems;
+            startWithCandleCheckbox.Checked = configuration.StartWithCandle;
+            startWithGloveCheckbox.Checked = configuration.StartWithGlove;
+            startWithRaftCheckbox.Checked = configuration.StartWithRaft;
+            startWithBootsCheckbox.Checked = configuration.StartWithBoots;
+            startWithFluteCheckbox.Checked = configuration.StartWithFlute;
+            startWithCrossCheckbox.Checked = configuration.StartWithCross;
+            startWithHammerCheckbox.Checked = configuration.StartWithHammer;
+            startWithMagicKeyCheckbox.Checked = configuration.StartWithMagicKey;
+
+            shuffleStartingSpellsCheckbox.Checked = configuration.ShuffleStartingSpells;
+            startWithShieldCheckbox.Checked = configuration.StartWithShield;
+            startWithJumpCheckbox.Checked = configuration.StartWithJump;
+            startWithLifeCheckbox.Checked = configuration.StartWithLife;
+            startWithFairyCheckbox.Checked = configuration.StartWithFairy;
+            startWithFireCheckbox.Checked = configuration.StartWithFire;
+            startWithReflectCheckbox.Checked = configuration.StartWithReflect;
+            startWithSpellCheckbox.Checked = configuration.StartWithSpell;
+            startWIthThunderCheckbox.Checked = configuration.StartWithThunder;
+
+            startingHeartsList.SelectedIndex = configuration.StartingHeartContainers switch
             {
-                Int32.Parse(seedTextBox.Text);
+                1 => 0,
+                2 => 1,
+                3 => 2,
+                4 => 3,
+                5 => 4,
+                6 => 5,
+                7 => 6,
+                8 => 7,
+                null => 8,
+                _ => throw new Exception("Invalid MaxHearts setting")
+            };
+            maxHeartsList.SelectedIndex = configuration.MaxHeartContainers switch
+            {
+                1 => 0,
+                2 => 1,
+                3 => 2,
+                4 => 3,
+                5 => 4,
+                6 => 5,
+                7 => 6,
+                8 => 7,
+                null => 8,
+                _ => throw new Exception("Invalid MaxHearts setting")
+            };
+            startingTechsList.SelectedIndex = (configuration.StartWithDownstab, configuration.StartWithUpstab) switch
+            {
+                (false, false) => 0,
+                (true, false) => 1,
+                (false, true) => 2,
+                (true, true) => 3,
+                (_, _) => 4
+            };
+            randomizeLivesBox.Checked = configuration.ShuffleStartingLives;
+            startingAttackLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
+            startingMagicLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
+            startingLifeLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
+
+            //Overworld
+            allowPalaceContinentSwapCheckbox.Checked = configuration.PalacesCanSwapContinents;
+            includeGPinShuffleCheckbox.Checked = configuration.ShuffleGP;
+            shuffleEncountersCheckbox.Checked = configuration.ShuffleEncounters;
+            allowPathEnemiesCheckbox.Checked = configuration.AllowUnsafePathEncounters;
+            encounterRateBox.SelectedIndex = configuration.EncounterRate switch
+            {
+                EncounterRate.NORMAL => 0,
+                EncounterRate.HALF => 1,
+                EncounterRate.NONE => 2,
+                _ => throw new Exception("Invalid EncounterRate setting")
+            };
+            hiddenPalaceList.SelectedIndex = configuration.HidePalace switch
+            {
+                false => 0,
+                true => 1,
+                null => 2,
+            };
+            hideKasutoList.SelectedIndex = configuration.HideKasuto switch
+            {
+                false => 0,
+                true => 1,
+                null => 2,
+            };
+            shuffleWhichLocationsAreHiddenCheckbox.Checked = configuration.ShuffleWhichLocationIsHidden;
+            hideLessImportantLocationsCheckbox.Checked = configuration.HideLessImportantLocations;
+            saneCaveShuffleBox.Checked = configuration.RestrictConnectionCaveShuffle;
+            allowBoulderBlockedConnectionsCheckbox.Checked = configuration.AllowConnectionCavesToBeBoulderBlocked;
+            useGoodBootsCheckbox.Checked = configuration.GoodBoots;
+            generateBaguWoodsCheckbox.Checked = configuration.GenerateBaguWoods;
+            continentConnectionBox.SelectedIndex = configuration.ContinentConnectionType switch
+            {
+                ContinentConnectionType.NORMAL => 0,
+                ContinentConnectionType.RB_BORDER_SHUFFLE => 1,
+                ContinentConnectionType.TRANSPORTATION_SHUFFLE => 2,
+                ContinentConnectionType.ANYTHING_GOES => 3,
+                _ => throw new Exception("Invalid ContinentConnection setting")
+            };
+            westBiome.SelectedIndex = configuration.WestBiome switch
+            {
+                Biome.VANILLA => 0,
+                Biome.VANILLA_SHUFFLE => 1,
+                Biome.VANILLALIKE => 2,
+                Biome.ISLANDS => 3,
+                Biome.CANYON => 4,
+                Biome.CALDERA => 5,
+                Biome.MOUNTAINOUS => 6,
+                Biome.RANDOM_NO_VANILLA => 7,
+                Biome.RANDOM => 8,
+                _ => throw new Exception("Invalid WestBiome setting")
+            };
+            eastBiome.SelectedIndex = configuration.EastBiome switch
+            {
+                Biome.VANILLA => 0,
+                Biome.VANILLA_SHUFFLE => 1,
+                Biome.VANILLALIKE => 2,
+                Biome.ISLANDS => 3,
+                Biome.CANYON => 4,
+                Biome.CALDERA => 5,
+                Biome.MOUNTAINOUS => 6,
+                Biome.RANDOM_NO_VANILLA => 7,
+                Biome.RANDOM => 8,
+                _ => throw new Exception("Invalid EastBiome setting")
+            };
+            dmBiome.SelectedIndex = configuration.DMBiome switch
+            {
+                Biome.VANILLA => 0,
+                Biome.VANILLA_SHUFFLE => 1,
+                Biome.VANILLALIKE => 2,
+                Biome.ISLANDS => 3,
+                Biome.CANYON => 4,
+                Biome.CALDERA => 5,
+                Biome.MOUNTAINOUS => 6,
+                Biome.RANDOM_NO_VANILLA => 7,
+                Biome.RANDOM => 8,
+                _ => throw new Exception("Invalid DMBiome setting")
+            };
+            mazeBiome.SelectedIndex = configuration.MazeBiome switch
+            {
+                Biome.VANILLA => 0,
+                Biome.VANILLA_SHUFFLE => 1,
+                Biome.VANILLALIKE => 2,
+                Biome.RANDOM => 3,
+                _ => throw new Exception("Invalid MazeBiome setting")
+            };
+            shuffledBasnill.Checked = configuration.VanillaShuffleUsesActualTerrain;
+
+            //Palaces
+            palaceStyleList.SelectedIndex = configuration.PalaceStyle switch
+            {
+                PalaceStyle.VANILLA => 0,
+                PalaceStyle.SHUFFLED => 1,
+                PalaceStyle.RECONSTRUCTED => 2,
+                _ => throw new Exception("Invalid PalaceStyle setting")
+            };
+            includeCommunityRoomsCheckbox.Checked = configuration.IncludeCommunityRooms;
+            blockingRoomsInAnyPalaceCheckbox.Checked = configuration.BlockingRoomsInAnyPalace;
+            bossRoomsExitToPalaceCheckbox.Checked = configuration.BossRoomsExitToPalace;
+            shortGPCheckbox.Checked = configuration.ShortGP;
+            tbirdRequiredCheckbox.Checked = configuration.TBirdRequired;
+            removeTbirdCheckbox.Checked = configuration.RemoveTBird;
+            restartAtPalacesCheckbox.Checked = configuration.RestartAtPalacesOnGameOver;
+            palacePaletteCheckbox.Checked = configuration.ChangePalacePallettes;
+            randomizeBossItemCheckbox.Checked = configuration.RandomizeBossItemDrop;
+            startingGemsList.SelectedIndex = configuration.StartingGems ?? 7;
+
+            //Levels
+            shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
+            magicExpNeededCheckbox.Checked = configuration.ShuffleMagicExperience;
+            lifeExpNeededCheckbox.Checked = configuration.ShuffleLifeExperience;
+            if(configuration.ShuffleAttackExperience && configuration.ShuffleMagicExperience && configuration.ShuffleLifeExperience)
+            {
+                shuffleAllExpCheckbox.Checked = true;
             }
-            catch (Exception ex)
+
+            /*
+            configuration.AttackLevelCap = 8 - atkCapList.SelectedIndex;
+            configuration.MagicLevelCap = 8 - magCapList.SelectedIndex;
+            configuration.LifeLevelCap = 8 - lifeCapList.SelectedIndex;
+            */
+            atkCapList.SelectedIndex = 8 - configuration.AttackLevelCap;
+            magCapList.SelectedIndex = 8 - configuration.MagicLevelCap;
+            lifeCapList.SelectedIndex = 8 - configuration.LifeLevelCap;
+            scaleLevelRequirementsToCapCheckbox.Checked = configuration.ScaleLevelRequirementsToCap;
+            attackEffectivenessList.SelectedIndex = configuration.AttackEffectiveness switch
             {
-                MessageBox.Show("Invalid Seed!");
+                StatEffectiveness.AVERAGE => 0,
+                StatEffectiveness.LOW => 1,
+                StatEffectiveness.VANILLA => 2,
+                StatEffectiveness.HIGH => 3,
+                StatEffectiveness.MAX => 4,
+                _ => throw new Exception("Invalid AttackEffectiveness setting")
+            };
+            magicEffectivenessList.SelectedIndex = configuration.MagicEffectiveness switch
+            {
+                StatEffectiveness.AVERAGE => 0,
+                StatEffectiveness.LOW => 1,
+                StatEffectiveness.VANILLA => 2,
+                StatEffectiveness.HIGH => 3,
+                StatEffectiveness.MAX => 4,
+                _ => throw new Exception("Invalid MagicEffectiveness setting")
+            };
+            lifeEffectivenessList.SelectedIndex = configuration.LifeEffectiveness switch
+            {
+                StatEffectiveness.AVERAGE => 0,
+                StatEffectiveness.NONE => 1,
+                StatEffectiveness.VANILLA => 2,
+                StatEffectiveness.HIGH => 3,
+                StatEffectiveness.MAX => 4,
+                _ => throw new Exception("Invalid LifeEffectiveness setting")
+            };
+
+            //Spells
+            shuffleLifeRefillCheckbox.Checked = configuration.ShuffleLifeRefillAmount;
+            shuffleSpellLocationsCheckbox.Checked = configuration.ShuffleSpellLocations;
+            disableMagicContainerRequirementCheckbox.Checked = configuration.DisableMagicContainerRequirements;
+            combineFireCheckbox.Checked = configuration.CombineFireWithRandomSpell;
+            randomizeSpellSpellEnemyCheckbox.Checked = configuration.RandomizeSpellSpellEnemy;
+            useDashCheckbox.Checked = configuration.ReplaceFireWithDash;
+
+            //Enemies
+            shuffleOverworldEnemiesCheckbox.Checked = configuration.ShuffleOverworldEnemies;
+            shufflePalaceEnemiesCheckbox.Checked = configuration.ShufflePalaceEnemies;
+            shuffleDripperEnemyCheckbox.Checked = configuration.ShuffleDripperEnemy;
+            mixLargeAndSmallCheckbox.Checked = configuration.MixLargeAndSmallEnemies;
+            shuffleEnemyHPBox.Checked = configuration.ShuffleEnemyHP;
+            shuffleXPStealersCheckbox.Checked = configuration.ShuffleXPStealers;
+            shuffleStealXPAmountCheckbox.Checked = configuration.ShuffleXPStolenAmount;
+            shuffleSwordImmunityBox.Checked = configuration.ShuffleSwordImmunity;
+            experienceDropsList.SelectedIndex = configuration.EnemyXPDrops switch
+            {
+                StatEffectiveness.VANILLA => 0,
+                StatEffectiveness.NONE => 1,
+                StatEffectiveness.LOW => 2,
+                StatEffectiveness.AVERAGE => 3,
+                StatEffectiveness.HIGH => 4,
+                _ => throw new Exception("Invalid EnemyXPDrops setting")
+            };
+
+            //Items
+            shufflePalaceItemsCheckbox.Checked = configuration.ShufflePalaceItems;
+            shuffleOverworldItemsCheckbox.Checked = configuration.ShuffleOverworldItems;
+            mixOverworldPalaceItemsCheckbox.Checked = configuration.MixOverworldAndPalaceItems;
+            includePbagCavesInShuffleCheckbox.Checked = configuration.IncludePBagCavesInItemShuffle;
+            shuffleSmallItemsCheckbox.Checked = configuration.ShuffleSmallItems;
+            palacesHaveExtraKeysCheckbox.Checked = configuration.PalacesContainExtraKeys;
+            randomizeJarRequirementsCheckbox.Checked = configuration.RandomizeNewKasutoJarRequirements;
+            removeSpellitemsCheckbox.Checked = configuration.RemoveSpellItems;
+            shufflePbagAmountsCheckbox.Checked = configuration.ShufflePBagAmounts;
+
+            //Drops
+            shuffleDropFrequencyCheckbox.Checked = configuration.ShuffleItemDropFrequency;
+            standardizeDropsCheckbox.Checked = configuration.StandardizeDrops;
+            if(configuration.RandomizeDrops)
+            {
+                randomizeDropsCheckbox.Checked = true;
+                manuallySelectDropsCheckbox.Checked = false;
+            }
+            else if (configuration.IsVanillaDrops())
+            {
+                randomizeDropsCheckbox.Checked = false;
+                manuallySelectDropsCheckbox.Checked = false;
+            }
+            else
+            {
+                randomizeDropsCheckbox.Checked = false;
+                manuallySelectDropsCheckbox.Checked = true;
+                smallEnemiesBlueJarCheckbox.Checked = configuration.SmallEnemiesCanDropBlueJar;
+                smallEnemiesRedJarCheckbox.Checked = configuration.SmallEnemiesCanDropRedJar;
+                smallEnemiesSmallBagCheckbox.Checked = configuration.SmallEnemiesCanDropSmallBag;
+                smallEnemiesMediumBagCheckbox.Checked = configuration.SmallEnemiesCanDropMediumBag;
+                smallEnemiesLargeBagCheckbox.Checked = configuration.SmallEnemiesCanDropLargeBag;
+                smallEnemiesXLBagCheckbox.Checked = configuration.SmallEnemiesCanDropXLBag;
+                smallEnemies1UpCheckbox.Checked = configuration.SmallEnemiesCanDrop1up;
+                smallEnemiesKeyCheckbox.Checked = configuration.SmallEnemiesCanDropKey;
+                largeEnemiesBlueJarCheckbox.Checked = configuration.LargeEnemiesCanDropBlueJar;
+                largeEnemiesRedJarCheckbox.Checked = configuration.LargeEnemiesCanDropRedJar;
+                largeEnemiesSmallBagCheckbox.Checked = configuration.LargeEnemiesCanDropSmallBag;
+                largeEnemiesMediumBagCheckbox.Checked = configuration.LargeEnemiesCanDropMediumBag;
+                largeEnemiesLargeBagCheckbox.Checked = configuration.LargeEnemiesCanDropLargeBag;
+                largeEnemiesXLBagCheckbox.Checked = configuration.LargeEnemiesCanDropXLBag;
+                largeEnemies1UpCheckbox.Checked = configuration.LargeEnemiesCanDrop1up;
+                largeEnemiesKeyCheckbox.Checked = configuration.LargeEnemiesCanDropKey;
+            }
+
+
+            //Hints
+            enableHelpfulHintsCheckbox.Checked = configuration.EnableHelpfulHints;
+            enableSpellItemHintsCheckbox.Checked = configuration.EnableSpellItemHints;
+            enableTownNameHintsCheckbox.Checked = configuration.EnableTownNameHints;
+            useCommunityHintsCheckbox.Checked = configuration.UseCommunityHints;
+
+            //Misc
+            disableLowHealthBeepCheckbox.Checked = configuration.DisableLowHealthBeep;
+            disableMusicCheckbox.Checked = configuration.DisableMusic;
+            jumpAlwaysOnCheckbox.Checked = configuration.JumpAlwaysOn;
+            dashAlwaysOnCheckbox.Checked = configuration.DashAlwaysOn;
+            fastSpellCheckbox.Checked = configuration.FastSpellCasting;
+            shuffleEnemyPalettesCheckbox.Checked = configuration.ShuffleSpritePalettes;
+            alwaysBeamCheckbox.Checked = configuration.PermanmentBeamSword;
+            upAOnController1Checkbox.Checked = configuration.UpAOnController1;
+            flashingOffCheckbox.Checked = configuration.RemoveFlashing;
+            characterSpriteList.SelectedIndex = configuration.Sprite.SelectionIndex;
+            tunicColorList.SelectedIndex = tunicColorList.FindStringExact(configuration.Tunic);
+            shieldColorList.SelectedIndex = shieldColorList.FindStringExact(configuration.ShieldTunic);
+            beamSpriteList.SelectedIndex = beamSpriteList.FindStringExact(configuration.BeamSprite);
+        }
+        catch (Exception e)
+        {
+            logger.Error(e, e.Message);
+            MessageBox.Show("Invalid flags entered!");
+        }
+        dontrunhandler = false;
+    }
+
+    private void updateBtn_Click(object sender, EventArgs e)
+    {
+        //WinSparkle.win_sparkle_check_update_with_ui();
+        throw new NotImplementedException();
+    }
+
+    private void shuffleOverworldEnemies_CheckedChanged(object sender, EventArgs e)
+    {
+        if (shufflePalaceEnemiesCheckbox.Checked || shuffleOverworldEnemiesCheckbox.Checked)
+        {
+            mixLargeAndSmallCheckbox.Enabled = true;
+        }
+        else
+        {
+            mixLargeAndSmallCheckbox.Checked = false;
+            mixLargeAndSmallCheckbox.Enabled = false;
+        }
+    }
+
+    private void shufflePalaceEnemies_CheckedChanged(object sender, EventArgs e)
+    {
+        if (shufflePalaceEnemiesCheckbox.Checked || shuffleOverworldEnemiesCheckbox.Checked)
+        {
+            mixLargeAndSmallCheckbox.Enabled = true;
+        }
+        else
+        {
+            mixLargeAndSmallCheckbox.Checked = false;
+            mixLargeAndSmallCheckbox.Enabled = false;
+        }
+    }
+
+    private void wikiBtn_Click(object sender, EventArgs e)
+    {
+        Process.Start(new ProcessStartInfo("https://bitbucket.org/digshake/z2randomizer/wiki/Home") { UseShellExecute = true });
+    }
+    
+    private void DiscordButton_Click(object sender, EventArgs e)
+    {
+        Process.Start(new ProcessStartInfo("http://z2r.gg/discord") { UseShellExecute = true });
+    }
+
+    private void palaceItemBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (shufflePalaceItemsCheckbox.Checked && shuffleOverworldItemsCheckbox.Checked)
+        {
+            mixOverworldPalaceItemsCheckbox.Enabled = true;
+        }
+        else
+        {
+            mixOverworldPalaceItemsCheckbox.Enabled = false;
+            mixOverworldPalaceItemsCheckbox.Checked = false;
+        }
+    }
+
+    private void overworldItemBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (shufflePalaceItemsCheckbox.Checked && shuffleOverworldItemsCheckbox.Checked)
+        {
+            mixOverworldPalaceItemsCheckbox.Enabled = true;
+        }
+        else
+        {
+            mixOverworldPalaceItemsCheckbox.Enabled = false;
+            mixOverworldPalaceItemsCheckbox.Checked = false;
+        }
+
+        if (shuffleOverworldItemsCheckbox.Checked)
+        {
+            includePbagCavesInShuffleCheckbox.Enabled = true;
+        }
+        else
+        {
+            includePbagCavesInShuffleCheckbox.Enabled = false;
+            includePbagCavesInShuffleCheckbox.Checked = false;
+        }
+    }
+
+    private void BeginnerFlags(object sender, EventArgs e)
+    {
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("jhEhMROm7DZ$MHRBTNBhBAh0PSmA");
+        flagsTextBox.Text = config.Serialize();
+    }
+
+    private void StandardFlags(object sender, EventArgs e)
+    {
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("jhEhMROm7DZ$MHRBTNBhBAh0PSmA");
+        flagsTextBox.Text = config.Serialize();
+    }
+
+    private void MaxRandoFlags(object sender, EventArgs e)
+    {
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7@$ZqTBT!BhOA!0P@@A");
+        flagsTextBox.Text = config.Serialize();
+    }
+
+    private void tbirdBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (tbirdRequiredCheckbox.Checked)
+        {
+            removeTbirdCheckbox.Enabled = false;
+            removeTbirdCheckbox.Checked = false;
+        }
+        else
+        {
+            removeTbirdCheckbox.Enabled = true;
+        }
+    }
+
+    private void removeTbird_CheckedChanged(object sender, EventArgs e)
+    {
+        if (removeTbirdCheckbox.Checked)
+        {
+            tbirdRequiredCheckbox.Enabled = false;
+            tbirdRequiredCheckbox.Checked = false;
+        }
+        else
+        {
+            tbirdRequiredCheckbox.Enabled = true;
+        }
+    }
+
+    private void palaceSwapBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (allowPalaceContinentSwapCheckbox.Checked)
+        {
+            includeGPinShuffleCheckbox.Enabled = true;
+        }
+        else
+        {
+            includeGPinShuffleCheckbox.Checked = false;
+            includeGPinShuffleCheckbox.Enabled = false;
+        }
+
+    }
+
+    private void Bulk_Generate_Click(object sender, EventArgs e)
+    {
+        String flagString = flagsTextBox.Text;
+
+        if (flagString.Length != validFlagStringLength)
+        {
+            MessageBox.Show("Invalid flags. Aborting seed generation.");
+            return;
+        }
+
+        for (int i = 0; i < flagString.Length; i++)
+        {
+            if (!flags.Contains(flagString[i]))
+            {
+                MessageBox.Show("Invalid flags. Aborting seed generation.");
                 return;
             }
-            props = generateProps();
-            // f3 = new GeneratingSeedsForm();
-            //f3.Show();
-
-            //f3.setText("Generating seed. This may take a moment.");
-            //f3.Width = 250;
-
-            //t = new Thread(() => new Hyrule(props));
-            //t.IsBackground = true;
-            //t.Start();
-
-            //while (t.IsAlive)
-            //{
-            //    Application.DoEvents();
-            //    if (f3.isClosed)
-            //    {
-            //        t.Abort();
-            //        return;
-            //    }
-            //}
-
-            //new Hyrule(props, null);
+        }
+        GenerateBatchForm f = new GenerateBatchForm();
+        f.ShowDialog();
+        
+        int numSeeds = f.numSeeds;
+        if (numSeeds > 0)
+        {
+            config = ExportConfig();
             f3 = new GeneratingSeedsForm();
             f3.Show();
-
-            f3.setText("Generating Palaces");
-            f3.Width = 250;
-            Exception generationException = null;
-            backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
-            backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.RunWorkerCompleted += (completed_sender, completed_event) => {
-                generationException = completed_event.Error;
-            };
-            backgroundWorker1.RunWorkerAsync();
-            
-
-            while (backgroundWorker1.IsBusy)
+            int i = 0;
+            spawnNextSeed = true;
+            while (i < numSeeds)
             {
-                Application.DoEvents();
+
+                f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
+                
+            
+                int seed = r.Next(1000000000);
+                if (spawnNextSeed)
+                {
+                    backgroundWorker1 = new BackgroundWorker();
+                    backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
+                    backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
+                    backgroundWorker1.WorkerReportsProgress = true;
+                    backgroundWorker1.WorkerSupportsCancellation = true;
+                    backgroundWorker1.RunWorkerAsync();
+                    f3.setText("Generating Palaces");
+                    spawnNextSeed = false;
+                }
+                else
+                {
+                    Application.DoEvents();
+                    if (!backgroundWorker1.IsBusy)
+                    {
+                        i++;
+                        if (i <= numSeeds)
+                        {
+                            f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
+                        }
+                        spawnNextSeed = true;
+                    }
+                }
+
                 if (f3.isClosed)
                 {
                     backgroundWorker1.CancelAsync();
                     return;
                 }
-            }
 
+            }
             f3.Close();
-            if (generationException == null)
+            MessageBox.Show("Batch generation complete!");
+        }
+    }
+
+    private void enemyDropBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if(manuallySelectDropsCheckbox.Checked)
+        {
+            for (int i = 0; i < small.Count(); i++)
             {
-                MessageBox.Show("File " + "Z2_" + props.seed + "_" + props.flags + ".nes" + " has been created!");
+                small[i].Enabled = true;
+                large[i].Enabled = true;
             }
-            else
+            randomizeDropsCheckbox.Enabled = false;
+        }
+        else
+        {
+            for (int i = 0; i < small.Count(); i++)
             {
-                MessageBox.Show("An exception occurred generating the rom");
-                logger.Error(generationException.StackTrace);
+                small[i].Enabled = false;
+                large[i].Enabled = false;
+            }
+            randomizeDropsCheckbox.Enabled = true;
+        }
+    }
+
+    private void AtLeastOneChecked(object sender, EventArgs e)
+    {
+        CheckBox c = (CheckBox)sender;
+        CheckBox[] l = large;
+        if(small.Contains(sender))
+        {
+            l = small;
+        }
+        int count = 0;
+        foreach(CheckBox b in l)
+        {
+            if(b.Checked)
+            {
+                count++;
             }
         }
-
-
-        private void shuffleAllExp_CheckedChanged(object sender, EventArgs e)
+        if(count == 0)
         {
-            shuffleAtkExp.Checked = shuffleAllExp.Checked;
-            shuffleAtkExp.Enabled = !shuffleAllExp.Checked;
+            c.Checked = true;
+        }
+    }
 
-            magicExpNeeded.Checked = shuffleAllExp.Checked;
-            magicExpNeeded.Enabled = !shuffleAllExp.Checked;
+    private void customSave1_Click(object sender, EventArgs e)
+    {
+        customFlags1TextBox.Text = flagsTextBox.Text;
+        Properties.Settings.Default.custom1 = flagsTextBox.Text;
+        Properties.Settings.Default.Save();
+    }
 
-            lifeExpNeeded.Checked = shuffleAllExp.Checked;
-            lifeExpNeeded.Enabled = !shuffleAllExp.Checked;
+    private void customLoad1_Click(object sender, EventArgs e)
+    {
+        flagsTextBox.Text = customFlags1TextBox.Text;
+    }
+
+    private void customSave2_Click(object sender, EventArgs e)
+    {
+        customFlags2TextBox.Text = flagsTextBox.Text;
+        Properties.Settings.Default.custom2 = flagsTextBox.Text;
+        Properties.Settings.Default.Save();
+    }
+
+    private void customSave3_Click(object sender, EventArgs e)
+    {
+        customFlags3TextBox.Text = flagsTextBox.Text;
+        Properties.Settings.Default.custom3 = flagsTextBox.Text;
+        Properties.Settings.Default.Save();
+    }
+
+    private void customLoad2_Click(object sender, EventArgs e)
+    {
+        flagsTextBox.Text = customFlags2TextBox.Text;
+    }
+
+    private void customLoad3_Click(object sender, EventArgs e)
+    {
+        flagsTextBox.Text = customFlags3TextBox.Text;
+    }
+
+    private void randoDrops_CheckedChanged(object sender, EventArgs e)
+    {
+        if(randomizeDropsCheckbox.Checked)
+        {
+            manuallySelectDropsCheckbox.Enabled = false;
+        }
+        else
+        {
+            manuallySelectDropsCheckbox.Enabled = true;
+        }
+    }
+
+    /*private void townSwap_CheckedChanged(object sender, EventArgs e)
+    {
+        if(townSwap.Checked)
+        {
+            hideKasutoBox.SelectedIndex = 0;
+            hideKasutoBox.Enabled = false;
+        }
+        else
+        {
+            hideKasutoBox.Enabled = true;
+        }
+    }*/
+
+    private void enableLevelScaling(object sender, EventArgs e)
+    {
+        if(!atkCapList.GetItemText(atkCapList.SelectedItem).Equals("8") || !magCapList.GetItemText(magCapList.SelectedItem).Equals("8") || !lifeCapList.GetItemText(lifeCapList.SelectedItem).Equals("8"))
+        {
+            scaleLevelRequirementsToCapCheckbox.Enabled = true;
+        }
+        else
+        {
+            scaleLevelRequirementsToCapCheckbox.Enabled = false;
+            scaleLevelRequirementsToCapCheckbox.Checked = false;
+        }
+    }
+
+    private void spellItemBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if(!removeSpellitemsCheckbox.Checked)
+        {
+            enableSpellItemHintsCheckbox.Enabled = false;
+            enableSpellItemHintsCheckbox.Checked = false;
+        }
+        else
+        {
+            enableSpellItemHintsCheckbox.Enabled = true;
+        }
+    }
+
+    private void mazeBiome_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        checkVanillaPossible();
+    }
+
+    private void eastBiome_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+        //if(eastBiome.SelectedIndex == 1)
+        //{
+        //    hideKasutoBox.SelectedIndex = 0;
+        //    hpCmbo.SelectedIndex = 0;
+        //    hideKasutoBox.Enabled = false;
+        //    hpCmbo.Enabled = false;
+        //}
+        //else
+        //{
+        //    hpCmbo.Enabled = true;
+        //    hideKasutoBox.Enabled = true;
+        //}
+        shuffleHiddenEnable();
+        checkVanillaPossible();
+
+
+    }
+
+    private void shuffleHiddenEnable()
+    {
+        if (eastBiome.SelectedIndex == 0 || (hiddenPalaceList.SelectedIndex == 0 && hideKasutoList.SelectedIndex == 0))
+        {
+
+            shuffleWhichLocationsAreHiddenCheckbox.Enabled = false;
+            shuffleWhichLocationsAreHiddenCheckbox.Checked = false;
+        }
+        else
+        {
+            shuffleWhichLocationsAreHiddenCheckbox.Enabled = true;
+        }
+    }
+
+    private void checkVanillaPossible()
+    {
+        if(vanillaPossible(eastBiome) || vanillaPossible(westBiome) || vanillaPossible(dmBiome) || vanillaPossible(mazeBiome))
+        {
+            shuffledBasnill.Enabled = true;
+        }
+        else
+        {
+            shuffledBasnill.Enabled = false;
+            shuffledBasnill.Checked = false;
+        }
+    }
+
+    private Boolean vanillaPossible(ComboBox cb)
+    {
+        if(cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    private void westBiome_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        checkVanillaPossible();
+        if(westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
+        {
+            generateBaguWoodsCheckbox.Checked = false;
+            generateBaguWoodsCheckbox.Enabled = false;
+        }
+        else
+        {
+            generateBaguWoodsCheckbox.Enabled = true;
+        }
+    }
+
+    private void dmBiome_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        checkVanillaPossible();
+    }
+
+    private void hpCmbo_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        shuffleHiddenEnable();
+    }
+
+    private void hideKasutoBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        shuffleHiddenEnable();
+    }
+
+    private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+    {
+        BackgroundWorker worker = sender as BackgroundWorker;
+        
+        new Hyrule(config, worker);
+        if(worker.CancellationPending)
+        {
+            e.Cancel = true;
+        }
+    }
+
+    private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+    {
+        if(e.ProgressPercentage == 2)
+        {
+            f3.setText("Generating Western Hyrule");
+        }
+        else if(e.ProgressPercentage == 3)
+        {
+            f3.setText("Generating Death Mountain");
+        }
+        else if (e.ProgressPercentage == 4)
+        {
+            f3.setText("Generating East Hyrule");
+        }
+        else if (e.ProgressPercentage == 5)
+        {
+            f3.setText("Generating Maze Island");
+        }
+        else if (e.ProgressPercentage == 6)
+        {
+            f3.setText("Shuffling Items and Spells");
+        }
+        else if (e.ProgressPercentage == 7)
+        {
+            f3.setText("Running Seed Completability Checks");
+        }
+        else if (e.ProgressPercentage == 8)
+        {
+            f3.setText("Generating Hints");
+        }
+        else if (e.ProgressPercentage == 9)
+        {
+            f3.setText("Finishing up");
+        }
+    }
+
+    private void palaceBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if(palaceStyleList.SelectedIndex != 2)
+        {
+            includeCommunityRoomsCheckbox.Enabled = false;
+            includeCommunityRoomsCheckbox.Checked = false;
+            blockingRoomsInAnyPalaceCheckbox.Enabled = false;
+            blockingRoomsInAnyPalaceCheckbox.Checked = false;
+            bossRoomsExitToPalaceCheckbox.Checked = false;
+            bossRoomsExitToPalaceCheckbox.Enabled = false;
+        }
+        else
+        {
+            includeCommunityRoomsCheckbox.Enabled = true;
+            blockingRoomsInAnyPalaceCheckbox.Enabled = true;
+            bossRoomsExitToPalaceCheckbox.Enabled = true;
         }
 
-
-        private void shuffleEncounters_CheckedChanged(object sender, EventArgs e)
+        if (palaceStyleList.SelectedIndex != 0)
         {
-            allowPathEnemies.Enabled = shuffleEncounters.Checked;
-            if (!shuffleEncounters.Checked)
-            {
-                allowPathEnemies.Checked = false;
-            }
+            shortGPCheckbox.Enabled = true;
+            tbirdRequiredCheckbox.Enabled = true;
         }
-
-        private void updateFlags(object sender, EventArgs e)
+        else
         {
-            if (!dontrunhandler)
-            {
-                String flagStr = "";
-                BitArray v = new BitArray(6);
-                int[] array = new int[1];
-
-                v[0] = shuffleItemBox.Checked;
-                v[1] = candleBox.Checked;
-                v[2] = gloveBox.Checked;
-                v[3] = raftBox.Checked;
-                v[4] = bootsBox.Checked;
-                v[5] = shuffleOverworldEnemies.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-                v[0] = fluteBox.Checked;
-                v[1] = crossBox.Checked;
-                v[2] = hammerBox.Checked;
-                v[3] = keyBox.Checked;
-                v[4] = spellShuffleBox.Checked;
-                v[5] = hideLocsBox.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = shieldBox.Checked;
-                v[1] = jumpBox.Checked;
-                v[2] = lifeBox.Checked;
-                v[3] = fairyBox.Checked;
-                v[4] = fireBox.Checked;
-                v[5] = combineFireBox.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = reflectBox.Checked;
-                v[1] = spellBox.Checked;
-                v[2] = thunderBox.Checked;
-                v[3] = livesBox.Checked;
-                v[4] = removeTbird.Checked;
-                v[5] = saneCaveShuffleBox.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-                BitArray w = new BitArray(new int[] { heartCmbo.SelectedIndex, techCmbo.SelectedIndex });
-                v[0] = w[0];
-                v[1] = w[1];
-                v[2] = w[2];
-                v[3] = w[32];
-                v[4] = w[33];
-                v[5] = w[34];
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = pbagDrop.Checked;
-                v[1] = pbagItemShuffleBox.Checked;
-                v[2] = w[3];
-                v[3] = p7Shuffle.Checked;
-                v[4] = palacePalette.Checked;
-                v[5] = shuffleEncounters.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = palaceKeys.Checked;
-                v[1] = palaceSwapBox.Checked;
-                w = new BitArray(new int[] { atkEffBox.SelectedIndex });
-                v[2] = w[0];
-                v[3] = w[1];
-                v[4] = w[2];
-                v[5] = allowPathEnemies.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = beamBox.Checked;
-                v[1] = shuffleDripper.Checked;
-                v[2] = dashBox.Checked;
-                v[3] = shuffleEnemyHPBox.Checked;
-                v[4] = shuffleAllExp.Checked;
-                v[5] = shufflePalaceEnemies.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = shuffleAtkExp.Checked;
-                v[1] = lifeExpNeeded.Checked;
-                v[2] = magicExpNeeded.Checked;
-                v[3] = upaBox.Checked;
-                v[4] = gpBox.Checked;
-                v[5] = tbirdBox.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                w = new BitArray(new int[] { magEffBox.SelectedIndex });
-                v[0] = w[0];
-                v[1] = w[1];
-                v[2] = w[2];
-                v[3] = stealExpBox.Checked;
-                v[4] = stealExpAmt.Checked;
-                v[5] = lifeRefilBox.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = swordImmuneBox.Checked;
-                v[1] = jumpNormalbox.Checked;
-
-                w = new BitArray(new int[] { numGemsCbo.SelectedIndex });
-                v[2] = w[0];
-                v[3] = w[1];
-                v[4] = w[2];
-                v[5] = mixEnemies.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = palaceItemBox.Checked;
-                v[1] = overworldItemBox.Checked;
-                v[2] = mixItemBox.Checked;
-                v[3] = shuffleSmallItemsBox.Checked;
-                v[4] = shuffleSpellLocationsBox.Checked;
-                v[5] = disableJarBox.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-
-
-
-                w = new BitArray(new int[] { lifeEffBox.SelectedIndex });
-                v[0] = w[0];
-                v[1] = w[1];
-                v[2] = w[2];
-                v[3] = kasutoBox.Checked;
-                v[4] = communityBox.Checked;
-                v[5] = enemyPalette.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                w = new BitArray(new int[] { maxHeartsBox.SelectedIndex });
-                v[0] = w[0];
-                v[1] = w[1];
-                v[2] = w[2];
-                v[3] = w[3];
-                w = new BitArray(new int[] { hpCmbo.SelectedIndex });
-                v[4] = w[0];
-                v[5] = w[1];
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                w = new BitArray(new int[] { hideKasutoBox.SelectedIndex });
-                v[0] = w[0];
-                v[1] = w[1];
-                v[2] = enemyDropBox.Checked;
-                v[3] = spellItemBox.Checked;
-                v[4] = smallBlueJar.Checked;
-                v[5] = smallRedJar.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = small50.Checked;
-                v[1] = small100.Checked;
-                v[2] = small200.Checked;
-                v[3] = small500.Checked;
-                v[4] = small1up.Checked;
-                v[5] = smallKey.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = largeBlueJar.Checked;
-                v[1] = largeRedJar.Checked;
-                v[2] = large50.Checked;
-                v[3] = large100.Checked;
-                v[4] = large200.Checked;
-                v[5] = large500.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = large1up.Checked;
-                v[1] = largeKey.Checked;
-                v[2] = helpfulHints.Checked;
-                v[3] = spellItemHints.Checked;
-                v[4] = standardDrops.Checked;
-                v[5] = randoDrops.Checked;
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-
-                v[0] = shufflePbagExp.Checked;
-                w = new BitArray(new int[] { atkCapBox.SelectedIndex });
-                v[1] = w[0];
-                v[2] = w[1];
-                v[3] = w[2];
-                w = new BitArray(new int[] { magCapBox.SelectedIndex });
-                v[4] = w[0];
-                v[5] = w[1];
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = w[2];
-                w = new BitArray(new int[] { lifeCapBox.SelectedIndex });
-                v[1] = w[0];
-                v[2] = w[1];
-                v[3] = w[2];
-                v[4] = scaleLevels.Checked;
-                v[5] = townSpellHints.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                w = new BitArray(new int[] { encounterBox.SelectedIndex });
-                v[0] = w[0];
-                v[1] = w[1];
-                w = new BitArray(new int[] { expDropBox.SelectedIndex });
-                v[2] = w[0];
-                v[3] = w[1];
-                v[4] = w[2];
-                w = new BitArray(new int[] { startAtkBox.SelectedIndex });
-                v[5] = w[0];
-
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = w[1];
-                v[1] = w[2];
-                w = new BitArray(new int[] { startMagBox.SelectedIndex });
-                v[2] = w[0];
-                v[3] = w[1];
-                v[4] = w[2];
-                w = new BitArray(new int[] { startLifeBox.SelectedIndex });
-                v[5] = w[0];
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = w[1];
-                v[1] = w[2];
-
-                w = new BitArray(new int[] { continentConnectionBox.SelectedIndex });
-                v[2] = w[0];
-                v[3] = w[1];
-                v[4] = boulderConnectionBox.Checked;
-                w = new BitArray(new int[] { westBiome.SelectedIndex });
-                v[5] = w[0];
-
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = w[1];
-                v[1] = w[2];
-
-                v[2] = w[3];
-                w = new BitArray(new int[] { dmBiome.SelectedIndex });
-                v[3] = w[0];
-                v[4] = w[1];
-                v[5] = w[2];
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = w[3];
-                w = new BitArray(new int[] { eastBiome.SelectedIndex });
-                v[1] = w[0];
-
-                v[2] = w[1];
-                v[3] = w[2];
-                v[4] = w[3];
-                w = new BitArray(new int[] { mazeBiome.SelectedIndex });
-                v[5] = w[0];
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                v[0] = w[1];
-                v[1] = vanillaOriginalTerrain.Checked;
-                v[2] = shuffleHidden.Checked;
-                v[3] = bossItem.Checked;
-                v[4] = waterBoots.Checked;
-                v[5] = spellEnemy.Checked;
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                w = new BitArray(new int[] { palaceBox.SelectedIndex });
-                v[0] = baguBox.Checked;
-                v[1] = w[0];
-                v[2] = customRooms.Checked;
-                v[3] = blockerBox.Checked;
-                v[4] = bossRoomBox.Checked;
-                v[5] = w[1];
-
-                v.CopyTo(array, 0);
-                flagStr = flagStr + flags[array[0]];
-
-                flagBox.Text = flagStr;
-            }
+            shortGPCheckbox.Checked = false;
+            shortGPCheckbox.Enabled = false;
+            tbirdRequiredCheckbox.Enabled = false;
+            tbirdRequiredCheckbox.Checked = true;
         }
+    }
 
-        private void flagBox_Clicked(object send, EventArgs e)
+    private void dashBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if(useDashCheckbox.Checked)
         {
-            flagBox.SelectAll();
+            combineFireCheckbox.Enabled = false;
+            combineFireCheckbox.Checked = false;
         }
-        private void flagBox_TextChanged(object sender, EventArgs e)
+        else
         {
-
-            dontrunhandler = true;
-            try
-            {
-                String flagText = flagBox.Text;
-
-                while (flagText.Length < numFlags)
-                {
-                    flagText += "A";
-                }
-
-                BitArray v = new BitArray(new int[] { flags.IndexOf(flagText[0]) });
-                int[] array = new int[1];
-
-                shuffleItemBox.Checked = v[0];
-                candleBox.Checked = v[1];
-                gloveBox.Checked = v[2];
-                raftBox.Checked = v[3];
-                bootsBox.Checked = v[4];
-                shuffleOverworldEnemies.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[1]) });
-                fluteBox.Checked = v[0];
-                crossBox.Checked = v[1];
-                hammerBox.Checked = v[2];
-                keyBox.Checked = v[3];
-                spellShuffleBox.Checked = v[4];
-                hideLocsBox.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[2]) });
-
-                shieldBox.Checked = v[0];
-                jumpBox.Checked = v[1];
-                lifeBox.Checked = v[2];
-                fairyBox.Checked = v[3];
-                fireBox.Checked = v[4];
-                combineFireBox.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[3]) });
-
-                reflectBox.Checked = v[0];
-                spellBox.Checked = v[1];
-                thunderBox.Checked = v[2];
-                livesBox.Checked = v[3];
-                removeTbird.Checked = v[4];
-                saneCaveShuffleBox.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[4]) });
-                BitArray w = new BitArray(3);
-                w[0] = v[3];
-                w[1] = v[4];
-                w[2] = v[5];
-                w.CopyTo(array, 0);
-                techCmbo.SelectedIndex = array[0];
-                w = new BitArray(4);
-                w[0] = v[0];
-                w[1] = v[1];
-                w[2] = v[2];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[5]) });
-                w[3] = v[2];
-                w.CopyTo(array, 0);
-                heartCmbo.SelectedIndex = array[0];
-                pbagDrop.Checked = v[0];
-                pbagItemShuffleBox.Checked = v[1];
-                p7Shuffle.Checked = v[3];
-                palacePalette.Checked = v[4];
-                shuffleEncounters.Checked = v[5];
-                v = new BitArray(new int[] { flags.IndexOf(flagText[6]) });
-
-                palaceKeys.Checked = v[0];
-                palaceSwapBox.Checked = v[1];
-                w = new BitArray(3);
-                w[0] = v[2];
-                w[1] = v[3];
-                w[2] = v[4];
-                w.CopyTo(array, 0);
-                atkEffBox.SelectedIndex = array[0];
-                allowPathEnemies.Checked = v[5];
-                v = new BitArray(new int[] { flags.IndexOf(flagText[7]) });
-
-                beamBox.Checked = v[0];
-                shuffleDripper.Checked = v[1];
-                dashBox.Checked = v[2];
-                shuffleEnemyHPBox.Checked = v[3];
-                shuffleAllExp.Checked = v[4];
-                shufflePalaceEnemies.Checked = v[5];
-                v = new BitArray(new int[] { flags.IndexOf(flagText[8]) });
-
-                shuffleAtkExp.Checked = v[0];
-                lifeExpNeeded.Checked = v[1];
-                magicExpNeeded.Checked = v[2];
-                upaBox.Checked = v[3];
-                gpBox.Checked = v[4];
-
-                tbirdBox.Checked = v[5];
-                v = new BitArray(new int[] { flags.IndexOf(flagText[9]) });
-
-                w[0] = v[0];
-                w[1] = v[1];
-                w[2] = v[2];
-                w.CopyTo(array, 0);
-                magEffBox.SelectedIndex = array[0];
-                stealExpBox.Checked = v[3];
-                stealExpAmt.Checked = v[4];
-                lifeRefilBox.Checked = v[5];
-                v = new BitArray(new int[] { flags.IndexOf(flagText[10]) });
-
-                v[0] = swordImmuneBox.Checked = v[0];
-                v[1] = jumpNormalbox.Checked = v[1];
-
-                w[0] = v[2];
-                w[1] = v[3];
-                w[2] = v[4];
-                w.CopyTo(array, 0);
-                numGemsCbo.SelectedIndex = array[0];
-
-                mixEnemies.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[11]) });
-
-                palaceItemBox.Checked = v[0];
-                overworldItemBox.Checked = v[1];
-                mixItemBox.Checked = v[2];
-                shuffleSmallItemsBox.Checked = v[3];
-                shuffleSpellLocationsBox.Checked = v[4];
-                disableJarBox.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[12]) });
-                w[0] = v[0];
-                w[1] = v[1];
-                w[2] = v[2];
-                w.CopyTo(array, 0);
-                lifeEffBox.SelectedIndex = array[0];
-                kasutoBox.Checked = v[3];
-                communityBox.Checked = v[4];
-                enemyPalette.Checked = v[5];
-                w = new BitArray(4);
-                v = new BitArray(new int[] { flags.IndexOf(flagText[13]) });
-                w[0] = v[0];
-                w[1] = v[1];
-                w[2] = v[2];
-                w[3] = v[3];
-                w.CopyTo(array, 0);
-                maxHeartsBox.SelectedIndex = array[0];
-                w = new BitArray(2);
-                w[0] = v[4];
-                w[1] = v[5];
-                w.CopyTo(array, 0);
-                hpCmbo.SelectedIndex = array[0];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[14]) });
-                w = new BitArray(2);
-                w[0] = v[0];
-                w[1] = v[1];
-                w.CopyTo(array, 0);
-
-                hideKasutoBox.SelectedIndex = array[0];
-                enemyDropBox.Checked = v[2];
-                spellItemBox.Checked = v[3];
-                smallBlueJar.Checked = v[4];
-                smallRedJar.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[15]) });
-
-                small50.Checked = v[0];
-                small100.Checked = v[1];
-                small200.Checked = v[2];
-                small500.Checked = v[3];
-                small1up.Checked = v[4];
-                smallKey.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[16]) });
-
-                largeBlueJar.Checked = v[0];
-                largeRedJar.Checked = v[1];
-                large50.Checked = v[2];
-                large100.Checked = v[3];
-                large200.Checked = v[4];
-                large500.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[17]) });
-
-                large1up.Checked = v[0];
-                largeKey.Checked = v[1];
-                w = new BitArray(2);
-                helpfulHints.Checked = v[2];
-                spellItemHints.Checked = v[3];
-                standardDrops.Checked = v[4];
-                randoDrops.Checked = v[5];
-                w.CopyTo(array, 0);
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[18]) });
-                shufflePbagExp.Checked = v[0];
-                w = new BitArray(3);
-                w[0] = v[1];
-                w[1] = v[2];
-                w[2] = v[3];
-                w.CopyTo(array, 0);
-                atkCapBox.SelectedIndex = array[0];
-                w = new BitArray(3);
-                w[0] = v[4];
-                w[1] = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[19]) });
-                w[2] = v[0];
-                w.CopyTo(array, 0);
-                magCapBox.SelectedIndex = array[0];
-                w = new BitArray(3);
-                w[0] = v[1];
-                w[1] = v[2];
-                w[2] = v[3];
-                w.CopyTo(array, 0);
-                lifeCapBox.SelectedIndex = array[0];
-                scaleLevels.Checked = v[4];
-                townSpellHints.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[20]) });
-                w = new BitArray(2);
-                w[0] = v[0];
-                w[1] = v[1];
-                w.CopyTo(array, 0);
-                encounterBox.SelectedIndex = array[0];
-                w = new BitArray(3);
-                w[0] = v[2];
-                w[1] = v[3];
-                w[2] = v[4];
-                w.CopyTo(array, 0);
-                expDropBox.SelectedIndex = array[0];
-
-                w[0] = v[5];
-                v = new BitArray(new int[] { flags.IndexOf(flagText[21]) });
-                w[1] = v[0];
-                w[2] = v[1];
-                w.CopyTo(array, 0);
-                startAtkBox.SelectedIndex = array[0];
-                w[0] = v[2];
-                w[1] = v[3];
-                w[2] = v[4];
-                w.CopyTo(array, 0);
-                startMagBox.SelectedIndex = array[0];
-                w[0] = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[22]) });
-                w[1] = v[0];
-                w[2] = v[1];
-                w.CopyTo(array, 0);
-                startLifeBox.SelectedIndex = array[0];
-
-                w = new BitArray(2);
-                w[0] = v[2];
-                w[1] = v[3];
-                w.CopyTo(array, 0);
-                continentConnectionBox.SelectedIndex = array[0];
-                boulderConnectionBox.Checked = v[4];
-                w = new BitArray(4);
-                w[0] = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[23]) });
-                w[1] = v[0];
-                w[2] = v[1];
-                w[3] = v[2];
-                w.CopyTo(array, 0);
-                westBiome.SelectedIndex = array[0];
-                w[0] = v[3];
-                w[1] = v[4];
-                w[2] = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[24]) });
-                w[3] = v[0];
-                w.CopyTo(array, 0);
-                dmBiome.SelectedIndex = array[0];
-                w[0] = v[1];
-                w[1] = v[2];
-                w[2] = v[3];
-                w[3] = v[4];
-                w.CopyTo(array, 0);
-                eastBiome.SelectedIndex = array[0];
-                w = new BitArray(2);
-                w[0] = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[25]) });
-                w[1] = v[0];
-                w.CopyTo(array, 0);
-                mazeBiome.SelectedIndex = array[0];
-                vanillaOriginalTerrain.Checked = v[1];
-                shuffleHidden.Checked = v[2];
-                bossItem.Checked = v[3];
-                waterBoots.Checked = v[4];
-                spellEnemy.Checked = v[5];
-
-                v = new BitArray(new int[] { flags.IndexOf(flagText[26]) });
-                w = new BitArray(2);
-                baguBox.Checked = v[0];
-                w[0] = v[1];
-                customRooms.Checked = v[2];
-                blockerBox.Checked = v[3];
-                bossRoomBox.Checked = v[4];
-                w[1] = v[5];
-                w.CopyTo(array, 0);
-                palaceBox.SelectedIndex = array[0];
-
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Invalid flags entered!");
-            }
-            dontrunhandler = false;
+            combineFireCheckbox.Enabled = true;
         }
+    }
 
-        private void updateBtn_Click(object sender, EventArgs e)
+    private void combineFireBox_CheckedChanged(object sender, EventArgs e)
+    {
+        if (combineFireCheckbox.Checked)
         {
-            WinSparkle.win_sparkle_check_update_with_ui();
+            useDashCheckbox.Enabled = false;
+            useDashCheckbox.Checked = false;
         }
-
-        private void shuffleOverworldEnemies_CheckedChanged(object sender, EventArgs e)
+        else
         {
-            if (shufflePalaceEnemies.Checked || shuffleOverworldEnemies.Checked)
-            {
-                mixEnemies.Enabled = true;
-            }
-            else
-            {
-                mixEnemies.Checked = false;
-                mixEnemies.Enabled = false;
-            }
-        }
-
-        private void shufflePalaceEnemies_CheckedChanged(object sender, EventArgs e)
-        {
-            if (shufflePalaceEnemies.Checked || shuffleOverworldEnemies.Checked)
-            {
-                mixEnemies.Enabled = true;
-            }
-            else
-            {
-                mixEnemies.Checked = false;
-                mixEnemies.Enabled = false;
-            }
-        }
-
-        private void wikiBtn_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("https://bitbucket.org/digshake/z2randomizer/wiki/Home");
-        }
-
-        private void palaceItemBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (palaceItemBox.Checked && overworldItemBox.Checked)
-            {
-                mixItemBox.Enabled = true;
-            }
-            else
-            {
-                mixItemBox.Enabled = false;
-                mixItemBox.Checked = false;
-            }
-        }
-
-        private void overworldItemBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (palaceItemBox.Checked && overworldItemBox.Checked)
-            {
-                mixItemBox.Enabled = true;
-            }
-            else
-            {
-                mixItemBox.Enabled = false;
-                mixItemBox.Checked = false;
-            }
-
-            if (overworldItemBox.Checked)
-            {
-                pbagItemShuffleBox.Enabled = true;
-            }
-            else
-            {
-                pbagItemShuffleBox.Enabled = false;
-                pbagItemShuffleBox.Checked = false;
-            }
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-        private void beginnerFlags(object sender, EventArgs e)
-        {
-            flagBox.Text = "jhEhMROm7DZ$MHRBTNBhBAh0PSm";
-        }
-
-        private void swissFlags(object sender, EventArgs e)
-        {
-            flagBox.Text = "jAhAD0L9$Za$LpTBT!BANAASESC";
-        }
-
-        private void bracketFlags(object sender, EventArgs e)
-        {
-            flagBox.Text = "hAhAD0j9$Z8$Jp5HgRBANAASESC";
-        }
-
-        private void finalsFlags(object sender, EventArgs e)
-        {
-            flagBox.Text = "hAhAC0j9x78gJqXBTRAANAASESC";
-        }
-
-        private void maxRandoFlags(object sender, EventArgs e)
-        {
-            flagBox.Text = "iyAqh$j#g7@$ZqTBT!BhOAdEzx@";
-        }
-
-        private void fourGemFlags(object sender, EventArgs e)
-        {
-            flagBox.Text = "jhAhDcC#$Zz$JHRBTuAhOAy0PB@";
-        }
-
-        private void tbirdBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (tbirdBox.Checked)
-            {
-                removeTbird.Enabled = false;
-                removeTbird.Checked = false;
-            }
-            else
-            {
-                removeTbird.Enabled = true;
-            }
-        }
-
-        private void removeTbird_CheckedChanged(object sender, EventArgs e)
-        {
-            if (removeTbird.Checked)
-            {
-                tbirdBox.Enabled = false;
-                tbirdBox.Checked = false;
-            }
-            else
-            {
-                tbirdBox.Enabled = true;
-            }
-        }
-
-        private void palaceSwapBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (palaceSwapBox.Checked)
-            {
-                p7Shuffle.Enabled = true;
-            }
-            else
-            {
-                p7Shuffle.Checked = false;
-                p7Shuffle.Enabled = false;
-            }
-
-        }
-
-        private void Bulk_Generate_Click(object sender, EventArgs e)
-        {
-            String flagString = flagBox.Text;
-
-            if (flagString.Length != numFlags)
-            {
-                MessageBox.Show("Invalid flags. Aborting seed generation.");
-                return;
-            }
-
-            for (int i = 0; i < flagString.Length; i++)
-            {
-                if (!flags.Contains(flagString[i]))
-                {
-                    MessageBox.Show("Invalid flags. Aborting seed generation.");
-                    return;
-                }
-            }
-            GenerateBatchForm f = new GenerateBatchForm();
-            f.ShowDialog();
-            
-            int numSeeds = f.numSeeds;
-            if (numSeeds > 0)
-            {
-                props = generateProps();
-                f3 = new GeneratingSeedsForm();
-                f3.Show();
-                int i = 0;
-                spawnNextSeed = true;
-                while (i < numSeeds)
-                {
-
-                    f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
-                    
-                
-                    props.seed = r.Next(1000000000);
-                    if (spawnNextSeed)
-                    {
-                        backgroundWorker1 = new BackgroundWorker();
-                        backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
-                        backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
-                        backgroundWorker1.WorkerReportsProgress = true;
-                        backgroundWorker1.WorkerSupportsCancellation = true;
-                        backgroundWorker1.RunWorkerAsync();
-                        f3.setText("Generating Palaces");
-                        spawnNextSeed = false;
-                    }
-                    else
-                    {
-                        Application.DoEvents();
-                        if (!backgroundWorker1.IsBusy)
-                        {
-                            i++;
-                            if (i <= numSeeds)
-                            {
-                                f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
-                            }
-                            spawnNextSeed = true;
-                        }
-                    }
-
-                    if (f3.isClosed)
-                    {
-                        backgroundWorker1.CancelAsync();
-                        return;
-                    }
-
-                }
-                f3.Close();
-                MessageBox.Show("Batch generation complete!");
-            }
-        }
-
-        private RandomizerProperties generateProps()
-        {
-            RandomizerProperties props = new RandomizerProperties();
-            props.filename = fileTextBox.Text;
-
-            try
-            {
-                props.seed = Int32.Parse(seedTextBox.Text);
-            }
-            catch (Exception ex)
-            {
-                props.seed = 0;
-            }
-
-            props.shuffleItems = shuffleItemBox.Checked;
-            props.startCandle = candleBox.Checked;
-            props.startGlove = gloveBox.Checked;
-            props.startRaft = raftBox.Checked;
-            props.startBoots = bootsBox.Checked;
-            props.startFlute = fluteBox.Checked;
-            props.startCross = crossBox.Checked;
-            props.startHammer = hammerBox.Checked;
-            props.startKey = keyBox.Checked;
-            props.shuffleSpells = spellShuffleBox.Checked;
-            props.startShield = shieldBox.Checked;
-            props.startJump = jumpBox.Checked;
-            props.startLife = lifeBox.Checked;
-            props.startFairy = fairyBox.Checked;
-            props.startFire = fireBox.Checked;
-            props.startReflect = reflectBox.Checked;
-            props.startSpell = spellBox.Checked;
-            props.startThunder = thunderBox.Checked;
-            props.startHearts = heartCmbo.GetItemText(heartCmbo.SelectedItem);
-            props.maxHearts = maxHeartsBox.GetItemText(maxHeartsBox.SelectedItem);
-            props.startTech = techCmbo.GetItemText(techCmbo.SelectedItem);
-            props.startGems = numGemsCbo.GetItemText(numGemsCbo.SelectedItem);
-            props.shuffleLives = livesBox.Checked;
-            props.shufflePalaceRooms = palaceBox.SelectedIndex == 1;
-            props.shuffleEnemyHP = shuffleEnemyHPBox.Checked;
-            props.shuffleAllExp = shuffleAllExp.Checked;
-            props.shuffleAtkExp = shuffleAtkExp.Checked;
-            props.shuffleLifeExp = lifeExpNeeded.Checked;
-            props.shuffleMagicExp = magicExpNeeded.Checked;
-            props.shuffleEnemyStealExp = stealExpBox.Checked;
-            props.shuffleStealExpAmt = stealExpAmt.Checked;
-            props.shuffleSwordImmunity = swordImmuneBox.Checked;
-            props.jumpAlwaysOn = jumpNormalbox.Checked;
-            props.shuffleLifeRefill = lifeRefilBox.Checked;
-            props.disableBeep = disableLowHealthBeep.Checked;
-            props.requireTbird = tbirdBox.Checked;
-            props.shuffleEncounters = shuffleEncounters.Checked;
-            props.allowPathEnemies = allowPathEnemies.Checked;
-            props.shuffleOverworldEnemies = shuffleOverworldEnemies.Checked;
-            props.shufflePalaceEnemies = shufflePalaceEnemies.Checked;
-            props.mixEnemies = mixEnemies.Checked;
-            props.flags = flagBox.Text;
-            props.shuffleOverworldItems = overworldItemBox.Checked;
-            props.shufflePalaceItems = palaceItemBox.Checked;
-            props.mixOverworldPalaceItems = mixItemBox.Checked;
-            props.shuffleSmallItems = shuffleSmallItemsBox.Checked;
-            props.shuffleSpellLocations = shuffleSpellLocationsBox.Checked;
-            props.disableMagicRecs = disableJarBox.Checked;
-            props.extraKeys = palaceKeys.Checked;
-            props.palacePalette = palacePalette.Checked;
-            props.pbagDrop = pbagDrop.Checked;
-            props.swapPalaceCont = palaceSwapBox.Checked;
-            props.shuffleAtkEff = atkEffBox.SelectedIndex == 0;
-            props.lowAtk = atkEffBox.SelectedIndex == 1;
-            props.highAtk = atkEffBox.SelectedIndex == 3;
-            props.ohkoEnemies = atkEffBox.SelectedIndex == 4;
-
-            props.shuffleMagEff = magEffBox.SelectedIndex == 0;
-            props.highMag = magEffBox.SelectedIndex == 1;
-            props.lowMag = magEffBox.SelectedIndex == 3;
-            props.wizardMode = magEffBox.SelectedIndex == 4;
-
-            props.shuffleLifeEff = lifeEffBox.SelectedIndex == 0;
-            props.ohkoLink = lifeEffBox.SelectedIndex == 1;
-            props.highDef = lifeEffBox.SelectedIndex == 3;
-            props.tankMode = lifeEffBox.SelectedIndex == 4;
-            props.upaBox = upaBox.Checked;
-            props.shortenGP = gpBox.Checked;
-            props.fastCast = fastSpellBox.Checked;
-            props.kasutoJars = kasutoBox.Checked;
-            props.useCommunityHints = communityBox.Checked;
-            props.combineFire = combineFireBox.Checked;
-            props.removeTbird = removeTbird.Checked;
-            props.permanentBeam = beamBox.Checked;
-            props.beamSprite = beamCmbo.GetItemText(beamCmbo.SelectedItem);
-            props.pbagItemShuffle = pbagItemShuffleBox.Checked;
-            props.p7shuffle = p7Shuffle.Checked;
-            props.shuffleDripper = shuffleDripper.Checked;
-            props.shuffleEnemyPalettes = enemyPalette.Checked;
-            props.hiddenPalace = hpCmbo.GetItemText(hpCmbo.SelectedItem);
-            props.disableMusic = disableMusicBox.Checked;
-            props.hiddenKasuto = hideKasutoBox.GetItemText(hideKasutoBox.SelectedItem);
-            props.ShuffleEnemyDrops = enemyDropBox.Checked;
-            props.charSprite = spriteCmbo.GetItemText(spriteCmbo.SelectedItem);
-            props.tunicColor = tunicColor.GetItemText(tunicColor.SelectedItem);
-            props.shieldColor = shieldColor.GetItemText(shieldColor.SelectedItem);
-            props.removeSpellItems = spellItemBox.Checked;
-            props.smallbluejar = smallBlueJar.Checked;
-            props.smallredjar = smallRedJar.Checked;
-            props.small50 = small50.Checked;
-            props.small100 = small100.Checked;
-            props.small200 = small200.Checked;
-            props.small500 = small500.Checked;
-            props.small1up = small1up.Checked;
-            props.smallkey = smallKey.Checked;
-            props.largebluejar = largeBlueJar.Checked;
-            props.largeredjar = largeRedJar.Checked;
-            props.large50 = large50.Checked;
-            props.large100 = large100.Checked;
-            props.large200 = large200.Checked;
-            props.large500 = large500.Checked;
-            props.large1up = large1up.Checked;
-            props.largekey = largeKey.Checked;
-            props.standardizeDrops = standardDrops.Checked;
-            props.randoDrops = randoDrops.Checked;
-            props.shufflePbagXp = shufflePbagExp.Checked;
-            props.townSwap = false;
-            props.attackCap = Int32.Parse(atkCapBox.GetItemText(atkCapBox.SelectedItem));
-            props.magicCap = Int32.Parse(magCapBox.GetItemText(magCapBox.SelectedItem));
-            props.lifeCap = Int32.Parse(lifeCapBox.GetItemText(lifeCapBox.SelectedItem));
-            props.scaleLevels = scaleLevels.Checked;
-            props.spellItemHints = spellItemHints.Checked;
-            props.helpfulHints = helpfulHints.Checked;
-            props.townNameHints = townSpellHints.Checked;
-            props.encounterRate = encounterBox.GetItemText(encounterBox.SelectedItem);
-            props.expLevel = expDropBox.GetItemText(expDropBox.SelectedItem);
-            props.startAtk = Int32.Parse(startAtkBox.GetItemText(startAtkBox.SelectedItem));
-            props.startMag = Int32.Parse(startMagBox.GetItemText(startMagBox.SelectedItem));
-            props.startLifeLvl = Int32.Parse(startLifeBox.GetItemText(startLifeBox.SelectedItem));
-            props.continentConnections = continentConnectionBox.GetItemText(continentConnectionBox.SelectedItem);
-            props.upAC1 = upAC1.Checked;
-            props.hideLocs = hideLocsBox.Checked;
-            props.saneCaves = saneCaveShuffleBox.Checked;
-            props.boulderBlockConnections = boulderConnectionBox.Checked;
-            props.westBiome = westBiome.GetItemText(westBiome.SelectedItem);
-            props.eastBiome = eastBiome.GetItemText(eastBiome.SelectedItem);
-            props.mazeBiome = mazeBiome.GetItemText(mazeBiome.SelectedItem);
-            props.dmBiome = dmBiome.GetItemText(dmBiome.SelectedItem);
-            props.removeFlashing = flashingOff.Checked;
-            props.vanillaOriginal = vanillaOriginalTerrain.Checked;
-            props.shuffleHidden = shuffleHidden.Checked;
-            props.bossItem = bossItem.Checked;
-            props.canWalkOnWaterWithBoots = waterBoots.Checked;
-            props.spellEnemy = spellEnemy.Checked;
-            props.bagusWoods = baguBox.Checked;
-            props.createPalaces = palaceBox.SelectedIndex == 2;
-            props.customRooms = customRooms.Checked;
-            props.blockersAnywhere = blockerBox.Checked;
-            props.bossRoomConnect = bossRoomBox.Checked;
-            props.dashSpell = dashBox.Checked;
-            return props;
-        }
-
-        private void enemyDropBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if(enemyDropBox.Checked)
-            {
-                for (int i = 0; i < small.Count(); i++)
-                {
-                    small[i].Enabled = true;
-                    large[i].Enabled = true;
-                }
-                randoDrops.Enabled = false;
-            }
-            else
-            {
-                for (int i = 0; i < small.Count(); i++)
-                {
-                    small[i].Enabled = false;
-                    large[i].Enabled = false;
-                }
-                randoDrops.Enabled = true;
-            }
-        }
-
-        private void atLeastOneChecked(object sender, EventArgs e)
-        {
-            CheckBox c = (CheckBox)sender;
-            CheckBox[] l = large;
-            if(small.Contains(sender))
-            {
-                l = small;
-            }
-            int count = 0;
-            foreach(CheckBox b in l)
-            {
-                if(b.Checked)
-                {
-                    count++;
-                }
-            }
-            if(count == 0)
-            {
-                c.Checked = true;
-            }
-        }
-
-        private void customSave1_Click(object sender, EventArgs e)
-        {
-            customBox1.Text = flagBox.Text;
-            Properties.Settings.Default.custom1 = flagBox.Text;
-            Properties.Settings.Default.Save();
-        }
-
-        private void customLoad1_Click(object sender, EventArgs e)
-        {
-            flagBox.Text = customBox1.Text;
-        }
-
-        private void customSave2_Click(object sender, EventArgs e)
-        {
-            customBox2.Text = flagBox.Text;
-            Properties.Settings.Default.custom2 = flagBox.Text;
-            Properties.Settings.Default.Save();
-        }
-
-        private void customSave3_Click(object sender, EventArgs e)
-        {
-            customBox3.Text = flagBox.Text;
-            Properties.Settings.Default.custom3 = flagBox.Text;
-            Properties.Settings.Default.Save();
-        }
-
-        private void customLoad2_Click(object sender, EventArgs e)
-        {
-            flagBox.Text = customBox2.Text;
-        }
-
-        private void customLoad3_Click(object sender, EventArgs e)
-        {
-            flagBox.Text = customBox3.Text;
-        }
-
-        private void randoDrops_CheckedChanged(object sender, EventArgs e)
-        {
-            if(randoDrops.Checked)
-            {
-                enemyDropBox.Enabled = false;
-            }
-            else
-            {
-                enemyDropBox.Enabled = true;
-            }
-        }
-
-        /*private void townSwap_CheckedChanged(object sender, EventArgs e)
-        {
-            if(townSwap.Checked)
-            {
-                hideKasutoBox.SelectedIndex = 0;
-                hideKasutoBox.Enabled = false;
-            }
-            else
-            {
-                hideKasutoBox.Enabled = true;
-            }
-        }*/
-
-        private void enableLevelScaling(object sender, EventArgs e)
-        {
-            if(!atkCapBox.GetItemText(atkCapBox.SelectedItem).Equals("8") || !magCapBox.GetItemText(magCapBox.SelectedItem).Equals("8") || !lifeCapBox.GetItemText(lifeCapBox.SelectedItem).Equals("8"))
-            {
-                scaleLevels.Enabled = true;
-            }
-            else
-            {
-                scaleLevels.Enabled = false;
-                scaleLevels.Checked = false;
-            }
-        }
-
-        private void spellItemBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if(!spellItemBox.Checked)
-            {
-                spellItemHints.Enabled = false;
-                spellItemHints.Checked = false;
-            }
-            else
-            {
-                spellItemHints.Enabled = true;
-            }
-        }
-
-        private void mazeBiome_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            checkVanillaPossible();
-        }
-
-        private void eastBiome_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-            //if(eastBiome.SelectedIndex == 1)
-            //{
-            //    hideKasutoBox.SelectedIndex = 0;
-            //    hpCmbo.SelectedIndex = 0;
-            //    hideKasutoBox.Enabled = false;
-            //    hpCmbo.Enabled = false;
-            //}
-            //else
-            //{
-            //    hpCmbo.Enabled = true;
-            //    hideKasutoBox.Enabled = true;
-            //}
-            shuffleHiddenEnable();
-            checkVanillaPossible();
-
-
-        }
-
-        private void shuffleHiddenEnable()
-        {
-            if (eastBiome.SelectedIndex == 0 || (hpCmbo.SelectedIndex == 0 && hideKasutoBox.SelectedIndex == 0))
-            {
-
-                shuffleHidden.Enabled = false;
-                shuffleHidden.Checked = false;
-            }
-            else
-            {
-                shuffleHidden.Enabled = true;
-            }
-        }
-
-        private void checkVanillaPossible()
-        {
-            if(vanillaPossible(eastBiome) || vanillaPossible(westBiome) || vanillaPossible(dmBiome) || vanillaPossible(mazeBiome))
-            {
-                vanillaOriginalTerrain.Enabled = true;
-            }
-            else
-            {
-                vanillaOriginalTerrain.Enabled = false;
-                vanillaOriginalTerrain.Checked = false;
-            }
-        }
-
-        private Boolean vanillaPossible(ComboBox cb)
-        {
-            if(cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private void westBiome_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            checkVanillaPossible();
-            if(westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
-            {
-                baguBox.Checked = false;
-                baguBox.Enabled = false;
-            }
-            else
-            {
-                baguBox.Enabled = true;
-            }
-        }
-
-        private void dmBiome_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            checkVanillaPossible();
-        }
-
-        private void hpCmbo_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            shuffleHiddenEnable();
-        }
-
-        private void hideKasutoBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            shuffleHiddenEnable();
-        }
-
-        private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            BackgroundWorker worker = sender as BackgroundWorker;
-            
-            new Hyrule(props, worker);
-            if(worker.CancellationPending)
-            {
-                e.Cancel = true;
-            }
-        }
-
-        private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-        {
-            if(e.ProgressPercentage == 2)
-            {
-                f3.setText("Generating Western Hyrule");
-            }
-            else if(e.ProgressPercentage == 3)
-            {
-                f3.setText("Generating Death Mountain");
-            }
-            else if (e.ProgressPercentage == 4)
-            {
-                f3.setText("Generating East Hyrule");
-            }
-            else if (e.ProgressPercentage == 5)
-            {
-                f3.setText("Generating Maze Island");
-            }
-            else if (e.ProgressPercentage == 6)
-            {
-                f3.setText("Shuffling Items and Spells");
-            }
-            else if (e.ProgressPercentage == 7)
-            {
-                f3.setText("Running Seed Completability Checks");
-            }
-            else if (e.ProgressPercentage == 8)
-            {
-                f3.setText("Generating Hints");
-            }
-            else if (e.ProgressPercentage == 9)
-            {
-                f3.setText("Finishing up");
-            }
-        }
-
-        private void palaceBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if(palaceBox.SelectedIndex != 2)
-            {
-                customRooms.Enabled = false;
-                customRooms.Checked = false;
-                blockerBox.Enabled = false;
-                blockerBox.Checked = false;
-                bossRoomBox.Checked = false;
-                bossRoomBox.Enabled = false;
-            }
-            else
-            {
-                customRooms.Enabled = true;
-                blockerBox.Enabled = true;
-                bossRoomBox.Enabled = true;
-            }
-
-            if (palaceBox.SelectedIndex != 0)
-            {
-                gpBox.Enabled = true;
-                tbirdBox.Enabled = true;
-            }
-            else
-            {
-                gpBox.Checked = false;
-                gpBox.Enabled = false;
-                tbirdBox.Enabled = false;
-                tbirdBox.Checked = true;
-            }
-        }
-
-        private void dashBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if(dashBox.Checked)
-            {
-                combineFireBox.Enabled = false;
-                combineFireBox.Checked = false;
-            }
-            else
-            {
-                combineFireBox.Enabled = true;
-            }
-        }
-
-        private void combineFireBox_CheckedChanged(object sender, EventArgs e)
-        {
-            if (combineFireBox.Checked)
-            {
-                dashBox.Enabled = false;
-                dashBox.Checked = false;
-            }
-            else
-            {
-                dashBox.Enabled = true;
-            }
+            useDashCheckbox.Enabled = true;
         }
     }
 }

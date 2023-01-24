@@ -6,4 +6,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer;
 
-public enum Spell { SHIELD = 0, JUMP = 1, LIFE = 2, FAIRY = 3, FIRE = 4, REFLECT = 5, SPELL = 6, THUNDER = 7, DOWNSTAB = 8, UPSTAB = 9 }
+public enum StatEffectiveness
+{
+    NONE, LOW, VANILLA, AVERAGE, HIGH, MAX
+}
