@@ -1423,7 +1423,7 @@ public partial class MainUI : Form
 
     private void spellItemBox_CheckedChanged(object sender, EventArgs e)
     {
-        if(!removeSpellitemsCheckbox.Checked)
+        if(removeSpellitemsCheckbox.Checked)
         {
             enableSpellItemHintsCheckbox.Enabled = false;
             enableSpellItemHintsCheckbox.Checked = false;
