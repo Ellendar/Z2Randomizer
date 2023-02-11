@@ -8,5 +8,5 @@ namespace Z2Randomizer;
 
 public enum PalaceStyle
 {
-    VANILLA, SHUFFLED, RECONSTRUCTED
+    VANILLA, SHUFFLED, RECONSTRUCTED, RANDOM
 }

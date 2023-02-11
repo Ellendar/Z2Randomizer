@@ -175,7 +175,7 @@ public class FlagReader
             throw new ArgumentException("Invalid ReadEnum on non-enumeration type");
         }
 
-        int limit = Enum.GetValues(typeof(T)).Length;
+        int limit = Enum.GetValues(typeof(T)).Length - 1;
 
         int take = (byte)Take((int)Math.Log(limit, 2) + 1);
         return (T)Enum.ToObject(typeof(T), take);
@@ -188,7 +188,7 @@ public class FlagReader
             throw new ArgumentException("Invalid ReadEnum on non-enumeration type");
         }
 
-        int limit = Enum.GetValues(typeof(T)).Length + 1;
+        int limit = Enum.GetValues(typeof(T)).Length;
 
         int take = (byte)Take((int)Math.Log(limit, 2) + 1);
         if(take == limit)

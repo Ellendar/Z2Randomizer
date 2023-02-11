@@ -5,6 +5,7 @@ public class FlagReaderTests
 {
     const string FALSE_FLAG = "A"; //000000
     const string TRUE_FLAG = "w"; //101110
+    const string ENUM_FLAG = "q"; //101000
     [TestMethod]
     public void TestReadBool()
     {
@@ -40,7 +41,7 @@ public class FlagReaderTests
     [TestMethod]
     public void TestReadEnum()
     {
-        FlagReader flagReader = new FlagReader(TRUE_FLAG);
+        FlagReader flagReader = new FlagReader(ENUM_FLAG);
         Assert.AreEqual(flagReader.ReadEnum<EncounterRate>(), EncounterRate.NORMAL);
         Assert.IsNull(flagReader.ReadNullableEnum<EncounterRate>());
     }

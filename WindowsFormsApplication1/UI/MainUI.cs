@@ -1,15 +1,12 @@
 ﻿using NLog;
 using System;
-using System.CodeDom;
-using System.Collections;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Speech.Synthesis;
 using System.Threading;
 using System.Windows.Forms;
+using Z2Randomizer.Flags;
 using Z2Randomizer.Overworld;
 
 namespace Z2Randomizer;
@@ -28,7 +25,7 @@ public partial class MainUI : Form
     private GeneratingSeedsForm f3;
     private RandomizerConfiguration config;
 
-    private int validFlagStringLength;
+    private readonly int validFlagStringLength;
 
     public MainUI()
     {
@@ -43,9 +40,9 @@ public partial class MainUI : Form
 
         InitializeComponent();
         r = new Random();
-        startingHeartsList.SelectedIndex = 3;
+        startHeartsMinList.SelectedIndex = 3;
         maxHeartsList.SelectedIndex = 7;
-        startingGemsList.SelectedIndex = 6;
+        startingGemsMinList.SelectedIndex = 6;
         startingTechsList.SelectedIndex = 0;
         allowPathEnemiesCheckbox.Enabled = false;
         romFileTextBox.Text = Properties.Settings.Default.filePath;
@@ -78,13 +75,18 @@ public partial class MainUI : Form
         hiddenPalaceList.SelectedIndex = 0;
         hideKasutoList.SelectedIndex = 0;
         characterSpriteList.SelectedIndex = Properties.Settings.Default.sprite;
-        CheckBox[] temp = { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox, smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
+        CheckBox[] temp = { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox, 
+            smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
         small = temp;
-        CheckBox[] temp2 = { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox, largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
+        CheckBox[] temp2 = { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox, 
+            largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
         large = temp2;
 
 
-        this.Text = "Zelda 2 Randomizer Version " + typeof(MainUI).Assembly.GetName().Version.Major + "." + typeof(MainUI).Assembly.GetName().Version.Minor + "." + typeof(MainUI).Assembly.GetName().Version.Build;
+        this.Text = "Zelda 2 Randomizer Version " 
+            + typeof(MainUI).Assembly.GetName().Version.Major + "." 
+            + typeof(MainUI).Assembly.GetName().Version.Minor + "." 
+            + typeof(MainUI).Assembly.GetName().Version.Build;
 
         flagsTextBox.DoubleClick += new System.EventHandler(this.flagBox_Clicked);
         oldFlagsTextbox.DoubleClick += new System.EventHandler(this.oldFlagsTextbox_Clicked);
@@ -107,10 +109,10 @@ public partial class MainUI : Form
         startWithReflectCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         startWithSpellCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         startWIthThunderCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingHeartsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startHeartsMinList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         maxHeartsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         startingTechsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingGemsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        startingGemsMinList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         randomizeLivesBox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleEnemyHPBox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleAllExpCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -155,7 +157,6 @@ public partial class MainUI : Form
         shuffleEnemyPalettesCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         hideKasutoList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        manuallySelectDropsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         removeSpellitemsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         useCommunityHintsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         standardizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -225,8 +226,15 @@ public partial class MainUI : Form
         //WinSparkle.win_sparkle_init();
     }
 
+    /// <summary>
+    /// Disabled for now to support overrides for shuffle starting items. Maybe in the future toggling this box still 
+    /// changes some state for ease of use.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void shuffleItemBox_CheckedChanged(object sender, EventArgs e)
     {
+        /*
         startWithCandleCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
         startWithGloveCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
         startWithRaftCheckbox.Enabled = !shuffleStartingItemsCheckbox.Checked;
@@ -247,6 +255,7 @@ public partial class MainUI : Form
             startWithHammerCheckbox.Checked = false;
             startWithMagicKeyCheckbox.Checked = false;
         }
+        */
     }
 
     private void fileBtn_Click(object sender, EventArgs e)
@@ -263,8 +272,15 @@ public partial class MainUI : Form
         seedTextBox.Text = r.Next(1000000000).ToString();
     }
 
+    /// <summary>
+    /// Disabled for now to support overrides for shuffle starting spells. Maybe in the future toggling this box still 
+    /// changes some state for ease of use.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void spellShuffleBox_CheckedChanged(object sender, EventArgs e)
     {
+        /*
         startWithShieldCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
         startWithJumpCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
         startWithLifeCheckbox.Enabled = !shuffleStartingSpellsCheckbox.Checked;
@@ -285,6 +301,7 @@ public partial class MainUI : Form
             startWithSpellCheckbox.Checked = false;
             startWIthThunderCheckbox.Checked = false;
         }
+        */
     }
 
     private void generateBtn_Click(object sender, EventArgs e)
@@ -305,7 +322,7 @@ public partial class MainUI : Form
                 return;
             }
         }
-        if (startingHeartsList.SelectedIndex != 8 && startingHeartsList.SelectedIndex > maxHeartsList.SelectedIndex && maxHeartsList.SelectedIndex != 8)
+        if (startHeartsMaxList.SelectedIndex < 8 && (startHeartsMinList.SelectedIndex < startHeartsMaxList.SelectedIndex))
         {
             MessageBox.Show("Max hearts must be greater than or equal to starting hearts!");
             return;
@@ -431,7 +448,15 @@ public partial class MainUI : Form
         RandomizerConfiguration configuration= new RandomizerConfiguration();
 
         configuration.FileName = romFileTextBox.Text;
-        configuration.Seed = Int32.Parse(seedTextBox.Text);
+        try
+        {
+            configuration.Seed = Int32.Parse(seedTextBox.Text);
+        }
+        catch (FormatException)
+        {
+            seedTextBox.Text = r.Next(1000000000).ToString();
+            configuration.Seed = Int32.Parse(seedTextBox.Text);
+        }
 
         //Start Configuration
         configuration.ShuffleStartingItems = shuffleStartingItemsCheckbox.Checked;
@@ -454,7 +479,32 @@ public partial class MainUI : Form
         configuration.StartWithSpell = startWithSpellCheckbox.Checked;
         configuration.StartWithThunder = startWIthThunderCheckbox.Checked;
 
-        configuration.StartingHeartContainers =
+        configuration.StartingHeartContainersMin = startHeartsMinList.SelectedIndex switch
+        {
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+            4 => 5,
+            5 => 6,
+            6 => 7,
+            7 => 8,
+            8 => null,
+            _ => throw new Exception("Invalid StartHeartsMin setting")
+        };
+        configuration.StartingHeartContainersMax = startHeartsMaxList.SelectedIndex switch
+        {
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+            4 => 5,
+            5 => 6,
+            6 => 7,
+            7 => 8,
+            8 => null,
+            _ => throw new Exception("Invalid StartHeartsMax setting")
+        };
         configuration.MaxHeartContainers = maxHeartsList.SelectedIndex switch
         {
             0 => 1,
@@ -466,9 +516,13 @@ public partial class MainUI : Form
             6 => 7,
             7 => 8,
             8 => null,
-            _ => throw new Exception("Invalid MaxHearts setting")
+            9 => 9,
+            10 => 10,
+            11 => 11,
+            _ => throw new Exception("Invalid StartHeartsMax setting")
         };
-        switch(startingTechsList.SelectedIndex)
+
+        switch (startingTechsList.SelectedIndex)
         {
             case 0:
                 configuration.StartWithDownstab = false;
@@ -499,15 +553,16 @@ public partial class MainUI : Form
         configuration.StartingLifeLevel = startingLifeLevelList.SelectedIndex + 1;
 
         //Overworld
-        configuration.PalacesCanSwapContinents = allowPalaceContinentSwapCheckbox.Checked;
-        configuration.ShuffleGP = shortGPCheckbox.Checked;
-        configuration.ShuffleEncounters = shuffleEncountersCheckbox.Checked;
-        configuration.AllowUnsafePathEncounters = allowPathEnemiesCheckbox.Checked;
+        configuration.PalacesCanSwapContinents = GetTripleCheckState(allowPalaceContinentSwapCheckbox);
+        configuration.ShuffleGP = GetTripleCheckState(shortGPCheckbox);
+        configuration.ShuffleEncounters = GetTripleCheckState(shuffleEncountersCheckbox);
+        configuration.AllowUnsafePathEncounters = GetTripleCheckState(allowPathEnemiesCheckbox);
         configuration.EncounterRate = encounterRateBox.SelectedIndex switch
         {
             0 => EncounterRate.NORMAL,
             1 => EncounterRate.HALF,
             2 => EncounterRate.NONE,
+            3 => EncounterRate.RANDOM,
             _ => throw new Exception("Invalid EncounterRate setting")
         };
         configuration.HidePalace = hiddenPalaceList.SelectedIndex switch
@@ -524,12 +579,12 @@ public partial class MainUI : Form
             2 => null,
             _ => throw new Exception("Invalid HideKasuto setting")
         };
-        configuration.ShuffleWhichLocationIsHidden = shuffleWhichLocationsAreHiddenCheckbox.Checked;
-        configuration.HideLessImportantLocations = hideLessImportantLocationsCheckbox.Checked;
-        configuration.RestrictConnectionCaveShuffle = saneCaveShuffleBox.Checked;
+        configuration.ShuffleWhichLocationIsHidden = GetTripleCheckState(shuffleWhichLocationsAreHiddenCheckbox);
+        configuration.HideLessImportantLocations = GetTripleCheckState(hideLessImportantLocationsCheckbox);
+        configuration.RestrictConnectionCaveShuffle = GetTripleCheckState(saneCaveShuffleBox);
         configuration.AllowConnectionCavesToBeBoulderBlocked = allowBoulderBlockedConnectionsCheckbox.Checked;
-        configuration.GoodBoots = useGoodBootsCheckbox.Checked;
-        configuration.GenerateBaguWoods = generateBaguWoodsCheckbox.Checked;
+        configuration.GoodBoots = GetTripleCheckState(useGoodBootsCheckbox);
+        configuration.GenerateBaguWoods = GetTripleCheckState(generateBaguWoodsCheckbox);
         configuration.ContinentConnectionType = continentConnectionBox.SelectedIndex switch
         {
             0 => ContinentConnectionType.NORMAL,
@@ -593,18 +648,20 @@ public partial class MainUI : Form
             0 => PalaceStyle.VANILLA,
             1 => PalaceStyle.SHUFFLED,
             2 => PalaceStyle.RECONSTRUCTED,
+            3 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
-        configuration.IncludeCommunityRooms = useCommunityHintsCheckbox.Checked;
+        configuration.IncludeCommunityRooms = GetTripleCheckState(useCommunityHintsCheckbox);
         configuration.BlockingRoomsInAnyPalace = blockingRoomsInAnyPalaceCheckbox.Checked;
-        configuration.BossRoomsExitToPalace = bossRoomsExitToPalaceCheckbox.Checked;
-        configuration.ShortGP = shortGPCheckbox.Checked;
-        configuration.TBirdRequired = tbirdRequiredCheckbox.Checked;
+        configuration.BossRoomsExitToPalace = GetTripleCheckState(bossRoomsExitToPalaceCheckbox);
+        configuration.ShortGP = GetTripleCheckState(shortGPCheckbox);
+        configuration.TBirdRequired = GetTripleCheckState(tbirdRequiredCheckbox);
         configuration.RemoveTBird = removeTbirdCheckbox.Checked;
         configuration.RestartAtPalacesOnGameOver = restartAtPalacesCheckbox.Checked;
         configuration.ChangePalacePallettes = palacePaletteCheckbox.Checked;
         configuration.RandomizeBossItemDrop = randomizeBossItemCheckbox.Checked;
-        configuration.StartingGems = startingGemsList.SelectedIndex <= 6 ? startingGemsList.SelectedIndex : null;
+        configuration.PalacesToCompleteMin = startingGemsMinList.SelectedIndex;
+        configuration.PalacesToCompleteMax = startingGemsMaxList.SelectedIndex;
 
         //Levels
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
@@ -650,17 +707,17 @@ public partial class MainUI : Form
 
         //Spells
         configuration.ShuffleLifeRefillAmount = shuffleLifeRefillCheckbox.Checked;
-        configuration.ShuffleSpellLocations = shuffleStartingSpellsCheckbox.Checked;
-        configuration.DisableMagicContainerRequirements = disableMagicContainerRequirementCheckbox.Checked;
+        configuration.ShuffleSpellLocations = GetTripleCheckState(shuffleStartingSpellsCheckbox);
+        configuration.DisableMagicContainerRequirements = GetTripleCheckState(disableMagicContainerRequirementCheckbox);
         configuration.CombineFireWithRandomSpell = combineFireCheckbox.Checked;
-        configuration.RandomizeSpellSpellEnemy = randomizeSpellSpellEnemyCheckbox.Checked;
-        configuration.ReplaceFireWithDash = useDashCheckbox.Checked;
+        configuration.RandomizeSpellSpellEnemy = GetTripleCheckState(randomizeSpellSpellEnemyCheckbox);
+        configuration.ReplaceFireWithDash = GetTripleCheckState(useDashCheckbox);
 
         //Enemies
-        configuration.ShuffleOverworldEnemies = shuffleOverworldEnemiesCheckbox.Checked;
-        configuration.ShufflePalaceEnemies = shufflePalaceEnemiesCheckbox.Checked;
+        configuration.ShuffleOverworldEnemies = GetTripleCheckState(shuffleOverworldEnemiesCheckbox);
+        configuration.ShufflePalaceEnemies = GetTripleCheckState(shufflePalaceEnemiesCheckbox);
         configuration.ShuffleDripperEnemy = shuffleDripperEnemyCheckbox.Checked;
-        configuration.MixLargeAndSmallEnemies = mixLargeAndSmallCheckbox.Checked;
+        configuration.MixLargeAndSmallEnemies = GetTripleCheckState(mixLargeAndSmallCheckbox);
         configuration.ShuffleEnemyHP = shuffleEnemyHPBox.Checked;
         configuration.ShuffleXPStealers = shuffleXPStealersCheckbox.Checked;
         configuration.ShuffleXPStolenAmount = shuffleStealXPAmountCheckbox.Checked;
@@ -676,45 +733,42 @@ public partial class MainUI : Form
         };
 
         //Items
-        configuration.ShufflePalaceItems = shufflePalaceItemsCheckbox.Checked;
-        configuration.ShuffleOverworldItems = shuffleOverworldItemsCheckbox.Checked;
-        configuration.MixOverworldAndPalaceItems = mixOverworldPalaceItemsCheckbox.Checked;
-        configuration.IncludePBagCavesInItemShuffle = includePbagCavesInShuffleCheckbox.Checked;
+        configuration.ShufflePalaceItems = GetTripleCheckState(shufflePalaceItemsCheckbox);
+        configuration.ShuffleOverworldItems = GetTripleCheckState(shuffleOverworldItemsCheckbox);
+        configuration.MixOverworldAndPalaceItems = GetTripleCheckState(mixOverworldPalaceItemsCheckbox);
+        configuration.IncludePBagCavesInItemShuffle = GetTripleCheckState(includePbagCavesInShuffleCheckbox);
         configuration.ShuffleSmallItems = shuffleSmallItemsCheckbox.Checked;
-        configuration.PalacesContainExtraKeys = palacesHaveExtraKeysCheckbox.Checked;
+        configuration.PalacesContainExtraKeys = GetTripleCheckState(palacesHaveExtraKeysCheckbox);
         configuration.RandomizeNewKasutoJarRequirements = randomizeJarRequirementsCheckbox.Checked;
-        configuration.RemoveSpellItems = removeSpellitemsCheckbox.Checked;
-        configuration.ShufflePBagAmounts = shufflePbagAmountsCheckbox.Checked;
+        configuration.RemoveSpellItems = GetTripleCheckState(removeSpellitemsCheckbox);
+        configuration.ShufflePBagAmounts = GetTripleCheckState(shufflePbagAmountsCheckbox);
 
         //Drops
         configuration.ShuffleItemDropFrequency = shuffleDropFrequencyCheckbox.Checked;
         configuration.RandomizeDrops = randomizeDropsCheckbox.Checked;
         configuration.StandardizeDrops = standardizeDropsCheckbox.Checked;
-        if(manuallySelectDropsCheckbox.Checked)
-        {
-            configuration.SmallEnemiesCanDropBlueJar = smallEnemiesBlueJarCheckbox.Checked;
-            configuration.SmallEnemiesCanDropRedJar = smallEnemiesRedJarCheckbox.Checked;
-            configuration.SmallEnemiesCanDropSmallBag = smallEnemiesSmallBagCheckbox.Checked;
-            configuration.SmallEnemiesCanDropMediumBag = smallEnemiesMediumBagCheckbox.Checked;
-            configuration.SmallEnemiesCanDropLargeBag = smallEnemiesLargeBagCheckbox.Checked;
-            configuration.SmallEnemiesCanDropXLBag = smallEnemiesXLBagCheckbox.Checked;
-            configuration.SmallEnemiesCanDrop1up = smallEnemies1UpCheckbox.Checked;
-            configuration.SmallEnemiesCanDropKey = smallEnemiesKeyCheckbox.Checked;
-            configuration.LargeEnemiesCanDropBlueJar = largeEnemiesBlueJarCheckbox.Checked;
-            configuration.LargeEnemiesCanDropRedJar = largeEnemiesRedJarCheckbox.Checked;
-            configuration.LargeEnemiesCanDropSmallBag = largeEnemiesSmallBagCheckbox.Checked;
-            configuration.LargeEnemiesCanDropMediumBag = largeEnemiesMediumBagCheckbox.Checked;
-            configuration.LargeEnemiesCanDropLargeBag = largeEnemiesLargeBagCheckbox.Checked;
-            configuration.LargeEnemiesCanDropXLBag = largeEnemiesXLBagCheckbox.Checked;
-            configuration.LargeEnemiesCanDrop1up = largeEnemies1UpCheckbox.Checked;
-            configuration.LargeEnemiesCanDropKey = largeEnemiesKeyCheckbox.Checked;
-        }
+        configuration.SmallEnemiesCanDropBlueJar = smallEnemiesBlueJarCheckbox.Checked;
+        configuration.SmallEnemiesCanDropRedJar = smallEnemiesRedJarCheckbox.Checked;
+        configuration.SmallEnemiesCanDropSmallBag = smallEnemiesSmallBagCheckbox.Checked;
+        configuration.SmallEnemiesCanDropMediumBag = smallEnemiesMediumBagCheckbox.Checked;
+        configuration.SmallEnemiesCanDropLargeBag = smallEnemiesLargeBagCheckbox.Checked;
+        configuration.SmallEnemiesCanDropXLBag = smallEnemiesXLBagCheckbox.Checked;
+        configuration.SmallEnemiesCanDrop1up = smallEnemies1UpCheckbox.Checked;
+        configuration.SmallEnemiesCanDropKey = smallEnemiesKeyCheckbox.Checked;
+        configuration.LargeEnemiesCanDropBlueJar = largeEnemiesBlueJarCheckbox.Checked;
+        configuration.LargeEnemiesCanDropRedJar = largeEnemiesRedJarCheckbox.Checked;
+        configuration.LargeEnemiesCanDropSmallBag = largeEnemiesSmallBagCheckbox.Checked;
+        configuration.LargeEnemiesCanDropMediumBag = largeEnemiesMediumBagCheckbox.Checked;
+        configuration.LargeEnemiesCanDropLargeBag = largeEnemiesLargeBagCheckbox.Checked;
+        configuration.LargeEnemiesCanDropXLBag = largeEnemiesXLBagCheckbox.Checked;
+        configuration.LargeEnemiesCanDrop1up = largeEnemies1UpCheckbox.Checked;
+        configuration.LargeEnemiesCanDropKey = largeEnemiesKeyCheckbox.Checked;
 
 
         //Hints
-        configuration.EnableHelpfulHints = enableHelpfulHintsCheckbox.Checked;
-        configuration.EnableSpellItemHints = enableSpellItemHintsCheckbox.Checked;
-        configuration.EnableTownNameHints = enableTownNameHintsCheckbox.Checked;
+        configuration.EnableHelpfulHints = GetTripleCheckState(enableHelpfulHintsCheckbox);
+        configuration.EnableSpellItemHints = GetTripleCheckState(enableSpellItemHintsCheckbox);
+        configuration.EnableTownNameHints = GetTripleCheckState(enableTownNameHintsCheckbox);
         configuration.UseCommunityHints = useCommunityHintsCheckbox.Checked;
 
         //Misc
@@ -768,7 +822,19 @@ public partial class MainUI : Form
     private void convertButton_Click(object send, EventArgs e)
     {
         String oldFlags = oldFlagsTextbox.Text;
+        RandomizerConfiguration oldSettings = ExportConfig();
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
+
+        config.DisableLowHealthBeep = oldSettings.DisableLowHealthBeep;
+        config.DisableMusic = oldSettings.DisableMusic;
+        config.FastSpellCasting = oldSettings.FastSpellCasting;
+        config.ShuffleSpritePalettes = oldSettings.ShuffleSpritePalettes;
+        config.UpAOnController1 = oldSettings.UpAOnController1;
+        config.RemoveFlashing = oldSettings.RemoveFlashing;
+        config.Sprite = oldSettings.Sprite;
+        config.Tunic = oldSettings.Tunic;
+        config.ShieldTunic = oldSettings.ShieldTunic;
+        config.BeamSprite = oldSettings.BeamSprite;
         flagsTextBox.Text = config.Serialize();
     }
 
@@ -800,7 +866,7 @@ public partial class MainUI : Form
             startWithSpellCheckbox.Checked = configuration.StartWithSpell;
             startWIthThunderCheckbox.Checked = configuration.StartWithThunder;
 
-            startingHeartsList.SelectedIndex = configuration.StartingHeartContainers switch
+            startHeartsMinList.SelectedIndex = configuration.StartingHeartContainersMin switch
             {
                 1 => 0,
                 2 => 1,
@@ -811,7 +877,23 @@ public partial class MainUI : Form
                 7 => 6,
                 8 => 7,
                 null => 8,
-                _ => throw new Exception("Invalid MaxHearts setting")
+                _ => throw new Exception("Invalid StartHeartsMin setting")
+            };
+            startHeartsMaxList.SelectedIndex = configuration.StartingHeartContainersMax switch
+            {
+                1 => 0,
+                2 => 1,
+                3 => 2,
+                4 => 3,
+                5 => 4,
+                6 => 5,
+                7 => 6,
+                8 => 7,
+                null => 8,
+                9 => 9,
+                10 => 10,
+                11 => 11,
+                _ => throw new Exception("Invalid StartHeartsMin setting")
             };
             maxHeartsList.SelectedIndex = configuration.MaxHeartContainers switch
             {
@@ -840,10 +922,10 @@ public partial class MainUI : Form
             startingLifeLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
 
             //Overworld
-            allowPalaceContinentSwapCheckbox.Checked = configuration.PalacesCanSwapContinents;
-            includeGPinShuffleCheckbox.Checked = configuration.ShuffleGP;
-            shuffleEncountersCheckbox.Checked = configuration.ShuffleEncounters;
-            allowPathEnemiesCheckbox.Checked = configuration.AllowUnsafePathEncounters;
+            allowPalaceContinentSwapCheckbox.CheckState = ToCheckState(configuration.PalacesCanSwapContinents);
+            includeGPinShuffleCheckbox.CheckState = ToCheckState(configuration.ShuffleGP);
+            shuffleEncountersCheckbox.CheckState = ToCheckState(configuration.ShuffleEncounters);
+            allowPathEnemiesCheckbox.CheckState = ToCheckState(configuration.AllowUnsafePathEncounters);
             encounterRateBox.SelectedIndex = configuration.EncounterRate switch
             {
                 EncounterRate.NORMAL => 0,
@@ -863,12 +945,12 @@ public partial class MainUI : Form
                 true => 1,
                 null => 2,
             };
-            shuffleWhichLocationsAreHiddenCheckbox.Checked = configuration.ShuffleWhichLocationIsHidden;
-            hideLessImportantLocationsCheckbox.Checked = configuration.HideLessImportantLocations;
-            saneCaveShuffleBox.Checked = configuration.RestrictConnectionCaveShuffle;
+            shuffleWhichLocationsAreHiddenCheckbox.CheckState = ToCheckState(configuration.ShuffleWhichLocationIsHidden);
+            hideLessImportantLocationsCheckbox.CheckState = ToCheckState(configuration.HideLessImportantLocations);
+            saneCaveShuffleBox.CheckState = ToCheckState(configuration.RestrictConnectionCaveShuffle);
             allowBoulderBlockedConnectionsCheckbox.Checked = configuration.AllowConnectionCavesToBeBoulderBlocked;
-            useGoodBootsCheckbox.Checked = configuration.GoodBoots;
-            generateBaguWoodsCheckbox.Checked = configuration.GenerateBaguWoods;
+            useGoodBootsCheckbox.CheckState = ToCheckState(configuration.GoodBoots);
+            generateBaguWoodsCheckbox.CheckState = ToCheckState(configuration.GenerateBaguWoods);
             continentConnectionBox.SelectedIndex = configuration.ContinentConnectionType switch
             {
                 ContinentConnectionType.NORMAL => 0,
@@ -934,16 +1016,17 @@ public partial class MainUI : Form
                 PalaceStyle.RECONSTRUCTED => 2,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
-            includeCommunityRoomsCheckbox.Checked = configuration.IncludeCommunityRooms;
+            includeCommunityRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeCommunityRooms);
             blockingRoomsInAnyPalaceCheckbox.Checked = configuration.BlockingRoomsInAnyPalace;
-            bossRoomsExitToPalaceCheckbox.Checked = configuration.BossRoomsExitToPalace;
-            shortGPCheckbox.Checked = configuration.ShortGP;
-            tbirdRequiredCheckbox.Checked = configuration.TBirdRequired;
+            bossRoomsExitToPalaceCheckbox.CheckState = ToCheckState(configuration.BossRoomsExitToPalace);
+            shortGPCheckbox.CheckState = ToCheckState(configuration.ShortGP);
+            tbirdRequiredCheckbox.CheckState = ToCheckState(configuration.TBirdRequired);
             removeTbirdCheckbox.Checked = configuration.RemoveTBird;
             restartAtPalacesCheckbox.Checked = configuration.RestartAtPalacesOnGameOver;
             palacePaletteCheckbox.Checked = configuration.ChangePalacePallettes;
             randomizeBossItemCheckbox.Checked = configuration.RandomizeBossItemDrop;
-            startingGemsList.SelectedIndex = configuration.StartingGems ?? 7;
+            startingGemsMinList.SelectedIndex = configuration.PalacesToCompleteMin;
+            startingGemsMaxList.SelectedIndex = configuration.PalacesToCompleteMax;
 
             //Levels
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
@@ -993,17 +1076,17 @@ public partial class MainUI : Form
 
             //Spells
             shuffleLifeRefillCheckbox.Checked = configuration.ShuffleLifeRefillAmount;
-            shuffleSpellLocationsCheckbox.Checked = configuration.ShuffleSpellLocations;
-            disableMagicContainerRequirementCheckbox.Checked = configuration.DisableMagicContainerRequirements;
+            shuffleSpellLocationsCheckbox.CheckState = ToCheckState(configuration.ShuffleSpellLocations);
+            disableMagicContainerRequirementCheckbox.CheckState = ToCheckState(configuration.DisableMagicContainerRequirements);
             combineFireCheckbox.Checked = configuration.CombineFireWithRandomSpell;
-            randomizeSpellSpellEnemyCheckbox.Checked = configuration.RandomizeSpellSpellEnemy;
-            useDashCheckbox.Checked = configuration.ReplaceFireWithDash;
+            randomizeSpellSpellEnemyCheckbox.CheckState = ToCheckState(configuration.RandomizeSpellSpellEnemy);
+            useDashCheckbox.CheckState = ToCheckState(configuration.ReplaceFireWithDash);
 
             //Enemies
-            shuffleOverworldEnemiesCheckbox.Checked = configuration.ShuffleOverworldEnemies;
-            shufflePalaceEnemiesCheckbox.Checked = configuration.ShufflePalaceEnemies;
+            shuffleOverworldEnemiesCheckbox.CheckState = ToCheckState(configuration.ShuffleOverworldEnemies);
+            shufflePalaceEnemiesCheckbox.CheckState = ToCheckState(configuration.ShufflePalaceEnemies);
             shuffleDripperEnemyCheckbox.Checked = configuration.ShuffleDripperEnemy;
-            mixLargeAndSmallCheckbox.Checked = configuration.MixLargeAndSmallEnemies;
+            mixLargeAndSmallCheckbox.CheckState = ToCheckState(configuration.MixLargeAndSmallEnemies);
             shuffleEnemyHPBox.Checked = configuration.ShuffleEnemyHP;
             shuffleXPStealersCheckbox.Checked = configuration.ShuffleXPStealers;
             shuffleStealXPAmountCheckbox.Checked = configuration.ShuffleXPStolenAmount;
@@ -1019,56 +1102,42 @@ public partial class MainUI : Form
             };
 
             //Items
-            shufflePalaceItemsCheckbox.Checked = configuration.ShufflePalaceItems;
-            shuffleOverworldItemsCheckbox.Checked = configuration.ShuffleOverworldItems;
-            mixOverworldPalaceItemsCheckbox.Checked = configuration.MixOverworldAndPalaceItems;
-            includePbagCavesInShuffleCheckbox.Checked = configuration.IncludePBagCavesInItemShuffle;
+            shufflePalaceItemsCheckbox.CheckState = ToCheckState(configuration.ShufflePalaceItems);
+            shuffleOverworldItemsCheckbox.CheckState = ToCheckState(configuration.ShuffleOverworldItems);
+            mixOverworldPalaceItemsCheckbox.CheckState = ToCheckState(configuration.MixOverworldAndPalaceItems);
+            includePbagCavesInShuffleCheckbox.CheckState = ToCheckState(configuration.IncludePBagCavesInItemShuffle);
             shuffleSmallItemsCheckbox.Checked = configuration.ShuffleSmallItems;
-            palacesHaveExtraKeysCheckbox.Checked = configuration.PalacesContainExtraKeys;
+            palacesHaveExtraKeysCheckbox.CheckState = ToCheckState(configuration.PalacesContainExtraKeys);
             randomizeJarRequirementsCheckbox.Checked = configuration.RandomizeNewKasutoJarRequirements;
-            removeSpellitemsCheckbox.Checked = configuration.RemoveSpellItems;
-            shufflePbagAmountsCheckbox.Checked = configuration.ShufflePBagAmounts;
+            removeSpellitemsCheckbox.CheckState = ToCheckState(configuration.RemoveSpellItems);
+            shufflePbagAmountsCheckbox.CheckState = ToCheckState(configuration.ShufflePBagAmounts);
 
             //Drops
             shuffleDropFrequencyCheckbox.Checked = configuration.ShuffleItemDropFrequency;
             standardizeDropsCheckbox.Checked = configuration.StandardizeDrops;
-            if(configuration.RandomizeDrops)
-            {
-                randomizeDropsCheckbox.Checked = true;
-                manuallySelectDropsCheckbox.Checked = false;
-            }
-            else if (configuration.IsVanillaDrops())
-            {
-                randomizeDropsCheckbox.Checked = false;
-                manuallySelectDropsCheckbox.Checked = false;
-            }
-            else
-            {
-                randomizeDropsCheckbox.Checked = false;
-                manuallySelectDropsCheckbox.Checked = true;
-                smallEnemiesBlueJarCheckbox.Checked = configuration.SmallEnemiesCanDropBlueJar;
-                smallEnemiesRedJarCheckbox.Checked = configuration.SmallEnemiesCanDropRedJar;
-                smallEnemiesSmallBagCheckbox.Checked = configuration.SmallEnemiesCanDropSmallBag;
-                smallEnemiesMediumBagCheckbox.Checked = configuration.SmallEnemiesCanDropMediumBag;
-                smallEnemiesLargeBagCheckbox.Checked = configuration.SmallEnemiesCanDropLargeBag;
-                smallEnemiesXLBagCheckbox.Checked = configuration.SmallEnemiesCanDropXLBag;
-                smallEnemies1UpCheckbox.Checked = configuration.SmallEnemiesCanDrop1up;
-                smallEnemiesKeyCheckbox.Checked = configuration.SmallEnemiesCanDropKey;
-                largeEnemiesBlueJarCheckbox.Checked = configuration.LargeEnemiesCanDropBlueJar;
-                largeEnemiesRedJarCheckbox.Checked = configuration.LargeEnemiesCanDropRedJar;
-                largeEnemiesSmallBagCheckbox.Checked = configuration.LargeEnemiesCanDropSmallBag;
-                largeEnemiesMediumBagCheckbox.Checked = configuration.LargeEnemiesCanDropMediumBag;
-                largeEnemiesLargeBagCheckbox.Checked = configuration.LargeEnemiesCanDropLargeBag;
-                largeEnemiesXLBagCheckbox.Checked = configuration.LargeEnemiesCanDropXLBag;
-                largeEnemies1UpCheckbox.Checked = configuration.LargeEnemiesCanDrop1up;
-                largeEnemiesKeyCheckbox.Checked = configuration.LargeEnemiesCanDropKey;
-            }
+            randomizeDropsCheckbox.Checked = configuration.RandomizeDrops;
+            smallEnemiesBlueJarCheckbox.Checked = configuration.SmallEnemiesCanDropBlueJar;
+            smallEnemiesRedJarCheckbox.Checked = configuration.SmallEnemiesCanDropRedJar;
+            smallEnemiesSmallBagCheckbox.Checked = configuration.SmallEnemiesCanDropSmallBag;
+            smallEnemiesMediumBagCheckbox.Checked = configuration.SmallEnemiesCanDropMediumBag;
+            smallEnemiesLargeBagCheckbox.Checked = configuration.SmallEnemiesCanDropLargeBag;
+            smallEnemiesXLBagCheckbox.Checked = configuration.SmallEnemiesCanDropXLBag;
+            smallEnemies1UpCheckbox.Checked = configuration.SmallEnemiesCanDrop1up;
+            smallEnemiesKeyCheckbox.Checked = configuration.SmallEnemiesCanDropKey;
+            largeEnemiesBlueJarCheckbox.Checked = configuration.LargeEnemiesCanDropBlueJar;
+            largeEnemiesRedJarCheckbox.Checked = configuration.LargeEnemiesCanDropRedJar;
+            largeEnemiesSmallBagCheckbox.Checked = configuration.LargeEnemiesCanDropSmallBag;
+            largeEnemiesMediumBagCheckbox.Checked = configuration.LargeEnemiesCanDropMediumBag;
+            largeEnemiesLargeBagCheckbox.Checked = configuration.LargeEnemiesCanDropLargeBag;
+            largeEnemiesXLBagCheckbox.Checked = configuration.LargeEnemiesCanDropXLBag;
+            largeEnemies1UpCheckbox.Checked = configuration.LargeEnemiesCanDrop1up;
+            largeEnemiesKeyCheckbox.Checked = configuration.LargeEnemiesCanDropKey;
 
 
             //Hints
-            enableHelpfulHintsCheckbox.Checked = configuration.EnableHelpfulHints;
-            enableSpellItemHintsCheckbox.Checked = configuration.EnableSpellItemHints;
-            enableTownNameHintsCheckbox.Checked = configuration.EnableTownNameHints;
+            enableHelpfulHintsCheckbox.CheckState = ToCheckState(configuration.EnableHelpfulHints);
+            enableSpellItemHintsCheckbox.CheckState = ToCheckState(configuration.EnableSpellItemHints);
+            enableTownNameHintsCheckbox.CheckState = ToCheckState(configuration.EnableTownNameHints);
             useCommunityHintsCheckbox.Checked = configuration.UseCommunityHints;
 
             //Misc
@@ -1180,7 +1249,7 @@ public partial class MainUI : Form
 
     private void StandardFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("jhEhMROm7DZ$MHRBTNBhBAh0PSmA");
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA");
         flagsTextBox.Text = config.Serialize();
     }
 
@@ -1303,28 +1372,6 @@ public partial class MainUI : Form
         }
     }
 
-    private void enemyDropBox_CheckedChanged(object sender, EventArgs e)
-    {
-        if(manuallySelectDropsCheckbox.Checked)
-        {
-            for (int i = 0; i < small.Count(); i++)
-            {
-                small[i].Enabled = true;
-                large[i].Enabled = true;
-            }
-            randomizeDropsCheckbox.Enabled = false;
-        }
-        else
-        {
-            for (int i = 0; i < small.Count(); i++)
-            {
-                small[i].Enabled = false;
-                large[i].Enabled = false;
-            }
-            randomizeDropsCheckbox.Enabled = true;
-        }
-    }
-
     private void AtLeastOneChecked(object sender, EventArgs e)
     {
         CheckBox c = (CheckBox)sender;
@@ -1383,18 +1430,6 @@ public partial class MainUI : Form
         flagsTextBox.Text = customFlags3TextBox.Text;
     }
 
-    private void randoDrops_CheckedChanged(object sender, EventArgs e)
-    {
-        if(randomizeDropsCheckbox.Checked)
-        {
-            manuallySelectDropsCheckbox.Enabled = false;
-        }
-        else
-        {
-            manuallySelectDropsCheckbox.Enabled = true;
-        }
-    }
-
     /*private void townSwap_CheckedChanged(object sender, EventArgs e)
     {
         if(townSwap.Checked)
@@ -1410,7 +1445,9 @@ public partial class MainUI : Form
 
     private void enableLevelScaling(object sender, EventArgs e)
     {
-        if(!atkCapList.GetItemText(atkCapList.SelectedItem).Equals("8") || !magCapList.GetItemText(magCapList.SelectedItem).Equals("8") || !lifeCapList.GetItemText(lifeCapList.SelectedItem).Equals("8"))
+        if(!atkCapList.GetItemText(atkCapList.SelectedItem).Equals("8") 
+            || !magCapList.GetItemText(magCapList.SelectedItem).Equals("8") 
+            || !lifeCapList.GetItemText(lifeCapList.SelectedItem).Equals("8"))
         {
             scaleLevelRequirementsToCapCheckbox.Enabled = true;
         }
@@ -1631,5 +1668,26 @@ public partial class MainUI : Form
         {
             useDashCheckbox.Enabled = true;
         }
+    }
+
+    private static bool? GetTripleCheckState(CheckBox checkBox)
+    {
+        return checkBox.CheckState switch
+        {
+            CheckState.Checked => true,
+            CheckState.Unchecked => false,
+            CheckState.Indeterminate => null,
+            _ => throw new ImpossibleException("Invalid CheckState")
+        };
+    }
+
+    private static CheckState ToCheckState(bool? value)
+    {
+        return value switch
+        {
+            false => CheckState.Unchecked,
+            true => CheckState.Checked,
+            null => CheckState.Indeterminate
+        };
     }
 }
