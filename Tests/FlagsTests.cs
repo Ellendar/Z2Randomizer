@@ -26,9 +26,9 @@ namespace Tests
         [TestMethod]
         public void TestBlankEncodeCycle()
         {
-            RandomizerConfiguration config = new RandomizerConfiguration();
+            RandomizerConfiguration config = new();
             String flags = config.Serialize();
-            RandomizerConfiguration config2 = new RandomizerConfiguration(flags);
+            RandomizerConfiguration config2 = new(flags);
             foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
             {
                 if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
@@ -47,16 +47,19 @@ namespace Tests
         {
             RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA");
             String flags = config.Serialize();
-            RandomizerConfiguration config2 = new RandomizerConfiguration(flags);
+            RandomizerConfiguration config2 = new(flags);
             String flags2 = config2.Serialize();
             Assert.AreEqual(flags, flags2);
         }
 
         [TestMethod]
-        public void TestRestartAtPalacesOnGameOver()
+        public void TestMaxRandoEncodeCycle()
         {
-            RandomizerConfiguration config = new RandomizerConfiguration("AAAOyAD5kkN1X5f$$Ox2$g3x$$7A");
-            Assert.AreEqual(true, config.RestartAtPalacesOnGameOver);
+            RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7z$ZqTBT!BhOA!0P@@A");
+            String flags = config.Serialize();
+            RandomizerConfiguration config2 = new(flags);
+            String flags2 = config2.Serialize();
+            Assert.AreEqual(flags, flags2);
         }
     }
 }

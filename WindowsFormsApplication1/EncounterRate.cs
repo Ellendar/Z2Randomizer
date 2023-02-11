@@ -8,5 +8,5 @@ namespace Z2Randomizer;
 
 public enum EncounterRate
 {
-    NONE, HALF, NORMAL
+    NONE, HALF, NORMAL, RANDOM
 }

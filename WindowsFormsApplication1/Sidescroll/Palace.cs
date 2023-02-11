@@ -206,7 +206,7 @@ public class Palace
             return false;
         }
 
-        if (netDeadEnds < -3 && r.countOpenExits() > 2)
+        if (netDeadEnds < -3 && r.CountOpenExits() > 2)
         {
             return false;
         }
@@ -243,7 +243,7 @@ public class Palace
         {
             netDeadEnds++;
         }
-        else if (r.countOpenExits() > 1)
+        else if (r.CountOpenExits() > 1)
         {
             netDeadEnds--;
         }
@@ -251,7 +251,7 @@ public class Palace
         SortRoom(r);
         numRooms++;
 
-        if (num != 7 && openRooms.Count > 1 && itemRoom.countOpenExits() > 0)
+        if (num != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
         {
             foreach (Room open2 in openRooms)
             {
@@ -262,7 +262,7 @@ public class Palace
                 }
             }
         }
-        if (openRooms.Count > 1 && bossRoom.countOpenExits() > 0)
+        if (openRooms.Count > 1 && bossRoom.CountOpenExits() > 0)
         {
             foreach (Room open2 in openRooms)
             {
@@ -273,7 +273,7 @@ public class Palace
                 }
             }
         }
-        if (num == 7 && openRooms.Count > 1 && Tbird != null && Tbird.countOpenExits() > 1)
+        if (num == 7 && openRooms.Count > 1 && Tbird != null && Tbird.CountOpenExits() > 1)
         {
             foreach (Room open2 in openRooms)
             {
@@ -290,11 +290,11 @@ public class Palace
     {
         if (num == 1 || num == 2 || num == 5)
         {
-            itemRoom.updateItem(i, 1, ROMData);
+            itemRoom.UpdateItem(i, 1, ROMData);
         }
         else
         {
-            itemRoom.updateItem(i, 2, ROMData);
+            itemRoom.UpdateItem(i, 2, ROMData);
         }
     }
 
@@ -387,7 +387,7 @@ public class Palace
     {
         bool placed = false;
         //Right from open into r
-        if (!placed && open.hasRightExit() && open.Right == null && r.hasLeftExit() && r.Left == null)
+        if (!placed && open.HasRightExit() && open.Right == null && r.HasLeftExit() && r.Left == null)
         {
             open.Right = r;
             open.RightByte = r.Newmap * 4;
@@ -398,7 +398,7 @@ public class Palace
             placed = true;
         }
         //Left open into r
-        if (!placed && open.hasLeftExit() && open.Left == null && r.hasRightExit() && r.Right == null)
+        if (!placed && open.HasLeftExit() && open.Left == null && r.HasRightExit() && r.Right == null)
         {
             open.Left = r;
             open.LeftByte = r.Newmap * 4 + 3;
@@ -409,7 +409,7 @@ public class Palace
             placed = true;
         }
         //Elevator Up from open
-        if (!placed && open.hasUpExit() && open.Up == null && r.hasDownExit() && r.Down == null && !r.HasDrop)
+        if (!placed && open.HasUpExit() && open.Up == null && r.HasDownExit() && r.Down == null && !r.HasDrop)
         {
             open.Up = r;
             open.UpByte = r.Newmap * 4 + r.ElevatorScreen;
@@ -420,7 +420,7 @@ public class Palace
             placed = true;
         }
         //Down Elevator from open
-        if (!placed && open.hasDownExit() && !open.HasDrop && open.Down == null && r.hasUpExit() && r.Up == null)
+        if (!placed && open.HasDownExit() && !open.HasDrop && open.Down == null && r.HasUpExit() && r.Up == null)
         {
 
             open.Down = r;
@@ -432,7 +432,7 @@ public class Palace
             placed = true;
         }
         //Drop from open into r
-        if (!placed && open.hasDownExit() && open.HasDrop && open.Down == null && r.DropZone)
+        if (!placed && open.HasDownExit() && open.HasDrop && open.Down == null && r.DropZone)
         {
 
             open.Down = r;
@@ -441,7 +441,7 @@ public class Palace
             placed = true;
         }
         //Drop from r into open 
-        if (!placed && open.DropZone && r.HasDrop && r.Down == null && r.hasDownExit())
+        if (!placed && open.DropZone && r.HasDrop && r.Down == null && r.HasDownExit())
         {
 
             r.Down = open;
@@ -451,7 +451,7 @@ public class Palace
         }
         //If the room doesn't have any open exits anymore, remove it from the list
         //#13: If the room doesn't have any open exits, how did it get into the 
-        if (open.countOpenExits() == 0)
+        if (open.CountOpenExits() == 0)
         {
             openRooms.Remove(open);
         }
@@ -463,7 +463,7 @@ public class Palace
             placed = true;
         }
         //If the room itself is already in the open rooms list (How?), but we filled the last exit, remove it from the open rooms list.
-        if (r.countOpenExits() == 0)
+        if (r.CountOpenExits() == 0)
         {
             openRooms.Remove(r);
         }
@@ -481,7 +481,7 @@ public class Palace
 
     public void SortRoom(Room r)
     {
-        if (r.hasDownExit())
+        if (r.HasDownExit())
         {
             if (r.HasDrop)
             {
@@ -493,17 +493,17 @@ public class Palace
             }
         }
 
-        if (r.hasLeftExit())
+        if (r.HasLeftExit())
         {
             leftExits.Add(r);
         }
 
-        if (r.hasRightExit())
+        if (r.HasRightExit())
         {
             rightExits.Add(r);
         }
 
-        if (r.hasUpExit())
+        if (r.HasUpExit())
         {
             upExits.Add(r);
         }
@@ -809,7 +809,7 @@ public class Palace
     {
         foreach (Room r in allRooms)
         {
-            r.updateBytes();
+            r.UpdateBytes();
             for (int i = 0; i < 4; i++)
             {
                 if (r.Connections[i] < 0xFC)
@@ -840,7 +840,7 @@ public class Palace
         }
         foreach (Room r in allRooms)
         {
-            if (r.Left == null && (r.hasLeftExit()))
+            if (r.Left == null && (r.HasLeftExit()))
             {
                 List<Room> l = rooms[r.LeftByte & 0xFC];
                 foreach (Room r2 in l)
@@ -852,7 +852,7 @@ public class Palace
                 }
             }
 
-            if (r.Right == null && (r.hasRightExit()))
+            if (r.Right == null && (r.HasRightExit()))
             {
                 List<Room> l = rooms[r.RightByte & 0xFC];
                 foreach (Room r2 in l)
@@ -864,7 +864,7 @@ public class Palace
                 }
             }
 
-            if (r.Up == null && (r.hasUpExit()))
+            if (r.Up == null && (r.HasUpExit()))
             {
                 List<Room> l = rooms[r.UpByte & 0xFC];
                 foreach (Room r2 in l)
@@ -876,7 +876,7 @@ public class Palace
                 }
             }
 
-            if (r.Down == null && (r.hasDownExit()))
+            if (r.Down == null && (r.HasDownExit()))
             {
                 List<Room> l = rooms[r.DownByte & 0xFC];
                 foreach (Room r2 in l)

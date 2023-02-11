@@ -51,8 +51,11 @@ public class RandomizerConfiguration
 
     [Limit(8)]
     [Minimum(1)]
-    public int? StartingHeartContainers { get; set; }
+    public int? StartingHeartContainersMin { get; set; }
     [Limit(8)]
+    [Minimum(1)]
+    public int? StartingHeartContainersMax { get; set; }
+    [Limit(11)]
     [Minimum(1)]
     public int? MaxHeartContainers { get; set; }
     public bool? StartWithUpstab { get; set; }
@@ -69,19 +72,20 @@ public class RandomizerConfiguration
     public int StartingLifeLevel { get; set; }
 
     //Overworld
-    public bool PalacesCanSwapContinents { get; set; }
-    public bool ShuffleGP { get; set; }
-    public bool ShuffleEncounters { get; set; }
-    public bool AllowUnsafePathEncounters { get; set; }
+    public bool? PalacesCanSwapContinents { get; set; }
+    public bool? ShuffleGP { get; set; }
+    public bool? ShuffleEncounters { get; set; }
+    public bool? AllowUnsafePathEncounters { get; set; }
     public EncounterRate EncounterRate { get; set; }
     public bool? HidePalace { get; set; }
     public bool? HideKasuto { get; set; }
-    public bool ShuffleWhichLocationIsHidden { get; set; }
-    public bool HideLessImportantLocations { get; set; }
-    public bool RestrictConnectionCaveShuffle { get; set; }
+    public bool? ShuffleWhichLocationIsHidden { get; set; }
+    public bool? HideLessImportantLocations { get; set; }
+    //Sane caves
+    public bool? RestrictConnectionCaveShuffle { get; set; }
     public bool AllowConnectionCavesToBeBoulderBlocked { get; set; }
-    public bool GoodBoots { get; set; }
-    public bool GenerateBaguWoods { get; set; }
+    public bool? GoodBoots { get; set; }
+    public bool? GenerateBaguWoods { get; set; }
     public ContinentConnectionType ContinentConnectionType { get; set; }
     public Biome WestBiome { get; set; }
     public Biome EastBiome { get; set; }
@@ -91,17 +95,19 @@ public class RandomizerConfiguration
 
     //Palaces
     public PalaceStyle PalaceStyle { get; set; }
-    public bool IncludeCommunityRooms { get; set; }
+    public bool? IncludeCommunityRooms { get; set; }
     public bool BlockingRoomsInAnyPalace { get; set; }
-    public bool BossRoomsExitToPalace { get; set; }
-    public bool ShortGP { get; set; }
-    public bool TBirdRequired { get; set; }
+    public bool? BossRoomsExitToPalace { get; set; }
+    public bool? ShortGP { get; set; }
+    public bool? TBirdRequired { get; set; }
     public bool RemoveTBird { get; set; }
     public bool RestartAtPalacesOnGameOver { get; set; }
     public bool ChangePalacePallettes { get; set; }
     public bool RandomizeBossItemDrop { get; set; }
     [Limit(7)]
-    public int? StartingGems { get; set; }
+    public int PalacesToCompleteMin { get; set; }
+    [Limit(7)]
+    public int PalacesToCompleteMax { get; set; }
 
     //Levels
     public bool ShuffleAttackExperience { get; set; }
@@ -123,17 +129,17 @@ public class RandomizerConfiguration
 
     //Spells
     public bool ShuffleLifeRefillAmount { get; set; }
-    public bool ShuffleSpellLocations { get; set; }
-    public bool DisableMagicContainerRequirements { get; set; }
+    public bool? ShuffleSpellLocations { get; set; }
+    public bool? DisableMagicContainerRequirements { get; set; }
     public bool CombineFireWithRandomSpell { get; set; }
-    public bool RandomizeSpellSpellEnemy { get; set; }
-    public bool ReplaceFireWithDash { get; set; }
+    public bool? RandomizeSpellSpellEnemy { get; set; }
+    public bool? ReplaceFireWithDash { get; set; }
 
     //Enemies
-    public bool ShuffleOverworldEnemies { get; set; }
-    public bool ShufflePalaceEnemies { get; set; }
+    public bool? ShuffleOverworldEnemies { get; set; }
+    public bool? ShufflePalaceEnemies { get; set; }
     public bool ShuffleDripperEnemy { get; set; }
-    public bool MixLargeAndSmallEnemies { get; set; }
+    public bool? MixLargeAndSmallEnemies { get; set; }
     public bool ShuffleEnemyHP { get; set; }
     public bool ShuffleXPStealers { get; set; }
     public bool ShuffleXPStolenAmount { get; set; }
@@ -141,15 +147,15 @@ public class RandomizerConfiguration
     public StatEffectiveness EnemyXPDrops { get; set; }
 
     //Items
-    public bool ShufflePalaceItems { get; set; }
-    public bool ShuffleOverworldItems { get; set; }
-    public bool MixOverworldAndPalaceItems { get; set; }
-    public bool IncludePBagCavesInItemShuffle { get; set; }
+    public bool? ShufflePalaceItems { get; set; }
+    public bool? ShuffleOverworldItems { get; set; }
+    public bool? MixOverworldAndPalaceItems { get; set; }
+    public bool? IncludePBagCavesInItemShuffle { get; set; }
     public bool ShuffleSmallItems { get; set; }
-    public bool PalacesContainExtraKeys { get; set; }
+    public bool? PalacesContainExtraKeys { get; set; }
     public bool RandomizeNewKasutoJarRequirements { get; set; }
-    public bool RemoveSpellItems { get; set; }
-    public bool ShufflePBagAmounts { get; set; }
+    public bool? RemoveSpellItems { get; set; }
+    public bool? ShufflePBagAmounts { get; set; }
 
     //Drops
     public bool ShuffleItemDropFrequency { get; set; }
@@ -173,9 +179,9 @@ public class RandomizerConfiguration
     public bool LargeEnemiesCanDropKey { get; set; }
 
     //Hints
-    public bool EnableHelpfulHints { get; set; }
-    public bool EnableSpellItemHints { get; set; }
-    public bool EnableTownNameHints { get; set; }
+    public bool? EnableHelpfulHints { get; set; }
+    public bool? EnableSpellItemHints { get; set; }
+    public bool? EnableTownNameHints { get; set; }
     public bool UseCommunityHints { get; set; }
 
     //Misc
@@ -285,7 +291,8 @@ public class RandomizerConfiguration
         StartingLifeLevel = 1;
 
         MaxHeartContainers = 8;
-        StartingHeartContainers = 8;
+        StartingHeartContainersMin = 8;
+        StartingHeartContainersMax = 8;
 
         AttackLevelCap = 8;
         MagicLevelCap= 8;
@@ -391,7 +398,7 @@ public class RandomizerConfiguration
             {
                 logger.Error("Unrecognized configuration property type.");
             }
-            //Debug.WriteLine(property.Name + "\t" + flagReader.index);
+            Debug.WriteLine(property.Name + "\t" + flagReader.index);
         }
     }
 
@@ -437,11 +444,12 @@ public class RandomizerConfiguration
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
         //For some reason the low 3 bits of the heart container start setting are stored on one byte and the 4th bit is disjointed on the next bite...
         BitArray nextBits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
-        config.StartingHeartContainers = ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0) + (nextBits[2] ? 8 : 0) + 1);
-        if (config.StartingHeartContainers == 9)
+        config.StartingHeartContainersMin = ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0) + (nextBits[2] ? 8 : 0) + 1);
+        if (config.StartingHeartContainersMin == 9)
         {
-            config.StartingHeartContainers = null;
+            config.StartingHeartContainersMin = null;
         }
+        config.StartingHeartContainersMax = config.StartingHeartContainersMin;
         switch ((bits[3] ? 1 : 0) + (bits[4] ? 2 : 0) + (bits[5] ? 4 : 0))
         {
             case 0:
@@ -543,11 +551,13 @@ public class RandomizerConfiguration
         string startGemsString = ((bits[2] ? 1 : 0) + (bits[3] ? 2 : 0) + (bits[4] ? 4 : 0)).ToString();
         if (startGemsString == "7")
         {
-            config.StartingGems = null;
+            config.PalacesToCompleteMin = 0;
+            config.PalacesToCompleteMax = 6;
         }
         else
         {
-            config.StartingGems = Int32.Parse(startGemsString);
+            config.PalacesToCompleteMin = Int32.Parse(startGemsString);
+            config.PalacesToCompleteMax = Int32.Parse(startGemsString);
         }
         config.MixLargeAndSmallEnemies = bits[5];
 
@@ -910,11 +920,11 @@ public class RandomizerConfiguration
                 int? index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
                 if (isNullable && index == null)
                 {
-                    flags.Append(index + 1, limit + 1);
+                    flags.Append((int)index + 1, limit + 1);
                 }
                 else
                 {
-                    flags.Append(index, limit);
+                    flags.Append((int)index, limit);
                 }
             }
             else if (IsIntegerType(propertyType))
@@ -953,7 +963,7 @@ public class RandomizerConfiguration
             {
                 logger.Error("Unrecognized configuration property type.");
             }
-            //Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
+            Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
         }
 
         return flags.ToString();
@@ -967,66 +977,55 @@ public class RandomizerConfiguration
         properties.saveRom = true;
 
         //Items
-        if (ShuffleStartingItems)
-        {
-            properties.startCandle = random.NextDouble() > .75;
-            properties.startGlove = random.NextDouble() > .75;
-            properties.startRaft = random.NextDouble() > .75;
-            properties.startBoots = random.NextDouble() > .75;
-            properties.startFlute = random.NextDouble() > .75;
-            properties.startCross = random.NextDouble() > .75;
-            properties.startHammer = random.NextDouble() > .75;
-            properties.startKey = random.NextDouble() > .75;
-        }
-        else {
-            properties.startCandle = StartWithCandle;
-            properties.startGlove = StartWithGlove;
-            properties.startRaft = StartWithRaft;
-            properties.startBoots = StartWithBoots;
-            properties.startFlute = StartWithFlute;
-            properties.startCross = StartWithCross;
-            properties.startHammer = StartWithHammer;
-            properties.startKey = StartWithMagicKey;
-        }
+        properties.startCandle = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCandle;
+        properties.startGlove = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithGlove;
+        properties.startRaft = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithRaft;
+        properties.startBoots = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithBoots;
+        properties.startFlute = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithFlute;
+        properties.startCross = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCross;
+        properties.startHammer = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithHammer;
+        properties.startKey = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithMagicKey;
 
         //Spells
-        if (ShuffleStartingSpells)
-        {
-            properties.startShield = random.NextDouble() > .75;
-            properties.startJump = random.NextDouble() > .75;
-            properties.startLife = random.NextDouble() > .75;
-            properties.startFairy = random.NextDouble() > .75;
-            properties.startFire = random.NextDouble() > .75;
-            properties.startReflect = random.NextDouble() > .75;
-            properties.startSpell = random.NextDouble() > .75;
-            properties.startThunder = random.NextDouble() > .75;
-        }
-        else
-        {
-            properties.startShield = StartWithShield;
-            properties.startJump = StartWithJump;
-            properties.startLife = StartWithLife;
-            properties.startFairy = StartWithFairy;
-            properties.startFire = StartWithFire;
-            properties.startReflect = StartWithReflect;
-            properties.startSpell = StartWithSpell;
-            properties.startThunder = StartWithThunder;
-        }
+        properties.startShield = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithShield;
+        properties.startJump = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithJump;
+        properties.startLife = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithLife;
+        properties.startFairy = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFairy;
+        properties.startFire = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFire;
+        properties.startReflect = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithReflect;
+        properties.startSpell = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithSpell;
+        properties.startThunder = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithThunder;
         properties.combineFire = CombineFireWithRandomSpell;
-        properties.dashSpell = ReplaceFireWithDash;
+        properties.dashSpell = ReplaceFireWithDash == null ? random.Next(2) == 1 : (bool)ReplaceFireWithDash;
 
         //Other starting attributes
-        if (StartingHeartContainers == null)
+        int startHeartsMin, startHeartsMax;
+        if (StartingHeartContainersMin == null)
         {
-            properties.startHearts = random.Next(1, 9);
+            startHeartsMin = random.Next(1, 9);
         }
         else
         {
-            properties.startHearts = (int)StartingHeartContainers;
+            startHeartsMin = (int)StartingHeartContainersMin;
         }
-        if (MaxHeartContainers == null)
+        if (StartingHeartContainersMax == null)
+        {
+            startHeartsMax = random.Next(startHeartsMin, 9);
+        }
+        else
+        {
+            startHeartsMax = (int)StartingHeartContainersMax;
+        }
+        properties.startHearts = random.Next(startHeartsMin, startHeartsMax + 1);
+
+        //+1/+2/+3
+        if(MaxHeartContainers == null)
         {
             properties.maxHearts = random.Next(properties.startHearts, 9);
+        }
+        else if (MaxHeartContainers > 8)
+        {
+            properties.maxHearts = Math.Min(properties.startHearts + (int)MaxHeartContainers - 8, 8);
         }
         else
         {
@@ -1073,10 +1072,10 @@ public class RandomizerConfiguration
         properties.startLifeLvl = StartingMagicLevel;
 
         //Overworld
-        properties.shuffleEncounters = ShuffleEncounters;
-        properties.allowPathEnemies = AllowUnsafePathEncounters;
-        properties.swapPalaceCont = PalacesCanSwapContinents;
-        properties.p7shuffle = ShuffleGP;
+        properties.shuffleEncounters = ShuffleEncounters == null ? random.Next(2) == 1 : (bool)ShuffleEncounters;
+        properties.allowPathEnemies = AllowUnsafePathEncounters == null ? random.Next(2) == 1 : (bool)AllowUnsafePathEncounters;
+        properties.swapPalaceCont = PalacesCanSwapContinents == null ? random.Next(2) == 1 : (bool)PalacesCanSwapContinents;
+        properties.p7shuffle = ShuffleGP == null ? random.Next(2) == 1 : (bool)ShuffleGP;
         properties.hiddenPalace = HidePalace == null ? random.Next(2) == 1 : (bool)HidePalace;
         properties.hiddenKasuto = HideKasuto == null ? random.Next(2) == 1 : (bool)HideKasuto;
         //As far as I can tell this was never properly rigged to the UI and was impossible to trigger.
@@ -1154,31 +1153,31 @@ public class RandomizerConfiguration
             properties.mazeBiome = MazeBiome;
         }
         properties.vanillaOriginal = VanillaShuffleUsesActualTerrain;
-        properties.shuffleHidden = ShuffleWhichLocationIsHidden;
-        properties.canWalkOnWaterWithBoots = GoodBoots;
-        properties.bagusWoods = GenerateBaguWoods;
+        properties.shuffleHidden = ShuffleWhichLocationIsHidden == null ? random.Next(2) == 1 : (bool)ShuffleWhichLocationIsHidden;
+        properties.canWalkOnWaterWithBoots = GoodBoots == null ? random.Next(2) == 1 : (bool)GoodBoots ;
+        properties.bagusWoods = GenerateBaguWoods == null ? random.Next(2) == 1 : (bool)GenerateBaguWoods;
 
         //Palaces
         properties.palaceStyle = PalaceStyle;
-        properties.startGems = StartingGems == null ? random.Next(7) : (int)StartingGems;
-        properties.requireTbird = TBirdRequired;
+        properties.startGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
+        properties.requireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
         properties.palacePalette = ChangePalacePallettes;
         properties.upaBox = UpAOnController1;
-        properties.shortenGP = ShortGP;
+        properties.shortenGP = ShortGP == null ? random.Next(2) == 1 : (bool)ShortGP;
         properties.removeTbird = RemoveTBird;
         properties.bossItem = RandomizeBossItemDrop;
-        properties.customRooms = IncludeCommunityRooms;
+        properties.customRooms = IncludeCommunityRooms == null ? random.Next(2) == 1 : (bool)IncludeCommunityRooms;
         properties.blockersAnywhere = BlockingRoomsInAnyPalace ;
-        properties.bossRoomConnect = BossRoomsExitToPalace;
+        properties.bossRoomConnect = BossRoomsExitToPalace == null ? random.Next(2) == 1 : (bool)BossRoomsExitToPalace;
 
         //Enemies
         properties.shuffleEnemyHP = ShuffleEnemyHP;
         properties.shuffleEnemyStealExp = ShuffleXPStealers;
         properties.shuffleStealExpAmt = ShuffleXPStolenAmount;
         properties.shuffleSwordImmunity = ShuffleSwordImmunity;
-        properties.shuffleOverworldEnemies = ShuffleOverworldEnemies;
-        properties.shufflePalaceEnemies = ShufflePalaceEnemies;
-        properties.mixEnemies = MixLargeAndSmallEnemies;
+        properties.shuffleOverworldEnemies = ShuffleOverworldEnemies == null ? random.Next(2) == 1 : (bool)ShuffleOverworldEnemies;
+        properties.shufflePalaceEnemies = ShufflePalaceEnemies == null ? random.Next(2) == 1 : (bool)ShufflePalaceEnemies;
+        properties.mixEnemies = MixLargeAndSmallEnemies == null ? random.Next(2) == 1 : (bool)MixLargeAndSmallEnemies;
         properties.shuffleDripper = ShuffleDripperEnemy;
         properties.shuffleEnemyPalettes = ShuffleSpritePalettes;
         properties.expLevel = EnemyXPDrops;
@@ -1232,72 +1231,58 @@ public class RandomizerConfiguration
             properties.lifeEffectiveness = LifeEffectiveness;
         }
         properties.shuffleLifeRefill = ShuffleLifeRefillAmount;
-        properties.shuffleSpellLocations = ShuffleSpellLocations;
-        properties.disableMagicRecs = DisableMagicContainerRequirements;
+        properties.shuffleSpellLocations = ShuffleSpellLocations == null ? random.Next(2) == 1 : (bool)ShuffleSpellLocations;
+        properties.disableMagicRecs = DisableMagicContainerRequirements == null ? random.Next(2) == 1 : (bool)DisableMagicContainerRequirements;
         properties.attackCap = AttackLevelCap;
         properties.magicCap = MagicLevelCap;
         properties.lifeCap = LifeLevelCap;
         properties.scaleLevels = ScaleLevelRequirementsToCap;
-        properties.hideLocs = HideLessImportantLocations;
-        properties.saneCaves = RestrictConnectionCaveShuffle;
-        properties.spellEnemy = RandomizeSpellSpellEnemy;
+        properties.hideLocs = HideLessImportantLocations == null ? random.Next(2) == 1 : (bool)HideLessImportantLocations;
+        properties.saneCaves = RestrictConnectionCaveShuffle == null ? random.Next(2) == 1 : (bool)RestrictConnectionCaveShuffle;
+        properties.spellEnemy = RandomizeSpellSpellEnemy == null ? random.Next(2) == 1 : (bool)RandomizeSpellSpellEnemy;
 
         //Items
-        properties.shuffleOverworldItems = ShuffleOverworldItems;
-        properties.shufflePalaceItems = ShufflePalaceItems;
-        properties.mixOverworldPalaceItems = MixOverworldAndPalaceItems;
+        properties.shuffleOverworldItems = ShuffleOverworldItems == null ? random.Next(2) == 1 : (bool)ShuffleOverworldItems;
+        properties.shufflePalaceItems = ShufflePalaceItems == null ? random.Next(2) == 1 : (bool)ShufflePalaceItems;
+        properties.mixOverworldPalaceItems = MixOverworldAndPalaceItems == null ? random.Next(2) == 1 : (bool)MixOverworldAndPalaceItems;
         properties.shuffleSmallItems = ShuffleSmallItems;
-        properties.extraKeys = PalacesContainExtraKeys;
+        properties.extraKeys = PalacesContainExtraKeys == null ? random.Next(2) == 1 : (bool)PalacesContainExtraKeys;
         properties.kasutoJars = RandomizeNewKasutoJarRequirements;
-        properties.pbagItemShuffle = IncludePBagCavesInItemShuffle;
-        properties.removeSpellItems = RemoveSpellItems;
-        properties.shufflePbagXp = ShufflePBagAmounts;
+        properties.pbagItemShuffle = IncludePBagCavesInItemShuffle == null ? random.Next(2) == 1 : (bool)IncludePBagCavesInItemShuffle;
+        properties.removeSpellItems = RemoveSpellItems == null ? random.Next(2) == 1 : (bool)RemoveSpellItems;
+        properties.shufflePbagXp = ShufflePBagAmounts == null ? random.Next(2) == 1 : (bool)ShufflePBagAmounts;
 
         //Drops
         properties.shuffleItemDropFrequency = ShuffleItemDropFrequency;
-        if (RandomizeDrops)
+        do {
+            properties.smallbluejar = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropBlueJar;
+            properties.smallredjar = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropRedJar;
+            properties.small50 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropSmallBag;
+            properties.small100 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropMediumBag;
+            properties.small200 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropLargeBag;
+            properties.small500 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropXLBag;
+            properties.small1up = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDrop1up;
+            properties.smallkey = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropKey;
+        } while(!properties.smallbluejar && !properties.smallredjar && !properties.small50 && !properties.small100 &&
+            !properties.small200 && !properties.small500 && !properties.small1up && !properties.smallkey);
+        do
         {
-            properties.smallbluejar = random.Next(2) == 1;
-            properties.smallredjar = random.Next(2) == 1;
-            properties.small50 = random.Next(2) == 1;
-            properties.small100 = random.Next(2) == 1;
-            properties.small200 = random.Next(2) == 1;
-            properties.small500 = random.Next(2) == 1;
-            properties.small1up = random.Next(2) == 1;
-            properties.smallkey = random.Next(2) == 1;
-            properties.largebluejar = random.Next(2) == 1;
-            properties.largeredjar = random.Next(2) == 1;
-            properties.large50 = random.Next(2) == 1;
-            properties.large100 = random.Next(2) == 1;
-            properties.large200 = random.Next(2) == 1;
-            properties.large500 = random.Next(2) == 1;
-            properties.large1up = random.Next(2) == 1;
-            properties.largekey = random.Next(2) == 1;
-        }
-        else {
-            properties.smallbluejar = SmallEnemiesCanDropBlueJar ;
-            properties.smallredjar = SmallEnemiesCanDropRedJar;
-            properties.small50 = SmallEnemiesCanDropSmallBag;
-            properties.small100 = SmallEnemiesCanDropMediumBag;
-            properties.small200 = SmallEnemiesCanDropLargeBag;
-            properties.small500 = SmallEnemiesCanDropXLBag;
-            properties.small1up = SmallEnemiesCanDrop1up;
-            properties.smallkey = SmallEnemiesCanDropKey;
-            properties.largebluejar = LargeEnemiesCanDropBlueJar;
-            properties.largeredjar = LargeEnemiesCanDropRedJar;
-            properties.large50 = LargeEnemiesCanDropLargeBag;
-            properties.large100 = LargeEnemiesCanDropMediumBag;
-            properties.large200 = LargeEnemiesCanDropLargeBag;
-            properties.large500 = LargeEnemiesCanDropXLBag;
-            properties.large1up = LargeEnemiesCanDrop1up;
-            properties.largekey = LargeEnemiesCanDropKey;
-        }
+            properties.largebluejar = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropBlueJar;
+            properties.largeredjar = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropRedJar;
+            properties.large50 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropSmallBag;
+            properties.large100 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropMediumBag;
+            properties.large200 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropLargeBag;
+            properties.large500 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropXLBag;
+            properties.large1up = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDrop1up;
+            properties.largekey = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropKey;
+        } while (!properties.largebluejar && !properties.largeredjar && !properties.large50 && !properties.large100 &&
+            !properties.large200 && !properties.large500 && !properties.large1up && !properties.largekey);
         properties.standardizeDrops = StandardizeDrops;
 
         //Hints
-        properties.spellItemHints = EnableSpellItemHints;
-        properties.helpfulHints = EnableHelpfulHints;
-        properties.townNameHints = EnableTownNameHints;
+        properties.spellItemHints = EnableSpellItemHints == null ? random.Next(2) == 1 : (bool)EnableSpellItemHints;
+        properties.helpfulHints = EnableHelpfulHints == null ? random.Next(2) == 1 : (bool)EnableHelpfulHints;
+        properties.townNameHints = EnableTownNameHints == null ? random.Next(2) == 1 : (bool)EnableTownNameHints;
 
         //Misc.
         properties.disableBeep = DisableLowHealthBeep;
@@ -1330,27 +1315,5 @@ public class RandomizerConfiguration
             default:
                 return false;
         }
-    }
-
-    public bool IsVanillaDrops()
-    {
-        return SmallEnemiesCanDropBlueJar
-            && SmallEnemiesCanDropSmallBag
-            && LargeEnemiesCanDropRedJar
-            && LargeEnemiesCanDropLargeBag
-
-            && !SmallEnemiesCanDrop1up
-            && !SmallEnemiesCanDropKey
-            && !SmallEnemiesCanDropLargeBag
-            && !SmallEnemiesCanDropMediumBag
-            && !SmallEnemiesCanDropRedJar
-            && !SmallEnemiesCanDropXLBag
-
-            && !LargeEnemiesCanDrop1up
-            && !LargeEnemiesCanDropBlueJar
-            && !LargeEnemiesCanDropKey
-            && !LargeEnemiesCanDropMediumBag
-            && !LargeEnemiesCanDropSmallBag
-            && !LargeEnemiesCanDropXLBag;
     }
 }

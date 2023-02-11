@@ -704,7 +704,7 @@ public class Shuffler
                         }
 
                         p = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
-                        p.Root = PalaceRooms.entrances[i - 1].deepCopy();
+                        p.Root = PalaceRooms.entrances[i - 1].DeepCopy();
 
                         p.BossRoom = SelectBossRoom(i);
 
@@ -730,13 +730,13 @@ public class Shuffler
                             }
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
                             p.ItemRoom.Newmap = mapNo;
-                            p.ItemRoom.setItem((Item)i);
+                            p.ItemRoom.SetItem((Item)i);
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
                             if (p.ItemRoom.Map == 69)
                             {
-                                Room extra = PalaceRooms.maxBonusItemRoom.deepCopy();
+                                Room extra = PalaceRooms.maxBonusItemRoom.DeepCopy();
                                 extra.Newmap = p.ItemRoom.Newmap;
-                                extra.setItem((Item)i);
+                                extra.SetItem((Item)i);
                                 p.AllRooms.Add(extra);
                                 p.SortRoom(extra);
                                 p.SetOpenRoom(extra);
@@ -757,7 +757,7 @@ public class Shuffler
                             //thunderbird?
                             if (!props.removeTbird)
                             {
-                                p.Tbird = PalaceRooms.tbirdRooms[R.Next(PalaceRooms.tbirdRooms.Count)].deepCopy();
+                                p.Tbird = PalaceRooms.tbirdRooms[R.Next(PalaceRooms.tbirdRooms.Count)].DeepCopy();
                                 p.Tbird.Newmap = mapNoGp;
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 p.SortRoom(p.Tbird);
@@ -790,7 +790,7 @@ public class Shuffler
                         bool dropped = false;
                         while (p.AllRooms.Count < p.MaxRooms)
                         {
-                            Room addThis = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].deepCopy();
+                            Room addThis = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].DeepCopy();
                             if (i < 7)
                             {
                                 addThis.Newmap = mapNo;
@@ -811,10 +811,10 @@ public class Shuffler
                                     int j = 0;
                                     while(j < numDrops && lastDrop)
                                     {
-                                        Room r = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].deepCopy();
+                                        Room r = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].DeepCopy();
                                         while(!r.DropZone)
                                         {
-                                            r = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].deepCopy();
+                                            r = PalaceRooms.roomPool[R.Next(PalaceRooms.roomPool.Count)].DeepCopy();
                                         }
                                         if (i < 7)
                                         {
@@ -844,7 +844,7 @@ public class Shuffler
                         done = true;
                         foreach (Room r in p.AllRooms)
                         {
-                            if (r.countOpenExits() > 0)
+                            if (r.CountOpenExits() > 0)
                             {
                                 done = false;
                             }
@@ -907,25 +907,25 @@ public class Shuffler
                 Palace p = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                 //p.dumpMaps();
 
-                p.Root = PalaceRooms.entrances[i - 1].deepCopy();
-                p.BossRoom = PalaceRooms.bossRooms[i - 1].deepCopy();
+                p.Root = PalaceRooms.entrances[i - 1].DeepCopy();
+                p.BossRoom = PalaceRooms.bossRooms[i - 1].DeepCopy();
                 p.AllRooms.Add(p.Root);
                 if (i != 7)
                 {
-                    p.ItemRoom = PalaceRooms.itemRooms[i - 1].deepCopy();
+                    p.ItemRoom = PalaceRooms.itemRooms[i - 1].DeepCopy();
                     p.AllRooms.Add(p.ItemRoom);
                 }
                 p.AllRooms.Add(p.BossRoom);
                 if (i == 7)
                 {
-                    Room bird = PalaceRooms.thunderBird.deepCopy();
+                    Room bird = PalaceRooms.thunderBird.DeepCopy();
                     p.AllRooms.Add(bird);
                     p.Tbird = bird;
                     
                 }
                 foreach (Room v in PalaceRooms.palaces[i - 1])
                 {
-                    p.AllRooms.Add(v.deepCopy());
+                    p.AllRooms.Add(v.DeepCopy());
                 }
                 Boolean removeTbird = (i == 7 && props.removeTbird);
                 p.CreateTree(removeTbird);
@@ -999,10 +999,10 @@ public class Shuffler
                     {
                         palSet = 2;
                     }
-                    r.writeSideViewPtr(addr, palSet, ROMData);
-                    r.updateEnemies(enemyPtr, palSet, ROMData);
+                    r.WriteSideViewPtr(addr, palSet, ROMData);
+                    r.UpdateEnemies(enemyPtr, palSet, ROMData);
                     enemyPtr += r.Enemies.Length;
-                    r.updateBitmask(palSet, ROMData);
+                    r.UpdateBitmask(palSet, ROMData);
                     bool entrance = false;
                     foreach(Palace p in palaces)
                     {
@@ -1011,7 +1011,7 @@ public class Shuffler
                             entrance = true;
                         }
                     }
-                    r.updateConnectors(palSet, ROMData, entrance);
+                    r.UpdateConnectors(palSet, ROMData, entrance);
                 }
 
             }
@@ -1033,11 +1033,11 @@ public class Shuffler
                 {
 
 
-                    r.writeSideViewPtr(addr, 3, ROMData);
-                    r.updateEnemies(enemyPtrgp, 3, ROMData);
+                    r.WriteSideViewPtr(addr, 3, ROMData);
+                    r.UpdateEnemies(enemyPtrgp, 3, ROMData);
                     enemyPtrgp += r.Enemies.Length;
-                    r.updateBitmask(3, ROMData);
-                    r.updateConnectors(3, ROMData, r == palaces[6].Root);
+                    r.UpdateBitmask(3, ROMData);
+                    r.UpdateConnectors(3, ROMData, r == palaces[6].Root);
                 }
 
             }
@@ -1068,13 +1068,13 @@ public class Shuffler
     {
         if(pal == 7)
         {
-            return PalaceRooms.darkLinkRooms[R.Next(PalaceRooms.darkLinkRooms.Count)].deepCopy();
+            return PalaceRooms.darkLinkRooms[R.Next(PalaceRooms.darkLinkRooms.Count)].DeepCopy();
         }
         if(pal == 6)
         {
-            return PalaceRooms.newp6BossRooms[R.Next(PalaceRooms.newp6BossRooms.Count)].deepCopy();
+            return PalaceRooms.newp6BossRooms[R.Next(PalaceRooms.newp6BossRooms.Count)].DeepCopy();
         }
-        Room r = PalaceRooms.newBossRooms[R.Next(PalaceRooms.newBossRooms.Count)].deepCopy();
+        Room r = PalaceRooms.newBossRooms[R.Next(PalaceRooms.newBossRooms.Count)].DeepCopy();
         r.Enemies = PalaceRooms.bossRooms[pal - 1].Enemies;
         return r;
     }
@@ -1135,15 +1135,15 @@ public class Shuffler
         return R.Next(5) switch
         {
             //left
-            0 => PalaceRooms.leftOpenItemRooms[R.Next(PalaceRooms.leftOpenItemRooms.Count)].deepCopy(),
+            0 => PalaceRooms.leftOpenItemRooms[R.Next(PalaceRooms.leftOpenItemRooms.Count)].DeepCopy(),
             //right
-            1 => PalaceRooms.rightOpenItemRooms[R.Next(PalaceRooms.rightOpenItemRooms.Count)].deepCopy(),
+            1 => PalaceRooms.rightOpenItemRooms[R.Next(PalaceRooms.rightOpenItemRooms.Count)].DeepCopy(),
             //up
-            2 => PalaceRooms.upOpenItemRooms[R.Next(PalaceRooms.upOpenItemRooms.Count)].deepCopy(),
+            2 => PalaceRooms.upOpenItemRooms[R.Next(PalaceRooms.upOpenItemRooms.Count)].DeepCopy(),
             //down
-            3 => PalaceRooms.downOpenItemRooms[R.Next(PalaceRooms.downOpenItemRooms.Count)].deepCopy(),
+            3 => PalaceRooms.downOpenItemRooms[R.Next(PalaceRooms.downOpenItemRooms.Count)].DeepCopy(),
             //Through
-            4 => PalaceRooms.throughItemRooms[R.Next(PalaceRooms.throughItemRooms.Count)].deepCopy(),
+            4 => PalaceRooms.throughItemRooms[R.Next(PalaceRooms.throughItemRooms.Count)].DeepCopy(),
             _ => throw new Exception("Invalid item room direction selection."),
         };
     }

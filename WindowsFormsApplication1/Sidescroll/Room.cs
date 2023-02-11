@@ -357,7 +357,7 @@ public class Room
         this.dropZone = dropZone;
     }
 
-    public void updateBytes()
+    public void UpdateBytes()
     {
         connections[0] = (Byte)leftByte;
         connections[1] = (Byte)downByte;
@@ -365,7 +365,7 @@ public class Room
         connections[3] = (Byte)rightByte;
     }
 
-    public void writeSideViewPtr(int addr, int palSet, ROM ROMData)
+    public void WriteSideViewPtr(int addr, int palSet, ROM ROMData)
     {
         if(palSet == 1)
         {
@@ -392,7 +392,7 @@ public class Room
         }
     }
 
-    public void updateEnemies(int addr, int palSet, ROM ROMData)
+    public void UpdateEnemies(int addr, int palSet, ROM ROMData)
     {
         if(enemies.Length > 1 && palSet == 2)
         {
@@ -426,7 +426,7 @@ public class Room
         }
     }
 
-    public void updateBitmask(int palSet, ROM ROMData)
+    public void UpdateBitmask(int palSet, ROM ROMData)
     {
         int ptr = bitmask1;
 
@@ -454,7 +454,7 @@ public class Room
         }
     }
 
-    public void setItem(Item it)
+    public void SetItem(Item it)
     {
         for(int i = 4; i < sideView.Length; i+=2)
         {
@@ -468,7 +468,7 @@ public class Room
         }
     }
 
-    public void updateItem(Item i, int palSet, ROM ROMData)
+    public void UpdateItem(Item i, int palSet, ROM ROMData)
     {
         int sideViewPtr = (ROMData.GetByte(sideview1 + newmap * 2) + (ROMData.GetByte(sideview1 + 1 + newmap * 2) << 8)) + 0x8010;
 
@@ -494,9 +494,9 @@ public class Room
     }
 
 
-    public void updateConnectors(int palSet, ROM ROMData, bool entrance)
+    public void UpdateConnectors(int palSet, ROM ROMData, bool entrance)
     {
-        this.updateBytes();
+        this.UpdateBytes();
         if(palSet == 1)
         {
             for (int i = 0; i < 4; i++)
@@ -568,7 +568,7 @@ public class Room
     }
     */
 
-    public bool hasUpExit()
+    public bool HasUpExit()
     {
         if (!udRev)
         {
@@ -580,7 +580,7 @@ public class Room
         }
     }
 
-    public bool hasDownExit()
+    public bool HasDownExit()
     {
         if (!udRev)
         {
@@ -592,47 +592,63 @@ public class Room
         }
     }
 
-    public bool hasLeftExit()
+    public bool HasLeftExit()
     {
 
         return (leftByte < 0xFC && leftByte > 0x03);
 
     }
 
-    public bool hasRightExit()
+    public bool HasRightExit()
     {
 
         return (rightByte < 0xFC && rightByte > 0x03);
 
     }
 
-    public int countOpenExits()
+    public int CountOpenExits()
     {
         int exits = 0;
-        if(hasRightExit() && Right == null)
+        if(HasRightExit() && Right == null)
         {
             exits++;
         }
 
-        if (hasLeftExit() && Left == null)
+        if (HasLeftExit() && Left == null)
         {
             exits++;
         }
 
-        if (hasUpExit() && Up == null)
+        if (HasUpExit() && Up == null)
         {
             exits++;
         }
 
-        if (hasDownExit() && Down == null)
+        if (HasDownExit() && Down == null)
         {
             exits++;
         }
         return exits;
     }
 
-    public Room deepCopy()
+    public Room DeepCopy()
     {
-        return new Room(Map, (Byte[])Connections.Clone(), (Byte[])Enemies.Clone(), (Byte[])SideView.Clone(), bitmask, FairyBlocked, GloveBlocked, downstabBlocked, UpstabBlocked, JumpBlocked, hasItem, hasBoss, HasDrop, ElevatorScreen, MemAddr, udRev, DropZone);
+        return new Room(Map, 
+            (Byte[])Connections.Clone(), 
+            (Byte[])Enemies.Clone(), 
+            (Byte[])SideView.Clone(), 
+            bitmask, 
+            FairyBlocked, 
+            GloveBlocked, 
+            downstabBlocked, 
+            UpstabBlocked, 
+            JumpBlocked, 
+            hasItem, 
+            hasBoss, 
+            HasDrop, 
+            ElevatorScreen, 
+            MemAddr, 
+            udRev, 
+            DropZone);
     }
 }
