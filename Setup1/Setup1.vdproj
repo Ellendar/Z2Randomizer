@@ -21,7 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E71669A5A7DF467591F5CD12F54CFAD2"
+        "MsmKey" = "8:_94EC71DD165A43C09436F29102CAC5DA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -65,7 +65,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\Setup1.msi"
+        "OutputFilename" = "8:Release\\Setup.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -150,26 +150,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E71669A5A7DF467591F5CD12F54CFAD2"
-            {
-            "SourcePath" = "8:WinSparkle.dll"
-            "TargetName" = "8:WinSparkle.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -238,7 +218,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer_Test"
         "ProductCode" = "8:{935E97AA-E281-4D97-AD6D-B3E81E38140C}"
-        "PackageCode" = "8:{1C05EF3D-BD9A-428C-A045-F9727A54C951}"
+        "PackageCode" = "8:{200F743B-D150-44E8-8364-548385057D2D}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -246,7 +226,7 @@
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:TRUE"
         "ProductVersion" = "8:4.1.0"
-        "Manufacturer" = "8: digshake"
+        "Manufacturer" = "8:digshake"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
         "Title" = "8:Z2RandomizerSetup"
@@ -259,7 +239,7 @@
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
-        "TargetPlatform" = "3:0"
+        "TargetPlatform" = "3:1"
         "PreBuildEvent" = "8:"
         "PostBuildEvent" = "8:"
         "RunPostBuildEvent" = "3:0"
@@ -358,6 +338,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F1C53558998A4D15A0CF7A7D654EDA25"
+            {
+            "Name" = "8:Z2Randomizer"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_94EC71DD165A43C09436F29102CAC5DA"
+            "Folder" = "8:_2836974F02AE481582FD5BD51CDF1670"
+            "WorkingFolder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
+            "Icon" = "8:_1CCB6BD983624AEB9B091031D25B8DA1"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
@@ -757,6 +751,35 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_94EC71DD165A43C09436F29102CAC5DA"
+            {
+            "SourcePath" = "8:..\\WindowsFormsApplication1\\obj\\Debug\\net6.0-windows7.0\\win-x64\\apphost.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:PublishItems"
+            "OutputProjectGuid" = "8:{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}"
+            "ShowKeyOutput" = "11:TRUE"
+            "PublishProfilePath" = "8:Properties\\PublishProfiles\\ProdPublishProfile.pubxml"
+                "ExcludeFilters"
+                {
+                }
+            }
         }
     }
 }

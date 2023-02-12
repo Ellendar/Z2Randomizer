@@ -398,7 +398,7 @@ public class RandomizerConfiguration
             {
                 logger.Error("Unrecognized configuration property type.");
             }
-            Debug.WriteLine(property.Name + "\t" + flagReader.index);
+            //Debug.WriteLine(property.Name + "\t" + flagReader.index);
         }
     }
 
@@ -963,7 +963,7 @@ public class RandomizerConfiguration
             {
                 logger.Error("Unrecognized configuration property type.");
             }
-            Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
+            //Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
         }
 
         return flags.ToString();
@@ -977,24 +977,24 @@ public class RandomizerConfiguration
         properties.saveRom = true;
 
         //Items
-        properties.startCandle = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCandle;
-        properties.startGlove = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithGlove;
-        properties.startRaft = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithRaft;
-        properties.startBoots = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithBoots;
-        properties.startFlute = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithFlute;
-        properties.startCross = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCross;
-        properties.startHammer = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithHammer;
-        properties.startKey = ShuffleStartingItems ? random.NextDouble() > .75 : StartWithMagicKey;
+        properties.startCandle = !StartWithCandle && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCandle;
+        properties.startGlove = !StartWithGlove && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithGlove;
+        properties.startRaft = !StartWithRaft && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithRaft;
+        properties.startBoots = !StartWithBoots && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithBoots;
+        properties.startFlute = !StartWithFlute && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithFlute;
+        properties.startCross = !StartWithCross && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCross;
+        properties.startHammer = !StartWithHammer && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithHammer;
+        properties.startKey = !StartWithMagicKey && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithMagicKey;
 
         //Spells
-        properties.startShield = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithShield;
-        properties.startJump = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithJump;
-        properties.startLife = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithLife;
-        properties.startFairy = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFairy;
-        properties.startFire = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFire;
-        properties.startReflect = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithReflect;
-        properties.startSpell = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithSpell;
-        properties.startThunder = ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithThunder;
+        properties.startShield = !StartWithShield && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithShield;
+        properties.startJump = !StartWithJump && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithJump;
+        properties.startLife = !StartWithLife && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithLife;
+        properties.startFairy = !StartWithFairy && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFairy;
+        properties.startFire = !StartWithFire && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFire;
+        properties.startReflect = !StartWithReflect && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithReflect;
+        properties.startSpell = !StartWithSpell && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithSpell;
+        properties.startThunder = !StartWithThunder && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithThunder;
         properties.combineFire = CombineFireWithRandomSpell;
         properties.dashSpell = ReplaceFireWithDash == null ? random.Next(2) == 1 : (bool)ReplaceFireWithDash;
 
@@ -1031,9 +1031,10 @@ public class RandomizerConfiguration
         {
             properties.maxHearts = (int)MaxHeartContainers;
         }
+        properties.maxHearts = Math.Min(properties.maxHearts, properties.startHearts);
 
         //If both stabs are random, use the classic weightings
-        if(StartWithDownstab == null && StartWithUpstab == null)
+        if (StartWithDownstab == null && StartWithUpstab == null)
         {
             switch(random.Next(7))
             {

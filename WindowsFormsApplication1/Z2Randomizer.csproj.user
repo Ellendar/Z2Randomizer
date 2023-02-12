@@ -12,6 +12,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <EnableSecurityDebugging>false</EnableSecurityDebugging>
+    <_LastSelectedProfileId>C:\Workspace\Z2Randomizer\WindowsFormsApplication1\Properties\PublishProfiles\ProdPublishProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
     <Compile Update="UI\GenerateBatchForm.cs">
