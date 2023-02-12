@@ -3016,6 +3016,7 @@
             this.randomPercentFlagButton.Text = "Random%";
             this.toolTip1.SetToolTip(this.randomPercentFlagButton, "Is it randomized? Who knows?");
             this.randomPercentFlagButton.UseVisualStyleBackColor = true;
+            this.randomPercentFlagButton.Click += new System.EventHandler(this.RandomPercentFlags);
             // 
             // unused2FlagsButton
             // 
