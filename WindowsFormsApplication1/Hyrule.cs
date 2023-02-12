@@ -2470,12 +2470,12 @@ public class Hyrule
             }
         }
 
-        if(props.encounterRate.Equals("None"))
+        if(props.encounterRate == EncounterRate.NONE)
         {
             ROMData.Put(0x294, 0x60); //skips the whole routine
         }
 
-        if(props.encounterRate.Equals("50%"))
+        if(props.encounterRate == EncounterRate.HALF)
         {
             //terrain timers
             ROMData.Put(0x250, 0x40);

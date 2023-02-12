@@ -226,7 +226,7 @@
             this.beginnerFlagsButton = new System.Windows.Forms.Button();
             this.standard2022FlagsButton = new System.Windows.Forms.Button();
             this.maxRandoFlagButton = new System.Windows.Forms.Button();
-            this.unused1FlagsButton = new System.Windows.Forms.Button();
+            this.randomPercentFlagButton = new System.Windows.Forms.Button();
             this.unused2FlagsButton = new System.Windows.Forms.Button();
             this.unused3FlagsButton = new System.Windows.Forms.Button();
             this.discordButton = new System.Windows.Forms.Button();
@@ -697,10 +697,9 @@
             this.shuffleStartingSpellsCheckbox.Size = new System.Drawing.Size(140, 19);
             this.shuffleStartingSpellsCheckbox.TabIndex = 1;
             this.shuffleStartingSpellsCheckbox.Text = "Shuffle Starting Spells";
-            this.shuffleStartingSpellsCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleStartingSpellsCheckbox, "Each spell has a 25% chance of being known");
             this.shuffleStartingSpellsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleStartingSpellsCheckbox.CheckedChanged += new System.EventHandler(this.spellShuffleBox_CheckedChanged);
+            this.shuffleStartingSpellsCheckbox.CheckStateChanged += new System.EventHandler(this.spellShuffleBox_CheckStateChanged);
             // 
             // itemGrp
             // 
@@ -828,10 +827,9 @@
             this.shuffleStartingItemsCheckbox.Size = new System.Drawing.Size(139, 19);
             this.shuffleStartingItemsCheckbox.TabIndex = 1;
             this.shuffleStartingItemsCheckbox.Text = "Shuffle Starting Items";
-            this.shuffleStartingItemsCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleStartingItemsCheckbox, "Each item has a 25% chance of being in your inventory");
             this.shuffleStartingItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleStartingItemsCheckbox.CheckedChanged += new System.EventHandler(this.shuffleItemBox_CheckedChanged);
+            this.shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleItemBox_CheckStateChanged);
             // 
             // tabPage1
             // 
@@ -1246,7 +1244,7 @@
             this.toolTip1.SetToolTip(this.allowPalaceContinentSwapCheckbox, "When selected, palaces can move from their normal continents. Palace 1 could be f" +
         "ound on Maze Island or East Hyrule, for example.");
             this.allowPalaceContinentSwapCheckbox.UseVisualStyleBackColor = true;
-            this.allowPalaceContinentSwapCheckbox.CheckedChanged += new System.EventHandler(this.palaceSwapBox_CheckedChanged);
+            this.allowPalaceContinentSwapCheckbox.CheckStateChanged += new System.EventHandler(this.palaceSwapBox_CheckStateChanged);
             // 
             // label4
             // 
@@ -1282,7 +1280,7 @@
             this.shuffleEncountersCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleEncountersCheckbox, "Shuffle which overworld encounters occur on different terrain types");
             this.shuffleEncountersCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleEncountersCheckbox.CheckedChanged += new System.EventHandler(this.shuffleEncounters_CheckedChanged);
+            this.shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleEncounters_CheckStateChanged);
             // 
             // tabPage2
             // 
@@ -1446,7 +1444,7 @@
             this.removeTbirdCheckbox.Text = "Remove Thunderbird";
             this.toolTip1.SetToolTip(this.removeTbirdCheckbox, "If checked, you must defeat thunderbird");
             this.removeTbirdCheckbox.UseVisualStyleBackColor = true;
-            this.removeTbirdCheckbox.CheckedChanged += new System.EventHandler(this.removeTbird_CheckedChanged);
+            this.removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(this.removeTbird_CheckStateChanged);
             // 
             // shortGPCheckbox
             // 
@@ -1498,7 +1496,7 @@
             this.tbirdRequiredCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.tbirdRequiredCheckbox, "If checked, you must defeat thunderbird");
             this.tbirdRequiredCheckbox.UseVisualStyleBackColor = true;
-            this.tbirdRequiredCheckbox.CheckedChanged += new System.EventHandler(this.tbirdBox_CheckedChanged);
+            this.tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(this.tbirdBox_CheckStateChanged);
             // 
             // label6
             // 
@@ -1819,7 +1817,7 @@
             this.shuffleAllExpCheckbox.Text = "Shuffle All Experience Needed";
             this.toolTip1.SetToolTip(this.shuffleAllExpCheckbox, "Shuffles experience needed for all levels");
             this.shuffleAllExpCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleAllExpCheckbox.CheckedChanged += new System.EventHandler(this.shuffleAllExp_CheckedChanged);
+            this.shuffleAllExpCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleAllExp_CheckStateChanged);
             // 
             // tabPage9
             // 
@@ -1851,7 +1849,7 @@
             this.toolTip1.SetToolTip(this.useDashCheckbox, "When selected, the Fire spell will be replaced with a Dash spell that makes Link " +
         "move faster");
             this.useDashCheckbox.UseVisualStyleBackColor = true;
-            this.useDashCheckbox.CheckedChanged += new System.EventHandler(this.dashBox_CheckedChanged);
+            this.useDashCheckbox.CheckStateChanged += new System.EventHandler(this.dashBox_CheckStateChanged);
             // 
             // randomizeSpellSpellEnemyCheckbox
             // 
@@ -1877,7 +1875,7 @@
             this.combineFireCheckbox.TabIndex = 19;
             this.combineFireCheckbox.Text = "Combine Fire with a Random Spell";
             this.combineFireCheckbox.UseVisualStyleBackColor = true;
-            this.combineFireCheckbox.CheckedChanged += new System.EventHandler(this.combineFireBox_CheckedChanged);
+            this.combineFireCheckbox.CheckStateChanged += new System.EventHandler(this.combineFireBox_CheckStateChanged);
             // 
             // disableMagicContainerRequirementCheckbox
             // 
@@ -2012,7 +2010,7 @@
             this.shufflePalaceEnemiesCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shufflePalaceEnemiesCheckbox, "Shuffles enemies in the palaces");
             this.shufflePalaceEnemiesCheckbox.UseVisualStyleBackColor = true;
-            this.shufflePalaceEnemiesCheckbox.CheckedChanged += new System.EventHandler(this.shufflePalaceEnemies_CheckedChanged);
+            this.shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.shufflePalaceEnemies_CheckStateChanged);
             // 
             // shuffleOverworldEnemiesCheckbox
             // 
@@ -2026,7 +2024,7 @@
             this.shuffleOverworldEnemiesCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleOverworldEnemiesCheckbox, "Shuffles enemies on the overworld");
             this.shuffleOverworldEnemiesCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleOverworldEnemiesCheckbox.CheckedChanged += new System.EventHandler(this.shuffleOverworldEnemies_CheckedChanged);
+            this.shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleOverworldEnemies_CheckStateChanged);
             // 
             // shuffleSwordImmunityBox
             // 
@@ -2122,7 +2120,7 @@
             this.toolTip1.SetToolTip(this.removeSpellitemsCheckbox, "When checked, you no longer need the trophy, medicine, or kid to access the respe" +
         "ctive spells");
             this.removeSpellitemsCheckbox.UseVisualStyleBackColor = true;
-            this.removeSpellitemsCheckbox.CheckedChanged += new System.EventHandler(this.spellItemBox_CheckedChanged);
+            this.removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(this.spellItemBox_CheckStateChanged);
             // 
             // includePbagCavesInShuffleCheckbox
             // 
@@ -2200,7 +2198,7 @@
             this.shuffleOverworldItemsCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleOverworldItemsCheckbox, "Shuffles the items that are found in the overworld");
             this.shuffleOverworldItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleOverworldItemsCheckbox.CheckedChanged += new System.EventHandler(this.overworldItemBox_CheckedChanged);
+            this.shuffleOverworldItemsCheckbox.CheckStateChanged += new System.EventHandler(this.overworldItemBox_CheckStateChanged);
             // 
             // shufflePalaceItemsCheckbox
             // 
@@ -2214,7 +2212,7 @@
             this.shufflePalaceItemsCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shufflePalaceItemsCheckbox, "Shuffles the items that are found in palaces");
             this.shufflePalaceItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shufflePalaceItemsCheckbox.CheckedChanged += new System.EventHandler(this.palaceItemBox_CheckedChanged);
+            this.shufflePalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(this.palaceItemBox_CheckStateChanged);
             // 
             // tabPage8
             // 
@@ -2277,7 +2275,6 @@
             // largeEnemiesKeyCheckbox
             // 
             this.largeEnemiesKeyCheckbox.AutoSize = true;
-            this.largeEnemiesKeyCheckbox.Enabled = false;
             this.largeEnemiesKeyCheckbox.Location = new System.Drawing.Point(404, 204);
             this.largeEnemiesKeyCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesKeyCheckbox.Name = "largeEnemiesKeyCheckbox";
@@ -2290,7 +2287,6 @@
             // largeEnemies1UpCheckbox
             // 
             this.largeEnemies1UpCheckbox.AutoSize = true;
-            this.largeEnemies1UpCheckbox.Enabled = false;
             this.largeEnemies1UpCheckbox.Location = new System.Drawing.Point(404, 180);
             this.largeEnemies1UpCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemies1UpCheckbox.Name = "largeEnemies1UpCheckbox";
@@ -2303,7 +2299,6 @@
             // largeEnemiesXLBagCheckbox
             // 
             this.largeEnemiesXLBagCheckbox.AutoSize = true;
-            this.largeEnemiesXLBagCheckbox.Enabled = false;
             this.largeEnemiesXLBagCheckbox.Location = new System.Drawing.Point(404, 156);
             this.largeEnemiesXLBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesXLBagCheckbox.Name = "largeEnemiesXLBagCheckbox";
@@ -2318,7 +2313,6 @@
             this.largeEnemiesLargeBagCheckbox.AutoSize = true;
             this.largeEnemiesLargeBagCheckbox.Checked = true;
             this.largeEnemiesLargeBagCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.largeEnemiesLargeBagCheckbox.Enabled = false;
             this.largeEnemiesLargeBagCheckbox.Location = new System.Drawing.Point(404, 132);
             this.largeEnemiesLargeBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesLargeBagCheckbox.Name = "largeEnemiesLargeBagCheckbox";
@@ -2331,7 +2325,6 @@
             // largeEnemiesMediumBagCheckbox
             // 
             this.largeEnemiesMediumBagCheckbox.AutoSize = true;
-            this.largeEnemiesMediumBagCheckbox.Enabled = false;
             this.largeEnemiesMediumBagCheckbox.Location = new System.Drawing.Point(404, 108);
             this.largeEnemiesMediumBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesMediumBagCheckbox.Name = "largeEnemiesMediumBagCheckbox";
@@ -2344,7 +2337,6 @@
             // largeEnemiesSmallBagCheckbox
             // 
             this.largeEnemiesSmallBagCheckbox.AutoSize = true;
-            this.largeEnemiesSmallBagCheckbox.Enabled = false;
             this.largeEnemiesSmallBagCheckbox.Location = new System.Drawing.Point(404, 84);
             this.largeEnemiesSmallBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesSmallBagCheckbox.Name = "largeEnemiesSmallBagCheckbox";
@@ -2359,7 +2351,6 @@
             this.largeEnemiesRedJarCheckbox.AutoSize = true;
             this.largeEnemiesRedJarCheckbox.Checked = true;
             this.largeEnemiesRedJarCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.largeEnemiesRedJarCheckbox.Enabled = false;
             this.largeEnemiesRedJarCheckbox.Location = new System.Drawing.Point(404, 60);
             this.largeEnemiesRedJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesRedJarCheckbox.Name = "largeEnemiesRedJarCheckbox";
@@ -2372,7 +2363,6 @@
             // largeEnemiesBlueJarCheckbox
             // 
             this.largeEnemiesBlueJarCheckbox.AutoSize = true;
-            this.largeEnemiesBlueJarCheckbox.Enabled = false;
             this.largeEnemiesBlueJarCheckbox.Location = new System.Drawing.Point(404, 36);
             this.largeEnemiesBlueJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.largeEnemiesBlueJarCheckbox.Name = "largeEnemiesBlueJarCheckbox";
@@ -2395,7 +2385,6 @@
             // smallEnemiesKeyCheckbox
             // 
             this.smallEnemiesKeyCheckbox.AutoSize = true;
-            this.smallEnemiesKeyCheckbox.Enabled = false;
             this.smallEnemiesKeyCheckbox.Location = new System.Drawing.Point(254, 204);
             this.smallEnemiesKeyCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesKeyCheckbox.Name = "smallEnemiesKeyCheckbox";
@@ -2408,7 +2397,6 @@
             // smallEnemies1UpCheckbox
             // 
             this.smallEnemies1UpCheckbox.AutoSize = true;
-            this.smallEnemies1UpCheckbox.Enabled = false;
             this.smallEnemies1UpCheckbox.Location = new System.Drawing.Point(255, 180);
             this.smallEnemies1UpCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemies1UpCheckbox.Name = "smallEnemies1UpCheckbox";
@@ -2421,7 +2409,6 @@
             // smallEnemiesXLBagCheckbox
             // 
             this.smallEnemiesXLBagCheckbox.AutoSize = true;
-            this.smallEnemiesXLBagCheckbox.Enabled = false;
             this.smallEnemiesXLBagCheckbox.Location = new System.Drawing.Point(255, 156);
             this.smallEnemiesXLBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesXLBagCheckbox.Name = "smallEnemiesXLBagCheckbox";
@@ -2434,7 +2421,6 @@
             // smallEnemiesLargeBagCheckbox
             // 
             this.smallEnemiesLargeBagCheckbox.AutoSize = true;
-            this.smallEnemiesLargeBagCheckbox.Enabled = false;
             this.smallEnemiesLargeBagCheckbox.Location = new System.Drawing.Point(255, 132);
             this.smallEnemiesLargeBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesLargeBagCheckbox.Name = "smallEnemiesLargeBagCheckbox";
@@ -2447,7 +2433,6 @@
             // smallEnemiesMediumBagCheckbox
             // 
             this.smallEnemiesMediumBagCheckbox.AutoSize = true;
-            this.smallEnemiesMediumBagCheckbox.Enabled = false;
             this.smallEnemiesMediumBagCheckbox.Location = new System.Drawing.Point(255, 108);
             this.smallEnemiesMediumBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesMediumBagCheckbox.Name = "smallEnemiesMediumBagCheckbox";
@@ -2462,7 +2447,6 @@
             this.smallEnemiesSmallBagCheckbox.AutoSize = true;
             this.smallEnemiesSmallBagCheckbox.Checked = true;
             this.smallEnemiesSmallBagCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.smallEnemiesSmallBagCheckbox.Enabled = false;
             this.smallEnemiesSmallBagCheckbox.Location = new System.Drawing.Point(255, 84);
             this.smallEnemiesSmallBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesSmallBagCheckbox.Name = "smallEnemiesSmallBagCheckbox";
@@ -2475,7 +2459,6 @@
             // smallEnemiesRedJarCheckbox
             // 
             this.smallEnemiesRedJarCheckbox.AutoSize = true;
-            this.smallEnemiesRedJarCheckbox.Enabled = false;
             this.smallEnemiesRedJarCheckbox.Location = new System.Drawing.Point(255, 60);
             this.smallEnemiesRedJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesRedJarCheckbox.Name = "smallEnemiesRedJarCheckbox";
@@ -2490,7 +2473,6 @@
             this.smallEnemiesBlueJarCheckbox.AutoSize = true;
             this.smallEnemiesBlueJarCheckbox.Checked = true;
             this.smallEnemiesBlueJarCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.smallEnemiesBlueJarCheckbox.Enabled = false;
             this.smallEnemiesBlueJarCheckbox.Location = new System.Drawing.Point(255, 36);
             this.smallEnemiesBlueJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.smallEnemiesBlueJarCheckbox.Name = "smallEnemiesBlueJarCheckbox";
@@ -3024,15 +3006,16 @@
             this.maxRandoFlagButton.UseVisualStyleBackColor = true;
             this.maxRandoFlagButton.Click += new System.EventHandler(this.MaxRandoFlags);
             // 
-            // unused1FlagsButton
+            // randomPercentFlagButton
             // 
-            this.unused1FlagsButton.Location = new System.Drawing.Point(318, 505);
-            this.unused1FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.unused1FlagsButton.Name = "unused1FlagsButton";
-            this.unused1FlagsButton.Size = new System.Drawing.Size(88, 27);
-            this.unused1FlagsButton.TabIndex = 21;
-            this.toolTip1.SetToolTip(this.unused1FlagsButton, "Unused (for now)");
-            this.unused1FlagsButton.UseVisualStyleBackColor = true;
+            this.randomPercentFlagButton.Location = new System.Drawing.Point(318, 505);
+            this.randomPercentFlagButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.randomPercentFlagButton.Name = "randomPercentFlagButton";
+            this.randomPercentFlagButton.Size = new System.Drawing.Size(88, 27);
+            this.randomPercentFlagButton.TabIndex = 21;
+            this.randomPercentFlagButton.Text = "Random%";
+            this.toolTip1.SetToolTip(this.randomPercentFlagButton, "Is it randomized? Who knows?");
+            this.randomPercentFlagButton.UseVisualStyleBackColor = true;
             // 
             // unused2FlagsButton
             // 
@@ -3278,7 +3261,7 @@
             this.Controls.Add(this.discordButton);
             this.Controls.Add(this.unused3FlagsButton);
             this.Controls.Add(this.unused2FlagsButton);
-            this.Controls.Add(this.unused1FlagsButton);
+            this.Controls.Add(this.randomPercentFlagButton);
             this.Controls.Add(this.maxRandoFlagButton);
             this.Controls.Add(this.standard2022FlagsButton);
             this.Controls.Add(this.beginnerFlagsButton);
@@ -3294,6 +3277,7 @@
             this.Controls.Add(this.seedTextBox);
             this.Controls.Add(this.romFileTextBox);
             this.Controls.Add(this.mainTabControl);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "MainUI";
             this.Text = "Zelda 2 Randomizer";
@@ -3404,7 +3388,7 @@
         private System.Windows.Forms.CheckBox palacePaletteCheckbox;
         private System.Windows.Forms.Button unused3FlagsButton;
         private System.Windows.Forms.Button unused2FlagsButton;
-        private System.Windows.Forms.Button unused1FlagsButton;
+        private System.Windows.Forms.Button randomPercentFlagButton;
         private System.Windows.Forms.Button maxRandoFlagButton;
         private System.Windows.Forms.Button standard2022FlagsButton;
         private System.Windows.Forms.Button beginnerFlagsButton;
