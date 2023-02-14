@@ -391,7 +391,7 @@ public class ROM
             }
         }
 
-        if(charSprite.Equals("Samus"))
+        if(charSprite == CharacterSprite.SAMUS)
         {
             for(int i = 0; i < Graphics.samusEnd.Count; i++)
             {

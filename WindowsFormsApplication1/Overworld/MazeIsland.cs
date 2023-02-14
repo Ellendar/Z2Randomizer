@@ -58,11 +58,11 @@ class MazeIsland : World
 
         baseAddr = 0xA10c;
         VANILLA_MAP_ADDR = 0xa65c;
-        if(hy.Props.mazeBiome.Equals("Vanilla"))
+        if(hy.Props.mazeBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if(hy.Props.mazeBiome.Equals("Vanilla (shuffled)"))
+        else if(hy.Props.mazeBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }

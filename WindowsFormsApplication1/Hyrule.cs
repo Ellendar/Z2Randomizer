@@ -144,8 +144,6 @@ public class Hyrule
 
     public Dictionary<Item, Boolean> itemGet = new Dictionary<Item, bool>();
     //private Boolean[] spellGet;
-    public Boolean hiddenPalace;
-    public Boolean hiddenKasuto;
     private readonly int enemyAddr1 = 0x108B0;
     private readonly int enemyAddr2 = 0x148B0;
     private readonly int enemyPtr1 = 0x105B1;
@@ -289,24 +287,6 @@ public class Hyrule
         if (props.disableMusic)
         {
             ROMData.DisableMusic();
-        }
-
-        if (props.hiddenPalace.Equals("Random"))
-        {
-            hiddenPalace = RNG.NextDouble() > .5;
-        }
-        else
-        {
-            hiddenPalace = props.hiddenPalace.Equals("On");
-        }
-
-        if (props.hiddenKasuto.Equals("Random"))
-        {
-            hiddenKasuto = RNG.NextDouble() > .5;
-        }
-        else
-        {
-            hiddenKasuto = props.hiddenKasuto.Equals("On");
         }
 
         ROMData.DoHackyFixes();
@@ -1024,8 +1004,8 @@ public class Hyrule
             && CanGet(eastHyrule.gp) 
             && CanGet(itemLocs) 
             && CanGet(westHyrule.bagu) 
-            && (!hiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation))) 
-            && (!hiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
+            && (!Props.hiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation))) 
+            && (!Props.hiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
         if(retval == false)
         {
             isEverythingReachableFailures++;
@@ -1414,7 +1394,7 @@ public class Hyrule
                 worlds.Add(mazeIsland);
                 ShuffleTowns();
 
-                if (props.continentConnections.Equals("Normal") || props.continentConnections.Equals("R+B Border Shuffle"))
+                if (props.continentConnections == ContinentConnectionType.NORMAL || props.continentConnections == ContinentConnectionType.RB_BORDER_SHUFFLE)
                 {
                     westHyrule.LoadCave1(1);
                     westHyrule.LoadCave2(1);
@@ -1428,18 +1408,24 @@ public class Hyrule
 
                     mazeIsland.LoadBridge(2);
                 }
-                else if (props.continentConnections.Equals("Transportation Shuffle"))
+                else if (props.continentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
                     List<int> chosen = new List<int>();
                     int type = RNG.Next(4);
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)") || props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA
+                        || props.westBiome == Biome.VANILLA_SHUFFLE 
+                        || props.dmBiome == Biome.VANILLA
+                        || props.dmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 3;
                     }
 
                     SetTransportation(0, 1, type);
                     chosen.Add(type);
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)") || props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA
+                        || props.westBiome == Biome.VANILLA_SHUFFLE
+                        || props.dmBiome == Biome.VANILLA
+                        || props.dmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 0;
                     }
@@ -1452,7 +1438,10 @@ public class Hyrule
                     }
                     SetTransportation(0, 1, type);
                     chosen.Add(type);
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)") || props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA
+                        || props.westBiome == Biome.VANILLA_SHUFFLE
+                        || props.eastBiome == Biome.VANILLA
+                        || props.eastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 1;
                     }
@@ -1465,7 +1454,10 @@ public class Hyrule
                     }
                     SetTransportation(0, 2, type);
                     chosen.Add(type);
-                    if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)") || props.mazeBiome.Equals("Vanilla") || props.mazeBiome.Equals("Vanilla (shuffled)"))
+                    if (props.eastBiome == Biome.VANILLA
+                        || props.eastBiome == Biome.VANILLA_SHUFFLE
+                        || props.mazeBiome == Biome.VANILLA
+                        || props.mazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 2;
                     }
@@ -1481,26 +1473,26 @@ public class Hyrule
                 else
                 {
                     List<int> doNotPick = new List<int>();
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(0);
                     }
-                    if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
+                    if (props.eastBiome == Biome.VANILLA || props.eastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(2);
                     }
-                    if (props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
+                    if (props.dmBiome == Biome.VANILLA || props.dmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(1);
                     }
-                    if (props.mazeBiome.Equals("Vanilla") || props.mazeBiome.Equals("Vanilla (shuffled)"))
+                    if (props.mazeBiome == Biome.VANILLA || props.mazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(3);
                     }
 
                     int raftw1 = RNG.Next(worlds.Count);
 
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
                     {
                         raftw1 = 0;
                     }
@@ -1514,7 +1506,7 @@ public class Hyrule
 
 
                     int raftw2 = RNG.Next(worlds.Count);
-                    if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
+                    if (props.eastBiome == Biome.VANILLA || props.eastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         raftw2 = 2;
                     }
@@ -1530,7 +1522,7 @@ public class Hyrule
                     worlds[raftw2].LoadRaft(raftw1);
 
                     int bridgew1 = RNG.Next(worlds.Count);
-                    if (props.eastBiome.Equals("Vanilla") || props.eastBiome.Equals("Vanilla (shuffled)"))
+                    if (props.eastBiome == Biome.VANILLA || props.eastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         bridgew1 = 2;
                     }
@@ -1542,7 +1534,7 @@ public class Hyrule
                         }
                     }
                     int bridgew2 = RNG.Next(worlds.Count);
-                    if (props.mazeBiome.Equals("Vanilla") || props.mazeBiome.Equals("Vanilla (shuffled)"))
+                    if (props.mazeBiome == Biome.VANILLA || props.mazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         bridgew2 = 3;
                     }
@@ -1558,7 +1550,7 @@ public class Hyrule
                     worlds[bridgew2].LoadBridge(bridgew1);
 
                     int c1w1 = RNG.Next(worlds.Count);
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c1w1 = 0;
                     }
@@ -1570,7 +1562,7 @@ public class Hyrule
                         }
                     }
                     int c1w2 = RNG.Next(worlds.Count);
-                    if (props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
+                    if (props.dmBiome == Biome.VANILLA || props.dmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c1w2 = 1;
                     }
@@ -1586,7 +1578,7 @@ public class Hyrule
                     worlds[c1w2].LoadCave1(c1w1);
 
                     int c2w1 = RNG.Next(worlds.Count);
-                    if (props.westBiome.Equals("Vanilla") || props.westBiome.Equals("Vanilla (shuffled)"))
+                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c2w1 = 0;
                     }
@@ -1598,7 +1590,7 @@ public class Hyrule
                         }
                     }
                     int c2w2 = RNG.Next(worlds.Count);
-                    if (props.dmBiome.Equals("Vanilla") || props.dmBiome.Equals("Vanilla (shuffled)"))
+                    if (props.dmBiome == Biome.VANILLA || props.dmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c2w2 = 1;
                     }
@@ -2198,16 +2190,16 @@ public class Hyrule
             int high = exp & 0xF0;
             int low = exp & 0x0F;
 
-            if(props.expLevel.Equals("High"))
+            if(props.expLevel == StatEffectiveness.HIGH)
             {
                 low++;
-            } else if(props.expLevel.Equals("Low")) {
+            } else if(props.expLevel == StatEffectiveness.LOW) {
                 low--;
-            } else if(props.expLevel.Equals("None")) {
+            } else if(props.expLevel == StatEffectiveness.NONE) {
                 low = 0;
             }
 
-            if (!props.expLevel.Equals("None"))
+            if (props.expLevel != StatEffectiveness.NONE)
             {
                 low = RNG.Next(low - 2, low + 3);
             }
@@ -2511,7 +2503,7 @@ public class Hyrule
         foreach (int l in tunicLocs)
         {
             ROMData.Put(0x10ea, (byte)c2);
-            if (props.charSprite.Equals("Iron Knuckle"))
+            if (props.charSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 ROMData.Put(0x10ea, (byte)0x30);
                 ROMData.Put(0x2a0a, 0x0D);
@@ -2520,7 +2512,7 @@ public class Hyrule
                 ROMData.Put(l - 1, (byte)c2);
                 ROMData.Put(l - 2, 0x0D);
             }
-            else if(props.charSprite.Equals("Samus"))
+            else if(props.charSprite == CharacterSprite.SAMUS)
             {
                 ROMData.Put(0x2a0a, 0x16);
                 ROMData.Put(0x2a10, 0x1a);
@@ -2528,13 +2520,13 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x1a);
                 ROMData.Put(l - 2, 0x16);
             }
-            else if (props.charSprite.Equals("Error") || props.charSprite.Equals("Vase Lady"))
+            else if (props.charSprite == CharacterSprite.ERROR || props.charSprite == CharacterSprite.VASE_LADY)
             {
                 ROMData.Put(0x2a0a, 0x0F);
                 ROMData.Put(l, (byte)c2);
                 ROMData.Put(l - 2, 0x0F);
             }
-            else if(props.charSprite.Equals("Simon"))
+            else if(props.charSprite == CharacterSprite.SIMON)
             {
                 ROMData.Put(0x2a0a, 0x07);
                 ROMData.Put(0x2a10, 0x37);
@@ -2542,7 +2534,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x37);
                 ROMData.Put(l - 2, 0x07);
             }
-            else if(props.charSprite.Equals("Stalfos"))
+            else if(props.charSprite == CharacterSprite.STALFOS)
             {
                 ROMData.Put(0x2a0a, 0x08);
                 ROMData.Put(0x2a10, 0x20);
@@ -2550,7 +2542,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x20);
                 ROMData.Put(l - 2, 0x08);
             }
-            else if(props.charSprite.Equals("Ruto"))
+            else if(props.charSprite == CharacterSprite.RUTO)
             {
                 ROMData.Put(0x2a0a, 0x0c);
                 ROMData.Put(0x2a10, 0x1c);
@@ -2558,7 +2550,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x1c);
                 ROMData.Put(l - 2, 0x0c);
             }
-            else if(props.charSprite.Equals("Yoshi"))
+            else if(props.charSprite == CharacterSprite.YOSHI)
             {
                 ROMData.Put(0x2a0a, 0x16);
                 ROMData.Put(0x2a10, 0x20);
@@ -2566,7 +2558,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x20);
                 ROMData.Put(l - 2, 0x16);
             }
-            else if(props.charSprite.Equals("Dragonlord"))
+            else if(props.charSprite == CharacterSprite.DRAGONLORD)
             {
                 ROMData.Put(0x2a0a, 0x28);
                 ROMData.Put(0x2a10, 0x11);
@@ -2574,7 +2566,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x11);
                 ROMData.Put(l - 2, 0x28);
             }
-            else if (props.charSprite.Equals("Miria"))
+            else if (props.charSprite == CharacterSprite.MIRIA)
             {
                 ROMData.Put(0x2a0a, 0x0D);
                 ROMData.Put(0x2a10, 0x30);
@@ -2583,7 +2575,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x0D);
                 
             }
-            else if (props.charSprite.Equals("Crystalis"))
+            else if (props.charSprite == CharacterSprite.CRYSTALIS)
             {
                 ROMData.Put(0x2a0a, 0x0D);
                 ROMData.Put(0x2a10, 0x36);
@@ -2592,7 +2584,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x0D);
 
             }
-            else if (props.charSprite.Equals("Taco"))
+            else if (props.charSprite == CharacterSprite.TACO)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2601,7 +2593,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite.Equals("Pyramid"))
+            else if (props.charSprite == CharacterSprite.PYRAMID)
             {
                 ROMData.Put(0x2a0a, 0x12);
                 ROMData.Put(0x2a10, 0x22);
@@ -2610,7 +2602,8 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x12);
 
             }
-            else if (props.charSprite.Equals("Faxanadu"))
+            /*
+            else if (props.charSprite == CharacterSprite.FAXANADU)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2619,7 +2612,8 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite.Equals("Lady Link"))
+            */
+            else if (props.charSprite == CharacterSprite.LADY_LINK)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2628,7 +2622,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite.Equals("Hoodie Link"))
+            else if (props.charSprite == CharacterSprite.HOODIE_LINK)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2637,7 +2631,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite.Equals("GliitchWiitch"))
+            else if (props.charSprite == CharacterSprite.GLITCH_WITCH)
             {
                 ROMData.Put(0x2a0a, 0x08);
                 ROMData.Put(0x2a10, 0x36);
@@ -2804,7 +2798,7 @@ public class Hyrule
             ShuffleBits(addr, true);
         }
 
-        if (!props.expLevel.Equals("Normal"))
+        if (props.expLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2830,7 +2824,7 @@ public class Hyrule
         {
             ShuffleBits(addr, true);
         }
-        if (!props.expLevel.Equals("Normal"))
+        if (props.expLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2863,7 +2857,7 @@ public class Hyrule
         {
             ShuffleBits(addr, true);
         }
-        if (!props.expLevel.Equals("Normal"))
+        if (props.expLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2905,7 +2899,7 @@ public class Hyrule
         {
             ShuffleBits(addr, true);
         }
-        if (!props.expLevel.Equals("Normal"))
+        if (props.expLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2940,12 +2934,12 @@ public class Hyrule
         {
             ShuffleBits(addr, true);
         }
-        if (!props.expLevel.Equals("Normal"))
+        if (props.expLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
 
-        if (!props.expLevel.Equals("Normal"))
+        if (props.expLevel != StatEffectiveness.VANILLA)
         {
             addr = new List<int>();
             addr.Add(0x11505);
@@ -3035,14 +3029,7 @@ public class Hyrule
 
         ShuffleLifeEffectiveness(false);
 
-        if (props.startGems.Equals("Random"))
-        {
-            ROMData.Put(0x17B10, (Byte)RNG.Next(0, 7));
-        }
-        else
-        {
-            ROMData.Put(0x17B10, (Byte)props.startGems);
-        }
+        ROMData.Put(0x17B10, (Byte)props.startGems);
 
 
         startHearts = props.startHearts;

@@ -213,31 +213,31 @@ public class WestHyrule : World
                 unimportantLocs.Add(GetLocationByMem(0x465B));
             }
         }
-        if (hy.Props.westBiome.Equals("Islands"))
+        if (hy.Props.westBiome == Biome.ISLANDS)
         {
             this.biome = Biome.ISLANDS;
         }
-        else if (hy.Props.westBiome.Equals("Canyon") || hy.Props.westBiome.Equals("CanyonD"))
+        else if (hy.Props.westBiome == Biome.CANYON || hy.Props.westBiome == Biome.DRY_CANYON)
         {
             this.biome = Biome.CANYON;
         }
-        else if (hy.Props.westBiome.Equals("Mountainous"))
+        else if (hy.Props.westBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if(hy.Props.westBiome.Equals("Caldera"))
+        else if(hy.Props.westBiome == Biome.CALDERA)
         {
             this.biome = Biome.CALDERA;
         }
-        else if(hy.Props.westBiome.Equals("Mountainous"))
+        else if(hy.Props.westBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if (hy.Props.westBiome.Equals("Vanilla"))
+        else if (hy.Props.westBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if (hy.Props.westBiome.Equals("Vanilla (shuffled)"))
+        else if (hy.Props.westBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }
@@ -454,7 +454,7 @@ public class WestHyrule : World
                     case Biome.CANYON:
                         isHorizontal = hyrule.RNG.NextDouble() > .5;
                         riverTerrain = fillerWater;
-                        if (hyrule.Props.westBiome.Equals("CanyonD"))
+                        if (hyrule.Props.westBiome == Biome.DRY_CANYON)
                         {
                             riverTerrain = Terrain.DESERT;
                             bridge1.CanShuffle = false;
@@ -548,7 +548,7 @@ public class WestHyrule : World
                 }
 
                 Direction raftDirection = Direction.EAST;
-                if (!hyrule.Props.continentConnections.Equals("Normal") && this.biome != Biome.CANYON)
+                if (hyrule.Props.continentConnections != ContinentConnectionType.NORMAL && this.biome != Biome.CANYON)
                 {
                     raftDirection = (Direction)hyrule.RNG.Next(4);
                 }

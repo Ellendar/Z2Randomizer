@@ -120,28 +120,28 @@ class DeathMountain : World
         baseAddr = 0x610C;
         VANILLA_MAP_ADDR = 0x665c;
 
-        if (hy.Props.dmBiome.Equals("Islands"))
+        if (hy.Props.dmBiome == Biome.ISLANDS)
         {
             this.biome = Biome.ISLANDS;
         }
-        else if (hy.Props.dmBiome.Equals("Canyon") || hy.Props.dmBiome.Equals("CanyonD"))
+        else if (hy.Props.dmBiome == Biome.CANYON || hy.Props.dmBiome == Biome.DRY_CANYON)
         {
             this.biome = Biome.CANYON;
             //MAP_ROWS = 75;
         }
-        else if(hy.Props.dmBiome.Equals("Caldera"))
+        else if(hy.Props.dmBiome == Biome.CALDERA)
         {
             this.biome = Biome.CALDERA;
         }
-        else if(hy.Props.dmBiome.Equals("Mountainous"))
+        else if(hy.Props.dmBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if(hy.Props.dmBiome.Equals("Vanilla"))
+        else if(hy.Props.dmBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if(hy.Props.dmBiome.Equals("Vanilla (shuffled)"))
+        else if(hy.Props.dmBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }
@@ -303,7 +303,7 @@ class DeathMountain : World
                     riverT = water;
                     horizontal = hyrule.RNG.NextDouble() > 0.5;
 
-                    if (hyrule.Props.westBiome.Equals("CanyonD"))
+                    if (hyrule.Props.westBiome == Biome.DRY_CANYON)
                     {
                         riverT = Terrain.DESERT;
                     }

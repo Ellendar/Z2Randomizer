@@ -875,6 +875,30 @@ public class RandomizerConfiguration
         //ShuffleEn = false;
         //upaBox = false;
 
+        //Legacy UI tracked individual drops and randomize / manual separately, so the flags often have stray incorrect data in them
+        //That wasn't actually used by the rando. This section is to convert those legacy flags to a modern interpretation
+        if(config.RandomizeDrops)
+        {
+            config.SmallEnemiesCanDrop1up = false;
+            config.SmallEnemiesCanDropBlueJar = false;
+            config.SmallEnemiesCanDropKey = false;
+            config.SmallEnemiesCanDropLargeBag = false;
+            config.SmallEnemiesCanDropMediumBag = false;
+            config.SmallEnemiesCanDropRedJar = false;
+            config.SmallEnemiesCanDropSmallBag = false;
+            config.SmallEnemiesCanDropXLBag = false;
+
+            config.LargeEnemiesCanDrop1up = false;
+            config.LargeEnemiesCanDropBlueJar = false;
+            config.LargeEnemiesCanDropKey = false;
+            config.LargeEnemiesCanDropLargeBag = false;
+            config.LargeEnemiesCanDropMediumBag = false;
+            config.LargeEnemiesCanDropRedJar = false;
+            config.LargeEnemiesCanDropSmallBag = false;
+            config.LargeEnemiesCanDropXLBag = false;
+        }
+
+
         return config;
     }
 
@@ -1031,7 +1055,7 @@ public class RandomizerConfiguration
         {
             properties.maxHearts = (int)MaxHeartContainers;
         }
-        properties.maxHearts = Math.Min(properties.maxHearts, properties.startHearts);
+        properties.maxHearts = Math.Max(properties.maxHearts, properties.startHearts);
 
         //If both stabs are random, use the classic weightings
         if (StartWithDownstab == null && StartWithUpstab == null)
@@ -1091,7 +1115,7 @@ public class RandomizerConfiguration
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
-                2 => Biome.CANYON,
+                2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.CALDERA,
                 4 => Biome.MOUNTAINOUS,
                 5 => Biome.VANILLA,
@@ -1109,7 +1133,7 @@ public class RandomizerConfiguration
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
-                2 => Biome.CANYON,
+                2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.VOLCANO,
                 4 => Biome.MOUNTAINOUS,
                 5 => Biome.VANILLA,
@@ -1127,7 +1151,7 @@ public class RandomizerConfiguration
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
-                2 => Biome.CANYON,
+                2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.CALDERA,
                 4 => Biome.MOUNTAINOUS,
                 5 => Biome.VANILLA,
@@ -1159,6 +1183,16 @@ public class RandomizerConfiguration
         properties.bagusWoods = GenerateBaguWoods == null ? random.Next(2) == 1 : (bool)GenerateBaguWoods;
 
         //Palaces
+        if(PalaceStyle == PalaceStyle.RANDOM)
+        {
+            properties.palaceStyle = random.Next(3) switch
+            {
+                0 => PalaceStyle.VANILLA,
+                1 => PalaceStyle.SHUFFLED,
+                2 => PalaceStyle.RECONSTRUCTED,
+                _ => throw new Exception("Invalid PalaceStyle")
+            };
+        }
         properties.palaceStyle = PalaceStyle;
         properties.startGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.requireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
@@ -1256,26 +1290,26 @@ public class RandomizerConfiguration
         //Drops
         properties.shuffleItemDropFrequency = ShuffleItemDropFrequency;
         do {
-            properties.smallbluejar = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropBlueJar;
-            properties.smallredjar = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropRedJar;
-            properties.small50 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropSmallBag;
-            properties.small100 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropMediumBag;
-            properties.small200 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropLargeBag;
-            properties.small500 = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropXLBag;
-            properties.small1up = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDrop1up;
-            properties.smallkey = RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropKey;
+            properties.smallbluejar = !SmallEnemiesCanDropBlueJar && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropBlueJar;
+            properties.smallredjar = !SmallEnemiesCanDropRedJar && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropRedJar;
+            properties.small50 = !SmallEnemiesCanDropSmallBag && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropSmallBag;
+            properties.small100 = !SmallEnemiesCanDropMediumBag && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropMediumBag;
+            properties.small200 = !SmallEnemiesCanDropLargeBag && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropLargeBag;
+            properties.small500 = !SmallEnemiesCanDropXLBag && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropXLBag;
+            properties.small1up = !SmallEnemiesCanDrop1up && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDrop1up;
+            properties.smallkey = !SmallEnemiesCanDropKey && RandomizeDrops ? random.Next(2) == 1 : SmallEnemiesCanDropKey;
         } while(!properties.smallbluejar && !properties.smallredjar && !properties.small50 && !properties.small100 &&
             !properties.small200 && !properties.small500 && !properties.small1up && !properties.smallkey);
         do
         {
-            properties.largebluejar = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropBlueJar;
-            properties.largeredjar = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropRedJar;
-            properties.large50 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropSmallBag;
-            properties.large100 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropMediumBag;
-            properties.large200 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropLargeBag;
-            properties.large500 = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropXLBag;
-            properties.large1up = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDrop1up;
-            properties.largekey = RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropKey;
+            properties.largebluejar = !LargeEnemiesCanDropBlueJar && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropBlueJar;
+            properties.largeredjar = !LargeEnemiesCanDropRedJar && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropRedJar;
+            properties.large50 = !LargeEnemiesCanDropSmallBag && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropSmallBag;
+            properties.large100 = !LargeEnemiesCanDropMediumBag && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropMediumBag;
+            properties.large200 = !LargeEnemiesCanDropLargeBag && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropLargeBag;
+            properties.large500 = !LargeEnemiesCanDropXLBag && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropXLBag;
+            properties.large1up = !LargeEnemiesCanDrop1up && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDrop1up;
+            properties.largekey = !LargeEnemiesCanDropKey && RandomizeDrops ? random.Next(2) == 1 : LargeEnemiesCanDropKey;
         } while (!properties.largebluejar && !properties.largeredjar && !properties.large50 && !properties.large100 &&
             !properties.large200 && !properties.large500 && !properties.large1up && !properties.largekey);
         properties.standardizeDrops = StandardizeDrops;
