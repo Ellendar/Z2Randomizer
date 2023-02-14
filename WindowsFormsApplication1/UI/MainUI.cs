@@ -199,6 +199,7 @@ public partial class MainUI : Form
 
         enableLevelScaling(null, null);
         eastBiome_SelectedIndexChanged(null, null);
+        randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.RandomizeDropsChanged);
         for (int i = 0; i < small.Count(); i++)
         {
             small[i].CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -999,6 +1000,7 @@ public partial class MainUI : Form
                 PalaceStyle.VANILLA => 0,
                 PalaceStyle.SHUFFLED => 1,
                 PalaceStyle.RECONSTRUCTED => 2,
+                PalaceStyle.RANDOM => 3,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeCommunityRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeCommunityRooms);
@@ -1365,23 +1367,41 @@ public partial class MainUI : Form
 
     private void AtLeastOneChecked(object sender, EventArgs e)
     {
-        CheckBox c = (CheckBox)sender;
-        CheckBox[] l = large;
-        if(small.Contains(sender))
+        if (!randomizeDropsCheckbox.Checked)
         {
-            l = small;
-        }
-        int count = 0;
-        foreach(CheckBox b in l)
-        {
-            if(b.Checked)
+            CheckBox c = (CheckBox)sender;
+            CheckBox[] l = large;
+            if (small.Contains(sender))
             {
-                count++;
+                l = small;
+            }
+            int count = 0;
+            foreach (CheckBox b in l)
+            {
+                if (b.Checked)
+                {
+                    count++;
+                }
+            }
+            if (count == 0)
+            {
+                c.Checked = true;
             }
         }
-        if(count == 0)
+    }
+
+    private void RandomizeDropsChanged(object sender, EventArgs e)
+    {
+        if(randomizeDropsCheckbox.Checked)
         {
-            c.Checked = true;
+            large.Union(small).ToList().ForEach(i => i.Checked = false);
+        }
+        else
+        {
+            smallEnemiesBlueJarCheckbox.Checked = true;
+            smallEnemiesSmallBagCheckbox.Checked = true;
+            largeEnemiesRedJarCheckbox.Checked = true;
+            largeEnemiesLargeBagCheckbox.Checked = true;
         }
     }
 
@@ -1605,7 +1625,7 @@ public partial class MainUI : Form
 
     private void palaceBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if(palaceStyleList.SelectedIndex != 2)
+        if(palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
         {
             includeCommunityRoomsCheckbox.Enabled = false;
             includeCommunityRoomsCheckbox.Checked = false;

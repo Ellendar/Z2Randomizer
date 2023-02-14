@@ -8,8 +8,6 @@ namespace Z2Randomizer;
 
 internal class ImpossibleException : Exception
 {
-    private object value;
-
     public ImpossibleException() : base()
     {
         

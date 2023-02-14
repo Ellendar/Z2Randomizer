@@ -1474,7 +1474,7 @@ public abstract class World
         {
             for (int x = 0; x < MAP_COLS; x++)
             {
-                if(hyrule.hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
+                if(hyrule.Props.hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
@@ -1489,7 +1489,7 @@ public abstract class World
                     bytesWritten += 2;
                     continue;
                 }
-                if (hyrule.hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE))
+                if (hyrule.Props.hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE))
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
