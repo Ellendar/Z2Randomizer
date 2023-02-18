@@ -146,6 +146,11 @@ public class Shuffler
             GenerateTownNameHints(hints, spellMap);
         }
 
+        if (props.swapUpAndDownStab)
+        {
+            (hints[upstabTextIndex], hints[downstabTextIndex]) = (hints[downstabTextIndex], hints[upstabTextIndex]);
+        }
+
         ROMData.TextToRom(hints);
     }
 

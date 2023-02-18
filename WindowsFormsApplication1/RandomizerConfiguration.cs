@@ -134,6 +134,7 @@ public class RandomizerConfiguration
     public bool CombineFireWithRandomSpell { get; set; }
     public bool? RandomizeSpellSpellEnemy { get; set; }
     public bool? ReplaceFireWithDash { get; set; }
+    public bool? SwapUpAndDownStab { get; set; }
 
     //Enemies
     public bool? ShuffleOverworldEnemies { get; set; }
@@ -898,6 +899,9 @@ public class RandomizerConfiguration
             config.LargeEnemiesCanDropXLBag = false;
         }
 
+        //New flags that didn't exist in 4.0.4
+        config.SwapUpAndDownStab = false;
+
 
         return config;
     }
@@ -1086,7 +1090,7 @@ public class RandomizerConfiguration
             properties.startWithDownstab = StartWithDownstab == null ? random.Next(7) >= 5 : (bool)StartWithDownstab;
             properties.startWithUpstab = StartWithUpstab == null ? random.Next(7) >= 5 : (bool)StartWithUpstab;
         }
-        
+        properties.swapUpAndDownStab = SwapUpAndDownStab == null ? random.Next(2) == 1 : (bool)SwapUpAndDownStab;
         
 
         properties.startLives = ShuffleStartingLives ? random.Next(2, 6) : 3;

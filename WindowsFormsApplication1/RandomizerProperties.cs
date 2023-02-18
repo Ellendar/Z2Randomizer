@@ -61,6 +61,7 @@ public class RandomizerProperties
     public int startAtk;
     public int startMag;
     public int startLifeLvl;
+    public bool swapUpAndDownStab;
 
     //Overworld
     public bool shuffleEncounters;

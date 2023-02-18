@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -147,9 +149,13 @@ public class Hint
         {
             this.text = Util.ToGameText(downstabtext[s.R.Next(downstabtext.Length)], true);
         }
-        else //upstab
+        else if (type == "upstab")
         {
             this.text = Util.ToGameText(upstabtext[s.R.Next(upstabtext.Length)], true);
+        }
+        else
+        {
+            Debug.WriteLine("Invalid hint type!");
         }
     }
 

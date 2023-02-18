@@ -2273,75 +2273,77 @@ public class Hyrule
 
         if(props.tunicColor.Equals("Default"))
         {
-            if(props.charSprite.Equals("Link"))
+            if(props.charSprite == CharacterSprite.LINK)
             {
                 c2 = colorMap["Green"];
             }
-            else if(props.charSprite.Equals("Iron Knuckle"))
+            else if(props.charSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 c2 = colorMap["Dark Blue"];
             }
-            else if(props.charSprite.Equals("Error"))
+            else if(props.charSprite == CharacterSprite.ERROR)
             {
                 c2 = 0x13;
             }
-            else if(props.charSprite.Equals("Samus"))
+            else if(props.charSprite == CharacterSprite.SAMUS)
             {
                 c2 = 0x27;
             }
-            else if(props.charSprite.Equals("Simon"))
+            else if(props.charSprite == CharacterSprite.SIMON)
             {
                 c2 = 0x27;
             }
-            else if(props.charSprite.Equals("Stalfos"))
+            else if(props.charSprite == CharacterSprite.STALFOS)
             {
                 c2 = colorMap["Red"];
             }
-            else if(props.charSprite.Equals("Vase Lady"))
+            else if(props.charSprite == CharacterSprite.VASE_LADY)
             {
                 c2 = 0x13;
             }
-            else if(props.charSprite.Equals("Ruto"))
+            else if(props.charSprite == CharacterSprite.RUTO)
             {
                 c2 = 0x30;
             }
-            else if(props.charSprite.Equals("Yoshi"))
+            else if(props.charSprite == CharacterSprite.YOSHI)
             {
                 c2 = 0x2a;
             }
-            else if(props.charSprite.Equals("Dragonlord"))
+            else if(props.charSprite == CharacterSprite.DRAGONLORD)
             {
                 c2 = 0x01;
             }
-            else if(props.charSprite.Equals("Miria"))
+            else if(props.charSprite == CharacterSprite.MIRIA)
             {
                 c2 = 0x16;
             }
-            else if(props.charSprite.Equals("Crystalis"))
+            else if(props.charSprite == CharacterSprite.CRYSTALIS)
             {
                 c2 = 0x14;
             }
-            else if(props.charSprite.Equals("Taco"))
+            else if(props.charSprite == CharacterSprite.TACO)
             {
                 c2 = 0x2a;
             }
-            else if(props.charSprite.Equals("Pyramid"))
+            else if(props.charSprite == CharacterSprite.PYRAMID)
             {
                 c2 = 0x32;
             }
+            /* NOT CURRENTLY ACCESSABLE
             else if (props.charSprite.Equals("Faxanadu"))
             {
                 c2 = 0x2a;
             }
-            else if (props.charSprite.Equals("Lady Link"))
+            */
+            else if (props.charSprite == CharacterSprite.LADY_LINK)
             {
                 c2 = 0x2a;
             }
-            else if (props.charSprite.Equals("Hoodie Link"))
+            else if (props.charSprite == CharacterSprite.HOODIE_LINK)
             {
                 c2 = 0x2a;
             }
-            else if(props.charSprite.Equals("GliitchWiitch"))
+            else if(props.charSprite == CharacterSprite.GLITCH_WITCH)
             {
                 c2 = 0x0c;
             }
@@ -2353,71 +2355,71 @@ public class Hyrule
 
         if(props.shieldColor.Equals("Default"))
         {
-            if (props.charSprite.Equals("Link"))
+            if (props.charSprite == CharacterSprite.LINK)
             {
                 c1 = colorMap["Red"];
             }
-            else if (props.charSprite.Equals("Iron Knuckle"))
+            else if (props.charSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 c1 = colorMap["Red"];
             }
-            else if (props.charSprite.Equals("Error"))
+            else if (props.charSprite == CharacterSprite.ERROR)
             {
                 c1 = colorMap["Red"];
             }
-            else if(props.charSprite.Equals("Samus"))
+            else if(props.charSprite == CharacterSprite.SAMUS)
             {
                 c1 = 0x37;
             }
-            else if(props.charSprite.Equals("Simon"))
+            else if(props.charSprite == CharacterSprite.SIMON)
             {
                 c1 = 0x16;
             }
-            else if(props.charSprite.Equals("Stalfos"))
+            else if(props.charSprite == CharacterSprite.STALFOS)
             {
                 c1 = colorMap["Dark Blue"];
             }
-            else if(props.charSprite.Equals("Vase Lady"))
+            else if(props.charSprite == CharacterSprite.VASE_LADY)
             {
                 c1 = colorMap["Red"];
             }
-            else if(props.charSprite.Equals("Ruto"))
+            else if(props.charSprite == CharacterSprite.RUTO)
             {
                 c1 = 0x3c;
             }
-            else if(props.charSprite.Equals("Yoshi"))
+            else if(props.charSprite == CharacterSprite.YOSHI)
             {
                 c1 = 0x0F;
             }
-            else if(props.charSprite.Equals("Dragonlord"))
+            else if(props.charSprite == CharacterSprite.DRAGONLORD)
             {
                 c1 = 0x03;
             }
-            else if(props.charSprite.Equals("Miria"))
+            else if(props.charSprite == CharacterSprite.MIRIA)
             {
                 c1 = 0x15;
             }
-            else if (props.charSprite.Equals("Crystalis"))
+            else if (props.charSprite == CharacterSprite.CRYSTALIS)
             {
                 c1 = 0x1B;
             }
-            else if (props.charSprite.Equals("Taco"))
+            else if (props.charSprite == CharacterSprite.TACO)
             {
                 c1 = 0x16;
             }
-            else if(props.charSprite.Equals("Pyramid"))
+            else if(props.charSprite == CharacterSprite.PYRAMID)
             {
                 c1 = 0x02;
             }
-            else if (props.charSprite.Equals("Lady Link"))
+            else if (props.charSprite == CharacterSprite.LADY_LINK)
             {
                 c1 = 0x16;
             }
-            else if (props.charSprite.Equals("Hoodie Link"))
+            else if (props.charSprite == CharacterSprite.HOODIE_LINK)
             {
                 c1 = 0x16;
             }
-            else if(props.charSprite.Equals("GliitchWiitch"))
+            else if(props.charSprite == CharacterSprite.GLITCH_WITCH)
             {
                 c1 = 0x25;
             }
@@ -3044,6 +3046,17 @@ public class Hyrule
         ROMData.Put(0x1C369, (Byte)props.startLives);
 
         ROMData.Put(0x17B12, (byte)((props.startWithUpstab ? 0x04 : 0) + (props.startWithDownstab ? 0x10 : 0)));
+
+        //Swap up and Downstab
+        if(props.swapUpAndDownStab)
+        {
+            //Swap the ORAs that determine which stab to give you
+            ROMData.Put(0xF4DF, 0x04);
+            ROMData.Put(0xF4F7, 0x10);
+            //Swap the ANDs that check whether or not you have the stab
+            ROMData.Put(0xF4DF, 0x04);
+            ROMData.Put(0xF4F7, 0x10);
+        }
 
         if (props.lifeEffectiveness == StatEffectiveness.MAX)
         {
