@@ -248,6 +248,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.oldFlagsLabel = new System.Windows.Forms.Label();
             this.batchButton = new System.Windows.Forms.Button();
+            this.swapUpAndDownstabCheckbox = new System.Windows.Forms.CheckBox();
             this.mainTabControl.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -1821,6 +1822,7 @@
             // 
             // tabPage9
             // 
+            this.tabPage9.Controls.Add(this.swapUpAndDownstabCheckbox);
             this.tabPage9.Controls.Add(this.useDashCheckbox);
             this.tabPage9.Controls.Add(this.randomizeSpellSpellEnemyCheckbox);
             this.tabPage9.Controls.Add(this.combineFireCheckbox);
@@ -3237,6 +3239,19 @@
             this.batchButton.UseVisualStyleBackColor = true;
             this.batchButton.Click += new System.EventHandler(this.Bulk_Generate_Click);
             // 
+            // checkBox1
+            // 
+            this.swapUpAndDownstabCheckbox.AutoSize = true;
+            this.swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 166);
+            this.swapUpAndDownstabCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.swapUpAndDownstabCheckbox.Name = "swapUpAndDownstabBox";
+            this.swapUpAndDownstabCheckbox.Size = new System.Drawing.Size(144, 19);
+            this.swapUpAndDownstabCheckbox.TabIndex = 22;
+            this.swapUpAndDownstabCheckbox.Text = "Swap the location of upstab and downstab";
+            this.swapUpAndDownstabCheckbox.ThreeState = true;
+            this.toolTip1.SetToolTip(this.swapUpAndDownstabCheckbox, "When selected, Upstab and Downstab will swap sources.");
+            this.swapUpAndDownstabCheckbox.UseVisualStyleBackColor = true;
+            // 
             // MainUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3535,6 +3550,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox startingGemsMaxList;
+        private System.Windows.Forms.CheckBox swapUpAndDownstabCheckbox;
     }
 }
 

@@ -193,6 +193,7 @@ public partial class MainUI : Form
         blockingRoomsInAnyPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         useDashCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
 
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
@@ -693,11 +694,12 @@ public partial class MainUI : Form
 
         //Spells
         configuration.ShuffleLifeRefillAmount = shuffleLifeRefillCheckbox.Checked;
-        configuration.ShuffleSpellLocations = GetTripleCheckState(shuffleStartingSpellsCheckbox);
+        configuration.ShuffleSpellLocations = GetTripleCheckState(shuffleSpellLocationsCheckbox);
         configuration.DisableMagicContainerRequirements = GetTripleCheckState(disableMagicContainerRequirementCheckbox);
         configuration.CombineFireWithRandomSpell = combineFireCheckbox.Checked;
         configuration.RandomizeSpellSpellEnemy = GetTripleCheckState(randomizeSpellSpellEnemyCheckbox);
         configuration.ReplaceFireWithDash = GetTripleCheckState(useDashCheckbox);
+        configuration.SwapUpAndDownStab = GetTripleCheckState(swapUpAndDownstabCheckbox);
 
         //Enemies
         configuration.ShuffleOverworldEnemies = GetTripleCheckState(shuffleOverworldEnemiesCheckbox);
@@ -904,8 +906,8 @@ public partial class MainUI : Form
             };
             randomizeLivesBox.Checked = configuration.ShuffleStartingLives;
             startingAttackLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
-            startingMagicLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
-            startingLifeLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
+            startingMagicLevelList.SelectedIndex = configuration.StartingMagicLevel - 1;
+            startingLifeLevelList.SelectedIndex = configuration.StartingLifeLevel - 1;
 
             //Overworld
             allowPalaceContinentSwapCheckbox.CheckState = ToCheckState(configuration.PalacesCanSwapContinents);
@@ -1068,6 +1070,7 @@ public partial class MainUI : Form
             combineFireCheckbox.Checked = configuration.CombineFireWithRandomSpell;
             randomizeSpellSpellEnemyCheckbox.CheckState = ToCheckState(configuration.RandomizeSpellSpellEnemy);
             useDashCheckbox.CheckState = ToCheckState(configuration.ReplaceFireWithDash);
+            swapUpAndDownstabCheckbox.CheckState = ToCheckState(configuration.SwapUpAndDownStab);
 
             //Enemies
             shuffleOverworldEnemiesCheckbox.CheckState = ToCheckState(configuration.ShuffleOverworldEnemies);
@@ -1153,7 +1156,6 @@ public partial class MainUI : Form
     private void updateBtn_Click(object sender, EventArgs e)
     {
         //WinSparkle.win_sparkle_check_update_with_ui();
-        throw new NotImplementedException();
     }
 
     private void shuffleOverworldEnemies_CheckStateChanged(object sender, EventArgs e)
