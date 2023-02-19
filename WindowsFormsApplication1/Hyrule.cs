@@ -2757,6 +2757,8 @@ public class Hyrule
 
         if (props.disableBeep)
         {
+            //C9 20 - EA 38
+            //CMP 20 -> NOP SEC
             ROMData.Put(0x1D4E4, (Byte)0xEA);
             ROMData.Put(0x1D4E5, (Byte)0x38);
         }
@@ -3054,8 +3056,8 @@ public class Hyrule
             ROMData.Put(0xF4DF, 0x04);
             ROMData.Put(0xF4F7, 0x10);
             //Swap the ANDs that check whether or not you have the stab
-            ROMData.Put(0xF4DF, 0x04);
-            ROMData.Put(0xF4F7, 0x10);
+            ROMData.Put(0xF4D3, 0x04);
+            ROMData.Put(0xF4EB, 0x10);
         }
 
         if (props.lifeEffectiveness == StatEffectiveness.MAX)

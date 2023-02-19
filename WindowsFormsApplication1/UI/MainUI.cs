@@ -1329,7 +1329,7 @@ public partial class MainUI : Form
                 f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
                 
             
-                int seed = r.Next(1000000000);
+                config.Seed = r.Next(1000000000);
                 if (spawnNextSeed)
                 {
                     backgroundWorker1 = new BackgroundWorker();

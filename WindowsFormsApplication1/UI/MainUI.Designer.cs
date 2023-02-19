@@ -137,6 +137,7 @@
             this.shuffleAtkExpNeededCheckbox = new System.Windows.Forms.CheckBox();
             this.shuffleAllExpCheckbox = new System.Windows.Forms.CheckBox();
             this.tabPage9 = new System.Windows.Forms.TabPage();
+            this.swapUpAndDownstabCheckbox = new System.Windows.Forms.CheckBox();
             this.useDashCheckbox = new System.Windows.Forms.CheckBox();
             this.randomizeSpellSpellEnemyCheckbox = new System.Windows.Forms.CheckBox();
             this.combineFireCheckbox = new System.Windows.Forms.CheckBox();
@@ -248,7 +249,6 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.oldFlagsLabel = new System.Windows.Forms.Label();
             this.batchButton = new System.Windows.Forms.Button();
-            this.swapUpAndDownstabCheckbox = new System.Windows.Forms.CheckBox();
             this.mainTabControl.SuspendLayout();
             this.tabPage4.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -1838,6 +1838,19 @@
             this.tabPage9.Text = "Spells";
             this.tabPage9.UseVisualStyleBackColor = true;
             // 
+            // swapUpAndDownstabCheckbox
+            // 
+            this.swapUpAndDownstabCheckbox.AutoSize = true;
+            this.swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 166);
+            this.swapUpAndDownstabCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.swapUpAndDownstabCheckbox.Name = "swapUpAndDownstabCheckbox";
+            this.swapUpAndDownstabCheckbox.Size = new System.Drawing.Size(251, 19);
+            this.swapUpAndDownstabCheckbox.TabIndex = 22;
+            this.swapUpAndDownstabCheckbox.Text = "Swap the location of upstab and downstab";
+            this.swapUpAndDownstabCheckbox.ThreeState = true;
+            this.toolTip1.SetToolTip(this.swapUpAndDownstabCheckbox, "When selected, Upstab and Downstab will swap sources.");
+            this.swapUpAndDownstabCheckbox.UseVisualStyleBackColor = true;
+            // 
             // useDashCheckbox
             // 
             this.useDashCheckbox.AutoSize = true;
@@ -3238,19 +3251,6 @@
             this.batchButton.Text = "Batch";
             this.batchButton.UseVisualStyleBackColor = true;
             this.batchButton.Click += new System.EventHandler(this.Bulk_Generate_Click);
-            // 
-            // checkBox1
-            // 
-            this.swapUpAndDownstabCheckbox.AutoSize = true;
-            this.swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 166);
-            this.swapUpAndDownstabCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.swapUpAndDownstabCheckbox.Name = "swapUpAndDownstabBox";
-            this.swapUpAndDownstabCheckbox.Size = new System.Drawing.Size(144, 19);
-            this.swapUpAndDownstabCheckbox.TabIndex = 22;
-            this.swapUpAndDownstabCheckbox.Text = "Swap the location of upstab and downstab";
-            this.swapUpAndDownstabCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.swapUpAndDownstabCheckbox, "When selected, Upstab and Downstab will swap sources.");
-            this.swapUpAndDownstabCheckbox.UseVisualStyleBackColor = true;
             // 
             // MainUI
             // 
