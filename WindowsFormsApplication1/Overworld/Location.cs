@@ -11,7 +11,7 @@ public class Location
     private int appear2loweruponexit;
     private Tuple<int, int> coords;
     public Item item;
-    public Boolean itemGet;
+    public bool itemGet;
 
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }
@@ -42,7 +42,7 @@ public class Location
     public bool NeedJump { get; set; }
 
     public bool NeedHammer { get; set; }
-    public Boolean Needboots { get; set; }
+    public bool Needboots { get; set; }
     public bool NeedFairy { get; set; }
 
     public bool NeedRecorder { get; set; }
@@ -98,7 +98,7 @@ public class Location
     .x.. .... - Pass through
     x... .... - Fall in hole
     */
-    public Location(Byte[] bytes, Terrain t, int mem, Continent c)
+    public Location(byte[] bytes, Terrain t, int mem, Continent c)
     {
         LocationBytes = bytes;
         ExternalWorld = bytes[0] & 128;

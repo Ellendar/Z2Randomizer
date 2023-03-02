@@ -504,7 +504,7 @@ class DeathMountain : World
                                     int otherx = 0;
                                     int othery = 0;
                                     tries = 0;
-                                    Boolean crossing = true;
+                                    bool crossing = true;
                                     do
                                     {
                                         int range = 7;
@@ -562,7 +562,7 @@ class DeathMountain : World
                                     int otherx = 0;
                                     int othery = 0;
                                     tries = 0;
-                                    Boolean crossing = true;
+                                    bool crossing = true;
                                     do
                                     {
                                         int range = 7;
@@ -712,7 +712,7 @@ class DeathMountain : World
                     {
                         MAP_COLS = 29;
                     }
-                    Boolean r = DrawRaft(false, raftDirection);
+                    bool r = DrawRaft(false, raftDirection);
                     MAP_COLS = 64;
                     if (!r)
                     {
@@ -726,7 +726,7 @@ class DeathMountain : World
                     {
                         MAP_COLS = 29;
                     }
-                    Boolean b = DrawRaft(true, bridgeDirection);
+                    bool b = DrawRaft(true, bridgeDirection);
                     MAP_COLS = 64;
                     if (!b)
                     {

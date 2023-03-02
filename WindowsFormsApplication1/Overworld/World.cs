@@ -64,7 +64,7 @@ public abstract class World
     public Location bridge;
     public Location cave1;
     public Location cave2;
-    //private Boolean allreached;
+    //private bool allreached;
 
     protected int baseAddr;
 
@@ -317,7 +317,7 @@ public abstract class World
     {
         for (int i = 0; i < locNum; i++)
         {
-            Byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(startAddr + i), hyrule.ROMData.GetByte(startAddr + overworldXOff + i), hyrule.ROMData.GetByte(startAddr + overworldMapOff + i), hyrule.ROMData.GetByte(startAddr + overworldWorldOff + i) };
+            byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(startAddr + i), hyrule.ROMData.GetByte(startAddr + overworldXOff + i), hyrule.ROMData.GetByte(startAddr + overworldMapOff + i), hyrule.ROMData.GetByte(startAddr + overworldWorldOff + i) };
             AddLocation(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
         }
     }
@@ -440,7 +440,7 @@ public abstract class World
         }
     }
 
-    protected Boolean PlaceLocations(Terrain riverTerrain)
+    protected bool PlaceLocations(Terrain riverTerrain)
     {
         int i = 0;
         foreach (Location location in AllLocations)
@@ -662,7 +662,7 @@ public abstract class World
         int otherx = 0;
         int othery = 0;
         int tries = 0;
-        Boolean crossing = true;    
+        bool crossing = true;    
         do
         {
             int range = 12;
@@ -778,7 +778,7 @@ public abstract class World
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int numBridges, Boolean placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia)
+    protected bool ConnectIslands(int numBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia)
     {
         int[,] mass = GetTerrainGlobs();
         Dictionary<int, List<int>> connectMass = new Dictionary<int, List<int>>();
@@ -1757,7 +1757,7 @@ public abstract class World
         }
     }
 
-    protected Boolean DrawRaft(bool bridge, Direction direction)
+    protected bool DrawRaft(bool bridge, Direction direction)
     {
         int raftx = 0;
         int deltax = 1;
@@ -1902,7 +1902,7 @@ public abstract class World
 
     private void LoadLocation(int addr, Terrain t, Continent c)
     {
-        Byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(addr), hyrule.ROMData.GetByte(addr + overworldXOff), hyrule.ROMData.GetByte(addr + overworldMapOff), hyrule.ROMData.GetByte(addr + overworldWorldOff) };
+        byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(addr), hyrule.ROMData.GetByte(addr + overworldXOff), hyrule.ROMData.GetByte(addr + overworldMapOff), hyrule.ROMData.GetByte(addr + overworldWorldOff) };
         AddLocation(new Location(bytes, t, addr, c));
     }
 
@@ -1949,7 +1949,7 @@ public abstract class World
         cave2.CanShuffle = true;
     }
 
-    public Boolean HasConnections()
+    public bool HasConnections()
     {
         return raft != null || bridge != null || cave1 != null || cave2 != null;
     }

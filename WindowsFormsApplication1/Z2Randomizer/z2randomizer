@@ -1,3 +1,0 @@
-#!/bin/sh
-
-exec mono "./Z2Randomizer.exe" "$@"
