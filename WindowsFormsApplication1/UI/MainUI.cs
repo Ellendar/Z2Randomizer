@@ -43,7 +43,7 @@ public partial class MainUI : Form
         startHeartsMinList.SelectedIndex = 3;
         startHeartsMinList.SelectedIndex = 3;
         maxHeartsList.SelectedIndex = 7;
-        
+
         startingTechsList.SelectedIndex = 0;
         allowPathEnemiesCheckbox.Enabled = false;
         romFileTextBox.Text = Properties.Settings.Default.filePath;
@@ -59,7 +59,7 @@ public partial class MainUI : Form
         customFlags3TextBox.Text = Properties.Settings.Default.custom3;
         seedTextBox.Text = Properties.Settings.Default.lastseed;
         flashingOffCheckbox.Checked = Properties.Settings.Default.noflash;
-         
+
         small = new CheckBox[] { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox,
             smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
         large = new CheckBox[] { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox,
@@ -82,9 +82,9 @@ public partial class MainUI : Form
         hideKasutoList.SelectedIndex = 0;
         characterSpriteList.SelectedIndex = Properties.Settings.Default.sprite;
 
-        this.Text = "Zelda 2 Randomizer Version " 
-            + typeof(MainUI).Assembly.GetName().Version.Major + "." 
-            + typeof(MainUI).Assembly.GetName().Version.Minor + "." 
+        this.Text = "Zelda 2 Randomizer Version "
+            + typeof(MainUI).Assembly.GetName().Version.Major + "."
+            + typeof(MainUI).Assembly.GetName().Version.Minor + "."
             + typeof(MainUI).Assembly.GetName().Version.Build;
 
         flagsTextBox.DoubleClick += new System.EventHandler(this.flagBox_Clicked);
@@ -310,7 +310,7 @@ public partial class MainUI : Form
     private void generateBtn_Click(object sender, EventArgs e)
     {
         String flagString = flagsTextBox.Text;
-       
+
         Properties.Settings.Default.filePath = romFileTextBox.Text;
         Properties.Settings.Default.beep = disableLowHealthBeepCheckbox.Checked;
         Properties.Settings.Default.beams = beamSpriteList.SelectedIndex;
@@ -354,7 +354,7 @@ public partial class MainUI : Form
         //    }
         //}
         //new Hyrule(props, null);
-        if(!Validate(flagString))
+        if (!Validate(flagString))
         {
             return;
         }
@@ -369,11 +369,12 @@ public partial class MainUI : Form
         backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
         backgroundWorker1.WorkerReportsProgress = true;
         backgroundWorker1.WorkerSupportsCancellation = true;
-        backgroundWorker1.RunWorkerCompleted += (completed_sender, completed_event) => {
+        backgroundWorker1.RunWorkerCompleted += (completed_sender, completed_event) =>
+        {
             generationException = completed_event.Error;
         };
         backgroundWorker1.RunWorkerAsync();
-        
+
 
         while (backgroundWorker1.IsBusy)
         {
@@ -432,7 +433,7 @@ public partial class MainUI : Form
 
     private RandomizerConfiguration ExportConfig()
     {
-        RandomizerConfiguration configuration= new RandomizerConfiguration();
+        RandomizerConfiguration configuration = new RandomizerConfiguration();
 
         configuration.FileName = romFileTextBox.Text;
         try
@@ -654,7 +655,7 @@ public partial class MainUI : Form
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
         configuration.ShuffleMagicExperience = magicExpNeededCheckbox.Checked;
         configuration.ShuffleLifeExperience = lifeExpNeededCheckbox.Checked;
-        if(shuffleAllExpCheckbox.Checked)
+        if (shuffleAllExpCheckbox.Checked)
         {
             configuration.ShuffleAttackExperience = true;
             configuration.ShuffleMagicExperience = true;
@@ -682,7 +683,7 @@ public partial class MainUI : Form
             4 => StatEffectiveness.MAX,
             _ => throw new Exception("Invalid MagicEffectiveness setting")
         };
-        configuration.LifeEffectiveness =lifeEffectivenessList.SelectedIndex switch
+        configuration.LifeEffectiveness = lifeEffectivenessList.SelectedIndex switch
         {
             0 => StatEffectiveness.AVERAGE,
             1 => StatEffectiveness.NONE,
@@ -1021,7 +1022,7 @@ public partial class MainUI : Form
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
             magicExpNeededCheckbox.Checked = configuration.ShuffleMagicExperience;
             lifeExpNeededCheckbox.Checked = configuration.ShuffleLifeExperience;
-            if(configuration.ShuffleAttackExperience && configuration.ShuffleMagicExperience && configuration.ShuffleLifeExperience)
+            if (configuration.ShuffleAttackExperience && configuration.ShuffleMagicExperience && configuration.ShuffleLifeExperience)
             {
                 shuffleAllExpCheckbox.Checked = true;
             }
@@ -1188,7 +1189,7 @@ public partial class MainUI : Form
     {
         Process.Start(new ProcessStartInfo("https://bitbucket.org/digshake/z2randomizer/wiki/Home") { UseShellExecute = true });
     }
-    
+
     private void DiscordButton_Click(object sender, EventArgs e)
     {
         Process.Start(new ProcessStartInfo("http://z2r.gg/discord") { UseShellExecute = true });
@@ -1247,7 +1248,7 @@ public partial class MainUI : Form
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7@$ZqTBT!BhOA!0P@@A");
         flagsTextBox.Text = config.Serialize();
     }
-    
+
     private void RandomPercentFlags(object sender, EventArgs e)
     {
         RandomizerConfiguration config = new("hEAjMsAKrspUN2LN2tg$o6tFc6WbYqEjqA");
@@ -1314,7 +1315,7 @@ public partial class MainUI : Form
         }
         GenerateBatchForm f = new GenerateBatchForm();
         f.ShowDialog();
-        
+
         int numSeeds = f.numSeeds;
         if (numSeeds > 0)
         {
@@ -1327,8 +1328,8 @@ public partial class MainUI : Form
             {
 
                 f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
-                
-            
+
+
                 config.Seed = r.Next(1000000000);
                 if (spawnNextSeed)
                 {
@@ -1394,7 +1395,7 @@ public partial class MainUI : Form
 
     private void RandomizeDropsChanged(object sender, EventArgs e)
     {
-        if(randomizeDropsCheckbox.Checked)
+        if (randomizeDropsCheckbox.Checked)
         {
             large.Union(small).ToList().ForEach(i => i.Checked = false);
         }
@@ -1458,8 +1459,8 @@ public partial class MainUI : Form
 
     private void EnableLevelScaling(object sender, EventArgs e)
     {
-        if(!atkCapList.GetItemText(atkCapList.SelectedItem).Equals("8") 
-            || !magCapList.GetItemText(magCapList.SelectedItem).Equals("8") 
+        if (!atkCapList.GetItemText(atkCapList.SelectedItem).Equals("8")
+            || !magCapList.GetItemText(magCapList.SelectedItem).Equals("8")
             || !lifeCapList.GetItemText(lifeCapList.SelectedItem).Equals("8"))
         {
             scaleLevelRequirementsToCapCheckbox.Enabled = true;
@@ -1473,7 +1474,7 @@ public partial class MainUI : Form
 
     private void SpellItemBox_CheckStateChanged(object sender, EventArgs e)
     {
-        if(removeSpellitemsCheckbox.Checked)
+        if (removeSpellitemsCheckbox.Checked)
         {
             enableSpellItemHintsCheckbox.Enabled = false;
             enableSpellItemHintsCheckbox.Checked = false;
@@ -1526,7 +1527,7 @@ public partial class MainUI : Form
 
     private void CheckVanillaPossible()
     {
-        if(VanillaPossible(eastBiome) || VanillaPossible(westBiome) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
+        if (VanillaPossible(eastBiome) || VanillaPossible(westBiome) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
         {
             shuffledVanillaShowsActualTerrain.Enabled = true;
             shuffledVanillaShowsActualTerrain.Checked = true;
@@ -1540,7 +1541,7 @@ public partial class MainUI : Form
 
     private bool VanillaPossible(ComboBox cb)
     {
-        if(cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
+        if (cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
         {
             return true;
         }
@@ -1553,7 +1554,7 @@ public partial class MainUI : Form
     private void WestBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
         CheckVanillaPossible();
-        if(westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
+        if (westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
         {
             generateBaguWoodsCheckbox.Checked = false;
             generateBaguWoodsCheckbox.Enabled = false;
@@ -1582,9 +1583,9 @@ public partial class MainUI : Form
     private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
     {
         BackgroundWorker worker = sender as BackgroundWorker;
-        
+
         new Hyrule(config, worker);
-        if(worker.CancellationPending)
+        if (worker.CancellationPending)
         {
             e.Cancel = true;
         }
@@ -1592,11 +1593,11 @@ public partial class MainUI : Form
 
     private void BackgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
     {
-        if(e.ProgressPercentage == 2)
+        if (e.ProgressPercentage == 2)
         {
             f3.setText("Generating Western Hyrule");
         }
-        else if(e.ProgressPercentage == 3)
+        else if (e.ProgressPercentage == 3)
         {
             f3.setText("Generating Death Mountain");
         }
@@ -1628,7 +1629,7 @@ public partial class MainUI : Form
 
     private void PalaceBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if(palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
+        if (palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
         {
             includeCommunityRoomsCheckbox.Enabled = false;
             includeCommunityRoomsCheckbox.Checked = false;
@@ -1660,7 +1661,7 @@ public partial class MainUI : Form
 
     private void DashBox_CheckStateChanged(object sender, EventArgs e)
     {
-        if(useDashCheckbox.Checked)
+        if (useDashCheckbox.Checked)
         {
             combineFireCheckbox.Enabled = false;
             combineFireCheckbox.Checked = false;
@@ -1721,7 +1722,7 @@ public partial class MainUI : Form
                 return false;
             }
         }
-        if (startHeartsMinList.SelectedIndex <= 8 
+        if (startHeartsMinList.SelectedIndex <= 8
             && startHeartsMinList.SelectedIndex <= 8
             && startHeartsMaxList.SelectedIndex < startHeartsMinList.SelectedIndex)
         {
