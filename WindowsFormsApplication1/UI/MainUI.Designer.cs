@@ -72,7 +72,7 @@
             this.generateBaguWoodsCheckbox = new System.Windows.Forms.CheckBox();
             this.useGoodBootsCheckbox = new System.Windows.Forms.CheckBox();
             this.shuffleWhichLocationsAreHiddenCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffledBasnill = new System.Windows.Forms.CheckBox();
+            this.shuffledVanillaShowsActualTerrain = new System.Windows.Forms.CheckBox();
             this.mazeBiome = new System.Windows.Forms.ComboBox();
             this.mazeIslandBiomeLabel = new System.Windows.Forms.Label();
             this.eastBiome = new System.Windows.Forms.ComboBox();
@@ -837,7 +837,7 @@
             this.tabPage1.Controls.Add(this.generateBaguWoodsCheckbox);
             this.tabPage1.Controls.Add(this.useGoodBootsCheckbox);
             this.tabPage1.Controls.Add(this.shuffleWhichLocationsAreHiddenCheckbox);
-            this.tabPage1.Controls.Add(this.shuffledBasnill);
+            this.tabPage1.Controls.Add(this.shuffledVanillaShowsActualTerrain);
             this.tabPage1.Controls.Add(this.mazeBiome);
             this.tabPage1.Controls.Add(this.mazeIslandBiomeLabel);
             this.tabPage1.Controls.Add(this.eastBiome);
@@ -918,16 +918,16 @@
             // 
             // shuffledBasnill
             // 
-            this.shuffledBasnill.AutoSize = true;
-            this.shuffledBasnill.Location = new System.Drawing.Point(281, 299);
-            this.shuffledBasnill.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffledBasnill.Name = "shuffledBasnill";
-            this.shuffledBasnill.Size = new System.Drawing.Size(268, 19);
-            this.shuffledBasnill.TabIndex = 44;
-            this.shuffledBasnill.Text = "Shuffled Vanilla Locations Show Actual Terrain";
-            this.toolTip1.SetToolTip(this.shuffledBasnill, "When selected, if a shuffled vanilla map is in play, the map will show the correc" +
+            this.shuffledVanillaShowsActualTerrain.AutoSize = true;
+            this.shuffledVanillaShowsActualTerrain.Location = new System.Drawing.Point(281, 299);
+            this.shuffledVanillaShowsActualTerrain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.shuffledVanillaShowsActualTerrain.Name = "shuffledBasnill";
+            this.shuffledVanillaShowsActualTerrain.Size = new System.Drawing.Size(268, 19);
+            this.shuffledVanillaShowsActualTerrain.TabIndex = 44;
+            this.shuffledVanillaShowsActualTerrain.Text = "Shuffled Vanilla Locations Show Actual Terrain";
+            this.toolTip1.SetToolTip(this.shuffledVanillaShowsActualTerrain, "When selected, if a shuffled vanilla map is in play, the map will show the correc" +
         "t terrain type of each location.");
-            this.shuffledBasnill.UseVisualStyleBackColor = true;
+            this.shuffledVanillaShowsActualTerrain.UseVisualStyleBackColor = true;
             // 
             // mazeBiome
             // 
@@ -944,7 +944,7 @@
             this.mazeBiome.Size = new System.Drawing.Size(140, 23);
             this.mazeBiome.TabIndex = 43;
             this.toolTip1.SetToolTip(this.mazeBiome, "Maze Island overworld map style.");
-            this.mazeBiome.SelectedIndexChanged += new System.EventHandler(this.mazeBiome_SelectedIndexChanged);
+            this.mazeBiome.SelectedIndexChanged += new System.EventHandler(this.MazeBiome_SelectedIndexChanged);
             // 
             // mazeIslandBiomeLabel
             // 
@@ -977,7 +977,7 @@
             this.eastBiome.Size = new System.Drawing.Size(140, 23);
             this.eastBiome.TabIndex = 41;
             this.toolTip1.SetToolTip(this.eastBiome, "East Hyrule overworld map style.");
-            this.eastBiome.SelectedIndexChanged += new System.EventHandler(this.eastBiome_SelectedIndexChanged);
+            this.eastBiome.SelectedIndexChanged += new System.EventHandler(this.EastBiome_SelectedIndexChanged);
             // 
             // dmBiome
             // 
@@ -999,7 +999,7 @@
             this.dmBiome.Size = new System.Drawing.Size(140, 23);
             this.dmBiome.TabIndex = 40;
             this.toolTip1.SetToolTip(this.dmBiome, "Death Mountain overworld map style.");
-            this.dmBiome.SelectedIndexChanged += new System.EventHandler(this.dmBiome_SelectedIndexChanged);
+            this.dmBiome.SelectedIndexChanged += new System.EventHandler(this.DmBiome_SelectedIndexChanged);
             // 
             // westBiome
             // 
@@ -1021,7 +1021,7 @@
             this.westBiome.Size = new System.Drawing.Size(140, 23);
             this.westBiome.TabIndex = 39;
             this.toolTip1.SetToolTip(this.westBiome, "West Hyrule overworld map style.");
-            this.westBiome.SelectedIndexChanged += new System.EventHandler(this.westBiome_SelectedIndexChanged);
+            this.westBiome.SelectedIndexChanged += new System.EventHandler(this.WestBiome_SelectedIndexChanged);
             // 
             // eastContinentBindingLabel
             // 
@@ -1181,7 +1181,7 @@
             this.hideKasutoList.Size = new System.Drawing.Size(100, 23);
             this.hideKasutoList.TabIndex = 25;
             this.toolTip1.SetToolTip(this.hideKasutoList, "When selected, will hide Kasuto behind a forest tile");
-            this.hideKasutoList.SelectedIndexChanged += new System.EventHandler(this.hideKasutoBox_SelectedIndexChanged);
+            this.hideKasutoList.SelectedIndexChanged += new System.EventHandler(this.HideKasutoBox_SelectedIndexChanged);
             // 
             // hiddenKasutoLabel
             // 
@@ -1207,7 +1207,7 @@
             this.hiddenPalaceList.Size = new System.Drawing.Size(100, 23);
             this.hiddenPalaceList.TabIndex = 23;
             this.toolTip1.SetToolTip(this.hiddenPalaceList, "When selected, will include three eye rock on the overworld");
-            this.hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(this.hpCmbo_SelectedIndexChanged);
+            this.hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(this.HpCmbo_SelectedIndexChanged);
             // 
             // hiddenPalaceLabel
             // 
@@ -1245,7 +1245,7 @@
             this.toolTip1.SetToolTip(this.allowPalaceContinentSwapCheckbox, "When selected, palaces can move from their normal continents. Palace 1 could be f" +
         "ound on Maze Island or East Hyrule, for example.");
             this.allowPalaceContinentSwapCheckbox.UseVisualStyleBackColor = true;
-            this.allowPalaceContinentSwapCheckbox.CheckStateChanged += new System.EventHandler(this.palaceSwapBox_CheckStateChanged);
+            this.allowPalaceContinentSwapCheckbox.CheckStateChanged += new System.EventHandler(this.PalaceSwapBox_CheckStateChanged);
             // 
             // label4
             // 
@@ -1379,7 +1379,7 @@
             this.palaceStyleList.TabIndex = 13;
             this.toolTip1.SetToolTip(this.palaceStyleList, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from" +
         " the room pool can appear and palaces can change sizes.");
-            this.palaceStyleList.SelectedIndexChanged += new System.EventHandler(this.palaceBox_SelectedIndexChanged);
+            this.palaceStyleList.SelectedIndexChanged += new System.EventHandler(this.PalaceBox_SelectedIndexChanged);
             // 
             // bossRoomsExitToPalaceCheckbox
             // 
@@ -1445,7 +1445,7 @@
             this.removeTbirdCheckbox.Text = "Remove Thunderbird";
             this.toolTip1.SetToolTip(this.removeTbirdCheckbox, "If checked, you must defeat thunderbird");
             this.removeTbirdCheckbox.UseVisualStyleBackColor = true;
-            this.removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(this.removeTbird_CheckStateChanged);
+            this.removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(this.RemoveTbird_CheckStateChanged);
             // 
             // shortGPCheckbox
             // 
@@ -1497,7 +1497,7 @@
             this.tbirdRequiredCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.tbirdRequiredCheckbox, "If checked, you must defeat thunderbird");
             this.tbirdRequiredCheckbox.UseVisualStyleBackColor = true;
-            this.tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(this.tbirdBox_CheckStateChanged);
+            this.tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(this.TbirdBox_CheckStateChanged);
             // 
             // label6
             // 
@@ -1646,7 +1646,7 @@
             this.lifeCapList.Size = new System.Drawing.Size(37, 23);
             this.lifeCapList.TabIndex = 20;
             this.toolTip1.SetToolTip(this.lifeCapList, "Maximum Life Level");
-            this.lifeCapList.SelectedIndexChanged += new System.EventHandler(this.enableLevelScaling);
+            this.lifeCapList.SelectedIndexChanged += new System.EventHandler(this.EnableLevelScaling);
             // 
             // magCapList
             // 
@@ -1667,7 +1667,7 @@
             this.magCapList.Size = new System.Drawing.Size(37, 23);
             this.magCapList.TabIndex = 19;
             this.toolTip1.SetToolTip(this.magCapList, "Maximum Magic Level");
-            this.magCapList.SelectedIndexChanged += new System.EventHandler(this.enableLevelScaling);
+            this.magCapList.SelectedIndexChanged += new System.EventHandler(this.EnableLevelScaling);
             // 
             // atkCapList
             // 
@@ -1688,7 +1688,7 @@
             this.atkCapList.Size = new System.Drawing.Size(37, 23);
             this.atkCapList.TabIndex = 18;
             this.toolTip1.SetToolTip(this.atkCapList, "Maximum Attack Level");
-            this.atkCapList.SelectedIndexChanged += new System.EventHandler(this.enableLevelScaling);
+            this.atkCapList.SelectedIndexChanged += new System.EventHandler(this.EnableLevelScaling);
             // 
             // lifeCapLabel
             // 
@@ -1864,7 +1864,7 @@
             this.toolTip1.SetToolTip(this.useDashCheckbox, "When selected, the Fire spell will be replaced with a Dash spell that makes Link " +
         "move faster");
             this.useDashCheckbox.UseVisualStyleBackColor = true;
-            this.useDashCheckbox.CheckStateChanged += new System.EventHandler(this.dashBox_CheckStateChanged);
+            this.useDashCheckbox.CheckStateChanged += new System.EventHandler(this.DashBox_CheckStateChanged);
             // 
             // randomizeSpellSpellEnemyCheckbox
             // 
@@ -1890,7 +1890,7 @@
             this.combineFireCheckbox.TabIndex = 19;
             this.combineFireCheckbox.Text = "Combine Fire with a Random Spell";
             this.combineFireCheckbox.UseVisualStyleBackColor = true;
-            this.combineFireCheckbox.CheckStateChanged += new System.EventHandler(this.combineFireBox_CheckStateChanged);
+            this.combineFireCheckbox.CheckStateChanged += new System.EventHandler(this.CombineFireBox_CheckStateChanged);
             // 
             // disableMagicContainerRequirementCheckbox
             // 
@@ -2025,7 +2025,7 @@
             this.shufflePalaceEnemiesCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shufflePalaceEnemiesCheckbox, "Shuffles enemies in the palaces");
             this.shufflePalaceEnemiesCheckbox.UseVisualStyleBackColor = true;
-            this.shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.shufflePalaceEnemies_CheckStateChanged);
+            this.shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.ShufflePalaceEnemies_CheckStateChanged);
             // 
             // shuffleOverworldEnemiesCheckbox
             // 
@@ -2039,7 +2039,7 @@
             this.shuffleOverworldEnemiesCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleOverworldEnemiesCheckbox, "Shuffles enemies on the overworld");
             this.shuffleOverworldEnemiesCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleOverworldEnemies_CheckStateChanged);
+            this.shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.ShuffleOverworldEnemies_CheckStateChanged);
             // 
             // shuffleSwordImmunityBox
             // 
@@ -2135,7 +2135,7 @@
             this.toolTip1.SetToolTip(this.removeSpellitemsCheckbox, "When checked, you no longer need the trophy, medicine, or kid to access the respe" +
         "ctive spells");
             this.removeSpellitemsCheckbox.UseVisualStyleBackColor = true;
-            this.removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(this.spellItemBox_CheckStateChanged);
+            this.removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(this.SpellItemBox_CheckStateChanged);
             // 
             // includePbagCavesInShuffleCheckbox
             // 
@@ -2213,7 +2213,7 @@
             this.shuffleOverworldItemsCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shuffleOverworldItemsCheckbox, "Shuffles the items that are found in the overworld");
             this.shuffleOverworldItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleOverworldItemsCheckbox.CheckStateChanged += new System.EventHandler(this.overworldItemBox_CheckStateChanged);
+            this.shuffleOverworldItemsCheckbox.CheckStateChanged += new System.EventHandler(this.OverworldItemBox_CheckStateChanged);
             // 
             // shufflePalaceItemsCheckbox
             // 
@@ -2227,7 +2227,7 @@
             this.shufflePalaceItemsCheckbox.ThreeState = true;
             this.toolTip1.SetToolTip(this.shufflePalaceItemsCheckbox, "Shuffles the items that are found in palaces");
             this.shufflePalaceItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shufflePalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(this.palaceItemBox_CheckStateChanged);
+            this.shufflePalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(this.PalaceItemBox_CheckStateChanged);
             // 
             // tabPage8
             // 
@@ -2961,7 +2961,7 @@
             this.updateButton.Text = "Check for Updates";
             this.toolTip1.SetToolTip(this.updateButton, "Check for updates");
             this.updateButton.UseVisualStyleBackColor = true;
-            this.updateButton.Click += new System.EventHandler(this.updateBtn_Click);
+            this.updateButton.Click += new System.EventHandler(this.UpdateBtn_Click);
             // 
             // flagsLabel
             // 
@@ -2983,7 +2983,7 @@
             this.wikiButton.Text = "Wiki";
             this.toolTip1.SetToolTip(this.wikiButton, "Visit the website");
             this.wikiButton.UseVisualStyleBackColor = true;
-            this.wikiButton.Click += new System.EventHandler(this.wikiBtn_Click);
+            this.wikiButton.Click += new System.EventHandler(this.WikiBtn_Click);
             // 
             // beginnerFlagsButton
             // 
@@ -3093,7 +3093,7 @@
             this.customFlags1SaveButton.Text = "Save";
             this.toolTip1.SetToolTip(this.customFlags1SaveButton, "Saves the current flags to this custom slot");
             this.customFlags1SaveButton.UseVisualStyleBackColor = true;
-            this.customFlags1SaveButton.Click += new System.EventHandler(this.customSave1_Click);
+            this.customFlags1SaveButton.Click += new System.EventHandler(this.CustomSave1_Click);
             // 
             // customFlags1LoadButton
             // 
@@ -3105,7 +3105,7 @@
             this.customFlags1LoadButton.Text = "Load";
             this.toolTip1.SetToolTip(this.customFlags1LoadButton, "Loads the flags in this current custom slot");
             this.customFlags1LoadButton.UseVisualStyleBackColor = true;
-            this.customFlags1LoadButton.Click += new System.EventHandler(this.customLoad1_Click);
+            this.customFlags1LoadButton.Click += new System.EventHandler(this.CustomLoad1_Click);
             // 
             // customFlags3TextBox
             // 
@@ -3126,7 +3126,7 @@
             this.customFlags2SaveButton.Text = "Save";
             this.toolTip1.SetToolTip(this.customFlags2SaveButton, "Saves the current flags to this custom slot");
             this.customFlags2SaveButton.UseVisualStyleBackColor = true;
-            this.customFlags2SaveButton.Click += new System.EventHandler(this.customSave2_Click);
+            this.customFlags2SaveButton.Click += new System.EventHandler(this.CustomSave2_Click);
             // 
             // customFlags2LoadButton
             // 
@@ -3138,7 +3138,7 @@
             this.customFlags2LoadButton.Text = "Load";
             this.toolTip1.SetToolTip(this.customFlags2LoadButton, "Loads the flags in this current custom slot");
             this.customFlags2LoadButton.UseVisualStyleBackColor = true;
-            this.customFlags2LoadButton.Click += new System.EventHandler(this.customLoad2_Click);
+            this.customFlags2LoadButton.Click += new System.EventHandler(this.CustomLoad2_Click);
             // 
             // customFlags3SaveButton
             // 
@@ -3150,7 +3150,7 @@
             this.customFlags3SaveButton.Text = "Save";
             this.toolTip1.SetToolTip(this.customFlags3SaveButton, "Saves the current flags to this custom slot");
             this.customFlags3SaveButton.UseVisualStyleBackColor = true;
-            this.customFlags3SaveButton.Click += new System.EventHandler(this.customSave3_Click);
+            this.customFlags3SaveButton.Click += new System.EventHandler(this.CustomSave3_Click);
             // 
             // customFlags3LoadButton
             // 
@@ -3162,7 +3162,7 @@
             this.customFlags3LoadButton.Text = "Load";
             this.toolTip1.SetToolTip(this.customFlags3LoadButton, "Loads the flags in this current custom slot");
             this.customFlags3LoadButton.UseVisualStyleBackColor = true;
-            this.customFlags3LoadButton.Click += new System.EventHandler(this.customLoad3_Click);
+            this.customFlags3LoadButton.Click += new System.EventHandler(this.CustomLoad3_Click);
             // 
             // oldFlagsTextbox
             // 
@@ -3228,8 +3228,8 @@
             // 
             this.backgroundWorker1.WorkerReportsProgress = true;
             this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker1_ProgressChanged);
             // 
             // oldFlagsLabel
             // 
@@ -3524,7 +3524,7 @@
         private System.Windows.Forms.CheckBox flashingOffCheckbox;
         private System.Windows.Forms.ComboBox mazeBiome;
         private System.Windows.Forms.Label mazeIslandBiomeLabel;
-        private System.Windows.Forms.CheckBox shuffledBasnill;
+        private System.Windows.Forms.CheckBox shuffledVanillaShowsActualTerrain;
         private System.Windows.Forms.CheckBox shuffleWhichLocationsAreHiddenCheckbox;
         private System.Windows.Forms.CheckBox randomizeBossItemCheckbox;
         private System.Windows.Forms.CheckBox useGoodBootsCheckbox;
