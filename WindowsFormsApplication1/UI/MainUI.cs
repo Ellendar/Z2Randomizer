@@ -66,9 +66,9 @@ public partial class MainUI : Form
             largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
 
 
-        customFlags1TextBox.TextChanged += new System.EventHandler(this.customSave1_Click);
-        customFlags2TextBox.TextChanged += new System.EventHandler(this.customSave2_Click);
-        customFlags3TextBox.TextChanged += new System.EventHandler(this.customSave3_Click);
+        customFlags1TextBox.TextChanged += new System.EventHandler(this.CustomSave1_Click);
+        customFlags2TextBox.TextChanged += new System.EventHandler(this.CustomSave2_Click);
+        customFlags3TextBox.TextChanged += new System.EventHandler(this.CustomSave3_Click);
 
 
         dontrunhandler = false;
@@ -182,7 +182,7 @@ public partial class MainUI : Form
         dmBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         eastBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         mazeBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffledBasnill.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        shuffledVanillaShowsActualTerrain.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleWhichLocationsAreHiddenCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         randomizeBossItemCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         useGoodBootsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -198,8 +198,8 @@ public partial class MainUI : Form
 
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
-        enableLevelScaling(null, null);
-        eastBiome_SelectedIndexChanged(null, null);
+        EnableLevelScaling(null, null);
+        EastBiome_SelectedIndexChanged(null, null);
         randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.RandomizeDropsChanged);
         for (int i = 0; i < small.Count(); i++)
         {
@@ -365,8 +365,8 @@ public partial class MainUI : Form
         f3.Width = 250;
         Exception generationException = null;
         backgroundWorker1 = new BackgroundWorker();
-        backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
-        backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
+        backgroundWorker1.DoWork += new DoWorkEventHandler(BackgroundWorker1_DoWork);
+        backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
         backgroundWorker1.WorkerReportsProgress = true;
         backgroundWorker1.WorkerSupportsCancellation = true;
         backgroundWorker1.RunWorkerCompleted += (completed_sender, completed_event) => {
@@ -627,7 +627,7 @@ public partial class MainUI : Form
             3 => Biome.RANDOM,
             _ => throw new Exception("Invalid MazeBiome setting")
         };
-        configuration.VanillaShuffleUsesActualTerrain = shuffledBasnill.Checked;
+        configuration.VanillaShuffleUsesActualTerrain = shuffledVanillaShowsActualTerrain.Checked;
 
         //Palaces
         configuration.PalaceStyle = palaceStyleList.SelectedIndex switch
@@ -994,7 +994,7 @@ public partial class MainUI : Form
                 Biome.RANDOM => 3,
                 _ => throw new Exception("Invalid MazeBiome setting")
             };
-            shuffledBasnill.Checked = configuration.VanillaShuffleUsesActualTerrain;
+            shuffledVanillaShowsActualTerrain.Checked = configuration.VanillaShuffleUsesActualTerrain;
 
             //Palaces
             palaceStyleList.SelectedIndex = configuration.PalaceStyle switch
@@ -1153,12 +1153,12 @@ public partial class MainUI : Form
         dontrunhandler = false;
     }
 
-    private void updateBtn_Click(object sender, EventArgs e)
+    private void UpdateBtn_Click(object sender, EventArgs e)
     {
         //WinSparkle.win_sparkle_check_update_with_ui();
     }
 
-    private void shuffleOverworldEnemies_CheckStateChanged(object sender, EventArgs e)
+    private void ShuffleOverworldEnemies_CheckStateChanged(object sender, EventArgs e)
     {
         if (shufflePalaceEnemiesCheckbox.Checked || shuffleOverworldEnemiesCheckbox.Checked)
         {
@@ -1171,7 +1171,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void shufflePalaceEnemies_CheckStateChanged(object sender, EventArgs e)
+    private void ShufflePalaceEnemies_CheckStateChanged(object sender, EventArgs e)
     {
         if (shufflePalaceEnemiesCheckbox.Checked || shuffleOverworldEnemiesCheckbox.Checked)
         {
@@ -1184,7 +1184,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void wikiBtn_Click(object sender, EventArgs e)
+    private void WikiBtn_Click(object sender, EventArgs e)
     {
         Process.Start(new ProcessStartInfo("https://bitbucket.org/digshake/z2randomizer/wiki/Home") { UseShellExecute = true });
     }
@@ -1194,7 +1194,7 @@ public partial class MainUI : Form
         Process.Start(new ProcessStartInfo("http://z2r.gg/discord") { UseShellExecute = true });
     }
 
-    private void palaceItemBox_CheckStateChanged(object sender, EventArgs e)
+    private void PalaceItemBox_CheckStateChanged(object sender, EventArgs e)
     {
         if (shufflePalaceItemsCheckbox.Checked && shuffleOverworldItemsCheckbox.Checked)
         {
@@ -1207,7 +1207,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void overworldItemBox_CheckStateChanged(object sender, EventArgs e)
+    private void OverworldItemBox_CheckStateChanged(object sender, EventArgs e)
     {
         if (shufflePalaceItemsCheckbox.Checked && shuffleOverworldItemsCheckbox.Checked)
         {
@@ -1254,7 +1254,7 @@ public partial class MainUI : Form
         flagsTextBox.Text = config.Serialize();
     }
 
-    private void tbirdBox_CheckStateChanged(object sender, EventArgs e)
+    private void TbirdBox_CheckStateChanged(object sender, EventArgs e)
     {
         if (tbirdRequiredCheckbox.Checked)
         {
@@ -1267,7 +1267,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void removeTbird_CheckStateChanged(object sender, EventArgs e)
+    private void RemoveTbird_CheckStateChanged(object sender, EventArgs e)
     {
         if (removeTbirdCheckbox.Checked)
         {
@@ -1280,7 +1280,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void palaceSwapBox_CheckStateChanged(object sender, EventArgs e)
+    private void PalaceSwapBox_CheckStateChanged(object sender, EventArgs e)
     {
         if (allowPalaceContinentSwapCheckbox.Checked)
         {
@@ -1333,8 +1333,8 @@ public partial class MainUI : Form
                 if (spawnNextSeed)
                 {
                     backgroundWorker1 = new BackgroundWorker();
-                    backgroundWorker1.DoWork += new DoWorkEventHandler(backgroundWorker1_DoWork);
-                    backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(backgroundWorker1_ProgressChanged);
+                    backgroundWorker1.DoWork += new DoWorkEventHandler(BackgroundWorker1_DoWork);
+                    backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
                     backgroundWorker1.WorkerReportsProgress = true;
                     backgroundWorker1.WorkerSupportsCancellation = true;
                     backgroundWorker1.RunWorkerAsync();
@@ -1407,38 +1407,38 @@ public partial class MainUI : Form
         }
     }
 
-    private void customSave1_Click(object sender, EventArgs e)
+    private void CustomSave1_Click(object sender, EventArgs e)
     {
         customFlags1TextBox.Text = flagsTextBox.Text;
         Properties.Settings.Default.custom1 = flagsTextBox.Text;
         Properties.Settings.Default.Save();
     }
 
-    private void customLoad1_Click(object sender, EventArgs e)
+    private void CustomLoad1_Click(object sender, EventArgs e)
     {
         flagsTextBox.Text = customFlags1TextBox.Text;
     }
 
-    private void customSave2_Click(object sender, EventArgs e)
+    private void CustomSave2_Click(object sender, EventArgs e)
     {
         customFlags2TextBox.Text = flagsTextBox.Text;
         Properties.Settings.Default.custom2 = flagsTextBox.Text;
         Properties.Settings.Default.Save();
     }
 
-    private void customSave3_Click(object sender, EventArgs e)
+    private void CustomSave3_Click(object sender, EventArgs e)
     {
         customFlags3TextBox.Text = flagsTextBox.Text;
         Properties.Settings.Default.custom3 = flagsTextBox.Text;
         Properties.Settings.Default.Save();
     }
 
-    private void customLoad2_Click(object sender, EventArgs e)
+    private void CustomLoad2_Click(object sender, EventArgs e)
     {
         flagsTextBox.Text = customFlags2TextBox.Text;
     }
 
-    private void customLoad3_Click(object sender, EventArgs e)
+    private void CustomLoad3_Click(object sender, EventArgs e)
     {
         flagsTextBox.Text = customFlags3TextBox.Text;
     }
@@ -1456,7 +1456,7 @@ public partial class MainUI : Form
         }
     }*/
 
-    private void enableLevelScaling(object sender, EventArgs e)
+    private void EnableLevelScaling(object sender, EventArgs e)
     {
         if(!atkCapList.GetItemText(atkCapList.SelectedItem).Equals("8") 
             || !magCapList.GetItemText(magCapList.SelectedItem).Equals("8") 
@@ -1471,7 +1471,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void spellItemBox_CheckStateChanged(object sender, EventArgs e)
+    private void SpellItemBox_CheckStateChanged(object sender, EventArgs e)
     {
         if(removeSpellitemsCheckbox.Checked)
         {
@@ -1484,12 +1484,12 @@ public partial class MainUI : Form
         }
     }
 
-    private void mazeBiome_SelectedIndexChanged(object sender, EventArgs e)
+    private void MazeBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
-        checkVanillaPossible();
+        CheckVanillaPossible();
     }
 
-    private void eastBiome_SelectedIndexChanged(object sender, EventArgs e)
+    private void EastBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
 
         //if(eastBiome.SelectedIndex == 1)
@@ -1504,13 +1504,13 @@ public partial class MainUI : Form
         //    hpCmbo.Enabled = true;
         //    hideKasutoBox.Enabled = true;
         //}
-        shuffleHiddenEnable();
-        checkVanillaPossible();
+        ShuffleHiddenEnable();
+        CheckVanillaPossible();
 
 
     }
 
-    private void shuffleHiddenEnable()
+    private void ShuffleHiddenEnable()
     {
         if (eastBiome.SelectedIndex == 0 || (hiddenPalaceList.SelectedIndex == 0 && hideKasutoList.SelectedIndex == 0))
         {
@@ -1524,20 +1524,21 @@ public partial class MainUI : Form
         }
     }
 
-    private void checkVanillaPossible()
+    private void CheckVanillaPossible()
     {
-        if(vanillaPossible(eastBiome) || vanillaPossible(westBiome) || vanillaPossible(dmBiome) || vanillaPossible(mazeBiome))
+        if(VanillaPossible(eastBiome) || VanillaPossible(westBiome) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
         {
-            shuffledBasnill.Enabled = true;
+            shuffledVanillaShowsActualTerrain.Enabled = true;
+            shuffledVanillaShowsActualTerrain.Checked = true;
         }
         else
         {
-            shuffledBasnill.Enabled = false;
-            shuffledBasnill.Checked = false;
+            shuffledVanillaShowsActualTerrain.Enabled = false;
+            shuffledVanillaShowsActualTerrain.Checked = false;
         }
     }
 
-    private bool vanillaPossible(ComboBox cb)
+    private bool VanillaPossible(ComboBox cb)
     {
         if(cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
         {
@@ -1549,9 +1550,9 @@ public partial class MainUI : Form
         }
     }
 
-    private void westBiome_SelectedIndexChanged(object sender, EventArgs e)
+    private void WestBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
-        checkVanillaPossible();
+        CheckVanillaPossible();
         if(westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
         {
             generateBaguWoodsCheckbox.Checked = false;
@@ -1563,22 +1564,22 @@ public partial class MainUI : Form
         }
     }
 
-    private void dmBiome_SelectedIndexChanged(object sender, EventArgs e)
+    private void DmBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
-        checkVanillaPossible();
+        CheckVanillaPossible();
     }
 
-    private void hpCmbo_SelectedIndexChanged(object sender, EventArgs e)
+    private void HpCmbo_SelectedIndexChanged(object sender, EventArgs e)
     {
-        shuffleHiddenEnable();
+        ShuffleHiddenEnable();
     }
 
-    private void hideKasutoBox_SelectedIndexChanged(object sender, EventArgs e)
+    private void HideKasutoBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        shuffleHiddenEnable();
+        ShuffleHiddenEnable();
     }
 
-    private void backgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+    private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
     {
         BackgroundWorker worker = sender as BackgroundWorker;
         
@@ -1589,7 +1590,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void backgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
+    private void BackgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
     {
         if(e.ProgressPercentage == 2)
         {
@@ -1625,7 +1626,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void palaceBox_SelectedIndexChanged(object sender, EventArgs e)
+    private void PalaceBox_SelectedIndexChanged(object sender, EventArgs e)
     {
         if(palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
         {
@@ -1657,7 +1658,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void dashBox_CheckStateChanged(object sender, EventArgs e)
+    private void DashBox_CheckStateChanged(object sender, EventArgs e)
     {
         if(useDashCheckbox.Checked)
         {
@@ -1670,7 +1671,7 @@ public partial class MainUI : Form
         }
     }
 
-    private void combineFireBox_CheckStateChanged(object sender, EventArgs e)
+    private void CombineFireBox_CheckStateChanged(object sender, EventArgs e)
     {
         if (combineFireCheckbox.Checked)
         {
