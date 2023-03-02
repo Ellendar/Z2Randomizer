@@ -28,3305 +28,3068 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.mainTabControl = new System.Windows.Forms.TabControl();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.maxHeartsList = new System.Windows.Forms.ComboBox();
-            this.startHeartsMaxList = new System.Windows.Forms.ComboBox();
-            this.startingLevelsLabel = new System.Windows.Forms.Label();
-            this.startingLifeLevelList = new System.Windows.Forms.ComboBox();
-            this.startingMagicLevelList = new System.Windows.Forms.ComboBox();
-            this.startingAttackLevelList = new System.Windows.Forms.ComboBox();
-            this.startingLifeLabel = new System.Windows.Forms.Label();
-            this.startingMagicLabel = new System.Windows.Forms.Label();
-            this.startingAttackLabel = new System.Windows.Forms.Label();
-            this.randomizeLivesBox = new System.Windows.Forms.CheckBox();
-            this.startingTechsLabel = new System.Windows.Forms.Label();
-            this.startingTechsList = new System.Windows.Forms.ComboBox();
-            this.startingHeartContainersLabel = new System.Windows.Forms.Label();
-            this.startHeartsMinList = new System.Windows.Forms.ComboBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.startWIthThunderCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithSpellCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithReflectCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithFireCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithFairyCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithLifeCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithJumpCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithShieldCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleStartingSpellsCheckbox = new System.Windows.Forms.CheckBox();
-            this.itemGrp = new System.Windows.Forms.GroupBox();
-            this.startWithMagicKeyCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithHammerCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithCrossCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithFluteCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithBootsCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithRaftCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithGloveCheckbox = new System.Windows.Forms.CheckBox();
-            this.startWithCandleCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleStartingItemsCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.generateBaguWoodsCheckbox = new System.Windows.Forms.CheckBox();
-            this.useGoodBootsCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleWhichLocationsAreHiddenCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffledVanillaShowsActualTerrain = new System.Windows.Forms.CheckBox();
-            this.mazeBiome = new System.Windows.Forms.ComboBox();
-            this.mazeIslandBiomeLabel = new System.Windows.Forms.Label();
-            this.eastBiome = new System.Windows.Forms.ComboBox();
-            this.dmBiome = new System.Windows.Forms.ComboBox();
-            this.westBiome = new System.Windows.Forms.ComboBox();
-            this.eastContinentBindingLabel = new System.Windows.Forms.Label();
-            this.deathMountainBiomeLabel = new System.Windows.Forms.Label();
-            this.label39 = new System.Windows.Forms.Label();
-            this.westContinentLabel = new System.Windows.Forms.Label();
-            this.allowBoulderBlockedConnectionsCheckbox = new System.Windows.Forms.CheckBox();
-            this.saneCaveShuffleBox = new System.Windows.Forms.CheckBox();
-            this.hideLessImportantLocationsCheckbox = new System.Windows.Forms.CheckBox();
-            this.ContinentConnectionLabel = new System.Windows.Forms.Label();
-            this.continentConnectionBox = new System.Windows.Forms.ComboBox();
-            this.label36 = new System.Windows.Forms.Label();
-            this.encounterRateBox = new System.Windows.Forms.ComboBox();
-            this.encounterRateLabel = new System.Windows.Forms.Label();
-            this.hideKasutoList = new System.Windows.Forms.ComboBox();
-            this.hiddenKasutoLabel = new System.Windows.Forms.Label();
-            this.hiddenPalaceList = new System.Windows.Forms.ComboBox();
-            this.hiddenPalaceLabel = new System.Windows.Forms.Label();
-            this.includeGPinShuffleCheckbox = new System.Windows.Forms.CheckBox();
-            this.allowPalaceContinentSwapCheckbox = new System.Windows.Forms.CheckBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.allowPathEnemiesCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleEncountersCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.startingGemsMaxList = new System.Windows.Forms.ComboBox();
-            this.palaceStyleLabel = new System.Windows.Forms.Label();
-            this.palaceStyleList = new System.Windows.Forms.ComboBox();
-            this.bossRoomsExitToPalaceCheckbox = new System.Windows.Forms.CheckBox();
-            this.blockingRoomsInAnyPalaceCheckbox = new System.Windows.Forms.CheckBox();
-            this.includeCommunityRoomsCheckbox = new System.Windows.Forms.CheckBox();
-            this.randomizeBossItemCheckbox = new System.Windows.Forms.CheckBox();
-            this.removeTbirdCheckbox = new System.Windows.Forms.CheckBox();
-            this.shortGPCheckbox = new System.Windows.Forms.CheckBox();
-            this.restartAtPalacesCheckbox = new System.Windows.Forms.CheckBox();
-            this.palacePaletteCheckbox = new System.Windows.Forms.CheckBox();
-            this.tbirdRequiredCheckbox = new System.Windows.Forms.CheckBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.startingGemsMinList = new System.Windows.Forms.ComboBox();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.lifeEffectivenessList = new System.Windows.Forms.ComboBox();
-            this.magicEffectivenessList = new System.Windows.Forms.ComboBox();
-            this.attackEffectivenessList = new System.Windows.Forms.ComboBox();
-            this.scaleLevelRequirementsToCapCheckbox = new System.Windows.Forms.CheckBox();
-            this.levelCapLabel = new System.Windows.Forms.Label();
-            this.lifeCapList = new System.Windows.Forms.ComboBox();
-            this.magCapList = new System.Windows.Forms.ComboBox();
-            this.atkCapList = new System.Windows.Forms.ComboBox();
-            this.lifeCapLabel = new System.Windows.Forms.Label();
-            this.magCapLabel = new System.Windows.Forms.Label();
-            this.attackCapLabel = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.magicEffectivenessLabel = new System.Windows.Forms.Label();
-            this.attackEffectivenessLabel = new System.Windows.Forms.Label();
-            this.expBox = new System.Windows.Forms.GroupBox();
-            this.lifeExpNeededCheckbox = new System.Windows.Forms.CheckBox();
-            this.magicExpNeededCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleAtkExpNeededCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleAllExpCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage9 = new System.Windows.Forms.TabPage();
-            this.swapUpAndDownstabCheckbox = new System.Windows.Forms.CheckBox();
-            this.useDashCheckbox = new System.Windows.Forms.CheckBox();
-            this.randomizeSpellSpellEnemyCheckbox = new System.Windows.Forms.CheckBox();
-            this.combineFireCheckbox = new System.Windows.Forms.CheckBox();
-            this.disableMagicContainerRequirementCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleSpellLocationsCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleLifeRefillCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage6 = new System.Windows.Forms.TabPage();
-            this.enemyExperienceDropsLabel = new System.Windows.Forms.Label();
-            this.experienceDropsList = new System.Windows.Forms.ComboBox();
-            this.shuffleDripperEnemyCheckbox = new System.Windows.Forms.CheckBox();
-            this.mixLargeAndSmallCheckbox = new System.Windows.Forms.CheckBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.shufflePalaceEnemiesCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleOverworldEnemiesCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleSwordImmunityBox = new System.Windows.Forms.CheckBox();
-            this.shuffleStealXPAmountCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleXPStealersCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleEnemyHPBox = new System.Windows.Forms.CheckBox();
-            this.tabPage7 = new System.Windows.Forms.TabPage();
-            this.shufflePbagAmountsCheckbox = new System.Windows.Forms.CheckBox();
-            this.removeSpellitemsCheckbox = new System.Windows.Forms.CheckBox();
-            this.includePbagCavesInShuffleCheckbox = new System.Windows.Forms.CheckBox();
-            this.randomizeJarRequirementsCheckbox = new System.Windows.Forms.CheckBox();
-            this.palacesHaveExtraKeysCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleSmallItemsCheckbox = new System.Windows.Forms.CheckBox();
-            this.mixOverworldPalaceItemsCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleOverworldItemsCheckbox = new System.Windows.Forms.CheckBox();
-            this.shufflePalaceItemsCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage8 = new System.Windows.Forms.TabPage();
-            this.randomizeDropsCheckbox = new System.Windows.Forms.CheckBox();
-            this.standardizeDropsCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesKeyCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemies1UpCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesXLBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesLargeBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesMediumBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesSmallBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesRedJarCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemiesBlueJarCheckbox = new System.Windows.Forms.CheckBox();
-            this.largeEnemyPoolLabel = new System.Windows.Forms.Label();
-            this.smallEnemiesKeyCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemies1UpCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemiesXLBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemiesLargeBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemiesMediumBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemiesSmallBagCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemiesRedJarCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemiesBlueJarCheckbox = new System.Windows.Forms.CheckBox();
-            this.smallEnemyPoolLabel = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.shuffleDropFrequencyCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage10 = new System.Windows.Forms.TabPage();
-            this.enableTownNameHintsCheckbox = new System.Windows.Forms.CheckBox();
-            this.enableSpellItemHintsCheckbox = new System.Windows.Forms.CheckBox();
-            this.useCommunityHintsCheckbox = new System.Windows.Forms.CheckBox();
-            this.enableHelpfulHintsCheckbox = new System.Windows.Forms.CheckBox();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.dashAlwaysOnCheckbox = new System.Windows.Forms.CheckBox();
-            this.flashingOffCheckbox = new System.Windows.Forms.CheckBox();
-            this.upAOnController1Checkbox = new System.Windows.Forms.CheckBox();
-            this.beamSpriteList = new System.Windows.Forms.ComboBox();
-            this.beamSpriteLabel = new System.Windows.Forms.Label();
-            this.shieldColorList = new System.Windows.Forms.ComboBox();
-            this.shieldColorLabel = new System.Windows.Forms.Label();
-            this.tunicColorList = new System.Windows.Forms.ComboBox();
-            this.tunicColorLabel = new System.Windows.Forms.Label();
-            this.characterSpriteList = new System.Windows.Forms.ComboBox();
-            this.characterSpriteLabel = new System.Windows.Forms.Label();
-            this.disableMusicCheckbox = new System.Windows.Forms.CheckBox();
-            this.shuffleEnemyPalettesCheckbox = new System.Windows.Forms.CheckBox();
-            this.alwaysBeamCheckbox = new System.Windows.Forms.CheckBox();
-            this.fastSpellCheckbox = new System.Windows.Forms.CheckBox();
-            this.jumpAlwaysOnCheckbox = new System.Windows.Forms.CheckBox();
-            this.disableLowHealthBeepCheckbox = new System.Windows.Forms.CheckBox();
-            this.romFileTextBox = new System.Windows.Forms.TextBox();
-            this.seedTextBox = new System.Windows.Forms.TextBox();
-            this.romFileLabel = new System.Windows.Forms.Label();
-            this.seedLabel = new System.Windows.Forms.Label();
-            this.createSeedButton = new System.Windows.Forms.Button();
-            this.romFileBrowseButton = new System.Windows.Forms.Button();
-            this.generateRomButton = new System.Windows.Forms.Button();
-            this.flagsTextBox = new System.Windows.Forms.TextBox();
-            this.updateButton = new System.Windows.Forms.Button();
-            this.flagsLabel = new System.Windows.Forms.Label();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.wikiButton = new System.Windows.Forms.Button();
-            this.beginnerFlagsButton = new System.Windows.Forms.Button();
-            this.standard2022FlagsButton = new System.Windows.Forms.Button();
-            this.maxRandoFlagButton = new System.Windows.Forms.Button();
-            this.randomPercentFlagButton = new System.Windows.Forms.Button();
-            this.unused2FlagsButton = new System.Windows.Forms.Button();
-            this.unused3FlagsButton = new System.Windows.Forms.Button();
-            this.discordButton = new System.Windows.Forms.Button();
-            this.customFlags1TextBox = new System.Windows.Forms.TextBox();
-            this.customFlags2TextBox = new System.Windows.Forms.TextBox();
-            this.customFlags1SaveButton = new System.Windows.Forms.Button();
-            this.customFlags1LoadButton = new System.Windows.Forms.Button();
-            this.customFlags3TextBox = new System.Windows.Forms.TextBox();
-            this.customFlags2SaveButton = new System.Windows.Forms.Button();
-            this.customFlags2LoadButton = new System.Windows.Forms.Button();
-            this.customFlags3SaveButton = new System.Windows.Forms.Button();
-            this.customFlags3LoadButton = new System.Windows.Forms.Button();
-            this.oldFlagsTextbox = new System.Windows.Forms.TextBox();
-            this.convertButton = new System.Windows.Forms.Button();
-            this.customFlags1Label = new System.Windows.Forms.Label();
-            this.customFlags2Label = new System.Windows.Forms.Label();
-            this.customFlags3Label = new System.Windows.Forms.Label();
-            this.label25 = new System.Windows.Forms.Label();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
-            this.oldFlagsLabel = new System.Windows.Forms.Label();
-            this.batchButton = new System.Windows.Forms.Button();
-            this.mainTabControl.SuspendLayout();
-            this.tabPage4.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.itemGrp.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.tabPage5.SuspendLayout();
-            this.expBox.SuspendLayout();
-            this.tabPage9.SuspendLayout();
-            this.tabPage6.SuspendLayout();
-            this.tabPage7.SuspendLayout();
-            this.tabPage8.SuspendLayout();
-            this.tabPage10.SuspendLayout();
-            this.tabPage3.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            mainTabControl = new System.Windows.Forms.TabControl();
+            tabPage4 = new System.Windows.Forms.TabPage();
+            label3 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            label1 = new System.Windows.Forms.Label();
+            maxHeartsList = new System.Windows.Forms.ComboBox();
+            startHeartsMaxList = new System.Windows.Forms.ComboBox();
+            startingLevelsLabel = new System.Windows.Forms.Label();
+            startingLifeLevelList = new System.Windows.Forms.ComboBox();
+            startingMagicLevelList = new System.Windows.Forms.ComboBox();
+            startingAttackLevelList = new System.Windows.Forms.ComboBox();
+            startingLifeLabel = new System.Windows.Forms.Label();
+            startingMagicLabel = new System.Windows.Forms.Label();
+            startingAttackLabel = new System.Windows.Forms.Label();
+            randomizeLivesBox = new System.Windows.Forms.CheckBox();
+            startingTechsLabel = new System.Windows.Forms.Label();
+            startingTechsList = new System.Windows.Forms.ComboBox();
+            startingHeartContainersLabel = new System.Windows.Forms.Label();
+            startHeartsMinList = new System.Windows.Forms.ComboBox();
+            groupBox1 = new System.Windows.Forms.GroupBox();
+            startWIthThunderCheckbox = new System.Windows.Forms.CheckBox();
+            startWithSpellCheckbox = new System.Windows.Forms.CheckBox();
+            startWithReflectCheckbox = new System.Windows.Forms.CheckBox();
+            startWithFireCheckbox = new System.Windows.Forms.CheckBox();
+            startWithFairyCheckbox = new System.Windows.Forms.CheckBox();
+            startWithLifeCheckbox = new System.Windows.Forms.CheckBox();
+            startWithJumpCheckbox = new System.Windows.Forms.CheckBox();
+            startWithShieldCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleStartingSpellsCheckbox = new System.Windows.Forms.CheckBox();
+            itemGrp = new System.Windows.Forms.GroupBox();
+            startWithMagicKeyCheckbox = new System.Windows.Forms.CheckBox();
+            startWithHammerCheckbox = new System.Windows.Forms.CheckBox();
+            startWithCrossCheckbox = new System.Windows.Forms.CheckBox();
+            startWithFluteCheckbox = new System.Windows.Forms.CheckBox();
+            startWithBootsCheckbox = new System.Windows.Forms.CheckBox();
+            startWithRaftCheckbox = new System.Windows.Forms.CheckBox();
+            startWithGloveCheckbox = new System.Windows.Forms.CheckBox();
+            startWithCandleCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleStartingItemsCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage1 = new System.Windows.Forms.TabPage();
+            generateBaguWoodsCheckbox = new System.Windows.Forms.CheckBox();
+            useGoodBootsCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleWhichLocationsAreHiddenCheckbox = new System.Windows.Forms.CheckBox();
+            shuffledVanillaShowsActualTerrain = new System.Windows.Forms.CheckBox();
+            mazeBiome = new System.Windows.Forms.ComboBox();
+            mazeIslandBiomeLabel = new System.Windows.Forms.Label();
+            eastBiome = new System.Windows.Forms.ComboBox();
+            dmBiome = new System.Windows.Forms.ComboBox();
+            westBiome = new System.Windows.Forms.ComboBox();
+            eastContinentBindingLabel = new System.Windows.Forms.Label();
+            deathMountainBiomeLabel = new System.Windows.Forms.Label();
+            label39 = new System.Windows.Forms.Label();
+            westContinentLabel = new System.Windows.Forms.Label();
+            allowBoulderBlockedConnectionsCheckbox = new System.Windows.Forms.CheckBox();
+            saneCaveShuffleBox = new System.Windows.Forms.CheckBox();
+            hideLessImportantLocationsCheckbox = new System.Windows.Forms.CheckBox();
+            ContinentConnectionLabel = new System.Windows.Forms.Label();
+            continentConnectionBox = new System.Windows.Forms.ComboBox();
+            label36 = new System.Windows.Forms.Label();
+            encounterRateBox = new System.Windows.Forms.ComboBox();
+            encounterRateLabel = new System.Windows.Forms.Label();
+            hideKasutoList = new System.Windows.Forms.ComboBox();
+            hiddenKasutoLabel = new System.Windows.Forms.Label();
+            hiddenPalaceList = new System.Windows.Forms.ComboBox();
+            hiddenPalaceLabel = new System.Windows.Forms.Label();
+            includeGPinShuffleCheckbox = new System.Windows.Forms.CheckBox();
+            allowPalaceContinentSwapCheckbox = new System.Windows.Forms.CheckBox();
+            label4 = new System.Windows.Forms.Label();
+            allowPathEnemiesCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleEncountersCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage2 = new System.Windows.Forms.TabPage();
+            label7 = new System.Windows.Forms.Label();
+            label5 = new System.Windows.Forms.Label();
+            startingGemsMaxList = new System.Windows.Forms.ComboBox();
+            palaceStyleLabel = new System.Windows.Forms.Label();
+            palaceStyleList = new System.Windows.Forms.ComboBox();
+            bossRoomsExitToPalaceCheckbox = new System.Windows.Forms.CheckBox();
+            blockingRoomsInAnyPalaceCheckbox = new System.Windows.Forms.CheckBox();
+            includeCommunityRoomsCheckbox = new System.Windows.Forms.CheckBox();
+            randomizeBossItemCheckbox = new System.Windows.Forms.CheckBox();
+            removeTbirdCheckbox = new System.Windows.Forms.CheckBox();
+            shortGPCheckbox = new System.Windows.Forms.CheckBox();
+            restartAtPalacesCheckbox = new System.Windows.Forms.CheckBox();
+            palacePaletteCheckbox = new System.Windows.Forms.CheckBox();
+            tbirdRequiredCheckbox = new System.Windows.Forms.CheckBox();
+            label6 = new System.Windows.Forms.Label();
+            startingGemsMinList = new System.Windows.Forms.ComboBox();
+            tabPage5 = new System.Windows.Forms.TabPage();
+            lifeEffectivenessList = new System.Windows.Forms.ComboBox();
+            magicEffectivenessList = new System.Windows.Forms.ComboBox();
+            attackEffectivenessList = new System.Windows.Forms.ComboBox();
+            scaleLevelRequirementsToCapCheckbox = new System.Windows.Forms.CheckBox();
+            levelCapLabel = new System.Windows.Forms.Label();
+            lifeCapList = new System.Windows.Forms.ComboBox();
+            magCapList = new System.Windows.Forms.ComboBox();
+            atkCapList = new System.Windows.Forms.ComboBox();
+            lifeCapLabel = new System.Windows.Forms.Label();
+            magCapLabel = new System.Windows.Forms.Label();
+            attackCapLabel = new System.Windows.Forms.Label();
+            label12 = new System.Windows.Forms.Label();
+            magicEffectivenessLabel = new System.Windows.Forms.Label();
+            attackEffectivenessLabel = new System.Windows.Forms.Label();
+            expBox = new System.Windows.Forms.GroupBox();
+            lifeExpNeededCheckbox = new System.Windows.Forms.CheckBox();
+            magicExpNeededCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleAtkExpNeededCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleAllExpCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage9 = new System.Windows.Forms.TabPage();
+            swapUpAndDownstabCheckbox = new System.Windows.Forms.CheckBox();
+            useDashCheckbox = new System.Windows.Forms.CheckBox();
+            randomizeSpellSpellEnemyCheckbox = new System.Windows.Forms.CheckBox();
+            combineFireCheckbox = new System.Windows.Forms.CheckBox();
+            disableMagicContainerRequirementCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleSpellLocationsCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleLifeRefillCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage6 = new System.Windows.Forms.TabPage();
+            enemyExperienceDropsLabel = new System.Windows.Forms.Label();
+            experienceDropsList = new System.Windows.Forms.ComboBox();
+            shuffleDripperEnemyCheckbox = new System.Windows.Forms.CheckBox();
+            mixLargeAndSmallCheckbox = new System.Windows.Forms.CheckBox();
+            label8 = new System.Windows.Forms.Label();
+            shufflePalaceEnemiesCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleOverworldEnemiesCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleSwordImmunityBox = new System.Windows.Forms.CheckBox();
+            shuffleStealXPAmountCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleXPStealersCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleEnemyHPBox = new System.Windows.Forms.CheckBox();
+            tabPage7 = new System.Windows.Forms.TabPage();
+            shufflePbagAmountsCheckbox = new System.Windows.Forms.CheckBox();
+            removeSpellitemsCheckbox = new System.Windows.Forms.CheckBox();
+            includePbagCavesInShuffleCheckbox = new System.Windows.Forms.CheckBox();
+            randomizeJarRequirementsCheckbox = new System.Windows.Forms.CheckBox();
+            palacesHaveExtraKeysCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleSmallItemsCheckbox = new System.Windows.Forms.CheckBox();
+            mixOverworldPalaceItemsCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleOverworldItemsCheckbox = new System.Windows.Forms.CheckBox();
+            shufflePalaceItemsCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage8 = new System.Windows.Forms.TabPage();
+            randomizeDropsCheckbox = new System.Windows.Forms.CheckBox();
+            standardizeDropsCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesKeyCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemies1UpCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesXLBagCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesLargeBagCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesMediumBagCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesSmallBagCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesRedJarCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemiesBlueJarCheckbox = new System.Windows.Forms.CheckBox();
+            largeEnemyPoolLabel = new System.Windows.Forms.Label();
+            smallEnemiesKeyCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemies1UpCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemiesXLBagCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemiesLargeBagCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemiesMediumBagCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemiesSmallBagCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemiesRedJarCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemiesBlueJarCheckbox = new System.Windows.Forms.CheckBox();
+            smallEnemyPoolLabel = new System.Windows.Forms.Label();
+            label19 = new System.Windows.Forms.Label();
+            shuffleDropFrequencyCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage10 = new System.Windows.Forms.TabPage();
+            enableTownNameHintsCheckbox = new System.Windows.Forms.CheckBox();
+            enableSpellItemHintsCheckbox = new System.Windows.Forms.CheckBox();
+            useCommunityHintsCheckbox = new System.Windows.Forms.CheckBox();
+            enableHelpfulHintsCheckbox = new System.Windows.Forms.CheckBox();
+            tabPage3 = new System.Windows.Forms.TabPage();
+            dashAlwaysOnCheckbox = new System.Windows.Forms.CheckBox();
+            flashingOffCheckbox = new System.Windows.Forms.CheckBox();
+            upAOnController1Checkbox = new System.Windows.Forms.CheckBox();
+            beamSpriteList = new System.Windows.Forms.ComboBox();
+            beamSpriteLabel = new System.Windows.Forms.Label();
+            shieldColorList = new System.Windows.Forms.ComboBox();
+            shieldColorLabel = new System.Windows.Forms.Label();
+            tunicColorList = new System.Windows.Forms.ComboBox();
+            tunicColorLabel = new System.Windows.Forms.Label();
+            characterSpriteList = new System.Windows.Forms.ComboBox();
+            characterSpriteLabel = new System.Windows.Forms.Label();
+            disableMusicCheckbox = new System.Windows.Forms.CheckBox();
+            shuffleEnemyPalettesCheckbox = new System.Windows.Forms.CheckBox();
+            alwaysBeamCheckbox = new System.Windows.Forms.CheckBox();
+            fastSpellCheckbox = new System.Windows.Forms.CheckBox();
+            jumpAlwaysOnCheckbox = new System.Windows.Forms.CheckBox();
+            disableLowHealthBeepCheckbox = new System.Windows.Forms.CheckBox();
+            romFileTextBox = new System.Windows.Forms.TextBox();
+            seedTextBox = new System.Windows.Forms.TextBox();
+            romFileLabel = new System.Windows.Forms.Label();
+            seedLabel = new System.Windows.Forms.Label();
+            createSeedButton = new System.Windows.Forms.Button();
+            romFileBrowseButton = new System.Windows.Forms.Button();
+            generateRomButton = new System.Windows.Forms.Button();
+            flagsTextBox = new System.Windows.Forms.TextBox();
+            updateButton = new System.Windows.Forms.Button();
+            flagsLabel = new System.Windows.Forms.Label();
+            toolTip1 = new System.Windows.Forms.ToolTip(components);
+            wikiButton = new System.Windows.Forms.Button();
+            beginnerFlagsButton = new System.Windows.Forms.Button();
+            standard2022FlagsButton = new System.Windows.Forms.Button();
+            maxRandoFlagButton = new System.Windows.Forms.Button();
+            randomPercentFlagButton = new System.Windows.Forms.Button();
+            unused2FlagsButton = new System.Windows.Forms.Button();
+            unused3FlagsButton = new System.Windows.Forms.Button();
+            discordButton = new System.Windows.Forms.Button();
+            customFlags1TextBox = new System.Windows.Forms.TextBox();
+            customFlags2TextBox = new System.Windows.Forms.TextBox();
+            customFlags1SaveButton = new System.Windows.Forms.Button();
+            customFlags1LoadButton = new System.Windows.Forms.Button();
+            customFlags3TextBox = new System.Windows.Forms.TextBox();
+            customFlags2SaveButton = new System.Windows.Forms.Button();
+            customFlags2LoadButton = new System.Windows.Forms.Button();
+            customFlags3SaveButton = new System.Windows.Forms.Button();
+            customFlags3LoadButton = new System.Windows.Forms.Button();
+            oldFlagsTextbox = new System.Windows.Forms.TextBox();
+            convertButton = new System.Windows.Forms.Button();
+            customFlags1Label = new System.Windows.Forms.Label();
+            customFlags2Label = new System.Windows.Forms.Label();
+            customFlags3Label = new System.Windows.Forms.Label();
+            label25 = new System.Windows.Forms.Label();
+            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            oldFlagsLabel = new System.Windows.Forms.Label();
+            batchButton = new System.Windows.Forms.Button();
+            mainTabControl.SuspendLayout();
+            tabPage4.SuspendLayout();
+            groupBox1.SuspendLayout();
+            itemGrp.SuspendLayout();
+            tabPage1.SuspendLayout();
+            tabPage2.SuspendLayout();
+            tabPage5.SuspendLayout();
+            expBox.SuspendLayout();
+            tabPage9.SuspendLayout();
+            tabPage6.SuspendLayout();
+            tabPage7.SuspendLayout();
+            tabPage8.SuspendLayout();
+            tabPage10.SuspendLayout();
+            tabPage3.SuspendLayout();
+            SuspendLayout();
             // 
             // mainTabControl
             // 
-            this.mainTabControl.Controls.Add(this.tabPage4);
-            this.mainTabControl.Controls.Add(this.tabPage1);
-            this.mainTabControl.Controls.Add(this.tabPage2);
-            this.mainTabControl.Controls.Add(this.tabPage5);
-            this.mainTabControl.Controls.Add(this.tabPage9);
-            this.mainTabControl.Controls.Add(this.tabPage6);
-            this.mainTabControl.Controls.Add(this.tabPage7);
-            this.mainTabControl.Controls.Add(this.tabPage8);
-            this.mainTabControl.Controls.Add(this.tabPage10);
-            this.mainTabControl.Controls.Add(this.tabPage3);
-            this.mainTabControl.Location = new System.Drawing.Point(15, 139);
-            this.mainTabControl.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.mainTabControl.Name = "mainTabControl";
-            this.mainTabControl.SelectedIndex = 0;
-            this.mainTabControl.Size = new System.Drawing.Size(603, 359);
-            this.mainTabControl.TabIndex = 0;
+            mainTabControl.Controls.Add(tabPage4);
+            mainTabControl.Controls.Add(tabPage1);
+            mainTabControl.Controls.Add(tabPage2);
+            mainTabControl.Controls.Add(tabPage5);
+            mainTabControl.Controls.Add(tabPage9);
+            mainTabControl.Controls.Add(tabPage6);
+            mainTabControl.Controls.Add(tabPage7);
+            mainTabControl.Controls.Add(tabPage8);
+            mainTabControl.Controls.Add(tabPage10);
+            mainTabControl.Controls.Add(tabPage3);
+            mainTabControl.Location = new System.Drawing.Point(15, 139);
+            mainTabControl.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            mainTabControl.Name = "mainTabControl";
+            mainTabControl.SelectedIndex = 0;
+            mainTabControl.Size = new System.Drawing.Size(603, 359);
+            mainTabControl.TabIndex = 0;
             // 
             // tabPage4
             // 
-            this.tabPage4.Controls.Add(this.label3);
-            this.tabPage4.Controls.Add(this.label2);
-            this.tabPage4.Controls.Add(this.label1);
-            this.tabPage4.Controls.Add(this.maxHeartsList);
-            this.tabPage4.Controls.Add(this.startHeartsMaxList);
-            this.tabPage4.Controls.Add(this.startingLevelsLabel);
-            this.tabPage4.Controls.Add(this.startingLifeLevelList);
-            this.tabPage4.Controls.Add(this.startingMagicLevelList);
-            this.tabPage4.Controls.Add(this.startingAttackLevelList);
-            this.tabPage4.Controls.Add(this.startingLifeLabel);
-            this.tabPage4.Controls.Add(this.startingMagicLabel);
-            this.tabPage4.Controls.Add(this.startingAttackLabel);
-            this.tabPage4.Controls.Add(this.randomizeLivesBox);
-            this.tabPage4.Controls.Add(this.startingTechsLabel);
-            this.tabPage4.Controls.Add(this.startingTechsList);
-            this.tabPage4.Controls.Add(this.startingHeartContainersLabel);
-            this.tabPage4.Controls.Add(this.startHeartsMinList);
-            this.tabPage4.Controls.Add(this.groupBox1);
-            this.tabPage4.Controls.Add(this.itemGrp);
-            this.tabPage4.Location = new System.Drawing.Point(4, 24);
-            this.tabPage4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(595, 331);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Start Configuration";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            tabPage4.Controls.Add(label3);
+            tabPage4.Controls.Add(label2);
+            tabPage4.Controls.Add(label1);
+            tabPage4.Controls.Add(maxHeartsList);
+            tabPage4.Controls.Add(startHeartsMaxList);
+            tabPage4.Controls.Add(startingLevelsLabel);
+            tabPage4.Controls.Add(startingLifeLevelList);
+            tabPage4.Controls.Add(startingMagicLevelList);
+            tabPage4.Controls.Add(startingAttackLevelList);
+            tabPage4.Controls.Add(startingLifeLabel);
+            tabPage4.Controls.Add(startingMagicLabel);
+            tabPage4.Controls.Add(startingAttackLabel);
+            tabPage4.Controls.Add(randomizeLivesBox);
+            tabPage4.Controls.Add(startingTechsLabel);
+            tabPage4.Controls.Add(startingTechsList);
+            tabPage4.Controls.Add(startingHeartContainersLabel);
+            tabPage4.Controls.Add(startHeartsMinList);
+            tabPage4.Controls.Add(groupBox1);
+            tabPage4.Controls.Add(itemGrp);
+            tabPage4.Location = new System.Drawing.Point(4, 24);
+            tabPage4.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage4.Name = "tabPage4";
+            tabPage4.Size = new System.Drawing.Size(595, 331);
+            tabPage4.TabIndex = 3;
+            tabPage4.Text = "Start Configuration";
+            tabPage4.UseVisualStyleBackColor = true;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(505, 82);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(32, 30);
-            this.label3.TabIndex = 33;
-            this.label3.Text = "Seed\r\nMax";
-            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.toolTip1.SetToolTip(this.label3, "Starting Attack Level");
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(505, 82);
+            label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(32, 30);
+            label3.TabIndex = 33;
+            label3.Text = "Seed\r\nMax";
+            label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            toolTip1.SetToolTip(label3, "Starting Attack Level");
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(454, 82);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(31, 30);
-            this.label2.TabIndex = 32;
-            this.label2.Text = "Start\r\nMax";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.toolTip1.SetToolTip(this.label2, "Starting Attack Level");
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(454, 82);
+            label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(31, 30);
+            label2.TabIndex = 32;
+            label2.Text = "Start\r\nMax";
+            label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            toolTip1.SetToolTip(label2, "Starting Attack Level");
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(406, 82);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(31, 30);
-            this.label1.TabIndex = 31;
-            this.label1.Text = "Start\r\nMin";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.toolTip1.SetToolTip(this.label1, "Starting Attack Level");
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(406, 82);
+            label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(31, 30);
+            label1.TabIndex = 31;
+            label1.Text = "Start\r\nMin";
+            label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            toolTip1.SetToolTip(label1, "Starting Attack Level");
             // 
             // maxHeartsList
             // 
-            this.maxHeartsList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.maxHeartsList.DropDownWidth = 40;
-            this.maxHeartsList.FormattingEnabled = true;
-            this.maxHeartsList.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "?",
-            "+1",
-            "+2",
-            "+3"});
-            this.maxHeartsList.Location = new System.Drawing.Point(500, 56);
-            this.maxHeartsList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.maxHeartsList.MaxDropDownItems = 12;
-            this.maxHeartsList.Name = "maxHeartsList";
-            this.maxHeartsList.Size = new System.Drawing.Size(40, 23);
-            this.maxHeartsList.TabIndex = 30;
-            this.toolTip1.SetToolTip(this.maxHeartsList, "The number of heart containers you start with");
+            maxHeartsList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            maxHeartsList.DropDownWidth = 40;
+            maxHeartsList.FormattingEnabled = true;
+            maxHeartsList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "?", "+1", "+2", "+3" });
+            maxHeartsList.Location = new System.Drawing.Point(500, 56);
+            maxHeartsList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            maxHeartsList.MaxDropDownItems = 12;
+            maxHeartsList.Name = "maxHeartsList";
+            maxHeartsList.Size = new System.Drawing.Size(40, 23);
+            maxHeartsList.TabIndex = 30;
+            toolTip1.SetToolTip(maxHeartsList, "The number of heart containers you start with");
             // 
             // startHeartsMaxList
             // 
-            this.startHeartsMaxList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startHeartsMaxList.DropDownWidth = 40;
-            this.startHeartsMaxList.FormattingEnabled = true;
-            this.startHeartsMaxList.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "?"});
-            this.startHeartsMaxList.Location = new System.Drawing.Point(450, 56);
-            this.startHeartsMaxList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startHeartsMaxList.Name = "startHeartsMaxList";
-            this.startHeartsMaxList.Size = new System.Drawing.Size(40, 23);
-            this.startHeartsMaxList.TabIndex = 29;
-            this.toolTip1.SetToolTip(this.startHeartsMaxList, "The number of heart containers you start with");
+            startHeartsMaxList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startHeartsMaxList.DropDownWidth = 40;
+            startHeartsMaxList.FormattingEnabled = true;
+            startHeartsMaxList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "?" });
+            startHeartsMaxList.Location = new System.Drawing.Point(450, 56);
+            startHeartsMaxList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startHeartsMaxList.Name = "startHeartsMaxList";
+            startHeartsMaxList.Size = new System.Drawing.Size(40, 23);
+            startHeartsMaxList.TabIndex = 29;
+            toolTip1.SetToolTip(startHeartsMaxList, "The number of heart containers you start with");
             // 
             // startingLevelsLabel
             // 
-            this.startingLevelsLabel.AutoSize = true;
-            this.startingLevelsLabel.Location = new System.Drawing.Point(427, 129);
-            this.startingLevelsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.startingLevelsLabel.Name = "startingLevelsLabel";
-            this.startingLevelsLabel.Size = new System.Drawing.Size(78, 15);
-            this.startingLevelsLabel.TabIndex = 28;
-            this.startingLevelsLabel.Text = "Starting Level";
+            startingLevelsLabel.AutoSize = true;
+            startingLevelsLabel.Location = new System.Drawing.Point(427, 129);
+            startingLevelsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            startingLevelsLabel.Name = "startingLevelsLabel";
+            startingLevelsLabel.Size = new System.Drawing.Size(78, 15);
+            startingLevelsLabel.TabIndex = 28;
+            startingLevelsLabel.Text = "Starting Level";
             // 
             // startingLifeLevelList
             // 
-            this.startingLifeLevelList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startingLifeLevelList.FormattingEnabled = true;
-            this.startingLifeLevelList.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8"});
-            this.startingLifeLevelList.Location = new System.Drawing.Point(500, 151);
-            this.startingLifeLevelList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startingLifeLevelList.Name = "startingLifeLevelList";
-            this.startingLifeLevelList.Size = new System.Drawing.Size(40, 23);
-            this.startingLifeLevelList.TabIndex = 27;
-            this.toolTip1.SetToolTip(this.startingLifeLevelList, "Starting Life Level");
+            startingLifeLevelList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startingLifeLevelList.FormattingEnabled = true;
+            startingLifeLevelList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8" });
+            startingLifeLevelList.Location = new System.Drawing.Point(500, 151);
+            startingLifeLevelList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startingLifeLevelList.Name = "startingLifeLevelList";
+            startingLifeLevelList.Size = new System.Drawing.Size(40, 23);
+            startingLifeLevelList.TabIndex = 27;
+            toolTip1.SetToolTip(startingLifeLevelList, "Starting Life Level");
             // 
             // startingMagicLevelList
             // 
-            this.startingMagicLevelList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startingMagicLevelList.DropDownWidth = 40;
-            this.startingMagicLevelList.FormattingEnabled = true;
-            this.startingMagicLevelList.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8"});
-            this.startingMagicLevelList.Location = new System.Drawing.Point(450, 151);
-            this.startingMagicLevelList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startingMagicLevelList.Name = "startingMagicLevelList";
-            this.startingMagicLevelList.Size = new System.Drawing.Size(40, 23);
-            this.startingMagicLevelList.TabIndex = 26;
-            this.toolTip1.SetToolTip(this.startingMagicLevelList, "Starting Magic Level");
+            startingMagicLevelList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startingMagicLevelList.DropDownWidth = 40;
+            startingMagicLevelList.FormattingEnabled = true;
+            startingMagicLevelList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8" });
+            startingMagicLevelList.Location = new System.Drawing.Point(450, 151);
+            startingMagicLevelList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startingMagicLevelList.Name = "startingMagicLevelList";
+            startingMagicLevelList.Size = new System.Drawing.Size(40, 23);
+            startingMagicLevelList.TabIndex = 26;
+            toolTip1.SetToolTip(startingMagicLevelList, "Starting Magic Level");
             // 
             // startingAttackLevelList
             // 
-            this.startingAttackLevelList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startingAttackLevelList.DropDownWidth = 40;
-            this.startingAttackLevelList.FormattingEnabled = true;
-            this.startingAttackLevelList.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8"});
-            this.startingAttackLevelList.Location = new System.Drawing.Point(400, 151);
-            this.startingAttackLevelList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startingAttackLevelList.Name = "startingAttackLevelList";
-            this.startingAttackLevelList.Size = new System.Drawing.Size(40, 23);
-            this.startingAttackLevelList.TabIndex = 25;
-            this.toolTip1.SetToolTip(this.startingAttackLevelList, "Starting Attack Level");
+            startingAttackLevelList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startingAttackLevelList.DropDownWidth = 40;
+            startingAttackLevelList.FormattingEnabled = true;
+            startingAttackLevelList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8" });
+            startingAttackLevelList.Location = new System.Drawing.Point(400, 151);
+            startingAttackLevelList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startingAttackLevelList.Name = "startingAttackLevelList";
+            startingAttackLevelList.Size = new System.Drawing.Size(40, 23);
+            startingAttackLevelList.TabIndex = 25;
+            toolTip1.SetToolTip(startingAttackLevelList, "Starting Attack Level");
             // 
             // startingLifeLabel
             // 
-            this.startingLifeLabel.AutoSize = true;
-            this.startingLifeLabel.Location = new System.Drawing.Point(505, 177);
-            this.startingLifeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.startingLifeLabel.Name = "startingLifeLabel";
-            this.startingLifeLabel.Size = new System.Drawing.Size(26, 15);
-            this.startingLifeLabel.TabIndex = 24;
-            this.startingLifeLabel.Text = "Life";
-            this.toolTip1.SetToolTip(this.startingLifeLabel, "Starting Life Level");
+            startingLifeLabel.AutoSize = true;
+            startingLifeLabel.Location = new System.Drawing.Point(505, 177);
+            startingLifeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            startingLifeLabel.Name = "startingLifeLabel";
+            startingLifeLabel.Size = new System.Drawing.Size(26, 15);
+            startingLifeLabel.TabIndex = 24;
+            startingLifeLabel.Text = "Life";
+            toolTip1.SetToolTip(startingLifeLabel, "Starting Life Level");
             // 
             // startingMagicLabel
             // 
-            this.startingMagicLabel.AutoSize = true;
-            this.startingMagicLabel.Location = new System.Drawing.Point(454, 177);
-            this.startingMagicLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.startingMagicLabel.Name = "startingMagicLabel";
-            this.startingMagicLabel.Size = new System.Drawing.Size(31, 15);
-            this.startingMagicLabel.TabIndex = 23;
-            this.startingMagicLabel.Text = "Mag";
-            this.toolTip1.SetToolTip(this.startingMagicLabel, "Starting Magic Level");
+            startingMagicLabel.AutoSize = true;
+            startingMagicLabel.Location = new System.Drawing.Point(454, 177);
+            startingMagicLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            startingMagicLabel.Name = "startingMagicLabel";
+            startingMagicLabel.Size = new System.Drawing.Size(31, 15);
+            startingMagicLabel.TabIndex = 23;
+            startingMagicLabel.Text = "Mag";
+            toolTip1.SetToolTip(startingMagicLabel, "Starting Magic Level");
             // 
             // startingAttackLabel
             // 
-            this.startingAttackLabel.AutoSize = true;
-            this.startingAttackLabel.Location = new System.Drawing.Point(406, 177);
-            this.startingAttackLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.startingAttackLabel.Name = "startingAttackLabel";
-            this.startingAttackLabel.Size = new System.Drawing.Size(25, 15);
-            this.startingAttackLabel.TabIndex = 22;
-            this.startingAttackLabel.Text = "Atk";
-            this.toolTip1.SetToolTip(this.startingAttackLabel, "Starting Attack Level");
+            startingAttackLabel.AutoSize = true;
+            startingAttackLabel.Location = new System.Drawing.Point(406, 177);
+            startingAttackLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            startingAttackLabel.Name = "startingAttackLabel";
+            startingAttackLabel.Size = new System.Drawing.Size(25, 15);
+            startingAttackLabel.TabIndex = 22;
+            startingAttackLabel.Text = "Atk";
+            toolTip1.SetToolTip(startingAttackLabel, "Starting Attack Level");
             // 
             // randomizeLivesBox
             // 
-            this.randomizeLivesBox.AutoSize = true;
-            this.randomizeLivesBox.Location = new System.Drawing.Point(400, 257);
-            this.randomizeLivesBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.randomizeLivesBox.Name = "randomizeLivesBox";
-            this.randomizeLivesBox.Size = new System.Drawing.Size(175, 19);
-            this.randomizeLivesBox.TabIndex = 15;
-            this.randomizeLivesBox.Text = "Randomize Number of Lives";
-            this.toolTip1.SetToolTip(this.randomizeLivesBox, "Start with anywhere from 2-5 lives");
-            this.randomizeLivesBox.UseVisualStyleBackColor = true;
+            randomizeLivesBox.AutoSize = true;
+            randomizeLivesBox.Location = new System.Drawing.Point(400, 257);
+            randomizeLivesBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            randomizeLivesBox.Name = "randomizeLivesBox";
+            randomizeLivesBox.Size = new System.Drawing.Size(175, 19);
+            randomizeLivesBox.TabIndex = 15;
+            randomizeLivesBox.Text = "Randomize Number of Lives";
+            toolTip1.SetToolTip(randomizeLivesBox, "Start with anywhere from 2-5 lives");
+            randomizeLivesBox.UseVisualStyleBackColor = true;
             // 
             // startingTechsLabel
             // 
-            this.startingTechsLabel.AutoSize = true;
-            this.startingTechsLabel.Location = new System.Drawing.Point(398, 211);
-            this.startingTechsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.startingTechsLabel.Name = "startingTechsLabel";
-            this.startingTechsLabel.Size = new System.Drawing.Size(80, 15);
-            this.startingTechsLabel.TabIndex = 14;
-            this.startingTechsLabel.Text = "Starting Techs";
+            startingTechsLabel.AutoSize = true;
+            startingTechsLabel.Location = new System.Drawing.Point(398, 211);
+            startingTechsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            startingTechsLabel.Name = "startingTechsLabel";
+            startingTechsLabel.Size = new System.Drawing.Size(80, 15);
+            startingTechsLabel.TabIndex = 14;
+            startingTechsLabel.Text = "Starting Techs";
             // 
             // startingTechsList
             // 
-            this.startingTechsList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startingTechsList.FormattingEnabled = true;
-            this.startingTechsList.Items.AddRange(new object[] {
-            "None",
-            "Downstab",
-            "Upstab",
-            "Both",
-            "Random"});
-            this.startingTechsList.Location = new System.Drawing.Point(402, 228);
-            this.startingTechsList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startingTechsList.Name = "startingTechsList";
-            this.startingTechsList.Size = new System.Drawing.Size(140, 23);
-            this.startingTechsList.TabIndex = 13;
-            this.toolTip1.SetToolTip(this.startingTechsList, "The sword techniques you start with");
+            startingTechsList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startingTechsList.FormattingEnabled = true;
+            startingTechsList.Items.AddRange(new object[] { "None", "Downstab", "Upstab", "Both", "Random" });
+            startingTechsList.Location = new System.Drawing.Point(402, 228);
+            startingTechsList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startingTechsList.Name = "startingTechsList";
+            startingTechsList.Size = new System.Drawing.Size(140, 23);
+            startingTechsList.TabIndex = 13;
+            toolTip1.SetToolTip(startingTechsList, "The sword techniques you start with");
             // 
             // startingHeartContainersLabel
             // 
-            this.startingHeartContainersLabel.AutoSize = true;
-            this.startingHeartContainersLabel.Location = new System.Drawing.Point(412, 38);
-            this.startingHeartContainersLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.startingHeartContainersLabel.Name = "startingHeartContainersLabel";
-            this.startingHeartContainersLabel.Size = new System.Drawing.Size(96, 15);
-            this.startingHeartContainersLabel.TabIndex = 10;
-            this.startingHeartContainersLabel.Text = "Heart Containers";
+            startingHeartContainersLabel.AutoSize = true;
+            startingHeartContainersLabel.Location = new System.Drawing.Point(412, 38);
+            startingHeartContainersLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            startingHeartContainersLabel.Name = "startingHeartContainersLabel";
+            startingHeartContainersLabel.Size = new System.Drawing.Size(96, 15);
+            startingHeartContainersLabel.TabIndex = 10;
+            startingHeartContainersLabel.Text = "Heart Containers";
             // 
             // startHeartsMinList
             // 
-            this.startHeartsMinList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startHeartsMinList.DropDownWidth = 40;
-            this.startHeartsMinList.FormattingEnabled = true;
-            this.startHeartsMinList.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "?"});
-            this.startHeartsMinList.Location = new System.Drawing.Point(400, 56);
-            this.startHeartsMinList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startHeartsMinList.Name = "startHeartsMinList";
-            this.startHeartsMinList.Size = new System.Drawing.Size(40, 23);
-            this.startHeartsMinList.TabIndex = 9;
-            this.toolTip1.SetToolTip(this.startHeartsMinList, "The number of heart containers you start with");
+            startHeartsMinList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startHeartsMinList.DropDownWidth = 40;
+            startHeartsMinList.FormattingEnabled = true;
+            startHeartsMinList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "?" });
+            startHeartsMinList.Location = new System.Drawing.Point(400, 56);
+            startHeartsMinList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startHeartsMinList.Name = "startHeartsMinList";
+            startHeartsMinList.Size = new System.Drawing.Size(40, 23);
+            startHeartsMinList.TabIndex = 9;
+            toolTip1.SetToolTip(startHeartsMinList, "The number of heart containers you start with");
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.startWIthThunderCheckbox);
-            this.groupBox1.Controls.Add(this.startWithSpellCheckbox);
-            this.groupBox1.Controls.Add(this.startWithReflectCheckbox);
-            this.groupBox1.Controls.Add(this.startWithFireCheckbox);
-            this.groupBox1.Controls.Add(this.startWithFairyCheckbox);
-            this.groupBox1.Controls.Add(this.startWithLifeCheckbox);
-            this.groupBox1.Controls.Add(this.startWithJumpCheckbox);
-            this.groupBox1.Controls.Add(this.startWithShieldCheckbox);
-            this.groupBox1.Controls.Add(this.shuffleStartingSpellsCheckbox);
-            this.groupBox1.Location = new System.Drawing.Point(204, 38);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.groupBox1.Size = new System.Drawing.Size(187, 237);
-            this.groupBox1.TabIndex = 8;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "                                        ";
+            groupBox1.Controls.Add(startWIthThunderCheckbox);
+            groupBox1.Controls.Add(startWithSpellCheckbox);
+            groupBox1.Controls.Add(startWithReflectCheckbox);
+            groupBox1.Controls.Add(startWithFireCheckbox);
+            groupBox1.Controls.Add(startWithFairyCheckbox);
+            groupBox1.Controls.Add(startWithLifeCheckbox);
+            groupBox1.Controls.Add(startWithJumpCheckbox);
+            groupBox1.Controls.Add(startWithShieldCheckbox);
+            groupBox1.Controls.Add(shuffleStartingSpellsCheckbox);
+            groupBox1.Location = new System.Drawing.Point(204, 38);
+            groupBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            groupBox1.Size = new System.Drawing.Size(187, 237);
+            groupBox1.TabIndex = 8;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "                                        ";
             // 
             // startWIthThunderCheckbox
             // 
-            this.startWIthThunderCheckbox.AutoSize = true;
-            this.startWIthThunderCheckbox.Location = new System.Drawing.Point(27, 208);
-            this.startWIthThunderCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWIthThunderCheckbox.Name = "startWIthThunderCheckbox";
-            this.startWIthThunderCheckbox.Size = new System.Drawing.Size(125, 19);
-            this.startWIthThunderCheckbox.TabIndex = 7;
-            this.startWIthThunderCheckbox.Text = "Start With Thunder";
-            this.toolTip1.SetToolTip(this.startWIthThunderCheckbox, "Start with thunder spell");
-            this.startWIthThunderCheckbox.UseVisualStyleBackColor = true;
+            startWIthThunderCheckbox.AutoSize = true;
+            startWIthThunderCheckbox.Location = new System.Drawing.Point(27, 208);
+            startWIthThunderCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWIthThunderCheckbox.Name = "startWIthThunderCheckbox";
+            startWIthThunderCheckbox.Size = new System.Drawing.Size(125, 19);
+            startWIthThunderCheckbox.TabIndex = 7;
+            startWIthThunderCheckbox.Text = "Start With Thunder";
+            toolTip1.SetToolTip(startWIthThunderCheckbox, "Start with thunder spell");
+            startWIthThunderCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithSpellCheckbox
             // 
-            this.startWithSpellCheckbox.AutoSize = true;
-            this.startWithSpellCheckbox.Location = new System.Drawing.Point(27, 181);
-            this.startWithSpellCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithSpellCheckbox.Name = "startWithSpellCheckbox";
-            this.startWithSpellCheckbox.Size = new System.Drawing.Size(106, 19);
-            this.startWithSpellCheckbox.TabIndex = 6;
-            this.startWithSpellCheckbox.Text = "Start With Spell";
-            this.toolTip1.SetToolTip(this.startWithSpellCheckbox, "Start with spell spell");
-            this.startWithSpellCheckbox.UseVisualStyleBackColor = true;
+            startWithSpellCheckbox.AutoSize = true;
+            startWithSpellCheckbox.Location = new System.Drawing.Point(27, 181);
+            startWithSpellCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithSpellCheckbox.Name = "startWithSpellCheckbox";
+            startWithSpellCheckbox.Size = new System.Drawing.Size(106, 19);
+            startWithSpellCheckbox.TabIndex = 6;
+            startWithSpellCheckbox.Text = "Start With Spell";
+            toolTip1.SetToolTip(startWithSpellCheckbox, "Start with spell spell");
+            startWithSpellCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithReflectCheckbox
             // 
-            this.startWithReflectCheckbox.AutoSize = true;
-            this.startWithReflectCheckbox.Location = new System.Drawing.Point(27, 155);
-            this.startWithReflectCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithReflectCheckbox.Name = "startWithReflectCheckbox";
-            this.startWithReflectCheckbox.Size = new System.Drawing.Size(117, 19);
-            this.startWithReflectCheckbox.TabIndex = 5;
-            this.startWithReflectCheckbox.Text = "Start With Reflect";
-            this.toolTip1.SetToolTip(this.startWithReflectCheckbox, "Start with reflect spell");
-            this.startWithReflectCheckbox.UseVisualStyleBackColor = true;
+            startWithReflectCheckbox.AutoSize = true;
+            startWithReflectCheckbox.Location = new System.Drawing.Point(27, 155);
+            startWithReflectCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithReflectCheckbox.Name = "startWithReflectCheckbox";
+            startWithReflectCheckbox.Size = new System.Drawing.Size(117, 19);
+            startWithReflectCheckbox.TabIndex = 5;
+            startWithReflectCheckbox.Text = "Start With Reflect";
+            toolTip1.SetToolTip(startWithReflectCheckbox, "Start with reflect spell");
+            startWithReflectCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithFireCheckbox
             // 
-            this.startWithFireCheckbox.AutoSize = true;
-            this.startWithFireCheckbox.Location = new System.Drawing.Point(27, 128);
-            this.startWithFireCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithFireCheckbox.Name = "startWithFireCheckbox";
-            this.startWithFireCheckbox.Size = new System.Drawing.Size(100, 19);
-            this.startWithFireCheckbox.TabIndex = 4;
-            this.startWithFireCheckbox.Text = "Start With Fire";
-            this.toolTip1.SetToolTip(this.startWithFireCheckbox, "Start with fire spell");
-            this.startWithFireCheckbox.UseVisualStyleBackColor = true;
+            startWithFireCheckbox.AutoSize = true;
+            startWithFireCheckbox.Location = new System.Drawing.Point(27, 128);
+            startWithFireCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithFireCheckbox.Name = "startWithFireCheckbox";
+            startWithFireCheckbox.Size = new System.Drawing.Size(100, 19);
+            startWithFireCheckbox.TabIndex = 4;
+            startWithFireCheckbox.Text = "Start With Fire";
+            toolTip1.SetToolTip(startWithFireCheckbox, "Start with fire spell");
+            startWithFireCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithFairyCheckbox
             // 
-            this.startWithFairyCheckbox.AutoSize = true;
-            this.startWithFairyCheckbox.Location = new System.Drawing.Point(27, 102);
-            this.startWithFairyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithFairyCheckbox.Name = "startWithFairyCheckbox";
-            this.startWithFairyCheckbox.Size = new System.Drawing.Size(106, 19);
-            this.startWithFairyCheckbox.TabIndex = 3;
-            this.startWithFairyCheckbox.Text = "Start With Fairy";
-            this.toolTip1.SetToolTip(this.startWithFairyCheckbox, "Start with fairy spell");
-            this.startWithFairyCheckbox.UseVisualStyleBackColor = true;
+            startWithFairyCheckbox.AutoSize = true;
+            startWithFairyCheckbox.Location = new System.Drawing.Point(27, 102);
+            startWithFairyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithFairyCheckbox.Name = "startWithFairyCheckbox";
+            startWithFairyCheckbox.Size = new System.Drawing.Size(106, 19);
+            startWithFairyCheckbox.TabIndex = 3;
+            startWithFairyCheckbox.Text = "Start With Fairy";
+            toolTip1.SetToolTip(startWithFairyCheckbox, "Start with fairy spell");
+            startWithFairyCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithLifeCheckbox
             // 
-            this.startWithLifeCheckbox.AutoSize = true;
-            this.startWithLifeCheckbox.Location = new System.Drawing.Point(27, 75);
-            this.startWithLifeCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithLifeCheckbox.Name = "startWithLifeCheckbox";
-            this.startWithLifeCheckbox.Size = new System.Drawing.Size(100, 19);
-            this.startWithLifeCheckbox.TabIndex = 2;
-            this.startWithLifeCheckbox.Text = "Start With Life";
-            this.toolTip1.SetToolTip(this.startWithLifeCheckbox, "Start with life spell");
-            this.startWithLifeCheckbox.UseVisualStyleBackColor = true;
+            startWithLifeCheckbox.AutoSize = true;
+            startWithLifeCheckbox.Location = new System.Drawing.Point(27, 75);
+            startWithLifeCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithLifeCheckbox.Name = "startWithLifeCheckbox";
+            startWithLifeCheckbox.Size = new System.Drawing.Size(100, 19);
+            startWithLifeCheckbox.TabIndex = 2;
+            startWithLifeCheckbox.Text = "Start With Life";
+            toolTip1.SetToolTip(startWithLifeCheckbox, "Start with life spell");
+            startWithLifeCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithJumpCheckbox
             // 
-            this.startWithJumpCheckbox.AutoSize = true;
-            this.startWithJumpCheckbox.Location = new System.Drawing.Point(27, 48);
-            this.startWithJumpCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithJumpCheckbox.Name = "startWithJumpCheckbox";
-            this.startWithJumpCheckbox.Size = new System.Drawing.Size(110, 19);
-            this.startWithJumpCheckbox.TabIndex = 1;
-            this.startWithJumpCheckbox.Text = "Start With Jump";
-            this.toolTip1.SetToolTip(this.startWithJumpCheckbox, "Start with jump spell");
-            this.startWithJumpCheckbox.UseVisualStyleBackColor = true;
+            startWithJumpCheckbox.AutoSize = true;
+            startWithJumpCheckbox.Location = new System.Drawing.Point(27, 48);
+            startWithJumpCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithJumpCheckbox.Name = "startWithJumpCheckbox";
+            startWithJumpCheckbox.Size = new System.Drawing.Size(110, 19);
+            startWithJumpCheckbox.TabIndex = 1;
+            startWithJumpCheckbox.Text = "Start With Jump";
+            toolTip1.SetToolTip(startWithJumpCheckbox, "Start with jump spell");
+            startWithJumpCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithShieldCheckbox
             // 
-            this.startWithShieldCheckbox.AutoSize = true;
-            this.startWithShieldCheckbox.Location = new System.Drawing.Point(27, 22);
-            this.startWithShieldCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithShieldCheckbox.Name = "startWithShieldCheckbox";
-            this.startWithShieldCheckbox.Size = new System.Drawing.Size(113, 19);
-            this.startWithShieldCheckbox.TabIndex = 1;
-            this.startWithShieldCheckbox.Text = "Start With Shield";
-            this.toolTip1.SetToolTip(this.startWithShieldCheckbox, "Start with shield spell");
-            this.startWithShieldCheckbox.UseVisualStyleBackColor = true;
+            startWithShieldCheckbox.AutoSize = true;
+            startWithShieldCheckbox.Location = new System.Drawing.Point(27, 22);
+            startWithShieldCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithShieldCheckbox.Name = "startWithShieldCheckbox";
+            startWithShieldCheckbox.Size = new System.Drawing.Size(113, 19);
+            startWithShieldCheckbox.TabIndex = 1;
+            startWithShieldCheckbox.Text = "Start With Shield";
+            toolTip1.SetToolTip(startWithShieldCheckbox, "Start with shield spell");
+            startWithShieldCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleStartingSpellsCheckbox
             // 
-            this.shuffleStartingSpellsCheckbox.AutoSize = true;
-            this.shuffleStartingSpellsCheckbox.Location = new System.Drawing.Point(7, 0);
-            this.shuffleStartingSpellsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleStartingSpellsCheckbox.Name = "shuffleStartingSpellsCheckbox";
-            this.shuffleStartingSpellsCheckbox.Size = new System.Drawing.Size(140, 19);
-            this.shuffleStartingSpellsCheckbox.TabIndex = 1;
-            this.shuffleStartingSpellsCheckbox.Text = "Shuffle Starting Spells";
-            this.toolTip1.SetToolTip(this.shuffleStartingSpellsCheckbox, "Each spell has a 25% chance of being known");
-            this.shuffleStartingSpellsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleStartingSpellsCheckbox.CheckStateChanged += new System.EventHandler(this.spellShuffleBox_CheckStateChanged);
+            shuffleStartingSpellsCheckbox.AutoSize = true;
+            shuffleStartingSpellsCheckbox.Location = new System.Drawing.Point(7, 0);
+            shuffleStartingSpellsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleStartingSpellsCheckbox.Name = "shuffleStartingSpellsCheckbox";
+            shuffleStartingSpellsCheckbox.Size = new System.Drawing.Size(140, 19);
+            shuffleStartingSpellsCheckbox.TabIndex = 1;
+            shuffleStartingSpellsCheckbox.Text = "Shuffle Starting Spells";
+            toolTip1.SetToolTip(shuffleStartingSpellsCheckbox, "Each spell has a 25% chance of being known");
+            shuffleStartingSpellsCheckbox.UseVisualStyleBackColor = true;
+            shuffleStartingSpellsCheckbox.CheckStateChanged += spellShuffleBox_CheckStateChanged;
             // 
             // itemGrp
             // 
-            this.itemGrp.Controls.Add(this.startWithMagicKeyCheckbox);
-            this.itemGrp.Controls.Add(this.startWithHammerCheckbox);
-            this.itemGrp.Controls.Add(this.startWithCrossCheckbox);
-            this.itemGrp.Controls.Add(this.startWithFluteCheckbox);
-            this.itemGrp.Controls.Add(this.startWithBootsCheckbox);
-            this.itemGrp.Controls.Add(this.startWithRaftCheckbox);
-            this.itemGrp.Controls.Add(this.startWithGloveCheckbox);
-            this.itemGrp.Controls.Add(this.startWithCandleCheckbox);
-            this.itemGrp.Controls.Add(this.shuffleStartingItemsCheckbox);
-            this.itemGrp.Location = new System.Drawing.Point(10, 38);
-            this.itemGrp.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.itemGrp.Name = "itemGrp";
-            this.itemGrp.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.itemGrp.Size = new System.Drawing.Size(187, 237);
-            this.itemGrp.TabIndex = 0;
-            this.itemGrp.TabStop = false;
-            this.itemGrp.Text = "                                        ";
+            itemGrp.Controls.Add(startWithMagicKeyCheckbox);
+            itemGrp.Controls.Add(startWithHammerCheckbox);
+            itemGrp.Controls.Add(startWithCrossCheckbox);
+            itemGrp.Controls.Add(startWithFluteCheckbox);
+            itemGrp.Controls.Add(startWithBootsCheckbox);
+            itemGrp.Controls.Add(startWithRaftCheckbox);
+            itemGrp.Controls.Add(startWithGloveCheckbox);
+            itemGrp.Controls.Add(startWithCandleCheckbox);
+            itemGrp.Controls.Add(shuffleStartingItemsCheckbox);
+            itemGrp.Location = new System.Drawing.Point(10, 38);
+            itemGrp.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            itemGrp.Name = "itemGrp";
+            itemGrp.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            itemGrp.Size = new System.Drawing.Size(187, 237);
+            itemGrp.TabIndex = 0;
+            itemGrp.TabStop = false;
+            itemGrp.Text = "                                        ";
             // 
             // startWithMagicKeyCheckbox
             // 
-            this.startWithMagicKeyCheckbox.AutoSize = true;
-            this.startWithMagicKeyCheckbox.Location = new System.Drawing.Point(27, 208);
-            this.startWithMagicKeyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithMagicKeyCheckbox.Name = "startWithMagicKeyCheckbox";
-            this.startWithMagicKeyCheckbox.Size = new System.Drawing.Size(136, 19);
-            this.startWithMagicKeyCheckbox.TabIndex = 7;
-            this.startWithMagicKeyCheckbox.Text = "Start With Magic Key";
-            this.toolTip1.SetToolTip(this.startWithMagicKeyCheckbox, "Start with the magic key");
-            this.startWithMagicKeyCheckbox.UseVisualStyleBackColor = true;
+            startWithMagicKeyCheckbox.AutoSize = true;
+            startWithMagicKeyCheckbox.Location = new System.Drawing.Point(27, 208);
+            startWithMagicKeyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithMagicKeyCheckbox.Name = "startWithMagicKeyCheckbox";
+            startWithMagicKeyCheckbox.Size = new System.Drawing.Size(136, 19);
+            startWithMagicKeyCheckbox.TabIndex = 7;
+            startWithMagicKeyCheckbox.Text = "Start With Magic Key";
+            toolTip1.SetToolTip(startWithMagicKeyCheckbox, "Start with the magic key");
+            startWithMagicKeyCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithHammerCheckbox
             // 
-            this.startWithHammerCheckbox.AutoSize = true;
-            this.startWithHammerCheckbox.Location = new System.Drawing.Point(27, 181);
-            this.startWithHammerCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithHammerCheckbox.Name = "startWithHammerCheckbox";
-            this.startWithHammerCheckbox.Size = new System.Drawing.Size(128, 19);
-            this.startWithHammerCheckbox.TabIndex = 6;
-            this.startWithHammerCheckbox.Text = "Start With Hammer";
-            this.toolTip1.SetToolTip(this.startWithHammerCheckbox, "Start with the hammer");
-            this.startWithHammerCheckbox.UseVisualStyleBackColor = true;
+            startWithHammerCheckbox.AutoSize = true;
+            startWithHammerCheckbox.Location = new System.Drawing.Point(27, 181);
+            startWithHammerCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithHammerCheckbox.Name = "startWithHammerCheckbox";
+            startWithHammerCheckbox.Size = new System.Drawing.Size(128, 19);
+            startWithHammerCheckbox.TabIndex = 6;
+            startWithHammerCheckbox.Text = "Start With Hammer";
+            toolTip1.SetToolTip(startWithHammerCheckbox, "Start with the hammer");
+            startWithHammerCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithCrossCheckbox
             // 
-            this.startWithCrossCheckbox.AutoSize = true;
-            this.startWithCrossCheckbox.Location = new System.Drawing.Point(27, 155);
-            this.startWithCrossCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithCrossCheckbox.Name = "startWithCrossCheckbox";
-            this.startWithCrossCheckbox.Size = new System.Drawing.Size(110, 19);
-            this.startWithCrossCheckbox.TabIndex = 5;
-            this.startWithCrossCheckbox.Text = "Start With Cross";
-            this.toolTip1.SetToolTip(this.startWithCrossCheckbox, "Start with the cross");
-            this.startWithCrossCheckbox.UseVisualStyleBackColor = true;
+            startWithCrossCheckbox.AutoSize = true;
+            startWithCrossCheckbox.Location = new System.Drawing.Point(27, 155);
+            startWithCrossCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithCrossCheckbox.Name = "startWithCrossCheckbox";
+            startWithCrossCheckbox.Size = new System.Drawing.Size(110, 19);
+            startWithCrossCheckbox.TabIndex = 5;
+            startWithCrossCheckbox.Text = "Start With Cross";
+            toolTip1.SetToolTip(startWithCrossCheckbox, "Start with the cross");
+            startWithCrossCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithFluteCheckbox
             // 
-            this.startWithFluteCheckbox.AutoSize = true;
-            this.startWithFluteCheckbox.Location = new System.Drawing.Point(27, 128);
-            this.startWithFluteCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithFluteCheckbox.Name = "startWithFluteCheckbox";
-            this.startWithFluteCheckbox.Size = new System.Drawing.Size(107, 19);
-            this.startWithFluteCheckbox.TabIndex = 4;
-            this.startWithFluteCheckbox.Text = "Start With Flute";
-            this.toolTip1.SetToolTip(this.startWithFluteCheckbox, "Start with the flute");
-            this.startWithFluteCheckbox.UseVisualStyleBackColor = true;
+            startWithFluteCheckbox.AutoSize = true;
+            startWithFluteCheckbox.Location = new System.Drawing.Point(27, 128);
+            startWithFluteCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithFluteCheckbox.Name = "startWithFluteCheckbox";
+            startWithFluteCheckbox.Size = new System.Drawing.Size(107, 19);
+            startWithFluteCheckbox.TabIndex = 4;
+            startWithFluteCheckbox.Text = "Start With Flute";
+            toolTip1.SetToolTip(startWithFluteCheckbox, "Start with the flute");
+            startWithFluteCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithBootsCheckbox
             // 
-            this.startWithBootsCheckbox.AutoSize = true;
-            this.startWithBootsCheckbox.Location = new System.Drawing.Point(27, 102);
-            this.startWithBootsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithBootsCheckbox.Name = "startWithBootsCheckbox";
-            this.startWithBootsCheckbox.Size = new System.Drawing.Size(111, 19);
-            this.startWithBootsCheckbox.TabIndex = 3;
-            this.startWithBootsCheckbox.Text = "Start With Boots";
-            this.toolTip1.SetToolTip(this.startWithBootsCheckbox, "Start with the boots");
-            this.startWithBootsCheckbox.UseVisualStyleBackColor = true;
+            startWithBootsCheckbox.AutoSize = true;
+            startWithBootsCheckbox.Location = new System.Drawing.Point(27, 102);
+            startWithBootsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithBootsCheckbox.Name = "startWithBootsCheckbox";
+            startWithBootsCheckbox.Size = new System.Drawing.Size(111, 19);
+            startWithBootsCheckbox.TabIndex = 3;
+            startWithBootsCheckbox.Text = "Start With Boots";
+            toolTip1.SetToolTip(startWithBootsCheckbox, "Start with the boots");
+            startWithBootsCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithRaftCheckbox
             // 
-            this.startWithRaftCheckbox.AutoSize = true;
-            this.startWithRaftCheckbox.Location = new System.Drawing.Point(27, 75);
-            this.startWithRaftCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithRaftCheckbox.Name = "startWithRaftCheckbox";
-            this.startWithRaftCheckbox.Size = new System.Drawing.Size(102, 19);
-            this.startWithRaftCheckbox.TabIndex = 2;
-            this.startWithRaftCheckbox.Text = "Start With Raft";
-            this.toolTip1.SetToolTip(this.startWithRaftCheckbox, "Start with the raft");
-            this.startWithRaftCheckbox.UseVisualStyleBackColor = true;
+            startWithRaftCheckbox.AutoSize = true;
+            startWithRaftCheckbox.Location = new System.Drawing.Point(27, 75);
+            startWithRaftCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithRaftCheckbox.Name = "startWithRaftCheckbox";
+            startWithRaftCheckbox.Size = new System.Drawing.Size(102, 19);
+            startWithRaftCheckbox.TabIndex = 2;
+            startWithRaftCheckbox.Text = "Start With Raft";
+            toolTip1.SetToolTip(startWithRaftCheckbox, "Start with the raft");
+            startWithRaftCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithGloveCheckbox
             // 
-            this.startWithGloveCheckbox.AutoSize = true;
-            this.startWithGloveCheckbox.Location = new System.Drawing.Point(27, 48);
-            this.startWithGloveCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithGloveCheckbox.Name = "startWithGloveCheckbox";
-            this.startWithGloveCheckbox.Size = new System.Drawing.Size(111, 19);
-            this.startWithGloveCheckbox.TabIndex = 1;
-            this.startWithGloveCheckbox.Text = "Start With Glove";
-            this.toolTip1.SetToolTip(this.startWithGloveCheckbox, "Start with the glove");
-            this.startWithGloveCheckbox.UseVisualStyleBackColor = true;
+            startWithGloveCheckbox.AutoSize = true;
+            startWithGloveCheckbox.Location = new System.Drawing.Point(27, 48);
+            startWithGloveCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithGloveCheckbox.Name = "startWithGloveCheckbox";
+            startWithGloveCheckbox.Size = new System.Drawing.Size(111, 19);
+            startWithGloveCheckbox.TabIndex = 1;
+            startWithGloveCheckbox.Text = "Start With Glove";
+            toolTip1.SetToolTip(startWithGloveCheckbox, "Start with the glove");
+            startWithGloveCheckbox.UseVisualStyleBackColor = true;
             // 
             // startWithCandleCheckbox
             // 
-            this.startWithCandleCheckbox.AutoSize = true;
-            this.startWithCandleCheckbox.Location = new System.Drawing.Point(27, 22);
-            this.startWithCandleCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startWithCandleCheckbox.Name = "startWithCandleCheckbox";
-            this.startWithCandleCheckbox.Size = new System.Drawing.Size(118, 19);
-            this.startWithCandleCheckbox.TabIndex = 1;
-            this.startWithCandleCheckbox.Text = "Start With Candle";
-            this.toolTip1.SetToolTip(this.startWithCandleCheckbox, "Start with candle");
-            this.startWithCandleCheckbox.UseVisualStyleBackColor = true;
+            startWithCandleCheckbox.AutoSize = true;
+            startWithCandleCheckbox.Location = new System.Drawing.Point(27, 22);
+            startWithCandleCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startWithCandleCheckbox.Name = "startWithCandleCheckbox";
+            startWithCandleCheckbox.Size = new System.Drawing.Size(118, 19);
+            startWithCandleCheckbox.TabIndex = 1;
+            startWithCandleCheckbox.Text = "Start With Candle";
+            toolTip1.SetToolTip(startWithCandleCheckbox, "Start with candle");
+            startWithCandleCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleStartingItemsCheckbox
             // 
-            this.shuffleStartingItemsCheckbox.AccessibleDescription = "";
-            this.shuffleStartingItemsCheckbox.AutoSize = true;
-            this.shuffleStartingItemsCheckbox.Location = new System.Drawing.Point(7, 0);
-            this.shuffleStartingItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleStartingItemsCheckbox.Name = "shuffleStartingItemsCheckbox";
-            this.shuffleStartingItemsCheckbox.Size = new System.Drawing.Size(139, 19);
-            this.shuffleStartingItemsCheckbox.TabIndex = 1;
-            this.shuffleStartingItemsCheckbox.Text = "Shuffle Starting Items";
-            this.toolTip1.SetToolTip(this.shuffleStartingItemsCheckbox, "Each item has a 25% chance of being in your inventory");
-            this.shuffleStartingItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleItemBox_CheckStateChanged);
+            shuffleStartingItemsCheckbox.AccessibleDescription = "";
+            shuffleStartingItemsCheckbox.AutoSize = true;
+            shuffleStartingItemsCheckbox.Location = new System.Drawing.Point(7, 0);
+            shuffleStartingItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleStartingItemsCheckbox.Name = "shuffleStartingItemsCheckbox";
+            shuffleStartingItemsCheckbox.Size = new System.Drawing.Size(139, 19);
+            shuffleStartingItemsCheckbox.TabIndex = 1;
+            shuffleStartingItemsCheckbox.Text = "Shuffle Starting Items";
+            toolTip1.SetToolTip(shuffleStartingItemsCheckbox, "Each item has a 25% chance of being in your inventory");
+            shuffleStartingItemsCheckbox.UseVisualStyleBackColor = true;
+            shuffleStartingItemsCheckbox.CheckStateChanged += shuffleItemBox_CheckStateChanged;
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.generateBaguWoodsCheckbox);
-            this.tabPage1.Controls.Add(this.useGoodBootsCheckbox);
-            this.tabPage1.Controls.Add(this.shuffleWhichLocationsAreHiddenCheckbox);
-            this.tabPage1.Controls.Add(this.shuffledVanillaShowsActualTerrain);
-            this.tabPage1.Controls.Add(this.mazeBiome);
-            this.tabPage1.Controls.Add(this.mazeIslandBiomeLabel);
-            this.tabPage1.Controls.Add(this.eastBiome);
-            this.tabPage1.Controls.Add(this.dmBiome);
-            this.tabPage1.Controls.Add(this.westBiome);
-            this.tabPage1.Controls.Add(this.eastContinentBindingLabel);
-            this.tabPage1.Controls.Add(this.deathMountainBiomeLabel);
-            this.tabPage1.Controls.Add(this.label39);
-            this.tabPage1.Controls.Add(this.westContinentLabel);
-            this.tabPage1.Controls.Add(this.allowBoulderBlockedConnectionsCheckbox);
-            this.tabPage1.Controls.Add(this.saneCaveShuffleBox);
-            this.tabPage1.Controls.Add(this.hideLessImportantLocationsCheckbox);
-            this.tabPage1.Controls.Add(this.ContinentConnectionLabel);
-            this.tabPage1.Controls.Add(this.continentConnectionBox);
-            this.tabPage1.Controls.Add(this.label36);
-            this.tabPage1.Controls.Add(this.encounterRateBox);
-            this.tabPage1.Controls.Add(this.encounterRateLabel);
-            this.tabPage1.Controls.Add(this.hideKasutoList);
-            this.tabPage1.Controls.Add(this.hiddenKasutoLabel);
-            this.tabPage1.Controls.Add(this.hiddenPalaceList);
-            this.tabPage1.Controls.Add(this.hiddenPalaceLabel);
-            this.tabPage1.Controls.Add(this.includeGPinShuffleCheckbox);
-            this.tabPage1.Controls.Add(this.allowPalaceContinentSwapCheckbox);
-            this.tabPage1.Controls.Add(this.label4);
-            this.tabPage1.Controls.Add(this.allowPathEnemiesCheckbox);
-            this.tabPage1.Controls.Add(this.shuffleEncountersCheckbox);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage1.Size = new System.Drawing.Size(595, 331);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Overworld";
-            this.tabPage1.ToolTipText = "When selected, will hide Kasuto behind a forest tile";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            tabPage1.Controls.Add(generateBaguWoodsCheckbox);
+            tabPage1.Controls.Add(useGoodBootsCheckbox);
+            tabPage1.Controls.Add(shuffleWhichLocationsAreHiddenCheckbox);
+            tabPage1.Controls.Add(shuffledVanillaShowsActualTerrain);
+            tabPage1.Controls.Add(mazeBiome);
+            tabPage1.Controls.Add(mazeIslandBiomeLabel);
+            tabPage1.Controls.Add(eastBiome);
+            tabPage1.Controls.Add(dmBiome);
+            tabPage1.Controls.Add(westBiome);
+            tabPage1.Controls.Add(eastContinentBindingLabel);
+            tabPage1.Controls.Add(deathMountainBiomeLabel);
+            tabPage1.Controls.Add(label39);
+            tabPage1.Controls.Add(westContinentLabel);
+            tabPage1.Controls.Add(allowBoulderBlockedConnectionsCheckbox);
+            tabPage1.Controls.Add(saneCaveShuffleBox);
+            tabPage1.Controls.Add(hideLessImportantLocationsCheckbox);
+            tabPage1.Controls.Add(ContinentConnectionLabel);
+            tabPage1.Controls.Add(continentConnectionBox);
+            tabPage1.Controls.Add(label36);
+            tabPage1.Controls.Add(encounterRateBox);
+            tabPage1.Controls.Add(encounterRateLabel);
+            tabPage1.Controls.Add(hideKasutoList);
+            tabPage1.Controls.Add(hiddenKasutoLabel);
+            tabPage1.Controls.Add(hiddenPalaceList);
+            tabPage1.Controls.Add(hiddenPalaceLabel);
+            tabPage1.Controls.Add(includeGPinShuffleCheckbox);
+            tabPage1.Controls.Add(allowPalaceContinentSwapCheckbox);
+            tabPage1.Controls.Add(label4);
+            tabPage1.Controls.Add(allowPathEnemiesCheckbox);
+            tabPage1.Controls.Add(shuffleEncountersCheckbox);
+            tabPage1.Location = new System.Drawing.Point(4, 24);
+            tabPage1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage1.Name = "tabPage1";
+            tabPage1.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage1.Size = new System.Drawing.Size(595, 331);
+            tabPage1.TabIndex = 0;
+            tabPage1.Text = "Overworld";
+            tabPage1.ToolTipText = "When selected, will hide Kasuto behind a forest tile";
+            tabPage1.UseVisualStyleBackColor = true;
             // 
             // generateBaguWoodsCheckbox
             // 
-            this.generateBaguWoodsCheckbox.AutoSize = true;
-            this.generateBaguWoodsCheckbox.Location = new System.Drawing.Point(282, 114);
-            this.generateBaguWoodsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.generateBaguWoodsCheckbox.Name = "generateBaguWoodsCheckbox";
-            this.generateBaguWoodsCheckbox.Size = new System.Drawing.Size(151, 19);
-            this.generateBaguWoodsCheckbox.TabIndex = 47;
-            this.generateBaguWoodsCheckbox.Text = "Generate Bagu\'s Woods";
-            this.generateBaguWoodsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.generateBaguWoodsCheckbox, "When selected, bagu\'s house will be hidden in a forest surrounded by lost woods t" +
-        "iles.");
-            this.generateBaguWoodsCheckbox.UseVisualStyleBackColor = true;
+            generateBaguWoodsCheckbox.AutoSize = true;
+            generateBaguWoodsCheckbox.Location = new System.Drawing.Point(282, 114);
+            generateBaguWoodsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            generateBaguWoodsCheckbox.Name = "generateBaguWoodsCheckbox";
+            generateBaguWoodsCheckbox.Size = new System.Drawing.Size(151, 19);
+            generateBaguWoodsCheckbox.TabIndex = 47;
+            generateBaguWoodsCheckbox.Text = "Generate Bagu's Woods";
+            generateBaguWoodsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(generateBaguWoodsCheckbox, "When selected, bagu's house will be hidden in a forest surrounded by lost woods tiles.");
+            generateBaguWoodsCheckbox.UseVisualStyleBackColor = true;
             // 
             // useGoodBootsCheckbox
             // 
-            this.useGoodBootsCheckbox.AutoSize = true;
-            this.useGoodBootsCheckbox.Location = new System.Drawing.Point(282, 88);
-            this.useGoodBootsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.useGoodBootsCheckbox.Name = "useGoodBootsCheckbox";
-            this.useGoodBootsCheckbox.Size = new System.Drawing.Size(195, 19);
-            this.useGoodBootsCheckbox.TabIndex = 46;
-            this.useGoodBootsCheckbox.Text = "All Water is Walkable with Boots";
-            this.useGoodBootsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.useGoodBootsCheckbox, "When selected, all water within the map boundaries can be traversed with the boot" +
-        "s.");
-            this.useGoodBootsCheckbox.UseVisualStyleBackColor = true;
+            useGoodBootsCheckbox.AutoSize = true;
+            useGoodBootsCheckbox.Location = new System.Drawing.Point(282, 88);
+            useGoodBootsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            useGoodBootsCheckbox.Name = "useGoodBootsCheckbox";
+            useGoodBootsCheckbox.Size = new System.Drawing.Size(195, 19);
+            useGoodBootsCheckbox.TabIndex = 46;
+            useGoodBootsCheckbox.Text = "All Water is Walkable with Boots";
+            useGoodBootsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(useGoodBootsCheckbox, "When selected, all water within the map boundaries can be traversed with the boots.");
+            useGoodBootsCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleWhichLocationsAreHiddenCheckbox
             // 
-            this.shuffleWhichLocationsAreHiddenCheckbox.AutoSize = true;
-            this.shuffleWhichLocationsAreHiddenCheckbox.Location = new System.Drawing.Point(7, 243);
-            this.shuffleWhichLocationsAreHiddenCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleWhichLocationsAreHiddenCheckbox.Name = "shuffleWhichLocationsAreHiddenCheckbox";
-            this.shuffleWhichLocationsAreHiddenCheckbox.Size = new System.Drawing.Size(221, 19);
-            this.shuffleWhichLocationsAreHiddenCheckbox.TabIndex = 45;
-            this.shuffleWhichLocationsAreHiddenCheckbox.Text = "Shuffle which Location(s) are Hidden";
-            this.shuffleWhichLocationsAreHiddenCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shuffleWhichLocationsAreHiddenCheckbox, "When selected, shuffles which location are in the hidden palace and hidden kasuto" +
-        " spots on the overworld.");
-            this.shuffleWhichLocationsAreHiddenCheckbox.UseVisualStyleBackColor = true;
+            shuffleWhichLocationsAreHiddenCheckbox.AutoSize = true;
+            shuffleWhichLocationsAreHiddenCheckbox.Location = new System.Drawing.Point(7, 243);
+            shuffleWhichLocationsAreHiddenCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleWhichLocationsAreHiddenCheckbox.Name = "shuffleWhichLocationsAreHiddenCheckbox";
+            shuffleWhichLocationsAreHiddenCheckbox.Size = new System.Drawing.Size(221, 19);
+            shuffleWhichLocationsAreHiddenCheckbox.TabIndex = 45;
+            shuffleWhichLocationsAreHiddenCheckbox.Text = "Shuffle which Location(s) are Hidden";
+            shuffleWhichLocationsAreHiddenCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shuffleWhichLocationsAreHiddenCheckbox, "When selected, shuffles which location are in the hidden palace and hidden kasuto spots on the overworld.");
+            shuffleWhichLocationsAreHiddenCheckbox.UseVisualStyleBackColor = true;
             // 
-            // shuffledBasnill
+            // shuffledVanillaShowsActualTerrain
             // 
-            this.shuffledVanillaShowsActualTerrain.AutoSize = true;
-            this.shuffledVanillaShowsActualTerrain.Location = new System.Drawing.Point(281, 299);
-            this.shuffledVanillaShowsActualTerrain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffledVanillaShowsActualTerrain.Name = "shuffledBasnill";
-            this.shuffledVanillaShowsActualTerrain.Size = new System.Drawing.Size(268, 19);
-            this.shuffledVanillaShowsActualTerrain.TabIndex = 44;
-            this.shuffledVanillaShowsActualTerrain.Text = "Shuffled Vanilla Locations Show Actual Terrain";
-            this.toolTip1.SetToolTip(this.shuffledVanillaShowsActualTerrain, "When selected, if a shuffled vanilla map is in play, the map will show the correc" +
-        "t terrain type of each location.");
-            this.shuffledVanillaShowsActualTerrain.UseVisualStyleBackColor = true;
+            shuffledVanillaShowsActualTerrain.AutoSize = true;
+            shuffledVanillaShowsActualTerrain.Location = new System.Drawing.Point(281, 299);
+            shuffledVanillaShowsActualTerrain.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffledVanillaShowsActualTerrain.Name = "shuffledVanillaShowsActualTerrain";
+            shuffledVanillaShowsActualTerrain.Size = new System.Drawing.Size(268, 19);
+            shuffledVanillaShowsActualTerrain.TabIndex = 44;
+            shuffledVanillaShowsActualTerrain.Text = "Shuffled Vanilla Locations Show Actual Terrain";
+            toolTip1.SetToolTip(shuffledVanillaShowsActualTerrain, "When selected, if a shuffled vanilla map is in play, the map will show the correct terrain type of each location.");
+            shuffledVanillaShowsActualTerrain.UseVisualStyleBackColor = true;
             // 
             // mazeBiome
             // 
-            this.mazeBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.mazeBiome.FormattingEnabled = true;
-            this.mazeBiome.Items.AddRange(new object[] {
-            "Vanilla",
-            "Vanilla (shuffled)",
-            "Vanilla-Like",
-            "Random (with Vanilla)"});
-            this.mazeBiome.Location = new System.Drawing.Point(422, 268);
-            this.mazeBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.mazeBiome.Name = "mazeBiome";
-            this.mazeBiome.Size = new System.Drawing.Size(140, 23);
-            this.mazeBiome.TabIndex = 43;
-            this.toolTip1.SetToolTip(this.mazeBiome, "Maze Island overworld map style.");
-            this.mazeBiome.SelectedIndexChanged += new System.EventHandler(this.MazeBiome_SelectedIndexChanged);
+            mazeBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            mazeBiome.FormattingEnabled = true;
+            mazeBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Random (with Vanilla)" });
+            mazeBiome.Location = new System.Drawing.Point(422, 268);
+            mazeBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            mazeBiome.Name = "mazeBiome";
+            mazeBiome.Size = new System.Drawing.Size(140, 23);
+            mazeBiome.TabIndex = 43;
+            toolTip1.SetToolTip(mazeBiome, "Maze Island overworld map style.");
+            mazeBiome.SelectedIndexChanged += MazeBiome_SelectedIndexChanged;
             // 
             // mazeIslandBiomeLabel
             // 
-            this.mazeIslandBiomeLabel.AutoSize = true;
-            this.mazeIslandBiomeLabel.Location = new System.Drawing.Point(279, 271);
-            this.mazeIslandBiomeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.mazeIslandBiomeLabel.Name = "mazeIslandBiomeLabel";
-            this.mazeIslandBiomeLabel.Size = new System.Drawing.Size(109, 15);
-            this.mazeIslandBiomeLabel.TabIndex = 42;
-            this.mazeIslandBiomeLabel.Text = "Maze Island Biome:";
-            this.toolTip1.SetToolTip(this.mazeIslandBiomeLabel, "Maze Island overworld map style.");
+            mazeIslandBiomeLabel.AutoSize = true;
+            mazeIslandBiomeLabel.Location = new System.Drawing.Point(279, 271);
+            mazeIslandBiomeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            mazeIslandBiomeLabel.Name = "mazeIslandBiomeLabel";
+            mazeIslandBiomeLabel.Size = new System.Drawing.Size(109, 15);
+            mazeIslandBiomeLabel.TabIndex = 42;
+            mazeIslandBiomeLabel.Text = "Maze Island Biome:";
+            toolTip1.SetToolTip(mazeIslandBiomeLabel, "Maze Island overworld map style.");
             // 
             // eastBiome
             // 
-            this.eastBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.eastBiome.FormattingEnabled = true;
-            this.eastBiome.Items.AddRange(new object[] {
-            "Vanilla",
-            "Vanilla (shuffled)",
-            "Vanilla-Like",
-            "Islands",
-            "Canyon",
-            "Volcano",
-            "Mountainous",
-            "Random (no Vanilla)",
-            "Random (with Vanilla)"});
-            this.eastBiome.Location = new System.Drawing.Point(422, 237);
-            this.eastBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.eastBiome.Name = "eastBiome";
-            this.eastBiome.Size = new System.Drawing.Size(140, 23);
-            this.eastBiome.TabIndex = 41;
-            this.toolTip1.SetToolTip(this.eastBiome, "East Hyrule overworld map style.");
-            this.eastBiome.SelectedIndexChanged += new System.EventHandler(this.EastBiome_SelectedIndexChanged);
+            eastBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            eastBiome.FormattingEnabled = true;
+            eastBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Volcano", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+            eastBiome.Location = new System.Drawing.Point(422, 237);
+            eastBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            eastBiome.Name = "eastBiome";
+            eastBiome.Size = new System.Drawing.Size(140, 23);
+            eastBiome.TabIndex = 41;
+            toolTip1.SetToolTip(eastBiome, "East Hyrule overworld map style.");
+            eastBiome.SelectedIndexChanged += EastBiome_SelectedIndexChanged;
             // 
             // dmBiome
             // 
-            this.dmBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.dmBiome.FormattingEnabled = true;
-            this.dmBiome.Items.AddRange(new object[] {
-            "Vanilla",
-            "Vanilla (shuffled)",
-            "Vanilla-Like",
-            "Islands",
-            "Canyon",
-            "Caldera",
-            "Mountainous",
-            "Random (no Vanilla)",
-            "Random (with Vanilla)"});
-            this.dmBiome.Location = new System.Drawing.Point(422, 205);
-            this.dmBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.dmBiome.Name = "dmBiome";
-            this.dmBiome.Size = new System.Drawing.Size(140, 23);
-            this.dmBiome.TabIndex = 40;
-            this.toolTip1.SetToolTip(this.dmBiome, "Death Mountain overworld map style.");
-            this.dmBiome.SelectedIndexChanged += new System.EventHandler(this.DmBiome_SelectedIndexChanged);
+            dmBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            dmBiome.FormattingEnabled = true;
+            dmBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+            dmBiome.Location = new System.Drawing.Point(422, 205);
+            dmBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            dmBiome.Name = "dmBiome";
+            dmBiome.Size = new System.Drawing.Size(140, 23);
+            dmBiome.TabIndex = 40;
+            toolTip1.SetToolTip(dmBiome, "Death Mountain overworld map style.");
+            dmBiome.SelectedIndexChanged += DmBiome_SelectedIndexChanged;
             // 
             // westBiome
             // 
-            this.westBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.westBiome.FormattingEnabled = true;
-            this.westBiome.Items.AddRange(new object[] {
-            "Vanilla",
-            "Vanilla (shuffled)",
-            "Vanilla-Like",
-            "Islands",
-            "Canyon",
-            "Caldera",
-            "Mountainous",
-            "Random (no Vanilla)",
-            "Random (with Vanilla)"});
-            this.westBiome.Location = new System.Drawing.Point(422, 175);
-            this.westBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.westBiome.Name = "westBiome";
-            this.westBiome.Size = new System.Drawing.Size(140, 23);
-            this.westBiome.TabIndex = 39;
-            this.toolTip1.SetToolTip(this.westBiome, "West Hyrule overworld map style.");
-            this.westBiome.SelectedIndexChanged += new System.EventHandler(this.WestBiome_SelectedIndexChanged);
+            westBiome.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            westBiome.FormattingEnabled = true;
+            westBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+            westBiome.Location = new System.Drawing.Point(422, 175);
+            westBiome.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            westBiome.Name = "westBiome";
+            westBiome.Size = new System.Drawing.Size(140, 23);
+            westBiome.TabIndex = 39;
+            toolTip1.SetToolTip(westBiome, "West Hyrule overworld map style.");
+            westBiome.SelectedIndexChanged += WestBiome_SelectedIndexChanged;
             // 
             // eastContinentBindingLabel
             // 
-            this.eastContinentBindingLabel.AutoSize = true;
-            this.eastContinentBindingLabel.Location = new System.Drawing.Point(279, 240);
-            this.eastContinentBindingLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.eastContinentBindingLabel.Name = "eastContinentBindingLabel";
-            this.eastContinentBindingLabel.Size = new System.Drawing.Size(124, 15);
-            this.eastContinentBindingLabel.TabIndex = 37;
-            this.eastContinentBindingLabel.Text = "East Continent Biome:";
-            this.toolTip1.SetToolTip(this.eastContinentBindingLabel, "East Hyrule overworld map style.");
+            eastContinentBindingLabel.AutoSize = true;
+            eastContinentBindingLabel.Location = new System.Drawing.Point(279, 240);
+            eastContinentBindingLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            eastContinentBindingLabel.Name = "eastContinentBindingLabel";
+            eastContinentBindingLabel.Size = new System.Drawing.Size(124, 15);
+            eastContinentBindingLabel.TabIndex = 37;
+            eastContinentBindingLabel.Text = "East Continent Biome:";
+            toolTip1.SetToolTip(eastContinentBindingLabel, "East Hyrule overworld map style.");
             // 
             // deathMountainBiomeLabel
             // 
-            this.deathMountainBiomeLabel.AutoSize = true;
-            this.deathMountainBiomeLabel.Location = new System.Drawing.Point(279, 209);
-            this.deathMountainBiomeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.deathMountainBiomeLabel.Name = "deathMountainBiomeLabel";
-            this.deathMountainBiomeLabel.Size = new System.Drawing.Size(133, 15);
-            this.deathMountainBiomeLabel.TabIndex = 36;
-            this.deathMountainBiomeLabel.Text = "Death Mountain Biome:";
-            this.toolTip1.SetToolTip(this.deathMountainBiomeLabel, "Death Mountain overworld map style.");
+            deathMountainBiomeLabel.AutoSize = true;
+            deathMountainBiomeLabel.Location = new System.Drawing.Point(279, 209);
+            deathMountainBiomeLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            deathMountainBiomeLabel.Name = "deathMountainBiomeLabel";
+            deathMountainBiomeLabel.Size = new System.Drawing.Size(133, 15);
+            deathMountainBiomeLabel.TabIndex = 36;
+            deathMountainBiomeLabel.Text = "Death Mountain Biome:";
+            toolTip1.SetToolTip(deathMountainBiomeLabel, "Death Mountain overworld map style.");
             // 
             // label39
             // 
-            this.label39.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label39.Location = new System.Drawing.Point(281, 170);
-            this.label39.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(298, 2);
-            this.label39.TabIndex = 35;
+            label39.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            label39.Location = new System.Drawing.Point(281, 170);
+            label39.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label39.Name = "label39";
+            label39.Size = new System.Drawing.Size(298, 2);
+            label39.TabIndex = 35;
             // 
             // westContinentLabel
             // 
-            this.westContinentLabel.AutoSize = true;
-            this.westContinentLabel.Location = new System.Drawing.Point(279, 179);
-            this.westContinentLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.westContinentLabel.Name = "westContinentLabel";
-            this.westContinentLabel.Size = new System.Drawing.Size(129, 15);
-            this.westContinentLabel.TabIndex = 34;
-            this.westContinentLabel.Text = "West Continent Biome:";
-            this.toolTip1.SetToolTip(this.westContinentLabel, "West Hyrule overworld map style.");
+            westContinentLabel.AutoSize = true;
+            westContinentLabel.Location = new System.Drawing.Point(279, 179);
+            westContinentLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            westContinentLabel.Name = "westContinentLabel";
+            westContinentLabel.Size = new System.Drawing.Size(129, 15);
+            westContinentLabel.TabIndex = 34;
+            westContinentLabel.Text = "West Continent Biome:";
+            toolTip1.SetToolTip(westContinentLabel, "West Hyrule overworld map style.");
             // 
             // allowBoulderBlockedConnectionsCheckbox
             // 
-            this.allowBoulderBlockedConnectionsCheckbox.AutoSize = true;
-            this.allowBoulderBlockedConnectionsCheckbox.Location = new System.Drawing.Point(282, 59);
-            this.allowBoulderBlockedConnectionsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.allowBoulderBlockedConnectionsCheckbox.Name = "allowBoulderBlockedConnectionsCheckbox";
-            this.allowBoulderBlockedConnectionsCheckbox.Size = new System.Drawing.Size(274, 19);
-            this.allowBoulderBlockedConnectionsCheckbox.TabIndex = 33;
-            this.allowBoulderBlockedConnectionsCheckbox.Text = "Allow Connection Caves to be Boulder Blocked";
-            this.toolTip1.SetToolTip(this.allowBoulderBlockedConnectionsCheckbox, "When selected, allows boulders to block any cave.");
-            this.allowBoulderBlockedConnectionsCheckbox.UseVisualStyleBackColor = true;
+            allowBoulderBlockedConnectionsCheckbox.AutoSize = true;
+            allowBoulderBlockedConnectionsCheckbox.Location = new System.Drawing.Point(282, 59);
+            allowBoulderBlockedConnectionsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            allowBoulderBlockedConnectionsCheckbox.Name = "allowBoulderBlockedConnectionsCheckbox";
+            allowBoulderBlockedConnectionsCheckbox.Size = new System.Drawing.Size(274, 19);
+            allowBoulderBlockedConnectionsCheckbox.TabIndex = 33;
+            allowBoulderBlockedConnectionsCheckbox.Text = "Allow Connection Caves to be Boulder Blocked";
+            toolTip1.SetToolTip(allowBoulderBlockedConnectionsCheckbox, "When selected, allows boulders to block any cave.");
+            allowBoulderBlockedConnectionsCheckbox.UseVisualStyleBackColor = true;
             // 
             // saneCaveShuffleBox
             // 
-            this.saneCaveShuffleBox.AutoSize = true;
-            this.saneCaveShuffleBox.Location = new System.Drawing.Point(282, 32);
-            this.saneCaveShuffleBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.saneCaveShuffleBox.Name = "saneCaveShuffleBox";
-            this.saneCaveShuffleBox.Size = new System.Drawing.Size(199, 19);
-            this.saneCaveShuffleBox.TabIndex = 32;
-            this.saneCaveShuffleBox.Text = "Restrict Connection Cave Shuffle";
-            this.saneCaveShuffleBox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.saneCaveShuffleBox, "When selected, caves will be placed in a more logical manner in which they \"point" +
-        "\" at their destination.");
-            this.saneCaveShuffleBox.UseVisualStyleBackColor = true;
+            saneCaveShuffleBox.AutoSize = true;
+            saneCaveShuffleBox.Location = new System.Drawing.Point(282, 32);
+            saneCaveShuffleBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            saneCaveShuffleBox.Name = "saneCaveShuffleBox";
+            saneCaveShuffleBox.Size = new System.Drawing.Size(199, 19);
+            saneCaveShuffleBox.TabIndex = 32;
+            saneCaveShuffleBox.Text = "Restrict Connection Cave Shuffle";
+            saneCaveShuffleBox.ThreeState = true;
+            toolTip1.SetToolTip(saneCaveShuffleBox, "When selected, caves will be placed in a more logical manner in which they \"point\" at their destination.");
+            saneCaveShuffleBox.UseVisualStyleBackColor = true;
             // 
             // hideLessImportantLocationsCheckbox
             // 
-            this.hideLessImportantLocationsCheckbox.AutoSize = true;
-            this.hideLessImportantLocationsCheckbox.Location = new System.Drawing.Point(282, 7);
-            this.hideLessImportantLocationsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.hideLessImportantLocationsCheckbox.Name = "hideLessImportantLocationsCheckbox";
-            this.hideLessImportantLocationsCheckbox.Size = new System.Drawing.Size(186, 19);
-            this.hideLessImportantLocationsCheckbox.TabIndex = 31;
-            this.hideLessImportantLocationsCheckbox.Text = "Hide Less Important Locations";
-            this.hideLessImportantLocationsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.hideLessImportantLocationsCheckbox, "When selected, blends unimportant locations in with the surrounding terrain.");
-            this.hideLessImportantLocationsCheckbox.UseVisualStyleBackColor = true;
+            hideLessImportantLocationsCheckbox.AutoSize = true;
+            hideLessImportantLocationsCheckbox.Location = new System.Drawing.Point(282, 7);
+            hideLessImportantLocationsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            hideLessImportantLocationsCheckbox.Name = "hideLessImportantLocationsCheckbox";
+            hideLessImportantLocationsCheckbox.Size = new System.Drawing.Size(186, 19);
+            hideLessImportantLocationsCheckbox.TabIndex = 31;
+            hideLessImportantLocationsCheckbox.Text = "Hide Less Important Locations";
+            hideLessImportantLocationsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(hideLessImportantLocationsCheckbox, "When selected, blends unimportant locations in with the surrounding terrain.");
+            hideLessImportantLocationsCheckbox.UseVisualStyleBackColor = true;
             // 
             // ContinentConnectionLabel
             // 
-            this.ContinentConnectionLabel.AutoSize = true;
-            this.ContinentConnectionLabel.Location = new System.Drawing.Point(279, 144);
-            this.ContinentConnectionLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.ContinentConnectionLabel.Name = "ContinentConnectionLabel";
-            this.ContinentConnectionLabel.Size = new System.Drawing.Size(133, 15);
-            this.ContinentConnectionLabel.TabIndex = 30;
-            this.ContinentConnectionLabel.Text = "Continent Connections:";
-            this.toolTip1.SetToolTip(this.ContinentConnectionLabel, "Modes for how the different continents can connect to each other.");
+            ContinentConnectionLabel.AutoSize = true;
+            ContinentConnectionLabel.Location = new System.Drawing.Point(279, 144);
+            ContinentConnectionLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            ContinentConnectionLabel.Name = "ContinentConnectionLabel";
+            ContinentConnectionLabel.Size = new System.Drawing.Size(133, 15);
+            ContinentConnectionLabel.TabIndex = 30;
+            ContinentConnectionLabel.Text = "Continent Connections:";
+            toolTip1.SetToolTip(ContinentConnectionLabel, "Modes for how the different continents can connect to each other.");
             // 
             // continentConnectionBox
             // 
-            this.continentConnectionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.continentConnectionBox.FormattingEnabled = true;
-            this.continentConnectionBox.Items.AddRange(new object[] {
-            "Normal",
-            "R+B Border Shuffle",
-            "Transportation Shuffle",
-            "Anything Goes"});
-            this.continentConnectionBox.Location = new System.Drawing.Point(422, 141);
-            this.continentConnectionBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.continentConnectionBox.Name = "continentConnectionBox";
-            this.continentConnectionBox.Size = new System.Drawing.Size(140, 23);
-            this.continentConnectionBox.TabIndex = 29;
-            this.toolTip1.SetToolTip(this.continentConnectionBox, "Modes for how the different continents can connect to each other.");
+            continentConnectionBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            continentConnectionBox.FormattingEnabled = true;
+            continentConnectionBox.Items.AddRange(new object[] { "Normal", "R+B Border Shuffle", "Transportation Shuffle", "Anything Goes" });
+            continentConnectionBox.Location = new System.Drawing.Point(422, 141);
+            continentConnectionBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            continentConnectionBox.Name = "continentConnectionBox";
+            continentConnectionBox.Size = new System.Drawing.Size(140, 23);
+            continentConnectionBox.TabIndex = 29;
+            toolTip1.SetToolTip(continentConnectionBox, "Modes for how the different continents can connect to each other.");
             // 
             // label36
             // 
-            this.label36.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label36.Location = new System.Drawing.Point(7, 163);
-            this.label36.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(243, 1);
-            this.label36.TabIndex = 28;
+            label36.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            label36.Location = new System.Drawing.Point(7, 163);
+            label36.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label36.Name = "label36";
+            label36.Size = new System.Drawing.Size(243, 1);
+            label36.TabIndex = 28;
             // 
             // encounterRateBox
             // 
-            this.encounterRateBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.encounterRateBox.FormattingEnabled = true;
-            this.encounterRateBox.Items.AddRange(new object[] {
-            "Normal",
-            "50%",
-            "None",
-            "Random"});
-            this.encounterRateBox.Location = new System.Drawing.Point(108, 132);
-            this.encounterRateBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.encounterRateBox.Name = "encounterRateBox";
-            this.encounterRateBox.Size = new System.Drawing.Size(100, 23);
-            this.encounterRateBox.TabIndex = 27;
-            this.toolTip1.SetToolTip(this.encounterRateBox, "Allows you to reduce the encounter rate or turn encounters off entirely.");
+            encounterRateBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            encounterRateBox.FormattingEnabled = true;
+            encounterRateBox.Items.AddRange(new object[] { "Normal", "50%", "None", "Random" });
+            encounterRateBox.Location = new System.Drawing.Point(108, 132);
+            encounterRateBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            encounterRateBox.Name = "encounterRateBox";
+            encounterRateBox.Size = new System.Drawing.Size(100, 23);
+            encounterRateBox.TabIndex = 27;
+            toolTip1.SetToolTip(encounterRateBox, "Allows you to reduce the encounter rate or turn encounters off entirely.");
             // 
             // encounterRateLabel
             // 
-            this.encounterRateLabel.AutoSize = true;
-            this.encounterRateLabel.Location = new System.Drawing.Point(4, 135);
-            this.encounterRateLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.encounterRateLabel.Name = "encounterRateLabel";
-            this.encounterRateLabel.Size = new System.Drawing.Size(90, 15);
-            this.encounterRateLabel.TabIndex = 26;
-            this.encounterRateLabel.Text = "Encounter Rate:";
-            this.toolTip1.SetToolTip(this.encounterRateLabel, "Allows you to reduce the encounter rate or turn encounters off entirely.");
+            encounterRateLabel.AutoSize = true;
+            encounterRateLabel.Location = new System.Drawing.Point(4, 135);
+            encounterRateLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            encounterRateLabel.Name = "encounterRateLabel";
+            encounterRateLabel.Size = new System.Drawing.Size(90, 15);
+            encounterRateLabel.TabIndex = 26;
+            encounterRateLabel.Text = "Encounter Rate:";
+            toolTip1.SetToolTip(encounterRateLabel, "Allows you to reduce the encounter rate or turn encounters off entirely.");
             // 
             // hideKasutoList
             // 
-            this.hideKasutoList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.hideKasutoList.FormattingEnabled = true;
-            this.hideKasutoList.Items.AddRange(new object[] {
-            "Off",
-            "On",
-            "Random"});
-            this.hideKasutoList.Location = new System.Drawing.Point(108, 203);
-            this.hideKasutoList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.hideKasutoList.Name = "hideKasutoList";
-            this.hideKasutoList.Size = new System.Drawing.Size(100, 23);
-            this.hideKasutoList.TabIndex = 25;
-            this.toolTip1.SetToolTip(this.hideKasutoList, "When selected, will hide Kasuto behind a forest tile");
-            this.hideKasutoList.SelectedIndexChanged += new System.EventHandler(this.HideKasutoBox_SelectedIndexChanged);
+            hideKasutoList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            hideKasutoList.FormattingEnabled = true;
+            hideKasutoList.Items.AddRange(new object[] { "Off", "On", "Random" });
+            hideKasutoList.Location = new System.Drawing.Point(108, 203);
+            hideKasutoList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            hideKasutoList.Name = "hideKasutoList";
+            hideKasutoList.Size = new System.Drawing.Size(100, 23);
+            hideKasutoList.TabIndex = 25;
+            toolTip1.SetToolTip(hideKasutoList, "When selected, will hide Kasuto behind a forest tile");
+            hideKasutoList.SelectedIndexChanged += HideKasutoBox_SelectedIndexChanged;
             // 
             // hiddenKasutoLabel
             // 
-            this.hiddenKasutoLabel.AutoSize = true;
-            this.hiddenKasutoLabel.Location = new System.Drawing.Point(5, 205);
-            this.hiddenKasutoLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.hiddenKasutoLabel.Name = "hiddenKasutoLabel";
-            this.hiddenKasutoLabel.Size = new System.Drawing.Size(88, 15);
-            this.hiddenKasutoLabel.TabIndex = 24;
-            this.hiddenKasutoLabel.Text = "Hidden Kasuto:";
+            hiddenKasutoLabel.AutoSize = true;
+            hiddenKasutoLabel.Location = new System.Drawing.Point(5, 205);
+            hiddenKasutoLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            hiddenKasutoLabel.Name = "hiddenKasutoLabel";
+            hiddenKasutoLabel.Size = new System.Drawing.Size(88, 15);
+            hiddenKasutoLabel.TabIndex = 24;
+            hiddenKasutoLabel.Text = "Hidden Kasuto:";
             // 
             // hiddenPalaceList
             // 
-            this.hiddenPalaceList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.hiddenPalaceList.FormattingEnabled = true;
-            this.hiddenPalaceList.Items.AddRange(new object[] {
-            "Off",
-            "On",
-            "Random"});
-            this.hiddenPalaceList.Location = new System.Drawing.Point(108, 172);
-            this.hiddenPalaceList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.hiddenPalaceList.Name = "hiddenPalaceList";
-            this.hiddenPalaceList.Size = new System.Drawing.Size(100, 23);
-            this.hiddenPalaceList.TabIndex = 23;
-            this.toolTip1.SetToolTip(this.hiddenPalaceList, "When selected, will include three eye rock on the overworld");
-            this.hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(this.HpCmbo_SelectedIndexChanged);
+            hiddenPalaceList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            hiddenPalaceList.FormattingEnabled = true;
+            hiddenPalaceList.Items.AddRange(new object[] { "Off", "On", "Random" });
+            hiddenPalaceList.Location = new System.Drawing.Point(108, 172);
+            hiddenPalaceList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            hiddenPalaceList.Name = "hiddenPalaceList";
+            hiddenPalaceList.Size = new System.Drawing.Size(100, 23);
+            hiddenPalaceList.TabIndex = 23;
+            toolTip1.SetToolTip(hiddenPalaceList, "When selected, will include three eye rock on the overworld");
+            hiddenPalaceList.SelectedIndexChanged += HpCmbo_SelectedIndexChanged;
             // 
             // hiddenPalaceLabel
             // 
-            this.hiddenPalaceLabel.AutoSize = true;
-            this.hiddenPalaceLabel.Location = new System.Drawing.Point(5, 175);
-            this.hiddenPalaceLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.hiddenPalaceLabel.Name = "hiddenPalaceLabel";
-            this.hiddenPalaceLabel.Size = new System.Drawing.Size(86, 15);
-            this.hiddenPalaceLabel.TabIndex = 22;
-            this.hiddenPalaceLabel.Text = "Hidden Palace:";
+            hiddenPalaceLabel.AutoSize = true;
+            hiddenPalaceLabel.Location = new System.Drawing.Point(5, 175);
+            hiddenPalaceLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            hiddenPalaceLabel.Name = "hiddenPalaceLabel";
+            hiddenPalaceLabel.Size = new System.Drawing.Size(86, 15);
+            hiddenPalaceLabel.TabIndex = 22;
+            hiddenPalaceLabel.Text = "Hidden Palace:";
             // 
             // includeGPinShuffleCheckbox
             // 
-            this.includeGPinShuffleCheckbox.AutoSize = true;
-            this.includeGPinShuffleCheckbox.Location = new System.Drawing.Point(7, 32);
-            this.includeGPinShuffleCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.includeGPinShuffleCheckbox.Name = "includeGPinShuffleCheckbox";
-            this.includeGPinShuffleCheckbox.Size = new System.Drawing.Size(186, 19);
-            this.includeGPinShuffleCheckbox.TabIndex = 21;
-            this.includeGPinShuffleCheckbox.Text = "Include Great Palace in Shuffle";
-            this.includeGPinShuffleCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.includeGPinShuffleCheckbox, "When selected, palace 7 does not have to be in the valley of death.");
-            this.includeGPinShuffleCheckbox.UseVisualStyleBackColor = true;
+            includeGPinShuffleCheckbox.AutoSize = true;
+            includeGPinShuffleCheckbox.Location = new System.Drawing.Point(7, 32);
+            includeGPinShuffleCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            includeGPinShuffleCheckbox.Name = "includeGPinShuffleCheckbox";
+            includeGPinShuffleCheckbox.Size = new System.Drawing.Size(186, 19);
+            includeGPinShuffleCheckbox.TabIndex = 21;
+            includeGPinShuffleCheckbox.Text = "Include Great Palace in Shuffle";
+            includeGPinShuffleCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(includeGPinShuffleCheckbox, "When selected, palace 7 does not have to be in the valley of death.");
+            includeGPinShuffleCheckbox.UseVisualStyleBackColor = true;
             // 
             // allowPalaceContinentSwapCheckbox
             // 
-            this.allowPalaceContinentSwapCheckbox.AutoSize = true;
-            this.allowPalaceContinentSwapCheckbox.Location = new System.Drawing.Point(7, 7);
-            this.allowPalaceContinentSwapCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.allowPalaceContinentSwapCheckbox.Name = "allowPalaceContinentSwapCheckbox";
-            this.allowPalaceContinentSwapCheckbox.Size = new System.Drawing.Size(204, 19);
-            this.allowPalaceContinentSwapCheckbox.TabIndex = 20;
-            this.allowPalaceContinentSwapCheckbox.Text = "Allow Palaces to Swap Continents";
-            this.allowPalaceContinentSwapCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.allowPalaceContinentSwapCheckbox, "When selected, palaces can move from their normal continents. Palace 1 could be f" +
-        "ound on Maze Island or East Hyrule, for example.");
-            this.allowPalaceContinentSwapCheckbox.UseVisualStyleBackColor = true;
-            this.allowPalaceContinentSwapCheckbox.CheckStateChanged += new System.EventHandler(this.PalaceSwapBox_CheckStateChanged);
+            allowPalaceContinentSwapCheckbox.AutoSize = true;
+            allowPalaceContinentSwapCheckbox.Location = new System.Drawing.Point(7, 7);
+            allowPalaceContinentSwapCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            allowPalaceContinentSwapCheckbox.Name = "allowPalaceContinentSwapCheckbox";
+            allowPalaceContinentSwapCheckbox.Size = new System.Drawing.Size(204, 19);
+            allowPalaceContinentSwapCheckbox.TabIndex = 20;
+            allowPalaceContinentSwapCheckbox.Text = "Allow Palaces to Swap Continents";
+            allowPalaceContinentSwapCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(allowPalaceContinentSwapCheckbox, "When selected, palaces can move from their normal continents. Palace 1 could be found on Maze Island or East Hyrule, for example.");
+            allowPalaceContinentSwapCheckbox.UseVisualStyleBackColor = true;
+            allowPalaceContinentSwapCheckbox.CheckStateChanged += PalaceSwapBox_CheckStateChanged;
             // 
             // label4
             // 
-            this.label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label4.Location = new System.Drawing.Point(7, 63);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(243, 1);
-            this.label4.TabIndex = 18;
+            label4.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            label4.Location = new System.Drawing.Point(7, 63);
+            label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(243, 1);
+            label4.TabIndex = 18;
             // 
             // allowPathEnemiesCheckbox
             // 
-            this.allowPathEnemiesCheckbox.AutoSize = true;
-            this.allowPathEnemiesCheckbox.Location = new System.Drawing.Point(7, 104);
-            this.allowPathEnemiesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.allowPathEnemiesCheckbox.Name = "allowPathEnemiesCheckbox";
-            this.allowPathEnemiesCheckbox.Size = new System.Drawing.Size(184, 19);
-            this.allowPathEnemiesCheckbox.TabIndex = 15;
-            this.allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
-            this.allowPathEnemiesCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
-            this.allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
+            allowPathEnemiesCheckbox.AutoSize = true;
+            allowPathEnemiesCheckbox.Location = new System.Drawing.Point(7, 104);
+            allowPathEnemiesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            allowPathEnemiesCheckbox.Name = "allowPathEnemiesCheckbox";
+            allowPathEnemiesCheckbox.Size = new System.Drawing.Size(184, 19);
+            allowPathEnemiesCheckbox.TabIndex = 15;
+            allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
+            allowPathEnemiesCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
+            allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleEncountersCheckbox
             // 
-            this.shuffleEncountersCheckbox.AutoSize = true;
-            this.shuffleEncountersCheckbox.Location = new System.Drawing.Point(7, 78);
-            this.shuffleEncountersCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleEncountersCheckbox.Name = "shuffleEncountersCheckbox";
-            this.shuffleEncountersCheckbox.Size = new System.Drawing.Size(125, 19);
-            this.shuffleEncountersCheckbox.TabIndex = 14;
-            this.shuffleEncountersCheckbox.Text = "Shuffle Encounters";
-            this.shuffleEncountersCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shuffleEncountersCheckbox, "Shuffle which overworld encounters occur on different terrain types");
-            this.shuffleEncountersCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleEncounters_CheckStateChanged);
+            shuffleEncountersCheckbox.AutoSize = true;
+            shuffleEncountersCheckbox.Location = new System.Drawing.Point(7, 78);
+            shuffleEncountersCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleEncountersCheckbox.Name = "shuffleEncountersCheckbox";
+            shuffleEncountersCheckbox.Size = new System.Drawing.Size(125, 19);
+            shuffleEncountersCheckbox.TabIndex = 14;
+            shuffleEncountersCheckbox.Text = "Shuffle Encounters";
+            shuffleEncountersCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shuffleEncountersCheckbox, "Shuffle which overworld encounters occur on different terrain types");
+            shuffleEncountersCheckbox.UseVisualStyleBackColor = true;
+            shuffleEncountersCheckbox.CheckStateChanged += shuffleEncounters_CheckStateChanged;
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.label7);
-            this.tabPage2.Controls.Add(this.label5);
-            this.tabPage2.Controls.Add(this.startingGemsMaxList);
-            this.tabPage2.Controls.Add(this.palaceStyleLabel);
-            this.tabPage2.Controls.Add(this.palaceStyleList);
-            this.tabPage2.Controls.Add(this.bossRoomsExitToPalaceCheckbox);
-            this.tabPage2.Controls.Add(this.blockingRoomsInAnyPalaceCheckbox);
-            this.tabPage2.Controls.Add(this.includeCommunityRoomsCheckbox);
-            this.tabPage2.Controls.Add(this.randomizeBossItemCheckbox);
-            this.tabPage2.Controls.Add(this.removeTbirdCheckbox);
-            this.tabPage2.Controls.Add(this.shortGPCheckbox);
-            this.tabPage2.Controls.Add(this.restartAtPalacesCheckbox);
-            this.tabPage2.Controls.Add(this.palacePaletteCheckbox);
-            this.tabPage2.Controls.Add(this.tbirdRequiredCheckbox);
-            this.tabPage2.Controls.Add(this.label6);
-            this.tabPage2.Controls.Add(this.startingGemsMinList);
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage2.Size = new System.Drawing.Size(595, 331);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Palaces";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            tabPage2.Controls.Add(label7);
+            tabPage2.Controls.Add(label5);
+            tabPage2.Controls.Add(startingGemsMaxList);
+            tabPage2.Controls.Add(palaceStyleLabel);
+            tabPage2.Controls.Add(palaceStyleList);
+            tabPage2.Controls.Add(bossRoomsExitToPalaceCheckbox);
+            tabPage2.Controls.Add(blockingRoomsInAnyPalaceCheckbox);
+            tabPage2.Controls.Add(includeCommunityRoomsCheckbox);
+            tabPage2.Controls.Add(randomizeBossItemCheckbox);
+            tabPage2.Controls.Add(removeTbirdCheckbox);
+            tabPage2.Controls.Add(shortGPCheckbox);
+            tabPage2.Controls.Add(restartAtPalacesCheckbox);
+            tabPage2.Controls.Add(palacePaletteCheckbox);
+            tabPage2.Controls.Add(tbirdRequiredCheckbox);
+            tabPage2.Controls.Add(label6);
+            tabPage2.Controls.Add(startingGemsMinList);
+            tabPage2.Location = new System.Drawing.Point(4, 24);
+            tabPage2.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage2.Name = "tabPage2";
+            tabPage2.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage2.Size = new System.Drawing.Size(595, 331);
+            tabPage2.TabIndex = 1;
+            tabPage2.Text = "Palaces";
+            tabPage2.UseVisualStyleBackColor = true;
             // 
             // label7
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(119, 270);
-            this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(30, 15);
-            this.label7.TabIndex = 24;
-            this.label7.Text = "Max";
-            this.toolTip1.SetToolTip(this.label7, "Starting Attack Level");
+            label7.AutoSize = true;
+            label7.Location = new System.Drawing.Point(119, 270);
+            label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label7.Name = "label7";
+            label7.Size = new System.Drawing.Size(30, 15);
+            label7.TabIndex = 24;
+            label7.Text = "Max";
+            toolTip1.SetToolTip(label7, "Starting Attack Level");
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(31, 270);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(28, 15);
-            this.label5.TabIndex = 23;
-            this.label5.Text = "Min";
-            this.toolTip1.SetToolTip(this.label5, "Starting Attack Level");
+            label5.AutoSize = true;
+            label5.Location = new System.Drawing.Point(31, 270);
+            label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label5.Name = "label5";
+            label5.Size = new System.Drawing.Size(28, 15);
+            label5.TabIndex = 23;
+            label5.Text = "Min";
+            toolTip1.SetToolTip(label5, "Starting Attack Level");
             // 
             // startingGemsMaxList
             // 
-            this.startingGemsMaxList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startingGemsMaxList.FormattingEnabled = true;
-            this.startingGemsMaxList.Items.AddRange(new object[] {
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6"});
-            this.startingGemsMaxList.Location = new System.Drawing.Point(98, 287);
-            this.startingGemsMaxList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startingGemsMaxList.Name = "startingGemsMaxList";
-            this.startingGemsMaxList.Size = new System.Drawing.Size(72, 23);
-            this.startingGemsMaxList.TabIndex = 15;
-            this.toolTip1.SetToolTip(this.startingGemsMaxList, "How many gems need to be placed before entering palace 7");
+            startingGemsMaxList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startingGemsMaxList.FormattingEnabled = true;
+            startingGemsMaxList.Items.AddRange(new object[] { "0", "1", "2", "3", "4", "5", "6" });
+            startingGemsMaxList.Location = new System.Drawing.Point(98, 287);
+            startingGemsMaxList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startingGemsMaxList.Name = "startingGemsMaxList";
+            startingGemsMaxList.Size = new System.Drawing.Size(72, 23);
+            startingGemsMaxList.TabIndex = 15;
+            toolTip1.SetToolTip(startingGemsMaxList, "How many gems need to be placed before entering palace 7");
             // 
             // palaceStyleLabel
             // 
-            this.palaceStyleLabel.AutoSize = true;
-            this.palaceStyleLabel.Location = new System.Drawing.Point(7, 12);
-            this.palaceStyleLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.palaceStyleLabel.Name = "palaceStyleLabel";
-            this.palaceStyleLabel.Size = new System.Drawing.Size(72, 15);
-            this.palaceStyleLabel.TabIndex = 14;
-            this.palaceStyleLabel.Text = "Palace Style:";
-            this.toolTip1.SetToolTip(this.palaceStyleLabel, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from" +
-        " the room pool can appear and palaces can change sizes.");
+            palaceStyleLabel.AutoSize = true;
+            palaceStyleLabel.Location = new System.Drawing.Point(7, 12);
+            palaceStyleLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            palaceStyleLabel.Name = "palaceStyleLabel";
+            palaceStyleLabel.Size = new System.Drawing.Size(72, 15);
+            palaceStyleLabel.TabIndex = 14;
+            palaceStyleLabel.Text = "Palace Style:";
+            toolTip1.SetToolTip(palaceStyleLabel, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from the room pool can appear and palaces can change sizes.");
             // 
             // palaceStyleList
             // 
-            this.palaceStyleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.palaceStyleList.FormattingEnabled = true;
-            this.palaceStyleList.Items.AddRange(new object[] {
-            "Vanilla",
-            "Shuffled",
-            "Reconstructed",
-            "Random"});
-            this.palaceStyleList.Location = new System.Drawing.Point(7, 29);
-            this.palaceStyleList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.palaceStyleList.Name = "palaceStyleList";
-            this.palaceStyleList.Size = new System.Drawing.Size(176, 23);
-            this.palaceStyleList.TabIndex = 13;
-            this.toolTip1.SetToolTip(this.palaceStyleList, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from" +
-        " the room pool can appear and palaces can change sizes.");
-            this.palaceStyleList.SelectedIndexChanged += new System.EventHandler(this.PalaceBox_SelectedIndexChanged);
+            palaceStyleList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            palaceStyleList.FormattingEnabled = true;
+            palaceStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed", "Random" });
+            palaceStyleList.Location = new System.Drawing.Point(7, 29);
+            palaceStyleList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            palaceStyleList.Name = "palaceStyleList";
+            palaceStyleList.Size = new System.Drawing.Size(176, 23);
+            palaceStyleList.TabIndex = 13;
+            toolTip1.SetToolTip(palaceStyleList, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from the room pool can appear and palaces can change sizes.");
+            palaceStyleList.SelectedIndexChanged += PalaceBox_SelectedIndexChanged;
             // 
             // bossRoomsExitToPalaceCheckbox
             // 
-            this.bossRoomsExitToPalaceCheckbox.AutoSize = true;
-            this.bossRoomsExitToPalaceCheckbox.Location = new System.Drawing.Point(7, 113);
-            this.bossRoomsExitToPalaceCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.bossRoomsExitToPalaceCheckbox.Name = "bossRoomsExitToPalaceCheckbox";
-            this.bossRoomsExitToPalaceCheckbox.Size = new System.Drawing.Size(163, 19);
-            this.bossRoomsExitToPalaceCheckbox.TabIndex = 12;
-            this.bossRoomsExitToPalaceCheckbox.Text = "Boss Rooms Exit to Palace";
-            this.bossRoomsExitToPalaceCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.bossRoomsExitToPalaceCheckbox, "When selected, boss rooms will no longer lead outside, they will lead to more pal" +
-        "ace");
-            this.bossRoomsExitToPalaceCheckbox.UseVisualStyleBackColor = true;
+            bossRoomsExitToPalaceCheckbox.AutoSize = true;
+            bossRoomsExitToPalaceCheckbox.Location = new System.Drawing.Point(7, 113);
+            bossRoomsExitToPalaceCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            bossRoomsExitToPalaceCheckbox.Name = "bossRoomsExitToPalaceCheckbox";
+            bossRoomsExitToPalaceCheckbox.Size = new System.Drawing.Size(163, 19);
+            bossRoomsExitToPalaceCheckbox.TabIndex = 12;
+            bossRoomsExitToPalaceCheckbox.Text = "Boss Rooms Exit to Palace";
+            bossRoomsExitToPalaceCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(bossRoomsExitToPalaceCheckbox, "When selected, boss rooms will no longer lead outside, they will lead to more palace");
+            bossRoomsExitToPalaceCheckbox.UseVisualStyleBackColor = true;
             // 
             // blockingRoomsInAnyPalaceCheckbox
             // 
-            this.blockingRoomsInAnyPalaceCheckbox.AutoSize = true;
-            this.blockingRoomsInAnyPalaceCheckbox.Location = new System.Drawing.Point(7, 87);
-            this.blockingRoomsInAnyPalaceCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.blockingRoomsInAnyPalaceCheckbox.Name = "blockingRoomsInAnyPalaceCheckbox";
-            this.blockingRoomsInAnyPalaceCheckbox.Size = new System.Drawing.Size(251, 19);
-            this.blockingRoomsInAnyPalaceCheckbox.TabIndex = 11;
-            this.blockingRoomsInAnyPalaceCheckbox.Text = "Blocking Rooms Can Appear in Any Palace";
-            this.toolTip1.SetToolTip(this.blockingRoomsInAnyPalaceCheckbox, "When selected, a palace can be blocked by any of the item/spell blocked rooms");
-            this.blockingRoomsInAnyPalaceCheckbox.UseVisualStyleBackColor = true;
+            blockingRoomsInAnyPalaceCheckbox.AutoSize = true;
+            blockingRoomsInAnyPalaceCheckbox.Location = new System.Drawing.Point(7, 87);
+            blockingRoomsInAnyPalaceCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            blockingRoomsInAnyPalaceCheckbox.Name = "blockingRoomsInAnyPalaceCheckbox";
+            blockingRoomsInAnyPalaceCheckbox.Size = new System.Drawing.Size(251, 19);
+            blockingRoomsInAnyPalaceCheckbox.TabIndex = 11;
+            blockingRoomsInAnyPalaceCheckbox.Text = "Blocking Rooms Can Appear in Any Palace";
+            toolTip1.SetToolTip(blockingRoomsInAnyPalaceCheckbox, "When selected, a palace can be blocked by any of the item/spell blocked rooms");
+            blockingRoomsInAnyPalaceCheckbox.UseVisualStyleBackColor = true;
             // 
             // includeCommunityRoomsCheckbox
             // 
-            this.includeCommunityRoomsCheckbox.AutoSize = true;
-            this.includeCommunityRoomsCheckbox.Location = new System.Drawing.Point(7, 60);
-            this.includeCommunityRoomsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.includeCommunityRoomsCheckbox.Name = "includeCommunityRoomsCheckbox";
-            this.includeCommunityRoomsCheckbox.Size = new System.Drawing.Size(172, 19);
-            this.includeCommunityRoomsCheckbox.TabIndex = 10;
-            this.includeCommunityRoomsCheckbox.Text = "Include Community Rooms";
-            this.includeCommunityRoomsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.includeCommunityRoomsCheckbox, "When selected, rooms created by the Zelda 2 community will be included in the roo" +
-        "m pool");
-            this.includeCommunityRoomsCheckbox.UseVisualStyleBackColor = true;
+            includeCommunityRoomsCheckbox.AutoSize = true;
+            includeCommunityRoomsCheckbox.Location = new System.Drawing.Point(7, 60);
+            includeCommunityRoomsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            includeCommunityRoomsCheckbox.Name = "includeCommunityRoomsCheckbox";
+            includeCommunityRoomsCheckbox.Size = new System.Drawing.Size(172, 19);
+            includeCommunityRoomsCheckbox.TabIndex = 10;
+            includeCommunityRoomsCheckbox.Text = "Include Community Rooms";
+            includeCommunityRoomsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(includeCommunityRoomsCheckbox, "When selected, rooms created by the Zelda 2 community will be included in the room pool");
+            includeCommunityRoomsCheckbox.UseVisualStyleBackColor = true;
             // 
             // randomizeBossItemCheckbox
             // 
-            this.randomizeBossItemCheckbox.AutoSize = true;
-            this.randomizeBossItemCheckbox.Location = new System.Drawing.Point(281, 60);
-            this.randomizeBossItemCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.randomizeBossItemCheckbox.Name = "randomizeBossItemCheckbox";
-            this.randomizeBossItemCheckbox.Size = new System.Drawing.Size(168, 19);
-            this.randomizeBossItemCheckbox.TabIndex = 8;
-            this.randomizeBossItemCheckbox.Text = "Randomize Boss Item Drop";
-            this.toolTip1.SetToolTip(this.randomizeBossItemCheckbox, "When selected, the item that drops after a boss has been killed will be randomize" +
-        "d");
-            this.randomizeBossItemCheckbox.UseVisualStyleBackColor = true;
+            randomizeBossItemCheckbox.AutoSize = true;
+            randomizeBossItemCheckbox.Location = new System.Drawing.Point(281, 60);
+            randomizeBossItemCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            randomizeBossItemCheckbox.Name = "randomizeBossItemCheckbox";
+            randomizeBossItemCheckbox.Size = new System.Drawing.Size(168, 19);
+            randomizeBossItemCheckbox.TabIndex = 8;
+            randomizeBossItemCheckbox.Text = "Randomize Boss Item Drop";
+            toolTip1.SetToolTip(randomizeBossItemCheckbox, "When selected, the item that drops after a boss has been killed will be randomized");
+            randomizeBossItemCheckbox.UseVisualStyleBackColor = true;
             // 
             // removeTbirdCheckbox
             // 
-            this.removeTbirdCheckbox.AutoSize = true;
-            this.removeTbirdCheckbox.Location = new System.Drawing.Point(7, 213);
-            this.removeTbirdCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.removeTbirdCheckbox.Name = "removeTbirdCheckbox";
-            this.removeTbirdCheckbox.Size = new System.Drawing.Size(137, 19);
-            this.removeTbirdCheckbox.TabIndex = 7;
-            this.removeTbirdCheckbox.Text = "Remove Thunderbird";
-            this.toolTip1.SetToolTip(this.removeTbirdCheckbox, "If checked, you must defeat thunderbird");
-            this.removeTbirdCheckbox.UseVisualStyleBackColor = true;
-            this.removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(this.RemoveTbird_CheckStateChanged);
+            removeTbirdCheckbox.AutoSize = true;
+            removeTbirdCheckbox.Location = new System.Drawing.Point(7, 213);
+            removeTbirdCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            removeTbirdCheckbox.Name = "removeTbirdCheckbox";
+            removeTbirdCheckbox.Size = new System.Drawing.Size(137, 19);
+            removeTbirdCheckbox.TabIndex = 7;
+            removeTbirdCheckbox.Text = "Remove Thunderbird";
+            toolTip1.SetToolTip(removeTbirdCheckbox, "If checked, you must defeat thunderbird");
+            removeTbirdCheckbox.UseVisualStyleBackColor = true;
+            removeTbirdCheckbox.CheckStateChanged += RemoveTbird_CheckStateChanged;
             // 
             // shortGPCheckbox
             // 
-            this.shortGPCheckbox.AutoSize = true;
-            this.shortGPCheckbox.Location = new System.Drawing.Point(7, 160);
-            this.shortGPCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shortGPCheckbox.Name = "shortGPCheckbox";
-            this.shortGPCheckbox.Size = new System.Drawing.Size(135, 19);
-            this.shortGPCheckbox.TabIndex = 6;
-            this.shortGPCheckbox.Text = "Shorten Great Palace";
-            this.shortGPCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shortGPCheckbox, "When selected, the Great Palace will have fewer rooms than normal");
-            this.shortGPCheckbox.UseVisualStyleBackColor = true;
+            shortGPCheckbox.AutoSize = true;
+            shortGPCheckbox.Location = new System.Drawing.Point(7, 160);
+            shortGPCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shortGPCheckbox.Name = "shortGPCheckbox";
+            shortGPCheckbox.Size = new System.Drawing.Size(135, 19);
+            shortGPCheckbox.TabIndex = 6;
+            shortGPCheckbox.Text = "Shorten Great Palace";
+            shortGPCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shortGPCheckbox, "When selected, the Great Palace will have fewer rooms than normal");
+            shortGPCheckbox.UseVisualStyleBackColor = true;
             // 
             // restartAtPalacesCheckbox
             // 
-            this.restartAtPalacesCheckbox.AutoSize = true;
-            this.restartAtPalacesCheckbox.Location = new System.Drawing.Point(281, 7);
-            this.restartAtPalacesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.restartAtPalacesCheckbox.Name = "restartAtPalacesCheckbox";
-            this.restartAtPalacesCheckbox.Size = new System.Drawing.Size(193, 19);
-            this.restartAtPalacesCheckbox.TabIndex = 5;
-            this.restartAtPalacesCheckbox.Text = "Restart at palaces on game over";
-            this.toolTip1.SetToolTip(this.restartAtPalacesCheckbox, "When selected, if you game over in a palace, you will restart at that palace inst" +
-        "ead of the normal starting spot");
-            this.restartAtPalacesCheckbox.UseVisualStyleBackColor = true;
+            restartAtPalacesCheckbox.AutoSize = true;
+            restartAtPalacesCheckbox.Location = new System.Drawing.Point(281, 7);
+            restartAtPalacesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            restartAtPalacesCheckbox.Name = "restartAtPalacesCheckbox";
+            restartAtPalacesCheckbox.Size = new System.Drawing.Size(193, 19);
+            restartAtPalacesCheckbox.TabIndex = 5;
+            restartAtPalacesCheckbox.Text = "Restart at palaces on game over";
+            toolTip1.SetToolTip(restartAtPalacesCheckbox, "When selected, if you game over in a palace, you will restart at that palace instead of the normal starting spot");
+            restartAtPalacesCheckbox.UseVisualStyleBackColor = true;
             // 
             // palacePaletteCheckbox
             // 
-            this.palacePaletteCheckbox.AutoSize = true;
-            this.palacePaletteCheckbox.Location = new System.Drawing.Point(281, 33);
-            this.palacePaletteCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.palacePaletteCheckbox.Name = "palacePaletteCheckbox";
-            this.palacePaletteCheckbox.Size = new System.Drawing.Size(148, 19);
-            this.palacePaletteCheckbox.TabIndex = 4;
-            this.palacePaletteCheckbox.Text = "Change Palace Palettes";
-            this.toolTip1.SetToolTip(this.palacePaletteCheckbox, "This option changes the colors and tileset of palaces");
-            this.palacePaletteCheckbox.UseVisualStyleBackColor = true;
+            palacePaletteCheckbox.AutoSize = true;
+            palacePaletteCheckbox.Location = new System.Drawing.Point(281, 33);
+            palacePaletteCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            palacePaletteCheckbox.Name = "palacePaletteCheckbox";
+            palacePaletteCheckbox.Size = new System.Drawing.Size(148, 19);
+            palacePaletteCheckbox.TabIndex = 4;
+            palacePaletteCheckbox.Text = "Change Palace Palettes";
+            toolTip1.SetToolTip(palacePaletteCheckbox, "This option changes the colors and tileset of palaces");
+            palacePaletteCheckbox.UseVisualStyleBackColor = true;
             // 
             // tbirdRequiredCheckbox
             // 
-            this.tbirdRequiredCheckbox.AutoSize = true;
-            this.tbirdRequiredCheckbox.Location = new System.Drawing.Point(7, 187);
-            this.tbirdRequiredCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tbirdRequiredCheckbox.Name = "tbirdRequiredCheckbox";
-            this.tbirdRequiredCheckbox.Size = new System.Drawing.Size(141, 19);
-            this.tbirdRequiredCheckbox.TabIndex = 3;
-            this.tbirdRequiredCheckbox.Text = "Thunderbird Required";
-            this.tbirdRequiredCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.tbirdRequiredCheckbox, "If checked, you must defeat thunderbird");
-            this.tbirdRequiredCheckbox.UseVisualStyleBackColor = true;
-            this.tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(this.TbirdBox_CheckStateChanged);
+            tbirdRequiredCheckbox.AutoSize = true;
+            tbirdRequiredCheckbox.Location = new System.Drawing.Point(7, 187);
+            tbirdRequiredCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tbirdRequiredCheckbox.Name = "tbirdRequiredCheckbox";
+            tbirdRequiredCheckbox.Size = new System.Drawing.Size(141, 19);
+            tbirdRequiredCheckbox.TabIndex = 3;
+            tbirdRequiredCheckbox.Text = "Thunderbird Required";
+            tbirdRequiredCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(tbirdRequiredCheckbox, "If checked, you must defeat thunderbird");
+            tbirdRequiredCheckbox.UseVisualStyleBackColor = true;
+            tbirdRequiredCheckbox.CheckStateChanged += TbirdBox_CheckStateChanged;
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 251);
-            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(176, 15);
-            this.label6.TabIndex = 2;
-            this.label6.Text = "Number of Palaces to Complete";
+            label6.AutoSize = true;
+            label6.Location = new System.Drawing.Point(7, 251);
+            label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label6.Name = "label6";
+            label6.Size = new System.Drawing.Size(176, 15);
+            label6.TabIndex = 2;
+            label6.Text = "Number of Palaces to Complete";
             // 
             // startingGemsMinList
             // 
-            this.startingGemsMinList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.startingGemsMinList.FormattingEnabled = true;
-            this.startingGemsMinList.Items.AddRange(new object[] {
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6"});
-            this.startingGemsMinList.Location = new System.Drawing.Point(7, 288);
-            this.startingGemsMinList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.startingGemsMinList.Name = "startingGemsMinList";
-            this.startingGemsMinList.Size = new System.Drawing.Size(72, 23);
-            this.startingGemsMinList.TabIndex = 1;
-            this.toolTip1.SetToolTip(this.startingGemsMinList, "How many gems need to be placed before entering palace 7");
+            startingGemsMinList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            startingGemsMinList.FormattingEnabled = true;
+            startingGemsMinList.Items.AddRange(new object[] { "0", "1", "2", "3", "4", "5", "6" });
+            startingGemsMinList.Location = new System.Drawing.Point(7, 288);
+            startingGemsMinList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            startingGemsMinList.Name = "startingGemsMinList";
+            startingGemsMinList.Size = new System.Drawing.Size(72, 23);
+            startingGemsMinList.TabIndex = 1;
+            toolTip1.SetToolTip(startingGemsMinList, "How many gems need to be placed before entering palace 7");
             // 
             // tabPage5
             // 
-            this.tabPage5.Controls.Add(this.lifeEffectivenessList);
-            this.tabPage5.Controls.Add(this.magicEffectivenessList);
-            this.tabPage5.Controls.Add(this.attackEffectivenessList);
-            this.tabPage5.Controls.Add(this.scaleLevelRequirementsToCapCheckbox);
-            this.tabPage5.Controls.Add(this.levelCapLabel);
-            this.tabPage5.Controls.Add(this.lifeCapList);
-            this.tabPage5.Controls.Add(this.magCapList);
-            this.tabPage5.Controls.Add(this.atkCapList);
-            this.tabPage5.Controls.Add(this.lifeCapLabel);
-            this.tabPage5.Controls.Add(this.magCapLabel);
-            this.tabPage5.Controls.Add(this.attackCapLabel);
-            this.tabPage5.Controls.Add(this.label12);
-            this.tabPage5.Controls.Add(this.magicEffectivenessLabel);
-            this.tabPage5.Controls.Add(this.attackEffectivenessLabel);
-            this.tabPage5.Controls.Add(this.expBox);
-            this.tabPage5.Location = new System.Drawing.Point(4, 24);
-            this.tabPage5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Size = new System.Drawing.Size(595, 331);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Levels";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            tabPage5.Controls.Add(lifeEffectivenessList);
+            tabPage5.Controls.Add(magicEffectivenessList);
+            tabPage5.Controls.Add(attackEffectivenessList);
+            tabPage5.Controls.Add(scaleLevelRequirementsToCapCheckbox);
+            tabPage5.Controls.Add(levelCapLabel);
+            tabPage5.Controls.Add(lifeCapList);
+            tabPage5.Controls.Add(magCapList);
+            tabPage5.Controls.Add(atkCapList);
+            tabPage5.Controls.Add(lifeCapLabel);
+            tabPage5.Controls.Add(magCapLabel);
+            tabPage5.Controls.Add(attackCapLabel);
+            tabPage5.Controls.Add(label12);
+            tabPage5.Controls.Add(magicEffectivenessLabel);
+            tabPage5.Controls.Add(attackEffectivenessLabel);
+            tabPage5.Controls.Add(expBox);
+            tabPage5.Location = new System.Drawing.Point(4, 24);
+            tabPage5.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage5.Name = "tabPage5";
+            tabPage5.Size = new System.Drawing.Size(595, 331);
+            tabPage5.TabIndex = 4;
+            tabPage5.Text = "Levels";
+            tabPage5.UseVisualStyleBackColor = true;
             // 
             // lifeEffectivenessList
             // 
-            this.lifeEffectivenessList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.lifeEffectivenessList.FormattingEnabled = true;
-            this.lifeEffectivenessList.Items.AddRange(new object[] {
-            "Random",
-            "OHKO Link",
-            "Vanilla",
-            "High Defense",
-            "Invincible"});
-            this.lifeEffectivenessList.Location = new System.Drawing.Point(392, 111);
-            this.lifeEffectivenessList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lifeEffectivenessList.Name = "lifeEffectivenessList";
-            this.lifeEffectivenessList.Size = new System.Drawing.Size(140, 23);
-            this.lifeEffectivenessList.TabIndex = 25;
-            this.toolTip1.SetToolTip(this.lifeEffectivenessList, "Different modes for the effectiveness of Life levels");
+            lifeEffectivenessList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            lifeEffectivenessList.FormattingEnabled = true;
+            lifeEffectivenessList.Items.AddRange(new object[] { "Random", "OHKO Link", "Vanilla", "High Defense", "Invincible" });
+            lifeEffectivenessList.Location = new System.Drawing.Point(392, 111);
+            lifeEffectivenessList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            lifeEffectivenessList.Name = "lifeEffectivenessList";
+            lifeEffectivenessList.Size = new System.Drawing.Size(140, 23);
+            lifeEffectivenessList.TabIndex = 25;
+            toolTip1.SetToolTip(lifeEffectivenessList, "Different modes for the effectiveness of Life levels");
             // 
             // magicEffectivenessList
             // 
-            this.magicEffectivenessList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.magicEffectivenessList.FormattingEnabled = true;
-            this.magicEffectivenessList.Items.AddRange(new object[] {
-            "Random",
-            "High Spell Cost",
-            "Vanilla",
-            "Low Spell Cost",
-            "Free Spells"});
-            this.magicEffectivenessList.Location = new System.Drawing.Point(392, 66);
-            this.magicEffectivenessList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.magicEffectivenessList.Name = "magicEffectivenessList";
-            this.magicEffectivenessList.Size = new System.Drawing.Size(140, 23);
-            this.magicEffectivenessList.TabIndex = 24;
-            this.toolTip1.SetToolTip(this.magicEffectivenessList, "Different modes for the effectiveness of Magic levels");
+            magicEffectivenessList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            magicEffectivenessList.FormattingEnabled = true;
+            magicEffectivenessList.Items.AddRange(new object[] { "Random", "High Spell Cost", "Vanilla", "Low Spell Cost", "Free Spells" });
+            magicEffectivenessList.Location = new System.Drawing.Point(392, 66);
+            magicEffectivenessList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            magicEffectivenessList.Name = "magicEffectivenessList";
+            magicEffectivenessList.Size = new System.Drawing.Size(140, 23);
+            magicEffectivenessList.TabIndex = 24;
+            toolTip1.SetToolTip(magicEffectivenessList, "Different modes for the effectiveness of Magic levels");
             // 
             // attackEffectivenessList
             // 
-            this.attackEffectivenessList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.attackEffectivenessList.FormattingEnabled = true;
-            this.attackEffectivenessList.Items.AddRange(new object[] {
-            "Random",
-            "Low Attack",
-            "Vanilla",
-            "High Attack",
-            "OHKO Enemies"});
-            this.attackEffectivenessList.Location = new System.Drawing.Point(392, 23);
-            this.attackEffectivenessList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.attackEffectivenessList.Name = "attackEffectivenessList";
-            this.attackEffectivenessList.Size = new System.Drawing.Size(140, 23);
-            this.attackEffectivenessList.TabIndex = 23;
-            this.toolTip1.SetToolTip(this.attackEffectivenessList, "Different modes for the effectiveness of Attack levels");
+            attackEffectivenessList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            attackEffectivenessList.FormattingEnabled = true;
+            attackEffectivenessList.Items.AddRange(new object[] { "Random", "Low Attack", "Vanilla", "High Attack", "OHKO Enemies" });
+            attackEffectivenessList.Location = new System.Drawing.Point(392, 23);
+            attackEffectivenessList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            attackEffectivenessList.Name = "attackEffectivenessList";
+            attackEffectivenessList.Size = new System.Drawing.Size(140, 23);
+            attackEffectivenessList.TabIndex = 23;
+            toolTip1.SetToolTip(attackEffectivenessList, "Different modes for the effectiveness of Attack levels");
             // 
             // scaleLevelRequirementsToCapCheckbox
             // 
-            this.scaleLevelRequirementsToCapCheckbox.AutoSize = true;
-            this.scaleLevelRequirementsToCapCheckbox.Location = new System.Drawing.Point(10, 188);
-            this.scaleLevelRequirementsToCapCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.scaleLevelRequirementsToCapCheckbox.Name = "scaleLevelRequirementsToCapCheckbox";
-            this.scaleLevelRequirementsToCapCheckbox.Size = new System.Drawing.Size(197, 19);
-            this.scaleLevelRequirementsToCapCheckbox.TabIndex = 22;
-            this.scaleLevelRequirementsToCapCheckbox.Text = "Scale Level Requirements to Cap";
-            this.toolTip1.SetToolTip(this.scaleLevelRequirementsToCapCheckbox, "When selected, experience requirements will be scaled up based on the maximum lev" +
-        "el from the level cap");
-            this.scaleLevelRequirementsToCapCheckbox.UseVisualStyleBackColor = true;
+            scaleLevelRequirementsToCapCheckbox.AutoSize = true;
+            scaleLevelRequirementsToCapCheckbox.Location = new System.Drawing.Point(10, 188);
+            scaleLevelRequirementsToCapCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            scaleLevelRequirementsToCapCheckbox.Name = "scaleLevelRequirementsToCapCheckbox";
+            scaleLevelRequirementsToCapCheckbox.Size = new System.Drawing.Size(197, 19);
+            scaleLevelRequirementsToCapCheckbox.TabIndex = 22;
+            scaleLevelRequirementsToCapCheckbox.Text = "Scale Level Requirements to Cap";
+            toolTip1.SetToolTip(scaleLevelRequirementsToCapCheckbox, "When selected, experience requirements will be scaled up based on the maximum level from the level cap");
+            scaleLevelRequirementsToCapCheckbox.UseVisualStyleBackColor = true;
             // 
             // levelCapLabel
             // 
-            this.levelCapLabel.AutoSize = true;
-            this.levelCapLabel.Location = new System.Drawing.Point(88, 108);
-            this.levelCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.levelCapLabel.Name = "levelCapLabel";
-            this.levelCapLabel.Size = new System.Drawing.Size(58, 15);
-            this.levelCapLabel.TabIndex = 21;
-            this.levelCapLabel.Text = "Level Cap";
+            levelCapLabel.AutoSize = true;
+            levelCapLabel.Location = new System.Drawing.Point(88, 108);
+            levelCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            levelCapLabel.Name = "levelCapLabel";
+            levelCapLabel.Size = new System.Drawing.Size(58, 15);
+            levelCapLabel.TabIndex = 21;
+            levelCapLabel.Text = "Level Cap";
             // 
             // lifeCapList
             // 
-            this.lifeCapList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.lifeCapList.FormattingEnabled = true;
-            this.lifeCapList.Items.AddRange(new object[] {
-            "8",
-            "7",
-            "6",
-            "5",
-            "4",
-            "3",
-            "2",
-            "1"});
-            this.lifeCapList.Location = new System.Drawing.Point(144, 130);
-            this.lifeCapList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lifeCapList.Name = "lifeCapList";
-            this.lifeCapList.Size = new System.Drawing.Size(37, 23);
-            this.lifeCapList.TabIndex = 20;
-            this.toolTip1.SetToolTip(this.lifeCapList, "Maximum Life Level");
-            this.lifeCapList.SelectedIndexChanged += new System.EventHandler(this.EnableLevelScaling);
+            lifeCapList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            lifeCapList.FormattingEnabled = true;
+            lifeCapList.Items.AddRange(new object[] { "8", "7", "6", "5", "4", "3", "2", "1" });
+            lifeCapList.Location = new System.Drawing.Point(144, 130);
+            lifeCapList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            lifeCapList.Name = "lifeCapList";
+            lifeCapList.Size = new System.Drawing.Size(37, 23);
+            lifeCapList.TabIndex = 20;
+            toolTip1.SetToolTip(lifeCapList, "Maximum Life Level");
+            lifeCapList.SelectedIndexChanged += EnableLevelScaling;
             // 
             // magCapList
             // 
-            this.magCapList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.magCapList.FormattingEnabled = true;
-            this.magCapList.Items.AddRange(new object[] {
-            "8",
-            "7",
-            "6",
-            "5",
-            "4",
-            "3",
-            "2",
-            "1"});
-            this.magCapList.Location = new System.Drawing.Point(99, 130);
-            this.magCapList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.magCapList.Name = "magCapList";
-            this.magCapList.Size = new System.Drawing.Size(37, 23);
-            this.magCapList.TabIndex = 19;
-            this.toolTip1.SetToolTip(this.magCapList, "Maximum Magic Level");
-            this.magCapList.SelectedIndexChanged += new System.EventHandler(this.EnableLevelScaling);
+            magCapList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            magCapList.FormattingEnabled = true;
+            magCapList.Items.AddRange(new object[] { "8", "7", "6", "5", "4", "3", "2", "1" });
+            magCapList.Location = new System.Drawing.Point(99, 130);
+            magCapList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            magCapList.Name = "magCapList";
+            magCapList.Size = new System.Drawing.Size(37, 23);
+            magCapList.TabIndex = 19;
+            toolTip1.SetToolTip(magCapList, "Maximum Magic Level");
+            magCapList.SelectedIndexChanged += EnableLevelScaling;
             // 
             // atkCapList
             // 
-            this.atkCapList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.atkCapList.FormattingEnabled = true;
-            this.atkCapList.Items.AddRange(new object[] {
-            "8",
-            "7",
-            "6",
-            "5",
-            "4",
-            "3",
-            "2",
-            "1"});
-            this.atkCapList.Location = new System.Drawing.Point(55, 130);
-            this.atkCapList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.atkCapList.Name = "atkCapList";
-            this.atkCapList.Size = new System.Drawing.Size(37, 23);
-            this.atkCapList.TabIndex = 18;
-            this.toolTip1.SetToolTip(this.atkCapList, "Maximum Attack Level");
-            this.atkCapList.SelectedIndexChanged += new System.EventHandler(this.EnableLevelScaling);
+            atkCapList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            atkCapList.FormattingEnabled = true;
+            atkCapList.Items.AddRange(new object[] { "8", "7", "6", "5", "4", "3", "2", "1" });
+            atkCapList.Location = new System.Drawing.Point(55, 130);
+            atkCapList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            atkCapList.Name = "atkCapList";
+            atkCapList.Size = new System.Drawing.Size(37, 23);
+            atkCapList.TabIndex = 18;
+            toolTip1.SetToolTip(atkCapList, "Maximum Attack Level");
+            atkCapList.SelectedIndexChanged += EnableLevelScaling;
             // 
             // lifeCapLabel
             // 
-            this.lifeCapLabel.AutoSize = true;
-            this.lifeCapLabel.Location = new System.Drawing.Point(148, 163);
-            this.lifeCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.lifeCapLabel.Name = "lifeCapLabel";
-            this.lifeCapLabel.Size = new System.Drawing.Size(26, 15);
-            this.lifeCapLabel.TabIndex = 17;
-            this.lifeCapLabel.Text = "Life";
-            this.toolTip1.SetToolTip(this.lifeCapLabel, "Maximum Life Level");
+            lifeCapLabel.AutoSize = true;
+            lifeCapLabel.Location = new System.Drawing.Point(148, 163);
+            lifeCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            lifeCapLabel.Name = "lifeCapLabel";
+            lifeCapLabel.Size = new System.Drawing.Size(26, 15);
+            lifeCapLabel.TabIndex = 17;
+            lifeCapLabel.Text = "Life";
+            toolTip1.SetToolTip(lifeCapLabel, "Maximum Life Level");
             // 
             // magCapLabel
             // 
-            this.magCapLabel.AutoSize = true;
-            this.magCapLabel.Location = new System.Drawing.Point(102, 163);
-            this.magCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.magCapLabel.Name = "magCapLabel";
-            this.magCapLabel.Size = new System.Drawing.Size(31, 15);
-            this.magCapLabel.TabIndex = 16;
-            this.magCapLabel.Text = "Mag";
-            this.toolTip1.SetToolTip(this.magCapLabel, "Maximum Magic Level");
+            magCapLabel.AutoSize = true;
+            magCapLabel.Location = new System.Drawing.Point(102, 163);
+            magCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            magCapLabel.Name = "magCapLabel";
+            magCapLabel.Size = new System.Drawing.Size(31, 15);
+            magCapLabel.TabIndex = 16;
+            magCapLabel.Text = "Mag";
+            toolTip1.SetToolTip(magCapLabel, "Maximum Magic Level");
             // 
             // attackCapLabel
             // 
-            this.attackCapLabel.AutoSize = true;
-            this.attackCapLabel.Location = new System.Drawing.Point(61, 163);
-            this.attackCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.attackCapLabel.Name = "attackCapLabel";
-            this.attackCapLabel.Size = new System.Drawing.Size(25, 15);
-            this.attackCapLabel.TabIndex = 15;
-            this.attackCapLabel.Text = "Atk";
-            this.toolTip1.SetToolTip(this.attackCapLabel, "Maximum Attack Level");
+            attackCapLabel.AutoSize = true;
+            attackCapLabel.Location = new System.Drawing.Point(61, 163);
+            attackCapLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            attackCapLabel.Name = "attackCapLabel";
+            attackCapLabel.Size = new System.Drawing.Size(25, 15);
+            attackCapLabel.TabIndex = 15;
+            attackCapLabel.Text = "Atk";
+            toolTip1.SetToolTip(attackCapLabel, "Maximum Attack Level");
             // 
             // label12
             // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(261, 114);
-            this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(100, 15);
-            this.label12.TabIndex = 11;
-            this.label12.Text = "Life Effectiveness:";
-            this.toolTip1.SetToolTip(this.label12, "Different modes for the effectiveness of Life levels");
+            label12.AutoSize = true;
+            label12.Location = new System.Drawing.Point(261, 114);
+            label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label12.Name = "label12";
+            label12.Size = new System.Drawing.Size(100, 15);
+            label12.TabIndex = 11;
+            label12.Text = "Life Effectiveness:";
+            toolTip1.SetToolTip(label12, "Different modes for the effectiveness of Life levels");
             // 
             // magicEffectivenessLabel
             // 
-            this.magicEffectivenessLabel.AutoSize = true;
-            this.magicEffectivenessLabel.Location = new System.Drawing.Point(261, 69);
-            this.magicEffectivenessLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.magicEffectivenessLabel.Name = "magicEffectivenessLabel";
-            this.magicEffectivenessLabel.Size = new System.Drawing.Size(114, 15);
-            this.magicEffectivenessLabel.TabIndex = 10;
-            this.magicEffectivenessLabel.Text = "Magic Effectiveness:";
-            this.toolTip1.SetToolTip(this.magicEffectivenessLabel, "Different modes for the effectiveness of Magic levels");
+            magicEffectivenessLabel.AutoSize = true;
+            magicEffectivenessLabel.Location = new System.Drawing.Point(261, 69);
+            magicEffectivenessLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            magicEffectivenessLabel.Name = "magicEffectivenessLabel";
+            magicEffectivenessLabel.Size = new System.Drawing.Size(114, 15);
+            magicEffectivenessLabel.TabIndex = 10;
+            magicEffectivenessLabel.Text = "Magic Effectiveness:";
+            toolTip1.SetToolTip(magicEffectivenessLabel, "Different modes for the effectiveness of Magic levels");
             // 
             // attackEffectivenessLabel
             // 
-            this.attackEffectivenessLabel.AutoSize = true;
-            this.attackEffectivenessLabel.Location = new System.Drawing.Point(261, 27);
-            this.attackEffectivenessLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.attackEffectivenessLabel.Name = "attackEffectivenessLabel";
-            this.attackEffectivenessLabel.Size = new System.Drawing.Size(115, 15);
-            this.attackEffectivenessLabel.TabIndex = 9;
-            this.attackEffectivenessLabel.Text = "Attack Effectiveness:";
-            this.toolTip1.SetToolTip(this.attackEffectivenessLabel, "Different modes for the effectiveness of Attack levels");
+            attackEffectivenessLabel.AutoSize = true;
+            attackEffectivenessLabel.Location = new System.Drawing.Point(261, 27);
+            attackEffectivenessLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            attackEffectivenessLabel.Name = "attackEffectivenessLabel";
+            attackEffectivenessLabel.Size = new System.Drawing.Size(115, 15);
+            attackEffectivenessLabel.TabIndex = 9;
+            attackEffectivenessLabel.Text = "Attack Effectiveness:";
+            toolTip1.SetToolTip(attackEffectivenessLabel, "Different modes for the effectiveness of Attack levels");
             // 
             // expBox
             // 
-            this.expBox.Controls.Add(this.lifeExpNeededCheckbox);
-            this.expBox.Controls.Add(this.magicExpNeededCheckbox);
-            this.expBox.Controls.Add(this.shuffleAtkExpNeededCheckbox);
-            this.expBox.Controls.Add(this.shuffleAllExpCheckbox);
-            this.expBox.Location = new System.Drawing.Point(4, 3);
-            this.expBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.expBox.Name = "expBox";
-            this.expBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.expBox.Size = new System.Drawing.Size(246, 99);
-            this.expBox.TabIndex = 0;
-            this.expBox.TabStop = false;
-            this.expBox.Text = "                                                      ";
+            expBox.Controls.Add(lifeExpNeededCheckbox);
+            expBox.Controls.Add(magicExpNeededCheckbox);
+            expBox.Controls.Add(shuffleAtkExpNeededCheckbox);
+            expBox.Controls.Add(shuffleAllExpCheckbox);
+            expBox.Location = new System.Drawing.Point(4, 3);
+            expBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            expBox.Name = "expBox";
+            expBox.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            expBox.Size = new System.Drawing.Size(246, 99);
+            expBox.TabIndex = 0;
+            expBox.TabStop = false;
+            expBox.Text = "                                                      ";
             // 
             // lifeExpNeededCheckbox
             // 
-            this.lifeExpNeededCheckbox.AutoSize = true;
-            this.lifeExpNeededCheckbox.Location = new System.Drawing.Point(21, 75);
-            this.lifeExpNeededCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lifeExpNeededCheckbox.Name = "lifeExpNeededCheckbox";
-            this.lifeExpNeededCheckbox.Size = new System.Drawing.Size(189, 19);
-            this.lifeExpNeededCheckbox.TabIndex = 3;
-            this.lifeExpNeededCheckbox.Text = "Shuffle Life Experience Needed";
-            this.toolTip1.SetToolTip(this.lifeExpNeededCheckbox, "Shuffles experience needed for life levels");
-            this.lifeExpNeededCheckbox.UseVisualStyleBackColor = true;
+            lifeExpNeededCheckbox.AutoSize = true;
+            lifeExpNeededCheckbox.Location = new System.Drawing.Point(21, 75);
+            lifeExpNeededCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            lifeExpNeededCheckbox.Name = "lifeExpNeededCheckbox";
+            lifeExpNeededCheckbox.Size = new System.Drawing.Size(189, 19);
+            lifeExpNeededCheckbox.TabIndex = 3;
+            lifeExpNeededCheckbox.Text = "Shuffle Life Experience Needed";
+            toolTip1.SetToolTip(lifeExpNeededCheckbox, "Shuffles experience needed for life levels");
+            lifeExpNeededCheckbox.UseVisualStyleBackColor = true;
             // 
             // magicExpNeededCheckbox
             // 
-            this.magicExpNeededCheckbox.AutoSize = true;
-            this.magicExpNeededCheckbox.Location = new System.Drawing.Point(21, 48);
-            this.magicExpNeededCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.magicExpNeededCheckbox.Name = "magicExpNeededCheckbox";
-            this.magicExpNeededCheckbox.Size = new System.Drawing.Size(203, 19);
-            this.magicExpNeededCheckbox.TabIndex = 2;
-            this.magicExpNeededCheckbox.Text = "Shuffle Magic Experience Needed";
-            this.toolTip1.SetToolTip(this.magicExpNeededCheckbox, "Shuffles experience needed for magic levels");
-            this.magicExpNeededCheckbox.UseVisualStyleBackColor = true;
+            magicExpNeededCheckbox.AutoSize = true;
+            magicExpNeededCheckbox.Location = new System.Drawing.Point(21, 48);
+            magicExpNeededCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            magicExpNeededCheckbox.Name = "magicExpNeededCheckbox";
+            magicExpNeededCheckbox.Size = new System.Drawing.Size(203, 19);
+            magicExpNeededCheckbox.TabIndex = 2;
+            magicExpNeededCheckbox.Text = "Shuffle Magic Experience Needed";
+            toolTip1.SetToolTip(magicExpNeededCheckbox, "Shuffles experience needed for magic levels");
+            magicExpNeededCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleAtkExpNeededCheckbox
             // 
-            this.shuffleAtkExpNeededCheckbox.AutoSize = true;
-            this.shuffleAtkExpNeededCheckbox.Location = new System.Drawing.Point(21, 22);
-            this.shuffleAtkExpNeededCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleAtkExpNeededCheckbox.Name = "shuffleAtkExpNeededCheckbox";
-            this.shuffleAtkExpNeededCheckbox.Size = new System.Drawing.Size(204, 19);
-            this.shuffleAtkExpNeededCheckbox.TabIndex = 1;
-            this.shuffleAtkExpNeededCheckbox.Text = "Shuffle Attack Experience Needed";
-            this.toolTip1.SetToolTip(this.shuffleAtkExpNeededCheckbox, "Shuffles experience needed for attack levels");
-            this.shuffleAtkExpNeededCheckbox.UseVisualStyleBackColor = true;
+            shuffleAtkExpNeededCheckbox.AutoSize = true;
+            shuffleAtkExpNeededCheckbox.Location = new System.Drawing.Point(21, 22);
+            shuffleAtkExpNeededCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleAtkExpNeededCheckbox.Name = "shuffleAtkExpNeededCheckbox";
+            shuffleAtkExpNeededCheckbox.Size = new System.Drawing.Size(204, 19);
+            shuffleAtkExpNeededCheckbox.TabIndex = 1;
+            shuffleAtkExpNeededCheckbox.Text = "Shuffle Attack Experience Needed";
+            toolTip1.SetToolTip(shuffleAtkExpNeededCheckbox, "Shuffles experience needed for attack levels");
+            shuffleAtkExpNeededCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleAllExpCheckbox
             // 
-            this.shuffleAllExpCheckbox.AutoSize = true;
-            this.shuffleAllExpCheckbox.Location = new System.Drawing.Point(7, 0);
-            this.shuffleAllExpCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleAllExpCheckbox.Name = "shuffleAllExpCheckbox";
-            this.shuffleAllExpCheckbox.Size = new System.Drawing.Size(184, 19);
-            this.shuffleAllExpCheckbox.TabIndex = 1;
-            this.shuffleAllExpCheckbox.Text = "Shuffle All Experience Needed";
-            this.toolTip1.SetToolTip(this.shuffleAllExpCheckbox, "Shuffles experience needed for all levels");
-            this.shuffleAllExpCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleAllExpCheckbox.CheckStateChanged += new System.EventHandler(this.shuffleAllExp_CheckStateChanged);
+            shuffleAllExpCheckbox.AutoSize = true;
+            shuffleAllExpCheckbox.Location = new System.Drawing.Point(7, 0);
+            shuffleAllExpCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleAllExpCheckbox.Name = "shuffleAllExpCheckbox";
+            shuffleAllExpCheckbox.Size = new System.Drawing.Size(184, 19);
+            shuffleAllExpCheckbox.TabIndex = 1;
+            shuffleAllExpCheckbox.Text = "Shuffle All Experience Needed";
+            toolTip1.SetToolTip(shuffleAllExpCheckbox, "Shuffles experience needed for all levels");
+            shuffleAllExpCheckbox.UseVisualStyleBackColor = true;
+            shuffleAllExpCheckbox.CheckStateChanged += shuffleAllExp_CheckStateChanged;
             // 
             // tabPage9
             // 
-            this.tabPage9.Controls.Add(this.swapUpAndDownstabCheckbox);
-            this.tabPage9.Controls.Add(this.useDashCheckbox);
-            this.tabPage9.Controls.Add(this.randomizeSpellSpellEnemyCheckbox);
-            this.tabPage9.Controls.Add(this.combineFireCheckbox);
-            this.tabPage9.Controls.Add(this.disableMagicContainerRequirementCheckbox);
-            this.tabPage9.Controls.Add(this.shuffleSpellLocationsCheckbox);
-            this.tabPage9.Controls.Add(this.shuffleLifeRefillCheckbox);
-            this.tabPage9.Location = new System.Drawing.Point(4, 24);
-            this.tabPage9.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage9.Name = "tabPage9";
-            this.tabPage9.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage9.Size = new System.Drawing.Size(595, 331);
-            this.tabPage9.TabIndex = 9;
-            this.tabPage9.Text = "Spells";
-            this.tabPage9.UseVisualStyleBackColor = true;
+            tabPage9.Controls.Add(swapUpAndDownstabCheckbox);
+            tabPage9.Controls.Add(useDashCheckbox);
+            tabPage9.Controls.Add(randomizeSpellSpellEnemyCheckbox);
+            tabPage9.Controls.Add(combineFireCheckbox);
+            tabPage9.Controls.Add(disableMagicContainerRequirementCheckbox);
+            tabPage9.Controls.Add(shuffleSpellLocationsCheckbox);
+            tabPage9.Controls.Add(shuffleLifeRefillCheckbox);
+            tabPage9.Location = new System.Drawing.Point(4, 24);
+            tabPage9.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage9.Name = "tabPage9";
+            tabPage9.Padding = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage9.Size = new System.Drawing.Size(595, 331);
+            tabPage9.TabIndex = 9;
+            tabPage9.Text = "Spells";
+            tabPage9.UseVisualStyleBackColor = true;
             // 
             // swapUpAndDownstabCheckbox
             // 
-            this.swapUpAndDownstabCheckbox.AutoSize = true;
-            this.swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 166);
-            this.swapUpAndDownstabCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.swapUpAndDownstabCheckbox.Name = "swapUpAndDownstabCheckbox";
-            this.swapUpAndDownstabCheckbox.Size = new System.Drawing.Size(251, 19);
-            this.swapUpAndDownstabCheckbox.TabIndex = 22;
-            this.swapUpAndDownstabCheckbox.Text = "Swap the location of upstab and downstab";
-            this.swapUpAndDownstabCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.swapUpAndDownstabCheckbox, "When selected, Upstab and Downstab will swap sources.");
-            this.swapUpAndDownstabCheckbox.UseVisualStyleBackColor = true;
+            swapUpAndDownstabCheckbox.AutoSize = true;
+            swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 166);
+            swapUpAndDownstabCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            swapUpAndDownstabCheckbox.Name = "swapUpAndDownstabCheckbox";
+            swapUpAndDownstabCheckbox.Size = new System.Drawing.Size(251, 19);
+            swapUpAndDownstabCheckbox.TabIndex = 22;
+            swapUpAndDownstabCheckbox.Text = "Swap the location of upstab and downstab";
+            swapUpAndDownstabCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(swapUpAndDownstabCheckbox, "When selected, Upstab and Downstab will swap sources.");
+            swapUpAndDownstabCheckbox.UseVisualStyleBackColor = true;
             // 
             // useDashCheckbox
             // 
-            this.useDashCheckbox.AutoSize = true;
-            this.useDashCheckbox.Location = new System.Drawing.Point(7, 141);
-            this.useDashCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.useDashCheckbox.Name = "useDashCheckbox";
-            this.useDashCheckbox.Size = new System.Drawing.Size(144, 19);
-            this.useDashCheckbox.TabIndex = 21;
-            this.useDashCheckbox.Text = "Replace Fire with Dash";
-            this.useDashCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.useDashCheckbox, "When selected, the Fire spell will be replaced with a Dash spell that makes Link " +
-        "move faster");
-            this.useDashCheckbox.UseVisualStyleBackColor = true;
-            this.useDashCheckbox.CheckStateChanged += new System.EventHandler(this.DashBox_CheckStateChanged);
+            useDashCheckbox.AutoSize = true;
+            useDashCheckbox.Location = new System.Drawing.Point(7, 141);
+            useDashCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            useDashCheckbox.Name = "useDashCheckbox";
+            useDashCheckbox.Size = new System.Drawing.Size(144, 19);
+            useDashCheckbox.TabIndex = 21;
+            useDashCheckbox.Text = "Replace Fire with Dash";
+            useDashCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(useDashCheckbox, "When selected, the Fire spell will be replaced with a Dash spell that makes Link move faster");
+            useDashCheckbox.UseVisualStyleBackColor = true;
+            useDashCheckbox.CheckStateChanged += DashBox_CheckStateChanged;
             // 
             // randomizeSpellSpellEnemyCheckbox
             // 
-            this.randomizeSpellSpellEnemyCheckbox.AutoSize = true;
-            this.randomizeSpellSpellEnemyCheckbox.Location = new System.Drawing.Point(7, 114);
-            this.randomizeSpellSpellEnemyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.randomizeSpellSpellEnemyCheckbox.Name = "randomizeSpellSpellEnemyCheckbox";
-            this.randomizeSpellSpellEnemyCheckbox.Size = new System.Drawing.Size(180, 19);
-            this.randomizeSpellSpellEnemyCheckbox.TabIndex = 20;
-            this.randomizeSpellSpellEnemyCheckbox.Text = "Randomize Spell Spell Enemy";
-            this.randomizeSpellSpellEnemyCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.randomizeSpellSpellEnemyCheckbox, "When selected, the enemy generated when the Spell spell is cast will be randomize" +
-        "d");
-            this.randomizeSpellSpellEnemyCheckbox.UseVisualStyleBackColor = true;
+            randomizeSpellSpellEnemyCheckbox.AutoSize = true;
+            randomizeSpellSpellEnemyCheckbox.Location = new System.Drawing.Point(7, 114);
+            randomizeSpellSpellEnemyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            randomizeSpellSpellEnemyCheckbox.Name = "randomizeSpellSpellEnemyCheckbox";
+            randomizeSpellSpellEnemyCheckbox.Size = new System.Drawing.Size(180, 19);
+            randomizeSpellSpellEnemyCheckbox.TabIndex = 20;
+            randomizeSpellSpellEnemyCheckbox.Text = "Randomize Spell Spell Enemy";
+            randomizeSpellSpellEnemyCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(randomizeSpellSpellEnemyCheckbox, "When selected, the enemy generated when the Spell spell is cast will be randomized");
+            randomizeSpellSpellEnemyCheckbox.UseVisualStyleBackColor = true;
             // 
             // combineFireCheckbox
             // 
-            this.combineFireCheckbox.AutoSize = true;
-            this.combineFireCheckbox.Location = new System.Drawing.Point(7, 88);
-            this.combineFireCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.combineFireCheckbox.Name = "combineFireCheckbox";
-            this.combineFireCheckbox.Size = new System.Drawing.Size(208, 19);
-            this.combineFireCheckbox.TabIndex = 19;
-            this.combineFireCheckbox.Text = "Combine Fire with a Random Spell";
-            this.combineFireCheckbox.UseVisualStyleBackColor = true;
-            this.combineFireCheckbox.CheckStateChanged += new System.EventHandler(this.CombineFireBox_CheckStateChanged);
+            combineFireCheckbox.AutoSize = true;
+            combineFireCheckbox.Location = new System.Drawing.Point(7, 88);
+            combineFireCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            combineFireCheckbox.Name = "combineFireCheckbox";
+            combineFireCheckbox.Size = new System.Drawing.Size(208, 19);
+            combineFireCheckbox.TabIndex = 19;
+            combineFireCheckbox.Text = "Combine Fire with a Random Spell";
+            combineFireCheckbox.UseVisualStyleBackColor = true;
+            combineFireCheckbox.CheckStateChanged += CombineFireBox_CheckStateChanged;
             // 
             // disableMagicContainerRequirementCheckbox
             // 
-            this.disableMagicContainerRequirementCheckbox.AutoSize = true;
-            this.disableMagicContainerRequirementCheckbox.Location = new System.Drawing.Point(7, 61);
-            this.disableMagicContainerRequirementCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.disableMagicContainerRequirementCheckbox.Name = "disableMagicContainerRequirementCheckbox";
-            this.disableMagicContainerRequirementCheckbox.Size = new System.Drawing.Size(231, 19);
-            this.disableMagicContainerRequirementCheckbox.TabIndex = 18;
-            this.disableMagicContainerRequirementCheckbox.Text = "Disable Magic Container Requirements";
-            this.disableMagicContainerRequirementCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.disableMagicContainerRequirementCheckbox, "When checked, you can get spells without having the necessary magic containers");
-            this.disableMagicContainerRequirementCheckbox.UseVisualStyleBackColor = true;
+            disableMagicContainerRequirementCheckbox.AutoSize = true;
+            disableMagicContainerRequirementCheckbox.Location = new System.Drawing.Point(7, 61);
+            disableMagicContainerRequirementCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            disableMagicContainerRequirementCheckbox.Name = "disableMagicContainerRequirementCheckbox";
+            disableMagicContainerRequirementCheckbox.Size = new System.Drawing.Size(231, 19);
+            disableMagicContainerRequirementCheckbox.TabIndex = 18;
+            disableMagicContainerRequirementCheckbox.Text = "Disable Magic Container Requirements";
+            disableMagicContainerRequirementCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(disableMagicContainerRequirementCheckbox, "When checked, you can get spells without having the necessary magic containers");
+            disableMagicContainerRequirementCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleSpellLocationsCheckbox
             // 
-            this.shuffleSpellLocationsCheckbox.AutoSize = true;
-            this.shuffleSpellLocationsCheckbox.Location = new System.Drawing.Point(7, 35);
-            this.shuffleSpellLocationsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleSpellLocationsCheckbox.Name = "shuffleSpellLocationsCheckbox";
-            this.shuffleSpellLocationsCheckbox.Size = new System.Drawing.Size(145, 19);
-            this.shuffleSpellLocationsCheckbox.TabIndex = 17;
-            this.shuffleSpellLocationsCheckbox.Text = "Shuffle Spell Locations";
-            this.shuffleSpellLocationsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shuffleSpellLocationsCheckbox, "This option shuffles which towns you find the spells in");
-            this.shuffleSpellLocationsCheckbox.UseVisualStyleBackColor = true;
+            shuffleSpellLocationsCheckbox.AutoSize = true;
+            shuffleSpellLocationsCheckbox.Location = new System.Drawing.Point(7, 35);
+            shuffleSpellLocationsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleSpellLocationsCheckbox.Name = "shuffleSpellLocationsCheckbox";
+            shuffleSpellLocationsCheckbox.Size = new System.Drawing.Size(145, 19);
+            shuffleSpellLocationsCheckbox.TabIndex = 17;
+            shuffleSpellLocationsCheckbox.Text = "Shuffle Spell Locations";
+            shuffleSpellLocationsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shuffleSpellLocationsCheckbox, "This option shuffles which towns you find the spells in");
+            shuffleSpellLocationsCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleLifeRefillCheckbox
             // 
-            this.shuffleLifeRefillCheckbox.AutoSize = true;
-            this.shuffleLifeRefillCheckbox.Location = new System.Drawing.Point(7, 8);
-            this.shuffleLifeRefillCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleLifeRefillCheckbox.Name = "shuffleLifeRefillCheckbox";
-            this.shuffleLifeRefillCheckbox.Size = new System.Drawing.Size(161, 19);
-            this.shuffleLifeRefillCheckbox.TabIndex = 16;
-            this.shuffleLifeRefillCheckbox.Text = "Shuffle Life Refill Amount";
-            this.toolTip1.SetToolTip(this.shuffleLifeRefillCheckbox, "Shuffles how much health is restored when the life spell is used");
-            this.shuffleLifeRefillCheckbox.UseVisualStyleBackColor = true;
+            shuffleLifeRefillCheckbox.AutoSize = true;
+            shuffleLifeRefillCheckbox.Location = new System.Drawing.Point(7, 8);
+            shuffleLifeRefillCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleLifeRefillCheckbox.Name = "shuffleLifeRefillCheckbox";
+            shuffleLifeRefillCheckbox.Size = new System.Drawing.Size(161, 19);
+            shuffleLifeRefillCheckbox.TabIndex = 16;
+            shuffleLifeRefillCheckbox.Text = "Shuffle Life Refill Amount";
+            toolTip1.SetToolTip(shuffleLifeRefillCheckbox, "Shuffles how much health is restored when the life spell is used");
+            shuffleLifeRefillCheckbox.UseVisualStyleBackColor = true;
             // 
             // tabPage6
             // 
-            this.tabPage6.Controls.Add(this.enemyExperienceDropsLabel);
-            this.tabPage6.Controls.Add(this.experienceDropsList);
-            this.tabPage6.Controls.Add(this.shuffleDripperEnemyCheckbox);
-            this.tabPage6.Controls.Add(this.mixLargeAndSmallCheckbox);
-            this.tabPage6.Controls.Add(this.label8);
-            this.tabPage6.Controls.Add(this.shufflePalaceEnemiesCheckbox);
-            this.tabPage6.Controls.Add(this.shuffleOverworldEnemiesCheckbox);
-            this.tabPage6.Controls.Add(this.shuffleSwordImmunityBox);
-            this.tabPage6.Controls.Add(this.shuffleStealXPAmountCheckbox);
-            this.tabPage6.Controls.Add(this.shuffleXPStealersCheckbox);
-            this.tabPage6.Controls.Add(this.shuffleEnemyHPBox);
-            this.tabPage6.Location = new System.Drawing.Point(4, 24);
-            this.tabPage6.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Size = new System.Drawing.Size(595, 331);
-            this.tabPage6.TabIndex = 5;
-            this.tabPage6.Text = "Enemies";
-            this.tabPage6.UseVisualStyleBackColor = true;
+            tabPage6.Controls.Add(enemyExperienceDropsLabel);
+            tabPage6.Controls.Add(experienceDropsList);
+            tabPage6.Controls.Add(shuffleDripperEnemyCheckbox);
+            tabPage6.Controls.Add(mixLargeAndSmallCheckbox);
+            tabPage6.Controls.Add(label8);
+            tabPage6.Controls.Add(shufflePalaceEnemiesCheckbox);
+            tabPage6.Controls.Add(shuffleOverworldEnemiesCheckbox);
+            tabPage6.Controls.Add(shuffleSwordImmunityBox);
+            tabPage6.Controls.Add(shuffleStealXPAmountCheckbox);
+            tabPage6.Controls.Add(shuffleXPStealersCheckbox);
+            tabPage6.Controls.Add(shuffleEnemyHPBox);
+            tabPage6.Location = new System.Drawing.Point(4, 24);
+            tabPage6.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage6.Name = "tabPage6";
+            tabPage6.Size = new System.Drawing.Size(595, 331);
+            tabPage6.TabIndex = 5;
+            tabPage6.Text = "Enemies";
+            tabPage6.UseVisualStyleBackColor = true;
             // 
             // enemyExperienceDropsLabel
             // 
-            this.enemyExperienceDropsLabel.AutoSize = true;
-            this.enemyExperienceDropsLabel.Location = new System.Drawing.Point(226, 147);
-            this.enemyExperienceDropsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.enemyExperienceDropsLabel.Name = "enemyExperienceDropsLabel";
-            this.enemyExperienceDropsLabel.Size = new System.Drawing.Size(140, 15);
-            this.enemyExperienceDropsLabel.TabIndex = 22;
-            this.enemyExperienceDropsLabel.Text = "Enemy Experience Drops:";
-            this.toolTip1.SetToolTip(this.enemyExperienceDropsLabel, "Different modes for how much experience the enemies drop");
+            enemyExperienceDropsLabel.AutoSize = true;
+            enemyExperienceDropsLabel.Location = new System.Drawing.Point(226, 147);
+            enemyExperienceDropsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            enemyExperienceDropsLabel.Name = "enemyExperienceDropsLabel";
+            enemyExperienceDropsLabel.Size = new System.Drawing.Size(140, 15);
+            enemyExperienceDropsLabel.TabIndex = 22;
+            enemyExperienceDropsLabel.Text = "Enemy Experience Drops:";
+            toolTip1.SetToolTip(enemyExperienceDropsLabel, "Different modes for how much experience the enemies drop");
             // 
             // experienceDropsList
             // 
-            this.experienceDropsList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.experienceDropsList.FormattingEnabled = true;
-            this.experienceDropsList.Items.AddRange(new object[] {
-            "Vanilla",
-            "None",
-            "Low",
-            "Average",
-            "High"});
-            this.experienceDropsList.Location = new System.Drawing.Point(384, 143);
-            this.experienceDropsList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.experienceDropsList.Name = "experienceDropsList";
-            this.experienceDropsList.Size = new System.Drawing.Size(140, 23);
-            this.experienceDropsList.TabIndex = 21;
-            this.toolTip1.SetToolTip(this.experienceDropsList, "Different modes for how much experience the enemies drop");
+            experienceDropsList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            experienceDropsList.FormattingEnabled = true;
+            experienceDropsList.Items.AddRange(new object[] { "Vanilla", "None", "Low", "Average", "High" });
+            experienceDropsList.Location = new System.Drawing.Point(384, 143);
+            experienceDropsList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            experienceDropsList.Name = "experienceDropsList";
+            experienceDropsList.Size = new System.Drawing.Size(140, 23);
+            experienceDropsList.TabIndex = 21;
+            toolTip1.SetToolTip(experienceDropsList, "Different modes for how much experience the enemies drop");
             // 
             // shuffleDripperEnemyCheckbox
             // 
-            this.shuffleDripperEnemyCheckbox.AutoSize = true;
-            this.shuffleDripperEnemyCheckbox.Location = new System.Drawing.Point(4, 59);
-            this.shuffleDripperEnemyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleDripperEnemyCheckbox.Name = "shuffleDripperEnemyCheckbox";
-            this.shuffleDripperEnemyCheckbox.Size = new System.Drawing.Size(144, 19);
-            this.shuffleDripperEnemyCheckbox.TabIndex = 20;
-            this.shuffleDripperEnemyCheckbox.Text = "Shuffle Dripper Enemy";
-            this.toolTip1.SetToolTip(this.shuffleDripperEnemyCheckbox, "When selected, the enemy spawned by the dripper will be randomized");
-            this.shuffleDripperEnemyCheckbox.UseVisualStyleBackColor = true;
+            shuffleDripperEnemyCheckbox.AutoSize = true;
+            shuffleDripperEnemyCheckbox.Location = new System.Drawing.Point(4, 59);
+            shuffleDripperEnemyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleDripperEnemyCheckbox.Name = "shuffleDripperEnemyCheckbox";
+            shuffleDripperEnemyCheckbox.Size = new System.Drawing.Size(144, 19);
+            shuffleDripperEnemyCheckbox.TabIndex = 20;
+            shuffleDripperEnemyCheckbox.Text = "Shuffle Dripper Enemy";
+            toolTip1.SetToolTip(shuffleDripperEnemyCheckbox, "When selected, the enemy spawned by the dripper will be randomized");
+            shuffleDripperEnemyCheckbox.UseVisualStyleBackColor = true;
             // 
             // mixLargeAndSmallCheckbox
             // 
-            this.mixLargeAndSmallCheckbox.AutoSize = true;
-            this.mixLargeAndSmallCheckbox.Location = new System.Drawing.Point(4, 85);
-            this.mixLargeAndSmallCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.mixLargeAndSmallCheckbox.Name = "mixLargeAndSmallCheckbox";
-            this.mixLargeAndSmallCheckbox.Size = new System.Drawing.Size(180, 19);
-            this.mixLargeAndSmallCheckbox.TabIndex = 18;
-            this.mixLargeAndSmallCheckbox.Text = "Mix Large and Small Enemies";
-            this.mixLargeAndSmallCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.mixLargeAndSmallCheckbox, "Allows large enemies to spawn where small enemies normally spawn and vice versa");
-            this.mixLargeAndSmallCheckbox.UseVisualStyleBackColor = true;
+            mixLargeAndSmallCheckbox.AutoSize = true;
+            mixLargeAndSmallCheckbox.Location = new System.Drawing.Point(4, 85);
+            mixLargeAndSmallCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            mixLargeAndSmallCheckbox.Name = "mixLargeAndSmallCheckbox";
+            mixLargeAndSmallCheckbox.Size = new System.Drawing.Size(180, 19);
+            mixLargeAndSmallCheckbox.TabIndex = 18;
+            mixLargeAndSmallCheckbox.Text = "Mix Large and Small Enemies";
+            mixLargeAndSmallCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(mixLargeAndSmallCheckbox, "Allows large enemies to spawn where small enemies normally spawn and vice versa");
+            mixLargeAndSmallCheckbox.UseVisualStyleBackColor = true;
             // 
             // label8
             // 
-            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label8.Location = new System.Drawing.Point(202, 6);
-            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(2, 225);
-            this.label8.TabIndex = 17;
+            label8.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            label8.Location = new System.Drawing.Point(202, 6);
+            label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label8.Name = "label8";
+            label8.Size = new System.Drawing.Size(2, 225);
+            label8.TabIndex = 17;
             // 
             // shufflePalaceEnemiesCheckbox
             // 
-            this.shufflePalaceEnemiesCheckbox.AutoSize = true;
-            this.shufflePalaceEnemiesCheckbox.Location = new System.Drawing.Point(4, 32);
-            this.shufflePalaceEnemiesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shufflePalaceEnemiesCheckbox.Name = "shufflePalaceEnemiesCheckbox";
-            this.shufflePalaceEnemiesCheckbox.Size = new System.Drawing.Size(147, 19);
-            this.shufflePalaceEnemiesCheckbox.TabIndex = 8;
-            this.shufflePalaceEnemiesCheckbox.Text = "Shuffle Palace Enemies";
-            this.shufflePalaceEnemiesCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shufflePalaceEnemiesCheckbox, "Shuffles enemies in the palaces");
-            this.shufflePalaceEnemiesCheckbox.UseVisualStyleBackColor = true;
-            this.shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.ShufflePalaceEnemies_CheckStateChanged);
+            shufflePalaceEnemiesCheckbox.AutoSize = true;
+            shufflePalaceEnemiesCheckbox.Location = new System.Drawing.Point(4, 32);
+            shufflePalaceEnemiesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shufflePalaceEnemiesCheckbox.Name = "shufflePalaceEnemiesCheckbox";
+            shufflePalaceEnemiesCheckbox.Size = new System.Drawing.Size(147, 19);
+            shufflePalaceEnemiesCheckbox.TabIndex = 8;
+            shufflePalaceEnemiesCheckbox.Text = "Shuffle Palace Enemies";
+            shufflePalaceEnemiesCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shufflePalaceEnemiesCheckbox, "Shuffles enemies in the palaces");
+            shufflePalaceEnemiesCheckbox.UseVisualStyleBackColor = true;
+            shufflePalaceEnemiesCheckbox.CheckStateChanged += ShufflePalaceEnemies_CheckStateChanged;
             // 
             // shuffleOverworldEnemiesCheckbox
             // 
-            this.shuffleOverworldEnemiesCheckbox.AutoSize = true;
-            this.shuffleOverworldEnemiesCheckbox.Location = new System.Drawing.Point(4, 6);
-            this.shuffleOverworldEnemiesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleOverworldEnemiesCheckbox.Name = "shuffleOverworldEnemiesCheckbox";
-            this.shuffleOverworldEnemiesCheckbox.Size = new System.Drawing.Size(168, 19);
-            this.shuffleOverworldEnemiesCheckbox.TabIndex = 7;
-            this.shuffleOverworldEnemiesCheckbox.Text = "Shuffle Overworld Enemies";
-            this.shuffleOverworldEnemiesCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shuffleOverworldEnemiesCheckbox, "Shuffles enemies on the overworld");
-            this.shuffleOverworldEnemiesCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.ShuffleOverworldEnemies_CheckStateChanged);
+            shuffleOverworldEnemiesCheckbox.AutoSize = true;
+            shuffleOverworldEnemiesCheckbox.Location = new System.Drawing.Point(4, 6);
+            shuffleOverworldEnemiesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleOverworldEnemiesCheckbox.Name = "shuffleOverworldEnemiesCheckbox";
+            shuffleOverworldEnemiesCheckbox.Size = new System.Drawing.Size(168, 19);
+            shuffleOverworldEnemiesCheckbox.TabIndex = 7;
+            shuffleOverworldEnemiesCheckbox.Text = "Shuffle Overworld Enemies";
+            shuffleOverworldEnemiesCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shuffleOverworldEnemiesCheckbox, "Shuffles enemies on the overworld");
+            shuffleOverworldEnemiesCheckbox.UseVisualStyleBackColor = true;
+            shuffleOverworldEnemiesCheckbox.CheckStateChanged += ShuffleOverworldEnemies_CheckStateChanged;
             // 
             // shuffleSwordImmunityBox
             // 
-            this.shuffleSwordImmunityBox.AutoSize = true;
-            this.shuffleSwordImmunityBox.Location = new System.Drawing.Point(226, 85);
-            this.shuffleSwordImmunityBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleSwordImmunityBox.Name = "shuffleSwordImmunityBox";
-            this.shuffleSwordImmunityBox.Size = new System.Drawing.Size(154, 19);
-            this.shuffleSwordImmunityBox.TabIndex = 4;
-            this.shuffleSwordImmunityBox.Text = "Shuffle Sword Immunity";
-            this.toolTip1.SetToolTip(this.shuffleSwordImmunityBox, "Shuffle which enemies require fire to kill");
-            this.shuffleSwordImmunityBox.UseVisualStyleBackColor = true;
+            shuffleSwordImmunityBox.AutoSize = true;
+            shuffleSwordImmunityBox.Location = new System.Drawing.Point(226, 85);
+            shuffleSwordImmunityBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleSwordImmunityBox.Name = "shuffleSwordImmunityBox";
+            shuffleSwordImmunityBox.Size = new System.Drawing.Size(154, 19);
+            shuffleSwordImmunityBox.TabIndex = 4;
+            shuffleSwordImmunityBox.Text = "Shuffle Sword Immunity";
+            toolTip1.SetToolTip(shuffleSwordImmunityBox, "Shuffle which enemies require fire to kill");
+            shuffleSwordImmunityBox.UseVisualStyleBackColor = true;
             // 
             // shuffleStealXPAmountCheckbox
             // 
-            this.shuffleStealXPAmountCheckbox.AutoSize = true;
-            this.shuffleStealXPAmountCheckbox.Location = new System.Drawing.Point(226, 59);
-            this.shuffleStealXPAmountCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleStealXPAmountCheckbox.Name = "shuffleStealXPAmountCheckbox";
-            this.shuffleStealXPAmountCheckbox.Size = new System.Drawing.Size(182, 19);
-            this.shuffleStealXPAmountCheckbox.TabIndex = 3;
-            this.shuffleStealXPAmountCheckbox.Text = "Shuffle Amount of Exp Stolen";
-            this.toolTip1.SetToolTip(this.shuffleStealXPAmountCheckbox, "Shuffle how much experience is stolen from the player when taking damage from cer" +
-        "tain enemies");
-            this.shuffleStealXPAmountCheckbox.UseVisualStyleBackColor = true;
+            shuffleStealXPAmountCheckbox.AutoSize = true;
+            shuffleStealXPAmountCheckbox.Location = new System.Drawing.Point(226, 59);
+            shuffleStealXPAmountCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleStealXPAmountCheckbox.Name = "shuffleStealXPAmountCheckbox";
+            shuffleStealXPAmountCheckbox.Size = new System.Drawing.Size(182, 19);
+            shuffleStealXPAmountCheckbox.TabIndex = 3;
+            shuffleStealXPAmountCheckbox.Text = "Shuffle Amount of Exp Stolen";
+            toolTip1.SetToolTip(shuffleStealXPAmountCheckbox, "Shuffle how much experience is stolen from the player when taking damage from certain enemies");
+            shuffleStealXPAmountCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleXPStealersCheckbox
             // 
-            this.shuffleXPStealersCheckbox.AutoSize = true;
-            this.shuffleXPStealersCheckbox.Location = new System.Drawing.Point(226, 32);
-            this.shuffleXPStealersCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleXPStealersCheckbox.Name = "shuffleXPStealersCheckbox";
-            this.shuffleXPStealersCheckbox.Size = new System.Drawing.Size(197, 19);
-            this.shuffleXPStealersCheckbox.TabIndex = 2;
-            this.shuffleXPStealersCheckbox.Text = "Shuffle Which Enemies Steal Exp";
-            this.toolTip1.SetToolTip(this.shuffleXPStealersCheckbox, "Shuffle which enemies steal experience when doing damage to the player");
-            this.shuffleXPStealersCheckbox.UseVisualStyleBackColor = true;
+            shuffleXPStealersCheckbox.AutoSize = true;
+            shuffleXPStealersCheckbox.Location = new System.Drawing.Point(226, 32);
+            shuffleXPStealersCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleXPStealersCheckbox.Name = "shuffleXPStealersCheckbox";
+            shuffleXPStealersCheckbox.Size = new System.Drawing.Size(197, 19);
+            shuffleXPStealersCheckbox.TabIndex = 2;
+            shuffleXPStealersCheckbox.Text = "Shuffle Which Enemies Steal Exp";
+            toolTip1.SetToolTip(shuffleXPStealersCheckbox, "Shuffle which enemies steal experience when doing damage to the player");
+            shuffleXPStealersCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleEnemyHPBox
             // 
-            this.shuffleEnemyHPBox.AutoSize = true;
-            this.shuffleEnemyHPBox.Location = new System.Drawing.Point(226, 6);
-            this.shuffleEnemyHPBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleEnemyHPBox.Name = "shuffleEnemyHPBox";
-            this.shuffleEnemyHPBox.Size = new System.Drawing.Size(121, 19);
-            this.shuffleEnemyHPBox.TabIndex = 0;
-            this.shuffleEnemyHPBox.Text = "Shuffle Enemy HP";
-            this.toolTip1.SetToolTip(this.shuffleEnemyHPBox, "Each enemy will have +/- 50% of its normal HP");
-            this.shuffleEnemyHPBox.UseVisualStyleBackColor = true;
+            shuffleEnemyHPBox.AutoSize = true;
+            shuffleEnemyHPBox.Location = new System.Drawing.Point(226, 6);
+            shuffleEnemyHPBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleEnemyHPBox.Name = "shuffleEnemyHPBox";
+            shuffleEnemyHPBox.Size = new System.Drawing.Size(121, 19);
+            shuffleEnemyHPBox.TabIndex = 0;
+            shuffleEnemyHPBox.Text = "Shuffle Enemy HP";
+            toolTip1.SetToolTip(shuffleEnemyHPBox, "Each enemy will have +/- 50% of its normal HP");
+            shuffleEnemyHPBox.UseVisualStyleBackColor = true;
             // 
             // tabPage7
             // 
-            this.tabPage7.Controls.Add(this.shufflePbagAmountsCheckbox);
-            this.tabPage7.Controls.Add(this.removeSpellitemsCheckbox);
-            this.tabPage7.Controls.Add(this.includePbagCavesInShuffleCheckbox);
-            this.tabPage7.Controls.Add(this.randomizeJarRequirementsCheckbox);
-            this.tabPage7.Controls.Add(this.palacesHaveExtraKeysCheckbox);
-            this.tabPage7.Controls.Add(this.shuffleSmallItemsCheckbox);
-            this.tabPage7.Controls.Add(this.mixOverworldPalaceItemsCheckbox);
-            this.tabPage7.Controls.Add(this.shuffleOverworldItemsCheckbox);
-            this.tabPage7.Controls.Add(this.shufflePalaceItemsCheckbox);
-            this.tabPage7.Location = new System.Drawing.Point(4, 24);
-            this.tabPage7.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage7.Name = "tabPage7";
-            this.tabPage7.Size = new System.Drawing.Size(595, 331);
-            this.tabPage7.TabIndex = 7;
-            this.tabPage7.Text = "Items";
-            this.tabPage7.UseVisualStyleBackColor = true;
+            tabPage7.Controls.Add(shufflePbagAmountsCheckbox);
+            tabPage7.Controls.Add(removeSpellitemsCheckbox);
+            tabPage7.Controls.Add(includePbagCavesInShuffleCheckbox);
+            tabPage7.Controls.Add(randomizeJarRequirementsCheckbox);
+            tabPage7.Controls.Add(palacesHaveExtraKeysCheckbox);
+            tabPage7.Controls.Add(shuffleSmallItemsCheckbox);
+            tabPage7.Controls.Add(mixOverworldPalaceItemsCheckbox);
+            tabPage7.Controls.Add(shuffleOverworldItemsCheckbox);
+            tabPage7.Controls.Add(shufflePalaceItemsCheckbox);
+            tabPage7.Location = new System.Drawing.Point(4, 24);
+            tabPage7.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage7.Name = "tabPage7";
+            tabPage7.Size = new System.Drawing.Size(595, 331);
+            tabPage7.TabIndex = 7;
+            tabPage7.Text = "Items";
+            tabPage7.UseVisualStyleBackColor = true;
             // 
             // shufflePbagAmountsCheckbox
             // 
-            this.shufflePbagAmountsCheckbox.AutoSize = true;
-            this.shufflePbagAmountsCheckbox.Location = new System.Drawing.Point(4, 215);
-            this.shufflePbagAmountsCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.shufflePbagAmountsCheckbox.Name = "shufflePbagAmountsCheckbox";
-            this.shufflePbagAmountsCheckbox.Size = new System.Drawing.Size(145, 19);
-            this.shufflePbagAmountsCheckbox.TabIndex = 19;
-            this.shufflePbagAmountsCheckbox.Text = "Shuffle Pbag Amounts";
-            this.shufflePbagAmountsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shufflePbagAmountsCheckbox, "If selected, the pbag amounts will be randomized.");
-            this.shufflePbagAmountsCheckbox.UseVisualStyleBackColor = true;
+            shufflePbagAmountsCheckbox.AutoSize = true;
+            shufflePbagAmountsCheckbox.Location = new System.Drawing.Point(4, 215);
+            shufflePbagAmountsCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            shufflePbagAmountsCheckbox.Name = "shufflePbagAmountsCheckbox";
+            shufflePbagAmountsCheckbox.Size = new System.Drawing.Size(145, 19);
+            shufflePbagAmountsCheckbox.TabIndex = 19;
+            shufflePbagAmountsCheckbox.Text = "Shuffle Pbag Amounts";
+            shufflePbagAmountsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shufflePbagAmountsCheckbox, "If selected, the pbag amounts will be randomized.");
+            shufflePbagAmountsCheckbox.UseVisualStyleBackColor = true;
             // 
             // removeSpellitemsCheckbox
             // 
-            this.removeSpellitemsCheckbox.AutoSize = true;
-            this.removeSpellitemsCheckbox.Location = new System.Drawing.Point(4, 188);
-            this.removeSpellitemsCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.removeSpellitemsCheckbox.Name = "removeSpellitemsCheckbox";
-            this.removeSpellitemsCheckbox.Size = new System.Drawing.Size(129, 19);
-            this.removeSpellitemsCheckbox.TabIndex = 18;
-            this.removeSpellitemsCheckbox.Text = "Remove Spell Items";
-            this.removeSpellitemsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.removeSpellitemsCheckbox, "When checked, you no longer need the trophy, medicine, or kid to access the respe" +
-        "ctive spells");
-            this.removeSpellitemsCheckbox.UseVisualStyleBackColor = true;
-            this.removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(this.SpellItemBox_CheckStateChanged);
+            removeSpellitemsCheckbox.AutoSize = true;
+            removeSpellitemsCheckbox.Location = new System.Drawing.Point(4, 188);
+            removeSpellitemsCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            removeSpellitemsCheckbox.Name = "removeSpellitemsCheckbox";
+            removeSpellitemsCheckbox.Size = new System.Drawing.Size(129, 19);
+            removeSpellitemsCheckbox.TabIndex = 18;
+            removeSpellitemsCheckbox.Text = "Remove Spell Items";
+            removeSpellitemsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(removeSpellitemsCheckbox, "When checked, you no longer need the trophy, medicine, or kid to access the respective spells");
+            removeSpellitemsCheckbox.UseVisualStyleBackColor = true;
+            removeSpellitemsCheckbox.CheckStateChanged += SpellItemBox_CheckStateChanged;
             // 
             // includePbagCavesInShuffleCheckbox
             // 
-            this.includePbagCavesInShuffleCheckbox.AutoSize = true;
-            this.includePbagCavesInShuffleCheckbox.Location = new System.Drawing.Point(4, 83);
-            this.includePbagCavesInShuffleCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.includePbagCavesInShuffleCheckbox.Name = "includePbagCavesInShuffleCheckbox";
-            this.includePbagCavesInShuffleCheckbox.Size = new System.Drawing.Size(209, 19);
-            this.includePbagCavesInShuffleCheckbox.TabIndex = 17;
-            this.includePbagCavesInShuffleCheckbox.Text = "Include Pbag Caves in Item Shuffle";
-            this.includePbagCavesInShuffleCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.includePbagCavesInShuffleCheckbox, "Will include the 3 pbag caves as item locations");
-            this.includePbagCavesInShuffleCheckbox.UseVisualStyleBackColor = true;
+            includePbagCavesInShuffleCheckbox.AutoSize = true;
+            includePbagCavesInShuffleCheckbox.Location = new System.Drawing.Point(4, 83);
+            includePbagCavesInShuffleCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            includePbagCavesInShuffleCheckbox.Name = "includePbagCavesInShuffleCheckbox";
+            includePbagCavesInShuffleCheckbox.Size = new System.Drawing.Size(209, 19);
+            includePbagCavesInShuffleCheckbox.TabIndex = 17;
+            includePbagCavesInShuffleCheckbox.Text = "Include Pbag Caves in Item Shuffle";
+            includePbagCavesInShuffleCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(includePbagCavesInShuffleCheckbox, "Will include the 3 pbag caves as item locations");
+            includePbagCavesInShuffleCheckbox.UseVisualStyleBackColor = true;
             // 
             // randomizeJarRequirementsCheckbox
             // 
-            this.randomizeJarRequirementsCheckbox.AutoSize = true;
-            this.randomizeJarRequirementsCheckbox.Location = new System.Drawing.Point(4, 163);
-            this.randomizeJarRequirementsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.randomizeJarRequirementsCheckbox.Name = "randomizeJarRequirementsCheckbox";
-            this.randomizeJarRequirementsCheckbox.Size = new System.Drawing.Size(244, 19);
-            this.randomizeJarRequirementsCheckbox.TabIndex = 16;
-            this.randomizeJarRequirementsCheckbox.Text = "Randomize New Kasuto Jar Requirements";
-            this.toolTip1.SetToolTip(this.randomizeJarRequirementsCheckbox, "When selected, the number of jars required to get the item in New Kasuto will be " +
-        "randomized between 5 and 7.");
-            this.randomizeJarRequirementsCheckbox.UseVisualStyleBackColor = true;
+            randomizeJarRequirementsCheckbox.AutoSize = true;
+            randomizeJarRequirementsCheckbox.Location = new System.Drawing.Point(4, 163);
+            randomizeJarRequirementsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            randomizeJarRequirementsCheckbox.Name = "randomizeJarRequirementsCheckbox";
+            randomizeJarRequirementsCheckbox.Size = new System.Drawing.Size(244, 19);
+            randomizeJarRequirementsCheckbox.TabIndex = 16;
+            randomizeJarRequirementsCheckbox.Text = "Randomize New Kasuto Jar Requirements";
+            toolTip1.SetToolTip(randomizeJarRequirementsCheckbox, "When selected, the number of jars required to get the item in New Kasuto will be randomized between 5 and 7.");
+            randomizeJarRequirementsCheckbox.UseVisualStyleBackColor = true;
             // 
             // palacesHaveExtraKeysCheckbox
             // 
-            this.palacesHaveExtraKeysCheckbox.AutoSize = true;
-            this.palacesHaveExtraKeysCheckbox.Location = new System.Drawing.Point(4, 136);
-            this.palacesHaveExtraKeysCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.palacesHaveExtraKeysCheckbox.Name = "palacesHaveExtraKeysCheckbox";
-            this.palacesHaveExtraKeysCheckbox.Size = new System.Drawing.Size(166, 19);
-            this.palacesHaveExtraKeysCheckbox.TabIndex = 4;
-            this.palacesHaveExtraKeysCheckbox.Text = "Palaces Contain Extra Keys";
-            this.palacesHaveExtraKeysCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.palacesHaveExtraKeysCheckbox, "Inserts a lot of extra keys into the palaces");
-            this.palacesHaveExtraKeysCheckbox.UseVisualStyleBackColor = true;
+            palacesHaveExtraKeysCheckbox.AutoSize = true;
+            palacesHaveExtraKeysCheckbox.Location = new System.Drawing.Point(4, 136);
+            palacesHaveExtraKeysCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            palacesHaveExtraKeysCheckbox.Name = "palacesHaveExtraKeysCheckbox";
+            palacesHaveExtraKeysCheckbox.Size = new System.Drawing.Size(166, 19);
+            palacesHaveExtraKeysCheckbox.TabIndex = 4;
+            palacesHaveExtraKeysCheckbox.Text = "Palaces Contain Extra Keys";
+            palacesHaveExtraKeysCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(palacesHaveExtraKeysCheckbox, "Inserts a lot of extra keys into the palaces");
+            palacesHaveExtraKeysCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleSmallItemsCheckbox
             // 
-            this.shuffleSmallItemsCheckbox.AutoSize = true;
-            this.shuffleSmallItemsCheckbox.Location = new System.Drawing.Point(4, 110);
-            this.shuffleSmallItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleSmallItemsCheckbox.Name = "shuffleSmallItemsCheckbox";
-            this.shuffleSmallItemsCheckbox.Size = new System.Drawing.Size(127, 19);
-            this.shuffleSmallItemsCheckbox.TabIndex = 3;
-            this.shuffleSmallItemsCheckbox.Text = "Shuffle Small Items";
-            this.toolTip1.SetToolTip(this.shuffleSmallItemsCheckbox, "Shuffles pbags, jars, and 1ups");
-            this.shuffleSmallItemsCheckbox.UseVisualStyleBackColor = true;
+            shuffleSmallItemsCheckbox.AutoSize = true;
+            shuffleSmallItemsCheckbox.Location = new System.Drawing.Point(4, 110);
+            shuffleSmallItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleSmallItemsCheckbox.Name = "shuffleSmallItemsCheckbox";
+            shuffleSmallItemsCheckbox.Size = new System.Drawing.Size(127, 19);
+            shuffleSmallItemsCheckbox.TabIndex = 3;
+            shuffleSmallItemsCheckbox.Text = "Shuffle Small Items";
+            toolTip1.SetToolTip(shuffleSmallItemsCheckbox, "Shuffles pbags, jars, and 1ups");
+            shuffleSmallItemsCheckbox.UseVisualStyleBackColor = true;
             // 
             // mixOverworldPalaceItemsCheckbox
             // 
-            this.mixOverworldPalaceItemsCheckbox.AutoSize = true;
-            this.mixOverworldPalaceItemsCheckbox.Location = new System.Drawing.Point(4, 57);
-            this.mixOverworldPalaceItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.mixOverworldPalaceItemsCheckbox.Name = "mixOverworldPalaceItemsCheckbox";
-            this.mixOverworldPalaceItemsCheckbox.Size = new System.Drawing.Size(196, 19);
-            this.mixOverworldPalaceItemsCheckbox.TabIndex = 2;
-            this.mixOverworldPalaceItemsCheckbox.Text = "Mix Overworld and Palace Items";
-            this.mixOverworldPalaceItemsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.mixOverworldPalaceItemsCheckbox, "Allows palace items to be found in the overworld, and vice versa");
-            this.mixOverworldPalaceItemsCheckbox.UseVisualStyleBackColor = true;
+            mixOverworldPalaceItemsCheckbox.AutoSize = true;
+            mixOverworldPalaceItemsCheckbox.Location = new System.Drawing.Point(4, 57);
+            mixOverworldPalaceItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            mixOverworldPalaceItemsCheckbox.Name = "mixOverworldPalaceItemsCheckbox";
+            mixOverworldPalaceItemsCheckbox.Size = new System.Drawing.Size(196, 19);
+            mixOverworldPalaceItemsCheckbox.TabIndex = 2;
+            mixOverworldPalaceItemsCheckbox.Text = "Mix Overworld and Palace Items";
+            mixOverworldPalaceItemsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(mixOverworldPalaceItemsCheckbox, "Allows palace items to be found in the overworld, and vice versa");
+            mixOverworldPalaceItemsCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleOverworldItemsCheckbox
             // 
-            this.shuffleOverworldItemsCheckbox.AutoSize = true;
-            this.shuffleOverworldItemsCheckbox.Location = new System.Drawing.Point(4, 30);
-            this.shuffleOverworldItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleOverworldItemsCheckbox.Name = "shuffleOverworldItemsCheckbox";
-            this.shuffleOverworldItemsCheckbox.Size = new System.Drawing.Size(153, 19);
-            this.shuffleOverworldItemsCheckbox.TabIndex = 1;
-            this.shuffleOverworldItemsCheckbox.Text = "Shuffle Overworld Items";
-            this.shuffleOverworldItemsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shuffleOverworldItemsCheckbox, "Shuffles the items that are found in the overworld");
-            this.shuffleOverworldItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shuffleOverworldItemsCheckbox.CheckStateChanged += new System.EventHandler(this.OverworldItemBox_CheckStateChanged);
+            shuffleOverworldItemsCheckbox.AutoSize = true;
+            shuffleOverworldItemsCheckbox.Location = new System.Drawing.Point(4, 30);
+            shuffleOverworldItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleOverworldItemsCheckbox.Name = "shuffleOverworldItemsCheckbox";
+            shuffleOverworldItemsCheckbox.Size = new System.Drawing.Size(153, 19);
+            shuffleOverworldItemsCheckbox.TabIndex = 1;
+            shuffleOverworldItemsCheckbox.Text = "Shuffle Overworld Items";
+            shuffleOverworldItemsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shuffleOverworldItemsCheckbox, "Shuffles the items that are found in the overworld");
+            shuffleOverworldItemsCheckbox.UseVisualStyleBackColor = true;
+            shuffleOverworldItemsCheckbox.CheckStateChanged += OverworldItemBox_CheckStateChanged;
             // 
             // shufflePalaceItemsCheckbox
             // 
-            this.shufflePalaceItemsCheckbox.AutoSize = true;
-            this.shufflePalaceItemsCheckbox.Location = new System.Drawing.Point(4, 3);
-            this.shufflePalaceItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shufflePalaceItemsCheckbox.Name = "shufflePalaceItemsCheckbox";
-            this.shufflePalaceItemsCheckbox.Size = new System.Drawing.Size(132, 19);
-            this.shufflePalaceItemsCheckbox.TabIndex = 0;
-            this.shufflePalaceItemsCheckbox.Text = "Shuffle Palace Items";
-            this.shufflePalaceItemsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.shufflePalaceItemsCheckbox, "Shuffles the items that are found in palaces");
-            this.shufflePalaceItemsCheckbox.UseVisualStyleBackColor = true;
-            this.shufflePalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(this.PalaceItemBox_CheckStateChanged);
+            shufflePalaceItemsCheckbox.AutoSize = true;
+            shufflePalaceItemsCheckbox.Location = new System.Drawing.Point(4, 3);
+            shufflePalaceItemsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shufflePalaceItemsCheckbox.Name = "shufflePalaceItemsCheckbox";
+            shufflePalaceItemsCheckbox.Size = new System.Drawing.Size(132, 19);
+            shufflePalaceItemsCheckbox.TabIndex = 0;
+            shufflePalaceItemsCheckbox.Text = "Shuffle Palace Items";
+            shufflePalaceItemsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(shufflePalaceItemsCheckbox, "Shuffles the items that are found in palaces");
+            shufflePalaceItemsCheckbox.UseVisualStyleBackColor = true;
+            shufflePalaceItemsCheckbox.CheckStateChanged += PalaceItemBox_CheckStateChanged;
             // 
             // tabPage8
             // 
-            this.tabPage8.Controls.Add(this.randomizeDropsCheckbox);
-            this.tabPage8.Controls.Add(this.standardizeDropsCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesKeyCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemies1UpCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesXLBagCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesLargeBagCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesMediumBagCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesSmallBagCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesRedJarCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemiesBlueJarCheckbox);
-            this.tabPage8.Controls.Add(this.largeEnemyPoolLabel);
-            this.tabPage8.Controls.Add(this.smallEnemiesKeyCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemies1UpCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemiesXLBagCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemiesLargeBagCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemiesMediumBagCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemiesSmallBagCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemiesRedJarCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemiesBlueJarCheckbox);
-            this.tabPage8.Controls.Add(this.smallEnemyPoolLabel);
-            this.tabPage8.Controls.Add(this.label19);
-            this.tabPage8.Controls.Add(this.shuffleDropFrequencyCheckbox);
-            this.tabPage8.Location = new System.Drawing.Point(4, 24);
-            this.tabPage8.Margin = new System.Windows.Forms.Padding(2);
-            this.tabPage8.Name = "tabPage8";
-            this.tabPage8.Padding = new System.Windows.Forms.Padding(2);
-            this.tabPage8.Size = new System.Drawing.Size(595, 331);
-            this.tabPage8.TabIndex = 8;
-            this.tabPage8.Text = "Drops";
-            this.tabPage8.UseVisualStyleBackColor = true;
+            tabPage8.Controls.Add(randomizeDropsCheckbox);
+            tabPage8.Controls.Add(standardizeDropsCheckbox);
+            tabPage8.Controls.Add(largeEnemiesKeyCheckbox);
+            tabPage8.Controls.Add(largeEnemies1UpCheckbox);
+            tabPage8.Controls.Add(largeEnemiesXLBagCheckbox);
+            tabPage8.Controls.Add(largeEnemiesLargeBagCheckbox);
+            tabPage8.Controls.Add(largeEnemiesMediumBagCheckbox);
+            tabPage8.Controls.Add(largeEnemiesSmallBagCheckbox);
+            tabPage8.Controls.Add(largeEnemiesRedJarCheckbox);
+            tabPage8.Controls.Add(largeEnemiesBlueJarCheckbox);
+            tabPage8.Controls.Add(largeEnemyPoolLabel);
+            tabPage8.Controls.Add(smallEnemiesKeyCheckbox);
+            tabPage8.Controls.Add(smallEnemies1UpCheckbox);
+            tabPage8.Controls.Add(smallEnemiesXLBagCheckbox);
+            tabPage8.Controls.Add(smallEnemiesLargeBagCheckbox);
+            tabPage8.Controls.Add(smallEnemiesMediumBagCheckbox);
+            tabPage8.Controls.Add(smallEnemiesSmallBagCheckbox);
+            tabPage8.Controls.Add(smallEnemiesRedJarCheckbox);
+            tabPage8.Controls.Add(smallEnemiesBlueJarCheckbox);
+            tabPage8.Controls.Add(smallEnemyPoolLabel);
+            tabPage8.Controls.Add(label19);
+            tabPage8.Controls.Add(shuffleDropFrequencyCheckbox);
+            tabPage8.Location = new System.Drawing.Point(4, 24);
+            tabPage8.Margin = new System.Windows.Forms.Padding(2);
+            tabPage8.Name = "tabPage8";
+            tabPage8.Padding = new System.Windows.Forms.Padding(2);
+            tabPage8.Size = new System.Drawing.Size(595, 331);
+            tabPage8.TabIndex = 8;
+            tabPage8.Text = "Drops";
+            tabPage8.UseVisualStyleBackColor = true;
             // 
             // randomizeDropsCheckbox
             // 
-            this.randomizeDropsCheckbox.AutoSize = true;
-            this.randomizeDropsCheckbox.Location = new System.Drawing.Point(9, 36);
-            this.randomizeDropsCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.randomizeDropsCheckbox.Name = "randomizeDropsCheckbox";
-            this.randomizeDropsCheckbox.Size = new System.Drawing.Size(119, 19);
-            this.randomizeDropsCheckbox.TabIndex = 45;
-            this.randomizeDropsCheckbox.Text = "Randomize Drops";
-            this.toolTip1.SetToolTip(this.randomizeDropsCheckbox, "When selected, the items in the drop pool will be randomized");
-            this.randomizeDropsCheckbox.UseVisualStyleBackColor = true;
+            randomizeDropsCheckbox.AutoSize = true;
+            randomizeDropsCheckbox.Location = new System.Drawing.Point(9, 36);
+            randomizeDropsCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            randomizeDropsCheckbox.Name = "randomizeDropsCheckbox";
+            randomizeDropsCheckbox.Size = new System.Drawing.Size(119, 19);
+            randomizeDropsCheckbox.TabIndex = 45;
+            randomizeDropsCheckbox.Text = "Randomize Drops";
+            toolTip1.SetToolTip(randomizeDropsCheckbox, "When selected, the items in the drop pool will be randomized");
+            randomizeDropsCheckbox.UseVisualStyleBackColor = true;
             // 
             // standardizeDropsCheckbox
             // 
-            this.standardizeDropsCheckbox.AutoSize = true;
-            this.standardizeDropsCheckbox.Location = new System.Drawing.Point(9, 60);
-            this.standardizeDropsCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.standardizeDropsCheckbox.Name = "standardizeDropsCheckbox";
-            this.standardizeDropsCheckbox.Size = new System.Drawing.Size(121, 19);
-            this.standardizeDropsCheckbox.TabIndex = 44;
-            this.standardizeDropsCheckbox.Text = "Standardize Drops";
-            this.toolTip1.SetToolTip(this.standardizeDropsCheckbox, "When selected, all runners playing the same seed will get the same drops in the s" +
-        "ame order");
-            this.standardizeDropsCheckbox.UseVisualStyleBackColor = true;
+            standardizeDropsCheckbox.AutoSize = true;
+            standardizeDropsCheckbox.Location = new System.Drawing.Point(9, 60);
+            standardizeDropsCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            standardizeDropsCheckbox.Name = "standardizeDropsCheckbox";
+            standardizeDropsCheckbox.Size = new System.Drawing.Size(121, 19);
+            standardizeDropsCheckbox.TabIndex = 44;
+            standardizeDropsCheckbox.Text = "Standardize Drops";
+            toolTip1.SetToolTip(standardizeDropsCheckbox, "When selected, all runners playing the same seed will get the same drops in the same order");
+            standardizeDropsCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesKeyCheckbox
             // 
-            this.largeEnemiesKeyCheckbox.AutoSize = true;
-            this.largeEnemiesKeyCheckbox.Location = new System.Drawing.Point(404, 204);
-            this.largeEnemiesKeyCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesKeyCheckbox.Name = "largeEnemiesKeyCheckbox";
-            this.largeEnemiesKeyCheckbox.Size = new System.Drawing.Size(45, 19);
-            this.largeEnemiesKeyCheckbox.TabIndex = 43;
-            this.largeEnemiesKeyCheckbox.Text = "Key";
-            this.toolTip1.SetToolTip(this.largeEnemiesKeyCheckbox, "Add small keys to the large enemy pool");
-            this.largeEnemiesKeyCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesKeyCheckbox.AutoSize = true;
+            largeEnemiesKeyCheckbox.Location = new System.Drawing.Point(404, 204);
+            largeEnemiesKeyCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesKeyCheckbox.Name = "largeEnemiesKeyCheckbox";
+            largeEnemiesKeyCheckbox.Size = new System.Drawing.Size(45, 19);
+            largeEnemiesKeyCheckbox.TabIndex = 43;
+            largeEnemiesKeyCheckbox.Text = "Key";
+            toolTip1.SetToolTip(largeEnemiesKeyCheckbox, "Add small keys to the large enemy pool");
+            largeEnemiesKeyCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemies1UpCheckbox
             // 
-            this.largeEnemies1UpCheckbox.AutoSize = true;
-            this.largeEnemies1UpCheckbox.Location = new System.Drawing.Point(404, 180);
-            this.largeEnemies1UpCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemies1UpCheckbox.Name = "largeEnemies1UpCheckbox";
-            this.largeEnemies1UpCheckbox.Size = new System.Drawing.Size(46, 19);
-            this.largeEnemies1UpCheckbox.TabIndex = 42;
-            this.largeEnemies1UpCheckbox.Text = "1up";
-            this.toolTip1.SetToolTip(this.largeEnemies1UpCheckbox, "Add 1ups to the large enemy pool");
-            this.largeEnemies1UpCheckbox.UseVisualStyleBackColor = true;
+            largeEnemies1UpCheckbox.AutoSize = true;
+            largeEnemies1UpCheckbox.Location = new System.Drawing.Point(404, 180);
+            largeEnemies1UpCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemies1UpCheckbox.Name = "largeEnemies1UpCheckbox";
+            largeEnemies1UpCheckbox.Size = new System.Drawing.Size(46, 19);
+            largeEnemies1UpCheckbox.TabIndex = 42;
+            largeEnemies1UpCheckbox.Text = "1up";
+            toolTip1.SetToolTip(largeEnemies1UpCheckbox, "Add 1ups to the large enemy pool");
+            largeEnemies1UpCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesXLBagCheckbox
             // 
-            this.largeEnemiesXLBagCheckbox.AutoSize = true;
-            this.largeEnemiesXLBagCheckbox.Location = new System.Drawing.Point(404, 156);
-            this.largeEnemiesXLBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesXLBagCheckbox.Name = "largeEnemiesXLBagCheckbox";
-            this.largeEnemiesXLBagCheckbox.Size = new System.Drawing.Size(74, 19);
-            this.largeEnemiesXLBagCheckbox.TabIndex = 41;
-            this.largeEnemiesXLBagCheckbox.Text = "500 pbag";
-            this.toolTip1.SetToolTip(this.largeEnemiesXLBagCheckbox, "Add 500 bags to the large enemy pool");
-            this.largeEnemiesXLBagCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesXLBagCheckbox.AutoSize = true;
+            largeEnemiesXLBagCheckbox.Location = new System.Drawing.Point(404, 156);
+            largeEnemiesXLBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesXLBagCheckbox.Name = "largeEnemiesXLBagCheckbox";
+            largeEnemiesXLBagCheckbox.Size = new System.Drawing.Size(74, 19);
+            largeEnemiesXLBagCheckbox.TabIndex = 41;
+            largeEnemiesXLBagCheckbox.Text = "500 pbag";
+            toolTip1.SetToolTip(largeEnemiesXLBagCheckbox, "Add 500 bags to the large enemy pool");
+            largeEnemiesXLBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesLargeBagCheckbox
             // 
-            this.largeEnemiesLargeBagCheckbox.AutoSize = true;
-            this.largeEnemiesLargeBagCheckbox.Checked = true;
-            this.largeEnemiesLargeBagCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.largeEnemiesLargeBagCheckbox.Location = new System.Drawing.Point(404, 132);
-            this.largeEnemiesLargeBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesLargeBagCheckbox.Name = "largeEnemiesLargeBagCheckbox";
-            this.largeEnemiesLargeBagCheckbox.Size = new System.Drawing.Size(74, 19);
-            this.largeEnemiesLargeBagCheckbox.TabIndex = 40;
-            this.largeEnemiesLargeBagCheckbox.Text = "200 pbag";
-            this.toolTip1.SetToolTip(this.largeEnemiesLargeBagCheckbox, "Add 200 bags to the large enemy pool");
-            this.largeEnemiesLargeBagCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesLargeBagCheckbox.AutoSize = true;
+            largeEnemiesLargeBagCheckbox.Checked = true;
+            largeEnemiesLargeBagCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            largeEnemiesLargeBagCheckbox.Location = new System.Drawing.Point(404, 132);
+            largeEnemiesLargeBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesLargeBagCheckbox.Name = "largeEnemiesLargeBagCheckbox";
+            largeEnemiesLargeBagCheckbox.Size = new System.Drawing.Size(74, 19);
+            largeEnemiesLargeBagCheckbox.TabIndex = 40;
+            largeEnemiesLargeBagCheckbox.Text = "200 pbag";
+            toolTip1.SetToolTip(largeEnemiesLargeBagCheckbox, "Add 200 bags to the large enemy pool");
+            largeEnemiesLargeBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesMediumBagCheckbox
             // 
-            this.largeEnemiesMediumBagCheckbox.AutoSize = true;
-            this.largeEnemiesMediumBagCheckbox.Location = new System.Drawing.Point(404, 108);
-            this.largeEnemiesMediumBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesMediumBagCheckbox.Name = "largeEnemiesMediumBagCheckbox";
-            this.largeEnemiesMediumBagCheckbox.Size = new System.Drawing.Size(74, 19);
-            this.largeEnemiesMediumBagCheckbox.TabIndex = 39;
-            this.largeEnemiesMediumBagCheckbox.Text = "100 pbag";
-            this.toolTip1.SetToolTip(this.largeEnemiesMediumBagCheckbox, "Add 100 bags to the large enemy pool");
-            this.largeEnemiesMediumBagCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesMediumBagCheckbox.AutoSize = true;
+            largeEnemiesMediumBagCheckbox.Location = new System.Drawing.Point(404, 108);
+            largeEnemiesMediumBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesMediumBagCheckbox.Name = "largeEnemiesMediumBagCheckbox";
+            largeEnemiesMediumBagCheckbox.Size = new System.Drawing.Size(74, 19);
+            largeEnemiesMediumBagCheckbox.TabIndex = 39;
+            largeEnemiesMediumBagCheckbox.Text = "100 pbag";
+            toolTip1.SetToolTip(largeEnemiesMediumBagCheckbox, "Add 100 bags to the large enemy pool");
+            largeEnemiesMediumBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesSmallBagCheckbox
             // 
-            this.largeEnemiesSmallBagCheckbox.AutoSize = true;
-            this.largeEnemiesSmallBagCheckbox.Location = new System.Drawing.Point(404, 84);
-            this.largeEnemiesSmallBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesSmallBagCheckbox.Name = "largeEnemiesSmallBagCheckbox";
-            this.largeEnemiesSmallBagCheckbox.Size = new System.Drawing.Size(68, 19);
-            this.largeEnemiesSmallBagCheckbox.TabIndex = 38;
-            this.largeEnemiesSmallBagCheckbox.Text = "50 pbag";
-            this.toolTip1.SetToolTip(this.largeEnemiesSmallBagCheckbox, "Add 50 bags to the large enemy pool");
-            this.largeEnemiesSmallBagCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesSmallBagCheckbox.AutoSize = true;
+            largeEnemiesSmallBagCheckbox.Location = new System.Drawing.Point(404, 84);
+            largeEnemiesSmallBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesSmallBagCheckbox.Name = "largeEnemiesSmallBagCheckbox";
+            largeEnemiesSmallBagCheckbox.Size = new System.Drawing.Size(68, 19);
+            largeEnemiesSmallBagCheckbox.TabIndex = 38;
+            largeEnemiesSmallBagCheckbox.Text = "50 pbag";
+            toolTip1.SetToolTip(largeEnemiesSmallBagCheckbox, "Add 50 bags to the large enemy pool");
+            largeEnemiesSmallBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesRedJarCheckbox
             // 
-            this.largeEnemiesRedJarCheckbox.AutoSize = true;
-            this.largeEnemiesRedJarCheckbox.Checked = true;
-            this.largeEnemiesRedJarCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.largeEnemiesRedJarCheckbox.Location = new System.Drawing.Point(404, 60);
-            this.largeEnemiesRedJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesRedJarCheckbox.Name = "largeEnemiesRedJarCheckbox";
-            this.largeEnemiesRedJarCheckbox.Size = new System.Drawing.Size(63, 19);
-            this.largeEnemiesRedJarCheckbox.TabIndex = 37;
-            this.largeEnemiesRedJarCheckbox.Text = "Red Jar";
-            this.toolTip1.SetToolTip(this.largeEnemiesRedJarCheckbox, "Add red jars to the large enemy pool");
-            this.largeEnemiesRedJarCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesRedJarCheckbox.AutoSize = true;
+            largeEnemiesRedJarCheckbox.Checked = true;
+            largeEnemiesRedJarCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            largeEnemiesRedJarCheckbox.Location = new System.Drawing.Point(404, 60);
+            largeEnemiesRedJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesRedJarCheckbox.Name = "largeEnemiesRedJarCheckbox";
+            largeEnemiesRedJarCheckbox.Size = new System.Drawing.Size(63, 19);
+            largeEnemiesRedJarCheckbox.TabIndex = 37;
+            largeEnemiesRedJarCheckbox.Text = "Red Jar";
+            toolTip1.SetToolTip(largeEnemiesRedJarCheckbox, "Add red jars to the large enemy pool");
+            largeEnemiesRedJarCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemiesBlueJarCheckbox
             // 
-            this.largeEnemiesBlueJarCheckbox.AutoSize = true;
-            this.largeEnemiesBlueJarCheckbox.Location = new System.Drawing.Point(404, 36);
-            this.largeEnemiesBlueJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.largeEnemiesBlueJarCheckbox.Name = "largeEnemiesBlueJarCheckbox";
-            this.largeEnemiesBlueJarCheckbox.Size = new System.Drawing.Size(66, 19);
-            this.largeEnemiesBlueJarCheckbox.TabIndex = 36;
-            this.largeEnemiesBlueJarCheckbox.Text = "Blue Jar";
-            this.toolTip1.SetToolTip(this.largeEnemiesBlueJarCheckbox, "Add blue jars to the large enemy pool");
-            this.largeEnemiesBlueJarCheckbox.UseVisualStyleBackColor = true;
+            largeEnemiesBlueJarCheckbox.AutoSize = true;
+            largeEnemiesBlueJarCheckbox.Location = new System.Drawing.Point(404, 36);
+            largeEnemiesBlueJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            largeEnemiesBlueJarCheckbox.Name = "largeEnemiesBlueJarCheckbox";
+            largeEnemiesBlueJarCheckbox.Size = new System.Drawing.Size(66, 19);
+            largeEnemiesBlueJarCheckbox.TabIndex = 36;
+            largeEnemiesBlueJarCheckbox.Text = "Blue Jar";
+            toolTip1.SetToolTip(largeEnemiesBlueJarCheckbox, "Add blue jars to the large enemy pool");
+            largeEnemiesBlueJarCheckbox.UseVisualStyleBackColor = true;
             // 
             // largeEnemyPoolLabel
             // 
-            this.largeEnemyPoolLabel.AutoSize = true;
-            this.largeEnemyPoolLabel.Location = new System.Drawing.Point(392, 12);
-            this.largeEnemyPoolLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.largeEnemyPoolLabel.Name = "largeEnemyPoolLabel";
-            this.largeEnemyPoolLabel.Size = new System.Drawing.Size(102, 15);
-            this.largeEnemyPoolLabel.TabIndex = 35;
-            this.largeEnemyPoolLabel.Text = "Large Enemy Pool";
+            largeEnemyPoolLabel.AutoSize = true;
+            largeEnemyPoolLabel.Location = new System.Drawing.Point(392, 12);
+            largeEnemyPoolLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            largeEnemyPoolLabel.Name = "largeEnemyPoolLabel";
+            largeEnemyPoolLabel.Size = new System.Drawing.Size(102, 15);
+            largeEnemyPoolLabel.TabIndex = 35;
+            largeEnemyPoolLabel.Text = "Large Enemy Pool";
             // 
             // smallEnemiesKeyCheckbox
             // 
-            this.smallEnemiesKeyCheckbox.AutoSize = true;
-            this.smallEnemiesKeyCheckbox.Location = new System.Drawing.Point(254, 204);
-            this.smallEnemiesKeyCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesKeyCheckbox.Name = "smallEnemiesKeyCheckbox";
-            this.smallEnemiesKeyCheckbox.Size = new System.Drawing.Size(45, 19);
-            this.smallEnemiesKeyCheckbox.TabIndex = 34;
-            this.smallEnemiesKeyCheckbox.Text = "Key";
-            this.toolTip1.SetToolTip(this.smallEnemiesKeyCheckbox, "Add small keys to the small enemy pool");
-            this.smallEnemiesKeyCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesKeyCheckbox.AutoSize = true;
+            smallEnemiesKeyCheckbox.Location = new System.Drawing.Point(254, 204);
+            smallEnemiesKeyCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesKeyCheckbox.Name = "smallEnemiesKeyCheckbox";
+            smallEnemiesKeyCheckbox.Size = new System.Drawing.Size(45, 19);
+            smallEnemiesKeyCheckbox.TabIndex = 34;
+            smallEnemiesKeyCheckbox.Text = "Key";
+            toolTip1.SetToolTip(smallEnemiesKeyCheckbox, "Add small keys to the small enemy pool");
+            smallEnemiesKeyCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemies1UpCheckbox
             // 
-            this.smallEnemies1UpCheckbox.AutoSize = true;
-            this.smallEnemies1UpCheckbox.Location = new System.Drawing.Point(255, 180);
-            this.smallEnemies1UpCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemies1UpCheckbox.Name = "smallEnemies1UpCheckbox";
-            this.smallEnemies1UpCheckbox.Size = new System.Drawing.Size(46, 19);
-            this.smallEnemies1UpCheckbox.TabIndex = 33;
-            this.smallEnemies1UpCheckbox.Text = "1up";
-            this.toolTip1.SetToolTip(this.smallEnemies1UpCheckbox, "Add 1ups to the small enemy pool");
-            this.smallEnemies1UpCheckbox.UseVisualStyleBackColor = true;
+            smallEnemies1UpCheckbox.AutoSize = true;
+            smallEnemies1UpCheckbox.Location = new System.Drawing.Point(255, 180);
+            smallEnemies1UpCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemies1UpCheckbox.Name = "smallEnemies1UpCheckbox";
+            smallEnemies1UpCheckbox.Size = new System.Drawing.Size(46, 19);
+            smallEnemies1UpCheckbox.TabIndex = 33;
+            smallEnemies1UpCheckbox.Text = "1up";
+            toolTip1.SetToolTip(smallEnemies1UpCheckbox, "Add 1ups to the small enemy pool");
+            smallEnemies1UpCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemiesXLBagCheckbox
             // 
-            this.smallEnemiesXLBagCheckbox.AutoSize = true;
-            this.smallEnemiesXLBagCheckbox.Location = new System.Drawing.Point(255, 156);
-            this.smallEnemiesXLBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesXLBagCheckbox.Name = "smallEnemiesXLBagCheckbox";
-            this.smallEnemiesXLBagCheckbox.Size = new System.Drawing.Size(74, 19);
-            this.smallEnemiesXLBagCheckbox.TabIndex = 32;
-            this.smallEnemiesXLBagCheckbox.Text = "500 pbag";
-            this.toolTip1.SetToolTip(this.smallEnemiesXLBagCheckbox, "Add 500 bags to the small enemy pool");
-            this.smallEnemiesXLBagCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesXLBagCheckbox.AutoSize = true;
+            smallEnemiesXLBagCheckbox.Location = new System.Drawing.Point(255, 156);
+            smallEnemiesXLBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesXLBagCheckbox.Name = "smallEnemiesXLBagCheckbox";
+            smallEnemiesXLBagCheckbox.Size = new System.Drawing.Size(74, 19);
+            smallEnemiesXLBagCheckbox.TabIndex = 32;
+            smallEnemiesXLBagCheckbox.Text = "500 pbag";
+            toolTip1.SetToolTip(smallEnemiesXLBagCheckbox, "Add 500 bags to the small enemy pool");
+            smallEnemiesXLBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemiesLargeBagCheckbox
             // 
-            this.smallEnemiesLargeBagCheckbox.AutoSize = true;
-            this.smallEnemiesLargeBagCheckbox.Location = new System.Drawing.Point(255, 132);
-            this.smallEnemiesLargeBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesLargeBagCheckbox.Name = "smallEnemiesLargeBagCheckbox";
-            this.smallEnemiesLargeBagCheckbox.Size = new System.Drawing.Size(74, 19);
-            this.smallEnemiesLargeBagCheckbox.TabIndex = 31;
-            this.smallEnemiesLargeBagCheckbox.Text = "200 pbag";
-            this.toolTip1.SetToolTip(this.smallEnemiesLargeBagCheckbox, "Add 200 bags to the small enemy pool");
-            this.smallEnemiesLargeBagCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesLargeBagCheckbox.AutoSize = true;
+            smallEnemiesLargeBagCheckbox.Location = new System.Drawing.Point(255, 132);
+            smallEnemiesLargeBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesLargeBagCheckbox.Name = "smallEnemiesLargeBagCheckbox";
+            smallEnemiesLargeBagCheckbox.Size = new System.Drawing.Size(74, 19);
+            smallEnemiesLargeBagCheckbox.TabIndex = 31;
+            smallEnemiesLargeBagCheckbox.Text = "200 pbag";
+            toolTip1.SetToolTip(smallEnemiesLargeBagCheckbox, "Add 200 bags to the small enemy pool");
+            smallEnemiesLargeBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemiesMediumBagCheckbox
             // 
-            this.smallEnemiesMediumBagCheckbox.AutoSize = true;
-            this.smallEnemiesMediumBagCheckbox.Location = new System.Drawing.Point(255, 108);
-            this.smallEnemiesMediumBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesMediumBagCheckbox.Name = "smallEnemiesMediumBagCheckbox";
-            this.smallEnemiesMediumBagCheckbox.Size = new System.Drawing.Size(74, 19);
-            this.smallEnemiesMediumBagCheckbox.TabIndex = 30;
-            this.smallEnemiesMediumBagCheckbox.Text = "100 pbag";
-            this.toolTip1.SetToolTip(this.smallEnemiesMediumBagCheckbox, "Add 100 bags to the small enemy pool");
-            this.smallEnemiesMediumBagCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesMediumBagCheckbox.AutoSize = true;
+            smallEnemiesMediumBagCheckbox.Location = new System.Drawing.Point(255, 108);
+            smallEnemiesMediumBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesMediumBagCheckbox.Name = "smallEnemiesMediumBagCheckbox";
+            smallEnemiesMediumBagCheckbox.Size = new System.Drawing.Size(74, 19);
+            smallEnemiesMediumBagCheckbox.TabIndex = 30;
+            smallEnemiesMediumBagCheckbox.Text = "100 pbag";
+            toolTip1.SetToolTip(smallEnemiesMediumBagCheckbox, "Add 100 bags to the small enemy pool");
+            smallEnemiesMediumBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemiesSmallBagCheckbox
             // 
-            this.smallEnemiesSmallBagCheckbox.AutoSize = true;
-            this.smallEnemiesSmallBagCheckbox.Checked = true;
-            this.smallEnemiesSmallBagCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.smallEnemiesSmallBagCheckbox.Location = new System.Drawing.Point(255, 84);
-            this.smallEnemiesSmallBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesSmallBagCheckbox.Name = "smallEnemiesSmallBagCheckbox";
-            this.smallEnemiesSmallBagCheckbox.Size = new System.Drawing.Size(68, 19);
-            this.smallEnemiesSmallBagCheckbox.TabIndex = 29;
-            this.smallEnemiesSmallBagCheckbox.Text = "50 pbag";
-            this.toolTip1.SetToolTip(this.smallEnemiesSmallBagCheckbox, "Add 50 bags to the small enemy pool");
-            this.smallEnemiesSmallBagCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesSmallBagCheckbox.AutoSize = true;
+            smallEnemiesSmallBagCheckbox.Checked = true;
+            smallEnemiesSmallBagCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            smallEnemiesSmallBagCheckbox.Location = new System.Drawing.Point(255, 84);
+            smallEnemiesSmallBagCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesSmallBagCheckbox.Name = "smallEnemiesSmallBagCheckbox";
+            smallEnemiesSmallBagCheckbox.Size = new System.Drawing.Size(68, 19);
+            smallEnemiesSmallBagCheckbox.TabIndex = 29;
+            smallEnemiesSmallBagCheckbox.Text = "50 pbag";
+            toolTip1.SetToolTip(smallEnemiesSmallBagCheckbox, "Add 50 bags to the small enemy pool");
+            smallEnemiesSmallBagCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemiesRedJarCheckbox
             // 
-            this.smallEnemiesRedJarCheckbox.AutoSize = true;
-            this.smallEnemiesRedJarCheckbox.Location = new System.Drawing.Point(255, 60);
-            this.smallEnemiesRedJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesRedJarCheckbox.Name = "smallEnemiesRedJarCheckbox";
-            this.smallEnemiesRedJarCheckbox.Size = new System.Drawing.Size(63, 19);
-            this.smallEnemiesRedJarCheckbox.TabIndex = 28;
-            this.smallEnemiesRedJarCheckbox.Text = "Red Jar";
-            this.toolTip1.SetToolTip(this.smallEnemiesRedJarCheckbox, "Add red jars to the small enemy pool");
-            this.smallEnemiesRedJarCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesRedJarCheckbox.AutoSize = true;
+            smallEnemiesRedJarCheckbox.Location = new System.Drawing.Point(255, 60);
+            smallEnemiesRedJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesRedJarCheckbox.Name = "smallEnemiesRedJarCheckbox";
+            smallEnemiesRedJarCheckbox.Size = new System.Drawing.Size(63, 19);
+            smallEnemiesRedJarCheckbox.TabIndex = 28;
+            smallEnemiesRedJarCheckbox.Text = "Red Jar";
+            toolTip1.SetToolTip(smallEnemiesRedJarCheckbox, "Add red jars to the small enemy pool");
+            smallEnemiesRedJarCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemiesBlueJarCheckbox
             // 
-            this.smallEnemiesBlueJarCheckbox.AutoSize = true;
-            this.smallEnemiesBlueJarCheckbox.Checked = true;
-            this.smallEnemiesBlueJarCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.smallEnemiesBlueJarCheckbox.Location = new System.Drawing.Point(255, 36);
-            this.smallEnemiesBlueJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.smallEnemiesBlueJarCheckbox.Name = "smallEnemiesBlueJarCheckbox";
-            this.smallEnemiesBlueJarCheckbox.Size = new System.Drawing.Size(66, 19);
-            this.smallEnemiesBlueJarCheckbox.TabIndex = 27;
-            this.smallEnemiesBlueJarCheckbox.Text = "Blue Jar";
-            this.toolTip1.SetToolTip(this.smallEnemiesBlueJarCheckbox, "Add blue jars to the small enemy pool");
-            this.smallEnemiesBlueJarCheckbox.UseVisualStyleBackColor = true;
+            smallEnemiesBlueJarCheckbox.AutoSize = true;
+            smallEnemiesBlueJarCheckbox.Checked = true;
+            smallEnemiesBlueJarCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            smallEnemiesBlueJarCheckbox.Location = new System.Drawing.Point(255, 36);
+            smallEnemiesBlueJarCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            smallEnemiesBlueJarCheckbox.Name = "smallEnemiesBlueJarCheckbox";
+            smallEnemiesBlueJarCheckbox.Size = new System.Drawing.Size(66, 19);
+            smallEnemiesBlueJarCheckbox.TabIndex = 27;
+            smallEnemiesBlueJarCheckbox.Text = "Blue Jar";
+            toolTip1.SetToolTip(smallEnemiesBlueJarCheckbox, "Add blue jars to the small enemy pool");
+            smallEnemiesBlueJarCheckbox.UseVisualStyleBackColor = true;
             // 
             // smallEnemyPoolLabel
             // 
-            this.smallEnemyPoolLabel.AutoSize = true;
-            this.smallEnemyPoolLabel.Location = new System.Drawing.Point(243, 12);
-            this.smallEnemyPoolLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.smallEnemyPoolLabel.Name = "smallEnemyPoolLabel";
-            this.smallEnemyPoolLabel.Size = new System.Drawing.Size(102, 15);
-            this.smallEnemyPoolLabel.TabIndex = 25;
-            this.smallEnemyPoolLabel.Text = "Small Enemy Pool";
+            smallEnemyPoolLabel.AutoSize = true;
+            smallEnemyPoolLabel.Location = new System.Drawing.Point(243, 12);
+            smallEnemyPoolLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            smallEnemyPoolLabel.Name = "smallEnemyPoolLabel";
+            smallEnemyPoolLabel.Size = new System.Drawing.Size(102, 15);
+            smallEnemyPoolLabel.TabIndex = 25;
+            smallEnemyPoolLabel.Text = "Small Enemy Pool";
             // 
             // label19
             // 
-            this.label19.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label19.Location = new System.Drawing.Point(209, 12);
-            this.label19.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(2, 225);
-            this.label19.TabIndex = 24;
+            label19.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            label19.Location = new System.Drawing.Point(209, 12);
+            label19.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label19.Name = "label19";
+            label19.Size = new System.Drawing.Size(2, 225);
+            label19.TabIndex = 24;
             // 
             // shuffleDropFrequencyCheckbox
             // 
-            this.shuffleDropFrequencyCheckbox.AutoSize = true;
-            this.shuffleDropFrequencyCheckbox.Location = new System.Drawing.Point(9, 12);
-            this.shuffleDropFrequencyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleDropFrequencyCheckbox.Name = "shuffleDropFrequencyCheckbox";
-            this.shuffleDropFrequencyCheckbox.Size = new System.Drawing.Size(177, 19);
-            this.shuffleDropFrequencyCheckbox.TabIndex = 22;
-            this.shuffleDropFrequencyCheckbox.Text = "Shuffle Item Drop Frequency";
-            this.toolTip1.SetToolTip(this.shuffleDropFrequencyCheckbox, "This option will shuffle how often enemies drop pbags and jars");
-            this.shuffleDropFrequencyCheckbox.UseVisualStyleBackColor = true;
+            shuffleDropFrequencyCheckbox.AutoSize = true;
+            shuffleDropFrequencyCheckbox.Location = new System.Drawing.Point(9, 12);
+            shuffleDropFrequencyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleDropFrequencyCheckbox.Name = "shuffleDropFrequencyCheckbox";
+            shuffleDropFrequencyCheckbox.Size = new System.Drawing.Size(177, 19);
+            shuffleDropFrequencyCheckbox.TabIndex = 22;
+            shuffleDropFrequencyCheckbox.Text = "Shuffle Item Drop Frequency";
+            toolTip1.SetToolTip(shuffleDropFrequencyCheckbox, "This option will shuffle how often enemies drop pbags and jars");
+            shuffleDropFrequencyCheckbox.UseVisualStyleBackColor = true;
             // 
             // tabPage10
             // 
-            this.tabPage10.Controls.Add(this.enableTownNameHintsCheckbox);
-            this.tabPage10.Controls.Add(this.enableSpellItemHintsCheckbox);
-            this.tabPage10.Controls.Add(this.useCommunityHintsCheckbox);
-            this.tabPage10.Controls.Add(this.enableHelpfulHintsCheckbox);
-            this.tabPage10.Location = new System.Drawing.Point(4, 24);
-            this.tabPage10.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage10.Name = "tabPage10";
-            this.tabPage10.Size = new System.Drawing.Size(595, 331);
-            this.tabPage10.TabIndex = 10;
-            this.tabPage10.Text = "Hints";
-            this.tabPage10.UseVisualStyleBackColor = true;
+            tabPage10.Controls.Add(enableTownNameHintsCheckbox);
+            tabPage10.Controls.Add(enableSpellItemHintsCheckbox);
+            tabPage10.Controls.Add(useCommunityHintsCheckbox);
+            tabPage10.Controls.Add(enableHelpfulHintsCheckbox);
+            tabPage10.Location = new System.Drawing.Point(4, 24);
+            tabPage10.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage10.Name = "tabPage10";
+            tabPage10.Size = new System.Drawing.Size(595, 331);
+            tabPage10.TabIndex = 10;
+            tabPage10.Text = "Hints";
+            tabPage10.UseVisualStyleBackColor = true;
             // 
             // enableTownNameHintsCheckbox
             // 
-            this.enableTownNameHintsCheckbox.AutoSize = true;
-            this.enableTownNameHintsCheckbox.Location = new System.Drawing.Point(4, 53);
-            this.enableTownNameHintsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.enableTownNameHintsCheckbox.Name = "enableTownNameHintsCheckbox";
-            this.enableTownNameHintsCheckbox.Size = new System.Drawing.Size(158, 19);
-            this.enableTownNameHintsCheckbox.TabIndex = 23;
-            this.enableTownNameHintsCheckbox.Text = "Enable Town Name Hints";
-            this.enableTownNameHintsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.enableTownNameHintsCheckbox, "Signs at the beginning of town will tell you what spell is contained in the town." +
-        "");
-            this.enableTownNameHintsCheckbox.UseVisualStyleBackColor = true;
+            enableTownNameHintsCheckbox.AutoSize = true;
+            enableTownNameHintsCheckbox.Location = new System.Drawing.Point(4, 53);
+            enableTownNameHintsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            enableTownNameHintsCheckbox.Name = "enableTownNameHintsCheckbox";
+            enableTownNameHintsCheckbox.Size = new System.Drawing.Size(158, 19);
+            enableTownNameHintsCheckbox.TabIndex = 23;
+            enableTownNameHintsCheckbox.Text = "Enable Town Name Hints";
+            enableTownNameHintsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(enableTownNameHintsCheckbox, "Signs at the beginning of town will tell you what spell is contained in the town.");
+            enableTownNameHintsCheckbox.UseVisualStyleBackColor = true;
             // 
             // enableSpellItemHintsCheckbox
             // 
-            this.enableSpellItemHintsCheckbox.AutoSize = true;
-            this.enableSpellItemHintsCheckbox.Location = new System.Drawing.Point(4, 29);
-            this.enableSpellItemHintsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.enableSpellItemHintsCheckbox.Name = "enableSpellItemHintsCheckbox";
-            this.enableSpellItemHintsCheckbox.Size = new System.Drawing.Size(147, 19);
-            this.enableSpellItemHintsCheckbox.TabIndex = 22;
-            this.enableSpellItemHintsCheckbox.Text = "Enable Spell Item Hints";
-            this.enableSpellItemHintsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.enableSpellItemHintsCheckbox, "The people who require spell items will tell you where the item can be found.");
-            this.enableSpellItemHintsCheckbox.UseVisualStyleBackColor = true;
+            enableSpellItemHintsCheckbox.AutoSize = true;
+            enableSpellItemHintsCheckbox.Location = new System.Drawing.Point(4, 29);
+            enableSpellItemHintsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            enableSpellItemHintsCheckbox.Name = "enableSpellItemHintsCheckbox";
+            enableSpellItemHintsCheckbox.Size = new System.Drawing.Size(147, 19);
+            enableSpellItemHintsCheckbox.TabIndex = 22;
+            enableSpellItemHintsCheckbox.Text = "Enable Spell Item Hints";
+            enableSpellItemHintsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(enableSpellItemHintsCheckbox, "The people who require spell items will tell you where the item can be found.");
+            enableSpellItemHintsCheckbox.UseVisualStyleBackColor = true;
             // 
             // useCommunityHintsCheckbox
             // 
-            this.useCommunityHintsCheckbox.AutoSize = true;
-            this.useCommunityHintsCheckbox.Location = new System.Drawing.Point(4, 78);
-            this.useCommunityHintsCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.useCommunityHintsCheckbox.Name = "useCommunityHintsCheckbox";
-            this.useCommunityHintsCheckbox.Size = new System.Drawing.Size(121, 19);
-            this.useCommunityHintsCheckbox.TabIndex = 21;
-            this.useCommunityHintsCheckbox.Text = "Community Hints";
-            this.toolTip1.SetToolTip(this.useCommunityHintsCheckbox, "When selected, will replace some text with hints submitted by the community");
-            this.useCommunityHintsCheckbox.UseVisualStyleBackColor = true;
+            useCommunityHintsCheckbox.AutoSize = true;
+            useCommunityHintsCheckbox.Location = new System.Drawing.Point(4, 78);
+            useCommunityHintsCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            useCommunityHintsCheckbox.Name = "useCommunityHintsCheckbox";
+            useCommunityHintsCheckbox.Size = new System.Drawing.Size(121, 19);
+            useCommunityHintsCheckbox.TabIndex = 21;
+            useCommunityHintsCheckbox.Text = "Community Hints";
+            toolTip1.SetToolTip(useCommunityHintsCheckbox, "When selected, will replace some text with hints submitted by the community");
+            useCommunityHintsCheckbox.UseVisualStyleBackColor = true;
             // 
             // enableHelpfulHintsCheckbox
             // 
-            this.enableHelpfulHintsCheckbox.AutoSize = true;
-            this.enableHelpfulHintsCheckbox.Location = new System.Drawing.Point(4, 3);
-            this.enableHelpfulHintsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.enableHelpfulHintsCheckbox.Name = "enableHelpfulHintsCheckbox";
-            this.enableHelpfulHintsCheckbox.Size = new System.Drawing.Size(134, 19);
-            this.enableHelpfulHintsCheckbox.TabIndex = 0;
-            this.enableHelpfulHintsCheckbox.Text = "Enable Helpful Hints";
-            this.enableHelpfulHintsCheckbox.ThreeState = true;
-            this.toolTip1.SetToolTip(this.enableHelpfulHintsCheckbox, "Townspeople will give you helpful hints as to where items are located.");
-            this.enableHelpfulHintsCheckbox.UseVisualStyleBackColor = true;
+            enableHelpfulHintsCheckbox.AutoSize = true;
+            enableHelpfulHintsCheckbox.Location = new System.Drawing.Point(4, 3);
+            enableHelpfulHintsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            enableHelpfulHintsCheckbox.Name = "enableHelpfulHintsCheckbox";
+            enableHelpfulHintsCheckbox.Size = new System.Drawing.Size(134, 19);
+            enableHelpfulHintsCheckbox.TabIndex = 0;
+            enableHelpfulHintsCheckbox.Text = "Enable Helpful Hints";
+            enableHelpfulHintsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(enableHelpfulHintsCheckbox, "Townspeople will give you helpful hints as to where items are located.");
+            enableHelpfulHintsCheckbox.UseVisualStyleBackColor = true;
             // 
             // tabPage3
             // 
-            this.tabPage3.Controls.Add(this.dashAlwaysOnCheckbox);
-            this.tabPage3.Controls.Add(this.flashingOffCheckbox);
-            this.tabPage3.Controls.Add(this.upAOnController1Checkbox);
-            this.tabPage3.Controls.Add(this.beamSpriteList);
-            this.tabPage3.Controls.Add(this.beamSpriteLabel);
-            this.tabPage3.Controls.Add(this.shieldColorList);
-            this.tabPage3.Controls.Add(this.shieldColorLabel);
-            this.tabPage3.Controls.Add(this.tunicColorList);
-            this.tabPage3.Controls.Add(this.tunicColorLabel);
-            this.tabPage3.Controls.Add(this.characterSpriteList);
-            this.tabPage3.Controls.Add(this.characterSpriteLabel);
-            this.tabPage3.Controls.Add(this.disableMusicCheckbox);
-            this.tabPage3.Controls.Add(this.shuffleEnemyPalettesCheckbox);
-            this.tabPage3.Controls.Add(this.alwaysBeamCheckbox);
-            this.tabPage3.Controls.Add(this.fastSpellCheckbox);
-            this.tabPage3.Controls.Add(this.jumpAlwaysOnCheckbox);
-            this.tabPage3.Controls.Add(this.disableLowHealthBeepCheckbox);
-            this.tabPage3.Location = new System.Drawing.Point(4, 24);
-            this.tabPage3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(595, 331);
-            this.tabPage3.TabIndex = 6;
-            this.tabPage3.Text = "Misc.";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            tabPage3.Controls.Add(dashAlwaysOnCheckbox);
+            tabPage3.Controls.Add(flashingOffCheckbox);
+            tabPage3.Controls.Add(upAOnController1Checkbox);
+            tabPage3.Controls.Add(beamSpriteList);
+            tabPage3.Controls.Add(beamSpriteLabel);
+            tabPage3.Controls.Add(shieldColorList);
+            tabPage3.Controls.Add(shieldColorLabel);
+            tabPage3.Controls.Add(tunicColorList);
+            tabPage3.Controls.Add(tunicColorLabel);
+            tabPage3.Controls.Add(characterSpriteList);
+            tabPage3.Controls.Add(characterSpriteLabel);
+            tabPage3.Controls.Add(disableMusicCheckbox);
+            tabPage3.Controls.Add(shuffleEnemyPalettesCheckbox);
+            tabPage3.Controls.Add(alwaysBeamCheckbox);
+            tabPage3.Controls.Add(fastSpellCheckbox);
+            tabPage3.Controls.Add(jumpAlwaysOnCheckbox);
+            tabPage3.Controls.Add(disableLowHealthBeepCheckbox);
+            tabPage3.Location = new System.Drawing.Point(4, 24);
+            tabPage3.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new System.Drawing.Size(595, 331);
+            tabPage3.TabIndex = 6;
+            tabPage3.Text = "Misc.";
+            tabPage3.UseVisualStyleBackColor = true;
             // 
             // dashAlwaysOnCheckbox
             // 
-            this.dashAlwaysOnCheckbox.AutoSize = true;
-            this.dashAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 75);
-            this.dashAlwaysOnCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.dashAlwaysOnCheckbox.Name = "dashAlwaysOnCheckbox";
-            this.dashAlwaysOnCheckbox.Size = new System.Drawing.Size(111, 19);
-            this.dashAlwaysOnCheckbox.TabIndex = 34;
-            this.dashAlwaysOnCheckbox.Text = "Dash Always On";
-            this.toolTip1.SetToolTip(this.dashAlwaysOnCheckbox, "The player will always move as though Dash spell were on.,");
-            this.dashAlwaysOnCheckbox.UseVisualStyleBackColor = true;
+            dashAlwaysOnCheckbox.AutoSize = true;
+            dashAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 75);
+            dashAlwaysOnCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            dashAlwaysOnCheckbox.Name = "dashAlwaysOnCheckbox";
+            dashAlwaysOnCheckbox.Size = new System.Drawing.Size(111, 19);
+            dashAlwaysOnCheckbox.TabIndex = 34;
+            dashAlwaysOnCheckbox.Text = "Dash Always On";
+            toolTip1.SetToolTip(dashAlwaysOnCheckbox, "The player will always move as though Dash spell were on.,");
+            dashAlwaysOnCheckbox.UseVisualStyleBackColor = true;
             // 
             // flashingOffCheckbox
             // 
-            this.flashingOffCheckbox.AutoSize = true;
-            this.flashingOffCheckbox.Location = new System.Drawing.Point(4, 201);
-            this.flashingOffCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.flashingOffCheckbox.Name = "flashingOffCheckbox";
-            this.flashingOffCheckbox.Size = new System.Drawing.Size(182, 19);
-            this.flashingOffCheckbox.TabIndex = 33;
-            this.flashingOffCheckbox.Text = "Remove Flashing Upon Death";
-            this.toolTip1.SetToolTip(this.flashingOffCheckbox, "When selected, the flashing animation after Link\'s death will be removed.");
-            this.flashingOffCheckbox.UseVisualStyleBackColor = true;
+            flashingOffCheckbox.AutoSize = true;
+            flashingOffCheckbox.Checked = true;
+            flashingOffCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            flashingOffCheckbox.Location = new System.Drawing.Point(4, 201);
+            flashingOffCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            flashingOffCheckbox.Name = "flashingOffCheckbox";
+            flashingOffCheckbox.Size = new System.Drawing.Size(182, 19);
+            flashingOffCheckbox.TabIndex = 33;
+            flashingOffCheckbox.Text = "Remove Flashing Upon Death";
+            toolTip1.SetToolTip(flashingOffCheckbox, "When selected, the flashing animation after Link's death will be removed.");
+            flashingOffCheckbox.UseVisualStyleBackColor = true;
             // 
             // upAOnController1Checkbox
             // 
-            this.upAOnController1Checkbox.AutoSize = true;
-            this.upAOnController1Checkbox.Location = new System.Drawing.Point(4, 174);
-            this.upAOnController1Checkbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.upAOnController1Checkbox.Name = "upAOnController1Checkbox";
-            this.upAOnController1Checkbox.Size = new System.Drawing.Size(250, 19);
-            this.upAOnController1Checkbox.TabIndex = 32;
-            this.upAOnController1Checkbox.Text = "Remap Up+A to Up+Select on Controller 1";
-            this.toolTip1.SetToolTip(this.upAOnController1Checkbox, "When selected, Up+A on controller 2 will be remapped to Up+Select on Controller 1" +
-        "");
-            this.upAOnController1Checkbox.UseVisualStyleBackColor = true;
+            upAOnController1Checkbox.AutoSize = true;
+            upAOnController1Checkbox.Location = new System.Drawing.Point(4, 174);
+            upAOnController1Checkbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            upAOnController1Checkbox.Name = "upAOnController1Checkbox";
+            upAOnController1Checkbox.Size = new System.Drawing.Size(250, 19);
+            upAOnController1Checkbox.TabIndex = 32;
+            upAOnController1Checkbox.Text = "Remap Up+A to Up+Select on Controller 1";
+            toolTip1.SetToolTip(upAOnController1Checkbox, "When selected, Up+A on controller 2 will be remapped to Up+Select on Controller 1");
+            upAOnController1Checkbox.UseVisualStyleBackColor = true;
             // 
             // beamSpriteList
             // 
-            this.beamSpriteList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.beamSpriteList.FormattingEnabled = true;
-            this.beamSpriteList.Items.AddRange(new object[] {
-            "Default",
-            "Fire",
-            "Bubble",
-            "Rock",
-            "Axe",
-            "Hammer",
-            "Wizzrobe Beam",
-            "Random"});
-            this.beamSpriteList.Location = new System.Drawing.Point(298, 193);
-            this.beamSpriteList.Margin = new System.Windows.Forms.Padding(2);
-            this.beamSpriteList.Name = "beamSpriteList";
-            this.beamSpriteList.Size = new System.Drawing.Size(142, 23);
-            this.beamSpriteList.TabIndex = 31;
-            this.toolTip1.SetToolTip(this.beamSpriteList, "Allows you to select what the beam sprite will be");
+            beamSpriteList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            beamSpriteList.FormattingEnabled = true;
+            beamSpriteList.Items.AddRange(new object[] { "Default", "Fire", "Bubble", "Rock", "Axe", "Hammer", "Wizzrobe Beam", "Random" });
+            beamSpriteList.Location = new System.Drawing.Point(298, 193);
+            beamSpriteList.Margin = new System.Windows.Forms.Padding(2);
+            beamSpriteList.Name = "beamSpriteList";
+            beamSpriteList.Size = new System.Drawing.Size(142, 23);
+            beamSpriteList.TabIndex = 31;
+            toolTip1.SetToolTip(beamSpriteList, "Allows you to select what the beam sprite will be");
             // 
             // beamSpriteLabel
             // 
-            this.beamSpriteLabel.AutoSize = true;
-            this.beamSpriteLabel.Location = new System.Drawing.Point(294, 170);
-            this.beamSpriteLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.beamSpriteLabel.Name = "beamSpriteLabel";
-            this.beamSpriteLabel.Size = new System.Drawing.Size(73, 15);
-            this.beamSpriteLabel.TabIndex = 30;
-            this.beamSpriteLabel.Text = "Beam Sprite:";
+            beamSpriteLabel.AutoSize = true;
+            beamSpriteLabel.Location = new System.Drawing.Point(294, 170);
+            beamSpriteLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            beamSpriteLabel.Name = "beamSpriteLabel";
+            beamSpriteLabel.Size = new System.Drawing.Size(73, 15);
+            beamSpriteLabel.TabIndex = 30;
+            beamSpriteLabel.Text = "Beam Sprite:";
             // 
             // shieldColorList
             // 
-            this.shieldColorList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.shieldColorList.FormattingEnabled = true;
-            this.shieldColorList.Items.AddRange(new object[] {
-            "Default",
-            "Green",
-            "Dark Green",
-            "Aqua",
-            "Dark Blue",
-            "Purple",
-            "Pink",
-            "Orange",
-            "Red",
-            "Turd",
-            "Random"});
-            this.shieldColorList.Location = new System.Drawing.Point(298, 136);
-            this.shieldColorList.Margin = new System.Windows.Forms.Padding(2);
-            this.shieldColorList.Name = "shieldColorList";
-            this.shieldColorList.Size = new System.Drawing.Size(142, 23);
-            this.shieldColorList.TabIndex = 29;
-            this.toolTip1.SetToolTip(this.shieldColorList, "Changes the tunic color for shield");
+            shieldColorList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            shieldColorList.FormattingEnabled = true;
+            shieldColorList.Items.AddRange(new object[] { "Default", "Green", "Dark Green", "Aqua", "Dark Blue", "Purple", "Pink", "Orange", "Red", "Turd", "Random" });
+            shieldColorList.Location = new System.Drawing.Point(298, 136);
+            shieldColorList.Margin = new System.Windows.Forms.Padding(2);
+            shieldColorList.Name = "shieldColorList";
+            shieldColorList.Size = new System.Drawing.Size(142, 23);
+            shieldColorList.TabIndex = 29;
+            toolTip1.SetToolTip(shieldColorList, "Changes the tunic color for shield");
             // 
             // shieldColorLabel
             // 
-            this.shieldColorLabel.AutoSize = true;
-            this.shieldColorLabel.Location = new System.Drawing.Point(294, 112);
-            this.shieldColorLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.shieldColorLabel.Name = "shieldColorLabel";
-            this.shieldColorLabel.Size = new System.Drawing.Size(106, 15);
-            this.shieldColorLabel.TabIndex = 28;
-            this.shieldColorLabel.Text = "Shield Tunic Color:";
+            shieldColorLabel.AutoSize = true;
+            shieldColorLabel.Location = new System.Drawing.Point(294, 112);
+            shieldColorLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            shieldColorLabel.Name = "shieldColorLabel";
+            shieldColorLabel.Size = new System.Drawing.Size(106, 15);
+            shieldColorLabel.TabIndex = 28;
+            shieldColorLabel.Text = "Shield Tunic Color:";
             // 
             // tunicColorList
             // 
-            this.tunicColorList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tunicColorList.FormattingEnabled = true;
-            this.tunicColorList.Items.AddRange(new object[] {
-            "Default",
-            "Green",
-            "Dark Green",
-            "Aqua",
-            "Dark Blue",
-            "Purple",
-            "Pink",
-            "Orange",
-            "Red",
-            "Turd",
-            "Random"});
-            this.tunicColorList.Location = new System.Drawing.Point(298, 80);
-            this.tunicColorList.Margin = new System.Windows.Forms.Padding(2);
-            this.tunicColorList.Name = "tunicColorList";
-            this.tunicColorList.Size = new System.Drawing.Size(142, 23);
-            this.tunicColorList.TabIndex = 27;
-            this.toolTip1.SetToolTip(this.tunicColorList, "Changes the normal tunic color");
+            tunicColorList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            tunicColorList.FormattingEnabled = true;
+            tunicColorList.Items.AddRange(new object[] { "Default", "Green", "Dark Green", "Aqua", "Dark Blue", "Purple", "Pink", "Orange", "Red", "Turd", "Random" });
+            tunicColorList.Location = new System.Drawing.Point(298, 80);
+            tunicColorList.Margin = new System.Windows.Forms.Padding(2);
+            tunicColorList.Name = "tunicColorList";
+            tunicColorList.Size = new System.Drawing.Size(142, 23);
+            tunicColorList.TabIndex = 27;
+            toolTip1.SetToolTip(tunicColorList, "Changes the normal tunic color");
             // 
             // tunicColorLabel
             // 
-            this.tunicColorLabel.AutoSize = true;
-            this.tunicColorLabel.Location = new System.Drawing.Point(294, 54);
-            this.tunicColorLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.tunicColorLabel.Name = "tunicColorLabel";
-            this.tunicColorLabel.Size = new System.Drawing.Size(114, 15);
-            this.tunicColorLabel.TabIndex = 26;
-            this.tunicColorLabel.Text = "Normal Tunic Color:";
+            tunicColorLabel.AutoSize = true;
+            tunicColorLabel.Location = new System.Drawing.Point(294, 54);
+            tunicColorLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            tunicColorLabel.Name = "tunicColorLabel";
+            tunicColorLabel.Size = new System.Drawing.Size(114, 15);
+            tunicColorLabel.TabIndex = 26;
+            tunicColorLabel.Text = "Normal Tunic Color:";
             // 
             // characterSpriteList
             // 
-            this.characterSpriteList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.characterSpriteList.FormattingEnabled = true;
-            this.characterSpriteList.Items.AddRange(new object[] {
-            "Link",
-            "Zelda",
-            "Iron Knuckle",
-            "Error",
-            "Samus",
-            "Simon",
-            "Stalfos",
-            "Vase Lady",
-            "Ruto",
-            "Yoshi",
-            "Dragonlord",
-            "Miria",
-            "Crystalis",
-            "Taco",
-            "Pyramid",
-            "Lady Link",
-            "Hoodie Link",
-            "GliitchWiitch",
-            "Random"});
-            this.characterSpriteList.Location = new System.Drawing.Point(298, 24);
-            this.characterSpriteList.Margin = new System.Windows.Forms.Padding(2);
-            this.characterSpriteList.Name = "characterSpriteList";
-            this.characterSpriteList.Size = new System.Drawing.Size(142, 23);
-            this.characterSpriteList.TabIndex = 25;
-            this.toolTip1.SetToolTip(this.characterSpriteList, "Changes the playable character sprite");
+            characterSpriteList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            characterSpriteList.FormattingEnabled = true;
+            characterSpriteList.Items.AddRange(new object[] { "Link", "Zelda", "Iron Knuckle", "Error", "Samus", "Simon", "Stalfos", "Vase Lady", "Ruto", "Yoshi", "Dragonlord", "Miria", "Crystalis", "Taco", "Pyramid", "Lady Link", "Hoodie Link", "GliitchWiitch", "Random" });
+            characterSpriteList.Location = new System.Drawing.Point(298, 24);
+            characterSpriteList.Margin = new System.Windows.Forms.Padding(2);
+            characterSpriteList.Name = "characterSpriteList";
+            characterSpriteList.Size = new System.Drawing.Size(142, 23);
+            characterSpriteList.TabIndex = 25;
+            toolTip1.SetToolTip(characterSpriteList, "Changes the playable character sprite");
             // 
             // characterSpriteLabel
             // 
-            this.characterSpriteLabel.AutoSize = true;
-            this.characterSpriteLabel.Location = new System.Drawing.Point(294, 3);
-            this.characterSpriteLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.characterSpriteLabel.Name = "characterSpriteLabel";
-            this.characterSpriteLabel.Size = new System.Drawing.Size(94, 15);
-            this.characterSpriteLabel.TabIndex = 24;
-            this.characterSpriteLabel.Text = "Character Sprite:";
+            characterSpriteLabel.AutoSize = true;
+            characterSpriteLabel.Location = new System.Drawing.Point(294, 3);
+            characterSpriteLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            characterSpriteLabel.Name = "characterSpriteLabel";
+            characterSpriteLabel.Size = new System.Drawing.Size(94, 15);
+            characterSpriteLabel.TabIndex = 24;
+            characterSpriteLabel.Text = "Character Sprite:";
             // 
             // disableMusicCheckbox
             // 
-            this.disableMusicCheckbox.AutoSize = true;
-            this.disableMusicCheckbox.Location = new System.Drawing.Point(4, 27);
-            this.disableMusicCheckbox.Margin = new System.Windows.Forms.Padding(2);
-            this.disableMusicCheckbox.Name = "disableMusicCheckbox";
-            this.disableMusicCheckbox.Size = new System.Drawing.Size(99, 19);
-            this.disableMusicCheckbox.TabIndex = 23;
-            this.disableMusicCheckbox.Text = "Disable Music";
-            this.toolTip1.SetToolTip(this.disableMusicCheckbox, "Disables most in game music");
-            this.disableMusicCheckbox.UseVisualStyleBackColor = true;
+            disableMusicCheckbox.AutoSize = true;
+            disableMusicCheckbox.Location = new System.Drawing.Point(4, 27);
+            disableMusicCheckbox.Margin = new System.Windows.Forms.Padding(2);
+            disableMusicCheckbox.Name = "disableMusicCheckbox";
+            disableMusicCheckbox.Size = new System.Drawing.Size(99, 19);
+            disableMusicCheckbox.TabIndex = 23;
+            disableMusicCheckbox.Text = "Disable Music";
+            toolTip1.SetToolTip(disableMusicCheckbox, "Disables most in game music");
+            disableMusicCheckbox.UseVisualStyleBackColor = true;
             // 
             // shuffleEnemyPalettesCheckbox
             // 
-            this.shuffleEnemyPalettesCheckbox.AutoSize = true;
-            this.shuffleEnemyPalettesCheckbox.Location = new System.Drawing.Point(4, 122);
-            this.shuffleEnemyPalettesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
-            this.shuffleEnemyPalettesCheckbox.Size = new System.Drawing.Size(140, 19);
-            this.shuffleEnemyPalettesCheckbox.TabIndex = 22;
-            this.shuffleEnemyPalettesCheckbox.Text = "Shuffle Sprite Palettes";
-            this.toolTip1.SetToolTip(this.shuffleEnemyPalettesCheckbox, "When selected, sprite colors will be shuffled");
-            this.shuffleEnemyPalettesCheckbox.UseVisualStyleBackColor = true;
+            shuffleEnemyPalettesCheckbox.AutoSize = true;
+            shuffleEnemyPalettesCheckbox.Location = new System.Drawing.Point(4, 122);
+            shuffleEnemyPalettesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
+            shuffleEnemyPalettesCheckbox.Size = new System.Drawing.Size(140, 19);
+            shuffleEnemyPalettesCheckbox.TabIndex = 22;
+            shuffleEnemyPalettesCheckbox.Text = "Shuffle Sprite Palettes";
+            toolTip1.SetToolTip(shuffleEnemyPalettesCheckbox, "When selected, sprite colors will be shuffled");
+            shuffleEnemyPalettesCheckbox.UseVisualStyleBackColor = true;
             // 
             // alwaysBeamCheckbox
             // 
-            this.alwaysBeamCheckbox.AutoSize = true;
-            this.alwaysBeamCheckbox.Location = new System.Drawing.Point(4, 147);
-            this.alwaysBeamCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
-            this.alwaysBeamCheckbox.Size = new System.Drawing.Size(153, 19);
-            this.alwaysBeamCheckbox.TabIndex = 19;
-            this.alwaysBeamCheckbox.Text = "Permanent Beam Sword";
-            this.toolTip1.SetToolTip(this.alwaysBeamCheckbox, "Gives Link beam sword regardless of how much health he has");
-            this.alwaysBeamCheckbox.UseVisualStyleBackColor = true;
+            alwaysBeamCheckbox.AutoSize = true;
+            alwaysBeamCheckbox.Location = new System.Drawing.Point(4, 147);
+            alwaysBeamCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
+            alwaysBeamCheckbox.Size = new System.Drawing.Size(153, 19);
+            alwaysBeamCheckbox.TabIndex = 19;
+            alwaysBeamCheckbox.Text = "Permanent Beam Sword";
+            toolTip1.SetToolTip(alwaysBeamCheckbox, "Gives Link beam sword regardless of how much health he has");
+            alwaysBeamCheckbox.UseVisualStyleBackColor = true;
             // 
             // fastSpellCheckbox
             // 
-            this.fastSpellCheckbox.AutoSize = true;
-            this.fastSpellCheckbox.Location = new System.Drawing.Point(4, 98);
-            this.fastSpellCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.fastSpellCheckbox.Name = "fastSpellCheckbox";
-            this.fastSpellCheckbox.Size = new System.Drawing.Size(118, 19);
-            this.fastSpellCheckbox.TabIndex = 4;
-            this.fastSpellCheckbox.Text = "Fast Spell Casting";
-            this.toolTip1.SetToolTip(this.fastSpellCheckbox, "When checked, you do not have to open the pause menu before casting the selected " +
-        "spell");
-            this.fastSpellCheckbox.UseVisualStyleBackColor = true;
+            fastSpellCheckbox.AutoSize = true;
+            fastSpellCheckbox.Location = new System.Drawing.Point(4, 98);
+            fastSpellCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            fastSpellCheckbox.Name = "fastSpellCheckbox";
+            fastSpellCheckbox.Size = new System.Drawing.Size(118, 19);
+            fastSpellCheckbox.TabIndex = 4;
+            fastSpellCheckbox.Text = "Fast Spell Casting";
+            toolTip1.SetToolTip(fastSpellCheckbox, "When checked, you do not have to open the pause menu before casting the selected spell");
+            fastSpellCheckbox.UseVisualStyleBackColor = true;
             // 
             // jumpAlwaysOnCheckbox
             // 
-            this.jumpAlwaysOnCheckbox.AutoSize = true;
-            this.jumpAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 50);
-            this.jumpAlwaysOnCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.jumpAlwaysOnCheckbox.Name = "jumpAlwaysOnCheckbox";
-            this.jumpAlwaysOnCheckbox.Size = new System.Drawing.Size(114, 19);
-            this.jumpAlwaysOnCheckbox.TabIndex = 3;
-            this.jumpAlwaysOnCheckbox.Text = "Jump Always On";
-            this.toolTip1.SetToolTip(this.jumpAlwaysOnCheckbox, "The player will jump very high, as if the jump spell is always active");
-            this.jumpAlwaysOnCheckbox.UseVisualStyleBackColor = true;
+            jumpAlwaysOnCheckbox.AutoSize = true;
+            jumpAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 50);
+            jumpAlwaysOnCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            jumpAlwaysOnCheckbox.Name = "jumpAlwaysOnCheckbox";
+            jumpAlwaysOnCheckbox.Size = new System.Drawing.Size(114, 19);
+            jumpAlwaysOnCheckbox.TabIndex = 3;
+            jumpAlwaysOnCheckbox.Text = "Jump Always On";
+            toolTip1.SetToolTip(jumpAlwaysOnCheckbox, "The player will jump very high, as if the jump spell is always active");
+            jumpAlwaysOnCheckbox.UseVisualStyleBackColor = true;
             // 
             // disableLowHealthBeepCheckbox
             // 
-            this.disableLowHealthBeepCheckbox.AutoSize = true;
-            this.disableLowHealthBeepCheckbox.Location = new System.Drawing.Point(4, 3);
-            this.disableLowHealthBeepCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.disableLowHealthBeepCheckbox.Name = "disableLowHealthBeepCheckbox";
-            this.disableLowHealthBeepCheckbox.Size = new System.Drawing.Size(156, 19);
-            this.disableLowHealthBeepCheckbox.TabIndex = 0;
-            this.disableLowHealthBeepCheckbox.Text = "Disable Low Health Beep";
-            this.toolTip1.SetToolTip(this.disableLowHealthBeepCheckbox, "Disables the beeping that happens when the player is low on health");
-            this.disableLowHealthBeepCheckbox.UseVisualStyleBackColor = true;
+            disableLowHealthBeepCheckbox.AutoSize = true;
+            disableLowHealthBeepCheckbox.Location = new System.Drawing.Point(4, 3);
+            disableLowHealthBeepCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            disableLowHealthBeepCheckbox.Name = "disableLowHealthBeepCheckbox";
+            disableLowHealthBeepCheckbox.Size = new System.Drawing.Size(156, 19);
+            disableLowHealthBeepCheckbox.TabIndex = 0;
+            disableLowHealthBeepCheckbox.Text = "Disable Low Health Beep";
+            toolTip1.SetToolTip(disableLowHealthBeepCheckbox, "Disables the beeping that happens when the player is low on health");
+            disableLowHealthBeepCheckbox.UseVisualStyleBackColor = true;
             // 
             // romFileTextBox
             // 
-            this.romFileTextBox.Location = new System.Drawing.Point(14, 30);
-            this.romFileTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.romFileTextBox.Name = "romFileTextBox";
-            this.romFileTextBox.Size = new System.Drawing.Size(156, 23);
-            this.romFileTextBox.TabIndex = 1;
-            this.toolTip1.SetToolTip(this.romFileTextBox, "Select a USA version of the Zelda 2 ROM");
+            romFileTextBox.Location = new System.Drawing.Point(14, 30);
+            romFileTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            romFileTextBox.Name = "romFileTextBox";
+            romFileTextBox.Size = new System.Drawing.Size(156, 23);
+            romFileTextBox.TabIndex = 1;
+            toolTip1.SetToolTip(romFileTextBox, "Select a USA version of the Zelda 2 ROM");
             // 
             // seedTextBox
             // 
-            this.seedTextBox.Location = new System.Drawing.Point(13, 79);
-            this.seedTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.seedTextBox.Name = "seedTextBox";
-            this.seedTextBox.Size = new System.Drawing.Size(156, 23);
-            this.seedTextBox.TabIndex = 2;
-            this.toolTip1.SetToolTip(this.seedTextBox, "This represents the random values that will be used. A different seed results in " +
-        "a different shuffled ROM.");
+            seedTextBox.Location = new System.Drawing.Point(13, 79);
+            seedTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            seedTextBox.Name = "seedTextBox";
+            seedTextBox.Size = new System.Drawing.Size(156, 23);
+            seedTextBox.TabIndex = 2;
+            toolTip1.SetToolTip(seedTextBox, "This represents the random values that will be used. A different seed results in a different shuffled ROM.");
             // 
             // romFileLabel
             // 
-            this.romFileLabel.AutoSize = true;
-            this.romFileLabel.Location = new System.Drawing.Point(10, 10);
-            this.romFileLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.romFileLabel.Name = "romFileLabel";
-            this.romFileLabel.Size = new System.Drawing.Size(55, 15);
-            this.romFileLabel.TabIndex = 4;
-            this.romFileLabel.Text = "ROM File";
+            romFileLabel.AutoSize = true;
+            romFileLabel.Location = new System.Drawing.Point(10, 10);
+            romFileLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            romFileLabel.Name = "romFileLabel";
+            romFileLabel.Size = new System.Drawing.Size(55, 15);
+            romFileLabel.TabIndex = 4;
+            romFileLabel.Text = "ROM File";
             // 
             // seedLabel
             // 
-            this.seedLabel.AutoSize = true;
-            this.seedLabel.Location = new System.Drawing.Point(10, 59);
-            this.seedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.seedLabel.Name = "seedLabel";
-            this.seedLabel.Size = new System.Drawing.Size(32, 15);
-            this.seedLabel.TabIndex = 5;
-            this.seedLabel.Text = "Seed";
+            seedLabel.AutoSize = true;
+            seedLabel.Location = new System.Drawing.Point(10, 59);
+            seedLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            seedLabel.Name = "seedLabel";
+            seedLabel.Size = new System.Drawing.Size(32, 15);
+            seedLabel.TabIndex = 5;
+            seedLabel.Text = "Seed";
             // 
             // createSeedButton
             // 
-            this.createSeedButton.Location = new System.Drawing.Point(177, 76);
-            this.createSeedButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.createSeedButton.Name = "createSeedButton";
-            this.createSeedButton.Size = new System.Drawing.Size(88, 27);
-            this.createSeedButton.TabIndex = 6;
-            this.createSeedButton.Text = "Create Seed";
-            this.createSeedButton.UseVisualStyleBackColor = true;
-            this.createSeedButton.Click += new System.EventHandler(this.createSeedButton_Click);
+            createSeedButton.Location = new System.Drawing.Point(177, 76);
+            createSeedButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            createSeedButton.Name = "createSeedButton";
+            createSeedButton.Size = new System.Drawing.Size(88, 27);
+            createSeedButton.TabIndex = 6;
+            createSeedButton.Text = "Create Seed";
+            createSeedButton.UseVisualStyleBackColor = true;
+            createSeedButton.Click += createSeedButton_Click;
             // 
             // romFileBrowseButton
             // 
-            this.romFileBrowseButton.Location = new System.Drawing.Point(177, 29);
-            this.romFileBrowseButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.romFileBrowseButton.Name = "romFileBrowseButton";
-            this.romFileBrowseButton.Size = new System.Drawing.Size(88, 27);
-            this.romFileBrowseButton.TabIndex = 7;
-            this.romFileBrowseButton.Text = "Browse...";
-            this.romFileBrowseButton.UseVisualStyleBackColor = true;
-            this.romFileBrowseButton.Click += new System.EventHandler(this.fileBtn_Click);
+            romFileBrowseButton.Location = new System.Drawing.Point(177, 29);
+            romFileBrowseButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            romFileBrowseButton.Name = "romFileBrowseButton";
+            romFileBrowseButton.Size = new System.Drawing.Size(88, 27);
+            romFileBrowseButton.TabIndex = 7;
+            romFileBrowseButton.Text = "Browse...";
+            romFileBrowseButton.UseVisualStyleBackColor = true;
+            romFileBrowseButton.Click += fileBtn_Click;
             // 
             // generateRomButton
             // 
-            this.generateRomButton.Location = new System.Drawing.Point(491, 30);
-            this.generateRomButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.generateRomButton.Name = "generateRomButton";
-            this.generateRomButton.Size = new System.Drawing.Size(126, 24);
-            this.generateRomButton.TabIndex = 8;
-            this.generateRomButton.Text = "Generate ROM";
-            this.toolTip1.SetToolTip(this.generateRomButton, "Create the ROM");
-            this.generateRomButton.UseVisualStyleBackColor = true;
-            this.generateRomButton.Click += new System.EventHandler(this.generateBtn_Click);
+            generateRomButton.Location = new System.Drawing.Point(491, 30);
+            generateRomButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            generateRomButton.Name = "generateRomButton";
+            generateRomButton.Size = new System.Drawing.Size(126, 24);
+            generateRomButton.TabIndex = 8;
+            generateRomButton.Text = "Generate ROM";
+            toolTip1.SetToolTip(generateRomButton, "Create the ROM");
+            generateRomButton.UseVisualStyleBackColor = true;
+            generateRomButton.Click += generateBtn_Click;
             // 
             // flagsTextBox
             // 
-            this.flagsTextBox.Location = new System.Drawing.Point(272, 30);
-            this.flagsTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.flagsTextBox.Name = "flagsTextBox";
-            this.flagsTextBox.Size = new System.Drawing.Size(212, 23);
-            this.flagsTextBox.TabIndex = 9;
-            this.toolTip1.SetToolTip(this.flagsTextBox, "These flags represent the selected options. They can be copy/pasted.");
-            this.flagsTextBox.TextChanged += new System.EventHandler(this.FlagBox_TextChanged);
+            flagsTextBox.Location = new System.Drawing.Point(272, 30);
+            flagsTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            flagsTextBox.Name = "flagsTextBox";
+            flagsTextBox.Size = new System.Drawing.Size(212, 23);
+            flagsTextBox.TabIndex = 9;
+            toolTip1.SetToolTip(flagsTextBox, "These flags represent the selected options. They can be copy/pasted.");
+            flagsTextBox.TextChanged += FlagBox_TextChanged;
             // 
             // updateButton
             // 
-            this.updateButton.Location = new System.Drawing.Point(492, 105);
-            this.updateButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.updateButton.Name = "updateButton";
-            this.updateButton.Size = new System.Drawing.Size(126, 27);
-            this.updateButton.TabIndex = 10;
-            this.updateButton.Text = "Check for Updates";
-            this.toolTip1.SetToolTip(this.updateButton, "Check for updates");
-            this.updateButton.UseVisualStyleBackColor = true;
-            this.updateButton.Click += new System.EventHandler(this.UpdateBtn_Click);
+            updateButton.Location = new System.Drawing.Point(492, 105);
+            updateButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            updateButton.Name = "updateButton";
+            updateButton.Size = new System.Drawing.Size(126, 27);
+            updateButton.TabIndex = 10;
+            updateButton.Text = "Check for Updates";
+            toolTip1.SetToolTip(updateButton, "Check for updates");
+            updateButton.UseVisualStyleBackColor = true;
+            updateButton.Click += UpdateBtn_Click;
             // 
             // flagsLabel
             // 
-            this.flagsLabel.AutoSize = true;
-            this.flagsLabel.Location = new System.Drawing.Point(273, 12);
-            this.flagsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.flagsLabel.Name = "flagsLabel";
-            this.flagsLabel.Size = new System.Drawing.Size(34, 15);
-            this.flagsLabel.TabIndex = 11;
-            this.flagsLabel.Text = "Flags";
+            flagsLabel.AutoSize = true;
+            flagsLabel.Location = new System.Drawing.Point(273, 12);
+            flagsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            flagsLabel.Name = "flagsLabel";
+            flagsLabel.Size = new System.Drawing.Size(34, 15);
+            flagsLabel.TabIndex = 11;
+            flagsLabel.Text = "Flags";
             // 
             // wikiButton
             // 
-            this.wikiButton.Location = new System.Drawing.Point(386, 105);
-            this.wikiButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.wikiButton.Name = "wikiButton";
-            this.wikiButton.Size = new System.Drawing.Size(99, 27);
-            this.wikiButton.TabIndex = 12;
-            this.wikiButton.Text = "Wiki";
-            this.toolTip1.SetToolTip(this.wikiButton, "Visit the website");
-            this.wikiButton.UseVisualStyleBackColor = true;
-            this.wikiButton.Click += new System.EventHandler(this.WikiBtn_Click);
+            wikiButton.Location = new System.Drawing.Point(386, 105);
+            wikiButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            wikiButton.Name = "wikiButton";
+            wikiButton.Size = new System.Drawing.Size(99, 27);
+            wikiButton.TabIndex = 12;
+            wikiButton.Text = "Wiki";
+            toolTip1.SetToolTip(wikiButton, "Visit the website");
+            wikiButton.UseVisualStyleBackColor = true;
+            wikiButton.Click += WikiBtn_Click;
             // 
             // beginnerFlagsButton
             // 
-            this.beginnerFlagsButton.Location = new System.Drawing.Point(35, 505);
-            this.beginnerFlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.beginnerFlagsButton.Name = "beginnerFlagsButton";
-            this.beginnerFlagsButton.Size = new System.Drawing.Size(88, 27);
-            this.beginnerFlagsButton.TabIndex = 18;
-            this.beginnerFlagsButton.Text = "Beginner";
-            this.toolTip1.SetToolTip(this.beginnerFlagsButton, "This preset is great for people who are looking for a casual experience.");
-            this.beginnerFlagsButton.UseVisualStyleBackColor = true;
-            this.beginnerFlagsButton.Click += new System.EventHandler(this.BeginnerFlags);
+            beginnerFlagsButton.Location = new System.Drawing.Point(35, 505);
+            beginnerFlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            beginnerFlagsButton.Name = "beginnerFlagsButton";
+            beginnerFlagsButton.Size = new System.Drawing.Size(88, 27);
+            beginnerFlagsButton.TabIndex = 18;
+            beginnerFlagsButton.Text = "Beginner";
+            toolTip1.SetToolTip(beginnerFlagsButton, "This preset is great for people who are looking for a casual experience.");
+            beginnerFlagsButton.UseVisualStyleBackColor = true;
+            beginnerFlagsButton.Click += BeginnerFlags;
             // 
             // standard2022FlagsButton
             // 
-            this.standard2022FlagsButton.Location = new System.Drawing.Point(129, 505);
-            this.standard2022FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.standard2022FlagsButton.Name = "standard2022FlagsButton";
-            this.standard2022FlagsButton.Size = new System.Drawing.Size(88, 27);
-            this.standard2022FlagsButton.TabIndex = 19;
-            this.standard2022FlagsButton.Text = "Standard";
-            this.toolTip1.SetToolTip(this.standard2022FlagsButton, "Flags for the 2022 Standard Tournament");
-            this.standard2022FlagsButton.UseVisualStyleBackColor = true;
-            this.standard2022FlagsButton.Click += new System.EventHandler(this.StandardFlags);
+            standard2022FlagsButton.Location = new System.Drawing.Point(129, 505);
+            standard2022FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            standard2022FlagsButton.Name = "standard2022FlagsButton";
+            standard2022FlagsButton.Size = new System.Drawing.Size(88, 27);
+            standard2022FlagsButton.TabIndex = 19;
+            standard2022FlagsButton.Text = "Standard";
+            toolTip1.SetToolTip(standard2022FlagsButton, "Flags for the 2022 Standard Tournament");
+            standard2022FlagsButton.UseVisualStyleBackColor = true;
+            standard2022FlagsButton.Click += StandardFlags;
             // 
             // maxRandoFlagButton
             // 
-            this.maxRandoFlagButton.Location = new System.Drawing.Point(224, 505);
-            this.maxRandoFlagButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.maxRandoFlagButton.Name = "maxRandoFlagButton";
-            this.maxRandoFlagButton.Size = new System.Drawing.Size(88, 27);
-            this.maxRandoFlagButton.TabIndex = 20;
-            this.maxRandoFlagButton.Text = "Max Rando";
-            this.toolTip1.SetToolTip(this.maxRandoFlagButton, "Flags for the 2023 Max Rando Tournament");
-            this.maxRandoFlagButton.UseVisualStyleBackColor = true;
-            this.maxRandoFlagButton.Click += new System.EventHandler(this.MaxRandoFlags);
+            maxRandoFlagButton.Location = new System.Drawing.Point(224, 505);
+            maxRandoFlagButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            maxRandoFlagButton.Name = "maxRandoFlagButton";
+            maxRandoFlagButton.Size = new System.Drawing.Size(88, 27);
+            maxRandoFlagButton.TabIndex = 20;
+            maxRandoFlagButton.Text = "Max Rando";
+            toolTip1.SetToolTip(maxRandoFlagButton, "Flags for the 2023 Max Rando Tournament");
+            maxRandoFlagButton.UseVisualStyleBackColor = true;
+            maxRandoFlagButton.Click += MaxRandoFlags;
             // 
             // randomPercentFlagButton
             // 
-            this.randomPercentFlagButton.Location = new System.Drawing.Point(318, 505);
-            this.randomPercentFlagButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.randomPercentFlagButton.Name = "randomPercentFlagButton";
-            this.randomPercentFlagButton.Size = new System.Drawing.Size(88, 27);
-            this.randomPercentFlagButton.TabIndex = 21;
-            this.randomPercentFlagButton.Text = "Random%";
-            this.toolTip1.SetToolTip(this.randomPercentFlagButton, "Is it randomized? Who knows?");
-            this.randomPercentFlagButton.UseVisualStyleBackColor = true;
-            this.randomPercentFlagButton.Click += new System.EventHandler(this.RandomPercentFlags);
+            randomPercentFlagButton.Location = new System.Drawing.Point(318, 505);
+            randomPercentFlagButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            randomPercentFlagButton.Name = "randomPercentFlagButton";
+            randomPercentFlagButton.Size = new System.Drawing.Size(88, 27);
+            randomPercentFlagButton.TabIndex = 21;
+            randomPercentFlagButton.Text = "Random%";
+            toolTip1.SetToolTip(randomPercentFlagButton, "Is it randomized? Who knows?");
+            randomPercentFlagButton.UseVisualStyleBackColor = true;
+            randomPercentFlagButton.Click += RandomPercentFlags;
             // 
             // unused2FlagsButton
             // 
-            this.unused2FlagsButton.Location = new System.Drawing.Point(413, 505);
-            this.unused2FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.unused2FlagsButton.Name = "unused2FlagsButton";
-            this.unused2FlagsButton.Size = new System.Drawing.Size(88, 27);
-            this.unused2FlagsButton.TabIndex = 22;
-            this.toolTip1.SetToolTip(this.unused2FlagsButton, "Unused (for now)");
-            this.unused2FlagsButton.UseVisualStyleBackColor = true;
+            unused2FlagsButton.Location = new System.Drawing.Point(413, 505);
+            unused2FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            unused2FlagsButton.Name = "unused2FlagsButton";
+            unused2FlagsButton.Size = new System.Drawing.Size(88, 27);
+            unused2FlagsButton.TabIndex = 22;
+            toolTip1.SetToolTip(unused2FlagsButton, "Unused (for now)");
+            unused2FlagsButton.UseVisualStyleBackColor = true;
             // 
             // unused3FlagsButton
             // 
-            this.unused3FlagsButton.Location = new System.Drawing.Point(507, 505);
-            this.unused3FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.unused3FlagsButton.Name = "unused3FlagsButton";
-            this.unused3FlagsButton.Size = new System.Drawing.Size(88, 27);
-            this.unused3FlagsButton.TabIndex = 23;
-            this.toolTip1.SetToolTip(this.unused3FlagsButton, "Unused (for now)");
-            this.unused3FlagsButton.UseVisualStyleBackColor = true;
+            unused3FlagsButton.Location = new System.Drawing.Point(507, 505);
+            unused3FlagsButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            unused3FlagsButton.Name = "unused3FlagsButton";
+            unused3FlagsButton.Size = new System.Drawing.Size(88, 27);
+            unused3FlagsButton.TabIndex = 23;
+            toolTip1.SetToolTip(unused3FlagsButton, "Unused (for now)");
+            unused3FlagsButton.UseVisualStyleBackColor = true;
             // 
             // discordButton
             // 
-            this.discordButton.Location = new System.Drawing.Point(273, 105);
-            this.discordButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.discordButton.Name = "discordButton";
-            this.discordButton.Size = new System.Drawing.Size(106, 27);
-            this.discordButton.TabIndex = 24;
-            this.discordButton.Text = "Discord";
-            this.toolTip1.SetToolTip(this.discordButton, "Join the Z2R Discord");
-            this.discordButton.UseVisualStyleBackColor = true;
-            this.discordButton.Click += new System.EventHandler(this.DiscordButton_Click);
+            discordButton.Location = new System.Drawing.Point(273, 105);
+            discordButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            discordButton.Name = "discordButton";
+            discordButton.Size = new System.Drawing.Size(106, 27);
+            discordButton.TabIndex = 24;
+            discordButton.Text = "Discord";
+            toolTip1.SetToolTip(discordButton, "Join the Z2R Discord");
+            discordButton.UseVisualStyleBackColor = true;
+            discordButton.Click += DiscordButton_Click;
             // 
             // customFlags1TextBox
             // 
-            this.customFlags1TextBox.Location = new System.Drawing.Point(35, 577);
-            this.customFlags1TextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags1TextBox.Name = "customFlags1TextBox";
-            this.customFlags1TextBox.Size = new System.Drawing.Size(184, 23);
-            this.customFlags1TextBox.TabIndex = 25;
-            this.toolTip1.SetToolTip(this.customFlags1TextBox, "These flags represent the selected options. They can be copy/pasted.");
+            customFlags1TextBox.Location = new System.Drawing.Point(35, 577);
+            customFlags1TextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags1TextBox.Name = "customFlags1TextBox";
+            customFlags1TextBox.Size = new System.Drawing.Size(184, 23);
+            customFlags1TextBox.TabIndex = 25;
+            toolTip1.SetToolTip(customFlags1TextBox, "These flags represent the selected options. They can be copy/pasted.");
             // 
             // customFlags2TextBox
             // 
-            this.customFlags2TextBox.Location = new System.Drawing.Point(224, 577);
-            this.customFlags2TextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags2TextBox.Name = "customFlags2TextBox";
-            this.customFlags2TextBox.Size = new System.Drawing.Size(184, 23);
-            this.customFlags2TextBox.TabIndex = 26;
-            this.toolTip1.SetToolTip(this.customFlags2TextBox, "These flags represent the selected options. They can be copy/pasted.");
+            customFlags2TextBox.Location = new System.Drawing.Point(224, 577);
+            customFlags2TextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags2TextBox.Name = "customFlags2TextBox";
+            customFlags2TextBox.Size = new System.Drawing.Size(184, 23);
+            customFlags2TextBox.TabIndex = 26;
+            toolTip1.SetToolTip(customFlags2TextBox, "These flags represent the selected options. They can be copy/pasted.");
             // 
             // customFlags1SaveButton
             // 
-            this.customFlags1SaveButton.Location = new System.Drawing.Point(35, 607);
-            this.customFlags1SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags1SaveButton.Name = "customFlags1SaveButton";
-            this.customFlags1SaveButton.Size = new System.Drawing.Size(88, 27);
-            this.customFlags1SaveButton.TabIndex = 29;
-            this.customFlags1SaveButton.Text = "Save";
-            this.toolTip1.SetToolTip(this.customFlags1SaveButton, "Saves the current flags to this custom slot");
-            this.customFlags1SaveButton.UseVisualStyleBackColor = true;
-            this.customFlags1SaveButton.Click += new System.EventHandler(this.CustomSave1_Click);
+            customFlags1SaveButton.Location = new System.Drawing.Point(35, 607);
+            customFlags1SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags1SaveButton.Name = "customFlags1SaveButton";
+            customFlags1SaveButton.Size = new System.Drawing.Size(88, 27);
+            customFlags1SaveButton.TabIndex = 29;
+            customFlags1SaveButton.Text = "Save";
+            toolTip1.SetToolTip(customFlags1SaveButton, "Saves the current flags to this custom slot");
+            customFlags1SaveButton.UseVisualStyleBackColor = true;
+            customFlags1SaveButton.Click += CustomSave1_Click;
             // 
             // customFlags1LoadButton
             // 
-            this.customFlags1LoadButton.Location = new System.Drawing.Point(131, 607);
-            this.customFlags1LoadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags1LoadButton.Name = "customFlags1LoadButton";
-            this.customFlags1LoadButton.Size = new System.Drawing.Size(88, 27);
-            this.customFlags1LoadButton.TabIndex = 30;
-            this.customFlags1LoadButton.Text = "Load";
-            this.toolTip1.SetToolTip(this.customFlags1LoadButton, "Loads the flags in this current custom slot");
-            this.customFlags1LoadButton.UseVisualStyleBackColor = true;
-            this.customFlags1LoadButton.Click += new System.EventHandler(this.CustomLoad1_Click);
+            customFlags1LoadButton.Location = new System.Drawing.Point(131, 607);
+            customFlags1LoadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags1LoadButton.Name = "customFlags1LoadButton";
+            customFlags1LoadButton.Size = new System.Drawing.Size(88, 27);
+            customFlags1LoadButton.TabIndex = 30;
+            customFlags1LoadButton.Text = "Load";
+            toolTip1.SetToolTip(customFlags1LoadButton, "Loads the flags in this current custom slot");
+            customFlags1LoadButton.UseVisualStyleBackColor = true;
+            customFlags1LoadButton.Click += CustomLoad1_Click;
             // 
             // customFlags3TextBox
             // 
-            this.customFlags3TextBox.Location = new System.Drawing.Point(413, 577);
-            this.customFlags3TextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags3TextBox.Name = "customFlags3TextBox";
-            this.customFlags3TextBox.Size = new System.Drawing.Size(184, 23);
-            this.customFlags3TextBox.TabIndex = 31;
-            this.toolTip1.SetToolTip(this.customFlags3TextBox, "These flags represent the selected options. They can be copy/pasted.");
+            customFlags3TextBox.Location = new System.Drawing.Point(413, 577);
+            customFlags3TextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags3TextBox.Name = "customFlags3TextBox";
+            customFlags3TextBox.Size = new System.Drawing.Size(184, 23);
+            customFlags3TextBox.TabIndex = 31;
+            toolTip1.SetToolTip(customFlags3TextBox, "These flags represent the selected options. They can be copy/pasted.");
             // 
             // customFlags2SaveButton
             // 
-            this.customFlags2SaveButton.Location = new System.Drawing.Point(225, 607);
-            this.customFlags2SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags2SaveButton.Name = "customFlags2SaveButton";
-            this.customFlags2SaveButton.Size = new System.Drawing.Size(88, 27);
-            this.customFlags2SaveButton.TabIndex = 33;
-            this.customFlags2SaveButton.Text = "Save";
-            this.toolTip1.SetToolTip(this.customFlags2SaveButton, "Saves the current flags to this custom slot");
-            this.customFlags2SaveButton.UseVisualStyleBackColor = true;
-            this.customFlags2SaveButton.Click += new System.EventHandler(this.CustomSave2_Click);
+            customFlags2SaveButton.Location = new System.Drawing.Point(225, 607);
+            customFlags2SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags2SaveButton.Name = "customFlags2SaveButton";
+            customFlags2SaveButton.Size = new System.Drawing.Size(88, 27);
+            customFlags2SaveButton.TabIndex = 33;
+            customFlags2SaveButton.Text = "Save";
+            toolTip1.SetToolTip(customFlags2SaveButton, "Saves the current flags to this custom slot");
+            customFlags2SaveButton.UseVisualStyleBackColor = true;
+            customFlags2SaveButton.Click += CustomSave2_Click;
             // 
             // customFlags2LoadButton
             // 
-            this.customFlags2LoadButton.Location = new System.Drawing.Point(319, 607);
-            this.customFlags2LoadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags2LoadButton.Name = "customFlags2LoadButton";
-            this.customFlags2LoadButton.Size = new System.Drawing.Size(88, 27);
-            this.customFlags2LoadButton.TabIndex = 34;
-            this.customFlags2LoadButton.Text = "Load";
-            this.toolTip1.SetToolTip(this.customFlags2LoadButton, "Loads the flags in this current custom slot");
-            this.customFlags2LoadButton.UseVisualStyleBackColor = true;
-            this.customFlags2LoadButton.Click += new System.EventHandler(this.CustomLoad2_Click);
+            customFlags2LoadButton.Location = new System.Drawing.Point(319, 607);
+            customFlags2LoadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags2LoadButton.Name = "customFlags2LoadButton";
+            customFlags2LoadButton.Size = new System.Drawing.Size(88, 27);
+            customFlags2LoadButton.TabIndex = 34;
+            customFlags2LoadButton.Text = "Load";
+            toolTip1.SetToolTip(customFlags2LoadButton, "Loads the flags in this current custom slot");
+            customFlags2LoadButton.UseVisualStyleBackColor = true;
+            customFlags2LoadButton.Click += CustomLoad2_Click;
             // 
             // customFlags3SaveButton
             // 
-            this.customFlags3SaveButton.Location = new System.Drawing.Point(413, 607);
-            this.customFlags3SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags3SaveButton.Name = "customFlags3SaveButton";
-            this.customFlags3SaveButton.Size = new System.Drawing.Size(88, 27);
-            this.customFlags3SaveButton.TabIndex = 35;
-            this.customFlags3SaveButton.Text = "Save";
-            this.toolTip1.SetToolTip(this.customFlags3SaveButton, "Saves the current flags to this custom slot");
-            this.customFlags3SaveButton.UseVisualStyleBackColor = true;
-            this.customFlags3SaveButton.Click += new System.EventHandler(this.CustomSave3_Click);
+            customFlags3SaveButton.Location = new System.Drawing.Point(413, 607);
+            customFlags3SaveButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags3SaveButton.Name = "customFlags3SaveButton";
+            customFlags3SaveButton.Size = new System.Drawing.Size(88, 27);
+            customFlags3SaveButton.TabIndex = 35;
+            customFlags3SaveButton.Text = "Save";
+            toolTip1.SetToolTip(customFlags3SaveButton, "Saves the current flags to this custom slot");
+            customFlags3SaveButton.UseVisualStyleBackColor = true;
+            customFlags3SaveButton.Click += CustomSave3_Click;
             // 
             // customFlags3LoadButton
             // 
-            this.customFlags3LoadButton.Location = new System.Drawing.Point(507, 607);
-            this.customFlags3LoadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.customFlags3LoadButton.Name = "customFlags3LoadButton";
-            this.customFlags3LoadButton.Size = new System.Drawing.Size(88, 27);
-            this.customFlags3LoadButton.TabIndex = 36;
-            this.customFlags3LoadButton.Text = "Load";
-            this.toolTip1.SetToolTip(this.customFlags3LoadButton, "Loads the flags in this current custom slot");
-            this.customFlags3LoadButton.UseVisualStyleBackColor = true;
-            this.customFlags3LoadButton.Click += new System.EventHandler(this.CustomLoad3_Click);
+            customFlags3LoadButton.Location = new System.Drawing.Point(507, 607);
+            customFlags3LoadButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            customFlags3LoadButton.Name = "customFlags3LoadButton";
+            customFlags3LoadButton.Size = new System.Drawing.Size(88, 27);
+            customFlags3LoadButton.TabIndex = 36;
+            customFlags3LoadButton.Text = "Load";
+            toolTip1.SetToolTip(customFlags3LoadButton, "Loads the flags in this current custom slot");
+            customFlags3LoadButton.UseVisualStyleBackColor = true;
+            customFlags3LoadButton.Click += CustomLoad3_Click;
             // 
             // oldFlagsTextbox
             // 
-            this.oldFlagsTextbox.Location = new System.Drawing.Point(273, 76);
-            this.oldFlagsTextbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.oldFlagsTextbox.Name = "oldFlagsTextbox";
-            this.oldFlagsTextbox.Size = new System.Drawing.Size(212, 23);
-            this.oldFlagsTextbox.TabIndex = 37;
-            this.toolTip1.SetToolTip(this.oldFlagsTextbox, "These flags represent the selected options. They can be copy/pasted.");
+            oldFlagsTextbox.Location = new System.Drawing.Point(273, 76);
+            oldFlagsTextbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            oldFlagsTextbox.Name = "oldFlagsTextbox";
+            oldFlagsTextbox.Size = new System.Drawing.Size(212, 23);
+            oldFlagsTextbox.TabIndex = 37;
+            toolTip1.SetToolTip(oldFlagsTextbox, "These flags represent the selected options. They can be copy/pasted.");
             // 
             // convertButton
             // 
-            this.convertButton.Location = new System.Drawing.Point(491, 76);
-            this.convertButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.convertButton.Name = "convertButton";
-            this.convertButton.Size = new System.Drawing.Size(126, 24);
-            this.convertButton.TabIndex = 39;
-            this.convertButton.Text = "Convert";
-            this.toolTip1.SetToolTip(this.convertButton, "Create the ROM");
-            this.convertButton.UseVisualStyleBackColor = true;
-            this.convertButton.Click += new System.EventHandler(this.convertButton_Click);
+            convertButton.Location = new System.Drawing.Point(491, 76);
+            convertButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            convertButton.Name = "convertButton";
+            convertButton.Size = new System.Drawing.Size(126, 24);
+            convertButton.TabIndex = 39;
+            convertButton.Text = "Convert";
+            toolTip1.SetToolTip(convertButton, "Create the ROM");
+            convertButton.UseVisualStyleBackColor = true;
+            convertButton.Click += convertButton_Click;
             // 
             // customFlags1Label
             // 
-            this.customFlags1Label.AutoSize = true;
-            this.customFlags1Label.Location = new System.Drawing.Point(32, 559);
-            this.customFlags1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.customFlags1Label.Name = "customFlags1Label";
-            this.customFlags1Label.Size = new System.Drawing.Size(98, 15);
-            this.customFlags1Label.TabIndex = 27;
-            this.customFlags1Label.Text = "Custom Flags #1:";
+            customFlags1Label.AutoSize = true;
+            customFlags1Label.Location = new System.Drawing.Point(32, 559);
+            customFlags1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            customFlags1Label.Name = "customFlags1Label";
+            customFlags1Label.Size = new System.Drawing.Size(98, 15);
+            customFlags1Label.TabIndex = 27;
+            customFlags1Label.Text = "Custom Flags #1:";
             // 
             // customFlags2Label
             // 
-            this.customFlags2Label.AutoSize = true;
-            this.customFlags2Label.Location = new System.Drawing.Point(221, 559);
-            this.customFlags2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.customFlags2Label.Name = "customFlags2Label";
-            this.customFlags2Label.Size = new System.Drawing.Size(98, 15);
-            this.customFlags2Label.TabIndex = 28;
-            this.customFlags2Label.Text = "Custom Flags #2:";
+            customFlags2Label.AutoSize = true;
+            customFlags2Label.Location = new System.Drawing.Point(221, 559);
+            customFlags2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            customFlags2Label.Name = "customFlags2Label";
+            customFlags2Label.Size = new System.Drawing.Size(98, 15);
+            customFlags2Label.TabIndex = 28;
+            customFlags2Label.Text = "Custom Flags #2:";
             // 
             // customFlags3Label
             // 
-            this.customFlags3Label.AutoSize = true;
-            this.customFlags3Label.Location = new System.Drawing.Point(411, 559);
-            this.customFlags3Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.customFlags3Label.Name = "customFlags3Label";
-            this.customFlags3Label.Size = new System.Drawing.Size(98, 15);
-            this.customFlags3Label.TabIndex = 32;
-            this.customFlags3Label.Text = "Custom Flags #3:";
+            customFlags3Label.AutoSize = true;
+            customFlags3Label.Location = new System.Drawing.Point(411, 559);
+            customFlags3Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            customFlags3Label.Name = "customFlags3Label";
+            customFlags3Label.Size = new System.Drawing.Size(98, 15);
+            customFlags3Label.TabIndex = 32;
+            customFlags3Label.Text = "Custom Flags #3:";
             // 
             // label25
             // 
-            this.label25.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.label25.Location = new System.Drawing.Point(35, 548);
-            this.label25.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(560, 1);
-            this.label25.TabIndex = 26;
+            label25.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            label25.Location = new System.Drawing.Point(35, 548);
+            label25.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            label25.Name = "label25";
+            label25.Size = new System.Drawing.Size(560, 1);
+            label25.TabIndex = 26;
             // 
             // backgroundWorker1
             // 
-            this.backgroundWorker1.WorkerReportsProgress = true;
-            this.backgroundWorker1.WorkerSupportsCancellation = true;
-            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker1_DoWork);
-            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker1_ProgressChanged);
+            backgroundWorker1.WorkerReportsProgress = true;
+            backgroundWorker1.WorkerSupportsCancellation = true;
+            backgroundWorker1.DoWork += BackgroundWorker1_DoWork;
+            backgroundWorker1.ProgressChanged += BackgroundWorker1_ProgressChanged;
             // 
             // oldFlagsLabel
             // 
-            this.oldFlagsLabel.AutoSize = true;
-            this.oldFlagsLabel.Location = new System.Drawing.Point(273, 58);
-            this.oldFlagsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.oldFlagsLabel.Name = "oldFlagsLabel";
-            this.oldFlagsLabel.Size = new System.Drawing.Size(56, 15);
-            this.oldFlagsLabel.TabIndex = 38;
-            this.oldFlagsLabel.Text = "Old Flags";
+            oldFlagsLabel.AutoSize = true;
+            oldFlagsLabel.Location = new System.Drawing.Point(273, 58);
+            oldFlagsLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            oldFlagsLabel.Name = "oldFlagsLabel";
+            oldFlagsLabel.Size = new System.Drawing.Size(56, 15);
+            oldFlagsLabel.TabIndex = 38;
+            oldFlagsLabel.Text = "Old Flags";
             // 
             // batchButton
             // 
-            this.batchButton.Location = new System.Drawing.Point(177, 105);
-            this.batchButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.batchButton.Name = "batchButton";
-            this.batchButton.Size = new System.Drawing.Size(88, 27);
-            this.batchButton.TabIndex = 40;
-            this.batchButton.Text = "Batch";
-            this.batchButton.UseVisualStyleBackColor = true;
-            this.batchButton.Click += new System.EventHandler(this.Bulk_Generate_Click);
+            batchButton.Location = new System.Drawing.Point(177, 105);
+            batchButton.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            batchButton.Name = "batchButton";
+            batchButton.Size = new System.Drawing.Size(88, 27);
+            batchButton.TabIndex = 40;
+            batchButton.Text = "Batch";
+            batchButton.UseVisualStyleBackColor = true;
+            batchButton.Click += Bulk_Generate_Click;
             // 
             // MainUI
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(626, 642);
-            this.Controls.Add(this.batchButton);
-            this.Controls.Add(this.convertButton);
-            this.Controls.Add(this.oldFlagsLabel);
-            this.Controls.Add(this.oldFlagsTextbox);
-            this.Controls.Add(this.customFlags3LoadButton);
-            this.Controls.Add(this.customFlags3SaveButton);
-            this.Controls.Add(this.customFlags2LoadButton);
-            this.Controls.Add(this.customFlags2SaveButton);
-            this.Controls.Add(this.label25);
-            this.Controls.Add(this.customFlags3Label);
-            this.Controls.Add(this.customFlags3TextBox);
-            this.Controls.Add(this.customFlags1LoadButton);
-            this.Controls.Add(this.customFlags1SaveButton);
-            this.Controls.Add(this.customFlags2Label);
-            this.Controls.Add(this.customFlags1Label);
-            this.Controls.Add(this.customFlags2TextBox);
-            this.Controls.Add(this.customFlags1TextBox);
-            this.Controls.Add(this.discordButton);
-            this.Controls.Add(this.unused3FlagsButton);
-            this.Controls.Add(this.unused2FlagsButton);
-            this.Controls.Add(this.randomPercentFlagButton);
-            this.Controls.Add(this.maxRandoFlagButton);
-            this.Controls.Add(this.standard2022FlagsButton);
-            this.Controls.Add(this.beginnerFlagsButton);
-            this.Controls.Add(this.wikiButton);
-            this.Controls.Add(this.flagsLabel);
-            this.Controls.Add(this.updateButton);
-            this.Controls.Add(this.flagsTextBox);
-            this.Controls.Add(this.generateRomButton);
-            this.Controls.Add(this.romFileBrowseButton);
-            this.Controls.Add(this.createSeedButton);
-            this.Controls.Add(this.seedLabel);
-            this.Controls.Add(this.romFileLabel);
-            this.Controls.Add(this.seedTextBox);
-            this.Controls.Add(this.romFileTextBox);
-            this.Controls.Add(this.mainTabControl);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.Name = "MainUI";
-            this.Text = "Zelda 2 Randomizer";
-            this.mainTabControl.ResumeLayout(false);
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.itemGrp.ResumeLayout(false);
-            this.itemGrp.PerformLayout();
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
-            this.tabPage5.ResumeLayout(false);
-            this.tabPage5.PerformLayout();
-            this.expBox.ResumeLayout(false);
-            this.expBox.PerformLayout();
-            this.tabPage9.ResumeLayout(false);
-            this.tabPage9.PerformLayout();
-            this.tabPage6.ResumeLayout(false);
-            this.tabPage6.PerformLayout();
-            this.tabPage7.ResumeLayout(false);
-            this.tabPage7.PerformLayout();
-            this.tabPage8.ResumeLayout(false);
-            this.tabPage8.PerformLayout();
-            this.tabPage10.ResumeLayout(false);
-            this.tabPage10.PerformLayout();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(626, 642);
+            Controls.Add(batchButton);
+            Controls.Add(convertButton);
+            Controls.Add(oldFlagsLabel);
+            Controls.Add(oldFlagsTextbox);
+            Controls.Add(customFlags3LoadButton);
+            Controls.Add(customFlags3SaveButton);
+            Controls.Add(customFlags2LoadButton);
+            Controls.Add(customFlags2SaveButton);
+            Controls.Add(label25);
+            Controls.Add(customFlags3Label);
+            Controls.Add(customFlags3TextBox);
+            Controls.Add(customFlags1LoadButton);
+            Controls.Add(customFlags1SaveButton);
+            Controls.Add(customFlags2Label);
+            Controls.Add(customFlags1Label);
+            Controls.Add(customFlags2TextBox);
+            Controls.Add(customFlags1TextBox);
+            Controls.Add(discordButton);
+            Controls.Add(unused3FlagsButton);
+            Controls.Add(unused2FlagsButton);
+            Controls.Add(randomPercentFlagButton);
+            Controls.Add(maxRandoFlagButton);
+            Controls.Add(standard2022FlagsButton);
+            Controls.Add(beginnerFlagsButton);
+            Controls.Add(wikiButton);
+            Controls.Add(flagsLabel);
+            Controls.Add(updateButton);
+            Controls.Add(flagsTextBox);
+            Controls.Add(generateRomButton);
+            Controls.Add(romFileBrowseButton);
+            Controls.Add(createSeedButton);
+            Controls.Add(seedLabel);
+            Controls.Add(romFileLabel);
+            Controls.Add(seedTextBox);
+            Controls.Add(romFileTextBox);
+            Controls.Add(mainTabControl);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            Name = "MainUI";
+            Text = "Zelda 2 Randomizer";
+            mainTabControl.ResumeLayout(false);
+            tabPage4.ResumeLayout(false);
+            tabPage4.PerformLayout();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            itemGrp.ResumeLayout(false);
+            itemGrp.PerformLayout();
+            tabPage1.ResumeLayout(false);
+            tabPage1.PerformLayout();
+            tabPage2.ResumeLayout(false);
+            tabPage2.PerformLayout();
+            tabPage5.ResumeLayout(false);
+            tabPage5.PerformLayout();
+            expBox.ResumeLayout(false);
+            expBox.PerformLayout();
+            tabPage9.ResumeLayout(false);
+            tabPage9.PerformLayout();
+            tabPage6.ResumeLayout(false);
+            tabPage6.PerformLayout();
+            tabPage7.ResumeLayout(false);
+            tabPage7.PerformLayout();
+            tabPage8.ResumeLayout(false);
+            tabPage8.PerformLayout();
+            tabPage10.ResumeLayout(false);
+            tabPage10.PerformLayout();
+            tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
