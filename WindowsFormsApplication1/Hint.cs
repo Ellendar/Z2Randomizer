@@ -110,52 +110,45 @@ public class Hint
     private List<char> text;
 
     public List<char> Text { get => text; }
-    private Shuffler s;
 
-    public Hint(Shuffler s)
+    public Hint()
     {
         text = Util.ToGameText("I know$nothing", true);
-        this.s = s;
     }
 
-    public Hint(List<char> text, Shuffler s)
+    public Hint(List<char> text)
     {
         this.text = text;
-        this.s = s;
-
     }
 
-    public void GenerateCommunityHint(String type)
+    public void GenerateCommunityHint(HintType type, Random r)
     {
-        if (type == "wizard")
+        switch(type)
         {
-            int thisone = s.R.Next(wizardTexts.Count());
-            while (used.Contains(thisone))
-            {
-                thisone = s.R.Next(wizardTexts.Count());
-            }
-            this.text = Util.ToGameText(wizardTexts[thisone], true).ToList();
-            used.Add(thisone);
-        }
-        else if (type == "bagu")
-        {
-            this.text = Util.ToGameText(bagutext[s.R.Next(bagutext.Count())], true);
-        }
-        else if (type == "bridge")
-        {
-            this.text = Util.ToGameText(bridgetext[s.R.Next(bridgetext.Length)], true);
-        }
-        else if (type == "downstab")
-        {
-            this.text = Util.ToGameText(downstabtext[s.R.Next(downstabtext.Length)], true);
-        }
-        else if (type == "upstab")
-        {
-            this.text = Util.ToGameText(upstabtext[s.R.Next(upstabtext.Length)], true);
-        }
-        else
-        {
-            Debug.WriteLine("Invalid hint type!");
+            case HintType.WIZARD:
+                int thisone = r.Next(wizardTexts.Count());
+                while (used.Contains(thisone))
+                {
+                    thisone = r.Next(wizardTexts.Count());
+                }
+                this.text = Util.ToGameText(wizardTexts[thisone], true).ToList();
+                used.Add(thisone);
+                break;
+            case HintType.BAGU:
+                this.text = Util.ToGameText(bagutext[r.Next(bagutext.Count())], true);
+                break;
+            case HintType.BRIDGE:
+                this.text = Util.ToGameText(bridgetext[r.Next(bridgetext.Length)], true);
+                break;
+            case HintType.DOWNSTAB:
+                this.text = Util.ToGameText(downstabtext[r.Next(downstabtext.Length)], true);
+                break;
+            case HintType.UPSTAB:
+                this.text = Util.ToGameText(upstabtext[r.Next(upstabtext.Length)], true);
+                break;
+            default:
+                Debug.WriteLine("Invalid hint type!");
+                break;
         }
     }
 
@@ -273,7 +266,7 @@ public class Hint
         text = Util.ToGameText(hint, true).ToList();
     }
 
-    public void GenerateTownHint(Spell spell)
+    public void GenerateTownHint(Spell spell, bool useDash)
     {
         String text = "";
         switch(spell)
@@ -291,13 +284,13 @@ public class Hint
                 text += "fairy$";
                 break;
             case Spell.FIRE:
-                if (!s.Props.dashSpell)
-                {
-                    text += "fire$";
+                if (useDash)
+                { 
+                    text += "dash$";
                 }
                 else
                 {
-                    text += "dash$";
+                    text += "fire$";
                 }
                 break;
             case Spell.REFLECT:

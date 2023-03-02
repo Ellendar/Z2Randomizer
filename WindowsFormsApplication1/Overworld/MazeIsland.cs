@@ -72,7 +72,7 @@ class MazeIsland : World
         }
 }
 
-    public Boolean Terraform()
+    public bool Terraform()
     {
         if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
         {
@@ -255,7 +255,7 @@ class MazeIsland : World
 
                 //place palace 4
 
-                Boolean canPlace = false;
+                bool canPlace = false;
 
                 int p4x = hyrule.RNG.Next(15) + 3;
                 int p4y = hyrule.RNG.Next(MAP_ROWS - 6) + 3;

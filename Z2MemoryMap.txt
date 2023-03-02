@@ -1,0 +1,11 @@
+0774 : Current life
+0796 : Stab state. 10 = down, 14```
+F4F8 : Middle of routine that sets downstab
+F508 : Probably equivalent offset for upstab
+
+--Swap the gains
+F4DF -> 04
+F4F7 -> 10
+--Reverse the checks for error message
+F4EB -> 10
+F4D3 -> 04

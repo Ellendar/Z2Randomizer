@@ -9,11 +9,11 @@ namespace Z2Randomizer;
 //This isn't actually used for anything. Should it be?
 class Character
 {
-    private Boolean[] itemGet;
-    private Boolean[] spellGet;
-    private Boolean startWithTrophy;
-    private Boolean startWithKid;
-    private Boolean startWithMedicine;
+    private bool[] itemGet;
+    private bool[] spellGet;
+    private bool startWithTrophy;
+    private bool startWithKid;
+    private bool startWithMedicine;
     
 
     public Character(RandomizerProperties props)
@@ -24,13 +24,13 @@ class Character
     public bool StartWithKid { get => startWithKid;  }
     public bool StartWithMedicine { get => startWithMedicine;  }
 
-    public Boolean Has(Item item)
+    public bool Has(Item item)
     {
         //check item map
         throw new NotImplementedException();
     }
 
-    public Boolean Has(Spell spell)
+    public bool Has(Spell spell)
     {
         //check spell map
         throw new NotImplementedException();

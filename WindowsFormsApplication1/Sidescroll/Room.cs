@@ -1,10 +1,12 @@
-﻿using NLog;
+﻿using Newtonsoft.Json;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.OleDb;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.Sidescroll;
@@ -12,38 +14,37 @@ namespace Z2Randomizer.Sidescroll;
 public class Room
 {
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
-    private int map;
-    private Byte[] connections;
-    private Byte[] enemies;
-    private Byte[] sideView;
-    private int leftByte;
-    private int rightByte;
+
+    //private int map;
+    //private byte[] Connections;
+    //private byte[] Enemies;
+    //private byte[] sideView;
+    //private int leftByte;
+    //private int rightByte;
     private int upByte;
     private int downByte;
-    private Room left;
-    private Room right;
+    //private Room left;
+    //private Room right;
     private Room up;
     private Room down;
-    private Boolean isRoot;
-    private Boolean isReachable;
-    private Boolean beforeTbird;
-    private int memAddr;
-    private Boolean isDeadEnd;
-    private Boolean isPlaced;
-    private Boolean udRev;
-    private Boolean fairyBlocked;
-    private Boolean upstabBlocked;
-    private Boolean downstabBlocked;
-    private Boolean gloveBlocked;
-    private Boolean jumpBlocked;
-    private Boolean hasItem;
-    private Boolean hasBoss;
-    private Boolean hasDrop;
-    private int elevatorScreen;
-    private Byte bitmask;
-    private int numExits;
-    private bool dropZone;
-    private int newmap;
+    //private bool isRoot;
+    //private bool isReachable;
+    //private bool beforeTbird;
+    //private int memAddr;
+    //private bool isDeadEnd;
+    //private bool isPlaced;
+    private bool isUpDownReversed;
+    //private bool fairyBlocked;
+    //private bool upstabBlocked;
+    //private bool downstabBlocked;
+    //private bool gloveBlocked;
+    //private bool jumpBlocked;
+    //private bool HasItem;
+    //private bool HasBoss;
+    //private bool hasDrop;
+    //private int ElevatorScreen;
+    //private bool dropZone;
+    //private int Newmap;
 
     private readonly int enemyPtr1 = 0x105B1;
     private readonly int enemyPtr2 = 0x1208E;
@@ -58,63 +59,18 @@ public class Room
     private readonly int connectors2 = 0x12208;
     private readonly int connectors3 = 0x1472b;
 
-    public int Map
-    {
-        get
-        {
-            return map;
-        }
+    private byte bitmask;
 
-        set
-        {
-            map = value;
-        }
-    }
+    public int Map { get; set; }
 
-    public bool IsRoot
-    {
-        get
-        {
-            return isRoot;
-        }
-
-        set
-        {
-            isRoot = value;
-        }
-    }
-
-    public Room Left
-    {
-        get
-        {
-            return left;
-        }
-
-        set
-        {
-            left = value;
-        }
-    }
-
-    public Room Right
-    {
-        get
-        {
-            return right;
-        }
-
-        set
-        {
-            right = value;
-        }
-    }
-
+    public bool IsRoot { get; set; }
+    public Room Left { get; set; }
+    public Room Right { get; set; }
     public Room Up
     {
         get
         {
-            if(udRev)
+            if (isUpDownReversed)
             {
                 return down;
             }
@@ -123,7 +79,7 @@ public class Room
 
         set
         {
-            if(udRev)
+            if (isUpDownReversed)
             {
                 down = value;
                 return;
@@ -131,12 +87,11 @@ public class Room
             up = value;
         }
     }
-
     public Room Down
     {
         get
         {
-            if(udRev)
+            if (isUpDownReversed)
             {
                 return up;
             }
@@ -145,7 +100,7 @@ public class Room
 
         set
         {
-            if(udRev)
+            if (isUpDownReversed)
             {
                 up = value;
                 return;
@@ -153,103 +108,18 @@ public class Room
             down = value;
         }
     }
-
-    public bool IsReachable
-    {
-        get
-        {
-            return isReachable;
-        }
-
-        set
-        {
-            isReachable = value;
-        }
-    }
-
-    public int MemAddr
-    {
-        get
-        {
-            return memAddr;
-        }
-
-        set
-        {
-            memAddr = value;
-        }
-    }
-
-    public byte[] Connections
-    {
-        get
-        {
-            return connections;
-        }
-
-        set
-        {
-            connections = value;
-        }
-    }
-
-    public bool IsDeadEnd
-    {
-        get
-        {
-            return isDeadEnd;
-        }
-
-        set
-        {
-            isDeadEnd = value;
-        }
-    }
-
-    public bool IsPlaced
-    {
-        get
-        {
-            return isPlaced;
-        }
-
-        set
-        {
-            isPlaced = value;
-        }
-    }
-
-    public int LeftByte
-    {
-        get
-        {
-            return leftByte;
-        }
-
-        set
-        {
-            leftByte = value;
-        }
-    }
-
-    public int RightByte
-    {
-        get
-        {
-            return rightByte;
-        }
-
-        set
-        {
-            rightByte = value;
-        }
-    }
-
+    public bool IsReachable { get; set; }
+    public int MemAddr { get; set; }
+    public byte[] Connections { get; set; }
+    public bool IsDeadEnd { get; set; }
+    public bool IsPlaced { get; set; }  
+    public int LeftByte { get; set; }
+    public int RightByte { get; set; }
     public int UpByte
     {
         get
         {
-            if(udRev)
+            if(isUpDownReversed)
             {
                 return downByte;
             }
@@ -258,7 +128,7 @@ public class Room
 
         set
         {
-            if(udRev)
+            if(isUpDownReversed)
             {
                 downByte = value;
                 return;
@@ -271,7 +141,7 @@ public class Room
     {
         get
         {
-            if(udRev)
+            if(isUpDownReversed)
             {
                 return upByte;
             }
@@ -280,7 +150,7 @@ public class Room
 
         set
         {
-            if(udRev)
+            if(isUpDownReversed)
             {
                 upByte = value;
                 return;
@@ -289,80 +159,116 @@ public class Room
         }
     }
 
-    public bool BeforeTbird
+    public bool IsBeforeTbird { get; set; }
+
+    public bool HasDrop { get; set; }
+    public int ElevatorScreen { get; set; }
+    public bool IsFairyBlocked { get; set; }
+    public bool IsUpstabBlocked { get; set; }
+    public bool IsDownstabBlocked { get; set; }
+    public bool IsGloveBlocked { get; set; }
+    public bool IsJumpBlocked { get; set; }
+    public bool IsDropZone { get; set; }
+    public bool HasItem { get; set; }
+    public byte[] Enemies { get; set; }
+    public byte[] SideView { get; set; }
+    public int Newmap { get; set; }
+    public bool HasBoss { get; set; }
+    public string Name { get; set; }
+    public string Group { get; set; }
+    public bool Enabled { get; set; }
+
+    public Room(
+        int map, 
+        byte[] conn, 
+        byte[] enemies, 
+        byte[] sideview, 
+        byte bitmask, 
+        bool fairyBlocked, 
+        bool gloveBlocked, 
+        bool downstabBlocked, 
+        bool upstabBlocked, 
+        bool jumpBlocked, 
+        bool hasItem, 
+        bool hasBoss, 
+        bool hasDrop, 
+        int elevatorScreen, 
+        int memAddr, 
+        bool upDownRev, 
+        bool dropZone)
     {
-        get
-        {
-            return beforeTbird;
-        }
-
-        set
-        {
-            beforeTbird = value;
-        }
-    }
-
-    public bool HasDrop { get => hasDrop; set => hasDrop = value; }
-    public int ElevatorScreen { get => elevatorScreen; set => elevatorScreen = value; }
-    public bool FairyBlocked { get => fairyBlocked; set => fairyBlocked = value; }
-    public bool UpstabBlocked { get => upstabBlocked; set => upstabBlocked = value; }
-    public bool DownstabBlocked { get => downstabBlocked; set => downstabBlocked = value; }
-    public bool GloveBlocked { get => gloveBlocked; set => gloveBlocked = value; }
-    public bool JumpBlocked { get => jumpBlocked; set => jumpBlocked = value; }
-    public bool DropZone { get => dropZone; set => dropZone = value; }
-    public byte[] Enemies { get => enemies; set => enemies = value; }
-    public byte[] SideView { get => sideView; set => sideView = value; }
-    public int Newmap { get => newmap; set => newmap = value; }
-    public bool HasBoss { get => hasBoss; set => hasBoss = value; }
-
-    public Room(int map, Byte[] conn, Byte[] enemies, Byte[] sideview, Byte bitmask, Boolean fairyBlocked, Boolean gloveBlocked, Boolean downstabBlocked, Boolean upstabBlocked, Boolean jumpBlocked, Boolean hasItem, Boolean hasBoss, Boolean hasDrop, int elevatorScreen, int memAddr, bool upDownRev, bool dropZone)
-    {
-        this.map = map;
-        connections = conn;
-        this.enemies = enemies;
-        this.sideView = sideview;
-        this.gloveBlocked = gloveBlocked;
-        this.downstabBlocked = downstabBlocked;
-        this.upstabBlocked = upstabBlocked;
-        this.fairyBlocked = fairyBlocked;
-        this.hasBoss = hasBoss;
-        this.hasItem = hasItem;
-        leftByte = conn[0];
-        downByte = conn[1];
-        upByte = conn[2];
-        rightByte = conn[3];
-        isRoot = false;
-        isReachable = false;
+        Map = map;
+        Connections = conn;
+        Enemies = enemies;
+        SideView = sideview;
+        IsGloveBlocked = gloveBlocked;
+        IsDownstabBlocked = downstabBlocked;
+        IsUpstabBlocked = upstabBlocked;
+        IsFairyBlocked = fairyBlocked;
+        IsJumpBlocked = jumpBlocked;
+        HasBoss = hasBoss;
+        HasItem = hasItem;
+        LeftByte = conn[0];
+        DownByte = conn[1];
+        UpByte = conn[2];
+        RightByte = conn[3];
+        IsRoot = false;
+        IsReachable = false;
         MemAddr = memAddr;
-        isPlaced = false;
-        left = null;
-        right = null;
-        up = null;
-        down = null;
-        beforeTbird = false;
-        udRev = upDownRev;
+        IsPlaced = false;
+        Left = null;
+        Right = null;
+        Up = null;
+        Down = null;
+        IsBeforeTbird = false;
+        isUpDownReversed = upDownRev;
         this.bitmask = bitmask;
-        this.hasDrop = hasDrop;
-        this.elevatorScreen = elevatorScreen;
+        HasDrop = hasDrop;
+        ElevatorScreen = elevatorScreen;
         int numExits = 0;
-        foreach(int con in connections)
+        foreach (int con in Connections)
         {
-            if(con < 0xFC && con > 3)
+            if (con < 0xFC && con > 3)
             {
                 numExits++;
             }
         }
-        this.numExits = numExits;
-        this.isDeadEnd = numExits == 1;
-        this.dropZone = dropZone;
+        //this.numExits = numExits;
+        IsDeadEnd = numExits == 1;
+        IsDropZone = dropZone;
+    }
+
+    public Room(string json)
+    {
+        dynamic roomData = JsonConvert.DeserializeObject(json);
+        Name = roomData.name;
+        Group = roomData.group;
+        Map = roomData.map;
+        Enabled = (bool)roomData.enabled;
+        Connections = Convert.FromHexString(roomData.connections.ToString());
+        Enemies = Convert.FromHexString(roomData.enemies.ToString());
+        SideView = Convert.FromHexString(roomData.sideviewData.ToString());
+        bitmask = Convert.FromHexString(roomData.bitmask.ToString())[0];
+        IsFairyBlocked = roomData.isFairyBlocked;
+        IsGloveBlocked = roomData.isGloveBlocked;
+        IsDownstabBlocked = roomData.isDownstabBlocked;
+        IsUpstabBlocked = roomData.isUpstabBlocked;
+        IsJumpBlocked = roomData.isJumpBlocked;
+        HasItem = roomData.hasItem;
+        HasBoss = roomData.hasBoss;
+        HasDrop = roomData.hasDrop;
+        ElevatorScreen = roomData.elevatorScreen;
+        MemAddr = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+        isUpDownReversed = roomData.isUpDownReversed;
+        IsDropZone = roomData.isDropZone;
     }
 
     public void UpdateBytes()
     {
-        connections[0] = (Byte)leftByte;
-        connections[1] = (Byte)downByte;
-        connections[2] = (Byte)upByte;
-        connections[3] = (Byte)rightByte;
+        Connections[0] = (Byte)LeftByte;
+        Connections[1] = (Byte)downByte;
+        Connections[2] = (Byte)upByte;
+        Connections[3] = (Byte)RightByte;
     }
 
     public void WriteSideViewPtr(int addr, int palSet, ROM ROMData)
@@ -394,17 +300,17 @@ public class Room
 
     public void UpdateEnemies(int addr, int palSet, ROM ROMData)
     {
-        if(enemies.Length > 1 && palSet == 2)
+        if(Enemies.Length > 1 && palSet == 2)
         {
-            for(int i = 2; i < enemies.Length; i += 2)
+            for(int i = 2; i < Enemies.Length; i += 2)
             {
-                if((enemies[i] & 0x3F) == 0x0A && !hasBoss && !hasItem)
+                if((Enemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
                 {
-                    enemies[i] = (byte)(0x0F + (enemies[i] & 0xC0));
+                    Enemies[i] = (byte)(0x0F + (Enemies[i] & 0xC0));
                 }
             }
         }
-        ROMData.Put(addr, enemies);
+        ROMData.Put(addr, Enemies);
         if (palSet == 1)
         {
             int memAddr = addr - 0x98b0;
@@ -440,29 +346,29 @@ public class Room
         }
         if(Newmap % 2 == 0)
         {
-            byte old = ROMData.GetByte(ptr + newmap / 2);
+            byte old = ROMData.GetByte(ptr + Newmap / 2);
             old = (byte)(old & 0x0F);
             old = (byte)((bitmask << 4) | old);
-            ROMData.Put(ptr + newmap / 2, old);
+            ROMData.Put(ptr + Newmap / 2, old);
         }
         else
         {
-            byte old = ROMData.GetByte(ptr + newmap / 2);
+            byte old = ROMData.GetByte(ptr + Newmap / 2);
             old = (byte)(old & 0xF0);
             old = (byte)((bitmask) | old);
-            ROMData.Put(ptr + newmap / 2, old);
+            ROMData.Put(ptr + Newmap / 2, old);
         }
     }
 
     public void SetItem(Item it)
     {
-        for(int i = 4; i < sideView.Length; i+=2)
+        for(int i = 4; i < SideView.Length; i+=2)
         {
-            int yPos = sideView[i] & 0xF0;
-            yPos = yPos >> 4;
-            if(yPos < 13 && sideView[i+1] == 0x0F)
+            int yPos = SideView[i] & 0xF0;
+            yPos >>= 4;
+            if(yPos < 13 && SideView[i+1] == 0x0F)
             {
-                sideView[i + 2] = (byte)it;
+                SideView[i + 2] = (byte)it;
                 return;
             }
         }
@@ -470,11 +376,11 @@ public class Room
 
     public void UpdateItem(Item i, int palSet, ROM ROMData)
     {
-        int sideViewPtr = (ROMData.GetByte(sideview1 + newmap * 2) + (ROMData.GetByte(sideview1 + 1 + newmap * 2) << 8)) + 0x8010;
+        int sideViewPtr = (ROMData.GetByte(sideview1 + Newmap * 2) + (ROMData.GetByte(sideview1 + 1 + Newmap * 2) << 8)) + 0x8010;
 
         if (palSet == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + newmap * 2) + (ROMData.GetByte(sideview2 + 1 + newmap * 2) << 8)) + 0x8010;
+            sideViewPtr = (ROMData.GetByte(sideview2 + Newmap * 2) + (ROMData.GetByte(sideview2 + 1 + Newmap * 2) << 8)) + 0x8010;
         }
         int ptr = sideViewPtr + 4;
         byte data = ROMData.GetByte(ptr);
@@ -501,9 +407,9 @@ public class Room
         {
             for (int i = 0; i < 4; i++)
             {
-                if (connections[i] < 0xFC || entrance)
+                if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors1 + newmap * 4 + i, connections[i]);
+                    ROMData.Put(connectors1 + Newmap * 4 + i, Connections[i]);
                 }
             }
         }
@@ -511,9 +417,9 @@ public class Room
         {
             for(int i = 0; i < 4; i++)
             {
-                if (connections[i] < 0xFC || entrance)
+                if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors2 + newmap * 4 + i, connections[i]);
+                    ROMData.Put(connectors2 + Newmap * 4 + i, Connections[i]);
                 }
             }
         }
@@ -521,9 +427,9 @@ public class Room
         {
             for (int i = 0; i < 4; i++)
             {
-                if (connections[i] < 0xFC || entrance)
+                if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors3 + newmap * 4 + i, connections[i]);
+                    ROMData.Put(connectors3 + Newmap * 4 + i, Connections[i]);
                 }
             }
         }
@@ -532,47 +438,47 @@ public class Room
     /*
     public void Dump()
     {
-        Console.Write("new Room(" + map + ", " + "new Byte[] {" );
+        Console.Write("new Room(" + map + ", " + "new byte[] {" );
         
-        for (int i = 0; i < connections.Length; i++)
+        for (int i = 0; i < Connections.Length; i++)
         {
-            Console.Write("0x{0:X}", connections[i]);
-            if (i != connections.Length - 1)
+            Console.Write("0x{0:X}", Connections[i]);
+            if (i != Connections.Length - 1)
             {
                 Console.Write(", ");
             }
         }
-        Console.Write("}, new Byte[] { ");
-        for (int i = 0; i < enemies.Length; i++)
+        Console.Write("}, new byte[] { ");
+        for (int i = 0; i < Enemies.Length; i++)
         {
-            Console.Write("0x{0:X}", enemies[i]);
-            if(i != enemies.Length - 1)
+            Console.Write("0x{0:X}", Enemies[i]);
+            if(i != Enemies.Length - 1)
             {
                 Console.Write(", ");
             }
         }
-        Console.Write("}, new Byte[] { ");
-        for (int i = 0; i < sideView.Length; i++)
+        Console.Write("}, new byte[] { ");
+        for (int i = 0; i < SideView.Length; i++)
         {
             Console.Write("0x{0:X}", sideView[i]);
-            if (i != sideView.Length - 1)
+            if (i != SideView.Length - 1)
             {
                 Console.Write(", ");
             }
         }
         Console.Write("}, ");
         Console.Write("0x{0:X}", bitmask); 
-        Console.Write(", " + fairyBlocked.ToString().ToLower() + ", " + gloveBlocked.ToString().ToLower() + ", " + downstabBlocked.ToString().ToLower() + ", " + upstabBlocked.ToString().ToLower() + ", " + jumpBlocked.ToString().ToLower() + ", " + hasItem.ToString().ToLower() + ", " + hasBoss.ToString().ToLower() + ", " + hasDrop.ToString().ToLower() + ", " + elevatorScreen + ", ");
+        Console.Write(", " + fairyBlocked.ToString().ToLower() + ", " + gloveBlocked.ToString().ToLower() + ", " + downstabBlocked.ToString().ToLower() + ", " + upstabBlocked.ToString().ToLower() + ", " + jumpBlocked.ToString().ToLower() + ", " + HasItem.ToString().ToLower() + ", " + HasBoss.ToString().ToLower() + ", " + hasDrop.ToString().ToLower() + ", " + elevatorScreen + ", ");
         Console.Write("0x{0:X}", memAddr);
-        logger.WriteLine(", " + udRev.ToString().ToLower() + ", " + dropZone.ToString().ToLower() + "),");
+        logger.WriteLine(", " + isUpDownReversed.ToString().ToLower() + ", " + dropZone.ToString().ToLower() + "),");
     }
     */
 
     public bool HasUpExit()
     {
-        if (!udRev)
+        if (!isUpDownReversed)
         {
-            return (upByte < 0xFC && upByte > 0x03) || (map == 4 && upByte == 0x02) || (map == 1 && upByte == 0x02) || (map == 2 && upByte == 0x03);
+            return (upByte < 0xFC && upByte > 0x03) || (Map == 4 && upByte == 0x02) || (Map == 1 && upByte == 0x02) || (Map == 2 && upByte == 0x03);
         }
         else
         {
@@ -582,7 +488,7 @@ public class Room
 
     public bool HasDownExit()
     {
-        if (!udRev)
+        if (!isUpDownReversed)
         {
             return (downByte < 0xFC && downByte > 0x03);
         }
@@ -595,14 +501,14 @@ public class Room
     public bool HasLeftExit()
     {
 
-        return (leftByte < 0xFC && leftByte > 0x03);
+        return (LeftByte < 0xFC && LeftByte > 0x03);
 
     }
 
     public bool HasRightExit()
     {
 
-        return (rightByte < 0xFC && rightByte > 0x03);
+        return (RightByte < 0xFC && RightByte > 0x03);
 
     }
 
@@ -634,21 +540,22 @@ public class Room
     public Room DeepCopy()
     {
         return new Room(Map, 
-            (Byte[])Connections.Clone(), 
-            (Byte[])Enemies.Clone(), 
-            (Byte[])SideView.Clone(), 
+            (byte[])Connections.Clone(), 
+            (byte[])Enemies.Clone(), 
+            (byte[])SideView.Clone(), 
             bitmask, 
-            FairyBlocked, 
-            GloveBlocked, 
-            downstabBlocked, 
-            UpstabBlocked, 
-            JumpBlocked, 
-            hasItem, 
-            hasBoss, 
+            IsFairyBlocked, 
+            IsGloveBlocked, 
+            IsDownstabBlocked, 
+            IsUpstabBlocked, 
+            IsJumpBlocked, 
+            HasItem, 
+            HasBoss, 
             HasDrop, 
             ElevatorScreen, 
             MemAddr, 
-            udRev, 
-            DropZone);
+            isUpDownReversed, 
+            IsDropZone);
     }
+
 }

@@ -1537,7 +1537,7 @@ public partial class MainUI : Form
         }
     }
 
-    private Boolean vanillaPossible(ComboBox cb)
+    private bool vanillaPossible(ComboBox cb)
     {
         if(cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
         {

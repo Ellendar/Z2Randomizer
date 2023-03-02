@@ -169,13 +169,13 @@ public class ROM
                 c = GetByte(addr);
             }
             t.Add((char)0xFF);
-            texts.Add(new Hint(t, null));
+            texts.Add(new Hint(t));
 
         }
         return texts;
     }
 
-    public void TextToRom(List<Hint> texts)
+    public void WriteHints(List<Hint> texts)
     {
         int textptr = 0xE390;
         int ptr = 0xE390 - 0x4010;

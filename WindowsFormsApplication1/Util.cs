@@ -15,7 +15,7 @@ class Util
         return (byte)(((b * 0x80200802ul) & 0x0884422110ul) * 0x0101010101ul >> 32);
     }
 
-    public static List<char> ToGameText(string s2, Boolean endByte)
+    public static List<char> ToGameText(string s2, bool endByte)
     {
         s2 = s2.ToUpper();
         List<char> s = s2.ToCharArray().ToList();

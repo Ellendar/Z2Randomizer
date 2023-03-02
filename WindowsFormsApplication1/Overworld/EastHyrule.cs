@@ -605,7 +605,7 @@ public class EastHyrule : World
                     DrawOcean(bridgeDirection);
                 }
 
-                Boolean b = PlaceLocations(riverTerrain);
+                bool b = PlaceLocations(riverTerrain);
                 if (!b)
                 {
                     return false;
@@ -629,7 +629,7 @@ public class EastHyrule : World
                 randomTerrains.Remove(Terrain.LAVA);
                 if (raft != null)
                 {
-                    Boolean r = DrawRaft(false, raftDirection);
+                    bool r = DrawRaft(false, raftDirection);
                     if (!r)
                     {
                         return false;
@@ -638,7 +638,7 @@ public class EastHyrule : World
 
                 if (bridge != null)
                 {
-                    Boolean b2 = DrawRaft(true, bridgeDirection);
+                    bool b2 = DrawRaft(true, bridgeDirection);
                     if (!b2)
                     {
                         return false;

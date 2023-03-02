@@ -578,7 +578,7 @@ public class WestHyrule : World
                 {
                     DrawOcean(bridgeDirection);
                 }
-                Boolean b = PlaceLocations(riverTerrain);
+                bool b = PlaceLocations(riverTerrain);
                 if (!b)
                 {
                     failedOnPlaceLocations++;
