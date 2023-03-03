@@ -75,7 +75,8 @@ public class RandomizerConfiguration
     public bool? PalacesCanSwapContinents { get; set; }
     public bool? ShuffleGP { get; set; }
     public bool? ShuffleEncounters { get; set; }
-    public bool? AllowUnsafePathEncounters { get; set; }
+    public bool AllowUnsafePathEncounters { get; set; }
+    public bool IncludeLavaInEncounterShuffle { get; set; }
     public EncounterRate EncounterRate { get; set; }
     public bool? HidePalace { get; set; }
     public bool? HideKasuto { get; set; }
@@ -505,6 +506,7 @@ public class RandomizerConfiguration
                 throw new Exception("Invalid AttackEffectiveness setting");
         }
         config.AllowUnsafePathEncounters = bits[5];
+        config.IncludeLavaInEncounterShuffle = true;
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
         config.PermanmentBeamSword = bits[0];
@@ -1102,7 +1104,8 @@ public class RandomizerConfiguration
 
         //Overworld
         properties.shuffleEncounters = ShuffleEncounters == null ? random.Next(2) == 1 : (bool)ShuffleEncounters;
-        properties.allowPathEnemies = AllowUnsafePathEncounters == null ? random.Next(2) == 1 : (bool)AllowUnsafePathEncounters;
+        properties.allowPathEnemies = AllowUnsafePathEncounters;
+        properties.includeLavaInEncounterShuffle = IncludeLavaInEncounterShuffle;
         properties.swapPalaceCont = PalacesCanSwapContinents == null ? random.Next(2) == 1 : (bool)PalacesCanSwapContinents;
         properties.p7shuffle = ShuffleGP == null ? random.Next(2) == 1 : (bool)ShuffleGP;
         properties.hiddenPalace = HidePalace == null ? random.Next(2) == 1 : (bool)HidePalace;
