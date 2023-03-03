@@ -66,6 +66,7 @@ public class RandomizerProperties
     //Overworld
     public bool shuffleEncounters;
     public bool allowPathEnemies;
+    public bool includeLavaInEncounterShuffle;
     public bool swapPalaceCont;
     public bool p7shuffle;
     public bool hiddenPalace;

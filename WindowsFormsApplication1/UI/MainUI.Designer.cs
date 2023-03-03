@@ -69,6 +69,7 @@
             startWithCandleCheckbox = new System.Windows.Forms.CheckBox();
             shuffleStartingItemsCheckbox = new System.Windows.Forms.CheckBox();
             tabPage1 = new System.Windows.Forms.TabPage();
+            includeLavaInShuffle = new System.Windows.Forms.CheckBox();
             generateBaguWoodsCheckbox = new System.Windows.Forms.CheckBox();
             useGoodBootsCheckbox = new System.Windows.Forms.CheckBox();
             shuffleWhichLocationsAreHiddenCheckbox = new System.Windows.Forms.CheckBox();
@@ -775,6 +776,7 @@
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(includeLavaInShuffle);
             tabPage1.Controls.Add(generateBaguWoodsCheckbox);
             tabPage1.Controls.Add(useGoodBootsCheckbox);
             tabPage1.Controls.Add(shuffleWhichLocationsAreHiddenCheckbox);
@@ -815,6 +817,18 @@
             tabPage1.ToolTipText = "When selected, will hide Kasuto behind a forest tile";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // includeLavaInShuffle
+            // 
+            includeLavaInShuffle.AutoSize = true;
+            includeLavaInShuffle.Location = new System.Drawing.Point(7, 129);
+            includeLavaInShuffle.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            includeLavaInShuffle.Name = "includeLavaInShuffle";
+            includeLavaInShuffle.Size = new System.Drawing.Size(145, 19);
+            includeLavaInShuffle.TabIndex = 48;
+            includeLavaInShuffle.Text = "Include Lava in Shuffle";
+            toolTip1.SetToolTip(includeLavaInShuffle, "If checked, you may have enemies in path encounters");
+            includeLavaInShuffle.UseVisualStyleBackColor = true;
+            // 
             // generateBaguWoodsCheckbox
             // 
             generateBaguWoodsCheckbox.AutoSize = true;
@@ -844,7 +858,7 @@
             // shuffleWhichLocationsAreHiddenCheckbox
             // 
             shuffleWhichLocationsAreHiddenCheckbox.AutoSize = true;
-            shuffleWhichLocationsAreHiddenCheckbox.Location = new System.Drawing.Point(7, 243);
+            shuffleWhichLocationsAreHiddenCheckbox.Location = new System.Drawing.Point(7, 267);
             shuffleWhichLocationsAreHiddenCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             shuffleWhichLocationsAreHiddenCheckbox.Name = "shuffleWhichLocationsAreHiddenCheckbox";
             shuffleWhichLocationsAreHiddenCheckbox.Size = new System.Drawing.Size(221, 19);
@@ -1035,7 +1049,7 @@
             // label36
             // 
             label36.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            label36.Location = new System.Drawing.Point(7, 163);
+            label36.Location = new System.Drawing.Point(7, 187);
             label36.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             label36.Name = "label36";
             label36.Size = new System.Drawing.Size(243, 1);
@@ -1046,7 +1060,7 @@
             encounterRateBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             encounterRateBox.FormattingEnabled = true;
             encounterRateBox.Items.AddRange(new object[] { "Normal", "50%", "None", "Random" });
-            encounterRateBox.Location = new System.Drawing.Point(108, 132);
+            encounterRateBox.Location = new System.Drawing.Point(108, 156);
             encounterRateBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             encounterRateBox.Name = "encounterRateBox";
             encounterRateBox.Size = new System.Drawing.Size(100, 23);
@@ -1056,7 +1070,7 @@
             // encounterRateLabel
             // 
             encounterRateLabel.AutoSize = true;
-            encounterRateLabel.Location = new System.Drawing.Point(4, 135);
+            encounterRateLabel.Location = new System.Drawing.Point(4, 159);
             encounterRateLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             encounterRateLabel.Name = "encounterRateLabel";
             encounterRateLabel.Size = new System.Drawing.Size(90, 15);
@@ -1069,7 +1083,7 @@
             hideKasutoList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             hideKasutoList.FormattingEnabled = true;
             hideKasutoList.Items.AddRange(new object[] { "Off", "On", "Random" });
-            hideKasutoList.Location = new System.Drawing.Point(108, 203);
+            hideKasutoList.Location = new System.Drawing.Point(108, 227);
             hideKasutoList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             hideKasutoList.Name = "hideKasutoList";
             hideKasutoList.Size = new System.Drawing.Size(100, 23);
@@ -1080,7 +1094,7 @@
             // hiddenKasutoLabel
             // 
             hiddenKasutoLabel.AutoSize = true;
-            hiddenKasutoLabel.Location = new System.Drawing.Point(5, 205);
+            hiddenKasutoLabel.Location = new System.Drawing.Point(5, 229);
             hiddenKasutoLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             hiddenKasutoLabel.Name = "hiddenKasutoLabel";
             hiddenKasutoLabel.Size = new System.Drawing.Size(88, 15);
@@ -1092,7 +1106,7 @@
             hiddenPalaceList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             hiddenPalaceList.FormattingEnabled = true;
             hiddenPalaceList.Items.AddRange(new object[] { "Off", "On", "Random" });
-            hiddenPalaceList.Location = new System.Drawing.Point(108, 172);
+            hiddenPalaceList.Location = new System.Drawing.Point(108, 196);
             hiddenPalaceList.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             hiddenPalaceList.Name = "hiddenPalaceList";
             hiddenPalaceList.Size = new System.Drawing.Size(100, 23);
@@ -1103,7 +1117,7 @@
             // hiddenPalaceLabel
             // 
             hiddenPalaceLabel.AutoSize = true;
-            hiddenPalaceLabel.Location = new System.Drawing.Point(5, 175);
+            hiddenPalaceLabel.Location = new System.Drawing.Point(5, 199);
             hiddenPalaceLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             hiddenPalaceLabel.Name = "hiddenPalaceLabel";
             hiddenPalaceLabel.Size = new System.Drawing.Size(86, 15);
@@ -1155,7 +1169,6 @@
             allowPathEnemiesCheckbox.Size = new System.Drawing.Size(184, 19);
             allowPathEnemiesCheckbox.TabIndex = 15;
             allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
-            allowPathEnemiesCheckbox.ThreeState = true;
             toolTip1.SetToolTip(allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
             allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
             // 
@@ -3314,6 +3327,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox startingGemsMaxList;
         private System.Windows.Forms.CheckBox swapUpAndDownstabCheckbox;
+        private System.Windows.Forms.CheckBox includeLavaInShuffle;
     }
 }
 

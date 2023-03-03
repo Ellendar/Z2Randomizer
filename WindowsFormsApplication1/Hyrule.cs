@@ -2217,11 +2217,13 @@ public class Hyrule
         }
     }
 
+    //Updated to use fisher-yates. Eventually i'll catch all of these. N is small enough here it REALLY makes a difference
     private void ShuffleEncounters(List<int> addr)
     {
-        for (int i = 0; i < addr.Count; i++)
+        for (int i = addr.Count - 1; i > 0; --i)
         {
-            int swap = RNG.Next(i, addr.Count);
+            int swap = RNG.Next(i + 1);
+
             Byte temp = ROMData.GetByte(addr[i]);
             ROMData.Put(addr[i], ROMData.GetByte(addr[swap]));
             ROMData.Put(addr[swap], temp);
@@ -2961,14 +2963,14 @@ public class Hyrule
         if (props.shuffleEncounters)
         {
             addr = new List<int>();
-            addr.Add(0x441b);
-            addr.Add(0x4419);
-            addr.Add(0x441D);
-            addr.Add(0x4420);
-            addr.Add(0x441C);
-            addr.Add(0x441A);
-            addr.Add(0x4422);
-            addr.Add(0x441E);
+            addr.Add(0x441b); // 0x62: West northern grass
+            addr.Add(0x4419); // 0x5D: West northern desert
+            addr.Add(0x441D); // 0x67: West northern forest
+            addr.Add(0x4420); // 0x70: West swamp
+            addr.Add(0x441C); // 0x63: West south grass
+            addr.Add(0x441A); // 0x5E: West south desert
+            addr.Add(0x4422); // 0x75: West grave
+            addr.Add(0x441E); // 0x68: West south forest
 
             if (props.allowPathEnemies)
             {
@@ -2979,14 +2981,17 @@ public class Hyrule
             ShuffleEncounters(addr);
 
             addr = new List<int>();
-            addr.Add(0x841B);
-            addr.Add(0x8419);
-            addr.Add(0x841D);
-            addr.Add(0x8422);
-            addr.Add(0x8420);
-            addr.Add(0x841A);
-            addr.Add(0x841E);
-            addr.Add(0x8426);
+            addr.Add(0x841B); // 0x62: East grass
+            addr.Add(0x8419); // 0x5D: East desert
+            addr.Add(0x841D); // 0x67: East forest
+            addr.Add(0x8422); // 0x75: East grave
+            addr.Add(0x8420); // 0x70: East swamp
+            addr.Add(0x841A); // 0x5E: East south desert
+            addr.Add(0x841E); // 0x68: East south forest
+            if (props.includeLavaInEncounterShuffle)
+            {
+                addr.Add(0x8426); // 0x7C: Valley of death
+            }
 
             if (props.allowPathEnemies)
             {

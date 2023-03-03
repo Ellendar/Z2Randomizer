@@ -45,7 +45,7 @@ public partial class MainUI : Form
         maxHeartsList.SelectedIndex = 7;
 
         startingTechsList.SelectedIndex = 0;
-        allowPathEnemiesCheckbox.Enabled = false;
+        //allowPathEnemiesCheckbox.Enabled = false;
         romFileTextBox.Text = Properties.Settings.Default.filePath;
         tunicColorList.SelectedIndex = Properties.Settings.Default.tunic;
         shieldColorList.SelectedIndex = Properties.Settings.Default.shield;
@@ -130,6 +130,7 @@ public partial class MainUI : Form
         experienceDropsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         allowPathEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeLavaInShuffle.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         mixLargeAndSmallCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -415,9 +416,11 @@ public partial class MainUI : Form
     private void shuffleEncounters_CheckStateChanged(object sender, EventArgs e)
     {
         allowPathEnemiesCheckbox.Enabled = shuffleEncountersCheckbox.Checked;
+        includeLavaInShuffle.Enabled = shuffleEncountersCheckbox.Checked;
         if (!shuffleEncountersCheckbox.Checked)
         {
             allowPathEnemiesCheckbox.Checked = false;
+            includeLavaInShuffle.Checked = false;
         }
     }
 
@@ -544,7 +547,8 @@ public partial class MainUI : Form
         configuration.PalacesCanSwapContinents = GetTripleCheckState(allowPalaceContinentSwapCheckbox);
         configuration.ShuffleGP = GetTripleCheckState(shortGPCheckbox);
         configuration.ShuffleEncounters = GetTripleCheckState(shuffleEncountersCheckbox);
-        configuration.AllowUnsafePathEncounters = GetTripleCheckState(allowPathEnemiesCheckbox);
+        configuration.AllowUnsafePathEncounters = allowPathEnemiesCheckbox.Checked;
+        configuration.IncludeLavaInEncounterShuffle = includeLavaInShuffle.Checked;
         configuration.EncounterRate = encounterRateBox.SelectedIndex switch
         {
             0 => EncounterRate.NORMAL,
@@ -915,6 +919,7 @@ public partial class MainUI : Form
             includeGPinShuffleCheckbox.CheckState = ToCheckState(configuration.ShuffleGP);
             shuffleEncountersCheckbox.CheckState = ToCheckState(configuration.ShuffleEncounters);
             allowPathEnemiesCheckbox.CheckState = ToCheckState(configuration.AllowUnsafePathEncounters);
+            includeLavaInShuffle.CheckState = ToCheckState(configuration.IncludeLavaInEncounterShuffle);
             encounterRateBox.SelectedIndex = configuration.EncounterRate switch
             {
                 EncounterRate.NORMAL => 0,
