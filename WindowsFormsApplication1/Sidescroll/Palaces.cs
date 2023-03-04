@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -90,7 +91,7 @@ public class Palaces
             for (int i = 1; i < 8; i++)
             {
 
-                Palace p;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
+                Palace palace;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                 int tries = 0;
 
                 do
@@ -120,77 +121,77 @@ public class Palaces
                             mapNoGp = 0;
                         }
 
-                        p = new Palace(i, palaceAddr[i], palaceConnectionLocs[i]);
-                        p.Root = PalaceRooms.Entrances[i - 1].DeepCopy();
+                        palace = new Palace(i, palaceAddr[i], palaceConnectionLocs[i]);
+                        palace.Root = PalaceRooms.Entrances[i - 1].DeepCopy();
 
-                        p.BossRoom = SelectBossRoom(i, r);
+                        palace.BossRoom = SelectBossRoom(i, r);
 
-                        p.AllRooms.Add(p.Root);
+                        palace.AllRooms.Add(palace.Root);
 
-                        p.AllRooms.Add(p.BossRoom);
+                        palace.AllRooms.Add(palace.BossRoom);
                         if (i < 7) //Not GP
                         {
-                            p.ItemRoom = SelectItemRoom(r);
-                            if ((i == 1 || i == 2 || i == 5) && p.ItemRoom.HasBoss)
+                            palace.ItemRoom = SelectItemRoom(r);
+                            if ((i == 1 || i == 2 || i == 5) && palace.ItemRoom.HasBoss)
                             {
-                                p.ItemRoom.Enemies[1] = 0x6C;
+                                palace.ItemRoom.Enemies[1] = 0x6C;
                             }
 
-                            p.AllRooms.Add(p.ItemRoom);
+                            palace.AllRooms.Add(palace.ItemRoom);
 
-                            p.Root.Newmap = mapNo;
+                            palace.Root.NewMap = mapNo;
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                            p.BossRoom.Newmap = mapNo;
+                            palace.BossRoom.NewMap = mapNo;
                             if (props.bossRoomConnect)
                             {
-                                p.BossRoom.RightByte = 0x69;
+                                palace.BossRoom.RightByte = 0x69;
                             }
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                            p.ItemRoom.Newmap = mapNo;
-                            p.ItemRoom.SetItem((Item)i);
+                            palace.ItemRoom.NewMap = mapNo;
+                            palace.ItemRoom.SetItem((Item)i);
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                            if (p.ItemRoom.Map == 69)
+                            if (palace.ItemRoom.Map == 69)
                             {
                                 Room extra = PalaceRooms.MaxBonusItemRoom.DeepCopy();
-                                extra.Newmap = p.ItemRoom.Newmap;
+                                extra.NewMap = palace.ItemRoom.NewMap;
                                 extra.SetItem((Item)i);
-                                p.AllRooms.Add(extra);
-                                p.SortRoom(extra);
-                                p.SetOpenRoom(extra);
+                                palace.AllRooms.Add(extra);
+                                palace.SortRoom(extra);
+                                palace.SetOpenRoom(extra);
                             }
-                            p.SortRoom(p.Root);
-                            p.SortRoom(p.BossRoom);
-                            p.SortRoom(p.ItemRoom);
-                            p.SetOpenRoom(p.Root);
+                            palace.SortRoom(palace.Root);
+                            palace.SortRoom(palace.BossRoom);
+                            palace.SortRoom(palace.ItemRoom);
+                            palace.SetOpenRoom(palace.Root);
                         }
                         else //GP
                         {
-                            p.Root.Newmap = mapNoGp;
+                            palace.Root.NewMap = mapNoGp;
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                            p.BossRoom.Newmap = mapNoGp;
+                            palace.BossRoom.NewMap = mapNoGp;
                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                            p.SortRoom(p.Root);
-                            p.SortRoom(p.BossRoom);
+                            palace.SortRoom(palace.Root);
+                            palace.SortRoom(palace.BossRoom);
                             //thunderbird?
                             if (!props.removeTbird)
                             {
-                                p.Tbird = PalaceRooms.TBirdRooms[r.Next(PalaceRooms.TBirdRooms.Count)].DeepCopy();
-                                p.Tbird.Newmap = mapNoGp;
+                                palace.Tbird = PalaceRooms.TBirdRooms[r.Next(PalaceRooms.TBirdRooms.Count)].DeepCopy();
+                                palace.Tbird.NewMap = mapNoGp;
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                                p.SortRoom(p.Tbird);
-                                p.AllRooms.Add(p.Tbird);
+                                palace.SortRoom(palace.Tbird);
+                                palace.AllRooms.Add(palace.Tbird);
                             }
-                            p.SetOpenRoom(p.Root);
+                            palace.SetOpenRoom(palace.Root);
 
                         }
 
 
-                        p.MaxRooms = sizes[i - 1];
+                        palace.MaxRooms = sizes[i - 1];
                         //add rooms
                         if (i == 7)
                         {
                             roomPool.Clear();
-                            roomPool.AddRange(PalaceRooms.Palace7Vanilla);
+                            //roomPool.AddRange(PalaceRooms.Palace7Vanilla);
                             if (props.customRooms)
                             {
                                 roomPool.AddRange(PalaceRooms.Link7777RoomJam);
@@ -205,24 +206,24 @@ public class Palaces
                             }
                         }
                         bool dropped = false;
-                        while (p.AllRooms.Count < p.MaxRooms)
+                        while (palace.AllRooms.Count < palace.MaxRooms)
                         {
                             Room addThis = roomPool[r.Next(roomPool.Count)].DeepCopy();
                             if (i < 7)
                             {
-                                addThis.Newmap = mapNo;
+                                addThis.NewMap = mapNo;
                             }
                             else
                             {
-                                addThis.Newmap = mapNoGp;
+                                addThis.NewMap = mapNoGp;
                             }
-                            bool added = p.AddRoom(addThis, props.blockersAnywhere);
+                            bool added = palace.AddRoom(addThis, props.blockersAnywhere);
                             if (added)
                             {
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
                                 if (addThis.HasDrop && !dropped)
                                 {
-                                    int numDrops = r.Next(Math.Min(3, p.MaxRooms - p.AllRooms.Count), Math.Min(6, p.MaxRooms - p.AllRooms.Count));
+                                    int numDrops = r.Next(Math.Min(3, palace.MaxRooms - palace.AllRooms.Count), Math.Min(6, palace.MaxRooms - palace.AllRooms.Count));
                                     bool lastDrop = true;
                                     int j = 0;
                                     while (j < numDrops && lastDrop)
@@ -234,13 +235,13 @@ public class Palaces
                                         }
                                         if (i < 7)
                                         {
-                                            room.Newmap = mapNo;
+                                            room.NewMap = mapNo;
                                         }
                                         else
                                         {
-                                            room.Newmap = mapNoGp;
+                                            room.NewMap = mapNoGp;
                                         }
-                                        bool added2 = p.AddRoom(room, props.blockersAnywhere);
+                                        bool added2 = palace.AddRoom(room, props.blockersAnywhere);
                                         if (added2)
                                         {
                                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
@@ -251,14 +252,14 @@ public class Palaces
                                 }
                             }
 
-                            if (p.GetOpenRooms() >= p.MaxRooms - p.AllRooms.Count) //consolidate
+                            if (palace.GetOpenRooms() >= palace.MaxRooms - palace.AllRooms.Count) //consolidate
                             {
-                                p.Consolidate();
+                                palace.Consolidate();
                             }
 
                         }
                         done = true;
-                        foreach (Room room in p.AllRooms)
+                        foreach (Room room in palace.AllRooms)
                         {
                             if (room.CountOpenExits() > 0)
                             {
@@ -268,20 +269,20 @@ public class Palaces
 
                     } while (!done);
 
-                    p.ShuffleRooms(r);
-                    bool reachable = p.AllReachable();
-                    while ((!reachable || (i == 7 && (props.requireTbird && !p.RequiresThunderbird())) || p.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
+                    palace.ShuffleRooms(r);
+                    bool reachable = palace.AllReachable();
+                    while ((!reachable || (i == 7 && (props.requireTbird && !palace.RequiresThunderbird())) || palace.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
                     {
-                        p.ResetRooms();
-                        p.ShuffleRooms(r);
-                        reachable = p.AllReachable();
+                        palace.ResetRooms();
+                        palace.ShuffleRooms(r);
+                        reachable = palace.AllReachable();
                         tries++;
                         logger.Debug("Palace room shuffle attempt #" + tries);
                     }
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
-                p.Generations += tries;
-                palaces.Add(p);
-                foreach (Room room in p.AllRooms)
+                palace.Generations += tries;
+                palaces.Add(palace);
+                foreach (Room room in palace.AllRooms)
                 {
                     if (i != 7)
                     {
@@ -406,7 +407,7 @@ public class Palaces
                 List<Room> rooms = sideviews[sv];
                 foreach (Room room in rooms)
                 {
-                    if (room.Newmap == 45)
+                    if (room.NewMap == 45)
                     {
                         logger.Trace("here");
                     }
@@ -477,6 +478,7 @@ public class Palaces
             palaces[5].ShuffleSmallItems(4, false, r, props.shuffleSmallItems, props.extraKeys, props.palaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
             palaces[6].ShuffleSmallItems(5, true, r, props.shuffleSmallItems, props.extraKeys, props.palaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
         }
+
         return palaces;
     }
 
