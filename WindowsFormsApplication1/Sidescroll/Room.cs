@@ -172,7 +172,7 @@ public class Room
     public bool HasItem { get; set; }
     public byte[] Enemies { get; set; }
     public byte[] SideView { get; set; }
-    public int Newmap { get; set; }
+    public int NewMap { get; set; }
     public bool HasBoss { get; set; }
     public string Name { get; set; }
     public string Group { get; set; }
@@ -276,14 +276,14 @@ public class Room
         if(palSet == 1)
         {
             int memAddr = addr - 0x8010;
-            ROMData.Put(sideview1 + Newmap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview1 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview1 + NewMap * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview1 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else if(palSet == 2)
         {
             int memAddr = addr - 0x8010;
-            ROMData.Put(sideview2 + Newmap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview2 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview2 + NewMap * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview2 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else
         {
@@ -292,8 +292,8 @@ public class Room
             {
                 memAddr = addr - 0x10010;
             }
-            ROMData.Put(sideview3 + Newmap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview3 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview3 + NewMap * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview3 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
 
         }
     }
@@ -314,20 +314,20 @@ public class Room
         if (palSet == 1)
         {
             int memAddr = addr - 0x98b0;
-            ROMData.Put(enemyPtr1 + Newmap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(enemyPtr1 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(enemyPtr1 + NewMap * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(enemyPtr1 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else if (palSet == 2)
         {
             int memAddr = addr - 0x98b0;
-            ROMData.Put(enemyPtr2 + Newmap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(enemyPtr2 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(enemyPtr2 + NewMap * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(enemyPtr2 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else
         {
             int memAddr = addr - 0xd8b0;
-            ROMData.Put(enemyPtr3 + Newmap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(enemyPtr3 + Newmap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(enemyPtr3 + NewMap * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(enemyPtr3 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
 
         }
     }
@@ -344,19 +344,19 @@ public class Room
         {
             ptr = bitmask3;
         }
-        if(Newmap % 2 == 0)
+        if(NewMap % 2 == 0)
         {
-            byte old = ROMData.GetByte(ptr + Newmap / 2);
+            byte old = ROMData.GetByte(ptr + NewMap / 2);
             old = (byte)(old & 0x0F);
             old = (byte)((bitmask << 4) | old);
-            ROMData.Put(ptr + Newmap / 2, old);
+            ROMData.Put(ptr + NewMap / 2, old);
         }
         else
         {
-            byte old = ROMData.GetByte(ptr + Newmap / 2);
+            byte old = ROMData.GetByte(ptr + NewMap / 2);
             old = (byte)(old & 0xF0);
             old = (byte)((bitmask) | old);
-            ROMData.Put(ptr + Newmap / 2, old);
+            ROMData.Put(ptr + NewMap / 2, old);
         }
     }
 
@@ -376,11 +376,11 @@ public class Room
 
     public void UpdateItem(Item i, int palSet, ROM ROMData)
     {
-        int sideViewPtr = (ROMData.GetByte(sideview1 + Newmap * 2) + (ROMData.GetByte(sideview1 + 1 + Newmap * 2) << 8)) + 0x8010;
+        int sideViewPtr = (ROMData.GetByte(sideview1 + NewMap * 2) + (ROMData.GetByte(sideview1 + 1 + NewMap * 2) << 8)) + 0x8010;
 
         if (palSet == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + Newmap * 2) + (ROMData.GetByte(sideview2 + 1 + Newmap * 2) << 8)) + 0x8010;
+            sideViewPtr = (ROMData.GetByte(sideview2 + NewMap * 2) + (ROMData.GetByte(sideview2 + 1 + NewMap * 2) << 8)) + 0x8010;
         }
         int ptr = sideViewPtr + 4;
         byte data = ROMData.GetByte(ptr);
@@ -409,7 +409,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors1 + Newmap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors1 + NewMap * 4 + i, Connections[i]);
                 }
             }
         }
@@ -419,7 +419,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors2 + Newmap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors2 + NewMap * 4 + i, Connections[i]);
                 }
             }
         }
@@ -429,7 +429,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors3 + Newmap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors3 + NewMap * 4 + i, Connections[i]);
                 }
             }
         }
@@ -556,6 +556,14 @@ public class Room
             MemAddr, 
             isUpDownReversed, 
             IsDropZone);
+    }
+
+    public string Debug()
+    {
+        StringBuilder sb = new();
+        sb.Append("Map: " + NewMap + " Name: " + Name + " Sideview: ");
+        sb.Append(BitConverter.ToString(SideView).Replace("-", ""));
+        return sb.ToString();
     }
 
 }

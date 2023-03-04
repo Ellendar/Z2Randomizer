@@ -15,7 +15,6 @@ namespace Z2Randomizer.Sidescroll;
 public class Palace
 {
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
-    private int num;
     private Room root;
     private Room itemRoom;
     private Room bossRoom;
@@ -65,6 +64,7 @@ public class Palace
     public bool NeedUstab { get => needUstab; set => needUstab = value; }
     public int NumRooms { get => numRooms; set => numRooms = value; }
     public int MaxRooms { get => maxRooms; set => maxRooms = value; }
+    public int Number { get; set; }
     internal Room Tbird { get => tbird; set => tbird = value; }
     public bool NeedReflect { get => needReflect; set => needReflect = value; }
 
@@ -73,7 +73,7 @@ public class Palace
 
     public Palace(int number, int b, int c)
     {
-        num = number;
+        Number = number;
         root = null;
         upExits = new List<Room>();
         downExits = new List<Room>();
@@ -94,7 +94,7 @@ public class Palace
         openRooms = new List<Room>();
         //dumpMaps();
         //createTree();
-        if (num < 7)
+        if (Number < 7)
         {
             netDeadEnds = 3;
         }
@@ -170,7 +170,7 @@ public class Palace
         List<Room> itemPath = CheckBlocks();
         foreach (Room r in itemPath)
         {
-            if (num == 4 && r == BossRoom)
+            if (Number == 4 && r == BossRoom)
             {
                 this.NeedReflect = true;
             }
@@ -253,7 +253,7 @@ public class Palace
         SortRoom(r);
         numRooms++;
 
-        if (num != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
+        if (Number != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
         {
             foreach (Room open2 in openRooms)
             {
@@ -275,7 +275,7 @@ public class Palace
                 }
             }
         }
-        if (num == 7 && openRooms.Count > 1 && Tbird != null && Tbird.CountOpenExits() > 1)
+        if (Number == 7 && openRooms.Count > 1 && Tbird != null && Tbird.CountOpenExits() > 1)
         {
             foreach (Room open2 in openRooms)
             {
@@ -290,7 +290,7 @@ public class Palace
 
     public void UpdateItem(Item i, ROM ROMData)
     {
-        if (num == 1 || num == 2 || num == 5)
+        if (Number == 1 || Number == 2 || Number == 5)
         {
             itemRoom.UpdateItem(i, 1, ROMData);
         }
@@ -320,7 +320,7 @@ public class Palace
     {
         if (!blockers)
         {
-            if (num == 1)
+            if (Number == 1)
             {
                 if (r.IsFairyBlocked || r.IsDownstabBlocked || r.IsUpstabBlocked || r.IsJumpBlocked || r.IsGloveBlocked || r.HasDrop || r.IsDropZone || r.HasBoss)
                 {
@@ -328,7 +328,7 @@ public class Palace
                 }
             }
 
-            if (num == 2)
+            if (Number == 2)
             {
                 if (r.IsFairyBlocked || r.IsDownstabBlocked || r.IsUpstabBlocked || r.HasDrop || r.IsDropZone || r.HasBoss)
                 {
@@ -336,7 +336,7 @@ public class Palace
                 }
             }
 
-            if (num == 3)
+            if (Number == 3)
             {
                 if (r.IsJumpBlocked || r.IsFairyBlocked || r.HasDrop || r.IsDropZone)
                 {
@@ -344,7 +344,7 @@ public class Palace
                 }
             }
 
-            if (num == 4)
+            if (Number == 4)
             {
                 if (r.IsGloveBlocked || r.IsUpstabBlocked || r.IsDownstabBlocked)
                 {
@@ -352,7 +352,7 @@ public class Palace
                 }
             }
 
-            if (num == 5)
+            if (Number == 5)
             {
                 if (r.IsGloveBlocked || r.IsUpstabBlocked || r.IsDownstabBlocked || r.HasDrop || r.IsDropZone || r.HasBoss)
                 {
@@ -360,7 +360,7 @@ public class Palace
                 }
             }
 
-            if (num == 6)
+            if (Number == 6)
             {
                 if (r.IsUpstabBlocked || r.IsDownstabBlocked)
                 {
@@ -370,7 +370,7 @@ public class Palace
         }
         else
         {
-            if ((num == 1 || num == 2 || num == 5 || num == 7) && r.HasBoss)
+            if ((Number == 1 || Number == 2 || Number == 5 || Number == 7) && r.HasBoss)
             {
                 return false;
             }
@@ -392,10 +392,10 @@ public class Palace
         if (!placed && open.HasRightExit() && open.Right == null && r.HasLeftExit() && r.Left == null)
         {
             open.Right = r;
-            open.RightByte = r.Newmap * 4;
+            open.RightByte = r.NewMap * 4;
 
             r.Left = open;
-            r.LeftByte = open.Newmap * 4 + 3;
+            r.LeftByte = open.NewMap * 4 + 3;
 
             placed = true;
         }
@@ -403,10 +403,10 @@ public class Palace
         if (!placed && open.HasLeftExit() && open.Left == null && r.HasRightExit() && r.Right == null)
         {
             open.Left = r;
-            open.LeftByte = r.Newmap * 4 + 3;
+            open.LeftByte = r.NewMap * 4 + 3;
 
             r.Right = open;
-            r.RightByte = open.Newmap * 4;
+            r.RightByte = open.NewMap * 4;
 
             placed = true;
         }
@@ -414,10 +414,10 @@ public class Palace
         if (!placed && open.HasUpExit() && open.Up == null && r.HasDownExit() && r.Down == null && !r.HasDrop)
         {
             open.Up = r;
-            open.UpByte = r.Newmap * 4 + r.ElevatorScreen;
+            open.UpByte = r.NewMap * 4 + r.ElevatorScreen;
 
             r.Down = open;
-            r.DownByte = open.Newmap * 4 + open.ElevatorScreen;
+            r.DownByte = open.NewMap * 4 + open.ElevatorScreen;
 
             placed = true;
         }
@@ -426,10 +426,10 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = r.Newmap * 4 + r.ElevatorScreen;
+            open.DownByte = r.NewMap * 4 + r.ElevatorScreen;
 
             r.Up = open;
-            r.UpByte = open.Newmap * 4 + open.ElevatorScreen;
+            r.UpByte = open.NewMap * 4 + open.ElevatorScreen;
 
             placed = true;
         }
@@ -438,7 +438,7 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = r.Newmap * 4;
+            open.DownByte = r.NewMap * 4;
             r.IsDropZone = false;
             placed = true;
         }
@@ -447,7 +447,7 @@ public class Palace
         {
 
             r.Down = open;
-            r.DownByte = open.Newmap * 4;
+            r.DownByte = open.NewMap * 4;
             open.IsDropZone = false;
             placed = true;
         }
@@ -570,7 +570,7 @@ public class Palace
     {
         if (!r.IsBeforeTbird)
         {
-            if ((num == 7) && r.Map == PalaceRooms.Thunderbird.Map)
+            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird.Map)
             {
                 r.IsBeforeTbird = true;
                 return;
@@ -624,7 +624,7 @@ public class Palace
     {
         if (!r.IsPlaced)
         {
-            if ((num == 7) && r.Map == PalaceRooms.Thunderbird.Map)
+            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird.Map)
             {
                 if (dir == 3)
                 {
@@ -784,7 +784,7 @@ public class Palace
             temp.LeftByte = down1.LeftByte;
             down1.LeftByte = tempByte;
         }
-        if (num == 6)
+        if (Number == 6)
         {
             foreach (Room room in onlyDownExits)
             {
@@ -1171,7 +1171,7 @@ public class Palace
             int i = startAddr + (room.Map * 2);
             if(newMap)
             {
-                i = startAddr + (room.Newmap * 2);
+                i = startAddr + (room.NewMap * 2);
             }
             int low = ROMData.GetByte(i);
             int hi = ROMData.GetByte(i + 1) * 256;
@@ -1208,7 +1208,7 @@ public class Palace
                 ROMData.Put(addresses[i], (Byte)items[i]);
             }
 
-            if (extraKeys && num != 7)
+            if (extraKeys && Number != 7)
             {
                 ROMData.Put(addresses[i], (Byte)0x08);
             }

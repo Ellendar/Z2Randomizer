@@ -5,6 +5,7 @@ using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -526,8 +527,19 @@ public class Hyrule
         {
             ROMData.Dump(newFileName);
         }
-        PrintSpoiler(LogLevel.Info);
 
+        PrintSpoiler(LogLevel.Info);
+        //DEBUG
+        StringBuilder sb = new();
+        foreach (Palace palace in palaces)
+        {
+            sb.AppendLine("Palace: " + palace.Number);
+            foreach (Room room in palace.AllRooms)
+            {
+                sb.AppendLine(room.Debug());
+            }
+        }
+        File.WriteAllText("rooms.log", sb.ToString());
     }
 
 
@@ -1921,7 +1933,7 @@ public class Hyrule
             byte helmetRoom = 0x22;
             if (props.palaceStyle == PalaceStyle.RECONSTRUCTED)
             {
-                helmetRoom = (byte)palaces[1].BossRoom.Newmap;
+                helmetRoom = (byte)palaces[1].BossRoom.NewMap;
             }
             ROMData.Put(0x13f71, helmetRoom);
             ROMData.Put(0x13f72, 0x4D);
@@ -3688,13 +3700,13 @@ public class Hyrule
                 palaces[eastHyrule.gp.PalNum - 1].UpdateItem(eastHyrule.gp.item, ROMData);
             }
 
-            ROMData.Put(westHyrule.palace1.MemAddress + 0x7e, (byte)palaces[westHyrule.palace1.PalNum - 1].Root.Newmap);
-            ROMData.Put(westHyrule.palace2.MemAddress + 0x7e, (byte)palaces[westHyrule.palace2.PalNum - 1].Root.Newmap);
-            ROMData.Put(westHyrule.palace3.MemAddress + 0x7e, (byte)palaces[westHyrule.palace3.PalNum - 1].Root.Newmap);
-            ROMData.Put(eastHyrule.palace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace5.PalNum - 1].Root.Newmap);
-            ROMData.Put(eastHyrule.palace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace6.PalNum - 1].Root.Newmap);
-            ROMData.Put(eastHyrule.gp.MemAddress + 0x7e, (byte)palaces[eastHyrule.gp.PalNum - 1].Root.Newmap);
-            ROMData.Put(mazeIsland.palace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.palace4.PalNum - 1].Root.Newmap);
+            ROMData.Put(westHyrule.palace1.MemAddress + 0x7e, (byte)palaces[westHyrule.palace1.PalNum - 1].Root.NewMap);
+            ROMData.Put(westHyrule.palace2.MemAddress + 0x7e, (byte)palaces[westHyrule.palace2.PalNum - 1].Root.NewMap);
+            ROMData.Put(westHyrule.palace3.MemAddress + 0x7e, (byte)palaces[westHyrule.palace3.PalNum - 1].Root.NewMap);
+            ROMData.Put(eastHyrule.palace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace5.PalNum - 1].Root.NewMap);
+            ROMData.Put(eastHyrule.palace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.palace6.PalNum - 1].Root.NewMap);
+            ROMData.Put(eastHyrule.gp.MemAddress + 0x7e, (byte)palaces[eastHyrule.gp.PalNum - 1].Root.NewMap);
+            ROMData.Put(mazeIsland.palace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.palace4.PalNum - 1].Root.NewMap);
 
         }
         if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
@@ -3928,13 +3940,13 @@ public class Hyrule
             { 
                 foreach(Room r in palaces[palace-1].AllRooms)
                 {
-                    if(r.Newmap == 0)
+                    if(r.NewMap == 0)
                     {
                         mapsNos.Add(r.Map);
                     }
                     else
                     {
-                        mapsNos.Add(r.Newmap);
+                        mapsNos.Add(r.NewMap);
                     }
                 }
             }
@@ -3943,13 +3955,13 @@ public class Hyrule
         {
             foreach (Room r in palaces[6].AllRooms)
             {
-                if (r.Newmap == 0)
+                if (r.NewMap == 0)
                 {
                     mapsNos.Add(r.Map);
                 }
                 else
                 {
-                    mapsNos.Add(r.Newmap);
+                    mapsNos.Add(r.NewMap);
                 }
             }
         }
