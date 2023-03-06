@@ -261,6 +261,12 @@ public class Room
         MemAddr = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
         isUpDownReversed = roomData.isUpDownReversed;
         IsDropZone = roomData.isDropZone;
+
+        byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
+        if(SideView.Length != length)
+        {
+            throw new Exception("Room length header does not match actual length for sideview: " + roomData.sideviewData.ToString());
+        }
     }
 
     public void UpdateBytes()
