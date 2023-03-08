@@ -8928,8 +8928,8 @@
     "isUpstabBlocked": false,
     "map": 33,
     "memoryAddress": "0107AF",
-    "name": "",
-    "sideviewData": "1D600508D814D903D902D901D900D40E8205D300A245920F0082C1D30F"
+    "name": "down staircase left open item room",
+    "sideviewData": "1D600508D614D903D902D901D900D40E8105D600A245920F0E82C1D30F"
     },
     {
     "bitmask": "05",
@@ -9324,8 +9324,8 @@
     "isUpstabBlocked": false,
     "map": 29,
     "memoryAddress": "01079F",
-    "name": "",
-    "sideviewData": "25600F08D20E8001DF086001E2006202D10EF45080F18A05D308A24581C1930F000273D20F"
+    "name": "Elevator free on the right item room",
+    "sideviewData": "25600F08D20E8001DF086001E2006202D10EF45080F18805D508A24581C1930F0E0273D20F"
     },
     {
     "bitmask": "0F",
@@ -9346,8 +9346,8 @@
     "isUpstabBlocked": false,
     "map": 69,
     "memoryAddress": "012228",
-    "name": "",
-    "sideviewData": "31600610F75080F1D200502F60206B20617482C2522F61206B2061748205512C6220A244920F026422717391744802D10E"
+    "name": "Split top/bottom item room A",
+    "sideviewData": "31600610F75080F1D200502F60206B20617482C2522F61206B2061748205512C6220A344920F026322717391744802D10E"
     },
     {
     "bitmask": "0F",
@@ -9456,8 +9456,8 @@
     "isUpstabBlocked": false,
     "map": 1,
     "memoryAddress": "01072F",
-    "name": "",
-    "sideviewData": "27608708307FD280A145910F0183C1447260728105347A53C5967F727D52799C719F7772755273"
+    "name": "Sunken left side passover item room",
+    "sideviewData": "27608708307FD280A245910F0C83C145756075337F800558C5967F727B5277E300987772755273"	 
     },
     {
     "bitmask": "0F",
@@ -10696,7 +10696,7 @@
     "connections": "FF3300C0",
     "elevatorScreen": 0,
     "enabled": true,
-    "enemies": "050D9E3A05",
+    "enemies": "031959",
     "group": "flippedGp",
     "hasBoss": false,
     "hasDrop": false,
@@ -11436,8 +11436,8 @@
     "isUpstabBlocked": false,
     "map": 8,
     "memoryAddress": "012228",
-    "name": "",
-    "sideviewData": "31600610F75080F1D200502F60206B20617482C2522F61206B2061748205512C6220A244920F026422717391744802D10E"
+    "name": "Split top/bottom item room B",
+    "sideviewData": "31600610F75080F1D200502F60206B20617482C2522F61206B2061748205512C6220A344920F026322717391744802D10E"
     },
     {
     "bitmask": "0F",
