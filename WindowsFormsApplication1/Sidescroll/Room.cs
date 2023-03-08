@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.OleDb;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -267,6 +268,33 @@ public class Room
         {
             throw new Exception("Room length header does not match actual length for sideview: " + roomData.sideviewData.ToString());
         }
+    }
+
+    public string Serialize()
+    {
+        dynamic result = new ExpandoObject();
+        result.name = Name;
+        result.group = Group;
+        result.map = Map;
+        result.enabled = Enabled;
+        result.connections = BitConverter.ToString(Connections).Replace("-", "");
+        result.enemies = BitConverter.ToString(Enemies).Replace("-", "");
+        result.sideviewData = BitConverter.ToString(SideView).Replace("-", "");
+        result.bitmask = BitConverter.ToString(new Byte[] { bitmask }).Replace("-", "");
+        result.isFairyBlocked = IsFairyBlocked;
+        result.isGloveBlocked = IsGloveBlocked;
+        result.isDownstabBlocked = IsDownstabBlocked;
+        result.isUpstabBlocked = IsUpstabBlocked;
+        result.isJumpBlocked = IsJumpBlocked;
+        result.hasItem = HasItem;
+        result.hasBoss = HasBoss;
+        result.hasDrop = HasDrop;
+        result.elevatorScreen = ElevatorScreen;
+        result.MemAddr = MemAddr;
+        result.isUpDownReversed = isUpDownReversed;
+        result.IsDropZone = IsDropZone;
+
+        return System.Text.Json.JsonSerializer.Serialize(result);
     }
 
     public void UpdateBytes()
