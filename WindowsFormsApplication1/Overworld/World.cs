@@ -207,7 +207,7 @@ public abstract class World
             {
                 int enemy = hyrule.ROMData.GetByte(j) & 0x3F;
                 int highPart = hyrule.ROMData.GetByte(j) & 0xC0;
-                if (hyrule.Props.mixEnemies)
+                if (hyrule.Props.MixEnemies)
                 {
                     if (enemies.Contains(enemy))
                     {
@@ -465,7 +465,7 @@ public abstract class World
                     Terrain entranceTerrain = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
                     // if (!hyrule.Props.saneCaves || !connections.ContainsKey(location))
                     //Updated to avoid "if not else" anti-pattern
-                    if(hyrule.Props.saneCaves && connections.ContainsKey(location))
+                    if(hyrule.Props.SaneCaves && connections.ContainsKey(location))
                     {
                         PlaceCaveCount++;
                         if(!PlaceSaneCave(x, y, direction, entranceTerrain, riverTerrain, location))
@@ -1222,7 +1222,7 @@ public abstract class World
                         }
                     }
                     TerrainCycle++;
-                    if (riverTerrain != Terrain.MOUNTAIN && riverTerrain != Terrain.DESERT && !hyrule.Props.canWalkOnWaterWithBoots)
+                    if (riverTerrain != Terrain.MOUNTAIN && riverTerrain != Terrain.DESERT && !hyrule.Props.CanWalkOnWaterWithBoots)
                     {
                         TerrainCycle = TerrainCycle % 3;
                     }
@@ -1474,7 +1474,7 @@ public abstract class World
         {
             for (int x = 0; x < MAP_COLS; x++)
             {
-                if(hyrule.Props.hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
+                if(hyrule.Props.HiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
@@ -1489,7 +1489,7 @@ public abstract class World
                     bytesWritten += 2;
                     continue;
                 }
-                if (hyrule.Props.hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE))
+                if (hyrule.Props.HiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE))
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
@@ -1557,7 +1557,7 @@ public abstract class World
     protected void DrawOcean(Direction direction)
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.canWalkOnWaterWithBoots)
+        if (hyrule.Props.CanWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }
@@ -2012,7 +2012,7 @@ public abstract class World
     protected void DrawRiver(List<Location> bridges)
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.canWalkOnWaterWithBoots)
+        if (hyrule.Props.CanWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }

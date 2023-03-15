@@ -58,11 +58,11 @@ class MazeIsland : World
 
         baseAddr = 0xA10c;
         VANILLA_MAP_ADDR = 0xa65c;
-        if(hy.Props.mazeBiome == Biome.VANILLA)
+        if(hy.Props.MazeBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if(hy.Props.mazeBiome == Biome.VANILLA_SHUFFLE)
+        else if(hy.Props.MazeBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }
@@ -82,7 +82,7 @@ class MazeIsland : World
             if (this.biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.vanillaOriginal)
+                if (hyrule.Props.VanillaOriginal)
                 {
                     foreach (Location location in AllLocations)
                     {

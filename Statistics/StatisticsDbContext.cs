@@ -10,6 +10,7 @@ namespace Z2Randomizer.Statistics
     internal class StatisticsDbContext : DbContext
     {
         public DbSet<Result> Results { get; set; }
+        public DbSet<RandomizerProperties> Properties { get; set; }
         private static bool _created = false;
 
         private string dbPath;

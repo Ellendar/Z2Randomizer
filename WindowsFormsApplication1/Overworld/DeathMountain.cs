@@ -120,28 +120,28 @@ class DeathMountain : World
         baseAddr = 0x610C;
         VANILLA_MAP_ADDR = 0x665c;
 
-        if (hy.Props.dmBiome == Biome.ISLANDS)
+        if (hy.Props.DmBiome == Biome.ISLANDS)
         {
             this.biome = Biome.ISLANDS;
         }
-        else if (hy.Props.dmBiome == Biome.CANYON || hy.Props.dmBiome == Biome.DRY_CANYON)
+        else if (hy.Props.DmBiome == Biome.CANYON || hy.Props.DmBiome == Biome.DRY_CANYON)
         {
             this.biome = Biome.CANYON;
             //MAP_ROWS = 75;
         }
-        else if(hy.Props.dmBiome == Biome.CALDERA)
+        else if(hy.Props.DmBiome == Biome.CALDERA)
         {
             this.biome = Biome.CALDERA;
         }
-        else if(hy.Props.dmBiome == Biome.MOUNTAINOUS)
+        else if(hy.Props.DmBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if(hy.Props.dmBiome == Biome.VANILLA)
+        else if(hy.Props.DmBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if(hy.Props.dmBiome == Biome.VANILLA_SHUFFLE)
+        else if(hy.Props.DmBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }
@@ -158,7 +158,7 @@ class DeathMountain : World
     public bool Terraform()
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.canWalkOnWaterWithBoots)
+        if (hyrule.Props.CanWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }
@@ -177,7 +177,7 @@ class DeathMountain : World
             if (this.biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.vanillaOriginal)
+                if (hyrule.Props.VanillaOriginal)
                 {
                     magicCave.TerrainType = Terrain.ROCK;
                     foreach (Location location in AllLocations)
@@ -303,7 +303,7 @@ class DeathMountain : World
                     riverT = water;
                     horizontal = hyrule.RNG.NextDouble() > 0.5;
 
-                    if (hyrule.Props.westBiome == Biome.DRY_CANYON)
+                    if (hyrule.Props.WestBiome == Biome.DRY_CANYON)
                     {
                         riverT = Terrain.DESERT;
                     }
@@ -451,7 +451,7 @@ class DeathMountain : World
                             {
                                 s = Terrain.ROAD;
                             }
-                            if (!hyrule.Props.saneCaves || !connectionsDM.ContainsKey(location))
+                            if (!hyrule.Props.SaneCaves || !connectionsDM.ContainsKey(location))
                             {
                                 PlaceCave(x, y, direction, s);
                             }
@@ -779,7 +779,7 @@ class DeathMountain : World
     private bool MakeCaldera()
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.canWalkOnWaterWithBoots)
+        if (hyrule.Props.CanWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }

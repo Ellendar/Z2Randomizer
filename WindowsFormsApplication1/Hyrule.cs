@@ -253,7 +253,7 @@ public class Hyrule
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
 
-        ROMData = new ROM(props.filename);
+        ROMData = new ROM(props.Filename);
         //ROMData.dumpAll("glitch");
         //ROMData.dumpSamus();
         //Palace.DumpMaps(ROMData);
@@ -281,12 +281,12 @@ public class Hyrule
         //ROMData.moveAfterGem();
 
         //Allows casting magic without requeueing a spell
-        if (props.fastCast)
+        if (props.FastCast)
         {
             ROMData.WriteFastCastMagic();
         }
 
-        if (props.disableMusic)
+        if (props.DisableMusic)
         {
             ROMData.DisableMusic();
         }
@@ -301,7 +301,7 @@ public class Hyrule
         ROMData.UpdateMapPointers();
         ROMData.FixContinentTransitions();
 
-        if (props.dashSpell)
+        if (props.DashSpell)
         {
             ROMData.DashSpell();
         }
@@ -318,11 +318,11 @@ public class Hyrule
 
         */
 
-        if(props.upAC1)
+        if(props.UpAC1)
         {
             ROMData.UpAController1();
         }
-        if (props.upaBox)
+        if (props.UpaBox)
         {
             ROMData.Put(0x1cbba, 0x20);
             ROMData.Put(0x1cbbb, 0x9a);
@@ -406,13 +406,13 @@ public class Hyrule
             ROMData.Put(0x1cfa4, 0xfe);
         }
 
-        if (props.permanentBeam)
+        if (props.PermanentBeam)
         {
             ROMData.Put(0x186c, 0xEA);
             ROMData.Put(0x186d, 0xEA);
         }
 
-        if (props.standardizeDrops)
+        if (props.StandardizeDrops)
         {
             ROMData.Put(0x1e8bd, 0x20);
             ROMData.Put(0x1e8be, 0x4c);
@@ -496,7 +496,7 @@ public class Hyrule
         }
         //This is a load-bearing debug statement :(
         logger.Trace("Random: " + RNG.Next(10));
-        if (props.shufflePalaceEnemies)
+        if (props.ShufflePalaceEnemies)
         {
             ShuffleEnemies(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
             ShuffleEnemies(enemyPtr2, enemyAddr1, enemies2, generators2, shorties2, tallGuys2, flyingEnemies2, false);
@@ -528,7 +528,7 @@ public class Hyrule
             File.ReadAllText(config.GetRoomsFile())
         ));
         UpdateRom(hash);
-        String newFileName = props.filename.Substring(0, props.filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+        String newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
         if(props.saveRom)
         {
             ROMData.Dump(newFileName);
@@ -588,20 +588,20 @@ public class Hyrule
                 int maxAtk = (int)(atk[i] + atk[i] * .5);
                 int next = atk[i];
 
-                if (props.attackEffectiveness == StatEffectiveness.AVERAGE)
+                if (props.AttackEffectiveness == StatEffectiveness.AVERAGE)
                 {
                     next = RNG.Next(minAtk, maxAtk);
                 }
-                else if (props.attackEffectiveness == StatEffectiveness.HIGH)
+                else if (props.AttackEffectiveness == StatEffectiveness.HIGH)
                 {
                     next = (int)(atk[i] + (atk[i] * .4));
                 }
-                else if (props.attackEffectiveness == StatEffectiveness.LOW)
+                else if (props.AttackEffectiveness == StatEffectiveness.LOW)
                 {
                     next = (int)(atk[i] * .5);
                 }
 
-                if (props.attackEffectiveness == StatEffectiveness.AVERAGE)
+                if (props.AttackEffectiveness == StatEffectiveness.AVERAGE)
                 {
                     if (i == 0)
                     {
@@ -661,26 +661,26 @@ public class Hyrule
         eastHyrule.pbagCave1.itemGet = false;
         eastHyrule.pbagCave2.itemGet = false;
 
-        ROMData.Put(RomMap.START_CANDLE, props.startCandle ? (Byte)1 : (Byte)0);
-        itemGet[Item.CANDLE] = props.startCandle;
-        ROMData.Put(RomMap.START_GLOVE, props.startGlove ? (Byte)1 : (Byte)0);
-        itemGet[Item.GLOVE] = props.startGlove;
-        ROMData.Put(RomMap.START_RAFT, props.startRaft ? (Byte)1 : (Byte)0);
-        itemGet[Item.RAFT] = props.startRaft;
-        ROMData.Put(RomMap.START_BOOTS, props.startBoots ? (Byte)1 : (Byte)0);
-        itemGet[Item.BOOTS] = props.startBoots;
-        ROMData.Put(RomMap.START_FLUTE, props.startFlute ? (Byte)1 : (Byte)0);
-        itemGet[Item.FLUTE] = props.startFlute;
-        ROMData.Put(RomMap.START_CROSS, props.startCross ? (Byte)1 : (Byte)0);
-        itemGet[Item.CROSS] = props.startCross;
-        ROMData.Put(RomMap.START_HAMMER, props.startHammer ? (Byte)1 : (Byte)0);
-        itemGet[Item.HAMMER] = props.startHammer;
-        ROMData.Put(RomMap.START_MAGICAL_KEY, props.startKey ? (Byte)1 : (Byte)0);
-        itemGet[Item.MAGIC_KEY] = props.startKey;
+        ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (Byte)1 : (Byte)0);
+        itemGet[Item.CANDLE] = props.StartCandle;
+        ROMData.Put(RomMap.START_GLOVE, props.StartGlove ? (Byte)1 : (Byte)0);
+        itemGet[Item.GLOVE] = props.StartGlove;
+        ROMData.Put(RomMap.START_RAFT, props.StartRaft ? (Byte)1 : (Byte)0);
+        itemGet[Item.RAFT] = props.StartRaft;
+        ROMData.Put(RomMap.START_BOOTS, props.StartBoots ? (Byte)1 : (Byte)0);
+        itemGet[Item.BOOTS] = props.StartBoots;
+        ROMData.Put(RomMap.START_FLUTE, props.StartFlute ? (Byte)1 : (Byte)0);
+        itemGet[Item.FLUTE] = props.StartFlute;
+        ROMData.Put(RomMap.START_CROSS, props.StartCross ? (Byte)1 : (Byte)0);
+        itemGet[Item.CROSS] = props.StartCross;
+        ROMData.Put(RomMap.START_HAMMER, props.StartHammer ? (Byte)1 : (Byte)0);
+        itemGet[Item.HAMMER] = props.StartHammer;
+        ROMData.Put(RomMap.START_MAGICAL_KEY, props.StartKey ? (Byte)1 : (Byte)0);
+        itemGet[Item.MAGIC_KEY] = props.StartKey;
 
         itemList = new List<Item> { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MEDICINE, Item.TROPHY, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MAGIC_KEY, Item.MAGIC_CONTAINER, Item.HAMMER, Item.CHILD, Item.MAGIC_CONTAINER };
 
-        if (props.pbagItemShuffle)
+        if (props.PbagItemShuffle)
         {
             westHyrule.pbagCave.item = (Item)ROMData.GetByte(0x4FE2);
             eastHyrule.pbagCave1.item = (Item)ROMData.GetByte(0x8ECC);
@@ -708,7 +708,7 @@ public class Hyrule
 
         if (heartContainersInItemPool > 4)
         {
-            if (props.pbagItemShuffle)
+            if (props.PbagItemShuffle)
             {
                 int heartContainersToAdd = heartContainersInItemPool - 4;
                 while (heartContainersToAdd > 0)
@@ -751,7 +751,7 @@ public class Hyrule
             }
         }
 
-        if(props.removeSpellItems)
+        if(props.RemoveSpellItems)
         {
             itemList[9] = smallItems[RNG.Next(smallItems.Count)];
             itemList[10] = smallItems[RNG.Next(smallItems.Count)];
@@ -825,7 +825,7 @@ public class Hyrule
         }
 
 
-        if (props.mixOverworldPalaceItems)
+        if (props.MixOverworldPalaceItems)
         {
             for (int i = 0; i < itemList.Count; i++)
             {
@@ -837,7 +837,7 @@ public class Hyrule
         }
         else
         {
-            if (props.shufflePalaceItems)
+            if (props.ShufflePalaceItems)
             {
                 for (int i = 0; i < 6; i++)
                 {
@@ -852,7 +852,7 @@ public class Hyrule
                 //Was this place intentionally left blank? If so why the else?
             }
 
-            if (props.shuffleOverworldItems)
+            if (props.ShuffleOverworldItems)
             {
                 for (int i = 6; i < itemList.Count; i++)
                 {
@@ -1024,8 +1024,8 @@ public class Hyrule
             && CanGet(eastHyrule.gp) 
             && CanGet(itemLocs) 
             && CanGet(westHyrule.bagu) 
-            && (!Props.hiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation))) 
-            && (!Props.hiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
+            && (!Props.HiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation))) 
+            && (!Props.HiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
         if(retval == false)
         {
             isEverythingReachableFailures++;
@@ -1105,7 +1105,7 @@ public class Hyrule
         bool changed = false;
         foreach (Spell s in spellMap.Keys)
         {
-            if (s == Spell.FAIRY && (((itemGet[Item.MEDICINE] || props.removeSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (accessibleMagicContainers >= 8 || props.disableMagicRecs))) && CanGet(westHyrule.fairy))
+            if (s == Spell.FAIRY && (((itemGet[Item.MEDICINE] || props.RemoveSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (accessibleMagicContainers >= 8 || props.DisableMagicRecs))) && CanGet(westHyrule.fairy))
             {
                 if(!SpellGet[spellMap[s]])
                 {
@@ -1113,7 +1113,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.JUMP && (((itemGet[Item.TROPHY] || props.removeSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.disableMagicRecs) && (itemGet[Item.CHILD] || props.removeSpellItems))) && CanGet(westHyrule.jump))
+            else if (s == Spell.JUMP && (((itemGet[Item.TROPHY] || props.RemoveSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.DisableMagicRecs) && (itemGet[Item.CHILD] || props.RemoveSpellItems))) && CanGet(westHyrule.jump))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1137,7 +1137,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.LIFE && (CanGet(westHyrule.lifeNorth)) && (((accessibleMagicContainers >= 7 || props.disableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
+            else if (s == Spell.LIFE && (CanGet(westHyrule.lifeNorth)) && (((accessibleMagicContainers >= 7 || props.DisableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1145,7 +1145,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.SHIELD && (CanGet(westHyrule.shieldTown)) && (((accessibleMagicContainers >= 5 || props.disableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
+            else if (s == Spell.SHIELD && (CanGet(westHyrule.shieldTown)) && (((accessibleMagicContainers >= 5 || props.DisableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1153,7 +1153,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.REFLECT && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[Item.TROPHY] || props.removeSpellItems)) || ((itemGet[Item.CHILD] || props.removeSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.disableMagicRecs))) && CanGet(eastHyrule.darunia))
+            else if (s == Spell.REFLECT && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[Item.TROPHY] || props.RemoveSpellItems)) || ((itemGet[Item.CHILD] || props.RemoveSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.DisableMagicRecs))) && CanGet(eastHyrule.darunia))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1161,7 +1161,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.FIRE && (CanGet(eastHyrule.nabooru)) && (((accessibleMagicContainers >= 5 || props.disableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
+            else if (s == Spell.FIRE && (CanGet(eastHyrule.nabooru)) && (((accessibleMagicContainers >= 5 || props.DisableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1169,7 +1169,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.SPELL && (CanGet(eastHyrule.newKasuto)) && (((accessibleMagicContainers >= 7 || props.disableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
+            else if (s == Spell.SPELL && (CanGet(eastHyrule.newKasuto)) && (((accessibleMagicContainers >= 7 || props.DisableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1177,7 +1177,7 @@ public class Hyrule
                 }
                 SpellGet[spellMap[s]] = true;
             }
-            else if (s == Spell.THUNDER && (CanGet(eastHyrule.oldKasuto)) && (((accessibleMagicContainers >= 8 || props.disableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[Item.MEDICINE] || props.removeSpellItems))))
+            else if (s == Spell.THUNDER && (CanGet(eastHyrule.oldKasuto)) && (((accessibleMagicContainers >= 8 || props.DisableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[Item.MEDICINE] || props.RemoveSpellItems))))
             {
                 if (!SpellGet[spellMap[s]])
                 {
@@ -1268,7 +1268,7 @@ public class Hyrule
             for (int i = 0; i < numBanks; i++)
             {
                 int nextVal = life[i, j];
-                if ((props.lifeEffectiveness == StatEffectiveness.AVERAGE && !isMag) || (props.magicEffectiveness == StatEffectiveness.AVERAGE && isMag))
+                if ((props.LifeEffectiveness == StatEffectiveness.AVERAGE && !isMag) || (props.MagicEffectiveness == StatEffectiveness.AVERAGE && isMag))
                 {
                     int max = (int)(life[i, j] + life[i, j] * .5);
                     int min = (int)(life[i, j] - life[i, j] * .5);
@@ -1289,11 +1289,11 @@ public class Hyrule
                         }
                     }
                 }
-                else if (props.magicEffectiveness == StatEffectiveness.LOW && isMag)
+                else if (props.MagicEffectiveness == StatEffectiveness.LOW && isMag)
                 {
                     nextVal = (int)(life[i, j] + (life[i, j] * .5));
                 }
-                else if (props.lifeEffectiveness == StatEffectiveness.HIGH && !isMag || props.magicEffectiveness == StatEffectiveness.HIGH && isMag)
+                else if (props.LifeEffectiveness == StatEffectiveness.HIGH && !isMag || props.MagicEffectiveness == StatEffectiveness.HIGH && isMag)
                 {
                     nextVal = (int)(life[i, j] * .5);
                 }
@@ -1320,7 +1320,7 @@ public class Hyrule
 
     private void RandomizeEnemies()
     {
-        if (props.shuffleEnemyHP)
+        if (props.ShuffleEnemyHP)
         {
             ShuffleHP(0x5434, 0x5453);
             ShuffleHP(0x9434, 0x944E);
@@ -1335,7 +1335,7 @@ public class Hyrule
             ShuffleHP(0x12937, 0x12954);
         }
 
-        if (props.attackEffectiveness == StatEffectiveness.MAX)
+        if (props.AttackEffectiveness == StatEffectiveness.MAX)
         {
             ShuffleAttackEffectiveness(true);
             ROMData.Put(0x005432, (Byte)193);
@@ -1375,7 +1375,7 @@ public class Hyrule
 
     private void ProcessOverworld()
     {
-        if (props.shuffleSmallItems)
+        if (props.ShuffleSmallItems)
         {
             ShuffleSmallItems(1, true);
             ShuffleSmallItems(1, false);
@@ -1414,7 +1414,7 @@ public class Hyrule
                 worlds.Add(mazeIsland);
                 ShuffleTowns();
 
-                if (props.continentConnections == ContinentConnectionType.NORMAL || props.continentConnections == ContinentConnectionType.RB_BORDER_SHUFFLE)
+                if (props.ContinentConnections == ContinentConnectionType.NORMAL || props.ContinentConnections == ContinentConnectionType.RB_BORDER_SHUFFLE)
                 {
                     westHyrule.LoadCave1(1);
                     westHyrule.LoadCave2(1);
@@ -1428,24 +1428,24 @@ public class Hyrule
 
                     mazeIsland.LoadBridge(2);
                 }
-                else if (props.continentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
+                else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
                     List<int> chosen = new List<int>();
                     int type = RNG.Next(4);
-                    if (props.westBiome == Biome.VANILLA
-                        || props.westBiome == Biome.VANILLA_SHUFFLE 
-                        || props.dmBiome == Biome.VANILLA
-                        || props.dmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA
+                        || props.WestBiome == Biome.VANILLA_SHUFFLE 
+                        || props.DmBiome == Biome.VANILLA
+                        || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 3;
                     }
 
                     SetTransportation(0, 1, type);
                     chosen.Add(type);
-                    if (props.westBiome == Biome.VANILLA
-                        || props.westBiome == Biome.VANILLA_SHUFFLE
-                        || props.dmBiome == Biome.VANILLA
-                        || props.dmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA
+                        || props.WestBiome == Biome.VANILLA_SHUFFLE
+                        || props.DmBiome == Biome.VANILLA
+                        || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 0;
                     }
@@ -1458,10 +1458,10 @@ public class Hyrule
                     }
                     SetTransportation(0, 1, type);
                     chosen.Add(type);
-                    if (props.westBiome == Biome.VANILLA
-                        || props.westBiome == Biome.VANILLA_SHUFFLE
-                        || props.eastBiome == Biome.VANILLA
-                        || props.eastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA
+                        || props.WestBiome == Biome.VANILLA_SHUFFLE
+                        || props.EastBiome == Biome.VANILLA
+                        || props.EastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 1;
                     }
@@ -1474,10 +1474,10 @@ public class Hyrule
                     }
                     SetTransportation(0, 2, type);
                     chosen.Add(type);
-                    if (props.eastBiome == Biome.VANILLA
-                        || props.eastBiome == Biome.VANILLA_SHUFFLE
-                        || props.mazeBiome == Biome.VANILLA
-                        || props.mazeBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome == Biome.VANILLA
+                        || props.EastBiome == Biome.VANILLA_SHUFFLE
+                        || props.MazeBiome == Biome.VANILLA
+                        || props.MazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         type = 2;
                     }
@@ -1493,26 +1493,26 @@ public class Hyrule
                 else
                 {
                     List<int> doNotPick = new List<int>();
-                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(0);
                     }
-                    if (props.eastBiome == Biome.VANILLA || props.eastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(2);
                     }
-                    if (props.dmBiome == Biome.VANILLA || props.dmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(1);
                     }
-                    if (props.mazeBiome == Biome.VANILLA || props.mazeBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.MazeBiome == Biome.VANILLA || props.MazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         doNotPick.Add(3);
                     }
 
                     int raftw1 = RNG.Next(worlds.Count);
 
-                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
                         raftw1 = 0;
                     }
@@ -1526,7 +1526,7 @@ public class Hyrule
 
 
                     int raftw2 = RNG.Next(worlds.Count);
-                    if (props.eastBiome == Biome.VANILLA || props.eastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         raftw2 = 2;
                     }
@@ -1542,7 +1542,7 @@ public class Hyrule
                     worlds[raftw2].LoadRaft(raftw1);
 
                     int bridgew1 = RNG.Next(worlds.Count);
-                    if (props.eastBiome == Biome.VANILLA || props.eastBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         bridgew1 = 2;
                     }
@@ -1554,7 +1554,7 @@ public class Hyrule
                         }
                     }
                     int bridgew2 = RNG.Next(worlds.Count);
-                    if (props.mazeBiome == Biome.VANILLA || props.mazeBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.MazeBiome == Biome.VANILLA || props.MazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         bridgew2 = 3;
                     }
@@ -1570,7 +1570,7 @@ public class Hyrule
                     worlds[bridgew2].LoadBridge(bridgew1);
 
                     int c1w1 = RNG.Next(worlds.Count);
-                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c1w1 = 0;
                     }
@@ -1582,7 +1582,7 @@ public class Hyrule
                         }
                     }
                     int c1w2 = RNG.Next(worlds.Count);
-                    if (props.dmBiome == Biome.VANILLA || props.dmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c1w2 = 1;
                     }
@@ -1598,7 +1598,7 @@ public class Hyrule
                     worlds[c1w2].LoadCave1(c1w1);
 
                     int c2w1 = RNG.Next(worlds.Count);
-                    if (props.westBiome == Biome.VANILLA || props.westBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c2w1 = 0;
                     }
@@ -1610,7 +1610,7 @@ public class Hyrule
                         }
                     }
                     int c2w2 = RNG.Next(worlds.Count);
-                    if (props.dmBiome == Biome.VANILLA || props.dmBiome == Biome.VANILLA_SHUFFLE)
+                    if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c2w2 = 1;
                     }
@@ -1765,7 +1765,7 @@ public class Hyrule
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
         } while (!IsEverythingReachable());
 
-        if (props.shuffleOverworldEnemies)
+        if (props.ShuffleOverworldEnemies)
         {
             foreach (World w in worlds)
             {
@@ -1837,7 +1837,7 @@ public class Hyrule
         eastHyrule.newKasuto2.TownNum = Town.NEW_KASUTO_2;
         eastHyrule.oldKasuto.TownNum = Town.OLD_KASUTO;
 
-        if(props.townSwap)
+        if(props.TownSwap)
         {
             if(RNG.NextDouble() > .5)
             {
@@ -1881,12 +1881,12 @@ public class Hyrule
     private void ShufflePalaces()
     {
 
-        if (props.swapPalaceCont)
+        if (props.SwapPalaceCont)
         {
 
             List<Location> pals = new List<Location> { westHyrule.palace1, westHyrule.palace2, westHyrule.palace3, mazeIsland.palace4, eastHyrule.palace5, eastHyrule.palace6 };
 
-            if (props.p7shuffle)
+            if (props.P7shuffle)
             {
                 pals.Add(eastHyrule.gp);
             }
@@ -1910,7 +1910,7 @@ public class Hyrule
             eastHyrule.palace6.World = eastHyrule.palace6.World & 0xFC;
             eastHyrule.palace6.World = eastHyrule.palace6.World | 0x02;
 
-            if (props.p7shuffle)
+            if (props.P7shuffle)
             {
                 eastHyrule.gp.World = eastHyrule.gp.World & 0xFC;
                 eastHyrule.gp.World = eastHyrule.gp.World | 0x02;
@@ -2022,7 +2022,7 @@ public class Hyrule
         itemLocs.Add(mazeIsland.magic);
 
 
-        if (props.pbagItemShuffle)
+        if (props.PbagItemShuffle)
         {
             itemLocs.Add(westHyrule.pbagCave);
             itemLocs.Add(eastHyrule.pbagCave1);
@@ -2045,7 +2045,7 @@ public class Hyrule
         {
             spellGet[i] = false;
         }*/
-        if (props.shuffleSpellLocations)
+        if (props.ShuffleSpellLocations)
         {
             for (int i = 0; i < shuffleThis.Count; i++)
             {
@@ -2064,24 +2064,24 @@ public class Hyrule
         spellMap.Add(Spell.DOWNSTAB, Spell.DOWNSTAB);
 
 
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.startShield ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.SHIELD] = props.startShield;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.JUMP), props.startJump ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.JUMP] = props.startJump;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.LIFE), props.startLife ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.LIFE] = props.startLife;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FAIRY), props.startFairy ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.FAIRY] = props.startFairy;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FIRE), props.startFire ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.FIRE] = props.startFire;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.REFLECT), props.startReflect ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.REFLECT] = props.startReflect;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SPELL), props.startSpell ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.SPELL] = props.startSpell;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.THUNDER), props.startThunder ? (Byte)1 : (Byte)0);
-        SpellGet[Spell.THUNDER] = props.startThunder;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.SHIELD] = props.StartShield;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.JUMP), props.StartJump ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.JUMP] = props.StartJump;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.LIFE), props.StartLife ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.LIFE] = props.StartLife;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FAIRY), props.StartFairy ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.FAIRY] = props.StartFairy;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FIRE), props.StartFire ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.FIRE] = props.StartFire;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.REFLECT), props.StartReflect ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.REFLECT] = props.StartReflect;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SPELL), props.StartSpell ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.SPELL] = props.StartSpell;
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.THUNDER), props.StartThunder ? (Byte)1 : (Byte)0);
+        SpellGet[Spell.THUNDER] = props.StartThunder;
 
-        if (props.combineFire)
+        if (props.CombineFire)
         {
             int newFire = RNG.Next(7);
             if (newFire > 3)
@@ -2127,7 +2127,7 @@ public class Hyrule
         }
 
         int[] cappedExp = new int[8];
-        if (props.scaleLevels)
+        if (props.ScaleLevels)
         {
             for (int i = 0; i < exp.Length; i++)
             {
@@ -2210,16 +2210,16 @@ public class Hyrule
             int high = exp & 0xF0;
             int low = exp & 0x0F;
 
-            if(props.expLevel == StatEffectiveness.HIGH)
+            if(props.ExpLevel == StatEffectiveness.HIGH)
             {
                 low++;
-            } else if(props.expLevel == StatEffectiveness.LOW) {
+            } else if(props.ExpLevel == StatEffectiveness.LOW) {
                 low--;
-            } else if(props.expLevel == StatEffectiveness.NONE) {
+            } else if(props.ExpLevel == StatEffectiveness.NONE) {
                 low = 0;
             }
 
-            if (props.expLevel != StatEffectiveness.NONE)
+            if (props.ExpLevel != StatEffectiveness.NONE)
             {
                 low = RNG.Next(low - 2, low + 3);
             }
@@ -2250,32 +2250,32 @@ public class Hyrule
     private void RandomizeStartingValues()
     {
 
-        ROMData.Put(0x17AF3, (byte)props.startAtk);
-        ROMData.Put(0x17AF4, (byte)props.startMag);
-        ROMData.Put(0x17AF5, (byte)props.startLifeLvl);
+        ROMData.Put(0x17AF3, (byte)props.StartAtk);
+        ROMData.Put(0x17AF4, (byte)props.StartMag);
+        ROMData.Put(0x17AF5, (byte)props.StartLifeLvl);
 
-        if(props.removeFlashing)
+        if(props.RemoveFlashing)
         {
             ROMData.DisableFlashing();
         }
 
-        if(props.spellEnemy)
+        if(props.SpellEnemy)
         {
             List<int> enemies = new List<int> { 3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26 };
             ROMData.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count())]);
         }
-        if(props.bossItem)
+        if(props.BossItem)
         {
             shuffler.ShuffleBossDrop(ROMData, RNG);
         }
 
-        if (props.removeSpellItems)
+        if (props.RemoveSpellItems)
         {
             ROMData.Put(0xF584, 0xA9);
             ROMData.Put(0xF585, 0x01);
             ROMData.Put(0xF586, 0xEA);
         }
-        ROMData.UpdateSprites(props.charSprite);
+        ROMData.UpdateSprites(props.CharSprite);
 
         Dictionary<String, int> colorMap = new Dictionary<String, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
 
@@ -2293,61 +2293,61 @@ public class Hyrule
         int c2 = 0;
         int c1 = 0;
 
-        if(props.tunicColor.Equals("Default"))
+        if(props.TunicColor.Equals("Default"))
         {
-            if(props.charSprite == CharacterSprite.LINK)
+            if(props.CharSprite == CharacterSprite.LINK)
             {
                 c2 = colorMap["Green"];
             }
-            else if(props.charSprite == CharacterSprite.IRON_KNUCKLE)
+            else if(props.CharSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 c2 = colorMap["Dark Blue"];
             }
-            else if(props.charSprite == CharacterSprite.ERROR)
+            else if(props.CharSprite == CharacterSprite.ERROR)
             {
                 c2 = 0x13;
             }
-            else if(props.charSprite == CharacterSprite.SAMUS)
+            else if(props.CharSprite == CharacterSprite.SAMUS)
             {
                 c2 = 0x27;
             }
-            else if(props.charSprite == CharacterSprite.SIMON)
+            else if(props.CharSprite == CharacterSprite.SIMON)
             {
                 c2 = 0x27;
             }
-            else if(props.charSprite == CharacterSprite.STALFOS)
+            else if(props.CharSprite == CharacterSprite.STALFOS)
             {
                 c2 = colorMap["Red"];
             }
-            else if(props.charSprite == CharacterSprite.VASE_LADY)
+            else if(props.CharSprite == CharacterSprite.VASE_LADY)
             {
                 c2 = 0x13;
             }
-            else if(props.charSprite == CharacterSprite.RUTO)
+            else if(props.CharSprite == CharacterSprite.RUTO)
             {
                 c2 = 0x30;
             }
-            else if(props.charSprite == CharacterSprite.YOSHI)
+            else if(props.CharSprite == CharacterSprite.YOSHI)
             {
                 c2 = 0x2a;
             }
-            else if(props.charSprite == CharacterSprite.DRAGONLORD)
+            else if(props.CharSprite == CharacterSprite.DRAGONLORD)
             {
                 c2 = 0x01;
             }
-            else if(props.charSprite == CharacterSprite.MIRIA)
+            else if(props.CharSprite == CharacterSprite.MIRIA)
             {
                 c2 = 0x16;
             }
-            else if(props.charSprite == CharacterSprite.CRYSTALIS)
+            else if(props.CharSprite == CharacterSprite.CRYSTALIS)
             {
                 c2 = 0x14;
             }
-            else if(props.charSprite == CharacterSprite.TACO)
+            else if(props.CharSprite == CharacterSprite.TACO)
             {
                 c2 = 0x2a;
             }
-            else if(props.charSprite == CharacterSprite.PYRAMID)
+            else if(props.CharSprite == CharacterSprite.PYRAMID)
             {
                 c2 = 0x32;
             }
@@ -2357,101 +2357,101 @@ public class Hyrule
                 c2 = 0x2a;
             }
             */
-            else if (props.charSprite == CharacterSprite.LADY_LINK)
+            else if (props.CharSprite == CharacterSprite.LADY_LINK)
             {
                 c2 = 0x2a;
             }
-            else if (props.charSprite == CharacterSprite.HOODIE_LINK)
+            else if (props.CharSprite == CharacterSprite.HOODIE_LINK)
             {
                 c2 = 0x2a;
             }
-            else if(props.charSprite == CharacterSprite.GLITCH_WITCH)
+            else if(props.CharSprite == CharacterSprite.GLITCH_WITCH)
             {
                 c2 = 0x0c;
             }
         }
-        else if (!props.tunicColor.Equals("Random"))
+        else if (!props.TunicColor.Equals("Random"))
         {
-            c2 = colorMap[props.tunicColor];
+            c2 = colorMap[props.TunicColor];
         }
 
-        if(props.shieldColor.Equals("Default"))
+        if(props.ShieldColor.Equals("Default"))
         {
-            if (props.charSprite == CharacterSprite.LINK)
+            if (props.CharSprite == CharacterSprite.LINK)
             {
                 c1 = colorMap["Red"];
             }
-            else if (props.charSprite == CharacterSprite.IRON_KNUCKLE)
+            else if (props.CharSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 c1 = colorMap["Red"];
             }
-            else if (props.charSprite == CharacterSprite.ERROR)
+            else if (props.CharSprite == CharacterSprite.ERROR)
             {
                 c1 = colorMap["Red"];
             }
-            else if(props.charSprite == CharacterSprite.SAMUS)
+            else if(props.CharSprite == CharacterSprite.SAMUS)
             {
                 c1 = 0x37;
             }
-            else if(props.charSprite == CharacterSprite.SIMON)
+            else if(props.CharSprite == CharacterSprite.SIMON)
             {
                 c1 = 0x16;
             }
-            else if(props.charSprite == CharacterSprite.STALFOS)
+            else if(props.CharSprite == CharacterSprite.STALFOS)
             {
                 c1 = colorMap["Dark Blue"];
             }
-            else if(props.charSprite == CharacterSprite.VASE_LADY)
+            else if(props.CharSprite == CharacterSprite.VASE_LADY)
             {
                 c1 = colorMap["Red"];
             }
-            else if(props.charSprite == CharacterSprite.RUTO)
+            else if(props.CharSprite == CharacterSprite.RUTO)
             {
                 c1 = 0x3c;
             }
-            else if(props.charSprite == CharacterSprite.YOSHI)
+            else if(props.CharSprite == CharacterSprite.YOSHI)
             {
                 c1 = 0x0F;
             }
-            else if(props.charSprite == CharacterSprite.DRAGONLORD)
+            else if(props.CharSprite == CharacterSprite.DRAGONLORD)
             {
                 c1 = 0x03;
             }
-            else if(props.charSprite == CharacterSprite.MIRIA)
+            else if(props.CharSprite == CharacterSprite.MIRIA)
             {
                 c1 = 0x15;
             }
-            else if (props.charSprite == CharacterSprite.CRYSTALIS)
+            else if (props.CharSprite == CharacterSprite.CRYSTALIS)
             {
                 c1 = 0x1B;
             }
-            else if (props.charSprite == CharacterSprite.TACO)
+            else if (props.CharSprite == CharacterSprite.TACO)
             {
                 c1 = 0x16;
             }
-            else if(props.charSprite == CharacterSprite.PYRAMID)
+            else if(props.CharSprite == CharacterSprite.PYRAMID)
             {
                 c1 = 0x02;
             }
-            else if (props.charSprite == CharacterSprite.LADY_LINK)
+            else if (props.CharSprite == CharacterSprite.LADY_LINK)
             {
                 c1 = 0x16;
             }
-            else if (props.charSprite == CharacterSprite.HOODIE_LINK)
+            else if (props.CharSprite == CharacterSprite.HOODIE_LINK)
             {
                 c1 = 0x16;
             }
-            else if(props.charSprite == CharacterSprite.GLITCH_WITCH)
+            else if(props.CharSprite == CharacterSprite.GLITCH_WITCH)
             {
                 c1 = 0x25;
             }
 
         }
-        else if (!props.shieldColor.Equals("Random"))
+        else if (!props.ShieldColor.Equals("Random"))
         {
-            c1 = colorMap[props.shieldColor];
+            c1 = colorMap[props.ShieldColor];
         }
-        if (props.tunicColor.Equals("Random"))
+        if (props.TunicColor.Equals("Random"))
         {
             Random r2 = new Random();
 
@@ -2467,7 +2467,7 @@ public class Hyrule
             }
         }
 
-        if (props.shieldColor.Equals("Random"))
+        if (props.ShieldColor.Equals("Random"))
         {
             Random r2 = new Random();
 
@@ -2486,12 +2486,12 @@ public class Hyrule
             }
         }
 
-        if(props.encounterRate == EncounterRate.NONE)
+        if(props.EncounterRate == EncounterRate.NONE)
         {
             ROMData.Put(0x294, 0x60); //skips the whole routine
         }
 
-        if(props.encounterRate == EncounterRate.HALF)
+        if(props.EncounterRate == EncounterRate.HALF)
         {
             //terrain timers
             ROMData.Put(0x250, 0x40);
@@ -2527,7 +2527,7 @@ public class Hyrule
         foreach (int l in tunicLocs)
         {
             ROMData.Put(0x10ea, (byte)c2);
-            if (props.charSprite == CharacterSprite.IRON_KNUCKLE)
+            if (props.CharSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 ROMData.Put(0x10ea, (byte)0x30);
                 ROMData.Put(0x2a0a, 0x0D);
@@ -2536,7 +2536,7 @@ public class Hyrule
                 ROMData.Put(l - 1, (byte)c2);
                 ROMData.Put(l - 2, 0x0D);
             }
-            else if(props.charSprite == CharacterSprite.SAMUS)
+            else if(props.CharSprite == CharacterSprite.SAMUS)
             {
                 ROMData.Put(0x2a0a, 0x16);
                 ROMData.Put(0x2a10, 0x1a);
@@ -2544,13 +2544,13 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x1a);
                 ROMData.Put(l - 2, 0x16);
             }
-            else if (props.charSprite == CharacterSprite.ERROR || props.charSprite == CharacterSprite.VASE_LADY)
+            else if (props.CharSprite == CharacterSprite.ERROR || props.CharSprite == CharacterSprite.VASE_LADY)
             {
                 ROMData.Put(0x2a0a, 0x0F);
                 ROMData.Put(l, (byte)c2);
                 ROMData.Put(l - 2, 0x0F);
             }
-            else if(props.charSprite == CharacterSprite.SIMON)
+            else if(props.CharSprite == CharacterSprite.SIMON)
             {
                 ROMData.Put(0x2a0a, 0x07);
                 ROMData.Put(0x2a10, 0x37);
@@ -2558,7 +2558,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x37);
                 ROMData.Put(l - 2, 0x07);
             }
-            else if(props.charSprite == CharacterSprite.STALFOS)
+            else if(props.CharSprite == CharacterSprite.STALFOS)
             {
                 ROMData.Put(0x2a0a, 0x08);
                 ROMData.Put(0x2a10, 0x20);
@@ -2566,7 +2566,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x20);
                 ROMData.Put(l - 2, 0x08);
             }
-            else if(props.charSprite == CharacterSprite.RUTO)
+            else if(props.CharSprite == CharacterSprite.RUTO)
             {
                 ROMData.Put(0x2a0a, 0x0c);
                 ROMData.Put(0x2a10, 0x1c);
@@ -2574,7 +2574,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x1c);
                 ROMData.Put(l - 2, 0x0c);
             }
-            else if(props.charSprite == CharacterSprite.YOSHI)
+            else if(props.CharSprite == CharacterSprite.YOSHI)
             {
                 ROMData.Put(0x2a0a, 0x16);
                 ROMData.Put(0x2a10, 0x20);
@@ -2582,7 +2582,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x20);
                 ROMData.Put(l - 2, 0x16);
             }
-            else if(props.charSprite == CharacterSprite.DRAGONLORD)
+            else if(props.CharSprite == CharacterSprite.DRAGONLORD)
             {
                 ROMData.Put(0x2a0a, 0x28);
                 ROMData.Put(0x2a10, 0x11);
@@ -2590,7 +2590,7 @@ public class Hyrule
                 ROMData.Put(l - 1, 0x11);
                 ROMData.Put(l - 2, 0x28);
             }
-            else if (props.charSprite == CharacterSprite.MIRIA)
+            else if (props.CharSprite == CharacterSprite.MIRIA)
             {
                 ROMData.Put(0x2a0a, 0x0D);
                 ROMData.Put(0x2a10, 0x30);
@@ -2599,7 +2599,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x0D);
                 
             }
-            else if (props.charSprite == CharacterSprite.CRYSTALIS)
+            else if (props.CharSprite == CharacterSprite.CRYSTALIS)
             {
                 ROMData.Put(0x2a0a, 0x0D);
                 ROMData.Put(0x2a10, 0x36);
@@ -2608,7 +2608,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x0D);
 
             }
-            else if (props.charSprite == CharacterSprite.TACO)
+            else if (props.CharSprite == CharacterSprite.TACO)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2617,7 +2617,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite == CharacterSprite.PYRAMID)
+            else if (props.CharSprite == CharacterSprite.PYRAMID)
             {
                 ROMData.Put(0x2a0a, 0x12);
                 ROMData.Put(0x2a10, 0x22);
@@ -2637,7 +2637,7 @@ public class Hyrule
 
             }
             */
-            else if (props.charSprite == CharacterSprite.LADY_LINK)
+            else if (props.CharSprite == CharacterSprite.LADY_LINK)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2646,7 +2646,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite == CharacterSprite.HOODIE_LINK)
+            else if (props.CharSprite == CharacterSprite.HOODIE_LINK)
             {
                 ROMData.Put(0x2a0a, 0x18);
                 ROMData.Put(0x2a10, 0x36);
@@ -2655,7 +2655,7 @@ public class Hyrule
                 ROMData.Put(l - 2, 0x18);
 
             }
-            else if (props.charSprite == CharacterSprite.GLITCH_WITCH)
+            else if (props.CharSprite == CharacterSprite.GLITCH_WITCH)
             {
                 ROMData.Put(0x2a0a, 0x08);
                 ROMData.Put(0x2a10, 0x36);
@@ -2676,33 +2676,33 @@ public class Hyrule
 
 
         int beamType = -1;
-        if (props.beamSprite.Equals("Random"))
+        if (props.BeamSprite.Equals("Random"))
         {
 
             Random r2 = new Random();
             beamType = r2.Next(6);
         }
-        else if (props.beamSprite.Equals("Fire"))
+        else if (props.BeamSprite.Equals("Fire"))
         {
             beamType = 0;
         }
-        else if (props.beamSprite.Equals("Bubble"))
+        else if (props.BeamSprite.Equals("Bubble"))
         {
             beamType = 1;
         }
-        else if (props.beamSprite.Equals("Rock"))
+        else if (props.BeamSprite.Equals("Rock"))
         {
             beamType = 2;
         }
-        else if (props.beamSprite.Equals("Axe"))
+        else if (props.BeamSprite.Equals("Axe"))
         {
             beamType = 3;
         }
-        else if (props.beamSprite.Equals("Hammer"))
+        else if (props.BeamSprite.Equals("Hammer"))
         {
             beamType = 4;
         }
-        else if (props.beamSprite.Equals("Wizzrobe Beam"))
+        else if (props.BeamSprite.Equals("Wizzrobe Beam"))
         {
             beamType = 5;
         }
@@ -2777,20 +2777,20 @@ public class Hyrule
         }
 
 
-        if (props.disableBeep)
+        if (props.DisableBeep)
         {
             //C9 20 - EA 38
             //CMP 20 -> NOP SEC
             ROMData.Put(0x1D4E4, (Byte)0xEA);
             ROMData.Put(0x1D4E5, (Byte)0x38);
         }
-        if (props.shuffleLifeRefill)
+        if (props.ShuffleLifeRefill)
         {
             int lifeRefill = RNG.Next(1, 6);
             ROMData.Put(0xE7A, (Byte)(lifeRefill * 16));
         }
 
-        if (props.shuffleStealExpAmt)
+        if (props.ShuffleStealExpAmt)
         {
             int small = ROMData.GetByte(0x1E30E);
             int big = ROMData.GetByte(0x1E314);
@@ -2814,17 +2814,17 @@ public class Hyrule
             addr.Add(i);
         }
 
-        if (props.shuffleEnemyStealExp)
+        if (props.ShuffleEnemyStealExp)
         {
             ShuffleBits(addr, false);
         }
 
-        if (props.shuffleSwordImmunity)
+        if (props.ShuffleSwordImmunity)
         {
             ShuffleBits(addr, true);
         }
 
-        if (props.expLevel != StatEffectiveness.VANILLA)
+        if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2841,16 +2841,16 @@ public class Hyrule
         {
             addr.Add(i);
         }
-        if (props.shuffleEnemyStealExp)
+        if (props.ShuffleEnemyStealExp)
         {
             ShuffleBits(addr, false);
         }
 
-        if (props.shuffleSwordImmunity)
+        if (props.ShuffleSwordImmunity)
         {
             ShuffleBits(addr, true);
         }
-        if (props.expLevel != StatEffectiveness.VANILLA)
+        if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2874,16 +2874,16 @@ public class Hyrule
         }
         addr.Add(0x11508);
 
-        if (props.shuffleEnemyStealExp)
+        if (props.ShuffleEnemyStealExp)
         {
             ShuffleBits(addr, false);
         }
 
-        if (props.shuffleSwordImmunity)
+        if (props.ShuffleSwordImmunity)
         {
             ShuffleBits(addr, true);
         }
-        if (props.expLevel != StatEffectiveness.VANILLA)
+        if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2916,16 +2916,16 @@ public class Hyrule
 
         addr.Add(0x12A08);
 
-        if (props.shuffleEnemyStealExp)
+        if (props.ShuffleEnemyStealExp)
         {
             ShuffleBits(addr, false);
         }
 
-        if (props.shuffleSwordImmunity)
+        if (props.ShuffleSwordImmunity)
         {
             ShuffleBits(addr, true);
         }
-        if (props.expLevel != StatEffectiveness.VANILLA)
+        if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
@@ -2951,21 +2951,21 @@ public class Hyrule
             addr.Add(i);
         }
 
-        if (props.shuffleEnemyStealExp)
+        if (props.ShuffleEnemyStealExp)
         {
             ShuffleBits(addr, false);
         }
 
-        if (props.shuffleSwordImmunity)
+        if (props.ShuffleSwordImmunity)
         {
             ShuffleBits(addr, true);
         }
-        if (props.expLevel != StatEffectiveness.VANILLA)
+        if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
             ShuffleEnemyExp(addr);
         }
 
-        if (props.expLevel != StatEffectiveness.VANILLA)
+        if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
             addr = new List<int>();
             addr.Add(0x11505);
@@ -2978,7 +2978,7 @@ public class Hyrule
             ShuffleEnemyExp(addr);
         }
 
-        if (props.shuffleEncounters)
+        if (props.ShuffleEncounters)
         {
             addr = new List<int>();
             addr.Add(0x441b); // 0x62: West northern grass
@@ -2990,7 +2990,7 @@ public class Hyrule
             addr.Add(0x4422); // 0x75: West grave
             addr.Add(0x441E); // 0x68: West south forest
 
-            if (props.allowPathEnemies)
+            if (props.AllowPathEnemies)
             {
                 addr.Add(0x4424);
                 addr.Add(0x4423);
@@ -3006,12 +3006,12 @@ public class Hyrule
             addr.Add(0x8420); // 0x70: East swamp
             addr.Add(0x841A); // 0x5E: East south desert
             addr.Add(0x841E); // 0x68: East south forest
-            if (props.includeLavaInEncounterShuffle)
+            if (props.IncludeLavaInEncounterShuffle)
             {
                 addr.Add(0x8426); // 0x7C: Valley of death
             }
 
-            if (props.allowPathEnemies)
+            if (props.AllowPathEnemies)
             {
                 addr.Add(0x8423);
                 addr.Add(0x8424);
@@ -3020,7 +3020,7 @@ public class Hyrule
             ShuffleEncounters(addr);
         }
 
-        if (props.jumpAlwaysOn)
+        if (props.JumpAlwaysOn)
         {
             ROMData.Put(0x1482, ROMData.GetByte(0x1480));
             ROMData.Put(0x1483, ROMData.GetByte(0x1481));
@@ -3029,28 +3029,28 @@ public class Hyrule
 
         }
 
-        if (props.disableMagicRecs)
+        if (props.DisableMagicRecs)
         {
             ROMData.Put(0xF539, (Byte)0xC9);
             ROMData.Put(0xF53A, (Byte)0);
         }
 
-        if (props.shuffleAtkExp)
+        if (props.ShuffleAtkExp)
         {
-            ShuffleExp(0x1669, props.attackCap);
+            ShuffleExp(0x1669, props.AttackCap);
         }
 
-        if (props.shuffleMagicExp)
+        if (props.ShuffleMagicExp)
         {
-            ShuffleExp(0x1671, props.magicCap);
+            ShuffleExp(0x1671, props.MagicCap);
         }
 
-        if (props.shuffleLifeExp)
+        if (props.ShuffleLifeExp)
         {
-            ShuffleExp(0x1679, props.lifeCap);
+            ShuffleExp(0x1679, props.LifeCap);
         }
 
-        ROMData.SetLevelCap(props.attackCap, props.magicCap, props.lifeCap);
+        ROMData.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
 
         ShuffleAttackEffectiveness(false);
 
@@ -3058,24 +3058,24 @@ public class Hyrule
 
         ShuffleLifeEffectiveness(false);
 
-        ROMData.Put(0x17B10, (Byte)props.startGems);
+        ROMData.Put(0x17B10, (Byte)props.StartGems);
 
 
-        startHearts = props.startHearts;
+        startHearts = props.StartHearts;
         ROMData.Put(0x17B00, (Byte)startHearts);
 
 
-        maxHearts = props.maxHearts;
+        maxHearts = props.MaxHearts;
 
         heartContainersInItemPool = maxHearts - startHearts;
 
 
-        ROMData.Put(0x1C369, (Byte)props.startLives);
+        ROMData.Put(0x1C369, (Byte)props.StartLives);
 
-        ROMData.Put(0x17B12, (byte)((props.startWithUpstab ? 0x04 : 0) + (props.startWithDownstab ? 0x10 : 0)));
+        ROMData.Put(0x17B12, (byte)((props.StartWithUpstab ? 0x04 : 0) + (props.StartWithDownstab ? 0x10 : 0)));
 
         //Swap up and Downstab
-        if(props.swapUpAndDownStab)
+        if(props.SwapUpAndDownStab)
         {
             //Swap the ORAs that determine which stab to give you
             ROMData.Put(0xF4DF, 0x04);
@@ -3085,7 +3085,7 @@ public class Hyrule
             ROMData.Put(0xF4EB, 0x10);
         }
 
-        if (props.lifeEffectiveness == StatEffectiveness.MAX)
+        if (props.LifeEffectiveness == StatEffectiveness.MAX)
         {
             for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
             {
@@ -3093,7 +3093,7 @@ public class Hyrule
             }
         }
 
-        if (props.lifeEffectiveness == StatEffectiveness.NONE)
+        if (props.LifeEffectiveness == StatEffectiveness.NONE)
         {
             for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
             {
@@ -3101,7 +3101,7 @@ public class Hyrule
             }
         }
 
-        if (props.magicEffectiveness == StatEffectiveness.MAX)
+        if (props.MagicEffectiveness == StatEffectiveness.MAX)
         {
             for (int i = 0xD8B; i < 0xD8b + 64; i++)
             {
@@ -3109,12 +3109,12 @@ public class Hyrule
             }
         }
 
-        if (props.palacePalette)
+        if (props.PalacePalette)
         {
             shuffler.ShufflePalacePalettes(ROMData, RNG);
         }
 
-        if (props.shuffleItemDropFrequency)
+        if (props.ShuffleItemDropFrequency)
         {
             int drop = RNG.Next(5) + 4;
             ROMData.Put(0x1E8B0, (Byte)drop);
@@ -3506,12 +3506,12 @@ public class Hyrule
 
         //}
 
-        if (props.shuffleDripper)
+        if (props.ShuffleDripper)
         {
             ROMData.Put(0x11927, (Byte)enemies1[RNG.Next(enemies1.Count)]);
         }
 
-        if (props.shuffleEnemyPalettes)
+        if (props.ShuffleEnemyPalettes)
         {
             List<int> doubleLocs = new List<int> { 0x40b4, 0x80b4, 0x100b4, 0x100b8, 0x100bc, 0x140b4, 0x140b8, 0x140bc };
             List<int> singleLocs = new List<int> { 0x40b8, 0x40bc, 0x80b8, 0x80bc };
@@ -3674,7 +3674,7 @@ public class Hyrule
         }
         else
         {
-            ROMData.ElevatorBossFix(props.bossItem);
+            ROMData.ElevatorBossFix(props.BossItem);
             if (westHyrule.palace1.PalNum != 7)
             {
                 palaces[westHyrule.palace1.PalNum-1].UpdateItem(westHyrule.palace1.item, ROMData);
@@ -3728,7 +3728,7 @@ public class Hyrule
             ROMData.Put(0xDB8C, (Byte)westHyrule.lifeNorth.item); //map 46
         }
 
-        if (props.townSwap)
+        if (props.TownSwap)
         {
             if (westHyrule.shieldTown.TownNum != Town.RAURU)
             {
@@ -3769,7 +3769,7 @@ public class Hyrule
         ROMData.Put(0xA5A8, (Byte)mazeIsland.magic.item);
         ROMData.Put(0xA58B, (Byte)mazeIsland.kid.item);
         
-        if (props.pbagItemShuffle)
+        if (props.PbagItemShuffle)
         {
             ROMData.Put(0x4FE2, (Byte)westHyrule.pbagCave.item);
             ROMData.Put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
@@ -3991,7 +3991,7 @@ public class Hyrule
             {
                 int enemy = ROMData.GetByte(j) & 0x3F;
                 int highPart = ROMData.GetByte(j) & 0xC0;
-                if (props.mixEnemies)
+                if (props.MixEnemies)
                 {
                     if (enemies.Contains(enemy))
                     {

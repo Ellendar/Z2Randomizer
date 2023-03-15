@@ -161,27 +161,27 @@ public class EastHyrule : World
         randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER };
         
 
-        if (hy.Props.eastBiome == Biome.ISLANDS)
+        if (hy.Props.EastBiome == Biome.ISLANDS)
         {
             this.biome = Biome.ISLANDS;
         }
-        else if (hy.Props.eastBiome == Biome.CANYON || hy.Props.eastBiome == Biome.DRY_CANYON)
+        else if (hy.Props.EastBiome == Biome.CANYON || hy.Props.EastBiome == Biome.DRY_CANYON)
         {
             this.biome = Biome.CANYON;
         }
-        else if (hy.Props.eastBiome == Biome.VOLCANO)
+        else if (hy.Props.EastBiome == Biome.VOLCANO)
         {
             this.biome = Biome.VOLCANO;
         }
-        else if (hy.Props.eastBiome == Biome.MOUNTAINOUS)
+        else if (hy.Props.EastBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if (hy.Props.eastBiome == Biome.VANILLA)
+        else if (hy.Props.EastBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if (hy.Props.eastBiome == Biome.VANILLA_SHUFFLE)
+        else if (hy.Props.EastBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }
@@ -251,7 +251,7 @@ public class EastHyrule : World
                 location.TerrainType = terrains[location.MemAddress];
             }
         }
-        if (hyrule.Props.hideLocs)
+        if (hyrule.Props.HideLocs)
         {
             unimportantLocs = new List<Location>();
             unimportantLocs.Add(GetLocationByMem(0x862F));
@@ -295,13 +295,13 @@ public class EastHyrule : World
                 ChooseConn("vod", connections, true);
                 ChooseConn("gp", connections, true);
 
-                if(!hyrule.Props.shuffleHidden)
+                if(!hyrule.Props.ShuffleHidden)
                 {
                     newKasuto.CanShuffle = false;
                     palace6.CanShuffle = false;
                 }
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.vanillaOriginal)
+                if (hyrule.Props.VanillaOriginal)
                 {
                     foreach (Location location in AllLocations)
                     {
@@ -350,7 +350,7 @@ public class EastHyrule : World
             hiddenKasutoLocation = GetLocationByCoords(Tuple.Create(81, 61));
             hiddenPalaceLocation = GetLocationByCoords(Tuple.Create(102, 45));
 
-            if (hyrule.Props.hiddenKasuto)
+            if (hyrule.Props.HiddenKasuto)
             {
                 
                 if(connections.ContainsKey(hiddenKasutoLocation) || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge)
@@ -358,7 +358,7 @@ public class EastHyrule : World
                     return false;
                 }
             }
-            if (hyrule.Props.hiddenPalace)
+            if (hyrule.Props.HiddenPalace)
             {
                 if (connections.ContainsKey(hiddenPalaceLocation) || hiddenPalaceLocation == raft || hiddenPalaceLocation == bridge)
                 {
@@ -373,7 +373,7 @@ public class EastHyrule : World
         else
         {
             Terrain water = Terrain.WATER;
-            if (hyrule.Props.canWalkOnWaterWithBoots)
+            if (hyrule.Props.CanWalkOnWaterWithBoots)
             {
                 water = Terrain.WALKABLEWATER;
             }
@@ -457,7 +457,7 @@ public class EastHyrule : World
                 {
                     isHorizontal = hyrule.RNG.NextDouble() > 0.5;
                     riverTerrain = water;
-                    if (hyrule.Props.eastBiome == Biome.DRY_CANYON)
+                    if (hyrule.Props.EastBiome == Biome.DRY_CANYON)
                     {
                         riverTerrain = Terrain.DESERT;
                     }
@@ -555,11 +555,11 @@ public class EastHyrule : World
                 }
 
 
-                if (hyrule.Props.hiddenKasuto)
+                if (hyrule.Props.HiddenKasuto)
                 {
                     DrawHiddenKasuto();
                 }
-                if (hyrule.Props.hiddenPalace)
+                if (hyrule.Props.HiddenPalace)
                 {
                     bool hp = DrawHiddenPalace();
                     if (!hp)
@@ -568,7 +568,7 @@ public class EastHyrule : World
                     }
                 }
                 Direction raftDirection = Direction.WEST;
-                if (hyrule.Props.continentConnections != ContinentConnectionType.NORMAL && this.biome != Biome.CANYON)
+                if (hyrule.Props.ContinentConnections != ContinentConnectionType.NORMAL && this.biome != Biome.CANYON)
                 {
                     raftDirection = (Direction)hyrule.RNG.Next(4);
                 }
@@ -612,7 +612,7 @@ public class EastHyrule : World
                 }
 
 
-                if (hyrule.Props.hideLocs)
+                if (hyrule.Props.HideLocs)
                 {
                     PlaceRandomTerrain(50);
                 }
@@ -688,11 +688,11 @@ public class EastHyrule : World
             }
             
         }
-        if (hyrule.Props.hiddenPalace)
+        if (hyrule.Props.HiddenPalace)
         {
             UpdateHPspot();
         }
-        if (hyrule.Props.hiddenKasuto)
+        if (hyrule.Props.HiddenKasuto)
         {
             UpdateKasuto();
         }
@@ -1360,7 +1360,7 @@ public class EastHyrule : World
             newKasuto.NeedHammer = true;
             newKasuto2.NeedHammer = true;
         }
-        if (hyrule.Props.vanillaOriginal || this.biome != Biome.VANILLA_SHUFFLE)
+        if (hyrule.Props.VanillaOriginal || this.biome != Biome.VANILLA_SHUFFLE)
         {
             Terrain t = terrains[hiddenKasutoLocation.MemAddress];
             hyrule.ROMData.Put(0x1df75, (byte)t);
@@ -1459,7 +1459,7 @@ public class EastHyrule : World
 
     private void DrawHiddenKasuto()
     {
-        if (hyrule.Props.shuffleHidden)
+        if (hyrule.Props.ShuffleHidden)
         {
             hiddenKasutoLocation = AllLocations[hyrule.RNG.Next(AllLocations.Count)];
             while (hiddenKasutoLocation == null || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge || hiddenKasutoLocation == cave1 || hiddenKasutoLocation == cave2 || connections.ContainsKey(hiddenKasutoLocation) || !hiddenKasutoLocation.CanShuffle || ((this.biome != Biome.VANILLA && this.biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough !=0))
@@ -1483,7 +1483,7 @@ public class EastHyrule : World
         bool done = false;
         int xpos = hyrule.RNG.Next(6, MAP_COLS - 6);
         int ypos = hyrule.RNG.Next(6, MAP_ROWS - 6);
-        if (hyrule.Props.shuffleHidden)
+        if (hyrule.Props.ShuffleHidden)
         {
             hiddenPalaceLocation = AllLocations[hyrule.RNG.Next(AllLocations.Count)];
             while(hiddenPalaceLocation == null || hiddenPalaceLocation == raft || hiddenPalaceLocation == bridge || hiddenPalaceLocation == cave1 || hiddenPalaceLocation == cave2 || connections.ContainsKey(hiddenPalaceLocation) || !hiddenPalaceLocation.CanShuffle || hiddenPalaceLocation == hiddenKasutoLocation || ((this.biome != Biome.VANILLA && this.biome != Biome.VANILLA_SHUFFLE) && hiddenPalaceLocation.TerrainType == Terrain.LAVA && hiddenPalaceLocation.PassThrough != 0))
@@ -1580,7 +1580,7 @@ public class EastHyrule : World
             newKasuto.NeedRecorder = true;
             newKasuto2.NeedRecorder = true;
         }
-        if (hyrule.Props.vanillaOriginal || this.biome != Biome.VANILLA_SHUFFLE)
+        if (hyrule.Props.VanillaOriginal || this.biome != Biome.VANILLA_SHUFFLE)
         {
             hyrule.ROMData.Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
             if (hiddenPalaceLocation.TerrainType == Terrain.PALACE)
