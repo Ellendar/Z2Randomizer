@@ -250,6 +250,7 @@
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             oldFlagsLabel = new System.Windows.Forms.Label();
             batchButton = new System.Windows.Forms.Button();
+            useCustomRoomsBox = new System.Windows.Forms.CheckBox();
             mainTabControl.SuspendLayout();
             tabPage4.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -2423,6 +2424,7 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(useCustomRoomsBox);
             tabPage3.Controls.Add(dashAlwaysOnCheckbox);
             tabPage3.Controls.Add(flashingOffCheckbox);
             tabPage3.Controls.Add(upAOnController1Checkbox);
@@ -2451,7 +2453,7 @@
             // dashAlwaysOnCheckbox
             // 
             dashAlwaysOnCheckbox.AutoSize = true;
-            dashAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 75);
+            dashAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 222);
             dashAlwaysOnCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             dashAlwaysOnCheckbox.Name = "dashAlwaysOnCheckbox";
             dashAlwaysOnCheckbox.Size = new System.Drawing.Size(111, 19);
@@ -2465,7 +2467,7 @@
             flashingOffCheckbox.AutoSize = true;
             flashingOffCheckbox.Checked = true;
             flashingOffCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            flashingOffCheckbox.Location = new System.Drawing.Point(4, 201);
+            flashingOffCheckbox.Location = new System.Drawing.Point(4, 126);
             flashingOffCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             flashingOffCheckbox.Name = "flashingOffCheckbox";
             flashingOffCheckbox.Size = new System.Drawing.Size(182, 19);
@@ -2477,7 +2479,7 @@
             // upAOnController1Checkbox
             // 
             upAOnController1Checkbox.AutoSize = true;
-            upAOnController1Checkbox.Location = new System.Drawing.Point(4, 174);
+            upAOnController1Checkbox.Location = new System.Drawing.Point(4, 101);
             upAOnController1Checkbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             upAOnController1Checkbox.Name = "upAOnController1Checkbox";
             upAOnController1Checkbox.Size = new System.Drawing.Size(250, 19);
@@ -2589,7 +2591,7 @@
             // shuffleEnemyPalettesCheckbox
             // 
             shuffleEnemyPalettesCheckbox.AutoSize = true;
-            shuffleEnemyPalettesCheckbox.Location = new System.Drawing.Point(4, 122);
+            shuffleEnemyPalettesCheckbox.Location = new System.Drawing.Point(4, 76);
             shuffleEnemyPalettesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
             shuffleEnemyPalettesCheckbox.Size = new System.Drawing.Size(140, 19);
@@ -2601,7 +2603,7 @@
             // alwaysBeamCheckbox
             // 
             alwaysBeamCheckbox.AutoSize = true;
-            alwaysBeamCheckbox.Location = new System.Drawing.Point(4, 147);
+            alwaysBeamCheckbox.Location = new System.Drawing.Point(4, 197);
             alwaysBeamCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
             alwaysBeamCheckbox.Size = new System.Drawing.Size(153, 19);
@@ -2613,7 +2615,7 @@
             // fastSpellCheckbox
             // 
             fastSpellCheckbox.AutoSize = true;
-            fastSpellCheckbox.Location = new System.Drawing.Point(4, 98);
+            fastSpellCheckbox.Location = new System.Drawing.Point(4, 51);
             fastSpellCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             fastSpellCheckbox.Name = "fastSpellCheckbox";
             fastSpellCheckbox.Size = new System.Drawing.Size(118, 19);
@@ -2625,7 +2627,7 @@
             // jumpAlwaysOnCheckbox
             // 
             jumpAlwaysOnCheckbox.AutoSize = true;
-            jumpAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 50);
+            jumpAlwaysOnCheckbox.Location = new System.Drawing.Point(4, 247);
             jumpAlwaysOnCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             jumpAlwaysOnCheckbox.Name = "jumpAlwaysOnCheckbox";
             jumpAlwaysOnCheckbox.Size = new System.Drawing.Size(114, 19);
@@ -3029,6 +3031,18 @@
             batchButton.UseVisualStyleBackColor = true;
             batchButton.Click += Bulk_Generate_Click;
             // 
+            // useCustomRoomsBox
+            // 
+            useCustomRoomsBox.AutoSize = true;
+            useCustomRoomsBox.Location = new System.Drawing.Point(4, 151);
+            useCustomRoomsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            useCustomRoomsBox.Name = "useCustomRoomsBox";
+            useCustomRoomsBox.Size = new System.Drawing.Size(130, 19);
+            useCustomRoomsBox.TabIndex = 35;
+            useCustomRoomsBox.Text = "Use Custom Rooms";
+            toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
+            useCustomRoomsBox.UseVisualStyleBackColor = true;
+            // 
             // MainUI
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3328,6 +3342,7 @@
         private System.Windows.Forms.ComboBox startingGemsMaxList;
         private System.Windows.Forms.CheckBox swapUpAndDownstabCheckbox;
         private System.Windows.Forms.CheckBox includeLavaInShuffle;
+        private System.Windows.Forms.CheckBox useCustomRoomsBox;
     }
 }
 
