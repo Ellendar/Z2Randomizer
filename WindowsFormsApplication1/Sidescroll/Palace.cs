@@ -40,6 +40,7 @@ public class Palace
     private List<Room> openRooms;
     private int maxRooms;
     private int netDeadEnds;
+    private bool useCustomRooms;
 
     internal List<Room> AllRooms
     {
@@ -67,11 +68,12 @@ public class Palace
     public int Number { get; set; }
     internal Room Tbird { get => tbird; set => tbird = value; }
     public bool NeedReflect { get => needReflect; set => needReflect = value; }
+    
 
     //DEBUG
     public int Generations { get; set; }
 
-    public Palace(int number, int b, int c)
+    public Palace(int number, int baseAddr, int connAddr)
     {
         Number = number;
         root = null;
@@ -84,14 +86,15 @@ public class Palace
         rooms = new SortedDictionary<int, List<Room>>();
         allRooms = new List<Room>();
         numRooms = 0;
-        baseAddr = b;
-        connAddr = c;
+        this.baseAddr = baseAddr;
+        this.connAddr = connAddr;
         //this.ROMData = ROMData;
         needDstab = false;
         needFairy = false;
         needGlove = false;
         needJumpOrFairy = false;
         openRooms = new List<Room>();
+        this.useCustomRooms = useCustomRooms;
         //dumpMaps();
         //createTree();
         if (Number < 7)
@@ -570,7 +573,7 @@ public class Palace
     {
         if (!r.IsBeforeTbird)
         {
-            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird.Map)
+            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
             {
                 r.IsBeforeTbird = true;
                 return;
@@ -624,7 +627,7 @@ public class Palace
     {
         if (!r.IsPlaced)
         {
-            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird.Map)
+            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
             {
                 if (dir == 3)
                 {
@@ -941,7 +944,7 @@ public class Palace
                 remove = downExits[r];
             }
 
-            if (onlyDownExits.Contains(remove) || remove.Map == PalaceRooms.Thunderbird.Map || remove == bossRoom)
+            if (onlyDownExits.Contains(remove) || remove.Map == PalaceRooms.Thunderbird(useCustomRooms).Map || remove == bossRoom)
             {
                 tries++;
                 continue;

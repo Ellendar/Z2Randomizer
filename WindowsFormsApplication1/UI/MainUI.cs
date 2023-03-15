@@ -59,6 +59,7 @@ public partial class MainUI : Form
         customFlags3TextBox.Text = Properties.Settings.Default.custom3;
         seedTextBox.Text = Properties.Settings.Default.lastseed;
         flashingOffCheckbox.Checked = Properties.Settings.Default.noflash;
+        useCustomRoomsBox.Checked = Properties.Settings.Default.useCustomRooms;
 
         small = new CheckBox[] { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox,
             smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
@@ -322,6 +323,7 @@ public partial class MainUI : Form
         Properties.Settings.Default.sprite = characterSpriteList.SelectedIndex;
         Properties.Settings.Default.upac1 = upAOnController1Checkbox.Checked;
         Properties.Settings.Default.noflash = flashingOffCheckbox.Checked;
+        Properties.Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
         Properties.Settings.Default.lastused = flagsTextBox.Text;
         Properties.Settings.Default.lastseed = seedTextBox.Text;
         Properties.Settings.Default.Save();
@@ -774,6 +776,7 @@ public partial class MainUI : Form
         configuration.PermanmentBeamSword = alwaysBeamCheckbox.Checked;
         configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
+        configuration.UseCustomRooms = useCustomRoomsBox.Checked;
         configuration.Sprite = characterSpriteList.SelectedIndex switch
         {
             0 => CharacterSprite.LINK,

@@ -95,7 +95,7 @@ public class RandomizerProperties
     public bool removeTbird;
     public bool bossItem;
     //public bool createPalaces;
-    public bool customRooms;
+    public bool useCommunityRooms;
     public bool blockersAnywhere;
     public bool bossRoomConnect;
 
@@ -193,4 +193,5 @@ public class RandomizerProperties
     public String shieldColor;
     public bool upAC1;
     public bool removeFlashing;
+    public bool useCustomRooms;
 }

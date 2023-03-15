@@ -520,7 +520,13 @@ public class Hyrule
             return;
         }
         MD5 hasher = MD5.Create();
-        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Flags + Seed + typeof(MainUI).Assembly.GetName().Version.Major + typeof(MainUI).Assembly.GetName().Version.Minor));
+        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
+            Flags + 
+            Seed + 
+            typeof(MainUI).Assembly.GetName().Version.Major + 
+            typeof(MainUI).Assembly.GetName().Version.Minor +
+            File.ReadAllText(config.GetRoomsFile())
+        ));
         UpdateRom(hash);
         String newFileName = props.filename.Substring(0, props.filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
         if(props.saveRom)

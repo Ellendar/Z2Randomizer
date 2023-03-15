@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Z2Randomizer.Sidescroll;
@@ -38,9 +40,13 @@ public class RoomSerializationTests
         }
     }
 
-    [TestMethod]
-    public void TestStaticInitializer()
+    [TestMethod] 
+    public void GenerateRoomsMD5()
     {
-        Assert.AreEqual(1, PalaceRooms.Test);
+        string roomsJson = File.ReadAllText("PalaceRooms.json");
+
+        MD5 hasher = MD5.Create();
+        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(roomsJson));
+        Debug.WriteLine(Convert.ToBase64String(hash));
     }
 }

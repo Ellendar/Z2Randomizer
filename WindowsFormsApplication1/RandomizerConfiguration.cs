@@ -196,7 +196,6 @@ public class RandomizerConfiguration
     public bool PermanmentBeamSword { get; set; }
     [IgnoreInFlags]
     public bool FastSpellCasting { get; set; }
-    [IgnoreInFlags]
     public bool ShuffleSpritePalettes { get; set; }
     [IgnoreInFlags]
     public bool UpAOnController1 { get; set; }
@@ -210,6 +209,9 @@ public class RandomizerConfiguration
     public string ShieldTunic { get; set; }
     [IgnoreInFlags]
     public string BeamSprite { get; set; }
+    [IgnoreInFlags]
+    public bool UseCustomRooms { get; set; }
+
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.
     //There should be a seperate class that does the full encode/decode cycle for both projects.
@@ -309,6 +311,7 @@ public class RandomizerConfiguration
         Tunic = "Default";
         ShieldTunic = "Orange";
         BeamSprite = "Default";
+        UseCustomRooms = false;
     }
 
     public RandomizerConfiguration (string flags) : this()
@@ -871,6 +874,7 @@ public class RandomizerConfiguration
         config.Tunic = "Default";
         config.ShieldTunic = "Orange";
         config.BeamSprite = "Default";
+        config.UseCustomRooms = false;
 
         config.DisableLowHealthBeep = true;
         config.DisableMusic = false;
@@ -1208,7 +1212,7 @@ public class RandomizerConfiguration
         properties.shortenGP = ShortGP == null ? random.Next(2) == 1 : (bool)ShortGP;
         properties.removeTbird = RemoveTBird;
         properties.bossItem = RandomizeBossItemDrop;
-        properties.customRooms = IncludeCommunityRooms == null ? random.Next(2) == 1 : (bool)IncludeCommunityRooms;
+        properties.useCommunityRooms = IncludeCommunityRooms == null ? random.Next(2) == 1 : (bool)IncludeCommunityRooms;
         properties.blockersAnywhere = BlockingRoomsInAnyPalace ;
         properties.bossRoomConnect = BossRoomsExitToPalace == null ? random.Next(2) == 1 : (bool)BossRoomsExitToPalace;
 
@@ -1337,6 +1341,7 @@ public class RandomizerConfiguration
         properties.shieldColor = ShieldTunic;
         properties.upAC1 = UpAOnController1;
         properties.removeFlashing = RemoveFlashing;
+        properties.useCustomRooms = UseCustomRooms;
 
         return properties;
     }
@@ -1357,5 +1362,10 @@ public class RandomizerConfiguration
             default:
                 return false;
         }
+    }
+
+    public string GetRoomsFile()
+    {
+        return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
     }
 }
