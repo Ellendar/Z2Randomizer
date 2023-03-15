@@ -81,67 +81,67 @@ public class Shuffler
         List<int> small = new List<int>();
         List<int> large = new List<int>();
 
-        if (props.smallbluejar)
+        if (props.Smallbluejar)
         {
             small.Add(0x90);
         }
-        if (props.smallredjar)
+        if (props.Smallredjar)
         {
             small.Add(0x91);
         }
-        if (props.small50)
+        if (props.Small50)
         {
             small.Add(0x8a);
         }
-        if (props.small100)
+        if (props.Small100)
         {
             small.Add(0x8b);
         }
-        if (props.small200)
+        if (props.Small200)
         {
             small.Add(0x8c);
         }
-        if (props.small500)
+        if (props.Small500)
         {
             small.Add(0x8d);
         }
-        if (props.small1up)
+        if (props.Small1up)
         {
             small.Add(0x92);
         }
-        if (props.smallkey)
+        if (props.Smallkey)
         {
             small.Add(0x88);
         }
-        if (props.largebluejar)
+        if (props.Largebluejar)
         {
             large.Add(0x90);
         }
-        if (props.largeredjar)
+        if (props.Largeredjar)
         {
             large.Add(0x91);
         }
-        if (props.large50)
+        if (props.Large50)
         {
             large.Add(0x8a);
         }
-        if (props.large100)
+        if (props.Large100)
         {
             large.Add(0x8b);
         }
-        if (props.large200)
+        if (props.Large200)
         {
             large.Add(0x8c);
         }
-        if (props.large500)
+        if (props.Large500)
         {
             large.Add(0x8d);
         }
-        if (props.large1up)
+        if (props.Large1up)
         {
             large.Add(0x92);
         }
-        if (props.largekey)
+        if (props.Largekey)
         {
             large.Add(0x88);
         }
@@ -187,7 +187,7 @@ public class Shuffler
 
     public void ShufflePbagAmounts(ROM ROMData, Random r)
     {
-        if (props.shufflePbagXp)
+        if (props.ShufflePbagXp)
         {
             ROMData.Put(0x1e800, (byte)r.Next(5, 10));
             ROMData.Put(0x1e801, (byte)r.Next(7, 12));
@@ -199,7 +199,7 @@ public class Shuffler
     public int ShuffleKasutoJars(ROM ROMData, Random r)
     {
         int kasutoJars = 7;
-        if (props.kasutoJars)
+        if (props.KasutoJars)
         {
             kasutoJars = r.Next(5, 8);
             ROMData.WriteKasutoJarAmount(kasutoJars);

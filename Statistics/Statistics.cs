@@ -24,13 +24,8 @@ namespace Z2Randomizer.Statistics
     class Statistics
     {
 
-        //private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOAdEScuA";
-        //private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOA!CScu"; //Force west caldera 
-        //private static readonly string FLAGS = "iRhqh$j9g7z$Zq5#0gAhOAdjJ@!A"; //Oops all canyons
-        private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOAd2Nau"; //All mountains
-        //private static readonly string FLAGS = "iRhqh$j9g7@$Zq5#0gAhOA!BSg!"; //Mirai's seed
-        //private static readonly string FLAGS = "hAhhD0j9$78$Jp5$$gAhOA!aGKu"; //Bad boots islands
-        private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda II - The Adventure of Link (USA).nes";
+        private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0g$o6XAv@suig$$WA"; //Standard
+        private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda 2 - The Adventure of Link (U).nes";
         private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
         private static readonly int LIMIT = 1;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -45,8 +40,9 @@ namespace Z2Randomizer.Statistics
                 for (int i = 0; i < LIMIT; i++)
                 {
                     RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
-                    string seed = random.Next(1000000000).ToString();
-                    //properties.seed = 2955027;
+                    int seed = random.Next(1000000000);
+                    config.Seed = seed;
+                    config.FileName = VANILLA_ROM_PATH;
                     BackgroundWorker backgroundWorker = new BackgroundWorker()
                     {
                         WorkerReportsProgress = true,
@@ -58,8 +54,9 @@ namespace Z2Randomizer.Statistics
                     Result result = new Result(hyrule);
                     result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
                     dbContext.Add(result);
+                    dbContext.Add(hyrule.Props);
                     logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
-                    //dbContext.SaveChanges();`
+                    //dbContext.SaveChanges();
                 }
                 int k = 0;
                 dbContext.SaveChanges();

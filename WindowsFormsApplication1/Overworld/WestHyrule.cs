@@ -141,7 +141,7 @@ public class WestHyrule : World
         bridge1 = GetLocationByMap(0x04, 0);
         bridge2 = GetLocationByMap(0xC5, 0);
 
-        if (hy.Props.saneCaves)
+        if (hy.Props.SaneCaves)
         {
             fairyCave.TerrainType = Terrain.CAVE;
         }
@@ -192,7 +192,7 @@ public class WestHyrule : World
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
         randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
-        if (hy.Props.hideLocs)
+        if (hy.Props.HideLocs)
         {
             unimportantLocs.Add(GetLocationByMem(0x4631));
             unimportantLocs.Add(GetLocationByMem(0x4633));
@@ -208,36 +208,36 @@ public class WestHyrule : World
             unimportantLocs.Add(GetLocationByMem(0x464C));
             unimportantLocs.Add(GetLocationByMem(0x464D));
             unimportantLocs.Add(GetLocationByMem(0x464F));
-            if(!hy.Props.helpfulHints)
+            if(!hy.Props.HelpfulHints)
             {
                 unimportantLocs.Add(GetLocationByMem(0x465B));
             }
         }
-        if (hy.Props.westBiome == Biome.ISLANDS)
+        if (hy.Props.WestBiome == Biome.ISLANDS)
         {
             this.biome = Biome.ISLANDS;
         }
-        else if (hy.Props.westBiome == Biome.CANYON || hy.Props.westBiome == Biome.DRY_CANYON)
+        else if (hy.Props.WestBiome == Biome.CANYON || hy.Props.WestBiome == Biome.DRY_CANYON)
         {
             this.biome = Biome.CANYON;
         }
-        else if (hy.Props.westBiome == Biome.MOUNTAINOUS)
+        else if (hy.Props.WestBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if(hy.Props.westBiome == Biome.CALDERA)
+        else if(hy.Props.WestBiome == Biome.CALDERA)
         {
             this.biome = Biome.CALDERA;
         }
-        else if(hy.Props.westBiome == Biome.MOUNTAINOUS)
+        else if(hy.Props.WestBiome == Biome.MOUNTAINOUS)
         {
             this.biome = Biome.MOUNTAINOUS;
         }
-        else if (hy.Props.westBiome == Biome.VANILLA)
+        else if (hy.Props.WestBiome == Biome.VANILLA)
         {
             this.biome = Biome.VANILLA;
         }
-        else if (hy.Props.westBiome == Biome.VANILLA_SHUFFLE)
+        else if (hy.Props.WestBiome == Biome.VANILLA_SHUFFLE)
         {
             this.biome = Biome.VANILLA_SHUFFLE;
         }
@@ -330,7 +330,7 @@ public class WestHyrule : World
                 ChooseConn("dmexit", connections, true);
 
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.vanillaOriginal)
+                if (hyrule.Props.VanillaOriginal)
                 {
                     foreach (Location location in AllLocations)
                     {
@@ -358,11 +358,11 @@ public class WestHyrule : World
         }
         else
         {
-            Terrain fillerWater = hyrule.Props.canWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
+            Terrain fillerWater = hyrule.Props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
 
             bytesWritten = 2000;
 
-            if(hyrule.Props.bagusWoods)
+            if(hyrule.Props.BagusWoods)
             {
                 bagu.CanShuffle = false;
                 foreach(Location location in lostWoods)
@@ -454,7 +454,7 @@ public class WestHyrule : World
                     case Biome.CANYON:
                         isHorizontal = hyrule.RNG.NextDouble() > .5;
                         riverTerrain = fillerWater;
-                        if (hyrule.Props.westBiome == Biome.DRY_CANYON)
+                        if (hyrule.Props.WestBiome == Biome.DRY_CANYON)
                         {
                             riverTerrain = Terrain.DESERT;
                             bridge1.CanShuffle = false;
@@ -548,7 +548,7 @@ public class WestHyrule : World
                 }
 
                 Direction raftDirection = Direction.EAST;
-                if (hyrule.Props.continentConnections != ContinentConnectionType.NORMAL && this.biome != Biome.CANYON)
+                if (hyrule.Props.ContinentConnections != ContinentConnectionType.NORMAL && this.biome != Biome.CANYON)
                 {
                     raftDirection = (Direction)hyrule.RNG.Next(4);
                 }
@@ -585,7 +585,7 @@ public class WestHyrule : World
                     return false;
                 }
 
-                if (hyrule.Props.bagusWoods)
+                if (hyrule.Props.BagusWoods)
                 {
                     bool f = PlaceBagu();
                     if (!f)
@@ -595,7 +595,7 @@ public class WestHyrule : World
                     }
                 }
 
-                if (hyrule.Props.hideLocs)
+                if (hyrule.Props.HideLocs)
                 {
                     PlaceRandomTerrain(50);
                 }
@@ -793,7 +793,7 @@ public class WestHyrule : World
     private bool MakeCaldera()
     {
         Terrain water = Terrain.WATER;
-        if(hyrule.Props.canWalkOnWaterWithBoots)
+        if(hyrule.Props.CanWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }
@@ -990,7 +990,7 @@ public class WestHyrule : World
         Location cave2l = new Location();
         Location cave2r = new Location();
         int numCaves = 2;
-        if(hyrule.Props.saneCaves)
+        if(hyrule.Props.SaneCaves)
         {
             numCaves++;
         }
@@ -1186,7 +1186,7 @@ public class WestHyrule : World
             {
                 caveConn = connections[GetLocationByMem(cavePicked)].MemAddress;
             }
-            if (hyrule.Props.boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
+            if (hyrule.Props.BoulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
                 if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords(Tuple.Create(cave.Ypos - 30, cave.Xpos + 2)) == null)
                 {

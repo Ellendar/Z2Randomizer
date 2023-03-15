@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,177 +22,181 @@ public class RandomizerProperties
     }
 
     //ROM Info
-    public String filename;
-    //public int seed;
-    //public String flags;
+    public string Filename { get; set; }
+    public int Seed { get; set; }
+    public string Flags { get; set; }
     public bool saveRom = true;
 
     //Items
     //public bool shuffleItems;
-    public bool startCandle;
-    public bool startGlove;
-    public bool startRaft;
-    public bool startBoots;
-    public bool startFlute;
-    public bool startCross;
-    public bool startHammer;
-    public bool startKey;
+    public bool StartCandle { get; set; }
+    public bool StartGlove { get; set; }
+    public bool StartRaft { get; set; }
+    public bool StartBoots { get; set; }
+    public bool StartFlute { get; set; }
+    public bool StartCross { get; set; }
+    public bool StartHammer { get; set; }
+    public bool StartKey { get; set; }
 
     //Spells
     //public bool shuffleSpells;
-    public bool startShield;
-    public bool startJump;
-    public bool startLife;
-    public bool startFairy;
-    public bool startFire;
-    public bool startReflect;
-    public bool startSpell;
-    public bool startThunder;
-    public bool combineFire;
-    public bool dashSpell;
+    public bool StartShield { get; set; }
+    public bool StartJump { get; set; }
+    public bool StartLife { get; set; }
+    public bool StartFairy { get; set; }
+    public bool StartFire { get; set; }
+    public bool StartReflect { get; set; }
+    public bool StartSpell { get; set; }
+    public bool StartThunder { get; set; }
+    public bool CombineFire { get; set; }
+    public bool DashSpell { get; set; }
 
     //Other starting attributes
-    public int startHearts;
-    public int maxHearts;
-    public bool startWithUpstab;
-    public bool startWithDownstab;
-    public int startLives;
-    public bool permanentBeam;
-    public bool useCommunityHints;
-    public int startAtk;
-    public int startMag;
-    public int startLifeLvl;
-    public bool swapUpAndDownStab;
+    public int StartHearts { get; set; }
+    public int MaxHearts { get; set; }
+    public bool StartWithUpstab { get; set; }
+    public bool StartWithDownstab { get; set; }
+    public int StartLives { get; set; }
+    public bool PermanentBeam { get; set; }
+    public bool UseCommunityHints { get; set; }
+    public int StartAtk { get; set; }
+    public int StartMag { get; set; }
+    public int StartLifeLvl { get; set; }
+    public bool SwapUpAndDownStab { get; set; }
 
     //Overworld
-    public bool shuffleEncounters;
-    public bool allowPathEnemies;
-    public bool includeLavaInEncounterShuffle;
-    public bool swapPalaceCont;
-    public bool p7shuffle;
-    public bool hiddenPalace;
-    public bool hiddenKasuto;
-    public bool townSwap;
-    public EncounterRate encounterRate;
-    public ContinentConnectionType continentConnections;
-    public bool boulderBlockConnections;
-    public Biome westBiome;
-    public Biome eastBiome;
-    public Biome mazeBiome;
-    public Biome dmBiome;
-    public bool vanillaOriginal;
-    public bool shuffleHidden;
-    public bool canWalkOnWaterWithBoots;
-    public bool bagusWoods;
+    public bool ShuffleEncounters { get; set; }
+    public bool AllowPathEnemies { get; set; }
+    public bool IncludeLavaInEncounterShuffle { get; set; }
+    public bool SwapPalaceCont { get; set; }
+    public bool P7shuffle { get; set; }
+    public bool HiddenPalace { get; set; }
+    public bool HiddenKasuto { get; set; }
+    public bool TownSwap { get; set; }
+    public EncounterRate EncounterRate { get; set; }
+    public ContinentConnectionType ContinentConnections { get; set; }
+    public bool BoulderBlockConnections { get; set; }
+    public Biome WestBiome { get; set; }
+    public Biome EastBiome { get; set; }
+    public Biome MazeBiome { get; set; }
+    public Biome DmBiome { get; set; }
+    public bool VanillaOriginal { get; set; }
+    public bool ShuffleHidden { get; set; }
+    public bool CanWalkOnWaterWithBoots { get; set; }
+    public bool BagusWoods { get; set; }
 
     //Palaces
-    //public bool shufflePalaceRooms;
-    public PalaceStyle palaceStyle;
-    public int startGems;
-    public bool requireTbird;
-    public bool palacePalette;
-    public bool upaBox;
-    public bool shortenGP;
-    public bool removeTbird;
-    public bool bossItem;
-    //public bool createPalaces;
-    public bool useCommunityRooms;
-    public bool blockersAnywhere;
-    public bool bossRoomConnect;
+    //public bool shufflePalaceRooms { get; set; }
+    public PalaceStyle palaceStyle { get; set; }
+    public int StartGems { get; set; }
+    public bool RequireTbird { get; set; }
+    public bool PalacePalette { get; set; }
+    public bool UpaBox { get; set; }
+    public bool ShortenGP { get; set; }
+    public bool RemoveTbird { get; set; }
+    public bool BossItem { get; set; }
+    //public bool createPalaces { get; set; }
+    public bool UseCommunityRooms { get; set; }
+    public bool BlockersAnywhere { get; set; }
+    public bool BossRoomConnect { get; set; }
 
     //Enemies
-    public bool shuffleEnemyHP;
-    public bool shuffleEnemyStealExp;
-    public bool shuffleStealExpAmt;
-    public bool shuffleSwordImmunity;
-    public bool shuffleOverworldEnemies;
-    public bool shufflePalaceEnemies;
-    public bool mixEnemies;
-    public bool shuffleDripper;
-    public bool shuffleEnemyPalettes;
-    public StatEffectiveness expLevel;
+    public bool ShuffleEnemyHP { get; set; }
+    public bool ShuffleEnemyStealExp { get; set; }
+    public bool ShuffleStealExpAmt { get; set; }
+    public bool ShuffleSwordImmunity { get; set; }
+    public bool ShuffleOverworldEnemies { get; set; }
+    public bool ShufflePalaceEnemies { get; set; }
+    public bool MixEnemies { get; set; }
+    public bool ShuffleDripper { get; set; }
+    public bool ShuffleEnemyPalettes { get; set; }
+    public StatEffectiveness ExpLevel { get; set; }
 
     //Levels
-    //public bool shuffleAllExp;
-    public bool shuffleAtkExp;
-    public bool shuffleMagicExp;
-    public bool shuffleLifeExp;
-    //public bool shuffleAtkEff;
-    //public bool shuffleMagEff;
-    //public bool shuffleLifeEff;
-    public bool shuffleLifeRefill;
-    public bool shuffleSpellLocations;
-    public bool disableMagicRecs;
+    //public bool shuffleAllExp { get; set; }
+    public bool ShuffleAtkExp { get; set; }
+    public bool ShuffleMagicExp { get; set; }
+    public bool ShuffleLifeExp { get; set; }
+    //public bool shuffleAtkEff { get; set; }
+    //public bool shuffleMagEff { get; set; }
+    //public bool shuffleLifeEff { get; set; }
+    public bool ShuffleLifeRefill { get; set; }
+    public bool ShuffleSpellLocations { get; set; }
+    public bool DisableMagicRecs { get; set; }
     /*
-    public bool ohkoEnemies;
-    public bool tankMode;
-    public bool ohkoLink;
-    public bool wizardMode;
-    public bool highAtk;
-    public bool lowAtk;
-    public bool highDef;
-    public bool highMag;
-    public bool lowMag;
+    public bool ohkoEnemies { get; set; }
+    public bool tankMode { get; set; }
+    public bool ohkoLink { get; set; }
+    public bool wizardMode { get; set; }
+    public bool highAtk { get; set; }
+    public bool lowAtk { get; set; }
+    public bool highDef { get; set; }
+    public bool highMag { get; set; }
+    public bool lowMag { get; set; }
     */
-    public StatEffectiveness attackEffectiveness;
-    public StatEffectiveness magicEffectiveness;
-    public StatEffectiveness lifeEffectiveness;
-    public int attackCap;
-    public int magicCap;
-    public int lifeCap;
-    public bool scaleLevels;
-    public bool hideLocs;
-    public bool saneCaves;
-    public bool spellEnemy;
+    public StatEffectiveness AttackEffectiveness { get; set; }
+    public StatEffectiveness MagicEffectiveness { get; set; }
+    public StatEffectiveness LifeEffectiveness { get; set; }
+    public int AttackCap { get; set; }
+    public int MagicCap { get; set; }
+    public int LifeCap { get; set; }
+    public bool ScaleLevels { get; set; }
+    public bool HideLocs { get; set; }
+    public bool SaneCaves { get; set; }
+    public bool SpellEnemy { get; set; }
 
     //Items
-    public bool shuffleOverworldItems;
-    public bool shufflePalaceItems;
-    public bool mixOverworldPalaceItems;
-    public bool shuffleSmallItems;
-    public bool extraKeys;
-    public bool kasutoJars;
-    public bool pbagItemShuffle;
-    public bool removeSpellItems;
-    public bool shufflePbagXp;
+    public bool ShuffleOverworldItems { get; set; }
+    public bool ShufflePalaceItems { get; set; }
+    public bool MixOverworldPalaceItems { get; set; }
+    public bool ShuffleSmallItems { get; set; }
+    public bool ExtraKeys { get; set; }
+    public bool KasutoJars { get; set; }
+    public bool PbagItemShuffle { get; set; }
+    public bool RemoveSpellItems { get; set; }
+    public bool ShufflePbagXp { get; set; }
 
     //Drops
-    public bool shuffleItemDropFrequency;
-    //public bool shuffleEnemyDrops;
-    public bool smallbluejar;
-    public bool smallredjar;
-    public bool small50;
-    public bool small100;
-    public bool small200;
-    public bool small500;
-    public bool small1up;
-    public bool smallkey;
+    public bool ShuffleItemDropFrequency { get; set; }
+    //public bool shuffleEnemyDrops { get; set; }
+    public bool Smallbluejar { get; set; }
+    public bool Smallredjar { get; set; }
+    public bool Small50 { get; set; }
+    public bool Small100 { get; set; }
+    public bool Small200 { get; set; }
+    public bool Small500 { get; set; }
+    public bool Small1up { get; set; }
+    public bool Smallkey { get; set; }
 
-    public bool largebluejar;
-    public bool largeredjar;
-    public bool large50;
-    public bool large100;
-    public bool large200;
-    public bool large500;
-    public bool large1up;
-    public bool largekey;
-    public bool standardizeDrops;
+    public bool Largebluejar { get; set; }
+    public bool Largeredjar { get; set; }
+    public bool Large50 { get; set; }
+    public bool Large100 { get; set; }
+    public bool Large200 { get; set; }
+    public bool Large500 { get; set; }
+    public bool Large1up { get; set; }
+    public bool Largekey { get; set; }
+    public bool StandardizeDrops { get; set; }
 
     //Hints
-    public bool spellItemHints;
-    public bool helpfulHints;
-    public bool townNameHints;
+    public bool SpellItemHints { get; set; }
+    public bool HelpfulHints { get; set; }
+    public bool TownNameHints { get; set; }
 
     //Misc.
-    public bool disableBeep;
-    public bool jumpAlwaysOn;
-    public bool fastCast;
-    public String beamSprite;
-    public bool disableMusic;
-    public CharacterSprite charSprite;
-    public String tunicColor;
-    public String shieldColor;
-    public bool upAC1;
-    public bool removeFlashing;
-    public bool useCustomRooms;
+    public bool DisableBeep { get; set; }
+    public bool JumpAlwaysOn { get; set; }
+    public bool FastCast { get; set; }
+    public String BeamSprite { get; set; }
+    public bool DisableMusic { get; set; }
+    public CharacterSprite CharSprite { get; set; }
+    public String TunicColor { get; set; }
+    public String ShieldColor { get; set; }
+    public bool UpAC1 { get; set; }
+    public bool RemoveFlashing { get; set; }
+    public bool UseCustomRooms { get; set; }
+
+    //Debug
+    [Key]
+    public int Id { get; set; }
 }

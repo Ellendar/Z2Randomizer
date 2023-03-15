@@ -72,42 +72,42 @@ public class Hints
         Random r)
     {
         //
-        if (props.dashSpell)
+        if (props.DashSpell)
         {
             hints[70] = new Hint(Util.ToGameText("USE THIS$TO GO$FAST", true));
         }
-        if (props.useCommunityHints)
+        if (props.UseCommunityHints)
         {
             GenerateCommunityHints(hints, r);
         }
 
-        if (props.spellItemHints)
+        if (props.SpellItemHints)
         {
             GenerateSpellHints(itemLocs, hints, startsWithTrophy, startsWithMedicine, startsWithKid);
         }
 
         List<int> placedIndex = new List<int>();
-        if (props.bagusWoods)
+        if (props.BagusWoods)
         {
             hints[baguText] = GenerateBaguHint(bagu);
             //sariaHints.Remove(baguText);
         }
-        if (props.helpfulHints)
+        if (props.HelpfulHints)
         {
-            placedIndex = GenerateHelpfulHints(hints, itemLocs, r, props.spellItemHints);
+            placedIndex = GenerateHelpfulHints(hints, itemLocs, r, props.SpellItemHints);
         }
 
-        if (props.spellItemHints || props.helpfulHints)
+        if (props.SpellItemHints || props.HelpfulHints)
         {
-            GenerateKnowNothings(hints, placedIndex, props.bagusWoods);
+            GenerateKnowNothings(hints, placedIndex, props.BagusWoods);
         }
 
-        if (props.townNameHints)
+        if (props.TownNameHints)
         {
-            GenerateTownNameHints(hints, spellMap, props.dashSpell);
+            GenerateTownNameHints(hints, spellMap, props.DashSpell);
         }
 
-        if (props.swapUpAndDownStab)
+        if (props.SwapUpAndDownStab)
         {
             (hints[upstabTextIndex], hints[downstabTextIndex]) = (hints[downstabTextIndex], hints[upstabTextIndex]);
         }
