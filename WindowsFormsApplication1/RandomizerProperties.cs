@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Overworld;
 
 namespace Z2Randomizer;
@@ -189,6 +186,7 @@ public class RandomizerProperties
     public bool FastCast { get; set; }
     public String BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
+    [NotMapped]
     public CharacterSprite CharSprite { get; set; }
     public String TunicColor { get; set; }
     public String ShieldColor { get; set; }
@@ -196,7 +194,7 @@ public class RandomizerProperties
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }
 
-    //Debug
+    //For Statistics
     [Key]
     public int Id { get; set; }
 }
