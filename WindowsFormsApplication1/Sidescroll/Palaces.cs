@@ -15,6 +15,7 @@ public class Palaces
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private const int PALACE_SHUFFLE_ATTEMPT_LIMIT = 100;
+    private const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
 
     private static readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
     {
@@ -98,6 +99,7 @@ public class Palaces
 
                 Palace palace;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                 int tries = 0;
+                int innertries = 0;
 
                 do
                 {
@@ -107,7 +109,8 @@ public class Palaces
                     }
 
                     tries = 0;
-                    bool done = false;
+                    innertries = 0;
+                    //bool done = false;
                     do
                     {
                         mapNo = i switch
@@ -128,6 +131,7 @@ public class Palaces
 
                         palace = new Palace(i, palaceAddr[i], palaceConnectionLocs[i]);
                         palace.Root = PalaceRooms.Entrances(props.UseCustomRooms)[i - 1].DeepCopy();
+                        palace.Root.IsRoot = true;
 
                         palace.BossRoom = SelectBossRoom(i, r, props.UseCustomRooms);
 
@@ -213,45 +217,51 @@ public class Palaces
                         bool dropped = false;
                         while (palace.AllRooms.Count < palace.MaxRooms)
                         {
-                            Room addThis = roomPool[r.Next(roomPool.Count)].DeepCopy();
+                            Room roomToAdd = roomPool[r.Next(roomPool.Count)].DeepCopy();
                             if (i < 7)
                             {
-                                addThis.NewMap = mapNo;
+                                roomToAdd.NewMap = mapNo;
                             }
                             else
                             {
-                                addThis.NewMap = mapNoGp;
+                                roomToAdd.NewMap = mapNoGp;
                             }
-                            bool added = palace.AddRoom(addThis, props.BlockersAnywhere);
+                            bool added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
                             if (added)
                             {
                                 IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                                if (addThis.HasDrop && !dropped)
+                                if (roomToAdd.HasDrop && !dropped)
                                 {
                                     int numDrops = r.Next(Math.Min(3, palace.MaxRooms - palace.AllRooms.Count), Math.Min(6, palace.MaxRooms - palace.AllRooms.Count));
                                     bool lastDrop = true;
                                     int j = 0;
+                                    int dropPlacementFailures = 0;
                                     while (j < numDrops && lastDrop)
                                     {
-                                        Room room = roomPool[r.Next(roomPool.Count)].DeepCopy();
-                                        while (!room.IsDropZone)
+                                        Room dropZoneRoom = roomPool[r.Next(roomPool.Count)].DeepCopy();
+                                        while (!dropZoneRoom.IsDropZone)
                                         {
-                                            room = roomPool[r.Next(roomPool.Count)].DeepCopy();
+                                            dropZoneRoom = roomPool[r.Next(roomPool.Count)].DeepCopy();
                                         }
                                         if (i < 7)
                                         {
-                                            room.NewMap = mapNo;
+                                            dropZoneRoom.NewMap = mapNo;
                                         }
                                         else
                                         {
-                                            room.NewMap = mapNoGp;
+                                            dropZoneRoom.NewMap = mapNoGp;
                                         }
-                                        bool added2 = palace.AddRoom(room, props.BlockersAnywhere);
+                                        bool added2 = palace.AddRoom(dropZoneRoom, props.BlockersAnywhere);
                                         if (added2)
                                         {
                                             IncrementMapNo(ref mapNo, ref mapNoGp, i);
-                                            lastDrop = room.HasDrop;
+                                            lastDrop = dropZoneRoom.HasDrop;
                                             j++;
+                                        }
+                                        else if(++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
+                                        {
+                                            logger.Warn("Drop placement failure limit exceeded.");
+                                            break;
                                         }
                                     }
                                 }
@@ -263,6 +273,7 @@ public class Palaces
                             }
 
                         }
+                        /*
                         done = true;
                         foreach (Room room in palace.AllRooms)
                         {
@@ -271,8 +282,9 @@ public class Palaces
                                 done = false;
                             }
                         }
-
-                    } while (!done);
+                        */
+                        innertries++;
+                    } while (palace.AllRooms.Any(i => i.CountOpenExits() > 0));
 
                     palace.ShuffleRooms(r);
                     bool reachable = palace.AllReachable();

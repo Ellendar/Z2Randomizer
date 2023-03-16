@@ -27,7 +27,7 @@ namespace Z2Randomizer.Statistics
         private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0g$o6XAv@suig$$WA"; //Standard
         private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda 2 - The Adventure of Link (U).nes";
         private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-        private static readonly int LIMIT = 1;
+        private static readonly int LIMIT = 1000;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()
         {
