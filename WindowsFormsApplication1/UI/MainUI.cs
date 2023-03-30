@@ -397,7 +397,7 @@ public partial class MainUI : Form
         else
         {
             MessageBox.Show("An exception occurred generating the rom");
-            logger.Error(generationException.StackTrace);
+            logger.Error(generationException);
         }
     }
 

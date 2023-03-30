@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Z2Randomizer.Sidescroll;
 
@@ -46,7 +47,7 @@ public class RoomSerializationTests
         string roomsJson = File.ReadAllText("PalaceRooms.json");
 
         MD5 hasher = MD5.Create();
-        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(roomsJson));
+        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
         Debug.WriteLine(Convert.ToBase64String(hash));
     }
 }
