@@ -28,13 +28,10 @@ class Result
     public int GPGenerationAttempts { get; set; }
 
     //Overall progress timestamps
-    public int ProgressStartTo2 { get; set; }
-    public int Progress2To3 { get; set; }
-    public int Progress3To4 { get; set; }
-    public int Progress4To5 { get; set; }
-    public int Progress5To6 { get; set; }
-    public int Progress6To8 { get; set; }
-    public int Progress8To9 { get; set; }
+    public int TimeBuildingWest { get; set; }
+    public int TimeBuildingEast { get; set; }
+    public int TimeBuildingDM { get; set; }
+    public int TimeBuildingMI { get; set; }
 
     public int ProgressStartToGenerateStartingValues { get; set; }
     public int ProgressStartingValuesToGenerateEnemies { get; set; }
@@ -83,13 +80,10 @@ class Result
         GPGenerationAttempts = hyrule.palaces[6].Generations;
 
         //Overall progress timestamps
-        ProgressStartTo2 = (int)hyrule.updateProgress2Timestamp.Subtract(hyrule.startTime).TotalMilliseconds;
-        Progress2To3 = (int)hyrule.updateProgress3Timestamp.Subtract(hyrule.updateProgress2Timestamp).TotalMilliseconds;
-        Progress3To4 = (int)hyrule.updateProgress4Timestamp.Subtract(hyrule.updateProgress3Timestamp).TotalMilliseconds;
-        Progress4To5 = (int)hyrule.updateProgress5Timestamp.Subtract(hyrule.updateProgress4Timestamp).TotalMilliseconds;
-        Progress5To6 = (int)hyrule.updateProgress6Timestamp.Subtract(hyrule.updateProgress5Timestamp).TotalMilliseconds;
-        Progress6To8 = (int)hyrule.updateProgress8Timestamp.Subtract(hyrule.updateProgress6Timestamp).TotalMilliseconds;
-        Progress8To9 = (int)hyrule.updateProgress9Timestamp.Subtract(hyrule.updateProgress8Timestamp).TotalMilliseconds;
+        TimeBuildingDM = hyrule.timeSpentBuildingDM;
+        TimeBuildingEast = hyrule.timeSpentBuildingEast;
+        TimeBuildingMI = hyrule.timeSpentBuildingMI;
+        TimeBuildingWest = hyrule.timeSpentBuildingWest;
 
         ProgressStartToGenerateStartingValues = (int)hyrule.startRandomizeStartingValuesTimestamp.Subtract(hyrule.startTime).TotalMilliseconds;
         ProgressStartingValuesToGenerateEnemies = (int)hyrule.startRandomizeEnemiesTimestamp.Subtract(hyrule.startRandomizeStartingValuesTimestamp).TotalMilliseconds;

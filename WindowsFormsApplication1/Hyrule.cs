@@ -99,7 +99,16 @@ Feature List:
 
 public class Hyrule
 {
-    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 10;
+    //IMPORTANT: Tuning these factors can have a big impact on generation times.
+    //In general, the non-terrain shuffle features are much cheaper than the cost of generating terrain or verifying the seed.
+    
+    //This controls how many attempts will be made to shuffle the non-terrain features like towns, spells, and items.
+    //The higher you set it, the more likely a given terrain is to find a set of items that works, resulting in fewer terrain generations.
+    //It will also increase the number of seeds that have more arcane solutions, where only a specific item route works.
+    //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
+    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 40;
+
+    //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
@@ -183,14 +192,6 @@ public class Hyrule
 
     //DEBUG/STATS
     public DateTime startTime = DateTime.Now;
-    public DateTime updateProgress2Timestamp;
-    public DateTime updateProgress3Timestamp;
-    public DateTime updateProgress4Timestamp;
-    public DateTime updateProgress5Timestamp;
-    public DateTime updateProgress6Timestamp;
-    //DateTime updateProgress7Timestamp = DateTime.Now; There is no progress state 7
-    public DateTime updateProgress8Timestamp;
-    public DateTime updateProgress9Timestamp;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
     public DateTime firstProcessOverworldTimestamp;
@@ -202,6 +203,11 @@ public class Hyrule
     public int totalMazeIslandGenerationAttempts = 0;
     public int totalDeathMountainGenerationAttempts = 0;
     public int isEverythingReachableFailures = 0;
+
+    public int timeSpentBuildingWest = 0;
+    public int timeSpentBuildingEast = 0;
+    public int timeSpentBuildingDM = 0;
+    public int timeSpentBuildingMI = 0;
 
 
     private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
@@ -244,11 +250,12 @@ public class Hyrule
         }
     }
 
-    public Hyrule(RandomizerConfiguration config, BackgroundWorker worker)
+    public Hyrule(RandomizerConfiguration config, BackgroundWorker worker, bool saveRom = true)
     {
         WestHyrule.ResetStats();
         RNG = new Random(config.Seed);
         props = config.Export(RNG);
+        props.saveRom = saveRom;
         Flags = config.Serialize();
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
@@ -494,8 +501,6 @@ public class Hyrule
             palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData);
             
         }
-        //This is a load-bearing debug statement :(
-        logger.Trace("Random: " + RNG.Next(10));
         if (props.ShufflePalaceEnemies)
         {
             ShuffleEnemies(enemyPtr1, enemyAddr1, enemies1, generators1, shorties1, tallGuys1, flyingEnemies1, false);
@@ -506,7 +511,6 @@ public class Hyrule
         firstProcessOverworldTimestamp = DateTime.Now;
         ProcessOverworld();
         bool f = UpdateProgress(8);
-        updateProgress8Timestamp = DateTime.Now;
         if (!f)
         {
             return;
@@ -514,7 +518,6 @@ public class Hyrule
         List<Hint> hints = ROMData.GetGameText();
         ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, spellMap, westHyrule.bagu, hints, props, RNG));
         f = UpdateProgress(9);
-        updateProgress9Timestamp = DateTime.Now;
         if (!f)
         {
             return;
@@ -907,13 +910,13 @@ public class Hyrule
         int eh = 0;
         int count = 1;
         int prevCount = 0;
+        int loopCount = 0;
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
-        logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
-           " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
+        //logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
+        //   " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
         bool updateItemsResult = false;
         bool updateSpellsResult = false;
-        int loopCount = 0;
         while (prevCount != count || updateItemsResult || updateSpellsResult)
         {
             prevCount = count;
@@ -971,14 +974,14 @@ public class Hyrule
             logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
             + " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
-        logger.Debug("Reached: " + count);
-        logger.Debug("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-        logger.Debug("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-        logger.Debug("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-        logger.Debug("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
+        //logger.Debug("Reached: " + count);
+        //logger.Debug("wh: " + wh + " / " + westHyrule.AllLocations.Count);
+        //logger.Debug("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
+        //logger.Debug("dm: " + dm + " / " + deathMountain.AllLocations.Count);
+        //logger.Debug("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
 
         //return true;
-        logger.Trace("-");
+        //logger.Trace("-");
 
         foreach (Item item in SHUFFLABLE_STARTING_ITEMS)
         {
@@ -1629,75 +1632,79 @@ public class Hyrule
 
             int nonContinentGenerationAttempts = 0;
             int nonTerrainShuffleAttempt = 0;
+            DateTime timestamp;
             //Shuffle everything else
             do //while (wtries < 10 && !EverythingReachable());
             {
                 //GENERATE WEST
                 bool shouldContinue = UpdateProgress(2);
-                updateProgress2Timestamp = DateTime.Now;
                 if (!shouldContinue)
                 {
                     return;
                 }
                 nonContinentGenerationAttempts++;
-                if (!westHyrule.Allreached)
+                timestamp = DateTime.Now;
+                if (!westHyrule.AllReached)
                 {
                     while (!westHyrule.Terraform()) { totalWestGenerationAttempts++; }
                     totalWestGenerationAttempts++;
                 }
                 westHyrule.ResetVisitabilityState();
+                timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
                 shouldContinue = UpdateProgress(3);
-                updateProgress3Timestamp = DateTime.Now;
                 if (!shouldContinue)
                 {
                     return;
                 }
-                if (!deathMountain.Allreached)
+                timestamp = DateTime.Now;
+                if (!deathMountain.AllReached)
                 {
                     while (!deathMountain.Terraform()) { totalDeathMountainGenerationAttempts++; }
                     totalDeathMountainGenerationAttempts++;
                 }
                 deathMountain.ResetVisitabilityState();
+                timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
                 shouldContinue = UpdateProgress(4);
-                updateProgress4Timestamp = DateTime.Now;
                 if (!shouldContinue)
                 {
                     return;
                 }
-                if (!eastHyrule.Allreached)
+                timestamp = DateTime.Now;
+                if (!eastHyrule.AllReached)
                 {
                     while (!eastHyrule.Terraform()) { totalEastGenerationAttempts++; }
                     totalEastGenerationAttempts++;
                 }
                 eastHyrule.ResetVisitabilityState();
+                timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
                 shouldContinue = UpdateProgress(5);
-                updateProgress5Timestamp = DateTime.Now;
                 if (!shouldContinue)
                 {
                     return;
                 }
-                if (!mazeIsland.Allreached)
+                timestamp = DateTime.Now;
+                if (!mazeIsland.AllReached)
                 {
                     while (!mazeIsland.Terraform()) { totalMazeIslandGenerationAttempts++; }
                     totalMazeIslandGenerationAttempts++;
                 }
                 mazeIsland.ResetVisitabilityState();
+                timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 shouldContinue = UpdateProgress(6);
-                updateProgress6Timestamp = DateTime.Now;
                 if (!shouldContinue)
                 {
                     return;
                 }
 
 
-                //Then perform up to 11 non-terrain shuffles looking for one that works.
+                //Then perform non-terrain shuffles looking for one that works.
                 nonTerrainShuffleAttempt = 0;
                 do
                 {
@@ -1728,10 +1735,12 @@ public class Hyrule
                     westHyrule.ResetVisitabilityState();
                     eastHyrule.ResetVisitabilityState();
                     mazeIsland.ResetVisitabilityState();
+                    
 
                     ShuffleSpells();
                     LoadItemLocs();
                     deathMountain.ResetVisitabilityState();
+
 
                     westHyrule.SetStart();
                     ShuffleItems();
@@ -1740,13 +1749,13 @@ public class Hyrule
                     LoadItemLocs();
 
 
-                    westHyrule.UpdateAllReachability();
-                    eastHyrule.UpdateAllReachability();
-                    mazeIsland.UpdateAllReachability();
-                    deathMountain.UpdateAllReachability();
+                    westHyrule.UpdateAllReached();
+                    eastHyrule.UpdateAllReached();
+                    mazeIsland.UpdateAllReached();
+                    deathMountain.UpdateAllReached();
 
                     nonTerrainShuffleAttempt++;
-                } while (!IsEverythingReachable() && nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT);
+                } while (nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT && !IsEverythingReachable());
 
                 if (nonTerrainShuffleAttempt != NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT)
                 {
@@ -1772,6 +1781,8 @@ public class Hyrule
                 w.ShuffleEnemies();
             }
         }
+
+        //WRITE LOCATIONS HERE
     }
 
     private bool UpdateProgress(int v)

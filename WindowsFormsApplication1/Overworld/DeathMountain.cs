@@ -69,47 +69,54 @@ class DeathMountain : World
         hammerCave = GetLocationByMem(0x6128);
         magicCave = GetLocationByMem(0x6144);
 
-        reachableAreas = new HashSet<string>();
-        connectionsDM = new Dictionary<Location, List<Location>>();
-        connectionsDM.Add(GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) });
-        connectionsDM.Add(GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) });
-        connectionsDM.Add(GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) });
-        connectionsDM.Add(GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) });
-        connectionsDM.Add(GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) });
-        connectionsDM.Add(GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) });
-        connectionsDM.Add(GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) });
-        connectionsDM.Add(GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) });
-        connectionsDM.Add(GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) });
-        connectionsDM.Add(GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) });
-        connectionsDM.Add(GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) });
-        connectionsDM.Add(GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) });
-        connectionsDM.Add(GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) });
-        connectionsDM.Add(GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) });
-        connectionsDM.Add(GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) });
-        connectionsDM.Add(GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) });
-        connectionsDM.Add(GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) });
-        connectionsDM.Add(GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) });
-        connectionsDM.Add(GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) });
-        connectionsDM.Add(GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) });
-        connectionsDM.Add(GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) });
-        connectionsDM.Add(GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) });
-        connectionsDM.Add(GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) });
-        connectionsDM.Add(GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) });
-        connectionsDM.Add(GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) });
-        connectionsDM.Add(GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) });
-        connectionsDM.Add(GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) });
-        connectionsDM.Add(GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) });
-        connectionsDM.Add(GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) });
-        connectionsDM.Add(GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
-        connectionsDM.Add(GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) });
-        connectionsDM.Add(GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) });
-        connectionsDM.Add(GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) });
+        //reachableAreas = new HashSet<string>();
+        connectionsDM = new Dictionary<Location, List<Location>>
+        {
+            { GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) } },
+            { GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) } },
+            { GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) } },
+            { GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) } },
+            { GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) } },
+            { GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) } },
+            { GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) } },
+            { GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) } },
+            { GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) } },
+            { GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) } },
+            { GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) } },
+            { GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) } },
+            { GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) } },
+            { GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) } },
+            { GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) } },
+            { GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) } },
+            { GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) } },
+            { GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) } },
+            { GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) } },
+            { GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) } },
+            { GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) } },
+            { GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) } },
+            { GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) } },
+            { GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) } },
+            { GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) } },
+            { GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) } },
+            { GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) } },
+            { GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) } },
+
+            { GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) } },
+            { GetLocationByMem(0x612A), new List<Location>() { GetLocationByMem(0x6129), GetLocationByMem(0x612B), GetLocationByMem(0x612C) } },
+            { GetLocationByMem(0x612B), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x6129), GetLocationByMem(0x612C) } },
+            { GetLocationByMem(0x612C), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x6129) } },
+
+            { GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) } },
+            { GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) } },
+            { GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) } },
+            { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
+        };
 
         enemies = new List<int> { 3, 4, 5, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
         flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        generators = new List<int> { 11, 12, 15, 29 };
-        shorties = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
-        tallGuys = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
+        spawners = new List<int> { 11, 12, 15, 29 };
+        smallEnemies = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
+        largeEnemies = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
         enemyAddr = 0x48B0;
         enemyPtr = 0x608E;
 
@@ -758,12 +765,12 @@ class DeathMountain : World
         WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
         
 
-        v = new bool[MAP_ROWS, MAP_COLS];
+        visitation = new bool[MAP_ROWS, MAP_COLS];
         for (int i = 0; i < MAP_ROWS; i++)
         {
             for (int j = 0; j < MAP_COLS; j++)
             {
-                v[i, j] = false;
+                visitation[i, j] = false;
             }
         }
 
@@ -1048,26 +1055,41 @@ class DeathMountain : World
         }
         return true;
     }
+
+    /// <summary>
+    /// Updates the visitation matrix and location reachability 
+    /// </summary>
     public void UpdateVisit()
     {
         UpdateReachable();
 
         foreach (Location location in AllLocations)
         {
-            if (v[location.Ypos - 30, location.Xpos])
+            if (visitation[location.Ypos - 30, location.Xpos])
             {
                 location.Reachable = true;
                 if (connectionsDM.Keys.Contains(location))
                 {
-                    List<Location> l2 = connectionsDM[location];
-
-                    foreach(Location l3 in l2)
+                    foreach(Location l3 in connectionsDM[location])
                     { 
                         l3.Reachable = true;
-                        v[l3.Ypos - 30, l3.Xpos] = true;
+                        visitation[l3.Ypos - 30, l3.Xpos] = true;
                     }
                 }
             }
         }
+    }
+
+    protected override List<Location> GetPathingStarts()
+    {
+        return 
+            connectionsDM.Keys.Where(i => i.Reachable)
+            .Union(GetContinentConnections().Where(i => i.Reachable))
+            .ToList();
+    }
+
+    public override string GetName()
+    {
+        return "Death Mountain";
     }
 }
