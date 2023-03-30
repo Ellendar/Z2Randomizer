@@ -105,7 +105,7 @@ public class WestHyrule : World
         LoadLocations(0x465B, 2, terrains, Continent.WEST);
         LoadLocations(0x465E, 8, terrains, Continent.WEST);
         start = GetLocationByMap(0x80, 0x00);
-        reachableAreas = new HashSet<string>();
+        //reachableAreas = new HashSet<string>();
         Location jumpCave = GetLocationByMap(9, 0);
         jumpCave.NeedJump = true;
         medCave = GetLocationByMap(0x0E, 0);
@@ -178,9 +178,9 @@ public class WestHyrule : World
 
         enemies = new List<int> { 3, 4, 5, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
         flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        generators = new List<int> { 11, 12, 15, 29 };
-        shorties = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
-        tallGuys = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
+        spawners = new List<int> { 11, 12, 15, 29 };
+        smallEnemies = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
+        largeEnemies = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
         enemyAddr = 0x48B0;
         enemyPtr = 0x45B1;
 
@@ -309,17 +309,18 @@ public class WestHyrule : World
             ReadVanillaMap();
             if(this.biome == Biome.VANILLA_SHUFFLE)
             {
-                areasByLocation = new SortedDictionary<string, List<Location>>();
-
-                areasByLocation.Add("north", new List<Location>());
-                areasByLocation.Add("mid", new List<Location>());
-                areasByLocation.Add("parapa", new List<Location>());
-                areasByLocation.Add("grave", new List<Location>());
-                areasByLocation.Add("lifesouth", new List<Location>());
-                areasByLocation.Add("island", new List<Location>());
-                areasByLocation.Add("hammer", new List<Location>());
-                areasByLocation.Add("hammer0", new List<Location>());
-                areasByLocation.Add("dmexit", new List<Location>());
+                areasByLocation = new SortedDictionary<string, List<Location>>
+                {
+                    { "north", new List<Location>() },
+                    { "mid", new List<Location>() },
+                    { "parapa", new List<Location>() },
+                    { "grave", new List<Location>() },
+                    { "lifesouth", new List<Location>() },
+                    { "island", new List<Location>() },
+                    { "hammer", new List<Location>() },
+                    { "hammer0", new List<Location>() },
+                    { "dmexit", new List<Location>() }
+                };
                 foreach (Location location in AllLocations)
                 {
                     areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords));
@@ -723,22 +724,22 @@ public class WestHyrule : World
         }
         WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
 
-        v = new bool[MAP_ROWS, MAP_COLS];
+        visitation = new bool[MAP_ROWS, MAP_COLS];
         for (int i = 0; i < MAP_ROWS; i++)
         {
             for (int j = 0; j < MAP_COLS; j++)
             {
-                v[i, j] = false;
+                visitation[i, j] = false;
             }
         }
 
-        v[start.Ypos - 30, start.Xpos] = true;
+        visitation[start.Ypos - 30, start.Xpos] = true;
         return true;
     }
 
     public void SetStart()
     {
-        v[start.Ypos - 30, start.Xpos] = true;
+        visitation[start.Ypos - 30, start.Xpos] = true;
         start.Reachable = true;
     }
 
@@ -1354,13 +1355,14 @@ public class WestHyrule : World
 
     public void UpdateVisit()
     {
+        visitation[start.Ypos - 30, start.Xpos] = true;
         UpdateReachable();
 
         foreach (Location location in AllLocations)
         {
             if (location.Ypos > 30)
             {
-                if (v[location.Ypos - 30, location.Xpos])
+                if (visitation[location.Ypos - 30, location.Xpos])
                 {
                     location.Reachable = true;
                     if (connections.Keys.Contains(location))
@@ -1369,25 +1371,25 @@ public class WestHyrule : World
                         if ((location.NeedBagu && (bagu.Reachable || hyrule.SpellGet[Spell.FAIRY])))
                         {
                             l2.Reachable = true;
-                            v[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
                         if (location.NeedFairy && hyrule.SpellGet[Spell.FAIRY])
                         {
                             l2.Reachable = true;
-                            v[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
                         if (location.NeedJump && (hyrule.SpellGet[Spell.JUMP] || hyrule.SpellGet[Spell.FAIRY]))
                         {
                             l2.Reachable = true;
-                            v[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
                         if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
                         {
                             l2.Reachable = true;
-                            v[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
                     }
                 }
@@ -1399,5 +1401,16 @@ public class WestHyrule : World
         }
     }
 
-    
+    protected override List<Location> GetPathingStarts()
+    {
+        return connections.Keys.Where(i => i.Reachable)
+            .Union(new List<Location>() { start })
+            .Union(GetContinentConnections().Where(i => i.Reachable))
+            .ToList();
+    }
+
+    public override string GetName()
+    {
+        return "West";
+    }
 }

@@ -42,9 +42,9 @@ class MazeIsland : World
         enemyAddr = 0x88B0;
         enemies = new List<int> { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-        generators = new List<int> { 0x0B, 0x0F, 0x17 };
-        shorties = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
-        tallGuys = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+        spawners = new List<int> { 0x0B, 0x0F, 0x17 };
+        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
+        largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         enemyPtr = 0xA08E;
         overworldMaps = new List<int>();
 
@@ -593,12 +593,12 @@ class MazeIsland : World
             }
         }
 
-        v = new bool[MAP_ROWS, MAP_COLS];
+        visitation = new bool[MAP_ROWS, MAP_COLS];
         for (int i = 0; i < MAP_ROWS; i++)
         {
             for (int j = 0; j < MAP_COLS; j++)
             {
-                v[i, j] = false;
+                visitation[i, j] = false;
             }
         }
         return true;
@@ -786,13 +786,13 @@ class MazeIsland : World
             {
                 for (int j = 0; j < MAP_COLS; j++)
                 {
-                    if (!v[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
+                    if (!visitation[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
                     {
                         if (i - 1 >= 0)
                         {
-                            if (v[i - 1, j])
+                            if (visitation[i - 1, j])
                             {
-                                v[i, j] = true;
+                                visitation[i, j] = true;
                                 changed = true;
                                 continue;
                             }
@@ -801,9 +801,9 @@ class MazeIsland : World
 
                         if (i + 1 < MAP_ROWS)
                         {
-                            if (v[i + 1, j])
+                            if (visitation[i + 1, j])
                             {
-                                v[i, j] = true;
+                                visitation[i, j] = true;
                                 changed = true;
                                 continue;
                             }
@@ -811,9 +811,9 @@ class MazeIsland : World
 
                         if (j - 1 >= 0)
                         {
-                            if (v[i, j - 1])
+                            if (visitation[i, j - 1])
                             {
-                                v[i, j] = true;
+                                visitation[i, j] = true;
                                 changed = true;
                                 continue;
                             }
@@ -821,9 +821,9 @@ class MazeIsland : World
 
                         if (j + 1 < MAP_COLS)
                         {
-                            if (v[i, j + 1])
+                            if (visitation[i, j + 1])
                             {
-                                v[i, j] = true;
+                                visitation[i, j] = true;
                                 changed = true;
                                 continue;
                             }
@@ -835,10 +835,20 @@ class MazeIsland : World
 
         foreach (Location location in AllLocations)
         {
-            if (v[location.Ypos - 30, location.Xpos])
+            if (visitation[location.Ypos - 30, location.Xpos])
             {
                 location.Reachable = true;
             }
         }
+    }
+
+    protected override List<Location> GetPathingStarts()
+    {
+        throw new NotImplementedException("Maze island does not use UpdateReachable so it does not have pathing starts.");
+    }
+
+    public override string GetName()
+    {
+        return "Maze Island";
     }
 }

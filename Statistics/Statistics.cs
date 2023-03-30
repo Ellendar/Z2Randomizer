@@ -23,11 +23,19 @@ namespace Z2Randomizer.Statistics
     /// </summary>
     class Statistics
     {
+        
+        //private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0g$o6XAv@suig$$WA"; //Standard
+        private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Max Rando
+        //private static readonly string FLAGS = "hEAjMsAFerXs2NTbkkg$o6Vqv@sukyAAWh"; //Max Rando all mountains
+        //private static readonly string FLAGS = "AAAe6B$zeqGjAAGZt0g$o6XAv@hEig$$WA"; //Standard vanilla overworld
+        //private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Bad seed
 
-        private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0g$o6XAv@suig$$WA"; //Standard
+
+        //private static readonly string FLAGS = "AAAN6AAFeqGkEAGZt0g$o6XAv@suig$$WA"; //Caldera/Volcano
+
         private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda 2 - The Adventure of Link (U).nes";
         private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-        private static readonly int LIMIT = 1000;
+        private static readonly int LIMIT = 10;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()
         {
@@ -41,6 +49,7 @@ namespace Z2Randomizer.Statistics
                 {
                     RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
                     int seed = random.Next(1000000000);
+                    //int seed = 647961511;
                     config.Seed = seed;
                     config.FileName = VANILLA_ROM_PATH;
                     BackgroundWorker backgroundWorker = new BackgroundWorker()
@@ -49,7 +58,7 @@ namespace Z2Randomizer.Statistics
                         WorkerSupportsCancellation = true
                     };
                     DateTime startTime = DateTime.Now;
-                    Hyrule hyrule = new Hyrule(config, backgroundWorker);
+                    Hyrule hyrule = new Hyrule(config, backgroundWorker, true);
                     DateTime endTime = DateTime.Now;
                     Result result = new Result(hyrule);
                     result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
@@ -58,7 +67,6 @@ namespace Z2Randomizer.Statistics
                     logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
                     //dbContext.SaveChanges();
                 }
-                int k = 0;
                 dbContext.SaveChanges();
             }
             catch(Exception e) { logger.Error(e); }

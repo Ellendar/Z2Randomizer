@@ -18,51 +18,51 @@ public class EastHyrule : World
     private readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
-        {
-            { 0x862F, Terrain.FOREST },
-            { 0x8630, Terrain.FOREST },
-            { 0x8631, Terrain.ROAD },
-            { 0x8632, Terrain.ROAD },
-            { 0x8633, Terrain.ROAD },
-            { 0x8634, Terrain.ROAD },
-            { 0x8635, Terrain.BRIDGE },
-            { 0x8636, Terrain.BRIDGE },
-            { 0x8637, Terrain.DESERT },
-            { 0x8638, Terrain.DESERT },
-            { 0x8639, Terrain.WALKABLEWATER },
-            { 0x863A, Terrain.CAVE },
-            { 0x863B, Terrain.CAVE },
-            { 0x863C, Terrain.CAVE },
-            { 0x863D, Terrain.CAVE },
-            { 0x863E, Terrain.CAVE },
-            { 0x863F, Terrain.CAVE },
-            { 0x8640, Terrain.CAVE },
-            { 0x8641, Terrain.CAVE },
-            { 0x8642, Terrain.CAVE },
-            { 0x8643, Terrain.CAVE },
-            { 0x8644, Terrain.SWAMP },
-            { 0x8645, Terrain.LAVA },
-            { 0x8646, Terrain.DESERT },
-            { 0x8647, Terrain.DESERT },
-            { 0x8648, Terrain.DESERT },
-            { RomMap.VANILLA_DESERT_TILE_LOCATION, Terrain.DESERT },
-            { 0x864A, Terrain.FOREST },
-            { 0x864B, Terrain.LAVA },
-            { 0x864C, Terrain.LAVA },
-            { 0x864D, Terrain.LAVA },
-            { 0x864E, Terrain.LAVA },
-            { 0x864F, Terrain.LAVA },
-            { 0x8657, Terrain.BRIDGE },
-            { 0x8658, Terrain.BRIDGE },
-            { 0x865C, Terrain.TOWN },
-            { 0x865E, Terrain.TOWN },
-            { 0x8660, Terrain.TOWN },
-            { 0x8662, Terrain.TOWN },
-            { 0x8663, Terrain.PALACE },
-            { 0x8664, Terrain.PALACE },
-            { 0x8665, Terrain.PALACE },
+    {
+        { 0x862F, Terrain.FOREST },
+        { 0x8630, Terrain.FOREST },
+        { 0x8631, Terrain.ROAD },
+        { 0x8632, Terrain.ROAD },
+        { 0x8633, Terrain.ROAD },
+        { 0x8634, Terrain.ROAD },
+        { 0x8635, Terrain.BRIDGE },
+        { 0x8636, Terrain.BRIDGE },
+        { 0x8637, Terrain.DESERT },
+        { 0x8638, Terrain.DESERT },
+        { 0x8639, Terrain.WALKABLEWATER },
+        { 0x863A, Terrain.CAVE },
+        { 0x863B, Terrain.CAVE },
+        { 0x863C, Terrain.CAVE },
+        { 0x863D, Terrain.CAVE },
+        { 0x863E, Terrain.CAVE },
+        { 0x863F, Terrain.CAVE },
+        { 0x8640, Terrain.CAVE },
+        { 0x8641, Terrain.CAVE },
+        { 0x8642, Terrain.CAVE },
+        { 0x8643, Terrain.CAVE },
+        { 0x8644, Terrain.SWAMP },
+        { 0x8645, Terrain.LAVA },
+        { 0x8646, Terrain.DESERT },
+        { 0x8647, Terrain.DESERT },
+        { 0x8648, Terrain.DESERT },
+        { RomMap.VANILLA_DESERT_TILE_LOCATION, Terrain.DESERT },
+        { 0x864A, Terrain.FOREST },
+        { 0x864B, Terrain.LAVA },
+        { 0x864C, Terrain.LAVA },
+        { 0x864D, Terrain.LAVA },
+        { 0x864E, Terrain.LAVA },
+        { 0x864F, Terrain.LAVA },
+        { 0x8657, Terrain.BRIDGE },
+        { 0x8658, Terrain.BRIDGE },
+        { 0x865C, Terrain.TOWN },
+        { 0x865E, Terrain.TOWN },
+        { 0x8660, Terrain.TOWN },
+        { 0x8662, Terrain.TOWN },
+        { 0x8663, Terrain.PALACE },
+        { 0x8664, Terrain.PALACE },
+        { 0x8665, Terrain.PALACE },
 
-        };
+    };
 
     public Location palace5;
     public Location palace6;
@@ -76,7 +76,7 @@ public class EastHyrule : World
     public Location gp;
     public Location pbagCave1;
     public Location pbagCave2;
-    public Location hpCallSpot;
+    public Location hiddenPalaceCallSpot;
     private bool canyonShort;
     private Location vodcave1;
     private Location vodcave2;
@@ -103,7 +103,7 @@ public class EastHyrule : World
         LoadLocations(0x8660, 1, terrains, Continent.EAST);
         LoadLocations(0x8662, 4, terrains, Continent.EAST);
 
-        reachableAreas = new HashSet<string>();
+        //reachableAreas = new HashSet<string>();
 
         connections.Add(GetLocationByMem(0x863A), GetLocationByMem(0x863B));
         connections.Add(GetLocationByMem(0x863B), GetLocationByMem(0x863A));
@@ -123,7 +123,7 @@ public class EastHyrule : World
         newKasuto = GetLocationByMem(0x8660);
         newKasuto2 = new Location(newKasuto.LocationBytes, newKasuto.TerrainType, newKasuto.MemAddress, Continent.EAST);
         waterTile = GetLocationByMem(0x8639);
-        waterTile.Needboots = true;
+        waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
         desertTile.PassThrough = 0;
         if (palace5 == null)
@@ -132,16 +132,16 @@ public class EastHyrule : World
             palace5.PalNum = 5;
         }
 
-        hpCallSpot = new Location();
-        hpCallSpot.Xpos = 0;
-        hpCallSpot.Ypos = 0;
+        hiddenPalaceCallSpot = new Location();
+        hiddenPalaceCallSpot.Xpos = 0;
+        hiddenPalaceCallSpot.Ypos = 0;
 
         enemyAddr = 0x88B0;
         enemies = new List<int> { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-        generators = new List<int> { 0x0B, 0x0F, 0x17 };
-        shorties = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
-        tallGuys = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+        spawners = new List<int> { 0x0B, 0x0F, 0x17 };
+        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
+        largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         enemyPtr = 0x85B1;
         nabooru = GetLocationByMem(0x865C);
         oldKasuto = GetLocationByMem(0x8662);
@@ -253,16 +253,18 @@ public class EastHyrule : World
         }
         if (hyrule.Props.HideLocs)
         {
-            unimportantLocs = new List<Location>();
-            unimportantLocs.Add(GetLocationByMem(0x862F));
-            unimportantLocs.Add(GetLocationByMem(0x8630));
-            unimportantLocs.Add(GetLocationByMem(0x8644));
-            unimportantLocs.Add(GetLocationByMem(0x8646));
-            unimportantLocs.Add(GetLocationByMem(0x8647));
-            unimportantLocs.Add(GetLocationByMem(0x8648));
-            unimportantLocs.Add(GetLocationByMem(0x864A));
-            unimportantLocs.Add(GetLocationByMem(0x864B));
-            unimportantLocs.Add(GetLocationByMem(0x864C));
+            unimportantLocs = new List<Location>
+            {
+                GetLocationByMem(0x862F),
+                GetLocationByMem(0x8630),
+                GetLocationByMem(0x8644),
+                GetLocationByMem(0x8646),
+                GetLocationByMem(0x8647),
+                GetLocationByMem(0x8648),
+                GetLocationByMem(0x864A),
+                GetLocationByMem(0x864B),
+                GetLocationByMem(0x864C)
+            };
 
         }
         if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
@@ -275,16 +277,18 @@ public class EastHyrule : World
 
             if (this.biome == Biome.VANILLA_SHUFFLE)
             {
-                areasByLocation = new SortedDictionary<string, List<Location>>();
-                areasByLocation.Add("north2", new List<Location>());
-                areasByLocation.Add("mid2", new List<Location>());
-                areasByLocation.Add("south", new List<Location>());
-                areasByLocation.Add("vod", new List<Location>());
-                areasByLocation.Add("kasuto", new List<Location>());
-                areasByLocation.Add("gp", new List<Location>());
-                areasByLocation.Add("boots", new List<Location>());
-                areasByLocation.Add("boots1", new List<Location>());
-                areasByLocation.Add("hammer2", new List<Location>());
+                areasByLocation = new SortedDictionary<string, List<Location>>
+                {
+                    { "north2", new List<Location>() },
+                    { "mid2", new List<Location>() },
+                    { "south", new List<Location>() },
+                    { "vod", new List<Location>() },
+                    { "kasuto", new List<Location>() },
+                    { "gp", new List<Location>() },
+                    { "boots", new List<Location>() },
+                    { "boots1", new List<Location>() },
+                    { "hammer2", new List<Location>() }
+                };
                 //areasByLocation.Add("horn", new List<Location>());
                 foreach (Location location in AllLocations)
                 {
@@ -699,12 +703,12 @@ public class EastHyrule : World
         WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos);
 
 
-        v = new bool[MAP_ROWS, MAP_COLS];
+        visitation = new bool[MAP_ROWS, MAP_COLS];
         for (int i = 0; i < MAP_ROWS; i++)
         {
             for (int j = 0; j < MAP_COLS; j++)
             {
-                v[i, j] = false;
+                visitation[i, j] = false;
             }
         }
         
@@ -1540,21 +1544,21 @@ public class EastHyrule : World
         //map[hpLoc.Ypos - 30, hpLoc.Xpos] = map[hpLoc.Ypos - 29, hpLoc.Xpos];
         hiddenPalaceLocation.Xpos = xpos;
         hiddenPalaceLocation.Ypos = ypos + 2 + 30;
-        hpCallSpot.Xpos = xpos;
-        hpCallSpot.Ypos = ypos + 30;
+        hiddenPalaceCallSpot.Xpos = xpos;
+        hiddenPalaceCallSpot.Ypos = ypos + 30;
         hyrule.ROMData.Put(0x1df70, (byte)t);
         hiddenPalaceLocation.CanShuffle = false;
         return true;
     }
 
-    public void UpdateAllReachability()
+    public void UpdateAllReached()
     {
-        if (!Allreached)
+        if (!AllReached)
         {
-            base.UpdateAllReachability();
+            base.UpdateAllReached();
             if (!hiddenPalaceLocation.Reachable || !hiddenKasutoLocation.Reachable || !newKasuto2.Reachable)
             {
-                Allreached = false;
+                AllReached = false;
             }
         }
     }
@@ -1564,8 +1568,8 @@ public class EastHyrule : World
 
         if (this.biome != Biome.VANILLA && this.biome != Biome.VANILLA_SHUFFLE)
         {
-            hyrule.ROMData.Put(0x8382, (byte)hpCallSpot.Ypos);
-            hyrule.ROMData.Put(0x8388, (byte)hpCallSpot.Xpos);
+            hyrule.ROMData.Put(0x8382, (byte)hiddenPalaceCallSpot.Ypos);
+            hyrule.ROMData.Put(0x8388, (byte)hiddenPalaceCallSpot.Xpos);
         }
         int pos = hiddenPalaceLocation.Ypos;
 
@@ -1690,49 +1694,45 @@ public class EastHyrule : World
 
     }
 
-
-
-
     public void UpdateVisit()
     {
         UpdateReachable();
 
         foreach (Location location in AllLocations)
         {
-            if (location.Ypos > 30)
+            if (location.Ypos > 30 && visitation[location.Ypos - 30, location.Xpos])
             {
-                if (v[location.Ypos - 30, location.Xpos])
+                if ((!location.NeedRecorder || (location.NeedRecorder && hyrule.itemGet[Item.FLUTE]) ) 
+                    && (!location.NeedHammer || (location.NeedHammer && hyrule.itemGet[Item.HAMMER]) )
+                    && (!location.NeedBoots || (location.NeedBoots && hyrule.itemGet[Item.BOOTS])))
                 {
-                    if ((!location.NeedRecorder || (location.NeedRecorder && hyrule.itemGet[Item.FLUTE]) ) && (!location.NeedHammer || (location.NeedHammer && hyrule.itemGet[Item.HAMMER]) )&& (!location.Needboots || (location.Needboots && hyrule.itemGet[Item.BOOTS])))
+                    location.Reachable = true;
+                    if (connections.Keys.Contains(location))
                     {
-                        location.Reachable = true;
-                        if (connections.Keys.Contains(location))
+                        Location connectedLocation = connections[location];
+
+                        if ((location.NeedBagu && (hyrule.westHyrule.bagu.Reachable || hyrule.SpellGet[Spell.FAIRY])))
                         {
-                            Location l2 = connections[location];
+                            connectedLocation.Reachable = true;
+                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
+                        }
 
-                            if ((location.NeedBagu && (hyrule.westHyrule.bagu.Reachable || hyrule.SpellGet[Spell.FAIRY])))
-                            {
-                                l2.Reachable = true;
-                                v[l2.Ypos - 30, l2.Xpos] = true;
-                            }
+                        if (location.NeedFairy && hyrule.SpellGet[Spell.FAIRY])
+                        {
+                            connectedLocation.Reachable = true;
+                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
+                        }
 
-                            if (location.NeedFairy && hyrule.SpellGet[Spell.FAIRY])
-                            {
-                                l2.Reachable = true;
-                                v[l2.Ypos - 30, l2.Xpos] = true;
-                            }
+                        if (location.NeedJump && (hyrule.SpellGet[Spell.JUMP] || hyrule.SpellGet[Spell.FAIRY]))
+                        {
+                            connectedLocation.Reachable = true;
+                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
+                        }
 
-                            if (location.NeedJump && (hyrule.SpellGet[Spell.JUMP] || hyrule.SpellGet[Spell.FAIRY]))
-                            {
-                                l2.Reachable = true;
-                                v[l2.Ypos - 30, l2.Xpos] = true;
-                            }
-
-                            if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
-                            {
-                                l2.Reachable = true;
-                                v[l2.Ypos - 30, l2.Xpos] = true;
-                            }
+                        if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
+                        {
+                            connectedLocation.Reachable = true;
+                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
                         }
                     }
                 }
@@ -1925,8 +1925,21 @@ public class EastHyrule : World
 
         
     }
+    protected override List<Location> GetPathingStarts()
+    {
+        /*return new List<Location>
+        {
+            palace5, palace6, waterTile, desertTile, darunia,
+            newKasuto, newKasuto2, nabooru, oldKasuto, gp,
+            pbagCave1, pbagCave2, hiddenPalaceCallSpot, hiddenPalaceLocation, hiddenKasutoLocation
+        };*/
+        return connections.Keys.Where(i => i.Reachable)
+            .Union(GetContinentConnections().Where(i => i.Reachable))
+            .ToList();
+    }
 
-
-
-    
+    public override string GetName()
+    {
+        return "East";
+    }
 }

@@ -7,6 +7,9 @@ using System.Collections;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using NLog;
+using System.Threading.Channels;
+using static System.Windows.Forms.AxHost;
+using System.Diagnostics;
 //using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer.Overworld;
@@ -29,31 +32,28 @@ public abstract class World
     private List<Location> allLocations;
     */
     public Dictionary<Location, Location> connections;
-    protected HashSet<String> reachableAreas;
+    //protected HashSet<String> reachableAreas;
     protected int enemyAddr;
     protected List<int> enemies;
     protected List<int> flyingEnemies;
-    protected List<int> generators;
-    protected List<int> shorties;
-    protected List<int> tallGuys;
+    protected List<int> spawners;
+    protected List<int> smallEnemies;
+    protected List<int> largeEnemies;
     protected int enemyPtr;
     protected List<int> overworldMaps;
     protected SortedDictionary<Tuple<int, int>, Location> locsByCoords;
     protected Hyrule hyrule;
     protected Terrain[,] map;
-    private const int overworldXOff = 0x3F;
-    private const int overworldMapOff = 0x7E;
-    private const int overworldWorldOff = 0xBD;
+    private const int overworldXOffset = 0x3F;
+    private const int overworldMapOffset = 0x7E;
+    private const int overworldWorldOffset = 0xBD;
     private List<int> visitedEnemies;
     protected int MAP_ROWS;
     protected int MAP_COLS;
     protected int bytesWritten;
     protected List<Terrain> randomTerrains;
     protected List<Terrain> walkableTerrains;
-    /// <summary>
-    /// This name is A W F U L. Figure out what this is supposed to represent and rename it
-    /// </summary>
-    protected bool[,] v;
+    protected bool[,] visitation;
     protected const int MAP_SIZE_BYTES = 1408;
     protected List<Location> unimportantLocs;
     protected Biome biome;
@@ -70,6 +70,9 @@ public abstract class World
 
     private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
+
+    protected abstract List<Location> GetPathingStarts();
+    public abstract string GetName();
 
 
     /*
@@ -108,7 +111,7 @@ public abstract class World
     public List<Location> AllLocations { get; }
     public Dictionary<Terrain, List<Location>> Locations { get; set; }
 
-    public bool Allreached { get; set; }
+    public bool AllReached { get; set; }
 
     public World(Hyrule parent)
     {
@@ -122,11 +125,11 @@ public abstract class World
         //Locations = new List<Location>[11] { Towns, Caves, Palaces, Bridges, Deserts, Grasses, Forests, Swamps, Graves, Roads, Lavas };
         AllLocations = new List<Location>();
         locsByCoords = new SortedDictionary<Tuple<int, int>, Location>();
-        reachableAreas = new HashSet<string>();
+        //reachableAreas = new HashSet<string>();
         visitedEnemies = new List<int>();
         unimportantLocs = new List<Location>();
         areasByLocation = new SortedDictionary<string, List<Location>>();
-        Allreached = false;
+        AllReached = false;
     }
 
     public static void ResetStats()
@@ -213,7 +216,7 @@ public abstract class World
                     {
                         int swap = enemies[hyrule.RNG.Next(0, enemies.Count)];
                         hyrule.ROMData.Put(j, (Byte)(swap + highPart));
-                        if ((shorties.Contains(enemy) && tallGuys.Contains(swap) && swap != 0x20))
+                        if ((smallEnemies.Contains(enemy) && largeEnemies.Contains(swap) && swap != 0x20))
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
@@ -239,23 +242,23 @@ public abstract class World
                 else
                 {
 
-                    if (tallGuys.Contains(enemy))
+                    if (largeEnemies.Contains(enemy))
                     {
-                        int swap = hyrule.RNG.Next(0, tallGuys.Count);
-                        if (tallGuys[swap] == 0x20 && tallGuys[swap] != enemy)
+                        int swap = hyrule.RNG.Next(0, largeEnemies.Count);
+                        if (largeEnemies[swap] == 0x20 && largeEnemies[swap] != enemy)
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                             ypos = ypos - 48;
                             hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
                         }
-                        hyrule.ROMData.Put(j, (Byte)(tallGuys[swap] + highPart));
+                        hyrule.ROMData.Put(j, (Byte)(largeEnemies[swap] + highPart));
                     }
 
-                    if (shorties.Contains(enemy))
+                    if (smallEnemies.Contains(enemy))
                     {
-                        int swap = hyrule.RNG.Next(0, shorties.Count);
-                        hyrule.ROMData.Put(j, (Byte)(shorties[swap] + highPart));
+                        int swap = hyrule.RNG.Next(0, smallEnemies.Count);
+                        hyrule.ROMData.Put(j, (Byte)(smallEnemies[swap] + highPart));
                     }
                 }
 
@@ -272,18 +275,18 @@ public abstract class World
                     }
                 }
 
-                if (generators.Contains(enemy))
+                if (spawners.Contains(enemy))
                 {
-                    int swap = hyrule.RNG.Next(0, generators.Count);
-                    hyrule.ROMData.Put(j, (Byte)(generators[swap] + highPart));
+                    int swap = hyrule.RNG.Next(0, spawners.Count);
+                    hyrule.ROMData.Put(j, (Byte)(spawners[swap] + highPart));
                 }
 
                 if (enemy == 33)
                 {
-                    int swap = hyrule.RNG.Next(0, generators.Count + 1);
-                    if (swap != generators.Count)
+                    int swap = hyrule.RNG.Next(0, spawners.Count + 1);
+                    if (swap != spawners.Count)
                     {
-                        hyrule.ROMData.Put(j, (Byte)(generators[swap] + highPart));
+                        hyrule.ROMData.Put(j, (Byte)(spawners[swap] + highPart));
                     }
                 }
             }
@@ -317,7 +320,7 @@ public abstract class World
     {
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(startAddr + i), hyrule.ROMData.GetByte(startAddr + overworldXOff + i), hyrule.ROMData.GetByte(startAddr + overworldMapOff + i), hyrule.ROMData.GetByte(startAddr + overworldWorldOff + i) };
+            byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(startAddr + i), hyrule.ROMData.GetByte(startAddr + overworldXOffset + i), hyrule.ROMData.GetByte(startAddr + overworldMapOffset + i), hyrule.ROMData.GetByte(startAddr + overworldWorldOffset + i) };
             AddLocation(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
         }
     }
@@ -362,22 +365,22 @@ public abstract class World
         }
     }
 
-    public void UpdateAllReachability()
+    public void UpdateAllReached()
     {
-        if(Allreached)
+        if(AllReached)
         {
             return;
         }
         else
         {
-            Allreached = true;
+            AllReached = true;
             foreach(Location location in AllLocations)
             {
                 if(location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Item.DO_NOT_USE)
                 {
                     if(!location.Reachable)
                     {
-                        Allreached = false;
+                        AllReached = false;
                     }
                 }
             }
@@ -455,7 +458,17 @@ public abstract class World
                 {
                     x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
                     y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
-                } while (map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
+                } while (
+                    map[y, x] != Terrain.NONE 
+                    || map[y - 1, x] != Terrain.NONE 
+                    || map[y + 1, x] != Terrain.NONE 
+                    || map[y + 1, x + 1] != Terrain.NONE 
+                    || map[y, x + 1] != Terrain.NONE 
+                    || map[y - 1, x + 1] != Terrain.NONE 
+                    || map[y + 1, x - 1] != Terrain.NONE 
+                    || map[y, x - 1] != Terrain.NONE 
+                    || map[y - 1, x - 1] != Terrain.NONE
+                );
 
                 map[y, x] = location.TerrainType;
                 //Connect the cave
@@ -667,12 +680,12 @@ public abstract class World
         {
             int range = 12;
             int offset = 6;
-            if (biome == Biome.ISLANDS)
+            if (biome == Biome.ISLANDS || biome == Biome.MOUNTAINOUS)
             {
                 range = 10;
                 offset = 10;
             }
-            else if (biome == Biome.VOLCANO)
+            else if (biome == Biome.VOLCANO || biome == Biome.CALDERA)
             {
                 range = 10;
                 offset = 20;
@@ -1649,37 +1662,43 @@ public abstract class World
             }
         }
     }
-    protected void UpdateReachable()
+    protected void LegacyUpdateReachable()
     {
         bool needJump = false;
         Location location = GetLocationByMem(0x8646);
-        int dy = -1;
-        int dx = -1;
+        int jumpBlockY = -1;
+        int jumpBlockX = -1;
         if(location != null)
         {
             needJump = location.NeedJump;
-            dy = location.Ypos - 30;
-            dx = location.Xpos;
+            jumpBlockY = location.Ypos - 30;
+            jumpBlockX = location.Xpos;
         }
 
         bool needFairy = false;
         location = GetLocationByMem(0x8644);
-        int sy = -1;
-        int sx = -1;
+        int fairyBlockY = -1;
+        int fairyBlockX = -1;
         if (location != null)
         {
             needFairy = location.NeedFairy;
-            sy = location.Ypos - 30;
-            sx = location.Xpos;
+            fairyBlockY = location.Ypos - 30;
+            fairyBlockX = location.Xpos;
         }
+        bool hasFairySpell = hyrule.SpellGet[Spell.FAIRY];
+        bool hasJumpSpell = hyrule.SpellGet[Spell.JUMP];
+        bool hasHammer = hyrule.itemGet[Item.HAMMER];
+        bool hasBoots = hyrule.itemGet[Item.BOOTS];
+        bool hasFlute = hyrule.itemGet[Item.FLUTE];
         bool changed = true;
         while (changed)
         {
             changed = false;
-            for (int i = 0; i < MAP_ROWS; i++)
+            for (int y = 0; y < MAP_ROWS; y++)
             {
-                for (int j = 0; j < MAP_COLS; j++)
+                for (int x = 0; x < MAP_COLS; x++)
                 {
+                    Terrain terrain = map[y, x];
                     if(location != null && location.TerrainType == Terrain.SWAMP)
                     {
                         needFairy = location.NeedFairy;
@@ -1688,46 +1707,71 @@ public abstract class World
                     {
                         needJump = location.NeedJump;
                     }
-                    if (!v[i, j] && !(needJump && dy == i && dx == j && (!hyrule.SpellGet[Spell.JUMP] && !hyrule.SpellGet[Spell.FAIRY])) && !(needFairy && sy == i && sx == j && !hyrule.SpellGet[Spell.FAIRY]) && (map[i, j] == Terrain.LAVA || map[i, j] == Terrain.BRIDGE || map[i, j] == Terrain.CAVE || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE || map[i, j] == Terrain.TOWN || (map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS]) || walkableTerrains.Contains(map[i, j]) || (map[i, j] == Terrain.ROCK && hyrule.itemGet[Item.HAMMER]) || (map[i, j] == Terrain.SPIDER && hyrule.itemGet[Item.FLUTE])))
+                    //If this isn't already marked as visited, and it is visitable:
+                    if (!visitation[y, x]
+                        //East desert jump blocker
+                        && !(
+                            needJump 
+                            && jumpBlockY == y 
+                            && jumpBlockX == x 
+                            && (!hasJumpSpell && !hasFairySpell)
+                        )
+                        //Fairy cave is traversable
+                        && !(needFairy && fairyBlockY == y && fairyBlockX == x && !hasFairySpell)
+                        //This map tile is a traversable terrain type
+                        && (
+                            terrain == Terrain.LAVA 
+                            || terrain == Terrain.BRIDGE 
+                            || terrain == Terrain.CAVE 
+                            || terrain == Terrain.ROAD 
+                            || terrain == Terrain.PALACE 
+                            || terrain == Terrain.TOWN 
+                            || (terrain == Terrain.WALKABLEWATER && hasBoots)
+                            || walkableTerrains.Contains(terrain) 
+                            || (terrain == Terrain.ROCK && hasHammer) 
+                            || (terrain == Terrain.SPIDER && hasFlute)
+                        )
+                    )
+                    //If an adjacent tile is visited, this one must also be.
                     {
-                        if (i - 1 >= 0)
+                        if (y - 1 >= 0)
                         {
-                            if (v[i - 1, j])
+                            if (visitation[y - 1, x])
                             {
-                                v[i, j] = true;
+                                visitation[y, x] = true;
                                 changed = true;
                                 continue;
                             }
 
                         }
 
-                        if (i + 1 < MAP_ROWS)
+                        if (y + 1 < MAP_ROWS)
                         {
-                            if (v[i + 1, j])
+                            if (visitation[y + 1, x])
                             {
-                                v[i, j] = true;
+                                visitation[y, x] = true;
                                 changed = true;
                                 continue;
 
                             }
                         }
 
-                        if (j - 1 >= 0)
+                        if (x - 1 >= 0)
                         {
-                            if (v[i, j - 1])
+                            if (visitation[y, x - 1])
                             {
-                                v[i, j] = true;
+                                visitation[y, x] = true;
                                 changed = true;
                                 continue;
 
                             }
                         }
 
-                        if (j + 1 < MAP_COLS)
+                        if (x + 1 < MAP_COLS)
                         {
-                            if (v[i, j + 1])
+                            if (visitation[y, x + 1])
                             {
-                                v[i, j] = true;
+                                visitation[y, x] = true;
                                 changed = true;
                                 continue;
 
@@ -1738,6 +1782,127 @@ public abstract class World
             }
         }
     }
+    protected void UpdateReachable()
+    {
+        //Setup
+        bool needJump = false;
+        Location location = GetLocationByMem(0x8646);
+        int jumpBlockY = -1;
+        int jumpBlockX = -1;
+        if (location != null)
+        {
+            needJump = location.NeedFairy;
+            jumpBlockY = location.Ypos - 30;
+            jumpBlockX = location.Xpos;
+        }
+
+        bool needFairy = false;
+        location = GetLocationByMem(0x8644);
+        int fairyBlockY = -1;
+        int fairyBlockX = -1;
+        if (location != null)
+        {
+            needFairy = location.NeedFairy;
+            fairyBlockY = location.Ypos - 30;
+            fairyBlockX = location.Xpos;
+        }
+
+        List<Location> starts = GetPathingStarts();
+
+        bool[,] covered = new bool[MAP_ROWS, MAP_COLS];
+        for (int i = 0; i < MAP_ROWS; i++)
+        {
+            for (int j = 0; j < MAP_COLS; j++)
+            {
+                covered[i, j] = false;
+            }
+        }
+
+        //Run the initial steps
+        foreach (Location start in starts)
+        {
+            if(start.Ypos >= 30 && start.Xpos >= 0)
+            {
+                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+            }
+        }
+
+        /*
+        StringBuilder sb = new();
+        sb.AppendLine(GetName());
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                sb.Append(visitation[y,x] ? 'x' : ' ');
+            }
+            sb.Append('\n');
+        }
+        Debug.Write(sb.ToString());
+        */
+    }
+
+    protected void UpdateReachable(ref bool[,] covered, int y, int x, int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
+    {
+        try
+        {
+            if (covered[y, x])
+            {
+                return;
+            }
+            covered[y, x] = true;
+
+            Terrain terrain = map[y, x];
+            if ((terrain == Terrain.LAVA
+                || terrain == Terrain.BRIDGE
+                || terrain == Terrain.CAVE
+                || terrain == Terrain.ROAD
+                || terrain == Terrain.PALACE
+                || terrain == Terrain.TOWN
+                || walkableTerrains.Contains(terrain)
+                || (terrain == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS])
+                || (terrain == Terrain.ROCK && hyrule.itemGet[Item.HAMMER])
+                || (terrain == Terrain.SPIDER && hyrule.itemGet[Item.FLUTE]))
+                //East desert jump blocker
+                && !(
+                    needJump
+                    && jumpBlockY == y
+                    && jumpBlockX == x
+                    && (!hyrule.SpellGet[Spell.JUMP] && !hyrule.SpellGet[Spell.FAIRY])
+                )
+                //Fairy cave is traversable
+                && !(needFairy && fairyBlockY == y && fairyBlockX == x && !hyrule.SpellGet[Spell.FAIRY])
+            )
+            {
+                visitation[y, x] = true;
+
+                if (y - 1 >= 0)
+                {
+                    UpdateReachable(ref covered, y - 1, x, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                }
+
+                if (y + 1 < MAP_ROWS)
+                {
+                    UpdateReachable(ref covered, y + 1, x, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                }
+
+                if (x - 1 >= 0)
+                {
+                    UpdateReachable(ref covered, y, x - 1, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                }
+
+                if (x + 1 < MAP_COLS)
+                {
+                    UpdateReachable(ref covered, y, x + 1, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                }
+            }
+        }
+        catch(IndexOutOfRangeException)
+        {
+            logger.Debug("?");
+            throw;
+        }
+    }
 
     //Should the visibility calculation table even be persistent? Why is this not just in scope of the calculation itself?
     public void ResetVisitabilityState()
@@ -1746,7 +1911,7 @@ public abstract class World
         {
             for(int j = 0; j < MAP_COLS; j++)
             {
-                v[i, j] = false;
+                visitation[i, j] = false;
             }
         }
         foreach(Location location in AllLocations)
@@ -1902,7 +2067,7 @@ public abstract class World
 
     private void LoadLocation(int addr, Terrain t, Continent c)
     {
-        byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(addr), hyrule.ROMData.GetByte(addr + overworldXOff), hyrule.ROMData.GetByte(addr + overworldMapOff), hyrule.ROMData.GetByte(addr + overworldWorldOff) };
+        byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(addr), hyrule.ROMData.GetByte(addr + overworldXOffset), hyrule.ROMData.GetByte(addr + overworldMapOffset), hyrule.ROMData.GetByte(addr + overworldWorldOffset) };
         AddLocation(new Location(bytes, t, addr, c));
     }
 
@@ -1958,7 +2123,7 @@ public abstract class World
     {
         if (raft != null)
         {
-            v[raft.Ypos - 30, raft.Xpos] = true;
+            visitation[raft.Ypos - 30, raft.Xpos] = true;
         }
     }
 
@@ -1966,7 +2131,7 @@ public abstract class World
     {
         if(bridge != null)
         {
-            v[bridge.Ypos - 30, bridge.Xpos] = true;
+            visitation[bridge.Ypos - 30, bridge.Xpos] = true;
         }
     }
 
@@ -1974,7 +2139,7 @@ public abstract class World
     {
         if(cave1 != null)
         {
-            v[cave1.Ypos - 30, cave1.Xpos] = true;
+            visitation[cave1.Ypos - 30, cave1.Xpos] = true;
         }
     }
 
@@ -1982,8 +2147,13 @@ public abstract class World
     {
         if (cave2 != null)
         {
-            v[cave2.Ypos - 30, cave2.Xpos] = true;
+            visitation[cave2.Ypos - 30, cave2.Xpos] = true;
         }
+    }
+
+    public List<Location> GetContinentConnections()
+    {
+        return new List<Location>() { cave1, cave2, bridge, raft }.Where(i => i != null).ToList();
     }
 
     public void RemoveUnusedConnectors()
@@ -2306,31 +2476,29 @@ public abstract class World
     public void DrawCenterMountain()
     {
         isHorizontal = hyrule.RNG.NextDouble() > 0.5;
-        int top = (MAP_ROWS - 35) / 2;
-        int bottom = MAP_ROWS - top;
+        int top = (MAP_ROWS - 35) / 2; //20
+        int bottom = MAP_ROWS - top; //55
         if (isHorizontal)
         {
-            for (int i = 0; i < MAP_ROWS; i++)
+            //Block out a stripe of mountains where the caldera is going to be
+            for (int y = bottom + 1; y < top; y++)
             {
-                if (i < top || i > bottom)
+                for (int x = 0; x < MAP_COLS; x++)
                 {
-                    for (int j = 0; j < MAP_COLS; j++)
-                    {
-                        map[i, j] = Terrain.MOUNTAIN;
-                    }
+                    map[y, x] = Terrain.MOUNTAIN;
                 }
             }
 
-            for (int i = 0; i < 8; i++)
+            for (int y = 0; y < 8; y++)
             {
-                int jstart = MAP_COLS / 2 - (3 + i);
-                int jend = MAP_COLS / 2 + (3 + i);
+                int xstart = MAP_COLS / 2 - (3 + y); //29 to 
+                int xend = MAP_COLS / 2 + (3 + y);
                 //map[20 + i, jstart - 1] = Terrain.lava;
                 //map[20 + i, jend] = Terrain.lava;
-                for (int j = jstart; j < jend; j++)
+                for (int x = xstart; x < xend; x++)
                 {
 
-                    map[top + i, j] = Terrain.MOUNTAIN;
+                    map[top + y, x] = Terrain.MOUNTAIN;
                 }
             }
             for (int i = 0; i < 19; i++)

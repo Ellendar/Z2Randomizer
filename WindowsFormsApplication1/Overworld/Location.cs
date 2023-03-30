@@ -42,7 +42,7 @@ public class Location
     public bool NeedJump { get; set; }
 
     public bool NeedHammer { get; set; }
-    public bool Needboots { get; set; }
+    public bool NeedBoots { get; set; }
     public bool NeedFairy { get; set; }
 
     public bool NeedRecorder { get; set; }
@@ -305,14 +305,16 @@ public class Location
             (Continent.EAST, 37, 23, 42) => "FAKE_DM_EXIT",
             (Continent.DM, 40, 52, 40) => "FAKE_MAZE_BRIDGE",
             (Continent.MAZE, 0, 0, 42) => "UNKNOWN",
-
-
+            (Continent.EAST, 37, 23, 43) => "FAKE_DM_EXIT",
+            (Continent.MAZE, 96, 21, 43) => "FAKE_DM_ENTRANCE",
+            (Continent.WEST, 37, 23, 43) => "FAKE_DM_EXIT",
+            (Continent.DM, 96, 21, 43) => "FAKE_DM_ENTRANCE",
 
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
-        if(Name.StartsWith("Unknown"))
+        if(Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
         {
-            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ")");
+            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
         }
     }
 
