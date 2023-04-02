@@ -2481,11 +2481,14 @@ public abstract class World
         if (isHorizontal)
         {
             //Block out a stripe of mountains where the caldera is going to be
-            for (int y = bottom + 1; y < top; y++)
+            for (int i = 0; i < MAP_ROWS; i++)
             {
-                for (int x = 0; x < MAP_COLS; x++)
+                if (i < top || i > bottom)
                 {
-                    map[y, x] = Terrain.MOUNTAIN;
+                    for (int j = 0; j < MAP_COLS; j++)
+                    {
+                        map[i, j] = Terrain.MOUNTAIN;
+                    }
                 }
             }
 

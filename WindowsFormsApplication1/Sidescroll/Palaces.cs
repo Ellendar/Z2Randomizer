@@ -41,7 +41,7 @@ public class Palaces
 
     public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData)
     {
-        if(props.UseCustomRooms && !File.Exists("CustomRooms.json"))
+        if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
             throw new Exception("Couldn't find CustomRooms.json. Please create the file or disable custom rooms on the misc tab.");
         }
@@ -258,7 +258,7 @@ public class Palaces
                                             lastDrop = dropZoneRoom.HasDrop;
                                             j++;
                                         }
-                                        else if(++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
+                                        else if (++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
                                         {
                                             logger.Warn("Drop placement failure limit exceeded.");
                                             break;
@@ -424,10 +424,6 @@ public class Palaces
                 List<Room> rooms = sideviews[sv];
                 foreach (Room room in rooms)
                 {
-                    if (room.NewMap == 45)
-                    {
-                        logger.Trace("here");
-                    }
                     int palSet = 1;
                     if (palaces[2].AllRooms.Contains(room) || palaces[3].AllRooms.Contains(room) || palaces[5].AllRooms.Contains(room))
                     {
