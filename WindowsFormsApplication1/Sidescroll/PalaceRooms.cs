@@ -26,12 +26,14 @@ public class PalaceRooms
         {
             string roomsJson = File.ReadAllText("PalaceRooms.json");
 
+            /*
             MD5 hasher = MD5.Create();
             byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
                 throw new Exception("Invalid PalaceRooms.json");
             }
+            */
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
             {
@@ -237,27 +239,27 @@ public class PalaceRooms
     }
     public static List<Room> TriforceOfCourage(bool useCustomRooms)
     {
-        return useCustomRooms ? customRoomsByGroup["tbirdRooms"] : roomsByGroup["tbirdRooms"];
+        return useCustomRooms ? customRoomsByGroup["triforceOfCourage"] : roomsByGroup["triforceOfCourage"];
     }
     public static List<Room> TriforceOfCourageGP(bool useCustomRooms)
     {
-        return useCustomRooms ? customRoomsByGroup["triforceOfCourage"] : roomsByGroup["triforceOfCourage"];
+        return useCustomRooms ? customRoomsByGroup["triforceOfCourageGP"] : roomsByGroup["triforceOfCourageGP"];
     }
     public static List<Room> WinterSolstice(bool useCustomRooms)
     {
-        return useCustomRooms ? customRoomsByGroup["triforceOfCourageGP"] : roomsByGroup["triforceOfCourageGP"];
+        return useCustomRooms ? customRoomsByGroup["winterSolstice"] : roomsByGroup["winterSolstice"];
     }
     public static List<Room> WinterSolsticeGP(bool useCustomRooms)
     {
-        return useCustomRooms ? customRoomsByGroup["winterSolstice"] : roomsByGroup["winterSolstice"];
+        return useCustomRooms ? customRoomsByGroup["winterSolsticeGP"] : roomsByGroup["winterSolsticeGP"];
     }
     public static List<Room> GTMOldGPRooms(bool useCustomRooms)
     {
-        return useCustomRooms ? customRoomsByGroup["winterSolsticeGP"] : roomsByGroup["winterSolsticeGP"];
+        return useCustomRooms ? customRoomsByGroup["gtmOldgpRooms"] : roomsByGroup["gtmOldgpRooms"];
     }
     public static List<Room> NewP6BossRooms(bool useCustomRooms)
     {
-        return useCustomRooms ? customRoomsByGroup["gtmOldgpRooms"] : roomsByGroup["gtmOldgpRooms"];
+        return useCustomRooms ? customRoomsByGroup["newp6BossRooms"] : roomsByGroup["newp6BossRooms"];
     }
     public static List<Room> NewBossRooms(bool useCustomRooms)
     {
