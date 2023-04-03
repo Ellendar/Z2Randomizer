@@ -607,7 +607,7 @@ public partial class MainUI : Form
             2 => Biome.VANILLALIKE,
             3 => Biome.ISLANDS,
             4 => Biome.CANYON,
-            5 => Biome.CALDERA,
+            5 => Biome.VOLCANO,
             6 => Biome.MOUNTAINOUS,
             7 => Biome.RANDOM_NO_VANILLA,
             8 => Biome.RANDOM,
