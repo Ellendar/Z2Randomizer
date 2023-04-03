@@ -111,6 +111,8 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
+    public const bool UNSAFE_DEBUG = false;
+
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -4110,7 +4112,7 @@ public class Hyrule
                 {
                     int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
                     int item = ROMData.GetByte(addr);
-                    if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
+                    if (UNSAFE_DEBUG && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
                     {
                         logger.Debug("Map: " + map);
                         logger.Debug("Item: " + item);

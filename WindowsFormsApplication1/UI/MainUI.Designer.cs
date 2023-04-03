@@ -196,6 +196,7 @@
             useCommunityHintsCheckbox = new System.Windows.Forms.CheckBox();
             enableHelpfulHintsCheckbox = new System.Windows.Forms.CheckBox();
             tabPage3 = new System.Windows.Forms.TabPage();
+            useCustomRoomsBox = new System.Windows.Forms.CheckBox();
             dashAlwaysOnCheckbox = new System.Windows.Forms.CheckBox();
             flashingOffCheckbox = new System.Windows.Forms.CheckBox();
             upAOnController1Checkbox = new System.Windows.Forms.CheckBox();
@@ -250,7 +251,6 @@
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             oldFlagsLabel = new System.Windows.Forms.Label();
             batchButton = new System.Windows.Forms.Button();
-            useCustomRoomsBox = new System.Windows.Forms.CheckBox();
             mainTabControl.SuspendLayout();
             tabPage4.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -2450,6 +2450,18 @@
             tabPage3.Text = "Misc.";
             tabPage3.UseVisualStyleBackColor = true;
             // 
+            // useCustomRoomsBox
+            // 
+            useCustomRoomsBox.AutoSize = true;
+            useCustomRoomsBox.Location = new System.Drawing.Point(4, 126);
+            useCustomRoomsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            useCustomRoomsBox.Name = "useCustomRoomsBox";
+            useCustomRoomsBox.Size = new System.Drawing.Size(130, 19);
+            useCustomRoomsBox.TabIndex = 35;
+            useCustomRoomsBox.Text = "Use Custom Rooms";
+            toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
+            useCustomRoomsBox.UseVisualStyleBackColor = true;
+            // 
             // dashAlwaysOnCheckbox
             // 
             dashAlwaysOnCheckbox.AutoSize = true;
@@ -2467,7 +2479,7 @@
             flashingOffCheckbox.AutoSize = true;
             flashingOffCheckbox.Checked = true;
             flashingOffCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
-            flashingOffCheckbox.Location = new System.Drawing.Point(4, 126);
+            flashingOffCheckbox.Location = new System.Drawing.Point(4, 101);
             flashingOffCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             flashingOffCheckbox.Name = "flashingOffCheckbox";
             flashingOffCheckbox.Size = new System.Drawing.Size(182, 19);
@@ -2479,7 +2491,7 @@
             // upAOnController1Checkbox
             // 
             upAOnController1Checkbox.AutoSize = true;
-            upAOnController1Checkbox.Location = new System.Drawing.Point(4, 101);
+            upAOnController1Checkbox.Location = new System.Drawing.Point(4, 76);
             upAOnController1Checkbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             upAOnController1Checkbox.Name = "upAOnController1Checkbox";
             upAOnController1Checkbox.Size = new System.Drawing.Size(250, 19);
@@ -2591,7 +2603,7 @@
             // shuffleEnemyPalettesCheckbox
             // 
             shuffleEnemyPalettesCheckbox.AutoSize = true;
-            shuffleEnemyPalettesCheckbox.Location = new System.Drawing.Point(4, 76);
+            shuffleEnemyPalettesCheckbox.Location = new System.Drawing.Point(4, 172);
             shuffleEnemyPalettesCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
             shuffleEnemyPalettesCheckbox.Size = new System.Drawing.Size(140, 19);
@@ -3030,18 +3042,6 @@
             batchButton.Text = "Batch";
             batchButton.UseVisualStyleBackColor = true;
             batchButton.Click += Bulk_Generate_Click;
-            // 
-            // useCustomRoomsBox
-            // 
-            useCustomRoomsBox.AutoSize = true;
-            useCustomRoomsBox.Location = new System.Drawing.Point(4, 151);
-            useCustomRoomsBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            useCustomRoomsBox.Name = "useCustomRoomsBox";
-            useCustomRoomsBox.Size = new System.Drawing.Size(130, 19);
-            useCustomRoomsBox.TabIndex = 35;
-            useCustomRoomsBox.Text = "Use Custom Rooms";
-            toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
-            useCustomRoomsBox.UseVisualStyleBackColor = true;
             // 
             // MainUI
             // 
