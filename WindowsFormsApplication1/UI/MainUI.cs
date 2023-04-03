@@ -547,7 +547,7 @@ public partial class MainUI : Form
 
         //Overworld
         configuration.PalacesCanSwapContinents = GetTripleCheckState(allowPalaceContinentSwapCheckbox);
-        configuration.ShuffleGP = GetTripleCheckState(shortGPCheckbox);
+        configuration.ShuffleGP = GetTripleCheckState(includeGPinShuffleCheckbox);
         configuration.ShuffleEncounters = GetTripleCheckState(shuffleEncountersCheckbox);
         configuration.AllowUnsafePathEncounters = allowPathEnemiesCheckbox.Checked;
         configuration.IncludeLavaInEncounterShuffle = includeLavaInShuffle.Checked;
@@ -1259,7 +1259,7 @@ public partial class MainUI : Form
 
     private void RandomPercentFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = new("hEAjMsAKrspUN2LN2tg$o6tFc6WbYqEjqA");
+        RandomizerConfiguration config = new("hEAK0sALvrpUWVXu2kg$o6rWX@4X4yAASh");
         flagsTextBox.Text = config.Serialize();
     }
 
@@ -1291,14 +1291,14 @@ public partial class MainUI : Form
 
     private void PalaceSwapBox_CheckStateChanged(object sender, EventArgs e)
     {
-        if (allowPalaceContinentSwapCheckbox.Checked)
+        if (allowPalaceContinentSwapCheckbox.CheckState == CheckState.Unchecked)
         {
-            includeGPinShuffleCheckbox.Enabled = true;
+            includeGPinShuffleCheckbox.CheckState = CheckState.Unchecked;
+            includeGPinShuffleCheckbox.Enabled = false;
         }
         else
         {
-            includeGPinShuffleCheckbox.Checked = false;
-            includeGPinShuffleCheckbox.Enabled = false;
+            includeGPinShuffleCheckbox.Enabled = true;
         }
 
     }

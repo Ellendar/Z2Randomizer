@@ -157,7 +157,7 @@ namespace Z2Randomizer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("RAhN6EAAFAViN1TRtcD$rJVJqBLnjLBJWA")]
         public string lastused {
             get {
                 return ((string)(this["lastused"]));
