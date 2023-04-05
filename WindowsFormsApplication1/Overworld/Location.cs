@@ -342,6 +342,6 @@ public class Location
 
     private string GetDebuggerDisplay()
     {
-        return Continent.ToString() + " " + TerrainType.ToString() + " (" + Xpos + "," + (Ypos - 30) + ") _" + (Reachable ? "Reachable" : "Unreachable");
+        return Continent.ToString() + " " + TerrainType.ToString() + " " + Name + " (" + Xpos + "," + (Ypos - 30) + ") _" + (Reachable ? "Reachable" : "Unreachable");
     }
 }

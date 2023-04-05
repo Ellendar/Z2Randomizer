@@ -58,7 +58,7 @@ namespace Z2Randomizer.Statistics
                         WorkerSupportsCancellation = true
                     };
                     DateTime startTime = DateTime.Now;
-                    Hyrule hyrule = new Hyrule(config, backgroundWorker, true);
+                    Hyrule hyrule = new Hyrule(config, backgroundWorker, false);
                     DateTime endTime = DateTime.Now;
                     Result result = new Result(hyrule);
                     result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;

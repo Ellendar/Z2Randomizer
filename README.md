@@ -1,11 +1,11 @@
 # Z2Randomizer
-Fork of the main Zelda 2 Randomizer by Digshake
+Fork of the main Zelda 2 Randomizer by Digshake ([Twitch](https://www.twitch.tv/digshake)\).
+Currently maintained by Ellendar ([Twitch](https://www.twitch.tv/ellendar)\).
 
 Original source is at https://bitbucket.org/digshake/z2randomizer/src/master/
 
-Goals for this fork are in roughly decreasing order of likelyhood.
-- Reduce the amount of code thrown into giant files like Hyrule.cs
-- Refactor to remove as many magic numbers and undocumented ROM addresses as possible.
-- Fix known issues (TODO: Get a list of known issues from Mirai/Discord and add them as issues.
-- Add support for alternate configuration methods. (YAML?)
-- Look into multiworld support
+Download - TBD
+Options - TBD
+[Changelog](https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md) - See a list of the most recent updates
+[Report A Bug] (https://github.com/Ellendar/Z2Randomizer/issues/new) - Let me know about a problem
+[Thanks](https://github.com/Ellendar/Z2Randomizer/blob/main/Thanks.md) - These people helped make the randomizer possible
