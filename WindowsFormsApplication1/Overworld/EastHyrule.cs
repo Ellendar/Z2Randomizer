@@ -615,7 +615,7 @@ public class EastHyrule : World
                     return false;
                 }
 
-
+                //WHAT?
                 if (hyrule.Props.HideLocs)
                 {
                     PlaceRandomTerrain(50);
@@ -688,7 +688,7 @@ public class EastHyrule : World
                     }
                 }
                 WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos);
-                logger.Debug("East:" + bytesWritten);
+                //logger.Debug("East:" + bytesWritten);
             }
             
         }

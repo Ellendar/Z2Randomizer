@@ -1,4 +1,5 @@
 ﻿using NLog;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -200,7 +201,7 @@ public class Palaces
                         if (i == 7)
                         {
                             roomPool.Clear();
-                            //roomPool.AddRange(PalaceRooms.Palace7Vanilla);
+                            roomPool.AddRange(PalaceRooms.Palace7Vanilla(props.UseCustomRooms));
                             if (props.UseCommunityRooms)
                             {
                                 roomPool.AddRange(PalaceRooms.Link7777RoomJam(props.UseCustomRooms));

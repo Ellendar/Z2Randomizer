@@ -1344,6 +1344,73 @@ public class RandomizerConfiguration
         properties.RemoveFlashing = RemoveFlashing;
         properties.UseCustomRooms = UseCustomRooms;
 
+        //"Server" side validation
+        //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML)
+        //or indeterminately generated properties still correspond to sanity. Without this you get randomly ungeneratable seeds.
+        if(!properties.ShuffleEncounters)
+        {
+            properties.AllowPathEnemies = false;
+            properties.IncludeLavaInEncounterShuffle = false;
+        }
+
+        if(!properties.ShuffleOverworldEnemies && !properties.ShufflePalaceEnemies)
+        {
+            properties.MixEnemies = false;
+        }
+
+        if(!properties.ShufflePalaceItems || !properties.ShuffleOverworldItems)
+        {
+            properties.MixOverworldPalaceItems = false;
+        }
+
+        if(!properties.ShuffleOverworldItems)
+        {
+            properties.PbagItemShuffle = false;
+        }
+
+        if(properties.RequireTbird)
+        {
+            properties.RemoveTbird = false;
+        }
+
+        if(!properties.SwapPalaceCont)
+        {
+            properties.P7shuffle = false;
+        }
+
+        if(!properties.RemoveSpellItems)
+        {
+            properties.SpellItemHints = false;
+        }
+
+        //if (eastBiome.SelectedIndex == 0 || (hiddenPalaceList.SelectedIndex == 0 && hideKasutoList.SelectedIndex == 0))
+        if(properties.EastBiome == Biome.VANILLA || (!properties.HiddenPalace && !properties.HiddenKasuto))
+        {
+            properties.ShuffleHidden = false;
+        }
+
+        if(properties.WestBiome == Biome.VANILLA || properties.WestBiome == Biome.VANILLA_SHUFFLE)
+        {
+            properties.BagusWoods = false;
+        }
+
+        if(properties.palaceStyle == PalaceStyle.VANILLA || properties.palaceStyle == PalaceStyle.SHUFFLED)
+        {
+            properties.UseCommunityRooms = false;
+            properties.BlockersAnywhere = false;
+            properties.BossRoomConnect = false;
+        }
+
+        if (properties.palaceStyle == PalaceStyle.VANILLA)
+        {
+            properties.ShortenGP = false;
+            properties.RequireTbird = true;
+        }
+
+        if(properties.DashSpell)
+        {
+            properties.CombineFire = false;
+        }
         return properties;
     }
 
@@ -1369,4 +1436,5 @@ public class RandomizerConfiguration
     {
         return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
     }
+
 }
