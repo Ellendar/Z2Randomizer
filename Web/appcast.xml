@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>Z2Randomizer Changelog</title>
+      <link>https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1</link>
+      <description>Most recent changes.</description>
+      <language>en</language>
+	  	  <item>
+           <title>Version 4.1.0</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Thursday, 13 Apr 2023 </pubDate>
+           <enclosure url="https://github.com/Ellendar/Z2Randomizer/tree/main/Releases/" sparkle:version="4.1.0" />
+        </item>
+	  <item>
+	  <item>
+           <title>Version 4.0.3</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Thu, 5 Dec 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="4.0.3" />
+        </item>
+	  <item>
+           <title>Version 4.0.2</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Thu, 3 Dec 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="4.0.2" />
+        </item>
+	  <item>
+           <title>Version 4.0.1</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Tue, 1 Dec 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="4.0.1" />
+        </item>
+	  <item>
+           <title>Version 4.0</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Sat, 28 Nov 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="4.0" />
+        </item>
+	  <item>
+           <title>Version 3.19</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Tue, 25 Aug 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.19" />
+        </item>
+	  <item>
+           <title>Version 3.17</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Tue, 25 Aug 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.18" />
+        </item>
+	  <item>
+           <title>Version 3.17</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Tue, 25 Aug 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.17" />
+        </item>
+	  <item>
+           <title>Version 3.16</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Sat, 11 Jul 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.16" />
+        </item>
+	  <item>
+           <title>Version 3.15</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Tue, 7 Jul 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.15" />
+        </item>
+	  <item>
+           <title>Version 3.14</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Mon, 6 Jul 2020 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.14" />
+        </item>
+	  <item>
+           <title>Version 3.13</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Thurs, 24 May 2018 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.13" />
+        </item>
+	  <item>
+           <title>Version 3.12</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Wed, 17 May 2018 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.12" />
+        </item>
+	  <item>
+           <title>Version 3.11</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Wed, 16 May 2018 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.11" />
+        </item>
+	  <item>
+           <title>Version 3.1</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Sun, 13 May 2018 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.10" />
+        </item>
+	  <item>
+           <title>Version 3.06</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Fri, 7 Jul 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.06" />
+        </item>
+	  <item>
+           <title>Version 3.05</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Thu, 29 Jun 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.05" />
+        </item>
+	  <item>
+           <title>Version 3.04</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Sat, 27 May 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.04" />
+        </item>
+	  <item>
+           <title>Version 3.03</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Sat, 20 May 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.03" />
+        </item>
+	  <item>
+           <title>Version 3.02</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Fri, 19 May 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.02" />
+        </item>
+	  <item>
+           <title>Version 3.01</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Wed, 17 May 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.01" />
+        </item>
+	  <item>
+           <title>Version 3.0</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Wed, 17 May 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="3.0" />
+        </item>
+	  <item>
+           <title>Version 2.29</title>
+			<description>
+			<![CDATA[
+			See the <a href="https://bitbucket.org/digshake/z2randomizer/wiki/Changelog">changelog</a> for details about new features.
+			]]>
+			</description>
+           <pubDate>Mon, 27 Mar 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.30" />
+        </item>
+	  <item>
+           <title>Version 2.29</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Removed Old Overworld Options</li>
+				<li>Modified Overworld Generation Algorithm</li>
+				<li>If "Thunderbird Required" is unchecked, thunderbird will be removed from the game</li>
+				<li>Added an option that combines Fire with other spells</li>
+				<li>Randomize tunic color now affects the shield spell</li>
+				<li>Fixed a bug that caused crashes during seed generation</li>
+				<li>Fixed a UI bug</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Thu, 23 Mar 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.29" />
+        </item>
+	  <item>
+           <title>Version 2.28</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Removed Old Overworld Options</li>
+				<li>Modified Overworld Generation Algorithm</li>
+				<li>If "Thunderbird Required" is unchecked, thunderbird will be removed from the game</li>
+				<li>Added an option that combines Fire with other spells</li>
+				<li>Randomize tunic color now affects the shield spell</li>
+				<li>Fixed a bug that caused crashes during seed generation</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Thu, 23 Mar 2017 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.28" />
+        </item>
+	  <item>
+           <title>Version 2.27</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Fixed a bug with Maze Island item locations (thanks darkmagician1184!)</li>
+        
+			</ul>
+			]]>
+			</description>
+           <pubDate>Tue, 4 Oct 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.27" />
+        </item>
+	  <item>
+           <title>Version 2.25</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Added an option to change the text for selected in game NPCs. Thank you to everyone who submitted text suggestions!</li>
+        <li>Added an option that shuffles how many containers are required for the item in New Kasuto</li>
+        
+			</ul>
+			]]>
+			</description>
+           <pubDate>Tue, 5 Sep 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.25" />
+        </item>
+	  <item>
+           <title>Version 2.24</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Made text even faster (thanks lemmypi!)</li>
+        <li>Reduced the size of maze island</li>
+        <li>Added a rock to death mountain that will always contain an item</li>
+        <li>Added an option that generates a random tunic color for link</li>
+        
+			</ul>
+			]]>
+			</description>
+           <pubDate>Wed, 24 Aug 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.24" />
+        </item>
+	  <item>
+           <title>Version 2.23</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Fixed a UI bug that didn't always update the flags</li>
+        <li>Fixed a bug with up+a in the eastern continent towns</li>
+        <li>Fixed a bug that broke up+a after saving</li>
+        <li>Fixed a bug that overlapped important locations on maze island</li>
+        <li>Tweaked rock placements</li>
+        <li>Added a feature that reduces the number of rooms in great palace</li>
+        
+			</ul>
+			]]>
+			</description>
+           <pubDate>Tue, 16 Aug 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.23" />
+        </item>
+	  <item>
+           <title>Version 2.22</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Fixed a UI bug that didn't always update the flags</li>
+        <li>Fixed a bug with up+a in the eastern continent towns</li>
+        <li>Fixed a bug that broke up+a after saving</li>
+        <li>Fixed a bug that overlapped important locations on maze island</li>
+        <li>Tweaked rock placements</li>
+        <li>Added a feature that reduces the number of rooms in great palace</li>
+        
+			</ul>
+			]]>
+			</description>
+           <pubDate>Tue, 16 Aug 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.22" />
+        </item>
+	  <item>
+           <title>Version 2.21</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Added an option to allow you to restart in the current palace when you game over or up+a</li>
+				<li>Fixed a bug with the UI that did not update buttons correctly when flags were changed</li>
+        
+			</ul>
+			]]>
+			</description>
+           <pubDate>Tue, 9 Aug 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.21" />
+        </item>
+	  <item>
+           <title>Version 2.2</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+				<li>Tweaked enemy experience amounts</li>
+        <li>Starting attack power will never be less than 2 (same as in original game)</li>
+        <li>Fixed a bug that spawned too many boulders on some maps.</li>
+        <li>Minor changes to valley of death generation.</li>
+        <li>Revamped Overworld tab and Levels and Spells Tab</li>
+        <li>Introduced five new modes: high attack, low attack, high defense, high spell cost, low spell cost</li>
+        <li>Removed some presets and updated remaing presets</li>
+        <li>You can now cast a spell as many times as you want without opening the spell menu</li>
+        <li>Text displays much faster (thanks lemmypi!)</li>
+        <li>Wizard text is now correct when spells are shuffled (thanks lemmypi!)</li>		
+			</ul>
+			]]>
+			</description>
+           <pubDate>Tue, 2 Aug 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.20" />
+        </item>
+	  <item>
+           <title>Version 2.13</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>If you opt to start with an item, that item will be replaced with a pbag in the game</li>
+			<li>Fixed a bug where I was checking for palace 4 instead of palace 3 (yes really, i know, i'm dumb)
+			</ul>
+			]]>
+			</description>
+           <pubDate>Fri, 29 Jul 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.13" />
+        </item>
+	  <item>
+           <title>Version 2.12</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Fixed a bug in the sanity checks (sorry Eunos!)</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Fri, 22 Jul 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.12" />
+        </item>
+	  <item>
+           <title>Version 2.11</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Palaces can be swapped across continents</li>
+        <li>Fixed Tooltips</li>
+        <li>Fixed a bug that spawned the ocean encounter in hard to see places</li></ul>
+			]]>
+			</description>
+           <pubDate>Sat, 22 Jul 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.11" />
+        </item>
+	  <item>
+           <title>Version 2.01</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Fixed a bug that trapped the player behind a rock coming out of caves</li>
+			<li>Fixed a hilarious bug that turned the valley of death into a river</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Sat, 16 Jul 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.01" />
+        </item>
+	  <item>
+           <title>Version 2.0</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Can now generate new overworld maps</li>
+			<li>Added option to shuffle palace palettes (thanks questwizard!)</li>
+        <li>Fixed exp softlock (thanks myria!)</li>
+        <li>Updated enemy placements</li>
+        <li>Tank Mode - makes Link invincible</li>
+        <li>OHKO Link Mode - Link will die in one hit</li>
+        <li>Wizard Mode - Link has infinite magic</li>
+        <li>Added an option to shuffle pbag drop frequency</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Fri, 15 Jul 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/z7ci6ukmk71gmfp/Z2RandomizerSetup.msi?dl=1" sparkle:version="2.0" />
+        </item>
+	  <item>
+           <title>Version 1.17</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Fixed a bug that generated improper spell costs</li>
+        <li>Moved raft animation to actual raft spot</li>
+        <li>Fixed music glitch on raft/maze island bridge tiles</li>
+        <li>Fixed a bug that shuffled overworld locations improperly</li>
+        <li>Adjusted flying enemy placements</li>
+        <li>Simplified overworld shuffle options</li>
+        <li>Added an option to insert extra keys into palaces</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Sat, 2 Apr 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.17" />
+        </item>
+	  <item>
+           <title>Version 1.16</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Fixed the sprite bug with the medicine and the kid. No, really. It's fixed. I promise.</li>
+        <li>Fixed sanity checks for upstab/downstab</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Sat, 26 Mar 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.16" />
+        </item>
+	  <item>
+           <title>Version 1.15</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Fixed bugs that trapped players behind rocks or in the ocean</li>
+        <li>Fixed a sanity check involving palace 2</li>
+        <li>Updated sanity checks to take disabled magic container requirements into account</li>
+        <li>Removed dumb moblins because I hate them and they're dumb</li>
+		<li>Attempted to fix a bug that causes the kid and medicine to be swapped but its probably still a little broken</li>
+		<li>Added version number to title (thanks jkoper!)</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Wed, 23 Mar 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.15" />
+        </item>
+	  <item>
+           <title>Version 1.12</title>
+			<description>
+			<![CDATA[
+			Changes:
+			<ul>
+			<li>Fixed a bug that counted magic containers incorrectly (thanks Eunos!)</li>
+			<li>Added a feature that disables the magic container requirements for spells</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Wed, 16 Mar 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.13" />
+        </item>
+	  <item>
+           <title>Version 1.11</title>
+			<description>
+			<![CDATA[
+			Bug Fixes:
+			<ul>
+			<li>Fixed a bug that started you with the wrong spells if spell shuffle is on</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Mon, 14 Mar 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.11" />
+        </item>
+	  <item>
+           <title>Version 1.1</title>
+			<description>
+			<![CDATA[
+			Bug Fixes:
+			<ul>
+			<li>Made sure you can never get stuck behind a rock without a hammer</li>
+        <li>Fixed a bug that cause spell costs to be too low (thanks Eunos!)</li>
+        <li>Fixed a graphical glitch that affects ropes in palace 3</li>
+        <li>Fixed OHKO bugs with rebonack and large skull bubbles</li>
+        <li>Fixed Life spell randomization</li>
+			</ul>
+			New Features:
+			<ul>
+			<li>Added item shuffle (thanks lemmypi!)</li>
+        <li>Added spell shuffle (thanks fcoughlin!)</li>
+		</ul>
+			]]>
+			</description>
+           <pubDate>Mon, 14 Mar 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.1" />
+        </item>
+	  <item>
+           <title>Version 1.0</title>
+			<description>
+			<![CDATA[
+			Version 1.0 is finished! Thanks to everyone who helped with testing and bug reports. I couldn't have done it without you!<br><br>
+			To celebrate the release of version 1.0, there will be a race on February 13th 2016 at 1PM Eastern. I hope to see you there!
+			<ul>
+			<li>Fixed OHKO enemies - all enemies now die in one hit
+        <li>Fixed mago/wizzrobe spawns - these enemies will always spawn on the floor</li>
+        <li>Fixed barba HP overflow bug - barba was spawning with too little HP</li>
+        <li>Fixed bug that crashes GP on some seeds</li>
+        <li>Fixed bug that shuffles caves even when option is not selected</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Sat, 6 Feb 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="1.0" />
+        </item>
+	  <item>
+           <title>Version 0.95</title>
+			<description>
+			<![CDATA[
+			Z2Randomizer is now in public beta!
+			<ul>
+			<li>Added descriptions to each option that can be viewed by hovering the mouse over them</li>
+        <li>Added buttons with preset options selected</li>
+        <li>Added a button to go to the wiki</li>
+        <li>Improved enemy spawn locations for magos, wizzrobes, and skull bubbles</li>
+        <li>Fixed a bug that prevented palaces from being shuffled in certain cases (thanks Jaylow7!)</li>
+        <li>Fixed an odd bug that caused unbeatable seeds in East Hyrule (thanks Kingdahl!)</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Mon, 26 Jan 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="0.95" />
+        </item>
+	  <item>
+           <title>Version 0.94</title>
+			<description>
+			<![CDATA[
+			Z2Randomizer is now in public beta!
+			<ul>
+			<li>Don't spawn magos and wizzrobes in stalfos spots (thanks warlock82!)</li>
+        <li>Fixed spawns for stalfos, skull heads, and megmets</li>
+        <li>Can no longer enter Thunderbird room from the right (thanks breastickle!)</li>
+        <li>Permenantly unhid palace 6 tile</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Sat, 23 Jan 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="0.94" />
+        </item>
+	  <item>
+           <title>Version 0.93</title>
+			<description>
+			<![CDATA[
+			<ul>
+			<li>Adjusted the level efficiency randomization to more closely match the original game.</li>
+			<li>Fixed a bug that prevented overworld shuffle from working in some situations (thanks Skavenger216!)</li>
+			</ul>
+			]]>
+			</description>
+           <pubDate>Thu, 21 Jan 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="0.93" />
+        </item>
+	  <item>
+           <title>Version 0.92</title>
+			<description>
+			<![CDATA[Lots of bug fixes:<br><br>
+			<ul>
+			<li>Recategorized a bunch of enemies so they spawn in more appropriate locations</li>
+			<li>Fixed a bug that made spells cost more than what was displayed on the menu (thanks, Jaylow7!)</li>
+			<li>Fixed blue stalfos HP shuffling</li>
+			<li>Fixed a bug that replaced red jars in p7 with enemies</li>
+			<li>Fixed a bug that could cause a softlock at the palace 6 overworld location (thanks GTM604!)</li>
+			</ul><br><br>
+			Added a new option for enemy shuffle. You can now choose to mix large and small enemies or not.]]>
+			</description>
+           <pubDate>Sat, 16 Jan 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="0.92" />
+        </item>
+	  <item>
+           <title>Version 0.91</title>
+			<description>
+			Bug fix that created unbeatable seeds when terrain mixing was off. Thanks to Jaylow7 for reporting the bug!
+			</description>
+           <pubDate>Tue, 12 Jan 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="0.91" />
+        </item>
+         <item>
+           <title>Version 0.9</title>
+			<description>
+			Beta release of Z2Randomizer!
+			</description>
+           <pubDate>Mon, 11 Jan 2016 </pubDate>
+           <enclosure url="https://www.dropbox.com/s/wehbsqc3twd7o2s/Z2RandomizerSetup.msi?dl=1" sparkle:version="0.9" />
+        </item>
+   </channel>
+</rss>
