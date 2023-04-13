@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Z2Randomizer.Flags;
 using Z2Randomizer.Overworld;
+using Z2Randomizer.UI;
 
 namespace Z2Randomizer;
 
@@ -226,9 +227,9 @@ public partial class MainUI : Form
 
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
-        //WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
-        //WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
-        //WinSparkle.win_sparkle_init();
+        WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
+        WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
+        WinSparkle.win_sparkle_init();
     }
 
     /// <summary>
@@ -976,7 +977,7 @@ public partial class MainUI : Form
                 Biome.VANILLALIKE => 2,
                 Biome.ISLANDS => 3,
                 Biome.CANYON => 4,
-                Biome.CALDERA => 5,
+                Biome.VOLCANO => 5,
                 Biome.MOUNTAINOUS => 6,
                 Biome.RANDOM_NO_VANILLA => 7,
                 Biome.RANDOM => 8,
@@ -1164,7 +1165,7 @@ public partial class MainUI : Form
 
     private void UpdateBtn_Click(object sender, EventArgs e)
     {
-        //WinSparkle.win_sparkle_check_update_with_ui();
+        WinSparkle.win_sparkle_check_update_with_ui();
     }
 
     private void ShuffleOverworldEnemies_CheckStateChanged(object sender, EventArgs e)

@@ -272,9 +272,6 @@ public class Hyrule
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
 
         ROMData = new ROM(props.Filename);
-        //ROMData.dumpAll("glitch");
-        //ROMData.dumpSamus();
-        //Palace.DumpMaps(ROMData);
         this.worker = worker;
 
 
