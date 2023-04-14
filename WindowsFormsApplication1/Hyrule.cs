@@ -2123,8 +2123,8 @@ public class Hyrule
         {
             spellMap.Add((Spell)i, (Spell)shuffleThis[i]);
         }
-        spellMap.Add(Spell.UPSTAB, Spell.UPSTAB);
-        spellMap.Add(Spell.DOWNSTAB, Spell.DOWNSTAB);
+        spellMap.Add(Spell.UPSTAB, props.SwapUpAndDownStab ? Spell.DOWNSTAB : Spell.UPSTAB);
+        spellMap.Add(Spell.DOWNSTAB, props.SwapUpAndDownStab ? Spell.UPSTAB : Spell.DOWNSTAB);
 
 
         ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (Byte)1 : (Byte)0);

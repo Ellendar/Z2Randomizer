@@ -227,7 +227,7 @@ public partial class MainUI : Form
 
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
-        WinSparkle.win_sparkle_set_appcast_url("https://www.dropbox.com/s/w4d9qptlg1kyx0o/appcast.xml?dl=1");
+        WinSparkle.win_sparkle_set_appcast_url("https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml");
         WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
         WinSparkle.win_sparkle_init();
     }
