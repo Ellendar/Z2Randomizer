@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 4.1.0 - April 4th, 2023
+## Version 4.1.0 - April 14th, 2023
 
 ### Bug Fixes
 - Fixed an issue with eastern desert tile in vanilla shuffle that sometimes made the item inaccessible.
