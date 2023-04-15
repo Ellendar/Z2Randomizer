@@ -228,7 +228,10 @@ public partial class MainUI : Form
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
         WinSparkle.win_sparkle_set_appcast_url("https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml");
-        WinSparkle.win_sparkle_set_app_details("Company","App", "Version"); // THIS CALL NOT IMPLEMENTED YET
+        String version = +typeof(MainUI).Assembly.GetName().Version.Major + "."
+            + typeof(MainUI).Assembly.GetName().Version.Minor + "."
+            + typeof(MainUI).Assembly.GetName().Version.Build;
+        WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", version); // THIS CALL NOT IMPLEMENTED YET
         WinSparkle.win_sparkle_init();
     }
 
