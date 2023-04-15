@@ -801,6 +801,7 @@ public partial class MainUI : Form
             15 => CharacterSprite.LADY_LINK,
             16 => CharacterSprite.HOODIE_LINK,
             17 => CharacterSprite.GLITCH_WITCH,
+            18 => CharacterSprite.RANDOM,
             _ => CharacterSprite.LINK
         };
         configuration.Tunic = tunicColorList.GetItemText(tunicColorList.SelectedItem);
