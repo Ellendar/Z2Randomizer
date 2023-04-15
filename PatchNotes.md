@@ -1,5 +1,10 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.1 - April 15th, 2023
+- Fixed an issue where sprite shuffle didn't work.
+- Fixed a bug that could incorrectly disable spell hints.
+- Updated sprite colors so that "Default" now doesn't set sprite colors if you have your sprite set to "Link". This allows you to preload your sprite to the rom and have it not be overwritten.
+
 ## Version 4.1.0 - April 14th, 2023
 
 ### Bug Fixes
