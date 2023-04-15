@@ -2590,7 +2590,16 @@ public class Hyrule
         foreach (int l in tunicLocs)
         {
             ROMData.Put(0x10ea, (byte)c2);
-            if (props.CharSprite == CharacterSprite.IRON_KNUCKLE)
+            if (props.CharSprite == CharacterSprite.LINK)
+            {
+                if(props.TunicColor != "Default")
+                {
+                    ROMData.Put(0x10ea, (byte)c2);
+                    ROMData.Put(l, (byte)c2);
+                }
+                //Don't overwrite for null 
+            }
+            else if (props.CharSprite == CharacterSprite.IRON_KNUCKLE)
             {
                 ROMData.Put(0x10ea, (byte)0x30);
                 ROMData.Put(0x2a0a, 0x0D);
@@ -2734,10 +2743,15 @@ public class Hyrule
             }
         }
 
-        ROMData.Put(0xe9e, (byte)c1);
-
-
-
+        if (props.CharSprite == CharacterSprite.LINK && props.ShieldColor == "Default")
+        {
+            //Don't overwrite default shield. For custom sprite IPS base
+        }
+        else
+        {
+            ROMData.Put(0xe9e, (byte)c1);
+        }
+                
         int beamType = -1;
         if (props.BeamSprite.Equals("Random"))
         {

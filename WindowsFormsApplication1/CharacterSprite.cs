@@ -39,12 +39,13 @@ public class CharacterSprite
     public static readonly CharacterSprite LADY_LINK = new CharacterSprite(15);
     public static readonly CharacterSprite HOODIE_LINK = new CharacterSprite(16);
     public static readonly CharacterSprite GLITCH_WITCH = new CharacterSprite(17);
-    
+    public static readonly CharacterSprite RANDOM = new CharacterSprite(18);
+
     public static CharacterSprite Random()
     {
         Random random = new Random();
-        PropertyInfo[] properties = typeof(CharacterSprite).GetProperties().Where(i => i.PropertyType == typeof(CharacterSprite)).ToArray();
-        PropertyInfo property = properties[random.Next(properties.Length)];
-        return (CharacterSprite)property.GetValue(null);
+        FieldInfo[] spriteOptions = typeof(CharacterSprite).GetFields().Where(i => i.FieldType == typeof(CharacterSprite) && i.IsStatic).ToArray();
+        FieldInfo sprite = spriteOptions[random.Next(spriteOptions.Length - 1)];
+        return (CharacterSprite)sprite.GetValue(null);
     }
 };
