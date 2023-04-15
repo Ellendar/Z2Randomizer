@@ -216,9 +216,9 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Z2Randomizer_Test"
+        "ProductName" = "8:Z2Randomizer Community Fork"
         "ProductCode" = "8:{935E97AA-E281-4D97-AD6D-B3E81E38140C}"
-        "PackageCode" = "8:{200F743B-D150-44E8-8364-548385057D2D}"
+        "PackageCode" = "8:{C6A0463C-742F-47FC-A101-92DFE0C8E136}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -753,7 +753,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_94EC71DD165A43C09436F29102CAC5DA"
             {
-            "SourcePath" = "8:..\\WindowsFormsApplication1\\obj\\Debug\\net6.0-windows7.0\\win-x64\\apphost.exe"
+            "SourcePath" = "8:..\\WindowsFormsApplication1\\obj\\Release\\net6.0-windows7.0\\win-x64\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"

@@ -36,7 +36,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="lastused" Type="System.String" Scope="User">
-      <Value Profile="(Default)">RAhN6EAAFAViN1TRtcD$rJVJqBLnjLBJWA</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="update" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
