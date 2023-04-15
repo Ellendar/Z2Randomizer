@@ -1337,7 +1337,7 @@ public class RandomizerConfiguration
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
-        properties.CharSprite = Sprite;
+        properties.CharSprite = Sprite == CharacterSprite.RANDOM ? CharacterSprite.Random() : Sprite;
         properties.TunicColor = Tunic;
         properties.ShieldColor = ShieldTunic;
         properties.UpAC1 = UpAOnController1;
@@ -1378,7 +1378,7 @@ public class RandomizerConfiguration
             properties.P7shuffle = false;
         }
 
-        if(!properties.RemoveSpellItems)
+        if(properties.RemoveSpellItems)
         {
             properties.SpellItemHints = false;
         }
