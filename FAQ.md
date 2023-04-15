@@ -19,3 +19,11 @@ Paste the old flags into the "Old flags" box and press convert. A compatable 4.1
 ## Windows is telling me this is a virus. What gives?
 
 Windows will normally flag the installer as suspicious because there is no code signing. There have been some cases where Windows Defender detects this version of the Randomizer as a Trojan. This is a false positive, but getting around it would be difficult. You can ignore these warnings and install anyway. If you are doubtful, downloading the source and building yourself will get around any security notices.
+
+## I found a bug / crash / uncompleteable seed. What should I do?
+
+Try any of these options
+
+- Post in #z2r-development on the Z2R discord. Feel free to ping me (Ellendar#2583).
+- DM me directly on discord. I may not be able to get back to you right away, but I can take a look at your issue.
+- [Submit an Issue](https://github.com/Ellendar/Z2Randomizer/issues/new) here on GitHub. 
