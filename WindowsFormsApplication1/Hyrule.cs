@@ -337,7 +337,7 @@ public class Hyrule
         {
             ROMData.UpAController1();
         }
-        if (props.UpaBox)
+        if (props.UpARestartsAtPalaces)
         {
             ROMData.Put(0x1cbba, 0x20);
             ROMData.Put(0x1cbbb, 0x9a);
@@ -2590,7 +2590,7 @@ public class Hyrule
         foreach (int l in tunicLocs)
         {
             ROMData.Put(0x10ea, (byte)c2);
-            if (props.CharSprite == CharacterSprite.LINK)
+            if ((props.CharSprite == CharacterSprite.LINK || !props.CharSprite.IsLegacy))
             {
                 if(props.TunicColor != "Default")
                 {
@@ -2743,7 +2743,7 @@ public class Hyrule
             }
         }
 
-        if (props.CharSprite == CharacterSprite.LINK && props.ShieldColor == "Default")
+        if ((props.CharSprite == CharacterSprite.LINK || !props.CharSprite.IsLegacy) && props.ShieldColor == "Default")
         {
             //Don't overwrite default shield. For custom sprite IPS base
         }

@@ -202,7 +202,7 @@ public class RandomizerConfiguration
     [IgnoreInFlags]
     public bool RemoveFlashing { get; set; }
     [IgnoreInFlags]
-    public CharacterSprite Sprite { get; set; }
+    public int Sprite { get; set; }
     [IgnoreInFlags]
     public string Tunic { get; set; }
     [IgnoreInFlags]
@@ -307,7 +307,7 @@ public class RandomizerConfiguration
         PermanmentBeamSword = false;
         UpAOnController1 = false;
         RemoveFlashing = false;
-        Sprite = CharacterSprite.LINK;
+        Sprite = 0;
         Tunic = "Default";
         ShieldTunic = "Orange";
         BeamSprite = "Default";
@@ -870,7 +870,7 @@ public class RandomizerConfiguration
 
         //These properties aren't stored in the flags, but aren't defaulted out in properties and will break if they are null.
         //Probably properties at some point should stop being a struct and default these in the right place
-        config.Sprite = CharacterSprite.LINK;
+        config.Sprite = 0;
         config.Tunic = "Default";
         config.ShieldTunic = "Orange";
         config.BeamSprite = "Default";
@@ -1209,7 +1209,7 @@ public class RandomizerConfiguration
         properties.StartGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
         properties.PalacePalette = ChangePalacePallettes;
-        properties.UpaBox = UpAOnController1;
+        properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
         properties.ShortenGP = ShortGP == null ? random.Next(2) == 1 : (bool)ShortGP;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
@@ -1337,7 +1337,7 @@ public class RandomizerConfiguration
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
-        properties.CharSprite = Sprite == CharacterSprite.RANDOM ? CharacterSprite.Random() : Sprite;
+        properties.CharSprite = CharacterSprite.ByIndex(Sprite);
         properties.TunicColor = Tunic;
         properties.ShieldColor = ShieldTunic;
         properties.UpAC1 = UpAOnController1;
