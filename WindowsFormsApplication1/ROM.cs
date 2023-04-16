@@ -269,8 +269,12 @@ public class ROM
          * that we can save in external files so they can be imported from a simple format people can use to customize all
          * the cosmetics.
          */
-        
-        if (!charSprite.Equals(CharacterSprite.LINK))
+
+        if (charSprite.Equals(CharacterSprite.LINK))
+        {
+            //Do nothing now.
+        }
+        else if (charSprite.IsLegacy)
         {
             List<int[]> spriteInfo = Graphics.sprites[charSprite];
 
@@ -389,6 +393,12 @@ public class ROM
             {
                 Put(0x31450 + i, (byte)raft[i]);
             }
+        }
+        //Non-legacy ips-based sprites
+        else
+        {
+            IpsPatcher patcher = new();
+            patcher.Patch(ROMData, charSprite.Path);
         }
 
         if(charSprite == CharacterSprite.SAMUS)

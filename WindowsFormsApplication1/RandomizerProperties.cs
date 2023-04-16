@@ -88,7 +88,7 @@ public class RandomizerProperties
     public int StartGems { get; set; }
     public bool RequireTbird { get; set; }
     public bool PalacePalette { get; set; }
-    public bool UpaBox { get; set; }
+    public bool UpARestartsAtPalaces { get; set; }
     public bool ShortenGP { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }

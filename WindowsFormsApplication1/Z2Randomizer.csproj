@@ -84,6 +84,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Update="Sprites\Black_Mage.ips">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="WinSparkle.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -93,5 +96,8 @@
     <None Update="WinSparkle_0_8_0_x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sprites\" />
   </ItemGroup>
 </Project>

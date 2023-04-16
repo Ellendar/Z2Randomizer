@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -16,30 +17,88 @@ namespace Z2Randomizer;
 public class CharacterSprite
 {
     public int SelectionIndex { get; private set; }
-    public CharacterSprite(int selectionIndex)
+    public string DisplayName { get; private set; }
+    public string Path { get; private set; }
+    public bool IsLegacy { get; private set; }
+    public CharacterSprite(int selectionIndex, string displayName, bool isLegacy, string path)
     {
-        SelectionIndex= selectionIndex;
+        SelectionIndex = selectionIndex;
+        DisplayName = displayName;
+        IsLegacy = isLegacy;
+        Path = path;
     }
 
-    public static readonly CharacterSprite LINK = new CharacterSprite(0);
-    public static readonly CharacterSprite ZELDA = new CharacterSprite(1);
-    public static readonly CharacterSprite IRON_KNUCKLE = new CharacterSprite(2);
-    public static readonly CharacterSprite ERROR = new CharacterSprite(3);
-    public static readonly CharacterSprite SAMUS = new CharacterSprite(4);
-    public static readonly CharacterSprite SIMON = new CharacterSprite(5);
-    public static readonly CharacterSprite STALFOS = new CharacterSprite(6);
-    public static readonly CharacterSprite VASE_LADY = new CharacterSprite(7);
-    public static readonly CharacterSprite RUTO = new CharacterSprite(8);
-    public static readonly CharacterSprite YOSHI = new CharacterSprite(9);
-    public static readonly CharacterSprite DRAGONLORD = new CharacterSprite(10);
-    public static readonly CharacterSprite MIRIA = new CharacterSprite(11);
-    public static readonly CharacterSprite CRYSTALIS = new CharacterSprite(12);
-    public static readonly CharacterSprite TACO = new CharacterSprite(13);
-    public static readonly CharacterSprite PYRAMID = new CharacterSprite(14);
-    public static readonly CharacterSprite LADY_LINK = new CharacterSprite(15);
-    public static readonly CharacterSprite HOODIE_LINK = new CharacterSprite(16);
-    public static readonly CharacterSprite GLITCH_WITCH = new CharacterSprite(17);
-    public static readonly CharacterSprite RANDOM = new CharacterSprite(18);
+    public CharacterSprite(int selectionIndex, string displayName, bool isLegacy) : this(selectionIndex, displayName, isLegacy, null)
+    {
+
+    }
+
+    public static readonly CharacterSprite LINK = new CharacterSprite(0, "Link", true);
+    public static readonly CharacterSprite ZELDA = new CharacterSprite(1, "Zelda", true);
+    public static readonly CharacterSprite IRON_KNUCKLE = new CharacterSprite(2, "Iron Knuckle", true);
+    public static readonly CharacterSprite ERROR = new CharacterSprite(3, "Error", true);
+    public static readonly CharacterSprite SAMUS = new CharacterSprite(4, "Samus", true);
+    public static readonly CharacterSprite SIMON = new CharacterSprite(5, "Simon", true);
+    public static readonly CharacterSprite STALFOS = new CharacterSprite(6, "Stalfos", true);
+    public static readonly CharacterSprite VASE_LADY = new CharacterSprite(7, "Vase Lady", true);
+    public static readonly CharacterSprite RUTO = new CharacterSprite(8, "Ruto", true);
+    public static readonly CharacterSprite YOSHI = new CharacterSprite(9, "Yoshi", true);
+    public static readonly CharacterSprite DRAGONLORD = new CharacterSprite(10, "Dragonlord", true);
+    public static readonly CharacterSprite MIRIA = new CharacterSprite(11, "Miria", true);
+    public static readonly CharacterSprite CRYSTALIS = new CharacterSprite(12, "Crystalis", true);
+    public static readonly CharacterSprite TACO = new CharacterSprite(13, "Taco", true);
+    public static readonly CharacterSprite PYRAMID = new CharacterSprite(14, "Pyramid", true);
+    public static readonly CharacterSprite LADY_LINK = new CharacterSprite(15, "Lady Link", true);
+    public static readonly CharacterSprite HOODIE_LINK = new CharacterSprite(16, "Hoodie Link", true);
+    public static readonly CharacterSprite GLITCH_WITCH = new CharacterSprite(17, "GliitchWitch", true);
+
+    public static List<CharacterSprite> Options()
+    {
+        List<CharacterSprite> options = new List<CharacterSprite>()
+        {
+            LINK,
+            ZELDA,
+            IRON_KNUCKLE,
+            ERROR,
+            SAMUS,
+            SIMON,
+            STALFOS,
+            VASE_LADY,
+            RUTO,
+            YOSHI,
+            DRAGONLORD,
+            MIRIA,
+            CRYSTALIS,
+            TACO,
+            PYRAMID,
+            LADY_LINK,
+            HOODIE_LINK,
+            GLITCH_WITCH
+        };
+
+        if (Directory.Exists("Sprites"))
+        {
+            foreach (string spritePath in Directory.GetFiles("Sprites", "*.ips"))
+            {
+                string parsedName = System.IO.Path.GetFileNameWithoutExtension(spritePath).Replace("_", " ");
+                options.Add(new CharacterSprite(options.Count, parsedName, false, spritePath));
+            }
+        }
+
+        options.Add(new CharacterSprite(options.Count, "Random", false));
+
+        return options;
+    }
+
+    public static CharacterSprite ByIndex(int index)
+    {
+        List<CharacterSprite> options = Options();
+        if(index == options.Count - 1)
+        {
+            return Random();
+        }
+        return options[index];
+    }
 
     public static CharacterSprite Random()
     {

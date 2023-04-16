@@ -40,6 +40,11 @@ public partial class MainUI : Form
         validFlagStringLength = new RandomizerConfiguration().Serialize().Length;
 
         InitializeComponent();
+        characterSpriteList.Items.Clear();
+        foreach(CharacterSprite sprite in CharacterSprite.Options())
+        {
+            characterSpriteList.Items.Add(sprite.DisplayName);
+        }
         r = new Random();
         startHeartsMinList.SelectedIndex = 3;
         startHeartsMinList.SelectedIndex = 3;
@@ -201,6 +206,8 @@ public partial class MainUI : Form
 
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
+        
+        
         EnableLevelScaling(null, null);
         EastBiome_SelectedIndexChanged(null, null);
         randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.RandomizeDropsChanged);
@@ -781,29 +788,8 @@ public partial class MainUI : Form
         configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
         configuration.UseCustomRooms = useCustomRoomsBox.Checked;
-        configuration.Sprite = characterSpriteList.SelectedIndex switch
-        {
-            0 => CharacterSprite.LINK,
-            1 => CharacterSprite.ZELDA,
-            2 => CharacterSprite.IRON_KNUCKLE,
-            3 => CharacterSprite.ERROR,
-            4 => CharacterSprite.SAMUS,
-            5 => CharacterSprite.SIMON,
-            6 => CharacterSprite.STALFOS,
-            7 => CharacterSprite.VASE_LADY,
-            8 => CharacterSprite.RUTO,
-            9 => CharacterSprite.YOSHI,
-            10 => CharacterSprite.DRAGONLORD,
-            11 => CharacterSprite.MIRIA,
-            12 => CharacterSprite.CRYSTALIS,
-            13 => CharacterSprite.TACO,
-            14 => CharacterSprite.PYRAMID,
-            15 => CharacterSprite.LADY_LINK,
-            16 => CharacterSprite.HOODIE_LINK,
-            17 => CharacterSprite.GLITCH_WITCH,
-            18 => CharacterSprite.RANDOM,
-            _ => CharacterSprite.LINK
-        };
+        configuration.Sprite = characterSpriteList.SelectedIndex;
+        
         configuration.Tunic = tunicColorList.GetItemText(tunicColorList.SelectedItem);
         configuration.ShieldTunic = shieldColorList.GetItemText(shieldColorList.SelectedItem);
         configuration.BeamSprite = beamSpriteList.GetItemText(beamSpriteList.SelectedItem);
