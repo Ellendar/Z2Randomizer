@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Newtonsoft.Json.Linq;
+using NLog;
 using NLog.Fluent;
 using System;
 using System.CodeDom;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -3881,6 +3883,8 @@ public class Hyrule
         ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
         ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
 
+        AddCropGuideBoxesToFileSelect(ROMData);
+
         //Update raft animation
         bool firstRaft = false;
         foreach(World w in worlds)
@@ -4210,4 +4214,121 @@ public class Hyrule
         }
     }
 
+    /// <summary>
+    /// Simple conversion routine that converts from a PRG rom address to CPU address.
+    /// </summary>
+    /// <param name="addr"></param>
+    /// <returns></returns>
+    private byte[] PrgToCpuAddr(int addr)
+    {
+        ushort banksize = 0x4000;
+        byte bank = (byte)(addr / banksize);
+        // If the bank is the last bank, then its the fixed bank and all pointers start from 0xc000 instead
+        ushort cpuOffset = (ushort) (bank == 7 ? 0xc000 : 0x8000);
+        ushort val = (ushort)(addr - (bank * banksize) + cpuOffset);
+        return new byte[] { (byte)(val & 0xff), (byte)(val >> 8) };
+    }
+
+    private void AddCropGuideBoxesToFileSelect(ROM rom)
+    {
+        byte hasINes = 0x10;
+
+        var freeAddr = 0x17da2;
+        var hookTitleScreenDraw = 0x1728d;
+        byte whiteTile = 0xfd;
+        byte blueTile = 0xfe;
+        var addr = PrgToCpuAddr(freeAddr);
+
+        // Hook into the title screen drawing to redirect it to our custom draw routine.
+        rom.Put(hasINes + hookTitleScreenDraw, new byte[] { 0x20, addr[0], addr[1] }); // replace sta $0726 with jsr $BDB1 ; CustomFileSelectUpdates
+
+        // and add the custom write code to the free space
+        rom.Put(hasINes + freeAddr, new byte[]
+        {
+            // CustomFileSelectUpdates:
+            0xc0, 0x01,       //  cpy #$02
+            0xf0, 0x04,       //  beq Skip
+            0x8d, 0x26, 0x07, //    sta $0726  ; perform the original hooked code before exiting
+            0x60,             //    rts
+            // Skip:
+            0xa2, 0x20,       //  ldx #$20     ; copy 32 + 1 bytes of data from the rom (+1 for terminator)
+            // Loop:
+            0xbd, 0xc0, 0xbd, //  lda CustomFileSelectData,x
+            0x9d, 0x02, 0x03, //  sta $0302,x
+            0xca,             //  dex
+            0x10, 0xf7,       //  bpl Loop    ; while x >= 0
+            0xa9, 0x00,       //  lda #0    ; use the draw handler for $302
+            0x8d, 0x25, 0x07, //  sta $0725 ; tell the code to draw from $302
+            0xee, 0x3e, 0x07, //  inc $073E ; increase the "state" count
+            0x68,             //  pla       ; we need to double return here to break out of the hook and the calling function
+            0x68,             //  pla
+            0x60,             //  rts
+            // CustomFileSelectData:
+            0x20, 0x00, 0x01, whiteTile,
+            0x20, 0x1f, 0x01, whiteTile,
+            0x23, 0xa0, 0x01, whiteTile,
+            0x23, 0xbf, 0x01, whiteTile,
+            0x20, 0x21, 0x01, blueTile,
+            0x20, 0x3e, 0x01, blueTile,
+            0x23, 0x81, 0x01, blueTile,
+            0x23, 0x9e, 0x01, blueTile,
+            0xff
+        });
+    }
+
+    private byte[] StringToZ2Bytes(string text)
+    {
+        return text.Select(letter => {
+            return CharMap.TryGetValue(letter, out var byt) ? byt : (byte)0xfc;
+        }).ToArray();
+    }
+
+    private static IDictionary<char, byte> CharMap = new Dictionary<char, byte>()
+    {
+        { '$', 0xc9 }, // sword
+        { '#', 0xca }, // filled box
+        { '=', 0xcb }, // horizontal border
+        { '|', 0xcc }, // vertical border
+        { '+', 0xcd }, // gem
+        { '/', 0xce },
+        { '.', 0xcf },
+        { '0', 0xd0 },
+        { '1', 0xd1 },
+        { '2', 0xd2 },
+        { '3', 0xd3 },
+        { '4', 0xd4 },
+        { '5', 0xd5 },
+        { '6', 0xd6 },
+        { '7', 0xd7 },
+        { '8', 0xd8 },
+        { '9', 0xd9 },
+        { 'A', 0xda },
+        { 'B', 0xdb },
+        { 'C', 0xdc },
+        { 'D', 0xdd },
+        { 'E', 0xde },
+        { 'F', 0xdf },
+        { 'G', 0xe0 },
+        { 'H', 0xe1 },
+        { 'I', 0xe2 },
+        { 'J', 0xe3 },
+        { 'K', 0xe4 },
+        { 'L', 0xe5 },
+        { 'M', 0xe6 },
+        { 'N', 0xe7 },
+        { 'O', 0xe8 },
+        { 'P', 0xe9 },
+        { 'Q', 0xea },
+        { 'R', 0xeb },
+        { 'S', 0xec },
+        { 'T', 0xed },
+        { 'U', 0xee },
+        { 'V', 0xef },
+        { 'W', 0xf0 },
+        { 'X', 0xf1 },
+        { 'Y', 0xf2 },
+        { 'Z', 0xf3 },
+        { ' ', 0xf4 },
+        { '-', 0xf6 },
+    };
 }
