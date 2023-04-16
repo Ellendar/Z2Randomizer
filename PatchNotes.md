@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 4.1.1 - April 16th, 2023
+## Version 4.1.2 - April 16th, 2023
 - Added the ability to sideload more sprites. Add some IPS patches to the Sprites folder and they will show up in the sprites list when you launch the randomizer and be applied when you generate the rom.
 
 ## Version 4.1.1 - April 15th, 2023
