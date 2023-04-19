@@ -14,9 +14,4 @@
     <EnableSecurityDebugging>false</EnableSecurityDebugging>
     <_LastSelectedProfileId>C:\Workspace\Z2Randomizer\RandomizerCore\Properties\PublishProfiles\ProdPublishProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
 </Project>

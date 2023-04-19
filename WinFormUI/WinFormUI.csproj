@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NoWin32Manifest>true</NoWin32Manifest>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<UseApplicationTrust>false</UseApplicationTrust>
+    <StartupObject>Z2Randomizer.WinFormUI.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="UI\GenerateBatchForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -36,6 +45,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <Generator>SettingsSingleFileGenerator</Generator>
+    </None>
     <None Update="WinSparkle_0_8_0_x32.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
