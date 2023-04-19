@@ -8,45 +8,44 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Z2Randomizer
-{
-    public partial class GenerateBatchForm : Form
-    {
-        public int numSeeds;
-        public GenerateBatchForm()
-        {
-            numSeeds = -1;
-            InitializeComponent();
-            this.AcceptButton = button1;
-        }
+namespace Z2Randomizer.WinFormUI;
 
-        private void button1_Click(object sender, EventArgs e)
+public partial class GenerateBatchForm : Form
+{
+    public int numSeeds;
+    public GenerateBatchForm()
+    {
+        numSeeds = -1;
+        InitializeComponent();
+        this.AcceptButton = button1;
+    }
+
+    private void button1_Click(object sender, EventArgs e)
+    {
+        try
         {
-            try
-            {
-                int x = Int32.Parse(textBox1.Text);
-                if(x <= 0)
-                {
-                    MessageBox.Show("Please enter a number greater than 0!");
-                    return;
-                }
-                numSeeds = x;
-                Close();
-            }
-            catch (Exception ex)
+            int x = Int32.Parse(textBox1.Text);
+            if(x <= 0)
             {
                 MessageBox.Show("Please enter a number greater than 0!");
+                return;
             }
+            numSeeds = x;
+            Close();
         }
-
-        private int getNumSeeds()
+        catch (Exception ex)
         {
-            return numSeeds;
+            MessageBox.Show("Please enter a number greater than 0!");
         }
+    }
 
-        private void GenerateBatchForm_Load(object sender, EventArgs e)
-        {
+    private int getNumSeeds()
+    {
+        return numSeeds;
+    }
 
-        }
+    private void GenerateBatchForm_Load(object sender, EventArgs e)
+    {
+
     }
 }

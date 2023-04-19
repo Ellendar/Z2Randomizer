@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer;
 
-internal class ImpossibleException : Exception
+public class ImpossibleException : Exception
 {
     public ImpossibleException() : base()
     {

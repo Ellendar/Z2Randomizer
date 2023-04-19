@@ -1,16 +1,10 @@
 ﻿using NLog;
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
-using Z2Randomizer.Flags;
 using Z2Randomizer.Overworld;
-using Z2Randomizer.UI;
+using Z2Randomizer;
 
-namespace Z2Randomizer;
+namespace Z2Randomizer.WinFormUI;
 
 public partial class MainUI : Form
 {
