@@ -2,18 +2,14 @@
 using NLog;
 using NLog.Fluent;
 using System;
-using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Intrinsics.Arm;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Z2Randomizer.Overworld;
 using Z2Randomizer.Sidescroll;
 
@@ -535,9 +531,9 @@ public class Hyrule
         MD5 hasher = MD5.Create();
         byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
             Flags + 
-            Seed + 
-            typeof(MainUI).Assembly.GetName().Version.Major + 
-            typeof(MainUI).Assembly.GetName().Version.Minor +
+            Seed +
+            Assembly.GetExecutingAssembly().GetName().Version.Major +
+            Assembly.GetExecutingAssembly().GetName().Version.Minor +
             File.ReadAllText(config.GetRoomsFile())
         ));
         UpdateRom(hash);
