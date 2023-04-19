@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="UI\1st.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="UI\1st.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="UI\GenerateBatchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\GeneratingSeedsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\MainUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\WinSparkle.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="WinSparkle_0_8_0_x32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="WinSparkle_0_8_0_x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
