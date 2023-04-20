@@ -109,6 +109,7 @@ public class RandomizerConfiguration
     public int PalacesToCompleteMin { get; set; }
     [Limit(7)]
     public int PalacesToCompleteMax { get; set; }
+    public bool? NoDuplicateRooms { get; set; }
 
     //Levels
     public bool ShuffleAttackExperience { get; set; }
@@ -132,10 +133,9 @@ public class RandomizerConfiguration
     public bool ShuffleLifeRefillAmount { get; set; }
     public bool? ShuffleSpellLocations { get; set; }
     public bool? DisableMagicContainerRequirements { get; set; }
-    public bool CombineFireWithRandomSpell { get; set; }
     public bool? RandomizeSpellSpellEnemy { get; set; }
-    public bool? ReplaceFireWithDash { get; set; }
     public bool? SwapUpAndDownStab { get; set; }
+    public FireOption FireOption { get; set; }
 
     //Enemies
     public bool? ShuffleOverworldEnemies { get; set; }
@@ -436,7 +436,7 @@ public class RandomizerConfiguration
         config.StartWithLife = bits[2];
         config.StartWithFairy = bits[3];
         config.StartWithFire = bits[4];
-        config.CombineFireWithRandomSpell = bits[5];
+        bool mergeFireWithRandomSpell = bits[5];
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
         config.StartWithReflect = bits[0];
@@ -514,7 +514,19 @@ public class RandomizerConfiguration
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
         config.PermanmentBeamSword = bits[0];
         config.ShuffleDripperEnemy = bits[1];
-        config.ReplaceFireWithDash = bits[2];
+        bool replaceFireWithDash = bits[2];
+        if(replaceFireWithDash)
+        {
+            config.FireOption = FireOption.REPLACE_WITH_DASH;
+        }
+        else if(mergeFireWithRandomSpell)
+        {
+            config.FireOption = FireOption.PAIR_WITH_RANDOM;
+        }
+        else
+        {
+            config.FireOption = FireOption.NORMAL;
+        }
         config.ShuffleEnemyHP = bits[3];
         //ShuffleAllExp = bits[4];
         config.ShufflePalaceEnemies = bits[5];
@@ -1030,8 +1042,39 @@ public class RandomizerConfiguration
         properties.StartReflect = !StartWithReflect && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithReflect;
         properties.StartSpell = !StartWithSpell && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithSpell;
         properties.StartThunder = !StartWithThunder && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithThunder;
-        properties.CombineFire = CombineFireWithRandomSpell;
-        properties.DashSpell = ReplaceFireWithDash == null ? random.Next(2) == 1 : (bool)ReplaceFireWithDash;
+        switch(FireOption)
+        {
+            case FireOption.NORMAL:
+                properties.CombineFire = false;
+                properties.DashSpell = false;
+            break;
+            case FireOption.PAIR_WITH_RANDOM:
+                properties.CombineFire = true;
+                properties.DashSpell = false;
+                break;
+            case FireOption.REPLACE_WITH_DASH:
+                properties.CombineFire = false;
+                properties.DashSpell = true;
+                break;
+            case FireOption.RANDOM:
+                switch(random.Next(3))
+                {
+                    case 0:
+                        properties.CombineFire = false;
+                        properties.DashSpell = false;
+                        break;
+                    case 1:
+                        properties.CombineFire = true;
+                        properties.DashSpell = false;
+                        break;
+                    case 2:
+                        properties.CombineFire = false;
+                        properties.DashSpell = true;
+                        break;
+
+                }
+            break; 
+        }
 
         //Other starting attributes
         int startHeartsMin, startHeartsMax;
@@ -1216,6 +1259,7 @@ public class RandomizerConfiguration
         properties.UseCommunityRooms = IncludeCommunityRooms == null ? random.Next(2) == 1 : (bool)IncludeCommunityRooms;
         properties.BlockersAnywhere = BlockingRoomsInAnyPalace ;
         properties.BossRoomConnect = BossRoomsExitToPalace == null ? random.Next(2) == 1 : (bool)BossRoomsExitToPalace;
+        properties.NoDuplicateRooms = NoDuplicateRooms == null ? random.Next(2) == 1 : (bool)NoDuplicateRooms;
 
         //Enemies
         properties.ShuffleEnemyHP = ShuffleEnemyHP;

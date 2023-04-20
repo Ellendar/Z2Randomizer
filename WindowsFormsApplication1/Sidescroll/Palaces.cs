@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Z2Randomizer.Util;
 
 namespace Z2Randomizer.Sidescroll;
 
@@ -42,12 +43,14 @@ public class Palaces
 
     public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData)
     {
+        IEqualityComparer<byte[]> byteArrayEqualityComparer = new StandardByteArrayEqualityComparer();
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
             throw new Exception("Couldn't find CustomRooms.json. Please create the file or disable custom rooms on the misc tab.");
         }
         List<Palace> palaces = new List<Palace>();
         List<Room> roomPool = new List<Room>();
+        List<Room> gpRoomPool = new List<Room>();
         Dictionary<byte[], List<Room>> sideviews = new Dictionary<byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
         Dictionary<byte[], List<Room>> sideviewsgp = new Dictionary<byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
         int enemyBytes = 0;
@@ -77,6 +80,20 @@ public class Palaces
                 roomPool.AddRange(PalaceRooms.EasternShadow(props.UseCustomRooms));
                 roomPool.AddRange(PalaceRooms.EunosRooms(props.UseCustomRooms));
             }
+
+            gpRoomPool.AddRange(PalaceRooms.Palace7Vanilla(props.UseCustomRooms));
+            if (props.UseCommunityRooms)
+            {
+                gpRoomPool.AddRange(PalaceRooms.Link7777RoomJam(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.GTMNewGpRooms(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.GTMOldGPRooms(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.WinterSolsticeGP(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.EonRoomJam(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.TriforceOfCourageGP(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.EunosGpRooms(props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.FlippedGP(props.UseCustomRooms));
+
+            }
             int[] sizes = new int[7];
 
             sizes[0] = r.Next(10, 17);
@@ -95,7 +112,7 @@ public class Palaces
                 sizes[6] = r.Next(54, 60);
             }
 
-            for (int i = 1; i < 8; i++)
+            for (int currentPalace = 1; currentPalace < 8; currentPalace++)
             {
 
                 Palace palace;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
@@ -114,7 +131,8 @@ public class Palaces
                     //bool done = false;
                     do
                     {
-                        mapNo = i switch
+                        List<Room> palaceRoomPool = new List<Room>(currentPalace == 7 ? gpRoomPool : roomPool);
+                        mapNo = currentPalace switch
                         {
                             1 => 0,
                             2 => palaces[0].AllRooms.Count,
@@ -125,24 +143,24 @@ public class Palaces
                             _ => 0
                         };
 
-                        if (i == 7)
+                        if (currentPalace == 7)
                         {
                             mapNoGp = 0;
                         }
 
-                        palace = new Palace(i, palaceAddr[i], palaceConnectionLocs[i]);
-                        palace.Root = PalaceRooms.Entrances(props.UseCustomRooms)[i - 1].DeepCopy();
+                        palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace]);
+                        palace.Root = PalaceRooms.Entrances(props.UseCustomRooms)[currentPalace - 1].DeepCopy();
                         palace.Root.IsRoot = true;
 
-                        palace.BossRoom = SelectBossRoom(i, r, props.UseCustomRooms);
+                        palace.BossRoom = SelectBossRoom(currentPalace, r, props.UseCustomRooms);
 
                         palace.AllRooms.Add(palace.Root);
 
                         palace.AllRooms.Add(palace.BossRoom);
-                        if (i < 7) //Not GP
+                        if (currentPalace < 7) //Not GP
                         {
                             palace.ItemRoom = SelectItemRoom(r, props.UseCustomRooms);
-                            if ((i == 1 || i == 2 || i == 5) && palace.ItemRoom.HasBoss)
+                            if ((currentPalace == 1 || currentPalace == 2 || currentPalace == 5) && palace.ItemRoom.HasBoss)
                             {
                                 palace.ItemRoom.Enemies[1] = 0x6C;
                             }
@@ -150,21 +168,21 @@ public class Palaces
                             palace.AllRooms.Add(palace.ItemRoom);
 
                             palace.Root.NewMap = mapNo;
-                            IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             palace.BossRoom.NewMap = mapNo;
                             if (props.BossRoomConnect)
                             {
                                 palace.BossRoom.RightByte = 0x69;
                             }
-                            IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             palace.ItemRoom.NewMap = mapNo;
-                            palace.ItemRoom.SetItem((Item)i);
-                            IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                            palace.ItemRoom.SetItem((Item)currentPalace);
+                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             if (palace.ItemRoom.Map == 69)
                             {
                                 Room extra = PalaceRooms.MaxBonusItemRoom(props.UseCustomRooms).DeepCopy();
                                 extra.NewMap = palace.ItemRoom.NewMap;
-                                extra.SetItem((Item)i);
+                                extra.SetItem((Item)currentPalace);
                                 palace.AllRooms.Add(extra);
                                 palace.SortRoom(extra);
                                 palace.SetOpenRoom(extra);
@@ -177,9 +195,9 @@ public class Palaces
                         else //GP
                         {
                             palace.Root.NewMap = mapNoGp;
-                            IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             palace.BossRoom.NewMap = mapNoGp;
-                            IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             palace.SortRoom(palace.Root);
                             palace.SortRoom(palace.BossRoom);
                             //thunderbird?
@@ -187,7 +205,7 @@ public class Palaces
                             {
                                 palace.Tbird = PalaceRooms.TBirdRooms(props.UseCustomRooms)[r.Next(PalaceRooms.TBirdRooms(props.UseCustomRooms).Count)].DeepCopy();
                                 palace.Tbird.NewMap = mapNoGp;
-                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                                 palace.SortRoom(palace.Tbird);
                                 palace.AllRooms.Add(palace.Tbird);
                             }
@@ -196,30 +214,31 @@ public class Palaces
                         }
 
 
-                        palace.MaxRooms = sizes[i - 1];
+                        palace.MaxRooms = sizes[currentPalace - 1];
                         //add rooms
-                        if (i == 7)
+                        if (currentPalace == 7)
                         {
-                            roomPool.Clear();
-                            roomPool.AddRange(PalaceRooms.Palace7Vanilla(props.UseCustomRooms));
-                            if (props.UseCommunityRooms)
-                            {
-                                roomPool.AddRange(PalaceRooms.Link7777RoomJam(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.GTMNewGpRooms(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.GTMOldGPRooms(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.WinterSolsticeGP(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.EonRoomJam(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.TriforceOfCourageGP(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.EunosGpRooms(props.UseCustomRooms));
-                                roomPool.AddRange(PalaceRooms.FlippedGP(props.UseCustomRooms));
 
-                            }
                         }
                         bool dropped = false;
                         while (palace.AllRooms.Count < palace.MaxRooms)
                         {
-                            Room roomToAdd = roomPool[r.Next(roomPool.Count)].DeepCopy();
-                            if (i < 7)
+                            int roomIndex = r.Next(palaceRoomPool.Count);
+                            Room roomToAdd = palaceRoomPool[roomIndex].DeepCopy();
+                            if(props.NoDuplicateRooms)
+                            {
+                                palaceRoomPool.RemoveAt(roomIndex);
+                                Room duplicateRoom = palace.AllRooms.FirstOrDefault(i =>
+                                    byteArrayEqualityComparer.Equals(roomToAdd.SideView, i.SideView)
+                                    && byteArrayEqualityComparer.Equals(roomToAdd.Enemies, i.Enemies)
+                                    && i.Enemies.Length > 1);
+                                if (duplicateRoom != null
+                                )
+                                {
+                                    continue;
+                                }
+                            }
+                            if (currentPalace < 7)
                             {
                                 roomToAdd.NewMap = mapNo;
                             }
@@ -230,7 +249,7 @@ public class Palaces
                             bool added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
                             if (added)
                             {
-                                IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                                IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                                 if (roomToAdd.HasDrop && !dropped)
                                 {
                                     int numDrops = r.Next(Math.Min(3, palace.MaxRooms - palace.AllRooms.Count), Math.Min(6, palace.MaxRooms - palace.AllRooms.Count));
@@ -239,12 +258,12 @@ public class Palaces
                                     int dropPlacementFailures = 0;
                                     while (j < numDrops && lastDrop)
                                     {
-                                        Room dropZoneRoom = roomPool[r.Next(roomPool.Count)].DeepCopy();
+                                        Room dropZoneRoom = palaceRoomPool[r.Next(palaceRoomPool.Count)].DeepCopy();
                                         while (!dropZoneRoom.IsDropZone)
                                         {
-                                            dropZoneRoom = roomPool[r.Next(roomPool.Count)].DeepCopy();
+                                            dropZoneRoom = palaceRoomPool[r.Next(palaceRoomPool.Count)].DeepCopy();
                                         }
-                                        if (i < 7)
+                                        if (currentPalace < 7)
                                         {
                                             dropZoneRoom.NewMap = mapNo;
                                         }
@@ -255,7 +274,7 @@ public class Palaces
                                         bool added2 = palace.AddRoom(dropZoneRoom, props.BlockersAnywhere);
                                         if (added2)
                                         {
-                                            IncrementMapNo(ref mapNo, ref mapNoGp, i);
+                                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                                             lastDrop = dropZoneRoom.HasDrop;
                                             j++;
                                         }
@@ -289,7 +308,7 @@ public class Palaces
 
                     palace.ShuffleRooms(r);
                     bool reachable = palace.AllReachable();
-                    while ((!reachable || (i == 7 && (props.RequireTbird && !palace.RequiresThunderbird())) || palace.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
+                    while ((!reachable || (currentPalace == 7 && (props.RequireTbird && !palace.RequiresThunderbird())) || palace.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
                     {
                         palace.ResetRooms();
                         palace.ShuffleRooms(r);
@@ -302,7 +321,7 @@ public class Palaces
                 palaces.Add(palace);
                 foreach (Room room in palace.AllRooms)
                 {
-                    if (i != 7)
+                    if (currentPalace != 7)
                     {
 
                         enemyBytes += room.Enemies.Length;

@@ -41,7 +41,7 @@ public partial class MainUI : Form
 
         InitializeComponent();
         characterSpriteList.Items.Clear();
-        foreach(CharacterSprite sprite in CharacterSprite.Options())
+        foreach (CharacterSprite sprite in CharacterSprite.Options())
         {
             characterSpriteList.Items.Add(sprite.DisplayName);
         }
@@ -157,7 +157,7 @@ public partial class MainUI : Form
         restartAtPalacesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shortGPCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         randomizeJarRequirementsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        combineFireCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        FireSpellBox.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         alwaysBeamCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         includePbagCavesInShuffleCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -200,14 +200,14 @@ public partial class MainUI : Form
         includeCommunityRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         blockingRoomsInAnyPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        useDashCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
 
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
-        
-        
+
+
         EnableLevelScaling(null, null);
         EastBiome_SelectedIndexChanged(null, null);
         randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.RandomizeDropsChanged);
@@ -667,6 +667,7 @@ public partial class MainUI : Form
         configuration.RandomizeBossItemDrop = randomizeBossItemCheckbox.Checked;
         configuration.PalacesToCompleteMin = startingGemsMinList.SelectedIndex;
         configuration.PalacesToCompleteMax = startingGemsMaxList.SelectedIndex;
+        configuration.NoDuplicateRooms = GetTripleCheckState(noDuplicateRoomsCheckbox);
 
         //Levels
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
@@ -714,10 +715,16 @@ public partial class MainUI : Form
         configuration.ShuffleLifeRefillAmount = shuffleLifeRefillCheckbox.Checked;
         configuration.ShuffleSpellLocations = GetTripleCheckState(shuffleSpellLocationsCheckbox);
         configuration.DisableMagicContainerRequirements = GetTripleCheckState(disableMagicContainerRequirementCheckbox);
-        configuration.CombineFireWithRandomSpell = combineFireCheckbox.Checked;
         configuration.RandomizeSpellSpellEnemy = GetTripleCheckState(randomizeSpellSpellEnemyCheckbox);
-        configuration.ReplaceFireWithDash = GetTripleCheckState(useDashCheckbox);
         configuration.SwapUpAndDownStab = GetTripleCheckState(swapUpAndDownstabCheckbox);
+        configuration.FireOption = FireSpellBox.SelectedIndex switch
+        {
+            0 => FireOption.NORMAL,
+            1 => FireOption.PAIR_WITH_RANDOM,
+            2 => FireOption.REPLACE_WITH_DASH,
+            3 => FireOption.RANDOM,
+            _ => throw new Exception("Unrecognized FireOption selection state")
+        };
 
         //Enemies
         configuration.ShuffleOverworldEnemies = GetTripleCheckState(shuffleOverworldEnemiesCheckbox);
@@ -789,7 +796,7 @@ public partial class MainUI : Form
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
         configuration.UseCustomRooms = useCustomRoomsBox.Checked;
         configuration.Sprite = characterSpriteList.SelectedIndex;
-        
+
         configuration.Tunic = tunicColorList.GetItemText(tunicColorList.SelectedItem);
         configuration.ShieldTunic = shieldColorList.GetItemText(shieldColorList.SelectedItem);
         configuration.BeamSprite = beamSpriteList.GetItemText(beamSpriteList.SelectedItem);
@@ -1016,6 +1023,7 @@ public partial class MainUI : Form
             randomizeBossItemCheckbox.Checked = configuration.RandomizeBossItemDrop;
             startingGemsMinList.SelectedIndex = configuration.PalacesToCompleteMin;
             startingGemsMaxList.SelectedIndex = configuration.PalacesToCompleteMax;
+            noDuplicateRoomsCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRooms);
 
             //Levels
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
@@ -1067,10 +1075,16 @@ public partial class MainUI : Form
             shuffleLifeRefillCheckbox.Checked = configuration.ShuffleLifeRefillAmount;
             shuffleSpellLocationsCheckbox.CheckState = ToCheckState(configuration.ShuffleSpellLocations);
             disableMagicContainerRequirementCheckbox.CheckState = ToCheckState(configuration.DisableMagicContainerRequirements);
-            combineFireCheckbox.Checked = configuration.CombineFireWithRandomSpell;
             randomizeSpellSpellEnemyCheckbox.CheckState = ToCheckState(configuration.RandomizeSpellSpellEnemy);
-            useDashCheckbox.CheckState = ToCheckState(configuration.ReplaceFireWithDash);
             swapUpAndDownstabCheckbox.CheckState = ToCheckState(configuration.SwapUpAndDownStab);
+            FireSpellBox.SelectedIndex = configuration.FireOption switch
+            {
+                FireOption.NORMAL => 0,
+                FireOption.PAIR_WITH_RANDOM => 1,
+                FireOption.REPLACE_WITH_DASH => 2,
+                FireOption.RANDOM => 3,
+                _ => throw new Exception("Unrecognized FireOption")
+            };
 
             //Enemies
             shuffleOverworldEnemiesCheckbox.CheckState = ToCheckState(configuration.ShuffleOverworldEnemies);
@@ -1250,7 +1264,7 @@ public partial class MainUI : Form
 
     private void RandomPercentFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = new("hEAK0sALvrpUWVXu2kg$o6rWX@4X4yAASh");
+        RandomizerConfiguration config = new("hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy");
         flagsTextBox.Text = config.Serialize();
     }
 
@@ -1655,32 +1669,6 @@ public partial class MainUI : Form
             shortGPCheckbox.Enabled = false;
             tbirdRequiredCheckbox.Enabled = false;
             tbirdRequiredCheckbox.Checked = true;
-        }
-    }
-
-    private void DashBox_CheckStateChanged(object sender, EventArgs e)
-    {
-        if (useDashCheckbox.Checked)
-        {
-            combineFireCheckbox.Enabled = false;
-            combineFireCheckbox.Checked = false;
-        }
-        else
-        {
-            combineFireCheckbox.Enabled = true;
-        }
-    }
-
-    private void CombineFireBox_CheckStateChanged(object sender, EventArgs e)
-    {
-        if (combineFireCheckbox.Checked)
-        {
-            useDashCheckbox.Enabled = false;
-            useDashCheckbox.Checked = false;
-        }
-        else
-        {
-            useDashCheckbox.Enabled = true;
         }
     }
 

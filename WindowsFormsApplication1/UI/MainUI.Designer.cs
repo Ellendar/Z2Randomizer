@@ -138,10 +138,10 @@
             shuffleAtkExpNeededCheckbox = new System.Windows.Forms.CheckBox();
             shuffleAllExpCheckbox = new System.Windows.Forms.CheckBox();
             tabPage9 = new System.Windows.Forms.TabPage();
+            FireSpellOptionLabel = new System.Windows.Forms.Label();
+            FireSpellBox = new System.Windows.Forms.ComboBox();
             swapUpAndDownstabCheckbox = new System.Windows.Forms.CheckBox();
-            useDashCheckbox = new System.Windows.Forms.CheckBox();
             randomizeSpellSpellEnemyCheckbox = new System.Windows.Forms.CheckBox();
-            combineFireCheckbox = new System.Windows.Forms.CheckBox();
             disableMagicContainerRequirementCheckbox = new System.Windows.Forms.CheckBox();
             shuffleSpellLocationsCheckbox = new System.Windows.Forms.CheckBox();
             shuffleLifeRefillCheckbox = new System.Windows.Forms.CheckBox();
@@ -251,6 +251,7 @@
             backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             oldFlagsLabel = new System.Windows.Forms.Label();
             batchButton = new System.Windows.Forms.Button();
+            noDuplicateRoomsCheckbox = new System.Windows.Forms.CheckBox();
             mainTabControl.SuspendLayout();
             tabPage4.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -1189,6 +1190,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(noDuplicateRoomsCheckbox);
             tabPage2.Controls.Add(label7);
             tabPage2.Controls.Add(label5);
             tabPage2.Controls.Add(startingGemsMaxList);
@@ -1662,10 +1664,10 @@
             // 
             // tabPage9
             // 
+            tabPage9.Controls.Add(FireSpellOptionLabel);
+            tabPage9.Controls.Add(FireSpellBox);
             tabPage9.Controls.Add(swapUpAndDownstabCheckbox);
-            tabPage9.Controls.Add(useDashCheckbox);
             tabPage9.Controls.Add(randomizeSpellSpellEnemyCheckbox);
-            tabPage9.Controls.Add(combineFireCheckbox);
             tabPage9.Controls.Add(disableMagicContainerRequirementCheckbox);
             tabPage9.Controls.Add(shuffleSpellLocationsCheckbox);
             tabPage9.Controls.Add(shuffleLifeRefillCheckbox);
@@ -1678,10 +1680,33 @@
             tabPage9.Text = "Spells";
             tabPage9.UseVisualStyleBackColor = true;
             // 
+            // FireSpellOptionLabel
+            // 
+            FireSpellOptionLabel.AutoSize = true;
+            FireSpellOptionLabel.Location = new System.Drawing.Point(7, 137);
+            FireSpellOptionLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            FireSpellOptionLabel.Name = "FireSpellOptionLabel";
+            FireSpellOptionLabel.Size = new System.Drawing.Size(57, 15);
+            FireSpellOptionLabel.TabIndex = 24;
+            FireSpellOptionLabel.Text = "Fire Spell:";
+            toolTip1.SetToolTip(FireSpellOptionLabel, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from the room pool can appear and palaces can change sizes.");
+            // 
+            // FireSpellBox
+            // 
+            FireSpellBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            FireSpellBox.FormattingEnabled = true;
+            FireSpellBox.Items.AddRange(new object[] { "Normal", "Link with Random Spell", "Replace with Dash Spell", "Random" });
+            FireSpellBox.Location = new System.Drawing.Point(7, 154);
+            FireSpellBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            FireSpellBox.Name = "FireSpellBox";
+            FireSpellBox.Size = new System.Drawing.Size(176, 23);
+            FireSpellBox.TabIndex = 23;
+            toolTip1.SetToolTip(FireSpellBox, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from the room pool can appear and palaces can change sizes.");
+            // 
             // swapUpAndDownstabCheckbox
             // 
             swapUpAndDownstabCheckbox.AutoSize = true;
-            swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 166);
+            swapUpAndDownstabCheckbox.Location = new System.Drawing.Point(7, 111);
             swapUpAndDownstabCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             swapUpAndDownstabCheckbox.Name = "swapUpAndDownstabCheckbox";
             swapUpAndDownstabCheckbox.Size = new System.Drawing.Size(251, 19);
@@ -1691,24 +1716,10 @@
             toolTip1.SetToolTip(swapUpAndDownstabCheckbox, "When selected, Upstab and Downstab will swap sources.");
             swapUpAndDownstabCheckbox.UseVisualStyleBackColor = true;
             // 
-            // useDashCheckbox
-            // 
-            useDashCheckbox.AutoSize = true;
-            useDashCheckbox.Location = new System.Drawing.Point(7, 141);
-            useDashCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            useDashCheckbox.Name = "useDashCheckbox";
-            useDashCheckbox.Size = new System.Drawing.Size(144, 19);
-            useDashCheckbox.TabIndex = 21;
-            useDashCheckbox.Text = "Replace Fire with Dash";
-            useDashCheckbox.ThreeState = true;
-            toolTip1.SetToolTip(useDashCheckbox, "When selected, the Fire spell will be replaced with a Dash spell that makes Link move faster");
-            useDashCheckbox.UseVisualStyleBackColor = true;
-            useDashCheckbox.CheckStateChanged += DashBox_CheckStateChanged;
-            // 
             // randomizeSpellSpellEnemyCheckbox
             // 
             randomizeSpellSpellEnemyCheckbox.AutoSize = true;
-            randomizeSpellSpellEnemyCheckbox.Location = new System.Drawing.Point(7, 114);
+            randomizeSpellSpellEnemyCheckbox.Location = new System.Drawing.Point(7, 86);
             randomizeSpellSpellEnemyCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             randomizeSpellSpellEnemyCheckbox.Name = "randomizeSpellSpellEnemyCheckbox";
             randomizeSpellSpellEnemyCheckbox.Size = new System.Drawing.Size(180, 19);
@@ -1717,18 +1728,6 @@
             randomizeSpellSpellEnemyCheckbox.ThreeState = true;
             toolTip1.SetToolTip(randomizeSpellSpellEnemyCheckbox, "When selected, the enemy generated when the Spell spell is cast will be randomized");
             randomizeSpellSpellEnemyCheckbox.UseVisualStyleBackColor = true;
-            // 
-            // combineFireCheckbox
-            // 
-            combineFireCheckbox.AutoSize = true;
-            combineFireCheckbox.Location = new System.Drawing.Point(7, 88);
-            combineFireCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            combineFireCheckbox.Name = "combineFireCheckbox";
-            combineFireCheckbox.Size = new System.Drawing.Size(208, 19);
-            combineFireCheckbox.TabIndex = 19;
-            combineFireCheckbox.Text = "Combine Fire with a Random Spell";
-            combineFireCheckbox.UseVisualStyleBackColor = true;
-            combineFireCheckbox.CheckStateChanged += CombineFireBox_CheckStateChanged;
             // 
             // disableMagicContainerRequirementCheckbox
             // 
@@ -3043,6 +3042,20 @@
             batchButton.UseVisualStyleBackColor = true;
             batchButton.Click += Bulk_Generate_Click;
             // 
+            // noDuplicateRoomsCheckbox
+            // 
+            noDuplicateRoomsCheckbox.AutoSize = true;
+            noDuplicateRoomsCheckbox.Location = new System.Drawing.Point(281, 87);
+            noDuplicateRoomsCheckbox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            noDuplicateRoomsCheckbox.Name = "noDuplicateRoomsCheckbox";
+            noDuplicateRoomsCheckbox.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            noDuplicateRoomsCheckbox.Size = new System.Drawing.Size(135, 19);
+            noDuplicateRoomsCheckbox.TabIndex = 25;
+            noDuplicateRoomsCheckbox.Text = "No Duplicate Rooms";
+            noDuplicateRoomsCheckbox.ThreeState = true;
+            toolTip1.SetToolTip(noDuplicateRoomsCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
+            noDuplicateRoomsCheckbox.UseVisualStyleBackColor = true;
+            // 
             // MainUI
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -3272,7 +3285,6 @@
         private System.Windows.Forms.Label lifeCapLabel;
         private System.Windows.Forms.Label magCapLabel;
         private System.Windows.Forms.Label attackCapLabel;
-        private System.Windows.Forms.CheckBox combineFireCheckbox;
         private System.Windows.Forms.CheckBox disableMagicContainerRequirementCheckbox;
         private System.Windows.Forms.CheckBox shuffleSpellLocationsCheckbox;
         private System.Windows.Forms.CheckBox shuffleLifeRefillCheckbox;
@@ -3326,7 +3338,6 @@
         private System.Windows.Forms.CheckBox bossRoomsExitToPalaceCheckbox;
         private System.Windows.Forms.Label palaceStyleLabel;
         private System.Windows.Forms.ComboBox palaceStyleList;
-        private System.Windows.Forms.CheckBox useDashCheckbox;
         private System.Windows.Forms.CheckBox dashAlwaysOnCheckbox;
         private System.Windows.Forms.Label oldFlagsLabel;
         private System.Windows.Forms.TextBox oldFlagsTextbox;
@@ -3343,6 +3354,9 @@
         private System.Windows.Forms.CheckBox swapUpAndDownstabCheckbox;
         private System.Windows.Forms.CheckBox includeLavaInShuffle;
         private System.Windows.Forms.CheckBox useCustomRoomsBox;
+        private System.Windows.Forms.Label FireSpellOptionLabel;
+        private System.Windows.Forms.ComboBox FireSpellBox;
+        private System.Windows.Forms.CheckBox noDuplicateRoomsCheckbox;
     }
 }
 

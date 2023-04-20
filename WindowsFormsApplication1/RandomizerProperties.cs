@@ -96,6 +96,7 @@ public class RandomizerProperties
     public bool UseCommunityRooms { get; set; }
     public bool BlockersAnywhere { get; set; }
     public bool BossRoomConnect { get; set; }
+    public bool NoDuplicateRooms { get; set; }
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }
