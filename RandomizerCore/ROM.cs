@@ -4,11 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Z2Randomizer;
-
 
 /*
 Classes Needed:
@@ -113,9 +110,9 @@ public class ROM
             ROMData = br.ReadBytes(257 * 1024);
 
         }
-        catch
+        catch (Exception err)
         {
-            MessageBox.Show("Cannot find or read file to dump.");
+            throw new Exception("Cannot find or read file to dump.", err);
         }
     }
 

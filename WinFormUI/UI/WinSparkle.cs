@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace Z2Randomizer.UI;
-
+namespace Z2Randomizer.WinFormUI;
 
 class WinSparkle
 {

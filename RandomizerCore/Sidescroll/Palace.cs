@@ -1,14 +1,7 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Z2Randomizer.Sidescroll;
 
 namespace Z2Randomizer.Sidescroll;
 

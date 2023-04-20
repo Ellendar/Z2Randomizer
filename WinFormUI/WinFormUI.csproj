@@ -1,0 +1,66 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <NoWin32Manifest>true</NoWin32Manifest>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<UseApplicationTrust>false</UseApplicationTrust>
+    <StartupObject>Z2Randomizer.WinFormUI.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="UI\1st.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="UI\1st.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="UI\GenerateBatchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\GeneratingSeedsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\MainUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="UI\WinSparkle.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <Generator>SettingsSingleFileGenerator</Generator>
+    </None>
+    <None Update="WinSparkle_0_8_0_x32.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="WinSparkle_0_8_0_x64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
