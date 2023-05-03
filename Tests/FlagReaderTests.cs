@@ -1,4 +1,7 @@
-namespace Tests;
+using Z2Randomizer.Core;
+using Z2Randomizer.Core.Flags;
+
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class FlagReaderTests

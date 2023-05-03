@@ -1,15 +1,7 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore.Storage;
-using NLog;
+﻿using NLog;
+using Z2Randomizer.Core;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.SQLite;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Z2Randomizer.Statistics
 {
@@ -23,9 +15,9 @@ namespace Z2Randomizer.Statistics
     /// </summary>
     class Statistics
     {
-        
-        //private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0g$o6XAv@suig$$WA"; //Standard
-        private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Max Rando
+
+        private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0Y$8v4BX#4XRx$$sh"; //Standard
+        //private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Max Rando
         //private static readonly string FLAGS = "hEAjMsAFerXs2NTbkkg$o6Vqv@sukyAAWh"; //Max Rando all mountains
         //private static readonly string FLAGS = "AAAe6B$zeqGjAAGZt0g$o6XAv@hEig$$WA"; //Standard vanilla overworld
         //private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Bad seed
@@ -35,7 +27,7 @@ namespace Z2Randomizer.Statistics
 
         private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda 2 - The Adventure of Link (U).nes";
         private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-        private static readonly int LIMIT = 10;
+        private static readonly int LIMIT = 1;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()
         {
@@ -48,8 +40,8 @@ namespace Z2Randomizer.Statistics
                 for (int i = 0; i < LIMIT; i++)
                 {
                     RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
-                    int seed = random.Next(1000000000);
-                    //int seed = 647961511;
+                    //int seed = random.Next(1000000000);
+                    int seed = 647961511;
                     config.Seed = seed;
                     config.FileName = VANILLA_ROM_PATH;
                     BackgroundWorker backgroundWorker = new BackgroundWorker()

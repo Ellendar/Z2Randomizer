@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Z2Randomizer.Overworld;
+﻿using System.ComponentModel.DataAnnotations;
+using Z2Randomizer.Core;
+using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Statistics;
 

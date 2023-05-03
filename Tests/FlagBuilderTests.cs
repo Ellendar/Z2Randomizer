@@ -1,5 +1,5 @@
 using Z2Randomizer.Flags;
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class FlagBuilderTests

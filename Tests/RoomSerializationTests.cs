@@ -1,17 +1,12 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Speech.Synthesis;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Z2Randomizer.Sidescroll;
+using Z2Randomizer.Core.Sidescroll;
+using Z2Randomizer.Core;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class RoomSerializationTests
@@ -84,11 +79,6 @@ public class RoomSerializationTests
             return result;
         }
     }
-    string ByteArrayToHexString(byte[] bytes)
-    {
-        string hex = BitConverter.ToString(bytes);
-        return hex.Replace("-", "");
-    }
 
     [TestMethod] 
     public void RoomsContainsNoDuplcateRooms()
@@ -113,19 +103,17 @@ public class RoomSerializationTests
         rooms.AddRange(PalaceRooms.EasternShadow(useCustomRooms));
         rooms.AddRange(PalaceRooms.EunosRooms(useCustomRooms));
 
-        IEqualityComparer<byte[]> byteArrayEqualityComparer = new StandardByteArrayEqualityComparer();
-
         for (int i = 0; i < rooms.Count; i++)
         {
             for (int j = 0; j < rooms.Count; j++)
             {
                 if(i != j)
                 {
-                    Assert.IsFalse(byteArrayEqualityComparer.Equals(rooms[i].SideView, rooms[j].SideView)
-                        && byteArrayEqualityComparer.Equals(rooms[i].Enemies, rooms[j].Enemies)
+                    Assert.IsFalse(Util.byteArrayEqualityComparer.Equals(rooms[i].SideView, rooms[j].SideView)
+                        && Util.byteArrayEqualityComparer.Equals(rooms[i].Enemies, rooms[j].Enemies)
                         && !(rooms[i].Group.EndsWith("vanilla") && rooms[j].Group.EndsWith("vanilla"))
-                        , "Room# " + i + " (" + ByteArrayToHexString(rooms[i].SideView) + "/" + ByteArrayToHexString(rooms[i].Enemies) + ") " +
-                        " is a duplicate of Room# " + j + " (" + ByteArrayToHexString(rooms[j].SideView) + "/" + ByteArrayToHexString(rooms[j].Enemies) + ")");
+                        , "Room# " + i + " (" + Util.ByteArrayToHexString(rooms[i].SideView) + "/" + Util.ByteArrayToHexString(rooms[i].Enemies) + ") " +
+                        " is a duplicate of Room# " + j + " (" + Util.ByteArrayToHexString(rooms[j].SideView) + "/" + Util.ByteArrayToHexString(rooms[j].Enemies) + ")");
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Speech.Synthesis;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class AttackStats

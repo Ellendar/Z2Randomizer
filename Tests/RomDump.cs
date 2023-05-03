@@ -5,9 +5,10 @@ using System.Linq;
 using System.Speech.Synthesis;
 using System.Text;
 using System.Threading.Tasks;
-using Z2Randomizer.Sidescroll;
+using Z2Randomizer.Core;
+using Z2Randomizer.Core.Sidescroll;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class RomDump

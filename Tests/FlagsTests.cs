@@ -1,6 +1,8 @@
+using Z2Randomizer.Core;
 using System.Reflection;
+using Z2Randomizer.Core.Flags;
 
-namespace Tests;
+namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class FlagsTests
