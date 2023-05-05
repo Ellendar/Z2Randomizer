@@ -84,7 +84,7 @@ class MazeIsland : World
             if (this.biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.VanillaOriginal)
+                if (hyrule.Props.VanillaShuffleUsesActualTerrain)
                 {
                     foreach (Location location in AllLocations)
                     {

@@ -2,10 +2,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
+using System.Text.Json;
 
 namespace Z2Randomizer.Core;
 
@@ -1228,7 +1230,7 @@ public class RandomizerConfiguration
         {
             properties.MazeBiome = MazeBiome;
         }
-        properties.VanillaOriginal = VanillaShuffleUsesActualTerrain;
+        properties.VanillaShuffleUsesActualTerrain = VanillaShuffleUsesActualTerrain;
         properties.ShuffleHidden = ShuffleWhichLocationIsHidden == null ? random.Next(2) == 1 : (bool)ShuffleWhichLocationIsHidden;
         properties.CanWalkOnWaterWithBoots = GoodBoots == null ? random.Next(2) == 1 : (bool)GoodBoots;
         properties.BagusWoods = GenerateBaguWoods == null ? random.Next(2) == 1 : (bool)GenerateBaguWoods;
@@ -1377,6 +1379,7 @@ public class RandomizerConfiguration
         //Misc.
         properties.DisableBeep = DisableLowHealthBeep;
         properties.JumpAlwaysOn = JumpAlwaysOn;
+        properties.DashAlwaysOn = JumpAlwaysOn;
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
@@ -1463,6 +1466,7 @@ public class RandomizerConfiguration
             properties.NoDuplicateRooms = false;
         }
 
+        string debug = JsonSerializer.Serialize(properties);
         return properties;
     }
 

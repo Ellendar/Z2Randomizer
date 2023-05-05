@@ -2070,7 +2070,7 @@ public abstract class World
         AddLocation(new Location(bytes, t, addr, c));
     }
 
-    public void LoadRaft(int world)
+    public Location LoadRaft(int world)
     {
         LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world);
         raft = GetLocationByMem(baseAddr + 41);
@@ -2078,9 +2078,10 @@ public abstract class World
         raft.World = world;
         raft.Map = 41;
         raft.TerrainType = Terrain.BRIDGE;
+        return raft;
     }
 
-    public void LoadBridge(int world)
+    public Location LoadBridge(int world)
     {
         LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world);
         bridge = GetLocationByMem(baseAddr + 40);
@@ -2088,9 +2089,10 @@ public abstract class World
         bridge.World = world;
         bridge.Map = 40;
         bridge.PassThrough = 0;
+        return bridge;
     }
 
-    public void LoadCave1(int world)
+    public Location LoadCave1(int world)
     {
         LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world);
         cave1 = GetLocationByMem(baseAddr + 42);
@@ -2098,11 +2100,10 @@ public abstract class World
         cave1.World = world;
         cave1.Map = 42;
         cave1.CanShuffle = true;
-
-
+        return cave1;
     }
 
-    public void LoadCave2(int world)
+    public Location LoadCave2(int world)
     {
         LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world);
         cave2 = GetLocationByMem(baseAddr + 43);
@@ -2111,6 +2112,7 @@ public abstract class World
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;
+        return cave2;
     }
 
     public bool HasConnections()

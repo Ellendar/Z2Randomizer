@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -137,7 +138,8 @@ public class Hyrule
     //Locations that are pbags in vanilla that are turned into hearts because maxhearts - startinghearts > 4
     private List<Location> pbagHearts;
     //Continent connectors
-    protected Dictionary<Location, List<Location>> connections;
+    protected (Location, Location)[] connections = new (Location, Location)[4];
+
     //public SortedDictionary<String, List<Location>> areasByLocation;
     //public Dictionary<Location, String> section;
     private int accessibleMagicContainers;
@@ -959,12 +961,6 @@ public class Hyrule
             //logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
             //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
-       /* logger.Debug("Reached: " + count);
-        logger.Debug("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-        logger.Debug("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-        logger.Debug("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-        logger.Debug("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
-       */
 
         //return true;
         /*
@@ -988,18 +984,29 @@ public class Hyrule
         {
             if(itemGet[item] == false)
             {
-                /*
-                if (count > 150)
+                if (count > 120 && debug++ >= 20)
                 {
-                    Debug.WriteLine("-" + count + "- " + accessibleMagicContainers);
+                    Debug.WriteLine("Reached: " + count);
+                    Debug.WriteLine("wh: " + wh + " / " + westHyrule.AllLocations.Count);
+                    Debug.WriteLine("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
+                    Debug.WriteLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
+                    Debug.WriteLine("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
+                    Debug.WriteLine("");
+
+                    //Debug.WriteLine("-" + count + "- " + accessibleMagicContainers);
                     //SHUFFLABLE_STARTING_ITEMS.Where(i => itemGet[item] == false).ToList().ForEach(i => Debug.WriteLine(Enum.GetName(typeof(Item), i)));
-                    westHyrule.AllLocations.Union(eastHyrule.AllLocations).Union(deathMountain.AllLocations).Union(mazeIsland.AllLocations)
-                        .Where(i => !i.itemGet && i.item != Item.DO_NOT_USE).ToList().ForEach(i => Debug.WriteLine(i.Name + " / " + Enum.GetName(typeof(Item), i.item)));
+                    List<Location> allLocations = westHyrule.AllLocations.Union(eastHyrule.AllLocations).Union(deathMountain.AllLocations).Union(mazeIsland.AllLocations).ToList();
+                    allLocations.Add(eastHyrule.newKasuto2);
+                    allLocations.Where(i => !i.itemGet && i.item != Item.DO_NOT_USE).ToList()
+                        .ForEach(i => Debug.WriteLine(i.Name + " / " + Enum.GetName(typeof(Item), i.item)));
+                    //Debug.WriteLine("---Inaccessable Locations---");
+                    //allLocations.Where(i => !i.Reachable).ToList().ForEach(i => Debug.WriteLine(i.Name));
+                    
+
                     Debug.WriteLine("");
                     itemGetReachableFailures++;
                     return true;
                 }
-                */
                 return false;
             }
         }
@@ -1519,6 +1526,7 @@ public class Hyrule
                 }
                 else
                 {
+                    Location l1, l2;
                     List<int> doNotPick = new List<int>();
                     if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
@@ -1565,8 +1573,9 @@ public class Hyrule
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
 
-                    worlds[raftw1].LoadRaft(raftw2);
-                    worlds[raftw2].LoadRaft(raftw1);
+                    l1 = worlds[raftw1].LoadRaft(raftw2);
+                    l2 = worlds[raftw2].LoadRaft(raftw1);
+                    connections[0] = (l1, l2);
 
                     int bridgew1 = RNG.Next(worlds.Count);
                     if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
@@ -1593,8 +1602,9 @@ public class Hyrule
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
 
-                    worlds[bridgew1].LoadBridge(bridgew2);
-                    worlds[bridgew2].LoadBridge(bridgew1);
+                    l1 = worlds[bridgew1].LoadBridge(bridgew2);
+                    l2 = worlds[bridgew2].LoadBridge(bridgew1);
+                    connections[1] = (l1, l2);
 
                     int c1w1 = RNG.Next(worlds.Count);
                     if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
@@ -1621,8 +1631,9 @@ public class Hyrule
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
 
-                    worlds[c1w1].LoadCave1(c1w2);
-                    worlds[c1w2].LoadCave1(c1w1);
+                    l1 = worlds[c1w1].LoadCave1(c1w2);
+                    l2 = worlds[c1w2].LoadCave1(c1w1);
+                    connections[2] = (l1, l2);
 
                     int c2w1 = RNG.Next(worlds.Count);
                     if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
@@ -1649,8 +1660,9 @@ public class Hyrule
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
 
-                    worlds[c2w1].LoadCave2(c2w2);
-                    worlds[c2w2].LoadCave2(c2w1);
+                    l1 = worlds[c2w1].LoadCave2(c2w2);
+                    l2 = worlds[c2w2].LoadCave2(c2w1);
+                    connections[3] = (l1, l2);
                 }
             } while (!AllContinentsHaveConnection(worlds));
 
@@ -1826,26 +1838,30 @@ public class Hyrule
 
     private void SetTransportation(int w1, int w2, int type)
     {
+        Location l1, l2;
         if(type == 1)
         {
-            worlds[w1].LoadRaft(w2);
-            worlds[w2].LoadRaft(w1);
+            l1 = worlds[w1].LoadRaft(w2);
+            l2 = worlds[w2].LoadRaft(w1);
+            connections[0] = (l1, l2);
         }
         else if (type == 2)
         {
-            worlds[w1].LoadBridge(w2);
-            worlds[w2].LoadBridge(w1);
+            l1 = worlds[w1].LoadBridge(w2);
+            l2 = worlds[w2].LoadBridge(w1);
+            connections[1] = (l1, l2);
         }
         else if(type == 3)
         {
-            worlds[w1].LoadCave1(w2);
-            worlds[w2].LoadCave1(w1);
-
+            l1 = worlds[w1].LoadCave1(w2);
+            l2 = worlds[w2].LoadCave1(w1);
+            connections[2] = (l1, l2);
         }
         else
         {
-            worlds[w1].LoadCave2(w2);
-            worlds[w2].LoadCave2(w1);
+            l1 = worlds[w1].LoadCave2(w2);
+            l2 = worlds[w2].LoadCave2(w1);
+            connections[3] = (l1, l2);
         }
     }
 

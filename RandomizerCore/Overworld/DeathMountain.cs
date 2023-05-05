@@ -186,7 +186,7 @@ class DeathMountain : World
             if (this.biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.VanillaOriginal)
+                if (hyrule.Props.VanillaShuffleUsesActualTerrain)
                 {
                     magicCave.TerrainType = Terrain.ROCK;
                     foreach (Location location in AllLocations)

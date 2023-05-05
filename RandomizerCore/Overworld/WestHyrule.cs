@@ -332,7 +332,7 @@ public class WestHyrule : World
                 ChooseConn("dmexit", connections, true);
 
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.VanillaOriginal)
+                if (hyrule.Props.VanillaShuffleUsesActualTerrain)
                 {
                     foreach (Location location in AllLocations)
                     {

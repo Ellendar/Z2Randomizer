@@ -1,3 +1,3 @@
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
-global using Z2Randomizer;
-global using Z2Randomizer.Flags;
+global using Z2Randomizer.Core;
+global using Z2Randomizer.Core.Flags;

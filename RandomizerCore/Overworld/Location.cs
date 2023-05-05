@@ -185,8 +185,8 @@ public class Location
             (Continent.EAST, 56, 63, 7) => "P5_HEART",
             (Continent.EAST, 52, 24, 8) => "FIRE_TOWN_CAVE_EXIT",
             (Continent.EAST, 48, 27, 8) => "FIRE_TOWN_CAVE_ENTRACE",
-            (Continent.EAST, 71, 25, 9) => "FIRE_TOWN_CAVE_500P_BAG",
-            (Continent.EAST, 78, 31, 11) => "RISEN_PAG_CAVE",
+            (Continent.EAST, 71, 25, 9) => "SUNKEN_PBAG_CAVE",
+            (Continent.EAST, 78, 31, 11) => "RISEN_PBAG_CAVE",
             (Continent.EAST, 78, 49, 13) => "NEW_KASUTO_CAVE_ENTRANCE",
             (Continent.EAST, 78, 57, 14) => "NEW_KASUTO_CAVE_EXIT",
             (Continent.EAST, 75, 2, 16) => "DEATH_VALLEY_CAVE_1_EXIT",
@@ -207,7 +207,7 @@ public class Location
             (Continent.EAST, 99, 8, 26) => "DEATH_VALLEY_BATTLE_1",
             (Continent.EAST, 40, 52, 40) => "MAZE_ISLAND_BRIDGE",
             (Continent.EAST, 52, 7, 41) => "RAFT_DOCK",
-            (Continent.EAST, 60, 23, 14) => "FABOORU",
+            (Continent.EAST, 60, 23, 14) => "NABOORU",
             (Continent.EAST, 33, 3, 17) => "DARUNIA",
             (Continent.EAST, 81, 61, 18) => "NEW_KASUTO",
             (Continent.EAST, 99, 34, 23) => "OLD_KASUTO",
@@ -343,6 +343,10 @@ public class Location
 
     private string GetDebuggerDisplay()
     {
-        return Continent.ToString() + " " + TerrainType.ToString() + " " + Name + " (" + Xpos + "," + (Ypos - 30) + ") _" + (Reachable ? "Reachable" : "Unreachable");
+        return Continent.ToString()
+            + " " + TerrainType.ToString()
+            + " " + Name
+            + " (" + Xpos + "," + (Ypos - 30) + ") _"
+            + (Reachable ? "Reachable" : "Unreachable");
     }
 }

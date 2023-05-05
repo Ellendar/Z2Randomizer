@@ -306,7 +306,7 @@ public class EastHyrule : World
                     palace6.CanShuffle = false;
                 }
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.VanillaOriginal)
+                if (hyrule.Props.VanillaShuffleUsesActualTerrain)
                 {
                     foreach (Location location in AllLocations)
                     {
@@ -1365,7 +1365,7 @@ public class EastHyrule : World
             newKasuto.NeedHammer = true;
             newKasuto2.NeedHammer = true;
         }
-        if (hyrule.Props.VanillaOriginal || this.biome != Biome.VANILLA_SHUFFLE)
+        if (hyrule.Props.VanillaShuffleUsesActualTerrain || this.biome != Biome.VANILLA_SHUFFLE)
         {
             Terrain t = terrains[hiddenKasutoLocation.MemAddress];
             hyrule.ROMData.Put(0x1df75, (byte)t);
@@ -1552,7 +1552,7 @@ public class EastHyrule : World
         return true;
     }
 
-    public void UpdateAllReached()
+    public new void UpdateAllReached()
     {
         if (!AllReached)
         {
@@ -1585,7 +1585,7 @@ public class EastHyrule : World
             newKasuto.NeedRecorder = true;
             newKasuto2.NeedRecorder = true;
         }
-        if (hyrule.Props.VanillaOriginal || this.biome != Biome.VANILLA_SHUFFLE)
+        if (hyrule.Props.VanillaShuffleUsesActualTerrain || this.biome != Biome.VANILLA_SHUFFLE)
         {
             hyrule.ROMData.Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
             if (hiddenPalaceLocation.TerrainType == Terrain.PALACE)

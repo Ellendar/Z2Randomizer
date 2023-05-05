@@ -77,7 +77,7 @@ public class RandomizerProperties
     public Biome EastBiome { get; set; }
     public Biome MazeBiome { get; set; }
     public Biome DmBiome { get; set; }
-    public bool VanillaOriginal { get; set; }
+    public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
     public bool BagusWoods { get; set; }
@@ -186,6 +186,7 @@ public class RandomizerProperties
     //Misc.
     public bool DisableBeep { get; set; }
     public bool JumpAlwaysOn { get; set; }
+    public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
     public String BeamSprite { get; set; }
     public bool DisableMusic { get; set; }

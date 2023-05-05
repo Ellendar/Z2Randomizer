@@ -1,4 +1,4 @@
-using Z2Randomizer.Flags;
+using Z2Randomizer.Core.Flags;
 namespace Z2Randomizer.Tests;
 
 [TestClass]
