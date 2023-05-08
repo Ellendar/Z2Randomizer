@@ -25,8 +25,8 @@ namespace Z2Randomizer.Statistics
 
         //private static readonly string FLAGS = "AAAN6AAFeqGkEAGZt0g$o6XAv@suig$$WA"; //Caldera/Volcano
 
-        private static readonly string VANILLA_ROM_PATH = "C:\\Users\\jgill\\Documents\\test.dat";
-        private static readonly string DB_PATH = "C:\\Burn\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
+        private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
+        private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
         private static readonly int LIMIT = 1;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()

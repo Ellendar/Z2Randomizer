@@ -1186,7 +1186,7 @@ public class RandomizerConfiguration
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
-                2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
+                2 => random.Next(2) == 1 ? Biome.DRY_CANYON : Biome.DRY_CANYON,
                 3 => Biome.VOLCANO,
                 4 => Biome.MOUNTAINOUS,
                 5 => Biome.VANILLA,
@@ -1246,7 +1246,6 @@ public class RandomizerConfiguration
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
-        properties.PalaceStyle = PalaceStyle;
         properties.StartGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
         properties.PalacePalette = ChangePalacePallettes;

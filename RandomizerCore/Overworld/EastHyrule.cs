@@ -1467,7 +1467,14 @@ public class EastHyrule : World
         if (hyrule.Props.ShuffleHidden)
         {
             hiddenKasutoLocation = AllLocations[hyrule.RNG.Next(AllLocations.Count)];
-            while (hiddenKasutoLocation == null || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge || hiddenKasutoLocation == cave1 || hiddenKasutoLocation == cave2 || connections.ContainsKey(hiddenKasutoLocation) || !hiddenKasutoLocation.CanShuffle || ((this.biome != Biome.VANILLA && this.biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough !=0))
+            while (hiddenKasutoLocation == null 
+                || hiddenKasutoLocation == raft 
+                || hiddenKasutoLocation == bridge 
+                || hiddenKasutoLocation == cave1 
+                || hiddenKasutoLocation == cave2 
+                || connections.ContainsKey(hiddenKasutoLocation) 
+                || !hiddenKasutoLocation.CanShuffle 
+                || ((this.biome != Biome.VANILLA && this.biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough !=0))
             {
                 hiddenKasutoLocation = AllLocations[hyrule.RNG.Next(AllLocations.Count)];
             }

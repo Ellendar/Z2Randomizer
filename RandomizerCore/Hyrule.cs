@@ -1,13 +1,17 @@
-﻿using NLog;
+﻿using Newtonsoft.Json.Linq;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Z2Randomizer.Core.Overworld;
 using Z2Randomizer.Core.Sidescroll;
 
@@ -103,10 +107,10 @@ public class Hyrule
     //The higher you set it, the more likely a given terrain is to find a set of items that works, resulting in fewer terrain generations.
     //It will also increase the number of seeds that have more arcane solutions, where only a specific item route works.
     //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
-    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 40;
+    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 20;
 
     //This controls how many times 
-    private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
+    private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 1;
 
     public const bool UNSAFE_DEBUG = true;
 
@@ -169,7 +173,7 @@ public class Hyrule
     public bool startTrophy;
     public bool startMed;
 
-    //DEBUG/STATS
+    //DEBUG/STATSf
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -195,6 +199,7 @@ public class Hyrule
     public int timeSpentBuildingMI = 0;
 
     public int debug = 0;
+    public int totalReachableCheck = 0;
 
 
     private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
@@ -243,6 +248,8 @@ public class Hyrule
         RNG = new Random(config.Seed);
         props = config.Export(RNG);
         props.saveRom = saveRom;
+        string export = JsonSerializer.Serialize(props);
+        Debug.WriteLine(export);
         Flags = config.Serialize();
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
@@ -484,13 +491,6 @@ public class Hyrule
             palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData);
             
         }
-        /*
-        if (props.ShufflePalaceEnemies)
-        {
-            ShufflePalaceEnemies(palace125EnemyPtr, enemyAddr1, palace125Enemies, palace125Generators, palace125SmallEnemies, palace125LargeEnemies, palace125FlyingEnemies, false);
-            ShufflePalaceEnemies(palace346EnemyPtr, enemyAddr1, palace346Enemies, palace346Generators, palace346SmallEnemies, palace346LargeEnemies, palace346FlyingEnemies, false);
-            ShufflePalaceEnemies(gpEnemyPtr, enemyAddr2, gpEnemies, gpGenerators, gpSmallEnemies, gpLargeEnemies, gpFlyingEnemies, true);
-        }*/
 
         firstProcessOverworldTimestamp = DateTime.Now;
         ProcessOverworld();
@@ -890,6 +890,7 @@ public class Hyrule
 
     private bool IsEverythingReachable()
     {
+        totalReachableCheck++;
         //return true;
         int dm = 0;
         int mi = 0;
@@ -984,28 +985,16 @@ public class Hyrule
         {
             if(itemGet[item] == false)
             {
-                if (count > 120 && debug++ >= 20)
+                if (count > 120)
                 {
-                    Debug.WriteLine("Reached: " + count);
-                    Debug.WriteLine("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-                    Debug.WriteLine("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-                    Debug.WriteLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-                    Debug.WriteLine("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
-                    Debug.WriteLine("");
-
-                    //Debug.WriteLine("-" + count + "- " + accessibleMagicContainers);
-                    //SHUFFLABLE_STARTING_ITEMS.Where(i => itemGet[item] == false).ToList().ForEach(i => Debug.WriteLine(Enum.GetName(typeof(Item), i)));
-                    List<Location> allLocations = westHyrule.AllLocations.Union(eastHyrule.AllLocations).Union(deathMountain.AllLocations).Union(mazeIsland.AllLocations).ToList();
-                    allLocations.Add(eastHyrule.newKasuto2);
-                    allLocations.Where(i => !i.itemGet && i.item != Item.DO_NOT_USE).ToList()
-                        .ForEach(i => Debug.WriteLine(i.Name + " / " + Enum.GetName(typeof(Item), i.item)));
-                    //Debug.WriteLine("---Inaccessable Locations---");
-                    //allLocations.Where(i => !i.Reachable).ToList().ForEach(i => Debug.WriteLine(i.Name));
-                    
-
-                    Debug.WriteLine("");
+                    debug++;
+                    PrintRoutingDebug(count, wh, eh, dm, mi);
                     itemGetReachableFailures++;
-                    return true;
+                    if(debug >= 18)
+                    {
+                        return false;
+                    }
+                    return false;
                 }
                 return false;
             }
@@ -1022,11 +1011,13 @@ public class Hyrule
         if (accessibleMagicContainers != 8)
         {
             magicContainerReachableFailures++;
+            PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
         if (heartContainers != maxHearts)
         {
             heartContainerReachableFailures++;
+            PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
         if(SpellGet.Values.Any(i => i == false))
@@ -1217,11 +1208,11 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private bool UpdateItemGets()
     {
-        accessibleMagicContainers = 4 + westHyrule.AllLocations.Union(eastHyrule.AllLocations).Union(deathMountain.AllLocations).Union(mazeIsland.AllLocations)
-            .Where(i => i.itemGet == true && i.item == Item.MAGIC_CONTAINER).Count();
+        accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.itemGet == true && i.item == Item.MAGIC_CONTAINER).Count();
         heartContainers = startHearts;
         bool changed = false;
-        foreach (Location location in itemLocs)
+        
+        foreach (Location location in AllLocationsForReal().Where(i => i.item != Item.DO_NOT_USE))
         {
             bool hadItemPreviously = location.itemGet;
             bool hasItemNow;
@@ -1255,12 +1246,6 @@ public class Hyrule
             location.itemGet = hasItemNow || hadItemPreviously;
             itemGet[location.item] = hasItemNow || hadItemPreviously;
 
-            /*
-            if (location.itemGet && location.item == Item.MAGIC_CONTAINER)
-            {
-                accessibleMagicContainers++;
-            }
-            */
             if (location.itemGet && location.item == Item.HEART_CONTAINER)
             {
                 heartContainers++;
@@ -1271,8 +1256,23 @@ public class Hyrule
             }
         }
 
-        accessibleMagicContainers = 4 + westHyrule.AllLocations.Union(eastHyrule.AllLocations).Union(deathMountain.AllLocations).Union(mazeIsland.AllLocations)
-            .Where(i => i.itemGet == true && i.item == Item.MAGIC_CONTAINER).Count();
+        if(!props.PbagItemShuffle)
+        {
+            if(westHyrule.pbagCave.Reachable)
+            {
+                westHyrule.pbagCave.itemGet = true;
+            }
+            if (eastHyrule.pbagCave1.Reachable)
+            {
+                eastHyrule.pbagCave1.itemGet = true;
+            }
+            if (eastHyrule.pbagCave2.Reachable)
+            {
+                eastHyrule.pbagCave2.itemGet = true;
+            }
+        }
+
+        accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.itemGet == true && i.item == Item.MAGIC_CONTAINER).Count();
         return changed;
     }
     private void ShuffleLifeEffectiveness(bool isMag)
@@ -1422,16 +1422,6 @@ public class Hyrule
         do //while (!EverythingReachable()) ;
         {
             totalReachabilityOverworldAttempts++;
-            worlds = new List<World>();
-            westHyrule = new WestHyrule(this);
-            deathMountain = new DeathMountain(this);
-            eastHyrule = new EastHyrule(this);
-            mazeIsland = new MazeIsland(this);
-            worlds.Add(westHyrule);
-            worlds.Add(deathMountain);
-            worlds.Add(eastHyrule);
-            worlds.Add(mazeIsland);
-            ShuffleTowns();
 
             //Generate a pathable set of continents
             do // } while (!AllContinentsHaveConnection(worlds));
@@ -4227,4 +4217,77 @@ public class Hyrule
         { ' ', 0xf4 },
         { '-', 0xf6 },
     };
+
+    public List<Location> AllLocationsForReal()
+    {
+        List<Location> locations = westHyrule.AllLocations
+            .Union(eastHyrule.AllLocations)
+            .Union(mazeIsland.AllLocations)
+            .Union(deathMountain.AllLocations).ToList();
+        locations.Add(eastHyrule.newKasuto2);
+        return locations;  
+    }
+
+    public string SpellDebug()
+    {
+        StringBuilder sb = new StringBuilder();
+        if (!SpellGet[spellMap[Spell.SHIELD]])
+        {
+            sb.AppendLine("Rauru: " + Enum.GetName(typeof(Spell), spellMap[Spell.SHIELD]));
+        }
+        if (!SpellGet[spellMap[Spell.JUMP]])
+        {
+            sb.AppendLine("Ruto: " + Enum.GetName(typeof(Spell), spellMap[Spell.JUMP]));
+        }
+        if (!SpellGet[spellMap[Spell.LIFE]])
+        {
+            sb.AppendLine("Saria: " + Enum.GetName(typeof(Spell), spellMap[Spell.LIFE]));
+        }
+        if (!SpellGet[spellMap[Spell.FAIRY]])
+        {
+            sb.AppendLine("Mido: " + Enum.GetName(typeof(Spell), spellMap[Spell.FAIRY]));
+        }
+        if (!SpellGet[spellMap[Spell.FIRE]])
+        {
+            sb.AppendLine("Nabooru: " + Enum.GetName(typeof(Spell), spellMap[Spell.FIRE]));
+        }
+        if (!SpellGet[spellMap[Spell.REFLECT]])
+        {
+            sb.AppendLine("Darunia: " + Enum.GetName(typeof(Spell), spellMap[Spell.REFLECT]));
+        }
+        if (!SpellGet[spellMap[Spell.SPELL]])
+        {
+            sb.AppendLine("New Kasuto: " + Enum.GetName(typeof(Spell), spellMap[Spell.SPELL]));
+        }
+        if (!SpellGet[spellMap[Spell.THUNDER]])
+        {
+            sb.AppendLine("Old Kasuto: " + Enum.GetName(typeof(Spell), spellMap[Spell.THUNDER]));
+        }
+        return sb.ToString();
+    }
+
+    public void PrintRoutingDebug(int count, int wh, int eh, int dm, int mi)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("Number: " + debug);
+        sb.AppendLine("Reached: " + count);
+        sb.AppendLine("wh: " + wh + " / " + westHyrule.AllLocations.Count);
+        sb.AppendLine("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
+        sb.AppendLine("dm: " + dm + " / " + deathMountain.AllLocations.Count);
+        sb.AppendLine("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
+        sb.AppendLine("");
+
+        //Debug.WriteLine("-" + count + "- " + accessibleMagicContainers);
+        //SHUFFLABLE_STARTING_ITEMS.Where(i => itemGet[item] == false).ToList().ForEach(i => Debug.WriteLine(Enum.GetName(typeof(Item), i)));
+        List<Location> allLocations = AllLocationsForReal();
+        allLocations.Where(i => !i.itemGet && i.item != Item.DO_NOT_USE).ToList()
+            .ForEach(i => sb.AppendLine(i.Name + " / " + Enum.GetName(typeof(Item), i.item)));
+        sb.AppendLine(SpellDebug());
+        //Debug.WriteLine("---Inaccessable Locations---");
+        //allLocations.Where(i => !i.Reachable).ToList().ForEach(i => Debug.WriteLine(i.Name));
+
+
+        sb.AppendLine("");
+        logger.Error(sb.ToString());
+    }
 }
