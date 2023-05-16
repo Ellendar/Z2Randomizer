@@ -1,18 +1,10 @@
 ﻿using NLog;
-using NLog.Fluent;
-using Z2Randomizer.Core;
-using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Speech.Synthesis;
-using System.Text;
-using System.Threading.Tasks;
-using static Z2Randomizer.Core.Util;
-using System.Numerics;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -22,6 +14,7 @@ public class Palaces
 
     private const int PALACE_SHUFFLE_ATTEMPT_LIMIT = 100;
     private const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
+    private const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
 
     private static readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
     {
@@ -133,7 +126,7 @@ public class Palaces
                     _ => throw new ImpossibleException("Invalid palace number: " + currentPalace)
                 };
 
-                do
+                do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 {
                     if (worker != null && worker.CancellationPending)
                     {
@@ -142,8 +135,10 @@ public class Palaces
 
                     tries = 0;
                     innertries = 0;
+                    int roomPlacementFailures = 0;
                     //bool done = false;
-                    do
+                    do //while (roomPlacementFailures > ROOM_PLACEMENT_FAILURE_LIMIT || palace.AllRooms.Any(i => i.CountOpenExits() > 0));
+
                     {
                         List<Room> palaceRoomPool = new List<Room>(currentPalace == 7 ? gpRoomPool : roomPool);
                         mapNo = currentPalace switch
@@ -168,13 +163,13 @@ public class Palaces
                         palace.Root.PalaceGroup = palaceGroup;
                         palace.AllRooms.Add(palace.Root);
 
-                        palace.BossRoom = SelectBossRoom(currentPalace, r, props.UseCustomRooms);
+                        palace.BossRoom = SelectBossRoom(currentPalace, r, props.UseCustomRooms, props.UseCommunityRooms);
                         palace.BossRoom.PalaceGroup = palaceGroup;
                         palace.AllRooms.Add(palace.BossRoom);
 
                         if (currentPalace < 7) //Not GP
                         {
-                            palace.ItemRoom = GenerateItemRoom(r, props.UseCustomRooms);
+                            palace.ItemRoom = GenerateItemRoom(r, props.UseCustomRooms, props.UseCommunityRooms);
                             palace.ItemRoom.PalaceGroup = palaceGroup;
                             if (palaceGroup == 1 && palace.ItemRoom.HasBoss)
                             {
@@ -233,16 +228,14 @@ public class Palaces
 
 
                         palace.MaxRooms = sizes[currentPalace - 1];
+
                         //add rooms
                         bool dropped = false;
+                        roomPlacementFailures = 0;
                         while (palace.AllRooms.Count < palace.MaxRooms)
                         {
                             int roomIndex = r.Next(palaceRoomPool.Count);
                             Room roomToAdd = palaceRoomPool[roomIndex].DeepCopy();
-                            if (props.NoDuplicateRooms)
-                            {
-                                palaceRoomPool.RemoveAt(roomIndex);
-                            }
 
                             roomToAdd.PalaceGroup = palaceGroup;
                             if (currentPalace < 7)
@@ -253,23 +246,45 @@ public class Palaces
                             {
                                 roomToAdd.NewMap = mapNoGp;
                             }
-                            bool added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
+                            bool added;
+                            if (roomToAdd.HasDrop && palaceRoomPool.Count(i => i.IsDropZone && i != roomToAdd) == 0)
+                            {
+                                //Debug.WriteLine(palace.AllRooms.Count + " - 0");
+                                added = false;
+                            }
+                            else
+                            {
+                                added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
+                                /*
+                                if (currentPalace == 7 && roomToAdd.HasDrop)
+                                {
+                                    Debug.WriteLine(palace.AllRooms.Count + " - " + palaceRoomPool.Count(i => i.IsDropZone && i != roomToAdd));
+                                }
+                                */
+                            }
                             if (added)
                             {
+                                if (props.NoDuplicateRooms)
+                                {
+                                    palaceRoomPool.RemoveAt(roomIndex);
+                                }
                                 IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                                 if (roomToAdd.HasDrop && !dropped)
                                 {
                                     int numDrops = r.Next(Math.Min(3, palace.MaxRooms - palace.AllRooms.Count), Math.Min(6, palace.MaxRooms - palace.AllRooms.Count));
-                                    bool lastDrop = true;
+                                    numDrops = Math.Min(numDrops, palaceRoomPool.Count(i => i.IsDropZone) + 1);
+                                    bool continueDropping = true;
                                     int j = 0;
                                     int dropPlacementFailures = 0;
-                                    while (j < numDrops && lastDrop)
+                                    while (j < numDrops && continueDropping)
                                     {
-                                        Room dropZoneRoom = palaceRoomPool[r.Next(palaceRoomPool.Count)].DeepCopy();
-                                        while (!dropZoneRoom.IsDropZone)
+                                        List<Room> possibleDropZones = palaceRoomPool.Where(i => i.IsDropZone).ToList();
+                                        if (possibleDropZones.Count == 0)
                                         {
-                                            dropZoneRoom = palaceRoomPool[r.Next(palaceRoomPool.Count)].DeepCopy();
+                                            throw new ImpossibleException();
                                         }
+                                        Room dropZoneRoom = possibleDropZones[r.Next(0, possibleDropZones.Count)].DeepCopy();
+
                                         if (currentPalace < 7)
                                         {
                                             dropZoneRoom.NewMap = mapNo;
@@ -281,8 +296,12 @@ public class Palaces
                                         bool added2 = palace.AddRoom(dropZoneRoom, props.BlockersAnywhere);
                                         if (added2)
                                         {
+                                            if (props.NoDuplicateRooms)
+                                            {
+                                                palaceRoomPool.Remove(dropZoneRoom);
+                                            }
                                             IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
-                                            lastDrop = dropZoneRoom.HasDrop;
+                                            continueDropping = dropZoneRoom.HasDrop;
                                             j++;
                                         }
                                         else if (++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
@@ -293,6 +312,10 @@ public class Palaces
                                     }
                                 }
                             }
+                            else if (++roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
+                            {
+                                break;
+                            }
 
                             if (palace.GetOpenRooms() >= palace.MaxRooms - palace.AllRooms.Count) //consolidate
                             {
@@ -301,7 +324,18 @@ public class Palaces
 
                         }
                         innertries++;
-                    } while (palace.AllRooms.Any(i => i.CountOpenExits() > 0));
+                        /*
+                        if (currentPalace == 7)
+                        {
+                            Debug.WriteLine("---" + palace.AllRooms.Where(i => i.CountOpenExits() > 0).Count() + "---");
+                            palace.AllRooms.Where(i => i.CountOpenExits() > 0).ToList()
+                                .ForEach(i => Debug.WriteLine(Util.ByteArrayToHexString(i.SideView) + i.PrintUnsatisfiedExits()));
+                        }
+                        */
+                    } while (roomPlacementFailures < ROOM_PLACEMENT_FAILURE_LIMIT
+                        && palace.AllRooms.Any(i => i.CountOpenExits() > 0)
+                        //|| (/*currentPalace == 1 && */!palace.AllRooms.Any(i => i.HasDrop))
+                      );
 
                     palace.ShuffleRooms(r);
                     bool reachable = palace.AllReachable();
@@ -433,9 +467,9 @@ public class Palaces
                 
             }
             */
-        }
+                                    }
 
-        for (int i = 0; i < 6; i++)
+                                    for (int i = 0; i < 6; i++)
         {
             palaces[i].UpdateBlocks();
         }
@@ -586,22 +620,43 @@ public class Palaces
             //}
         }
     }
-    private static Room SelectBossRoom(int pal, Random r, bool useCustomRooms)
+    private static Room SelectBossRoom(int pal, Random r, bool useCustomRooms, bool useCommunityRooms)
     {
-        if (pal == 7)
+        if(useCommunityRooms)
         {
-            return PalaceRooms.DarkLinkRooms(useCustomRooms)[r.Next(PalaceRooms.DarkLinkRooms(useCustomRooms).Count)].DeepCopy();
+            if (pal == 7)
+            {
+                return PalaceRooms.DarkLinkRooms(useCustomRooms)[r.Next(PalaceRooms.DarkLinkRooms(useCustomRooms).Count)].DeepCopy();
+            }
+            if (pal == 6)
+            {
+                return PalaceRooms.NewP6BossRooms(useCustomRooms)[r.Next(PalaceRooms.NewP6BossRooms(useCustomRooms).Count)].DeepCopy();
+            }
+            Room room = PalaceRooms.NewBossRooms(useCustomRooms)[r.Next(PalaceRooms.NewBossRooms(useCustomRooms).Count)].DeepCopy();
+            room.Enemies = PalaceRooms.BossRooms(useCustomRooms)[pal - 1].Enemies;
+            return room;
         }
-        if (pal == 6)
+        else
         {
-            return PalaceRooms.NewP6BossRooms(useCustomRooms)[r.Next(PalaceRooms.NewP6BossRooms(useCustomRooms).Count)].DeepCopy();
+            return pal switch
+            {
+                1 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 13).First().DeepCopy(),
+                2 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 34).First().DeepCopy(),
+                3 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 14).First().DeepCopy(),
+                4 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 28).First().DeepCopy(),
+                5 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 41).First().DeepCopy(),
+                6 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 58).First().DeepCopy(),
+                7 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 54).First().DeepCopy(),
+                _ => throw new ImpossibleException("Unable to find vanilla boss room")
+            };
         }
-        Room room = PalaceRooms.NewBossRooms(useCustomRooms)[r.Next(PalaceRooms.NewBossRooms(useCustomRooms).Count)].DeepCopy();
-        room.Enemies = PalaceRooms.BossRooms(useCustomRooms)[pal - 1].Enemies;
-        return room;
     }
-    public static Room GenerateItemRoom(Random r, bool useCustomRooms)
+    public static Room GenerateItemRoom(Random r, bool useCustomRooms, bool useCommunityRooms)
     {
+        if(!useCommunityRooms)
+        {
+            return PalaceRooms.ItemRooms(useCustomRooms)[r.Next(PalaceRooms.ItemRooms(useCustomRooms).Count)].DeepCopy();
+        }
         return r.Next(5) switch
         {
             //left

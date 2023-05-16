@@ -85,6 +85,7 @@ public class EastHyrule : World
     public Location hiddenKasutoLocation;
 
     private const int MAP_ADDR = 0xb480;
+    public static int debug = 0;
 
 
     public EastHyrule(Hyrule hy)
@@ -126,7 +127,7 @@ public class EastHyrule : World
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
-        desertTile.PassThrough = 0;
+
         if (palace5 == null)
         {
             palace5 = GetLocationByMem(0x8657);
@@ -329,7 +330,9 @@ public class EastHyrule : World
                 bridge.PassThrough = 0;
                 //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
                 desertTile.PassThrough = 0;
-                desertTile.MapPage = 1;
+                debug++;
+
+                desertTile.MapPage = 64;
                 desertTile.UpdateBytes();
                 Location desert = GetLocationByMem(0x8646);
                 Location swamp = GetLocationByMem(0x8644);

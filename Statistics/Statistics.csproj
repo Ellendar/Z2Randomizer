@@ -9,9 +9,6 @@
     <None Remove="nlog.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="nlog.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -1246,9 +1246,10 @@ public class RandomizerConfiguration
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
+        properties.PalaceStyle = PalaceStyle;
         properties.StartGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
-        properties.PalacePalette = ChangePalacePallettes;
+        properties.ShufflePalacePalettes = ChangePalacePallettes;
         properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
         properties.ShortenGP = ShortGP == null ? random.Next(2) == 1 : (bool)ShortGP;
         properties.RemoveTbird = RemoveTBird;
@@ -1378,7 +1379,7 @@ public class RandomizerConfiguration
         //Misc.
         properties.DisableBeep = DisableLowHealthBeep;
         properties.JumpAlwaysOn = JumpAlwaysOn;
-        properties.DashAlwaysOn = JumpAlwaysOn;
+        properties.DashAlwaysOn = DashAlwaysOn;
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;

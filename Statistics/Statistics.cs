@@ -17,7 +17,9 @@ namespace Z2Randomizer.Statistics
     {
 
         //private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0Y$8v4BX#4XRx$$sh"; //Standard
-        private static readonly string FLAGS = "hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy"; //Max Rando
+        //private static readonly string FLAGS = "hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy"; //Max Rando
+        private static readonly string FLAGS = "hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy"; //Random%
+        
         //private static readonly string FLAGS = "hEAjMsAFerXs2NTbkkg$o6Vqv@sukyAAWh"; //Max Rando all mountains
         //private static readonly string FLAGS = "AAAe6B$zeqGjAAGZt0g$o6XAv@hEig$$WA"; //Standard vanilla overworld
         //private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Bad seed
@@ -27,7 +29,7 @@ namespace Z2Randomizer.Statistics
 
         private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
         private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-        private static readonly int LIMIT = 1;
+        private static readonly int LIMIT = 100;
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         static void Main()
         {
@@ -40,8 +42,8 @@ namespace Z2Randomizer.Statistics
                 for (int i = 0; i < LIMIT; i++)
                 {
                     RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
-                    //int seed = random.Next(1000000000);
-                    int seed = 246099122;
+                    int seed = random.Next(1000000000);
+                    //int seed = 246099122;
                     config.Seed = seed;
                     config.FileName = VANILLA_ROM_PATH;
                     BackgroundWorker backgroundWorker = new BackgroundWorker()
@@ -50,6 +52,7 @@ namespace Z2Randomizer.Statistics
                         WorkerSupportsCancellation = true
                     };
                     DateTime startTime = DateTime.Now;
+                    //logger.Info("Starting seed# " + i + " at: " + startTime);
                     Hyrule hyrule = new Hyrule(config, backgroundWorker, true);
                     DateTime endTime = DateTime.Now;
                     Result result = new Result(hyrule);

@@ -18,7 +18,7 @@ public class PalaceRooms
     private static Dictionary<string, List<Room>> roomsByGroup = new Dictionary<string, List<Room>>();
     private static Dictionary<string, List<Room>> customRoomsByGroup = new Dictionary<string, List<Room>>();
 
-    public static readonly string roomsMD5 = "Nmp0X6tCIdnAHiuVFG7N7g==";
+    public static readonly string roomsMD5 = "GkI2G/XlxbTGTMPYlt0stQ==";
 
     static PalaceRooms()
     {
@@ -26,14 +26,12 @@ public class PalaceRooms
         {
             string roomsJson = File.ReadAllText("PalaceRooms.json");
 
-            /*
             MD5 hasher = MD5.Create();
             byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
                 throw new Exception("Invalid PalaceRooms.json");
             }
-            */
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
             {

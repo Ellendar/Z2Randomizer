@@ -112,7 +112,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 1;
 
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -302,6 +302,11 @@ public class Hyrule
         if (props.DashSpell)
         {
             ROMData.DashSpell();
+        }
+
+        if(props.DashAlwaysOn)
+        {
+            ROMData.Put(0x13C3, new Byte[] { 0x30, 0xD0 });
         }
 
         /*
@@ -985,17 +990,14 @@ public class Hyrule
         {
             if(itemGet[item] == false)
             {
-                if (count > 120)
-                {
-                    debug++;
-                    PrintRoutingDebug(count, wh, eh, dm, mi);
-                    itemGetReachableFailures++;
-                    if(debug >= 18)
-                    {
-                        return false;
-                    }
-                    return false;
-                }
+                //if (count > 120)
+                //{
+                //    debug++;
+                //    PrintRoutingDebug(count, wh, eh, dm, mi);
+                //    
+                //   return false;
+                //}
+                itemGetReachableFailures++;
                 return false;
             }
         }
@@ -1011,13 +1013,13 @@ public class Hyrule
         if (accessibleMagicContainers != 8)
         {
             magicContainerReachableFailures++;
-            PrintRoutingDebug(count, wh, eh, dm, mi);
+            //PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
         if (heartContainers != maxHearts)
         {
             heartContainerReachableFailures++;
-            PrintRoutingDebug(count, wh, eh, dm, mi);
+            //PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
         if(SpellGet.Values.Any(i => i == false))
@@ -3166,7 +3168,7 @@ public class Hyrule
             }
         }
 
-        if (props.PalacePalette)
+        if (props.ShufflePalacePalettes)
         {
             shuffler.ShufflePalacePalettes(ROMData, RNG);
         }

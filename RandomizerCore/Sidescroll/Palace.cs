@@ -17,14 +17,16 @@ public class Palace
     private Room bossRoom;
     private Room tbird;
     private SortedDictionary<int, List<Room>> rooms;
+    /*
     private List<Room> upExits;
     private List<Room> downExits;
     private List<Room> leftExits;
     private List<Room> rightExits;
-    private List<Room> allRooms;
-    private List<Room> onlyDownExits;
+    private List<Room> dropExits;
     private List<Room> onlyp7DownExits;
+    */
     //private ROM ROMData;
+    private List<Room> allRooms;
     private int numRooms;
     private int baseAddr;
     private int connAddr;
@@ -74,12 +76,14 @@ public class Palace
     {
         Number = number;
         root = null;
+        /*
         upExits = new List<Room>();
         downExits = new List<Room>();
         leftExits = new List<Room>();
         rightExits = new List<Room>();
-        onlyDownExits = new List<Room>();
+        dropExits = new List<Room>();
         onlyp7DownExits = new List<Room>();
+        */
         rooms = new SortedDictionary<int, List<Room>>();
         allRooms = new List<Room>();
         numRooms = 0;
@@ -475,11 +479,14 @@ public class Palace
 
     public void SortRoom(Room r)
     {
+        //There is no reason this should be separate, persistent collections.
+        //They were desynchronizing so frequently I got rid of it.
+        /*
         if (r.HasDownExit())
         {
             if (r.HasDrop)
             {
-                onlyDownExits.Add(r);
+                dropExits.Add(r);
             }
             else
             {
@@ -501,6 +508,7 @@ public class Palace
         {
             upExits.Add(r);
         }
+        */
     }
 
     public bool RequiresThunderbird()
@@ -511,12 +519,13 @@ public class Palace
 
     public bool HasDeadEnd()
     {
-        if (onlyDownExits.Count == 0)
+        List<Room> dropExits = allRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+        if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
         {
             return false;
         }
         Room end = BossRoom;
-        foreach (Room r in onlyDownExits)
+        foreach (Room r in dropExits)
         {
             List<Room> reachable = new List<Room>();
             List<Room> roomsToCheck = new List<Room>();
@@ -688,6 +697,11 @@ public class Palace
 
     public void ShuffleRooms(Random r)
     {
+        List<Room> upExits = allRooms.Where(i => i.HasUpExit()).ToList();
+        List<Room> downExits = allRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
+        List<Room> leftExits = allRooms.Where(i => i.HasLeftExit()).ToList();
+        List<Room> rightExits = allRooms.Where(i => i.HasRightExit()).ToList();
+        List<Room> dropExits = allRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
         //Digshake - This method is so ugly and i hate it.
         for (int i = 0; i < upExits.Count; i++)
         {
@@ -707,17 +721,17 @@ public class Palace
             temp.DownByte = down1.DownByte;
             down1.DownByte = tempByte;
         }
-        for (int i = 0; i < onlyDownExits.Count; i++)
+        for (int i = 0; i < dropExits.Count; i++)
         {
-            int swap = r.Next(i, onlyDownExits.Count);
+            int swap = r.Next(i, dropExits.Count);
 
-            Room temp = onlyDownExits[i].Down;
-            int tempByte = onlyDownExits[i].DownByte;
+            Room temp = dropExits[i].Down;
+            int tempByte = dropExits[i].DownByte;
 
-            onlyDownExits[i].Down = onlyDownExits[swap].Down;
-            onlyDownExits[i].DownByte = onlyDownExits[swap].DownByte;
-            onlyDownExits[swap].Down = temp;
-            onlyDownExits[swap].DownByte = tempByte;
+            dropExits[i].Down = dropExits[swap].Down;
+            dropExits[i].DownByte = dropExits[swap].DownByte;
+            dropExits[swap].Down = temp;
+            dropExits[swap].DownByte = tempByte;
         }
 
         for (int i = 0; i < downExits.Count; i++)
@@ -778,7 +792,7 @@ public class Palace
         }
         if (Number == 6)
         {
-            foreach (Room room in onlyDownExits)
+            foreach (Room room in dropExits)
             {
                 if (room.Down.Map != 0xBC)
                 {
@@ -902,14 +916,20 @@ public class Palace
             Tbird.Right.LeftByte = Tbird.LeftByte;
             Tbird.Left.Right = Tbird.Right;
             Tbird.Right.Left = Tbird.Left;
-            leftExits.Remove(Tbird);
-            rightExits.Remove(Tbird);
+            //leftExits.Remove(Tbird);
+            //rightExits.Remove(Tbird);
             allRooms.Remove(Tbird);
         }
     }
 
     public void Shorten(Random random)
     {
+        List<Room> upExits = allRooms.Where(i => i.HasUpExit()).ToList();
+        List<Room> downExits = allRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
+        List<Room> leftExits = allRooms.Where(i => i.HasLeftExit()).ToList();
+        List<Room> rightExits = allRooms.Where(i => i.HasRightExit()).ToList();
+        List<Room> dropExits = allRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+
         int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
         int tries = 0;
@@ -943,7 +963,7 @@ public class Palace
                 remove = downExits[r];
             }
 
-            if (onlyDownExits.Contains(remove) || remove.Map == PalaceRooms.Thunderbird(useCustomRooms).Map || remove == bossRoom)
+            if (dropExits.Contains(remove) || remove.Map == PalaceRooms.Thunderbird(useCustomRooms).Map || remove == bossRoom)
             {
                 tries++;
                 continue;
@@ -970,7 +990,7 @@ public class Palace
                     continue;
                 }
 
-                if (hasLeft && hasRight && (onlyDownExits[0].Down != remove && onlyDownExits[1].Down != remove && onlyDownExits[2].Down != remove && onlyDownExits[3].Down != remove))
+                if (hasLeft && hasRight && (dropExits[0].Down != remove && dropExits[1].Down != remove && dropExits[2].Down != remove && dropExits[3].Down != remove))
                 {
                     remove.Left.Right = remove.Right;
                     remove.Right.Left = remove.Left;
@@ -1086,7 +1106,7 @@ public class Palace
                             continue;
                         }
 
-                        if (remove.Left.Down == null || onlyDownExits.Contains(remove.Left))
+                        if (remove.Left.Down == null || dropExits.Contains(remove.Left))
                         {
                             tries++;
                             continue;
@@ -1121,7 +1141,7 @@ public class Palace
                             continue;
                         }
 
-                        if (remove.Right.Down == null || onlyDownExits.Contains(remove.Right))
+                        if (remove.Right.Down == null || dropExits.Contains(remove.Right))
                         {
                             tries++;
                             continue;

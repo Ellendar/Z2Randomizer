@@ -222,10 +222,12 @@ public class Room
         IsReachable = false;
         MemAddr = memAddr;
         IsPlaced = false;
+        /*
         Left = null;
         Right = null;
         Up = null;
         Down = null;
+        */
         IsBeforeTbird = false;
         isUpDownReversed = upDownRev;
         this.bitmask = bitmask;
@@ -756,6 +758,28 @@ public class Room
         sb.Append(BitConverter.ToString(SideView).Replace("-", ""));
         sb.Append(" Enemies: ");
         sb.Append(BitConverter.ToString(Enemies).Replace("-", ""));
+        return sb.ToString();
+    }
+
+    public string PrintUnsatisfiedExits()
+    {
+        StringBuilder sb = new();
+        if(HasLeftExit() && Left == null)
+        {
+            sb.Append("(Left) ");
+        }
+        if (HasRightExit() && Right == null)
+        {
+            sb.Append("(Right) ");
+        }
+        if (HasUpExit() && Up == null)
+        {
+            sb.Append("(Up) ");
+        }
+        if (HasDownExit() && Down == null)
+        {
+            sb.Append("(Down) ");
+        }
         return sb.ToString();
     }
 
