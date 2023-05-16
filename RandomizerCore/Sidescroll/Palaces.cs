@@ -157,7 +157,7 @@ public class Palaces
                             mapNoGp = 0;
                         }
 
-                        palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace]);
+                        palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace], props.UseCustomRooms);
                         palace.Root = PalaceRooms.Entrances(props.UseCustomRooms)[currentPalace - 1].DeepCopy();
                         palace.Root.IsRoot = true;
                         palace.Root.PalaceGroup = palaceGroup;
@@ -306,7 +306,7 @@ public class Palaces
                                         }
                                         else if (++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
                                         {
-                                            logger.Warn("Drop placement failure limit exceeded.");
+                                            logger.Trace("Drop placement failure limit exceeded.");
                                             break;
                                         }
                                     }
@@ -337,16 +337,19 @@ public class Palaces
                         //|| (/*currentPalace == 1 && */!palace.AllRooms.Any(i => i.HasDrop))
                       );
 
-                    palace.ShuffleRooms(r);
-                    bool reachable = palace.AllReachable();
-                    while ((!reachable || (currentPalace == 7 && (props.RequireTbird && !palace.RequiresThunderbird())) || palace.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
+                    if(roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
                     {
-                        palace.ResetRooms();
                         palace.ShuffleRooms(r);
-                        reachable = palace.AllReachable();
-                        tries++;
-                        logger.Debug("Palace room shuffle attempt #" + tries);
-                    }
+                        bool reachable = palace.AllReachable();
+                        while ((!reachable || (currentPalace == 7 && (props.RequireTbird && !palace.RequiresThunderbird())) || palace.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
+                        {
+                            palace.ResetRooms();
+                            palace.ShuffleRooms(r);
+                            reachable = palace.AllReachable();
+                            tries++;
+                            logger.Debug("Palace room shuffle attempt #" + tries);
+                        }
+                    } 
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 palace.Generations += tries;
                 palaces.Add(palace);
@@ -388,7 +391,7 @@ public class Palaces
         {
             for (int currentPalace = 1; currentPalace < 8; currentPalace++)
             {
-                Palace palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace]);
+                Palace palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace], props.UseCustomRooms);
                 //p.dumpMaps();
                 int palaceGroup = currentPalace switch
                 {

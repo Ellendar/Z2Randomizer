@@ -12,6 +12,8 @@ namespace Z2Randomizer.Core.Sidescroll;
 public class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+    private const bool DROPS_ARE_BLOCKERS = false;
     private Room root;
     private Room itemRoom;
     private Room bossRoom;
@@ -26,7 +28,6 @@ public class Palace
     private List<Room> onlyp7DownExits;
     */
     //private ROM ROMData;
-    private List<Room> allRooms;
     private int numRooms;
     private int baseAddr;
     private int connAddr;
@@ -41,18 +42,7 @@ public class Palace
     private int netDeadEnds;
     private bool useCustomRooms;
 
-    internal List<Room> AllRooms
-    {
-        get
-        {
-            return allRooms;
-        }
-
-        set
-        {
-            allRooms = value;
-        }
-    }
+    internal List<Room> AllRooms { get; private set; }
 
     public bool NeedJumpOrFairy { get => needJumpOrFairy; set => needJumpOrFairy = value; }
     public bool NeedFairy { get => needFairy; set => needFairy = value; }
@@ -72,7 +62,7 @@ public class Palace
     //DEBUG
     public int Generations { get; set; }
 
-    public Palace(int number, int baseAddr, int connAddr)
+    public Palace(int number, int baseAddr, int connAddr, bool useCustomRooms)
     {
         Number = number;
         root = null;
@@ -85,7 +75,7 @@ public class Palace
         onlyp7DownExits = new List<Room>();
         */
         rooms = new SortedDictionary<int, List<Room>>();
-        allRooms = new List<Room>();
+        AllRooms = new List<Room>();
         numRooms = 0;
         this.baseAddr = baseAddr;
         this.connAddr = connAddr;
@@ -252,7 +242,7 @@ public class Palace
         {
             netDeadEnds--;
         }
-        allRooms.Add(r);
+        AllRooms.Add(r);
         SortRoom(r);
         numRooms++;
 
@@ -318,7 +308,13 @@ public class Palace
         {
             if (Number == 1)
             {
-                if (r.IsFairyBlocked || r.IsDownstabBlocked || r.IsUpstabBlocked || r.IsJumpBlocked || r.IsGloveBlocked || r.HasDrop || r.IsDropZone || r.HasBoss)
+                if (r.IsFairyBlocked 
+                    || r.IsDownstabBlocked 
+                    || r.IsUpstabBlocked 
+                    || r.IsJumpBlocked 
+                    || r.IsGloveBlocked 
+                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)) 
+                    || r.HasBoss)
                 {
                     return false;
                 }
@@ -326,7 +322,11 @@ public class Palace
 
             if (Number == 2)
             {
-                if (r.IsFairyBlocked || r.IsDownstabBlocked || r.IsUpstabBlocked || r.HasDrop || r.IsDropZone || r.HasBoss)
+                if (r.IsFairyBlocked 
+                    || r.IsDownstabBlocked 
+                    || r.IsUpstabBlocked
+                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                    || r.HasBoss)
                 {
                     return false;
                 }
@@ -334,7 +334,9 @@ public class Palace
 
             if (Number == 3)
             {
-                if (r.IsJumpBlocked || r.IsFairyBlocked || r.HasDrop || r.IsDropZone)
+                if (r.IsJumpBlocked 
+                    || r.IsFairyBlocked
+                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)))
                 {
                     return false;
                 }
@@ -342,7 +344,9 @@ public class Palace
 
             if (Number == 4)
             {
-                if (r.IsGloveBlocked || r.IsUpstabBlocked || r.IsDownstabBlocked)
+                if (r.IsGloveBlocked 
+                    || r.IsUpstabBlocked 
+                    || r.IsDownstabBlocked)
                 {
                     return false;
                 }
@@ -350,7 +354,11 @@ public class Palace
 
             if (Number == 5)
             {
-                if (r.IsGloveBlocked || r.IsUpstabBlocked || r.IsDownstabBlocked || r.HasDrop || r.IsDropZone || r.HasBoss)
+                if (r.IsGloveBlocked 
+                    || r.IsUpstabBlocked 
+                    || r.IsDownstabBlocked
+                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                    || r.HasBoss)
                 {
                     return false;
                 }
@@ -519,7 +527,7 @@ public class Palace
 
     public bool HasDeadEnd()
     {
-        List<Room> dropExits = allRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
         if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
         {
             return false;
@@ -610,7 +618,7 @@ public class Palace
             }
         }
         CheckPaths(root, 2);
-        foreach (Room r in allRooms)
+        foreach (Room r in AllRooms)
         {
             if (!r.IsPlaced)
             {
@@ -697,11 +705,16 @@ public class Palace
 
     public void ShuffleRooms(Random r)
     {
-        List<Room> upExits = allRooms.Where(i => i.HasUpExit()).ToList();
-        List<Room> downExits = allRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
-        List<Room> leftExits = allRooms.Where(i => i.HasLeftExit()).ToList();
-        List<Room> rightExits = allRooms.Where(i => i.HasRightExit()).ToList();
-        List<Room> dropExits = allRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+        List<Room> upExits = AllRooms.Where(i => i.HasUpExit()).ToList();
+        List<Room> downExits = AllRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
+        List<Room> leftExits = AllRooms.Where(i => i.HasLeftExit()).ToList();
+        List<Room> rightExits = AllRooms.Where(i => i.HasRightExit()).ToList();
+        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+
+        if(upExits.Any(i => i.Up == null))
+        {
+            logger.Error("Up Exits desynched!");
+        }
         //Digshake - This method is so ugly and i hate it.
         for (int i = 0; i < upExits.Count; i++)
         {
@@ -720,6 +733,10 @@ public class Palace
             tempByte = temp.DownByte;
             temp.DownByte = down1.DownByte;
             down1.DownByte = tempByte;
+            if (upExits.Any(i => i.Up == null))
+            {
+                logger.Error("Up Exits desynched!");
+            }
         }
         for (int i = 0; i < dropExits.Count; i++)
         {
@@ -794,15 +811,26 @@ public class Palace
         {
             foreach (Room room in dropExits)
             {
-                if (room.Down.Map != 0xBC)
+                /*
+                //There was an issue here with dropexits with null Down references breaking this.
+                //I have no idea why this code exists, so for now I just coalesced it out.
+                if(room.Down == null)
                 {
+                    logger.Warn("Null Down exit from a dropExit.");
                     int db = room.DownByte;
                     room.DownByte = (db & 0xFC) + 1;
+                }
+                else 
+                */
+                if (room.Down.Map == 0xBC)
+                {
+                    int db = room.DownByte;
+                    room.DownByte = (db & 0xFC) + 2;
                 }
                 else
                 {
                     int db = room.DownByte;
-                    room.DownByte = (db & 0xFC) + 2;
+                    room.DownByte = (db & 0xFC) + 1;
                 }
             }
         }
@@ -816,7 +844,7 @@ public class Palace
     public void UpdateRom(ROM ROMData)
     {
         
-        foreach (Room r in allRooms)
+        foreach (Room r in AllRooms)
         {
             r.UpdateConnectionBytes();
             for (int i = 0; i < 4; i++)
@@ -840,7 +868,7 @@ public class Palace
 
     public void CreateTree(bool removeTbird)
     {
-        foreach (Room r in allRooms)
+        foreach (Room r in AllRooms)
         {
             if (rooms.ContainsKey(r.Map * 4))
             {
@@ -856,7 +884,7 @@ public class Palace
             }
             SortRoom(r);
         }
-        foreach (Room r in allRooms)
+        foreach (Room r in AllRooms)
         {
             if (r.Left == null && (r.HasLeftExit()))
             {
@@ -918,17 +946,17 @@ public class Palace
             Tbird.Right.Left = Tbird.Left;
             //leftExits.Remove(Tbird);
             //rightExits.Remove(Tbird);
-            allRooms.Remove(Tbird);
+            AllRooms.Remove(Tbird);
         }
     }
 
     public void Shorten(Random random)
     {
-        List<Room> upExits = allRooms.Where(i => i.HasUpExit()).ToList();
-        List<Room> downExits = allRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
-        List<Room> leftExits = allRooms.Where(i => i.HasLeftExit()).ToList();
-        List<Room> rightExits = allRooms.Where(i => i.HasRightExit()).ToList();
-        List<Room> dropExits = allRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+        List<Room> upExits = AllRooms.Where(i => i.HasUpExit()).ToList();
+        List<Room> downExits = AllRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
+        List<Room> leftExits = AllRooms.Where(i => i.HasLeftExit()).ToList();
+        List<Room> rightExits = AllRooms.Where(i => i.HasRightExit()).ToList();
+        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
 
         int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
@@ -1000,7 +1028,7 @@ public class Palace
                     //logger.WriteLine("removed 1 room");
                     leftExits.Remove(remove);
                     rightExits.Remove(remove);
-                    allRooms.Remove(remove);
+                    AllRooms.Remove(remove);
                     tries = 0;
                     continue;
                 }
@@ -1015,7 +1043,7 @@ public class Palace
                     rooms--;
                     upExits.Remove(remove);
                     downExits.Remove(remove);
-                    allRooms.Remove(remove);
+                    AllRooms.Remove(remove);
                     tries = 0;
                     continue;
                 }
@@ -1049,8 +1077,8 @@ public class Palace
                         leftExits.Remove(remove);
                         rightExits.Remove(remove.Left);
                         upExits.Remove(remove.Left);
-                        allRooms.Remove(remove);
-                        allRooms.Remove(remove.Left);
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Left);
                         //logger.WriteLine("removed 2 room");
                         rooms = rooms - 2;
                         tries = 0;
@@ -1083,8 +1111,8 @@ public class Palace
                         rightExits.Remove(remove);
                         leftExits.Remove(remove.Right);
                         upExits.Remove(remove.Right);
-                        allRooms.Remove(remove);
-                        allRooms.Remove(remove.Right);
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Right);
                         //logger.WriteLine("removed 2 room");
 
                         rooms = rooms - 2;
@@ -1121,8 +1149,8 @@ public class Palace
                         leftExits.Remove(remove);
                         rightExits.Remove(remove.Left);
                         downExits.Remove(remove.Left);
-                        allRooms.Remove(remove);
-                        allRooms.Remove(remove.Left);
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Left);
                         //logger.WriteLine("removed 2 room");
 
                         rooms = rooms - 2;
@@ -1156,8 +1184,8 @@ public class Palace
                         rightExits.Remove(remove);
                         leftExits.Remove(remove.Right);
                         downExits.Remove(remove.Right);
-                        allRooms.Remove(remove);
-                        allRooms.Remove(remove.Right);
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Right);
                         //logger.WriteLine("removed 2 room");
 
                         rooms = rooms - 2;
@@ -1188,7 +1216,7 @@ public class Palace
             startAddr = 0xA000 - 0x8000 + (world * 0x4000) + 0x10;
         }
         
-        foreach (Room room in allRooms)
+        foreach (Room room in AllRooms)
         {
             int i = startAddr + (room.Map * 2);
             if(newMap)
