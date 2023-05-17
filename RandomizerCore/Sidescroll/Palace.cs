@@ -1308,7 +1308,6 @@ public class Palace
 
     public void RandomizeEnemies(RandomizerProperties props, Random r)
     {
-        /*
         int count = 0;
         int ENEMY_SHUFFLE_LIMIT = 10;
         foreach(Room room in AllRooms)
@@ -1336,7 +1335,7 @@ public class Palace
                         ") Exceeded the enemy shuffle limit");
                 }
             }
-        }*/
+        }
     }
 
     public int GetPalaceGroup()

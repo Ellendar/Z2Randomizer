@@ -112,7 +112,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 1;
 
-    public const bool UNSAFE_DEBUG = false;
+    public const bool UNSAFE_DEBUG = true;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -3978,6 +3978,14 @@ public class Hyrule
         //    ROMData.put(0x8660, 0);
         //}
 
+        long inthash = BitConverter.ToInt64(hash, 0);
+
+        ROMData.Put(0x17C2C, (byte)(((inthash) & 0x1F) + 0xD0));
+        ROMData.Put(0x17C2E, (byte)(((inthash >> 5) & 0x1F) + 0xD0));
+        ROMData.Put(0x17C30, (byte)(((inthash >> 10) & 0x1F) + 0xD0));
+        ROMData.Put(0x17C32, (byte)(((inthash >> 15) & 0x1F) + 0xD0));
+        ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
+        ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
     }
 
     /*

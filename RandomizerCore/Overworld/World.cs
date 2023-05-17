@@ -117,7 +117,7 @@ public abstract class World
         hyrule = parent;
         connections = new Dictionary<Location, Location>();
         Locations = new Dictionary<Terrain, List<Location>>();
-        foreach(Terrain Terrain in Enum.GetValues(typeof(Terrain)))
+        foreach (Terrain Terrain in Enum.GetValues(typeof(Terrain)))
         {
             Locations.Add(Terrain, new List<Location>());
         }
@@ -344,16 +344,16 @@ public abstract class World
         int i = 0;
         int j = 0;
         map = new Terrain[MAP_ROWS, MAP_COLS];
-        while(i < MAP_ROWS)
+        while (i < MAP_ROWS)
         {
             j = 0;
-            while(j < MAP_COLS)
+            while (j < MAP_COLS)
             {
                 byte data = hyrule.ROMData.GetByte(addr);
                 int count = (data & 0xF0) >> 4;
                 count++;
                 Terrain t = (Terrain)(data & 0x0F);
-                for(int k = 0; k < count; k++)
+                for (int k = 0; k < count; k++)
                 {
                     map[i, j + k] = t;
                 }
@@ -366,18 +366,18 @@ public abstract class World
 
     public void UpdateAllReached()
     {
-        if(AllReached)
+        if (AllReached)
         {
             return;
         }
         else
         {
             AllReached = true;
-            foreach(Location location in AllLocations)
+            foreach (Location location in AllLocations)
             {
-                if(location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Item.DO_NOT_USE)
+                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Item.DO_NOT_USE)
                 {
-                    if(!location.Reachable)
+                    if (!location.Reachable)
                     {
                         AllReached = false;
                     }
@@ -458,14 +458,14 @@ public abstract class World
                     x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
                     y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
                 } while (
-                    map[y, x] != Terrain.NONE 
-                    || map[y - 1, x] != Terrain.NONE 
-                    || map[y + 1, x] != Terrain.NONE 
-                    || map[y + 1, x + 1] != Terrain.NONE 
-                    || map[y, x + 1] != Terrain.NONE 
-                    || map[y - 1, x + 1] != Terrain.NONE 
-                    || map[y + 1, x - 1] != Terrain.NONE 
-                    || map[y, x - 1] != Terrain.NONE 
+                    map[y, x] != Terrain.NONE
+                    || map[y - 1, x] != Terrain.NONE
+                    || map[y + 1, x] != Terrain.NONE
+                    || map[y + 1, x + 1] != Terrain.NONE
+                    || map[y, x + 1] != Terrain.NONE
+                    || map[y - 1, x + 1] != Terrain.NONE
+                    || map[y + 1, x - 1] != Terrain.NONE
+                    || map[y, x - 1] != Terrain.NONE
                     || map[y - 1, x - 1] != Terrain.NONE
                 );
 
@@ -477,10 +477,10 @@ public abstract class World
                     Terrain entranceTerrain = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
                     // if (!hyrule.Props.saneCaves || !connections.ContainsKey(location))
                     //Updated to avoid "if not else" anti-pattern
-                    if(hyrule.Props.SaneCaves && connections.ContainsKey(location))
+                    if (hyrule.Props.SaneCaves && connections.ContainsKey(location))
                     {
                         PlaceCaveCount++;
-                        if(!PlaceSaneCave(x, y, direction, entranceTerrain, riverTerrain, location))
+                        if (!PlaceSaneCave(x, y, direction, entranceTerrain, riverTerrain, location))
                         {
                             return false;
                         }
@@ -509,7 +509,7 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if(location.TerrainType != Terrain.TOWN || location.TownNum != Town.NEW_KASUTO_2) //don't place newkasuto2
+                else if (location.TerrainType != Terrain.TOWN || location.TownNum != Town.NEW_KASUTO_2) //don't place newkasuto2
                 {
                     Terrain t = Terrain.NONE;
                     do
@@ -546,7 +546,7 @@ public abstract class World
     {
         int smallx = x;
         int largex = otherx;
-        if(x > otherx)
+        if (x > otherx)
         {
             smallx = otherx;
             largex = x;
@@ -555,17 +555,17 @@ public abstract class World
         int smally = y;
         int largey = othery;
 
-        if(y > othery)
+        if (y > othery)
         {
             smally = othery;
             largey = y;
         }
 
-        for(int i = smally; i < largey; i++)
+        for (int i = smally; i < largey; i++)
         {
             for (int j = smallx; j < largex; j++)
             {
-                if(i > 0 && i < MAP_ROWS && j > 0 && j < MAP_COLS && map[i, j] == riverT)
+                if (i > 0 && i < MAP_ROWS && j > 0 && j < MAP_COLS && map[i, j] == riverT)
                 {
                     return true;
                 }
@@ -674,7 +674,7 @@ public abstract class World
         int otherx = 0;
         int othery = 0;
         int tries = 0;
-        bool crossing = true;    
+        bool crossing = true;
         do
         {
             int range = 12;
@@ -751,7 +751,7 @@ public abstract class World
 
     public void PlaceHiddenLocations()
     {
-        foreach(Location location in unimportantLocs)
+        foreach (Location location in unimportantLocs)
         {
             if (location.CanShuffle)
             {
@@ -811,25 +811,25 @@ public abstract class World
                 waterDirection = NextToWater(x, y, riverTerrain);
                 waterTries++;
             }
-            if(waterTries >= 2000)
+            if (waterTries >= 2000)
             {
                 return false;
             }
             int deltaX = waterDirection.DeltaX();
             int deltaY = waterDirection.DeltaY();
             int length = 0;
-            if(IsSingleTile(y, x))
+            if (IsSingleTile(y, x))
             {
                 length = 100;
             }
 
             int startMass = mass[y, x];
 
-           
-            if(GetLocationByCoords(Tuple.Create(y + 30, x)) != null 
-                || GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null 
-                || GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null 
-                || GetLocationByCoords(Tuple.Create(y + 31, x)) != null 
+
+            if (GetLocationByCoords(Tuple.Create(y + 30, x)) != null
+                || GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null
+                || GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null
+                || GetLocationByCoords(Tuple.Create(y + 31, x)) != null
                 || GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
             {
                 length = 100;
@@ -837,10 +837,10 @@ public abstract class World
 
             x += deltaX;
             y += deltaY;
-            
+
             while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && map[y, x] == riverTerrain)
             {
-                if(x + 1 < MAP_COLS && GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null)
+                if (x + 1 < MAP_COLS && GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null)
                 {
                     length = 100;
                 }
@@ -877,11 +877,11 @@ public abstract class World
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-                if(deltaX != 0)
+                if (deltaX != 0)
                 {
-                    if(y - 1 > 0)
+                    if (y - 1 > 0)
                     {
-                        if(map[y - 1, x] != riverTerrain && map[y - 1, x] != Terrain.MOUNTAIN)
+                        if (map[y - 1, x] != riverTerrain && map[y - 1, x] != Terrain.MOUNTAIN)
                         {
                             length = 100;
                         }
@@ -920,31 +920,31 @@ public abstract class World
                 x += deltaX;
                 y += deltaY;
                 length++;
-                
+
             }
             if (IsSingleTile(y, x))
             {
                 length = 100;
             }
-            
+
             int endMass = 0;
-            if(y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
+            if (y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
             {
-                if (GetLocationByCoords(Tuple.Create(y + 30, x)) != null 
-                    || GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null 
-                    || GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null 
-                    || GetLocationByCoords(Tuple.Create(y + 31, x)) != null 
+                if (GetLocationByCoords(Tuple.Create(y + 30, x)) != null
+                    || GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null
+                    || GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null
+                    || GetLocationByCoords(Tuple.Create(y + 31, x)) != null
                     || GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
                 {
                     length = 100;
                 }
                 endMass = mass[y, x];
             }
-            
-            if((riverTerrain != Terrain.DESERT && this.biome != Biome.CALDERA && this.biome != Biome.VOLCANO) 
-                && (startMass == 0 
-                    || endMass == 0 
-                    || endMass == startMass 
+
+            if ((riverTerrain != Terrain.DESERT && this.biome != Biome.CALDERA && this.biome != Biome.VOLCANO)
+                && (startMass == 0
+                    || endMass == 0
+                    || endMass == startMass
                     || (connectMass.ContainsKey(startMass) && connectMass[startMass].Contains(endMass))
                 )
             )
@@ -952,22 +952,22 @@ public abstract class World
                 length = 100;
             }
             if (
-                (placeTown && length < MAXIMUM_BRIDGE_LENGTH || (length < MAXIMUM_BRIDGE_LENGTH && length > MINIMUM_BRIDGE_LENGTH)) 
-                && x > 0 
-                && x < MAP_COLS - 1 
-                && y > 0 
-                && y < MAP_ROWS - 1 
-                && walkableTerrains.Contains(map[y, x]) 
+                (placeTown && length < MAXIMUM_BRIDGE_LENGTH || (length < MAXIMUM_BRIDGE_LENGTH && length > MINIMUM_BRIDGE_LENGTH))
+                && x > 0
+                && x < MAP_COLS - 1
+                && y > 0
+                && y < MAP_ROWS - 1
+                && walkableTerrains.Contains(map[y, x])
                 && map[y, x] != riverTerrain)
             {
-                if(!connectMass.ContainsKey(startMass))
+                if (!connectMass.ContainsKey(startMass))
                 {
                     List<int> c = new List<int>();
                     c.Add(endMass);
                     connectMass[startMass] = c;
                 }
                 else
-                {                        
+                {
                     connectMass[startMass].Add(endMass);
                 }
 
@@ -987,7 +987,7 @@ public abstract class World
 
                 if (placeTown)
                 {
-                    
+
                     map[y, x] = Terrain.TOWN;
                     Location location = GetLocationByMem(0x465F);
                     location.Ypos = y + 30;
@@ -1009,7 +1009,7 @@ public abstract class World
                     location.Xpos = x;
                     placeTown = false;
                 }
-                else if(placeLongBridge)
+                else if (placeLongBridge)
                 {
                     Location bridge1 = GetLocationByMap(0x04, 0);
                     Location bridge2 = GetLocationByMap(0xC5, 0);
@@ -1025,7 +1025,7 @@ public abstract class World
                         bridge1.Xpos = x;
                         bridge1.Ypos = y + 30;
                     }
-                    
+
                     while (map[y, x] == riverTerrain)
                     {
                         map[y, x] = Terrain.BRIDGE;
@@ -1035,7 +1035,7 @@ public abstract class World
                         //{
                         //    map[y + deltaY, x + deltaX] = Terrain.walkablewater;
                         //}
-                        
+
                     }
                     x += deltaX;
                     y += deltaY;
@@ -1054,7 +1054,7 @@ public abstract class World
                     bridge1.CanShuffle = false;
                     bridge2.CanShuffle = false;
                 }
-                else if(placeDarunia)
+                else if (placeDarunia)
                 {
                     Location bridge1 = GetLocationByMem(0x8638);
                     Location bridge2 = GetLocationByMem(0x8637);
@@ -1101,7 +1101,7 @@ public abstract class World
                         bridge2.CanShuffle = false;
                     }
                     placeDarunia = false;
-                    
+
                 }
                 else
                 {
@@ -1110,7 +1110,7 @@ public abstract class World
                     int curr = 0;
                     if (TerrainCycle == 2)
                     {
-                        
+
                         x += deltaX;
                         y += deltaY;
                         map[y, x] = Terrain.ROAD;
@@ -1128,9 +1128,10 @@ public abstract class World
                             //}
                         }
                         map[y, x] = Terrain.ROAD;
-                        
+
                     }
-                    else {
+                    else
+                    {
                         while (map[y, x] == riverTerrain)
                         {
 
@@ -1242,16 +1243,16 @@ public abstract class World
                     {
                         TerrainCycle = TerrainCycle % 2;
                     }
-                    
+
                 }
-                
+
                 bridges--;
-                
+
             }
         }
         return !placeTown;
     }
-     
+
     /// <summary>
     /// Groups the map into connected sections of walkable terrain.
     /// </summary>
@@ -1271,7 +1272,7 @@ public abstract class World
         {
             for (int j = 0; j < MAP_COLS; j++)
             {
-                if(mass[i,j] == 0 && walkableTerrains.Contains(map[i,j]))
+                if (mass[i, j] == 0 && walkableTerrains.Contains(map[i, j]))
                 {
                     CategorizeTerrainGlob(i, j, massNo, mass);
                     massNo++;
@@ -1291,7 +1292,7 @@ public abstract class World
     private void CategorizeTerrainGlob(int y, int x, int massNo, int[,] mass)
     {
         mass[y, x] = massNo;
-        if(y - 1 > 0 && mass[y - 1, x] == 0 && walkableTerrains.Contains(map[y - 1, x]))
+        if (y - 1 > 0 && mass[y - 1, x] == 0 && walkableTerrains.Contains(map[y - 1, x]))
         {
             CategorizeTerrainGlob(y - 1, x, massNo, mass);
         }
@@ -1311,7 +1312,7 @@ public abstract class World
 
     private string PrintTerrainGlobMap(int[,] mass)
     {
-        char[] encoding = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q'};
+        char[] encoding = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q' };
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < MAP_ROWS; i++)
         {
@@ -1326,9 +1327,9 @@ public abstract class World
 
     protected Direction NextToWater(int x, int y, Terrain riverTerrain)
     {
-        if(walkableTerrains.Contains(map[y, x]) && map[y, x] != riverTerrain)
+        if (walkableTerrains.Contains(map[y, x]) && map[y, x] != riverTerrain)
         {
-            if(map[y + 1, x] == riverTerrain)
+            if (map[y + 1, x] == riverTerrain)
             {
                 return Direction.SOUTH;
             }
@@ -1390,9 +1391,9 @@ public abstract class World
         TerrainGrowthAttempts++;
         Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
         List<Tuple<int, int>> placed = new List<Tuple<int, int>>();
-        for(int i = 0; i < MAP_ROWS; i++)
+        for (int i = 0; i < MAP_ROWS; i++)
         {
-            for(int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MAP_COLS; j++)
             {
                 if (map[i, j] != Terrain.NONE && randomTerrains.Contains(map[i, j]))
                 {
@@ -1413,7 +1414,7 @@ public abstract class World
                     choices.Clear();
                     double mindistance = Int32.MaxValue;
 
-                    foreach(Tuple<int, int> t in placed)
+                    foreach (Tuple<int, int> t in placed)
                     {
                         tx = t.Item1 - i;
                         ty = t.Item2 - j;
@@ -1426,7 +1427,7 @@ public abstract class World
                             choices.Add(map[t.Item1, t.Item2]);
                             mindistance = distance;
                         }
-                        else if(distance == mindistance)
+                        else if (distance == mindistance)
                         {
                             choices.Add(map[t.Item1, t.Item2]);
                         }
@@ -1486,7 +1487,7 @@ public abstract class World
         {
             for (int x = 0; x < MAP_COLS; x++)
             {
-                if(hyrule.Props.HiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
+                if (hyrule.Props.HiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
@@ -1516,7 +1517,7 @@ public abstract class World
                     bytesWritten += 2;
                     continue;
                 }
-                
+
                 if (map[y, x] == currentTerrain && currentTerrainCount < 16)
                 {
                     currentTerrainCount++;
@@ -1577,19 +1578,19 @@ public abstract class World
         int y;
         int olength = 0;
 
-        if(direction == Direction.WEST)
+        if (direction == Direction.WEST)
         {
             x = 0;
             y = hyrule.RNG.Next(MAP_ROWS);
             olength = hyrule.RNG.Next(Math.Max(y, MAP_ROWS - y));
-        } 
-        else if(direction == Direction.EAST)
+        }
+        else if (direction == Direction.EAST)
         {
             x = MAP_COLS - 1;
             y = hyrule.RNG.Next(MAP_ROWS);
             olength = hyrule.RNG.Next(Math.Max(y, MAP_ROWS - y));
         }
-        else if(direction == Direction.NORTH)
+        else if (direction == Direction.NORTH)
         {
             x = hyrule.RNG.Next(MAP_COLS);
             y = 0;
@@ -1602,14 +1603,14 @@ public abstract class World
             olength = hyrule.RNG.Next(Math.Max(x, MAP_COLS - x));
         }
         //draw ocean on right side
-        
+
         if (direction == Direction.EAST || direction == Direction.WEST)
         {
             if (y < MAP_ROWS / 2)
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if(map[y + i, x] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
+                    if (map[y + i, x] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
                     {
                         return;
                     }
@@ -1629,7 +1630,7 @@ public abstract class World
                         map[y - i, x] = water;
                     }
                 }
-                catch(IndexOutOfRangeException e)
+                catch (IndexOutOfRangeException e)
                 {
                     logger.Error(e);
                 }
@@ -1667,7 +1668,7 @@ public abstract class World
         Location location = GetLocationByMem(0x8646);
         int jumpBlockY = -1;
         int jumpBlockX = -1;
-        if(location != null)
+        if (location != null)
         {
             needJump = location.NeedJump;
             jumpBlockY = location.Ypos - 30;
@@ -1698,7 +1699,7 @@ public abstract class World
                 for (int x = 0; x < MAP_COLS; x++)
                 {
                     Terrain terrain = map[y, x];
-                    if(location != null && location.TerrainType == Terrain.SWAMP)
+                    if (location != null && location.TerrainType == Terrain.SWAMP)
                     {
                         needFairy = location.NeedFairy;
                     }
@@ -1710,24 +1711,24 @@ public abstract class World
                     if (!visitation[y, x]
                         //East desert jump blocker
                         && !(
-                            needJump 
-                            && jumpBlockY == y 
-                            && jumpBlockX == x 
+                            needJump
+                            && jumpBlockY == y
+                            && jumpBlockX == x
                             && (!hasJumpSpell && !hasFairySpell)
                         )
                         //Fairy cave is traversable
                         && !(needFairy && fairyBlockY == y && fairyBlockX == x && !hasFairySpell)
                         //This map tile is a traversable terrain type
                         && (
-                            terrain == Terrain.LAVA 
-                            || terrain == Terrain.BRIDGE 
-                            || terrain == Terrain.CAVE 
-                            || terrain == Terrain.ROAD 
-                            || terrain == Terrain.PALACE 
-                            || terrain == Terrain.TOWN 
+                            terrain == Terrain.LAVA
+                            || terrain == Terrain.BRIDGE
+                            || terrain == Terrain.CAVE
+                            || terrain == Terrain.ROAD
+                            || terrain == Terrain.PALACE
+                            || terrain == Terrain.TOWN
                             || (terrain == Terrain.WALKABLEWATER && hasBoots)
-                            || walkableTerrains.Contains(terrain) 
-                            || (terrain == Terrain.ROCK && hasHammer) 
+                            || walkableTerrains.Contains(terrain)
+                            || (terrain == Terrain.ROCK && hasHammer)
                             || (terrain == Terrain.SPIDER && hasFlute)
                         )
                     )
@@ -1820,7 +1821,7 @@ public abstract class World
         //Run the initial steps
         foreach (Location start in starts)
         {
-            if(start.Ypos >= 30 && start.Xpos >= 0)
+            if (start.Ypos >= 30 && start.Xpos >= 0)
             {
                 UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
             }
@@ -1896,7 +1897,7 @@ public abstract class World
                 }
             }
         }
-        catch(IndexOutOfRangeException)
+        catch (IndexOutOfRangeException)
         {
             logger.Debug("?");
             throw;
@@ -1906,14 +1907,14 @@ public abstract class World
     //Should the visibility calculation table even be persistent? Why is this not just in scope of the calculation itself?
     public void ResetVisitabilityState()
     {
-        for(int i = 0; i < MAP_ROWS; i++)
+        for (int i = 0; i < MAP_ROWS; i++)
         {
-            for(int j = 0; j < MAP_COLS; j++)
+            for (int j = 0; j < MAP_COLS; j++)
             {
                 visitation[i, j] = false;
             }
         }
-        foreach(Location location in AllLocations)
+        foreach (Location location in AllLocations)
         {
             location.CanShuffle = true;
             location.Reachable = false;
@@ -1935,7 +1936,7 @@ public abstract class World
         {
             length = 0;
             tries++;
-            if(tries > 100)
+            if (tries > 100)
             {
                 return false;
             }
@@ -1947,7 +1948,7 @@ public abstract class World
                 {
                     rafty = hyrule.RNG.Next(0, MAP_ROWS);
                     rtries++;
-                    if(rtries > 100)
+                    if (rtries > 100)
                     {
                         return false;
                     }
@@ -1977,14 +1978,14 @@ public abstract class World
                 int rtries = 0;
 
                 do
-                { 
+                {
                     raftx = hyrule.RNG.Next(0, MAP_COLS);
                     rtries++;
                     if (rtries > 100)
                     {
                         return false;
                     }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER) ;
+                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
                 deltax = 0;
                 deltay = -1;
             }
@@ -2002,7 +2003,7 @@ public abstract class World
                         return false;
                     }
                 } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                
+
                 deltax = -1;
                 deltay = 0;
             }
@@ -2038,7 +2039,7 @@ public abstract class World
                     map[rafty, i] = Terrain.BRIDGE;
                 }
             }
-            else if(direction == Direction.WEST)
+            else if (direction == Direction.WEST)
             {
                 for (int i = raftx - 1; i >= 0; i--)
                 {
@@ -2130,7 +2131,7 @@ public abstract class World
 
     public void VisitBridge()
     {
-        if(bridge != null)
+        if (bridge != null)
         {
             visitation[bridge.Ypos - 30, bridge.Xpos] = true;
         }
@@ -2138,7 +2139,7 @@ public abstract class World
 
     public void VisitCave1()
     {
-        if(cave1 != null)
+        if (cave1 != null)
         {
             visitation[cave1.Ypos - 30, cave1.Xpos] = true;
         }
@@ -2159,22 +2160,22 @@ public abstract class World
 
     public void RemoveUnusedConnectors()
     {
-        if(this.raft == null)
+        if (this.raft == null)
         {
             hyrule.ROMData.Put(baseAddr + 41, 0x00);
         }
 
-        if(this.bridge == null)
+        if (this.bridge == null)
         {
             hyrule.ROMData.Put(baseAddr + 40, 0x00);
         }
 
-        if(this.cave1 == null)
+        if (this.cave1 == null)
         {
             hyrule.ROMData.Put(baseAddr + 42, 0x00);
         }
 
-        if(this.cave2 == null)
+        if (this.cave2 == null)
         {
             hyrule.ROMData.Put(baseAddr + 43, 0x00);
         }
@@ -2198,19 +2199,19 @@ public abstract class World
         int deltay = 0;
         int startx = 0;
         int starty = 0;
-        if(dirr == 0) //north
+        if (dirr == 0) //north
         {
             deltay = 1;
             startx = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
             starty = 0;
         }
-        else if(dirr == 1) //east
+        else if (dirr == 1) //east
         {
             deltax = -1;
             startx = MAP_COLS - 1;
             starty = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
         }
-        else if(dirr == 2) //south
+        else if (dirr == 2) //south
         {
             deltay = -1;
             startx = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
@@ -2224,15 +2225,15 @@ public abstract class World
         }
 
         int stopping = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
-        if(deltay != 0)
+        if (deltay != 0)
         {
             stopping = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
         }
         int curr = 0;
-        while(curr < stopping)
+        while (curr < stopping)
         {
-            
-            if(map[starty, startx] == Terrain.NONE)
+
+            if (map[starty, startx] == Terrain.NONE)
             {
                 map[starty, startx] = water;
                 int adjust = hyrule.RNG.Next(-1, 2);
@@ -2240,11 +2241,11 @@ public abstract class World
                 {
                     adjust = hyrule.RNG.Next(0, 2);
                 }
-                else if((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
+                else if ((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
                 {
                     adjust = hyrule.RNG.Next(-1, 1);
                 }
-                
+
                 if (adjust < 0)
                 {
                     if (deltax != 0)
@@ -2256,7 +2257,7 @@ public abstract class World
                         startx--;
                     }
                 }
-                else if(adjust > 0)
+                else if (adjust > 0)
                 {
                     if (deltax != 0)
                     {
@@ -2269,7 +2270,7 @@ public abstract class World
                 }
                 map[starty, startx] = water;
             }
-            
+
             startx += deltax;
             starty += deltay;
             curr++;
@@ -2292,7 +2293,7 @@ public abstract class World
         {
             deltax = 1;
         }
-        while(startx > 0 && startx < MAP_COLS && starty > 0 && starty < MAP_ROWS)
+        while (startx > 0 && startx < MAP_COLS && starty > 0 && starty < MAP_ROWS)
         {
 
             if (map[starty, startx] == Terrain.NONE)
@@ -2318,7 +2319,7 @@ public abstract class World
                         startx--;
                     }
                 }
-                else if(adjust > 0)
+                else if (adjust > 0)
                 {
                     if (deltax != 0)
                     {
@@ -2367,12 +2368,12 @@ public abstract class World
                 }
 
                 int rightM = hyrule.RNG.Next(14, 17);
-                
+
                 if (riverx + rightM < MAP_COLS)
                 {
                     map[y, riverx + rightM - 3] = tright;
                 }
-                
+
                 if (drawRight % 5 == 0)
                 {
                     tright = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
@@ -2432,12 +2433,12 @@ public abstract class World
                 }
 
                 int rightM = hyrule.RNG.Next(14, 17);
-                
+
                 if (rivery + rightM < MAP_ROWS)
                 {
                     map[rivery + rightM - 3, x] = tright;
                 }
-                
+
                 if (drawRight % 5 == 0)
                 {
                     tright = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
@@ -2529,8 +2530,8 @@ public abstract class World
         }
         else
         {
-             top = (MAP_COLS - 35) / 2;
-             bottom = MAP_COLS - top;
+            top = (MAP_COLS - 35) / 2;
+            bottom = MAP_COLS - top;
             for (int i = 0; i < MAP_COLS; i++)
             {
                 if (i < top || i > bottom)
@@ -2592,7 +2593,7 @@ public abstract class World
             {
                 cavey--;
             }
-            else if(map[cavey - 1, cavex] != Terrain.MOUNTAIN)
+            else if (map[cavey - 1, cavex] != Terrain.MOUNTAIN)
             {
                 cavey++;
             }
@@ -2751,7 +2752,7 @@ public abstract class World
             cave1l.Xpos = cavex;
             cavey++;
             int curr = 0;
-            while (cavey < MAP_ROWS && map[cavey, cavex] == Terrain.MOUNTAIN )
+            while (cavey < MAP_ROWS && map[cavey, cavex] == Terrain.MOUNTAIN)
             {
                 cavey++;
                 curr++;

@@ -409,7 +409,7 @@ public class Room
         }
 
 
-        ROMData.Put(enemyAddr, Enemies);
+        ROMData.Put(enemyAddr, NewEnemies);
     }
 
     public void UpdateBitmask(ROM ROMData)

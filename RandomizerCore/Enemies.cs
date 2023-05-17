@@ -8,30 +8,36 @@ namespace Z2Randomizer.Core;
 
 public class Enemies
 {
-    public static readonly int NormalPalaceEnemyAddr = 0x108B0;
-    public static readonly int GPEnemyAddr = 0x148B0;
+    public const int NormalPalaceEnemyAddr = 0x108B0;
+    public const int GPEnemyAddr = 0x148B0;
+    public const int OverworldEnemyAddr = 0x88B0;
     //Palaces 1,2,5
-    public static readonly int Palace125EnemyPtr = 0x105B1;
+    public const int Palace125EnemyPtr = 0x105B1;
     //Palaces 3,4,6
-    public static readonly int Palace346EnemyPtr = 0x1208E;
+    public const int Palace346EnemyPtr = 0x1208E;
     //GP
-    public static readonly int GPEnemyPtr = 0x145B1;
+    public const int GPEnemyPtr = 0x145B1;
+    public const int OverworldEnemyPtr = 0xA08E;
 
-	public const int MAXIMUM_ENEMY_BYTES = 0x400;
+
+    public const int MAXIMUM_ENEMY_BYTES = 0x400;
 	public const int MAXIMUM_ENEMY_BYTES_GP = 681;
 
 
 
-    public static readonly int[] Palace125Enemies = new int[] { 3, 4, 12, 17, 18, 24, 25, 26, 29, 0x1E, 0x1F, 0x23 };
+
+	public static readonly int[] Palace125Enemies = new int[] { 3, 4, 12, 17, 18, 24, 25, 26, 29, 0x1E, 0x1F, 0x23 };
     public static readonly int[] Palace125FlyingEnemies = new int[] { 0x06, 0x07, 0x0E };
     public static readonly int[] Palace125Generators = new int[] { 0x0B, 0x0F, 0x1B, 0x0A };
     public static readonly int[] Palace125SmallEnemies = new int[] { 0x03, 0x04, 0x11, 0x12 };
     public static readonly int[] Palace125LargeEnemies = new int[] { 0x0C, 0x18, 0x19, 0x1A, 0x1D, 0x1E, 0x1F, 0x23 };
+
     public static readonly int[] Palace346Enemies = new int[] { 3, 4, 12, 17, 24, 25, 26, 29, 0x1F, 0x1E, 0x23 };
     public static readonly int[] Palace346FlyingEnemies = new int[] { 0x06, 0x07, 0x0E };
     public static readonly int[] Palace346Generators = new int[] { 0x0B, 0x1B, 0x0F };
     public static readonly int[] Palace346SmallEnemies = new int[] { 0x03, 0x04, 0x11 };
     public static readonly int[] Palace346LargeEnemies = new int[] { 0x0C, 0x18, 0x19, 0x1A, 0x1D, 0x1F, 0x1E, 0x23 };
+
     public static readonly int[] GPEnemies = new int[] { 3, 4, 17, 18, 24, 25, 26, 0x1D };
     public static readonly int[] GPFlyingEnemies = new int[] { 0x06, 0x14, 0x15, 0x17, 0x1E };
     public static readonly int[] GPGenerators = new int[] { 0x0B, 0x0C, 0x0F, 0x16 };

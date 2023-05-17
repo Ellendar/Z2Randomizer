@@ -458,21 +458,13 @@ public class Palaces
         //Randomize Enemies
         foreach(Palace palace in palaces)
         {
-            /*
             if (props.ShufflePalaceEnemies)
             {
-                int enemiesLength;
-                do
-                {
-                    palace.RandomizeEnemies(props, r);
-                    enemiesLength = 
-                }
-                
+                palace.RandomizeEnemies(props, r);
             }
-            */
-                                    }
+        }
 
-                                    for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 6; i++)
         {
             palaces[i].UpdateBlocks();
         }
