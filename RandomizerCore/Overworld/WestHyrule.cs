@@ -177,14 +177,15 @@ public class WestHyrule : World
         bridgeConn.Add(bridge1, bridge2);
         bridgeConn.Add(bridge2, bridge1);
 
-        enemies = new List<int> { 3, 4, 5, 17, 18, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 32 };
+        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1F, 0x20 };
         flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        spawners = new List<int> { 11, 12, 15, 29 };
-        smallEnemies = new List<int> { 3, 4, 5, 17, 18, 0x1C, 0x1F };
-        largeEnemies = new List<int> { 0x20, 20, 21, 22, 23, 24, 25, 26, 27 };
+        generators = new List<int> { 0x0B, 0x0C, 0x0F, 0x1D };
+        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x1C, 0x1F };
+        largeEnemies = new List<int> { 0x20, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B };
         enemyAddr = 0x48B0;
         enemyPtr = 0x45B1;
 
+        //34 29 39 48 35 58 30 53 40
         overworldMaps = new List<int>() { 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
         MAP_ROWS = 75;
         MAP_COLS = 64;

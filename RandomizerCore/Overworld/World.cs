@@ -35,7 +35,7 @@ public abstract class World
     protected int enemyAddr;
     protected List<int> enemies;
     protected List<int> flyingEnemies;
-    protected List<int> spawners;
+    protected List<int> generators;
     protected List<int> smallEnemies;
     protected List<int> largeEnemies;
     protected int enemyPtr;
@@ -46,7 +46,7 @@ public abstract class World
     private const int overworldXOffset = 0x3F;
     private const int overworldMapOffset = 0x7E;
     private const int overworldWorldOffset = 0xBD;
-    private List<int> visitedEnemies;
+    //private List<int> visitedEnemies;
     protected int MAP_ROWS;
     protected int MAP_COLS;
     protected int bytesWritten;
@@ -125,7 +125,6 @@ public abstract class World
         AllLocations = new List<Location>();
         locsByCoords = new SortedDictionary<Tuple<int, int>, Location>();
         //reachableAreas = new HashSet<string>();
-        visitedEnemies = new List<int>();
         unimportantLocs = new List<Location>();
         areasByLocation = new SortedDictionary<string, List<Location>>();
         AllReached = false;
@@ -196,13 +195,16 @@ public abstract class World
         l2.PassThrough = tempPass;
     }
 
-    public void ShuffleEnemies(int addr, bool isOver)
+    //TODO: This should work like the new palace enemy shuffle. Shuffle should set what enemies are where into
+    //enemies arrays for the different encouter types, and then there should be a separate write step.
+    public void ShuffleEnemies(int addr, bool isOver, bool generatorsAlwaysMatch)
     {
-        if (isOver)
+        int? firstGenerator = null;
+        if (isOver) 
         {
             addr = addr + hyrule.ROMData.GetByte(addr);
         }
-        if (!visitedEnemies.Contains(addr) && addr != 0x95A4)
+        if (addr != 0x95A4)
         {
             int numBytes = hyrule.ROMData.GetByte(addr);
             for (int j = addr + 2; j < addr + numBytes; j = j + 2)
@@ -214,27 +216,27 @@ public abstract class World
                     if (enemies.Contains(enemy))
                     {
                         int swap = enemies[hyrule.RNG.Next(0, enemies.Count)];
-                        hyrule.ROMData.Put(j, (Byte)(swap + highPart));
+                        hyrule.ROMData.Put(j, (byte)(swap + highPart));
                         if ((smallEnemies.Contains(enemy) && largeEnemies.Contains(swap) && swap != 0x20))
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                             ypos = ypos - 32;
-                            hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         else if (swap == 0x20 && swap != enemy)
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                             ypos = ypos - 48;
-                            hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         else if (enemy == 0x1F && swap != enemy)
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                             ypos = ypos - 16;
-                            hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                     }
                 }
@@ -249,47 +251,61 @@ public abstract class World
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
                             ypos = ypos - 48;
-                            hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
-                        hyrule.ROMData.Put(j, (Byte)(largeEnemies[swap] + highPart));
+                        hyrule.ROMData.Put(j, (byte)(largeEnemies[swap] + highPart));
                     }
 
                     if (smallEnemies.Contains(enemy))
                     {
                         int swap = hyrule.RNG.Next(0, smallEnemies.Count);
-                        hyrule.ROMData.Put(j, (Byte)(smallEnemies[swap] + highPart));
+                        hyrule.ROMData.Put(j, (byte)(smallEnemies[swap] + highPart));
                     }
                 }
 
                 if (flyingEnemies.Contains(enemy))
                 {
                     int swap = hyrule.RNG.Next(0, flyingEnemies.Count);
-                    hyrule.ROMData.Put(j, (Byte)(flyingEnemies[swap] + highPart));
+                    hyrule.ROMData.Put(j, (byte)(flyingEnemies[swap] + highPart));
 
                     if (flyingEnemies[swap] == 0x07 || flyingEnemies[swap] == 0x0a || flyingEnemies[swap] == 0x0d || flyingEnemies[swap] == 0x0e)
                     {
                         int ypos = 0x00;
                         int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
-                        hyrule.ROMData.Put(j - 1, (Byte)(ypos + xpos));
+                        hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                     }
                 }
 
-                if (spawners.Contains(enemy))
+                if (generators.Contains(enemy))
                 {
-                    int swap = hyrule.RNG.Next(0, spawners.Count);
-                    hyrule.ROMData.Put(j, (Byte)(spawners[swap] + highPart));
+                    int swap = hyrule.RNG.Next(0, generators.Count);
+                    firstGenerator ??= generators[swap];
+                    if (generatorsAlwaysMatch)
+                    {
+                        hyrule.ROMData.Put(j, (byte)(firstGenerator + highPart));
+                    }
+                    else
+                    {
+                        hyrule.ROMData.Put(j, (byte)(generators[swap] + highPart));
+                    }
                 }
 
-                if (enemy == 33)
+                //Moblin generators can become things, but things can't become moblin generators.
+                //Why? I assume it causes some kind of issue, but I've never investigated.
+                if (enemy == 0x21)
                 {
-                    int swap = hyrule.RNG.Next(0, spawners.Count + 1);
-                    if (swap != spawners.Count)
+                    int swap = hyrule.RNG.Next(0, generators.Count + 1);
+                    firstGenerator ??= swap == generators.Count ? 0x21 : generators[swap];
+                    if (generatorsAlwaysMatch)
                     {
-                        hyrule.ROMData.Put(j, (Byte)(spawners[swap] + highPart));
+                        hyrule.ROMData.Put(j, (byte)(firstGenerator + highPart));
+                    }
+                    else if (swap != generators.Count)
+                    {
+                        hyrule.ROMData.Put(j, (byte)(generators[swap] + highPart));
                     }
                 }
             }
-            visitedEnemies.Add(addr);
         }
     }
 
@@ -418,7 +434,7 @@ public abstract class World
         return location;
     }
 
-    public void ShuffleOverworldEnemies()
+    public void ShuffleOverworldEnemies(bool generatorsAlwaysMatch)
     {
         for (int i = enemyPtr; i < enemyPtr + 126; i = i + 2)
         {
@@ -427,7 +443,7 @@ public abstract class World
             high = high << 8;
             high = high & 0x0FFF;
             int addr = high + low + enemyAddr;
-            ShuffleEnemies(high + low + enemyAddr, false);
+            ShuffleEnemies(high + low + enemyAddr, false, generatorsAlwaysMatch);
         }
 
         foreach (int i in overworldMaps)
@@ -438,7 +454,7 @@ public abstract class World
             high = high << 8;
             high = high & 0x0FFF;
             int addr = high + low + enemyAddr;
-            ShuffleEnemies(high + low + enemyAddr, true);
+            ShuffleEnemies(high + low + enemyAddr, true, generatorsAlwaysMatch);
         }
     }
 
@@ -1494,7 +1510,7 @@ public abstract class World
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
-                        hyrule.ROMData.Put(loc, (Byte)b);
+                        hyrule.ROMData.Put(loc, (byte)b);
                         hyrule.ROMData.Put(loc + 1, (byte)currentTerrain);
                     }
                     currentTerrainCount = 0;
@@ -1509,7 +1525,7 @@ public abstract class World
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
-                        hyrule.ROMData.Put(loc, (Byte)b);
+                        hyrule.ROMData.Put(loc, (byte)b);
                         hyrule.ROMData.Put(loc + 1, (byte)currentTerrain);
                     }
                     currentTerrainCount = 0;
@@ -1530,7 +1546,7 @@ public abstract class World
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
-                        hyrule.ROMData.Put(loc, (Byte)b);
+                        hyrule.ROMData.Put(loc, (byte)b);
                     }
 
                     currentTerrain = map[y, x];
@@ -1546,7 +1562,7 @@ public abstract class World
             //logger.WriteLine("Hex: {0:X}", b2);
             if (doWrite)
             {
-                hyrule.ROMData.Put(loc, (Byte)b2);
+                hyrule.ROMData.Put(loc, (byte)b2);
             }
 
             if (y < MAP_ROWS - 1)
@@ -1561,7 +1577,7 @@ public abstract class World
         //Fill any remaining map space in the rom with filler. (Replace 0x0B with a constant)
         while (bytesWritten < total)
         {
-            hyrule.ROMData.Put(loc, (Byte)0x0B);
+            hyrule.ROMData.Put(loc, (byte)0x0B);
             bytesWritten++;
             loc++;
         }

@@ -1255,12 +1255,12 @@ public class Palace
         {
             if (shuffleSmallItems)
             {
-                ROMData.Put(addresses[i], (Byte)items[i]);
+                ROMData.Put(addresses[i], (byte)items[i]);
             }
 
             if (extraKeys && Number != 7)
             {
-                ROMData.Put(addresses[i], (Byte)0x08);
+                ROMData.Put(addresses[i], (byte)0x08);
             }
         }
     }

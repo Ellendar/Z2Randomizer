@@ -187,7 +187,7 @@ public class ROM
             ptrptr = ptrptr + 2;
             for (int j = 0; j < texts[i].Text.Count; j++)
             {
-                Put(textptr, (Byte)texts[i].Text[j]);
+                Put(textptr, (byte)texts[i].Text[j]);
                 textptr++;
                 ptr++;
             }
@@ -210,19 +210,19 @@ public class ROM
         {
             for (int j = 0; j < 3; j++)
             {
-                Put(outBricks[i] + j, (Byte)bricks[i][j]);
-                Put(inBricks[i] + j, (Byte)bricks[i][j]);
-                Put(inCurtains[i] + j, (Byte)curtains[i][j]);
+                Put(outBricks[i] + j, (byte)bricks[i][j]);
+                Put(inBricks[i] + j, (byte)bricks[i][j]);
+                Put(inCurtains[i] + j, (byte)curtains[i][j]);
                 if (j == 0)
                 {
-                    Put(inWindows[i] + j, (Byte)bricks[i][j]);
+                    Put(inWindows[i] + j, (byte)bricks[i][j]);
                 }
             }
 
             for (int j = 0; j < 32; j++)
             {
-                Put(brickSprites[i] + j, (Byte)bSprites[bRows[i], j]);
-                Put(inBrickSprites[i] + j, (Byte)binSprites[binRows[i], j]);
+                Put(brickSprites[i] + j, (byte)bSprites[bRows[i], j]);
+                Put(inBrickSprites[i] + j, (byte)binSprites[binRows[i], j]);
             }
         }
     }
@@ -232,13 +232,13 @@ public class ROM
         List<char> randoby = Util.ToGameText("RANDO BY  ", false);
         for (int i = 0; i < randoby.Count; i++)
         {
-            Put(creditsLineOneAddr + i, (Byte)randoby[i]);
+            Put(creditsLineOneAddr + i, (byte)randoby[i]);
         }
 
         List<char> digshake = Util.ToGameText("DIGSHAKE ", true);
         for (int i = 0; i < digshake.Count; i++)
         {
-            Put(creditsLineTwoAddr + i, (Byte)digshake[i]);
+            Put(creditsLineTwoAddr + i, (byte)digshake[i]);
         }
     }
 
@@ -443,7 +443,7 @@ public class ROM
         Put(0x8645, 0x00);
 
         //Disable hold over head animation
-        Put(0x1E54C, (Byte)0);
+        Put(0x1E54C, (byte)0);
 
         //Make text go fast
         Put(0xF75E, 0x00);
@@ -453,8 +453,8 @@ public class ROM
 
     public void WriteKasutoJarAmount(int kasutoJars)
     {
-        Put(kasutoJarTextAddr, (Byte)(0xD0 + kasutoJars));
-        Put(kasutoJarAddr, (Byte)kasutoJars);
+        Put(kasutoJarTextAddr, (byte)(0xD0 + kasutoJars));
+        Put(kasutoJarAddr, (byte)kasutoJars);
     }
 
     public void WriteFastCastMagic()
@@ -516,26 +516,26 @@ public class ROM
     /// </summary>
     public void FixSoftLock()
     {
-        Put(0x1E19A, (Byte)0x20);
-        Put(0x1E19B, (Byte)0xAA);
-        Put(0x1E19C, (Byte)0xFE);
+        Put(0x1E19A, (byte)0x20);
+        Put(0x1E19B, (byte)0xAA);
+        Put(0x1E19C, (byte)0xFE);
 
-        Put(0x1FEBA, (Byte)0xEE);
-        Put(0x1FEBB, (Byte)0x26);
-        Put(0x1FEBC, (Byte)0x07);
-        Put(0x1FEBD, (Byte)0xAD);
-        Put(0x1FEBE, (Byte)0x4C);
-        Put(0x1FEBF, (Byte)0x07);
-        Put(0x1FEC0, (Byte)0xC9);
-        Put(0x1FEC1, (Byte)0x02);
-        Put(0x1FEC2, (Byte)0xF0);
-        Put(0x1FEC3, (Byte)0x05);
-        Put(0x1FEC4, (Byte)0xA2);
-        Put(0x1FEC5, (Byte)0x00);
-        Put(0x1FEC6, (Byte)0x8E);
-        Put(0x1FEC7, (Byte)0x4C);
-        Put(0x1FEC8, (Byte)0x07);
-        Put(0x1FEC9, (Byte)0x60);
+        Put(0x1FEBA, (byte)0xEE);
+        Put(0x1FEBB, (byte)0x26);
+        Put(0x1FEBC, (byte)0x07);
+        Put(0x1FEBD, (byte)0xAD);
+        Put(0x1FEBE, (byte)0x4C);
+        Put(0x1FEBF, (byte)0x07);
+        Put(0x1FEC0, (byte)0xC9);
+        Put(0x1FEC1, (byte)0x02);
+        Put(0x1FEC2, (byte)0xF0);
+        Put(0x1FEC3, (byte)0x05);
+        Put(0x1FEC4, (byte)0xA2);
+        Put(0x1FEC5, (byte)0x00);
+        Put(0x1FEC6, (byte)0x8E);
+        Put(0x1FEC7, (byte)0x4C);
+        Put(0x1FEC8, (byte)0x07);
+        Put(0x1FEC9, (byte)0x60);
     }
 
     public void SetLevelCap(int atkMax, int magicMax, int lifeMax)

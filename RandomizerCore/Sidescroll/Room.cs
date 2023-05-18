@@ -306,10 +306,10 @@ public class Room
 
     public void UpdateConnectionBytes()
     {
-        Connections[0] = (Byte)LeftByte;
-        Connections[1] = (Byte)downByte;
-        Connections[2] = (Byte)upByte;
-        Connections[3] = (Byte)RightByte;
+        Connections[0] = (byte)LeftByte;
+        Connections[1] = (byte)downByte;
+        Connections[2] = (byte)upByte;
+        Connections[3] = (byte)RightByte;
     }
 
     public void WriteSideViewPtr(int addr, ROM ROMData)
@@ -679,8 +679,8 @@ public class Room
                         }
                     }
 
-                    NewEnemies[i] = (Byte)(ypos + xpos);
-                    NewEnemies[i + 1] = (Byte)(enemyPage + swap);
+                    NewEnemies[i] = (byte)(ypos + xpos);
+                    NewEnemies[i + 1] = (byte)(enemyPage + swap);
                 }
             }
             else
@@ -694,12 +694,12 @@ public class Room
                     {
                         swap = RNG.Next(0, largeEnemies.Length);
                     }
-                    NewEnemies[i] = (Byte)(largeEnemies[swap] + enemyPage);
+                    NewEnemies[i] = (byte)(largeEnemies[swap] + enemyPage);
                 }
                 else if (smallEnemies.Contains(enemyNumber))
                 { 
                     int swap = RNG.Next(0, smallEnemies.Length);
-                    NewEnemies[i+1] = (Byte)(smallEnemies[swap] + enemyPage);
+                    NewEnemies[i+1] = (byte)(smallEnemies[swap] + enemyPage);
                 }
             }
 
@@ -711,7 +711,7 @@ public class Room
                 {
                     swap = RNG.Next(0, flyingEnemies.Length);
                 }
-                NewEnemies[i + 1] = (Byte)(flyingEnemies[swap] + enemyPage);
+                NewEnemies[i + 1] = (byte)(flyingEnemies[swap] + enemyPage);
             }
 
             if (generators.Contains(enemyNumber))
@@ -721,11 +721,14 @@ public class Room
                 {
                     firstGenerator = swap;
                 }
-                if(generatorsAlwaysMatch)
+                if (generatorsAlwaysMatch)
                 {
-                    NewEnemies[i + 1] = (Byte)(generators[firstGenerator ?? 0] + enemyPage);
+                    NewEnemies[i + 1] = (byte)(generators[firstGenerator ?? 0] + enemyPage);
                 }
-                NewEnemies[i + 1] = (Byte)(generators[swap] + enemyPage);
+                else
+                {
+                    NewEnemies[i + 1] = (byte)(generators[swap] + enemyPage);
+                }
             }
 
             //This used to make specifically ra head generators (but not any other generator) more likely to be vanilla by adding
@@ -737,7 +740,7 @@ public class Room
                 int swap = RNG.Next(0, generators.Length + 1);
                 if (swap != generators.Length)
                 {
-                    NewEnemies[i + 1] = (Byte)(generators[swap] + enemyPage);
+                    NewEnemies[i + 1] = (byte)(generators[swap] + enemyPage);
                 }
             }
             */

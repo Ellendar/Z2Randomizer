@@ -623,14 +623,14 @@ public class Hyrule
 
             for (int i = 0; i < 8; i++)
             {
-                ROMData.Put(0x1E67D + i, (Byte)atk[i]);
+                ROMData.Put(0x1E67D + i, (byte)atk[i]);
             }
         }
         else
         {
             for (int i = 0; i < 8; i++)
             {
-                ROMData.Put(0x1E67D + i, (Byte)192);
+                ROMData.Put(0x1E67D + i, (byte)192);
             }
         }
     }
@@ -656,21 +656,21 @@ public class Hyrule
         eastHyrule.pbagCave1.itemGet = false;
         eastHyrule.pbagCave2.itemGet = false;
 
-        ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (byte)1 : (byte)0);
         itemGet[Item.CANDLE] = props.StartCandle;
-        ROMData.Put(RomMap.START_GLOVE, props.StartGlove ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_GLOVE, props.StartGlove ? (byte)1 : (byte)0);
         itemGet[Item.GLOVE] = props.StartGlove;
-        ROMData.Put(RomMap.START_RAFT, props.StartRaft ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_RAFT, props.StartRaft ? (byte)1 : (byte)0);
         itemGet[Item.RAFT] = props.StartRaft;
-        ROMData.Put(RomMap.START_BOOTS, props.StartBoots ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_BOOTS, props.StartBoots ? (byte)1 : (byte)0);
         itemGet[Item.BOOTS] = props.StartBoots;
-        ROMData.Put(RomMap.START_FLUTE, props.StartFlute ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_FLUTE, props.StartFlute ? (byte)1 : (byte)0);
         itemGet[Item.FLUTE] = props.StartFlute;
-        ROMData.Put(RomMap.START_CROSS, props.StartCross ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_CROSS, props.StartCross ? (byte)1 : (byte)0);
         itemGet[Item.CROSS] = props.StartCross;
-        ROMData.Put(RomMap.START_HAMMER, props.StartHammer ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_HAMMER, props.StartHammer ? (byte)1 : (byte)0);
         itemGet[Item.HAMMER] = props.StartHammer;
-        ROMData.Put(RomMap.START_MAGICAL_KEY, props.StartKey ? (Byte)1 : (Byte)0);
+        ROMData.Put(RomMap.START_MAGICAL_KEY, props.StartKey ? (byte)1 : (byte)0);
         itemGet[Item.MAGIC_KEY] = props.StartKey;
 
         itemList = new List<Item> { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MEDICINE, Item.TROPHY, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MAGIC_KEY, Item.MAGIC_CONTAINER, Item.HAMMER, Item.CHILD, Item.MAGIC_CONTAINER };
@@ -1077,29 +1077,29 @@ public class Hyrule
         */
         for (int i = 0; i < 16; i = i + 2)
         {
-            ROMData.Put(0xC611 + i, (Byte)0x75);
-            ROMData.Put(0xC611 + i + 1, (Byte)0x70);
-            ROMData.Put(0xC593 + i, (Byte)0x48);
-            ROMData.Put(0xC593 + i + 1, (Byte)0x9B);
+            ROMData.Put(0xC611 + i, (byte)0x75);
+            ROMData.Put(0xC611 + i + 1, (byte)0x70);
+            ROMData.Put(0xC593 + i, (byte)0x48);
+            ROMData.Put(0xC593 + i + 1, (byte)0x9B);
         }
-        ROMData.Put(0xC7BB, (Byte)0x07);
-        ROMData.Put(0xC7BF, (Byte)0x13);
-        ROMData.Put(0xC7C3, (Byte)0x21);
-        ROMData.Put(0xC7C7, (Byte)0x27);
-        ROMData.Put(0xC7CB, (Byte)0x37);
-        ROMData.Put(0xC7CF, (Byte)0x3F);
-        ROMData.Put(0xC850, (Byte)0xB0);
-        //ROMData.put(0xC7D3, (Byte)0x4D);
-        ROMData.Put(0xC7D7, (Byte)0x5E);
-        ROMData.Put(0xC7DF, (Byte)0x43);
-        ROMData.Put(0xC870, (Byte)0xB8);
-        ROMData.Put(0xC7E3, (Byte)0x49);
-        ROMData.Put(0xC874, (Byte)0xA8);
-        ROMData.Put(0xC7D3, (Byte)0x4D);
-        ROMData.Put(0xC7DB, (Byte)0x29);
-        //ROMData.put(0xC7E3, (Byte)0x49);
-        // ROMData.put(0xC874, (Byte)0xA8);
-        //ROMData.put(0x8560, (Byte)0xBC);
+        ROMData.Put(0xC7BB, (byte)0x07);
+        ROMData.Put(0xC7BF, (byte)0x13);
+        ROMData.Put(0xC7C3, (byte)0x21);
+        ROMData.Put(0xC7C7, (byte)0x27);
+        ROMData.Put(0xC7CB, (byte)0x37);
+        ROMData.Put(0xC7CF, (byte)0x3F);
+        ROMData.Put(0xC850, (byte)0xB0);
+        //ROMData.put(0xC7D3, (byte)0x4D);
+        ROMData.Put(0xC7D7, (byte)0x5E);
+        ROMData.Put(0xC7DF, (byte)0x43);
+        ROMData.Put(0xC870, (byte)0xB8);
+        ROMData.Put(0xC7E3, (byte)0x49);
+        ROMData.Put(0xC874, (byte)0xA8);
+        ROMData.Put(0xC7D3, (byte)0x4D);
+        ROMData.Put(0xC7DB, (byte)0x29);
+        //ROMData.put(0xC7E3, (byte)0x49);
+        // ROMData.put(0xC874, (byte)0xA8);
+        //ROMData.put(0x8560, (byte)0xBC);
     }
 
     private bool UpdateSpells()
@@ -1348,7 +1348,7 @@ public class Hyrule
             {
                 int highPart = (life[i, j] / 8) << 4;
                 int lowPart = (life[i, j] % 8);
-                ROMData.Put(start + (i * 8) + j, (Byte)(highPart + (lowPart * 2)));
+                ROMData.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
             }
         }
 
@@ -1374,20 +1374,20 @@ public class Hyrule
         if (props.AttackEffectiveness == StatEffectiveness.MAX)
         {
             ShuffleAttackEffectiveness(true);
-            ROMData.Put(0x005432, (Byte)193);
-            ROMData.Put(0x009432, (Byte)193);
-            ROMData.Put(0x11436, (Byte)193);
-            ROMData.Put(0x12936, (Byte)193);
-            ROMData.Put(0x15532, (Byte)193);
-            ROMData.Put(0x11437, (Byte)192);
-            ROMData.Put(0x1143F, (Byte)192);
-            ROMData.Put(0x12937, (Byte)192);
-            ROMData.Put(0x1293F, (Byte)192);
-            ROMData.Put(0x15445, (Byte)192);
-            ROMData.Put(0x15446, (Byte)192);
-            ROMData.Put(0x15448, (Byte)192);
-            ROMData.Put(0x15453, (Byte)193);
-            ROMData.Put(0x12951, (Byte)227);
+            ROMData.Put(0x005432, (byte)193);
+            ROMData.Put(0x009432, (byte)193);
+            ROMData.Put(0x11436, (byte)193);
+            ROMData.Put(0x12936, (byte)193);
+            ROMData.Put(0x15532, (byte)193);
+            ROMData.Put(0x11437, (byte)192);
+            ROMData.Put(0x1143F, (byte)192);
+            ROMData.Put(0x12937, (byte)192);
+            ROMData.Put(0x1293F, (byte)192);
+            ROMData.Put(0x15445, (byte)192);
+            ROMData.Put(0x15446, (byte)192);
+            ROMData.Put(0x15448, (byte)192);
+            ROMData.Put(0x15453, (byte)193);
+            ROMData.Put(0x12951, (byte)227);
 
         }
     }
@@ -1405,7 +1405,7 @@ public class Hyrule
                 newVal = 255;
             }
 
-            ROMData.Put(i, (Byte)newVal);
+            ROMData.Put(i, (byte)newVal);
         }
     }
 
@@ -1808,7 +1808,7 @@ public class Hyrule
         {
             foreach (World w in worlds)
             {
-                w.ShuffleOverworldEnemies();
+                w.ShuffleOverworldEnemies(props.GeneratorsAlwaysMatch);
             }
         }
 
@@ -2109,21 +2109,21 @@ public class Hyrule
         spellMap.Add(Spell.DOWNSTAB, props.SwapUpAndDownStab ? Spell.UPSTAB : Spell.DOWNSTAB);
 
 
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (byte)1 : (byte)0);
         SpellGet[Spell.SHIELD] = props.StartShield;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.JUMP), props.StartJump ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.JUMP), props.StartJump ? (byte)1 : (byte)0);
         SpellGet[Spell.JUMP] = props.StartJump;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.LIFE), props.StartLife ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.LIFE), props.StartLife ? (byte)1 : (byte)0);
         SpellGet[Spell.LIFE] = props.StartLife;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FAIRY), props.StartFairy ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FAIRY), props.StartFairy ? (byte)1 : (byte)0);
         SpellGet[Spell.FAIRY] = props.StartFairy;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FIRE), props.StartFire ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FIRE), props.StartFire ? (byte)1 : (byte)0);
         SpellGet[Spell.FIRE] = props.StartFire;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.REFLECT), props.StartReflect ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.REFLECT), props.StartReflect ? (byte)1 : (byte)0);
         SpellGet[Spell.REFLECT] = props.StartReflect;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SPELL), props.StartSpell ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SPELL), props.StartSpell ? (byte)1 : (byte)0);
         SpellGet[Spell.SPELL] = props.StartSpell;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.THUNDER), props.StartThunder ? (Byte)1 : (Byte)0);
+        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.THUNDER), props.StartThunder ? (byte)1 : (byte)0);
         SpellGet[Spell.THUNDER] = props.StartThunder;
 
         if (props.CombineFire)
@@ -2133,7 +2133,7 @@ public class Hyrule
             {
                 newFire++;
             }
-            Byte newnewFire = (Byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
+            Byte newnewFire = (byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
             ROMData.Put(0xDCF, newnewFire);
         }
 
@@ -2198,8 +2198,8 @@ public class Hyrule
 
         for (int i = 0; i < exp.Length; i++)
         {
-            ROMData.Put(start + i, (Byte)(cappedExp[i] / 256));
-            ROMData.Put(start + 24 + i, (Byte)(cappedExp[i] % 256));
+            ROMData.Put(start + i, (byte)(cappedExp[i] / 256));
+            ROMData.Put(start + 24 + i, (byte)(cappedExp[i] % 256));
         }
 
         for (int i = 0; i < exp.Length; i++)
@@ -2243,7 +2243,7 @@ public class Hyrule
             {
                 part1 = mask;
             }
-            ROMData.Put(i, (Byte)(part1 + part2));
+            ROMData.Put(i, (byte)(part1 + part2));
         }
     }
 
@@ -2276,7 +2276,7 @@ public class Hyrule
             {
                 low = 15;
             }
-            ROMData.Put(i, (Byte)(high + low));
+            ROMData.Put(i, (byte)(high + low));
         }
     }
 
@@ -2840,13 +2840,13 @@ public class Hyrule
         {
             //C9 20 - EA 38
             //CMP 20 -> NOP SEC
-            ROMData.Put(0x1D4E4, (Byte)0xEA);
-            ROMData.Put(0x1D4E5, (Byte)0x38);
+            ROMData.Put(0x1D4E4, (byte)0xEA);
+            ROMData.Put(0x1D4E5, (byte)0x38);
         }
         if (props.ShuffleLifeRefill)
         {
             int lifeRefill = RNG.Next(1, 6);
-            ROMData.Put(0xE7A, (Byte)(lifeRefill * 16));
+            ROMData.Put(0xE7A, (byte)(lifeRefill * 16));
         }
 
         if (props.ShuffleStealExpAmt)
@@ -2855,8 +2855,8 @@ public class Hyrule
             int big = ROMData.GetByte(0x1E314);
             small = RNG.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
             big = RNG.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
-            ROMData.Put(0x1E30E, (Byte)small);
-            ROMData.Put(0x1E314, (Byte)big);
+            ROMData.Put(0x1E30E, (byte)small);
+            ROMData.Put(0x1E314, (byte)big);
         }
 
         List<int> addr = new List<int>();
@@ -3090,8 +3090,8 @@ public class Hyrule
 
         if (props.DisableMagicRecs)
         {
-            ROMData.Put(0xF539, (Byte)0xC9);
-            ROMData.Put(0xF53A, (Byte)0);
+            ROMData.Put(0xF539, (byte)0xC9);
+            ROMData.Put(0xF53A, (byte)0);
         }
 
         if (props.ShuffleAtkExp)
@@ -3117,11 +3117,11 @@ public class Hyrule
 
         ShuffleLifeEffectiveness(false);
 
-        ROMData.Put(0x17B10, (Byte)props.StartGems);
+        ROMData.Put(0x17B10, (byte)props.StartGems);
 
 
         startHearts = props.StartHearts;
-        ROMData.Put(0x17B00, (Byte)startHearts);
+        ROMData.Put(0x17B00, (byte)startHearts);
 
 
         maxHearts = props.MaxHearts;
@@ -3129,7 +3129,7 @@ public class Hyrule
         heartContainersInItemPool = maxHearts - startHearts;
 
 
-        ROMData.Put(0x1C369, (Byte)props.StartLives);
+        ROMData.Put(0x1C369, (byte)props.StartLives);
 
         ROMData.Put(0x17B12, (byte)((props.StartWithUpstab ? 0x04 : 0) + (props.StartWithDownstab ? 0x10 : 0)));
 
@@ -3176,7 +3176,7 @@ public class Hyrule
         if (props.ShuffleItemDropFrequency)
         {
             int drop = RNG.Next(5) + 4;
-            ROMData.Put(0x1E8B0, (Byte)drop);
+            ROMData.Put(0x1E8B0, (byte)drop);
         }
 
     }
@@ -3186,25 +3186,25 @@ public class Hyrule
         switch (x)
         {
             case 0:
-                return (Byte)0xD0;
+                return (byte)0xD0;
             case 1:
-                return (Byte)0xD1;
+                return (byte)0xD1;
             case 2:
-                return (Byte)0xD2;
+                return (byte)0xD2;
             case 3:
-                return (Byte)0xD3;
+                return (byte)0xD3;
             case 4:
-                return (Byte)0xD4;
+                return (byte)0xD4;
             case 5:
-                return (Byte)0xD5;
+                return (byte)0xD5;
             case 6:
-                return (Byte)0xD6;
+                return (byte)0xD6;
             case 7:
-                return (Byte)0xD7;
+                return (byte)0xD7;
             case 8:
-                return (Byte)0xD8;
+                return (byte)0xD8;
             default:
-                return (Byte)0xD9;
+                return (byte)0xD9;
         }
     }
 
@@ -3529,45 +3529,45 @@ public class Hyrule
         //}
 
 
-        ROMData.Put(0x1CD3A, (Byte)palGraphics[westHyrule.palace1.PalNum]);
+        ROMData.Put(0x1CD3A, (byte)palGraphics[westHyrule.palace1.PalNum]);
 
 
-        ROMData.Put(0x1CD3B, (Byte)palGraphics[westHyrule.palace2.PalNum]);
+        ROMData.Put(0x1CD3B, (byte)palGraphics[westHyrule.palace2.PalNum]);
 
 
-        ROMData.Put(0x1CD3C, (Byte)palGraphics[westHyrule.palace3.PalNum]);
+        ROMData.Put(0x1CD3C, (byte)palGraphics[westHyrule.palace3.PalNum]);
 
 
-        ROMData.Put(0x1CD46, (Byte)palGraphics[mazeIsland.palace4.PalNum]);
+        ROMData.Put(0x1CD46, (byte)palGraphics[mazeIsland.palace4.PalNum]);
 
 
-        ROMData.Put(0x1CD42, (Byte)palGraphics[eastHyrule.palace5.PalNum]);
+        ROMData.Put(0x1CD42, (byte)palGraphics[eastHyrule.palace5.PalNum]);
 
-        ROMData.Put(0x1CD43, (Byte)palGraphics[eastHyrule.palace6.PalNum]);
-        ROMData.Put(0x1CD44, (Byte)palGraphics[eastHyrule.gp.PalNum]);
+        ROMData.Put(0x1CD43, (byte)palGraphics[eastHyrule.palace6.PalNum]);
+        ROMData.Put(0x1CD44, (byte)palGraphics[eastHyrule.gp.PalNum]);
 
         //if (!props.palacePalette)
         //{
 
-        ROMData.Put(0x1FFF4, (Byte)palPalettes[westHyrule.palace1.PalNum]);
+        ROMData.Put(0x1FFF4, (byte)palPalettes[westHyrule.palace1.PalNum]);
 
-        ROMData.Put(0x1FFF5, (Byte)palPalettes[westHyrule.palace2.PalNum]);
+        ROMData.Put(0x1FFF5, (byte)palPalettes[westHyrule.palace2.PalNum]);
 
-        ROMData.Put(0x1FFF6, (Byte)palPalettes[westHyrule.palace3.PalNum]);
+        ROMData.Put(0x1FFF6, (byte)palPalettes[westHyrule.palace3.PalNum]);
 
-        ROMData.Put(0x20000, (Byte)palPalettes[mazeIsland.palace4.PalNum]);
+        ROMData.Put(0x20000, (byte)palPalettes[mazeIsland.palace4.PalNum]);
 
-        ROMData.Put(0x1FFFC, (Byte)palPalettes[eastHyrule.palace5.PalNum]);
+        ROMData.Put(0x1FFFC, (byte)palPalettes[eastHyrule.palace5.PalNum]);
 
-        ROMData.Put(0x1FFFD, (Byte)palPalettes[eastHyrule.palace6.PalNum]);
+        ROMData.Put(0x1FFFD, (byte)palPalettes[eastHyrule.palace6.PalNum]);
 
-        ROMData.Put(0x1FFFE, (Byte)palPalettes[eastHyrule.gp.PalNum]);
+        ROMData.Put(0x1FFFE, (byte)palPalettes[eastHyrule.gp.PalNum]);
 
         //}
 
         if (props.ShuffleDripper)
         {
-            ROMData.Put(0x11927, (Byte)Enemies.Palace125Enemies[RNG.Next(Enemies.Palace125Enemies.Length)]);
+            ROMData.Put(0x11927, (byte)Enemies.Palace125Enemies[RNG.Next(Enemies.Palace125Enemies.Length)]);
         }
 
         if (props.ShuffleEnemyPalettes)
@@ -3653,9 +3653,9 @@ public class Hyrule
             }
         }
 
-        ROMData.Put(0x4DEA, (Byte)westHyrule.trophyCave.item);
-        ROMData.Put(0x502A, (Byte)westHyrule.jar.item);
-        ROMData.Put(0x4DD7, (Byte)westHyrule.heart2.item);
+        ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.item);
+        ROMData.Put(0x502A, (byte)westHyrule.jar.item);
+        ROMData.Put(0x4DD7, (byte)westHyrule.heart2.item);
         //logger.WriteLine(westHyrule.heart1.item);
         //logger.WriteLine(westHyrule.heart2.item);
         //logger.WriteLine(westHyrule.medCave.item);
@@ -3691,44 +3691,44 @@ public class Hyrule
         int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 
 
-        ROMData.Put(0x5069, (Byte)westHyrule.medCave.item);
-        ROMData.Put(0x4ff5, (Byte)westHyrule.heart1.item);
+        ROMData.Put(0x5069, (byte)westHyrule.medCave.item);
+        ROMData.Put(0x4ff5, (byte)westHyrule.heart1.item);
         
-        ROMData.Put(0x65C3, (Byte)deathMountain.magicCave.item);
-        ROMData.Put(0x6512, (Byte)deathMountain.hammerCave.item);
-        ROMData.Put(0x8FAA, (Byte)eastHyrule.waterTile.item);
-        ROMData.Put(0x9011, (Byte)eastHyrule.desertTile.item);
+        ROMData.Put(0x65C3, (byte)deathMountain.magicCave.item);
+        ROMData.Put(0x6512, (byte)deathMountain.hammerCave.item);
+        ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.item);
+        ROMData.Put(0x9011, (byte)eastHyrule.desertTile.item);
         if (props.PalaceStyle != PalaceStyle.RECONSTRUCTED)
         {
             if (westHyrule.palace1.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[westHyrule.palace1.PalNum - 1], (Byte)westHyrule.palace1.item);
+                ROMData.Put(itemLocs2[westHyrule.palace1.PalNum - 1], (byte)westHyrule.palace1.item);
             }
             if (westHyrule.palace2.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[westHyrule.palace2.PalNum - 1], (Byte)westHyrule.palace2.item);
+                ROMData.Put(itemLocs2[westHyrule.palace2.PalNum - 1], (byte)westHyrule.palace2.item);
             }
             if (westHyrule.palace3.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[westHyrule.palace3.PalNum - 1], (Byte)westHyrule.palace3.item);
+                ROMData.Put(itemLocs2[westHyrule.palace3.PalNum - 1], (byte)westHyrule.palace3.item);
             }
             if (eastHyrule.palace5.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[eastHyrule.palace5.PalNum - 1], (Byte)eastHyrule.palace5.item);
+                ROMData.Put(itemLocs2[eastHyrule.palace5.PalNum - 1], (byte)eastHyrule.palace5.item);
             }
             if (eastHyrule.palace6.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[eastHyrule.palace6.PalNum - 1], (Byte)eastHyrule.palace6.item);
+                ROMData.Put(itemLocs2[eastHyrule.palace6.PalNum - 1], (byte)eastHyrule.palace6.item);
             }
             if (mazeIsland.palace4.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[mazeIsland.palace4.PalNum - 1], (Byte)mazeIsland.palace4.item);
+                ROMData.Put(itemLocs2[mazeIsland.palace4.PalNum - 1], (byte)mazeIsland.palace4.item);
             }
 
 
             if (eastHyrule.gp.PalNum != 7)
             {
-                ROMData.Put(itemLocs2[eastHyrule.gp.PalNum - 1], (Byte)eastHyrule.gp.item);
+                ROMData.Put(itemLocs2[eastHyrule.gp.PalNum - 1], (byte)eastHyrule.gp.item);
             }
         }
         else
@@ -3776,15 +3776,15 @@ public class Hyrule
         }
         if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
         {
-            ROMData.Put(0xDB95, (Byte)eastHyrule.newKasuto2.item); //map 47
+            ROMData.Put(0xDB95, (byte)eastHyrule.newKasuto2.item); //map 47
 
-            ROMData.Put(0xDB8C, (Byte)eastHyrule.newKasuto.item); //map 46
+            ROMData.Put(0xDB8C, (byte)eastHyrule.newKasuto.item); //map 46
         }
         else
         {
-            ROMData.Put(0xDB95, (Byte)westHyrule.lifeSouth.item); //map 47
+            ROMData.Put(0xDB95, (byte)westHyrule.lifeSouth.item); //map 47
 
-            ROMData.Put(0xDB8C, (Byte)westHyrule.lifeNorth.item); //map 46
+            ROMData.Put(0xDB8C, (byte)westHyrule.lifeNorth.item); //map 46
         }
 
         if (props.TownSwap)
@@ -3825,14 +3825,14 @@ public class Hyrule
             }
         }
 
-        ROMData.Put(0xA5A8, (Byte)mazeIsland.magic.item);
-        ROMData.Put(0xA58B, (Byte)mazeIsland.kid.item);
+        ROMData.Put(0xA5A8, (byte)mazeIsland.magic.item);
+        ROMData.Put(0xA58B, (byte)mazeIsland.kid.item);
         
         if (props.PbagItemShuffle)
         {
-            ROMData.Put(0x4FE2, (Byte)westHyrule.pbagCave.item);
-            ROMData.Put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
-            ROMData.Put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
+            ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.item);
+            ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.item);
+            ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.item);
 
         }
 
@@ -3840,16 +3840,16 @@ public class Hyrule
         {
             if (location == westHyrule.pbagCave)
             {
-                ROMData.Put(0x4FE2, (Byte)westHyrule.pbagCave.item);
+                ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.item);
             }
 
             if (location == eastHyrule.pbagCave1)
             {
-                ROMData.Put(0x8ECC, (Byte)eastHyrule.pbagCave1.item);
+                ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.item);
             }
             if (location == eastHyrule.pbagCave2)
             {
-                ROMData.Put(0x8FB3, (Byte)eastHyrule.pbagCave2.item);
+                ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.item);
             }
         }
 
@@ -3863,14 +3863,14 @@ public class Hyrule
             {
                 if (!firstRaft)
                 {
-                    ROMData.Put(0x538, (Byte)w.raft.Xpos);
-                    ROMData.Put(0x53A, (Byte)w.raft.Ypos);
+                    ROMData.Put(0x538, (byte)w.raft.Xpos);
+                    ROMData.Put(0x53A, (byte)w.raft.Ypos);
                     firstRaft = true;
                 } 
                 else
                 {
-                    ROMData.Put(0x539, (Byte)w.raft.Xpos);
-                    ROMData.Put(0x53B, (Byte)w.raft.Ypos);
+                    ROMData.Put(0x539, (byte)w.raft.Xpos);
+                    ROMData.Put(0x53B, (byte)w.raft.Ypos);
                 }
             } 
         }
@@ -3883,14 +3883,14 @@ public class Hyrule
             {
                 if (!firstRaft)
                 {
-                    ROMData.Put(0x565, (Byte)w.bridge.Xpos);
-                    ROMData.Put(0x567, (Byte)w.bridge.Ypos);
+                    ROMData.Put(0x565, (byte)w.bridge.Xpos);
+                    ROMData.Put(0x567, (byte)w.bridge.Ypos);
                     firstRaft = true;
                 }
                 else
                 {
-                    ROMData.Put(0x564, (Byte)w.bridge.Xpos);
-                    ROMData.Put(0x566, (Byte)w.bridge.Ypos);
+                    ROMData.Put(0x564, (byte)w.bridge.Xpos);
+                    ROMData.Put(0x566, (byte)w.bridge.Ypos);
                 }
             }
         }
@@ -3940,25 +3940,25 @@ public class Hyrule
 
         for (int i = 0; i < magFunction.Count(); i++)
         {
-            ROMData.Put(functionBase + i, (Byte)magFunction[i]);
+            ROMData.Put(functionBase + i, (byte)magFunction[i]);
         }
 
         for (int i = 0; i < magEffects.Count(); i = i + 2)
         {
-            ROMData.Put(effectBase + i, (Byte)magEffects[i]);
-            ROMData.Put(effectBase + i + 1, (Byte)magEffects[i + 1]);
+            ROMData.Put(effectBase + i, (byte)magEffects[i]);
+            ROMData.Put(effectBase + i + 1, (byte)magEffects[i + 1]);
         }
 
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                ROMData.Put(spellCostBase + (i * 8) + j, (Byte)magLevels[i, j]);
+                ROMData.Put(spellCostBase + (i * 8) + j, (byte)magLevels[i, j]);
             }
 
             for (int j = 0; j < 7; j++)
             {
-                ROMData.Put(spellNameBase + (i * 0xe) + j, (Byte)magNames[i, j]);
+                ROMData.Put(spellNameBase + (i * 0xe) + j, (byte)magNames[i, j]);
             }
         }
 
@@ -3968,11 +3968,11 @@ public class Hyrule
             ROMData.Put(0x32CD0 + i, ROMData.GetByte(0x34CD0 + i));
         }
 
+        //These were commented out in 4.0.4. I have no idea what they do or why they exist.
         //if (hiddenPalace)
         //{
         //    ROMData.put(0x8664, 0);
         //}
-
         //if (hiddenKasuto)
         //{
         //    ROMData.put(0x8660, 0);
@@ -4098,7 +4098,7 @@ public class Hyrule
         }
         for (int i = 0; i < addresses.Count; i++)
         {
-            ROMData.Put(addresses[i], (Byte)items[i]);
+            ROMData.Put(addresses[i], (byte)items[i]);
         }
     }
 

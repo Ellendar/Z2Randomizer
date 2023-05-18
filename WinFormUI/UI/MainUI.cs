@@ -1636,12 +1636,15 @@ public partial class MainUI : Form
             blockingRoomsInAnyPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Enabled = false;
+            noDuplicateRoomsCheckbox.Checked = false;
+            noDuplicateRoomsCheckbox.Enabled = false;
         }
         else
         {
             includeCommunityRoomsCheckbox.Enabled = true;
             blockingRoomsInAnyPalaceCheckbox.Enabled = true;
             bossRoomsExitToPalaceCheckbox.Enabled = true;
+            noDuplicateRoomsCheckbox.Enabled = true;
         }
 
         if (palaceStyleList.SelectedIndex != 0)

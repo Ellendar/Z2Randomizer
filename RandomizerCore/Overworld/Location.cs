@@ -334,11 +334,11 @@ public class Location
         }
         else
         {
-            LocationBytes[0] = (Byte)(ExternalWorld + Ypos);
+            LocationBytes[0] = (byte)(ExternalWorld + Ypos);
         }
-        LocationBytes[1] = (Byte)(appear2loweruponexit + Secondpartofcave + Xpos);
-        LocationBytes[2] = (Byte)(MapPage + Map);
-        LocationBytes[3] = (Byte)(FallInHole + PassThrough + ForceEnterRight + World);
+        LocationBytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
+        LocationBytes[2] = (byte)(MapPage + Map);
+        LocationBytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + World);
     }
 
     private string GetDebuggerDisplay()

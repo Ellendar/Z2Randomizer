@@ -1,12 +1,7 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Z2Randomizer.Core;
 
 namespace Z2Randomizer.Core.Overworld;
 
@@ -141,7 +136,7 @@ public class EastHyrule : World
         enemyAddr = 0x88B0;
         enemies = new List<int> { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-        spawners = new List<int> { 0x0B, 0x0F, 0x17 };
+        generators = new List<int> { 0x0B, 0x0F, 0x17 };
         smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
         largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         enemyPtr = 0x85B1;
