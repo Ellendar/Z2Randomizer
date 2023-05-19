@@ -53,7 +53,7 @@ namespace Z2Randomizer.Statistics
                     };
                     DateTime startTime = DateTime.Now;
                     //logger.Info("Starting seed# " + i + " at: " + startTime);
-                    Hyrule hyrule = new Hyrule(config, backgroundWorker, true);
+                    Hyrule hyrule = new Hyrule(config, backgroundWorker, false);
                     DateTime endTime = DateTime.Now;
                     Result result = new Result(hyrule);
                     result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;

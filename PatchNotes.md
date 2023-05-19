@@ -1,5 +1,21 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.3 - 
+
+### Bug Fixes
+- Fixed a bug in the fix to the vanilla shuffle desert tile bug.
+- Corrected several item rooms that were not marked as having items, causing slightly incorrect logic.
+- Dash always on now works correctly. Thanks alewifey for reporting this and Cody for the fix.
+- PalaceStyle of Random no longer only chooses vanilla. Thanks TAH for reporting this.
+- Fixed a logic bug where seeds couldn't generate if shuffle pbag cave items was off, but extra hearts in the pool were forced into the pbag caves.
+- Fixed a bug where community boss/item rooms could appear when community rooms were off.
+
+### New features
+- New Flag: "Generators always match" - When this flag is on, enemy generators (the ones that create enemies from the left/right side of the screen) will always match on the left and right side like they do in vanilla.
+- New Flag: "No duplicate rooms" - When this flag is on, each palace will not have rooms in it that are duplicates of other rooms in that palace. Each room in the room pool will appear at most once. For rooms that have several versions in the room pool with different enemies (like GP bridges), if multiple of those rooms appear, they will be guaranteed to have at least one enemy different, even after enemy shuffle.
+- Linked fire / Replace fire with dash are now a single combined option with options (Vanilla / Link fire with random spell / Replace fire with dash / Random)
+- A bunch of tweaks/bugfixes to palace generation, especially for drops.
+
 ## Version 4.1.2 - April 16th, 2023
 - Added the ability to sideload more sprites. Add some IPS patches to the Sprites folder and they will show up in the sprites list when you launch the randomizer and be applied when you generate the rom.
 

@@ -1321,7 +1321,8 @@ public class Palace
                     duplicateRoom = AllRooms.FirstOrDefault(i =>
                         Util.byteArrayEqualityComparer.Equals(room.SideView, i.SideView)
                         && Util.byteArrayEqualityComparer.Equals(room.NewEnemies, i.NewEnemies)
-                        && i.Enemies.Length > 1);
+                        && i.Enemies.Length > 1
+                        && i != room);
                     if (duplicateRoom != null)
                     {
                         Debug.WriteLine("Room# " + room.MemAddr + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +

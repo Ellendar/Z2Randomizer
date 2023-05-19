@@ -197,7 +197,7 @@ public partial class MainUI : Form
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-
+        generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
 

@@ -17,87 +17,6 @@ using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.Core;
 
-/*
- * 
-Change List:
-    Removed items are no longer replaced with a pbag, they can be replaced with any small item
-    Implemented a level cap, along with an option to scale xp requirements to the level cap
-    Added an option for town signs to tell you what spell is in the town (thanks, Thirwolf!)
-    Added an option to reduce the encounter spawn rate or turn them off entirely
-    Introduced new exp shuffling levels
-    Added an option to allow users to select their starting atk/mag/life level
-    Added options to shuffle how continents are connected
-    Added new overworld biomes (Islands, Canyon, Caldera, Volcano, Mountainous)
-    Added an option to create new palaces
-    Added the ability to use community based rooms in the palaces (thanks GTM, Scorpion__Max, eonHck, aaron2u2, TKnightCrawler, Duster, Link_7777)
-    Reintroduced vanila maps
-    Removed a few more extraneous rooms from spell houses
-    Added an option to remap Up+A to controller 1
-    Added an option to allow less important locations to be hidden on the overworld
-    Added an option to restrict how connection caves are placed
-    Added an option to allow connection caves to be boulder blocked
-    Added an option to randomize which locations are hidden in New Kasuto/Hidden Palace spots
-    Added an option to remove the flashing death screen
-    Added an option to randomly select character sprite
-    Added an option to randomize the item dropped by bosses
-    Added an option to generate Bagu's Woods
-    Fixed softlock when dying while talking (thanks eon!)
-    Fixed a bug that robbed you of 1 attack power at attack 5 in rare situations
-    Added the Yoshi, Dragonlord, Miria, Crystalis sprites (thanks TKnightCrawler!)
-    Added the Pyramid sprite (thanks Plan!)
-    Added the GliitchWiitch sprite (thanks RandomSaliance!)
-    Added the Lady Link sprite (thanks eonHck!)
-    Added the Hoodie Link sprite (thanks gtm!)
-    Added the Taco sprite (thanks Warlock!)
-
-    Double clicking on the box with the flags selects all of the text automatically
-    Removed options to shuffle xp of bosses and enemies seperately
-    Changed UI for level effectiveness
-    Continued my never ending quest to get tooltips right
-    UI now updates progress of seed generation
-
-
-Bug List:
-    funky grass encounter in east hyrule
-    death mountain encounters
-
-Todo List for version 4.0:
-    Mess with drop rooms
-    Add more rooms
-    Update tooltips / Make sure UI is reasonable
-    Update documentation
-
-Bugs in 4.0
-   
-
-Feature List:
-
-    Item shuffling
-        More extreme item shuffling
-        Duplicate items? (maybe a bad idea...)
-    Move towns accross continents (tried this and it is very hard)
-        Notes:
-            Must swap map and world bytes for this to work
-            Must update sanity checker
-            How to deal with life town?
-            How to deal with new kasuto?
-    Palace columns tell you info about the palace
-    New experience amounts *
-    Shorten Towns
-    More extreme enemy shuffle
-        Slider? (easy, medium, crazy)
-    Overworld Generation improvements
-        Continent sizes (maybe just for maze island?)
-    Randomize overworld caves
-    Swap up/downstab
-    Allow jars to restore health
-    Allow fairies to restore magic
-    New graphics/tile sets/etc.
-    Spells as items?
-    Tri-state checkboxes?
-    Random%        
-*/
-
 public class Hyrule
 {
     //IMPORTANT: Tuning these factors can have a big impact on generation times.
@@ -110,9 +29,9 @@ public class Hyrule
     private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 20;
 
     //This controls how many times 
-    private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 1;
+    private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 20;
 
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
