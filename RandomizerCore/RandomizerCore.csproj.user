@@ -12,6 +12,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <EnableSecurityDebugging>false</EnableSecurityDebugging>
-    <_LastSelectedProfileId>C:\Workspace\Z2Randomizer\RandomizerCore\Properties\PublishProfiles\ProdPublishProfile.pubxml</_LastSelectedProfileId>
+    <_LastSelectedProfileId>C:\Workspace\z2randomizer\RandomizerCore\Properties\PublishProfiles\ProdPublishProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
 </Project>
