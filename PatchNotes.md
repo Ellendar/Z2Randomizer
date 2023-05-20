@@ -4,6 +4,8 @@
 
 Flag strings have changed (again). Eventually I want to create a system where the flags conversion box works for all old versions of the flags, but for now it will only convert from 4.0.4 to the current version. Any flags from 4.1.2 you'll have to manually update. Sorry.
 
+.NET requirement updated to 7.0 from 6.0. This will download automatically so you should be fine. I promise this is the last .NET update for a while.
+
 ### Bug Fixes
 - Fixed a bug in the fix to the vanilla shuffle desert tile bug.
 - Corrected several item rooms that were not marked as having items, causing slightly incorrect logic.
