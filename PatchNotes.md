@@ -2,10 +2,12 @@
 
 ## Version 4.1.3 - 
 
+Flag strings have changed (again). Eventually I want to create a system where the flags conversion box works for all old versions of the flags, but for now it will only convert from 4.0.4 to the current version. Any flags from 4.1.2 you'll have to manually update. Sorry.
+
 ### Bug Fixes
 - Fixed a bug in the fix to the vanilla shuffle desert tile bug.
 - Corrected several item rooms that were not marked as having items, causing slightly incorrect logic.
-- Dash always on now works correctly. Thanks alewifey for reporting this and Cody for the fix.
+- "Dash always on" now works correctly. Thanks alewifey for reporting this and Cody for the fix!
 - PalaceStyle of Random no longer only chooses vanilla. Thanks TAH for reporting this.
 - Fixed a logic bug where seeds couldn't generate if shuffle pbag cave items was off, but extra hearts in the pool were forced into the pbag caves.
 - Fixed a bug where community boss/item rooms could appear when community rooms were off.

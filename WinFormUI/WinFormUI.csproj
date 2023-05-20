@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,6 +10,10 @@
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	<UseApplicationTrust>false</UseApplicationTrust>
     <StartupObject>Z2Randomizer.WinFormUI.Program</StartupObject>
+    <UseWPF>False</UseWPF>
+    <ApplicationIcon>UI\1st.ico</ApplicationIcon>
+    <SignAssembly>False</SignAssembly>
+    <AssemblyName>Z2Randomizer</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

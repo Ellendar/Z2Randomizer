@@ -26,10 +26,10 @@ public class Hyrule
     //The higher you set it, the more likely a given terrain is to find a set of items that works, resulting in fewer terrain generations.
     //It will also increase the number of seeds that have more arcane solutions, where only a specific item route works.
     //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
-    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 20;
+    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 40;
 
     //This controls how many times 
-    private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 20;
+    private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
     public const bool UNSAFE_DEBUG = false;
 

@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_86871ED6EABD43DCA7D0F27EDD20B6FE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_94EC71DD165A43C09436F29102CAC5DA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -191,7 +197,7 @@
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_2836974F02AE481582FD5BD51CDF1670"
                     {
                     "Name" = "8:Z2Randomizer"
-                    "AlwaysCreate" = "11:FALSE"
+                    "AlwaysCreate" = "11:TRUE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
                     "Property" = "8:_DC21AD826FE841739485A27E7AA7F6F6"
@@ -217,15 +223,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{5486756B-26B3-4F52-B503-59DB384BF6A0}"
-        "PackageCode" = "8:{7FDFE00C-6BFA-46D4-8082-8841DDE5EE83}"
+        "ProductCode" = "8:{DEBE52D0-408C-4A28-95F6-BA88108D58F2}"
+        "PackageCode" = "8:{A9B5ECB0-B937-4503-B8CC-135461BCA8EE}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.1.2"
+        "ProductVersion" = "8:4.1.3"
         "Manufacturer" = "8:digshake"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -338,17 +344,17 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F1C53558998A4D15A0CF7A7D654EDA25"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_4B9897F8FD0C4270B3574A6C55BB5565"
             {
-            "Name" = "8:Z2Randomizer"
+            "Name" = "8:Shortcut to Z2Randomizer"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_94EC71DD165A43C09436F29102CAC5DA"
+            "Target" = "8:_2836974F02AE481582FD5BD51CDF1670"
             "Folder" = "8:_2836974F02AE481582FD5BD51CDF1670"
-            "WorkingFolder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
+            "WorkingFolder" = "8:_1EE1569BD222497EAB095E18C85E030F"
             "Icon" = "8:_1CCB6BD983624AEB9B091031D25B8DA1"
             "Feature" = "8:"
             }
@@ -751,9 +757,37 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_86871ED6EABD43DCA7D0F27EDD20B6FE"
+            {
+            "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net7.0-windows\\apphost.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:PublishItems"
+            "OutputProjectGuid" = "8:{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_94EC71DD165A43C09436F29102CAC5DA"
             {
-            "SourcePath" = "8:..\\RandomizerCore\\obj\\Debug\\net6.0-windows7.0\\win-x64\\apphost.exe"
+            "SourcePath" = "8:"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
