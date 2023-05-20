@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 4.1.3 - 
+## Version 4.1.3 - May 20th, 2023
 
 Flag strings have changed (again). Eventually I want to create a system where the flags conversion box works for all old versions of the flags, but for now it will only convert from 4.0.4 to the current version. Any flags from 4.1.2 you'll have to manually update. Sorry.
 
