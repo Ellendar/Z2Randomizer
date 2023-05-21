@@ -355,22 +355,7 @@ public class Palaces
                 palaces.Add(palace);
                 foreach (Room room in palace.AllRooms)
                 {
-                    if (currentPalace != 7)
-                    {
-
-                        enemyBytes += room.Enemies.Length;
-                        if (sideviews.ContainsKey(room.SideView))
-                        {
-                            sideviews[room.SideView].Add(room);
-                        }
-                        else
-                        {
-                            List<Room> l = new List<Room> { room };
-                            sideviews.Add(room.SideView, l);
-                        }
-                    }
-
-                    else
+                    if (currentPalace == 7)
                     {
                         enemyBytesGP += room.Enemies.Length;
                         if (sideviewsgp.ContainsKey(room.SideView))
@@ -381,6 +366,19 @@ public class Palaces
                         {
                             List<Room> l = new List<Room> { room };
                             sideviewsgp.Add(room.SideView, l);
+                        }
+                    }
+                    else
+                    {
+                        enemyBytes += room.Enemies.Length;
+                        if (sideviews.ContainsKey(room.SideView))
+                        {
+                            sideviews[room.SideView].Add(room);
+                        }
+                        else
+                        {
+                            List<Room> l = new List<Room> { room };
+                            sideviews.Add(room.SideView, l);
                         }
                     }
                 }
@@ -507,7 +505,7 @@ public class Palaces
                     room.WriteSideViewPtr(sideViewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
-                    enemyAddr += room.Enemies.Length;
+                    enemyAddr += room.NewEnemies.Length;
                     bool entrance = false;
                     foreach (Palace p in palaces)
                     {

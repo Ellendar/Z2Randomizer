@@ -1246,7 +1246,6 @@ public class RandomizerConfiguration
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
-        properties.PalaceStyle = PalaceStyle;
         properties.StartGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
         properties.ShufflePalacePalettes = ChangePalacePallettes;

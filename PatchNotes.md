@@ -1,5 +1,10 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.4 - May 21st, 2023
+
+- Fixed a bug that would replace some large enemies with fairies when mixed enemies was off and palace enemy shuffle was on.
+- Actually fixed the PalaceStyle bug from before...
+
 ## Version 4.1.3 - May 20th, 2023
 
 Flag strings have changed (again). Eventually I want to create a system where the flags conversion box works for all old versions of the flags, but for now it will only convert from 4.0.4 to the current version. Any flags from 4.1.2 you'll have to manually update. Sorry.
@@ -7,6 +12,7 @@ Flag strings have changed (again). Eventually I want to create a system where th
 .NET requirement updated to 7.0 from 6.0. This will download automatically so you should be fine. I promise this is the last .NET update for a while.
 
 ### Bug Fixes
+
 - Fixed a bug in the fix to the vanilla shuffle desert tile bug.
 - Corrected several item rooms that were not marked as having items, causing slightly incorrect logic.
 - "Dash always on" now works correctly. Thanks alewifey for reporting this and Cody for the fix!
@@ -15,15 +21,18 @@ Flag strings have changed (again). Eventually I want to create a system where th
 - Fixed a bug where community boss/item rooms could appear when community rooms were off.
 
 ### New features
+
 - New Flag: "Generators always match" - When this flag is on, enemy generators (the ones that create enemies from the left/right side of the screen) will always match on the left and right side like they do in vanilla.
 - New Flag: "No duplicate rooms" - When this flag is on, each palace will not have rooms in it that are duplicates of other rooms in that palace. Each room in the room pool will appear at most once. For rooms that have several versions in the room pool with different enemies (like GP bridges), if multiple of those rooms appear, they will be guaranteed to have at least one enemy different, even after enemy shuffle.
 - Linked fire / Replace fire with dash are now a single combined option with options (Vanilla / Link fire with random spell / Replace fire with dash / Random)
 - A bunch of tweaks/bugfixes to palace generation, especially for drops.
 
 ## Version 4.1.2 - April 16th, 2023
+
 - Added the ability to sideload more sprites. Add some IPS patches to the Sprites folder and they will show up in the sprites list when you launch the randomizer and be applied when you generate the rom.
 
 ## Version 4.1.1 - April 15th, 2023
+
 - Fixed an issue where sprite shuffle didn't work.
 - Fixed a bug that could incorrectly disable spell hints.
 - Updated sprite colors so that "Default" now doesn't set sprite colors if you have your sprite set to "Link". This allows you to preload your sprite to the rom and have it not be overwritten.
@@ -31,6 +40,7 @@ Flag strings have changed (again). Eventually I want to create a system where th
 ## Version 4.1.0 - April 14th, 2023
 
 ### Bug Fixes
+
 - Fixed an issue with eastern desert tile in vanilla shuffle that sometimes made the item inaccessible.
 - Fixed an bug where helpful spell hints would sometimes incorrectly display the vanilla hint.
 - Fixed an issue with some community rooms that would cause the item to despawn if you died or left the room after opening the key door.
@@ -39,6 +49,7 @@ Flag strings have changed (again). Eventually I want to create a system where th
 - Fixed a bug where item accessability data would sometimes persist from seed to seed, resulting in incompleteable seeds due to inaccessible items.
 
 ### New features
+
 - Reworked the flag generation system. To convert from the old 4.0.4 flags, paste them to the "Old Flags" box and click "Convert"
 - Many options now support an indeterminate state that is randomly on/off.
 - Items can now be marked as starting items even when starting item shuffle is on. You will always start with those items, and others will be randomized normally.
@@ -53,6 +64,7 @@ Flag strings have changed (again). Eventually I want to create a system where th
 - Added a link to the Z2Randomizer Discord. Check us out!
 
 ### Other Updates
+
 - Substantially updated the seed verification logic to significantly increase speed.
 - Jump+Dash to cross the Saria river is now in logic.
 

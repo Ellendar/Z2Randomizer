@@ -316,9 +316,9 @@ public partial class MainUI : Form
 
     private void generateBtn_Click(object sender, EventArgs e)
     {
-        String flagString = flagsTextBox.Text;
+        String flagString = flagsTextBox.Text.Trim();
 
-        Properties.Settings.Default.filePath = romFileTextBox.Text;
+        Properties.Settings.Default.filePath = romFileTextBox.Text.Trim();
         Properties.Settings.Default.beep = disableLowHealthBeepCheckbox.Checked;
         Properties.Settings.Default.beams = beamSpriteList.SelectedIndex;
         Properties.Settings.Default.spells = fastSpellCheckbox.Checked;
@@ -329,12 +329,12 @@ public partial class MainUI : Form
         Properties.Settings.Default.upac1 = upAOnController1Checkbox.Checked;
         Properties.Settings.Default.noflash = flashingOffCheckbox.Checked;
         Properties.Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
-        Properties.Settings.Default.lastused = flagsTextBox.Text;
-        Properties.Settings.Default.lastseed = seedTextBox.Text;
+        Properties.Settings.Default.lastused = flagsTextBox.Text.Trim();
+        Properties.Settings.Default.lastseed = seedTextBox.Text.Trim();
         Properties.Settings.Default.Save();
         try
         {
-            Int32.Parse(seedTextBox.Text);
+            Int32.Parse(seedTextBox.Text.Trim());
         }
         catch (Exception)
         {
@@ -397,7 +397,7 @@ public partial class MainUI : Form
         f3.Close();
         if (generationException == null)
         {
-            MessageBox.Show("File " + "Z2_" + seedTextBox.Text + "_" + flagsTextBox.Text + ".nes" + " has been created!");
+            MessageBox.Show("File " + "Z2_" + seedTextBox.Text.Trim() + "_" + flagsTextBox.Text.Trim() + ".nes" + " has been created!");
         }
         else
         {
@@ -445,15 +445,15 @@ public partial class MainUI : Form
     {
         RandomizerConfiguration configuration = new RandomizerConfiguration();
 
-        configuration.FileName = romFileTextBox.Text;
+        configuration.FileName = romFileTextBox.Text.Trim();
         try
         {
-            configuration.Seed = Int32.Parse(seedTextBox.Text);
+            configuration.Seed = Int32.Parse(seedTextBox.Text.Trim());
         }
         catch (FormatException)
         {
             seedTextBox.Text = r.Next(1000000000).ToString();
-            configuration.Seed = Int32.Parse(seedTextBox.Text);
+            configuration.Seed = Int32.Parse(seedTextBox.Text.Trim());
         }
 
         //Start Configuration
@@ -810,7 +810,7 @@ public partial class MainUI : Form
 
     private void convertButton_Click(object send, EventArgs e)
     {
-        String oldFlags = oldFlagsTextbox.Text;
+        String oldFlags = oldFlagsTextbox.Text.Trim();
         RandomizerConfiguration oldSettings = ExportConfig();
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
 
@@ -830,6 +830,7 @@ public partial class MainUI : Form
     private void FlagBox_TextChanged(object sender, EventArgs eventArgs)
     {
         dontrunhandler = true;
+        flagsTextBox.Text = flagsTextBox.Text.Trim();
         try
         {
             RandomizerConfiguration configuration = new RandomizerConfiguration(flagsTextBox.Text);

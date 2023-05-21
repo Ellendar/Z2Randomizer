@@ -5,6 +5,16 @@
 		<link>https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml</link>
 		<description>Most recent changes.</description>
 		<language>en</language>
+				<item>
+			<title>Version 4.1.4</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Sunday, 21 Apr 2023 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/blob/main/Releases/Z2Randomizer_4_1_4.msi?raw=true" sparkle:version="4.1.4" />
+		</item>
 		<item>
 			<title>Version 4.1.3</title>
 			<description>

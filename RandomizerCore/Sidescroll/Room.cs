@@ -653,6 +653,7 @@ public class Room
         NewEnemies[0] = Enemies[0];
         for (int i = 1; i <= enemiesLength; i+=2)
         {
+            NewEnemies[i] = Enemies[i];
             int enemyNumber = Enemies[i + 1] & 0x3F;
             int enemyPage = Enemies[i + 1] & 0xC0;
             if (mixEnemies)
@@ -694,7 +695,7 @@ public class Room
                     {
                         swap = RNG.Next(0, largeEnemies.Length);
                     }
-                    NewEnemies[i] = (byte)(largeEnemies[swap] + enemyPage);
+                    NewEnemies[i + 1] = (byte)(largeEnemies[swap] + enemyPage);
                 }
                 else if (smallEnemies.Contains(enemyNumber))
                 { 
@@ -760,7 +761,7 @@ public class Room
         sb.Append("Map: " + (NewMap == 0 ? Map : NewMap) + " Name: " + Name + " Sideview: ");
         sb.Append(BitConverter.ToString(SideView).Replace("-", ""));
         sb.Append(" Enemies: ");
-        sb.Append(BitConverter.ToString(Enemies).Replace("-", ""));
+        sb.Append(BitConverter.ToString(NewEnemies).Replace("-", ""));
         return sb.ToString();
     }
 
