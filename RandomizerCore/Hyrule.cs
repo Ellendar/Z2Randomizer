@@ -431,12 +431,19 @@ public class Hyrule
             return;
         }
         MD5 hasher = MD5.Create();
+        byte[] finalRNGState = new byte[32];
+        RNG.NextBytes(finalRNGState);
         byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
             Flags + 
             Seed +
-            Assembly.GetExecutingAssembly().GetName().Version.Major +
-            Assembly.GetExecutingAssembly().GetName().Version.Minor +
-            File.ReadAllText(config.GetRoomsFile())
+            //Assembly.GetExecutingAssembly().GetName().Version.Major +
+            //Assembly.GetExecutingAssembly().GetName().Version.Minor +
+            //Assembly.GetExecutingAssembly().GetName().Version.Revision +
+            //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
+            //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
+            "4.1.4" +
+            File.ReadAllText(config.GetRoomsFile()) +
+            finalRNGState
         ));
         UpdateRom(hash);
         String newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";

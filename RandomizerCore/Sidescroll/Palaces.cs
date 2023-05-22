@@ -454,9 +454,9 @@ public class Palaces
         }
 
         //Randomize Enemies
-        foreach(Palace palace in palaces)
+        if (props.ShufflePalaceEnemies)
         {
-            if (props.ShufflePalaceEnemies)
+            foreach (Palace palace in palaces)
             {
                 palace.RandomizeEnemies(props, r);
             }
@@ -504,7 +504,10 @@ public class Palaces
                 {
                     room.WriteSideViewPtr(sideViewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    if(props.ShufflePalaceEnemies)
+                    {
+                        room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    }
                     enemyAddr += room.NewEnemies.Length;
                     bool entrance = false;
                     foreach (Palace p in palaces)
@@ -537,7 +540,10 @@ public class Palaces
                 {
                     room.WriteSideViewPtr(sideviewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    if (props.ShufflePalaceEnemies)
+                    {
+                        room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    }
                     enemyAddr += room.Enemies.Length;
                     room.UpdateConnectors(ROMData, room == palaces[6].Root);
                 }

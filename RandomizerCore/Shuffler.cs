@@ -181,6 +181,24 @@ public class Shuffler
 
     public void ShufflePbagAmounts(ROM ROMData, Random r)
     {
+        /*
+         * 0 - 0
+         * 1 - 2
+         * 2 - 3
+         * 3 - 5
+         * 4 - 10
+         * 5 - 20
+         * 6 - 30
+         * 7 - 50
+         * 8 - 70
+         * 9 - 100
+         * 10 - 150
+         * 11 - 200
+         * 12 - 300
+         * 13 - 500
+         * 14 - 700
+         * 15 - 1000
+         */
         if (props.ShufflePbagXp)
         {
             ROMData.Put(0x1e800, (byte)r.Next(5, 10));

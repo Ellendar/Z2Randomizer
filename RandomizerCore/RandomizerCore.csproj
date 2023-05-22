@@ -36,6 +36,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
+    <Version>4.1.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />
