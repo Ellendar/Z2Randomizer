@@ -4,6 +4,8 @@
 
 - Fixed a bug that would replace some large enemies with fairies when mixed enemies was off and palace enemy shuffle was on.
 - Actually fixed the PalaceStyle bug from before...
+- Fixed a bug where enemies would dissapear when palace enemy shuffle is off on reconstructed palaces.
+- Fixed a bug where the hash incorrectly did not contain version data.
 
 ## Version 4.1.3 - May 20th, 2023
 
