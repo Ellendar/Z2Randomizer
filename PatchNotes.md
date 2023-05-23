@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.5 - May 23rd, 2023
+
+- Fixed a validation issue that could cause "No duplicate Rooms' to be disabled.
+
 ## Version 4.1.4 - May 21st, 2023
 
 - Fixed a bug that would replace some large enemies with fairies when mixed enemies was off and palace enemy shuffle was on.

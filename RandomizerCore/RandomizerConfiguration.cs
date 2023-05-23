@@ -1464,7 +1464,7 @@ public class RandomizerConfiguration
         //Non-reconstructed is incompatable with no duplicate rooms.
         //Also, if community rooms is off, vanilla doesn't contain enough non-duplciate rooms to properly cover the number
         //of required rooms, often even in short GP.
-        if(properties.PalaceStyle != PalaceStyle.RECONSTRUCTED || properties.UseCommunityRooms)
+        if(properties.PalaceStyle != PalaceStyle.RECONSTRUCTED || !properties.UseCommunityRooms)
         {
             properties.NoDuplicateRooms = false;
         }
