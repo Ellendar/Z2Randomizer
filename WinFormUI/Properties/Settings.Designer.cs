@@ -8,234 +8,336 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Z2Randomizer.WinFormUI.Properties; 
+namespace Z2Randomizer.WinFormUI.Properties {
+    
+    
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
+        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        
+        public static Settings Default {
+            get {
+                return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string filePath {
+            get {
+                return ((string)(this["filePath"]));
+            }
+            set {
+                this["filePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool beep {
+            get {
+                return ((bool)(this["beep"]));
+            }
+            set {
+                this["beep"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int tunic {
+            get {
+                return ((int)(this["tunic"]));
+            }
+            set {
+                this["tunic"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool spells {
+            get {
+                return ((bool)(this["spells"]));
+            }
+            set {
+                this["spells"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool beam {
+            get {
+                return ((bool)(this["beam"]));
+            }
+            set {
+                this["beam"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool music {
+            get {
+                return ((bool)(this["music"]));
+            }
+            set {
+                this["music"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int sprite {
+            get {
+                return ((int)(this["sprite"]));
+            }
+            set {
+                this["sprite"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7")]
+        public int shield {
+            get {
+                return ((int)(this["shield"]));
+            }
+            set {
+                this["shield"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string custom1 {
+            get {
+                return ((string)(this["custom1"]));
+            }
+            set {
+                this["custom1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string custom2 {
+            get {
+                return ((string)(this["custom2"]));
+            }
+            set {
+                this["custom2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string custom3 {
+            get {
+                return ((string)(this["custom3"]));
+            }
+            set {
+                this["custom3"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastused {
+            get {
+                return ((string)(this["lastused"]));
+            }
+            set {
+                this["lastused"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool update {
+            get {
+                return ((bool)(this["update"]));
+            }
+            set {
+                this["update"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int beams {
+            get {
+                return ((int)(this["beams"]));
+            }
+            set {
+                this["beams"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool upac1 {
+            get {
+                return ((bool)(this["upac1"]));
+            }
+            set {
+                this["upac1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string lastseed {
+            get {
+                return ((string)(this["lastseed"]));
+            }
+            set {
+                this["lastseed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool noflash {
+            get {
+                return ((bool)(this["noflash"]));
+            }
+            set {
+                this["noflash"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useCustomRooms {
+            get {
+                return ((bool)(this["useCustomRooms"]));
+            }
+            set {
+                this["useCustomRooms"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+  <string>Name|Not set</string>
+  <string>Flagset|</string>
+  <string>Tooltip|Right click to set your custom flagset</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection customizableButtonBase {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButtonBase"]));
+            }
+            set {
+                this["customizableButtonBase"] = value;
+            }
+        }
 
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customFlagsButton1
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton1"]));
+            }
+            set
+            {
+                this["customFlagsButton1"] = value;
+            }
+        }
 
-[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
-internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
-    
-    private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-    
-    public static Settings Default {
-        get {
-            return defaultInstance;
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customFlagsButton2
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton2"]));
+            }
+            set
+            {
+                this["customFlagsButton2"] = value;
+            }
         }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("")]
-    public string filePath {
-        get {
-            return ((string)(this["filePath"]));
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customFlagsButton3
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton3"]));
+            }
+            set
+            {
+                this["customFlagsButton3"] = value;
+            }
         }
-        set {
-            this["filePath"] = value;
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customFlagsButton4
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton4"]));
+            }
+            set
+            {
+                this["customFlagsButton4"] = value;
+            }
         }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("False")]
-    public bool beep {
-        get {
-            return ((bool)(this["beep"]));
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customFlagsButton5
+        {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton5"]));
+            }
+            set {
+                this["customFlagsButton5"] = value;
+            }
         }
-        set {
-            this["beep"] = value;
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customFlagsButton6
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton6"]));
+            }
+            set
+            {
+                this["customFlagsButton6"] = value;
+            }
         }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("0")]
-    public int tunic {
-        get {
-            return ((int)(this["tunic"]));
-        }
-        set {
-            this["tunic"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("False")]
-    public bool spells {
-        get {
-            return ((bool)(this["spells"]));
-        }
-        set {
-            this["spells"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("False")]
-    public bool beam {
-        get {
-            return ((bool)(this["beam"]));
-        }
-        set {
-            this["beam"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("False")]
-    public bool music {
-        get {
-            return ((bool)(this["music"]));
-        }
-        set {
-            this["music"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("0")]
-    public int sprite {
-        get {
-            return ((int)(this["sprite"]));
-        }
-        set {
-            this["sprite"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("7")]
-    public int shield {
-        get {
-            return ((int)(this["shield"]));
-        }
-        set {
-            this["shield"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("")]
-    public string custom1 {
-        get {
-            return ((string)(this["custom1"]));
-        }
-        set {
-            this["custom1"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("")]
-    public string custom2 {
-        get {
-            return ((string)(this["custom2"]));
-        }
-        set {
-            this["custom2"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("")]
-    public string custom3 {
-        get {
-            return ((string)(this["custom3"]));
-        }
-        set {
-            this["custom3"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("")]
-    public string lastused {
-        get {
-            return ((string)(this["lastused"]));
-        }
-        set {
-            this["lastused"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("True")]
-    public bool update {
-        get {
-            return ((bool)(this["update"]));
-        }
-        set {
-            this["update"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("0")]
-    public int beams {
-        get {
-            return ((int)(this["beams"]));
-        }
-        set {
-            this["beams"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("False")]
-    public bool upac1 {
-        get {
-            return ((bool)(this["upac1"]));
-        }
-        set {
-            this["upac1"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("")]
-    public string lastseed {
-        get {
-            return ((string)(this["lastseed"]));
-        }
-        set {
-            this["lastseed"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("True")]
-    public bool noflash {
-        get {
-            return ((bool)(this["noflash"]));
-        }
-        set {
-            this["noflash"] = value;
-        }
-    }
-    
-    [global::System.Configuration.UserScopedSettingAttribute()]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Configuration.DefaultSettingValueAttribute("False")]
-    public bool useCustomRooms {
-        get {
-            return ((bool)(this["useCustomRooms"]));
-        }
-        set {
-            this["useCustomRooms"] = value;
-        }
+
+        
     }
 }

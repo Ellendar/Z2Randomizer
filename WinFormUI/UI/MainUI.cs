@@ -22,6 +22,7 @@ public partial class MainUI : Form
     private String oldFlags;
     private GeneratingSeedsForm f3;
     private RandomizerConfiguration config;
+    private List<Button> customisableButtons = new List<Button>();
 
     private readonly int validFlagStringLength;
 
@@ -68,6 +69,20 @@ public partial class MainUI : Form
             smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
         large = new CheckBox[] { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox,
             largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
+
+
+
+
+        //customisable buttons (need to add these in order so they don't get mixed up)
+        customisableButtons.Add(customFlagsButton1);
+        customisableButtons.Add(customFlagsButton2);
+        customisableButtons.Add(customFlagsButton3);
+        customisableButtons.Add(customFlagsButton4);
+        customisableButtons.Add(customFlagsButton5);
+        customisableButtons.Add(customFlagsButton6);
+        customisableButtonContextMenu.Items.Add("Edit", null, CustomisableButtonContextMenuOnClick);
+        customisableButtonContextMenu.Items.Add("Clear", null, CustomisableButtonContextMenuOnClick);
+        SetCustomFlagsetButtons();
 
 
         customFlags1TextBox.TextChanged += new System.EventHandler(this.CustomSave1_Click);
@@ -238,6 +253,106 @@ public partial class MainUI : Form
         WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", version); // THIS CALL NOT IMPLEMENTED YET
         WinSparkle.win_sparkle_init();
     }
+
+    private void SetCustomFlagsetButtons()
+    {
+        foreach (var button in customisableButtons)
+        {
+
+            var setting = (System.Collections.Specialized.StringCollection)Properties.Settings.Default[button.Name];
+            var customButtonSettings = new CustomisedButtonSettings(setting);
+
+
+            if (customButtonSettings.IsEmpty)
+            {
+                customButtonSettings = new CustomisedButtonSettings(Properties.Settings.Default.customizableButtonBase);
+                customButtonSettings.IsCustomised = false;
+            }
+
+            button.Text = customButtonSettings.Name;
+            button.Tag = customButtonSettings;
+            toolTip1.SetToolTip(button, customButtonSettings.Tooltip);
+
+            if (!customButtonSettings.IsCustomised)
+            {
+                // set some indicator that this button is not customised
+                button.ForeColor = Color.Gray;
+            }
+
+            button.MouseUp += CustomisableButtonOnClick;
+
+        }
+
+    }
+
+    void CustomisableButtonOnClick(object sender, System.Windows.Forms.MouseEventArgs e)
+    {
+        var button = (Button)sender;
+
+        if (e.Button == MouseButtons.Right)
+        {
+            // Show context menu
+            customisableButtonContextMenu.Show(button, new Point(e.X, e.Y));
+        }
+        else
+        {
+            var customButtonSettings = (CustomisedButtonSettings)button.Tag;
+            if (customButtonSettings.IsCustomised)
+            {
+                // Run the customised flagset
+                flagsTextBox.Text = customButtonSettings.Flagset;
+            }
+        }
+    }
+
+    void CustomisableButtonContextMenuOnClick(object sender, System.EventArgs e)
+    {
+        var menuItem = (ToolStripMenuItem)sender;
+        var button = (Button)customisableButtonContextMenu.SourceControl;
+        var customButtonSettings = (CustomisedButtonSettings)button.Tag;
+        switch (menuItem.Text)
+        {
+            case "Edit":
+                var customiseButtonFlagsetForm = new CustomiseButtonFlagsetForm(button, flagsTextBox.Text);
+                customiseButtonFlagsetForm.ShowDialog();
+                if (customiseButtonFlagsetForm.DialogResult == DialogResult.OK)
+                {
+                    button.Text = customButtonSettings.Name;
+                    button.Tag = customButtonSettings;
+                    toolTip1.SetToolTip(button, customButtonSettings.Tooltip);
+                    button.ForeColor = Color.Black;
+                }
+                Properties.Settings.Default[button.Name] = customButtonSettings.Export();
+                Properties.Settings.Default.Save();
+
+                break;
+            case "Clear":
+                customButtonSettings = new CustomisedButtonSettings(Properties.Settings.Default.customizableButtonBase);
+                customButtonSettings.IsCustomised = false;
+                button.Text = customButtonSettings.Name;
+                button.Tag = customButtonSettings;
+                toolTip1.SetToolTip(button, customButtonSettings.Tooltip);
+                button.ForeColor = Color.Gray;
+                Properties.Settings.Default[button.Name] = new System.Collections.Specialized.StringCollection();
+                Properties.Settings.Default.Save();
+                break;
+        }
+
+
+        //var customiseButtonFlagsetForm = new CustomiseButtonFlagsetForm(button, flagsTextBox.Text);
+        //var result = customiseButtonFlagsetForm.ShowDialog();
+        //if (result == DialogResult.OK)
+        //{
+        //    var customisedButtonSettings = button.Tag as CustomisedButtonSettings;
+        //    if (customisedButtonSettings != null)
+        //    {
+        //        button.Text = customisedButtonSettings.Name;
+        //        toolTip1.SetToolTip(button, customisedButtonSettings.Tooltip);
+        //        button.ForeColor = Color.Black;
+        //    }
+        //}
+    }
+
 
     /// <summary>
     /// Disabled for now to support overrides for shuffle starting items. Maybe in the future toggling this box still 
@@ -1725,4 +1840,6 @@ public partial class MainUI : Form
         }
         return true;
     }
+
+
 }
