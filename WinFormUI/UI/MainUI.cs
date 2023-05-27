@@ -8,6 +8,9 @@ namespace Z2Randomizer.WinFormUI;
 
 public partial class MainUI : Form
 {
+    const string DISCORD_URL = @"http://z2r.gg/discord";
+    const string WIKI_URL = @"https://bitbucket.org/digshake/z2randomizer/wiki/Home";
+
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private Random r;
     private bool dontrunhandler;
@@ -1187,12 +1190,14 @@ public partial class MainUI : Form
 
     private void WikiBtn_Click(object sender, EventArgs e)
     {
-        Process.Start(new ProcessStartInfo("https://bitbucket.org/digshake/z2randomizer/wiki/Home") { UseShellExecute = true });
+        var linkForm = new ExternalLinkConfirmationForm(WIKI_URL);
+        linkForm.ShowDialog();
     }
 
     private void DiscordButton_Click(object sender, EventArgs e)
     {
-        Process.Start(new ProcessStartInfo("http://z2r.gg/discord") { UseShellExecute = true });
+        var linkForm = new ExternalLinkConfirmationForm(DISCORD_URL);
+        linkForm.ShowDialog();
     }
 
     private void PalaceItemBox_CheckStateChanged(object sender, EventArgs e)
