@@ -251,7 +251,7 @@ public partial class MainUI : Form
         // in the meantime, this'll do.
         customisableButtonContextMenu.Items.Add("Edit", null, CustomFlagsetButtonContextMenuOnClick);
         customisableButtonContextMenu.Items.Add("Copy", null, CustomFlagsetButtonContextMenuOnClick);
-        customisableButtonContextMenu.Items.Add("-");
+        customisableButtonContextMenu.Items.Add(new ToolStripSeparator());
         customisableButtonContextMenu.Items.Add("Clear", null, CustomFlagsetButtonContextMenuOnClick);
 
 
@@ -363,7 +363,7 @@ public partial class MainUI : Form
     /// </summary>
     /// <param name="button"></param>
     /// <param name="customButtonSettings"></param>
-    private void SetCustomFlagsetButtonProperties(Button? button, CustomisedButtonSettings customButtonSettings)
+    private void SetCustomFlagsetButtonProperties(Button button, CustomisedButtonSettings customButtonSettings)
     {
 
         // found that this was being repeated a lot, so made it a function
@@ -387,11 +387,11 @@ public partial class MainUI : Form
         if (!customButtonSettings.IsCustomised)
         {
             // set some indicator that this button is not customised
-            button.ForeColor = Color.Gray;
+            button.ForeColor = SystemColors.GrayText;
         }
         else
         {
-            button.ForeColor = Color.Black;
+            button.ForeColor = SystemColors.WindowText;
         }
     }
 
