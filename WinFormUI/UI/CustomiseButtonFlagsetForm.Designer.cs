@@ -47,7 +47,7 @@
             txtName.Location = new Point(73, 15);
             txtName.Name = "txtName";
             txtName.Size = new Size(177, 23);
-            txtName.TabIndex = 0;
+            txtName.TabIndex = 1;
             txtName.Validating += txtName_Validating;
             // 
             // labelName
@@ -56,15 +56,15 @@
             labelName.Location = new Point(12, 18);
             labelName.Name = "labelName";
             labelName.Size = new Size(39, 15);
-            labelName.TabIndex = 1;
+            labelName.TabIndex = 0;
             labelName.Text = "Name";
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(175, 118);
+            btnSave.Location = new Point(191, 118);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(75, 23);
-            btnSave.TabIndex = 2;
+            btnSave.TabIndex = 7;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
@@ -75,7 +75,7 @@
             labelFlagset.Location = new Point(12, 47);
             labelFlagset.Name = "labelFlagset";
             labelFlagset.Size = new Size(44, 15);
-            labelFlagset.TabIndex = 4;
+            labelFlagset.TabIndex = 2;
             labelFlagset.Text = "Flagset";
             // 
             // txtFlagset
@@ -92,7 +92,7 @@
             labelTooltip.Location = new Point(12, 76);
             labelTooltip.Name = "labelTooltip";
             labelTooltip.Size = new Size(43, 15);
-            labelTooltip.TabIndex = 6;
+            labelTooltip.TabIndex = 4;
             labelTooltip.Text = "Tooltip";
             // 
             // txtToolTip
@@ -101,13 +101,14 @@
             txtToolTip.Name = "txtToolTip";
             txtToolTip.Size = new Size(274, 23);
             txtToolTip.TabIndex = 5;
+            txtToolTip.Validating += txtToolTip_Validating;
             // 
             // btnCancel
             // 
             btnCancel.Location = new Point(272, 118);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(75, 23);
-            btnCancel.TabIndex = 7;
+            btnCancel.TabIndex = 8;
             btnCancel.Text = "Cancel";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
@@ -117,9 +118,10 @@
             btnUpdateFlagset.Location = new Point(12, 118);
             btnUpdateFlagset.Name = "btnUpdateFlagset";
             btnUpdateFlagset.Size = new Size(119, 23);
-            btnUpdateFlagset.TabIndex = 8;
+            btnUpdateFlagset.TabIndex = 6;
             btnUpdateFlagset.Text = "Update Flagset";
             btnUpdateFlagset.UseVisualStyleBackColor = true;
+            btnUpdateFlagset.Click += btnUpdateFlagset_Click;
             // 
             // errorProvider1
             // 
@@ -130,7 +132,6 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(359, 161);
-            ControlBox = false;
             Controls.Add(btnUpdateFlagset);
             Controls.Add(btnCancel);
             Controls.Add(labelTooltip);
@@ -140,6 +141,9 @@
             Controls.Add(btnSave);
             Controls.Add(labelName);
             Controls.Add(txtName);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "CustomiseButtonFlagsetForm";
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterParent;

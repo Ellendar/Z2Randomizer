@@ -19,6 +19,8 @@ namespace Z2Randomizer.WinFormUI
         {
             InitializeComponent();
             btnCancel.CausesValidation = false;
+            AcceptButton = btnSave;
+            CancelButton = btnCancel;
 
         }
         public CustomiseButtonFlagsetForm(Button caller, string flagset) : this()
@@ -101,6 +103,10 @@ namespace Z2Randomizer.WinFormUI
             {
                 errorProvider1.SetError(txtName, "Name cannot be blank!");
             }
+            if (txtName.Text.Contains("|"))
+            {
+                errorProvider1.SetError(txtName, "Pipe | cannot be used in Name!");
+            }
         }
 
         private void txtFlagset_Validating(object sender, CancelEventArgs e)
@@ -108,6 +114,23 @@ namespace Z2Randomizer.WinFormUI
             if (string.IsNullOrWhiteSpace(txtFlagset.Text))
             {
                 errorProvider1.SetError(txtFlagset, "Flagset cannot be blank!");
+            }
+            if (txtFlagset.Text.Contains("|"))
+            {
+                errorProvider1.SetError(txtFlagset, "Pipe | cannot be used in Flagset!");
+            }
+        }
+
+        private void btnUpdateFlagset_Click(object sender, EventArgs e)
+        {
+            txtFlagset.Text = mainFormFlagset;
+        }
+
+        private void txtToolTip_Validating(object sender, CancelEventArgs e)
+        {
+            if (txtToolTip.Text.Contains("|"))
+            {
+                errorProvider1.SetError(txtToolTip, "Pipe | cannot be used in Tooltip!");
             }
         }
     }

@@ -240,21 +240,8 @@ partial class MainUI
         this.customFlagsButton5 = (new global::System.Windows.Forms.Button());
         this.customFlagsButton6 = (new global::System.Windows.Forms.Button());
         this.discordButton = (new global::System.Windows.Forms.Button());
-        this.customFlags1TextBox = (new global::System.Windows.Forms.TextBox());
-        this.customFlags2TextBox = (new global::System.Windows.Forms.TextBox());
-        this.customFlags1SaveButton = (new global::System.Windows.Forms.Button());
-        this.customFlags1LoadButton = (new global::System.Windows.Forms.Button());
-        this.customFlags3TextBox = (new global::System.Windows.Forms.TextBox());
-        this.customFlags2SaveButton = (new global::System.Windows.Forms.Button());
-        this.customFlags2LoadButton = (new global::System.Windows.Forms.Button());
-        this.customFlags3SaveButton = (new global::System.Windows.Forms.Button());
-        this.customFlags3LoadButton = (new global::System.Windows.Forms.Button());
         this.oldFlagsTextbox = (new global::System.Windows.Forms.TextBox());
         this.convertButton = (new global::System.Windows.Forms.Button());
-        this.customFlags1Label = (new global::System.Windows.Forms.Label());
-        this.customFlags2Label = (new global::System.Windows.Forms.Label());
-        this.customFlags3Label = (new global::System.Windows.Forms.Label());
-        this.label25 = (new global::System.Windows.Forms.Label());
         this.backgroundWorker1 = (new global::System.ComponentModel.BackgroundWorker());
         this.oldFlagsLabel = (new global::System.Windows.Forms.Label());
         this.batchButton = (new global::System.Windows.Forms.Button());
@@ -2811,68 +2798,70 @@ partial class MainUI
         // 
         // customFlagsButton1
         // 
-        this.customFlagsButton1.Location = (new global::System.Drawing.Point(35, 505));
+        this.customFlagsButton1.AutoEllipsis = (true);
+        this.customFlagsButton1.Location = (new global::System.Drawing.Point(16, 504));
         this.customFlagsButton1.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
         this.customFlagsButton1.Name = ("customFlagsButton1");
-        this.customFlagsButton1.Size = (new global::System.Drawing.Size(88, 27));
+        this.customFlagsButton1.Size = (new global::System.Drawing.Size(96, 27));
         this.customFlagsButton1.TabIndex = (18);
         this.customFlagsButton1.Text = ("Beginner");
         this.toolTip1.SetToolTip(this.customFlagsButton1, "This preset is great for people who are looking for a casual experience.");
         this.customFlagsButton1.UseVisualStyleBackColor = (true);
-        this.customFlagsButton1.Click += (this.BeginnerFlags);
         // 
         // customFlagsButton2
         // 
-        this.customFlagsButton2.Location = (new global::System.Drawing.Point(129, 505));
+        this.customFlagsButton2.AutoEllipsis = (true);
+        this.customFlagsButton2.Location = (new global::System.Drawing.Point(116, 504));
         this.customFlagsButton2.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
         this.customFlagsButton2.Name = ("customFlagsButton2");
-        this.customFlagsButton2.Size = (new global::System.Drawing.Size(88, 27));
+        this.customFlagsButton2.Size = (new global::System.Drawing.Size(96, 27));
         this.customFlagsButton2.TabIndex = (19);
         this.customFlagsButton2.Text = ("Standard");
         this.toolTip1.SetToolTip(this.customFlagsButton2, "Flags for the 2022 Standard Tournament");
         this.customFlagsButton2.UseVisualStyleBackColor = (true);
-        this.customFlagsButton2.Click += (this.StandardFlags);
         // 
         // customFlagsButton3
         // 
-        this.customFlagsButton3.Location = (new global::System.Drawing.Point(224, 505));
+        this.customFlagsButton3.AutoEllipsis = (true);
+        this.customFlagsButton3.Location = (new global::System.Drawing.Point(216, 504));
         this.customFlagsButton3.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
         this.customFlagsButton3.Name = ("customFlagsButton3");
-        this.customFlagsButton3.Size = (new global::System.Drawing.Size(88, 27));
+        this.customFlagsButton3.Size = (new global::System.Drawing.Size(96, 27));
         this.customFlagsButton3.TabIndex = (20);
         this.customFlagsButton3.Text = ("Max Rando");
         this.toolTip1.SetToolTip(this.customFlagsButton3, "Flags for the 2023 Max Rando Tournament");
         this.customFlagsButton3.UseVisualStyleBackColor = (true);
-        this.customFlagsButton3.Click += (this.MaxRandoFlags);
         // 
         // customFlagsButton4
         // 
-        this.customFlagsButton4.Location = (new global::System.Drawing.Point(318, 505));
+        this.customFlagsButton4.AutoEllipsis = (true);
+        this.customFlagsButton4.Location = (new global::System.Drawing.Point(316, 504));
         this.customFlagsButton4.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
         this.customFlagsButton4.Name = ("customFlagsButton4");
-        this.customFlagsButton4.Size = (new global::System.Drawing.Size(88, 27));
+        this.customFlagsButton4.Size = (new global::System.Drawing.Size(96, 27));
         this.customFlagsButton4.TabIndex = (21);
         this.customFlagsButton4.Text = ("Random%");
         this.toolTip1.SetToolTip(this.customFlagsButton4, "Is it randomized? Who knows?");
         this.customFlagsButton4.UseVisualStyleBackColor = (true);
-        this.customFlagsButton4.Click += (this.RandomPercentFlags);
         // 
         // customFlagsButton5
         // 
-        this.customFlagsButton5.Location = (new global::System.Drawing.Point(413, 505));
+        this.customFlagsButton5.AutoEllipsis = (true);
+        this.customFlagsButton5.Location = (new global::System.Drawing.Point(416, 504));
         this.customFlagsButton5.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
         this.customFlagsButton5.Name = ("customFlagsButton5");
-        this.customFlagsButton5.Size = (new global::System.Drawing.Size(88, 27));
+        this.customFlagsButton5.Size = (new global::System.Drawing.Size(96, 27));
         this.customFlagsButton5.TabIndex = (22);
         this.toolTip1.SetToolTip(this.customFlagsButton5, "Unused (for now)");
         this.customFlagsButton5.UseVisualStyleBackColor = (true);
         // 
         // customFlagsButton6
         // 
-        this.customFlagsButton6.Location = (new global::System.Drawing.Point(507, 505));
+        this.customFlagsButton6.AutoEllipsis = (true);
+        this.customFlagsButton6.Location = (new global::System.Drawing.Point(516, 504));
         this.customFlagsButton6.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
         this.customFlagsButton6.Name = ("customFlagsButton6");
-        this.customFlagsButton6.Size = (new global::System.Drawing.Size(88, 27));
+        this.customFlagsButton6.Size = (new global::System.Drawing.Size(96, 27));
         this.customFlagsButton6.TabIndex = (23);
         this.toolTip1.SetToolTip(this.customFlagsButton6, "Unused (for now)");
         this.customFlagsButton6.UseVisualStyleBackColor = (true);
@@ -2888,105 +2877,6 @@ partial class MainUI
         this.toolTip1.SetToolTip(this.discordButton, "Join the Z2R Discord");
         this.discordButton.UseVisualStyleBackColor = (true);
         this.discordButton.Click += (this.DiscordButton_Click);
-        // 
-        // customFlags1TextBox
-        // 
-        this.customFlags1TextBox.Location = (new global::System.Drawing.Point(35, 577));
-        this.customFlags1TextBox.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags1TextBox.Name = ("customFlags1TextBox");
-        this.customFlags1TextBox.Size = (new global::System.Drawing.Size(184, 23));
-        this.customFlags1TextBox.TabIndex = (25);
-        this.toolTip1.SetToolTip(this.customFlags1TextBox, "These flags represent the selected options. They can be copy/pasted.");
-        // 
-        // customFlags2TextBox
-        // 
-        this.customFlags2TextBox.Location = (new global::System.Drawing.Point(224, 577));
-        this.customFlags2TextBox.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags2TextBox.Name = ("customFlags2TextBox");
-        this.customFlags2TextBox.Size = (new global::System.Drawing.Size(184, 23));
-        this.customFlags2TextBox.TabIndex = (26);
-        this.toolTip1.SetToolTip(this.customFlags2TextBox, "These flags represent the selected options. They can be copy/pasted.");
-        // 
-        // customFlags1SaveButton
-        // 
-        this.customFlags1SaveButton.Location = (new global::System.Drawing.Point(35, 607));
-        this.customFlags1SaveButton.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags1SaveButton.Name = ("customFlags1SaveButton");
-        this.customFlags1SaveButton.Size = (new global::System.Drawing.Size(88, 27));
-        this.customFlags1SaveButton.TabIndex = (29);
-        this.customFlags1SaveButton.Text = ("Save");
-        this.toolTip1.SetToolTip(this.customFlags1SaveButton, "Saves the current flags to this custom slot");
-        this.customFlags1SaveButton.UseVisualStyleBackColor = (true);
-        this.customFlags1SaveButton.Click += (this.CustomSave1_Click);
-        // 
-        // customFlags1LoadButton
-        // 
-        this.customFlags1LoadButton.Location = (new global::System.Drawing.Point(131, 607));
-        this.customFlags1LoadButton.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags1LoadButton.Name = ("customFlags1LoadButton");
-        this.customFlags1LoadButton.Size = (new global::System.Drawing.Size(88, 27));
-        this.customFlags1LoadButton.TabIndex = (30);
-        this.customFlags1LoadButton.Text = ("Load");
-        this.toolTip1.SetToolTip(this.customFlags1LoadButton, "Loads the flags in this current custom slot");
-        this.customFlags1LoadButton.UseVisualStyleBackColor = (true);
-        this.customFlags1LoadButton.Click += (this.CustomLoad1_Click);
-        // 
-        // customFlags3TextBox
-        // 
-        this.customFlags3TextBox.Location = (new global::System.Drawing.Point(413, 577));
-        this.customFlags3TextBox.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags3TextBox.Name = ("customFlags3TextBox");
-        this.customFlags3TextBox.Size = (new global::System.Drawing.Size(184, 23));
-        this.customFlags3TextBox.TabIndex = (31);
-        this.toolTip1.SetToolTip(this.customFlags3TextBox, "These flags represent the selected options. They can be copy/pasted.");
-        // 
-        // customFlags2SaveButton
-        // 
-        this.customFlags2SaveButton.Location = (new global::System.Drawing.Point(225, 607));
-        this.customFlags2SaveButton.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags2SaveButton.Name = ("customFlags2SaveButton");
-        this.customFlags2SaveButton.Size = (new global::System.Drawing.Size(88, 27));
-        this.customFlags2SaveButton.TabIndex = (33);
-        this.customFlags2SaveButton.Text = ("Save");
-        this.toolTip1.SetToolTip(this.customFlags2SaveButton, "Saves the current flags to this custom slot");
-        this.customFlags2SaveButton.UseVisualStyleBackColor = (true);
-        this.customFlags2SaveButton.Click += (this.CustomSave2_Click);
-        // 
-        // customFlags2LoadButton
-        // 
-        this.customFlags2LoadButton.Location = (new global::System.Drawing.Point(319, 607));
-        this.customFlags2LoadButton.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags2LoadButton.Name = ("customFlags2LoadButton");
-        this.customFlags2LoadButton.Size = (new global::System.Drawing.Size(88, 27));
-        this.customFlags2LoadButton.TabIndex = (34);
-        this.customFlags2LoadButton.Text = ("Load");
-        this.toolTip1.SetToolTip(this.customFlags2LoadButton, "Loads the flags in this current custom slot");
-        this.customFlags2LoadButton.UseVisualStyleBackColor = (true);
-        this.customFlags2LoadButton.Click += (this.CustomLoad2_Click);
-        // 
-        // customFlags3SaveButton
-        // 
-        this.customFlags3SaveButton.Location = (new global::System.Drawing.Point(413, 607));
-        this.customFlags3SaveButton.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags3SaveButton.Name = ("customFlags3SaveButton");
-        this.customFlags3SaveButton.Size = (new global::System.Drawing.Size(88, 27));
-        this.customFlags3SaveButton.TabIndex = (35);
-        this.customFlags3SaveButton.Text = ("Save");
-        this.toolTip1.SetToolTip(this.customFlags3SaveButton, "Saves the current flags to this custom slot");
-        this.customFlags3SaveButton.UseVisualStyleBackColor = (true);
-        this.customFlags3SaveButton.Click += (this.CustomSave3_Click);
-        // 
-        // customFlags3LoadButton
-        // 
-        this.customFlags3LoadButton.Location = (new global::System.Drawing.Point(507, 607));
-        this.customFlags3LoadButton.Margin = (new global::System.Windows.Forms.Padding(4, 3, 4, 3));
-        this.customFlags3LoadButton.Name = ("customFlags3LoadButton");
-        this.customFlags3LoadButton.Size = (new global::System.Drawing.Size(88, 27));
-        this.customFlags3LoadButton.TabIndex = (36);
-        this.customFlags3LoadButton.Text = ("Load");
-        this.toolTip1.SetToolTip(this.customFlags3LoadButton, "Loads the flags in this current custom slot");
-        this.customFlags3LoadButton.UseVisualStyleBackColor = (true);
-        this.customFlags3LoadButton.Click += (this.CustomLoad3_Click);
         // 
         // oldFlagsTextbox
         // 
@@ -3008,45 +2898,6 @@ partial class MainUI
         this.toolTip1.SetToolTip(this.convertButton, "Create the ROM");
         this.convertButton.UseVisualStyleBackColor = (true);
         this.convertButton.Click += (this.convertButton_Click);
-        // 
-        // customFlags1Label
-        // 
-        this.customFlags1Label.AutoSize = (true);
-        this.customFlags1Label.Location = (new global::System.Drawing.Point(32, 559));
-        this.customFlags1Label.Margin = (new global::System.Windows.Forms.Padding(2, 0, 2, 0));
-        this.customFlags1Label.Name = ("customFlags1Label");
-        this.customFlags1Label.Size = (new global::System.Drawing.Size(98, 15));
-        this.customFlags1Label.TabIndex = (27);
-        this.customFlags1Label.Text = ("Custom Flags #1:");
-        // 
-        // customFlags2Label
-        // 
-        this.customFlags2Label.AutoSize = (true);
-        this.customFlags2Label.Location = (new global::System.Drawing.Point(221, 559));
-        this.customFlags2Label.Margin = (new global::System.Windows.Forms.Padding(2, 0, 2, 0));
-        this.customFlags2Label.Name = ("customFlags2Label");
-        this.customFlags2Label.Size = (new global::System.Drawing.Size(98, 15));
-        this.customFlags2Label.TabIndex = (28);
-        this.customFlags2Label.Text = ("Custom Flags #2:");
-        // 
-        // customFlags3Label
-        // 
-        this.customFlags3Label.AutoSize = (true);
-        this.customFlags3Label.Location = (new global::System.Drawing.Point(411, 559));
-        this.customFlags3Label.Margin = (new global::System.Windows.Forms.Padding(2, 0, 2, 0));
-        this.customFlags3Label.Name = ("customFlags3Label");
-        this.customFlags3Label.Size = (new global::System.Drawing.Size(98, 15));
-        this.customFlags3Label.TabIndex = (32);
-        this.customFlags3Label.Text = ("Custom Flags #3:");
-        // 
-        // label25
-        // 
-        this.label25.BorderStyle = (global::System.Windows.Forms.BorderStyle.Fixed3D);
-        this.label25.Location = (new global::System.Drawing.Point(35, 548));
-        this.label25.Margin = (new global::System.Windows.Forms.Padding(4, 0, 4, 0));
-        this.label25.Name = ("label25");
-        this.label25.Size = (new global::System.Drawing.Size(560, 1));
-        this.label25.TabIndex = (26);
         // 
         // backgroundWorker1
         // 
@@ -3085,24 +2936,11 @@ partial class MainUI
         // 
         this.AutoScaleDimensions = (new global::System.Drawing.SizeF(7F, 15F));
         this.AutoScaleMode = (global::System.Windows.Forms.AutoScaleMode.Font);
-        this.ClientSize = (new global::System.Drawing.Size(626, 642));
+        this.ClientSize = (new global::System.Drawing.Size(626, 551));
         this.Controls.Add(this.batchButton);
         this.Controls.Add(this.convertButton);
         this.Controls.Add(this.oldFlagsLabel);
         this.Controls.Add(this.oldFlagsTextbox);
-        this.Controls.Add(this.customFlags3LoadButton);
-        this.Controls.Add(this.customFlags3SaveButton);
-        this.Controls.Add(this.customFlags2LoadButton);
-        this.Controls.Add(this.customFlags2SaveButton);
-        this.Controls.Add(this.label25);
-        this.Controls.Add(this.customFlags3Label);
-        this.Controls.Add(this.customFlags3TextBox);
-        this.Controls.Add(this.customFlags1LoadButton);
-        this.Controls.Add(this.customFlags1SaveButton);
-        this.Controls.Add(this.customFlags2Label);
-        this.Controls.Add(this.customFlags1Label);
-        this.Controls.Add(this.customFlags2TextBox);
-        this.Controls.Add(this.customFlags1TextBox);
         this.Controls.Add(this.discordButton);
         this.Controls.Add(this.customFlagsButton6);
         this.Controls.Add(this.customFlagsButton5);
@@ -3285,19 +3123,6 @@ partial class MainUI
     private System.Windows.Forms.Label smallEnemyPoolLabel;
     private System.Windows.Forms.Label label19;
     private System.Windows.Forms.CheckBox shuffleDropFrequencyCheckbox;
-    private System.Windows.Forms.TextBox customFlags1TextBox;
-    private System.Windows.Forms.TextBox customFlags2TextBox;
-    private System.Windows.Forms.Label customFlags1Label;
-    private System.Windows.Forms.Label customFlags2Label;
-    private System.Windows.Forms.Button customFlags1SaveButton;
-    private System.Windows.Forms.Button customFlags1LoadButton;
-    private System.Windows.Forms.Label customFlags3Label;
-    private System.Windows.Forms.TextBox customFlags3TextBox;
-    private System.Windows.Forms.Label label25;
-    private System.Windows.Forms.Button customFlags2SaveButton;
-    private System.Windows.Forms.Button customFlags2LoadButton;
-    private System.Windows.Forms.Button customFlags3SaveButton;
-    private System.Windows.Forms.Button customFlags3LoadButton;
     private System.Windows.Forms.ComboBox beamSpriteList;
     private System.Windows.Forms.Label beamSpriteLabel;
     private System.Windows.Forms.CheckBox standardizeDropsCheckbox;

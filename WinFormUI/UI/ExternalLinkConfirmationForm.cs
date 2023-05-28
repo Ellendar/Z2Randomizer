@@ -35,5 +35,7 @@ namespace Z2Randomizer.WinFormUI
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
+
+
     }
 }

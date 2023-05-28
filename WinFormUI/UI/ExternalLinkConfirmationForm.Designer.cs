@@ -39,7 +39,7 @@
             TakeMeThere.Location = new Point(12, 125);
             TakeMeThere.Name = "TakeMeThere";
             TakeMeThere.Size = new Size(106, 27);
-            TakeMeThere.TabIndex = 0;
+            TakeMeThere.TabIndex = 2;
             TakeMeThere.Text = "Take Me There!";
             TakeMeThere.UseVisualStyleBackColor = true;
             TakeMeThere.Click += TakeMeThere_Click;
@@ -49,7 +49,7 @@
             CopyUrl.Location = new Point(147, 125);
             CopyUrl.Name = "CopyUrl";
             CopyUrl.Size = new Size(106, 27);
-            CopyUrl.TabIndex = 1;
+            CopyUrl.TabIndex = 3;
             CopyUrl.Text = "Copy URL";
             CopyUrl.UseVisualStyleBackColor = true;
             CopyUrl.Click += CopyUrl_Click;
@@ -59,7 +59,7 @@
             UrlLabel.Location = new Point(12, 65);
             UrlLabel.Name = "UrlLabel";
             UrlLabel.Size = new Size(241, 40);
-            UrlLabel.TabIndex = 2;
+            UrlLabel.TabIndex = 1;
             UrlLabel.TabStop = true;
             UrlLabel.Text = "Url";
             UrlLabel.TextAlign = ContentAlignment.MiddleCenter;
@@ -69,7 +69,7 @@
             MessageLabel.Location = new Point(12, 9);
             MessageLabel.Name = "MessageLabel";
             MessageLabel.Size = new Size(241, 56);
-            MessageLabel.TabIndex = 3;
+            MessageLabel.TabIndex = 0;
             MessageLabel.Text = "We're about to open a browser tab and redirect you to:";
             MessageLabel.TextAlign = ContentAlignment.MiddleCenter;
             // 
@@ -80,11 +80,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = CopyUrl;
             ClientSize = new Size(265, 164);
-            ControlBox = false;
             Controls.Add(MessageLabel);
             Controls.Add(UrlLabel);
             Controls.Add(CopyUrl);
             Controls.Add(TakeMeThere);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ExternalLinkConfirmationForm";
@@ -98,8 +98,6 @@
 
         private Button TakeMeThere;
         private Button CopyUrl;
-        private LinkLabel linkLabel1;
-        private Label label1;
         private LinkLabel UrlLabel;
         private Label MessageLabel;
     }
