@@ -25,7 +25,7 @@ public partial class GenerateBatchForm : Form
         try
         {
             int x = Int32.Parse(textBox1.Text);
-            if(x <= 0)
+            if (x <= 0)
             {
                 MessageBox.Show("Please enter a number greater than 0!");
                 return;

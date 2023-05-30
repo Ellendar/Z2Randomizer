@@ -4,10 +4,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Z2Randomizer.Core.Overworld;
 
+
 namespace Z2Randomizer.WinFormUI;
 
 public partial class MainUI : Form
 {
+    const string DISCORD_URL = @"http://z2r.gg/discord";
+    const string WIKI_URL = @"https://bitbucket.org/digshake/z2randomizer/wiki/Home";
+
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private Random r;
     private bool dontrunhandler;
@@ -19,6 +23,7 @@ public partial class MainUI : Form
     private String oldFlags;
     private GeneratingSeedsForm f3;
     private RandomizerConfiguration config;
+    private List<Button> customisableButtons = new List<Button>();
 
     private readonly int validFlagStringLength;
 
@@ -54,9 +59,6 @@ public partial class MainUI : Form
         beamSpriteList.SelectedIndex = Properties.Settings.Default.beams;
         disableMusicCheckbox.Checked = Properties.Settings.Default.music;
         upAOnController1Checkbox.Checked = Properties.Settings.Default.upac1;
-        customFlags1TextBox.Text = Properties.Settings.Default.custom1;
-        customFlags2TextBox.Text = Properties.Settings.Default.custom2;
-        customFlags3TextBox.Text = Properties.Settings.Default.custom3;
         seedTextBox.Text = Properties.Settings.Default.lastseed;
         flashingOffCheckbox.Checked = Properties.Settings.Default.noflash;
         useCustomRoomsBox.Checked = Properties.Settings.Default.useCustomRooms;
@@ -66,11 +68,7 @@ public partial class MainUI : Form
         large = new CheckBox[] { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox,
             largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
 
-
-        customFlags1TextBox.TextChanged += new System.EventHandler(this.CustomSave1_Click);
-        customFlags2TextBox.TextChanged += new System.EventHandler(this.CustomSave2_Click);
-        customFlags3TextBox.TextChanged += new System.EventHandler(this.CustomSave3_Click);
-
+        InitialiseCustomFlagsetButtons();
 
         dontrunhandler = false;
         mixLargeAndSmallCheckbox.Enabled = false;
@@ -235,6 +233,168 @@ public partial class MainUI : Form
         WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", version); // THIS CALL NOT IMPLEMENTED YET
         WinSparkle.win_sparkle_init();
     }
+
+    private void InitialiseCustomFlagsetButtons()
+    {
+
+        //customisable buttons - config settings are stored using the name of the control as the key, so order does not specifically matter. 
+        customisableButtons.Add(customFlagsButton1);
+        customisableButtons.Add(customFlagsButton2);
+        customisableButtons.Add(customFlagsButton3);
+        customisableButtons.Add(customFlagsButton4);
+        customisableButtons.Add(customFlagsButton5);
+        customisableButtons.Add(customFlagsButton6);
+
+
+        // could probably implement a custom toolstrip item here so we can figure out whether things should be enabled or not
+        // or we rebuild the menu every time it's opened.... how often is it really going to be needed.
+        // in the meantime, this'll do.
+        customisableButtonContextMenu.Items.Add("Edit", null, CustomFlagsetButtonContextMenuOnClick);
+        customisableButtonContextMenu.Items.Add("Copy", null, CustomFlagsetButtonContextMenuOnClick);
+        customisableButtonContextMenu.Items.Add(new ToolStripSeparator());
+        customisableButtonContextMenu.Items.Add("Clear", null, CustomFlagsetButtonContextMenuOnClick);
+
+
+        foreach (var button in customisableButtons)
+        {
+            // only because I couldn't be bothered to do it in the designer
+            button.AutoEllipsis = false;
+            button.AutoSize = false;
+
+            var setting = (System.Collections.Specialized.StringCollection)Properties.Settings.Default[button.Name];
+            var customButtonSettings = new CustomisedButtonSettings(setting);
+
+            if (customButtonSettings.IsEmpty)
+            {
+                customButtonSettings = new CustomisedButtonSettings(Properties.Settings.Default.customizableButtonBase);
+                customButtonSettings.IsCustomised = false;
+            }
+
+            SetCustomFlagsetButtonProperties(button, customButtonSettings);
+
+            button.MouseUp += CustomFlagsetButtonOnClick;
+        }
+    }
+
+    /// <summary>
+    /// Handle the left/right clicks on the custom flagset buttons
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void CustomFlagsetButtonOnClick(object sender, System.Windows.Forms.MouseEventArgs e)
+    {
+        var button = (Button)sender;
+
+        if (e.Button == MouseButtons.Right)
+        {
+            // Show context menu
+            customisableButtonContextMenu.Show(button, new Point(e.X, e.Y));
+        }
+        else
+        {
+            var customButtonSettings = (CustomisedButtonSettings)button.Tag;
+            if (customButtonSettings.IsCustomised)
+            {
+                // Update the flags textbox with the custom flagset
+                flagsTextBox.Text = customButtonSettings.Flagset;
+            }
+        }
+    }
+
+
+    private void CustomFlagsetButtonContextMenuOnClick(object sender, System.EventArgs e)
+    {
+        var menuItem = (ToolStripMenuItem)sender;
+        var button = (Button)customisableButtonContextMenu.SourceControl;
+        CustomisedButtonSettings customButtonSettings;
+
+        switch (menuItem.Text.ToLowerInvariant())
+        {
+            case "edit":
+                {
+                    var customiseButtonFlagsetForm = new CustomiseButtonFlagsetForm(button, flagsTextBox.Text);
+                    customiseButtonFlagsetForm.ShowDialog();
+                    if (customiseButtonFlagsetForm.DialogResult == DialogResult.OK)
+                    {
+                        customButtonSettings = (CustomisedButtonSettings)button.Tag;
+                        SetCustomFlagsetButtonProperties(button, customButtonSettings);
+                        Properties.Settings.Default[button.Name] = customButtonSettings.Export();
+                        Properties.Settings.Default.Save();
+                    }
+                    break;
+                }
+            case "copy":
+                {
+                    customButtonSettings = (CustomisedButtonSettings)button.Tag;
+                    if (customButtonSettings.IsCustomised)
+                        Clipboard.SetText(customButtonSettings.Flagset);
+                    break;
+                }
+            case "paste":
+                {
+                    // not sure what we will be doing in here yet, if anything
+                    // could possibly let someone paste a flagset into a button and immediately popop the custom flagset editor
+                    // would help if there was some way to detect if the clipboard contains a valid flagset
+                    break;
+                }
+            case "clear":
+                {
+                    customButtonSettings = (CustomisedButtonSettings)button.Tag;
+                    if (customButtonSettings.IsCustomised)
+                    {
+                        var result = MessageBox.Show("Are you sure you want to clear this custom Flagset?", "Confirm"
+                                , MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                        if (result == DialogResult.Yes)
+                        {
+                            customButtonSettings = new CustomisedButtonSettings(Properties.Settings.Default.customizableButtonBase);
+                            customButtonSettings.IsCustomised = false;
+                            SetCustomFlagsetButtonProperties(button, customButtonSettings);
+                            Properties.Settings.Default[button.Name] = new System.Collections.Specialized.StringCollection();
+                            Properties.Settings.Default.Save();
+                        }
+                    }
+                    break;
+                }
+        }
+    }
+
+    /// <summary>
+    /// Set the properties of a custom flagset button
+    /// </summary>
+    /// <param name="button"></param>
+    /// <param name="customButtonSettings"></param>
+    private void SetCustomFlagsetButtonProperties(Button button, CustomisedButtonSettings customButtonSettings)
+    {
+
+        // found that this was being repeated a lot, so made it a function
+
+
+        button.Text = customButtonSettings.Name;
+        button.Tag = customButtonSettings;
+        toolTip1.SetToolTip(button, customButtonSettings.Tooltip);
+
+        // couldn't really find a nice way to turn off the wordwrap on a button, and the autoellipsis, would still cause a wordwrap
+        // which then shifted the button text up a little so it was out of line with the other buttons.
+        // so we'll just do ellipsis ourselves
+        // if we are ellipsing we'll shove the full button name as line 1 of the tooltip
+        while (button.IsEllipsisShown())
+        {
+            button.Text = button.Text.Substring(0, button.Text.Length - 4) + "...";
+            toolTip1.SetToolTip(button, customButtonSettings.Name + 
+                    (!string.IsNullOrWhiteSpace(customButtonSettings.Tooltip) ? Environment.NewLine + customButtonSettings.Tooltip : string.Empty));
+        }
+
+        if (!customButtonSettings.IsCustomised)
+        {
+            // set some indicator that this button is not customised
+            button.ForeColor = SystemColors.GrayText;
+        }
+        else
+        {
+            button.ForeColor = SystemColors.WindowText;
+        }
+    }
+
 
     /// <summary>
     /// Disabled for now to support overrides for shuffle starting items. Maybe in the future toggling this box still 
@@ -1187,12 +1347,14 @@ public partial class MainUI : Form
 
     private void WikiBtn_Click(object sender, EventArgs e)
     {
-        Process.Start(new ProcessStartInfo("https://bitbucket.org/digshake/z2randomizer/wiki/Home") { UseShellExecute = true });
+        var linkForm = new ExternalLinkConfirmationForm(WIKI_URL);
+        linkForm.ShowDialog();
     }
 
     private void DiscordButton_Click(object sender, EventArgs e)
     {
-        Process.Start(new ProcessStartInfo("http://z2r.gg/discord") { UseShellExecute = true });
+        var linkForm = new ExternalLinkConfirmationForm(DISCORD_URL);
+        linkForm.ShowDialog();
     }
 
     private void PalaceItemBox_CheckStateChanged(object sender, EventArgs e)
@@ -1408,41 +1570,6 @@ public partial class MainUI : Form
         }
     }
 
-    private void CustomSave1_Click(object sender, EventArgs e)
-    {
-        customFlags1TextBox.Text = flagsTextBox.Text;
-        Properties.Settings.Default.custom1 = flagsTextBox.Text;
-        Properties.Settings.Default.Save();
-    }
-
-    private void CustomLoad1_Click(object sender, EventArgs e)
-    {
-        flagsTextBox.Text = customFlags1TextBox.Text;
-    }
-
-    private void CustomSave2_Click(object sender, EventArgs e)
-    {
-        customFlags2TextBox.Text = flagsTextBox.Text;
-        Properties.Settings.Default.custom2 = flagsTextBox.Text;
-        Properties.Settings.Default.Save();
-    }
-
-    private void CustomSave3_Click(object sender, EventArgs e)
-    {
-        customFlags3TextBox.Text = flagsTextBox.Text;
-        Properties.Settings.Default.custom3 = flagsTextBox.Text;
-        Properties.Settings.Default.Save();
-    }
-
-    private void CustomLoad2_Click(object sender, EventArgs e)
-    {
-        flagsTextBox.Text = customFlags2TextBox.Text;
-    }
-
-    private void CustomLoad3_Click(object sender, EventArgs e)
-    {
-        flagsTextBox.Text = customFlags3TextBox.Text;
-    }
 
     /*private void townSwap_CheckStateChanged(object sender, EventArgs e)
     {
@@ -1720,4 +1847,6 @@ public partial class MainUI : Form
         }
         return true;
     }
+
+
 }

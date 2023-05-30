@@ -28,73 +28,72 @@ partial class GenerateBatchForm
     /// </summary>
     private void InitializeComponent()
     {
-        this.label1 = new System.Windows.Forms.Label();
-        this.textBox1 = new System.Windows.Forms.TextBox();
-        this.label2 = new System.Windows.Forms.Label();
-        this.button1 = new System.Windows.Forms.Button();
-        this.SuspendLayout();
+        label1 = new Label();
+        textBox1 = new TextBox();
+        label2 = new Label();
+        button1 = new Button();
+        SuspendLayout();
         // 
         // label1
         // 
-        this.label1.AutoSize = true;
-        this.label1.Location = new System.Drawing.Point(14, 10);
-        this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-        this.label1.MaximumSize = new System.Drawing.Size(408, 0);
-        this.label1.Name = "label1";
-        this.label1.Size = new System.Drawing.Size(397, 45);
-        this.label1.TabIndex = 0;
-        this.label1.Text = "Please enter the number of seeds you would like to create. Note that each seed ca" +
-"n take a few minutes to generate, depending on the settings you chose.";
+        label1.AutoSize = true;
+        label1.Location = new Point(14, 10);
+        label1.Margin = new Padding(4, 0, 4, 0);
+        label1.MaximumSize = new Size(408, 0);
+        label1.Name = "label1";
+        label1.Size = new Size(397, 45);
+        label1.TabIndex = 0;
+        label1.Text = "Please enter the number of seeds you would like to create. Note that each seed can take a few minutes to generate, depending on the settings you chose.";
         // 
         // textBox1
         // 
-        this.textBox1.Location = new System.Drawing.Point(156, 68);
-        this.textBox1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-        this.textBox1.Name = "textBox1";
-        this.textBox1.Size = new System.Drawing.Size(116, 23);
-        this.textBox1.TabIndex = 1;
+        textBox1.Location = new Point(156, 68);
+        textBox1.Margin = new Padding(4, 3, 4, 3);
+        textBox1.Name = "textBox1";
+        textBox1.Size = new Size(116, 23);
+        textBox1.TabIndex = 1;
         // 
         // label2
         // 
-        this.label2.AutoSize = true;
-        this.label2.Location = new System.Drawing.Point(42, 72);
-        this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-        this.label2.Name = "label2";
-        this.label2.Size = new System.Drawing.Size(101, 15);
-        this.label2.TabIndex = 2;
-        this.label2.Text = "Number of Seeds:";
+        label2.AutoSize = true;
+        label2.Location = new Point(42, 72);
+        label2.Margin = new Padding(4, 0, 4, 0);
+        label2.Name = "label2";
+        label2.Size = new Size(101, 15);
+        label2.TabIndex = 2;
+        label2.Text = "Number of Seeds:";
         // 
         // button1
         // 
-        this.button1.Location = new System.Drawing.Point(280, 66);
-        this.button1.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-        this.button1.Name = "button1";
-        this.button1.Size = new System.Drawing.Size(88, 27);
-        this.button1.TabIndex = 3;
-        this.button1.Text = "Generate!";
-        this.button1.UseVisualStyleBackColor = true;
-        this.button1.Click += new System.EventHandler(this.button1_Click);
+        button1.Location = new Point(280, 66);
+        button1.Margin = new Padding(4, 3, 4, 3);
+        button1.Name = "button1";
+        button1.Size = new Size(88, 27);
+        button1.TabIndex = 3;
+        button1.Text = "Generate!";
+        button1.UseVisualStyleBackColor = true;
+        button1.Click += button1_Click;
         // 
         // GenerateBatchForm
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(413, 107);
-        this.Controls.Add(this.button1);
-        this.Controls.Add(this.label2);
-        this.Controls.Add(this.textBox1);
-        this.Controls.Add(this.label1);
-        this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-        this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-        this.MaximizeBox = false;
-        this.MinimizeBox = false;
-        this.Name = "GenerateBatchForm";
-        this.ShowIcon = false;
-        this.Text = "Generate Batch Seeds";
-        this.Load += new System.EventHandler(this.GenerateBatchForm_Load);
-        this.ResumeLayout(false);
-        this.PerformLayout();
-
+        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new Size(413, 107);
+        Controls.Add(button1);
+        Controls.Add(label2);
+        Controls.Add(textBox1);
+        Controls.Add(label1);
+        FormBorderStyle = FormBorderStyle.FixedDialog;
+        Margin = new Padding(4, 3, 4, 3);
+        MaximizeBox = false;
+        MinimizeBox = false;
+        Name = "GenerateBatchForm";
+        ShowIcon = false;
+        StartPosition = FormStartPosition.CenterParent;
+        Text = "Generate Batch Seeds";
+        Load += GenerateBatchForm_Load;
+        ResumeLayout(false);
+        PerformLayout();
     }
 
     #endregion
