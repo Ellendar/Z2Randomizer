@@ -31,7 +31,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = false;
+    public const bool UNSAFE_DEBUG = true;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -460,7 +460,7 @@ public class Hyrule
             foreach (Palace palace in palaces)
             {
                 sb.AppendLine("Palace: " + palace.Number);
-                foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap == 0 ? i.Map : i.NewMap))
+                foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
                 {
                     sb.AppendLine(room.Debug());
                 }
@@ -4002,11 +4002,14 @@ public class Hyrule
                 {
                     int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
                     int item = ROMData.GetByte(addr);
-                    if (UNSAFE_DEBUG && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
+                    if (false && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
                     {
-                        logger.Debug("Map: " + map);
-                        logger.Debug("Item: " + item);
-                        logger.Debug("Address: {0:X}", addr);
+                        if(UNSAFE_DEBUG)
+                        {
+                            logger.Debug("Map: " + map);
+                            logger.Debug("Item: " + item);
+                            logger.Debug("Address: {0:X}", addr);
+                        }
                         addresses.Add(addr);
                         items.Add(item);
                     }

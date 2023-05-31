@@ -177,7 +177,7 @@ public class Room
     public byte[] Enemies { get; set; }
     public byte[] NewEnemies { get; set; }
     public byte[] SideView { get; set; }
-    public int NewMap { get; set; }
+    public int? NewMap { get; set; }
     public bool HasBoss { get; set; }
     public string Name { get; set; }
     public string Group { get; set; }
@@ -321,14 +321,14 @@ public class Room
         if(PalaceGroup == 1)
         {
             int memAddr = addr - 0x8010;
-            ROMData.Put(sideview1 + NewMap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview1 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview1 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview1 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else if(PalaceGroup == 2)
         {
             int memAddr = addr - 0x8010;
-            ROMData.Put(sideview2 + NewMap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview2 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview2 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview2 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else
         {
@@ -337,8 +337,8 @@ public class Room
             {
                 memAddr = addr - 0x10010;
             }
-            ROMData.Put(sideview3 + NewMap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview3 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview3 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview3 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
 
         }
     }
@@ -380,20 +380,20 @@ public class Room
             if (PalaceGroup == 1)
             {
                 memAddr -= 0x98b0;
-                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else if (PalaceGroup == 2)
             {
                 memAddr -= 0x98b0;
-                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else
             {
                 memAddr -= 0xd8b0;
-                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap == 0 ? Map : NewMap) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
         }
         //For non-reconstructed, we're not rewriting the sideviews, so we need to use the vanilla
@@ -401,15 +401,15 @@ public class Room
         //vanilla data inline
         else
         {
-            int low = ROMData.GetByte(enemyPtr + (NewMap == 0 ? Map : NewMap) * 2);
-            int high = ROMData.GetByte(enemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1);
+            int low = ROMData.GetByte(enemyPtr + (NewMap ?? Map) * 2);
+            int high = ROMData.GetByte(enemyPtr + (NewMap ?? Map) * 2 + 1);
             high = high << 8;
             high = high & 0x0FFF;
             enemyAddr = high + low + baseEnemyAddr;
         }
 
 
-        ROMData.Put(enemyAddr, NewEnemies);
+        ROMData.Put(enemyAddr, NewEnemies[0] == 0 ? Enemies : NewEnemies);
     }
 
     public void UpdateBitmask(ROM ROMData)
@@ -430,17 +430,17 @@ public class Room
         }
         if(NewMap % 2 == 0)
         {
-            byte old = ROMData.GetByte(ptr + NewMap / 2);
+            byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0x0F);
             old = (byte)((bitmask << 4) | old);
-            ROMData.Put(ptr + NewMap / 2, old);
+            ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
         }
         else
         {
-            byte old = ROMData.GetByte(ptr + NewMap / 2);
+            byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0xF0);
             old = (byte)((bitmask) | old);
-            ROMData.Put(ptr + NewMap / 2, old);
+            ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
         }
     }
 
@@ -464,11 +464,11 @@ public class Room
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int sideViewPtr = (ROMData.GetByte(sideview1 + NewMap * 2) + (ROMData.GetByte(sideview1 + 1 + NewMap * 2) << 8)) + 0x8010;
+        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
 
         if (PalaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + NewMap * 2) + (ROMData.GetByte(sideview2 + 1 + NewMap * 2) << 8)) + 0x8010;
+            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
         }
         int ptr = sideViewPtr + 4;
         byte data = ROMData.GetByte(ptr);
@@ -500,7 +500,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors1 + NewMap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors1 + (NewMap ?? Map) * 4 + i, Connections[i]);
                 }
             }
         }
@@ -510,7 +510,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors2 + NewMap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors2 + (NewMap ?? Map) * 4 + i, Connections[i]);
                 }
             }
         }
@@ -520,7 +520,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors3 + NewMap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors3 + (NewMap ?? Map) * 4 + i, Connections[i]);
                 }
             }
         }
@@ -758,10 +758,10 @@ public class Room
     public string Debug()
     {
         StringBuilder sb = new();
-        sb.Append("Map: " + (NewMap == 0 ? Map : NewMap) + " Name: " + Name + " Sideview: ");
+        sb.Append("Map: " + (NewMap ?? Map) + " Name: " + Name + " Sideview: ");
         sb.Append(BitConverter.ToString(SideView).Replace("-", ""));
         sb.Append(" Enemies: ");
-        sb.Append(BitConverter.ToString(NewEnemies).Replace("-", ""));
+        sb.Append(BitConverter.ToString(NewEnemies[0] == 0 ? Enemies : NewEnemies).Replace("-", ""));
         return sb.ToString();
     }
 

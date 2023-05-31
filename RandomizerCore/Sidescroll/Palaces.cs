@@ -491,9 +491,7 @@ public class Palaces
             {
                 int sideViewAddr = FindFreeSpace(freeSpace, sv);
                 if (sideViewAddr == -1) //not enough space
-                {
-                    return new List<Palace>();
-                }
+                return new List<Palace>();
                 ROMData.Put(sideViewAddr, sv);
                 if (ROMData.GetByte(sideViewAddr + sv.Length) >= 0xD0)
                 {
@@ -504,10 +502,7 @@ public class Palaces
                 {
                     room.WriteSideViewPtr(sideViewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
-                    if(props.ShufflePalaceEnemies)
-                    {
-                        room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
-                    }
+                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
                     enemyAddr += room.NewEnemies.Length;
                     bool entrance = false;
                     foreach (Palace p in palaces)
@@ -540,10 +535,7 @@ public class Palaces
                 {
                     room.WriteSideViewPtr(sideviewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
-                    if (props.ShufflePalaceEnemies)
-                    {
-                        room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
-                    }
+                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
                     enemyAddr += room.Enemies.Length;
                     room.UpdateConnectors(ROMData, room == palaces[6].Root);
                 }
@@ -704,7 +696,7 @@ public class Palaces
     {
         foreach (int addr in freeSpace.Keys)
         {
-            if (freeSpace[addr] > sv.Length)
+            if (freeSpace[addr] >= sv.Length)
             {
                 int oldSize = freeSpace[addr];
                 freeSpace.Remove(addr);

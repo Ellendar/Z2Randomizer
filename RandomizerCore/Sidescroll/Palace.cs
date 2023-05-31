@@ -396,10 +396,10 @@ public class Palace
         if (!placed && open.HasRightExit() && open.Right == null && r.HasLeftExit() && r.Left == null)
         {
             open.Right = r;
-            open.RightByte = r.NewMap * 4;
+            open.RightByte = (r.NewMap ?? r.Map) * 4;
 
             r.Left = open;
-            r.LeftByte = open.NewMap * 4 + 3;
+            r.LeftByte = (open.NewMap ?? open.Map) * 4 + 3;
 
             placed = true;
         }
@@ -407,10 +407,10 @@ public class Palace
         if (!placed && open.HasLeftExit() && open.Left == null && r.HasRightExit() && r.Right == null)
         {
             open.Left = r;
-            open.LeftByte = r.NewMap * 4 + 3;
+            open.LeftByte = (r.NewMap ?? r.Map) * 4 + 3;
 
             r.Right = open;
-            r.RightByte = open.NewMap * 4;
+            r.RightByte = (open.NewMap ?? open.Map) * 4;
 
             placed = true;
         }
@@ -418,10 +418,10 @@ public class Palace
         if (!placed && open.HasUpExit() && open.Up == null && r.HasDownExit() && r.Down == null && !r.HasDrop)
         {
             open.Up = r;
-            open.UpByte = r.NewMap * 4 + r.ElevatorScreen;
+            open.UpByte = (r.NewMap ?? r.Map) * 4 + r.ElevatorScreen;
 
             r.Down = open;
-            r.DownByte = open.NewMap * 4 + open.ElevatorScreen;
+            r.DownByte = (open.NewMap ?? open.Map) * 4 + open.ElevatorScreen;
 
             placed = true;
         }
@@ -430,10 +430,10 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = r.NewMap * 4 + r.ElevatorScreen;
+            open.DownByte = (r.NewMap ?? r.Map) * 4 + r.ElevatorScreen;
 
             r.Up = open;
-            r.UpByte = open.NewMap * 4 + open.ElevatorScreen;
+            r.UpByte = (open.NewMap ?? open.Map) * 4 + open.ElevatorScreen;
 
             placed = true;
         }
@@ -442,7 +442,7 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = r.NewMap * 4;
+            open.DownByte = (r.NewMap ?? r.Map) * 4;
             r.IsDropZone = false;
             placed = true;
         }
@@ -451,7 +451,7 @@ public class Palace
         {
 
             r.Down = open;
-            r.DownByte = open.NewMap * 4;
+            r.DownByte = (open.NewMap ?? open.Map) * 4;
             open.IsDropZone = false;
             placed = true;
         }
@@ -1221,7 +1221,7 @@ public class Palace
             int i = startAddr + (room.Map * 2);
             if(newMap)
             {
-                i = startAddr + (room.NewMap * 2);
+                i = startAddr + ((room.NewMap ?? room.Map) * 2);
             }
             int low = ROMData.GetByte(i);
             int hi = ROMData.GetByte(i + 1) * 256;
