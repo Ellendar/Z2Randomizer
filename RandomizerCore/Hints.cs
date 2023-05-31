@@ -93,7 +93,7 @@ public class Hints
             placedIndex = GenerateHelpfulHints(hints, itemLocs, r, props.SpellItemHints);
         }
 
-        if (props.SpellItemHints || props.HelpfulHints)
+        if (props.HelpfulHints)
         {
             GenerateKnowNothings(hints, placedIndex, props.BagusWoods);
         }
