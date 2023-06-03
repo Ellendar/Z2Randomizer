@@ -64,8 +64,10 @@ public class Palaces
             roomPool.AddRange(PalaceRooms.Palace6Vanilla(props.UseCustomRooms));
             if (props.UseCommunityRooms)
             {
-                roomPool.AddRange(PalaceRooms.RoomJamGTM(props.UseCustomRooms));
+                //XXX: Remove this
+                //roomPool.AddRange(PalaceRooms.RoomJamGTM(props.UseCustomRooms));
                 roomPool.AddRange(PalaceRooms.DMInPalaces(props.UseCustomRooms));
+                /*
                 roomPool.AddRange(PalaceRooms.WinterSolstice(props.UseCustomRooms));
                 roomPool.AddRange(PalaceRooms.MaxRoomJam(props.UseCustomRooms));
                 roomPool.AddRange(PalaceRooms.DusterRoomJam(props.UseCustomRooms));
@@ -75,6 +77,7 @@ public class Palaces
                 roomPool.AddRange(PalaceRooms.BenthicKing(props.UseCustomRooms));
                 roomPool.AddRange(PalaceRooms.EasternShadow(props.UseCustomRooms));
                 roomPool.AddRange(PalaceRooms.EunosRooms(props.UseCustomRooms));
+                */
             }
 
             gpRoomPool.AddRange(PalaceRooms.Palace7Vanilla(props.UseCustomRooms));

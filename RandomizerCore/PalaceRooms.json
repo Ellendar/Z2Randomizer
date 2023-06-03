@@ -4624,7 +4624,7 @@
     "connections": "07690069",
     "elevatorScreen": 2,
     "enabled": true,
-    "enemies": "07125F1E9F7E4C",
+    "enemies": "07125F1F9F7E4C",
     "group": "dmInPalaces",
     "hasBoss": false,
     "hasDrop": false,
@@ -4638,8 +4638,8 @@
     "isUpstabBlocked": false,
     "map": 2,
     "memoryAddress": "010733",
-    "name": "",
-    "sideviewData": "24600608102DDA14D202D208D60EE200A525F25480D781D7D30CD208D9021029D204D206"
+    "name": "DM dropdown passthrough with down elevator",
+    "sideviewData": "26600608102DDA14D202D208D60EE200A525F25480D781D7D30ED10CD208D8021029D204D206"
     },
     {
     "bitmask": "0F",
@@ -4800,7 +4800,7 @@
     "connections": "6900FC30",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0D669169916C91635169516651",
+    "enemies": "0D69916C916F91605166516351",
     "group": "dmInPalaces",
     "hasBoss": false,
     "hasDrop": false,
@@ -4814,8 +4814,8 @@
     "isUpstabBlocked": false,
     "map": 11,
     "memoryAddress": "010757",
-    "name": "",
-    "sideviewData": "24600B089073D402DF01D102D201D102D201D102DC31D132D231D132D231D132DF0B9073"
+    "name": "GP double quad 1 space hole room",
+    "sideviewData": "2C600B089073D402DC01D102D201D102D201D102D201D102DC31D132D231D132D231D132D201D102DC0B9073"
     },
     {
     "bitmask": "0F",
