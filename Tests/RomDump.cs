@@ -63,8 +63,9 @@ public class RomDump
                     bitmask = (byte)(bitmask & 0x0F);
                 }
 
-
-                r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, false, false, false, false, false, -1, addr, false, false);
+                //TODO: fix this dumping utility to properly render requirements
+                throw new NotImplementedException();
+                r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, false, false, false, false, false, -1, addr, false, false, null);
                 r.Group = "Bank# " + (j + 1);
                 sb.Append(r.Serialize() + ",");
 

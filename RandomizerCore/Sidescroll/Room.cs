@@ -172,6 +172,8 @@ public class Room
     public bool IsDownstabBlocked { get; set; }
     public bool IsGloveBlocked { get; set; }
     public bool IsJumpBlocked { get; set; }
+    [JsonConverter(typeof(RequirementsJsonConverter))]
+    public Requirements Requirements { get; set; }
     public bool IsDropZone { get; set; }
     public bool HasItem { get; set; }
     public byte[] Enemies { get; set; }
@@ -200,7 +202,9 @@ public class Room
         int elevatorScreen, 
         int memAddr, 
         bool upDownRev, 
-        bool dropZone)
+        bool dropZone,
+        Requirements requirements
+        )
     {
         Map = map;
         Connections = conn;
@@ -244,6 +248,7 @@ public class Room
         //this.numExits = numExits;
         IsDeadEnd = numExits == 1;
         IsDropZone = dropZone;
+        Requirements = requirements;
     }
 
     public Room(string json)
@@ -269,6 +274,7 @@ public class Room
         MemAddr = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
         isUpDownReversed = roomData.isUpDownReversed;
         IsDropZone = roomData.isDropZone;
+        Requirements = new Requirements((string)roomData.requirements);
 
         byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
         if(SideView.Length != length)
@@ -288,11 +294,12 @@ public class Room
         result.enemies = BitConverter.ToString(Enemies).Replace("-", "");
         result.sideviewData = BitConverter.ToString(SideView).Replace("-", "");
         result.bitmask = BitConverter.ToString(new Byte[] { bitmask }).Replace("-", "");
-        result.isFairyBlocked = IsFairyBlocked;
-        result.isGloveBlocked = IsGloveBlocked;
-        result.isDownstabBlocked = IsDownstabBlocked;
-        result.isUpstabBlocked = IsUpstabBlocked;
-        result.isJumpBlocked = IsJumpBlocked;
+        //result.isFairyBlocked = IsFairyBlocked;
+        //result.isGloveBlocked = IsGloveBlocked;
+        //result.isDownstabBlocked = IsDownstabBlocked;
+        //result.isUpstabBlocked = IsUpstabBlocked;
+        //result.isJumpBlocked = IsJumpBlocked;
+        result.requirements = Requirements;
         result.hasItem = HasItem;
         result.hasBoss = HasBoss;
         result.hasDrop = HasDrop;
@@ -301,7 +308,7 @@ public class Room
         result.isUpDownReversed = isUpDownReversed;
         result.IsDropZone = IsDropZone;
 
-        return System.Text.Json.JsonSerializer.Serialize(result);
+        return JsonConvert.SerializeObject(result);
     }
 
     public void UpdateConnectionBytes()
@@ -607,7 +614,8 @@ public class Room
             ElevatorScreen, 
             MemAddr, 
             isUpDownReversed, 
-            IsDropZone);
+            IsDropZone,
+            Requirements);
     }
 
     public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)

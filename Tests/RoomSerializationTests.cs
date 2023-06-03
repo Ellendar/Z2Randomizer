@@ -66,14 +66,14 @@ public class RoomSerializationTests
             return true;
         }
 
-        public int GetHashCode(byte[] obj)
+        public int GetHashCode(byte[] room)
         {
             int result = 17;
-            for (int i = 0; i < obj.Length; i++)
+            for (int i = 0; i < room.Length; i++)
             {
                 unchecked
                 {
-                    result = result * 23 + obj[i];
+                    result = result * 23 + room[i];
                 }
             }
             return result;
