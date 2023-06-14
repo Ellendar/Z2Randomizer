@@ -11,6 +11,10 @@ using System.Speech.Synthesis;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Drawing;
+using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -36,7 +40,7 @@ public class Room
     //private int memAddr;
     //private bool isDeadEnd;
     //private bool isPlaced;
-    private bool isUpDownReversed;
+    public bool isUpDownReversed;
     //private bool fairyBlocked;
     //private bool upstabBlocked;
     //private bool downstabBlocked;
@@ -62,7 +66,7 @@ public class Room
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
-    private byte bitmask;
+    public byte bitmask;
 
     public int Map { get; set; }
     public int PalaceGroup { get; set; }
@@ -167,11 +171,11 @@ public class Room
 
     public bool HasDrop { get; set; }
     public int ElevatorScreen { get; set; }
-    public bool IsFairyBlocked { get; set; }
-    public bool IsUpstabBlocked { get; set; }
-    public bool IsDownstabBlocked { get; set; }
-    public bool IsGloveBlocked { get; set; }
-    public bool IsJumpBlocked { get; set; }
+    //public bool IsFairyBlocked { get; set; }
+    //public bool IsUpstabBlocked { get; set; }
+    //public bool IsDownstabBlocked { get; set; }
+    //public bool IsGloveBlocked { get; set; }
+    //public bool IsJumpBlocked { get; set; }
     [JsonConverter(typeof(RequirementsJsonConverter))]
     public Requirements Requirements { get; set; }
     public bool IsDropZone { get; set; }
@@ -179,7 +183,7 @@ public class Room
     public byte[] Enemies { get; set; }
     public byte[] NewEnemies { get; set; }
     public byte[] SideView { get; set; }
-    public int NewMap { get; set; }
+    public int? NewMap { get; set; }
     public bool HasBoss { get; set; }
     public string Name { get; set; }
     public string Group { get; set; }
@@ -191,11 +195,6 @@ public class Room
         byte[] enemies, 
         byte[] sideview, 
         byte bitmask, 
-        bool fairyBlocked, 
-        bool gloveBlocked, 
-        bool downstabBlocked, 
-        bool upstabBlocked, 
-        bool jumpBlocked, 
         bool hasItem, 
         bool hasBoss, 
         bool hasDrop, 
@@ -211,11 +210,6 @@ public class Room
         Enemies = enemies;
         NewEnemies = new byte[enemies.Length];
         SideView = sideview;
-        IsGloveBlocked = gloveBlocked;
-        IsDownstabBlocked = downstabBlocked;
-        IsUpstabBlocked = upstabBlocked;
-        IsFairyBlocked = fairyBlocked;
-        IsJumpBlocked = jumpBlocked;
         HasBoss = hasBoss;
         HasItem = hasItem;
         LeftByte = conn[0];
@@ -262,11 +256,6 @@ public class Room
         Enemies = Convert.FromHexString(roomData.enemies.ToString());
         SideView = Convert.FromHexString(roomData.sideviewData.ToString());
         bitmask = Convert.FromHexString(roomData.bitmask.ToString())[0];
-        IsFairyBlocked = roomData.isFairyBlocked;
-        IsGloveBlocked = roomData.isGloveBlocked;
-        IsDownstabBlocked = roomData.isDownstabBlocked;
-        IsUpstabBlocked = roomData.isUpstabBlocked;
-        IsJumpBlocked = roomData.isJumpBlocked;
         HasItem = roomData.hasItem;
         HasBoss = roomData.hasBoss;
         HasDrop = roomData.hasDrop;
@@ -285,30 +274,7 @@ public class Room
 
     public string Serialize()
     {
-        dynamic result = new ExpandoObject();
-        result.name = Name;
-        result.group = Group;
-        result.map = Map;
-        result.enabled = Enabled;
-        result.connections = BitConverter.ToString(Connections).Replace("-", "");
-        result.enemies = BitConverter.ToString(Enemies).Replace("-", "");
-        result.sideviewData = BitConverter.ToString(SideView).Replace("-", "");
-        result.bitmask = BitConverter.ToString(new Byte[] { bitmask }).Replace("-", "");
-        //result.isFairyBlocked = IsFairyBlocked;
-        //result.isGloveBlocked = IsGloveBlocked;
-        //result.isDownstabBlocked = IsDownstabBlocked;
-        //result.isUpstabBlocked = IsUpstabBlocked;
-        //result.isJumpBlocked = IsJumpBlocked;
-        result.requirements = Requirements;
-        result.hasItem = HasItem;
-        result.hasBoss = HasBoss;
-        result.hasDrop = HasDrop;
-        result.elevatorScreen = ElevatorScreen;
-        result.MemAddr = MemAddr;
-        result.isUpDownReversed = isUpDownReversed;
-        result.IsDropZone = IsDropZone;
-
-        return JsonConvert.SerializeObject(result);
+        return JsonConvert.SerializeObject(this, Formatting.None, new RoomJsonConverter());
     }
 
     public void UpdateConnectionBytes()
@@ -328,14 +294,14 @@ public class Room
         if(PalaceGroup == 1)
         {
             int memAddr = addr - 0x8010;
-            ROMData.Put(sideview1 + NewMap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview1 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview1 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview1 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else if(PalaceGroup == 2)
         {
             int memAddr = addr - 0x8010;
-            ROMData.Put(sideview2 + NewMap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview2 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview2 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview2 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else
         {
@@ -344,8 +310,8 @@ public class Room
             {
                 memAddr = addr - 0x10010;
             }
-            ROMData.Put(sideview3 + NewMap * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview3 + NewMap * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(sideview3 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(sideview3 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
 
         }
     }
@@ -387,20 +353,20 @@ public class Room
             if (PalaceGroup == 1)
             {
                 memAddr -= 0x98b0;
-                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else if (PalaceGroup == 2)
             {
                 memAddr -= 0x98b0;
-                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
             else
             {
                 memAddr -= 0xd8b0;
-                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap == 0 ? Map : NewMap) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
             }
         }
         //For non-reconstructed, we're not rewriting the sideviews, so we need to use the vanilla
@@ -408,15 +374,15 @@ public class Room
         //vanilla data inline
         else
         {
-            int low = ROMData.GetByte(enemyPtr + (NewMap == 0 ? Map : NewMap) * 2);
-            int high = ROMData.GetByte(enemyPtr + (NewMap == 0 ? Map : NewMap) * 2 + 1);
+            int low = ROMData.GetByte(enemyPtr + (NewMap ?? Map) * 2);
+            int high = ROMData.GetByte(enemyPtr + (NewMap ?? Map) * 2 + 1);
             high = high << 8;
             high = high & 0x0FFF;
             enemyAddr = high + low + baseEnemyAddr;
         }
 
 
-        ROMData.Put(enemyAddr, NewEnemies);
+        ROMData.Put(enemyAddr, NewEnemies[0] == 0 ? Enemies : NewEnemies);
     }
 
     public void UpdateBitmask(ROM ROMData)
@@ -437,17 +403,17 @@ public class Room
         }
         if(NewMap % 2 == 0)
         {
-            byte old = ROMData.GetByte(ptr + NewMap / 2);
+            byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0x0F);
             old = (byte)((bitmask << 4) | old);
-            ROMData.Put(ptr + NewMap / 2, old);
+            ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
         }
         else
         {
-            byte old = ROMData.GetByte(ptr + NewMap / 2);
+            byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0xF0);
             old = (byte)((bitmask) | old);
-            ROMData.Put(ptr + NewMap / 2, old);
+            ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
         }
     }
 
@@ -471,11 +437,11 @@ public class Room
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int sideViewPtr = (ROMData.GetByte(sideview1 + NewMap * 2) + (ROMData.GetByte(sideview1 + 1 + NewMap * 2) << 8)) + 0x8010;
+        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
 
         if (PalaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + NewMap * 2) + (ROMData.GetByte(sideview2 + 1 + NewMap * 2) << 8)) + 0x8010;
+            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
         }
         int ptr = sideViewPtr + 4;
         byte data = ROMData.GetByte(ptr);
@@ -507,7 +473,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors1 + NewMap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors1 + (NewMap ?? Map) * 4 + i, Connections[i]);
                 }
             }
         }
@@ -517,7 +483,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors2 + NewMap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors2 + (NewMap ?? Map) * 4 + i, Connections[i]);
                 }
             }
         }
@@ -527,7 +493,7 @@ public class Room
             {
                 if (Connections[i] < 0xFC || entrance)
                 {
-                    ROMData.Put(connectors3 + NewMap * 4 + i, Connections[i]);
+                    ROMData.Put(connectors3 + (NewMap ?? Map) * 4 + i, Connections[i]);
                 }
             }
         }
@@ -603,11 +569,6 @@ public class Room
             (byte[])Enemies.Clone(), 
             (byte[])SideView.Clone(), 
             bitmask, 
-            IsFairyBlocked, 
-            IsGloveBlocked, 
-            IsDownstabBlocked, 
-            IsUpstabBlocked, 
-            IsJumpBlocked, 
             HasItem, 
             HasBoss, 
             HasDrop, 
@@ -766,10 +727,10 @@ public class Room
     public string Debug()
     {
         StringBuilder sb = new();
-        sb.Append("Map: " + (NewMap == 0 ? Map : NewMap) + " Name: " + Name + " Sideview: ");
+        sb.Append("Map: " + (NewMap ?? Map) + " Name: " + Name + " Sideview: ");
         sb.Append(BitConverter.ToString(SideView).Replace("-", ""));
         sb.Append(" Enemies: ");
-        sb.Append(BitConverter.ToString(NewEnemies).Replace("-", ""));
+        sb.Append(BitConverter.ToString(NewEnemies[0] == 0 ? Enemies : NewEnemies).Replace("-", ""));
         return sb.ToString();
     }
 
@@ -795,4 +756,144 @@ public class Room
         return sb.ToString();
     }
 
+    /*
+    private bool IsAppropriateBlocker(int palaceNumber)
+    {
+        if (Number == 1)
+        {
+            if (r.IsFairyBlocked
+                || r.IsDownstabBlocked
+                || r.IsUpstabBlocked
+                || r.IsJumpBlocked
+                || r.IsGloveBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                || r.HasBoss)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 2)
+        {
+            if (r.IsFairyBlocked
+                || r.IsDownstabBlocked
+                || r.IsUpstabBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                || r.HasBoss)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 3)
+        {
+            if (r.IsJumpBlocked
+                || r.IsFairyBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)))
+            {
+                return false;
+            }
+        }
+
+        if (Number == 4)
+        {
+            if (r.IsGloveBlocked
+                || r.IsUpstabBlocked
+                || r.IsDownstabBlocked)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 5)
+        {
+            if (r.IsGloveBlocked
+                || r.IsUpstabBlocked
+                || r.IsDownstabBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                || r.HasBoss)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 6)
+        {
+            if (r.IsUpstabBlocked || r.IsDownstabBlocked)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    */
+
+    public bool IsTraversable(IEnumerable<RequirementType> requireables)
+    {
+        return Requirements.AreSatisfiedBy(requireables);
+    }
+}
+
+public class RoomJsonConverter : JsonConverter<Room>
+{
+    public override Room ReadJson(JsonReader reader, Type objectType, Room existingValue, bool hasExistingValue, JsonSerializer serializer)
+    {
+        //Eventually i'll replace the hacky custom serialization in the Room(string json) constructor. That day is not now.
+        throw new NotImplementedException();
+    }
+
+    public override void WriteJson(JsonWriter writer, Room value, JsonSerializer serializer)
+    {
+        writer.WriteStartObject();
+
+        writer.WritePropertyName("name");
+        writer.WriteValue(value.Name);
+
+        writer.WritePropertyName("group");
+        writer.WriteValue(value.Group);
+
+        writer.WritePropertyName("map");
+        writer.WriteValue(value.Map);
+
+        writer.WritePropertyName("enabled");
+        writer.WriteValue(value.Enabled);
+
+        writer.WritePropertyName("connections");
+        writer.WriteValue(BitConverter.ToString(value.Connections).Replace("-", ""));
+
+        writer.WritePropertyName("enemies");
+        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
+
+        writer.WritePropertyName("sideviewData");
+        writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
+
+        writer.WritePropertyName("bitmask");
+        writer.WriteValue(BitConverter.ToString(new Byte[] { value.bitmask }).Replace("-", ""));
+
+        writer.WritePropertyName("requirements");
+        writer.WriteRawValue(value.Requirements.Serialize());
+
+        writer.WritePropertyName("hasItem");
+        writer.WriteValue(value.HasItem);
+
+        writer.WritePropertyName("hasBoss");
+        writer.WriteValue(value.HasBoss);
+
+        writer.WritePropertyName("hasDrop");
+        writer.WriteValue(value.HasDrop);
+
+        writer.WritePropertyName("elevatorScreen");
+        writer.WriteValue(value.ElevatorScreen); ;
+
+        writer.WritePropertyName("memoryAddress");
+        writer.WriteValue(value.MemAddr);
+
+        writer.WritePropertyName("isUpDownReversed");
+        writer.WriteValue(value.isUpDownReversed);
+
+        writer.WritePropertyName("isDropZone");
+        writer.WriteValue(value.IsDropZone);
+
+        writer.WriteEndObject();
+    }
 }

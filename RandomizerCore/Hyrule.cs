@@ -8,6 +8,7 @@ using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -441,7 +442,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.1.4" +
+            "4.1.6" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
@@ -460,7 +461,7 @@ public class Hyrule
             foreach (Palace palace in palaces)
             {
                 sb.AppendLine("Palace: " + palace.Number);
-                foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap == 0 ? i.Map : i.NewMap))
+                foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
                 {
                     sb.AppendLine(room.Debug());
                 }
@@ -1147,13 +1148,16 @@ public class Hyrule
             if (location.PalNum > 0 && location.PalNum < 7)
             {
                 Palace palace = palaces[location.PalNum - 1];
-                hasItemNow = CanGet(location) 
-                    && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY]) 
+                hasItemNow = CanGet(location)
+                    && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY])
+                    && palace.IsTraversable(GetRequireables());
+                    /*
                     && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) 
                     && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) 
                     && (!palace.NeedGlove || (palace.NeedGlove && itemGet[Item.GLOVE])) 
                     && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY])) 
                     && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
+                    */
             }
             else if (location.TownNum == Town.NEW_KASUTO)
             {
@@ -1333,6 +1337,47 @@ public class Hyrule
 
             ROMData.Put(i, (byte)newVal);
         }
+    }
+
+    public List<RequirementType> GetRequireables()
+    {
+        List<RequirementType> requireables = new();
+        /*
+        && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB]))
+        && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY]))
+        && (!palace.NeedGlove || (palace.NeedGlove && itemGet[Item.GLOVE]))
+        && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY]))
+        && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
+        */
+        if (SpellGet[Spell.DOWNSTAB])
+        {
+            requireables.Add(RequirementType.DOWNSTAB);
+        }
+        if (SpellGet[Spell.UPSTAB])
+        {
+            requireables.Add(RequirementType.UPSTAB);
+        }
+        if (SpellGet[Spell.FAIRY])
+        {
+            requireables.Add(RequirementType.FAIRY);
+        }
+        if (SpellGet[Spell.REFLECT])
+        {
+            requireables.Add(RequirementType.REFLECT);
+        }
+        if (SpellGet[Spell.JUMP])
+        {
+            requireables.Add(RequirementType.JUMP);
+        }
+        if (itemGet[Item.GLOVE])
+        {
+            requireables.Add(RequirementType.GLOVE);
+        }
+        if (itemGet[Item.MAGIC_KEY])
+        {
+            requireables.Add(RequirementType.KEY);
+        }
+        return requireables;
     }
 
     private void ProcessOverworld()
@@ -4002,11 +4047,14 @@ public class Hyrule
                 {
                     int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
                     int item = ROMData.GetByte(addr);
-                    if (UNSAFE_DEBUG && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
+                    if (false && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
                     {
-                        logger.Debug("Map: " + map);
-                        logger.Debug("Item: " + item);
-                        logger.Debug("Address: {0:X}", addr);
+                        if(UNSAFE_DEBUG)
+                        {
+                            logger.Debug("Map: " + map);
+                            logger.Debug("Item: " + item);
+                            logger.Debug("Address: {0:X}", addr);
+                        }
                         addresses.Add(addr);
                         items.Add(item);
                     }

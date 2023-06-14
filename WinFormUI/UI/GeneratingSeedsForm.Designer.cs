@@ -28,48 +28,49 @@ partial class GeneratingSeedsForm
     /// </summary>
     private void InitializeComponent()
     {
-        this.label1 = new System.Windows.Forms.Label();
-        this.button1 = new System.Windows.Forms.Button();
-        this.SuspendLayout();
+        label1 = new Label();
+        button1 = new Button();
+        SuspendLayout();
         // 
         // label1
         // 
-        this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-        | System.Windows.Forms.AnchorStyles.Left) 
-        | System.Windows.Forms.AnchorStyles.Right)));
-        this.label1.Location = new System.Drawing.Point(12, 19);
-        this.label1.Name = "label1";
-        this.label1.Size = new System.Drawing.Size(148, 13);
-        this.label1.TabIndex = 0;
-        this.label1.Text = "Generating seed 100 of 100...";
-        this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-        this.label1.Click += new System.EventHandler(this.label1_Click);
+        label1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        label1.Location = new Point(14, 22);
+        label1.Margin = new Padding(4, 0, 4, 0);
+        label1.Name = "label1";
+        label1.Size = new Size(173, 15);
+        label1.TabIndex = 0;
+        label1.Text = "Generating seed 100 of 100...";
+        label1.TextAlign = ContentAlignment.MiddleCenter;
+        label1.Click += label1_Click;
         // 
         // button1
         // 
-        this.button1.Location = new System.Drawing.Point(64, 48);
-        this.button1.Name = "button1";
-        this.button1.Size = new System.Drawing.Size(75, 23);
-        this.button1.TabIndex = 1;
-        this.button1.Text = "Cancel";
-        this.button1.UseVisualStyleBackColor = true;
-        this.button1.Click += new System.EventHandler(this.button1_Click);
+        button1.Location = new Point(75, 55);
+        button1.Margin = new Padding(4, 3, 4, 3);
+        button1.Name = "button1";
+        button1.Size = new Size(88, 27);
+        button1.TabIndex = 1;
+        button1.Text = "Cancel";
+        button1.UseVisualStyleBackColor = true;
+        button1.Click += button1_Click;
         // 
         // GeneratingSeedsForm
         // 
-        this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(208, 83);
-        this.Controls.Add(this.button1);
-        this.Controls.Add(this.label1);
-        this.MaximizeBox = false;
-        this.MinimizeBox = false;
-        this.Name = "GeneratingSeedsForm";
-        this.ShowIcon = false;
-        this.Text = "Generating Seeds";
-        this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form3_FormClosed);
-        this.ResumeLayout(false);
-
+        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new Size(243, 96);
+        Controls.Add(button1);
+        Controls.Add(label1);
+        Margin = new Padding(4, 3, 4, 3);
+        MaximizeBox = false;
+        MinimizeBox = false;
+        Name = "GeneratingSeedsForm";
+        ShowIcon = false;
+        StartPosition = FormStartPosition.CenterParent;
+        Text = "Generating Seeds";
+        FormClosed += Form3_FormClosed;
+        ResumeLayout(false);
     }
 
     #endregion

@@ -1,5 +1,13 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.6 - June 3rd, 2023
+
+- Updated the wiki/discord buttons to confirm before opening your browser. (Thanks nelyom!)
+- Custom / Preset flags boxes are now editable/customizable. Right click them for options. (Thanks nelyom!)
+- Fixed two "Death Mountain in palaces" rooms to match what they actually look like in DM.
+- Townsfolk will now say their vanilla phrases instead of "I know nothing" when helpful hints are off, but spell hints are on.
+- Fixed a bug where sometimes enemies would not be properly updated so rooms would use chunks of the vanilla enemy data isstead of their proper enemies.
+
 ## Version 4.1.5 - May 23rd, 2023
 
 - Fixed a validation issue that could cause "No duplicate Rooms' to be disabled.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Z2Randomizer.Core.Overworld;
 
@@ -51,10 +52,108 @@ public class Hints
     private const int errorTextIndex1 = 25;
     private const int errorTextIndex2 = 26;
 
+    private static List<int> usedWizardHints = new List<int>();
     private static readonly int[] wizardindex = { 15, 24, 35, 46, 70, 81, 93, 96 };
 
     private static readonly int[][] hintIndexes = { rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint };
 
+    private static readonly String[] wizardTexts =
+    {
+        "do you know$why we$stopped$the car?",
+        "link...$i am your$father",
+        "I like big$bots and i$cannot lie",
+        "why am i$locked in$a basement",
+        "thats just$like your$opinion$man",
+        "the dude$abides",
+        "i hope$this isnt$fire spell",
+        "boy this$is really$expensive",
+        "10th enemy$has the$bomb",
+        "stay$awhile and$listen",
+        "Dude eff$this game",
+        "you teach$me a spell",
+        "you know$nothing",
+        "thats what$she said",
+        "lets throw$a rave",
+        "jump in$lava for$200 rupees",
+        "you wont$be able$to cast$this",
+        "big bucks$no whammys",
+        "bagu owes$me 20$rupees",
+        "you are$the$weakest$link",
+        "link i$am your$father",
+        "theres no$wifi here",
+        "a wild$link$appears",
+        "welcome$to walmart",
+        "whats the$wifi$password",
+        "dont send$me back to$the home",
+        "pull my$finger",
+        "id like$to buy a$vowel",
+        "i only$know one$spell",
+        "i went$to$college$for this",
+        "larry is$still in$northern$palace",
+        "this game$needs more$categories",
+        "who$picked$these$flags",
+        "i found$this in$the$garbage",
+        "have you$heard my$mixtape"
+    };
+
+    private static readonly String[] bridgetext = {
+        "bagu said$what? that$jerk!",
+        "try not$to drown",
+        "who is$bagu? i$dont know$any bagu",
+        "3 5 10 7$12 4 11 6$1 13 14 2$15 8 9",
+        "why cant$you swim?",
+        "what is$your$quest?",
+        "what is$your$favorite$color?",
+        "what is$the speed$of a laden$swallow?",
+        "tickets$please",
+        "you know$magoo? i$can help$you cross",
+        "boom boom$boom",
+        "WRAAAAAAFT"
+        };
+
+    private static readonly String[] bagutext =
+    {
+        "have you$seen error$around?",
+        "tell the$riverman$i said hes$an idiot",
+        "i am bagu.$husband$of$baguette",
+        "wanna see$a corpse?",
+        "aliens$are real",
+        "rupees are$mind$control$devices",
+        "would you$like a$cookie?",
+        "anybody$want a$peanut?",
+        "please dont$tell my$wife i am$here",
+        "bam bam$bam",
+        "ASL?",
+    };
+
+    private static readonly String[] downstabtext =
+    {
+        "stick them$with the$pointy end",
+        "youll stab$your eye$out",
+        "press down$you idiot",
+        "have a$pogo stick",
+        "yakhammer$acquired",
+        "press down$to crouch",
+        "press$dongward$to stab",
+        "kick punch$chop block$duck jump",
+        "jump crouch$its all in$the mind!",
+        "you walked$past me$didnt you"
+    };
+
+    private static readonly String[] upstabtext =
+    {
+        "bet you$wish this$was$downstab",
+        "you$probably$wont need$this",
+        "press up$you idiot",
+        "press up$to go in$doors",
+        "are you$santa$claus?",
+        "SHORYUKEN!",
+        "you wasted$your time"
+    };
+    public static void Reset()
+    {
+        usedWizardHints = new List<int>();
+    }
 
     public static List<Hint> GenerateHints(
         List<Location> itemLocs, 
@@ -93,7 +192,7 @@ public class Hints
             placedIndex = GenerateHelpfulHints(hints, itemLocs, r, props.SpellItemHints);
         }
 
-        if (props.SpellItemHints || props.HelpfulHints)
+        if (props.HelpfulHints)
         {
             GenerateKnowNothings(hints, placedIndex, props.BagusWoods);
         }
@@ -198,6 +297,31 @@ public class Hints
         h = new Hint();
         h.GenerateTownHint(spellMap[Spell.THUNDER], useDash);
         hints[oldKasutoSign] = h;
+    }
+
+    public static Hint GenerateCommunityHint(HintType type, Random r)
+    {
+        switch (type)
+        {
+            case HintType.WIZARD:
+                int selectedHintIndex = r.Next(wizardTexts.Count());
+                while (usedWizardHints.Contains(selectedHintIndex))
+                {
+                    selectedHintIndex = r.Next(wizardTexts.Count());
+                }
+                usedWizardHints.Add(selectedHintIndex);
+                return new Hint(Util.ToGameText(wizardTexts[selectedHintIndex], true));
+            case HintType.BAGU:
+                return new Hint(Util.ToGameText(bagutext[r.Next(bagutext.Count())], true));
+            case HintType.BRIDGE:
+                return new Hint(Util.ToGameText(bridgetext[r.Next(bridgetext.Length)], true));
+            case HintType.DOWNSTAB:
+                return new Hint(Util.ToGameText(downstabtext[r.Next(downstabtext.Length)], true));
+            case HintType.UPSTAB:
+                return new Hint(Util.ToGameText(upstabtext[r.Next(upstabtext.Length)], true));
+            default:
+                throw new Exception("Invalid Hint Type");
+        }
     }
 
     private static void GenerateKnowNothings(List<Hint> hints, List<int> placedIndex, bool useBaguWoods)
@@ -333,32 +457,27 @@ public class Hints
 
     private static void GenerateCommunityHints(List<Hint> hints, Random r)
     {
-        Hint.Reset();
+        Hints.Reset();
         do
         {
             for (int i = 0; i < 8; i++)
             {
-                Hint wizardHint = new Hint();
-                wizardHint.GenerateCommunityHint(HintType.WIZARD, r);
+                Hint wizardHint = GenerateCommunityHint(HintType.WIZARD, r);
                 hints.RemoveAt(wizardindex[i]);
                 hints.Insert(wizardindex[i], wizardHint);
 
             }
 
-            Hint baguHint = new Hint();
-            baguHint.GenerateCommunityHint(HintType.BAGU, r);
+            Hint baguHint = GenerateCommunityHint(HintType.BAGU, r);
             hints[baguTextIndex] = baguHint;
 
-            Hint bridgeHint = new Hint();
-            bridgeHint.GenerateCommunityHint(HintType.BRIDGE, r);
+            Hint bridgeHint = GenerateCommunityHint(HintType.BRIDGE, r);
             hints[bridgeTextIndex] = bridgeHint;
 
-            Hint downstabHint = new Hint();
-            downstabHint.GenerateCommunityHint(HintType.DOWNSTAB, r);
+            Hint downstabHint = GenerateCommunityHint(HintType.DOWNSTAB, r);
             hints[downstabTextIndex] = downstabHint;
 
-            Hint upstabHint = new Hint();
-            upstabHint.GenerateCommunityHint(HintType.UPSTAB, r);
+            Hint upstabHint = GenerateCommunityHint(HintType.UPSTAB, r);
             hints[upstabTextIndex] = upstabHint;
 
         } while (TextLength(hints) > maxTextLength);
