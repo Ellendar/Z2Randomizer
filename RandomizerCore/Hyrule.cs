@@ -413,7 +413,6 @@ public class Hyrule
                 return;
             }
             palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData);
-            
         }
 
         firstProcessOverworldTimestamp = DateTime.Now;
@@ -446,7 +445,7 @@ public class Hyrule
             finalRNGState
         ));
         UpdateRom(hash);
-        String newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
         if(props.saveRom)
         {
             ROMData.Dump(newFileName);

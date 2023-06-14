@@ -113,7 +113,7 @@ public class Room
         }
     }
     public bool IsReachable { get; set; }
-    public int MemAddr { get; set; }
+    public int ConnectionStartAddress { get; set; }
     public byte[] Connections { get; set; }
     public bool IsDeadEnd { get; set; }
     public bool IsPlaced { get; set; }  
@@ -220,7 +220,7 @@ public class Room
         RightByte = conn[3];
         IsRoot = false;
         IsReachable = false;
-        MemAddr = memAddr;
+        ConnectionStartAddress = memAddr;
         IsPlaced = false;
         /*
         Left = null;
@@ -266,7 +266,7 @@ public class Room
         HasBoss = roomData.hasBoss;
         HasDrop = roomData.hasDrop;
         ElevatorScreen = roomData.elevatorScreen;
-        MemAddr = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+        ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
         isUpDownReversed = roomData.isUpDownReversed;
         IsDropZone = roomData.isDropZone;
 
@@ -297,7 +297,7 @@ public class Room
         result.hasBoss = HasBoss;
         result.hasDrop = HasDrop;
         result.elevatorScreen = ElevatorScreen;
-        result.MemAddr = MemAddr;
+        result.MemAddr = ConnectionStartAddress;
         result.isUpDownReversed = isUpDownReversed;
         result.IsDropZone = IsDropZone;
 
@@ -487,43 +487,17 @@ public class Room
 
     }
 
-    public void UpdateConnectors(ROM ROMData, bool entrance)
+    public void UpdateConnectors()
     {
-        if (PalaceGroup <= 0 || PalaceGroup > 3)
-        {
-            throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
-        }
         this.UpdateConnectionBytes();
-        if(PalaceGroup == 1)
+        ConnectionStartAddress = PalaceGroup switch
         {
-            for (int i = 0; i < 4; i++)
-            {
-                if (Connections[i] < 0xFC || entrance)
-                {
-                    ROMData.Put(connectors1 + (NewMap ?? Map) * 4 + i, Connections[i]);
-                }
-            }
-        }
-        else if(PalaceGroup == 2)
-        {
-            for(int i = 0; i < 4; i++)
-            {
-                if (Connections[i] < 0xFC || entrance)
-                {
-                    ROMData.Put(connectors2 + (NewMap ?? Map) * 4 + i, Connections[i]);
-                }
-            }
-        }
-        else
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if (Connections[i] < 0xFC || entrance)
-                {
-                    ROMData.Put(connectors3 + (NewMap ?? Map) * 4 + i, Connections[i]);
-                }
-            }
-        }
+            1 => connectors1 + (NewMap ?? Map) * 4,
+            2 => connectors2 + (NewMap ?? Map) * 4,
+            3 => connectors3 + (NewMap ?? Map) * 4,
+            _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
+        };
+        //ROMData.Put(connectors1 + (NewMap ?? Map) * 4 + i, Connections[i]);
     }
 
     public bool HasUpExit()
@@ -605,7 +579,7 @@ public class Room
             HasBoss, 
             HasDrop, 
             ElevatorScreen, 
-            MemAddr, 
+            ConnectionStartAddress, 
             isUpDownReversed, 
             IsDropZone);
     }
