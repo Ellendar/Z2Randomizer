@@ -2487,6 +2487,7 @@ partial class MainUI
         // spritePreviewBox
         // 
         this.spritePreviewBox.Location = (new global::System.Drawing.Point(472, 24));
+        this.spritePreviewBox.Margin = (new global::System.Windows.Forms.Padding(0));
         this.spritePreviewBox.Name = ("spritePreviewBox");
         this.spritePreviewBox.Size = (new global::System.Drawing.Size(96, 192));
         this.spritePreviewBox.TabIndex = (36);

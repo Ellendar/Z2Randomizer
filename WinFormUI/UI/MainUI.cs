@@ -200,7 +200,7 @@ public partial class MainUI : Form
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
-
+        TryLoadSpriteImageFromFile(romFileTextBox.Text);
 
         EnableLevelScaling(null, null);
         EastBiome_SelectedIndexChanged(null, null);
@@ -429,17 +429,21 @@ public partial class MainUI : Form
         */
     }
 
+    private void TryLoadSpriteImageFromFile(string fileName)
+    {
+        // basic validation that they selected a "validish" rom before drawing a sprite from it
+        if (new FileInfo(fileName).Length == 0x10 + 128 * 1024 + 128 * 1024)
+            _spritePreview = new SpritePreview(fileName);
+        GenerateSpriteImage();
+    }
+
     private void fileBtn_Click(object sender, EventArgs e)
     {
         var FD = new System.Windows.Forms.OpenFileDialog();
         if (FD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
             romFileTextBox.Text = FD.FileName;
-            // basic validation that they selected a "validish" rom before drawing a sprite from it
-            if (new FileInfo(FD.FileName).Length == 0x10 + 128 * 1024 + 128 * 1024)
-                _spritePreview = new SpritePreview(FD.FileName);
-            GenerateSpriteImage();
-
+            TryLoadSpriteImageFromFile(FD.FileName);
         }
     }
 
