@@ -9,3 +9,4 @@
 /AnalysisReport.sarif
 /Statistics/Statistics.csproj.user
 /Statistics/db/*.sqlite
+.idea/

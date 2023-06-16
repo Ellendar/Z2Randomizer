@@ -203,6 +203,8 @@ partial class MainUI
         this.useCommunityHintsCheckbox = (new global::System.Windows.Forms.CheckBox());
         this.enableHelpfulHintsCheckbox = (new global::System.Windows.Forms.CheckBox());
         this.tabPage3 = (new global::System.Windows.Forms.TabPage());
+        this.spritePreviewLabel = (new global::System.Windows.Forms.Label());
+        this.spritePreviewBox = (new global::System.Windows.Forms.PictureBox());
         this.useCustomRoomsBox = (new global::System.Windows.Forms.CheckBox());
         this.dashAlwaysOnCheckbox = (new global::System.Windows.Forms.CheckBox());
         this.flashingOffCheckbox = (new global::System.Windows.Forms.CheckBox());
@@ -260,6 +262,7 @@ partial class MainUI
         this.tabPage8.SuspendLayout();
         this.tabPage10.SuspendLayout();
         this.tabPage3.SuspendLayout();
+        ((global::System.ComponentModel.ISupportInitialize)(this.spritePreviewBox)).BeginInit();
         this.SuspendLayout();
         // 
         // mainTabControl
@@ -2444,6 +2447,8 @@ partial class MainUI
         // 
         // tabPage3
         // 
+        this.tabPage3.Controls.Add(this.spritePreviewLabel);
+        this.tabPage3.Controls.Add(this.spritePreviewBox);
         this.tabPage3.Controls.Add(this.useCustomRoomsBox);
         this.tabPage3.Controls.Add(this.dashAlwaysOnCheckbox);
         this.tabPage3.Controls.Add(this.flashingOffCheckbox);
@@ -2469,6 +2474,23 @@ partial class MainUI
         this.tabPage3.TabIndex = (6);
         this.tabPage3.Text = ("Misc.");
         this.tabPage3.UseVisualStyleBackColor = (true);
+        // 
+        // spritePreviewLabel
+        // 
+        this.spritePreviewLabel.AutoSize = (true);
+        this.spritePreviewLabel.Location = (new global::System.Drawing.Point(473, 3));
+        this.spritePreviewLabel.Name = ("spritePreviewLabel");
+        this.spritePreviewLabel.Size = (new global::System.Drawing.Size(81, 15));
+        this.spritePreviewLabel.TabIndex = (37);
+        this.spritePreviewLabel.Text = ("Sprite Preview");
+        // 
+        // spritePreviewBox
+        // 
+        this.spritePreviewBox.Location = (new global::System.Drawing.Point(472, 24));
+        this.spritePreviewBox.Name = ("spritePreviewBox");
+        this.spritePreviewBox.Size = (new global::System.Drawing.Size(96, 192));
+        this.spritePreviewBox.TabIndex = (36);
+        this.spritePreviewBox.TabStop = (false);
         // 
         // useCustomRoomsBox
         // 
@@ -2531,6 +2553,7 @@ partial class MainUI
         this.beamSpriteList.Size = (new global::System.Drawing.Size(142, 23));
         this.beamSpriteList.TabIndex = (31);
         this.toolTip1.SetToolTip(this.beamSpriteList, "Allows you to select what the beam sprite will be");
+        this.beamSpriteList.SelectedIndexChanged += (this.beamSpriteList_SelectedIndexChanged);
         // 
         // beamSpriteLabel
         // 
@@ -2553,6 +2576,7 @@ partial class MainUI
         this.shieldColorList.Size = (new global::System.Drawing.Size(142, 23));
         this.shieldColorList.TabIndex = (29);
         this.toolTip1.SetToolTip(this.shieldColorList, "Changes the tunic color for shield");
+        this.shieldColorList.SelectedIndexChanged += (this.shieldColorList_SelectedIndexChanged);
         // 
         // shieldColorLabel
         // 
@@ -2575,6 +2599,7 @@ partial class MainUI
         this.tunicColorList.Size = (new global::System.Drawing.Size(142, 23));
         this.tunicColorList.TabIndex = (27);
         this.toolTip1.SetToolTip(this.tunicColorList, "Changes the normal tunic color");
+        this.tunicColorList.SelectedIndexChanged += (this.tunicColorList_SelectedIndexChanged);
         // 
         // tunicColorLabel
         // 
@@ -2597,6 +2622,7 @@ partial class MainUI
         this.characterSpriteList.Size = (new global::System.Drawing.Size(142, 23));
         this.characterSpriteList.TabIndex = (25);
         this.toolTip1.SetToolTip(this.characterSpriteList, "Changes the playable character sprite");
+        this.characterSpriteList.SelectedIndexChanged += (this.characterSpriteList_SelectedIndexChanged);
         // 
         // characterSpriteLabel
         // 
@@ -2991,6 +3017,7 @@ partial class MainUI
         this.tabPage10.PerformLayout();
         this.tabPage3.ResumeLayout(false);
         this.tabPage3.PerformLayout();
+        ((global::System.ComponentModel.ISupportInitialize)(this.spritePreviewBox)).EndInit();
         this.ResumeLayout(false);
         this.PerformLayout();
     }
@@ -3209,5 +3236,7 @@ partial class MainUI
     private System.Windows.Forms.CheckBox noDuplicateRoomsCheckbox;
     private CheckBox generatorsMatchCheckBox;
     private global::System.Windows.Forms.ContextMenuStrip customisableButtonContextMenu;
+    private global::System.Windows.Forms.Label spritePreviewLabel;
+    private global::System.Windows.Forms.PictureBox spritePreviewBox;
 }
 

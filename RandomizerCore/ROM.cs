@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
 
 namespace Z2Randomizer.Core;
@@ -114,6 +115,11 @@ public class ROM
         {
             throw new Exception("Cannot find or read file to dump.", err);
         }
+    }
+
+    public ROM(byte[] data)
+    {
+        ROMData = data;
     }
 
     public Byte GetByte(int index)
@@ -242,7 +248,9 @@ public class ROM
         }
     }
 
-    public void UpdateSprites(CharacterSprite charSprite)
+    private readonly int[] fireLocs = { 0x20850, 0x22850, 0x24850, 0x26850, 0x28850, 0x2a850, 0x2c850, 0x2e850, 0x36850, 0x32850, 0x34850, 0x38850 };
+
+    public void UpdateSprites(CharacterSprite charSprite, string tunicColor, string shieldColor, string beamSprite)
     {
         /*
          * Dear future digshake,
@@ -406,6 +414,482 @@ public class ROM
             }
         }
 
+        Dictionary<String, int> colorMap = new Dictionary<String, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
+
+        /*colors to include
+            Green (2A)
+            Dark Green (0A)
+            Aqua (3C)
+            Dark Blue (02)
+            Purple (04)
+            Pink (24)
+            Red (16)
+            Orange (27)
+            Turd (08)
+        */
+        int c2 = 0;
+        int c1 = 0;
+
+        if (tunicColor.Equals("Default"))
+        {
+            if (charSprite == CharacterSprite.LINK)
+            {
+                c2 = colorMap["Green"];
+            }
+            else if (charSprite == CharacterSprite.IRON_KNUCKLE)
+            {
+                c2 = colorMap["Dark Blue"];
+            }
+            else if (charSprite == CharacterSprite.ERROR)
+            {
+                c2 = 0x13;
+            }
+            else if (charSprite == CharacterSprite.SAMUS)
+            {
+                c2 = 0x27;
+            }
+            else if (charSprite == CharacterSprite.SIMON)
+            {
+                c2 = 0x27;
+            }
+            else if (charSprite == CharacterSprite.STALFOS)
+            {
+                c2 = colorMap["Red"];
+            }
+            else if (charSprite == CharacterSprite.VASE_LADY)
+            {
+                c2 = 0x13;
+            }
+            else if (charSprite == CharacterSprite.RUTO)
+            {
+                c2 = 0x30;
+            }
+            else if (charSprite == CharacterSprite.YOSHI)
+            {
+                c2 = 0x2a;
+            }
+            else if (charSprite == CharacterSprite.DRAGONLORD)
+            {
+                c2 = 0x01;
+            }
+            else if (charSprite == CharacterSprite.MIRIA)
+            {
+                c2 = 0x16;
+            }
+            else if (charSprite == CharacterSprite.CRYSTALIS)
+            {
+                c2 = 0x14;
+            }
+            else if (charSprite == CharacterSprite.TACO)
+            {
+                c2 = 0x2a;
+            }
+            else if (charSprite == CharacterSprite.PYRAMID)
+            {
+                c2 = 0x32;
+            }
+            /* NOT CURRENTLY ACCESSABLE
+            else if (charSprite.Equals("Faxanadu"))
+            {
+                c2 = 0x2a;
+            }
+            */
+            else if (charSprite == CharacterSprite.LADY_LINK)
+            {
+                c2 = 0x2a;
+            }
+            else if (charSprite == CharacterSprite.HOODIE_LINK)
+            {
+                c2 = 0x2a;
+            }
+            else if (charSprite == CharacterSprite.GLITCH_WITCH)
+            {
+                c2 = 0x0c;
+            }
+        }
+        else if (!tunicColor.Equals("Random"))
+        {
+            c2 = colorMap[tunicColor];
+        }
+
+        if (shieldColor.Equals("Default"))
+        {
+            if (charSprite == CharacterSprite.LINK)
+            {
+                c1 = colorMap["Red"];
+            }
+            else if (charSprite == CharacterSprite.IRON_KNUCKLE)
+            {
+                c1 = colorMap["Red"];
+            }
+            else if (charSprite == CharacterSprite.ERROR)
+            {
+                c1 = colorMap["Red"];
+            }
+            else if (charSprite == CharacterSprite.SAMUS)
+            {
+                c1 = 0x37;
+            }
+            else if (charSprite == CharacterSprite.SIMON)
+            {
+                c1 = 0x16;
+            }
+            else if (charSprite == CharacterSprite.STALFOS)
+            {
+                c1 = colorMap["Dark Blue"];
+            }
+            else if (charSprite == CharacterSprite.VASE_LADY)
+            {
+                c1 = colorMap["Red"];
+            }
+            else if (charSprite == CharacterSprite.RUTO)
+            {
+                c1 = 0x3c;
+            }
+            else if (charSprite == CharacterSprite.YOSHI)
+            {
+                c1 = 0x0F;
+            }
+            else if (charSprite == CharacterSprite.DRAGONLORD)
+            {
+                c1 = 0x03;
+            }
+            else if (charSprite == CharacterSprite.MIRIA)
+            {
+                c1 = 0x15;
+            }
+            else if (charSprite == CharacterSprite.CRYSTALIS)
+            {
+                c1 = 0x1B;
+            }
+            else if (charSprite == CharacterSprite.TACO)
+            {
+                c1 = 0x16;
+            }
+            else if (charSprite == CharacterSprite.PYRAMID)
+            {
+                c1 = 0x02;
+            }
+            else if (charSprite == CharacterSprite.LADY_LINK)
+            {
+                c1 = 0x16;
+            }
+            else if (charSprite == CharacterSprite.HOODIE_LINK)
+            {
+                c1 = 0x16;
+            }
+            else if (charSprite == CharacterSprite.GLITCH_WITCH)
+            {
+                c1 = 0x25;
+            }
+
+        }
+        else if (!shieldColor.Equals("Random"))
+        {
+            c1 = colorMap[shieldColor];
+        }
+        if (tunicColor.Equals("Random"))
+        {
+            Random r2 = new Random();
+
+            int c2p1 = r2.Next(3);
+            int c2p2 = r2.Next(1, 13);
+            c2 = c2p1 * 16 + c2p2;
+
+            while (c1 == c2)
+            {
+                c2p1 = r2.Next(3);
+                c2p2 = r2.Next(1, 13);
+                c2 = c2p1 * 16 + c2p2;
+            }
+        }
+
+        if (shieldColor.Equals("Random"))
+        {
+            Random r2 = new Random();
+
+
+
+            int c1p1 = r2.Next(3);
+            int c1p2 = r2.Next(1, 13);
+
+            c1 = c1p1 * 16 + c1p2;
+
+            while (c1 == c2)
+            {
+                c1p1 = r2.Next(3);
+                c1p2 = r2.Next(1, 13);
+                c1 = c1p1 * 16 + c1p2;
+            }
+        }
+
+        int[] tunicLocs = { 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
+
+        foreach (int l in tunicLocs)
+        {
+            Put(0x10ea, (byte)c2);
+            if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
+            {
+                if (tunicColor != "Default")
+                {
+                    Put(0x10ea, (byte)c2);
+                    Put(l, (byte)c2);
+                }
+                //Don't overwrite for null 
+            }
+            else if (charSprite == CharacterSprite.IRON_KNUCKLE)
+            {
+                Put(0x10ea, (byte)0x30);
+                Put(0x2a0a, 0x0D);
+                Put(0x2a10, (byte)c2);
+                Put(l, 0x20);
+                Put(l - 1, (byte)c2);
+                Put(l - 2, 0x0D);
+            }
+            else if (charSprite == CharacterSprite.SAMUS)
+            {
+                Put(0x2a0a, 0x16);
+                Put(0x2a10, 0x1a);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x1a);
+                Put(l - 2, 0x16);
+            }
+            else if (charSprite == CharacterSprite.ERROR || charSprite == CharacterSprite.VASE_LADY)
+            {
+                Put(0x2a0a, 0x0F);
+                Put(l, (byte)c2);
+                Put(l - 2, 0x0F);
+            }
+            else if (charSprite == CharacterSprite.SIMON)
+            {
+                Put(0x2a0a, 0x07);
+                Put(0x2a10, 0x37);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x37);
+                Put(l - 2, 0x07);
+            }
+            else if (charSprite == CharacterSprite.STALFOS)
+            {
+                Put(0x2a0a, 0x08);
+                Put(0x2a10, 0x20);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x20);
+                Put(l - 2, 0x08);
+            }
+            else if (charSprite == CharacterSprite.RUTO)
+            {
+                Put(0x2a0a, 0x0c);
+                Put(0x2a10, 0x1c);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x1c);
+                Put(l - 2, 0x0c);
+            }
+            else if (charSprite == CharacterSprite.YOSHI)
+            {
+                Put(0x2a0a, 0x16);
+                Put(0x2a10, 0x20);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x20);
+                Put(l - 2, 0x16);
+            }
+            else if (charSprite == CharacterSprite.DRAGONLORD)
+            {
+                Put(0x2a0a, 0x28);
+                Put(0x2a10, 0x11);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x11);
+                Put(l - 2, 0x28);
+            }
+            else if (charSprite == CharacterSprite.MIRIA)
+            {
+                Put(0x2a0a, 0x0D);
+                Put(0x2a10, 0x30);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x30);
+                Put(l - 2, 0x0D);
+
+            }
+            else if (charSprite == CharacterSprite.CRYSTALIS)
+            {
+                Put(0x2a0a, 0x0D);
+                Put(0x2a10, 0x36);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x36);
+                Put(l - 2, 0x0D);
+
+            }
+            else if (charSprite == CharacterSprite.TACO)
+            {
+                Put(0x2a0a, 0x18);
+                Put(0x2a10, 0x36);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x36);
+                Put(l - 2, 0x18);
+
+            }
+            else if (charSprite == CharacterSprite.PYRAMID)
+            {
+                Put(0x2a0a, 0x12);
+                Put(0x2a10, 0x22);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x22);
+                Put(l - 2, 0x12);
+
+            }
+            /*
+            else if (charSprite == CharacterSprite.FAXANADU)
+            {
+                Put(0x2a0a, 0x18);
+                Put(0x2a10, 0x36);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x36);
+                Put(l - 2, 0x18);
+
+            }
+            */
+            else if (charSprite == CharacterSprite.LADY_LINK)
+            {
+                Put(0x2a0a, 0x18);
+                Put(0x2a10, 0x36);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x36);
+                Put(l - 2, 0x18);
+
+            }
+            else if (charSprite == CharacterSprite.HOODIE_LINK)
+            {
+                Put(0x2a0a, 0x18);
+                Put(0x2a10, 0x36);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x36);
+                Put(l - 2, 0x18);
+
+            }
+            else if (charSprite == CharacterSprite.GLITCH_WITCH)
+            {
+                Put(0x2a0a, 0x08);
+                Put(0x2a10, 0x36);
+                Put(l, (byte)c2);
+                Put(l - 1, 0x36);
+                Put(l - 2, 0x08);
+
+            }
+            else
+            {
+                Put(0x10ea, (byte)c2);
+                Put(l, (byte)c2);
+            }
+        }
+
+        if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy) && shieldColor == "Default")
+        {
+            //Don't overwrite default shield. For custom sprite IPS base
+        }
+        else
+        {
+            Put(0xe9e, (byte)c1);
+        }
+
+        int beamType = -1;
+        if (beamSprite.Equals("Random"))
+        {
+
+            Random r2 = new Random();
+            beamType = r2.Next(6);
+        }
+        else if (beamSprite.Equals("Fire"))
+        {
+            beamType = 0;
+        }
+        else if (beamSprite.Equals("Bubble"))
+        {
+            beamType = 1;
+        }
+        else if (beamSprite.Equals("Rock"))
+        {
+            beamType = 2;
+        }
+        else if (beamSprite.Equals("Axe"))
+        {
+            beamType = 3;
+        }
+        else if (beamSprite.Equals("Hammer"))
+        {
+            beamType = 4;
+        }
+        else if (beamSprite.Equals("Wizzrobe Beam"))
+        {
+            beamType = 5;
+        }
+        byte[] newSprite = new Byte[32];
+
+        if (beamType == 0 || beamType == 3 || beamType == 4)
+        {
+            Put(0x18f5, 0xa9);
+            Put(0x18f6, 0x00);
+            Put(0x18f7, 0xea);
+        }
+        else if (beamType != -1)
+        {
+            Put(0X18FB, 0x84);
+        }
+
+        if (beamType == 1)//bubbles
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x20ab0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 2)//rocks
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x22af0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 3)//axes
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x22fb0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 4)//hammers
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x32ef0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 5)//wizzrobe beam
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x34dd0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+
+        if (beamType != 0 && beamType != -1)
+        {
+            foreach (int loc in fireLocs)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    Put(loc + i, newSprite[i]);
+                }
+            }
+        }
     }
 
     public void UpdateSpellText(Dictionary<Spell, Spell> spellMap)

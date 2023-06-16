@@ -3,7 +3,8 @@ using Z2Randomizer.Core;
 using System.ComponentModel;
 using System.Diagnostics;
 using Z2Randomizer.Core.Overworld;
-
+using WinFormUI.UI;
+using System.Configuration;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -24,6 +25,7 @@ public partial class MainUI : Form
     private GeneratingSeedsForm f3;
     private RandomizerConfiguration config;
     private List<Button> customisableButtons = new List<Button>();
+    private SpritePreview? _spritePreview;
 
     private readonly int validFlagStringLength;
 
@@ -223,7 +225,6 @@ public partial class MainUI : Form
             dontrunhandler = false;
         }
 
-
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
         WinSparkle.win_sparkle_set_appcast_url("https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml");
@@ -380,7 +381,7 @@ public partial class MainUI : Form
         while (button.IsEllipsisShown())
         {
             button.Text = button.Text.Substring(0, button.Text.Length - 4) + "...";
-            toolTip1.SetToolTip(button, customButtonSettings.Name + 
+            toolTip1.SetToolTip(button, customButtonSettings.Name +
                     (!string.IsNullOrWhiteSpace(customButtonSettings.Tooltip) ? Environment.NewLine + customButtonSettings.Tooltip : string.Empty));
         }
 
@@ -434,6 +435,11 @@ public partial class MainUI : Form
         if (FD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
             romFileTextBox.Text = FD.FileName;
+            // basic validation that they selected a "validish" rom before drawing a sprite from it
+            if (new FileInfo(FD.FileName).Length == 0x10 + 128 * 1024 + 128 * 1024)
+                _spritePreview = new SpritePreview(FD.FileName);
+            GenerateSpriteImage();
+
         }
     }
 
@@ -1848,5 +1854,33 @@ public partial class MainUI : Form
         return true;
     }
 
+    private void GenerateSpriteImage()
+    {
+        spritePreviewBox.Image = _spritePreview?.GeneratePreviewImage(
+               CharacterSprite.ByIndex(characterSpriteList.SelectedIndex),
+               tunicColorList.GetItemText(tunicColorList.SelectedItem),
+               shieldColorList.GetItemText(shieldColorList.SelectedItem),
+               beamSpriteList.GetItemText(beamSpriteList.SelectedItem)
+           );
+    }
 
+    private void characterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
+
+    private void tunicColorList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
+
+    private void shieldColorList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
+
+    private void beamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
 }
