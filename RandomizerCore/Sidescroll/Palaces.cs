@@ -56,15 +56,12 @@ public class Palaces
         if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
         {
             roomPool.Clear();
-            //XXX: Fix this
-            /*
             roomPool.AddRange(PalaceRooms.Palace1Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace2Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace3Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace4Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace5Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace6Vanilla(props.UseCustomRooms));
-            */
             if (props.UseCommunityRooms)
             {
                 roomPool.AddRange(PalaceRooms.RoomJamGTM(props.UseCustomRooms));
