@@ -14,6 +14,7 @@ public class Palace
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private const bool DROPS_ARE_BLOCKERS = false;
+    private const int OUTSIDE_ROOM_EXIT = 0b11111100;
     private Room root;
     private Room itemRoom;
     private Room bossRoom;
@@ -723,16 +724,15 @@ public class Palace
 
     public void UpdateRom(ROM ROMData)
     {
-        
         foreach (Room r in AllRooms)
         {
             r.UpdateConnectionBytes();
             for (int i = 0; i < 4; i++)
             {
-                if (r.Connections[i] < 0xFC)
-                {
-                    ROMData.Put(r.MemAddr + i, r.Connections[i]);
-                }
+                //if (r.Connections[i] < 0xFC)
+                //{
+                    ROMData.Put(r.ConnectionStartAddress + i, r.Connections[i]);
+                //}
             }
         }
     }
@@ -1205,22 +1205,56 @@ public class Palace
                         && i != room);
                     if (duplicateRoom != null)
                     {
-                        Debug.WriteLine("Room# " + room.MemAddr + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
-                            " is a duplicate of Room# " + duplicateRoom.MemAddr + " (" + Util.ByteArrayToHexString(duplicateRoom.SideView) + "/" + Util.ByteArrayToHexString(duplicateRoom.Enemies) + ")");
+                        Debug.WriteLine("Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
+                            " is a duplicate of Room# " + duplicateRoom.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(duplicateRoom.SideView) + "/" + Util.ByteArrayToHexString(duplicateRoom.Enemies) + ")");
                         room.RandomizeEnemies(props.MixPalaceEnemies, props.GeneratorsAlwaysMatch, r);
                     }
                 }
                 if(count == ENEMY_SHUFFLE_LIMIT)
                 {
-                    logger.Warn("Room# " + room.MemAddr + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.Enemies) +
+                    logger.Warn("Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.Enemies) +
                         ") Exceeded the enemy shuffle limit");
                 }
             }
         }
     }
 
-    public bool IsTraversable(IEnumerable<RequirementType> requireables)
+    public bool IsTraversable(IEnumerable<RequirementType> requireables, Item palaceItem)
     {
+        if(palaceItem == Item.GLOVE)
+        {
+            List<Room> pendingRooms = new List<Room>() { AllRooms.First(i => i.IsRoot) };
+            List<Room> coveredRooms = new List<Room>();
+
+            while(pendingRooms.Count > 0)
+            {
+                Room room = pendingRooms.First();
+                if(room == ItemRoom)
+                {
+                    requireables = new List<RequirementType>(requireables).ToList();
+                    ((List<RequirementType>)requireables).Add(RequirementType.GLOVE);
+                    break;
+                }
+                coveredRooms.Add(room);
+                pendingRooms.Remove(room);
+                if(room.Left != null && room.Left.IsTraversable(requireables) && !coveredRooms.Contains(room.Left))
+                {
+                    pendingRooms.Add(room.Left);
+                }
+                if (room.Right != null && room.Right.IsTraversable(requireables) && !coveredRooms.Contains(room.Right))
+                {
+                    pendingRooms.Add(room.Right);
+                }
+                if (room.Up != null && room.Up.IsTraversable(requireables) && !coveredRooms.Contains(room.Up))
+                {
+                    pendingRooms.Add(room.Up);
+                }
+                if (room.Down != null && room.Down.IsTraversable(requireables) && !coveredRooms.Contains(room.Down))
+                {
+                    pendingRooms.Add(room.Down);
+                }
+            }
+        }
         return AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
     }
 
@@ -1237,5 +1271,31 @@ public class Palace
             7 => 3,
             _ => throw new ImpossibleException("Invalid palace number: " + Number)
         };
+    }
+
+    public void ValidateRoomConnections()
+    {
+        foreach(Room r in AllRooms)
+        {
+            //If this room connects to any rooms that aren't in the same palace, it's leftover stray data from the vanilla versions of the rooms.
+            //While often these connections are inaccessible, the can freak out Z2Edit's sideview graph.
+            //No reason not to remove them.
+            if (r.Left == null || !AllRooms.Contains(r.Left))
+            {
+                r.LeftByte = OUTSIDE_ROOM_EXIT;
+            }
+            if (r.Right == null || !AllRooms.Contains(r.Right))
+            {
+                r.RightByte = OUTSIDE_ROOM_EXIT;
+            }
+            if (r.Up == null || !AllRooms.Contains(r.Up))
+            {
+                r.UpByte = OUTSIDE_ROOM_EXIT;
+            }
+            if (r.Down == null || !AllRooms.Contains(r.Down))
+            {
+                r.DownByte = OUTSIDE_ROOM_EXIT;
+            }
+        }
     }
 }

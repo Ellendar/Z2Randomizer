@@ -414,7 +414,6 @@ public class Hyrule
                 return;
             }
             palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData);
-            
         }
 
         firstProcessOverworldTimestamp = DateTime.Now;
@@ -447,7 +446,7 @@ public class Hyrule
             finalRNGState
         ));
         UpdateRom(hash);
-        String newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
         if(props.saveRom)
         {
             ROMData.Dump(newFileName);
@@ -1150,7 +1149,7 @@ public class Hyrule
                 Palace palace = palaces[location.PalNum - 1];
                 hasItemNow = CanGet(location)
                     && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY])
-                    && palace.IsTraversable(GetRequireables());
+                    && palace.IsTraversable(GetRequireables(), location.item);
                     /*
                     && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) 
                     && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) 

@@ -30,7 +30,7 @@ public class RoomSerializationTests
 
         Room room = new Room(roomJson);
         Assert.AreEqual("testName", room.Name);
-        Assert.AreEqual(0x1073B, room.MemAddr);
+        Assert.AreEqual(0x1073B, room.ConnectionStartAddress);
     }
 
     [TestMethod]

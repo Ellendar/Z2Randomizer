@@ -61,12 +61,15 @@ public class Palaces
         if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
         {
             roomPool.Clear();
+            //XXX: Fix this
+            /*
             roomPool.AddRange(PalaceRooms.Palace1Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace2Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace3Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace4Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace5Vanilla(props.UseCustomRooms));
             roomPool.AddRange(PalaceRooms.Palace6Vanilla(props.UseCustomRooms));
+            */
             if (props.UseCommunityRooms)
             {
                 roomPool.AddRange(PalaceRooms.RoomJamGTM(props.UseCustomRooms));
@@ -467,15 +470,6 @@ public class Palaces
             }
         }
 
-        if (palaces[1].NeedGlove && !props.ShufflePalaceItems && (props.PalaceStyle == PalaceStyle.SHUFFLED || props.PalaceStyle == PalaceStyle.RECONSTRUCTED))
-        {
-            return new List<Palace>();
-        }
-
-        if (!(props.PalaceStyle == PalaceStyle.SHUFFLED || props.PalaceStyle == PalaceStyle.RECONSTRUCTED))
-        {
-            palaces[1].NeedGlove = false;
-        }
         //update pointers
         if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
         {
@@ -504,6 +498,7 @@ public class Palaces
                     room.UpdateBitmask(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
                     enemyAddr += room.NewEnemies.Length;
+                    /*
                     bool entrance = false;
                     foreach (Palace p in palaces)
                     {
@@ -512,7 +507,9 @@ public class Palaces
                             entrance = true;
                         }
                     }
-                    room.UpdateConnectors(ROMData, entrance);
+                    */
+                    //room.UpdateConnectors(ROMData, entrance);
+                    room.UpdateConnectors();
                 }
             }
             //GP Reconstructed
@@ -537,7 +534,8 @@ public class Palaces
                     room.UpdateBitmask(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
                     enemyAddr += room.Enemies.Length;
-                    room.UpdateConnectors(ROMData, room == palaces[6].Root);
+                    //room.UpdateConnectors(ROMData, room == palaces[6].Root);
+                    room.UpdateConnectors();
                 }
             }
         }
@@ -568,10 +566,6 @@ public class Palaces
                     enemyAddr += room.Enemies.Length;
                 }
             }
-            foreach (Palace palace in palaces)
-            {
-                palace.UpdateRom(ROMData);
-            }
         }
 
         if (props.ShuffleSmallItems || props.ExtraKeys)
@@ -583,6 +577,11 @@ public class Palaces
             palaces[4].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
             palaces[5].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
             palaces[6].ShuffleSmallItems(5, true, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
+        }
+        foreach(Palace palace in palaces)
+        {
+            palace.ValidateRoomConnections();
+            palace.UpdateRom(ROMData);
         }
 
         return palaces;
@@ -673,7 +672,9 @@ public class Palaces
             freeSpace.Add(0x10649, 226);
             freeSpace.Add(0x10827, 89);
             freeSpace.Add(0x10cb0, 1888);
-            freeSpace.Add(0x11ef0, 288);
+            //Bugfix for tyvarius's seed with a scuffed P3 entrance. This was 1 byte too long, which caused the sideview data to overflow
+            //into the palace set 2 sideview pointer data starting at 0x12010
+            freeSpace.Add(0x11ef0, 287);
             freeSpace.Add(0x12124, 79);
             freeSpace.Add(0x1218b, 125);
             freeSpace.Add(0x12304, 1548);
