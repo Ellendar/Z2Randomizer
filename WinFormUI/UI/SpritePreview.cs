@@ -1,6 +1,8 @@
 ﻿
 using Z2Randomizer.Core;
 using System.Drawing.Imaging;
+using System.Security.Policy;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace WinFormUI.UI
 {
@@ -9,7 +11,9 @@ namespace WinFormUI.UI
 
         private byte[] _rom;
 
-        private Image _previousImage;
+        public string? Credit { get; private set; }
+
+        public Image? Preview { get; private set; }
 
         public SpritePreview(byte[] rawRom)
         {
@@ -20,7 +24,13 @@ namespace WinFormUI.UI
             _rom = File.ReadAllBytes(romPath);
         }
 
-        public Image GeneratePreviewImage(CharacterSprite sprite, string? tunicColor, string? shieldColor, string? beamSprite)
+        private void LoadSpriteCredit(ROM rom)
+        {
+            // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
+            Credit = rom.Z2BytesToString(rom.GetBytes(0x10 + 0x16AAB, 0x10 + 0x16AC7)).Trim();
+        }
+
+        public void ReloadSpriteFromROM(CharacterSprite sprite, string? tunicColor, string? shieldColor, string? beamSprite)
         {
             // make a temporary copy of the original ROM file and apply the sprite to it
             var rom = new ROM(_rom.ToArray());
@@ -28,10 +38,12 @@ namespace WinFormUI.UI
 
             // now the original rom has the sprite and palette data applied,
             // so load the specific CHR tiles and palette data that we want
-            return LoadPreviewFromRom(rom);
-
+            LoadPreviewFromRom(rom);
+            LoadSpriteCredit(rom);
+            rom.Dump("C:/dev/temp/" + sprite.DisplayName + ".nes");
         }
-        private Image LoadPreviewFromRom(ROM rom)
+
+        private void LoadPreviewFromRom(ROM rom)
         {
             var img = new Bitmap(16, 32, PixelFormat.Format32bppArgb);
             
@@ -84,8 +96,7 @@ namespace WinFormUI.UI
                 }
             }
 
-            //return new Bitmap(img, 96, 192);
-            return EnlargeImage(img, 6);
+            Preview = EnlargeImage(img, 6);
         }
         private static Image EnlargeImage(Image original, int scale)
         {

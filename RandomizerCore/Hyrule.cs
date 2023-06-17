@@ -3618,62 +3618,6 @@ public class Hyrule
         });
     }
 
-    private byte[] StringToZ2Bytes(string text)
-    {
-        return text.Select(letter => {
-            return CharMap.TryGetValue(letter, out var byt) ? byt : (byte)0xfc;
-        }).ToArray();
-    }
-
-    private static IDictionary<char, byte> CharMap = new Dictionary<char, byte>()
-    {
-        { '$', 0xc9 }, // sword
-        { '#', 0xca }, // filled box
-        { '=', 0xcb }, // horizontal border
-        { '|', 0xcc }, // vertical border
-        { '+', 0xcd }, // gem
-        { '/', 0xce },
-        { '.', 0xcf },
-        { '0', 0xd0 },
-        { '1', 0xd1 },
-        { '2', 0xd2 },
-        { '3', 0xd3 },
-        { '4', 0xd4 },
-        { '5', 0xd5 },
-        { '6', 0xd6 },
-        { '7', 0xd7 },
-        { '8', 0xd8 },
-        { '9', 0xd9 },
-        { 'A', 0xda },
-        { 'B', 0xdb },
-        { 'C', 0xdc },
-        { 'D', 0xdd },
-        { 'E', 0xde },
-        { 'F', 0xdf },
-        { 'G', 0xe0 },
-        { 'H', 0xe1 },
-        { 'I', 0xe2 },
-        { 'J', 0xe3 },
-        { 'K', 0xe4 },
-        { 'L', 0xe5 },
-        { 'M', 0xe6 },
-        { 'N', 0xe7 },
-        { 'O', 0xe8 },
-        { 'P', 0xe9 },
-        { 'Q', 0xea },
-        { 'R', 0xeb },
-        { 'S', 0xec },
-        { 'T', 0xed },
-        { 'U', 0xee },
-        { 'V', 0xef },
-        { 'W', 0xf0 },
-        { 'X', 0xf1 },
-        { 'Y', 0xf2 },
-        { 'Z', 0xf3 },
-        { ' ', 0xf4 },
-        { '-', 0xf6 },
-    };
-
     public List<Location> AllLocationsForReal()
     {
         List<Location> locations = westHyrule.AllLocations

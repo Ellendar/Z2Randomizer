@@ -81,7 +81,8 @@ public partial class MainUI : Form
         tbirdRequiredCheckbox.Checked = true;
         hiddenPalaceList.SelectedIndex = 0;
         hideKasutoList.SelectedIndex = 0;
-        characterSpriteList.SelectedIndex = Properties.Settings.Default.sprite;
+        var selectedSprite = Properties.Settings.Default.sprite;
+        characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
 
         this.Text = "Zelda 2 Randomizer Version "
             + typeof(MainUI).Assembly.GetName().Version.Major + "."
@@ -1860,12 +1861,14 @@ public partial class MainUI : Form
 
     private void GenerateSpriteImage()
     {
-        spritePreviewBox.Image = _spritePreview?.GeneratePreviewImage(
+        _spritePreview?.ReloadSpriteFromROM(
                CharacterSprite.ByIndex(characterSpriteList.SelectedIndex),
                tunicColorList.GetItemText(tunicColorList.SelectedItem),
                shieldColorList.GetItemText(shieldColorList.SelectedItem),
                beamSpriteList.GetItemText(beamSpriteList.SelectedItem)
            );
+        spritePreviewBox.Image = _spritePreview?.Preview;
+        spriteCreditLabel.Text = _spritePreview?.Credit;
     }
 
     private void characterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
