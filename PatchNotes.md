@@ -1,5 +1,11 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.7 - June 17th 2023
+
+- Fixed an issue that could cause the first room of palace 3 to be corrupted.
+- Corrected some updated rooms that had gotten reverted to their previous version.
+- Added a process to scrub exit data from invalid exits. Note this means ALL unintended exits will now lead outside.
+
 ## Version 4.1.6 - June 3rd, 2023
 
 - Updated the wiki/discord buttons to confirm before opening your browser. (Thanks nelyom!)
