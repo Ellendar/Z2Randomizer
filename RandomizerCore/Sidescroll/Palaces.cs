@@ -16,9 +16,23 @@ public class Palaces
     private const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
     private const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
 
-    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = new RequirementType[] { };
+    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY };
+    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE };
+    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP};
+    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE};
 
-    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = new RequirementType[][] { VANILLA_P1_ALLOWED_BLOCKERS };
+    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = new RequirementType[][] { 
+        VANILLA_P1_ALLOWED_BLOCKERS,
+        VANILLA_P2_ALLOWED_BLOCKERS,
+        VANILLA_P3_ALLOWED_BLOCKERS,
+        VANILLA_P4_ALLOWED_BLOCKERS,
+        VANILLA_P5_ALLOWED_BLOCKERS,
+        VANILLA_P6_ALLOWED_BLOCKERS,
+        VANILLA_P7_ALLOWED_BLOCKERS
+    };
 
 
     private static readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
@@ -239,6 +253,10 @@ public class Palaces
                         roomPlacementFailures = 0;
                         while (palace.AllRooms.Count < palace.MaxRooms)
                         {
+                            if(palaceRoomPool.Count == 0)
+                            {
+                                return null;
+                            }
                             int roomIndex = r.Next(palaceRoomPool.Count);
                             Room roomToAdd = palaceRoomPool[roomIndex].DeepCopy();
 
@@ -665,16 +683,16 @@ public class Palaces
         Dictionary<int, int> freeSpace = new Dictionary<int, int>();
         if (bank4)
         {
-            freeSpace.Add(0x103EC, 148);
-            freeSpace.Add(0x10649, 226);
-            freeSpace.Add(0x10827, 89);
-            freeSpace.Add(0x10cb0, 1888);
+            freeSpace.Add(0x103EC, 147);
+            freeSpace.Add(0x10649, 225);
+            freeSpace.Add(0x10827, 88);
+            freeSpace.Add(0x10cb0, 1887);
             //Bugfix for tyvarius's seed with a scuffed P3 entrance. This was 1 byte too long, which caused the sideview data to overflow
             //into the palace set 2 sideview pointer data starting at 0x12010
             freeSpace.Add(0x11ef0, 287);
-            freeSpace.Add(0x12124, 79);
-            freeSpace.Add(0x1218b, 125);
-            freeSpace.Add(0x12304, 1548);
+            freeSpace.Add(0x12124, 78);
+            freeSpace.Add(0x1218b, 124);
+            freeSpace.Add(0x12304, 1547);
         }
         else
         {

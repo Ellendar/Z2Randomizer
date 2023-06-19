@@ -96,7 +96,7 @@ public class Requirements
         return sb.ToString();
     }
 
-    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables, IEnumerable<RequirementType> disallowedRequirements = null)
+    public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables)
     {
 
         bool individualRequirementsSatisfied = false;
@@ -112,7 +112,7 @@ public class Requirements
                 return false;
             }
         }
-        if(!individualRequirementsSatisfied)
+        if(IndividualRequirements.Length > 0 && !individualRequirementsSatisfied)
         {
             return false;
         }

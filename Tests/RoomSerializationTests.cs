@@ -50,16 +50,6 @@ public class RoomSerializationTests
         }
     }
 
-    [TestMethod] 
-    public void GenerateRoomsMD5()
-    {
-        string roomsJson = File.ReadAllText("PalaceRooms.json");
-
-        MD5 hasher = MD5.Create();
-        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
-        Debug.WriteLine(Convert.ToBase64String(hash));
-    }
-
     public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
         public bool Equals(byte[] x, byte[] y)

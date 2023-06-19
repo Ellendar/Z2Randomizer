@@ -51,27 +51,12 @@ public class Util
     }
     public static void Swap(Location p1, Location p2)
     {
-        int tempw = p1.World;
-        p1.World = p2.World;
-        p2.World = tempw;
+        (p2.World, p1.World) = (p1.World, p2.World);
+        (p2.Map, p1.Map) = (p1.Map, p2.Map);
+        (p2.PalNum, p1.PalNum) = (p1.PalNum, p2.PalNum);
 
-        tempw = p1.Map;
-        p1.Map = p2.Map;
-        p2.Map = tempw;
-
-        tempw = p1.PalNum;
-        p1.PalNum = p2.PalNum;
-        p2.PalNum = tempw;
-
-        Town tempTown = p1.TownNum;
-        p1.TownNum = p2.TownNum;
-        p2.TownNum = tempTown;
-
-        Item i = p1.item;
-        p1.item = p2.item;
-        p2.item = i;
-
-
+        (p2.TownNum, p1.TownNum) = (p1.TownNum, p2.TownNum);
+        (p2.Item, p1.Item) = (p1.Item, p2.Item);
     }
     public static string ByteArrayToHexString(byte[] bytes)
     {

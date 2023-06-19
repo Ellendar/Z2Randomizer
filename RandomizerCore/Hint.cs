@@ -25,7 +25,7 @@ public class Hint
 
     public void GenerateHelpfulHint(Location location)
     {
-        Item hintItem = location.item;
+        Item hintItem = location.Item;
         String hint = "";
         if (location.PalNum == 1)
         {

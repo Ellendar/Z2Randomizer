@@ -6,6 +6,7 @@ using System.Linq;
 using System.Speech.Synthesis;
 using System.Diagnostics;
 using System.Numerics;
+using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -729,10 +730,7 @@ public class Palace
             r.UpdateConnectionBytes();
             for (int i = 0; i < 4; i++)
             {
-                //if (r.Connections[i] < 0xFC)
-                //{
-                    ROMData.Put(r.ConnectionStartAddress + i, r.Connections[i]);
-                //}
+                ROMData.Put(r.ConnectionStartAddress + i, r.Connections[i]);
             }
         }
     }
@@ -1219,11 +1217,11 @@ public class Palace
         }
     }
 
-    public bool IsTraversable(IEnumerable<RequirementType> requireables, Item palaceItem)
+    public bool IsTraversable(IEnumerable<RequirementType> requireables, Location location)
     {
-        if(palaceItem == Item.GLOVE)
+        if(location.Item == Item.GLOVE)
         {
-            List<Room> pendingRooms = new List<Room>() { AllRooms.First(i => i.IsRoot) };
+            List<Room> pendingRooms = new List<Room>() { AllRooms.First(i => i.IsEntrance) };
             List<Room> coveredRooms = new List<Room>();
 
             while(pendingRooms.Count > 0)

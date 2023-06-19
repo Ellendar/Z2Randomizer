@@ -391,7 +391,7 @@ public abstract class World
             AllReached = true;
             foreach (Location location in AllLocations)
             {
-                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Item.DO_NOT_USE)
+                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.Item != Item.DO_NOT_USE)
                 {
                     if (!location.Reachable)
                     {

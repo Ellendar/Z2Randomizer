@@ -188,6 +188,7 @@ public class Room
     public string Name { get; set; }
     public string Group { get; set; }
     public bool Enabled { get; set; }
+    public bool IsEntrance { get; set; }
 
     public Room(
         int map,
@@ -202,6 +203,7 @@ public class Room
         int memAddr, 
         bool upDownRev, 
         bool dropZone,
+        bool isEntrance,
         Requirements requirements
         )
     {
@@ -242,6 +244,7 @@ public class Room
         //this.numExits = numExits;
         IsDeadEnd = numExits == 1;
         IsDropZone = dropZone;
+        IsEntrance = isEntrance;
         Requirements = requirements;
     }
 
@@ -260,9 +263,11 @@ public class Room
         HasBoss = roomData.hasBoss;
         HasDrop = roomData.hasDrop;
         ElevatorScreen = roomData.elevatorScreen;
-        ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+        //ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+        ConnectionStartAddress = roomData.memoryAddress;
         isUpDownReversed = roomData.isUpDownReversed;
         IsDropZone = roomData.isDropZone;
+        IsEntrance = roomData.isEntrance;
         Requirements = new Requirements(roomData.requirements.ToString());
 
         byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
@@ -550,6 +555,7 @@ public class Room
             ConnectionStartAddress, 
             isUpDownReversed, 
             IsDropZone,
+            IsEntrance,
             Requirements);
     }
 

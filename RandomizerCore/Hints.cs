@@ -373,7 +373,7 @@ public class Hints
         List<Item> it = new List<Item>();
         for (int i = 0; i < itemLocs.Count(); i++)
         {
-            it.Add(itemLocs[i].item);
+            it.Add(itemLocs[i].Item);
         }
 
         if (useSpellItemHints)
@@ -393,7 +393,7 @@ public class Hints
                 tries++;
             }
             int j = 0;
-            while (itemLocs[j].item != doThis)
+            while (itemLocs[j].Item != doThis)
             {
                 j++;
             }
@@ -434,19 +434,19 @@ public class Hints
 
         foreach (Location itemLocation in itemLocs)
         {
-            if (itemLocation.item == Item.TROPHY && !startsWithTrophy)
+            if (itemLocation.Item == Item.TROPHY && !startsWithTrophy)
             {
                 Hint trophyHint = new Hint();
                 trophyHint.GenerateHelpfulHint(itemLocation);
                 hints[trophyIndex] = trophyHint;
             }
-            else if (itemLocation.item == Item.MEDICINE && !startsWithMedicine)
+            else if (itemLocation.Item == Item.MEDICINE && !startsWithMedicine)
             {
                 Hint medHint = new Hint();
                 medHint.GenerateHelpfulHint(itemLocation);
                 hints[medIndex] = medHint;
             }
-            else if (itemLocation.item == Item.CHILD && !startsWithKid)
+            else if (itemLocation.Item == Item.CHILD && !startsWithKid)
             {
                 Hint kidHint = new Hint();
                 kidHint.GenerateHelpfulHint(itemLocation);
