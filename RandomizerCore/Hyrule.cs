@@ -442,7 +442,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.1.7" +
+            "4.2.0" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
