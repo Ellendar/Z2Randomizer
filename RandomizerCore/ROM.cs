@@ -776,19 +776,37 @@ public class ROM
          * return (60)
          */
 
-        Put(0x13ea9, new byte[] { 0x20, 0x40, 0xF3 });
-        Put(0x16373, new byte[] { 0x20, 0x40, 0xF3 });
-        Put(0x13230, new byte[] { 0x20, 0x40, 0xF3 });
+        // jsr $f340
+        var jsrF340 = new byte[] { 0x20, 0x40, 0xF3 };
+        Put(0x13ea9, jsrF340);
+        Put(0x16373, jsrF340);
+        Put(0x13230, jsrF340);
 
         if (!bossItem)
         {
-            Put(0x1e7b9, new byte[] { 0x20, 0x40, 0xF3 });
+            Put(0x1e7b9, jsrF340);
         }
         else
         {
-            Put(0x1e7b1, new byte[] { 0x20, 0x40, 0xF3 });
+            Put(0x1e7b1, jsrF340);
         }
 
+        /*
+         * Patched function at $f340
+         * lda #1
+         * eor $0728   ; _728_FreezeScrolling un freeze scrolling if frozen, otherwise freeze it.
+         * sta $0728   ; _728_FreezeScrolling
+         * lda #$13     ; check if the enemy id is 0x13
+         * cmp $a1     ; enemy slot "6" (index 0) current ID
+         * bne + ; * + 10
+         * lda #1      ; if it is equal, then flip $b6 (holds the enemy status?)
+         * eor $b6
+         * sta $b6
+         * lda #$a0    ; and set the enemy y position to 0xa0
+         * sta $2a
+         * +
+         * rts
+         */
         Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
     }
 
