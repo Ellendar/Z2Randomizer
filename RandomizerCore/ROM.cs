@@ -449,6 +449,14 @@ public class ROM
         Put(0xF75E, 0x00);
         Put(0xF625, 0x00);
         Put(0xF667, 0x00);
+
+        // Horsehead mini-boss despawn bug fix.
+        // For some reason in vanilla, killing horsehead also eliminates *ALL* loaded objects in the enemy slots
+        // This includes custom rando rooms with items like pbags that are loaded into enemy slots.
+        // The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
+        // as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
+        // keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5)
+        Put(0x13ec1, new byte[2] { 0xaa, 0xea, }); // tax nop
     }
 
     public void WriteKasutoJarAmount(int kasutoJars)
