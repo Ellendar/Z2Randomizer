@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.1.8 - June 28th 2023
+
+- Fixed an issue where sin wave head generators in palaces 3/4/6 under reconstructed palaces with vanilla enemies caused a lockup.
+
 ## Version 4.1.7 - June 17th 2023
 
 - Fixed an issue that could cause the first room of palace 3 to be corrupted.
