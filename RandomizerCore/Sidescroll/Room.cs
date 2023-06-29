@@ -323,6 +323,7 @@ public class Room
 
     public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle palaceStyle)
     {
+        byte[] enemiesToSave = NewEnemies[0] == 0 ? Enemies : NewEnemies;
         int enemyPtr = PalaceGroup switch
         {
             1 => Core.Enemies.Palace125EnemyPtr,
@@ -339,13 +340,13 @@ public class Room
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
 
-        if (NewEnemies.Length > 1 && PalaceGroup == 2)
+        if (enemiesToSave.Length > 1 && PalaceGroup == 2)
         {
-            for(int i = 2; i < NewEnemies.Length; i += 2)
+            for (int i = 2; i < enemiesToSave.Length; i += 2)
             {
-                if((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
+                if ((enemiesToSave[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
                 {
-                    NewEnemies[i] = (byte)(0x0F + (NewEnemies[i] & 0xC0));
+                    enemiesToSave[i] = (byte)(0x0F + (enemiesToSave[i] & 0xC0));
                 }
             }
         }
@@ -387,7 +388,7 @@ public class Room
         }
 
 
-        ROMData.Put(enemyAddr, NewEnemies[0] == 0 ? Enemies : NewEnemies);
+        ROMData.Put(enemyAddr, enemiesToSave);
     }
 
     public void UpdateBitmask(ROM ROMData)
