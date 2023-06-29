@@ -18,7 +18,7 @@ public class PalaceRooms
     private static Dictionary<string, List<Room>> roomsByGroup = new Dictionary<string, List<Room>>();
     private static Dictionary<string, List<Room>> customRoomsByGroup = new Dictionary<string, List<Room>>();
 
-    public static readonly string roomsMD5 = "w4gTeHolGtlk/WOSiPtpoA==";
+    public static readonly string roomsMD5 = "XRi6FuGgVYR8xTkiC+u+Vw==";
 
     static PalaceRooms()
     {
@@ -81,50 +81,6 @@ public class PalaceRooms
         7 => customRooms ? customRoomsByGroup["palace7vanilla"] : roomsByGroup["palace7vanilla"],
         _ => throw new ArgumentException("Invalid palace number: " + palaceNum)
     };
-    /*
-    //public static List<List<Room>> PalacesByNumber = new List<List<Room>> { };
-    private static Room Thunderbird { get { return roomsByGroup["thunderbird"].First(); } }
-    private static List<Room> TBirdRooms { get { return roomsByGroup["tbirdRooms"]; } }
-    private static List<Room> BossRooms { get { return roomsByGroup["bossrooms"]; } }
-    private static List<Room> ItemRooms { get { return roomsByGroup["itemRooms"]; } }
-    private static List<Room> Entrances { get { return roomsByGroup["entrances"]; } }
-    private static Room MaxBonusItemRoom { get { return roomsByGroup["maxBonusItemRoom"].First(); } }
-    private static List<Room> AaronRoomJam { get { return roomsByGroup["aaronRoomJam"]; } }
-    private static List<Room> BenthicKing { get { return roomsByGroup["benthicKing"]; } }
-    private static List<Room> DMInPalaces { get { return roomsByGroup["dmInPalaces"]; } }
-    private static List<Room> DusterRoomJam { get { return roomsByGroup["dusterRoomJam"]; } }
-    private static List<Room> EasternShadow { get { return roomsByGroup["easternShadow"]; } }
-    private static List<Room> EonRoomJam { get { return roomsByGroup["eonRoomjam"]; } }
-    private static List<Room> EunosGpRooms { get { return roomsByGroup["eunosGpRooms"]; } }
-    private static List<Room> EunosRooms { get { return roomsByGroup["eunosRooms"]; } }
-    private static List<Room> FlippedGP { get { return roomsByGroup["flippedGp"]; } }
-    private static List<Room> GTMNewGpRooms { get { return roomsByGroup["gtmNewgpRooms"]; } }
-    private static List<Room> KnightcrawlerRoomJam { get { return roomsByGroup["knightCrawlerRoomJam"]; } }
-    private static List<Room> Link7777RoomJam { get { return roomsByGroup["link7777RoomJam"]; } }
-    private static List<Room> MaxRoomJam { get { return roomsByGroup["maxRoomJam"]; } }
-    private static List<Room> Palace1Vanilla { get { return roomsByGroup["palace1vanilla"]; } }
-    private static List<Room> Palace2Vanilla { get { return roomsByGroup["palace2vanilla"]; } }
-    private static List<Room> Palace3Vanilla { get { return roomsByGroup["palace3vanilla"]; } }
-    private static List<Room> Palace4Vanilla { get { return roomsByGroup["palace4vanilla"]; } }
-    private static List<Room> Palace5Vanilla { get { return roomsByGroup["palace5vanilla"]; } }
-    private static List<Room> Palace6Vanilla { get { return roomsByGroup["palace6vanilla"]; } }
-    private static List<Room> Palace7Vanilla { get { return roomsByGroup["palace7vanilla"]; } }
-    private static List<Room> RoomJamGTM { get { return roomsByGroup["roomJamGTM"]; } }
-    private static List<Room> TriforceOfCourage { get { return roomsByGroup["triforceOfCourage"]; } }
-    private static List<Room> TriforceOfCourageGP { get { return roomsByGroup["triforceOfCourageGP"]; } }
-    private static List<Room> WinterSolstice { get { return roomsByGroup["winterSolstice"]; } }
-    private static List<Room> WinterSolsticeGP { get { return roomsByGroup["winterSolsticeGP"]; } }
-    private static List<Room> GTMOldGPRooms { get { return roomsByGroup["gtmOldgpRooms"]; } }
-    private static List<Room> NewP6BossRooms { get { return roomsByGroup["newp6BossRooms"]; } }
-    private static List<Room> NewBossRooms { get { return roomsByGroup["newbossrooms"]; } }
-    private static List<Room> LeftOpenItemRooms { get { return roomsByGroup["leftOpenItemRooms"]; } }
-    private static List<Room> RightOpenItemRooms { get { return roomsByGroup["rightOpenItemRooms"]; } }
-    private static List<Room> UpOpenItemRooms { get { return roomsByGroup["upOpenItemRooms"]; } }
-    private static List<Room> DownOpenItemRooms { get { return roomsByGroup["downOpenItemRooms"]; } }
-    private static List<Room> ThroughItemRooms { get { return roomsByGroup["throughItemRooms"]; } }
-    private static List<Room> DarkLinkRooms { get { return roomsByGroup["darkLinkRooms"]; } }
-    */
- 
 
     public static Room Thunderbird(bool useCustomRooms)
     { 

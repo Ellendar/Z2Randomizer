@@ -391,7 +391,7 @@ public abstract class World
             AllReached = true;
             foreach (Location location in AllLocations)
             {
-                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.item != Item.DO_NOT_USE)
+                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.Item != Item.DO_NOT_USE)
                 {
                     if (!location.Reachable)
                     {
@@ -525,7 +525,7 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || location.TownNum != Town.NEW_KASUTO_2) //don't place newkasuto2
+                else if (location.TerrainType != Terrain.TOWN || location.TownNum != Town.SPELL_TOWER) //don't place newkasuto2
                 {
                     Terrain t = Terrain.NONE;
                     do

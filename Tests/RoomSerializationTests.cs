@@ -12,9 +12,21 @@ namespace Z2Randomizer.Tests;
 public class RoomSerializationTests
 {
     [TestMethod]
-    public void TestDeserialization()
+    public void TestSerialization()
     {
         string roomJson = "{\"name\": \"testName\", \"enabled\": true, \"group\": \"palace1vanilla\", \"map\": 4, \"connections\": \"0F000214\", \"enemies\": \"050F0B00CB\", \"sideviewData\": \"3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E\", \"bitmask\": \"0F\", \"isFairyBlocked\": false, \"isGloveBlocked\": false, \"isDownstabBlocked\": false, \"isUpstabBlocked\": false, \"isJumpBlocked\": false, \"hasItem\": false, \"hasBoss\": false, \"hasDrop\": false, \"elevatorScreen\": 2, \"memoryAddress\": \"01073B\", \"isUpDownReversed\": false, \"isDropZone\": false}";
+
+        Room room = new Room(roomJson);
+        String serialized = room.Serialize();
+        Debug.WriteLine(serialized);
+        room = new Room(serialized);
+    }
+
+    [TestMethod]
+    public void TestDeserialization()
+    {
+        //string roomJson = "{\"name\": \"testName\", \"enabled\": true, \"group\": \"palace1vanilla\", \"map\": 4, \"connections\": \"0F000214\", \"enemies\": \"050F0B00CB\", \"sideviewData\": \"3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E\", \"bitmask\": \"0F\", \"isFairyBlocked\": false, \"isGloveBlocked\": false, \"isDownstabBlocked\": false, \"isUpstabBlocked\": false, \"isJumpBlocked\": false, \"hasItem\": false, \"hasBoss\": false, \"hasDrop\": false, \"elevatorScreen\": 2, \"memoryAddress\": \"01073B\", \"isUpDownReversed\": false, \"isDropZone\": false}";
+        string roomJson = @"{""name"": ""testName""}";
 
         Room room = new Room(roomJson);
         Assert.AreEqual("testName", room.Name);
@@ -38,16 +50,6 @@ public class RoomSerializationTests
         }
     }
 
-    [TestMethod] 
-    public void GenerateRoomsMD5()
-    {
-        string roomsJson = File.ReadAllText("PalaceRooms.json");
-
-        MD5 hasher = MD5.Create();
-        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
-        Debug.WriteLine(Convert.ToBase64String(hash));
-    }
-
     public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
         public bool Equals(byte[] x, byte[] y)
@@ -66,14 +68,14 @@ public class RoomSerializationTests
             return true;
         }
 
-        public int GetHashCode(byte[] obj)
+        public int GetHashCode(byte[] room)
         {
             int result = 17;
-            for (int i = 0; i < obj.Length; i++)
+            for (int i = 0; i < room.Length; i++)
             {
                 unchecked
                 {
-                    result = result * 23 + obj[i];
+                    result = result * 23 + room[i];
                 }
             }
             return result;

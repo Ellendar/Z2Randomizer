@@ -20,9 +20,9 @@ public class WestHyrule : World
     public Location jump;
     public Location medCave;
     public Location trophyCave;
-    public Location palace1;
-    public Location palace2;
-    public Location palace3;
+    public Location locationAtPalace1;
+    public Location locationAtPalace2;
+    public Location locationAtPalace3;
     public Location jar;
     public Location heart1;
     public Location heart2;
@@ -122,12 +122,12 @@ public class WestHyrule : World
         lifeSouth.NeedBagu = true;
         trophyCave = GetLocationByMap(0xE1, 0);
         raft = GetLocationByMem(0x4658);
-        palace1 = GetLocationByMem(0x4663);
-        palace1.PalNum = 1;
-        palace2 = GetLocationByMem(0x4664);
-        palace2.PalNum = 2;
-        palace3 = GetLocationByMem(0x4665);
-        palace3.PalNum = 3;
+        locationAtPalace1 = GetLocationByMem(0x4663);
+        locationAtPalace1.PalNum = 1;
+        locationAtPalace2 = GetLocationByMem(0x4664);
+        locationAtPalace2.PalNum = 2;
+        locationAtPalace3 = GetLocationByMem(0x4665);
+        locationAtPalace3.PalNum = 3;
         jar = GetLocationByMem(0x4632);
         heart1 = GetLocationByMem(0x463F);
         heart2 = GetLocationByMem(0x4634);
@@ -476,7 +476,7 @@ public class WestHyrule : World
                     case Biome.CALDERA:
                         this.isHorizontal = hyrule.RNG.NextDouble() > .5;
                         DrawCenterMountain();
-                        palace3.CanShuffle = false;
+                        locationAtPalace3.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
                         randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                         break;
@@ -1081,8 +1081,8 @@ public class WestHyrule : World
                     palacex += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                palace3.Ypos = palacey + 30;
-                palace3.Xpos = palacex;
+                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Xpos = palacex;
                 map[palacey, palacex + delta] = Terrain.MOUNTAIN;
 
             }
@@ -1101,8 +1101,8 @@ public class WestHyrule : World
                     palacey += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                palace3.Ypos = palacey + 30;
-                palace3.Xpos = palacex;
+                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Xpos = palacex;
                 map[palacey + delta, palacex] = Terrain.MOUNTAIN;
 
             }
@@ -1147,8 +1147,8 @@ public class WestHyrule : World
                     palacey += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                palace3.Ypos = palacey + 30;
-                palace3.Xpos = palacex;
+                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Xpos = palacex;
                 map[palacey + delta, palacex] = Terrain.MOUNTAIN;
 
 
@@ -1168,8 +1168,8 @@ public class WestHyrule : World
                     palacex += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                palace3.Ypos = palacey + 30;
-                palace3.Xpos = palacex;
+                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Xpos = palacex;
                 map[palacey, palacex + delta] = Terrain.MOUNTAIN;
 
             }

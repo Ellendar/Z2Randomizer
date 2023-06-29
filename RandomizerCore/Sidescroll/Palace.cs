@@ -6,6 +6,7 @@ using System.Linq;
 using System.Speech.Synthesis;
 using System.Diagnostics;
 using System.Numerics;
+using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -32,12 +33,6 @@ public class Palace
     private int numRooms;
     private int baseAddr;
     private int connAddr;
-    private bool needJumpOrFairy;
-    private bool needFairy;
-    private bool needGlove;
-    private bool needDstab;
-    private bool needUstab;
-    private bool needReflect;
     private List<Room> openRooms;
     private int maxRooms;
     private int netDeadEnds;
@@ -45,21 +40,14 @@ public class Palace
 
     internal List<Room> AllRooms { get; private set; }
 
-    public bool NeedJumpOrFairy { get => needJumpOrFairy; set => needJumpOrFairy = value; }
-    public bool NeedFairy { get => needFairy; set => needFairy = value; }
-    public bool NeedGlove { get => needGlove; set => needGlove = value; }
-    public bool NeedDstab { get => needDstab; set => needDstab = value; }
     public Room Root { get => root; set => root = value; }
     public Room ItemRoom { get => itemRoom; set => itemRoom = value; }
     public Room BossRoom { get => bossRoom; set => bossRoom = value; }
-    public bool NeedUstab { get => needUstab; set => needUstab = value; }
     public int NumRooms { get => numRooms; set => numRooms = value; }
     public int MaxRooms { get => maxRooms; set => maxRooms = value; }
     public int Number { get; set; }
     internal Room Tbird { get => tbird; set => tbird = value; }
-    public bool NeedReflect { get => needReflect; set => needReflect = value; }
     
-
     //DEBUG
     public int Generations { get; set; }
 
@@ -81,10 +69,6 @@ public class Palace
         this.baseAddr = baseAddr;
         this.connAddr = connAddr;
         //this.ROMData = ROMData;
-        needDstab = false;
-        needFairy = false;
-        needGlove = false;
-        needJumpOrFairy = false;
         openRooms = new List<Room>();
         this.useCustomRooms = useCustomRooms;
         //dumpMaps();
@@ -160,39 +144,8 @@ public class Palace
     {
         return openRooms.Count;
     }
-    public void UpdateBlocks()
-    {
-        List<Room> itemPath = CheckBlocks();
-        foreach (Room r in itemPath)
-        {
-            if (Number == 4 && r == BossRoom)
-            {
-                this.NeedReflect = true;
-            }
-            if (r.IsFairyBlocked)
-            {
-                this.needFairy = true;
-            }
-            if (r.IsDownstabBlocked)
-            {
-                this.needDstab = true;
-            }
-            if (r.IsUpstabBlocked)
-            {
-                this.needUstab = true;
-            }
-            if (r.IsJumpBlocked)
-            {
-                this.needJumpOrFairy = true;
-            }
-            if (r.IsGloveBlocked)
-            {
-                this.needGlove = true;
-            }
-        }
-    }
 
-    public bool AddRoom(Room r, bool blocker)
+    public bool AddRoom(Room r, bool blockersAnywhere)
     {
         bool placed = false;
         r.PalaceGroup = GetPalaceGroup();
@@ -207,9 +160,17 @@ public class Palace
             return false;
         }
 
-        if (!AppropriateBlocker(r, blocker))
+        if(!blockersAnywhere)
         {
-            return false;
+            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[Number-1];
+            if(!r.IsTraversable(allowedBlockers))
+            {
+                return false;
+            }
+            if ((Number == 1 || Number == 2 || Number == 5 || Number == 7) && r.HasBoss)
+            {
+                return false;
+            }
         }
 
         if (openRooms.Count == 0)
@@ -301,86 +262,6 @@ public class Palace
                 }
             }
         }
-    }
-
-    private bool AppropriateBlocker(Room r, bool blockers)
-    {
-        if (!blockers)
-        {
-            if (Number == 1)
-            {
-                if (r.IsFairyBlocked 
-                    || r.IsDownstabBlocked 
-                    || r.IsUpstabBlocked 
-                    || r.IsJumpBlocked 
-                    || r.IsGloveBlocked 
-                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)) 
-                    || r.HasBoss)
-                {
-                    return false;
-                }
-            }
-
-            if (Number == 2)
-            {
-                if (r.IsFairyBlocked 
-                    || r.IsDownstabBlocked 
-                    || r.IsUpstabBlocked
-                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
-                    || r.HasBoss)
-                {
-                    return false;
-                }
-            }
-
-            if (Number == 3)
-            {
-                if (r.IsJumpBlocked 
-                    || r.IsFairyBlocked
-                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)))
-                {
-                    return false;
-                }
-            }
-
-            if (Number == 4)
-            {
-                if (r.IsGloveBlocked 
-                    || r.IsUpstabBlocked 
-                    || r.IsDownstabBlocked)
-                {
-                    return false;
-                }
-            }
-
-            if (Number == 5)
-            {
-                if (r.IsGloveBlocked 
-                    || r.IsUpstabBlocked 
-                    || r.IsDownstabBlocked
-                    || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
-                    || r.HasBoss)
-                {
-                    return false;
-                }
-            }
-
-            if (Number == 6)
-            {
-                if (r.IsUpstabBlocked || r.IsDownstabBlocked)
-                {
-                    return false;
-                }
-            }
-        }
-        else
-        {
-            if ((Number == 1 || Number == 2 || Number == 5 || Number == 7) && r.HasBoss)
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     /// <summary>
@@ -849,10 +730,7 @@ public class Palace
             r.UpdateConnectionBytes();
             for (int i = 0; i < 4; i++)
             {
-                //if (r.Connections[i] < 0xFC)
-                //{
-                    ROMData.Put(r.ConnectionStartAddress + i, r.Connections[i]);
-                //}
+                ROMData.Put(r.ConnectionStartAddress + i, r.Connections[i]);
             }
         }
     }
@@ -1337,6 +1215,45 @@ public class Palace
                 }
             }
         }
+    }
+
+    public bool IsTraversable(IEnumerable<RequirementType> requireables, Location location)
+    {
+        if(location.Item == Item.GLOVE)
+        {
+            List<Room> pendingRooms = new List<Room>() { AllRooms.First(i => i.IsEntrance) };
+            List<Room> coveredRooms = new List<Room>();
+
+            while(pendingRooms.Count > 0)
+            {
+                Room room = pendingRooms.First();
+                if(room == ItemRoom)
+                {
+                    requireables = new List<RequirementType>(requireables).ToList();
+                    ((List<RequirementType>)requireables).Add(RequirementType.GLOVE);
+                    break;
+                }
+                coveredRooms.Add(room);
+                pendingRooms.Remove(room);
+                if(room.Left != null && room.Left.IsTraversable(requireables) && !coveredRooms.Contains(room.Left))
+                {
+                    pendingRooms.Add(room.Left);
+                }
+                if (room.Right != null && room.Right.IsTraversable(requireables) && !coveredRooms.Contains(room.Right))
+                {
+                    pendingRooms.Add(room.Right);
+                }
+                if (room.Up != null && room.Up.IsTraversable(requireables) && !coveredRooms.Contains(room.Up))
+                {
+                    pendingRooms.Add(room.Up);
+                }
+                if (room.Down != null && room.Down.IsTraversable(requireables) && !coveredRooms.Contains(room.Down))
+                {
+                    pendingRooms.Add(room.Down);
+                }
+            }
+        }
+        return AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
     }
 
     public int GetPalaceGroup()

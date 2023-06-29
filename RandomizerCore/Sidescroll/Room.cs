@@ -11,6 +11,10 @@ using System.Speech.Synthesis;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Drawing;
+using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -36,7 +40,7 @@ public class Room
     //private int memAddr;
     //private bool isDeadEnd;
     //private bool isPlaced;
-    private bool isUpDownReversed;
+    public bool isUpDownReversed;
     //private bool fairyBlocked;
     //private bool upstabBlocked;
     //private bool downstabBlocked;
@@ -62,7 +66,7 @@ public class Room
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
-    private byte bitmask;
+    public byte bitmask;
 
     public int Map { get; set; }
     public int PalaceGroup { get; set; }
@@ -167,11 +171,13 @@ public class Room
 
     public bool HasDrop { get; set; }
     public int ElevatorScreen { get; set; }
-    public bool IsFairyBlocked { get; set; }
-    public bool IsUpstabBlocked { get; set; }
-    public bool IsDownstabBlocked { get; set; }
-    public bool IsGloveBlocked { get; set; }
-    public bool IsJumpBlocked { get; set; }
+    //public bool IsFairyBlocked { get; set; }
+    //public bool IsUpstabBlocked { get; set; }
+    //public bool IsDownstabBlocked { get; set; }
+    //public bool IsGloveBlocked { get; set; }
+    //public bool IsJumpBlocked { get; set; }
+    [JsonConverter(typeof(RequirementsJsonConverter))]
+    public Requirements Requirements { get; set; }
     public bool IsDropZone { get; set; }
     public bool HasItem { get; set; }
     public byte[] Enemies { get; set; }
@@ -182,6 +188,7 @@ public class Room
     public string Name { get; set; }
     public string Group { get; set; }
     public bool Enabled { get; set; }
+    public bool IsEntrance { get; set; }
 
     public Room(
         int map,
@@ -189,29 +196,22 @@ public class Room
         byte[] enemies, 
         byte[] sideview, 
         byte bitmask, 
-        bool fairyBlocked, 
-        bool gloveBlocked, 
-        bool downstabBlocked, 
-        bool upstabBlocked, 
-        bool jumpBlocked, 
         bool hasItem, 
         bool hasBoss, 
         bool hasDrop, 
         int elevatorScreen, 
         int memAddr, 
         bool upDownRev, 
-        bool dropZone)
+        bool dropZone,
+        bool isEntrance,
+        Requirements requirements
+        )
     {
         Map = map;
         Connections = conn;
         Enemies = enemies;
         NewEnemies = new byte[enemies.Length];
         SideView = sideview;
-        IsGloveBlocked = gloveBlocked;
-        IsDownstabBlocked = downstabBlocked;
-        IsUpstabBlocked = upstabBlocked;
-        IsFairyBlocked = fairyBlocked;
-        IsJumpBlocked = jumpBlocked;
         HasBoss = hasBoss;
         HasItem = hasItem;
         LeftByte = conn[0];
@@ -244,6 +244,8 @@ public class Room
         //this.numExits = numExits;
         IsDeadEnd = numExits == 1;
         IsDropZone = dropZone;
+        IsEntrance = isEntrance;
+        Requirements = requirements;
     }
 
     public Room(string json)
@@ -257,18 +259,16 @@ public class Room
         Enemies = Convert.FromHexString(roomData.enemies.ToString());
         SideView = Convert.FromHexString(roomData.sideviewData.ToString());
         bitmask = Convert.FromHexString(roomData.bitmask.ToString())[0];
-        IsFairyBlocked = roomData.isFairyBlocked;
-        IsGloveBlocked = roomData.isGloveBlocked;
-        IsDownstabBlocked = roomData.isDownstabBlocked;
-        IsUpstabBlocked = roomData.isUpstabBlocked;
-        IsJumpBlocked = roomData.isJumpBlocked;
         HasItem = roomData.hasItem;
         HasBoss = roomData.hasBoss;
         HasDrop = roomData.hasDrop;
         ElevatorScreen = roomData.elevatorScreen;
-        ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+        //ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+        ConnectionStartAddress = roomData.memoryAddress;
         isUpDownReversed = roomData.isUpDownReversed;
         IsDropZone = roomData.isDropZone;
+        IsEntrance = roomData.isEntrance;
+        Requirements = new Requirements(roomData.requirements.ToString());
 
         byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
         if(SideView.Length != length)
@@ -279,29 +279,7 @@ public class Room
 
     public string Serialize()
     {
-        dynamic result = new ExpandoObject();
-        result.name = Name;
-        result.group = Group;
-        result.map = Map;
-        result.enabled = Enabled;
-        result.connections = BitConverter.ToString(Connections).Replace("-", "");
-        result.enemies = BitConverter.ToString(Enemies).Replace("-", "");
-        result.sideviewData = BitConverter.ToString(SideView).Replace("-", "");
-        result.bitmask = BitConverter.ToString(new Byte[] { bitmask }).Replace("-", "");
-        result.isFairyBlocked = IsFairyBlocked;
-        result.isGloveBlocked = IsGloveBlocked;
-        result.isDownstabBlocked = IsDownstabBlocked;
-        result.isUpstabBlocked = IsUpstabBlocked;
-        result.isJumpBlocked = IsJumpBlocked;
-        result.hasItem = HasItem;
-        result.hasBoss = HasBoss;
-        result.hasDrop = HasDrop;
-        result.elevatorScreen = ElevatorScreen;
-        result.MemAddr = ConnectionStartAddress;
-        result.isUpDownReversed = isUpDownReversed;
-        result.IsDropZone = IsDropZone;
-
-        return System.Text.Json.JsonSerializer.Serialize(result);
+        return JsonConvert.SerializeObject(this, Formatting.None, new RoomJsonConverter());
     }
 
     public void UpdateConnectionBytes()
@@ -345,6 +323,7 @@ public class Room
 
     public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle palaceStyle)
     {
+        byte[] enemiesToSave = NewEnemies[0] == 0 ? Enemies : NewEnemies;
         int enemyPtr = PalaceGroup switch
         {
             1 => Core.Enemies.Palace125EnemyPtr,
@@ -361,13 +340,13 @@ public class Room
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
 
-        if (NewEnemies.Length > 1 && PalaceGroup == 2)
+        if (enemiesToSave.Length > 1 && PalaceGroup == 2)
         {
-            for(int i = 2; i < NewEnemies.Length; i += 2)
+            for (int i = 2; i < enemiesToSave.Length; i += 2)
             {
-                if((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
+                if ((enemiesToSave[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
                 {
-                    NewEnemies[i] = (byte)(0x0F + (NewEnemies[i] & 0xC0));
+                    enemiesToSave[i] = (byte)(0x0F + (enemiesToSave[i] & 0xC0));
                 }
             }
         }
@@ -409,7 +388,7 @@ public class Room
         }
 
 
-        ROMData.Put(enemyAddr, NewEnemies[0] == 0 ? Enemies : NewEnemies);
+        ROMData.Put(enemyAddr, enemiesToSave);
     }
 
     public void UpdateBitmask(ROM ROMData)
@@ -570,18 +549,15 @@ public class Room
             (byte[])Enemies.Clone(), 
             (byte[])SideView.Clone(), 
             bitmask, 
-            IsFairyBlocked, 
-            IsGloveBlocked, 
-            IsDownstabBlocked, 
-            IsUpstabBlocked, 
-            IsJumpBlocked, 
             HasItem, 
             HasBoss, 
             HasDrop, 
             ElevatorScreen, 
             ConnectionStartAddress, 
             isUpDownReversed, 
-            IsDropZone);
+            IsDropZone,
+            IsEntrance,
+            Requirements);
     }
 
     public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)
@@ -761,4 +737,144 @@ public class Room
         return sb.ToString();
     }
 
+    /*
+    private bool IsAppropriateBlocker(int palaceNumber)
+    {
+        if (Number == 1)
+        {
+            if (r.IsFairyBlocked
+                || r.IsDownstabBlocked
+                || r.IsUpstabBlocked
+                || r.IsJumpBlocked
+                || r.IsGloveBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                || r.HasBoss)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 2)
+        {
+            if (r.IsFairyBlocked
+                || r.IsDownstabBlocked
+                || r.IsUpstabBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                || r.HasBoss)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 3)
+        {
+            if (r.IsJumpBlocked
+                || r.IsFairyBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)))
+            {
+                return false;
+            }
+        }
+
+        if (Number == 4)
+        {
+            if (r.IsGloveBlocked
+                || r.IsUpstabBlocked
+                || r.IsDownstabBlocked)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 5)
+        {
+            if (r.IsGloveBlocked
+                || r.IsUpstabBlocked
+                || r.IsDownstabBlocked
+                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
+                || r.HasBoss)
+            {
+                return false;
+            }
+        }
+
+        if (Number == 6)
+        {
+            if (r.IsUpstabBlocked || r.IsDownstabBlocked)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    */
+
+    public bool IsTraversable(IEnumerable<RequirementType> requireables)
+    {
+        return Requirements.AreSatisfiedBy(requireables);
+    }
+}
+
+public class RoomJsonConverter : JsonConverter<Room>
+{
+    public override Room ReadJson(JsonReader reader, Type objectType, Room existingValue, bool hasExistingValue, JsonSerializer serializer)
+    {
+        //Eventually i'll replace the hacky custom serialization in the Room(string json) constructor. That day is not now.
+        throw new NotImplementedException();
+    }
+
+    public override void WriteJson(JsonWriter writer, Room value, JsonSerializer serializer)
+    {
+        writer.WriteStartObject();
+
+        writer.WritePropertyName("name");
+        writer.WriteValue(value.Name);
+
+        writer.WritePropertyName("group");
+        writer.WriteValue(value.Group);
+
+        writer.WritePropertyName("map");
+        writer.WriteValue(value.Map);
+
+        writer.WritePropertyName("enabled");
+        writer.WriteValue(value.Enabled);
+
+        writer.WritePropertyName("connections");
+        writer.WriteValue(BitConverter.ToString(value.Connections).Replace("-", ""));
+
+        writer.WritePropertyName("enemies");
+        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
+
+        writer.WritePropertyName("sideviewData");
+        writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
+
+        writer.WritePropertyName("bitmask");
+        writer.WriteValue(BitConverter.ToString(new Byte[] { value.bitmask }).Replace("-", ""));
+
+        writer.WritePropertyName("requirements");
+        writer.WriteRawValue(value.Requirements.Serialize());
+
+        writer.WritePropertyName("hasItem");
+        writer.WriteValue(value.HasItem);
+
+        writer.WritePropertyName("hasBoss");
+        writer.WriteValue(value.HasBoss);
+
+        writer.WritePropertyName("hasDrop");
+        writer.WriteValue(value.HasDrop);
+
+        writer.WritePropertyName("elevatorScreen");
+        writer.WriteValue(value.ElevatorScreen); ;
+
+        writer.WritePropertyName("memoryAddress");
+        writer.WriteValue(value.ConnectionStartAddress);
+
+        writer.WritePropertyName("isUpDownReversed");
+        writer.WriteValue(value.isUpDownReversed);
+
+        writer.WritePropertyName("isDropZone");
+        writer.WriteValue(value.IsDropZone);
+
+        writer.WriteEndObject();
+    }
 }

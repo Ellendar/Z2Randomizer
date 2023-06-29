@@ -11,7 +11,7 @@ public class Location
     Logger logger = LogManager.GetCurrentClassLogger();
     private int appear2loweruponexit;
     private Tuple<int, int> coords;
-    public Item item;
+    public Item Item { get; set; }
     public bool itemGet;
 
     public Terrain TerrainType { get; set; }
@@ -116,7 +116,7 @@ public class Location
         TerrainType = t;
         MemAddress = mem;
         CanShuffle = true;
-        item = Item.DO_NOT_USE;
+        Item = Item.DO_NOT_USE;
         itemGet = false;
         Reachable = false;
         PalNum = 0;

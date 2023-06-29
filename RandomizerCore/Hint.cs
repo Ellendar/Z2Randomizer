@@ -22,10 +22,14 @@ public class Hint
     {
         this.text = text;
     }
+    public Hint(String text)
+    {
+        this.text = Util.ToGameText(text, true);
+    }
 
     public void GenerateHelpfulHint(Location location)
     {
-        Item hintItem = location.item;
+        Item hintItem = location.Item;
         String hint = "";
         if (location.PalNum == 1)
         {
@@ -130,48 +134,6 @@ public class Hint
         }
 
         text = Util.ToGameText(hint, true).ToList();
-    }
-
-    public void GenerateTownHint(Spell spell, bool useDash)
-    {
-        String text = "";
-        switch(spell)
-        {
-            case Spell.SHIELD:
-                text += "shield$";
-                break;
-            case Spell.JUMP:
-                text += "jump";
-                break;
-            case Spell.LIFE:
-                text += "life$";
-                break;
-            case Spell.FAIRY:
-                text += "fairy$";
-                break;
-            case Spell.FIRE:
-                if (useDash)
-                { 
-                    text += "dash$";
-                }
-                else
-                {
-                    text += "fire$";
-                }
-                break;
-            case Spell.REFLECT:
-                text += "reflect$";
-                break;
-            case Spell.SPELL:
-                text += "spell$";
-                break;
-            case Spell.THUNDER:
-                text += "thunder$";
-                break;
-
-        }
-        text += "town";
-        this.text = Util.ToGameText(text, true);
     }
 
 }

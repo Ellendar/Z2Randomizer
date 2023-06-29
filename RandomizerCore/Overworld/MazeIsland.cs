@@ -33,7 +33,7 @@ class MazeIsland : World
 
     public Location kid;
     public Location magic;
-    public Location palace4;
+    public Location locationAtPalace4;
 
     private const int MAP_ADDR = 0xba00;
 
@@ -58,9 +58,9 @@ class MazeIsland : World
 
         kid = GetLocationByMem(0xA143);
         magic = GetLocationByMem(0xA133);
-        palace4 = GetLocationByMem(0xA140);
-        palace4.PalNum = 4;
-        palace4.World = palace4.World | 0x03;
+        locationAtPalace4 = GetLocationByMem(0xA140);
+        locationAtPalace4.PalNum = 4;
+        locationAtPalace4.World = locationAtPalace4.World | 0x03;
         MAP_ROWS = 23;
         MAP_COLS = 23;
 
@@ -288,8 +288,8 @@ class MazeIsland : World
                         }
                     }
                 }
-                palace4.Xpos = p4x;
-                palace4.Ypos = p4y + 30;
+                locationAtPalace4.Xpos = p4x;
+                locationAtPalace4.Ypos = p4y + 30;
                 map[p4y, p4x] = Terrain.PALACE;
                 map[p4y + 1, p4x] = Terrain.ROAD;
                 map[p4y - 1, p4x] = Terrain.ROAD;

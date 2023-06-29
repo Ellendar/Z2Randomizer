@@ -60,8 +60,8 @@ public class EastHyrule : World
 
     };
 
-    public Location palace5;
-    public Location palace6;
+    public Location locationAtPalace5;
+    public Location locationAtPalace6;
     public Location waterTile;
     public Location desertTile;
     public Location darunia;
@@ -69,7 +69,7 @@ public class EastHyrule : World
     public Location newKasuto2;
     public Location nabooru;
     public Location oldKasuto;
-    public Location gp;
+    public Location locationAtGP;
     public Location pbagCave1;
     public Location pbagCave2;
     public Location hiddenPalaceCallSpot;
@@ -111,11 +111,11 @@ public class EastHyrule : World
         connections.Add(GetLocationByMem(0x8642), GetLocationByMem(0x8643));
         connections.Add(GetLocationByMem(0x8643), GetLocationByMem(0x8642));
 
-        palace6 = GetLocationByMem(0x8664);
-        palace6.PalNum = 6;
+        locationAtPalace6 = GetLocationByMem(0x8664);
+        locationAtPalace6.PalNum = 6;
         darunia = GetLocationByMem(0x865E);
-        palace5 = GetLocationByMap(0x23, 0x0E);
-        palace5.PalNum = 5;
+        locationAtPalace5 = GetLocationByMap(0x23, 0x0E);
+        locationAtPalace5.PalNum = 5;
 
         newKasuto = GetLocationByMem(0x8660);
         newKasuto2 = new Location(newKasuto.LocationBytes, newKasuto.TerrainType, newKasuto.MemAddress, Continent.EAST);
@@ -123,10 +123,10 @@ public class EastHyrule : World
         waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
 
-        if (palace5 == null)
+        if (locationAtPalace5 == null)
         {
-            palace5 = GetLocationByMem(0x8657);
-            palace5.PalNum = 5;
+            locationAtPalace5 = GetLocationByMem(0x8657);
+            locationAtPalace5.PalNum = 5;
         }
 
         hiddenPalaceCallSpot = new Location();
@@ -142,9 +142,9 @@ public class EastHyrule : World
         enemyPtr = 0x85B1;
         nabooru = GetLocationByMem(0x865C);
         oldKasuto = GetLocationByMem(0x8662);
-        gp = GetLocationByMem(0x8665);
-        gp.PalNum = 7;
-        gp.item = Item.DO_NOT_USE;
+        locationAtGP = GetLocationByMem(0x8665);
+        locationAtGP.PalNum = 7;
+        locationAtGP.Item = Item.DO_NOT_USE;
         pbagCave1 = GetLocationByMem(0x863C);
         pbagCave2 = GetLocationByMem(0x863D);
         VANILLA_MAP_ADDR = 0x9056;
@@ -231,8 +231,8 @@ public class EastHyrule : World
         { Tuple.Create(0x49, 0x04), "gp" }
     };
         newKasuto.ExternalWorld = 128;
-        palace6.ExternalWorld = 128;
-        hiddenPalaceLocation = palace6;
+        locationAtPalace6.ExternalWorld = 128;
+        hiddenPalaceLocation = locationAtPalace6;
         hiddenKasutoLocation = newKasuto;
     }
 
@@ -299,7 +299,7 @@ public class EastHyrule : World
                 if(!hyrule.Props.ShuffleHidden)
                 {
                     newKasuto.CanShuffle = false;
-                    palace6.CanShuffle = false;
+                    locationAtPalace6.CanShuffle = false;
                 }
                 ShuffleLocations(AllLocations);
                 if (hyrule.Props.VanillaShuffleUsesActualTerrain)
@@ -382,7 +382,7 @@ public class EastHyrule : World
             }
 
             bytesWritten = 2000;
-            this.gp.CanShuffle = false;
+            this.locationAtGP.CanShuffle = false;
             Terrain riverTerrain = Terrain.MOUNTAIN;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
@@ -472,7 +472,7 @@ public class EastHyrule : World
                     DrawCanyon(riverTerrain);
                     this.walkableTerrains.Remove(Terrain.MOUNTAIN);
 
-                    gp.CanShuffle = false;
+                    locationAtGP.CanShuffle = false;
 
 
                 }
@@ -782,9 +782,9 @@ public class EastHyrule : World
             }
         }
         map[palacey, palacex] = Terrain.PALACE;
-        gp.Xpos = palacex;
-        gp.Ypos = palacey + 30;
-        gp.CanShuffle = false;
+        locationAtGP.Xpos = palacex;
+        locationAtGP.Ypos = palacey + 30;
+        locationAtGP.CanShuffle = false;
 
         int length = 20;
         if (this.biome != Biome.CANYON && this.biome != Biome.VOLCANO)
@@ -1503,7 +1503,7 @@ public class EastHyrule : World
         }
         else
         {
-            hiddenPalaceLocation = palace6;
+            hiddenPalaceLocation = locationAtPalace6;
         }
         int tries = 0;
         while (!done && tries < 1000)
