@@ -432,8 +432,19 @@ public partial class MainUI : Form
 
     private void TryLoadSpriteImageFromFile(string fileName)
     {
+        // Quick file checks to make sure we can load the rom
+        if (!File.Exists(fileName))
+        {
+            return;
+        }
+        FileInfo? rom;
+        try
+        {
+            rom = new FileInfo(fileName);
+        } catch (Exception _ex) { return; }
+
         // basic validation that they selected a "validish" rom before drawing a sprite from it
-        if (new FileInfo(fileName).Length == 0x10 + 128 * 1024 + 128 * 1024)
+        if (rom?.Length == 0x10 + 128 * 1024 + 128 * 1024)
             _spritePreview = new SpritePreview(fileName);
         GenerateSpriteImage();
     }
