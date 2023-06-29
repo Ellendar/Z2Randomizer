@@ -512,9 +512,8 @@ public class Hints
                 do
                 {
                     wizardHint = GenerateCommunityHint(HintType.WIZARD, r, town, spell);
-                } while (!usedWizardHints.Contains(wizardHint));
-                hints.RemoveAt(spellTextIndexes[town]);
-                hints.Insert(spellTextIndexes[town], wizardHint);
+                } while (usedWizardHints.Contains(wizardHint));
+                hints[spellTextIndexes[town]] = wizardHint;
             }
 
             Hint baguHint = GenerateCommunityHint(HintType.BAGU, r);
