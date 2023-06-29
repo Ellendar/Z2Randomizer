@@ -40,7 +40,7 @@ namespace WinFormUI.UI
             // so load the specific CHR tiles and palette data that we want
             LoadPreviewFromRom(rom);
             LoadSpriteCredit(rom);
-            rom.Dump("C:/dev/temp/" + sprite.DisplayName + ".nes");
+            //rom.Dump("C:/dev/temp/" + sprite.DisplayName + ".nes");
         }
 
         private void LoadPreviewFromRom(ROM rom)
