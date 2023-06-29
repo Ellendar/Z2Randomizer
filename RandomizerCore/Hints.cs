@@ -42,8 +42,8 @@ public class Hints
     private const int numberOfTextEntries = 98;
     private const int baguTextIndex = 48;
     private const int bridgeTextIndex = 37;
-    private const int downstabTextIndex = 47;
-    private const int upstabTextIndex = 82;
+    //private const int downstabTextIndex = 47;
+    //private const int upstabTextIndex = 82;
     private const int trophyIndex = 13;
     private const int medIndex = 43;
     private const int kidIndex = 79;
@@ -52,12 +52,24 @@ public class Hints
     private const int errorTextIndex1 = 25;
     private const int errorTextIndex2 = 26;
 
-    private static List<int> usedWizardHints = new List<int>();
-    private static readonly int[] wizardindex = { 15, 24, 35, 46, 70, 81, 93, 96 };
+    //private static readonly Dictionary<Town, int> spellTextIndexes = { 15, 24, 35, 46, 70, 81, 93, 96 };
+    private static readonly Dictionary<Town, int> spellTextIndexes = new()
+    {
+        { Town.RAURU, 15 },
+        { Town.RUTO, 24 },
+        { Town.SARIA_NORTH, 35 },
+        { Town.MIDO_WEST, 46 },
+        { Town.MIDO_CHURCH, 47 },
+        { Town.NABOORU, 70 },
+        { Town.DARUNIA_ROOF, 82 },
+        { Town.DARUNIA_WEST, 81 },
+        { Town.NEW_KASUTO, 93 },
+        { Town.OLD_KASUTO, 96 },
+    };
 
     private static readonly int[][] hintIndexes = { rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint };
 
-    private static readonly String[] wizardTexts =
+    private static readonly String[] GENERIC_WIZARD_TEXTS =
     {
         "do you know$why we$stopped$the car?",
         "link...$i am your$father",
@@ -96,7 +108,7 @@ public class Hints
         "have you$heard my$mixtape"
     };
 
-    private static readonly String[] bridgetext = {
+    private static readonly String[] RIVER_MAN_TEXTS = {
         "bagu said$what? that$jerk!",
         "try not$to drown",
         "who is$bagu? i$dont know$any bagu",
@@ -111,7 +123,7 @@ public class Hints
         "WRAAAAAAFT"
         };
 
-    private static readonly String[] bagutext =
+    private static readonly String[] BAGU_TEXTS =
     {
         "have you$seen error$around?",
         "tell the$riverman$i said hes$an idiot",
@@ -126,7 +138,7 @@ public class Hints
         "ASL?",
     };
 
-    private static readonly String[] downstabtext =
+    private static readonly String[] DOWNSTAB_TEXTS =
     {
         "stick them$with the$pointy end",
         "youll stab$your eye$out",
@@ -140,7 +152,7 @@ public class Hints
         "you walked$past me$didnt you"
     };
 
-    private static readonly String[] upstabtext =
+    private static readonly String[] UPSTAB_TEXTS =
     {
         "bet you$wish this$was$downstab",
         "you$probably$wont need$this",
@@ -150,17 +162,42 @@ public class Hints
         "SHORYUKEN!",
         "you wasted$your time"
     };
-    public static void Reset()
+
+    private static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
     {
-        usedWizardHints = new List<int>();
-    }
+        { Town.RAURU, new string[] { } },
+        { Town.RUTO, new string[] { } },
+        { Town.SARIA_NORTH, new string[] { } },
+        { Town.MIDO_WEST, new string[] { } },
+        { Town.MIDO_CHURCH, new string[] { } },
+        { Town.NABOORU, new string[] { } },
+        { Town.DARUNIA_ROOF, new string[] { } },
+        { Town.DARUNIA_WEST, new string[] { } },
+        { Town.NEW_KASUTO, new string[] { } },
+        { Town.OLD_KASUTO, new string[] { } }
+    };
+
+    private static readonly Dictionary<Spell, string[]> WIZARD_TEXTS_BY_SPELL = new()
+    {
+        { Spell.SHIELD, new string[] { } },
+        { Spell.JUMP, new string[] { } },
+        { Spell.LIFE, new string[] { } },
+        { Spell.FAIRY, new string[] { } },
+        { Spell.FIRE, new string[] { } },
+        { Spell.DASH, new string[] { } },
+        { Spell.REFLECT, new string[] { } },
+        { Spell.SPELL, new string[] { } },
+        { Spell.THUNDER, new string[] { } },
+        { Spell.UPSTAB, new string[] { } },
+        { Spell.DOWNSTAB, new string[] { } }
+    };
 
     public static List<Hint> GenerateHints(
         List<Location> itemLocs, 
         bool startsWithTrophy, 
         bool startsWithMedicine, 
         bool startsWithKid, 
-        Dictionary<Spell, Spell> spellMap, 
+        Dictionary<Town, Spell> spellMap, 
         Location bagu,
         List<Hint> hints,
         RandomizerProperties props,
@@ -173,7 +210,7 @@ public class Hints
         }
         if (props.UseCommunityHints)
         {
-            GenerateCommunityHints(hints, r);
+            GenerateCommunityHints(hints, spellMap, r);
         }
 
         if (props.SpellItemHints)
@@ -200,11 +237,6 @@ public class Hints
         if (props.TownNameHints)
         {
             GenerateTownNameHints(hints, spellMap, props.DashSpell);
-        }
-
-        if (props.SwapUpAndDownStab)
-        {
-            (hints[upstabTextIndex], hints[downstabTextIndex]) = (hints[downstabTextIndex], hints[upstabTextIndex]);
         }
 
         return hints;
@@ -264,61 +296,74 @@ public class Hints
         return baguH;
     }
 
-    private static void GenerateTownNameHints(List<Hint> hints, Dictionary<Spell, Spell> spellMap, bool useDash)
+    private static void GenerateTownNameHints(List<Hint> hints, Dictionary<Town, Spell> spellMap, bool useDash)
     {
-        Hint h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.SHIELD], useDash);
-        hints[rauruSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.JUMP], useDash);
-        hints[rutoSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.LIFE], useDash);
-        hints[sariaSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.FAIRY], useDash);
-        hints[midoSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.FIRE], useDash);
-        hints[nabooruSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.REFLECT], useDash);
-        hints[daruniaSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.SPELL], useDash);
-        hints[newKasutoSign] = h;
-
-        h = new Hint();
-        h.GenerateTownHint(spellMap[Spell.THUNDER], useDash);
-        hints[oldKasutoSign] = h;
+        hints[rauruSign] = GenerateTownHint(spellMap[Town.RAURU]);
+        hints[rutoSign] = GenerateTownHint(spellMap[Town.RUTO]);
+        hints[sariaSign] = GenerateTownHint(spellMap[Town.SARIA_NORTH]);
+        hints[midoSign] = GenerateTownHint(spellMap[Town.MIDO_WEST]);
+        hints[nabooruSign] = GenerateTownHint(spellMap[Town.NABOORU]);
+        hints[daruniaSign] = GenerateTownHint(spellMap[Town.DARUNIA_WEST]);
+        hints[newKasutoSign] = GenerateTownHint(spellMap[Town.NEW_KASUTO]);
+        hints[oldKasutoSign] = GenerateTownHint(spellMap[Town.OLD_KASUTO]);
     }
 
-    public static Hint GenerateCommunityHint(HintType type, Random r)
+    public static Hint GenerateTownHint(Spell spell)
+    {
+        String text = "";
+        switch (spell)
+        {
+            case Spell.SHIELD:
+                text += "shield$";
+                break;
+            case Spell.JUMP:
+                text += "jump";
+                break;
+            case Spell.LIFE:
+                text += "life$";
+                break;
+            case Spell.FAIRY:
+                text += "fairy$";
+                break;
+            case Spell.FIRE:
+                text += "fire$";
+                break;
+            case Spell.DASH:
+                text += "dash$";
+                break;
+            case Spell.REFLECT:
+                text += "reflect$";
+                break;
+            case Spell.SPELL:
+                text += "spell$";
+                break;
+            case Spell.THUNDER:
+                text += "thunder$";
+                break;
+
+        }
+        text += "town";
+        return new Hint(text);
+    }
+
+    public static Hint GenerateCommunityHint(HintType type, Random r, Town? town = null, Spell? spell = null)
     {
         switch (type)
         {
             case HintType.WIZARD:
-                int selectedHintIndex = r.Next(wizardTexts.Count());
-                while (usedWizardHints.Contains(selectedHintIndex))
+                if (town == null || spell == null)
                 {
-                    selectedHintIndex = r.Next(wizardTexts.Count());
+                    throw new ArgumentException("Spell/Town is required to generate wizard text");
                 }
-                usedWizardHints.Add(selectedHintIndex);
-                return new Hint(Util.ToGameText(wizardTexts[selectedHintIndex], true));
+                List<String> possibleWizardHints = GENERIC_WIZARD_TEXTS
+                    .Union(WIZARD_TEXTS_BY_TOWN[town ?? Town.RAURU])
+                    .Union(WIZARD_TEXTS_BY_SPELL[spell ?? Spell.SHIELD]).ToList();
+                int selectedHintIndex = r.Next(possibleWizardHints.Count());
+                return new Hint(possibleWizardHints[selectedHintIndex]);
             case HintType.BAGU:
-                return new Hint(Util.ToGameText(bagutext[r.Next(bagutext.Count())], true));
+                return new Hint(BAGU_TEXTS[r.Next(BAGU_TEXTS.Count())]);
             case HintType.BRIDGE:
-                return new Hint(Util.ToGameText(bridgetext[r.Next(bridgetext.Length)], true));
-            case HintType.DOWNSTAB:
-                return new Hint(Util.ToGameText(downstabtext[r.Next(downstabtext.Length)], true));
-            case HintType.UPSTAB:
-                return new Hint(Util.ToGameText(upstabtext[r.Next(upstabtext.Length)], true));
+                return new Hint(RIVER_MAN_TEXTS[r.Next(RIVER_MAN_TEXTS.Length)]);
             default:
                 throw new Exception("Invalid Hint Type");
         }
@@ -455,17 +500,21 @@ public class Hints
         }
     }
 
-    private static void GenerateCommunityHints(List<Hint> hints, Random r)
+    private static void GenerateCommunityHints(List<Hint> hints, Dictionary<Town, Spell> spellMap, Random r)
     {
-        Hints.Reset();
+        List<Hint> usedWizardHints = new List<Hint>();
         do
         {
-            for (int i = 0; i < 8; i++)
+            foreach(Town town in spellMap.Keys)
             {
-                Hint wizardHint = GenerateCommunityHint(HintType.WIZARD, r);
-                hints.RemoveAt(wizardindex[i]);
-                hints.Insert(wizardindex[i], wizardHint);
-
+                Hint wizardHint;
+                Spell spell = spellMap[town];
+                do
+                {
+                    wizardHint = GenerateCommunityHint(HintType.WIZARD, r, town, spell);
+                } while (!usedWizardHints.Contains(wizardHint));
+                hints.RemoveAt(spellTextIndexes[town]);
+                hints.Insert(spellTextIndexes[town], wizardHint);
             }
 
             Hint baguHint = GenerateCommunityHint(HintType.BAGU, r);
@@ -473,12 +522,6 @@ public class Hints
 
             Hint bridgeHint = GenerateCommunityHint(HintType.BRIDGE, r);
             hints[bridgeTextIndex] = bridgeHint;
-
-            Hint downstabHint = GenerateCommunityHint(HintType.DOWNSTAB, r);
-            hints[downstabTextIndex] = downstabHint;
-
-            Hint upstabHint = GenerateCommunityHint(HintType.UPSTAB, r);
-            hints[upstabTextIndex] = upstabHint;
 
         } while (TextLength(hints) > maxTextLength);
     }

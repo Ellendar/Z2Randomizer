@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using NLog;
+using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,6 +51,9 @@ public class Hyrule
     private const int overworldMapOff = 0x7E;
     private const int overworldWorldOff = 0xBD;
 
+    private static readonly List<Town> spellLocations = new List<Town>() { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
+        Town.MIDO_CHURCH, Town.NABOORU, Town.DARUNIA_WEST, Town.DARUNIA_ROOF, Town.NEW_KASUTO, Town.OLD_KASUTO};
+
     //Unused
     private Dictionary<int, int> spellEnters;
     //Unused
@@ -57,7 +61,7 @@ public class Hyrule
     //Unused
     public HashSet<String> reachableAreas;
     //Which vanilla spell corresponds with which shuffled spell
-    private Dictionary<Spell, Spell> spellMap; //key is location, value is spell (this is a bad implementation)
+    private Dictionary<Town, Spell> SpellMap { get; set; }
     //Locations that contain an item
     private List<Location> itemLocs;
     //Locations that are pbags in vanilla that are turned into hearts because maxhearts - startinghearts > 4
@@ -425,7 +429,7 @@ public class Hyrule
             return;
         }
         List<Hint> hints = ROMData.GetGameText();
-        ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, spellMap, westHyrule.bagu, hints, props, RNG));
+        ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
         f = UpdateProgress(9);
         if (!f)
         {
@@ -684,21 +688,21 @@ public class Hyrule
 
         }
 
-        if (SpellGet[spellMap[Spell.FAIRY]])
+        if (SpellGet[SpellMap[Town.MIDO_WEST]])
         {
             itemList[9] = smallItems[RNG.Next(smallItems.Count)];
             itemGet[Item.MEDICINE] = true;
             startMed = true;
         }
 
-        if(SpellGet[spellMap[Spell.JUMP]])
+        if(SpellGet[SpellMap[Town.RUTO]])
         {
             itemList[10] = smallItems[RNG.Next(smallItems.Count)];
             itemGet[Item.TROPHY] = true;
             startTrophy = true;
         }
 
-        if(SpellGet[spellMap[Spell.REFLECT]])
+        if(SpellGet[SpellMap[Town.DARUNIA_WEST]])
         {
             itemList[17] = smallItems[RNG.Next(smallItems.Count)];
             itemGet[Item.CHILD] = true;
@@ -1031,101 +1035,17 @@ public class Hyrule
 
     private bool UpdateSpells()
     {
-        //Location[] townLocations = new Location[11];
-        Dictionary<Town, Location> townLocations = new Dictionary<Town, Location>();
-        townLocations[westHyrule.shieldTown.TownNum] = westHyrule.shieldTown;
-        townLocations[westHyrule.jump.TownNum] = westHyrule.jump;
-        townLocations[westHyrule.lifeNorth.TownNum] = westHyrule.lifeNorth;
-        townLocations[westHyrule.lifeSouth.TownNum] = westHyrule.lifeSouth;
-        townLocations[westHyrule.fairy.TownNum] = westHyrule.fairy;
-        townLocations[eastHyrule.nabooru.TownNum] = eastHyrule.nabooru;
-        townLocations[eastHyrule.darunia.TownNum] = eastHyrule.darunia;
-        townLocations[eastHyrule.newKasuto.TownNum] = eastHyrule.newKasuto;
-        townLocations[eastHyrule.newKasuto2.TownNum] = eastHyrule.newKasuto2;
-        townLocations[eastHyrule.oldKasuto.TownNum] = eastHyrule.oldKasuto;
-
         bool changed = false;
-        foreach (Spell s in spellMap.Keys)
+        List<RequirementType> requireables = GetRequireables();
+        foreach (Town town in spellLocations)
         {
-            if (s == Spell.FAIRY && (((itemGet[Item.MEDICINE] || props.RemoveSpellItems) && westHyrule.fairy.TownNum == Town.MIDO) || (westHyrule.fairy.TownNum == Town.OLD_KASUTO && (accessibleMagicContainers >= 8 || props.DisableMagicRecs))) && CanGet(westHyrule.fairy))
+            if (Towns.townSpellAndItemRequirements[town].AreSatisfiedBy(requireables))
             {
-                if(!SpellGet[spellMap[s]])
+                if (!SpellGet[SpellMap[town]])
                 {
                     changed = true;
                 }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.JUMP && (((itemGet[Item.TROPHY] || props.RemoveSpellItems) && westHyrule.jump.TownNum == Town.RUTO) || (westHyrule.jump.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.DisableMagicRecs) && (itemGet[Item.CHILD] || props.RemoveSpellItems))) && CanGet(westHyrule.jump))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.DOWNSTAB && (SpellGet[Spell.JUMP] || SpellGet[Spell.FAIRY]) && CanGet(townLocations[Town.MIDO]))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.UPSTAB && (SpellGet[Spell.JUMP]) && CanGet(townLocations[Town.DARUNIA]))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.LIFE && (CanGet(westHyrule.lifeNorth)) && (((accessibleMagicContainers >= 7 || props.DisableMagicRecs) && westHyrule.lifeNorth.TownNum == Town.NEW_KASUTO) || westHyrule.lifeNorth.TownNum == Town.SARIA_NORTH))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.SHIELD && (CanGet(westHyrule.shieldTown)) && (((accessibleMagicContainers >= 5 || props.DisableMagicRecs) && westHyrule.shieldTown.TownNum == Town.NABOORU) || westHyrule.shieldTown.TownNum == Town.RAURU))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.REFLECT && ((eastHyrule.darunia.TownNum == Town.RUTO && (itemGet[Item.TROPHY] || props.RemoveSpellItems)) || ((itemGet[Item.CHILD] || props.RemoveSpellItems) && eastHyrule.darunia.TownNum == Town.DARUNIA && (accessibleMagicContainers >= 6 || props.DisableMagicRecs))) && CanGet(eastHyrule.darunia))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.FIRE && (CanGet(eastHyrule.nabooru)) && (((accessibleMagicContainers >= 5 || props.DisableMagicRecs) && eastHyrule.nabooru.TownNum == Town.NABOORU) || eastHyrule.nabooru.TownNum == Town.RAURU))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.SPELL && (CanGet(eastHyrule.newKasuto)) && (((accessibleMagicContainers >= 7 || props.DisableMagicRecs) && eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO) || eastHyrule.newKasuto.TownNum == Town.SARIA_NORTH))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
-            }
-            else if (s == Spell.THUNDER && (CanGet(eastHyrule.oldKasuto)) && (((accessibleMagicContainers >= 8 || props.DisableMagicRecs) && eastHyrule.oldKasuto.TownNum == Town.OLD_KASUTO) || (eastHyrule.oldKasuto.TownNum == Town.MIDO && (itemGet[Item.MEDICINE] || props.RemoveSpellItems))))
-            {
-                if (!SpellGet[spellMap[s]])
-                {
-                    changed = true;
-                }
-                SpellGet[spellMap[s]] = true;
+                SpellGet[SpellMap[town]] = true;
             }
         }
         return changed;
@@ -1163,7 +1083,7 @@ public class Hyrule
             {
                 hasItemNow = CanGet(location) && (accessibleMagicContainers >= kasutoJars) && (!location.NeedHammer || itemGet[Item.HAMMER]);
             }
-            else if (location.TownNum == Town.NEW_KASUTO_2)
+            else if (location.TownNum == Town.SPELL_TOWER)
             {
                 hasItemNow = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || itemGet[Item.HAMMER]);
             }
@@ -1369,6 +1289,10 @@ public class Hyrule
         {
             requireables.Add(RequirementType.JUMP);
         }
+        if (SpellGet[Spell.SPELL])
+        {
+            requireables.Add(RequirementType.SPELL);
+        }
         if (itemGet[Item.GLOVE])
         {
             requireables.Add(RequirementType.GLOVE);
@@ -1376,6 +1300,34 @@ public class Hyrule
         if (itemGet[Item.MAGIC_KEY])
         {
             requireables.Add(RequirementType.KEY);
+        }
+        if(accessibleMagicContainers >= 5 || props.DisableMagicRecs) 
+        {
+            requireables.Add(RequirementType.FIVE_CONTAINERS);
+        }
+        if (accessibleMagicContainers >= 6 || props.DisableMagicRecs)
+        {
+            requireables.Add(RequirementType.SIX_CONTAINERS);
+        }
+        if (accessibleMagicContainers >= 7 || props.DisableMagicRecs)
+        {
+            requireables.Add(RequirementType.SEVEN_CONTAINERS);
+        }
+        if (accessibleMagicContainers == 8 || props.DisableMagicRecs)
+        {
+            requireables.Add(RequirementType.EIGHT_CONTAINERS);
+        }
+        if (itemGet[Item.TROPHY] || props.RemoveSpellItems)
+        {
+            requireables.Add(RequirementType.TROPHY);
+        }
+        if (itemGet[Item.MEDICINE] || props.RemoveSpellItems)
+        {
+            requireables.Add(RequirementType.MEDICINE);
+        }
+        if (itemGet[Item.CHILD] || props.RemoveSpellItems)
+        {
+            requireables.Add(RequirementType.CHILD);
         }
         return requireables;
     }
@@ -1409,7 +1361,8 @@ public class Hyrule
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
                 worlds.Add(mazeIsland);
-                ShuffleTowns();
+                //This just supports town swap, which never worked, so it does nothing.
+                //ShuffleTowns();
 
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL || props.ContinentConnections == ContinentConnectionType.RB_BORDER_SHUFFLE)
                 {
@@ -1840,17 +1793,18 @@ public class Hyrule
         return true;
     }
 
+    /*
     private void ShuffleTowns()
     {
         westHyrule.shieldTown.TownNum = Town.RAURU;
         westHyrule.jump.TownNum = Town.RUTO;
         westHyrule.lifeNorth.TownNum = Town.SARIA_NORTH;
         westHyrule.lifeSouth.TownNum = Town.SARIA_SOUTH;
-        westHyrule.fairy.TownNum = Town.MIDO;
+        westHyrule.fairy.TownNum = Town.MIDO_WEST;
         eastHyrule.nabooru.TownNum = Town.NABOORU;
-        eastHyrule.darunia.TownNum = Town.DARUNIA;
+        eastHyrule.darunia.TownNum = Town.DARUNIA_WEST;
         eastHyrule.newKasuto.TownNum = Town.NEW_KASUTO;
-        eastHyrule.newKasuto2.TownNum = Town.NEW_KASUTO_2;
+        eastHyrule.newKasuto2.TownNum = Town.SPELL_TOWER;
         eastHyrule.oldKasuto.TownNum = Town.OLD_KASUTO;
 
         if(props.TownSwap)
@@ -1892,7 +1846,9 @@ public class Hyrule
                 Util.Swap(westHyrule.fairy, eastHyrule.oldKasuto);
             }
         }
+
     }
+    */
 
     private void ShufflePalaces()
     {
@@ -2051,51 +2007,64 @@ public class Hyrule
 
     private void ShuffleSpells()
     {
-        spellMap = new Dictionary<Spell, Spell>();
-        List<int> shuffleThis = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 };
+        SpellMap = new();
         SpellGet.Clear();
+
+        List<Town> unallocatedTowns = new List<Town> { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
+            Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
+
         foreach (Spell spell in Enum.GetValues(typeof(Spell)))
         {
-            SpellGet.Add(spell, false);
-        }
-        /*for (int i = 0; i < spellGet.Count(); i++)
-        {
-            spellGet[i] = false;
-        }*/
-        if (props.ShuffleSpellLocations)
-        {
-            for (int i = 0; i < shuffleThis.Count; i++)
+            if(props.DashSpell && spell == Spell.FIRE 
+                || !props.DashSpell && spell == Spell.DASH
+                || spell == Spell.UPSTAB
+                || spell == Spell.DOWNSTAB)
             {
-
-                int s = RNG.Next(i, shuffleThis.Count);
-                int sl = shuffleThis[s];
-                shuffleThis[s] = shuffleThis[i];
-                shuffleThis[i] = sl;
+                continue;
+            }
+            Town town = unallocatedTowns[RNG.Next(unallocatedTowns.Count)];
+            unallocatedTowns.Remove(town);
+            SpellGet.Add(spell, false);
+            if(props.ShuffleSpellLocations)
+            {
+                SpellMap.Add(town, spell);
+            }
+            else
+            {
+                SpellMap.Add(town, town switch
+                {
+                    Town.RAURU => Spell.SHIELD,
+                    Town.RUTO => Spell.JUMP,
+                    Town.SARIA_NORTH => Spell.LIFE,
+                    Town.MIDO_WEST => Spell.FAIRY,
+                    Town.NABOORU => props.DashSpell ? Spell.DASH : Spell.FIRE,
+                    Town.DARUNIA_WEST => Spell.REFLECT,
+                    Town.NEW_KASUTO => Spell.SPELL,
+                    Town.OLD_KASUTO => Spell.THUNDER,
+                    _ => throw new Exception("Unrecognized vanilla spell location")
+                });
             }
         }
-        for (int i = 0; i < shuffleThis.Count; i++)
-        {
-            spellMap.Add((Spell)i, (Spell)shuffleThis[i]);
-        }
-        spellMap.Add(Spell.UPSTAB, props.SwapUpAndDownStab ? Spell.DOWNSTAB : Spell.UPSTAB);
-        spellMap.Add(Spell.DOWNSTAB, props.SwapUpAndDownStab ? Spell.UPSTAB : Spell.DOWNSTAB);
+        SpellMap.Add(Town.DARUNIA_ROOF, props.SwapUpAndDownStab ? Spell.DOWNSTAB : Spell.UPSTAB);
+        SpellMap.Add(Town.MIDO_CHURCH, props.SwapUpAndDownStab ? Spell.UPSTAB : Spell.DOWNSTAB);
+        SpellGet.Add(Spell.DOWNSTAB, false);
+        SpellGet.Add(Spell.UPSTAB, false);
 
-
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (byte)1 : (byte)0);
         SpellGet[Spell.SHIELD] = props.StartShield;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.JUMP), props.StartJump ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.JUMP), props.StartJump ? (byte)1 : (byte)0);
         SpellGet[Spell.JUMP] = props.StartJump;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.LIFE), props.StartLife ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.LIFE), props.StartLife ? (byte)1 : (byte)0);
         SpellGet[Spell.LIFE] = props.StartLife;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FAIRY), props.StartFairy ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.FAIRY), props.StartFairy ? (byte)1 : (byte)0);
         SpellGet[Spell.FAIRY] = props.StartFairy;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.FIRE), props.StartFire ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.FIRE), props.StartFire ? (byte)1 : (byte)0);
         SpellGet[Spell.FIRE] = props.StartFire;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.REFLECT), props.StartReflect ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.REFLECT), props.StartReflect ? (byte)1 : (byte)0);
         SpellGet[Spell.REFLECT] = props.StartReflect;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.SPELL), props.StartSpell ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.SPELL), props.StartSpell ? (byte)1 : (byte)0);
         SpellGet[Spell.SPELL] = props.StartSpell;
-        ROMData.Put(0x17AF7 + spellMap.Values.ToList().IndexOf(Spell.THUNDER), props.StartThunder ? (byte)1 : (byte)0);
+        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.THUNDER), props.StartThunder ? (byte)1 : (byte)0);
         SpellGet[Spell.THUNDER] = props.StartThunder;
 
         if (props.CombineFire)
@@ -2108,10 +2077,6 @@ public class Hyrule
             Byte newnewFire = (byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
             ROMData.Put(0xDCF, newnewFire);
         }
-
-
-
-
     }
 
     private void ShuffleExp(int start, int cap)
@@ -3759,6 +3724,8 @@ public class Hyrule
             ROMData.Put(0xDB8C, (byte)westHyrule.lifeNorth.Item); //map 46
         }
 
+        //Town swap was never implemented, and when it is, it is going to work very different, so this should die.
+        /*
         if (props.TownSwap)
         {
             if (westHyrule.shieldTown.TownNum != Town.RAURU)
@@ -3788,7 +3755,7 @@ public class Hyrule
                 ROMData.Put(eastHyrule.newKasuto2.MemAddress + 0xBE, (byte)6);
             }
 
-            if (westHyrule.fairy.TownNum != Town.MIDO)
+            if (westHyrule.fairy.TownNum != Town.MIDO_WEST)
             {
                 ROMData.Put(westHyrule.fairy.MemAddress + 0x7E, (byte)(westHyrule.fairy.Map + 0xC0));
                 ROMData.Put(westHyrule.fairy.MemAddress + 0xBD, (byte)8);
@@ -3796,6 +3763,7 @@ public class Hyrule
                 ROMData.Put(eastHyrule.oldKasuto.MemAddress + 0xBD, (byte)6);
             }
         }
+        */
 
         ROMData.Put(0xA5A8, (byte)mazeIsland.magic.Item);
         ROMData.Put(0xA58B, (byte)mazeIsland.kid.Item);
@@ -3884,29 +3852,29 @@ public class Hyrule
         int[,] magNames = new int[8, 7];
         int[] magEffects = new int[16];
         int[] magFunction = new int[8];
-        ROMData.UpdateSpellText(spellMap);
+        ROMData.UpdateSpellText(SpellMap);
 
         for (int i = 0; i < magFunction.Count(); i++)
         {
-            magFunction[i] = ROMData.GetByte(functionBase + (int)spellMap[(Spell)i]);
+            magFunction[i] = ROMData.GetByte(functionBase + (int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]]);
         }
 
         for (int i = 0; i < magEffects.Count(); i = i + 2)
         {
-            magEffects[i] = ROMData.GetByte(effectBase + (int)spellMap[(Spell)(i / 2)] * 2);
-            magEffects[i + 1] = ROMData.GetByte(effectBase + (int)spellMap[(Spell)(i / 2)] * 2 + 1);
+            magEffects[i] = ROMData.GetByte(effectBase + (int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i / 2]] * 2);
+            magEffects[i + 1] = ROMData.GetByte(effectBase + (int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i / 2]] * 2 + 1);
         }
 
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                magLevels[i, j] = ROMData.GetByte(spellCostBase + ((int)spellMap[(Spell)i] * 8 + j));
+                magLevels[i, j] = ROMData.GetByte(spellCostBase + ((int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]] * 8 + j));
             }
 
             for (int j = 0; j < 7; j++)
             {
-                magNames[i, j] = ROMData.GetByte(spellNameBase + ((int)spellMap[(Spell)i] * 0xe + j));
+                magNames[i, j] = ROMData.GetByte(spellNameBase + ((int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]] * 0xe + j));
             }
         }
 
@@ -4216,37 +4184,45 @@ public class Hyrule
     public string SpellDebug()
     {
         StringBuilder sb = new StringBuilder();
-        if (!SpellGet[spellMap[Spell.SHIELD]])
+        if (!SpellGet[SpellMap[Town.RAURU]])
         {
-            sb.AppendLine("Rauru: " + Enum.GetName(typeof(Spell), spellMap[Spell.SHIELD]));
+            sb.AppendLine("Rauru: " + Enum.GetName(typeof(Spell), SpellMap[Town.RAURU]));
         }
-        if (!SpellGet[spellMap[Spell.JUMP]])
+        if (!SpellGet[SpellMap[Town.RUTO]])
         {
-            sb.AppendLine("Ruto: " + Enum.GetName(typeof(Spell), spellMap[Spell.JUMP]));
+            sb.AppendLine("Ruto: " + Enum.GetName(typeof(Spell), SpellMap[Town.RUTO]));
         }
-        if (!SpellGet[spellMap[Spell.LIFE]])
+        if (!SpellGet[SpellMap[Town.RAURU]])
         {
-            sb.AppendLine("Saria: " + Enum.GetName(typeof(Spell), spellMap[Spell.LIFE]));
+            sb.AppendLine("Saria: " + Enum.GetName(typeof(Spell), SpellMap[Town.RAURU]));
         }
-        if (!SpellGet[spellMap[Spell.FAIRY]])
+        if (!SpellGet[SpellMap[Town.MIDO_WEST]])
         {
-            sb.AppendLine("Mido: " + Enum.GetName(typeof(Spell), spellMap[Spell.FAIRY]));
+            sb.AppendLine("Mido West: " + Enum.GetName(typeof(Spell), SpellMap[Town.MIDO_WEST]));
         }
-        if (!SpellGet[spellMap[Spell.FIRE]])
+        if (!SpellGet[SpellMap[Town.MIDO_CHURCH]])
         {
-            sb.AppendLine("Nabooru: " + Enum.GetName(typeof(Spell), spellMap[Spell.FIRE]));
+            sb.AppendLine("Mido Tower: " + Enum.GetName(typeof(Spell), SpellMap[Town.MIDO_CHURCH]));
         }
-        if (!SpellGet[spellMap[Spell.REFLECT]])
+        if (!SpellGet[SpellMap[Town.NABOORU]])
         {
-            sb.AppendLine("Darunia: " + Enum.GetName(typeof(Spell), spellMap[Spell.REFLECT]));
+            sb.AppendLine("Nabooru: " + Enum.GetName(typeof(Spell), SpellMap[Town.NABOORU]));
         }
-        if (!SpellGet[spellMap[Spell.SPELL]])
+        if (!SpellGet[SpellMap[Town.DARUNIA_WEST]])
         {
-            sb.AppendLine("New Kasuto: " + Enum.GetName(typeof(Spell), spellMap[Spell.SPELL]));
+            sb.AppendLine("Darunia West: " + Enum.GetName(typeof(Spell), SpellMap[Town.DARUNIA_WEST]));
         }
-        if (!SpellGet[spellMap[Spell.THUNDER]])
+        if (!SpellGet[SpellMap[Town.DARUNIA_ROOF]])
         {
-            sb.AppendLine("Old Kasuto: " + Enum.GetName(typeof(Spell), spellMap[Spell.THUNDER]));
+            sb.AppendLine("Darunia Roof: " + Enum.GetName(typeof(Spell), SpellMap[Town.DARUNIA_ROOF]));
+        }
+        if (!SpellGet[SpellMap[Town.NEW_KASUTO]])
+        {
+            sb.AppendLine("New Kasuto: " + Enum.GetName(typeof(Spell), SpellMap[Town.NEW_KASUTO]));
+        }
+        if (!SpellGet[SpellMap[Town.OLD_KASUTO]])
+        {
+            sb.AppendLine("Old Kasuto: " + Enum.GetName(typeof(Spell), SpellMap[Town.OLD_KASUTO]));
         }
         return sb.ToString();
     }

@@ -15,13 +15,14 @@ public class Requirements
 
     public Requirements(bool individualRequirementsAreAnds = false)
     {
+        IndividualRequirements = new RequirementType[] { };
+        CompositeRequirements = new RequirementType[][] { };
         IndividualRequirementsAreAnds = individualRequirementsAreAnds;
     }
 
     public Requirements(RequirementType[] requirements, bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
     {
         IndividualRequirements = requirements;
-        CompositeRequirements = new RequirementType[][] { };
     }
 
     public Requirements(RequirementType[] requirements, RequirementType[][] compositeRequirements,

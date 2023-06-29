@@ -3,5 +3,5 @@ namespace Z2Randomizer.Core;
 
 public enum HintType
 {
-    WIZARD, BAGU, BRIDGE, DOWNSTAB, UPSTAB
+    WIZARD, BAGU, BRIDGE, DOWNSTAB, UPSTAB, SHIELD
 }

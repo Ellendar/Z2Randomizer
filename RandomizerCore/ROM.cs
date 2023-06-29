@@ -1,4 +1,5 @@
 ﻿using NLog;
+using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -408,7 +409,7 @@ public class ROM
 
     }
 
-    public void UpdateSpellText(Dictionary<Spell, Spell> spellMap)
+    public void UpdateSpellText(Dictionary<Town, Spell> spellMap)
     {
         int[,] textPointers = new int[8, 2];
         for (int i = 0; i < spellTextPointers.Length; i++)
@@ -419,8 +420,8 @@ public class ROM
 
         for (int i = 0; i < spellTextPointers.Length; i++)
         {
-            Put(spellTextPointers[i], (byte)textPointers[(int)spellMap[(Spell)i], 0]);
-            Put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[(Spell)i], 1]);
+            Put(spellTextPointers[i], (byte)textPointers[(int)spellMap[Towns.STRICT_SPELL_LOCATIONS[i]], 0]);
+            Put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[Towns.STRICT_SPELL_LOCATIONS[i]], 1]);
         }
     }
 
@@ -449,6 +450,9 @@ public class ROM
         Put(0xF75E, 0x00);
         Put(0xF625, 0x00);
         Put(0xF667, 0x00);
+
+        //300 point XP reward is actually 300 and not 301
+        Put(0x1DDDC, 0x2C);
     }
 
     public void WriteKasutoJarAmount(int kasutoJars)
