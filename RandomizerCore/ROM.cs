@@ -117,6 +117,11 @@ public class ROM
         }
     }
 
+    public ROM(byte[] data)
+    {
+        ROMData = data;
+    }
+
     public Byte GetByte(int index)
     {
         return ROMData[index];
@@ -243,7 +248,9 @@ public class ROM
         }
     }
 
-    public void UpdateSprites(CharacterSprite charSprite)
+    private readonly int[] fireLocs = { 0x20850, 0x22850, 0x24850, 0x26850, 0x28850, 0x2a850, 0x2c850, 0x2e850, 0x36850, 0x32850, 0x34850, 0x38850 };
+
+    public void UpdateSprites(CharacterSprite charSprite, string tunicColor, string shieldColor, string beamSprite)
     {
         /*
          * Dear future digshake,
@@ -272,141 +279,198 @@ public class ROM
         {
             //Do nothing now.
         }
-        else if (charSprite.IsLegacy)
-        {
-            List<int[]> spriteInfo = Graphics.sprites[charSprite];
-
-            int[] sprite = spriteInfo[0];
-            int[] s1up = spriteInfo[1];
-            int[] sOW = spriteInfo[2];
-            int[] sleeper = spriteInfo[3];
-            int[] sTitle = spriteInfo[4];
-            int[] end1 = spriteInfo[5];
-            int[] end2 = spriteInfo[6];
-            int[] end3 = spriteInfo[7];
-            int[] head = spriteInfo[8];
-            int[] raft = spriteInfo[9];
-
-            for (int i = 0; i < sprite.Count() * 3 / 8; i++)
-            {
-                Put(0x20010 + i, (byte)sprite[i]);
-                Put(0x22010 + i, (byte)sprite[i]);
-                Put(0x24010 + i, (byte)sprite[i]);
-                Put(0x26010 + i, (byte)sprite[i]);
-                Put(0x28010 + i, (byte)sprite[i]);
-                Put(0x2a010 + i, (byte)sprite[i]);
-                Put(0x2c010 + i, (byte)sprite[i]);
-                Put(0x2e010 + i, (byte)sprite[i]);
-                Put(0x30010 + i, (byte)sprite[i]);
-                Put(0x32010 + i, (byte)sprite[i]);
-                Put(0x34010 + i, (byte)sprite[i]);
-                if (i < 0x4E0 || i >= 0x520)
-                {
-                    Put(0x36010 + i, (byte)sprite[i]);
-                }
-                Put(0x38010 + i, (byte)sprite[i]);
-
-            }
-
-            for (int i = 0; i < 0x20; i++)
-            {
-                Put(0x206d0 + i, (byte)sprite[0x6c0 + i]);
-                Put(0x2e6d0 + i, (byte)sprite[0x6c0 + i]);
-                Put(0x306d0 + i, (byte)sprite[0x6c0 + i]);
-            }
-
-            for (int i = 0; i < s1up.Count(); i++)
-            {
-                Put(0x20a90 + i, (byte)s1up[i]);
-                Put(0x22a90 + i, (byte)s1up[i]);
-                Put(0x24a90 + i, (byte)s1up[i]);
-                Put(0x26a90 + i, (byte)s1up[i]);
-                Put(0x28a90 + i, (byte)s1up[i]);
-                Put(0x2aa90 + i, (byte)s1up[i]);
-                Put(0x2ca90 + i, (byte)s1up[i]);
-                Put(0x2ea90 + i, (byte)s1up[i]);
-                Put(0x30a90 + i, (byte)s1up[i]);
-                Put(0x32a90 + i, (byte)s1up[i]);
-                Put(0x34a90 + i, (byte)s1up[i]);
-                Put(0x36a90 + i, (byte)s1up[i]);
-                Put(0x38a90 + i, (byte)s1up[i]);
-
-
-            }
-
-            for (int i = 0; i < sOW.Count(); i++)
-            {
-                Put(0x31750 + i, (byte)sOW[i]);
-            }
-
-            for (int i = 0; i < sTitle.Count(); i++)
-            {
-                Put(0x20D10 + i, (byte)sTitle[i]);
-                Put(0x2ED10 + i, (byte)sTitle[i]);
-
-            }
-
-            for (int i = 0; i < sleeper.Count(); i++)
-            {
-                Put(0x21010 + i, (byte)sleeper[i]);
-                if (i > 31)
-                {
-                    Put(0x23270 + i, (byte)sleeper[i]);
-                }
-            }
-
-            for (int i = 0; i < end1.Count(); i++)
-            {
-                Put(0x2ed90 + i, (byte)end1[i]);
-            }
-
-            for (int i = 0; i < end2.Count(); i++)
-            {
-                Put(0x2f010 + i, (byte)end2[i]);
-            }
-
-            for (int i = 0; i < end3.Count(); i++)
-            {
-                Put(0x2d010 + i, (byte)end3[i]);
-            }
-
-            for (int i = 0; i < head.Count(); i++)
-            {
-                Put(0x21970 + i, (byte)head[i]);
-                Put(0x23970 + i, (byte)head[i]);
-                Put(0x25970 + i, (byte)head[i]);
-                Put(0x27970 + i, (byte)head[i]);
-                Put(0x29970 + i, (byte)head[i]);
-                Put(0x2B970 + i, (byte)head[i]);
-                Put(0x2D970 + i, (byte)head[i]);
-                Put(0x2F970 + i, (byte)head[i]);
-                Put(0x31970 + i, (byte)head[i]);
-                Put(0x33970 + i, (byte)head[i]);
-                Put(0x35970 + i, (byte)head[i]);
-                Put(0x37970 + i, (byte)head[i]);
-                Put(0x39970 + i, (byte)head[i]);
-            }
-
-            for (int i = 0; i < raft.Count(); i++)
-            {
-                Put(0x31450 + i, (byte)raft[i]);
-            }
-        }
-        //Non-legacy ips-based sprites
         else
         {
             IpsPatcher patcher = new();
             patcher.Patch(ROMData, charSprite.Path);
         }
 
-        if(charSprite == CharacterSprite.SAMUS)
+        Dictionary<String, int> colorMap = new Dictionary<String, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
+
+        /*colors to include
+            Green (2A)
+            Dark Green (0A)
+            Aqua (3C)
+            Dark Blue (02)
+            Purple (04)
+            Pink (24)
+            Red (16)
+            Orange (27)
+            Turd (08)
+        */
+        int c2 = 0;
+        int c1 = 0;
+        if (tunicColor == "Random")
         {
-            for(int i = 0; i < Graphics.samusEnd.Count; i++)
+            Random r2 = new Random();
+
+            int c2p1 = r2.Next(3);
+            int c2p2 = r2.Next(1, 13);
+            c2 = c2p1 * 16 + c2p2;
+
+            while (c1 == c2)
             {
-                Put(0x20010, (byte)Graphics.samusEnd[i]);
+                c2p1 = r2.Next(3);
+                c2p2 = r2.Next(1, 13);
+                c2 = c2p1 * 16 + c2p2;
+            }
+        } else if (tunicColor != "Default")
+        {
+            c2 = colorMap[tunicColor];
+        }
+
+        if (shieldColor == "Random")
+        {
+            Random r2 = new Random();
+
+
+
+            int c1p1 = r2.Next(3);
+            int c1p2 = r2.Next(1, 13);
+
+            c1 = c1p1 * 16 + c1p2;
+
+            while (c1 == c2)
+            {
+                c1p1 = r2.Next(3);
+                c1p2 = r2.Next(1, 13);
+                c1 = c1p1 * 16 + c1p2;
+            }
+        } else if (shieldColor != "Default")
+        {
+            c1 = colorMap[shieldColor];
+        }
+
+        int[] tunicLocs = { 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
+
+        foreach (int l in tunicLocs)
+        {
+            Put(0x10ea, (byte)c2);
+            if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
+            {
+                if (tunicColor != "Default")
+                {
+                    Put(0x10ea, (byte)c2);
+                    Put(l, (byte)c2);
+                }
+                //Don't overwrite for null 
+            }
+            else
+            {
+                Put(0x10ea, (byte)c2);
+                Put(l, (byte)c2);
             }
         }
 
+        if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy) && shieldColor == "Default")
+        {
+            //Don't overwrite default shield. For custom sprite IPS base
+        }
+        else
+        {
+            Put(0xe9e, (byte)c1);
+        }
+
+        int beamType = -1;
+        if (beamSprite.Equals("Random"))
+        {
+
+            Random r2 = new Random();
+            beamType = r2.Next(6);
+        }
+        else if (beamSprite.Equals("Fire"))
+        {
+            beamType = 0;
+        }
+        else if (beamSprite.Equals("Bubble"))
+        {
+            beamType = 1;
+        }
+        else if (beamSprite.Equals("Rock"))
+        {
+            beamType = 2;
+        }
+        else if (beamSprite.Equals("Axe"))
+        {
+            beamType = 3;
+        }
+        else if (beamSprite.Equals("Hammer"))
+        {
+            beamType = 4;
+        }
+        else if (beamSprite.Equals("Wizzrobe Beam"))
+        {
+            beamType = 5;
+        }
+        byte[] newSprite = new Byte[32];
+
+        if (beamType == 0 || beamType == 3 || beamType == 4)
+        {
+            Put(0x18f5, 0xa9);
+            Put(0x18f6, 0x00);
+            Put(0x18f7, 0xea);
+        }
+        else if (beamType != -1)
+        {
+            Put(0X18FB, 0x84);
+        }
+
+        if (beamType == 1)//bubbles
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x20ab0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 2)//rocks
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x22af0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 3)//axes
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x22fb0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 4)//hammers
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x32ef0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+        if (beamType == 5)//wizzrobe beam
+        {
+            for (int i = 0; i < 32; i++)
+            {
+                Byte next = GetByte(0x34dd0 + i);
+                newSprite[i] = next;
+            }
+        }
+
+
+        if (beamType != 0 && beamType != -1)
+        {
+            foreach (int loc in fireLocs)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    Put(loc + i, newSprite[i]);
+                }
+            }
+        }
     }
 
     public void UpdateSpellText(Dictionary<Town, Spell> spellMap)
@@ -821,6 +885,72 @@ public class ROM
          */
         Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
     }
+
+    public string Z2BytesToString(byte[] data)
+    {
+        return new string(data.Select(letter => {
+            return ReverseCharMap.TryGetValue(letter, out var chr) ? chr : ' ';
+        }).ToArray());
+    }
+
+    public byte[] StringToZ2Bytes(string text)
+    {
+        return text.Select(letter => {
+            return CharMap.TryGetValue(letter, out var byt) ? byt : (byte)0xfc;
+        }).ToArray();
+    }
+
+    private static readonly IDictionary<char, byte> CharMap = new Dictionary<char, byte>()
+    {
+        { '$', 0xc9 }, // sword
+        { '#', 0xca }, // filled box
+        { '=', 0xcb }, // horizontal border
+        { '|', 0xcc }, // vertical border
+        { '+', 0xcd }, // gem
+        { '/', 0xce },
+        { '.', 0xcf },
+        { '0', 0xd0 },
+        { '1', 0xd1 },
+        { '2', 0xd2 },
+        { '3', 0xd3 },
+        { '4', 0xd4 },
+        { '5', 0xd5 },
+        { '6', 0xd6 },
+        { '7', 0xd7 },
+        { '8', 0xd8 },
+        { '9', 0xd9 },
+        { 'A', 0xda },
+        { 'B', 0xdb },
+        { 'C', 0xdc },
+        { 'D', 0xdd },
+        { 'E', 0xde },
+        { 'F', 0xdf },
+        { 'G', 0xe0 },
+        { 'H', 0xe1 },
+        { 'I', 0xe2 },
+        { 'J', 0xe3 },
+        { 'K', 0xe4 },
+        { 'L', 0xe5 },
+        { 'M', 0xe6 },
+        { 'N', 0xe7 },
+        { 'O', 0xe8 },
+        { 'P', 0xe9 },
+        { 'Q', 0xea },
+        { 'R', 0xeb },
+        { 'S', 0xec },
+        { 'T', 0xed },
+        { 'U', 0xee },
+        { 'V', 0xef },
+        { 'W', 0xf0 },
+        { 'X', 0xf1 },
+        { 'Y', 0xf2 },
+        { 'Z', 0xf3 },
+        { ' ', 0xf4 },
+        { '-', 0xf6 },
+    };
+
+    private static readonly IDictionary<byte, char> ReverseCharMap = CharMap.ToDictionary(x => x.Value, x => x.Key);
+
 
     //Not sure what the point of any of this metaprogramming/debugging is, but there's a strong chance it gets removed in the future.
     public void DumpAll(String name)

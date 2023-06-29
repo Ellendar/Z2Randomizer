@@ -3,7 +3,8 @@ using Z2Randomizer.Core;
 using System.ComponentModel;
 using System.Diagnostics;
 using Z2Randomizer.Core.Overworld;
-
+using WinFormUI.UI;
+using System.Configuration;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -24,6 +25,7 @@ public partial class MainUI : Form
     private GeneratingSeedsForm f3;
     private RandomizerConfiguration config;
     private List<Button> customisableButtons = new List<Button>();
+    private SpritePreview? _spritePreview;
 
     private readonly int validFlagStringLength;
 
@@ -79,7 +81,8 @@ public partial class MainUI : Form
         tbirdRequiredCheckbox.Checked = true;
         hiddenPalaceList.SelectedIndex = 0;
         hideKasutoList.SelectedIndex = 0;
-        characterSpriteList.SelectedIndex = Properties.Settings.Default.sprite;
+        var selectedSprite = Properties.Settings.Default.sprite;
+        characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
 
         this.Text = "Zelda 2 Randomizer Version "
             + typeof(MainUI).Assembly.GetName().Version.Major + "."
@@ -198,7 +201,7 @@ public partial class MainUI : Form
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
-
+        TryLoadSpriteImageFromFile(romFileTextBox.Text);
 
         EnableLevelScaling(null, null);
         EastBiome_SelectedIndexChanged(null, null);
@@ -222,7 +225,6 @@ public partial class MainUI : Form
             flagsTextBox.Text = lastUsed;
             dontrunhandler = false;
         }
-
 
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
@@ -380,7 +382,7 @@ public partial class MainUI : Form
         while (button.IsEllipsisShown())
         {
             button.Text = button.Text.Substring(0, button.Text.Length - 4) + "...";
-            toolTip1.SetToolTip(button, customButtonSettings.Name + 
+            toolTip1.SetToolTip(button, customButtonSettings.Name +
                     (!string.IsNullOrWhiteSpace(customButtonSettings.Tooltip) ? Environment.NewLine + customButtonSettings.Tooltip : string.Empty));
         }
 
@@ -428,12 +430,21 @@ public partial class MainUI : Form
         */
     }
 
+    private void TryLoadSpriteImageFromFile(string fileName)
+    {
+        // basic validation that they selected a "validish" rom before drawing a sprite from it
+        if (new FileInfo(fileName).Length == 0x10 + 128 * 1024 + 128 * 1024)
+            _spritePreview = new SpritePreview(fileName);
+        GenerateSpriteImage();
+    }
+
     private void fileBtn_Click(object sender, EventArgs e)
     {
         var FD = new System.Windows.Forms.OpenFileDialog();
         if (FD.ShowDialog() == System.Windows.Forms.DialogResult.OK)
         {
             romFileTextBox.Text = FD.FileName;
+            TryLoadSpriteImageFromFile(FD.FileName);
         }
     }
 
@@ -1848,5 +1859,35 @@ public partial class MainUI : Form
         return true;
     }
 
+    private void GenerateSpriteImage()
+    {
+        _spritePreview?.ReloadSpriteFromROM(
+               CharacterSprite.ByIndex(characterSpriteList.SelectedIndex),
+               tunicColorList.GetItemText(tunicColorList.SelectedItem),
+               shieldColorList.GetItemText(shieldColorList.SelectedItem),
+               beamSpriteList.GetItemText(beamSpriteList.SelectedItem)
+           );
+        spritePreviewBox.Image = _spritePreview?.Preview;
+        spriteCreditLabel.Text = _spritePreview?.Credit;
+    }
 
+    private void characterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
+
+    private void tunicColorList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
+
+    private void shieldColorList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
+
+    private void beamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        GenerateSpriteImage();
+    }
 }
