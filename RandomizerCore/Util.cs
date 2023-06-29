@@ -53,7 +53,7 @@ public class Util
     {
         (p2.World, p1.World) = (p1.World, p2.World);
         (p2.Map, p1.Map) = (p1.Map, p2.Map);
-        (p2.PalNum, p1.PalNum) = (p1.PalNum, p2.PalNum);
+        (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
 
         (p2.TownNum, p1.TownNum) = (p1.TownNum, p2.TownNum);
         (p2.Item, p1.Item) = (p1.Item, p2.Item);

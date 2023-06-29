@@ -112,10 +112,10 @@ public class EastHyrule : World
         connections.Add(GetLocationByMem(0x8643), GetLocationByMem(0x8642));
 
         locationAtPalace6 = GetLocationByMem(0x8664);
-        locationAtPalace6.PalNum = 6;
+        locationAtPalace6.PalaceNumber = 6;
         darunia = GetLocationByMem(0x865E);
         locationAtPalace5 = GetLocationByMap(0x23, 0x0E);
-        locationAtPalace5.PalNum = 5;
+        locationAtPalace5.PalaceNumber = 5;
 
         newKasuto = GetLocationByMem(0x8660);
         newKasuto2 = new Location(newKasuto.LocationBytes, newKasuto.TerrainType, newKasuto.MemAddress, Continent.EAST);
@@ -126,7 +126,7 @@ public class EastHyrule : World
         if (locationAtPalace5 == null)
         {
             locationAtPalace5 = GetLocationByMem(0x8657);
-            locationAtPalace5.PalNum = 5;
+            locationAtPalace5.PalaceNumber = 5;
         }
 
         hiddenPalaceCallSpot = new Location();
@@ -143,7 +143,7 @@ public class EastHyrule : World
         nabooru = GetLocationByMem(0x865C);
         oldKasuto = GetLocationByMem(0x8662);
         locationAtGP = GetLocationByMem(0x8665);
-        locationAtGP.PalNum = 7;
+        locationAtGP.PalaceNumber = 7;
         locationAtGP.Item = Item.DO_NOT_USE;
         pbagCave1 = GetLocationByMem(0x863C);
         pbagCave2 = GetLocationByMem(0x863D);

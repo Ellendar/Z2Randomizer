@@ -1062,9 +1062,9 @@ public class Hyrule
         {
             bool hadItemPreviously = location.itemGet;
             bool hasItemNow;
-            if (location.PalNum > 0 && location.PalNum < 7)
+            if (location.PalaceNumber > 0 && location.PalaceNumber < 7)
             {
-                Palace palace = palaces[location.PalNum - 1];
+                Palace palace = palaces[location.PalaceNumber - 1];
                 hasItemNow = CanGet(location)
                     && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY])
                     && palace.IsTraversable(GetRequireables(), location);
@@ -1941,31 +1941,31 @@ public class Hyrule
     private List<Location> LoadItemLocs()
     {
         itemLocs = new List<Location>();
-        if (westHyrule.locationAtPalace1.PalNum != 7)
+        if (westHyrule.locationAtPalace1.PalaceNumber != 7)
         {
             itemLocs.Add(westHyrule.locationAtPalace1);
         }
-        if (westHyrule.locationAtPalace2.PalNum != 7)
+        if (westHyrule.locationAtPalace2.PalaceNumber != 7)
         {
             itemLocs.Add(westHyrule.locationAtPalace2);
         }
-        if (westHyrule.locationAtPalace3.PalNum != 7)
+        if (westHyrule.locationAtPalace3.PalaceNumber != 7)
         {
             itemLocs.Add(westHyrule.locationAtPalace3);
         }
-        if (mazeIsland.locationAtPalace4.PalNum != 7)
+        if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
         {
             itemLocs.Add(mazeIsland.locationAtPalace4);
         }
-        if (eastHyrule.locationAtPalace5.PalNum != 7)
+        if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
         {
             itemLocs.Add(eastHyrule.locationAtPalace5);
         }
-        if (eastHyrule.locationAtPalace6.PalNum != 7)
+        if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
         {
             itemLocs.Add(eastHyrule.locationAtPalace6);
         }
-        if (eastHyrule.locationAtGP.PalNum != 7)
+        if (eastHyrule.locationAtGP.PalaceNumber != 7)
         {
             itemLocs.Add(eastHyrule.locationAtGP);
         }
@@ -2785,7 +2785,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2794,7 +2794,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2803,7 +2803,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2812,7 +2812,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2821,7 +2821,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2830,7 +2830,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2839,7 +2839,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalNum] + i, trophySprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalaceNumber] + i, trophySprite[i]);
             }
             ROMData.Put(0x1eeb7, 0xAD);
             ROMData.Put(0x1eeb8, 0xAD);
@@ -2849,7 +2849,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2858,7 +2858,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2867,7 +2867,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2876,7 +2876,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2885,7 +2885,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2894,7 +2894,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2903,7 +2903,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalNum] + i, medSprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalaceNumber] + i, medSprite[i]);
             }
             ROMData.Put(0x1eeb9, 0xAD);
             ROMData.Put(0x1eeba, 0xAD);
@@ -2913,7 +2913,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2922,7 +2922,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2931,7 +2931,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2940,7 +2940,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2949,7 +2949,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2958,7 +2958,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2967,7 +2967,7 @@ public class Hyrule
         {
             for (int i = 0; i < 32; i++)
             {
-                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalNum] + i, kidSprite[i]);
+                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalaceNumber] + i, kidSprite[i]);
             }
             ROMData.Put(0x1eeb5, 0xAD);
             ROMData.Put(0x1eeb6, 0xAD);
@@ -2985,39 +2985,39 @@ public class Hyrule
         //}
 
 
-        ROMData.Put(0x1CD3A, (byte)palGraphics[westHyrule.locationAtPalace1.PalNum]);
+        ROMData.Put(0x1CD3A, (byte)palGraphics[westHyrule.locationAtPalace1.PalaceNumber]);
 
 
-        ROMData.Put(0x1CD3B, (byte)palGraphics[westHyrule.locationAtPalace2.PalNum]);
+        ROMData.Put(0x1CD3B, (byte)palGraphics[westHyrule.locationAtPalace2.PalaceNumber]);
 
 
-        ROMData.Put(0x1CD3C, (byte)palGraphics[westHyrule.locationAtPalace3.PalNum]);
+        ROMData.Put(0x1CD3C, (byte)palGraphics[westHyrule.locationAtPalace3.PalaceNumber]);
 
 
-        ROMData.Put(0x1CD46, (byte)palGraphics[mazeIsland.locationAtPalace4.PalNum]);
+        ROMData.Put(0x1CD46, (byte)palGraphics[mazeIsland.locationAtPalace4.PalaceNumber]);
 
 
-        ROMData.Put(0x1CD42, (byte)palGraphics[eastHyrule.locationAtPalace5.PalNum]);
+        ROMData.Put(0x1CD42, (byte)palGraphics[eastHyrule.locationAtPalace5.PalaceNumber]);
 
-        ROMData.Put(0x1CD43, (byte)palGraphics[eastHyrule.locationAtPalace6.PalNum]);
-        ROMData.Put(0x1CD44, (byte)palGraphics[eastHyrule.locationAtGP.PalNum]);
+        ROMData.Put(0x1CD43, (byte)palGraphics[eastHyrule.locationAtPalace6.PalaceNumber]);
+        ROMData.Put(0x1CD44, (byte)palGraphics[eastHyrule.locationAtGP.PalaceNumber]);
 
         //if (!props.palacePalette)
         //{
 
-        ROMData.Put(0x1FFF4, (byte)palPalettes[westHyrule.locationAtPalace1.PalNum]);
+        ROMData.Put(0x1FFF4, (byte)palPalettes[westHyrule.locationAtPalace1.PalaceNumber]);
 
-        ROMData.Put(0x1FFF5, (byte)palPalettes[westHyrule.locationAtPalace2.PalNum]);
+        ROMData.Put(0x1FFF5, (byte)palPalettes[westHyrule.locationAtPalace2.PalaceNumber]);
 
-        ROMData.Put(0x1FFF6, (byte)palPalettes[westHyrule.locationAtPalace3.PalNum]);
+        ROMData.Put(0x1FFF6, (byte)palPalettes[westHyrule.locationAtPalace3.PalaceNumber]);
 
-        ROMData.Put(0x20000, (byte)palPalettes[mazeIsland.locationAtPalace4.PalNum]);
+        ROMData.Put(0x20000, (byte)palPalettes[mazeIsland.locationAtPalace4.PalaceNumber]);
 
-        ROMData.Put(0x1FFFC, (byte)palPalettes[eastHyrule.locationAtPalace5.PalNum]);
+        ROMData.Put(0x1FFFC, (byte)palPalettes[eastHyrule.locationAtPalace5.PalaceNumber]);
 
-        ROMData.Put(0x1FFFD, (byte)palPalettes[eastHyrule.locationAtPalace6.PalNum]);
+        ROMData.Put(0x1FFFD, (byte)palPalettes[eastHyrule.locationAtPalace6.PalaceNumber]);
 
-        ROMData.Put(0x1FFFE, (byte)palPalettes[eastHyrule.locationAtGP.PalNum]);
+        ROMData.Put(0x1FFFE, (byte)palPalettes[eastHyrule.locationAtGP.PalaceNumber]);
 
         //}
 
@@ -3156,78 +3156,78 @@ public class Hyrule
         ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Item);
         if (props.PalaceStyle != PalaceStyle.RECONSTRUCTED)
         {
-            if (westHyrule.locationAtPalace1.PalNum != 7)
+            if (westHyrule.locationAtPalace1.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[westHyrule.locationAtPalace1.PalNum - 1], (byte)westHyrule.locationAtPalace1.Item);
+                ROMData.Put(itemLocs2[westHyrule.locationAtPalace1.PalaceNumber - 1], (byte)westHyrule.locationAtPalace1.Item);
             }
-            if (westHyrule.locationAtPalace2.PalNum != 7)
+            if (westHyrule.locationAtPalace2.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[westHyrule.locationAtPalace2.PalNum - 1], (byte)westHyrule.locationAtPalace2.Item);
+                ROMData.Put(itemLocs2[westHyrule.locationAtPalace2.PalaceNumber - 1], (byte)westHyrule.locationAtPalace2.Item);
             }
-            if (westHyrule.locationAtPalace3.PalNum != 7)
+            if (westHyrule.locationAtPalace3.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[westHyrule.locationAtPalace3.PalNum - 1], (byte)westHyrule.locationAtPalace3.Item);
+                ROMData.Put(itemLocs2[westHyrule.locationAtPalace3.PalaceNumber - 1], (byte)westHyrule.locationAtPalace3.Item);
             }
-            if (eastHyrule.locationAtPalace5.PalNum != 7)
+            if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[eastHyrule.locationAtPalace5.PalNum - 1], (byte)eastHyrule.locationAtPalace5.Item);
+                ROMData.Put(itemLocs2[eastHyrule.locationAtPalace5.PalaceNumber - 1], (byte)eastHyrule.locationAtPalace5.Item);
             }
-            if (eastHyrule.locationAtPalace6.PalNum != 7)
+            if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[eastHyrule.locationAtPalace6.PalNum - 1], (byte)eastHyrule.locationAtPalace6.Item);
+                ROMData.Put(itemLocs2[eastHyrule.locationAtPalace6.PalaceNumber - 1], (byte)eastHyrule.locationAtPalace6.Item);
             }
-            if (mazeIsland.locationAtPalace4.PalNum != 7)
+            if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[mazeIsland.locationAtPalace4.PalNum - 1], (byte)mazeIsland.locationAtPalace4.Item);
+                ROMData.Put(itemLocs2[mazeIsland.locationAtPalace4.PalaceNumber - 1], (byte)mazeIsland.locationAtPalace4.Item);
             }
 
 
-            if (eastHyrule.locationAtGP.PalNum != 7)
+            if (eastHyrule.locationAtGP.PalaceNumber != 7)
             {
-                ROMData.Put(itemLocs2[eastHyrule.locationAtGP.PalNum - 1], (byte)eastHyrule.locationAtGP.Item);
+                ROMData.Put(itemLocs2[eastHyrule.locationAtGP.PalaceNumber - 1], (byte)eastHyrule.locationAtGP.Item);
             }
         }
         else
         {
             ROMData.ElevatorBossFix(props.BossItem);
-            if (westHyrule.locationAtPalace1.PalNum != 7)
+            if (westHyrule.locationAtPalace1.PalaceNumber != 7)
             {
-                palaces[westHyrule.locationAtPalace1.PalNum-1].UpdateItem(westHyrule.locationAtPalace1.Item, ROMData);
+                palaces[westHyrule.locationAtPalace1.PalaceNumber-1].UpdateItem(westHyrule.locationAtPalace1.Item, ROMData);
             }
-            if (westHyrule.locationAtPalace2.PalNum != 7)
+            if (westHyrule.locationAtPalace2.PalaceNumber != 7)
             {
-                palaces[westHyrule.locationAtPalace2.PalNum - 1].UpdateItem(westHyrule.locationAtPalace2.Item, ROMData);
+                palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace2.Item, ROMData);
             }
-            if (westHyrule.locationAtPalace3.PalNum != 7)
+            if (westHyrule.locationAtPalace3.PalaceNumber != 7)
             {
-                palaces[westHyrule.locationAtPalace3.PalNum - 1].UpdateItem(westHyrule.locationAtPalace3.Item, ROMData);
+                palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace3.Item, ROMData);
             }
-            if (eastHyrule.locationAtPalace5.PalNum != 7)
+            if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
             {
-                palaces[eastHyrule.locationAtPalace5.PalNum - 1].UpdateItem(eastHyrule.locationAtPalace5.Item, ROMData);
+                palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtPalace5.Item, ROMData);
             }
-            if (eastHyrule.locationAtPalace6.PalNum != 7)
+            if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
             {
-                palaces[eastHyrule.locationAtPalace6.PalNum - 1].UpdateItem(eastHyrule.locationAtPalace6.Item, ROMData);
+                palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtPalace6.Item, ROMData);
             }
-            if (mazeIsland.locationAtPalace4.PalNum != 7)
+            if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
             {
-                palaces[mazeIsland.locationAtPalace4.PalNum - 1].UpdateItem(mazeIsland.locationAtPalace4.Item, ROMData);
-            }
-
-
-            if (eastHyrule.locationAtGP.PalNum != 7)
-            {
-                palaces[eastHyrule.locationAtGP.PalNum - 1].UpdateItem(eastHyrule.locationAtGP.Item, ROMData);
+                palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateItem(mazeIsland.locationAtPalace4.Item, ROMData);
             }
 
-            ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace1.PalNum - 1].Root.NewMap);
-            ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace2.PalNum - 1].Root.NewMap);
-            ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace3.PalNum - 1].Root.NewMap);
-            ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtPalace5.PalNum - 1].Root.NewMap);
-            ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtPalace6.PalNum - 1].Root.NewMap);
-            ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtGP.PalNum - 1].Root.NewMap);
-            ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.locationAtPalace4.PalNum - 1].Root.NewMap);
+
+            if (eastHyrule.locationAtGP.PalaceNumber != 7)
+            {
+                palaces[eastHyrule.locationAtGP.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtGP.Item, ROMData);
+            }
+
+            ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Root.NewMap);
+            ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Root.NewMap);
+            ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Root.NewMap);
+            ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Root.NewMap);
+            ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Root.NewMap);
+            ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Root.NewMap);
+            ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root.NewMap);
 
         }
         if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
@@ -3355,12 +3355,12 @@ public class Hyrule
         }
 
         //Update world check for p7
-        if (westHyrule.locationAtPalace1.PalNum == 7 || westHyrule.locationAtPalace2.PalNum == 7 || westHyrule.locationAtPalace3.PalNum == 7)
+        if (westHyrule.locationAtPalace1.PalaceNumber == 7 || westHyrule.locationAtPalace2.PalaceNumber == 7 || westHyrule.locationAtPalace3.PalaceNumber == 7)
         {
             ROMData.Put(0x1dd3b, 0x05);
         }
 
-        if (mazeIsland.locationAtPalace4.PalNum == 7)
+        if (mazeIsland.locationAtPalace4.PalaceNumber == 7)
         {
             ROMData.Put(0x1dd3b, 0x14);
         }

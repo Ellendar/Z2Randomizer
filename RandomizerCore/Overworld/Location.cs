@@ -61,7 +61,7 @@ public class Location
 
     public bool Reachable { get; set; }
 
-    public int PalNum { get; set; }
+    public int PalaceNumber { get; set; }
 
     public Town TownNum { get; set; }
     public Continent Continent { get; set; }
@@ -119,7 +119,7 @@ public class Location
         Item = Item.DO_NOT_USE;
         itemGet = false;
         Reachable = false;
-        PalNum = 0;
+        PalaceNumber = 0;
         TownNum = 0;
         Continent = c;
 

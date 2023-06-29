@@ -59,7 +59,7 @@ class MazeIsland : World
         kid = GetLocationByMem(0xA143);
         magic = GetLocationByMem(0xA133);
         locationAtPalace4 = GetLocationByMem(0xA140);
-        locationAtPalace4.PalNum = 4;
+        locationAtPalace4.PalaceNumber = 4;
         locationAtPalace4.World = locationAtPalace4.World | 0x03;
         MAP_ROWS = 23;
         MAP_COLS = 23;

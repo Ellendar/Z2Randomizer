@@ -31,27 +31,27 @@ public class Hint
     {
         Item hintItem = location.Item;
         String hint = "";
-        if (location.PalNum == 1)
+        if (location.PalaceNumber == 1)
         {
             hint += "horsehead$neighs$with the$";
         }
-        else if (location.PalNum == 2)
+        else if (location.PalaceNumber == 2)
         {
             hint += "helmethead$guards the$";
         }
-        else if (location.PalNum == 3)
+        else if (location.PalaceNumber == 3)
         {
             hint += "rebonack$rides$with the$";
         }
-        else if (location.PalNum == 4)
+        else if (location.PalaceNumber == 4)
         {
             hint += "carock$disappears$with the$";
         }
-        else if (location.PalNum == 5)
+        else if (location.PalaceNumber == 5)
         {
             hint += "gooma sits$on the$";
         }
-        else if (location.PalNum == 6)
+        else if (location.PalaceNumber == 6)
         {
             hint += "barba$slithers$with the$";
         }

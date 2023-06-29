@@ -123,11 +123,11 @@ public class WestHyrule : World
         trophyCave = GetLocationByMap(0xE1, 0);
         raft = GetLocationByMem(0x4658);
         locationAtPalace1 = GetLocationByMem(0x4663);
-        locationAtPalace1.PalNum = 1;
+        locationAtPalace1.PalaceNumber = 1;
         locationAtPalace2 = GetLocationByMem(0x4664);
-        locationAtPalace2.PalNum = 2;
+        locationAtPalace2.PalaceNumber = 2;
         locationAtPalace3 = GetLocationByMem(0x4665);
-        locationAtPalace3.PalNum = 3;
+        locationAtPalace3.PalaceNumber = 3;
         jar = GetLocationByMem(0x4632);
         heart1 = GetLocationByMem(0x463F);
         heart2 = GetLocationByMem(0x4634);
