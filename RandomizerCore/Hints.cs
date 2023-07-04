@@ -204,7 +204,7 @@ public class Hints
         Random r)
     {
         //
-        if (props.DashSpell)
+        if (props.ReplaceFireWithDash)
         {
             hints[70] = new Hint(Util.ToGameText("USE THIS$TO GO$FAST", true));
         }
@@ -236,7 +236,7 @@ public class Hints
 
         if (props.TownNameHints)
         {
-            GenerateTownNameHints(hints, spellMap, props.DashSpell);
+            GenerateTownNameHints(hints, spellMap, props.ReplaceFireWithDash);
         }
 
         return hints;

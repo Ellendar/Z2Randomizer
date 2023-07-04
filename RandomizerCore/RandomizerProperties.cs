@@ -46,7 +46,7 @@ public class RandomizerProperties
     public bool StartSpell { get; set; }
     public bool StartThunder { get; set; }
     public bool CombineFire { get; set; }
-    public bool DashSpell { get; set; }
+    public bool ReplaceFireWithDash { get; set; }
 
     //Other starting attributes
     public int StartHearts { get; set; }

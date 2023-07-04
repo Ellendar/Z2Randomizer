@@ -18,6 +18,7 @@ public enum Town
 
 public static class TownExtensions
 {
+    public const int SPELL_GET_START_ADDRESS = 0x17AF7;
     public static int VanillaTownOrder(this Town town)
     {
         return town switch

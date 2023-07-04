@@ -461,6 +461,7 @@ public class Palace
     {
         if (!r.IsBeforeTbird)
         {
+            //Using this map number as a signal is a terrible idea. Just use isBoss to determine which room is Tbird.
             if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
             {
                 r.IsBeforeTbird = true;
@@ -1253,7 +1254,8 @@ public class Palace
                 }
             }
         }
-        return AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
+        bool retVal = AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
+        return retVal;
     }
 
     public int GetPalaceGroup()

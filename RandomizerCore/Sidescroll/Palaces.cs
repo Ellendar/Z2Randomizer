@@ -234,7 +234,14 @@ public class Palaces
                             //thunderbird?
                             if (!props.RemoveTbird)
                             {
-                                palace.Tbird = PalaceRooms.TBirdRooms(props.UseCustomRooms)[r.Next(PalaceRooms.TBirdRooms(props.UseCustomRooms).Count)].DeepCopy();
+                                if(props.UseCommunityRooms)
+                                {
+                                    palace.Tbird = PalaceRooms.TBirdRooms(props.UseCustomRooms)[r.Next(PalaceRooms.TBirdRooms(props.UseCustomRooms).Count)].DeepCopy();
+                                }
+                                else
+                                {
+                                    palace.Tbird = PalaceRooms.Thunderbird(props.UseCustomRooms);
+                                }
                                 palace.Tbird.NewMap = mapNoGp;
                                 palace.Tbird.PalaceGroup = 3;
                                 IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
@@ -625,33 +632,33 @@ public class Palaces
             //}
         }
     }
-    private static Room SelectBossRoom(int pal, Random r, bool useCustomRooms, bool useCommunityRooms)
+    private static Room SelectBossRoom(int palaceNumber, Random r, bool useCustomRooms, bool useCommunityRooms)
     {
         if(useCommunityRooms)
         {
-            if (pal == 7)
+            if (palaceNumber == 7)
             {
                 return PalaceRooms.DarkLinkRooms(useCustomRooms)[r.Next(PalaceRooms.DarkLinkRooms(useCustomRooms).Count)].DeepCopy();
             }
-            if (pal == 6)
+            if (palaceNumber == 6)
             {
                 return PalaceRooms.NewP6BossRooms(useCustomRooms)[r.Next(PalaceRooms.NewP6BossRooms(useCustomRooms).Count)].DeepCopy();
             }
             Room room = PalaceRooms.NewBossRooms(useCustomRooms)[r.Next(PalaceRooms.NewBossRooms(useCustomRooms).Count)].DeepCopy();
-            room.Enemies = PalaceRooms.BossRooms(useCustomRooms)[pal - 1].Enemies;
+            room.Enemies = PalaceRooms.BossRooms(useCustomRooms)[palaceNumber - 1].Enemies;
             return room;
         }
         else
         {
-            return pal switch
+            return palaceNumber switch
             {
-                1 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 13).First().DeepCopy(),
-                2 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 34).First().DeepCopy(),
-                3 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 14).First().DeepCopy(),
-                4 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 28).First().DeepCopy(),
-                5 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 41).First().DeepCopy(),
-                6 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 58).First().DeepCopy(),
-                7 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 54).First().DeepCopy(),
+                1 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 13).First().DeepCopy(),
+                2 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 34).First().DeepCopy(),
+                3 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 14).First().DeepCopy(),
+                4 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 28).First().DeepCopy(),
+                5 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 41).First().DeepCopy(),
+                6 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 58).First().DeepCopy(),
+                7 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 54).First().DeepCopy(),
                 _ => throw new ImpossibleException("Unable to find vanilla boss room")
             };
         }

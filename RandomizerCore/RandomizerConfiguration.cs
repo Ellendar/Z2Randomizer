@@ -545,7 +545,6 @@ public class RandomizerConfiguration
                 break;
             case 2:
                 config.MagicEffectiveness = StatEffectiveness.VANILLA;
-
                 break;
             case 3:
                 config.MagicEffectiveness = StatEffectiveness.HIGH;
@@ -1041,30 +1040,30 @@ public class RandomizerConfiguration
         {
             case FireOption.NORMAL:
                 properties.CombineFire = false;
-                properties.DashSpell = false;
+                properties.ReplaceFireWithDash = false;
                 break;
             case FireOption.PAIR_WITH_RANDOM:
                 properties.CombineFire = true;
-                properties.DashSpell = false;
+                properties.ReplaceFireWithDash = false;
                 break;
             case FireOption.REPLACE_WITH_DASH:
                 properties.CombineFire = false;
-                properties.DashSpell = true;
+                properties.ReplaceFireWithDash = true;
                 break;
             case FireOption.RANDOM:
                 switch (random.Next(3))
                 {
                     case 0:
                         properties.CombineFire = false;
-                        properties.DashSpell = false;
+                        properties.ReplaceFireWithDash = false;
                         break;
                     case 1:
                         properties.CombineFire = true;
-                        properties.DashSpell = false;
+                        properties.ReplaceFireWithDash = false;
                         break;
                     case 2:
                         properties.CombineFire = false;
-                        properties.DashSpell = true;
+                        properties.ReplaceFireWithDash = true;
                         break;
 
                 }
@@ -1456,7 +1455,7 @@ public class RandomizerConfiguration
             properties.RequireTbird = true;
         }
 
-        if (properties.DashSpell)
+        if (properties.ReplaceFireWithDash)
         {
             properties.CombineFire = false;
         }

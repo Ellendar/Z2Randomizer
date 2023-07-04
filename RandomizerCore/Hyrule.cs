@@ -190,10 +190,6 @@ public class Hyrule
             itemGet.Add(item, false);
         }
         SpellGet = new Dictionary<Spell, bool>();
-        foreach(Spell spell in Enum.GetValues(typeof(Spell)))
-        {
-            SpellGet.Add(spell, false);
-        }
         reachableAreas = new HashSet<string>();
         //areasByLocation = new SortedDictionary<string, List<Location>>();
 
@@ -221,7 +217,7 @@ public class Hyrule
         ROMData.UpdateMapPointers();
         ROMData.FixContinentTransitions();
 
-        if (props.DashSpell)
+        if (props.ReplaceFireWithDash)
         {
             ROMData.DashSpell();
         }
@@ -896,35 +892,18 @@ public class Hyrule
             //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
 
-        //return true;
-        /*
-        if(eastHyrule.AllLocations.Where(i => i.Reachable == false).ToList().Count <= 6)
-        {
-            if(debug++ >= 1)
-            {
-                int i = 2;
-                logger.Debug("wh: " + wh + " / " + westHyrule.AllLocations.Count);
-                logger.Debug("eh: " + eh + " / " + eastHyrule.AllLocations.Count);
-                logger.Debug("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-                logger.Debug("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
-                UpdateItemGets();
-                return true;
-            } 
-        }
-        */
-        //logger.Debug("-");
-
         foreach (Item item in SHUFFLABLE_STARTING_ITEMS)
         {
             if(itemGet[item] == false)
             {
-                //if (count > 120)
-                //{
-                //    debug++;
-                //    PrintRoutingDebug(count, wh, eh, dm, mi);
-                //    
-                //   return false;
-                //}
+                if (UNSAFE_DEBUG && count > 120)
+                {
+                    Debug.WriteLine("Failed on critical item");
+                    debug++;
+                    PrintRoutingDebug(count, wh, eh, dm, mi);
+                    
+                   return false;
+                }
                 itemGetReachableFailures++;
                 return false;
             }
@@ -935,6 +914,12 @@ public class Hyrule
             if (itemGet[(Item)i] == false)
             {
                 itemGetReachableFailures++;
+                if (UNSAFE_DEBUG && count > 120)
+                {
+                    Debug.WriteLine("Failed on items");
+                    debug++;
+                    PrintRoutingDebug(count, wh, eh, dm, mi);
+                }
                 return false;
             }
         }
@@ -953,6 +938,12 @@ public class Hyrule
         if(SpellGet.Values.Any(i => i == false))
         {
             spellGetReachableFailures++;
+            if (UNSAFE_DEBUG && count > 120)
+            {
+                Debug.WriteLine("Failed on spells");
+                debug++;
+                PrintRoutingDebug(count, wh, eh, dm, mi);
+            }
             return false;
         }
 
@@ -1040,9 +1031,9 @@ public class Hyrule
             {
                 if (!SpellGet[SpellMap[town]])
                 {
+                    SpellGet[SpellMap[town]] = true;
                     changed = true;
-                }
-                SpellGet[SpellMap[town]] = true;
+                }  
             }
         }
         return changed;
@@ -1124,7 +1115,7 @@ public class Hyrule
         accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.itemGet == true && i.Item == Item.MAGIC_CONTAINER).Count();
         return changed;
     }
-    private void ShuffleLifeEffectiveness(bool isMag)
+    private void ShuffleLifeOrMagicEffectiveness(bool isMag)
     {
 
         int numBanks = 7;
@@ -2012,8 +2003,8 @@ public class Hyrule
 
         foreach (Spell spell in Enum.GetValues(typeof(Spell)))
         {
-            if(props.DashSpell && spell == Spell.FIRE 
-                || !props.DashSpell && spell == Spell.DASH
+            if(props.ReplaceFireWithDash && spell == Spell.FIRE 
+                || !props.ReplaceFireWithDash && spell == Spell.DASH
                 || spell == Spell.UPSTAB
                 || spell == Spell.DOWNSTAB)
             {
@@ -2021,7 +2012,6 @@ public class Hyrule
             }
             Town town = unallocatedTowns[RNG.Next(unallocatedTowns.Count)];
             unallocatedTowns.Remove(town);
-            SpellGet.Add(spell, false);
             if(props.ShuffleSpellLocations)
             {
                 SpellMap.Add(town, spell);
@@ -2034,7 +2024,7 @@ public class Hyrule
                     Town.RUTO => Spell.JUMP,
                     Town.SARIA_NORTH => Spell.LIFE,
                     Town.MIDO_WEST => Spell.FAIRY,
-                    Town.NABOORU => props.DashSpell ? Spell.DASH : Spell.FIRE,
+                    Town.NABOORU => props.ReplaceFireWithDash ? Spell.DASH : Spell.FIRE,
                     Town.DARUNIA_WEST => Spell.REFLECT,
                     Town.NEW_KASUTO => Spell.SPELL,
                     Town.OLD_KASUTO => Spell.THUNDER,
@@ -2047,22 +2037,11 @@ public class Hyrule
         SpellGet.Add(Spell.DOWNSTAB, false);
         SpellGet.Add(Spell.UPSTAB, false);
 
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (byte)1 : (byte)0);
+
+        /*
+        ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + SpellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (byte)1 : (byte)0);
         SpellGet[Spell.SHIELD] = props.StartShield;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.JUMP), props.StartJump ? (byte)1 : (byte)0);
-        SpellGet[Spell.JUMP] = props.StartJump;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.LIFE), props.StartLife ? (byte)1 : (byte)0);
-        SpellGet[Spell.LIFE] = props.StartLife;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.FAIRY), props.StartFairy ? (byte)1 : (byte)0);
-        SpellGet[Spell.FAIRY] = props.StartFairy;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.FIRE), props.StartFire ? (byte)1 : (byte)0);
-        SpellGet[Spell.FIRE] = props.StartFire;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.REFLECT), props.StartReflect ? (byte)1 : (byte)0);
-        SpellGet[Spell.REFLECT] = props.StartReflect;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.SPELL), props.StartSpell ? (byte)1 : (byte)0);
-        SpellGet[Spell.SPELL] = props.StartSpell;
-        ROMData.Put(0x17AF7 + SpellMap.Values.ToList().IndexOf(Spell.THUNDER), props.StartThunder ? (byte)1 : (byte)0);
-        SpellGet[Spell.THUNDER] = props.StartThunder;
+        */
 
         if (props.CombineFire)
         {
@@ -2569,9 +2548,9 @@ public class Hyrule
 
         ShuffleAttackEffectiveness(false);
 
-        ShuffleLifeEffectiveness(true);
+        ShuffleLifeOrMagicEffectiveness(true);
 
-        ShuffleLifeEffectiveness(false);
+        ShuffleLifeOrMagicEffectiveness(false);
 
         ROMData.Put(0x17B10, (byte)props.StartGems);
 
@@ -3375,25 +3354,25 @@ public class Hyrule
 
         for (int i = 0; i < magFunction.Count(); i++)
         {
-            magFunction[i] = ROMData.GetByte(functionBase + (int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]]);
+            magFunction[i] = ROMData.GetByte(functionBase + SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder());
         }
 
         for (int i = 0; i < magEffects.Count(); i = i + 2)
         {
-            magEffects[i] = ROMData.GetByte(effectBase + (int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i / 2]] * 2);
-            magEffects[i + 1] = ROMData.GetByte(effectBase + (int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i / 2]] * 2 + 1);
+            magEffects[i] = ROMData.GetByte(effectBase + SpellMap[Towns.STRICT_SPELL_LOCATIONS[i / 2]].VanillaSpellOrder() * 2);
+            magEffects[i + 1] = ROMData.GetByte(effectBase + SpellMap[Towns.STRICT_SPELL_LOCATIONS[i / 2]].VanillaSpellOrder() * 2 + 1);
         }
 
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                magLevels[i, j] = ROMData.GetByte(spellCostBase + ((int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]] * 8 + j));
+                magLevels[i, j] = ROMData.GetByte(spellCostBase + (SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 8 + j));
             }
 
             for (int j = 0; j < 7; j++)
             {
-                magNames[i, j] = ROMData.GetByte(spellNameBase + ((int)SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]] * 0xe + j));
+                magNames[i, j] = ROMData.GetByte(spellNameBase + (SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 0xe + j));
             }
         }
 
@@ -3427,16 +3406,6 @@ public class Hyrule
             ROMData.Put(0x32CD0 + i, ROMData.GetByte(0x34CD0 + i));
         }
 
-        //These were commented out in 4.0.4. I have no idea what they do or why they exist.
-        //if (hiddenPalace)
-        //{
-        //    ROMData.put(0x8664, 0);
-        //}
-        //if (hiddenKasuto)
-        //{
-        //    ROMData.put(0x8660, 0);
-        //}
-
         long inthash = BitConverter.ToInt64(hash, 0);
 
         ROMData.Put(0x17C2C, (byte)(((inthash) & 0x1F) + 0xD0));
@@ -3446,59 +3415,6 @@ public class Hyrule
         ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
         ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
     }
-
-    /*
-    public void ShufflePalaceEnemies(int enemyPtr, int enemyAddr, List<int> enemies, List<int> generators, List<int> shorties, List<int> tallGuys, List<int> flyingEnemies, bool isP7)
-    {
-        List<int> mapsNos = new List<int>();
-        if(isP7)
-        {
-            foreach (Room r in palaces[6].AllRooms)
-            {
-                if (r.NewMap == 0)
-                {
-                    mapsNos.Add(r.Map);
-                }
-                else
-                {
-                    mapsNos.Add(r.NewMap);
-                }
-            }
-        }
-        else
-        {
-            List<int> palacesInt = new List<int> { 1, 2, 5 };
-            if (enemyPtr == palace346EnemyPtr)
-            {
-                palacesInt = new List<int> { 3, 4, 6 };
-            }
-
-            foreach (int palace in palacesInt)
-            {
-                foreach (Room r in palaces[palace - 1].AllRooms)
-                {
-                    if (r.NewMap == 0)
-                    {
-                        mapsNos.Add(r.Map);
-                    }
-                    else
-                    {
-                        mapsNos.Add(r.NewMap);
-                    }
-                }
-            }
-        }
-        foreach(int map in mapsNos) 
-        {
-            int low = ROMData.GetByte(enemyPtr + map * 2);
-            int high = ROMData.GetByte(enemyPtr + map * 2 + 1);
-            high = high << 8;
-            high = high & 0x0FFF;
-            int addr = high + low + enemyAddr;
-            ShuffleEnemies(high + low + enemyAddr, enemies, generators, shorties, tallGuys, flyingEnemies, isP7);
-        }
-    }
-    */
 
     public void ShuffleEnemies(int addr, List<int> enemies, List<int> generators, 
         List<int> smallEnemies, List<int> largeEnemies, List<int> flyingEnemies, bool isP7)
