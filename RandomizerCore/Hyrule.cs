@@ -2037,7 +2037,12 @@ public class Hyrule
         SpellGet.Add(Spell.DOWNSTAB, false);
         SpellGet.Add(Spell.UPSTAB, false);
 
-
+        int i = 0;
+        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
+        {
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i++, props.StartWithSpell(SpellMap[town]) ? (byte)1 : (byte)0);
+            SpellGet[SpellMap[town]] = props.StartWithSpell(SpellMap[town]);
+        }
         /*
         ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + SpellMap.Values.ToList().IndexOf(Spell.SHIELD), props.StartShield ? (byte)1 : (byte)0);
         SpellGet[Spell.SHIELD] = props.StartShield;

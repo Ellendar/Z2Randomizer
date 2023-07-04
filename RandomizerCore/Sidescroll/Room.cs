@@ -204,7 +204,8 @@ public class Room
         bool upDownRev, 
         bool dropZone,
         bool isEntrance,
-        Requirements requirements
+        Requirements requirements,
+        string name
         )
     {
         Map = map;
@@ -246,6 +247,7 @@ public class Room
         IsDropZone = dropZone;
         IsEntrance = isEntrance;
         Requirements = requirements;
+        Name = name;
     }
 
     public Room(string json)
@@ -557,7 +559,8 @@ public class Room
             isUpDownReversed, 
             IsDropZone,
             IsEntrance,
-            Requirements);
+            Requirements,
+            Name);
     }
 
     public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)

@@ -16,13 +16,20 @@ public class Palaces
     private const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
     private const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
 
-    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY };
-    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE };
-    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE};
-    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP};
-    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
-    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
-    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = new RequirementType[] { RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.KEY };
+    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE };
+    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP};
+    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = new RequirementType[] { 
+        RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE};
 
     public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = new RequirementType[][] { 
         VANILLA_P1_ALLOWED_BLOCKERS,
@@ -144,9 +151,12 @@ public class Palaces
                     7 => 3,
                     _ => throw new ImpossibleException("Invalid palace number: " + currentPalace)
                 };
+                Room segmentedItemRoom1, segmentedItemRoom2;
 
                 do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 {
+                    segmentedItemRoom1 = null;
+                    segmentedItemRoom2 = null;
                     if (worker != null && worker.CancellationPending)
                     {
                         return null;
@@ -190,9 +200,11 @@ public class Palaces
                         {
                             palace.ItemRoom = GenerateItemRoom(r, props.UseCustomRooms, props.UseCommunityRooms);
                             palace.ItemRoom.PalaceGroup = palaceGroup;
+                            //#76: Not sure if this is still needed. If the item room is a boss item room, and it's in palace group 1,
+                            //move the boss up 1 tile. I fixed the underlying broken room, but for now, let's keep this.
                             if (palaceGroup == 1 && palace.ItemRoom.HasBoss)
                             {
-                                palace.ItemRoom.Enemies[1] = 0x6C;
+                                palace.ItemRoom.NewEnemies[1] = 0x6C;
                             }
                             palace.AllRooms.Add(palace.ItemRoom);
 
@@ -207,16 +219,17 @@ public class Palaces
                             palace.ItemRoom.NewMap = mapNo;
                             palace.ItemRoom.SetItem((Item)currentPalace);
                             IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
-                            //WTF is this magic number
+                            //This magic number is an awful way to indicate this is the segmented item room. Update this to just use a boolean flag.
                             if (palace.ItemRoom.Map == 69)
                             {
-                                Room extra = PalaceRooms.MaxBonusItemRoom(props.UseCustomRooms).DeepCopy();
-                                extra.NewMap = palace.ItemRoom.NewMap;
-                                extra.PalaceGroup = palaceGroup;
-                                extra.SetItem((Item)currentPalace);
-                                palace.AllRooms.Add(extra);
-                                palace.SortRoom(extra);
-                                palace.SetOpenRoom(extra);
+                                segmentedItemRoom1 = palace.ItemRoom;
+                                segmentedItemRoom2 = PalaceRooms.MaxBonusItemRoom(props.UseCustomRooms).DeepCopy();
+                                segmentedItemRoom2.NewMap = palace.ItemRoom.NewMap;
+                                segmentedItemRoom2.PalaceGroup = palaceGroup;
+                                segmentedItemRoom2.SetItem((Item)currentPalace);
+                                palace.AllRooms.Add(segmentedItemRoom2);
+                                palace.SortRoom(segmentedItemRoom2);
+                                palace.SetOpenRoom(segmentedItemRoom2);
                             }
                             palace.SortRoom(palace.Root);
                             palace.SortRoom(palace.BossRoom);
@@ -371,7 +384,8 @@ public class Palaces
                     {
                         palace.ShuffleRooms(r);
                         bool reachable = palace.AllReachable();
-                        while ((!reachable || (currentPalace == 7 && (props.RequireTbird && !palace.RequiresThunderbird())) || palace.HasDeadEnd()) && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
+                        while ((!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd()) 
+                            && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
                         {
                             palace.ResetRooms();
                             palace.ShuffleRooms(r);
@@ -411,6 +425,15 @@ public class Palaces
                             sideviews.Add(room.SideView, l);
                         }
                     }
+                }
+
+                //Unify the parts of the segmented item room back together.
+                if (segmentedItemRoom1 != null)
+                {
+                    segmentedItemRoom2.Down = segmentedItemRoom1.Down;
+                    segmentedItemRoom2.DownByte = segmentedItemRoom1.DownByte;
+                    palace.AllRooms.Where(i => i.Up == segmentedItemRoom1).ToList().ForEach(i => i.Up = segmentedItemRoom2);
+                    palace.AllRooms.Remove(segmentedItemRoom1);
                 }
             }
         }

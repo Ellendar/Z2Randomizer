@@ -201,4 +201,23 @@ public class RandomizerProperties
     //For Statistics
     [Key]
     public int Id { get; set; }
+
+    public bool StartWithSpell(Spell spell)
+    {
+        return spell switch
+        {
+            Spell.SHIELD => StartShield,
+            Spell.JUMP => StartJump,
+            Spell.LIFE => StartLife,
+            Spell.FAIRY => StartFairy,
+            Spell.FIRE => StartFire,
+            Spell.DASH => StartFire,
+            Spell.REFLECT => StartReflect,
+            Spell.SPELL => StartSpell,
+            Spell.THUNDER => StartThunder,
+            Spell.UPSTAB => StartWithUpstab,
+            Spell.DOWNSTAB => StartWithDownstab,
+            _ => throw new ImpossibleException("Unrecognized spell")
+        };
+    }
 }
