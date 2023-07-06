@@ -308,8 +308,8 @@ public class ROM
             Orange (27)
             Turd (08)
         */
-        int c2 = 0;
-        int c1 = 0;
+        int? c2 = null;
+        int? c1 = null;
         if (tunicColor == "Random")
         {
             Random r2 = new Random();
@@ -333,8 +333,6 @@ public class ROM
         {
             Random r2 = new Random();
 
-
-
             int c1p1 = r2.Next(3);
             int c1p2 = r2.Next(1, 13);
 
@@ -355,20 +353,23 @@ public class ROM
 
         foreach (int l in tunicLocs)
         {
-            Put(0x10ea, (byte)c2);
-            if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
+            if (c2 != null)
             {
-                if (tunicColor != "Default")
+                Put(0x10ea, (byte)c2);
+                if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
+                {
+                    if (tunicColor != "Default")
+                    {
+                        Put(0x10ea, (byte)c2);
+                        Put(l, (byte)c2);
+                    }
+                    //Don't overwrite for null 
+                }
+                else
                 {
                     Put(0x10ea, (byte)c2);
                     Put(l, (byte)c2);
                 }
-                //Don't overwrite for null 
-            }
-            else
-            {
-                Put(0x10ea, (byte)c2);
-                Put(l, (byte)c2);
             }
         }
 
@@ -378,7 +379,10 @@ public class ROM
         }
         else
         {
-            Put(0xe9e, (byte)c1);
+            if(c1 != null)
+            {
+                Put(0xe9e, (byte)c1);
+            }
         }
 
         int beamType = -1;
