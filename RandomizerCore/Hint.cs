@@ -8,29 +8,29 @@ namespace Z2Randomizer.Core;
 
 public class Hint
 {
-
-    private List<char> text;
-
-    public List<char> Text { get => text; }
+    public string RawText { get; }
+    public List<char> Text { get; private set; }
 
     public Hint()
     {
-        text = Util.ToGameText("I know$nothing", true);
+        Text = Util.ToGameText("I know$nothing", true);
     }
 
     public Hint(List<char> text)
     {
-        this.text = text;
+        RawText = new string(text.ToArray());
+        Text = text;
     }
-    public Hint(String text)
+    public Hint(string text)
     {
-        this.text = Util.ToGameText(text, true);
+        RawText = text;
+        Text = Util.ToGameText(text, true);
     }
 
     public void GenerateHelpfulHint(Location location)
     {
         Item hintItem = location.Item;
-        String hint = "";
+        string hint = "";
         if (location.PalaceNumber == 1)
         {
             hint += "horsehead$neighs$with the$";
@@ -133,7 +133,7 @@ public class Hint
                 break;
         }
 
-        text = Util.ToGameText(hint, true).ToList();
+        Text = Util.ToGameText(hint, true).ToList();
     }
 
 }

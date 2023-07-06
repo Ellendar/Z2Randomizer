@@ -69,7 +69,7 @@ public class Hints
 
     private static readonly int[][] hintIndexes = { rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint };
 
-    private static readonly String[] GENERIC_WIZARD_TEXTS =
+    public static readonly String[] GENERIC_WIZARD_TEXTS =
     {
         "do you know$why we$stopped$the car?",
         "link...$i am your$father",
@@ -77,15 +77,12 @@ public class Hints
         "why am i$locked in$a basement",
         "thats just$like your$opinion$man",
         "the dude$abides",
-        "i hope$this isnt$fire spell",
         "boy this$is really$expensive",
         "10th enemy$has the$bomb",
         "stay$awhile and$listen",
-        "Dude eff$this game",
         "you teach$me a spell",
         "you know$nothing",
         "thats what$she said",
-        "lets throw$a rave",
         "jump in$lava for$200 rupees",
         "you wont$be able$to cast$this",
         "big bucks$no whammys",
@@ -94,51 +91,80 @@ public class Hints
         "link i$am your$father",
         "theres no$wifi here",
         "a wild$link$appears",
-        "welcome$to walmart",
         "whats the$wifi$password",
         "dont send$me back to$the home",
-        "pull my$finger",
         "id like$to buy a$vowel",
         "i only$know one$spell",
         "i went$to$college$for this",
-        "larry is$still in$northern$palace",
         "this game$needs more$categories",
         "who$picked$these$flags",
         "i found$this in$the$garbage",
-        "have you$heard my$mixtape"
+        "have you$heard my$mixtape",
+        "Does this$robe make$me look$fat?",
+        "No pom pom$shaking$here",
+        "Youre$a wizard,$Link",
+        "Take any$Robe you$want",
+        "The child$can stay$lost",
+        "Dont Move$I dropped$a contact$lens",
+        "Please$support$ZSR",
+        "This wont$hurt a bit",
+        "How many$shakes can$a digshake$shake?",
+        "Free$your mind",
+        "da$na na na$naaaaaaaaa",
+        "Join the$Nintendo$Power$Club",
+        "Silvers$are in$palace 1",
+        "Needs$more$Cowbell",
+        "Which$timeline$is this?",
+        "Hurry!$I have to$preheat$the oven",
+        "Poyo!",
+        "Sploosh$Kaboom!",
     };
 
-    private static readonly String[] RIVER_MAN_TEXTS = {
+    public static readonly String[] RIVER_MAN_TEXTS = 
+    {
         "bagu said$what? that$jerk!",
         "try not$to drown",
         "who is$bagu? i$dont know$any bagu",
         "3 5 10 7$12 4 11 6$1 13 14 2$15 8 9",
         "why cant$you swim?",
         "what is$your$quest?",
-        "what is$your$favorite$color?",
-        "what is$the speed$of a laden$swallow?",
         "tickets$please",
-        "you know$magoo? i$can help$you cross",
-        "boom boom$boom",
-        "WRAAAAAAFT"
-        };
+        "WRAAAAAAFT",
+        "Which way$to Denver?",
+        "Do you know$the way to$San Jose?",
+        "Do you$knowThe$Muffin Man",
+        "Can we$fix it?",
+        "What?$You cant$swim?",
+        "Link.exe$has$stopped$working",
+        "No running$by$the pool",
+    };
 
-    private static readonly String[] BAGU_TEXTS =
+    public static readonly String[] BAGU_TEXTS =
     {
         "have you$seen error$around?",
         "tell the$riverman$i said hes$an idiot",
-        "i am bagu.$husband$of$baguette",
         "wanna see$a corpse?",
         "aliens$are real",
         "rupees are$mind$control$devices",
-        "would you$like a$cookie?",
-        "anybody$want a$peanut?",
         "please dont$tell my$wife i am$here",
         "bam bam$bam",
-        "ASL?",
+        "Here is$my list of$demands",
+        "my email to$River Man$was in$my drafts",
+        "Hey!$Listen!",
+        "Pizza$dudes got$thirty$seconds",
+        "I am$Batman",
+        "I am$Groot",
+        "BAGU$SMAAAAASH",
+        "Get out$of ma$swamp!!",
+        "Praise$the sun",
+        "am I$being$detained?",
+        "Error$is the$evil twin",
+        "Tingle$Tingle$Kooloo$Limpah!",
+        "Is this a$pedestal$seed?",
+        "Does$Spec rock$wear$glasses?",
     };
 
-    private static readonly String[] DOWNSTAB_TEXTS =
+    public static readonly String[] DOWNSTAB_TEXTS =
     {
         "stick them$with the$pointy end",
         "youll stab$your eye$out",
@@ -146,13 +172,16 @@ public class Hints
         "have a$pogo stick",
         "yakhammer$acquired",
         "press down$to crouch",
-        "press$dongward$to stab",
         "kick punch$chop block$duck jump",
         "jump crouch$its all in$the mind!",
-        "you walked$past me$didnt you"
+        "you walked$past me$didnt you",
+        "upstab is$the best$stab",
+        "Do the$Safety$Dance",
+        "easy mode$activated",
+        "Never$gonna give$you up",
     };
 
-    private static readonly String[] UPSTAB_TEXTS =
+    public static readonly String[] UPSTAB_TEXTS =
     {
         "bet you$wish this$was$downstab",
         "you$probably$wont need$this",
@@ -160,36 +189,41 @@ public class Hints
         "press up$to go in$doors",
         "are you$santa$claus?",
         "SHORYUKEN!",
-        "you wasted$your time"
+        "you wasted$your time",
+        "Mario can$do this$without$magic",
+        "downstab$is the$best stab",
+        "Tiger$Uppercut!",
+        "Never$gonna let$you down",
+        "Thanks$for not$skipping$me",
     };
 
-    private static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
+    public static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
     {
         { Town.RAURU, new string[] { } },
         { Town.RUTO, new string[] { } },
-        { Town.SARIA_NORTH, new string[] { } },
+        { Town.SARIA_NORTH, new string[] { "Water$you$doing?" } },
         { Town.MIDO_WEST, new string[] { } },
         { Town.MIDO_CHURCH, new string[] { } },
         { Town.NABOORU, new string[] { } },
         { Town.DARUNIA_ROOF, new string[] { } },
-        { Town.DARUNIA_WEST, new string[] { } },
+        { Town.DARUNIA_WEST, new string[] { "You saved$a kid$for this?", "Dont$forget to$get upstab" } },
         { Town.NEW_KASUTO, new string[] { } },
         { Town.OLD_KASUTO, new string[] { } }
     };
 
-    private static readonly Dictionary<Spell, string[]> WIZARD_TEXTS_BY_SPELL = new()
+    public static readonly Dictionary<Spell, string[]> WIZARD_TEXTS_BY_SPELL = new()
     {
-        { Spell.SHIELD, new string[] { } },
-        { Spell.JUMP, new string[] { } },
-        { Spell.LIFE, new string[] { } },
+        { Spell.SHIELD, new string[] { "Have you$tried not$dying?" } },
+        { Spell.JUMP, new string[] { "I get up$and nothin$gets me$down", "Kris Kross$will make$you..." } },
+        { Spell.LIFE, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar" } },
         { Spell.FAIRY, new string[] { } },
-        { Spell.FIRE, new string[] { } },
-        { Spell.DASH, new string[] { } },
-        { Spell.REFLECT, new string[] { } },
-        { Spell.SPELL, new string[] { } },
-        { Spell.THUNDER, new string[] { } },
-        { Spell.UPSTAB, new string[] { } },
-        { Spell.DOWNSTAB, new string[] { } }
+        { Spell.FIRE, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless" } },
+        { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast" } },
+        { Spell.REFLECT, new string[] { "I am not$Mirror$Shield", "Crysta$was$here" } },
+        { Spell.SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?" } },
+        { Spell.THUNDER, new string[] { "With this$you can$now beat$the game" } },
+        { Spell.UPSTAB, UPSTAB_TEXTS },
+        { Spell.DOWNSTAB, DOWNSTAB_TEXTS }
     };
 
     public static List<Hint> GenerateHints(

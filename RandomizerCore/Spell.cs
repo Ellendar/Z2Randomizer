@@ -17,7 +17,25 @@ public static class SpellExtensions
             Spell.REFLECT => 5,
             Spell.SPELL => 6,
             Spell.THUNDER => 7,
-            Spell.DOWNSTAB => 8,
+            _ => throw new ImpossibleException("Invalid vanilla spell index")
+        };
+    }
+
+    public static Town VanillaTown(this Spell spell)
+    {
+        return spell switch
+        {
+            Spell.SHIELD => Town.RAURU,
+            Spell.JUMP => Town.RUTO,
+            Spell.LIFE => Town.SARIA_NORTH,
+            Spell.FAIRY => Town.MIDO_WEST,
+            Spell.FIRE => Town.NABOORU,
+            Spell.DASH => Town.NABOORU,
+            Spell.REFLECT => Town.DARUNIA_WEST,
+            Spell.SPELL => Town.NEW_KASUTO,
+            Spell.THUNDER => Town.OLD_KASUTO,
+            Spell.DOWNSTAB => Town.MIDO_WEST,
+            Spell.UPSTAB => Town.DARUNIA_ROOF,
             _ => throw new ImpossibleException("Invalid vanilla spell index")
         };
     }

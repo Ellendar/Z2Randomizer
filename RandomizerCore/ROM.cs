@@ -95,7 +95,17 @@ public class ROM
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
-    private readonly int[] spellTextPointers = { 0xEFEC, 0xEFFE, 0xF014, 0xF02A, 0xF05A, 0xf070, 0xf088, 0xf08e };
+    private readonly Dictionary<Town, int> spellTextPointers = new()
+    {
+        {Town.RAURU, 0xEFEC },
+        {Town.RUTO, 0xEFFE },
+        {Town.SARIA_NORTH, 0xF014 },
+        {Town.MIDO_WEST, 0xF02A },
+        {Town.NABOORU, 0xF05A },
+        {Town.DARUNIA_WEST, 0xf070 },
+        {Town.NEW_KASUTO, 0xf088 },
+        {Town.OLD_KASUTO, 0xf08e }
+    };
 
     private byte[] ROMData;
 
@@ -137,12 +147,12 @@ public class ROM
         return bytes;
     }
 
-    public void Put(int index, Byte data)
+    public void Put(int index, byte data)
     {
         ROMData[index] = data;
     }
 
-    public void Put(int index, Byte[] data)
+    public void Put(int index, params byte[] data)
     {
         for (int i = 0; i < data.Length; i++)
         {
@@ -475,17 +485,21 @@ public class ROM
 
     public void UpdateSpellText(Dictionary<Town, Spell> spellMap)
     {
-        int[,] textPointers = new int[8, 2];
-        for (int i = 0; i < spellTextPointers.Length; i++)
+        Dictionary<Town, byte[]> currentSpellPointers = new();
+        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
         {
-            textPointers[i, 0] = GetByte(spellTextPointers[i]);
-            textPointers[i, 1] = GetByte(spellTextPointers[i] + 1);
+            currentSpellPointers[town] = new byte[]{ GetByte(spellTextPointers[town]), GetByte(spellTextPointers[town] + 1)};
         }
 
-        for (int i = 0; i < spellTextPointers.Length; i++)
+        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
         {
-            Put(spellTextPointers[i], (byte)textPointers[(int)spellMap[Towns.STRICT_SPELL_LOCATIONS[i]], 0]);
-            Put(spellTextPointers[i] + 1, (byte)textPointers[(int)spellMap[Towns.STRICT_SPELL_LOCATIONS[i]], 1]);
+            Put(spellTextPointers[town], currentSpellPointers[spellMap[town].VanillaTown()]);
+            /*
+            textPointers[i, 0] = GetByte(spellTextPointers[i]);
+            textPointers[i, 1] = GetByte(spellTextPointers[i] + 1);
+            Put(spellTextPointers[i], (byte)textPointers[spellMap[Towns.STRICT_SPELL_LOCATIONS[i]]], 0]);
+            Put(spellTextPointers[i] + 1, (byte)textPointers[spellMap[Towns.STRICT_SPELL_LOCATIONS[i]], 1]);
+            */
         }
     }
 
@@ -508,7 +522,7 @@ public class ROM
         Put(0x8645, 0x00);
 
         //Disable hold over head animation
-        Put(0x1E54C, (byte)0);
+        Put(0x1E54C, 0);
 
         //Make text go fast
         Put(0xF75E, 0x00);
