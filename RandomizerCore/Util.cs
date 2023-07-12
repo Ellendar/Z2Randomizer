@@ -57,6 +57,7 @@ public class Util
 
         (p2.TownNum, p1.TownNum) = (p1.TownNum, p2.TownNum);
         (p2.Item, p1.Item) = (p1.Item, p2.Item);
+        (p2.Name, p1.Name) = (p1.Name, p2.Name);
     }
     public static string ByteArrayToHexString(byte[] bytes)
     {

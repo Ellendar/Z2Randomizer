@@ -18,7 +18,7 @@ public class PalaceRooms
     private static Dictionary<string, List<Room>> roomsByGroup = new Dictionary<string, List<Room>>();
     private static Dictionary<string, List<Room>> customRoomsByGroup = new Dictionary<string, List<Room>>();
 
-    public static readonly string roomsMD5 = "W/kxndGONzYjtM1xkW63Iw==";
+    public static readonly string roomsMD5 = "LztAgfHYEq+YuBFUNu9P3g==";
 
     static PalaceRooms()
     {

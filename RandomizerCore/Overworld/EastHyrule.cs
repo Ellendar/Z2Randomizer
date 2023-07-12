@@ -1717,12 +1717,6 @@ public class EastHyrule : World
                     {
                         Location connectedLocation = connections[location];
 
-                        if ((location.NeedBagu && (hyrule.westHyrule.bagu.Reachable || hyrule.SpellGet[Spell.FAIRY])))
-                        {
-                            connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
-                        }
-
                         if (location.NeedFairy && hyrule.SpellGet[Spell.FAIRY])
                         {
                             connectedLocation.Reachable = true;

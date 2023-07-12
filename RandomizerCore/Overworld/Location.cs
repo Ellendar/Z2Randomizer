@@ -69,7 +69,7 @@ public class Location
     public int ForceEnterRight { get; set; }
     public int Secondpartofcave { get; set; }
 
-    public string Name { get; private set; }
+    public string Name { get; set; }
 
     /*
     Byte 0

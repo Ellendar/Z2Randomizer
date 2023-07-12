@@ -97,9 +97,8 @@ public class AttackStats
             {
                 double minAtk = VANILLA[i] - VANILLA[i] * .333;
                 double maxAtk = VANILLA[i] + VANILLA[i] * .5;
-                double next = VANILLA[i];
 
-                next = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
+                double next = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
 
                 if (i == 0)
                 {

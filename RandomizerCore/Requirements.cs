@@ -97,6 +97,11 @@ public class Requirements
         return sb.ToString();
     }
 
+    public override string ToString()
+    {
+        return Serialize();
+    }
+
     public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables)
     {
 

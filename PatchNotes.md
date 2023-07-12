@@ -1,5 +1,27 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.0 - ???
+
+### New features
+- Updated community hints to have new / different hints. Have ideas for new texts? (especially for specific spells/locations) Post them to the #community-hints channel on discord.
+- Updated the hints system to allow per-location / per-spell hints.
+- Added a new sprite preview window to the misc tab that will show off what the current sprite/color combo will look like. (thanks jroweboy!)
+- Added new sprites and converted all existing sprites to IPS sprites. If you are a sprite author and have any sprites you want to have added, ping Ellendar on discord.
+- Added a system for crediting sprite authors in the UI and in the opening crawl. If you are the author of an existing sprite and would like to be credited, ping Ellendar on discord.
+- Updated the installer to automatically clean up old versions when it runs. This will remove all old 4.1 and later versions when you install this update. 4.0.4 and earlier are not affected.
+- Reworked the logic for palace routing to more accurately reflect how the rooms are actually constructed.
+	- Dash is now allowed in logic, and rooms can be cleared by dashing over pits (possibly with jump as well).
+	- Glove is now allowed to be in palaces that contain glove blocks, as long as it is possible to reach the glove without the glove.
+	- Several rooms with incorrect logic were updated.
+	- Magic key or fairy is still logically required for any palace. (for now...)
+
+### Bug Fixes
+- Fixed a bug from 4.1.8 that would cause the split item room to exit outside when you went down the elevator.
+- Fixed a bug that would cause minor items in horsehead's item room to despawn when you beat horsehead (Thanks jroweboy!)
+- When community rooms are off, all boss rooms will correctly enter from the left.
+- When community rooms are off, all item rooms will now be one of the vanilla item rooms.
+- Fixed a bunch of small logical bugs that could lead to seeds taking a long time to generate.
+
 ## Version 4.1.8 - June 28th 2023
 
 - Fixed an issue where sin wave head generators in palaces 3/4/6 under reconstructed palaces with vanilla enemies caused a lockup.
@@ -33,7 +55,7 @@
 
 Flag strings have changed (again). Eventually I want to create a system where the flags conversion box works for all old versions of the flags, but for now it will only convert from 4.0.4 to the current version. Any flags from 4.1.2 you'll have to manually update. Sorry.
 
-.NET requirement updated to 7.0 from 6.0. This will download automatically so you should be fine. I promise this is the last .NET update for a while.
+.NET requirement updated to 7.0 from 6.0 This will download automatically so you should be fine. I promise this is the last .NET update for a while.
 
 ### Bug Fixes
 

@@ -5,6 +5,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Numerics;
+using System.Speech.Synthesis;
+using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -64,7 +67,7 @@ public class Palaces
         {7, 0x8665 }
     };
 
-    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData)
+    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData, bool raftIsRequired)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -228,12 +231,12 @@ public class Palaces
                                 segmentedItemRoom2.PalaceGroup = palaceGroup;
                                 segmentedItemRoom2.SetItem((Item)currentPalace);
                                 palace.AllRooms.Add(segmentedItemRoom2);
-                                palace.SortRoom(segmentedItemRoom2);
+                                //palace.SortRoom(segmentedItemRoom2);
                                 palace.SetOpenRoom(segmentedItemRoom2);
                             }
-                            palace.SortRoom(palace.Root);
-                            palace.SortRoom(palace.BossRoom);
-                            palace.SortRoom(palace.ItemRoom);
+                            //palace.SortRoom(palace.Root);
+                            //palace.SortRoom(palace.BossRoom);
+                            //palace.SortRoom(palace.ItemRoom);
                             palace.SetOpenRoom(palace.Root);
                         }
                         else //GP
@@ -242,8 +245,8 @@ public class Palaces
                             IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             palace.BossRoom.NewMap = mapNoGp;
                             IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
-                            palace.SortRoom(palace.Root);
-                            palace.SortRoom(palace.BossRoom);
+                            //palace.SortRoom(palace.Root);
+                            //palace.SortRoom(palace.BossRoom);
                             //thunderbird?
                             if (!props.RemoveTbird)
                             {
@@ -253,12 +256,12 @@ public class Palaces
                                 }
                                 else
                                 {
-                                    palace.Tbird = PalaceRooms.Thunderbird(props.UseCustomRooms);
+                                    palace.Tbird = PalaceRooms.Thunderbird(props.UseCustomRooms).DeepCopy();
                                 }
                                 palace.Tbird.NewMap = mapNoGp;
                                 palace.Tbird.PalaceGroup = 3;
                                 IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
-                                palace.SortRoom(palace.Tbird);
+                                //palace.SortRoom(palace.Tbird);
                                 palace.AllRooms.Add(palace.Tbird);
                             }
                             palace.SetOpenRoom(palace.Root);
@@ -366,26 +369,20 @@ public class Palaces
                             }
 
                         }
+
                         innertries++;
-                        /*
-                        if (currentPalace == 7)
-                        {
-                            Debug.WriteLine("---" + palace.AllRooms.Where(i => i.CountOpenExits() > 0).Count() + "---");
-                            palace.AllRooms.Where(i => i.CountOpenExits() > 0).ToList()
-                                .ForEach(i => Debug.WriteLine(Util.ByteArrayToHexString(i.SideView) + i.PrintUnsatisfiedExits()));
-                        }
-                        */
                     } while (roomPlacementFailures < ROOM_PLACEMENT_FAILURE_LIMIT
                         && palace.AllRooms.Any(i => i.CountOpenExits() > 0)
-                        //|| (/*currentPalace == 1 && */!palace.AllRooms.Any(i => i.HasDrop))
                       );
 
                     if(roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
                     {
                         palace.ShuffleRooms(r);
                         bool reachable = palace.AllReachable();
-                        while ((!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd()) 
-                            && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT))
+                        while (
+                            (!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd()) 
+                            && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT)
+                            )
                         {
                             palace.ResetRooms();
                             palace.ShuffleRooms(r);
@@ -394,6 +391,7 @@ public class Palaces
                             logger.Debug("Palace room shuffle attempt #" + tries);
                         }
                     } 
+
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 palace.Generations += tries;
                 palaces.Add(palace);
@@ -435,6 +433,7 @@ public class Palaces
                     palace.AllRooms.Where(i => i.Up == segmentedItemRoom1).ToList().ForEach(i => i.Up = segmentedItemRoom2);
                     palace.AllRooms.Remove(segmentedItemRoom1);
                 }
+
             }
         }
         //Not reconstructed
@@ -504,6 +503,11 @@ public class Palaces
                 }
                 palaces.Add(palace);
             }
+        }
+
+        if (!ValidatePalaces(props, raftIsRequired, palaces))
+        {
+            return null;
         }
 
         //Randomize Enemies
@@ -675,13 +679,13 @@ public class Palaces
         {
             return palaceNumber switch
             {
-                1 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 13).First().DeepCopy(),
-                2 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 34).First().DeepCopy(),
-                3 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 14).First().DeepCopy(),
-                4 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 28).First().DeepCopy(),
-                5 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 41).First().DeepCopy(),
-                6 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 58).First().DeepCopy(),
-                7 => PalaceRooms.PalaceRoomsByNumber(palaceNumber, useCustomRooms).Where(i => i.Map == 54).First().DeepCopy(),
+                1 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 13).First().DeepCopy(),
+                2 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 34).First().DeepCopy(),
+                3 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 14).First().DeepCopy(),
+                4 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 28).First().DeepCopy(),
+                5 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 41).First().DeepCopy(),
+                6 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 58).First().DeepCopy(),
+                7 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 54).First().DeepCopy(),
                 _ => throw new ImpossibleException("Unable to find vanilla boss room")
             };
         }
@@ -751,6 +755,95 @@ public class Palaces
             }
         }
         return -1;
+    }
+
+    private static bool ValidatePalaces(RandomizerProperties props, bool raftIsRequired, List<Palace> palaces)
+    {
+        return CanGetGlove(props, palaces[1])
+            && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])
+            && AtLeastOnePalaceCanHaveGlove(props, palaces);
+    }
+    private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
+    {
+        List<RequirementType> requireables = new List<RequirementType>();
+        requireables.Add(RequirementType.KEY);
+        requireables.Add(RequirementType.UPSTAB);
+        requireables.Add(RequirementType.DOWNSTAB);
+        requireables.Add(RequirementType.JUMP);
+        requireables.Add(RequirementType.FAIRY);
+        for(int i = 0; i < 6; i++)
+        {
+            //If there is at least one palace that would be clearable with everything but the glove
+            //that palace could contain the glove, so we're not deadlocked.
+            if (palaces[i].IsTraversable(requireables, Item.GLOVE))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool CanGetGlove(RandomizerProperties props, Palace palace2)
+    {
+        if (!props.ShufflePalaceItems)
+        {
+            List<RequirementType> requireables = new List<RequirementType>();
+            //If shuffle overworld items is on, we assume you can get all the items / spells
+            //as all progression items will eventually shuffle into spots that work
+            if (props.ShuffleOverworldItems)
+            {
+                requireables.Add(RequirementType.KEY);
+            }
+            //Otherwise if it's vanilla items we can't get the magic key, because we could need glove for boots for flute to get to new kasuto
+            requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
+            requireables.Add(RequirementType.JUMP);
+            requireables.Add(RequirementType.FAIRY);
+
+            //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
+            if (!palace2.IsTraversable(requireables, Item.GLOVE))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static bool CanGetRaft(RandomizerProperties props, bool raftIsRequired, Palace palace2, Palace palace3)
+    {
+        //if the flagset has vanilla connections and vanilla palace items, you have to be able to get the raft
+        //or it will send the logic into an uinrecoverable nosedive since the palaces can't re-generate
+        if (!props.ShufflePalaceItems && raftIsRequired)
+        {
+            List<RequirementType> requireables = new List<RequirementType>();
+            //If shuffle overworld items is on, we assume you can get all the items / spells
+            //as all progression items will eventually shuffle into spots that work
+            if (props.ShuffleOverworldItems)
+            {
+                requireables.Add(RequirementType.KEY);
+                requireables.Add(RequirementType.GLOVE);
+                requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
+                requireables.Add(RequirementType.JUMP);
+                requireables.Add(RequirementType.FAIRY);
+            }
+            //Otherwise we can only get the things you can get on the west normally
+            else
+            {
+                requireables.Add(RequirementType.JUMP);
+                requireables.Add(RequirementType.FAIRY);
+            }
+            //If we can clear P2 with this stuff, we can also get the glove
+            if (palace2.IsTraversable(requireables, Item.GLOVE))
+            {
+                requireables.Add(RequirementType.GLOVE);
+            }
+            //If we can't clear 3 with all the items available on west/DM, we can never raft out, and so we're stuck forever
+            //so start over
+            if (!palace3.IsTraversable(requireables, Item.RAFT))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

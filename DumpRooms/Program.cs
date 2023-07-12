@@ -49,7 +49,7 @@ for (int j = 0; j < 3; j++)
         {
             bitmask = (byte)(bitmask & 0x0F);
         }
-        r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, -1, addr, false, false, false, new Requirements());
+        r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, -1, addr, false, false, false, new Requirements(), null);
         r.Group = "Bank# " + (j + 1);
         sb.Append(r.Serialize() + ",");
 

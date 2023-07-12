@@ -7,6 +7,7 @@ using System.Speech.Synthesis;
 using System.Diagnostics;
 using System.Numerics;
 using Z2Randomizer.Core.Overworld;
+using System.Text;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -83,63 +84,6 @@ public class Palace
         }
     }
 
-    /*
-    public static void DumpMaps(ROM ROMData)
-    {
-        int[] connAddr = new int[] { 0x1072B, 0x12208, 0x1472B };
-        int[] side = new int[] { 0x10533, 0x12010, 0x14533 };
-        int[] enemy = new int[] { 0x105b1, 0x1208E, 0x145b1 };
-        int[] bit = new int[] { 0x17ba5, 0x17bc5, 0x17be5 };
-        for (int j = 0; j < 3; j++)
-        {
-            for (int i = 0; i < 63; i++)
-            {
-                int addr = connAddr[j] + i * 4;
-                byte[] connectBytes = new Byte[4];
-                for (int k = 0; k < 4; k++)
-                {
-                    connectBytes[k] = ROMData.GetByte(addr + k);
-
-                }
-                Room room;
-                int sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0x8010;
-                if (j == 2)
-                {
-                    sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
-                }
-                int sideViewLength = ROMData.GetByte(sideViewPtr);
-                byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewPtr + sideViewLength);
-
-                int enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
-                if (j == 2)
-                {
-                    enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0xd8b0;
-                }
-
-                int enemyLength = ROMData.GetByte(enemyPtr);
-                byte[] enemies = ROMData.GetBytes(enemyPtr, enemyPtr + enemyLength);
-
-                Byte bitmask = ROMData.GetByte(bit[j] + i / 2);
-            
-                if (i % 2 == 0)
-                {
-                    bitmask = (byte)(bitmask & 0xF0);
-                    bitmask = (byte)(bitmask >> 4);
-                }
-                else
-                {
-                    bitmask = (byte)(bitmask & 0x0F);
-                }
-
-
-                //room = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, false, false, false, false, false, -1, addr, false, false);
-
-                //room.Dump();
-            }
-        }
-    }
-    */
-
     public int GetOpenRooms()
     {
         return openRooms.Count;
@@ -205,7 +149,7 @@ public class Palace
             netDeadEnds--;
         }
         AllRooms.Add(r);
-        SortRoom(r);
+        //SortRoom(r);
         numRooms++;
 
         if (Number != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
@@ -363,42 +307,6 @@ public class Palace
         }
 
         return placed;
-    }
-
-
-
-    public void SortRoom(Room r)
-    {
-        //There is no reason this should be separate, persistent collections.
-        //They were desynchronizing so frequently I got rid of it.
-        /*
-        if (r.HasDownExit())
-        {
-            if (r.HasDrop)
-            {
-                dropExits.Add(r);
-            }
-            else
-            {
-                downExits.Add(r);
-            }
-        }
-
-        if (r.HasLeftExit())
-        {
-            leftExits.Add(r);
-        }
-
-        if (r.HasRightExit())
-        {
-            rightExits.Add(r);
-        }
-
-        if (r.HasUpExit())
-        {
-            upExits.Add(r);
-        }
-        */
     }
 
     public bool RequiresThunderbird()
@@ -735,15 +643,7 @@ public class Palace
             }
         }
     }
-    /*
-    public void UpdateEnemies(ROM ROMData)
-    {
-        foreach (Room r in allRooms)
-        {
-            r.UpdateEnemies(ROMData);
-        }
-    }
-    */
+
 
     public void CreateTree(bool removeTbird)
     {
@@ -761,7 +661,7 @@ public class Palace
                 List<Room> l = new List<Room> { r };
                 rooms.Add(r.Map * 4, l);
             }
-            SortRoom(r);
+            //SortRoom(r);
         }
         foreach (Room r in AllRooms)
         {
@@ -1218,10 +1118,16 @@ public class Palace
         }
     }
 
-    public bool IsTraversable(IEnumerable<RequirementType> requireables, Location location)
+    public bool IsTraversable(IEnumerable<RequirementType> requireables, Item palaceItem, int debug = 0)
     {
-        if(location.Item == Item.GLOVE)
+        if(palaceItem == Item.GLOVE)
         {
+            /*
+            if(debug != 0)
+            {
+                Debug.WriteLine(debug);
+            }
+            */
             List<Room> pendingRooms = new List<Room>() { AllRooms.First(i => i.IsEntrance) };
             List<Room> coveredRooms = new List<Room>();
 
@@ -1254,6 +1160,17 @@ public class Palace
                 }
             }
         }
+        /*
+        if(Hyrule.UNSAFE_DEBUG)
+        {
+            StringBuilder sb = new();
+            foreach(Room room in rooms.Values.SelectMany(i => i))
+            {
+                sb.Append(room.Requirements.ToString());
+            }
+            Debug.WriteLine(sb.ToString());
+        }
+        */
         bool retVal = AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
         return retVal;
     }
