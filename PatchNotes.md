@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 4.2.0 - ???
+## Version 4.2.0 - July 13th, 2023
 
 ### New features
 - Updated community hints to have new / different hints. Have ideas for new texts? (especially for specific spells/locations) Post them to the #community-hints channel on discord.
@@ -9,6 +9,7 @@
 - Added new sprites and converted all existing sprites to IPS sprites. If you are a sprite author and have any sprites you want to have added, ping Ellendar on discord.
 - Added a system for crediting sprite authors in the UI and in the opening crawl. If you are the author of an existing sprite and would like to be credited, ping Ellendar on discord.
 - Updated the installer to automatically clean up old versions when it runs. This will remove all old 4.1 and later versions when you install this update. 4.0.4 and earlier are not affected.
+- Fixed the attack randomization procedure to be more statistically accurate. This will result in more normal attack progression and fewer weird outliers, especially at lower levels.
 - Reworked the logic for palace routing to more accurately reflect how the rooms are actually constructed.
 	- Dash is now allowed in logic, and rooms can be cleared by dashing over pits (possibly with jump as well).
 	- Glove is now allowed to be in palaces that contain glove blocks, as long as it is possible to reach the glove without the glove.
