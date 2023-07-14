@@ -144,6 +144,8 @@ partial class MainUI
         shuffleAtkExpNeededCheckbox = new CheckBox();
         shuffleAllExpCheckbox = new CheckBox();
         tabPage9 = new TabPage();
+        dashAlwaysOnCheckbox = new CheckBox();
+        jumpAlwaysOnCheckbox = new CheckBox();
         FireSpellOptionLabel = new Label();
         FireSpellBox = new ComboBox();
         swapUpAndDownstabCheckbox = new CheckBox();
@@ -203,11 +205,13 @@ partial class MainUI
         useCommunityHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         tabPage3 = new TabPage();
-        spriteCreditLabel = new Label();
+        beepFrequencyDropdown = new ComboBox();
+        label10 = new Label();
+        beepThresholdDropdown = new ComboBox();
+        label9 = new Label();
         spritePreviewLabel = new Label();
         spritePreviewBox = new PictureBox();
         useCustomRoomsBox = new CheckBox();
-        dashAlwaysOnCheckbox = new CheckBox();
         flashingOffCheckbox = new CheckBox();
         upAOnController1Checkbox = new CheckBox();
         beamSpriteList = new ComboBox();
@@ -222,8 +226,6 @@ partial class MainUI
         shuffleEnemyPalettesCheckbox = new CheckBox();
         alwaysBeamCheckbox = new CheckBox();
         fastSpellCheckbox = new CheckBox();
-        jumpAlwaysOnCheckbox = new CheckBox();
-        disableLowHealthBeepCheckbox = new CheckBox();
         romFileTextBox = new TextBox();
         seedTextBox = new TextBox();
         romFileLabel = new Label();
@@ -249,6 +251,7 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
+        spriteCreditLabel = new Label();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1676,6 +1679,8 @@ partial class MainUI
         // 
         // tabPage9
         // 
+        tabPage9.Controls.Add(dashAlwaysOnCheckbox);
+        tabPage9.Controls.Add(jumpAlwaysOnCheckbox);
         tabPage9.Controls.Add(FireSpellOptionLabel);
         tabPage9.Controls.Add(FireSpellBox);
         tabPage9.Controls.Add(swapUpAndDownstabCheckbox);
@@ -1691,6 +1696,30 @@ partial class MainUI
         tabPage9.TabIndex = 9;
         tabPage9.Text = "Spells";
         tabPage9.UseVisualStyleBackColor = true;
+        // 
+        // dashAlwaysOnCheckbox
+        // 
+        dashAlwaysOnCheckbox.AutoSize = true;
+        dashAlwaysOnCheckbox.Location = new Point(297, 8);
+        dashAlwaysOnCheckbox.Margin = new Padding(4, 3, 4, 3);
+        dashAlwaysOnCheckbox.Name = "dashAlwaysOnCheckbox";
+        dashAlwaysOnCheckbox.Size = new Size(111, 19);
+        dashAlwaysOnCheckbox.TabIndex = 36;
+        dashAlwaysOnCheckbox.Text = "Dash Always On";
+        toolTip1.SetToolTip(dashAlwaysOnCheckbox, "The player will always move as though Dash spell were on.,");
+        dashAlwaysOnCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // jumpAlwaysOnCheckbox
+        // 
+        jumpAlwaysOnCheckbox.AutoSize = true;
+        jumpAlwaysOnCheckbox.Location = new Point(297, 33);
+        jumpAlwaysOnCheckbox.Margin = new Padding(4, 3, 4, 3);
+        jumpAlwaysOnCheckbox.Name = "jumpAlwaysOnCheckbox";
+        jumpAlwaysOnCheckbox.Size = new Size(114, 19);
+        jumpAlwaysOnCheckbox.TabIndex = 35;
+        jumpAlwaysOnCheckbox.Text = "Jump Always On";
+        toolTip1.SetToolTip(jumpAlwaysOnCheckbox, "The player will jump very high, as if the jump spell is always active");
+        jumpAlwaysOnCheckbox.UseVisualStyleBackColor = true;
         // 
         // FireSpellOptionLabel
         // 
@@ -2449,10 +2478,13 @@ partial class MainUI
         // tabPage3
         // 
         tabPage3.Controls.Add(spriteCreditLabel);
+        tabPage3.Controls.Add(beepFrequencyDropdown);
+        tabPage3.Controls.Add(label10);
+        tabPage3.Controls.Add(beepThresholdDropdown);
+        tabPage3.Controls.Add(label9);
         tabPage3.Controls.Add(spritePreviewLabel);
         tabPage3.Controls.Add(spritePreviewBox);
         tabPage3.Controls.Add(useCustomRoomsBox);
-        tabPage3.Controls.Add(dashAlwaysOnCheckbox);
         tabPage3.Controls.Add(flashingOffCheckbox);
         tabPage3.Controls.Add(upAOnController1Checkbox);
         tabPage3.Controls.Add(beamSpriteList);
@@ -2467,8 +2499,6 @@ partial class MainUI
         tabPage3.Controls.Add(shuffleEnemyPalettesCheckbox);
         tabPage3.Controls.Add(alwaysBeamCheckbox);
         tabPage3.Controls.Add(fastSpellCheckbox);
-        tabPage3.Controls.Add(jumpAlwaysOnCheckbox);
-        tabPage3.Controls.Add(disableLowHealthBeepCheckbox);
         tabPage3.Location = new Point(4, 24);
         tabPage3.Margin = new Padding(4, 3, 4, 3);
         tabPage3.Name = "tabPage3";
@@ -2477,14 +2507,49 @@ partial class MainUI
         tabPage3.Text = "Misc.";
         tabPage3.UseVisualStyleBackColor = true;
         // 
-        // spriteCreditLabel
+        // beepFrequencyDropdown
         // 
-        spriteCreditLabel.Anchor = AnchorStyles.Right;
-        spriteCreditLabel.Location = new Point(439, 222);
-        spriteCreditLabel.Name = "spriteCreditLabel";
-        spriteCreditLabel.Size = new Size(129, 23);
-        spriteCreditLabel.TabIndex = 38;
-        spriteCreditLabel.TextAlign = ContentAlignment.MiddleRight;
+        beepFrequencyDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
+        beepFrequencyDropdown.FormattingEnabled = true;
+        beepFrequencyDropdown.Items.AddRange(new object[] { "Normal", "Half Speed", "Quarter Speed", "Off" });
+        beepFrequencyDropdown.Location = new Point(4, 207);
+        beepFrequencyDropdown.Margin = new Padding(2);
+        beepFrequencyDropdown.Name = "beepFrequencyDropdown";
+        beepFrequencyDropdown.Size = new Size(142, 23);
+        beepFrequencyDropdown.TabIndex = 41;
+        toolTip1.SetToolTip(beepFrequencyDropdown, "Controls how often the beep occurs when on low life.");
+        // 
+        // label10
+        // 
+        label10.AutoSize = true;
+        label10.Location = new Point(0, 184);
+        label10.Margin = new Padding(2, 0, 2, 0);
+        label10.Name = "label10";
+        label10.Size = new Size(91, 15);
+        label10.TabIndex = 40;
+        label10.Text = "Beep Frequency";
+        // 
+        // beepThresholdDropdown
+        // 
+        beepThresholdDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
+        beepThresholdDropdown.FormattingEnabled = true;
+        beepThresholdDropdown.Items.AddRange(new object[] { "Normal", "Half Bar", "Quarter Bar", "Two Bars" });
+        beepThresholdDropdown.Location = new Point(4, 151);
+        beepThresholdDropdown.Margin = new Padding(2);
+        beepThresholdDropdown.Name = "beepThresholdDropdown";
+        beepThresholdDropdown.Size = new Size(142, 23);
+        beepThresholdDropdown.TabIndex = 39;
+        toolTip1.SetToolTip(beepThresholdDropdown, "Controls how much health you must be down to before beeping starts.");
+        // 
+        // label9
+        // 
+        label9.AutoSize = true;
+        label9.Location = new Point(0, 128);
+        label9.Margin = new Padding(2, 0, 2, 0);
+        label9.Name = "label9";
+        label9.Size = new Size(88, 15);
+        label9.TabIndex = 38;
+        label9.Text = "Beep Threshold";
         // 
         // spritePreviewLabel
         // 
@@ -2507,7 +2572,7 @@ partial class MainUI
         // useCustomRoomsBox
         // 
         useCustomRoomsBox.AutoSize = true;
-        useCustomRoomsBox.Location = new Point(4, 126);
+        useCustomRoomsBox.Location = new Point(4, 102);
         useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
         useCustomRoomsBox.Name = "useCustomRoomsBox";
         useCustomRoomsBox.Size = new Size(130, 19);
@@ -2516,24 +2581,12 @@ partial class MainUI
         toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
         useCustomRoomsBox.UseVisualStyleBackColor = true;
         // 
-        // dashAlwaysOnCheckbox
-        // 
-        dashAlwaysOnCheckbox.AutoSize = true;
-        dashAlwaysOnCheckbox.Location = new Point(4, 222);
-        dashAlwaysOnCheckbox.Margin = new Padding(4, 3, 4, 3);
-        dashAlwaysOnCheckbox.Name = "dashAlwaysOnCheckbox";
-        dashAlwaysOnCheckbox.Size = new Size(111, 19);
-        dashAlwaysOnCheckbox.TabIndex = 34;
-        dashAlwaysOnCheckbox.Text = "Dash Always On";
-        toolTip1.SetToolTip(dashAlwaysOnCheckbox, "The player will always move as though Dash spell were on.,");
-        dashAlwaysOnCheckbox.UseVisualStyleBackColor = true;
-        // 
         // flashingOffCheckbox
         // 
         flashingOffCheckbox.AutoSize = true;
         flashingOffCheckbox.Checked = true;
         flashingOffCheckbox.CheckState = CheckState.Checked;
-        flashingOffCheckbox.Location = new Point(4, 101);
+        flashingOffCheckbox.Location = new Point(4, 77);
         flashingOffCheckbox.Margin = new Padding(4, 3, 4, 3);
         flashingOffCheckbox.Name = "flashingOffCheckbox";
         flashingOffCheckbox.Size = new Size(182, 19);
@@ -2545,7 +2598,7 @@ partial class MainUI
         // upAOnController1Checkbox
         // 
         upAOnController1Checkbox.AutoSize = true;
-        upAOnController1Checkbox.Location = new Point(4, 76);
+        upAOnController1Checkbox.Location = new Point(4, 52);
         upAOnController1Checkbox.Margin = new Padding(4, 3, 4, 3);
         upAOnController1Checkbox.Name = "upAOnController1Checkbox";
         upAOnController1Checkbox.Size = new Size(250, 19);
@@ -2649,7 +2702,7 @@ partial class MainUI
         // disableMusicCheckbox
         // 
         disableMusicCheckbox.AutoSize = true;
-        disableMusicCheckbox.Location = new Point(4, 27);
+        disableMusicCheckbox.Location = new Point(4, 3);
         disableMusicCheckbox.Margin = new Padding(2);
         disableMusicCheckbox.Name = "disableMusicCheckbox";
         disableMusicCheckbox.Size = new Size(99, 19);
@@ -2661,7 +2714,7 @@ partial class MainUI
         // shuffleEnemyPalettesCheckbox
         // 
         shuffleEnemyPalettesCheckbox.AutoSize = true;
-        shuffleEnemyPalettesCheckbox.Location = new Point(4, 172);
+        shuffleEnemyPalettesCheckbox.Location = new Point(4, 250);
         shuffleEnemyPalettesCheckbox.Margin = new Padding(4, 3, 4, 3);
         shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
         shuffleEnemyPalettesCheckbox.Size = new Size(140, 19);
@@ -2673,7 +2726,7 @@ partial class MainUI
         // alwaysBeamCheckbox
         // 
         alwaysBeamCheckbox.AutoSize = true;
-        alwaysBeamCheckbox.Location = new Point(4, 197);
+        alwaysBeamCheckbox.Location = new Point(4, 275);
         alwaysBeamCheckbox.Margin = new Padding(4, 3, 4, 3);
         alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
         alwaysBeamCheckbox.Size = new Size(153, 19);
@@ -2685,7 +2738,7 @@ partial class MainUI
         // fastSpellCheckbox
         // 
         fastSpellCheckbox.AutoSize = true;
-        fastSpellCheckbox.Location = new Point(4, 51);
+        fastSpellCheckbox.Location = new Point(4, 27);
         fastSpellCheckbox.Margin = new Padding(4, 3, 4, 3);
         fastSpellCheckbox.Name = "fastSpellCheckbox";
         fastSpellCheckbox.Size = new Size(118, 19);
@@ -2693,30 +2746,6 @@ partial class MainUI
         fastSpellCheckbox.Text = "Fast Spell Casting";
         toolTip1.SetToolTip(fastSpellCheckbox, "When checked, you do not have to open the pause menu before casting the selected spell");
         fastSpellCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // jumpAlwaysOnCheckbox
-        // 
-        jumpAlwaysOnCheckbox.AutoSize = true;
-        jumpAlwaysOnCheckbox.Location = new Point(4, 247);
-        jumpAlwaysOnCheckbox.Margin = new Padding(4, 3, 4, 3);
-        jumpAlwaysOnCheckbox.Name = "jumpAlwaysOnCheckbox";
-        jumpAlwaysOnCheckbox.Size = new Size(114, 19);
-        jumpAlwaysOnCheckbox.TabIndex = 3;
-        jumpAlwaysOnCheckbox.Text = "Jump Always On";
-        toolTip1.SetToolTip(jumpAlwaysOnCheckbox, "The player will jump very high, as if the jump spell is always active");
-        jumpAlwaysOnCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // disableLowHealthBeepCheckbox
-        // 
-        disableLowHealthBeepCheckbox.AutoSize = true;
-        disableLowHealthBeepCheckbox.Location = new Point(4, 3);
-        disableLowHealthBeepCheckbox.Margin = new Padding(4, 3, 4, 3);
-        disableLowHealthBeepCheckbox.Name = "disableLowHealthBeepCheckbox";
-        disableLowHealthBeepCheckbox.Size = new Size(156, 19);
-        disableLowHealthBeepCheckbox.TabIndex = 0;
-        disableLowHealthBeepCheckbox.Text = "Disable Low Health Beep";
-        toolTip1.SetToolTip(disableLowHealthBeepCheckbox, "Disables the beeping that happens when the player is low on health");
-        disableLowHealthBeepCheckbox.UseVisualStyleBackColor = true;
         // 
         // romFileTextBox
         // 
@@ -2970,6 +2999,15 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
+        // spriteCreditLabel
+        // 
+        spriteCreditLabel.Anchor = AnchorStyles.Right;
+        spriteCreditLabel.Location = new Point(441, 227);
+        spriteCreditLabel.Name = "spriteCreditLabel";
+        spriteCreditLabel.Size = new Size(129, 23);
+        spriteCreditLabel.TabIndex = 42;
+        spriteCreditLabel.TextAlign = ContentAlignment.MiddleRight;
+        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3086,14 +3124,12 @@ partial class MainUI
     private CheckBox shuffleStealXPAmountCheckbox;
     private CheckBox shuffleXPStealersCheckbox;
     private TabPage tabPage3;
-    private CheckBox disableLowHealthBeepCheckbox;
     private CheckBox tbirdRequiredCheckbox;
     private CheckBox allowPathEnemiesCheckbox;
     private CheckBox shuffleEncountersCheckbox;
     private CheckBox shufflePalaceEnemiesCheckbox;
     private CheckBox shuffleOverworldEnemiesCheckbox;
     private Label label8;
-    private CheckBox jumpAlwaysOnCheckbox;
     private TextBox flagsTextBox;
     private Button updateButton;
     private Label flagsLabel;
@@ -3227,7 +3263,6 @@ partial class MainUI
     private CheckBox bossRoomsExitToPalaceCheckbox;
     private Label palaceStyleLabel;
     private ComboBox palaceStyleList;
-    private CheckBox dashAlwaysOnCheckbox;
     private Label oldFlagsLabel;
     private TextBox oldFlagsTextbox;
     private Button convertButton;
@@ -3250,6 +3285,12 @@ partial class MainUI
     private ContextMenuStrip customisableButtonContextMenu;
     private Label spritePreviewLabel;
     private PictureBox spritePreviewBox;
+    private CheckBox dashAlwaysOnCheckbox;
+    private CheckBox jumpAlwaysOnCheckbox;
+    private ComboBox beepFrequencyDropdown;
+    private Label label10;
+    private ComboBox beepThresholdDropdown;
+    private Label label9;
     private Label spriteCreditLabel;
 }
 

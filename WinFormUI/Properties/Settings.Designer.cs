@@ -13,7 +13,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
@@ -238,7 +238,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
                 this["useCustomRooms"] = value;
             }
         }
-        
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
@@ -247,11 +247,14 @@ namespace Z2Randomizer.WinFormUI.Properties {
   <string>Flagset|</string>
   <string>Tooltip|Right click to set your custom flagset</string>
 </ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customizableButtonBase {
-            get {
+        public global::System.Collections.Specialized.StringCollection customizableButtonBase
+        {
+            get
+            {
                 return ((global::System.Collections.Specialized.StringCollection)(this["customizableButtonBase"]));
             }
-            set {
+            set
+            {
                 this["customizableButtonBase"] = value;
             }
         }
@@ -340,10 +343,12 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         public global::System.Collections.Specialized.StringCollection customFlagsButton5
         {
-            get {
+            get
+            {
                 return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton5"]));
             }
-            set {
+            set
+            {
                 this["customFlagsButton5"] = value;
             }
         }
@@ -362,6 +367,28 @@ namespace Z2Randomizer.WinFormUI.Properties {
             }
         }
 
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int beepFrequency {
+            get {
+                return ((int)(this["beepFrequency"]));
+            }
+            set {
+                this["beepFrequency"] = value;
+            }
+        }
         
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int beepThreshold {
+            get {
+                return ((int)(this["beepThreshold"]));
+            }
+            set {
+                this["beepThreshold"] = value;
+            }
+        }
     }
 }

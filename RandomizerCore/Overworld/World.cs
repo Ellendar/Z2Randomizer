@@ -158,21 +158,6 @@ public abstract class World
 
     protected void ShuffleLocations(List<Location> locationsToShuffle)
     {
-        //This only swaps elements in a list a number of times equal to the number of elements in the list.
-        //This is an extremely biased shuffle (see https://blog.codinghorror.com/the-danger-of-naivete/)
-        //ALSO, it has a bias towards things in their vanilla locations by just not shuffling when one of
-        //the locations can't shuffle instead of ignoring such locations in the shuffling
-        //TODO: Replace this with knuth-fisher-yates, which will break seed compatibility
-        /*for (int i = 0; i < locationsToShuffle.Count; i++)
-        {
-            int s = hyrule.RNG.Next(i, locationsToShuffle.Count);
-            Location sl = locationsToShuffle[s];
-            if (sl.CanShuffle && locationsToShuffle[i].CanShuffle)
-            {
-                Swap(locationsToShuffle[i], locationsToShuffle[s]);
-            }
-        }*/
-
         List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle).ToList();
         for (int i = shufflableLocations.Count() - 1; i > 0; i--)
         {
@@ -184,15 +169,9 @@ public abstract class World
 
     protected void Swap(Location l1, Location l2)
     {
-        int tempX = l1.Xpos;
-        int tempY = l1.Ypos;
-        int tempPass = l1.PassThrough;
-        l1.Xpos = l2.Xpos;
-        l1.Ypos = l2.Ypos;
-        l1.PassThrough = l2.PassThrough;
-        l2.Xpos = tempX;
-        l2.Ypos = tempY;
-        l2.PassThrough = tempPass;
+        (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
+        (l2.Ypos, l1.Ypos) = (l1.Ypos, l2.Ypos);
+        (l2.PassThrough, l1.PassThrough) = (l1.PassThrough, l2.PassThrough);
     }
 
     //TODO: This should work like the new palace enemy shuffle. Shuffle should set what enemies are where into
@@ -525,7 +504,7 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || location.TownNum != Town.SPELL_TOWER) //don't place newkasuto2
+                else if (location.TerrainType != Terrain.TOWN || location.ActualTown != Town.SPELL_TOWER) //don't place newkasuto2
                 {
                     Terrain t = Terrain.NONE;
                     do
@@ -1842,6 +1821,11 @@ public abstract class World
                 UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
             }
         }
+
+        if(AllLocations.Where(i => i.ActualTown == Town.NEW_KASUTO).FirstOrDefault()?.Reachable ?? false)
+        {
+            hyrule.eastHyrule.spellTower.Reachable = true;
+        } 
 
         /*
         StringBuilder sb = new();

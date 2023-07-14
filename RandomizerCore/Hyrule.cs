@@ -436,7 +436,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.0" +
+            "4.2.1" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
@@ -728,55 +728,52 @@ public class Hyrule
         }
 
         //TODO: Clean up the readability of this logic
-        if (itemGet[(Item)0])
+        if (itemGet[Item.CANDLE])
         {
             itemList[0] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)1])
+        if (itemGet[Item.GLOVE])
         {
             itemList[1] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)2])
+        if (itemGet[Item.RAFT])
         {
             itemList[2] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)3])
+        if (itemGet[Item.BOOTS])
         {
             itemList[3] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)4])
+        if (itemGet[Item.FLUTE])
         {
             itemList[4] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)5])
+        if (itemGet[Item.CROSS])
         {
             itemList[5] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)7])
+        if (itemGet[Item.MAGIC_KEY])
         {
             itemList[14] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[(Item)6])
+        if (itemGet[Item.HAMMER])
         {
             itemList[16] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-
         if (props.MixOverworldPalaceItems)
         {
-            for (int i = 0; i < itemList.Count; i++)
+            for (int i = itemList.Count - 1; i > 0; --i)
             {
                 int s = RNG.Next(i, itemList.Count);
-                Item sl = itemList[s];
-                itemList[s] = itemList[i];
-                itemList[i] = sl;
+                (itemList[i], itemList[s]) = (itemList[s], itemList[i]);
             }
         }
         else
@@ -989,6 +986,10 @@ public class Hyrule
         {
             logicallyRequiredLocationsReachableFailures++;
         }
+        if(UNSAFE_DEBUG && retval)
+        {
+            PrintRoutingDebug(count, wh, eh, dm, mi);
+        }
         return retval;
     }
 
@@ -1092,11 +1093,11 @@ public class Hyrule
                     && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
                     */
             }
-            else if (location.TownNum == Town.NEW_KASUTO)
+            else if (location.ActualTown == Town.NEW_KASUTO)
             {
                 hasItemNow = CanGet(location) && (accessibleMagicContainers >= kasutoJars) && (!location.NeedHammer || itemGet[Item.HAMMER]);
             }
-            else if (location.TownNum == Town.SPELL_TOWER)
+            else if (location.ActualTown == Town.SPELL_TOWER)
             {
                 hasItemNow = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || itemGet[Item.HAMMER]);
             }
@@ -1374,8 +1375,7 @@ public class Hyrule
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
                 worlds.Add(mazeIsland);
-                //This just supports town swap, which never worked, so it does nothing.
-                //ShuffleTowns();
+                ResetTowns();
 
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL || props.ContinentConnections == ContinentConnectionType.RB_BORDER_SHUFFLE)
                 {
@@ -1691,7 +1691,7 @@ public class Hyrule
                         location.Reachable = false;
                     }
 
-                    eastHyrule.newKasuto2.Reachable = false;
+                    eastHyrule.spellTower.Reachable = false;
                     //eastHyrule.bridge.Reachable = false;
                     startMed = false;
                     startTrophy = false;
@@ -1802,62 +1802,19 @@ public class Hyrule
         return true;
     }
 
-    /*
-    private void ShuffleTowns()
+    private void ResetTowns()
     {
-        westHyrule.shieldTown.TownNum = Town.RAURU;
-        westHyrule.jump.TownNum = Town.RUTO;
-        westHyrule.lifeNorth.TownNum = Town.SARIA_NORTH;
-        westHyrule.lifeSouth.TownNum = Town.SARIA_SOUTH;
-        westHyrule.fairy.TownNum = Town.MIDO_WEST;
-        eastHyrule.nabooru.TownNum = Town.NABOORU;
-        eastHyrule.darunia.TownNum = Town.DARUNIA_WEST;
-        eastHyrule.newKasuto.TownNum = Town.NEW_KASUTO;
-        eastHyrule.newKasuto2.TownNum = Town.SPELL_TOWER;
-        eastHyrule.oldKasuto.TownNum = Town.OLD_KASUTO;
-
-        if(props.TownSwap)
-        {
-            if(RNG.NextDouble() > .5)
-            {
-                Util.Swap(westHyrule.shieldTown, eastHyrule.nabooru);
-            }
-            if (RNG.NextDouble() > .5)
-            {
-                Util.Swap(westHyrule.jump, eastHyrule.darunia);
-            }
-            if (RNG.NextDouble() > .5)
-            {
-                Util.Swap(westHyrule.lifeNorth, eastHyrule.newKasuto);
-                Util.Swap(westHyrule.lifeSouth, eastHyrule.newKasuto2);
-
-                eastHyrule.newKasuto.NeedBagu = true;
-                eastHyrule.newKasuto2.NeedBagu = true;
-
-                westHyrule.lifeNorth.NeedBagu = false;
-                westHyrule.lifeSouth.NeedBagu = false;
-
-                westHyrule.connections.Remove(westHyrule.lifeNorth);
-                westHyrule.connections.Remove(westHyrule.lifeSouth);
-
-                eastHyrule.connections.Add(eastHyrule.newKasuto, eastHyrule.newKasuto2);
-                eastHyrule.connections.Add(eastHyrule.newKasuto2, eastHyrule.newKasuto);
-
-                westHyrule.AllLocations.Remove(westHyrule.lifeSouth);
-
-                eastHyrule.AllLocations.Add(eastHyrule.newKasuto2);
-
-
-
-            }
-            if (RNG.NextDouble() > .5)
-            {
-                Util.Swap(westHyrule.fairy, eastHyrule.oldKasuto);
-            }
-        }
-
+        westHyrule.shieldTown.ActualTown = Town.RAURU;
+        westHyrule.jump.ActualTown = Town.RUTO;
+        westHyrule.lifeNorth.ActualTown = Town.SARIA_NORTH;
+        westHyrule.lifeSouth.ActualTown = Town.SARIA_SOUTH;
+        westHyrule.fairy.ActualTown = Town.MIDO_WEST;
+        eastHyrule.townAtNabooru.ActualTown = Town.NABOORU;
+        eastHyrule.townAtDarunia.ActualTown = Town.DARUNIA_WEST;
+        eastHyrule.townAtNewKasuto.ActualTown = Town.NEW_KASUTO;
+        eastHyrule.spellTower.ActualTown = Town.SPELL_TOWER;
+        eastHyrule.townAtOldKasuto.ActualTown = Town.OLD_KASUTO;
     }
-    */
 
     private void ShufflePalaces()
     {
@@ -1988,16 +1945,8 @@ public class Hyrule
         itemLocs.Add(westHyrule.trophyCave);
         itemLocs.Add(eastHyrule.waterTile);
         itemLocs.Add(eastHyrule.desertTile);
-        if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
-        {
-            itemLocs.Add(eastHyrule.newKasuto);
-            itemLocs.Add(eastHyrule.newKasuto2);
-        } 
-        else
-        {
-            itemLocs.Add(westHyrule.lifeNorth);
-            itemLocs.Add(westHyrule.lifeSouth);
-        }
+        itemLocs.Add(eastHyrule.townAtNewKasuto);
+        itemLocs.Add(eastHyrule.spellTower);
         itemLocs.Add(deathMountain.magicCave);
         itemLocs.Add(deathMountain.hammerCave);
         itemLocs.Add(mazeIsland.kid);
@@ -2297,13 +2246,21 @@ public class Hyrule
             ROMData.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
         }
 
-        if (props.DisableBeep)
+        if (props.BeepFrequency == 0)
         {
             //C9 20 - EA 38
             //CMP 20 -> NOP SEC
-            ROMData.Put(0x1D4E4, (byte)0xEA);
-            ROMData.Put(0x1D4E5, (byte)0x38);
+            ROMData.Put(0x1D4E4, 0xEA);
+            ROMData.Put(0x1D4E5, 0x38);
         }
+        else
+        {
+            //LDA      #$30                      ; 0x193c1 $93B1 A9 30
+            ROMData.Put(0x193c2, props.BeepFrequency);
+        }
+        //CMP      #$20                      ; 0x1d4e4 $D4D4 C9 20
+        ROMData.Put(0x1d4e5, props.BeepThreshold);
+
         if (props.ShuffleLifeRefill)
         {
             int lifeRefill = RNG.Next(1, 6);
@@ -2756,7 +2713,7 @@ public class Hyrule
             ROMData.Put(0x1eeb6, 0x57);
         }
 
-        if (eastHyrule.newKasuto.Item == Item.TROPHY || eastHyrule.newKasuto2.Item == Item.TROPHY || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
+        if (eastHyrule.townAtNewKasuto.Item == Item.TROPHY || eastHyrule.spellTower.Item == Item.TROPHY || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
         {
             for (int i = 0; i < 32; i++)
             {
@@ -2766,7 +2723,7 @@ public class Hyrule
             ROMData.Put(0x1eeb8, 0x21);
         }
 
-        if (eastHyrule.newKasuto.Item == Item.MEDICINE || eastHyrule.newKasuto2.Item == Item.MEDICINE || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
+        if (eastHyrule.townAtNewKasuto.Item == Item.MEDICINE || eastHyrule.spellTower.Item == Item.MEDICINE || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
         {
             for (int i = 0; i < 32; i++)
             {
@@ -2776,7 +2733,7 @@ public class Hyrule
             ROMData.Put(0x1eeba, 0x23);
         }
 
-        if (eastHyrule.newKasuto.Item == Item.CHILD || eastHyrule.newKasuto2.Item == Item.CHILD || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
+        if (eastHyrule.townAtNewKasuto.Item == Item.CHILD || eastHyrule.spellTower.Item == Item.CHILD || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
         {
             for (int i = 0; i < 32; i++)
             {
@@ -3235,59 +3192,8 @@ public class Hyrule
             ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root.NewMap);
 
         }
-        if (eastHyrule.newKasuto.TownNum == Town.NEW_KASUTO)
-        {
-            ROMData.Put(0xDB95, (byte)eastHyrule.newKasuto2.Item); //map 47
-
-            ROMData.Put(0xDB8C, (byte)eastHyrule.newKasuto.Item); //map 46
-        }
-        else
-        {
-            ROMData.Put(0xDB95, (byte)westHyrule.lifeSouth.Item); //map 47
-
-            ROMData.Put(0xDB8C, (byte)westHyrule.lifeNorth.Item); //map 46
-        }
-
-        //Town swap was never implemented, and when it is, it is going to work very different, so this should die.
-        /*
-        if (props.TownSwap)
-        {
-            if (westHyrule.shieldTown.TownNum != Town.RAURU)
-            {
-                ROMData.Put(westHyrule.shieldTown.MemAddress + 0x7E, (byte)(westHyrule.shieldTown.Map + 0xC0));
-                ROMData.Put(westHyrule.shieldTown.MemAddress + 0xBD, (byte)8);
-                ROMData.Put(eastHyrule.nabooru.MemAddress + 0x7E, (byte)(eastHyrule.nabooru.Map + 0xC0));
-                ROMData.Put(eastHyrule.nabooru.MemAddress + 0xBD, (byte)6);
-            }
-
-            if (westHyrule.jump.TownNum != Town.RUTO)
-            {
-                ROMData.Put(westHyrule.jump.MemAddress + 0x7E, (byte)(westHyrule.jump.Map + 0xC0));
-                ROMData.Put(westHyrule.jump.MemAddress + 0xBD, (byte)8);
-                ROMData.Put(eastHyrule.darunia.MemAddress + 0x7E, (byte)(eastHyrule.darunia.Map + 0xC0));
-                ROMData.Put(eastHyrule.darunia.MemAddress + 0xBD, (byte)6);
-            }
-
-            if (westHyrule.lifeNorth.TownNum != Town.SARIA_NORTH)
-            {
-                ROMData.Put(westHyrule.lifeNorth.MemAddress + 0x7E, (byte)(westHyrule.lifeNorth.Map));
-                ROMData.Put(westHyrule.lifeNorth.MemAddress + 0xBD, (byte)8);
-                ROMData.Put(westHyrule.lifeSouth.MemAddress, (byte)0);
-                ROMData.Put(eastHyrule.newKasuto.MemAddress + 0x7E, (byte)(eastHyrule.newKasuto.Map + 0xC0));
-                ROMData.Put(eastHyrule.newKasuto.MemAddress + 0xBD, (byte)6);
-                ROMData.Put(eastHyrule.newKasuto2.MemAddress + 0x7F, (byte)(eastHyrule.newKasuto2.Map));
-                ROMData.Put(eastHyrule.newKasuto2.MemAddress + 0xBE, (byte)6);
-            }
-
-            if (westHyrule.fairy.TownNum != Town.MIDO_WEST)
-            {
-                ROMData.Put(westHyrule.fairy.MemAddress + 0x7E, (byte)(westHyrule.fairy.Map + 0xC0));
-                ROMData.Put(westHyrule.fairy.MemAddress + 0xBD, (byte)8);
-                ROMData.Put(eastHyrule.oldKasuto.MemAddress + 0x7E, (byte)(eastHyrule.oldKasuto.Map + 0xC0));
-                ROMData.Put(eastHyrule.oldKasuto.MemAddress + 0xBD, (byte)6);
-            }
-        }
-        */
+        ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Item); //map 47
+        ROMData.Put(0xDB8C, (byte)eastHyrule.townAtNewKasuto.Item); //map 46
 
         ROMData.Put(0xA5A8, (byte)mazeIsland.magic.Item);
         ROMData.Put(0xA58B, (byte)mazeIsland.kid.Item);
@@ -3582,7 +3488,7 @@ public class Hyrule
             .Union(eastHyrule.AllLocations)
             .Union(mazeIsland.AllLocations)
             .Union(deathMountain.AllLocations).ToList();
-        locations.Add(eastHyrule.newKasuto2);
+        locations.Add(eastHyrule.spellTower);
         return locations;  
     }
 

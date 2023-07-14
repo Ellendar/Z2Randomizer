@@ -57,7 +57,7 @@
   <ItemGroup>
     <None Update="Properties\Settings.settings">
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
     </None>
     <None Update="WinSparkle_0_8_0_x32.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

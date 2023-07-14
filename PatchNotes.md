@@ -1,5 +1,12 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.1 - July 14th, 2023
+
+- Fixed a bug that could cause town items to not correctly randomize.
+- Updated the item shuffle algorithm to be less biased.
+- Added options to control the threshold / frequency of low health beeps. (Thanks jroweboy!) If you don't like the beeping, set the beep frequency to "off".'
+- Moved dash/jump always on to the "Spells" tab.
+
 ## Version 4.2.0 - July 13th, 2023
 
 ### New features

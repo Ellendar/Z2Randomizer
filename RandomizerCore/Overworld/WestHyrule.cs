@@ -1401,7 +1401,7 @@ public class WestHyrule : World
                 }
             }
         }
-        if (lifeNorth.Reachable && lifeNorth.TownNum == Town.NEW_KASUTO)
+        if (lifeNorth.Reachable && lifeNorth.ActualTown == Town.NEW_KASUTO)
         {
             lifeSouth.Reachable = true;
         }

@@ -183,7 +183,9 @@ public class RandomizerConfiguration
 
     //Misc
     [IgnoreInFlags]
-    public bool DisableLowHealthBeep { get; set; }
+    public byte BeepFrequency { get; set; }
+    [IgnoreInFlags]
+    public byte BeepThreshold { get; set; }
     [IgnoreInFlags]
     public bool DisableMusic { get; set; }
     public bool JumpAlwaysOn { get; set; }
@@ -882,7 +884,8 @@ public class RandomizerConfiguration
         config.BeamSprite = "Default";
         config.UseCustomRooms = false;
 
-        config.DisableLowHealthBeep = true;
+        config.BeepFrequency = 0x30;
+        config.BeepThreshold = 0x20;
         config.DisableMusic = false;
         config.FastSpellCasting = true;
         //ShuffleEn = false;
@@ -1379,7 +1382,8 @@ public class RandomizerConfiguration
         properties.TownNameHints = EnableTownNameHints == null ? random.Next(2) == 1 : (bool)EnableTownNameHints;
 
         //Misc.
-        properties.DisableBeep = DisableLowHealthBeep;
+        properties.BeepThreshold = BeepThreshold;
+        properties.BeepFrequency = BeepFrequency;
         properties.JumpAlwaysOn = JumpAlwaysOn;
         properties.DashAlwaysOn = DashAlwaysOn;
         properties.FastCast = FastSpellCasting;

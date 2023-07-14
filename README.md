@@ -4,7 +4,7 @@ Currently maintained by Ellendar ([Twitch](https://www.twitch.tv/ellendar)\).
 
 Original source is at https://bitbucket.org/digshake/z2randomizer/src/master/
 
-[Download](https://github.com/Ellendar/Z2Randomizer/releases/download/4.2.0/4_2_0.msi) - Download the latest version
+[Download](https://github.com/Ellendar/Z2Randomizer/releases/download/4.2.1/4_2_1.msi) - Download the latest version
 
 [FAQ](https://github.com/Ellendar/Z2Randomizer/blob/main/FAQ.md) - Check out the FAQ for this update.
 

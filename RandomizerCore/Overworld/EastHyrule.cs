@@ -64,11 +64,11 @@ public class EastHyrule : World
     public Location locationAtPalace6;
     public Location waterTile;
     public Location desertTile;
-    public Location darunia;
-    public Location newKasuto;
-    public Location newKasuto2;
-    public Location nabooru;
-    public Location oldKasuto;
+    public Location townAtDarunia;
+    public Location townAtNewKasuto;
+    public Location spellTower;
+    public Location townAtNabooru;
+    public Location townAtOldKasuto;
     public Location locationAtGP;
     public Location pbagCave1;
     public Location pbagCave2;
@@ -113,12 +113,12 @@ public class EastHyrule : World
 
         locationAtPalace6 = GetLocationByMem(0x8664);
         locationAtPalace6.PalaceNumber = 6;
-        darunia = GetLocationByMem(0x865E);
+        townAtDarunia = GetLocationByMem(0x865E);
         locationAtPalace5 = GetLocationByMap(0x23, 0x0E);
         locationAtPalace5.PalaceNumber = 5;
 
-        newKasuto = GetLocationByMem(0x8660);
-        newKasuto2 = new Location(newKasuto.LocationBytes, newKasuto.TerrainType, newKasuto.MemAddress, Continent.EAST);
+        townAtNewKasuto = GetLocationByMem(0x8660);
+        spellTower = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
@@ -140,8 +140,8 @@ public class EastHyrule : World
         smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
         largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
         enemyPtr = 0x85B1;
-        nabooru = GetLocationByMem(0x865C);
-        oldKasuto = GetLocationByMem(0x8662);
+        townAtNabooru = GetLocationByMem(0x865C);
+        townAtOldKasuto = GetLocationByMem(0x8662);
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
         locationAtGP.Item = Item.DO_NOT_USE;
@@ -230,10 +230,10 @@ public class EastHyrule : World
         { Tuple.Create(0x66, 0x2D), "south" },
         { Tuple.Create(0x49, 0x04), "gp" }
     };
-        newKasuto.ExternalWorld = 128;
+        townAtNewKasuto.ExternalWorld = 128;
         locationAtPalace6.ExternalWorld = 128;
         hiddenPalaceLocation = locationAtPalace6;
-        hiddenKasutoLocation = newKasuto;
+        hiddenKasutoLocation = townAtNewKasuto;
     }
 
     public bool Terraform()
@@ -298,7 +298,7 @@ public class EastHyrule : World
 
                 if(!hyrule.Props.ShuffleHidden)
                 {
-                    newKasuto.CanShuffle = false;
+                    townAtNewKasuto.CanShuffle = false;
                     locationAtPalace6.CanShuffle = false;
                 }
                 ShuffleLocations(AllLocations);
@@ -1358,10 +1358,10 @@ public class EastHyrule : World
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         hyrule.ROMData.Put(0x1df77, (byte)connection);
         hiddenKasutoLocation.NeedHammer = true;
-        if (hiddenKasutoLocation == newKasuto || hiddenKasutoLocation == newKasuto2)
+        if (hiddenKasutoLocation == townAtNewKasuto || hiddenKasutoLocation == spellTower)
         {
-            newKasuto.NeedHammer = true;
-            newKasuto2.NeedHammer = true;
+            townAtNewKasuto.NeedHammer = true;
+            spellTower.NeedHammer = true;
         }
         if (hyrule.Props.VanillaShuffleUsesActualTerrain || this.biome != Biome.VANILLA_SHUFFLE)
         {
@@ -1479,7 +1479,7 @@ public class EastHyrule : World
         }
         else
         {
-            hiddenKasutoLocation = newKasuto;
+            hiddenKasutoLocation = townAtNewKasuto;
         }
         hiddenKasutoLocation.TerrainType = Terrain.FOREST;
         hiddenKasutoLocation.NeedHammer = true;
@@ -1562,7 +1562,7 @@ public class EastHyrule : World
         if (!AllReached)
         {
             base.UpdateAllReached();
-            if (!hiddenPalaceLocation.Reachable || !hiddenKasutoLocation.Reachable || !newKasuto2.Reachable)
+            if (!hiddenPalaceLocation.Reachable || !hiddenKasutoLocation.Reachable || !spellTower.Reachable)
             {
                 AllReached = false;
             }
@@ -1585,10 +1585,10 @@ public class EastHyrule : World
         int connection = hiddenPalaceLocation.MemAddress - baseAddr;
         hyrule.ROMData.Put(0x1df76, (byte)connection);
         hiddenPalaceLocation.NeedRecorder = true;
-        if (hiddenPalaceLocation == newKasuto || hiddenPalaceLocation == newKasuto2)
+        if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
         {
-            newKasuto.NeedRecorder = true;
-            newKasuto2.NeedRecorder = true;
+            townAtNewKasuto.NeedRecorder = true;
+            spellTower.NeedRecorder = true;
         }
         if (hyrule.Props.VanillaShuffleUsesActualTerrain || this.biome != Biome.VANILLA_SHUFFLE)
         {
@@ -1703,7 +1703,7 @@ public class EastHyrule : World
     public void UpdateVisit()
     {
         UpdateReachable();
-
+        
         foreach (Location location in AllLocations)
         {
             if (location.Ypos > 30 && visitation[location.Ypos - 30, location.Xpos])
@@ -1736,10 +1736,6 @@ public class EastHyrule : World
                         }
                     }
                 }
-            }
-            if (newKasuto.Reachable && newKasuto.TownNum == Town.NEW_KASUTO)
-            {
-                newKasuto2.Reachable = true;
             }
         }
     }

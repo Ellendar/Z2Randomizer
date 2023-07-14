@@ -63,7 +63,7 @@ public class Location
 
     public int PalaceNumber { get; set; }
 
-    public Town TownNum { get; set; }
+    public Town ActualTown { get; set; }
     public Continent Continent { get; set; }
     public int FallInHole { get; set; }
     public int ForceEnterRight { get; set; }
@@ -120,7 +120,7 @@ public class Location
         itemGet = false;
         Reachable = false;
         PalaceNumber = 0;
-        TownNum = 0;
+        ActualTown = 0;
         Continent = c;
 
         //Shoutouts to thetruekingofspace for datamining this
@@ -131,7 +131,7 @@ public class Location
             (Continent.WEST, 42, 37, 43) => "FOREST_50P",
             (Continent.WEST, 60, 16, 45) => "MAGIC_CAVE",
             (Continent.WEST, 86, 20, 46) => "FOREST_100P",
-            (Continent.WEST, 64, 62, 38) => "HEART_CLIFF",
+            (Continent.WEST, 64, 62, 38) => "GRASS_TILE",
             (Continent.WEST, 77, 21, 44) => "LOST_WOODS_1",
             (Continent.WEST, 57, 61, 6) => "BUBBLE_CLIFF",
             (Continent.WEST, 71, 8, 51) => "EX_LIFE_SWAMP_1",
@@ -140,7 +140,7 @@ public class Location
             (Continent.WEST, 46, 55, 7) => "PARAPA_CAVE_S",
             (Continent.WEST, 58, 1, 9) => "JUMP_CAVE_N",
             (Continent.WEST, 62, 3, 11) => "JUMP_CAVE_S",
-            (Continent.WEST, 62, 38, 12) => "CAVE_200P",
+            (Continent.WEST, 62, 38, 12) => "PILLAR_PBAG_CAVE",
             (Continent.WEST, 69, 9, 14) => "MEDICINE_CAVE",
             (Continent.WEST, 62, 54, 16) => "HEART_CONTAINER_CAVE",
             (Continent.WEST, 96, 50, 18) => "FAIRY_CAVE_HOLE",
@@ -172,8 +172,8 @@ public class Location
             (Continent.WEST, 32, 62, 0) => "P1",
             (Continent.WEST, 64, 11, 14) => "P2",
             (Continent.WEST, 98, 57, 0) => "P3",
-            (Continent.EAST, 58, 10, 38) => "FIRE_TOWN_FOREST_500P_BAG",
-            (Continent.EAST, 91, 54, 44) => "P6_500P_BAG",
+            (Continent.EAST, 58, 10, 38) => "SUNKEN_PBAG_CAVE",
+            (Continent.EAST, 91, 54, 44) => "RISEN_PBAG_CAVE",
             (Continent.EAST, 76, 21, 2) => "WILSON_FENCE_1",
             (Continent.EAST, 81, 17, 3) => "WILSON_FENCE_2",
             (Continent.EAST, 84, 19, 4) => "WILSON_FENCE_3",
@@ -347,6 +347,7 @@ public class Location
             + " " + TerrainType.ToString()
             + " " + Name
             + " (" + Xpos + "," + (Ypos - 30) + ") _"
-            + (Reachable ? "Reachable" : "Unreachable");
+            + (Reachable ? "Reachable " : "Unreachable ")
+            + (Item == Item.DO_NOT_USE ? "" : Item.ToString());
     }
 }

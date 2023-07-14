@@ -55,7 +55,7 @@ public class Util
         (p2.Map, p1.Map) = (p1.Map, p2.Map);
         (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
 
-        (p2.TownNum, p1.TownNum) = (p1.TownNum, p2.TownNum);
+        (p2.ActualTown, p1.ActualTown) = (p1.ActualTown, p2.ActualTown);
         (p2.Item, p1.Item) = (p1.Item, p2.Item);
         (p2.Name, p1.Name) = (p1.Name, p2.Name);
     }

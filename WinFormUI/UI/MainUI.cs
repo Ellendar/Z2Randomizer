@@ -57,13 +57,14 @@ public partial class MainUI : Form
         tunicColorList.SelectedIndex = Properties.Settings.Default.tunic;
         shieldColorList.SelectedIndex = Properties.Settings.Default.shield;
         fastSpellCheckbox.Checked = Properties.Settings.Default.spells;
-        disableLowHealthBeepCheckbox.Checked = Properties.Settings.Default.beep;
         beamSpriteList.SelectedIndex = Properties.Settings.Default.beams;
         disableMusicCheckbox.Checked = Properties.Settings.Default.music;
         upAOnController1Checkbox.Checked = Properties.Settings.Default.upac1;
         seedTextBox.Text = Properties.Settings.Default.lastseed;
         flashingOffCheckbox.Checked = Properties.Settings.Default.noflash;
         useCustomRoomsBox.Checked = Properties.Settings.Default.useCustomRooms;
+        beepFrequencyDropdown.SelectedIndex = Properties.Settings.Default.beepFrequency;
+        beepThresholdDropdown.SelectedIndex = Properties.Settings.Default.beepThreshold;
 
         small = new CheckBox[] { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox,
             smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
@@ -127,7 +128,6 @@ public partial class MainUI : Form
         shuffleSwordImmunityBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         jumpAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleLifeRefillCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        disableLowHealthBeepCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         experienceDropsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -441,7 +441,8 @@ public partial class MainUI : Form
         try
         {
             rom = new FileInfo(fileName);
-        } catch (Exception _ex) { return; }
+        }
+        catch (Exception _ex) { return; }
 
         // basic validation that they selected a "validish" rom before drawing a sprite from it
         if (rom?.Length == 0x10 + 128 * 1024 + 128 * 1024)
@@ -501,7 +502,6 @@ public partial class MainUI : Form
         String flagString = flagsTextBox.Text.Trim();
 
         Properties.Settings.Default.filePath = romFileTextBox.Text.Trim();
-        Properties.Settings.Default.beep = disableLowHealthBeepCheckbox.Checked;
         Properties.Settings.Default.beams = beamSpriteList.SelectedIndex;
         Properties.Settings.Default.spells = fastSpellCheckbox.Checked;
         Properties.Settings.Default.tunic = tunicColorList.SelectedIndex;
@@ -583,7 +583,7 @@ public partial class MainUI : Form
         }
         else
         {
-            MessageBox.Show("An exception occurred generating the rom");
+            MessageBox.Show("An exception occurred generating the rom: \n" + generationException.Message);
             logger.Error(generationException);
         }
     }
@@ -962,7 +962,6 @@ public partial class MainUI : Form
         configuration.UseCommunityHints = useCommunityHintsCheckbox.Checked;
 
         //Misc
-        configuration.DisableLowHealthBeep = disableLowHealthBeepCheckbox.Checked;
         configuration.DisableMusic = disableMusicCheckbox.Checked;
         configuration.JumpAlwaysOn = jumpAlwaysOnCheckbox.Checked;
         configuration.DashAlwaysOn = dashAlwaysOnCheckbox.Checked;
@@ -973,6 +972,31 @@ public partial class MainUI : Form
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
         configuration.UseCustomRooms = useCustomRoomsBox.Checked;
         configuration.Sprite = characterSpriteList.SelectedIndex;
+        configuration.BeepFrequency = beepFrequencyDropdown.SelectedIndex switch
+        {
+            //Normal
+            0 => 0x30,
+            //Half Speed
+            1 => 0x60,
+            //Quarter Speed
+            2 => 0xC0,
+            //Off
+            3 => 0,
+            _ => 0x30
+        };
+
+        configuration.BeepThreshold = beepThresholdDropdown.SelectedIndex switch
+        {
+            //Normal
+            0 => 0x20,
+            //Half Bar
+            1 => 0x10,
+            //Quarter Bar
+            2 => 0x08,
+            //Two Bars
+            3 => 0x40,
+            _ => 0x20
+        };
 
         configuration.Tunic = tunicColorList.GetItemText(tunicColorList.SelectedItem);
         configuration.ShieldTunic = shieldColorList.GetItemText(shieldColorList.SelectedItem);
@@ -996,7 +1020,8 @@ public partial class MainUI : Form
         RandomizerConfiguration oldSettings = ExportConfig();
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
 
-        config.DisableLowHealthBeep = oldSettings.DisableLowHealthBeep;
+        config.BeepFrequency = oldSettings.BeepFrequency;
+        config.BeepThreshold = oldSettings.BeepThreshold;
         config.DisableMusic = oldSettings.DisableMusic;
         config.FastSpellCasting = oldSettings.FastSpellCasting;
         config.ShuffleSpritePalettes = oldSettings.ShuffleSpritePalettes;
@@ -1337,6 +1362,7 @@ public partial class MainUI : Form
             //tunicColorList.SelectedIndex = tunicColorList.FindStringExact(configuration.Tunic);
             //shieldColorList.SelectedIndex = shieldColorList.FindStringExact(configuration.ShieldTunic);
             //beamSpriteList.SelectedIndex = beamSpriteList.FindStringExact(configuration.BeamSprite);
+
         }
         catch (Exception e)
         {
