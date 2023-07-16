@@ -1040,6 +1040,10 @@ public partial class MainUI : Form
     {
         dontrunhandler = true;
         flagsTextBox.Text = flagsTextBox.Text.Trim();
+        if(flagsTextBox.Text.Length == 0)
+        {
+            return;
+        }
         try
         {
             RandomizerConfiguration configuration = new RandomizerConfiguration(flagsTextBox.Text);
