@@ -152,6 +152,11 @@ public class ROM
         ROMData[index] = data;
     }
 
+    public void Put(int index, string data)
+    {
+        Put(index, Convert.FromHexString(data));
+    }
+
     public void Put(int index, params byte[] data)
     {
         for (int i = 0; i < data.Length; i++)

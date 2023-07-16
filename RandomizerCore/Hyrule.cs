@@ -2250,20 +2250,20 @@ public class Hyrule
             ROMData.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
         }
 
+        //CMP      #$20                      ; 0x1d4e4 $D4D4 C9 20
+        ROMData.Put(0x1d4e5, props.BeepThreshold);
         if (props.BeepFrequency == 0)
         {
             //C9 20 - EA 38
             //CMP 20 -> NOP SEC
-            ROMData.Put(0x1D4E4, 0xEA);
-            ROMData.Put(0x1D4E5, 0x38);
+            ROMData.Put(0x1D4E4, (Byte)0xEA);
+            ROMData.Put(0x1D4E5, (Byte)0x38);
         }
         else
         {
             //LDA      #$30                      ; 0x193c1 $93B1 A9 30
             ROMData.Put(0x193c2, props.BeepFrequency);
         }
-        //CMP      #$20                      ; 0x1d4e4 $D4D4 C9 20
-        ROMData.Put(0x1d4e5, props.BeepThreshold);
 
         if (props.ShuffleLifeRefill)
         {
