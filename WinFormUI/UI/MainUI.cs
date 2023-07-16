@@ -512,6 +512,8 @@ public partial class MainUI : Form
         Properties.Settings.Default.noflash = flashingOffCheckbox.Checked;
         Properties.Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
         Properties.Settings.Default.lastused = flagsTextBox.Text.Trim();
+        Properties.Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
+        Properties.Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
         Properties.Settings.Default.lastseed = seedTextBox.Text.Trim();
         Properties.Settings.Default.Save();
         try

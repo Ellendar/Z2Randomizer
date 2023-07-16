@@ -19,7 +19,7 @@ public class Hyrule
 {
     //IMPORTANT: Tuning these factors can have a big impact on generation times.
     //In general, the non-terrain shuffle features are much cheaper than the cost of generating terrain or verifying the seed.
-    
+
     //This controls how many attempts will be made to shuffle the non-terrain features like towns, spells, and items.
     //The higher you set it, the more likely a given terrain is to find a set of items that works, resulting in fewer terrain generations.
     //It will also increase the number of seeds that have more arcane solutions, where only a specific item route works.
@@ -29,7 +29,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = false;
+    public const bool UNSAFE_DEBUG = true;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -39,7 +39,7 @@ public class Hyrule
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
- 
+
     //private ROM romData;
     private const int overworldXOff = 0x3F;
     private const int overworldMapOff = 0x7E;
@@ -72,7 +72,7 @@ public class Hyrule
     private int heartContainersInItemPool;
     private int kasutoJars;
     private readonly BackgroundWorker worker;
-    
+
     //private Character character;
 
     public Dictionary<Item, bool> itemGet = new Dictionary<Item, bool>();
@@ -183,7 +183,7 @@ public class Hyrule
 
         palaces = new List<Palace>();
         itemGet = new Dictionary<Item, bool>();
-        foreach(Item item in Enum.GetValues(typeof(Item)))
+        foreach (Item item in Enum.GetValues(typeof(Item)))
         {
             itemGet.Add(item, false);
         }
@@ -220,7 +220,7 @@ public class Hyrule
             ROMData.DashSpell();
         }
 
-        if(props.DashAlwaysOn)
+        if (props.DashAlwaysOn)
         {
             ROMData.Put(0x13C3, new Byte[] { 0x30, 0xD0 });
         }
@@ -237,7 +237,7 @@ public class Hyrule
 
         */
 
-        if(props.UpAC1)
+        if (props.UpAC1)
         {
             ROMData.UpAController1();
         }
@@ -402,7 +402,7 @@ public class Hyrule
         RandomizeEnemyStats();
 
         bool raftIsRequired = IsRaftAlwaysRequired(props);
-        while(palaces == null || palaces.Count != 7)
+        while (palaces == null || palaces.Count != 7)
         {
             palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData, raftIsRequired);
             if (palaces == null)
@@ -429,7 +429,7 @@ public class Hyrule
         byte[] finalRNGState = new byte[32];
         RNG.NextBytes(finalRNGState);
         byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
-            Flags + 
+            Flags +
             Seed +
             //Assembly.GetExecutingAssembly().GetName().Version.Major +
             //Assembly.GetExecutingAssembly().GetName().Version.Minor +
@@ -442,7 +442,7 @@ public class Hyrule
         ));
         UpdateRom(hash);
         string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
-        if(props.saveRom)
+        if (props.saveRom)
         {
             ROMData.Dump(newFileName);
         }
@@ -486,7 +486,7 @@ public class Hyrule
         Spell           93  25
         Thunder         96  36 
     */
-    
+
 
     private void ShuffleAttackEffectiveness(bool ohko)
     {
@@ -592,8 +592,8 @@ public class Hyrule
         Location medicineLoc = westHyrule.medCave;
         Location trophyLoc = westHyrule.trophyCave;
         heartContainersInItemPool = maxHearts - startHearts;
-        
-        foreach(Item item in itemGet.Keys.ToList())
+
+        foreach (Item item in itemGet.Keys.ToList())
         {
             itemGet[item] = false;
         }
@@ -695,7 +695,7 @@ public class Hyrule
             }
         }
 
-        if(props.RemoveSpellItems)
+        if (props.RemoveSpellItems)
         {
             itemList[9] = smallItems[RNG.Next(smallItems.Count)];
             itemList[10] = smallItems[RNG.Next(smallItems.Count)];
@@ -713,14 +713,14 @@ public class Hyrule
             startMed = true;
         }
 
-        if(SpellGet[SpellMap[Town.RUTO]])
+        if (SpellGet[SpellMap[Town.RUTO]])
         {
             itemList[10] = smallItems[RNG.Next(smallItems.Count)];
             itemGet[Item.TROPHY] = true;
             startTrophy = true;
         }
 
-        if(SpellGet[SpellMap[Town.DARUNIA_WEST]])
+        if (SpellGet[SpellMap[Town.DARUNIA_WEST]])
         {
             itemList[17] = smallItems[RNG.Next(smallItems.Count)];
             itemGet[Item.CHILD] = true;
@@ -864,9 +864,9 @@ public class Hyrule
             eastHyrule.UpdateVisit();
             mazeIsland.UpdateVisit();
 
-            foreach(World world in worlds)
+            foreach (World world in worlds)
             {
-                if(world.raft != null && CanGet(world.raft) && itemGet[Item.RAFT])
+                if (world.raft != null && CanGet(world.raft) && itemGet[Item.RAFT])
                 {
                     worlds.ForEach(i => i.VisitRaft());
                 }
@@ -916,14 +916,14 @@ public class Hyrule
 
         foreach (Item item in SHUFFLABLE_STARTING_ITEMS)
         {
-            if(itemGet[item] == false)
+            if (itemGet[item] == false)
             {
                 if (UNSAFE_DEBUG && count > DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on critical item");
                     debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
-                    
+
                     return false;
                 }
                 itemGetReachableFailures++;
@@ -957,7 +957,7 @@ public class Hyrule
             //PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
-        if(SpellGet.Values.Any(i => i == false))
+        if (SpellGet.Values.Any(i => i == false))
         {
             spellGetReachableFailures++;
             if (UNSAFE_DEBUG && count > DEBUG_THRESHOLD)
@@ -969,24 +969,24 @@ public class Hyrule
             return false;
         }
 
-        bool retval = (CanGet(westHyrule.Locations[Terrain.TOWN]) 
-            && CanGet(eastHyrule.Locations[Terrain.TOWN]) 
-            && CanGet(westHyrule.locationAtPalace1) 
-            && CanGet(westHyrule.locationAtPalace2) 
-            && CanGet(westHyrule.locationAtPalace3) 
-            && CanGet(mazeIsland.locationAtPalace4) 
-            && CanGet(eastHyrule.locationAtPalace5) 
-            && CanGet(eastHyrule.locationAtPalace6) 
-            && CanGet(eastHyrule.locationAtGP) 
-            && CanGet(itemLocs) 
-            && CanGet(westHyrule.bagu) 
-            && (!Props.HiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation))) 
+        bool retval = (CanGet(westHyrule.Locations[Terrain.TOWN])
+            && CanGet(eastHyrule.Locations[Terrain.TOWN])
+            && CanGet(westHyrule.locationAtPalace1)
+            && CanGet(westHyrule.locationAtPalace2)
+            && CanGet(westHyrule.locationAtPalace3)
+            && CanGet(mazeIsland.locationAtPalace4)
+            && CanGet(eastHyrule.locationAtPalace5)
+            && CanGet(eastHyrule.locationAtPalace6)
+            && CanGet(eastHyrule.locationAtGP)
+            && CanGet(itemLocs)
+            && CanGet(westHyrule.bagu)
+            && (!Props.HiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation)))
             && (!Props.HiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
-        if(retval == false)
+        if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
         }
-        if(UNSAFE_DEBUG && retval)
+        if (UNSAFE_DEBUG && retval)
         {
             PrintRoutingDebug(count, wh, eh, dm, mi);
         }
@@ -1059,7 +1059,7 @@ public class Hyrule
                 {
                     SpellGet[SpellMap[town]] = true;
                     changed = true;
-                }  
+                }
             }
         }
         return changed;
@@ -1074,7 +1074,7 @@ public class Hyrule
         accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.itemGet == true && i.Item == Item.MAGIC_CONTAINER).Count();
         heartContainers = startHearts;
         bool changed = false;
-        
+
         foreach (Location location in AllLocationsForReal().Where(i => i.Item != Item.DO_NOT_USE))
         {
             bool hadItemPreviously = location.itemGet;
@@ -1084,14 +1084,14 @@ public class Hyrule
                 Palace palace = palaces[location.PalaceNumber - 1];
                 hasItemNow = CanGet(location)
                     && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY])
-                    && palace.IsTraversable(GetRequireables(), location.Item, debug++);
-                    /*
-                    && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) 
-                    && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) 
-                    && (!palace.NeedGlove || (palace.NeedGlove && itemGet[Item.GLOVE])) 
-                    && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY])) 
-                    && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
-                    */
+                    && palace.IsTraversable(GetRequireables(), location.Item, debug);
+                /*
+                && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) 
+                && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) 
+                && (!palace.NeedGlove || (palace.NeedGlove && itemGet[Item.GLOVE])) 
+                && (!palace.NeedJumpOrFairy || (palace.NeedJumpOrFairy && (SpellGet[Spell.JUMP]) || SpellGet[Spell.FAIRY])) 
+                && (!palace.NeedReflect || (palace.NeedReflect && SpellGet[Spell.REFLECT]));
+                */
             }
             else if (location.ActualTown == Town.NEW_KASUTO)
             {
@@ -1116,15 +1116,15 @@ public class Hyrule
             {
                 heartContainers++;
             }
-            if(!hadItemPreviously && location.itemGet)
+            if (!hadItemPreviously && location.itemGet)
             {
                 changed = true;
             }
         }
 
-        if(!props.PbagItemShuffle)
+        if (!props.PbagItemShuffle)
         {
-            if(westHyrule.pbagCave.Reachable)
+            if (westHyrule.pbagCave.Reachable)
             {
                 westHyrule.pbagCave.itemGet = true;
             }
@@ -1172,7 +1172,7 @@ public class Hyrule
                 {
                     int max = (int)(life[i, j] + life[i, j] * .5);
                     int min = (int)(life[i, j] - life[i, j] * .5);
-                    if(!isMag)
+                    if (!isMag)
                     {
                         min = (int)(life[i, j] - life[i, j] * .25);
                     }
@@ -1315,7 +1315,7 @@ public class Hyrule
         {
             requireables.Add(RequirementType.KEY);
         }
-        if(accessibleMagicContainers >= 5 || props.DisableMagicRecs) 
+        if (accessibleMagicContainers >= 5 || props.DisableMagicRecs)
         {
             requireables.Add(RequirementType.FIVE_CONTAINERS);
         }
@@ -1396,7 +1396,7 @@ public class Hyrule
                     List<int> chosen = new List<int>();
                     int type = RNG.Next(4);
                     if (props.WestBiome == Biome.VANILLA
-                        || props.WestBiome == Biome.VANILLA_SHUFFLE 
+                        || props.WestBiome == Biome.VANILLA_SHUFFLE
                         || props.DmBiome == Biome.VANILLA
                         || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
@@ -1700,14 +1700,14 @@ public class Hyrule
                     eastHyrule.ResetVisitabilityState();
                     mazeIsland.ResetVisitabilityState();
                     deathMountain.ResetVisitabilityState();
-
+                    debug++;
                     ShuffleSpells();
                     LoadItemLocs();
                     westHyrule.SetStart();
 
                     ShufflePalaces();
-                    ShuffleItems();
                     LoadItemLocs();
+                    ShuffleItems();
 
 
                     westHyrule.UpdateAllReached();
@@ -1764,7 +1764,7 @@ public class Hyrule
     private void SetTransportation(int w1, int w2, int type)
     {
         Location l1, l2;
-        if(type == 1)
+        if (type == 1)
         {
             l1 = worlds[w1].LoadRaft(w2);
             l2 = worlds[w2].LoadRaft(w1);
@@ -1776,7 +1776,7 @@ public class Hyrule
             l2 = worlds[w2].LoadBridge(w1);
             connections[1] = (l1, l2);
         }
-        else if(type == 3)
+        else if (type == 3)
         {
             l1 = worlds[w1].LoadCave1(w2);
             l2 = worlds[w2].LoadCave1(w1);
@@ -1968,12 +1968,12 @@ public class Hyrule
         SpellMap = new();
         SpellGet.Clear();
 
-        List<Town> unallocatedTowns = new List<Town> { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
+        List<Town> unallocatedTowns = new List<Town> { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
             Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
 
         foreach (Spell spell in Enum.GetValues(typeof(Spell)))
         {
-            if(props.ReplaceFireWithDash && spell == Spell.FIRE 
+            if (props.ReplaceFireWithDash && spell == Spell.FIRE
                 || !props.ReplaceFireWithDash && spell == Spell.DASH
                 || spell == Spell.UPSTAB
                 || spell == Spell.DOWNSTAB)
@@ -1982,7 +1982,7 @@ public class Hyrule
             }
             Town town = unallocatedTowns[RNG.Next(unallocatedTowns.Count)];
             unallocatedTowns.Remove(town);
-            if(props.ShuffleSpellLocations)
+            if (props.ShuffleSpellLocations)
             {
                 SpellMap.Add(town, spell);
             }
@@ -2008,7 +2008,7 @@ public class Hyrule
         SpellGet.Add(Spell.UPSTAB, false);
 
         int i = 0;
-        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
+        foreach (Town town in Towns.STRICT_SPELL_LOCATIONS)
         {
             ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i++, props.StartWithSpell(SpellMap[town]) ? (byte)1 : (byte)0);
             SpellGet[SpellMap[town]] = props.StartWithSpell(SpellMap[town]);
@@ -2082,7 +2082,7 @@ public class Hyrule
         else
         {
             cappedExp = exp;
-        }    
+        }
 
         for (int i = 0; i < exp.Length; i++)
         {
@@ -2143,12 +2143,16 @@ public class Hyrule
             int high = exp & 0xF0;
             int low = exp & 0x0F;
 
-            if(props.ExpLevel == StatEffectiveness.HIGH)
+            if (props.ExpLevel == StatEffectiveness.HIGH)
             {
                 low++;
-            } else if(props.ExpLevel == StatEffectiveness.LOW) {
+            }
+            else if (props.ExpLevel == StatEffectiveness.LOW)
+            {
                 low--;
-            } else if(props.ExpLevel == StatEffectiveness.NONE) {
+            }
+            else if (props.ExpLevel == StatEffectiveness.NONE)
+            {
                 low = 0;
             }
 
@@ -2187,17 +2191,17 @@ public class Hyrule
         ROMData.Put(0x17AF4, (byte)props.StartMag);
         ROMData.Put(0x17AF5, (byte)props.StartLifeLvl);
 
-        if(props.RemoveFlashing)
+        if (props.RemoveFlashing)
         {
             ROMData.DisableFlashing();
         }
 
-        if(props.SpellEnemy)
+        if (props.SpellEnemy)
         {
             List<int> enemies = new List<int> { 3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26 };
             ROMData.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count())]);
         }
-        if(props.BossItem)
+        if (props.BossItem)
         {
             shuffler.ShuffleBossDrop(ROMData, RNG);
         }
@@ -2210,12 +2214,12 @@ public class Hyrule
         }
         ROMData.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
 
-        if(props.EncounterRate == EncounterRate.NONE)
+        if (props.EncounterRate == EncounterRate.NONE)
         {
             ROMData.Put(0x294, 0x60); //skips the whole routine
         }
 
-        if(props.EncounterRate == EncounterRate.HALF)
+        if (props.EncounterRate == EncounterRate.HALF)
         {
             //terrain timers
             ROMData.Put(0x250, 0x40);
@@ -2552,7 +2556,7 @@ public class Hyrule
         ROMData.Put(0x17B12, (byte)((props.StartWithUpstab ? 0x04 : 0) + (props.StartWithDownstab ? 0x10 : 0)));
 
         //Swap up and Downstab
-        if(props.SwapUpAndDownStab)
+        if (props.SwapUpAndDownStab)
         {
             //Swap the ORAs that determine which stab to give you
             ROMData.Put(0xF4DF, 0x04);
@@ -3111,7 +3115,7 @@ public class Hyrule
 
         ROMData.Put(0x5069, (byte)westHyrule.medCave.Item);
         ROMData.Put(0x4ff5, (byte)westHyrule.heart1.Item);
-        
+
         ROMData.Put(0x65C3, (byte)deathMountain.magicCave.Item);
         ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Item);
         ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.Item);
@@ -3154,7 +3158,7 @@ public class Hyrule
             ROMData.ElevatorBossFix(props.BossItem);
             if (westHyrule.locationAtPalace1.PalaceNumber != 7)
             {
-                palaces[westHyrule.locationAtPalace1.PalaceNumber-1].UpdateItem(westHyrule.locationAtPalace1.Item, ROMData);
+                palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace1.Item, ROMData);
             }
             if (westHyrule.locationAtPalace2.PalaceNumber != 7)
             {
@@ -3197,7 +3201,7 @@ public class Hyrule
 
         ROMData.Put(0xA5A8, (byte)mazeIsland.magic.Item);
         ROMData.Put(0xA58B, (byte)mazeIsland.kid.Item);
-        
+
         if (props.PbagItemShuffle)
         {
             ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Item);
@@ -3227,7 +3231,7 @@ public class Hyrule
 
         //Update raft animation
         bool firstRaft = false;
-        foreach(World w in worlds)
+        foreach (World w in worlds)
         {
             if (w.raft != null)
             {
@@ -3236,13 +3240,13 @@ public class Hyrule
                     ROMData.Put(0x538, (byte)w.raft.Xpos);
                     ROMData.Put(0x53A, (byte)w.raft.Ypos);
                     firstRaft = true;
-                } 
+                }
                 else
                 {
                     ROMData.Put(0x539, (byte)w.raft.Xpos);
                     ROMData.Put(0x53B, (byte)w.raft.Ypos);
                 }
-            } 
+            }
         }
 
         firstRaft = false;
@@ -3348,7 +3352,7 @@ public class Hyrule
         ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
     }
 
-    public void ShuffleEnemies(int addr, List<int> enemies, List<int> generators, 
+    public void ShuffleEnemies(int addr, List<int> enemies, List<int> generators,
         List<int> smallEnemies, List<int> largeEnemies, List<int> flyingEnemies, bool isP7)
     {
         throw new NotImplementedException();
@@ -3385,7 +3389,7 @@ public class Hyrule
                     int item = ROMData.GetByte(addr);
                     if (false && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
                     {
-                        if(UNSAFE_DEBUG)
+                        if (UNSAFE_DEBUG)
                         {
                             logger.Debug("Map: " + map);
                             logger.Debug("Item: " + item);
@@ -3415,7 +3419,8 @@ public class Hyrule
     public void PrintSpoiler(LogLevel logLevel)
     {
         logger.Log(logLevel, "ITEMS:");
-        foreach (Item item in SHUFFLABLE_STARTING_ITEMS) {
+        foreach (Item item in SHUFFLABLE_STARTING_ITEMS)
+        {
             logger.Log(logLevel, item.ToString() + "(" + itemGet[item] + ") : " + itemLocs.Where(i => i.Item == item).FirstOrDefault()?.Name);
         }
     }
@@ -3430,7 +3435,7 @@ public class Hyrule
         ushort banksize = 0x4000;
         byte bank = (byte)(addr / banksize);
         // If the bank is the last bank, then its the fixed bank and all pointers start from 0xc000 instead
-        ushort cpuOffset = (ushort) (bank == 7 ? 0xc000 : 0x8000);
+        ushort cpuOffset = (ushort)(bank == 7 ? 0xc000 : 0x8000);
         ushort val = (ushort)(addr - (bank * banksize) + cpuOffset);
         return new byte[] { (byte)(val & 0xff), (byte)(val >> 8) };
     }
@@ -3489,7 +3494,7 @@ public class Hyrule
             .Union(mazeIsland.AllLocations)
             .Union(deathMountain.AllLocations).ToList();
         locations.Add(eastHyrule.spellTower);
-        return locations;  
+        return locations;
     }
 
     public string SpellDebug()
@@ -3566,12 +3571,12 @@ public class Hyrule
     private bool IsRaftAlwaysRequired(RandomizerProperties props)
     {
         //If continent connections are vanilla, you for sure need the raft.
-        if(props.ContinentConnections == ContinentConnectionType.NORMAL)
+        if (props.ContinentConnections == ContinentConnectionType.NORMAL)
         {
             return true;
         }
         //If west and DM are both vanilla, the caves have to connect between west and DM, and vanilla connections are forced
-        if((props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
+        if ((props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
             && (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE))
         {
             return true;
