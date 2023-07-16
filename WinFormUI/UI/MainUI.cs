@@ -1019,6 +1019,10 @@ public partial class MainUI : Form
     private void convertButton_Click(object send, EventArgs e)
     {
         String oldFlags = oldFlagsTextbox.Text.Trim();
+        if(oldFlags.Length == 0)
+        {
+            return;
+        }
         RandomizerConfiguration oldSettings = ExportConfig();
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
 
