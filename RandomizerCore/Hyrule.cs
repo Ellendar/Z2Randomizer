@@ -1,6 +1,7 @@
 ﻿using NLog;
 using RandomizerCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -29,7 +30,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -45,7 +46,7 @@ public class Hyrule
     private const int overworldMapOff = 0x7E;
     private const int overworldWorldOff = 0xBD;
 
-    private static readonly List<Town> spellLocations = new List<Town>() { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
+    private static readonly List<Town> spellTowns = new List<Town>() { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
         Town.MIDO_CHURCH, Town.NABOORU, Town.DARUNIA_WEST, Town.DARUNIA_ROOF, Town.NEW_KASUTO, Town.OLD_KASUTO};
 
     //Unused
@@ -850,6 +851,8 @@ public class Hyrule
         int count = 1;
         int prevCount = 0;
         int loopCount = 0;
+        debug++;
+        Dictionary<Spell, Location> spellLocations = GetSpellLocations();
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
         //logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
@@ -887,15 +890,17 @@ public class Hyrule
                 }
             }
             updateItemsResult = UpdateItemGets();
-            updateSpellsResult = UpdateSpells();
+            updateSpellsResult = UpdateSpells(spellLocations);
 
+            //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
             westHyrule.UpdateVisit();
             deathMountain.UpdateVisit();
             eastHyrule.UpdateVisit();
             mazeIsland.UpdateVisit();
 
-            updateItemsResult = UpdateItemGets();
-            updateSpellsResult = UpdateSpells();
+            updateItemsResult = updateItemsResult | UpdateItemGets();
+            updateSpellsResult = updateSpellsResult | UpdateSpells(spellLocations);
+
 
 
             count = 0;
@@ -1047,17 +1052,19 @@ public class Hyrule
         //ROMData.put(0x8560, (byte)0xBC);
     }
 
-    private bool UpdateSpells()
+    private bool UpdateSpells(Dictionary<Spell, Location> spellLocations)
     {
         bool changed = false;
         List<RequirementType> requireables = GetRequireables();
-        foreach (Town town in spellLocations)
+
+        foreach (Spell spell in spellLocations.Keys)
         {
-            if (Towns.townSpellAndItemRequirements[town].AreSatisfiedBy(requireables))
+            Town town = spellLocations[spell].ActualTown;
+            if (spellLocations[spell].Reachable && Towns.townSpellAndItemRequirements[town].AreSatisfiedBy(requireables))
             {
-                if (!SpellGet[SpellMap[town]])
+                if (!SpellGet[spell])
                 {
-                    SpellGet[SpellMap[town]] = true;
+                    SpellGet[spell] = true;
                     changed = true;
                 }
             }
@@ -1700,7 +1707,7 @@ public class Hyrule
                     eastHyrule.ResetVisitabilityState();
                     mazeIsland.ResetVisitabilityState();
                     deathMountain.ResetVisitabilityState();
-                    debug++;
+
                     ShuffleSpells();
                     LoadItemLocs();
                     westHyrule.SetStart();
@@ -3588,5 +3595,27 @@ public class Hyrule
             return true;
         }
         return false;
+    }
+
+    private Dictionary<Spell, Location> GetSpellLocations()
+    {
+        Dictionary<Spell, Location> spellLocations = new();
+        foreach (Location location in AllLocationsForReal())
+        {
+            if (location.ActualTown > 0 && location.ActualTown != Town.SARIA_SOUTH && location.ActualTown != Town.SPELL_TOWER)
+            {
+                spellLocations.Add(SpellMap[location.ActualTown], location);
+            }
+            if(location.ActualTown == Town.MIDO_WEST)
+            {
+                spellLocations.Add(SpellMap[Town.MIDO_CHURCH], location);
+            }
+            if (location.ActualTown == Town.DARUNIA_WEST)
+            {
+                spellLocations.Add(SpellMap[Town.DARUNIA_ROOF], location);
+            }
+        }
+
+        return spellLocations;
     }
 }

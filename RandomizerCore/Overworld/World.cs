@@ -1828,18 +1828,20 @@ public abstract class World
         } 
 
         /*
-        StringBuilder sb = new();
-        sb.AppendLine(GetName());
-        for (int y = 0; y < MAP_ROWS; y++)
+        if(hyrule.debug >= 1604)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            StringBuilder sb = new();
+            sb.AppendLine(GetName());
+            for (int y = 0; y < MAP_ROWS; y++)
             {
-                sb.Append(visitation[y,x] ? 'x' : ' ');
+                for (int x = 0; x < MAP_COLS; x++)
+                {
+                    sb.Append(visitation[y, x] ? 'x' : ' ');
+                }
+                sb.Append('\n');
             }
-            sb.Append('\n');
-        }
-        Debug.Write(sb.ToString());
-        */
+            Debug.Write(sb.ToString());
+        }*/
     }
 
     protected void UpdateReachable(ref bool[,] covered, int y, int x, int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
