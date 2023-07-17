@@ -242,6 +242,11 @@ public class Hints
         {
             hints[70] = new Hint(Util.ToGameText("USE THIS$TO GO$FAST", true));
         }
+        if(props.SwapUpAndDownStab)
+        {
+            (hints[spellTextIndexes[Town.DARUNIA_ROOF]], hints[spellTextIndexes[Town.MIDO_CHURCH]]) =
+                (hints[spellTextIndexes[Town.MIDO_CHURCH]], hints[spellTextIndexes[Town.DARUNIA_ROOF]]);
+        }
         if (props.UseCommunityHints)
         {
             GenerateCommunityHints(hints, spellMap, r);

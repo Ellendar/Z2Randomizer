@@ -898,8 +898,8 @@ public class Hyrule
             eastHyrule.UpdateVisit();
             mazeIsland.UpdateVisit();
 
-            updateItemsResult = updateItemsResult | UpdateItemGets();
-            updateSpellsResult = updateSpellsResult | UpdateSpells(spellLocations);
+            updateItemsResult |= UpdateItemGets();
+            updateSpellsResult |= UpdateSpells(spellLocations);
 
 
 
