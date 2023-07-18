@@ -371,8 +371,8 @@ public class Palaces
                         }
 
                         innertries++;
-                    } while (roomPlacementFailures < ROOM_PLACEMENT_FAILURE_LIMIT
-                        && palace.AllRooms.Any(i => i.CountOpenExits() > 0)
+                    } while (roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT
+                        || palace.AllRooms.Any(i => i.CountOpenExits() > 0)
                       );
 
                     if(roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
