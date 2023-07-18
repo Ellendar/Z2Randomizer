@@ -548,10 +548,22 @@ public class Hints
             {
                 Hint wizardHint;
                 Spell spell = spellMap[town];
+                //TODO: eventually when up/downstab are in the generic spell pool, they can use generic hints again.
+                if(spell == Spell.DOWNSTAB)
+                {
+                    hints[spellTextIndexes[town]] = new Hint(DOWNSTAB_TEXTS[r.Next(DOWNSTAB_TEXTS.Length)]);
+                    continue;
+                }
+                if (spell == Spell.UPSTAB)
+                {
+                    hints[spellTextIndexes[town]] = new Hint(UPSTAB_TEXTS[r.Next(UPSTAB_TEXTS.Length)]);
+                    continue;
+                }
                 do
                 {
                     wizardHint = GenerateCommunityHint(HintType.WIZARD, r, town, spell);
                 } while (usedWizardHints.Contains(wizardHint));
+                usedWizardHints.Add(wizardHint);
                 hints[spellTextIndexes[town]] = wizardHint;
             }
 

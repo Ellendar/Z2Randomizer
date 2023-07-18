@@ -1,5 +1,18 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.2 - July 17th, 2023
+
+- Updated flags field to not check flags validity when the box is blank.
+- Fixed a crash related to beep frequency: "Off"
+- Fixed a bug where the logic would think you can get spells in towns you can't reach
+- Fixed an exception when you hit convert with an empty flags box.
+- Added a check to swap up/down stab text if up/down stab are swapped and vanilla hints are on.
+- Cleaned up the gem pedestal in up/down elevator barba rooms (Thanks mirai/eunos)
+- Small corrections to a DM in Palaces room that was incorrect.
+- Fixed a bug that sometimes caused the item in one palace to be incorrect
+- Updated Hoodie Link sprite to have hood down in palaces/towns. (Thanks Knightcrawler)
+- Updated mixed item shuffle to use unbiased shuffling algorithm
+
 ## Version 4.2.1 - July 14th, 2023
 
 - Fixed a bug that could cause town items to not correctly randomize.

@@ -2884,7 +2884,7 @@ partial class MainUI
         customFlagsButton2.Size = new Size(96, 27);
         customFlagsButton2.TabIndex = 19;
         customFlagsButton2.Text = "Standard";
-        toolTip1.SetToolTip(customFlagsButton2, "Flags for the 2022 Standard Tournament");
+        toolTip1.SetToolTip(customFlagsButton2, "Flags for the 2023 Standard Tournament");
         customFlagsButton2.UseVisualStyleBackColor = true;
         // 
         // customFlagsButton3

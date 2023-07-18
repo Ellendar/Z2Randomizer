@@ -437,7 +437,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.1" +
+            "4.2.2" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
@@ -771,7 +771,7 @@ public class Hyrule
 
         if (props.MixOverworldPalaceItems)
         {
-            for (int i = itemList.Count - 1; i > 0; --i)
+            for (int i = itemList.Count - 1; i > 0; i--)
             {
                 int s = RNG.Next(i, itemList.Count);
                 (itemList[i], itemList[s]) = (itemList[s], itemList[i]);
@@ -781,27 +781,19 @@ public class Hyrule
         {
             if (props.ShufflePalaceItems)
             {
-                for (int i = 0; i < 6; i++)
+                for (int i = 5; i > 0; i--)
                 {
                     int s = RNG.Next(i, 6);
-                    Item sl = itemList[s];
-                    itemList[s] = itemList[i];
-                    itemList[i] = sl;
+                    (itemList[i], itemList[s]) = (itemList[s], itemList[i]);
                 }
-            }
-            else
-            {
-                //Was this place intentionally left blank? If so why the else?
             }
 
             if (props.ShuffleOverworldItems)
             {
-                for (int i = 6; i < itemList.Count; i++)
+                for (int i = itemList.Count - 1; i > 6; i--)
                 {
                     int s = RNG.Next(i, itemList.Count);
-                    Item sl = itemList[s];
-                    itemList[s] = itemList[i];
-                    itemList[i] = sl;
+                    (itemList[i], itemList[s]) = (itemList[s], itemList[i]);
                 }
             }
         }
