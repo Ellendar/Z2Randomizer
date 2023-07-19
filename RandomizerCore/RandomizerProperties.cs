@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Core.Overworld;
+using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.Core;
 
@@ -19,7 +20,7 @@ public class RandomizerProperties
     }
 
     //ROM Info
-    public string Filename { get; set; }
+    public byte[] File { get; set; }
     public int Seed { get; set; }
     public string Flags { get; set; }
     public bool saveRom = true;
@@ -189,15 +190,16 @@ public class RandomizerProperties
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
-    public String BeamSprite { get; set; }
+    public string BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
     [NotMapped]
     public CharacterSprite CharSprite { get; set; }
-    public String TunicColor { get; set; }
-    public String ShieldColor { get; set; }
+    public string TunicColor { get; set; }
+    public string ShieldColor { get; set; }
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }
+    public PalaceRooms Rooms { get; set; }
 
     //For Statistics
     [Key]

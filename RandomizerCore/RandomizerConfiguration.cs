@@ -8,6 +8,7 @@ using System.Reflection;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using System.Text.Json;
+using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.Core;
 
@@ -208,7 +209,10 @@ public class RandomizerConfiguration
     public string BeamSprite { get; set; }
     [IgnoreInFlags]
     public bool UseCustomRooms { get; set; }
-
+    [IgnoreInFlags]
+    public string Rooms { get; set; }
+    [IgnoreInFlags]
+    public string RoomFileName { get; set; }
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.
     //There should be a seperate class that does the full encode/decode cycle for both projects.
@@ -309,6 +313,9 @@ public class RandomizerConfiguration
         ShieldTunic = "Orange";
         BeamSprite = "Default";
         UseCustomRooms = false;
+
+        RoomFileName = "PalaceRooms.json";
+        Rooms = "";
     }
 
     public RandomizerConfiguration(string flags) : this()
@@ -1011,14 +1018,15 @@ public class RandomizerConfiguration
 
         return flags.ToString();
     }
-    public RandomizerProperties Export(Random random)
+    public RandomizerProperties Export(Random random, byte[] romData, PalaceRooms palaceRooms)
     {
         RandomizerProperties properties = new RandomizerProperties();
 
         //ROM Info
-        properties.Filename = FileName;
         properties.saveRom = true;
         properties.Seed = Seed;
+        properties.File = romData;
+        properties.Rooms = palaceRooms;
 
         //Items
         properties.StartCandle = !StartWithCandle && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCandle;
@@ -1493,10 +1501,4 @@ public class RandomizerConfiguration
                 return false;
         }
     }
-
-    public string GetRoomsFile()
-    {
-        return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
-    }
-
 }

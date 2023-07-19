@@ -11,6 +11,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Z2Randomizer.Core.Overworld;
 using Z2Randomizer.Core.Sidescroll;
 
@@ -102,6 +104,9 @@ public class Hyrule
 
     public int totalReachabilityOverworldAttempts = 0;
     public int totalContinentConnectionOverworldAttempts = 0;
+    private Dictionary<int, int> segmentGenerationAttempts = new Dictionary<int, int>();
+    private Dictionary<int, int> timeSpentBuildingSegment = new Dictionary<int, int>();
+
     public int totalWestGenerationAttempts = 0;
     public int totalEastGenerationAttempts = 0;
     public int totalMazeIslandGenerationAttempts = 0;
@@ -150,6 +155,8 @@ public class Hyrule
     public Random RNG { get; set; }
     public string Flags { get; private set; }
     public int Seed { get; private set; }
+    private string RoomFileName { get; set; }
+
     public RandomizerProperties Props
     {
         get
@@ -163,309 +170,330 @@ public class Hyrule
         }
     }
 
-    public Hyrule(RandomizerConfiguration config, BackgroundWorker worker, bool saveRom = true)
+    public Hyrule(RandomizerConfiguration config, byte[] romData, PalaceRooms palaceRooms)
     {
         WestHyrule.ResetStats();
         RNG = new Random(config.Seed);
-        props = config.Export(RNG);
-        props.saveRom = saveRom;
+        props = config.Export(RNG, romData, palaceRooms);
         string export = JsonSerializer.Serialize(props);
         Debug.WriteLine(export);
         Flags = config.Serialize();
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
 
-        ROMData = new ROM(props.Filename);
-        this.worker = worker;
+        ROMData = new ROM(props.File);
+    }
 
+    public async Task<byte[]> Randomize(Action<string> progress)
+    {
+        return await Task.Run(async () => {
+            //character = new Character(props);
+            shuffler = new Shuffler(props);
 
-        //character = new Character(props);
-        shuffler = new Shuffler(props);
-
-        palaces = new List<Palace>();
-        itemGet = new Dictionary<Item, bool>();
-        foreach (Item item in Enum.GetValues(typeof(Item)))
-        {
-            itemGet.Add(item, false);
-        }
-        SpellGet = new Dictionary<Spell, bool>();
-        reachableAreas = new HashSet<string>();
-        //areasByLocation = new SortedDictionary<string, List<Location>>();
-
-        kasutoJars = shuffler.ShuffleKasutoJars(ROMData, RNG);
-        //ROMData.moveAfterGem();
-
-        //Allows casting magic without requeueing a spell
-        if (props.FastCast)
-        {
-            ROMData.WriteFastCastMagic();
-        }
-
-        if (props.DisableMusic)
-        {
-            ROMData.DisableMusic();
-        }
-
-        ROMData.DoHackyFixes();
-        shuffler.ShuffleDrops(ROMData, RNG);
-        shuffler.ShufflePbagAmounts(ROMData, RNG);
-
-        ROMData.FixSoftLock();
-        ROMData.ExtendMapSize();
-        ROMData.DisableTurningPalacesToStone();
-        ROMData.UpdateMapPointers();
-        ROMData.FixContinentTransitions();
-
-        if (props.ReplaceFireWithDash)
-        {
-            ROMData.DashSpell();
-        }
-
-        if (props.DashAlwaysOn)
-        {
-            ROMData.Put(0x13C3, new Byte[] { 0x30, 0xD0 });
-        }
-
-        /*
-        Up + A:
-        1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
-        1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
-        d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
-        feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-        CAD0(1CAE0): (20bcd3) c902 10
-        CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-        CF92: (1CFA2): Jump to feb3(20b3fe)
-
-        */
-
-        if (props.UpAC1)
-        {
-            ROMData.UpAController1();
-        }
-        if (props.UpARestartsAtPalaces)
-        {
-            ROMData.Put(0x1cbba, 0x20);
-            ROMData.Put(0x1cbbb, 0x9a);
-            ROMData.Put(0x1cbbc, 0xd3);
-
-            ROMData.Put(0x1d3aa, 0x8d);
-            ROMData.Put(0x1d3ab, 0x07);
-            ROMData.Put(0x1d3ac, 0x07);
-            ROMData.Put(0x1d3ad, 0xad);
-            ROMData.Put(0x1d3ae, 0x07);
-            ROMData.Put(0x1d3af, 0x07);
-            ROMData.Put(0x1d3b0, 0xc9);
-            ROMData.Put(0x1d3b1, 0x03);
-            ROMData.Put(0x1d3b2, 0x30);
-            ROMData.Put(0x1d3b3, 0x12);
-            ROMData.Put(0x1d3b4, 0xad);
-            ROMData.Put(0x1d3b5, 0xb0);
-            ROMData.Put(0x1d3b6, 0x0f);
-            ROMData.Put(0x1d3b7, 0xc9);
-            ROMData.Put(0x1d3b8, 0x01);
-            ROMData.Put(0x1d3b9, 0xf0);
-            ROMData.Put(0x1d3ba, 0x0b);
-            ROMData.Put(0x1d3bb, 0xad);
-            ROMData.Put(0x1d3bc, 0x61);
-            ROMData.Put(0x1d3bd, 0x05);
-            ROMData.Put(0x1d3be, 0x8d);
-            ROMData.Put(0x1d3bf, 0xb1);
-            ROMData.Put(0x1d3c0, 0x0f);
-            ROMData.Put(0x1d3c1, 0xa9);
-            ROMData.Put(0x1d3c2, 0x01);
-            ROMData.Put(0x1d3c3, 0x8D);
-            ROMData.Put(0x1d3c4, 0xB0);
-            ROMData.Put(0x1d3c5, 0x0F);
-            ROMData.Put(0x1d3c6, 0xad);
-            ROMData.Put(0x1d3c7, 0x07);
-            ROMData.Put(0x1d3c8, 0x07);
-            ROMData.Put(0x1d3c9, 0x29);
-            ROMData.Put(0x1d3ca, 0x07);
-            ROMData.Put(0x1d3cb, 0x60);
-            ROMData.Put(0x1d3cc, 0xad);
-            ROMData.Put(0x1d3cd, 0xb1);
-            ROMData.Put(0x1d3ce, 0x0f);
-            ROMData.Put(0x1d3cf, 0x8d);
-            ROMData.Put(0x1d3d0, 0x61);
-            ROMData.Put(0x1d3d1, 0x05);
-            ROMData.Put(0x1d3d2, 0x20);
-            ROMData.Put(0x1d3d3, 0x57);
-            ROMData.Put(0x1d3d4, 0xa0);
-            ROMData.Put(0x1d3d5, 0xad);
-            ROMData.Put(0x1d3d6, 0x07);
-            ROMData.Put(0x1d3d7, 0x07);
-            ROMData.Put(0x1d3d8, 0x60);
-
-            //feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-            ROMData.Put(0x1feca, 0x8c);
-            ROMData.Put(0x1fecb, 0x07);
-            ROMData.Put(0x1fecc, 0x07);
-            ROMData.Put(0x1fecd, 0xa9);
-            ROMData.Put(0x1fece, 0x00);
-            ROMData.Put(0x1fecf, 0x8d);
-            ROMData.Put(0x1fed0, 0xb0);
-            ROMData.Put(0x1fed1, 0x0f);
-            ROMData.Put(0x1fed2, 0x60);
-
-            //CAD0(1CAE0): (20b7d3) c902 10
-            ROMData.Put(0x1cae0, 0x20);
-            ROMData.Put(0x1cae1, 0xbc);
-            ROMData.Put(0x1cae2, 0xd3);
-            ROMData.Put(0x1cae3, 0xc9);
-            ROMData.Put(0x1cae4, 0x03);
-            ROMData.Put(0x1cae5, 0x10);
-
-            //CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-            ROMData.Put(0x1caf3, 0xea);
-            ROMData.Put(0x1caf4, 0xea);
-            ROMData.Put(0x1caf5, 0xea);
-
-            //CF92: (1CFA2): Jump to feba(20bafe)
-            ROMData.Put(0x1cfa2, 0x20);
-            ROMData.Put(0x1cfa3, 0xba);
-            ROMData.Put(0x1cfa4, 0xfe);
-        }
-
-        if (props.PermanentBeam)
-        {
-            ROMData.Put(0x186c, 0xEA);
-            ROMData.Put(0x186d, 0xEA);
-        }
-
-        if (props.StandardizeDrops)
-        {
-            ROMData.Put(0x1e8bd, 0x20);
-            ROMData.Put(0x1e8be, 0x4c);
-            ROMData.Put(0x1e8bf, 0xff);
-
-            ROMData.Put(0x1ff5c, 0xc0);
-            ROMData.Put(0x1ff5d, 0x02);
-            ROMData.Put(0x1ff5e, 0xd0);
-            ROMData.Put(0x1ff5f, 0x07);
-            ROMData.Put(0x1ff60, 0xad);
-            ROMData.Put(0x1ff61, 0xfe);
-            ROMData.Put(0x1ff62, 0x06);
-            ROMData.Put(0x1ff63, 0xee);
-            ROMData.Put(0x1ff64, 0xfe);
-            ROMData.Put(0x1ff65, 0x06);
-            ROMData.Put(0x1ff66, 0x60);
-            ROMData.Put(0x1ff67, 0xad);
-            ROMData.Put(0x1ff68, 0xff);
-            ROMData.Put(0x1ff69, 0x06);
-            ROMData.Put(0x1ff6a, 0xee);
-            ROMData.Put(0x1ff6b, 0xff);
-            ROMData.Put(0x1ff6c, 0x06);
-            ROMData.Put(0x1ff6d, 0x60);
-
-        }
-
-        //load 706 (3) (AD0607)
-        //cmp 03 (2) (c903)
-        //bne 2 (2) (d0 03)
-        //store 01 in 706 (3) (
-        //do the math (3)
-        //push to stack (1)
-        //load 70a (3)
-        //store to 706 (3)
-        //pop stack (1)
-        //rts (1)
-
-        spellEnters = new Dictionary<int, int>();
-        spellEnters.Add(0, 0x90);
-        spellEnters.Add(1, 0x94);
-        spellEnters.Add(2, 0x98);
-        spellEnters.Add(3, 0x9C);
-        spellEnters.Add(4, 0xA0);
-        spellEnters.Add(5, 0xA4);
-        spellEnters.Add(6, 0x4D);
-        spellEnters.Add(7, 0xAC);
-        spellEnters.Add(8, 0xB0);
-        spellEnters.Add(9, 0xB4);
-
-        spellExits = new Dictionary<int, int>();
-        spellExits.Add(0, 0xC1);
-        spellExits.Add(1, 0xC5);
-        spellExits.Add(2, 0xC9);
-        spellExits.Add(3, 0xCD);
-        spellExits.Add(4, 0xD1);
-        spellExits.Add(5, 0xD5);
-        spellExits.Add(6, 0x6A);
-        spellExits.Add(7, 0xDD);
-        spellExits.Add(8, 0xE1);
-        spellExits.Add(9, 0xE5);
-
-        ShortenWizards();
-        accessibleMagicContainers = 4;
-
-        startRandomizeStartingValuesTimestamp = DateTime.Now;
-        RandomizeStartingValues();
-        startRandomizeEnemiesTimestamp = DateTime.Now;
-        RandomizeEnemyStats();
-
-        bool raftIsRequired = IsRaftAlwaysRequired(props);
-        while (palaces == null || palaces.Count != 7)
-        {
-            palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData, raftIsRequired);
-            if (palaces == null)
+            palaces = new List<Palace>();
+            itemGet = new Dictionary<Item, bool>();
+            foreach (Item item in Enum.GetValues(typeof(Item)))
             {
-                continue;
+                itemGet.Add(item, false);
             }
-        }
+            SpellGet = new Dictionary<Spell, bool>();
+            reachableAreas = new HashSet<string>();
+            //areasByLocation = new SortedDictionary<string, List<Location>>();
 
-        firstProcessOverworldTimestamp = DateTime.Now;
-        ProcessOverworld();
-        bool f = UpdateProgress(8);
-        if (!f)
-        {
-            return;
-        }
-        List<Hint> hints = ROMData.GetGameText();
-        ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
-        f = UpdateProgress(9);
-        if (!f)
-        {
-            return;
-        }
-        MD5 hasher = MD5.Create();
-        byte[] finalRNGState = new byte[32];
-        RNG.NextBytes(finalRNGState);
-        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
-            Flags +
-            Seed +
-            //Assembly.GetExecutingAssembly().GetName().Version.Major +
-            //Assembly.GetExecutingAssembly().GetName().Version.Minor +
-            //Assembly.GetExecutingAssembly().GetName().Version.Revision +
-            //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
-            //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.2" +
-            File.ReadAllText(config.GetRoomsFile()) +
-            finalRNGState
-        ));
-        UpdateRom(hash);
-        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
-        if (props.saveRom)
-        {
-            ROMData.Dump(newFileName);
-        }
+            kasutoJars = shuffler.ShuffleKasutoJars(ROMData, RNG);
+            //ROMData.moveAfterGem();
 
-        if (UNSAFE_DEBUG)
-        {
-            PrintSpoiler(LogLevel.Info);
-            //DEBUG
-            StringBuilder sb = new();
-            foreach (Palace palace in palaces)
+            //Allows casting magic without requeueing a spell
+            if (props.FastCast)
             {
-                sb.AppendLine("Palace: " + palace.Number);
-                foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
+                ROMData.WriteFastCastMagic();
+            }
+
+            if (props.DisableMusic)
+            {
+                ROMData.DisableMusic();
+            }
+
+            ROMData.DoHackyFixes();
+            shuffler.ShuffleDrops(ROMData, RNG);
+            shuffler.ShufflePbagAmounts(ROMData, RNG);
+
+            ROMData.FixSoftLock();
+            ROMData.ExtendMapSize();
+            ROMData.DisableTurningPalacesToStone();
+            ROMData.UpdateMapPointers();
+            ROMData.FixContinentTransitions();
+
+            if (props.ReplaceFireWithDash)
+            {
+                ROMData.DashSpell();
+            }
+
+            if (props.DashAlwaysOn)
+            {
+                ROMData.Put(0x13C3, new Byte[] { 0x30, 0xD0 });
+            }
+
+            /*
+            Up + A:
+            1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
+            1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
+            d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
+            feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
+            CAD0(1CAE0): (20bcd3) c902 10
+            CAE3(1CAF3): NOP NOP NOP(EAEAEA)
+            CF92: (1CFA2): Jump to feb3(20b3fe)
+
+            */
+
+            if (props.UpAC1)
+            {
+                ROMData.UpAController1();
+            }
+            if (props.UpARestartsAtPalaces)
+            {
+                ROMData.Put(0x1cbba, 0x20);
+                ROMData.Put(0x1cbbb, 0x9a);
+                ROMData.Put(0x1cbbc, 0xd3);
+
+                ROMData.Put(0x1d3aa, 0x8d);
+                ROMData.Put(0x1d3ab, 0x07);
+                ROMData.Put(0x1d3ac, 0x07);
+                ROMData.Put(0x1d3ad, 0xad);
+                ROMData.Put(0x1d3ae, 0x07);
+                ROMData.Put(0x1d3af, 0x07);
+                ROMData.Put(0x1d3b0, 0xc9);
+                ROMData.Put(0x1d3b1, 0x03);
+                ROMData.Put(0x1d3b2, 0x30);
+                ROMData.Put(0x1d3b3, 0x12);
+                ROMData.Put(0x1d3b4, 0xad);
+                ROMData.Put(0x1d3b5, 0xb0);
+                ROMData.Put(0x1d3b6, 0x0f);
+                ROMData.Put(0x1d3b7, 0xc9);
+                ROMData.Put(0x1d3b8, 0x01);
+                ROMData.Put(0x1d3b9, 0xf0);
+                ROMData.Put(0x1d3ba, 0x0b);
+                ROMData.Put(0x1d3bb, 0xad);
+                ROMData.Put(0x1d3bc, 0x61);
+                ROMData.Put(0x1d3bd, 0x05);
+                ROMData.Put(0x1d3be, 0x8d);
+                ROMData.Put(0x1d3bf, 0xb1);
+                ROMData.Put(0x1d3c0, 0x0f);
+                ROMData.Put(0x1d3c1, 0xa9);
+                ROMData.Put(0x1d3c2, 0x01);
+                ROMData.Put(0x1d3c3, 0x8D);
+                ROMData.Put(0x1d3c4, 0xB0);
+                ROMData.Put(0x1d3c5, 0x0F);
+                ROMData.Put(0x1d3c6, 0xad);
+                ROMData.Put(0x1d3c7, 0x07);
+                ROMData.Put(0x1d3c8, 0x07);
+                ROMData.Put(0x1d3c9, 0x29);
+                ROMData.Put(0x1d3ca, 0x07);
+                ROMData.Put(0x1d3cb, 0x60);
+                ROMData.Put(0x1d3cc, 0xad);
+                ROMData.Put(0x1d3cd, 0xb1);
+                ROMData.Put(0x1d3ce, 0x0f);
+                ROMData.Put(0x1d3cf, 0x8d);
+                ROMData.Put(0x1d3d0, 0x61);
+                ROMData.Put(0x1d3d1, 0x05);
+                ROMData.Put(0x1d3d2, 0x20);
+                ROMData.Put(0x1d3d3, 0x57);
+                ROMData.Put(0x1d3d4, 0xa0);
+                ROMData.Put(0x1d3d5, 0xad);
+                ROMData.Put(0x1d3d6, 0x07);
+                ROMData.Put(0x1d3d7, 0x07);
+                ROMData.Put(0x1d3d8, 0x60);
+
+                //feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
+                ROMData.Put(0x1feca, 0x8c);
+                ROMData.Put(0x1fecb, 0x07);
+                ROMData.Put(0x1fecc, 0x07);
+                ROMData.Put(0x1fecd, 0xa9);
+                ROMData.Put(0x1fece, 0x00);
+                ROMData.Put(0x1fecf, 0x8d);
+                ROMData.Put(0x1fed0, 0xb0);
+                ROMData.Put(0x1fed1, 0x0f);
+                ROMData.Put(0x1fed2, 0x60);
+
+                //CAD0(1CAE0): (20b7d3) c902 10
+                ROMData.Put(0x1cae0, 0x20);
+                ROMData.Put(0x1cae1, 0xbc);
+                ROMData.Put(0x1cae2, 0xd3);
+                ROMData.Put(0x1cae3, 0xc9);
+                ROMData.Put(0x1cae4, 0x03);
+                ROMData.Put(0x1cae5, 0x10);
+
+                //CAE3(1CAF3): NOP NOP NOP(EAEAEA)
+                ROMData.Put(0x1caf3, 0xea);
+                ROMData.Put(0x1caf4, 0xea);
+                ROMData.Put(0x1caf5, 0xea);
+
+                //CF92: (1CFA2): Jump to feba(20bafe)
+                ROMData.Put(0x1cfa2, 0x20);
+                ROMData.Put(0x1cfa3, 0xba);
+                ROMData.Put(0x1cfa4, 0xfe);
+            }
+
+            if (props.PermanentBeam)
+            {
+                ROMData.Put(0x186c, 0xEA);
+                ROMData.Put(0x186d, 0xEA);
+            }
+
+            if (props.StandardizeDrops)
+            {
+                ROMData.Put(0x1e8bd, 0x20);
+                ROMData.Put(0x1e8be, 0x4c);
+                ROMData.Put(0x1e8bf, 0xff);
+
+                ROMData.Put(0x1ff5c, 0xc0);
+                ROMData.Put(0x1ff5d, 0x02);
+                ROMData.Put(0x1ff5e, 0xd0);
+                ROMData.Put(0x1ff5f, 0x07);
+                ROMData.Put(0x1ff60, 0xad);
+                ROMData.Put(0x1ff61, 0xfe);
+                ROMData.Put(0x1ff62, 0x06);
+                ROMData.Put(0x1ff63, 0xee);
+                ROMData.Put(0x1ff64, 0xfe);
+                ROMData.Put(0x1ff65, 0x06);
+                ROMData.Put(0x1ff66, 0x60);
+                ROMData.Put(0x1ff67, 0xad);
+                ROMData.Put(0x1ff68, 0xff);
+                ROMData.Put(0x1ff69, 0x06);
+                ROMData.Put(0x1ff6a, 0xee);
+                ROMData.Put(0x1ff6b, 0xff);
+                ROMData.Put(0x1ff6c, 0x06);
+                ROMData.Put(0x1ff6d, 0x60);
+
+            }
+
+            //load 706 (3) (AD0607)
+            //cmp 03 (2) (c903)
+            //bne 2 (2) (d0 03)
+            //store 01 in 706 (3) (
+            //do the math (3)
+            //push to stack (1)
+            //load 70a (3)
+            //store to 706 (3)
+            //pop stack (1)
+            //rts (1)
+
+            spellEnters = new Dictionary<int, int>
+            {
+                { 0, 0x90 },
+                { 1, 0x94 },
+                { 2, 0x98 },
+                { 3, 0x9C },
+                { 4, 0xA0 },
+                { 5, 0xA4 },
+                { 6, 0x4D },
+                { 7, 0xAC },
+                { 8, 0xB0 },
+                { 9, 0xB4 }
+            };
+
+            spellExits = new Dictionary<int, int>
+            {
+                { 0, 0xC1 },
+                { 1, 0xC5 },
+                { 2, 0xC9 },
+                { 3, 0xCD },
+                { 4, 0xD1 },
+                { 5, 0xD5 },
+                { 6, 0x6A },
+                { 7, 0xDD },
+                { 8, 0xE1 },
+                { 9, 0xE5 }
+            };
+
+            ShortenWizards();
+            accessibleMagicContainers = 4;
+
+            startRandomizeStartingValuesTimestamp = DateTime.Now;
+            RandomizeStartingValues();
+            startRandomizeEnemiesTimestamp = DateTime.Now;
+            RandomizeEnemyStats();
+
+            bool raftIsRequired = IsRaftAlwaysRequired(props);
+            while (palaces == null || palaces.Count != 7)
+            {
+                palaces = await Palaces.CreatePalaces(RNG, props, ROMData, raftIsRequired);
+                if (palaces == null)
                 {
-                    sb.AppendLine(room.Debug());
+                    continue;
                 }
             }
-            File.WriteAllText("rooms.log", sb.ToString());
-        }
+
+            firstProcessOverworldTimestamp = DateTime.Now;
+            await ProcessOverworld(progress);
+            progress?.Invoke("Generating Hints");
+            if (!UpdateProgress(8, progress))
+            {
+                return new byte[0];
+            }
+            List<Hint> hints = ROMData.GetGameText();
+            ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
+            if (!UpdateProgress(9, progress))
+            {
+                return new byte[0];
+            }
+            SHA1 hasher = SHA1.Create();
+            byte[] finalRNGState = new byte[32];
+            RNG.NextBytes(finalRNGState);
+            byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
+                Flags +
+                Seed +
+                //Assembly.GetExecutingAssembly().GetName().Version.Major +
+                //Assembly.GetExecutingAssembly().GetName().Version.Minor +
+                //Assembly.GetExecutingAssembly().GetName().Version.Revision +
+                //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
+                //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
+                "4.2.2" + RoomFileName + finalRNGState
+            ));
+            UpdateRom(hash);
+            //string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+            if (props.saveRom)
+            {
+                return ROMData.Dump();
+            }
+
+            if (UNSAFE_DEBUG)
+            {
+                PrintSpoiler(LogLevel.Info);
+                //DEBUG
+                StringBuilder sb = new();
+                foreach (Palace palace in palaces)
+                {
+                    sb.AppendLine("Palace: " + palace.Number);
+                    foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
+                    {
+                        sb.AppendLine(room.Debug());
+                    }
+                }
+                File.WriteAllText("rooms.log", sb.ToString());
+            }
+
+            return new byte[0];
+        });
     }
 
 
+    private bool UpdateProgress(int val, Action<string> progress)
+    {
+        progress?.Invoke(val switch
+        {
+            2 => "Generating Western Hyrule",
+            3 => "Generating Death Mountain",
+            4 => "Generating East Hyrule",
+            5 => "Generating Maze Island",
+            6 => "Shuffling Items and Spells",
+            7 => "Running Seed Completability Checks",
+            8 => "Generating Hints",
+            9 => "Finishing up",
+            _ => throw new NotImplementedException(),
+        });
+        return true;
+    }
 
     /*
         Text Notes:
@@ -1345,7 +1373,7 @@ public class Hyrule
         return requireables;
     }
 
-    private void ProcessOverworld()
+    private async Task ProcessOverworld(Action<string> progress)
     {
         if (props.ShuffleSmallItems)
         {
@@ -1595,77 +1623,35 @@ public class Hyrule
 
             int nonContinentGenerationAttempts = 0;
             int nonTerrainShuffleAttempt = 0;
-            DateTime timestamp;
             //Shuffle everything else
             do //while (wtries < 10 && !EverythingReachable());
             {
+
+                nonContinentGenerationAttempts++;
+
                 //GENERATE WEST
-                bool shouldContinue = UpdateProgress(2);
-                if (!shouldContinue)
+                if (!await GenerateWorldSegment(westHyrule, progress))
                 {
                     return;
                 }
-                nonContinentGenerationAttempts++;
-                timestamp = DateTime.Now;
-                if (!westHyrule.AllReached)
-                {
-                    while (!westHyrule.Terraform()) { totalWestGenerationAttempts++; }
-                    totalWestGenerationAttempts++;
-                }
-                westHyrule.ResetVisitabilityState();
-                timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
-                shouldContinue = UpdateProgress(3);
-                if (!shouldContinue)
+                if (!await GenerateWorldSegment(deathMountain, progress))
                 {
                     return;
                 }
-                timestamp = DateTime.Now;
-                if (!deathMountain.AllReached)
-                {
-                    while (!deathMountain.Terraform()) { totalDeathMountainGenerationAttempts++; }
-                    totalDeathMountainGenerationAttempts++;
-                }
-                deathMountain.ResetVisitabilityState();
-                timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
-                shouldContinue = UpdateProgress(4);
-                if (!shouldContinue)
+                if (!await GenerateWorldSegment(eastHyrule, progress))
                 {
                     return;
                 }
-                timestamp = DateTime.Now;
-                if (!eastHyrule.AllReached)
-                {
-                    while (!eastHyrule.Terraform()) { totalEastGenerationAttempts++; }
-                    totalEastGenerationAttempts++;
-                }
-                eastHyrule.ResetVisitabilityState();
-                timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
-                shouldContinue = UpdateProgress(5);
-                if (!shouldContinue)
+                if (!await GenerateWorldSegment(mazeIsland, progress))
                 {
                     return;
                 }
-                timestamp = DateTime.Now;
-                if (!mazeIsland.AllReached)
-                {
-                    while (!mazeIsland.Terraform()) { totalMazeIslandGenerationAttempts++; }
-                    totalMazeIslandGenerationAttempts++;
-                }
-                mazeIsland.ResetVisitabilityState();
-                timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
-
-                shouldContinue = UpdateProgress(6);
-                if (!shouldContinue)
-                {
-                    return;
-                }
-
 
                 //Then perform non-terrain shuffles looking for one that works.
                 nonTerrainShuffleAttempt = 0;
@@ -1747,16 +1733,31 @@ public class Hyrule
         //WRITE LOCATIONS HERE
     }
 
-    private bool UpdateProgress(int v)
+    private async Task<bool> GenerateWorldSegment(World segment, Action<string> progress)
     {
-        if (worker != null)
+        var id = segment.GetID();
+        if (!UpdateProgress(id, progress))
         {
-            if (worker.CancellationPending)
-            {
-                return false;
-            }
-            worker.ReportProgress(v);
+            return false;
         }
+        await Task.Run(() =>
+        {
+            var timestamp = DateTime.Now;
+            if (!westHyrule.AllReached)
+            {
+
+                while (!segment.Terraform())
+                {
+                    segmentGenerationAttempts.TryGetValue(id, out var count);
+                    segmentGenerationAttempts[id] = count + 1;
+                }
+                segmentGenerationAttempts.TryGetValue(id, out var currentCount);
+                segmentGenerationAttempts[id] = currentCount + 1;
+            }
+            segment.ResetVisitabilityState();
+            timeSpentBuildingSegment.TryGetValue(id, out var time);
+            timeSpentBuildingSegment[id] = time + (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
+        });
         return true;
     }
 

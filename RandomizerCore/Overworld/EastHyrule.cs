@@ -236,7 +236,7 @@ public class EastHyrule : World
         hiddenKasutoLocation = townAtNewKasuto;
     }
 
-    public bool Terraform()
+    public override bool Terraform()
     {
         foreach (Location location in AllLocations)
         {
@@ -1937,5 +1937,10 @@ public class EastHyrule : World
     public override string GetName()
     {
         return "East";
+    }
+
+    public override int GetID()
+    {
+        return 4;
     }
 }

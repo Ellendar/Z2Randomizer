@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' ">
+      <ExternalConsole>true</ExternalConsole>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' ">
+      <ExternalConsole>true</ExternalConsole>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.9" PrivateAssets="all" />
+        <PackageReference Include="Blazor.Bootstrap" Version="1.9.5" />
+        <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="wwwroot\css\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="wwwroot\css\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Update="wwwroot\PalaceRooms.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+</Project>

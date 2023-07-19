@@ -164,7 +164,7 @@ class DeathMountain : World
         
     }
 
-    public bool Terraform()
+    public override bool Terraform()
     {
         Terrain water = Terrain.WATER;
         if (hyrule.Props.CanWalkOnWaterWithBoots)
@@ -1093,5 +1093,10 @@ class DeathMountain : World
     public override string GetName()
     {
         return "Death Mountain";
+    }
+
+    public override int GetID()
+    {
+        return 3;
     }
 }

@@ -80,7 +80,7 @@ class MazeIsland : World
         }
 }
 
-    public bool Terraform()
+    public override bool Terraform()
     {
         if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
         {
@@ -858,5 +858,9 @@ class MazeIsland : World
     public override string GetName()
     {
         return "Maze Island";
+    }
+    public override int GetID()
+    {
+        return 5;
     }
 }
