@@ -1848,44 +1848,6 @@ public partial class MainUI : Form
         };
     }
 
-    private bool Validate(string flagString)
-    {
-        if (flagString.Length != validFlagStringLength)
-        {
-            MessageBox.Show("Invalid flags. Aborting seed generation.");
-            return false;
-        }
-
-        for (int i = 0; i < flagString.Length; i++)
-        {
-            if (!flags.Contains(flagString[i]))
-            {
-                MessageBox.Show("Invalid flags. Aborting seed generation.");
-                return false;
-            }
-        }
-        if (startHeartsMinList.SelectedIndex <= 8
-            && startHeartsMinList.SelectedIndex <= 8
-            && startHeartsMaxList.SelectedIndex < startHeartsMinList.SelectedIndex)
-        {
-            MessageBox.Show("Start max hearts must be greater than or equal to start min hearts.");
-            return false;
-        }
-        if (startHeartsMinList.SelectedIndex <= 8
-            && maxHeartsList.SelectedIndex <= 8
-            && maxHeartsList.SelectedIndex < startHeartsMinList.SelectedIndex)
-        {
-            MessageBox.Show("Seed max hearts must be greater than or equal to start min hearts.");
-            return false;
-        }
-        if (startingGemsMinList.SelectedIndex > startingGemsMaxList.SelectedIndex)
-        {
-            MessageBox.Show("Required palaces min must be less than or equal to max.");
-            return false;
-        }
-        return true;
-    }
-
     public string GetRoomsFile()
     {
         return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";

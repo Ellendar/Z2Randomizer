@@ -4,6 +4,9 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RunAOTCompilation>true</RunAOTCompilation>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <WasmEnableSIMD>true</WasmEnableSIMD>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' ">

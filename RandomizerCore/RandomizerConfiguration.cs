@@ -1501,4 +1501,42 @@ public class RandomizerConfiguration
                 return false;
         }
     }
+
+    private static int ValidFlagStringLength = new RandomizerConfiguration().Serialize().Length;
+
+    public static bool Validate(string flagString)
+    {
+        if (flagString.Length != ValidFlagStringLength)
+        {
+            return false;
+        }
+
+        //for (int i = 0; i < flagString.Length; i++)
+        //{
+        //    if (!flags.Contains(flagString[i]))
+        //    {
+        //        return false;
+        //    }
+        //}
+        //if (startHeartsMinList.SelectedIndex <= 8
+        //    && startHeartsMinList.SelectedIndex <= 8
+        //    && startHeartsMaxList.SelectedIndex < startHeartsMinList.SelectedIndex)
+        //{
+        //    MessageBox.Show("Start max hearts must be greater than or equal to start min hearts.");
+        //    return false;
+        //}
+        //if (startHeartsMinList.SelectedIndex <= 8
+        //    && maxHeartsList.SelectedIndex <= 8
+        //    && maxHeartsList.SelectedIndex < startHeartsMinList.SelectedIndex)
+        //{
+        //    MessageBox.Show("Seed max hearts must be greater than or equal to start min hearts.");
+        //    return false;
+        //}
+        //if (startingGemsMinList.SelectedIndex > startingGemsMaxList.SelectedIndex)
+        //{
+        //    MessageBox.Show("Required palaces min must be less than or equal to max.");
+        //    return false;
+        //}
+        return true;
+    }
 }
