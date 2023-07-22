@@ -14,170 +14,101 @@
 </div>
 
 <div hidden="@(!HasRom)" class="container">
-    <div class="row">
-        <div class="col-auto">
-            <label>
-                Seed
-                <input @bind="Seed" />
-                <Button Color="ButtonColor.Secondary" @onclick="@NewSeed">New Seed</Button>
-            </label>
+    <EditForm EditContext="@Context">
+        <div class="row">
+            <div class="col-auto">
+                <label>
+                    Seed
+                    <InputText @bind-Value="Seed" />
+                    <Button Color="ButtonColor.Secondary" @onclick="@NewSeed">New Seed</Button>
+                </label>
+            </div>
+            <div class="col-auto">
+                <label>
+                    Flags
+                    <InputText size="40" @bind-Value="Flags" @oninput="OnFlagsChanged"/>
+                </label>
+            </div>
+            <div class="col-auto">
+                <label>
+                    <Button Color="ButtonColor.Primary" @onclick="@OnShowModalClick">Generate ROM</Button>
+                </label>
+            </div>
         </div>
-        <div class="col-auto">
-            <label>
-                Flags
-                <input @bind:get="@(config.Serialize())" @bind:set="@(str => config = new RandomizerConfiguration(str))" />
-            </label>
-        </div>
-        <div class="col-auto">
-            <label>
-                <Button Color="ButtonColor.Primary" @onclick="@OnShowModalClick">Generate ROM</Button>
-            </label>
-        </div>
-    </div>
-    <div class="row">
-        <h4>Quick Start</h4>
-        <p>To get started, choose a preset below or customize your experience</p>
+        <div class="row">
+            <h4>Quick Start</h4>
+            <p>To get started, choose a preset below or customize your experience</p>
 
-        <div class="col-auto">
-            <Button Color="ButtonColor.Secondary" @onclick="@(e => config = RandomizerConfiguration.FromLegacyFlags("jhEhMROm7DZ$MHRBTNBhBAh0PSmA"))">Beginner</Button>
+            <div class="col-auto">
+                <Button Color="ButtonColor.Secondary" @onclick="@(e => NewLegacyFlags("jhEhMROm7DZ$MHRBTNBhBAh0PSmA"))">Beginner</Button>
+            </div>
+            <div class="col-auto">
+                <Button Color="ButtonColor.Secondary" @onclick="@(e => NewLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA"))">Standard</Button>
+            </div>
+            <div class="col-auto">
+                <Button Color="ButtonColor.Secondary" @onclick="@(e => NewLegacyFlags("iyAqh$j#g7@$ZqTBT!BhOA!0P@@A"))">Max Rando</Button>
+            </div>
+            <div class="col-auto">
+                <Button Color="ButtonColor.Secondary" @onclick="@(e => NewFlags("hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy"))">Random%</Button>
+            </div>
         </div>
-        <div class="col-auto">
-            <Button Color="ButtonColor.Secondary" @onclick="@(e => config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA"))">Standard</Button>
+        <div class="row">
+            <h4>Full Customization</h4>
+            <Tabs>
+                <Tab Title="Start Options" IsActive="true">
+                    <Content>
+                        <StartingConfiguration Config="Config" />
+                    </Content>
+                </Tab>
+                <Tab Title="Overworld" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Overworld</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Palaces" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Palaces</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Levels" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Levels</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Spells" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Spells</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Enemies" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Enemies</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Items" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Items</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Drops" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Drops</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Hints" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Hints</b> tab.</p>
+                    </Content>
+                </Tab>
+                <Tab Title="Misc" IsActive="false">
+                    <Content>
+                        <p class="mt-3">This is the placeholder content for the <b>Misc</b> tab.</p>
+                    </Content>
+                </Tab>
+            </Tabs>
         </div>
-        <div class="col-auto">
-            <Button Color="ButtonColor.Secondary" @onclick="@(e => config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7@$ZqTBT!BhOA!0P@@A"))">Max Rando</Button>
-        </div>
-        <div class="col-auto">
-            <Button Color="ButtonColor.Secondary" @onclick="@(e => config = new("hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy"))">Random%</Button>
-        </div>
-    </div>
-    <div class="row">
-        <h4>Full Customization</h4>
-        <Tabs>
-            <Tab Title="Start Config" IsActive="true">
-                <Content>
-                    <div class="row">
-                        <div class="col-auto form-group">
-                            <Switch @bind-Value="config.ShuffleStartingItems" Label="Shuffle Starting Items" />
-                            <Switch @bind-Value="config.StartWithCandle" Label="Start With Candle" />
-                            <Switch @bind-Value="config.StartWithGlove" Label="Start With Glove" />
-                            <Switch @bind-Value="config.StartWithRaft" Label="Start With Raft" />
-                            <Switch @bind-Value="config.StartWithBoots" Label="Start With Boots" />
-                            <Switch @bind-Value="config.StartWithFlute" Label="Start With Flute" />
-                            <Switch @bind-Value="config.StartWithCross" Label="Start With Cross" />
-                            <Switch @bind-Value="config.StartWithHammer" Label="Start With Hammer" />
-                            <Switch @bind-Value="config.StartWithMagicKey" Label="Start With Magic Key" />
-                        </div>
-                        <div class="col-auto form-group">
-                            <Switch @bind-Value="config.ShuffleStartingSpells" Label="Shuffle Starting Spells" />
-                            <Switch @bind-Value="config.StartWithShield" Label="Start With Shield" />
-                            <Switch @bind-Value="config.StartWithJump" Label="Start With Jump" />
-                            <Switch @bind-Value="config.StartWithLife" Label="Start With Life" />
-                            <Switch @bind-Value="config.StartWithFairy" Label="Start With Fairy" />
-                            <Switch @bind-Value="config.StartWithFire" Label="Start With Fire" />
-                            <Switch @bind-Value="config.StartWithReflect" Label="Start With Reflect" />
-                            <Switch @bind-Value="config.StartWithSpell" Label="Start With Spell" />
-                            <Switch @bind-Value="config.StartWithThunder" Label="Start With Thunder" />
-                        </div>
-                        <div class="col-sm form-group">
-                            <div class="row">
-                                <p>Heart Containers</p>
-                                <div class="col-sm-2">
-                                    <label>
-                                        <NumberInput TValue="int?" @bind-Value="@config.StartingHeartContainersMin" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
-                                        Start Min
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label>
-                                        <NumberInput TValue="int?" @bind-Value="@config.StartingHeartContainersMax" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
-                                        Start Max
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label>
-                                        <NumberInput TValue="int?" @bind-Value="@config.MaxHeartContainers" EnableMinMax="true" Min="1" Max="10" Placeholder="?" />
-                                        Seed Max
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <p>Starting Level</p>
-                                <div class="col-sm-2">
-                                    <label>
-                                        <NumberInput TValue="int" @bind-Value="@config.StartingAttackLevel" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
-                                        Atk
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label>
-                                        <NumberInput TValue="int" @bind-Value="@config.StartingMagicLevel" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
-                                        Mag
-                                    </label>
-                                </div>
-                                <div class="col-sm-2">
-                                    <label>
-                                        <NumberInput TValue="int" @bind-Value="@config.StartingLifeLevel" EnableMinMax="true" Min="1" Max="11" Placeholder="?" />
-                                        Life
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                @*<Switch @bind-Value="config.StartWithDownstab" Label="Start With Downstab" />
-                                <Switch @bind-Value="config.StartWithUpstab" Label="Start With Upstab" />*@
-                                <Switch @bind-Value="config.ShuffleStartingLives" Label="Randomize Number of Lives" />
-                            </div>
-                        </div>
-                    </div>
-                </Content>
-            </Tab>
-            <Tab Title="Overworld" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Overworld</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Palaces" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Palaces</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Levels" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Levels</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Spells" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Spells</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Enemies" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Enemies</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Items" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Items</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Drops" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Drops</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Hints" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Hints</b> tab.</p>
-                </Content>
-            </Tab>
-            <Tab Title="Misc" IsActive="false">
-                <Content>
-                    <p class="mt-3">This is the placeholder content for the <b>Misc</b> tab.</p>
-                </Content>
-            </Tab>
-        </Tabs>
-    </div>
+
+    </EditForm>
 </div>
 
 <Modal @ref="modal" title="Generating ROM" IsVerticallyCentered="true" CloseOnEscape="false">
@@ -206,13 +137,62 @@
 
     private WebWorker? webWorker { get; set; }
 
-    //private class ProgressRef { public string Progress { get; set; } }
-    //private ProgressRef GenerationProgress = new ProgressRef();
     private string GenerationProgress { get; set; } = "";
 
-    private RandomizerConfiguration config = new RandomizerConfiguration();
+    private RandomizerConfiguration Config = new RandomizerConfiguration();
 
-    //private CancellationTokenSource cancellation = new CancellationTokenSource();
+    private string? Flags { get; set; }
+
+
+    private EditContext? Context;
+
+    // Note: The OnFieldChanged event is raised for each field in the model
+    private void Context_OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        Flags = Config.Serialize();
+        Console.WriteLine($"State changed: {e.FieldIdentifier.FieldName}");
+        StateHasChanged();
+    }
+
+    private void NewLegacyFlags(string str)
+    {
+        NewFlags(RandomizerConfiguration.FromLegacyFlags(str).Serialize());
+    }
+
+    private void NewFlags(string str)
+    {
+        Console.WriteLine("Setting new flags");
+        Flags = str;
+        Config = new(Flags);
+        StateHasChanged();
+    }
+
+    private void OnFlagsChanged(ChangeEventArgs e)
+    {
+        Console.WriteLine("on flags changed");
+        RandomizerConfiguration? newConfig = null;
+        try
+        {
+            newConfig = new RandomizerConfiguration(e.Value?.ToString());
+        }
+        catch { }
+        if (newConfig == null) {
+            return;
+        }
+        Config = newConfig;
+        Flags = Config.Serialize();
+
+        StateHasChanged();
+    }
+
+
+    protected override void OnInitialized()
+    {
+        Context = new(Config);
+        Context.OnFieldChanged += Context_OnFieldChanged;
+        Flags = Config.Serialize();
+        base.OnInitialized();
+    }
 
     protected void NewSeed()
     {
@@ -230,15 +210,15 @@
         // GetService can only be called with Interface types
         var workerRandomizeService = webWorker?.GetService<IRandomizerService>();
 
-        var randomizer = new Hyrule(config, ROM, palaceRooms);
-        var randomized = await workerRandomizeService!.Randomize(config, ROM!, palaceRoomsRaw, new Action<string>(s => {
+        var randomizer = new Hyrule(Config, ROM, palaceRooms);
+        var randomized = await workerRandomizeService!.Randomize(Config, ROM!, palaceRoomsRaw, new Action<string>(s => {
             GenerationProgress = s;
             Console.WriteLine($"progress {s}");
             StateHasChanged();
             Task.Delay(1);
         }));
 
-        await localStorage.SetItemAsync("Flags", config.Serialize());
+        await localStorage.SetItemAsync("Flags", Config.Serialize());
 
         // TODO properly set the name of the file
         var fileName = "rom.nes";
@@ -260,7 +240,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Attempting to load from local storage");
+        //Console.WriteLine("Attempting to load from local storage");
         await LoadROMFromLocalStorage();
     }
 
@@ -279,7 +259,7 @@
         var flags = await localStorage.GetItemAsync<string>("Flags");
         if (RandomizerConfiguration.Validate(flags))
         {
-            config = new(flags);
+            Config = new(flags);
         }
     }
 

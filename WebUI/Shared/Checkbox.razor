@@ -1,0 +1,64 @@
+﻿
+@inherits InputBase<bool?>
+
+<div class="form-check">
+    <label class="form-check-label">
+        <input @ref=InputElement class="form-check-input" checked="@State" type="checkbox" @onchange="CheckIndeterminate" />
+        @Label
+    </label>
+</div>
+
+@code {
+    @inject IJSRuntime JS
+
+
+    // private static Random random = new Random();
+
+    //public static string RandomString(int length)
+    //{
+    //    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    //    return new string(Enumerable.Repeat(chars, length)
+    //        .Select(s => s[random.Next(s.Length)]).ToArray());
+    //}
+
+    //[Parameter]
+    //public string Id { get; set; } = RandomString(10);
+    [Parameter]
+    public string Label { get; set; } = "";
+
+    private bool State { get; set; } = false;
+
+    private ElementReference InputElement;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    public async Task CheckIndeterminate(ChangeEventArgs args)
+    {
+        Console.WriteLine($"Check indeterminate for {Label}");
+        //Console.WriteLine($"Incoming: {args.Value}");
+        bool? next = (CurrentValue) switch { true => false, false => null, _ => true };
+        Console.WriteLine($"setting: {next.ToString()}");
+        CurrentValue = next;
+
+        Console.WriteLine($"Checkbox changed: {CurrentValue}");
+        State = CurrentValue == true;
+        //Console.WriteLine($"New state: {Value}");
+        await ValueChanged.InvokeAsync(CurrentValue);
+        await JS.InvokeVoidAsync("window.jsinterop.setPropByElement", InputElement, "indeterminate", CurrentValue == null);
+        //EditContext.NotifyFieldChanged(_fieldIdentifier);
+        //await JS.InvokeVoidAsync("window.jsinterop.setPropByElement", inputElement, "checked", Value == true);
+    }
+
+    protected override bool TryParseValueFromString(string? value, out bool? result, out string validationErrorMessage)
+    {
+        Console.WriteLine($"what about: {value}");
+        result = value switch { "True" => true, "False" => false, _ => null };
+        Console.WriteLine($"value parsed result {result}");
+        validationErrorMessage = "";
+        return true;
+    }
+}
+

@@ -1,0 +1,82 @@
+﻿
+<div class="row">
+    <div class="col-auto form-group">
+        <Switch @bind-Value="Config.ShuffleStartingItems" Label="Shuffle Starting Items" />
+        <Switch @bind-Value="Config.StartWithCandle" Label="Start With Candle" />
+        <Switch @bind-Value="Config.StartWithGlove" Label="Start With Glove" />
+        <Switch @bind-Value="Config.StartWithRaft" Label="Start With Raft" />
+        <Switch @bind-Value="Config.StartWithBoots" Label="Start With Boots" />
+        <Switch @bind-Value="Config.StartWithFlute" Label="Start With Flute" />
+        <Switch @bind-Value="Config.StartWithCross" Label="Start With Cross" />
+        <Switch @bind-Value="Config.StartWithHammer" Label="Start With Hammer" />
+        <Switch @bind-Value="Config.StartWithMagicKey" Label="Start With Magic Key" />
+    </div>
+    <div class="col-auto form-group">
+        <Switch @bind-Value="Config.ShuffleStartingSpells" Label="Shuffle Starting Spells" />
+        <Switch @bind-Value="Config.StartWithShield" Label="Start With Shield" />
+        <Switch @bind-Value="Config.StartWithJump" Label="Start With Jump" />
+        <Switch @bind-Value="Config.StartWithLife" Label="Start With Life" />
+        <Switch @bind-Value="Config.StartWithFairy" Label="Start With Fairy" />
+        <Switch @bind-Value="Config.StartWithFire" Label="Start With Fire" />
+        <Switch @bind-Value="Config.StartWithReflect" Label="Start With Reflect" />
+        <Switch @bind-Value="Config.StartWithSpell" Label="Start With Spell" />
+        <Switch @bind-Value="Config.StartWithThunder" Label="Start With Thunder" />
+    </div>
+    <div class="col-sm form-group">
+        <div class="row">
+            <p>Heart Containers</p>
+            <div class="col-sm-2">
+                <label>
+                    <NumberInput TValue="int?" @bind-Value="@Config.StartingHeartContainersMin" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
+                    Start Min
+                </label>
+            </div>
+            <div class="col-sm-2">
+                <label>
+                    <NumberInput TValue="int?" @bind-Value="@Config.StartingHeartContainersMax" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
+                    Start Max
+                </label>
+            </div>
+            <div class="col-sm-2">
+                <label>
+                    <NumberInput TValue="int?" @bind-Value="@Config.MaxHeartContainers" EnableMinMax="true" Min="1" Max="10" Placeholder="?" />
+                    Seed Max
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <p>Starting Level</p>
+            <div class="col-sm-2">
+                <label>
+                    <NumberInput TValue="int" @bind-Value="@Config.StartingAttackLevel" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
+                    Atk
+                </label>
+            </div>
+            <div class="col-sm-2">
+                <label>
+                    <NumberInput TValue="int" @bind-Value="@Config.StartingMagicLevel" EnableMinMax="true" Min="1" Max="8" Placeholder="?" />
+                    Mag
+                </label>
+            </div>
+            <div class="col-sm-2">
+                <label>
+                    <NumberInput TValue="int" @bind-Value="@Config.StartingLifeLevel" EnableMinMax="true" Min="1" Max="11" Placeholder="?" />
+                    Life
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <Checkbox @bind-Value="Config.StartWithDownstab" Label="Start With Downstab" />
+            <Checkbox @bind-Value="Config.StartWithUpstab" Label="Start With Upstab" />
+            <Switch @bind-Value="Config.ShuffleStartingLives" Label="Randomize Number of Lives" />
+        </div>
+    </div>
+</div>
+
+@code {
+    @using Z2Randomizer.Core
+    [Parameter, EditorRequired]
+    public RandomizerConfiguration Config { get; set; } = null!;
+
+    //[CascadingParameter] private EditContext? CascadedEditContext { get; set; }
+}

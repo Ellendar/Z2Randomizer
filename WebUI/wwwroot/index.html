@@ -33,6 +33,11 @@
             anchorElement.remove();
             URL.revokeObjectURL(url);
         }
+        window.jsinterop = {
+            setPropByElement: function (element, property, value) {
+                element[property] = value;
+            }
+        }
     </script>
 
 </body>
