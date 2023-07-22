@@ -1,5 +1,10 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.3 - July 22nd, 2023
+
+- Fixed a bug causing some overworld encounters to spawn enemies with incorrect y-coordinates
+- Fixed a bug in palace generation that could cause invalid exits.
+
 ## Version 4.2.2 - July 17th, 2023
 
 - Updated flags field to not check flags validity when the box is blank.

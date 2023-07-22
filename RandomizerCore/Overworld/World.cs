@@ -176,17 +176,13 @@ public abstract class World
 
     //TODO: This should work like the new palace enemy shuffle. Shuffle should set what enemies are where into
     //enemies arrays for the different encouter types, and then there should be a separate write step.
-    public void ShuffleEnemies(int addr, bool isOver, bool generatorsAlwaysMatch)
+    public void ShuffleEnemies(int addr, bool generatorsAlwaysMatch)
     {
         int? firstGenerator = null;
-        if (isOver) 
-        {
-            addr = addr + hyrule.ROMData.GetByte(addr);
-        }
         if (addr != 0x95A4)
         {
             int numBytes = hyrule.ROMData.GetByte(addr);
-            for (int j = addr + 2; j < addr + numBytes; j = j + 2)
+            for (int j = addr + 2; j < addr + numBytes; j += 2)
             {
                 int enemy = hyrule.ROMData.GetByte(j) & 0x3F;
                 int highPart = hyrule.ROMData.GetByte(j) & 0xC0;
@@ -196,25 +192,25 @@ public abstract class World
                     {
                         int swap = enemies[hyrule.RNG.Next(0, enemies.Count)];
                         hyrule.ROMData.Put(j, (byte)(swap + highPart));
-                        if ((smallEnemies.Contains(enemy) && largeEnemies.Contains(swap) && swap != 0x20))
+                        if (smallEnemies.Contains(enemy) && largeEnemies.Contains(swap) && swap != 0x20)
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
-                            ypos = ypos - 32;
+                            ypos -= 32;
                             hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         else if (swap == 0x20 && swap != enemy)
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
-                            ypos = ypos - 48;
+                            ypos -= 48;
                             hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         else if (enemy == 0x1F && swap != enemy)
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
-                            ypos = ypos - 16;
+                            ypos -= 16;
                             hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                     }
@@ -229,7 +225,7 @@ public abstract class World
                         {
                             int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
                             int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
-                            ypos = ypos - 48;
+                            ypos -= 48;
                             hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         hyrule.ROMData.Put(j, (byte)(largeEnemies[swap] + highPart));
@@ -415,25 +411,44 @@ public abstract class World
 
     public void ShuffleOverworldEnemies(bool generatorsAlwaysMatch)
     {
-        for (int i = enemyPtr; i < enemyPtr + 126; i = i + 2)
+        List<int> shuffledEncounters = new List<int>();
+        //0x4581
+        for (int i = enemyPtr; i < enemyPtr + 126; i += 2)
         {
             int low = hyrule.ROMData.GetByte(i);
             int high = hyrule.ROMData.GetByte(i + 1);
-            high = high << 8;
-            high = high & 0x0FFF;
+            high <<= 8;
+            high &= 0x0FFF;
             int addr = high + low + enemyAddr;
-            ShuffleEnemies(high + low + enemyAddr, false, generatorsAlwaysMatch);
+            if(shuffledEncounters.Contains(addr))
+            {
+                logger.Debug("Duplicate encounter");
+            }
+            else
+            {
+                shuffledEncounters.Add(addr);
+                ShuffleEnemies(addr, generatorsAlwaysMatch);
+            }
         }
-
-        foreach (int i in overworldMaps)
+        //{ 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
+        foreach (int map in overworldMaps)
         {
-            int ptrAddr = enemyPtr + i * 2;
+            int ptrAddr = enemyPtr + map * 2;
             int low = hyrule.ROMData.GetByte(ptrAddr);
             int high = hyrule.ROMData.GetByte(ptrAddr + 1);
-            high = high << 8;
-            high = high & 0x0FFF;
+            high <<= 8;
+            high &= 0x0FFF;
             int addr = high + low + enemyAddr;
-            ShuffleEnemies(high + low + enemyAddr, true, generatorsAlwaysMatch);
+            addr += hyrule.ROMData.GetByte(addr);
+            if (shuffledEncounters.Contains(addr))
+            {
+                logger.Debug("Duplicate encounter");
+            }
+            else
+            {
+                shuffledEncounters.Add(addr);
+                ShuffleEnemies(addr, generatorsAlwaysMatch);
+            }
         }
     }
 
