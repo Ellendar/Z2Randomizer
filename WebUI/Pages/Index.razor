@@ -143,7 +143,6 @@
 
     private string? Flags { get; set; }
 
-
     private EditContext? Context;
 
     // Note: The OnFieldChanged event is raised for each field in the model
@@ -163,7 +162,7 @@
     {
         Console.WriteLine("Setting new flags");
         Flags = str;
-        Config = new(Flags);
+        Config.CopyFrom(new(Flags));
         StateHasChanged();
     }
 
@@ -179,7 +178,7 @@
         if (newConfig == null) {
             return;
         }
-        Config = newConfig;
+        Config.CopyFrom(newConfig);
         Flags = Config.Serialize();
 
         StateHasChanged();

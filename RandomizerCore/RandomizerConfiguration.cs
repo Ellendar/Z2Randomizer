@@ -9,6 +9,7 @@ using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using System.Text.Json;
 using Z2Randomizer.Core.Sidescroll;
+using NLog.Targets;
 
 namespace Z2Randomizer.Core;
 
@@ -286,6 +287,20 @@ public class RandomizerConfiguration
         {'$', 63},
     };
 
+    public void CopyFrom(RandomizerConfiguration other)
+    {
+        var type = GetType();
+        foreach (var sourceProperty in type.GetProperties())
+        {
+            var targetProperty = type.GetProperty(sourceProperty.Name);
+            targetProperty.SetValue(this, sourceProperty.GetValue(other, null), null);
+        }
+        foreach (var sourceField in type.GetFields())
+        {
+            var targetField = type.GetField(sourceField.Name);
+            targetField.SetValue(this, sourceField.GetValue(other));
+        }
+    }
 
     public RandomizerConfiguration()
     {

@@ -3,7 +3,7 @@
 
 <div class="form-check">
     <label class="form-check-label">
-        <input @ref=InputElement class="form-check-input" checked="@State" type="checkbox" @onchange="CheckIndeterminate" />
+        <input @ref=element class="form-check-input" checked="@State" type="checkbox" @oninput="CheckIndeterminate" />
         @Label
     </label>
 </div>
@@ -28,7 +28,7 @@
 
     private bool State { get; set; } = false;
 
-    private ElementReference InputElement;
+    private ElementReference element;
 
     protected override void OnInitialized()
     {
@@ -47,8 +47,8 @@
         State = CurrentValue == true;
         //Console.WriteLine($"New state: {Value}");
         await ValueChanged.InvokeAsync(CurrentValue);
-        await JS.InvokeVoidAsync("window.jsinterop.setPropByElement", InputElement, "indeterminate", CurrentValue == null);
-        //EditContext.NotifyFieldChanged(_fieldIdentifier);
+
+        EditContext.NotifyFieldChanged(EditContext.Field("StartWithDownstab"));
         //await JS.InvokeVoidAsync("window.jsinterop.setPropByElement", inputElement, "checked", Value == true);
     }
 
@@ -59,6 +59,12 @@
         Console.WriteLine($"value parsed result {result}");
         validationErrorMessage = "";
         return true;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("window.jsinterop.setPropByElement", element, "indeterminate", CurrentValue == null);
+        await base.OnAfterRenderAsync(firstRender);
     }
 }
 
