@@ -298,7 +298,7 @@ public class WestHyrule : World
         lostWoods = new List<Location> { GetLocationByMem(0x4649), GetLocationByMem(0x464A), GetLocationByMem(0x464B), GetLocationByMem(0x464C), GetLocationByMem(0x4635) };
     }
 
-    public bool Terraform()
+    public override bool Terraform()
     {
         foreach (Location location in AllLocations)
         {
@@ -1418,5 +1418,10 @@ public class WestHyrule : World
     public override string GetName()
     {
         return "West";
+    }
+
+    public override int GetID()
+    {
+        return 2;
     }
 }

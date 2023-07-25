@@ -130,6 +130,10 @@ public abstract class World
         AllReached = false;
     }
 
+    public abstract bool Terraform();
+
+    public abstract int GetID();
+
     public static void ResetStats()
     {
         failedOnPlaceLocations = 0;

@@ -15,6 +15,8 @@ public class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    private PalaceRooms palaceRooms;
+
     private const bool DROPS_ARE_BLOCKERS = false;
     private const int OUTSIDE_ROOM_EXIT = 0b11111100;
     private Room root;
@@ -52,8 +54,9 @@ public class Palace
     //DEBUG
     public int Generations { get; set; }
 
-    public Palace(int number, int baseAddr, int connAddr, bool useCustomRooms)
+    public Palace(PalaceRooms palaces, int number, int baseAddr, int connAddr, bool useCustomRooms)
     {
+        palaceRooms = palaces;
         Number = number;
         root = null;
         /*
@@ -370,7 +373,7 @@ public class Palace
         if (!r.IsBeforeTbird)
         {
             //Using this map number as a signal is a terrible idea. Just use isBoss to determine which room is Tbird.
-            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
+            if ((Number == 7) && r.Map == palaceRooms.Thunderbird(useCustomRooms).Map)
             {
                 r.IsBeforeTbird = true;
                 return;
@@ -424,7 +427,7 @@ public class Palace
     {
         if (!r.IsPlaced)
         {
-            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
+            if ((Number == 7) && r.Map == palaceRooms.Thunderbird(useCustomRooms).Map)
             {
                 if (dir == 3)
                 {
@@ -770,7 +773,7 @@ public class Palace
                 remove = downExits[r];
             }
 
-            if (dropExits.Contains(remove) || remove.Map == PalaceRooms.Thunderbird(useCustomRooms).Map || remove == bossRoom)
+            if (dropExits.Contains(remove) || remove.Map == palaceRooms.Thunderbird(useCustomRooms).Map || remove == bossRoom)
             {
                 tries++;
                 continue;

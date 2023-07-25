@@ -8,6 +8,8 @@ using System.Reflection;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using System.Text.Json;
+using Z2Randomizer.Core.Sidescroll;
+using NLog.Targets;
 
 namespace Z2Randomizer.Core;
 
@@ -208,7 +210,10 @@ public class RandomizerConfiguration
     public string BeamSprite { get; set; }
     [IgnoreInFlags]
     public bool UseCustomRooms { get; set; }
-
+    [IgnoreInFlags]
+    public string Rooms { get; set; }
+    [IgnoreInFlags]
+    public string RoomFileName { get; set; }
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.
     //There should be a seperate class that does the full encode/decode cycle for both projects.
@@ -282,6 +287,20 @@ public class RandomizerConfiguration
         {'$', 63},
     };
 
+    public void CopyFrom(RandomizerConfiguration other)
+    {
+        var type = GetType();
+        foreach (var sourceProperty in type.GetProperties())
+        {
+            var targetProperty = type.GetProperty(sourceProperty.Name);
+            targetProperty.SetValue(this, sourceProperty.GetValue(other, null), null);
+        }
+        foreach (var sourceField in type.GetFields())
+        {
+            var targetField = type.GetField(sourceField.Name);
+            targetField.SetValue(this, sourceField.GetValue(other));
+        }
+    }
 
     public RandomizerConfiguration()
     {
@@ -309,6 +328,9 @@ public class RandomizerConfiguration
         ShieldTunic = "Orange";
         BeamSprite = "Default";
         UseCustomRooms = false;
+
+        RoomFileName = "PalaceRooms.json";
+        Rooms = "";
     }
 
     public RandomizerConfiguration(string flags) : this()
@@ -1011,14 +1033,15 @@ public class RandomizerConfiguration
 
         return flags.ToString();
     }
-    public RandomizerProperties Export(Random random)
+    public RandomizerProperties Export(Random random, byte[] romData, PalaceRooms palaceRooms)
     {
         RandomizerProperties properties = new RandomizerProperties();
 
         //ROM Info
-        properties.Filename = FileName;
         properties.saveRom = true;
         properties.Seed = Seed;
+        properties.File = romData;
+        properties.Rooms = palaceRooms;
 
         //Items
         properties.StartCandle = !StartWithCandle && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCandle;
@@ -1494,9 +1517,41 @@ public class RandomizerConfiguration
         }
     }
 
-    public string GetRoomsFile()
-    {
-        return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
-    }
+    private static int ValidFlagStringLength = new RandomizerConfiguration().Serialize().Length;
 
+    public static bool Validate(string flagString)
+    {
+        if (flagString.Length != ValidFlagStringLength)
+        {
+            return false;
+        }
+
+        //for (int i = 0; i < flagString.Length; i++)
+        //{
+        //    if (!flags.Contains(flagString[i]))
+        //    {
+        //        return false;
+        //    }
+        //}
+        //if (startHeartsMinList.SelectedIndex <= 8
+        //    && startHeartsMinList.SelectedIndex <= 8
+        //    && startHeartsMaxList.SelectedIndex < startHeartsMinList.SelectedIndex)
+        //{
+        //    MessageBox.Show("Start max hearts must be greater than or equal to start min hearts.");
+        //    return false;
+        //}
+        //if (startHeartsMinList.SelectedIndex <= 8
+        //    && maxHeartsList.SelectedIndex <= 8
+        //    && maxHeartsList.SelectedIndex < startHeartsMinList.SelectedIndex)
+        //{
+        //    MessageBox.Show("Seed max hearts must be greater than or equal to start min hearts.");
+        //    return false;
+        //}
+        //if (startingGemsMinList.SelectedIndex > startingGemsMaxList.SelectedIndex)
+        //{
+        //    MessageBox.Show("Required palaces min must be less than or equal to max.");
+        //    return false;
+        //}
+        return true;
+    }
 }

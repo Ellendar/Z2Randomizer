@@ -26,6 +26,8 @@ public partial class MainUI : Form
     private RandomizerConfiguration config;
     private List<Button> customisableButtons = new List<Button>();
     private SpritePreview? _spritePreview;
+    private PalaceRooms? palaceRooms;
+    private CancellationTokenSource cancellation;
 
     private readonly int validFlagStringLength;
 
@@ -202,6 +204,7 @@ public partial class MainUI : Form
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
         TryLoadSpriteImageFromFile(romFileTextBox.Text);
+        TryLoadPalaceRooms();
 
         EnableLevelScaling(null, null);
         EastBiome_SelectedIndexChanged(null, null);
@@ -430,6 +433,21 @@ public partial class MainUI : Form
         */
     }
 
+    private void TryLoadPalaceRooms()
+    {
+        string? palaceRoomsText;
+        string? customRoomsText;
+        if (File.Exists("PalaceRooms.json"))
+        {
+            palaceRoomsText = palacFile.ReadAllText("PalaceRooms.json");
+        }
+        if (File.Exists("CustomRooms.json"))
+        {
+            customRoomsText = palacFile.ReadAllText("CustomRooms.json");
+        }
+        palaceRooms = new PalaceRooms(palaceRoomsText, customRoomsText);
+    }
+
     private void TryLoadSpriteImageFromFile(string fileName)
     {
         // Quick file checks to make sure we can load the rom
@@ -573,7 +591,7 @@ public partial class MainUI : Form
             Application.DoEvents();
             if (f3.isClosed)
             {
-                backgroundWorker1.CancelAsync();
+                cancellation.Cancel();
                 return;
             }
         }
@@ -1765,51 +1783,13 @@ public partial class MainUI : Form
         ShuffleHiddenEnable();
     }
 
-    private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+    private void BackgroundWorker1_DoWork()
     {
-        BackgroundWorker worker = sender as BackgroundWorker;
-
-        new Hyrule(config, worker);
-        if (worker.CancellationPending)
-        {
-            e.Cancel = true;
-        }
-    }
-
-    private void BackgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-    {
-        if (e.ProgressPercentage == 2)
-        {
-            f3.setText("Generating Western Hyrule");
-        }
-        else if (e.ProgressPercentage == 3)
-        {
-            f3.setText("Generating Death Mountain");
-        }
-        else if (e.ProgressPercentage == 4)
-        {
-            f3.setText("Generating East Hyrule");
-        }
-        else if (e.ProgressPercentage == 5)
-        {
-            f3.setText("Generating Maze Island");
-        }
-        else if (e.ProgressPercentage == 6)
-        {
-            f3.setText("Shuffling Items and Spells");
-        }
-        else if (e.ProgressPercentage == 7)
-        {
-            f3.setText("Running Seed Completability Checks");
-        }
-        else if (e.ProgressPercentage == 8)
-        {
-            f3.setText("Generating Hints");
-        }
-        else if (e.ProgressPercentage == 9)
-        {
-            f3.setText("Finishing up");
-        }
+        var randomizer = new Hyrule(config);
+        var progress = new Progress<string>();
+        await randomizer.Randomize(progress, cancellation.Token);
+        // TODO THIS IS BROKEN
+        // but i can't test because i'm not on windows.
     }
 
     private void PalaceBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -1868,42 +1848,9 @@ public partial class MainUI : Form
         };
     }
 
-    private bool Validate(string flagString)
+    public string GetRoomsFile()
     {
-        if (flagString.Length != validFlagStringLength)
-        {
-            MessageBox.Show("Invalid flags. Aborting seed generation.");
-            return false;
-        }
-
-        for (int i = 0; i < flagString.Length; i++)
-        {
-            if (!flags.Contains(flagString[i]))
-            {
-                MessageBox.Show("Invalid flags. Aborting seed generation.");
-                return false;
-            }
-        }
-        if (startHeartsMinList.SelectedIndex <= 8
-            && startHeartsMinList.SelectedIndex <= 8
-            && startHeartsMaxList.SelectedIndex < startHeartsMinList.SelectedIndex)
-        {
-            MessageBox.Show("Start max hearts must be greater than or equal to start min hearts.");
-            return false;
-        }
-        if (startHeartsMinList.SelectedIndex <= 8
-            && maxHeartsList.SelectedIndex <= 8
-            && maxHeartsList.SelectedIndex < startHeartsMinList.SelectedIndex)
-        {
-            MessageBox.Show("Seed max hearts must be greater than or equal to start min hearts.");
-            return false;
-        }
-        if (startingGemsMinList.SelectedIndex > startingGemsMaxList.SelectedIndex)
-        {
-            MessageBox.Show("Required palaces min must be less than or equal to max.");
-            return false;
-        }
-        return true;
+        return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
     }
 
     private void GenerateSpriteImage()

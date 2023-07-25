@@ -170,6 +170,11 @@ public class ROM
         File.WriteAllBytes(filename, ROMData);
     }
 
+    public byte[] Dump()
+    {
+        return ROMData;
+    }
+
     public List<Hint> GetGameText()
     {
         List<Hint> texts = new List<Hint>();
