@@ -72,9 +72,6 @@
     <None Update="Sprites\Black_Mage.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sprites\Cheese_Link.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Sprites\Crystalis.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
