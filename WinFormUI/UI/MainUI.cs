@@ -1139,6 +1139,7 @@ public partial class MainUI : Form
                 EncounterRate.NORMAL => 0,
                 EncounterRate.HALF => 1,
                 EncounterRate.NONE => 2,
+                EncounterRate.RANDOM => 3,
                 _ => throw new Exception("Invalid EncounterRate setting")
             };
             hiddenPalaceList.SelectedIndex = configuration.HidePalace switch
