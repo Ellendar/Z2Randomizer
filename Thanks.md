@@ -17,6 +17,7 @@ Finally, thank YOU for your interest. I made this out of love for Zelda II, and 
 ## Version 4.1 - Ellendar
 
 Thanks to Mirai for beta testing, fixing some of the broken rooms, and making a bunch of suggestions.
-Thanks to thetrueking of space for providing names for all the overworld locations.
-Thanks to jrowe for helping with asm and refactoring.
+Thanks to thetruekingofspace for providing names for all the overworld locations.
+Thanks to jroweboy for numerous assembly updates and some code refactoring.
 Thanks to nelyom for doing some UI work.
+Thanks to everyone in #z2-sprite-workshop for submitting sprites.

@@ -21,7 +21,8 @@ Paste the old flags into the "Old flags" box and press convert. A compatable 4.1
 Windows will normally flag the installer as suspicious because there is no code signing. There have been some cases where Windows Defender detects this version of the Randomizer as a Trojan. This is a false positive, but getting around it would be difficult. You can ignore these warnings and install anyway. If you are doubtful, downloading the source and building yourself will get around any security notices.
 
 ## Right after installing, I'm getting a correct hash but incorrect seed. What's up?
-Sometimes after installing, if you had to download the .NET6 runtimes, the wrong runtimes will be used by the application, potentially resulting in different randomness.
+
+Sometimes after installing, if you had to download the .NET7 runtimes, the wrong runtimes will be used by the application, potentially resulting in different randomness.
 Restarting your computer will correct this.
 
 ## I found a bug / crash / uncompleteable seed. What should I do?
