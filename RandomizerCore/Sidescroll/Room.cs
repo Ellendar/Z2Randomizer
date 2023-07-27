@@ -15,6 +15,7 @@ using System.Xml.Linq;
 using System.Drawing;
 using System.Diagnostics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Numerics;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -326,7 +327,18 @@ public class Room
 
     public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle palaceStyle)
     {
-        byte[] enemiesToSave = NewEnemies[0] == 0 ? Enemies : NewEnemies;
+        //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
+        if(NewEnemies[0] == 0)
+        {
+            NewEnemies = Enemies;
+        }        
+        //#76: If the item room is a boss item room, and it's in palace group 1, move the boss up 1 tile.
+        //For some reason a bunch of the boss item rooms are fucked up in a bunch of different ways, so i'm keeping digshake's catch-all
+        //though repositioned into the place it belongs.
+        if (PalaceGroup == 1 && HasItem && HasBoss)
+        {
+            NewEnemies[1] = 0x6C;
+        }
         int enemyPtr = PalaceGroup switch
         {
             1 => Core.Enemies.Palace125EnemyPtr,
@@ -343,13 +355,13 @@ public class Room
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
 
-        if (enemiesToSave.Length > 1 && PalaceGroup == 2)
+        if (NewEnemies.Length > 1 && PalaceGroup == 2)
         {
-            for (int i = 2; i < enemiesToSave.Length; i += 2)
+            for (int i = 2; i < NewEnemies.Length; i += 2)
             {
-                if ((enemiesToSave[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
+                if ((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
                 {
-                    enemiesToSave[i] = (byte)(0x0F + (enemiesToSave[i] & 0xC0));
+                    NewEnemies[i] = (byte)(0x0F + (NewEnemies[i] & 0xC0));
                 }
             }
         }
@@ -391,7 +403,7 @@ public class Room
         }
 
 
-        ROMData.Put(enemyAddr, enemiesToSave);
+        ROMData.Put(enemyAddr, NewEnemies);
     }
 
     public void UpdateBitmask(ROM ROMData)

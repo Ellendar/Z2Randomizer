@@ -3351,11 +3351,6 @@ public class Hyrule
         ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
     }
 
-    public void ShuffleEnemies(int addr, List<int> enemies, List<int> generators,
-        List<int> smallEnemies, List<int> largeEnemies, List<int> flyingEnemies, bool isP7)
-    {
-        throw new NotImplementedException();
-    }
     public void ShuffleSmallItems(int world, bool first)
     {
         logger.Debug("World: " + world);
