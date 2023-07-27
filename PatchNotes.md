@@ -1,5 +1,14 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.4 - July 27th, 2023
+
+- Fixed a bug where darunia's spell was sometimes not requiring the child
+- Fixed a bug where item room bosses were sometimes incorrectly positioned when palace enemy shuffle was off
+- Fixed an issue where the UI would not clear lava shuffle when flags were applied that included lava shuffle but not encounter shuffle
+- Fixed a bug where encounter rate couldn't be set to "Random"
+- Upated Cheese Link sprite. (Thanos Irenepunmaster)
+- Added Garfield sprite. (Thanos Irenepunmaster)
+
 ## Version 4.2.3 - July 22nd, 2023
 
 - Fixed a bug causing some overworld encounters to spawn enemies with incorrect y-coordinates

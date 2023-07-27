@@ -36,7 +36,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
-    <Version>4.2.3</Version>
+    <Version>4.2.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />
@@ -72,9 +72,6 @@
     <None Update="Sprites\Black_Mage.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Sprites\Cheese_Link.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Sprites\Crystalis.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -85,6 +82,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Fighter.ips">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Sprites\Garfield.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Glitch_Witch.ips">
@@ -150,8 +150,5 @@
     <None Update="WinSparkle_0_8_0_x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sprites\" />
   </ItemGroup>
 </Project>
