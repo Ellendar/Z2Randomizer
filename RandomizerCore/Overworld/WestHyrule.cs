@@ -1374,7 +1374,7 @@ public class WestHyrule : World
                             location.NeedBagu 
                             && (bagu.Reachable 
                                 || hyrule.SpellGet[Spell.FAIRY] 
-                                || (hyrule.Props.ReplaceFireWithDash && hyrule.SpellGet[Spell.DASH] && hyrule.SpellGet[Spell.JUMP])))
+                                || (hyrule.SpellGet.ContainsKey(Spell.DASH) && hyrule.SpellGet[Spell.DASH] && hyrule.SpellGet[Spell.JUMP])))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;

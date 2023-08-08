@@ -831,6 +831,7 @@ partial class MainUI
         includeLavaInShuffleCheckbox.Text = "Include Lava in Shuffle";
         toolTip1.SetToolTip(includeLavaInShuffleCheckbox, "If checked, you may have enemies in path encounters");
         includeLavaInShuffleCheckbox.UseVisualStyleBackColor = true;
+        includeLavaInShuffleCheckbox.CheckStateChanged += shuffleEncounters_CheckStateChanged;
         // 
         // generateBaguWoodsCheckbox
         // 
@@ -1174,6 +1175,7 @@ partial class MainUI
         allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
         toolTip1.SetToolTip(allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
         allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
+        allowPathEnemiesCheckbox.CheckStateChanged += shuffleEncounters_CheckStateChanged;
         // 
         // shuffleEncountersCheckbox
         // 

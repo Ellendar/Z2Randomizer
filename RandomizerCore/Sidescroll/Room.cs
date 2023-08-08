@@ -1,21 +1,9 @@
 ﻿using Newtonsoft.Json;
 using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.OleDb;
-using System.Dynamic;
 using System.Linq;
-using System.Speech.Synthesis;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Drawing;
-using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Numerics;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -580,37 +568,37 @@ public class Room
     {
         int[] allEnemies = PalaceGroup switch
         {
-            1 => Z2Randomizer.Core.Enemies.Palace125Enemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346Enemies,
-            3 => Z2Randomizer.Core.Enemies.GPEnemies,
+            1 => Core.Enemies.Palace125Enemies,
+            2 => Core.Enemies.Palace346Enemies,
+            3 => Core.Enemies.GPEnemies,
             _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
         };
         int[] smallEnemies = PalaceGroup switch
         {
-            1 => Z2Randomizer.Core.Enemies.Palace125SmallEnemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346SmallEnemies,
-            3 => Z2Randomizer.Core.Enemies.GPSmallEnemies,
+            1 => Core.Enemies.Palace125SmallEnemies,
+            2 => Core.Enemies.Palace346SmallEnemies,
+            3 => Core.Enemies.GPSmallEnemies,
             _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
         };
         int[] largeEnemies = PalaceGroup switch
         {
-            1 => Z2Randomizer.Core.Enemies.Palace125LargeEnemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346LargeEnemies,
-            3 => Z2Randomizer.Core.Enemies.GPLargeEnemies,
+            1 => Core.Enemies.Palace125LargeEnemies,
+            2 => Core.Enemies.Palace346LargeEnemies,
+            3 => Core.Enemies.GPLargeEnemies,
             _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
         };
         int[] flyingEnemies = PalaceGroup switch
         {
-            1 => Z2Randomizer.Core.Enemies.Palace125FlyingEnemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346FlyingEnemies,
-            3 => Z2Randomizer.Core.Enemies.GPFlyingEnemies,
+            1 => Core.Enemies.Palace125FlyingEnemies,
+            2 => Core.Enemies.Palace346FlyingEnemies,
+            3 => Core.Enemies.GPFlyingEnemies,
             _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
         };
         int[] generators = PalaceGroup switch
         {
-            1 => Z2Randomizer.Core.Enemies.Palace125Generators,
-            2 => Z2Randomizer.Core.Enemies.Palace346Generators,
-            3 => Z2Randomizer.Core.Enemies.GPGenerators,
+            1 => Core.Enemies.Palace125Generators,
+            2 => Core.Enemies.Palace346Generators,
+            3 => Core.Enemies.GPGenerators,
             _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
         };
 
