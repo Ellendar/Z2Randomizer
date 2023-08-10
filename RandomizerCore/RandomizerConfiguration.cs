@@ -279,7 +279,7 @@ public class RandomizerConfiguration
         {'!', 60},
         {'@', 61},
         {'#', 62},
-        {'$', 63},
+        {'+', 63},
     };
 
 
