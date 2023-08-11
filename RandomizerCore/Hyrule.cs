@@ -442,7 +442,8 @@ public class Hyrule
             finalRNGState
         ));
         UpdateRom(hash);
-        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+        char os_sep = Path.DirectorySeparatorChar;
+        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf(os_sep) + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
         if (props.saveRom)
         {
             ROMData.Dump(newFileName);
