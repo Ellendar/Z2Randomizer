@@ -1,9 +1,21 @@
 ﻿using Newtonsoft.Json;
 using NLog;
+using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.OleDb;
+using System.Dynamic;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Drawing;
+using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Numerics;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -847,7 +859,7 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WriteValue(BitConverter.ToString(value.Connections).Replace("-", ""));
 
         writer.WritePropertyName("enemies");
-        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
+        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies.Length == 0 || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
 
         writer.WritePropertyName("sideviewData");
         writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
