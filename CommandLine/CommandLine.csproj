@@ -5,7 +5,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <StartupObject>Program</StartupObject>
+    <StartupObject>Z2Randomizer.CommandLine.Program</StartupObject>
     <AssemblyName>Z2R</AssemblyName>
   </PropertyGroup>
 

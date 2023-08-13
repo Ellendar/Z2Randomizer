@@ -1,14 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using McMaster.Extensions.CommandLineUtils;
-using NLog;
+﻿using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel;
-using System.Security.Cryptography.X509Certificates;
 using Z2Randomizer.Core;
 
-//Console.WriteLine("Usage: Z2R -flags RAAN6AAFesXtN1Tdt0g$8v4cYf4XT7AAWA -rom <path to base rom> -seed 744740757");
-//Console.WriteLine("Options:");
-//Console.WriteLine("    (-f | -flags) <flag string>");
+namespace Z2Randomizer.CommandLine;
 
 public class Program
 {
