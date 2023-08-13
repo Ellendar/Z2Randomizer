@@ -1,5 +1,32 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.4 - July 27th, 2023
+
+- Fixed a bug where darunia's spell was sometimes not requiring the child
+- Fixed a bug where item room bosses were sometimes incorrectly positioned when palace enemy shuffle was off
+- Fixed an issue where the UI would not clear lava shuffle when flags were applied that included lava shuffle but not encounter shuffle
+- Fixed a bug where encounter rate couldn't be set to "Random"
+- Upated Cheese Link sprite. (Thanos Irenepunmaster)
+- Added Garfield sprite. (Thanos Irenepunmaster)
+
+## Version 4.2.3 - July 22nd, 2023
+
+- Fixed a bug causing some overworld encounters to spawn enemies with incorrect y-coordinates
+- Fixed a bug in palace generation that could cause invalid exits.
+
+## Version 4.2.2 - July 17th, 2023
+
+- Updated flags field to not check flags validity when the box is blank.
+- Fixed a crash related to beep frequency: "Off"
+- Fixed a bug where the logic would think you can get spells in towns you can't reach
+- Fixed an exception when you hit convert with an empty flags box.
+- Added a check to swap up/down stab text if up/down stab are swapped and vanilla hints are on.
+- Cleaned up the gem pedestal in up/down elevator barba rooms (Thanks mirai/eunos)
+- Small corrections to a DM in Palaces room that was incorrect.
+- Fixed a bug that sometimes caused the item in one palace to be incorrect
+- Updated Hoodie Link sprite to have hood down in palaces/towns. (Thanks Knightcrawler)
+- Updated mixed item shuffle to use unbiased shuffling algorithm
+
 ## Version 4.2.1 - July 14th, 2023
 
 - Fixed a bug that could cause town items to not correctly randomize.

@@ -284,8 +284,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <string>Name|Standard</string>
-  <string>Flagset|AAAN6AAFeqGkWVXZt0H$8v4BX#4XRx$$sh</string>
-  <string>Tooltip|Flags for the 2022 Standard Tournament</string>
+  <string>Flagset|RAAN6AAFesXtN1Tdt0g$8v4cYf4XT7AAWA</string>
+  <string>Tooltip|Flags for the 2023 Standard Tournament</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection customFlagsButton2
         {

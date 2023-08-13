@@ -132,7 +132,7 @@ public partial class MainUI : Form
         experienceDropsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         allowPathEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeLavaInShuffle.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeLavaInShuffleCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         mixLargeAndSmallCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -512,6 +512,8 @@ public partial class MainUI : Form
         Properties.Settings.Default.noflash = flashingOffCheckbox.Checked;
         Properties.Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
         Properties.Settings.Default.lastused = flagsTextBox.Text.Trim();
+        Properties.Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
+        Properties.Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
         Properties.Settings.Default.lastseed = seedTextBox.Text.Trim();
         Properties.Settings.Default.Save();
         try
@@ -605,11 +607,11 @@ public partial class MainUI : Form
     private void shuffleEncounters_CheckStateChanged(object sender, EventArgs e)
     {
         allowPathEnemiesCheckbox.Enabled = shuffleEncountersCheckbox.Checked;
-        includeLavaInShuffle.Enabled = shuffleEncountersCheckbox.Checked;
-        if (!shuffleEncountersCheckbox.Checked)
+        includeLavaInShuffleCheckbox.Enabled = shuffleEncountersCheckbox.Checked;
+        if (shuffleEncountersCheckbox.CheckState != CheckState.Checked)
         {
             allowPathEnemiesCheckbox.Checked = false;
-            includeLavaInShuffle.Checked = false;
+            includeLavaInShuffleCheckbox.Checked = false;
         }
     }
 
@@ -737,7 +739,7 @@ public partial class MainUI : Form
         configuration.ShuffleGP = GetTripleCheckState(includeGPinShuffleCheckbox);
         configuration.ShuffleEncounters = GetTripleCheckState(shuffleEncountersCheckbox);
         configuration.AllowUnsafePathEncounters = allowPathEnemiesCheckbox.Checked;
-        configuration.IncludeLavaInEncounterShuffle = includeLavaInShuffle.Checked;
+        configuration.IncludeLavaInEncounterShuffle = includeLavaInShuffleCheckbox.Checked;
         configuration.EncounterRate = encounterRateBox.SelectedIndex switch
         {
             0 => EncounterRate.NORMAL,
@@ -1017,6 +1019,10 @@ public partial class MainUI : Form
     private void convertButton_Click(object send, EventArgs e)
     {
         String oldFlags = oldFlagsTextbox.Text.Trim();
+        if(oldFlags.Length == 0)
+        {
+            return;
+        }
         RandomizerConfiguration oldSettings = ExportConfig();
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
 
@@ -1038,6 +1044,10 @@ public partial class MainUI : Form
     {
         dontrunhandler = true;
         flagsTextBox.Text = flagsTextBox.Text.Trim();
+        if(flagsTextBox.Text.Length == 0)
+        {
+            return;
+        }
         try
         {
             RandomizerConfiguration configuration = new RandomizerConfiguration(flagsTextBox.Text);
@@ -1121,14 +1131,15 @@ public partial class MainUI : Form
             //Overworld
             allowPalaceContinentSwapCheckbox.CheckState = ToCheckState(configuration.PalacesCanSwapContinents);
             includeGPinShuffleCheckbox.CheckState = ToCheckState(configuration.ShuffleGP);
+            includeLavaInShuffleCheckbox.CheckState = ToCheckState(configuration.IncludeLavaInEncounterShuffle);
             shuffleEncountersCheckbox.CheckState = ToCheckState(configuration.ShuffleEncounters);
             allowPathEnemiesCheckbox.CheckState = ToCheckState(configuration.AllowUnsafePathEncounters);
-            includeLavaInShuffle.CheckState = ToCheckState(configuration.IncludeLavaInEncounterShuffle);
             encounterRateBox.SelectedIndex = configuration.EncounterRate switch
             {
                 EncounterRate.NORMAL => 0,
                 EncounterRate.HALF => 1,
                 EncounterRate.NONE => 2,
+                EncounterRate.RANDOM => 3,
                 _ => throw new Exception("Invalid EncounterRate setting")
             };
             hiddenPalaceList.SelectedIndex = configuration.HidePalace switch

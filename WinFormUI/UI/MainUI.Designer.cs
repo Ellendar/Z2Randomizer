@@ -74,7 +74,7 @@ partial class MainUI
         startWithCandleCheckbox = new CheckBox();
         shuffleStartingItemsCheckbox = new CheckBox();
         tabPage1 = new TabPage();
-        includeLavaInShuffle = new CheckBox();
+        includeLavaInShuffleCheckbox = new CheckBox();
         generateBaguWoodsCheckbox = new CheckBox();
         useGoodBootsCheckbox = new CheckBox();
         shuffleWhichLocationsAreHiddenCheckbox = new CheckBox();
@@ -779,7 +779,7 @@ partial class MainUI
         // 
         // tabPage1
         // 
-        tabPage1.Controls.Add(includeLavaInShuffle);
+        tabPage1.Controls.Add(includeLavaInShuffleCheckbox);
         tabPage1.Controls.Add(generateBaguWoodsCheckbox);
         tabPage1.Controls.Add(useGoodBootsCheckbox);
         tabPage1.Controls.Add(shuffleWhichLocationsAreHiddenCheckbox);
@@ -822,15 +822,15 @@ partial class MainUI
         // 
         // includeLavaInShuffle
         // 
-        includeLavaInShuffle.AutoSize = true;
-        includeLavaInShuffle.Location = new Point(7, 129);
-        includeLavaInShuffle.Margin = new Padding(4, 3, 4, 3);
-        includeLavaInShuffle.Name = "includeLavaInShuffle";
-        includeLavaInShuffle.Size = new Size(145, 19);
-        includeLavaInShuffle.TabIndex = 48;
-        includeLavaInShuffle.Text = "Include Lava in Shuffle";
-        toolTip1.SetToolTip(includeLavaInShuffle, "If checked, you may have enemies in path encounters");
-        includeLavaInShuffle.UseVisualStyleBackColor = true;
+        includeLavaInShuffleCheckbox.AutoSize = true;
+        includeLavaInShuffleCheckbox.Location = new Point(7, 129);
+        includeLavaInShuffleCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includeLavaInShuffleCheckbox.Name = "includeLavaInShuffle";
+        includeLavaInShuffleCheckbox.Size = new Size(145, 19);
+        includeLavaInShuffleCheckbox.TabIndex = 48;
+        includeLavaInShuffleCheckbox.Text = "Include Lava in Shuffle";
+        toolTip1.SetToolTip(includeLavaInShuffleCheckbox, "If checked, you may have enemies in path encounters");
+        includeLavaInShuffleCheckbox.UseVisualStyleBackColor = true;
         // 
         // generateBaguWoodsCheckbox
         // 
@@ -2884,7 +2884,7 @@ partial class MainUI
         customFlagsButton2.Size = new Size(96, 27);
         customFlagsButton2.TabIndex = 19;
         customFlagsButton2.Text = "Standard";
-        toolTip1.SetToolTip(customFlagsButton2, "Flags for the 2022 Standard Tournament");
+        toolTip1.SetToolTip(customFlagsButton2, "Flags for the 2023 Standard Tournament");
         customFlagsButton2.UseVisualStyleBackColor = true;
         // 
         // customFlagsButton3
@@ -3276,7 +3276,7 @@ partial class MainUI
     private Label label5;
     private ComboBox startingGemsMaxList;
     private CheckBox swapUpAndDownstabCheckbox;
-    private CheckBox includeLavaInShuffle;
+    private CheckBox includeLavaInShuffleCheckbox;
     private CheckBox useCustomRoomsBox;
     private Label FireSpellOptionLabel;
     private ComboBox FireSpellBox;
