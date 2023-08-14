@@ -96,6 +96,7 @@ public class WestHyrule : World
     public WestHyrule(Hyrule hy)
         : base(hy)
     {
+        isHorizontal = hy.Props.WestIsHorizontal;
         LoadLocations(0x4639, 4, terrains, Continent.WEST);
         LoadLocations(0x4640, 2, terrains, Continent.WEST);
 
@@ -455,7 +456,6 @@ public class WestHyrule : World
                         break;
 
                     case Biome.CANYON:
-                        isHorizontal = hyrule.RNG.NextDouble() > .5;
                         riverTerrain = fillerWater;
                         if (hyrule.Props.WestBiome == Biome.DRY_CANYON)
                         {
@@ -474,7 +474,6 @@ public class WestHyrule : World
                         //this.randomTerrains.Add(terrain.lava);
                         break;
                     case Biome.CALDERA:
-                        this.isHorizontal = hyrule.RNG.NextDouble() > .5;
                         DrawCenterMountain();
                         locationAtPalace3.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };

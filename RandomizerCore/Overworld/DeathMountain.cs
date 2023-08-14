@@ -68,6 +68,9 @@ class DeathMountain : World
         //loadLocations(0x6136, 2, terrains, continent.dm);
         LoadLocations(0x6144, 1, terrains, Continent.DM);
 
+        //isHorizontal = hy.Props.DmIsHorizontal;
+        isHorizontal = true;
+
         hammerCave = GetLocationByMem(0x6128);
         magicCave = GetLocationByMem(0x6144);
 
@@ -334,7 +337,6 @@ class DeathMountain : World
                 }
                 else if (this.biome == Biome.CALDERA)
                 {
-                    this.isHorizontal = hyrule.RNG.NextDouble() > .5;
                     DrawCenterMountain();
                 }
                 else if (this.biome == Biome.MOUNTAINOUS)

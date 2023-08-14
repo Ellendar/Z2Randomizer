@@ -1015,6 +1015,10 @@ public class RandomizerConfiguration
     {
         RandomizerProperties properties = new RandomizerProperties();
 
+        properties.WestIsHorizontal = random.Next(2) == 1;
+        properties.EastIsHorizontal = random.Next(2) == 1;
+        properties.DmIsHorizontal = random.Next(2) == 1;
+
         //ROM Info
         properties.Filename = FileName;
         properties.saveRom = true;

@@ -2,13 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Collections;
-using System.Runtime.InteropServices;
 using NLog;
-using System.Threading.Channels;
-using System.Diagnostics;
-using Z2Randomizer.Core;
 //using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -2495,7 +2489,6 @@ public abstract class World
 
     public void DrawCenterMountain()
     {
-        isHorizontal = hyrule.RNG.NextDouble() > 0.5;
         int top = (MAP_ROWS - 35) / 2; //20
         int bottom = MAP_ROWS - top; //55
         if (isHorizontal)

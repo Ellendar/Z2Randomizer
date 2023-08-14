@@ -86,6 +86,7 @@ public class EastHyrule : World
     public EastHyrule(Hyrule hy)
         : base(hy)
     {
+        isHorizontal = hy.Props.EastIsHorizontal;
         baseAddr = 0x862F;
         LoadLocations(0x863E, 6, terrains, Continent.EAST);
         LoadLocations(0x863A, 2, terrains, Continent.EAST);
@@ -458,7 +459,6 @@ public class EastHyrule : World
                 }
                 else if (biome == Biome.CANYON)
                 {
-                    isHorizontal = hyrule.RNG.NextDouble() > 0.5;
                     riverTerrain = water;
                     if (hyrule.Props.EastBiome == Biome.DRY_CANYON)
                     {
@@ -478,8 +478,6 @@ public class EastHyrule : World
                 }
                 else if (biome == Biome.VOLCANO)
                 {
-                    isHorizontal = hyrule.RNG.NextDouble() > .5;
-
                     DrawCenterMountain();
 
 
@@ -800,7 +798,6 @@ public class EastHyrule : World
         int length = 20;
         if (biome != Biome.CANYON && biome != Biome.VOLCANO)
         {
-            this.isHorizontal = hyrule.RNG.NextDouble() > .5;
             length = hyrule.RNG.Next(5, 16);
         }
         int deltax = 1;
