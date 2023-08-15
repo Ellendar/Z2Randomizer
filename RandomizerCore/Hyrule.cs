@@ -1738,13 +1738,11 @@ public class Hyrule
 
         if (props.ShuffleOverworldEnemies)
         {
-            foreach (World w in worlds)
+            foreach (World world in worlds)
             {
-                w.ShuffleOverworldEnemies(props.GeneratorsAlwaysMatch);
+                world.ShuffleOverworldEnemies(props.GeneratorsAlwaysMatch);
             }
         }
-
-        //WRITE LOCATIONS HERE
     }
 
     private bool UpdateProgress(int v)
