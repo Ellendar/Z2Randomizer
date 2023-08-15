@@ -76,7 +76,7 @@ public class Hyrule
 
     //private Character character;
 
-    public Dictionary<Item, bool> itemGet = new Dictionary<Item, bool>();
+    public Dictionary<Item, bool> ItemGet { get; set; }
     //private bool[] spellGet;
 
     public WestHyrule westHyrule;
@@ -183,10 +183,10 @@ public class Hyrule
         shuffler = new Shuffler(props);
 
         palaces = new List<Palace>();
-        itemGet = new Dictionary<Item, bool>();
+        ItemGet = new Dictionary<Item, bool>();
         foreach (Item item in Enum.GetValues(typeof(Item)))
         {
-            itemGet.Add(item, false);
+            ItemGet.Add(item, false);
         }
         SpellGet = new Dictionary<Spell, bool>();
         reachableAreas = new HashSet<string>();
@@ -594,9 +594,9 @@ public class Hyrule
         Location trophyLoc = westHyrule.trophyCave;
         heartContainersInItemPool = maxHearts - startHearts;
 
-        foreach (Item item in itemGet.Keys.ToList())
+        foreach (Item item in ItemGet.Keys.ToList())
         {
-            itemGet[item] = false;
+            ItemGet[item] = false;
         }
         foreach (Location location in itemLocs)
         {
@@ -607,21 +607,21 @@ public class Hyrule
         eastHyrule.pbagCave2.itemGet = false;
 
         ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (byte)1 : (byte)0);
-        itemGet[Item.CANDLE] = props.StartCandle;
+        ItemGet[Item.CANDLE] = props.StartCandle;
         ROMData.Put(RomMap.START_GLOVE, props.StartGlove ? (byte)1 : (byte)0);
-        itemGet[Item.GLOVE] = props.StartGlove;
+        ItemGet[Item.GLOVE] = props.StartGlove;
         ROMData.Put(RomMap.START_RAFT, props.StartRaft ? (byte)1 : (byte)0);
-        itemGet[Item.RAFT] = props.StartRaft;
+        ItemGet[Item.RAFT] = props.StartRaft;
         ROMData.Put(RomMap.START_BOOTS, props.StartBoots ? (byte)1 : (byte)0);
-        itemGet[Item.BOOTS] = props.StartBoots;
+        ItemGet[Item.BOOTS] = props.StartBoots;
         ROMData.Put(RomMap.START_FLUTE, props.StartFlute ? (byte)1 : (byte)0);
-        itemGet[Item.FLUTE] = props.StartFlute;
+        ItemGet[Item.FLUTE] = props.StartFlute;
         ROMData.Put(RomMap.START_CROSS, props.StartCross ? (byte)1 : (byte)0);
-        itemGet[Item.CROSS] = props.StartCross;
+        ItemGet[Item.CROSS] = props.StartCross;
         ROMData.Put(RomMap.START_HAMMER, props.StartHammer ? (byte)1 : (byte)0);
-        itemGet[Item.HAMMER] = props.StartHammer;
+        ItemGet[Item.HAMMER] = props.StartHammer;
         ROMData.Put(RomMap.START_MAGICAL_KEY, props.StartKey ? (byte)1 : (byte)0);
-        itemGet[Item.MAGIC_KEY] = props.StartKey;
+        ItemGet[Item.MAGIC_KEY] = props.StartKey;
 
         itemList = new List<Item> { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MEDICINE, Item.TROPHY, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MAGIC_KEY, Item.MAGIC_CONTAINER, Item.HAMMER, Item.CHILD, Item.MAGIC_CONTAINER };
 
@@ -701,70 +701,70 @@ public class Hyrule
             itemList[9] = smallItems[RNG.Next(smallItems.Count)];
             itemList[10] = smallItems[RNG.Next(smallItems.Count)];
             itemList[17] = smallItems[RNG.Next(smallItems.Count)];
-            itemGet[Item.TROPHY] = true;
-            itemGet[Item.MEDICINE] = true;
-            itemGet[Item.CHILD] = true;
+            ItemGet[Item.TROPHY] = true;
+            ItemGet[Item.MEDICINE] = true;
+            ItemGet[Item.CHILD] = true;
 
         }
 
         if (SpellGet[SpellMap[Town.MIDO_WEST]])
         {
             itemList[9] = smallItems[RNG.Next(smallItems.Count)];
-            itemGet[Item.MEDICINE] = true;
+            ItemGet[Item.MEDICINE] = true;
             startMed = true;
         }
 
         if (SpellGet[SpellMap[Town.RUTO]])
         {
             itemList[10] = smallItems[RNG.Next(smallItems.Count)];
-            itemGet[Item.TROPHY] = true;
+            ItemGet[Item.TROPHY] = true;
             startTrophy = true;
         }
 
         if (SpellGet[SpellMap[Town.DARUNIA_WEST]])
         {
             itemList[17] = smallItems[RNG.Next(smallItems.Count)];
-            itemGet[Item.CHILD] = true;
+            ItemGet[Item.CHILD] = true;
             startKid = true;
         }
 
         //TODO: Clean up the readability of this logic
-        if (itemGet[Item.CANDLE])
+        if (ItemGet[Item.CANDLE])
         {
             itemList[0] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.GLOVE])
+        if (ItemGet[Item.GLOVE])
         {
             itemList[1] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.RAFT])
+        if (ItemGet[Item.RAFT])
         {
             itemList[2] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.BOOTS])
+        if (ItemGet[Item.BOOTS])
         {
             itemList[3] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.FLUTE])
+        if (ItemGet[Item.FLUTE])
         {
             itemList[4] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.CROSS])
+        if (ItemGet[Item.CROSS])
         {
             itemList[5] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.MAGIC_KEY])
+        if (ItemGet[Item.MAGIC_KEY])
         {
             itemList[14] = smallItems[RNG.Next(smallItems.Count)];
         }
 
-        if (itemGet[Item.HAMMER])
+        if (ItemGet[Item.HAMMER])
         {
             itemList[16] = smallItems[RNG.Next(smallItems.Count)];
         }
@@ -832,7 +832,7 @@ public class Hyrule
 
     }
 
-    private bool IsEverythingReachable()
+    private bool IsEverythingReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         totalReachableCheck++;
         //return true;
@@ -854,10 +854,10 @@ public class Hyrule
         while (prevCount != count || updateItemsResult || updateSpellsResult)
         {
             prevCount = count;
-            westHyrule.UpdateVisit();
-            deathMountain.UpdateVisit();
-            eastHyrule.UpdateVisit();
-            mazeIsland.UpdateVisit();
+            westHyrule.UpdateVisit(itemGet, spellGet);
+            deathMountain.UpdateVisit(itemGet, spellGet);
+            eastHyrule.UpdateVisit(itemGet, spellGet);
+            mazeIsland.UpdateVisit(itemGet, spellGet);
 
             foreach (World world in worlds)
             {
@@ -885,10 +885,10 @@ public class Hyrule
             updateSpellsResult = UpdateSpells(spellLocations);
 
             //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
-            westHyrule.UpdateVisit();
-            deathMountain.UpdateVisit();
-            eastHyrule.UpdateVisit();
-            mazeIsland.UpdateVisit();
+            westHyrule.UpdateVisit(itemGet, spellGet);
+            deathMountain.UpdateVisit(itemGet, spellGet);
+            eastHyrule.UpdateVisit(itemGet, spellGet);
+            mazeIsland.UpdateVisit(itemGet, spellGet);
 
             updateItemsResult |= UpdateItemGets();
             updateSpellsResult |= UpdateSpells(spellLocations);
@@ -1082,7 +1082,7 @@ public class Hyrule
             {
                 Palace palace = palaces[location.PalaceNumber - 1];
                 hasItemNow = CanGet(location)
-                    && (SpellGet[Spell.FAIRY] || itemGet[Item.MAGIC_KEY])
+                    && (SpellGet[Spell.FAIRY] || ItemGet[Item.MAGIC_KEY])
                     && palace.IsTraversable(GetRequireables(), location.Item, debug);
                 /*
                 && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) 
@@ -1094,22 +1094,22 @@ public class Hyrule
             }
             else if (location.ActualTown == Town.NEW_KASUTO)
             {
-                hasItemNow = CanGet(location) && (accessibleMagicContainers >= kasutoJars) && (!location.NeedHammer || itemGet[Item.HAMMER]);
+                hasItemNow = CanGet(location) && (accessibleMagicContainers >= kasutoJars) && (!location.NeedHammer || ItemGet[Item.HAMMER]);
             }
             else if (location.ActualTown == Town.SPELL_TOWER)
             {
-                hasItemNow = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || itemGet[Item.HAMMER]);
+                hasItemNow = (CanGet(location) && SpellGet[Spell.SPELL]) && (!location.NeedHammer || ItemGet[Item.HAMMER]);
             }
             else
             {
-                hasItemNow = CanGet(location) && (!location.NeedHammer || itemGet[Item.HAMMER]) && (!location.NeedRecorder || itemGet[Item.FLUTE]);
+                hasItemNow = CanGet(location) && (!location.NeedHammer || ItemGet[Item.HAMMER]) && (!location.NeedRecorder || ItemGet[Item.FLUTE]);
             }
 
             //Issue #3: Previously running UpdateItemGets multiple times could produce different results based on the sequence of times it ran
             //For items that were blocked by MC requirements, different orders of parsing the same world could check the MCs at different times
             //producing different results. Now it's not possible to "go back" in logic and call previously accessed items inaccesable.
             location.itemGet = hasItemNow || hadItemPreviously;
-            itemGet[location.Item] = hasItemNow || hadItemPreviously;
+            ItemGet[location.Item] = hasItemNow || hadItemPreviously;
 
             if (location.itemGet && location.Item == Item.HEART_CONTAINER)
             {
@@ -1306,11 +1306,11 @@ public class Hyrule
         {
             requireables.Add(RequirementType.SPELL);
         }
-        if (itemGet[Item.GLOVE])
+        if (ItemGet[Item.GLOVE])
         {
             requireables.Add(RequirementType.GLOVE);
         }
-        if (itemGet[Item.MAGIC_KEY])
+        if (ItemGet[Item.MAGIC_KEY])
         {
             requireables.Add(RequirementType.KEY);
         }
@@ -1330,15 +1330,15 @@ public class Hyrule
         {
             requireables.Add(RequirementType.EIGHT_CONTAINERS);
         }
-        if (itemGet[Item.TROPHY] || props.RemoveSpellItems)
+        if (ItemGet[Item.TROPHY] || props.RemoveSpellItems)
         {
             requireables.Add(RequirementType.TROPHY);
         }
-        if (itemGet[Item.MEDICINE] || props.RemoveSpellItems)
+        if (ItemGet[Item.MEDICINE] || props.RemoveSpellItems)
         {
             requireables.Add(RequirementType.MEDICINE);
         }
-        if (itemGet[Item.CHILD] || props.RemoveSpellItems)
+        if (ItemGet[Item.CHILD] || props.RemoveSpellItems)
         {
             requireables.Add(RequirementType.CHILD);
         }
@@ -1366,10 +1366,10 @@ public class Hyrule
             {
                 totalContinentConnectionOverworldAttempts++;
                 worlds = new List<World>();
-                westHyrule = new WestHyrule(this);
-                deathMountain = new DeathMountain(this);
-                eastHyrule = new EastHyrule(this);
-                mazeIsland = new MazeIsland(this);
+                westHyrule = new WestHyrule(props, RNG, ROMData);
+                deathMountain = new DeathMountain(props, RNG, ROMData);
+                eastHyrule = new EastHyrule(props, RNG, ROMData);
+                mazeIsland = new MazeIsland(props, RNG, ROMData);
                 worlds.Add(westHyrule);
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
@@ -1378,17 +1378,17 @@ public class Hyrule
 
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL || props.ContinentConnections == ContinentConnectionType.RB_BORDER_SHUFFLE)
                 {
-                    westHyrule.LoadCave1(1);
-                    westHyrule.LoadCave2(1);
-                    westHyrule.LoadRaft(2);
+                    westHyrule.LoadCave1(ROMData, 1);
+                    westHyrule.LoadCave2(ROMData, 1);
+                    westHyrule.LoadRaft(ROMData, 2);
 
-                    deathMountain.LoadCave1(0);
-                    deathMountain.LoadCave2(0);
+                    deathMountain.LoadCave1(ROMData, 0);
+                    deathMountain.LoadCave2(ROMData, 0);
 
-                    eastHyrule.LoadRaft(0);
-                    eastHyrule.LoadBridge(3);
+                    eastHyrule.LoadRaft(ROMData, 0);
+                    eastHyrule.LoadBridge(ROMData, 3);
 
-                    mazeIsland.LoadBridge(2);
+                    mazeIsland.LoadBridge(ROMData, 2);
                 }
                 else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
@@ -1500,8 +1500,8 @@ public class Hyrule
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
 
-                    l1 = worlds[raftw1].LoadRaft(raftw2);
-                    l2 = worlds[raftw2].LoadRaft(raftw1);
+                    l1 = worlds[raftw1].LoadRaft(ROMData, raftw2);
+                    l2 = worlds[raftw2].LoadRaft(ROMData, raftw1);
                     connections[0] = (l1, l2);
 
                     int bridgew1 = RNG.Next(worlds.Count);
@@ -1529,8 +1529,8 @@ public class Hyrule
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
 
-                    l1 = worlds[bridgew1].LoadBridge(bridgew2);
-                    l2 = worlds[bridgew2].LoadBridge(bridgew1);
+                    l1 = worlds[bridgew1].LoadBridge(ROMData, bridgew2);
+                    l2 = worlds[bridgew2].LoadBridge(ROMData, bridgew1);
                     connections[1] = (l1, l2);
 
                     int c1w1 = RNG.Next(worlds.Count);
@@ -1558,8 +1558,8 @@ public class Hyrule
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
 
-                    l1 = worlds[c1w1].LoadCave1(c1w2);
-                    l2 = worlds[c1w2].LoadCave1(c1w1);
+                    l1 = worlds[c1w1].LoadCave1(ROMData, c1w2);
+                    l2 = worlds[c1w2].LoadCave1(ROMData, c1w1);
                     connections[2] = (l1, l2);
 
                     int c2w1 = RNG.Next(worlds.Count);
@@ -1587,8 +1587,8 @@ public class Hyrule
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
 
-                    l1 = worlds[c2w1].LoadCave2(c2w2);
-                    l2 = worlds[c2w2].LoadCave2(c2w1);
+                    l1 = worlds[c2w1].LoadCave2(ROMData, c2w2);
+                    l2 = worlds[c2w2].LoadCave2(ROMData, c2w1);
                     connections[3] = (l1, l2);
                 }
             } while (!AllContinentsHaveConnection(worlds));
@@ -1609,7 +1609,7 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!westHyrule.AllReached)
                 {
-                    while (!westHyrule.Terraform()) { totalWestGenerationAttempts++; }
+                    while (!westHyrule.Terraform(props, ROMData)) { totalWestGenerationAttempts++; }
                     totalWestGenerationAttempts++;
                 }
                 westHyrule.ResetVisitabilityState();
@@ -1624,7 +1624,7 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!deathMountain.AllReached)
                 {
-                    while (!deathMountain.Terraform()) { totalDeathMountainGenerationAttempts++; }
+                    while (!deathMountain.Terraform(props, ROMData)) { totalDeathMountainGenerationAttempts++; }
                     totalDeathMountainGenerationAttempts++;
                 }
                 deathMountain.ResetVisitabilityState();
@@ -1639,7 +1639,7 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!eastHyrule.AllReached)
                 {
-                    while (!eastHyrule.Terraform()) { totalEastGenerationAttempts++; }
+                    while (!eastHyrule.Terraform(props, ROMData)) { totalEastGenerationAttempts++; }
                     totalEastGenerationAttempts++;
                 }
                 eastHyrule.ResetVisitabilityState();
@@ -1654,7 +1654,7 @@ public class Hyrule
                 timestamp = DateTime.Now;
                 if (!mazeIsland.AllReached)
                 {
-                    while (!mazeIsland.Terraform()) { totalMazeIslandGenerationAttempts++; }
+                    while (!mazeIsland.Terraform(props, ROMData)) { totalMazeIslandGenerationAttempts++; }
                     totalMazeIslandGenerationAttempts++;
                 }
                 mazeIsland.ResetVisitabilityState();
@@ -1715,7 +1715,7 @@ public class Hyrule
                     deathMountain.UpdateAllReached();
 
                     nonTerrainShuffleAttempt++;
-                } while (nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT && !IsEverythingReachable());
+                } while (nonTerrainShuffleAttempt < NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT && !IsEverythingReachable(ItemGet, SpellGet));
 
                 if (nonTerrainShuffleAttempt != NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT)
                 {
@@ -1734,13 +1734,13 @@ public class Hyrule
                 logger.Trace("maze: " + maze + " / " + mazeIsland.AllLocations.Count);
                 */
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
-        } while (!IsEverythingReachable());
+        } while (!IsEverythingReachable(ItemGet, SpellGet));
 
         if (props.ShuffleOverworldEnemies)
         {
-            foreach (World w in worlds)
+            foreach (World world in worlds)
             {
-                w.ShuffleOverworldEnemies(props.GeneratorsAlwaysMatch);
+                world.ShuffleOverworldEnemies(ROMData, props.GeneratorsAlwaysMatch, props.MixLargeAndSmallEnemies);
             }
         }
 
@@ -1765,26 +1765,26 @@ public class Hyrule
         Location l1, l2;
         if (type == 1)
         {
-            l1 = worlds[w1].LoadRaft(w2);
-            l2 = worlds[w2].LoadRaft(w1);
+            l1 = worlds[w1].LoadRaft(ROMData, w2);
+            l2 = worlds[w2].LoadRaft(ROMData, w1);
             connections[0] = (l1, l2);
         }
         else if (type == 2)
         {
-            l1 = worlds[w1].LoadBridge(w2);
-            l2 = worlds[w2].LoadBridge(w1);
+            l1 = worlds[w1].LoadBridge(ROMData, w2);
+            l2 = worlds[w2].LoadBridge(ROMData, w1);
             connections[1] = (l1, l2);
         }
         else if (type == 3)
         {
-            l1 = worlds[w1].LoadCave1(w2);
-            l2 = worlds[w2].LoadCave1(w1);
+            l1 = worlds[w1].LoadCave1(ROMData, w2);
+            l2 = worlds[w2].LoadCave1(ROMData, w1);
             connections[2] = (l1, l2);
         }
         else
         {
-            l1 = worlds[w1].LoadCave2(w2);
-            l2 = worlds[w2].LoadCave2(w1);
+            l1 = worlds[w1].LoadCave2(ROMData, w2);
+            l2 = worlds[w2].LoadCave2(ROMData, w1);
             connections[3] = (l1, l2);
         }
     }
@@ -2642,7 +2642,7 @@ public class Hyrule
                 ROMData.Put(location.MemAddress + overworldMapOff, location.LocationBytes[2]);
                 ROMData.Put(location.MemAddress + overworldWorldOff, location.LocationBytes[3]);
             }
-            world.RemoveUnusedConnectors();
+            ROMData.RemoveUnusedConnectors(world);
         }
 
 
@@ -3420,7 +3420,7 @@ public class Hyrule
         logger.Log(logLevel, "ITEMS:");
         foreach (Item item in SHUFFLABLE_STARTING_ITEMS)
         {
-            logger.Log(logLevel, item.ToString() + "(" + itemGet[item] + ") : " + itemLocs.Where(i => i.Item == item).FirstOrDefault()?.Name);
+            logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + itemLocs.Where(i => i.Item == item).FirstOrDefault()?.Name);
         }
     }
 

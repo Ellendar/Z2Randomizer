@@ -181,7 +181,8 @@ public partial class MainUI : Form
         saneCaveShuffleBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         hideLessImportantLocationsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         allowBoulderBlockedConnectionsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        westBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        climateSelector.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        westBiomeSelector.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         dmBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         eastBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         mazeBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -776,7 +777,7 @@ public partial class MainUI : Form
             3 => ContinentConnectionType.ANYTHING_GOES,
             _ => throw new Exception("Invalid ContinentConnection setting")
         };
-        configuration.WestBiome = westBiome.SelectedIndex switch
+        configuration.WestBiome = westBiomeSelector.SelectedIndex switch
         {
             0 => Biome.VANILLA,
             1 => Biome.VANILLA_SHUFFLE,
@@ -1019,7 +1020,7 @@ public partial class MainUI : Form
     private void convertButton_Click(object send, EventArgs e)
     {
         String oldFlags = oldFlagsTextbox.Text.Trim();
-        if(oldFlags.Length == 0)
+        if (oldFlags.Length == 0)
         {
             return;
         }
@@ -1044,7 +1045,7 @@ public partial class MainUI : Form
     {
         dontrunhandler = true;
         flagsTextBox.Text = flagsTextBox.Text.Trim();
-        if(flagsTextBox.Text.Length == 0)
+        if (flagsTextBox.Text.Length == 0)
         {
             return;
         }
@@ -1167,7 +1168,7 @@ public partial class MainUI : Form
                 ContinentConnectionType.ANYTHING_GOES => 3,
                 _ => throw new Exception("Invalid ContinentConnection setting")
             };
-            westBiome.SelectedIndex = configuration.WestBiome switch
+            westBiomeSelector.SelectedIndex = configuration.WestBiome switch
             {
                 Biome.VANILLA => 0,
                 Biome.VANILLA_SHUFFLE => 1,
@@ -1712,7 +1713,7 @@ public partial class MainUI : Form
 
     private void CheckVanillaPossible()
     {
-        if (VanillaPossible(eastBiome) || VanillaPossible(westBiome) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
+        if (VanillaPossible(eastBiome) || VanillaPossible(westBiomeSelector) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
         {
             shuffledVanillaShowsActualTerrain.Enabled = true;
             shuffledVanillaShowsActualTerrain.Checked = true;
@@ -1739,7 +1740,7 @@ public partial class MainUI : Form
     private void WestBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
         CheckVanillaPossible();
-        if (westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
+        if (westBiomeSelector.SelectedIndex == 0 || westBiomeSelector.SelectedIndex == 1)
         {
             generateBaguWoodsCheckbox.Checked = false;
             generateBaguWoodsCheckbox.Enabled = false;
@@ -1937,4 +1938,5 @@ public partial class MainUI : Form
     {
         GenerateSpriteImage();
     }
+
 }

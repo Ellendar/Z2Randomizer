@@ -2,9 +2,12 @@
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
+using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
 
@@ -974,180 +977,322 @@ public class ROM
 
     private static readonly IDictionary<byte, char> ReverseCharMap = CharMap.ToDictionary(x => x.Value, x => x.Key);
 
-
-    //Not sure what the point of any of this metaprogramming/debugging is, but there's a strong chance it gets removed in the future.
-    public void DumpAll(String name)
+    public Terrain[,] ReadVanillaMap(ROM romData, int mapAddr, int mapRows, int mapCols)
     {
-        DumpSprite(name);
-        Dump1up(name);
-        DumpOW(name);
-        DumpSleeper(name);
-        DumpTitle(name);
-        Ending1(name);
-        Ending2(name);
-        Ending3(name);
-        DumpHead(name);
-        DumpRaft(name);
-        DumpBeam(name);
-        DumpColors(name);
-    }
-
-    public void DumpTitle(String name)
-    {
-        logger.Trace("DumpTitle");
-        /*
-        Console.Write("private static readonly int[] " + name + "Title = {");
-        for (int i = titleSpriteStartAddr; i < titleSpriteEndAddr; i++)
+        int addr = mapAddr;
+        int i = 0;
+        int j = 0;
+        Terrain[,] map = new Terrain[mapRows, mapCols];
+        while (i < mapRows)
         {
-            Console.Write(GetByte(i) + ", ");
+            j = 0;
+            while (j < mapCols)
+            {
+                byte data = romData.GetByte(addr);
+                int count = (data & 0xF0) >> 4;
+                count++;
+                Terrain t = (Terrain)(data & 0x0F);
+                for (int k = 0; k < count; k++)
+                {
+                    map[i, j + k] = t;
+                }
+                j += count;
+                addr++;
+            }
+            i++;
         }
-        logger.Trace("};");
-        */
+
+        return map;
     }
 
-    public void DumpBeam(String name)
+    public List<Location> LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> Terrains, Continent continent)
     {
-        logger.Trace("DumpTitle");
-        /*
-        Console.Write("private static readonly int[] " + name + "Beam = {");
-        for (int i = beamSpriteStartAddr; i < beamSpriteEndAddr; i++)
+        List<Location> locations = new List<Location>();
+        for (int i = 0; i < locNum; i++)
         {
-            Console.Write(GetByte(i) + ", ");
+            byte[] bytes = new Byte[4] { 
+                GetByte(startAddr + i), 
+                GetByte(startAddr + RomMap.overworldXOffset + i), 
+                GetByte(startAddr + RomMap.overworldMapOffset + i), 
+                GetByte(startAddr + RomMap.overworldWorldOffset + i) };
+            locations.Add(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
         }
-        logger.WriteLine("};");
-        */
+        return locations;
     }
 
-    public void DumpRaft(String name)
+    public Location LoadLocation(int addr, Terrain t, Continent c)
     {
-        /*
-        Console.Write("private static readonly int[] " + name + "Raft = {");
-        for (int i = raftSpriteStartAddr; i < raftSpriteEndAddr; i++)
+        byte[] bytes = new Byte[4] { 
+            GetByte(addr), 
+            GetByte(addr + RomMap.overworldXOffset), 
+            GetByte(addr + RomMap.overworldMapOffset), 
+            GetByte(addr + RomMap.overworldWorldOffset) };
+        return new Location(bytes, t, addr, c);
+    }
+
+    public void RemoveUnusedConnectors(World world)
+    {
+        if (world.raft == null)
         {
-            Console.Write(GetByte(i) + ", ");
+            Put(world.baseAddr + 41, 0x00);
         }
-        logger.WriteLine("};");
-        */
-    }
 
-    public void DumpOW(String name)
-    {
-        /*
-        Console.Write("private static readonly int[] " + name + "OW = {");
-        for (int i = OWSpriteStartAddr; i < OWSpriteEndAddr; i++)
+        if (world.bridge == null)
         {
-            Console.Write(GetByte(i) + ", ");
+            Put(world.baseAddr + 40, 0x00);
         }
-        logger.WriteLine("};");
-        */
-    }
 
-    public void DumpSleeper(String name)
-    {
-        /*
-        Console.Write("private static readonly int[] " + name + "Sleeper = {");
-        for (int i = sleeperSpriteStartAddr; i < sleeperSpriteEndAddr; i++)
+        if (world.cave1 == null)
         {
-            Console.Write(GetByte(i) + ", ");
+            Put(world.baseAddr + 42, 0x00);
         }
-        logger.WriteLine("};");
-        */
-    }
 
-    public void Dump1up(String name)
-    {
-        /*
-        Console.Write("private static readonly int[] " + name + "1up = {");
-        for (int i = oneUpSpriteStartAddr; i < oneUpSpriteEndAddr; i++)
+        if (world.cave2 == null)
         {
-            Console.Write(GetByte(i) + ", ");
+            Put(world.baseAddr + 43, 0x00);
         }
-        logger.WriteLine("};");
-        */
     }
 
-    public void Ending1(String name)
+    //This was refactored out of EastHyrule. The signature/timing/structure needs work.
+    public void UpdateHiddenPalaceSpot(Biome biome, Location hiddenPalaceCallSpot, Location hiddenPalaceLocation, 
+        Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
     {
-        /*
-        Console.Write("private static readonly int[] " + name + "End1 = {");
-        for (int i = endSprite1StartAddr; i < endSprite1EndAddr; i++)
+        if (biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE)
         {
-            Console.Write(GetByte(i) + ", ");
+            Put(0x8382, (byte)hiddenPalaceCallSpot.Ypos);
+            Put(0x8388, (byte)hiddenPalaceCallSpot.Xpos);
         }
-        logger.WriteLine("};");
-        */
-    }
+        int pos = hiddenPalaceLocation.Ypos;
 
-    public void Ending2(String name)
-    {
-        /*
-        Console.Write("private static readonly int[] " + name + "End2 = {");
-        for (int i = endSprite2StartAddr; i < endSprite2EndAddr; i++)
+        Put(0x1df78, (byte)(pos + hiddenPalaceLocation.ExternalWorld));
+        Put(0x1df84, 0xff);
+        Put(0x1ccc0, (byte)pos);
+        int connection = hiddenPalaceLocation.MemAddress - 0x862F;
+        Put(0x1df76, (byte)connection);
+        hiddenPalaceLocation.NeedRecorder = true;
+        if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
         {
-            Console.Write(GetByte(i) + ", ");
+            townAtNewKasuto.NeedRecorder = true;
+            spellTower.NeedRecorder = true;
         }
-        logger.WriteLine("};");
-        */
-    }
-
-    public void Ending3(String name)
-    {
-        /*
-        Console.Write("private static readonly int[] " + name + "End3 = {");
-        for (int i = endSprite3StartAddr; i < endSprite3EndAddr; i++)
+        if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
-            Console.Write(GetByte(i) + ", ");
+            Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
+            if (hiddenPalaceLocation.TerrainType == Terrain.PALACE)
+            {
+                Put(0x1df7d, 0x60);
+                Put(0x1df82, 0x61);
+
+                Put(0x1df7e, 0x62);
+
+                Put(0x1df83, 0x63);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.SWAMP)
+            {
+                Put(0x1df7d, 0x6F);
+                Put(0x1df82, 0x6F);
+
+                Put(0x1df7e, 0x6F);
+
+                Put(0x1df83, 0x6F);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.LAVA || hiddenPalaceLocation.TerrainType == Terrain.WALKABLEWATER)
+            {
+                Put(0x1df7d, 0x6E);
+                Put(0x1df82, 0x6E);
+
+                Put(0x1df7e, 0x6E);
+
+                Put(0x1df83, 0x6E);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.FOREST)
+            {
+                Put(0x1df7d, 0x68);
+                Put(0x1df82, 0x69);
+
+                Put(0x1df7e, 0x6A);
+
+                Put(0x1df83, 0x6B);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.GRAVE)
+            {
+                Put(0x1df7d, 0x70);
+                Put(0x1df82, 0x71);
+
+                Put(0x1df7e, 0x7F);
+
+                Put(0x1df83, 0x7F);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.ROAD)
+            {
+                Put(0x1df7d, 0xFE);
+                Put(0x1df82, 0xFE);
+
+                Put(0x1df7e, 0xFE);
+
+                Put(0x1df83, 0xFE);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.BRIDGE)
+            {
+                Put(0x1df7d, 0x5A);
+                Put(0x1df82, 0x5B);
+
+                Put(0x1df7e, 0x5A);
+
+                Put(0x1df83, 0x5B);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.CAVE)
+            {
+                Put(0x1df7d, 0x72);
+                Put(0x1df82, 0x73);
+
+                Put(0x1df7e, 0x72);
+
+                Put(0x1df83, 0x73);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.DESERT)
+            {
+                Put(0x1df7d, 0x6C);
+                Put(0x1df82, 0x6C);
+
+                Put(0x1df7e, 0x6C);
+
+                Put(0x1df83, 0x6C);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.TOWN)
+            {
+                Put(0x1df7d, 0x5C);
+                Put(0x1df82, 0x5D);
+
+                Put(0x1df7e, 0x5E);
+
+                Put(0x1df83, 0x5F);
+            }
         }
-        logger.WriteLine("};");
-        */
+
+        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.Ypos % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.Ypos % 30 / 15);
+        int ppu_addr2 = ppu_addr1 + 32;
+        int ppu1low = ppu_addr1 & 0x00ff;
+        int ppu1high = (ppu_addr1 >> 8) & 0xff;
+        int ppu2low = ppu_addr2 & 0x00ff;
+        int ppu2high = (ppu_addr2 >> 8) & 0xff;
+        Put(0x1df7a, (byte)ppu1high);
+        Put(0x1df7b, (byte)ppu1low);
+        Put(0x1df7f, (byte)ppu2high);
+        Put(0x1df80, (byte)ppu2low);
+
     }
 
-    public void DumpHead(String name)
+    public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
+        int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
-        /*
-        Console.Write("private static readonly int[] " + name + "Head = {");
-        for (int i = headSpriteStartAddr; i < headSpriteEndAddr; i++)
+        Put(0x1df79, (byte)(hiddenKasutoLocation.Ypos + hiddenKasutoLocation.ExternalWorld));
+        Put(0x1dfac, (byte)(hiddenKasutoLocation.Ypos - 30));
+        Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
+        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + hiddenKasutoLocation.Secondpartofcave));
+        Put(0x1ccdb, (byte)(hiddenKasutoLocation.Ypos));
+        int connection = hiddenKasutoLocation.MemAddress - baseAddr;
+        Put(0x1df77, (byte)connection);
+        hiddenKasutoLocation.NeedHammer = true;
+        if (hiddenKasutoLocation == townAtNewKasuto || hiddenKasutoLocation == spellTower)
         {
-            Console.Write(GetByte(i) + ", ");
+            townAtNewKasuto.NeedHammer = true;
+            spellTower.NeedHammer = true;
         }
-        logger.WriteLine("};");
-        */
-    }
-
-    public void DumpSprite(String name)
-    {
-        /*
-        Console.Write("private static readonly int[] " + name + "Sprite = {");
-        for (int i = playerSpriteStartAddr; i < playerSpriteEndAddr; i++)
+        if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
-            Console.Write(GetByte(i) + ", ");
-        }
-        logger.WriteLine("};");
-        */
-    }
+            //Terrain t = terrains[hiddenKasutoLocation.MemAddress];
+            Put(0x1df75, (byte)hiddenKasutoTerrain);
+            if (hiddenKasutoTerrain == Terrain.PALACE)
+            {
+                Put(0x1dfb6, 0x60);
+                Put(0x1dfbb, 0x61);
 
-    public void DumpColors(String name)
-    {
-        /*
-        logger.WriteLine("private static readonly List<int[]> " + name + " = new List<int[]> { " + name + "Sprite, " + name + "1up, " + name + "OW, " + name + "Sleeper, " + name + "Title, " + name + "End1, " + name + "End2, " + name + "End3, " + name + "Head, " + name + "Raft, " + name + "Beam };");
-        logger.WriteLine("0x2a0a: " + GetByte(0x2a0a));
-        logger.WriteLine("0x2a10: " + GetByte(0x2a10));
-        logger.WriteLine("Tunic: " + GetByte(0x285c));
-        logger.WriteLine("Tunic2: " + GetByte(0x285b));
-        logger.WriteLine("Tunic3: " + GetByte(0x285a));
-        logger.WriteLine("Shield: " + GetByte(0xe9e));
-        */
-    }
+                Put(0x1dfc0, 0x62);
 
-    public void DumpSamus()
-    {
-        /*
-        Console.Write("private static readonly List<int> samusEnd = new List<int[]> { ");
-        for(int i = 0x20010; i < 0x21010; i++)
-        {
-            Console.Write(GetByte(i) + ", ");
+                Put(0x1dfc5, 0x63);
+            }
+            else if (hiddenKasutoTerrain == Terrain.SWAMP)
+            {
+                Put(0x1dfb6, 0x6F);
+                Put(0x1dfbb, 0x6F);
+
+                Put(0x1dfc0, 0x6F);
+
+                Put(0x1dfc5, 0x6F);
+            }
+            else if (hiddenKasutoTerrain == Terrain.LAVA || hiddenKasutoTerrain == Terrain.WALKABLEWATER)
+            {
+                Put(0x1dfb6, 0x6E);
+                Put(0x1dfbb, 0x6E);
+
+                Put(0x1dfc0, 0x6E);
+
+                Put(0x1dfc5, 0x6E);
+            }
+            else if (hiddenKasutoTerrain == Terrain.FOREST)
+            {
+                Put(0x1dfb6, 0x68);
+                Put(0x1dfbb, 0x69);
+
+                Put(0x1dfc0, 0x6A);
+
+                Put(0x1dfc5, 0x6B);
+            }
+            else if (hiddenKasutoTerrain == Terrain.GRAVE)
+            {
+                Put(0x1dfb6, 0x70);
+                Put(0x1dfbb, 0x71);
+
+                Put(0x1dfc0, 0x7F);
+
+                Put(0x1dfc5, 0x7F);
+            }
+            else if (hiddenKasutoTerrain == Terrain.ROAD)
+            {
+                Put(0x1dfb6, 0xFE);
+                Put(0x1dfbb, 0xFE);
+
+                Put(0x1dfc0, 0xFE);
+
+                Put(0x1dfc5, 0xFE);
+            }
+            else if (hiddenKasutoTerrain == Terrain.BRIDGE)
+            {
+                Put(0x1dfb6, 0x5A);
+                Put(0x1dfbb, 0x5B);
+
+                Put(0x1dfc0, 0x5A);
+
+                Put(0x1dfc5, 0x5B);
+            }
+            else if (hiddenKasutoTerrain == Terrain.CAVE)
+            {
+                Put(0x1dfb6, 0x72);
+                Put(0x1dfbb, 0x73);
+
+                Put(0x1dfc0, 0x72);
+
+                Put(0x1dfc5, 0x73);
+            }
+            else if (hiddenKasutoTerrain == Terrain.DESERT)
+            {
+                Put(0x1dfb6, 0x6C);
+                Put(0x1dfbb, 0x6C);
+
+                Put(0x1dfc0, 0x6C);
+
+                Put(0x1dfc5, 0x6C);
+            }
+            else if (hiddenKasutoTerrain == Terrain.TOWN)
+            {
+                Put(0x1dfb6, 0x5C);
+                Put(0x1dfbb, 0x5D);
+
+                Put(0x1dfc0, 0x5E);
+
+                Put(0x1dfc5, 0x5F);
+            }
         }
-        logger.WriteLine("};");
-        */
     }
 }

@@ -1091,7 +1091,7 @@ public class Palace
         int ENEMY_SHUFFLE_LIMIT = 10;
         foreach(Room room in AllRooms)
         {
-            room.RandomizeEnemies(props.MixPalaceEnemies, props.GeneratorsAlwaysMatch, r);
+            room.RandomizeEnemies(props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             if (props.NoDuplicateRooms)
             {
                 Room duplicateRoom = null;
@@ -1106,7 +1106,7 @@ public class Palace
                     {
                         Debug.WriteLine("Room# " + room.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(room.SideView) + "/" + Util.ByteArrayToHexString(room.NewEnemies) + ") " +
                             " is a duplicate of Room# " + duplicateRoom.ConnectionStartAddress + " (" + Util.ByteArrayToHexString(duplicateRoom.SideView) + "/" + Util.ByteArrayToHexString(duplicateRoom.Enemies) + ")");
-                        room.RandomizeEnemies(props.MixPalaceEnemies, props.GeneratorsAlwaysMatch, r);
+                        room.RandomizeEnemies(props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
                     }
                 }
                 if(count == ENEMY_SHUFFLE_LIMIT)

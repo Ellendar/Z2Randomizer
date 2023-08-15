@@ -41,11 +41,8 @@ public abstract class World
     protected int enemyPtr;
     protected List<int> overworldMaps;
     protected SortedDictionary<Tuple<int, int>, Location> locsByCoords;
-    protected Hyrule hyrule;
+    //protected Hyrule hyrule;
     protected Terrain[,] map;
-    private const int overworldXOffset = 0x3F;
-    private const int overworldMapOffset = 0x7E;
-    private const int overworldWorldOffset = 0xBD;
     //private List<int> visitedEnemies;
     protected int MAP_ROWS;
     protected int MAP_COLS;
@@ -65,12 +62,16 @@ public abstract class World
     public Location cave2;
     //private bool allreached;
 
-    protected int baseAddr;
+    public int baseAddr;
+
+    protected Random RNG;
 
     private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
 
+
     protected abstract List<Location> GetPathingStarts();
+    public abstract bool Terraform(RandomizerProperties props, ROM rom);
     public abstract string GetName();
 
 
@@ -112,9 +113,10 @@ public abstract class World
 
     public bool AllReached { get; set; }
 
-    public World(Hyrule parent)
+    public World(Random r)
     {
-        hyrule = parent;
+        RNG = r;
+
         connections = new Dictionary<Location, Location>();
         Locations = new Dictionary<Terrain, List<Location>>();
         foreach (Terrain Terrain in Enum.GetValues(typeof(Terrain)))
@@ -161,7 +163,7 @@ public abstract class World
         List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle).ToList();
         for (int i = shufflableLocations.Count() - 1; i > 0; i--)
         {
-            int n = hyrule.RNG.Next(i + 1);
+            int n = RNG.Next(i + 1);
             Swap(shufflableLocations[i], shufflableLocations[n]);
         }
     }
@@ -176,42 +178,42 @@ public abstract class World
 
     //TODO: This should work like the new palace enemy shuffle. Shuffle should set what enemies are where into
     //enemies arrays for the different encouter types, and then there should be a separate write step.
-    public void ShuffleEnemies(int addr, bool generatorsAlwaysMatch)
+    public void ShuffleEnemies(ROM romData, int addr, bool generatorsAlwaysMatch, bool mixLargeAndSmallEnemies)
     {
         int? firstGenerator = null;
         if (addr != 0x95A4)
         {
-            int numBytes = hyrule.ROMData.GetByte(addr);
+            int numBytes = romData.GetByte(addr);
             for (int j = addr + 2; j < addr + numBytes; j += 2)
             {
-                int enemy = hyrule.ROMData.GetByte(j) & 0x3F;
-                int highPart = hyrule.ROMData.GetByte(j) & 0xC0;
-                if (hyrule.Props.MixPalaceEnemies)
+                int enemy = romData.GetByte(j) & 0x3F;
+                int highPart = romData.GetByte(j) & 0xC0;
+                if (mixLargeAndSmallEnemies)
                 {
                     if (enemies.Contains(enemy))
                     {
-                        int swap = enemies[hyrule.RNG.Next(0, enemies.Count)];
-                        hyrule.ROMData.Put(j, (byte)(swap + highPart));
+                        int swap = enemies[RNG.Next(0, enemies.Count)];
+                        romData.Put(j, (byte)(swap + highPart));
                         if (smallEnemies.Contains(enemy) && largeEnemies.Contains(swap) && swap != 0x20)
                         {
-                            int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
-                            int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
+                            int ypos = romData.GetByte(j - 1) & 0xF0;
+                            int xpos = romData.GetByte(j - 1) & 0x0F;
                             ypos -= 32;
-                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
+                            romData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         else if (swap == 0x20 && swap != enemy)
                         {
-                            int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
-                            int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
+                            int ypos = romData.GetByte(j - 1) & 0xF0;
+                            int xpos = romData.GetByte(j - 1) & 0x0F;
                             ypos -= 48;
-                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
+                            romData.Put(j - 1, (byte)(ypos + xpos));
                         }
                         else if (enemy == 0x1F && swap != enemy)
                         {
-                            int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
-                            int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
+                            int ypos = romData.GetByte(j - 1) & 0xF0;
+                            int xpos = romData.GetByte(j - 1) & 0x0F;
                             ypos -= 16;
-                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
+                            romData.Put(j - 1, (byte)(ypos + xpos));
                         }
                     }
                 }
@@ -220,48 +222,48 @@ public abstract class World
 
                     if (largeEnemies.Contains(enemy))
                     {
-                        int swap = hyrule.RNG.Next(0, largeEnemies.Count);
+                        int swap = RNG.Next(0, largeEnemies.Count);
                         if (largeEnemies[swap] == 0x20 && largeEnemies[swap] != enemy)
                         {
-                            int ypos = hyrule.ROMData.GetByte(j - 1) & 0xF0;
-                            int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
+                            int ypos = romData.GetByte(j - 1) & 0xF0;
+                            int xpos = romData.GetByte(j - 1) & 0x0F;
                             ypos -= 48;
-                            hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
+                            romData.Put(j - 1, (byte)(ypos + xpos));
                         }
-                        hyrule.ROMData.Put(j, (byte)(largeEnemies[swap] + highPart));
+                        romData.Put(j, (byte)(largeEnemies[swap] + highPart));
                     }
 
                     if (smallEnemies.Contains(enemy))
                     {
-                        int swap = hyrule.RNG.Next(0, smallEnemies.Count);
-                        hyrule.ROMData.Put(j, (byte)(smallEnemies[swap] + highPart));
+                        int swap = RNG.Next(0, smallEnemies.Count);
+                        romData.Put(j, (byte)(smallEnemies[swap] + highPart));
                     }
                 }
 
                 if (flyingEnemies.Contains(enemy))
                 {
-                    int swap = hyrule.RNG.Next(0, flyingEnemies.Count);
-                    hyrule.ROMData.Put(j, (byte)(flyingEnemies[swap] + highPart));
+                    int swap = RNG.Next(0, flyingEnemies.Count);
+                    romData.Put(j, (byte)(flyingEnemies[swap] + highPart));
 
                     if (flyingEnemies[swap] == 0x07 || flyingEnemies[swap] == 0x0a || flyingEnemies[swap] == 0x0d || flyingEnemies[swap] == 0x0e)
                     {
                         int ypos = 0x00;
-                        int xpos = hyrule.ROMData.GetByte(j - 1) & 0x0F;
-                        hyrule.ROMData.Put(j - 1, (byte)(ypos + xpos));
+                        int xpos = romData.GetByte(j - 1) & 0x0F;
+                        romData.Put(j - 1, (byte)(ypos + xpos));
                     }
                 }
 
                 if (generators.Contains(enemy))
                 {
-                    int swap = hyrule.RNG.Next(0, generators.Count);
+                    int swap = RNG.Next(0, generators.Count);
                     firstGenerator ??= generators[swap];
                     if (generatorsAlwaysMatch)
                     {
-                        hyrule.ROMData.Put(j, (byte)(firstGenerator + highPart));
+                        romData.Put(j, (byte)(firstGenerator + highPart));
                     }
                     else
                     {
-                        hyrule.ROMData.Put(j, (byte)(generators[swap] + highPart));
+                        romData.Put(j, (byte)(generators[swap] + highPart));
                     }
                 }
 
@@ -269,15 +271,15 @@ public abstract class World
                 //Why? I assume it causes some kind of issue, but I've never investigated.
                 if (enemy == 0x21)
                 {
-                    int swap = hyrule.RNG.Next(0, generators.Count + 1);
+                    int swap = RNG.Next(0, generators.Count + 1);
                     firstGenerator ??= swap == generators.Count ? 0x21 : generators[swap];
                     if (generatorsAlwaysMatch)
                     {
-                        hyrule.ROMData.Put(j, (byte)(firstGenerator + highPart));
+                        romData.Put(j, (byte)(firstGenerator + highPart));
                     }
                     else if (swap != generators.Count)
                     {
-                        hyrule.ROMData.Put(j, (byte)(generators[swap] + highPart));
+                        romData.Put(j, (byte)(generators[swap] + highPart));
                     }
                 }
             }
@@ -288,30 +290,21 @@ public abstract class World
     {
         if (co.Count > 0)
         {
-            int start = hyrule.RNG.Next(areasByLocation[section].Count);
+            int start = RNG.Next(areasByLocation[section].Count);
             Location s = areasByLocation[section][start];
-            int conn = hyrule.RNG.Next(co.Count);
+            int conn = RNG.Next(co.Count);
             Location c = co.Keys.ElementAt(conn);
             int count = 0;
             while ((!c.CanShuffle || !s.CanShuffle || (!changeType && (c.TerrainType != s.TerrainType))) && count < co.Count)
             {
-                start = hyrule.RNG.Next(areasByLocation[section].Count);
+                start = RNG.Next(areasByLocation[section].Count);
                 s = areasByLocation[section][start];
-                conn = hyrule.RNG.Next(co.Count);
+                conn = RNG.Next(co.Count);
                 c = co.Keys.ElementAt(conn);
                 count++;
             }
             Swap(s, c);
             c.CanShuffle = false;
-        }
-    }
-
-    protected void LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> Terrains, Continent continent)
-    {
-        for (int i = 0; i < locNum; i++)
-        {
-            byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(startAddr + i), hyrule.ROMData.GetByte(startAddr + overworldXOffset + i), hyrule.ROMData.GetByte(startAddr + overworldMapOffset + i), hyrule.ROMData.GetByte(startAddr + overworldWorldOffset + i) };
-            AddLocation(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
         }
     }
 
@@ -327,32 +320,6 @@ public abstract class World
             }
         }
         return l;
-    }
-
-    protected void ReadVanillaMap()
-    {
-        int addr = VANILLA_MAP_ADDR;
-        int i = 0;
-        int j = 0;
-        map = new Terrain[MAP_ROWS, MAP_COLS];
-        while (i < MAP_ROWS)
-        {
-            j = 0;
-            while (j < MAP_COLS)
-            {
-                byte data = hyrule.ROMData.GetByte(addr);
-                int count = (data & 0xF0) >> 4;
-                count++;
-                Terrain t = (Terrain)(data & 0x0F);
-                for (int k = 0; k < count; k++)
-                {
-                    map[i, j + k] = t;
-                }
-                j += count;
-                addr++;
-            }
-            i++;
-        }
     }
 
     public void UpdateAllReached()
@@ -409,14 +376,14 @@ public abstract class World
         return location;
     }
 
-    public void ShuffleOverworldEnemies(bool generatorsAlwaysMatch)
+    public void ShuffleOverworldEnemies(ROM romData, bool generatorsAlwaysMatch, bool mixLargeAndSmallEnemies)
     {
         List<int> shuffledEncounters = new List<int>();
         //0x4581
         for (int i = enemyPtr; i < enemyPtr + 126; i += 2)
         {
-            int low = hyrule.ROMData.GetByte(i);
-            int high = hyrule.ROMData.GetByte(i + 1);
+            int low = romData.GetByte(i);
+            int high = romData.GetByte(i + 1);
             high <<= 8;
             high &= 0x0FFF;
             int addr = high + low + enemyAddr;
@@ -427,19 +394,19 @@ public abstract class World
             else
             {
                 shuffledEncounters.Add(addr);
-                ShuffleEnemies(addr, generatorsAlwaysMatch);
+                ShuffleEnemies(romData, addr, generatorsAlwaysMatch, mixLargeAndSmallEnemies);
             }
         }
         //{ 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
         foreach (int map in overworldMaps)
         {
             int ptrAddr = enemyPtr + map * 2;
-            int low = hyrule.ROMData.GetByte(ptrAddr);
-            int high = hyrule.ROMData.GetByte(ptrAddr + 1);
+            int low = romData.GetByte(ptrAddr);
+            int high = romData.GetByte(ptrAddr + 1);
             high <<= 8;
             high &= 0x0FFF;
             int addr = high + low + enemyAddr;
-            addr += hyrule.ROMData.GetByte(addr);
+            addr += romData.GetByte(addr);
             if (shuffledEncounters.Contains(addr))
             {
                 logger.Debug("Duplicate encounter");
@@ -447,12 +414,12 @@ public abstract class World
             else
             {
                 shuffledEncounters.Add(addr);
-                ShuffleEnemies(addr, generatorsAlwaysMatch);
+                ShuffleEnemies(romData, addr, generatorsAlwaysMatch, mixLargeAndSmallEnemies);
             }
         }
     }
 
-    protected bool PlaceLocations(Terrain riverTerrain)
+    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
         int i = 0;
         foreach (Location location in AllLocations)
@@ -465,8 +432,8 @@ public abstract class World
                 //Place the location in a spot that is not adjacent to any other location
                 do
                 {
-                    x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                    y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                    x = RNG.Next(MAP_COLS - 2) + 1;
+                    y = RNG.Next(MAP_ROWS - 2) + 1;
                 } while (
                     map[y, x] != Terrain.NONE
                     || map[y - 1, x] != Terrain.NONE
@@ -483,11 +450,10 @@ public abstract class World
                 //Connect the cave
                 if (location.TerrainType == Terrain.CAVE)
                 {
-                    Direction direction = (Direction)hyrule.RNG.Next(4);
-                    Terrain entranceTerrain = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
-                    // if (!hyrule.Props.saneCaves || !connections.ContainsKey(location))
-                    //Updated to avoid "if not else" anti-pattern
-                    if (hyrule.Props.SaneCaves && connections.ContainsKey(location))
+                    Direction direction = (Direction)RNG.Next(4);
+                    Terrain entranceTerrain = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+
+                    if (saneCaves && connections.ContainsKey(location))
                     {
                         PlaceCaveCount++;
                         if (!PlaceSaneCave(x, y, direction, entranceTerrain, riverTerrain, location))
@@ -506,7 +472,7 @@ public abstract class World
                 }
                 else if (location.TerrainType == Terrain.PALACE)
                 {
-                    Terrain s = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                    Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
                     map[y + 1, x] = s;
                     map[y + 1, x + 1] = s;
                     map[y + 1, x - 1] = s;
@@ -524,7 +490,7 @@ public abstract class World
                     Terrain t = Terrain.NONE;
                     do
                     {
-                        t = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                        t = walkableTerrains[RNG.Next(walkableTerrains.Count)];
                     } while (t == location.TerrainType);
                     map[y + 1, x] = t;
                     map[y + 1, x + 1] = t;
@@ -673,13 +639,13 @@ public abstract class World
         //That is also not adjacent to any other location.
         do
         {
-            x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-            y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+            x = RNG.Next(MAP_COLS - 2) + 1;
+            y = RNG.Next(MAP_ROWS - 2) + 1;
         } while (x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
 
         while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
         {
-            direction = (Direction)hyrule.RNG.Next(4);
+            direction = (Direction)RNG.Next(4);
         }
         int otherx = 0;
         int othery = 0;
@@ -702,25 +668,25 @@ public abstract class World
             crossing = true;
             if (direction == Direction.NORTH)
             {
-                otherx = x + (hyrule.RNG.Next(7) - 3);
-                othery = y - (hyrule.RNG.Next(range) + offset);
+                otherx = x + (RNG.Next(7) - 3);
+                othery = y - (RNG.Next(range) + offset);
             }
             else if (direction == Direction.EAST)
             {
-                otherx = x + (hyrule.RNG.Next(range) + offset);
-                othery = y + (hyrule.RNG.Next(7) - 3);
+                otherx = x + (RNG.Next(range) + offset);
+                othery = y + (RNG.Next(7) - 3);
             }
             else if (direction == Direction.SOUTH)
             {
-                otherx = x + (hyrule.RNG.Next(7) - 3);
-                othery = y + (hyrule.RNG.Next(range) + offset);
+                otherx = x + (RNG.Next(7) - 3);
+                othery = y + (RNG.Next(range) + offset);
             }
             else //west
             {
-                otherx = x - (hyrule.RNG.Next(range) + offset);
-                othery = y + (hyrule.RNG.Next(7) - 3);
+                otherx = x - (RNG.Next(range) + offset);
+                othery = y + (RNG.Next(7) - 3);
             }
-            if (this.biome != Biome.VOLCANO)
+            if (biome != Biome.VOLCANO)
             {
                 if (!CrossingWater(x, otherx, y, othery, riverTerrain))
                 {
@@ -754,8 +720,8 @@ public abstract class World
         location2.CanShuffle = false;
         location2.Xpos = otherx;
         location2.Ypos = othery + 30;
-        PlaceCave(x, y, direction, walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)]);
-        PlaceCave(otherx, othery, direction.Reverse(), walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)]);
+        PlaceCave(x, y, direction, walkableTerrains[RNG.Next(walkableTerrains.Count)]);
+        PlaceCave(otherx, othery, direction.Reverse(), walkableTerrains[RNG.Next(walkableTerrains.Count)]);
         return true;
     }
 
@@ -770,8 +736,8 @@ public abstract class World
                 int y = 0;
                 do
                 {
-                    x = hyrule.RNG.Next(MAP_COLS);
-                    y = hyrule.RNG.Next(MAP_ROWS);
+                    x = RNG.Next(MAP_COLS);
+                    y = RNG.Next(MAP_ROWS);
                     tries++;
                 } while ((map[y, x] != location.TerrainType || GetLocationByCoords(Tuple.Create(y + 30, x)) != null) && tries < 2000);
 
@@ -800,7 +766,7 @@ public abstract class World
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int numBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia)
+    protected bool ConnectIslands(int numBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, bool canWalkOnWater)
     {
         int[,] mass = GetTerrainGlobs();
         Dictionary<int, List<int>> connectMass = new Dictionary<int, List<int>>();
@@ -810,14 +776,14 @@ public abstract class World
         while (bridges > 0 && tries < 2000)
         {
             tries++;
-            int x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-            int y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+            int x = RNG.Next(MAP_COLS - 2) + 1;
+            int y = RNG.Next(MAP_ROWS - 2) + 1;
             Direction waterDirection = NextToWater(x, y, riverTerrain);
             int waterTries = 0;
             while (waterDirection == Direction.NONE && waterTries < 2000)// || (this.bio == biome.canyon && (waterdir == Direction.NORTH || waterdir == Direction.SOUTH)))
             {
-                x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                x = RNG.Next(MAP_COLS - 2) + 1;
+                y = RNG.Next(MAP_ROWS - 2) + 1;
                 waterDirection = NextToWater(x, y, riverTerrain);
                 waterTries++;
             }
@@ -951,7 +917,7 @@ public abstract class World
                 endMass = mass[y, x];
             }
 
-            if ((riverTerrain != Terrain.DESERT && this.biome != Biome.CALDERA && this.biome != Biome.VOLCANO)
+            if ((riverTerrain != Terrain.DESERT && biome != Biome.CALDERA && biome != Biome.VOLCANO)
                 && (startMass == 0
                     || endMass == 0
                     || endMass == startMass
@@ -1145,9 +1111,9 @@ public abstract class World
                         while (map[y, x] == riverTerrain)
                         {
 
-                            if (this.biome == Biome.MOUNTAINOUS || this.biome == Biome.VANILLALIKE)
+                            if (biome == Biome.MOUNTAINOUS || biome == Biome.VANILLALIKE)
                             {
-                                if (this.biome == Biome.VANILLALIKE)
+                                if (biome == Biome.VANILLALIKE)
                                 {
                                     if (riverTerrain == Terrain.WALKABLEWATER || riverTerrain == Terrain.WATER)
                                     {
@@ -1245,7 +1211,7 @@ public abstract class World
                         }
                     }
                     TerrainCycle++;
-                    if (riverTerrain != Terrain.MOUNTAIN && riverTerrain != Terrain.DESERT && !hyrule.Props.CanWalkOnWaterWithBoots)
+                    if (riverTerrain != Terrain.MOUNTAIN && riverTerrain != Terrain.DESERT && !canWalkOnWater)
                     {
                         TerrainCycle = TerrainCycle % 3;
                     }
@@ -1442,7 +1408,7 @@ public abstract class World
                             choices.Add(map[t.Item1, t.Item2]);
                         }
                     }
-                    mapCopy[i, j] = choices[hyrule.RNG.Next(choices.Count)];
+                    mapCopy[i, j] = choices[RNG.Next(choices.Count)];
                 }
             }
         }
@@ -1461,19 +1427,19 @@ public abstract class World
         return true;
     }
 
-    protected void PlaceRandomTerrain(int num)
+    protected void PlaceRandomTerrain(int numberOfTerrainsToPlace)
     {
         //randomly place remaining Terrain
         int placed = 0;
-        while (placed < num)
+        while (placed < numberOfTerrainsToPlace)
         {
             int x = 0;
             int y = 0;
-            Terrain t = randomTerrains[hyrule.RNG.Next(randomTerrains.Count)];
+            Terrain t = randomTerrains[RNG.Next(randomTerrains.Count)];
             do
             {
-                x = hyrule.RNG.Next(MAP_COLS);
-                y = hyrule.RNG.Next(MAP_ROWS);
+                x = RNG.Next(MAP_COLS);
+                y = RNG.Next(MAP_ROWS);
             } while (map[y, x] != Terrain.NONE);
             map[y, x] = t;
             placed++;
@@ -1488,7 +1454,7 @@ public abstract class World
     /// <param name="total">Total number of bytes to write</param>
     /// <param name="h1">For east: Hidden Palace Y - 30</param>
     /// <param name="h2">For east: Hidden palace X</param>
-    protected void WriteMapToRom(bool doWrite, int loc, int total, int h1, int h2)
+    protected void WriteMapToRom(ROM romData, bool doWrite, int loc, int total, int h1, int h2, bool hiddenPalace, bool hiddenKasuto)
     {
         bytesWritten = 0; //Number of bytes written so far
         Terrain currentTerrain = map[0, 0];
@@ -1497,30 +1463,32 @@ public abstract class World
         {
             for (int x = 0; x < MAP_COLS; x++)
             {
-                if (hyrule.Props.HiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
+                //These two conditionals ABSOLUTELY should not be processed here.
+                //Refactor them and remove the excess boolean parameters.
+                if (hiddenPalace && y == h1 && x == h2 && y != 0 && x != 0)
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
-                        hyrule.ROMData.Put(loc, (byte)b);
-                        hyrule.ROMData.Put(loc + 1, (byte)currentTerrain);
+                        romData.Put(loc, (byte)b);
+                        romData.Put(loc + 1, (byte)currentTerrain);
                     }
                     currentTerrainCount = 0;
                     loc += 2;
                     bytesWritten += 2;
                     continue;
                 }
-                if (hyrule.Props.HiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE))
+                if (hiddenKasuto && y == 51 && x == 61 && y != 0 && x != 0 && (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE))
                 {
                     currentTerrainCount--;
                     int b = currentTerrainCount * 16 + (int)currentTerrain;
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
-                        hyrule.ROMData.Put(loc, (byte)b);
-                        hyrule.ROMData.Put(loc + 1, (byte)currentTerrain);
+                        romData.Put(loc, (byte)b);
+                        romData.Put(loc + 1, (byte)currentTerrain);
                     }
                     currentTerrainCount = 0;
                     loc += 2;
@@ -1540,7 +1508,7 @@ public abstract class World
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
-                        hyrule.ROMData.Put(loc, (byte)b);
+                        romData.Put(loc, (byte)b);
                     }
 
                     currentTerrain = map[y, x];
@@ -1556,7 +1524,7 @@ public abstract class World
             //logger.WriteLine("Hex: {0:X}", b2);
             if (doWrite)
             {
-                hyrule.ROMData.Put(loc, (byte)b2);
+                romData.Put(loc, (byte)b2);
             }
 
             if (y < MAP_ROWS - 1)
@@ -1571,16 +1539,16 @@ public abstract class World
         //Fill any remaining map space in the rom with filler. (Replace 0x0B with a constant)
         while (bytesWritten < total)
         {
-            hyrule.ROMData.Put(loc, (byte)0x0B);
+            romData.Put(loc, (byte)0x0B);
             bytesWritten++;
             loc++;
         }
     }
 
-    protected void DrawOcean(Direction direction)
+    protected void DrawOcean(Direction direction, bool walkableWater)
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.CanWalkOnWaterWithBoots)
+        if (walkableWater)
         {
             water = Terrain.WALKABLEWATER;
         }
@@ -1591,26 +1559,26 @@ public abstract class World
         if (direction == Direction.WEST)
         {
             x = 0;
-            y = hyrule.RNG.Next(MAP_ROWS);
-            olength = hyrule.RNG.Next(Math.Max(y, MAP_ROWS - y));
+            y = RNG.Next(MAP_ROWS);
+            olength = RNG.Next(Math.Max(y, MAP_ROWS - y));
         }
         else if (direction == Direction.EAST)
         {
             x = MAP_COLS - 1;
-            y = hyrule.RNG.Next(MAP_ROWS);
-            olength = hyrule.RNG.Next(Math.Max(y, MAP_ROWS - y));
+            y = RNG.Next(MAP_ROWS);
+            olength = RNG.Next(Math.Max(y, MAP_ROWS - y));
         }
         else if (direction == Direction.NORTH)
         {
-            x = hyrule.RNG.Next(MAP_COLS);
+            x = RNG.Next(MAP_COLS);
             y = 0;
-            olength = hyrule.RNG.Next(Math.Max(x, MAP_COLS - x));
+            olength = RNG.Next(Math.Max(x, MAP_COLS - x));
         }
         else //south
         {
-            x = hyrule.RNG.Next(MAP_COLS);
+            x = RNG.Next(MAP_COLS);
             y = MAP_ROWS - 1;
-            olength = hyrule.RNG.Next(Math.Max(x, MAP_COLS - x));
+            olength = RNG.Next(Math.Max(x, MAP_COLS - x));
         }
         //draw ocean on right side
 
@@ -1620,7 +1588,7 @@ public abstract class World
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if (map[y + i, x] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
+                    if (map[y + i, x] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
                     {
                         return;
                     }
@@ -1633,7 +1601,7 @@ public abstract class World
                 {
                     for (int i = 0; i < olength; i++)
                     {
-                        if (map[y - i, x] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
+                        if (map[y - i, x] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
                         {
                             return;
                         }
@@ -1652,7 +1620,7 @@ public abstract class World
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if (map[y, x + i] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
+                    if (map[y, x + i] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
                     {
                         return;
                     }
@@ -1663,7 +1631,7 @@ public abstract class World
             {
                 for (int i = 0; i < olength; i++)
                 {
-                    if (map[y, x - 1] != Terrain.NONE && this.biome != Biome.MOUNTAINOUS)
+                    if (map[y, x - 1] != Terrain.NONE && biome != Biome.MOUNTAINOUS)
                     {
                         return;
                     }
@@ -1672,6 +1640,7 @@ public abstract class World
             }
         }
     }
+    /*
     protected void LegacyUpdateReachable()
     {
         bool needJump = false;
@@ -1695,11 +1664,11 @@ public abstract class World
             fairyBlockY = location.Ypos - 30;
             fairyBlockX = location.Xpos;
         }
-        bool hasFairySpell = hyrule.SpellGet[Spell.FAIRY];
-        bool hasJumpSpell = hyrule.SpellGet[Spell.JUMP];
-        bool hasHammer = hyrule.itemGet[Item.HAMMER];
-        bool hasBoots = hyrule.itemGet[Item.BOOTS];
-        bool hasFlute = hyrule.itemGet[Item.FLUTE];
+        bool hasFairySpell = spellGet[Spell.FAIRY];
+        bool hasJumpSpell = spellGet[Spell.JUMP];
+        bool hasHammer = itemGet[Item.HAMMER];
+        bool hasBoots = itemGet[Item.BOOTS];
+        bool hasFlute = itemGet[Item.FLUTE];
         bool changed = true;
         while (changed)
         {
@@ -1792,7 +1761,8 @@ public abstract class World
             }
         }
     }
-    protected void UpdateReachable()
+    */
+    protected void UpdateReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         //Setup
         bool needJump = false;
@@ -1801,7 +1771,7 @@ public abstract class World
         int jumpBlockX = -1;
         if (location != null)
         {
-            needJump = location.NeedFairy;
+            needJump = location.NeedJump;
             jumpBlockY = location.Ypos - 30;
             jumpBlockX = location.Xpos;
         }
@@ -1833,14 +1803,11 @@ public abstract class World
         {
             if (start.Ypos >= 30 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
             }
         }
 
-        if(AllLocations.Where(i => i.ActualTown == Town.NEW_KASUTO).FirstOrDefault()?.Reachable ?? false)
-        {
-            hyrule.eastHyrule.spellTower.Reachable = true;
-        } 
+        OnUpdateReachableTrigger();
 
         /*
         if(hyrule.debug >= 1604)
@@ -1859,7 +1826,14 @@ public abstract class World
         }*/
     }
 
-    protected void UpdateReachable(ref bool[,] covered, int y, int x, int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
+    protected virtual void OnUpdateReachableTrigger()
+    {
+        //This space intentionally left blank
+    }
+
+    //This signature has gotten out of control, consider a refactor
+    protected void UpdateReachable(ref bool[,] covered, int y, int x, Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet, 
+        int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
     {
         try
         {
@@ -1877,40 +1851,40 @@ public abstract class World
                 || terrain == Terrain.PALACE
                 || terrain == Terrain.TOWN
                 || walkableTerrains.Contains(terrain)
-                || (terrain == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS])
-                || (terrain == Terrain.ROCK && hyrule.itemGet[Item.HAMMER])
-                || (terrain == Terrain.SPIDER && hyrule.itemGet[Item.FLUTE]))
+                || (terrain == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
+                || (terrain == Terrain.ROCK && itemGet[Item.HAMMER])
+                || (terrain == Terrain.SPIDER && itemGet[Item.FLUTE]))
                 //East desert jump blocker
                 && !(
                     needJump
                     && jumpBlockY == y
                     && jumpBlockX == x
-                    && (!hyrule.SpellGet[Spell.JUMP] && !hyrule.SpellGet[Spell.FAIRY])
+                    && (!spellGet[Spell.JUMP] && !spellGet[Spell.FAIRY])
                 )
                 //Fairy cave is traversable
-                && !(needFairy && fairyBlockY == y && fairyBlockX == x && !hyrule.SpellGet[Spell.FAIRY])
+                && !(needFairy && fairyBlockY == y && fairyBlockX == x && !spellGet[Spell.FAIRY])
             )
             {
                 visitation[y, x] = true;
 
                 if (y - 1 >= 0)
                 {
-                    UpdateReachable(ref covered, y - 1, x, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                    UpdateReachable(ref covered, y - 1, x, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
                 }
 
                 if (y + 1 < MAP_ROWS)
                 {
-                    UpdateReachable(ref covered, y + 1, x, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                    UpdateReachable(ref covered, y + 1, x, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
                 }
 
                 if (x - 1 >= 0)
                 {
-                    UpdateReachable(ref covered, y, x - 1, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                    UpdateReachable(ref covered, y, x - 1, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
                 }
 
                 if (x + 1 < MAP_COLS)
                 {
-                    UpdateReachable(ref covered, y, x + 1, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                    UpdateReachable(ref covered, y, x + 1, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
                 }
             }
         }
@@ -1944,7 +1918,7 @@ public abstract class World
         int raftx = 0;
         int deltax = 1;
         int deltay = 0;
-        int rafty = hyrule.RNG.Next(0, MAP_ROWS);
+        int rafty = RNG.Next(0, MAP_ROWS);
 
         int tries = 0;
         int length = 0;
@@ -1963,7 +1937,7 @@ public abstract class World
                 int rtries = 0;
                 do
                 {
-                    rafty = hyrule.RNG.Next(0, MAP_ROWS);
+                    rafty = RNG.Next(0, MAP_ROWS);
                     rtries++;
                     if (rtries > 100)
                     {
@@ -1979,7 +1953,7 @@ public abstract class World
 
                 do
                 {
-                    raftx = hyrule.RNG.Next(0, MAP_COLS);
+                    raftx = RNG.Next(0, MAP_COLS);
                     rtries++;
                     if (rtries > 100)
                     {
@@ -1996,7 +1970,7 @@ public abstract class World
 
                 do
                 {
-                    raftx = hyrule.RNG.Next(0, MAP_COLS);
+                    raftx = RNG.Next(0, MAP_COLS);
                     rtries++;
                     if (rtries > 100)
                     {
@@ -2013,7 +1987,7 @@ public abstract class World
 
                 do
                 {
-                    rafty = hyrule.RNG.Next(0, MAP_ROWS);
+                    rafty = RNG.Next(0, MAP_ROWS);
                     rtries++;
                     if (rtries > 100)
                     {
@@ -2082,15 +2056,9 @@ public abstract class World
 
     }
 
-    private void LoadLocation(int addr, Terrain t, Continent c)
+    public Location LoadRaft(ROM rom, int world)
     {
-        byte[] bytes = new Byte[4] { hyrule.ROMData.GetByte(addr), hyrule.ROMData.GetByte(addr + overworldXOffset), hyrule.ROMData.GetByte(addr + overworldMapOffset), hyrule.ROMData.GetByte(addr + overworldWorldOffset) };
-        AddLocation(new Location(bytes, t, addr, c));
-    }
-
-    public Location LoadRaft(int world)
-    {
-        LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world);
+        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world));
         raft = GetLocationByMem(baseAddr + 41);
         raft.ExternalWorld = 0x80;
         raft.World = world;
@@ -2099,9 +2067,9 @@ public abstract class World
         return raft;
     }
 
-    public Location LoadBridge(int world)
+    public Location LoadBridge(ROM rom, int world)
     {
-        LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world);
+        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world));
         bridge = GetLocationByMem(baseAddr + 40);
         bridge.ExternalWorld = 0x80;
         bridge.World = world;
@@ -2110,9 +2078,9 @@ public abstract class World
         return bridge;
     }
 
-    public Location LoadCave1(int world)
+    public Location LoadCave1(ROM rom, int world)
     {
-        LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world);
+        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world));
         cave1 = GetLocationByMem(baseAddr + 42);
         cave1.ExternalWorld = 0x80;
         cave1.World = world;
@@ -2121,9 +2089,9 @@ public abstract class World
         return cave1;
     }
 
-    public Location LoadCave2(int world)
+    public Location LoadCave2(ROM rom, int world)
     {
-        LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world);
+        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world));
         cave2 = GetLocationByMem(baseAddr + 43);
         cave2.ExternalWorld = 0x80;
         cave2.World = world;
@@ -2175,41 +2143,18 @@ public abstract class World
         return new List<Location>() { cave1, cave2, bridge, raft }.Where(i => i != null).ToList();
     }
 
-    public void RemoveUnusedConnectors()
-    {
-        if (this.raft == null)
-        {
-            hyrule.ROMData.Put(baseAddr + 41, 0x00);
-        }
-
-        if (this.bridge == null)
-        {
-            hyrule.ROMData.Put(baseAddr + 40, 0x00);
-        }
-
-        if (this.cave1 == null)
-        {
-            hyrule.ROMData.Put(baseAddr + 42, 0x00);
-        }
-
-        if (this.cave2 == null)
-        {
-            hyrule.ROMData.Put(baseAddr + 43, 0x00);
-        }
-    }
-
-    protected void DrawRiver(List<Location> bridges)
+    protected void DrawRiver(bool canWalkOnWaterWithBoots)
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.CanWalkOnWaterWithBoots)
+        if (canWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }
-        int dirr = hyrule.RNG.Next(4);
+        int dirr = RNG.Next(4);
         int dirr2 = dirr;
         while (dirr == dirr2)
         {
-            dirr2 = hyrule.RNG.Next(4);
+            dirr2 = RNG.Next(4);
         }
 
         int deltax = 0;
@@ -2219,32 +2164,32 @@ public abstract class World
         if (dirr == 0) //north
         {
             deltay = 1;
-            startx = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+            startx = RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
             starty = 0;
         }
         else if (dirr == 1) //east
         {
             deltax = -1;
             startx = MAP_COLS - 1;
-            starty = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+            starty = RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
         }
         else if (dirr == 2) //south
         {
             deltay = -1;
-            startx = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+            startx = RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
             starty = MAP_ROWS - 1;
         }
         else //west
         {
             deltax = 1;
             startx = 0;
-            starty = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+            starty = RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
         }
 
-        int stopping = hyrule.RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
+        int stopping = RNG.Next(MAP_COLS / 3, (MAP_COLS / 3) * 2);
         if (deltay != 0)
         {
-            stopping = hyrule.RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
+            stopping = RNG.Next(MAP_ROWS / 3, (MAP_ROWS / 3) * 2);
         }
         int curr = 0;
         while (curr < stopping)
@@ -2253,14 +2198,14 @@ public abstract class World
             if (map[starty, startx] == Terrain.NONE)
             {
                 map[starty, startx] = water;
-                int adjust = hyrule.RNG.Next(-1, 2);
+                int adjust = RNG.Next(-1, 2);
                 if ((deltax == 0 && startx == 1) || (deltay == 0 && starty == 1))
                 {
-                    adjust = hyrule.RNG.Next(0, 2);
+                    adjust = RNG.Next(0, 2);
                 }
                 else if ((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
                 {
-                    adjust = hyrule.RNG.Next(-1, 1);
+                    adjust = RNG.Next(-1, 1);
                 }
 
                 if (adjust < 0)
@@ -2316,14 +2261,14 @@ public abstract class World
             if (map[starty, startx] == Terrain.NONE)
             {
                 map[starty, startx] = water;
-                int adjust = hyrule.RNG.Next(-1, 2);
+                int adjust = RNG.Next(-1, 2);
                 if ((deltax == 0 && startx == 1) || (deltay == 0 && starty == 1))
                 {
-                    adjust = hyrule.RNG.Next(0, 2);
+                    adjust = RNG.Next(0, 2);
                 }
                 else if ((deltax == 0 && startx == MAP_COLS - 2) || (deltay == 0 && starty == MAP_ROWS - 2))
                 {
-                    adjust = hyrule.RNG.Next(-1, 1);
+                    adjust = RNG.Next(-1, 1);
                 }
                 if (adjust < 0)
                 {
@@ -2356,35 +2301,35 @@ public abstract class World
 
     public void DrawCanyon(Terrain riverT)
     {
-        int drawLeft = hyrule.RNG.Next(0, 5);
-        int drawRight = hyrule.RNG.Next(0, 5);
-        Terrain tleft = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
-        Terrain tright = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+        int drawLeft = RNG.Next(0, 5);
+        int drawRight = RNG.Next(0, 5);
+        Terrain tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+        Terrain tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
         if (!isHorizontal)
         {
-            int riverx = hyrule.RNG.Next(15, MAP_COLS - 15);
+            int riverx = RNG.Next(15, MAP_COLS - 15);
             for (int y = 0; y < MAP_ROWS; y++)
             {
                 drawLeft++;
                 drawRight++;
                 map[y, riverx] = riverT;
                 map[y, riverx + 1] = riverT;
-                int adjust = hyrule.RNG.Next(-3, 4);
-                int leftM = hyrule.RNG.Next(14, 17);
+                int adjust = RNG.Next(-3, 4);
+                int leftM = RNG.Next(14, 17);
                 if (riverx - leftM > 0)
                 {
                     map[y, riverx - leftM + 3] = tleft;
                 }
                 if (drawLeft % 5 == 0)
                 {
-                    tleft = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                    tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
                 }
                 for (int i = riverx - leftM; i >= 0; i--)
                 {
                     map[y, i] = Terrain.MOUNTAIN;
                 }
 
-                int rightM = hyrule.RNG.Next(14, 17);
+                int rightM = RNG.Next(14, 17);
 
                 if (riverx + rightM < MAP_COLS)
                 {
@@ -2393,7 +2338,7 @@ public abstract class World
 
                 if (drawRight % 5 == 0)
                 {
-                    tright = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                    tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
                 }
                 for (int i = riverx + 1 + rightM; i < MAP_COLS; i++)
                 {
@@ -2401,7 +2346,7 @@ public abstract class World
                 }
                 while (riverx + adjust + 1 > MAP_COLS - 15 || riverx + adjust < 15)
                 {
-                    adjust = hyrule.RNG.Next(-1, 2);
+                    adjust = RNG.Next(-1, 2);
                 }
                 if (adjust > 0)
                 {
@@ -2427,29 +2372,29 @@ public abstract class World
         }
         else
         {
-            int rivery = hyrule.RNG.Next(15, MAP_ROWS - 15);
+            int rivery = RNG.Next(15, MAP_ROWS - 15);
             for (int x = 0; x < MAP_COLS; x++)
             {
                 drawLeft++;
                 drawRight++;
                 map[rivery, x] = riverT;
                 map[rivery + 1, x] = riverT;
-                int adjust = hyrule.RNG.Next(-3, 3);
-                int leftM = hyrule.RNG.Next(14, 17);
+                int adjust = RNG.Next(-3, 3);
+                int leftM = RNG.Next(14, 17);
                 if (rivery - leftM > 0)
                 {
                     map[rivery - leftM + 3, x] = tleft;
                 }
                 if (drawLeft % 5 == 0)
                 {
-                    tleft = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                    tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
                 }
                 for (int i = rivery - leftM; i >= 0; i--)
                 {
                     map[i, x] = Terrain.MOUNTAIN;
                 }
 
-                int rightM = hyrule.RNG.Next(14, 17);
+                int rightM = RNG.Next(14, 17);
 
                 if (rivery + rightM < MAP_ROWS)
                 {
@@ -2458,7 +2403,7 @@ public abstract class World
 
                 if (drawRight % 5 == 0)
                 {
-                    tright = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
+                    tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
                 }
                 for (int i = rivery + 1 + rightM; i < MAP_ROWS; i++)
                 {
@@ -2466,7 +2411,7 @@ public abstract class World
                 }
                 while (rivery + adjust + 1 > MAP_ROWS - 15 || rivery + adjust < 15)
                 {
-                    adjust = hyrule.RNG.Next(-1, 2);
+                    adjust = RNG.Next(-1, 2);
                 }
                 if (adjust > 0)
                 {
@@ -2494,7 +2439,7 @@ public abstract class World
 
     public void DrawCenterMountain()
     {
-        isHorizontal = hyrule.RNG.NextDouble() > 0.5;
+        isHorizontal = RNG.NextDouble() > 0.5;
         int top = (MAP_ROWS - 35) / 2; //20
         int bottom = MAP_ROWS - top; //55
         if (isHorizontal)
@@ -2600,7 +2545,7 @@ public abstract class World
     {
         if (caveType == 0) //first cave left
         {
-            int cavey = hyrule.RNG.Next(centery - 2, centery + 3);
+            int cavey = RNG.Next(centery - 2, centery + 3);
             int cavex = centerx;
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
             {
@@ -2646,7 +2591,7 @@ public abstract class World
         }
         else
         {
-            int cavey = hyrule.RNG.Next(centery - 2, centery + 3);
+            int cavey = RNG.Next(centery - 2, centery + 3);
             int cavex = centerx;
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
             {
@@ -2706,7 +2651,7 @@ public abstract class World
         if (caveType == 0) //first cave up
         {
             int cavey = centery;
-            int cavex = hyrule.RNG.Next(centerx - 2, centerx + 3);
+            int cavex = RNG.Next(centerx - 2, centerx + 3);
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
             {
                 cavey--;
@@ -2751,7 +2696,7 @@ public abstract class World
         else
         {
             int cavey = centery;
-            int cavex = hyrule.RNG.Next(centerx - 2, centerx + 3);
+            int cavex = RNG.Next(centerx - 2, centerx + 3);
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
             {
                 cavey++;
@@ -2796,4 +2741,6 @@ public abstract class World
         }
         return true;
     }
+
+    public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);
 }

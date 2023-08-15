@@ -38,13 +38,15 @@ class MazeIsland : World
     private const int MAP_ADDR = 0xba00;
 
 
-    public MazeIsland(Hyrule hy)
-        : base(hy)
+    public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        LoadLocations(0xA131, 3, terrains, Continent.MAZE);
-        LoadLocations(0xA140, 1, terrains, Continent.MAZE);
-        LoadLocations(0xA143, 1, terrains, Continent.MAZE);
-        LoadLocations(0xA145, 5, terrains, Continent.MAZE);
+        List<Location> locations = new();
+        locations.AddRange(rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE));
+        locations.AddRange(rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE));
+        locations.AddRange(rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE));
+        locations.AddRange(rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE));
+        locations.ForEach(AddLocation);
+
         walkableTerrains = new List<Terrain>();
         walkableTerrains.Add(Terrain.MOUNTAIN);
         enemyAddr = 0x88B0;
@@ -66,31 +68,21 @@ class MazeIsland : World
 
         baseAddr = 0xA10c;
         VANILLA_MAP_ADDR = 0xa65c;
-        if(hy.Props.MazeBiome == Biome.VANILLA)
-        {
-            this.biome = Biome.VANILLA;
-        }
-        else if(hy.Props.MazeBiome == Biome.VANILLA_SHUFFLE)
-        {
-            this.biome = Biome.VANILLA_SHUFFLE;
-        }
-        else
-        {
-            this.biome = Biome.VANILLALIKE;
-        }
-}
 
-    public bool Terraform()
+        biome = props.MazeBiome;
+    }
+
+    public override bool Terraform(RandomizerProperties props, ROM rom)
     {
-        if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
+        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
             MAP_ROWS = 75;
             MAP_COLS = 64;
-            ReadVanillaMap();
-            if (this.biome == Biome.VANILLA_SHUFFLE)
+            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
+            if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.VanillaShuffleUsesActualTerrain)
+                if (props.VanillaShuffleUsesActualTerrain)
                 {
                     foreach (Location location in AllLocations)
                     {
@@ -190,7 +182,7 @@ class MazeIsland : World
                     }
                 }
                 //choose starting position
-                int starty = hyrule.RNG.Next(2, MAP_ROWS);
+                int starty = RNG.Next(2, MAP_ROWS);
                 if (starty == 0)
                 {
                     starty++;
@@ -213,7 +205,7 @@ class MazeIsland : World
                     if (n.Count > 0)
                     {
                         canPlaceCave = true;
-                        Tuple<int, int> next = n[hyrule.RNG.Next(n.Count)];
+                        Tuple<int, int> next = n[RNG.Next(n.Count)];
                         s.Push(next);
                         if (next.Item1 > currx)
                         {
@@ -265,12 +257,12 @@ class MazeIsland : World
 
                 bool canPlace = false;
 
-                int p4x = hyrule.RNG.Next(15) + 3;
-                int p4y = hyrule.RNG.Next(MAP_ROWS - 6) + 3;
+                int p4x = RNG.Next(15) + 3;
+                int p4y = RNG.Next(MAP_ROWS - 6) + 3;
                 while (!canPlace)
                 {
-                    p4x = hyrule.RNG.Next(15) + 3;
-                    p4y = hyrule.RNG.Next(MAP_ROWS - 6) + 3;
+                    p4x = RNG.Next(15) + 3;
+                    p4y = RNG.Next(MAP_ROWS - 6) + 3;
                     canPlace = true;
                     if (map[p4y, p4x] != Terrain.ROAD)
                     {
@@ -304,10 +296,10 @@ class MazeIsland : World
                 int riverstart = starty;
                 while (riverstart == starty)
                 {
-                    riverstart = hyrule.RNG.Next(10) * 2 + 1;
+                    riverstart = RNG.Next(10) * 2 + 1;
                 }
 
-                int riverend = hyrule.RNG.Next(10) * 2 + 1;
+                int riverend = RNG.Next(10) * 2 + 1;
 
                 Location rs = new Location();
                 rs.Xpos = 1;
@@ -322,17 +314,17 @@ class MazeIsland : World
                 if (raft != null)
                 {
 
-                    raftDirection = (Direction)hyrule.RNG.Next(4);
+                    raftDirection = (Direction)RNG.Next(4);
 
                     int bx = 0;
                     int by = 0;
                     if (raftDirection == Direction.NORTH)
                     {
 
-                        bx = hyrule.RNG.Next(2, MAP_COLS - 1);
+                        bx = RNG.Next(2, MAP_COLS - 1);
                         while (by != 2)
                         {
-                            bx = hyrule.RNG.Next(2, MAP_COLS - 1);
+                            bx = RNG.Next(2, MAP_COLS - 1);
                             by = 0;
                             while (by < MAP_ROWS && map[by, bx] != Terrain.ROAD)
                             {
@@ -358,11 +350,11 @@ class MazeIsland : World
                     else if (raftDirection == Direction.SOUTH)
                     {
                         by = MAP_ROWS - 1;
-                        bx = hyrule.RNG.Next(2, MAP_COLS - 1);
+                        bx = RNG.Next(2, MAP_COLS - 1);
                         while (by != MAP_ROWS - 3)
                         {
                             by = MAP_ROWS - 1;
-                            bx = hyrule.RNG.Next(2, MAP_COLS - 1);
+                            bx = RNG.Next(2, MAP_COLS - 1);
                             while (by > 0 && map[by, bx] != Terrain.ROAD)
                             {
                                 by--;
@@ -389,7 +381,7 @@ class MazeIsland : World
                         while (bx != 2)
                         {
                             bx = 0;
-                            by = hyrule.RNG.Next(2, MAP_ROWS - 2);
+                            by = RNG.Next(2, MAP_ROWS - 2);
                             while (bx < MAP_COLS && map[by, bx] != Terrain.ROAD)
                             {
                                 bx++;
@@ -417,7 +409,7 @@ class MazeIsland : World
                         while (bx != MAP_COLS - 3)
                         {
                             bx = MAP_COLS - 1;
-                            by = hyrule.RNG.Next(2, MAP_ROWS - 2);
+                            by = RNG.Next(2, MAP_ROWS - 2);
                             while (bx > 0 && map[by, bx] != Terrain.ROAD)
                             {
                                 bx--;
@@ -444,7 +436,7 @@ class MazeIsland : World
                 Direction bridgeDirection = Direction.WEST;
                 while (bridgeDirection == raftDirection)
                 {
-                    bridgeDirection = (Direction)hyrule.RNG.Next(4);
+                    bridgeDirection = (Direction)RNG.Next(4);
                 }
                 if (bridge != null)
                 {
@@ -452,7 +444,7 @@ class MazeIsland : World
                     int by = 0;
                     if (bridgeDirection == Direction.NORTH)
                     {
-                        bx = hyrule.RNG.Next(2, MAP_COLS - 1);
+                        bx = RNG.Next(2, MAP_COLS - 1);
                         while (by < MAP_ROWS && map[by, bx] != Terrain.ROAD)
                         {
                             by++;
@@ -476,7 +468,7 @@ class MazeIsland : World
                     else if (bridgeDirection == Direction.SOUTH)
                     {
                         by = MAP_ROWS - 1;
-                        bx = hyrule.RNG.Next(2, MAP_COLS - 1);
+                        bx = RNG.Next(2, MAP_COLS - 1);
                         while (by > 0 && map[by, bx] != Terrain.ROAD)
                         {
                             by--;
@@ -499,10 +491,10 @@ class MazeIsland : World
                     }
                     else if (bridgeDirection == Direction.WEST)
                     {
-                        by = hyrule.RNG.Next(2, MAP_ROWS - 2);
+                        by = RNG.Next(2, MAP_ROWS - 2);
                         while(by == riverend || by == riverstart)
                         {
-                            by = hyrule.RNG.Next(2, MAP_ROWS - 2);
+                            by = RNG.Next(2, MAP_ROWS - 2);
 
                         }
                         while (bx < MAP_COLS && map[by, bx] != Terrain.ROAD)
@@ -528,10 +520,10 @@ class MazeIsland : World
                     else
                     {
                         bx = MAP_COLS + 3;
-                        by = hyrule.RNG.Next(2, MAP_ROWS - 2);
+                        by = RNG.Next(2, MAP_ROWS - 2);
                         while (by == riverend || by == riverstart)
                         {
-                            by = hyrule.RNG.Next(2, MAP_ROWS - 2);
+                            by = RNG.Next(2, MAP_ROWS - 2);
 
                         }
                         while (bx > 0 && map[by, bx] != Terrain.ROAD)
@@ -566,16 +558,16 @@ class MazeIsland : World
                         {
                             do
                             {
-                                x = hyrule.RNG.Next(19) + 2;
-                                y = hyrule.RNG.Next(MAP_ROWS - 4) + 2;
+                                x = RNG.Next(19) + 2;
+                                y = RNG.Next(MAP_ROWS - 4) + 2;
                             } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
                         }
                         else
                         {
                             do
                             {
-                                x = hyrule.RNG.Next(19) + 2;
-                                y = hyrule.RNG.Next(MAP_ROWS - 4) + 2;
+                                x = RNG.Next(19) + 2;
+                                y = RNG.Next(MAP_ROWS - 4) + 2;
                             } while (map[y, x] != Terrain.ROAD || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
                         }
 
@@ -586,18 +578,18 @@ class MazeIsland : World
 
                 //check bytes and adjust
                 MAP_COLS = 64;
-                WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+                WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
                 MAP_COLS = 23;
                 
             }
         }
         MAP_COLS = 64;
-        WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
         for (int i = 0xA10C; i < 0xA149; i++)
         {
             if(!terrains.Keys.Contains(i))
             {
-                hyrule.ROMData.Put(i, 0x00);
+                rom.Put(i, 0x00);
             }
         }
 
@@ -704,10 +696,10 @@ class MazeIsland : World
         int y = from.Ypos - 30;
         while (x != to.Xpos)
         {
-            if (x == 21 || (hyrule.RNG.NextDouble() > .5 && x != to.Xpos))
+            if (x == 21 || (RNG.NextDouble() > .5 && x != to.Xpos))
             {
                 int diff = to.Xpos - x;
-                int move = (hyrule.RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
+                int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
 
  
                 while (Math.Abs(move) > 0 && !(x == to.Xpos && y == to.Ypos - 30))
@@ -748,7 +740,7 @@ class MazeIsland : World
             else if(y != to.Ypos - 30)
             {
                 int diff = to.Ypos - 30 - y;
-                int move = (hyrule.RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
+                int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
                 while (Math.Abs(move) > 0 && !(x == to.Xpos && y == to.Ypos - 30))
                 {
                     for (int i = 0; i < 2; i++)
@@ -784,7 +776,7 @@ class MazeIsland : World
             }
         }
     }
-    public void UpdateVisit()
+    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         bool changed = true;
         while (changed)
@@ -794,7 +786,7 @@ class MazeIsland : World
             {
                 for (int j = 0; j < MAP_COLS; j++)
                 {
-                    if (!visitation[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && hyrule.itemGet[Item.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
+                    if (!visitation[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && itemGet[Item.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
                     {
                         if (i - 1 >= 0)
                         {
