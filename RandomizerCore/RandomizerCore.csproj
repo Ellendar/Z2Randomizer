@@ -36,7 +36,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
-    <Version>4.2.4</Version>
+    <Version>4.2.5</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />
@@ -85,9 +85,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Fighter.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Garfield.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Glitch_Witch.ips">

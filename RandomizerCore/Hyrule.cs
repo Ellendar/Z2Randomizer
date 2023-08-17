@@ -30,7 +30,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -437,7 +437,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.4" +
+            "4.2.5" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));

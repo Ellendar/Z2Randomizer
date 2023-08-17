@@ -15,7 +15,6 @@ public class Util
 
     public static List<char> ToGameText(string rawText, bool endByte)
     {
-        rawText = "test_test_";
         List<char> s = rawText.ToUpper().ToCharArray().ToList();
         for (int i = 0; i < s.Count; i++)
         {
