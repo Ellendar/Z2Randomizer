@@ -3379,7 +3379,7 @@ public class Hyrule
                 {
                     int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
                     int item = ROMData.GetByte(addr);
-                    if (false && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
+                    if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
                     {
                         if (UNSAFE_DEBUG)
                         {
