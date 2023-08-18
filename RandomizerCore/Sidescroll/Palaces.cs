@@ -203,12 +203,6 @@ public class Palaces
                         {
                             palace.ItemRoom = GenerateItemRoom(r, props.UseCustomRooms, props.UseCommunityRooms);
                             palace.ItemRoom.PalaceGroup = palaceGroup;
-                            //#76: Not sure if this is still needed. If the item room is a boss item room, and it's in palace group 1,
-                            //move the boss up 1 tile. I fixed the underlying broken room, but for now, let's keep this.
-                            if (palaceGroup == 1 && palace.ItemRoom.HasBoss)
-                            {
-                                palace.ItemRoom.NewEnemies[1] = 0x6C;
-                            }
                             palace.AllRooms.Add(palace.ItemRoom);
 
                             palace.Root.NewMap = mapNo;

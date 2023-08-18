@@ -437,12 +437,13 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.3" +
+            "4.2.4" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
         UpdateRom(hash);
-        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf("\\") + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+        char os_sep = Path.DirectorySeparatorChar;
+        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf(os_sep) + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
         if (props.saveRom)
         {
             ROMData.Dump(newFileName);
@@ -3351,11 +3352,6 @@ public class Hyrule
         ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
     }
 
-    public void ShuffleEnemies(int addr, List<int> enemies, List<int> generators,
-        List<int> smallEnemies, List<int> largeEnemies, List<int> flyingEnemies, bool isP7)
-    {
-        throw new NotImplementedException();
-    }
     public void ShuffleSmallItems(int world, bool first)
     {
         logger.Debug("World: " + world);

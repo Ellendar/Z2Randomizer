@@ -17,7 +17,7 @@ internal class Towns
         { Town.MIDO_WEST, new Requirements(new RequirementType[] {RequirementType.MEDICINE }) },
         { Town.MIDO_CHURCH, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
         { Town.NABOORU, new Requirements(new RequirementType[] {RequirementType.FIVE_CONTAINERS }) },
-        { Town.DARUNIA_WEST, new Requirements(new RequirementType[] {RequirementType.CHILD, RequirementType.SIX_CONTAINERS }) },
+        { Town.DARUNIA_WEST, new Requirements(new RequirementType[] { }, new RequirementType[][] { new RequirementType[]{ RequirementType.CHILD, RequirementType.SIX_CONTAINERS }}) },
         { Town.DARUNIA_ROOF, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
         { Town.NEW_KASUTO, new Requirements(new RequirementType[] {RequirementType.SEVEN_CONTAINERS })  },
         { Town.SPELL_TOWER, new Requirements(new RequirementType[] {RequirementType.SPELL })  },

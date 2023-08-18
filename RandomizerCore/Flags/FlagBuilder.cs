@@ -15,7 +15,7 @@ namespace Z2Randomizer.Core.Flags;
 public class FlagBuilder
 {
     public List<bool> bits;
-    private static readonly string ENCODING_TABLE = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#$";
+    private static readonly string ENCODING_TABLE = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#+";
     public FlagBuilder()
     {
         bits = new List<bool>();
