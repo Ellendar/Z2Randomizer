@@ -1,0 +1,12 @@
+﻿{
+  "DisableMusic": false,
+  "FastSpellCasting": true,
+  "RemapUpAToUpSelect": false,
+  "RemoveFlashingUponDeath": true,
+  "Sprite": "Link",
+  "TunicColor": "Default",
+  "ShieldTunicColor": "Default",
+  "BeamSprite": "Default",
+  "BeepThreshold": "Normal",
+  "BeepFrequency": "Normal"
+}

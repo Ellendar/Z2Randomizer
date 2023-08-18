@@ -1454,7 +1454,7 @@ public partial class MainUI : Form
 
     private void BeginnerFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("jhEhMROm7DZ$MHRBTNBhBAh0PSmA");
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("jhEhMROm7DZ+MHRBTNBhBAh0PSmA");
         flagsTextBox.Text = config.Serialize();
     }
 

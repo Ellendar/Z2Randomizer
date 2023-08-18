@@ -1,4 +1,5 @@
-﻿using McMaster.Extensions.CommandLineUtils;
+﻿using CommandLine;
+using McMaster.Extensions.CommandLineUtils;
 using System.ComponentModel;
 using Z2Randomizer.Core;
 
@@ -18,39 +19,37 @@ public class Program
     [Option(ShortName = "s", Description = "[Optional] Seed used to generate the shuffled ROM")]
     public int? Seed { get; set; }
 
+    [Option(ShortName = "po", Description = "[Optional] Specifies a player options file to use for misc settings")]
+    public string PlayerOptions { get; }
+
     private RandomizerConfiguration? configuration;
 
     private int OnExecute()
     {
-       if (Flags == null || Flags == string.Empty)
-       {
+        if (Flags == null || Flags == string.Empty)
+        {
             Console.WriteLine("The flag string is required");
             return -1;
-       }
-
-        
+        }
 
         this.configuration = new RandomizerConfiguration(Flags);
 
-        if (Seed.HasValue) 
-        {
-            this.configuration.Seed = Seed.Value;
-        } 
-        else
+        if (!Seed.HasValue) 
         {
             var r = new Random();
             this.Seed = r.Next(1000000000);
-        }
+        } 
+        this.configuration.Seed = Seed.Value;
 
         if (Rom == null || Rom == string.Empty)
         {
             Console.WriteLine("The ROM path is required");
-            return -1;
+            return -2;
         } 
         else if (!File.Exists(Rom))
         {
             Console.WriteLine($"The specified ROM file does not exist: {Rom}");
-            return -2;
+            return -3;
         }
 
         this.configuration.FileName = Rom;
@@ -58,6 +57,10 @@ public class Program
         Console.WriteLine($"Flags: {Flags}");
         Console.WriteLine($"Rom: {Rom}");
         Console.WriteLine($"Seed: {Seed}");
+
+        var playerOptionsService = new PlayerOptionsService();
+        var playerOptions = playerOptionsService.LoadFromFile(this.PlayerOptions);
+        playerOptionsService.ApplyOptionsToConfiguration(playerOptions, configuration);
 
         Randomize();
 
@@ -68,7 +71,7 @@ public class Program
     {
         Exception generationException = null;
         var worker = new BackgroundWorker();
-        worker.DoWork += new DoWorkEventHandler(BackgroundWorker1_DoWork);
+        worker.DoWork += new DoWorkEventHandler(RandomizationWorker);
         worker.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
         worker.WorkerReportsProgress = true;
         worker.WorkerSupportsCancellation = true;
@@ -94,11 +97,11 @@ public class Program
         }
     }
 
-    private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+    private void RandomizationWorker(object sender, DoWorkEventArgs e)
     {
         BackgroundWorker worker = sender as BackgroundWorker;
 
-        new Hyrule(this.configuration, worker);
+        new Hyrule(this.configuration, worker, true);
         if (worker.CancellationPending)
         {
             e.Cancel = true;
