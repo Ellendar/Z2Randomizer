@@ -1,5 +1,15 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.5 - August 18th, 2023
+
+- Temporarily disabled Garfield sprite due to potential crashes. If you have already installed 4.2.4 it will still show up in the list, but crashes may result if you use it.
+- Fixed a bug where some palace enemies would incorrectly never shuffle. This was a combination of 4.0.4 and 4.2 bugs, so many rooms that haven't shuffled in a long time may be shuffled now. Be warned!
+- Fixed a bug where some overworld locations that always contain small items did not properly shuffle when shuffle small items was on.
+- Fixed a bug where some DM biomes almost always selected specific vertical/horizonal orientations. All biomes that have vertical/horizonal orientations are now exactly 50/50 for each option.
+- Fixed a bug that could cause caves in volcano/caldera biomes to exit into mountains.
+- Slightly decreased the maximum distance of caves in volcano/caldera. This now makes volcano and caldera's distance identical to 4.0.4 volcano (which is slightly longer and less random than 4.0.4 caldera)
+
+
 ## Version 4.2.4 - July 27th, 2023
 
 - Fixed a bug where darunia's spell was sometimes not requiring the child
