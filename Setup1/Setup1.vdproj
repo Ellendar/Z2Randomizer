@@ -118,7 +118,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:.NETFramework,Version=v4.5"
+                "FrameworkVersion" = "8:v4.5"
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -223,15 +223,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{5FA51836-DE38-46D2-9DDA-5CE3A03858D9}"
-        "PackageCode" = "8:{9D81F74E-41F1-4FF5-9927-190F9F42282A}"
+        "ProductCode" = "8:{6660A9C2-9B41-4319-B235-9C57BE1B1F40}"
+        "PackageCode" = "8:{461F353D-8CAC-4340-B90A-76421C3C617D}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.2.4"
+        "ProductVersion" = "8:4.2.5"
         "Manufacturer" = "8:digshake"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
