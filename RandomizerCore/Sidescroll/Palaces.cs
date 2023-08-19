@@ -2,12 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Speech.Synthesis;
-using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core.Sidescroll;
 

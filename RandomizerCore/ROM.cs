@@ -112,7 +112,6 @@ public class ROM
 
     private byte[] ROMData;
     private readonly Engine _engine;
-    private List<string> _modules = new ();
 
     public ROM(String filename, Engine engine)
     {
@@ -815,7 +814,7 @@ CheckController1ForUpAMagic:
   lda $f7
   cmp #$28
 """, "UpAController1.s");
-        _modules.Add(a.module());
+        _engine.Modules.Add(a.Actions);
         //Put(0x21B0, 0xF7);
         //Put(0x21B2, 0x28);
         //Put(0x21EE, 0xF7);
@@ -833,7 +832,7 @@ CheckController1ForUpAMagic:
 
     public void ApplyAsm()
     {
-        _engine.Apply(ROMData, _modules);
+        _engine.Apply(ROMData);
     }
 
     public void DashSpell()
