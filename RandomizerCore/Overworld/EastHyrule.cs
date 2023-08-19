@@ -86,6 +86,7 @@ public class EastHyrule : World
 
     public EastHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
+        isHorizontal = hy.Props.EastIsHorizontal;
         baseAddr = 0x862F;
         List<Location> locations = new();
         locations.AddRange(rom.LoadLocations(0x863E, 6, terrains, Continent.EAST));
@@ -354,7 +355,7 @@ public class EastHyrule : World
             }
 
             bytesWritten = 2000;
-            this.locationAtGP.CanShuffle = false;
+            locationAtGP.CanShuffle = false;
             Terrain riverTerrain = Terrain.MOUNTAIN;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
@@ -430,7 +431,6 @@ public class EastHyrule : World
                 }
                 else if (biome == Biome.CANYON)
                 {
-                    isHorizontal = RNG.NextDouble() > 0.5;
                     riverTerrain = water;
                     if (props.EastBiome == Biome.DRY_CANYON)
                     {
@@ -450,8 +450,6 @@ public class EastHyrule : World
                 }
                 else if (biome == Biome.VOLCANO)
                 {
-                    isHorizontal = RNG.NextDouble() > .5;
-
                     DrawCenterMountain();
 
 
@@ -580,6 +578,15 @@ public class EastHyrule : World
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
                 }
 
+                if (biome == Biome.VOLCANO || biome == Biome.CANYON)
+                {
+                    bool f = MakeVolcano();
+                    if (!f)
+                    {
+                        return false;
+                    }
+                }
+
                 bool b = PlaceLocations(riverTerrain, props.SaneCaves);
                 if (!b)
                 {
@@ -612,6 +619,7 @@ public class EastHyrule : World
                     }
                 }
 
+                /*
                 if (biome == Biome.VOLCANO || biome == Biome.CANYON)
                 {
                     bool f = MakeVolcano();
@@ -620,6 +628,7 @@ public class EastHyrule : World
                         return false;
                     }
                 }
+                */
                 PlaceHiddenLocations();
                 if (biome == Biome.VANILLALIKE)
                 {
@@ -696,6 +705,7 @@ public class EastHyrule : World
         }
         int palacex = RNG.Next(xmin, xmax);
         int palacey = RNG.Next(ymin, ymax);
+        
         if (biome == Biome.VOLCANO || biome == Biome.CANYON)
         {
             bool placeable = false;
@@ -755,7 +765,6 @@ public class EastHyrule : World
         int length = 20;
         if (biome != Biome.CANYON && biome != Biome.VOLCANO)
         {
-            this.isHorizontal = RNG.NextDouble() > .5;
             length = RNG.Next(5, 16);
         }
         int deltax = 1;
@@ -852,7 +861,11 @@ public class EastHyrule : World
             int minadjust = -1;
             int maxadjust = 2;
             int c = 0;
-            while (startx > 1 && startx < MAP_COLS - 1 && starty > 1 && starty < MAP_ROWS - 1 && (((biome == Biome.VOLCANO || biome == Biome.CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || ((biome != Biome.VOLCANO && biome != Biome.CANYON) && c < length)))
+            while (startx > 1 
+                && startx < MAP_COLS - 1 
+                && starty > 1 
+                && starty < MAP_ROWS - 1 
+                && (((biome == Biome.VOLCANO || biome == Biome.CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || (biome != Biome.VOLCANO && biome != Biome.CANYON && c < length)))
             {
                 c++;
                 map[starty, startx] = Terrain.LAVA;
@@ -1164,7 +1177,6 @@ public class EastHyrule : World
                     }
                     vodcave1.Xpos = startx;
                     vodcave1.Ypos = starty + 30;
-
 
                     if (RNG.NextDouble() > .5 && vodRoutes != 2 && biome == Biome.VOLCANO)
                     {

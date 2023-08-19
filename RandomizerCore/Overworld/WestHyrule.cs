@@ -95,6 +95,7 @@ public class WestHyrule : World
 
     public WestHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
+        isHorizontal = hy.Props.WestIsHorizontal;
         List<Location> locations = new();
         locations.AddRange(rom.LoadLocations(0x4639, 4, terrains, Continent.WEST));
         locations.AddRange(rom.LoadLocations(0x4640, 2, terrains, Continent.WEST));
@@ -106,6 +107,7 @@ public class WestHyrule : World
         locations.AddRange(rom.LoadLocations(0x465B, 2, terrains, Continent.WEST));
         locations.AddRange(rom.LoadLocations(0x465E, 8, terrains, Continent.WEST));
         locations.ForEach(AddLocation);
+
         start = GetLocationByMap(0x80, 0x00);
         //reachableAreas = new HashSet<string>();
         Location jumpCave = GetLocationByMap(9, 0);
@@ -456,7 +458,6 @@ public class WestHyrule : World
                         break;
 
                     case Biome.CANYON:
-                        isHorizontal = RNG.NextDouble() > .5;
                         riverTerrain = fillerWater;
                         if (props.WestBiome == Biome.DRY_CANYON)
                         {
@@ -475,7 +476,6 @@ public class WestHyrule : World
                         //this.randomTerrains.Add(terrain.lava);
                         break;
                     case Biome.CALDERA:
-                        this.isHorizontal = RNG.NextDouble() > .5;
                         DrawCenterMountain();
                         locationAtPalace3.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
@@ -1366,8 +1366,8 @@ public class WestHyrule : World
                         if (
                             location.NeedBagu 
                             && (bagu.Reachable 
-                                || spellGet[Spell.FAIRY] 
-                                || spellGet[Spell.DASH] && spellGet[Spell.JUMP]))
+                                || hyrule.SpellGet[Spell.FAIRY] 
+                                || (hyrule.SpellGet.ContainsKey(Spell.DASH) && hyrule.SpellGet[Spell.DASH] && hyrule.SpellGet[Spell.JUMP])))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;
