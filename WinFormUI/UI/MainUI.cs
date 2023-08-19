@@ -1460,19 +1460,19 @@ public partial class MainUI : Form
 
     private void StandardFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA");
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9+78+Jp5++gAhOAdEScuA");
         flagsTextBox.Text = config.Serialize();
     }
 
     private void MaxRandoFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7@$ZqTBT!BhOA!0P@@A");
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh+j#g7@+ZqTBT!BhOA!0P@@A");
         flagsTextBox.Text = config.Serialize();
     }
 
     private void RandomPercentFlags(object sender, EventArgs e)
     {
-        RandomizerConfiguration config = new("hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy");
+        RandomizerConfiguration config = new("hEAK0sALvrpUWVXu20Y+8v9ttf9tb7AAJy");
         flagsTextBox.Text = config.Serialize();
     }
 
