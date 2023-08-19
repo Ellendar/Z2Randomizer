@@ -95,7 +95,7 @@ public class WestHyrule : World
 
     public WestHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        isHorizontal = hy.Props.WestIsHorizontal;
+        isHorizontal = props.WestIsHorizontal;
         List<Location> locations = new();
         locations.AddRange(rom.LoadLocations(0x4639, 4, terrains, Continent.WEST));
         locations.AddRange(rom.LoadLocations(0x4640, 2, terrains, Continent.WEST));
@@ -1366,8 +1366,8 @@ public class WestHyrule : World
                         if (
                             location.NeedBagu 
                             && (bagu.Reachable 
-                                || hyrule.SpellGet[Spell.FAIRY] 
-                                || (hyrule.SpellGet.ContainsKey(Spell.DASH) && hyrule.SpellGet[Spell.DASH] && hyrule.SpellGet[Spell.JUMP])))
+                                || spellGet[Spell.FAIRY] 
+                                || (spellGet.ContainsKey(Spell.DASH) && spellGet[Spell.DASH] && spellGet[Spell.JUMP])))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;

@@ -65,8 +65,7 @@ class DeathMountain : World
         locations.AddRange(rom.LoadLocations(0x6144, 1, terrains, Continent.DM));
         locations.ForEach(AddLocation);
 
-        //isHorizontal = hy.Props.DmIsHorizontal;
-        isHorizontal = true;
+        isHorizontal = props.DmIsHorizontal;
 
         hammerCave = GetLocationByMem(0x6128);
         magicCave = GetLocationByMem(0x6144);

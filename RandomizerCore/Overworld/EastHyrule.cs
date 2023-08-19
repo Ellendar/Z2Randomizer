@@ -86,7 +86,7 @@ public class EastHyrule : World
 
     public EastHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        isHorizontal = hy.Props.EastIsHorizontal;
+        isHorizontal = props.EastIsHorizontal;
         baseAddr = 0x862F;
         List<Location> locations = new();
         locations.AddRange(rom.LoadLocations(0x863E, 6, terrains, Continent.EAST));
