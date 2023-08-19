@@ -13,16 +13,15 @@ public class Util
         return (byte)(((b * 0x80200802ul) & 0x0884422110ul) * 0x0101010101ul >> 32);
     }
 
-    public static List<char> ToGameText(string s2, bool endByte)
+    public static List<char> ToGameText(string rawText, bool endByte)
     {
-        s2 = s2.ToUpper();
-        List<char> s = s2.ToCharArray().ToList();
+        List<char> s = rawText.ToUpper().ToCharArray().ToList();
         for (int i = 0; i < s.Count; i++)
         {
             if (s[i] >= '0' && s[i] <= '9')
-                s[i] += (char)(0xd0 - '0');
+                s[i] += (char)0xA0;
             else if (s[i] >= 'A' && s[i] <= 'Z')
-                s[i] += (char)(0xda - 'A');
+                s[i] += (char)0x99;
             else if (s[i] == '.')
                 s[i] = (char)0xcf;
             else if (s[i] == '/')
@@ -41,6 +40,10 @@ public class Util
                 s[i] = (char)0xfd;
             else if (s[i] == '$')
                 s[i] = (char)0xfd;
+            else if (s[i] == '-')
+                s[i] = (char)0xf6;
+            else if (s[i] == '_')
+                s[i] = (char)0xc5;
         }
         if (endByte)
         {

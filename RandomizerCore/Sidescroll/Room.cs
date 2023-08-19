@@ -1,21 +1,9 @@
 ﻿using Newtonsoft.Json;
 using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.OleDb;
-using System.Dynamic;
 using System.Linq;
-using System.Speech.Synthesis;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using System.Drawing;
-using System.Diagnostics;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Numerics;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -23,40 +11,12 @@ public class Room
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    //private int map;
-    //private byte[] Connections;
-    //private byte[] Enemies;
-    //private byte[] sideView;
-    //private int leftByte;
-    //private int rightByte;
     private int upByte;
     private int downByte;
-    //private Room left;
-    //private Room right;
     private Room up;
     private Room down;
-    //private bool isRoot;
-    //private bool isReachable;
-    //private bool beforeTbird;
-    //private int memAddr;
-    //private bool isDeadEnd;
-    //private bool isPlaced;
     public bool isUpDownReversed;
-    //private bool fairyBlocked;
-    //private bool upstabBlocked;
-    //private bool downstabBlocked;
-    //private bool gloveBlocked;
-    //private bool jumpBlocked;
-    //private bool HasItem;
-    //private bool HasBoss;
-    //private bool hasDrop;
-    //private int ElevatorScreen;
-    //private bool dropZone;
-    //private int Newmap;
 
-    //private const int palace125EnemyPtr = 0x105B1;
-    //private const int palace346EnemyPtr = 0x1208E;
-    //private const int gpEnemyPtr = 0x145B1;
     private const int sideview1 = 0x10533;
     private const int sideview2 = 0x12010;
     private const int sideview3 = 0x14533;
@@ -578,41 +538,59 @@ public class Room
 
     public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)
     {
-        int[] allEnemies = PalaceGroup switch
+        int[] allEnemies;
+        int[] smallEnemies;
+        int[] largeEnemies;
+        int[] flyingEnemies;
+        int[] generators;
+        //Because a 125 room could be shuffled into 346 or vice versa, we have to check if the enemy is that type in either
+        //palace group, and if so, shuffle that enemy into a new enemy specifically appropriate to that palace
+        int[] shufflableEnemies;
+        int[] shufflableSmallEnemies;
+        int[] shufflableLargeEnemies;
+        int[] shufflableFlyingEnemies;
+        int[] shufflableGenerators;
+        switch (PalaceGroup)
         {
-            1 => Z2Randomizer.Core.Enemies.Palace125Enemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346Enemies,
-            3 => Z2Randomizer.Core.Enemies.GPEnemies,
-            _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
-        };
-        int[] smallEnemies = PalaceGroup switch
-        {
-            1 => Z2Randomizer.Core.Enemies.Palace125SmallEnemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346SmallEnemies,
-            3 => Z2Randomizer.Core.Enemies.GPSmallEnemies,
-            _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
-        };
-        int[] largeEnemies = PalaceGroup switch
-        {
-            1 => Z2Randomizer.Core.Enemies.Palace125LargeEnemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346LargeEnemies,
-            3 => Z2Randomizer.Core.Enemies.GPLargeEnemies,
-            _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
-        };
-        int[] flyingEnemies = PalaceGroup switch
-        {
-            1 => Z2Randomizer.Core.Enemies.Palace125FlyingEnemies,
-            2 => Z2Randomizer.Core.Enemies.Palace346FlyingEnemies,
-            3 => Z2Randomizer.Core.Enemies.GPFlyingEnemies,
-            _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
-        };
-        int[] generators = PalaceGroup switch
-        {
-            1 => Z2Randomizer.Core.Enemies.Palace125Generators,
-            2 => Z2Randomizer.Core.Enemies.Palace346Generators,
-            3 => Z2Randomizer.Core.Enemies.GPGenerators,
-            _ => throw new Exception("Invalid Palace Group: " + PalaceGroup)
-        };
+            case 1:
+                allEnemies = Core.Enemies.Palace125Enemies;
+                smallEnemies = Core.Enemies.Palace125SmallEnemies;
+                largeEnemies = Core.Enemies.Palace125LargeEnemies;
+                flyingEnemies = Core.Enemies.Palace125FlyingEnemies;
+                generators = Core.Enemies.Palace125Generators;
+                shufflableEnemies = Core.Enemies.StandardPalaceEnemies;
+                shufflableSmallEnemies = Core.Enemies.StandardPalaceSmallEnemies;
+                shufflableLargeEnemies = Core.Enemies.StandardPalaceLargeEnemies;
+                shufflableFlyingEnemies = Core.Enemies.StandardPalaceFlyingEnemies;
+                shufflableGenerators = Core.Enemies.StandardPalaceGenerators;
+                break;
+            case 2:
+                allEnemies = Core.Enemies.Palace346Enemies;
+                smallEnemies = Core.Enemies.Palace346SmallEnemies;
+                largeEnemies = Core.Enemies.Palace346LargeEnemies;
+                flyingEnemies = Core.Enemies.Palace346FlyingEnemies;
+                generators = Core.Enemies.Palace346Generators;
+                shufflableEnemies = Core.Enemies.StandardPalaceEnemies;
+                shufflableSmallEnemies = Core.Enemies.StandardPalaceSmallEnemies;
+                shufflableLargeEnemies = Core.Enemies.StandardPalaceLargeEnemies;
+                shufflableFlyingEnemies = Core.Enemies.StandardPalaceFlyingEnemies;
+                shufflableGenerators = Core.Enemies.StandardPalaceGenerators;
+                break;
+            case 3:
+                allEnemies = Core.Enemies.GPEnemies;
+                smallEnemies = Core.Enemies.GPSmallEnemies;
+                largeEnemies = Core.Enemies.GPLargeEnemies;
+                flyingEnemies = Core.Enemies.GPFlyingEnemies;
+                generators = Core.Enemies.GPGenerators;
+                shufflableEnemies = Core.Enemies.GPEnemies;
+                shufflableSmallEnemies = Core.Enemies.GPSmallEnemies;
+                shufflableLargeEnemies = Core.Enemies.GPLargeEnemies;
+                shufflableFlyingEnemies = Core.Enemies.GPFlyingEnemies;
+                shufflableGenerators = Core.Enemies.GPGenerators;
+                break;
+            default:
+                throw new ImpossibleException("Invalid Palace Group");
+        }
 
         int? firstGenerator = null;
         int enemiesLength = (int)Enemies[0] - 1;
@@ -625,34 +603,35 @@ public class Room
             if (mixEnemies)
             {
                 //If this is a shufflable enemy (As opposed to something like a crystal marker)
-                if (allEnemies.Contains(enemyNumber))
+                if (shufflableEnemies.Contains(enemyNumber))
                 {
-                    int swap = allEnemies[RNG.Next(0, allEnemies.Length)];
+                    int swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
                     int ypos = Enemies[i] & 0xF0;
                     int xpos = Enemies[i] & 0x0F;
-                    if (smallEnemies.Contains(enemyNumber) && largeEnemies.Contains(swap))
+                    if (shufflableSmallEnemies.Contains(enemyNumber) && shufflableLargeEnemies.Contains(swapEnemy))
                     {
-                        ypos = ypos - 16;
-                        while (swap == 0x1D && ypos != 0x70 && PalaceGroup != 3)
+                        ypos -= 16;
+                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != 3)
                         {
-                            swap = largeEnemies[RNG.Next(0, largeEnemies.Length)];
+                            swapEnemy = largeEnemies[RNG.Next(0, largeEnemies.Length)];
                         }
                     }
                     else
                     {
-                        while (swap == 0x1D && ypos != 0x70 && PalaceGroup != 3)
+                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != 3)
                         {
-                            swap = allEnemies[RNG.Next(0, allEnemies.Length)];
+                            swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
                         }
                     }
 
                     NewEnemies[i] = (byte)(ypos + xpos);
-                    NewEnemies[i + 1] = (byte)(enemyPage + swap);
+                    NewEnemies[i + 1] = (byte)(enemyPage + swapEnemy);
+                    continue;
                 }
             }
             else
             {
-                if (largeEnemies.Contains(enemyNumber))
+                if (shufflableLargeEnemies.Contains(enemyNumber))
                 {
                     int swap = RNG.Next(0, largeEnemies.Length);
                     int ypos = Enemies[i] & 0xF0;
@@ -662,16 +641,18 @@ public class Room
                         swap = RNG.Next(0, largeEnemies.Length);
                     }
                     NewEnemies[i + 1] = (byte)(largeEnemies[swap] + enemyPage);
+                    continue;
                 }
-                else if (smallEnemies.Contains(enemyNumber))
+                else if (shufflableSmallEnemies.Contains(enemyNumber))
                 { 
                     int swap = RNG.Next(0, smallEnemies.Length);
                     NewEnemies[i+1] = (byte)(smallEnemies[swap] + enemyPage);
+                    continue;
                 }
             }
 
 
-            if (flyingEnemies.Contains(enemyNumber))
+            if (shufflableFlyingEnemies.Contains(enemyNumber))
             {
                 int swap = RNG.Next(0, flyingEnemies.Length);
                 while (enemyNumber == 0x07 && (flyingEnemies[swap] == 0x06 || flyingEnemies[swap] == 0x0E))
@@ -679,45 +660,28 @@ public class Room
                     swap = RNG.Next(0, flyingEnemies.Length);
                 }
                 NewEnemies[i + 1] = (byte)(flyingEnemies[swap] + enemyPage);
+                continue;
             }
 
-            if (generators.Contains(enemyNumber))
+            if (shufflableGenerators.Contains(enemyNumber))
             {
                 int swap = RNG.Next(0, generators.Length);
-                if(firstGenerator == null)
-                {
-                    firstGenerator = swap;
-                }
+                firstGenerator ??= swap;
                 if (generatorsAlwaysMatch)
                 {
                     NewEnemies[i + 1] = (byte)(generators[firstGenerator ?? 0] + enemyPage);
+                    continue;
                 }
                 else
                 {
                     NewEnemies[i + 1] = (byte)(generators[swap] + enemyPage);
+                    continue;
                 }
             }
-
-            //This used to make specifically ra head generators (but not any other generator) more likely to be vanilla by adding
-            //it to the shuffle pool an extra time. Why? Who the fuck knows. After polling the community, most didn't care
-            //some wanted it removed, and nobody wanted to keep it. So it goes.
-            /*
-            if (enemyNumber == 0x0B)
-            {
-                int swap = RNG.Next(0, generators.Length + 1);
-                if (swap != generators.Length)
-                {
-                    NewEnemies[i + 1] = (byte)(generators[swap] + enemyPage);
-                }
-            }
-            */
 
             //If this is not a shufflable enemy, just copy it as is.
-            if(!(allEnemies.Contains(enemyNumber)))
-            {
-                NewEnemies[i] = Enemies[i];
-                NewEnemies[i + 1] = Enemies[i + 1];
-            }
+            NewEnemies[i] = Enemies[i];
+            NewEnemies[i + 1] = Enemies[i + 1];
         }
     }
 
@@ -859,7 +823,7 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WriteValue(BitConverter.ToString(value.Connections).Replace("-", ""));
 
         writer.WritePropertyName("enemies");
-        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
+        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies.Length == 0 || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
 
         writer.WritePropertyName("sideviewData");
         writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));

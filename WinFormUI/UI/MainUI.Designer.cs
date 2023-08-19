@@ -1201,6 +1201,7 @@ partial class MainUI
         allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
         toolTip1.SetToolTip(allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
         allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
+        allowPathEnemiesCheckbox.CheckStateChanged += shuffleEncounters_CheckStateChanged;
         // 
         // shuffleEncountersCheckbox
         // 
