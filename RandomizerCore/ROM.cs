@@ -2,9 +2,12 @@
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
+using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
 
@@ -974,4 +977,322 @@ public class ROM
 
     private static readonly IDictionary<byte, char> ReverseCharMap = CharMap.ToDictionary(x => x.Value, x => x.Key);
 
+    public Terrain[,] ReadVanillaMap(ROM romData, int mapAddr, int mapRows, int mapCols)
+    {
+        int addr = mapAddr;
+        int i = 0;
+        int j = 0;
+        Terrain[,] map = new Terrain[mapRows, mapCols];
+        while (i < mapRows)
+        {
+            j = 0;
+            while (j < mapCols)
+            {
+                byte data = romData.GetByte(addr);
+                int count = (data & 0xF0) >> 4;
+                count++;
+                Terrain t = (Terrain)(data & 0x0F);
+                for (int k = 0; k < count; k++)
+                {
+                    map[i, j + k] = t;
+                }
+                j += count;
+                addr++;
+            }
+            i++;
+        }
+
+        return map;
+    }
+
+    public List<Location> LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> Terrains, Continent continent)
+    {
+        List<Location> locations = new List<Location>();
+        for (int i = 0; i < locNum; i++)
+        {
+            byte[] bytes = new Byte[4] { 
+                GetByte(startAddr + i), 
+                GetByte(startAddr + RomMap.overworldXOffset + i), 
+                GetByte(startAddr + RomMap.overworldMapOffset + i), 
+                GetByte(startAddr + RomMap.overworldWorldOffset + i) };
+            locations.Add(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
+        }
+        return locations;
+    }
+
+    public Location LoadLocation(int addr, Terrain t, Continent c)
+    {
+        byte[] bytes = new Byte[4] { 
+            GetByte(addr), 
+            GetByte(addr + RomMap.overworldXOffset), 
+            GetByte(addr + RomMap.overworldMapOffset), 
+            GetByte(addr + RomMap.overworldWorldOffset) };
+        return new Location(bytes, t, addr, c);
+    }
+
+    public void RemoveUnusedConnectors(World world)
+    {
+        if (world.raft == null)
+        {
+            Put(world.baseAddr + 41, 0x00);
+        }
+
+        if (world.bridge == null)
+        {
+            Put(world.baseAddr + 40, 0x00);
+        }
+
+        if (world.cave1 == null)
+        {
+            Put(world.baseAddr + 42, 0x00);
+        }
+
+        if (world.cave2 == null)
+        {
+            Put(world.baseAddr + 43, 0x00);
+        }
+    }
+
+    //This was refactored out of EastHyrule. The signature/timing/structure needs work.
+    public void UpdateHiddenPalaceSpot(Biome biome, Location hiddenPalaceCallSpot, Location hiddenPalaceLocation, 
+        Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
+    {
+        if (biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE)
+        {
+            Put(0x8382, (byte)hiddenPalaceCallSpot.Ypos);
+            Put(0x8388, (byte)hiddenPalaceCallSpot.Xpos);
+        }
+        int pos = hiddenPalaceLocation.Ypos;
+
+        Put(0x1df78, (byte)(pos + hiddenPalaceLocation.ExternalWorld));
+        Put(0x1df84, 0xff);
+        Put(0x1ccc0, (byte)pos);
+        int connection = hiddenPalaceLocation.MemAddress - 0x862F;
+        Put(0x1df76, (byte)connection);
+        hiddenPalaceLocation.NeedRecorder = true;
+        if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
+        {
+            townAtNewKasuto.NeedRecorder = true;
+            spellTower.NeedRecorder = true;
+        }
+        if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
+        {
+            Put(0x1df74, (byte)hiddenPalaceLocation.TerrainType);
+            if (hiddenPalaceLocation.TerrainType == Terrain.PALACE)
+            {
+                Put(0x1df7d, 0x60);
+                Put(0x1df82, 0x61);
+
+                Put(0x1df7e, 0x62);
+
+                Put(0x1df83, 0x63);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.SWAMP)
+            {
+                Put(0x1df7d, 0x6F);
+                Put(0x1df82, 0x6F);
+
+                Put(0x1df7e, 0x6F);
+
+                Put(0x1df83, 0x6F);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.LAVA || hiddenPalaceLocation.TerrainType == Terrain.WALKABLEWATER)
+            {
+                Put(0x1df7d, 0x6E);
+                Put(0x1df82, 0x6E);
+
+                Put(0x1df7e, 0x6E);
+
+                Put(0x1df83, 0x6E);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.FOREST)
+            {
+                Put(0x1df7d, 0x68);
+                Put(0x1df82, 0x69);
+
+                Put(0x1df7e, 0x6A);
+
+                Put(0x1df83, 0x6B);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.GRAVE)
+            {
+                Put(0x1df7d, 0x70);
+                Put(0x1df82, 0x71);
+
+                Put(0x1df7e, 0x7F);
+
+                Put(0x1df83, 0x7F);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.ROAD)
+            {
+                Put(0x1df7d, 0xFE);
+                Put(0x1df82, 0xFE);
+
+                Put(0x1df7e, 0xFE);
+
+                Put(0x1df83, 0xFE);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.BRIDGE)
+            {
+                Put(0x1df7d, 0x5A);
+                Put(0x1df82, 0x5B);
+
+                Put(0x1df7e, 0x5A);
+
+                Put(0x1df83, 0x5B);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.CAVE)
+            {
+                Put(0x1df7d, 0x72);
+                Put(0x1df82, 0x73);
+
+                Put(0x1df7e, 0x72);
+
+                Put(0x1df83, 0x73);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.DESERT)
+            {
+                Put(0x1df7d, 0x6C);
+                Put(0x1df82, 0x6C);
+
+                Put(0x1df7e, 0x6C);
+
+                Put(0x1df83, 0x6C);
+            }
+            else if (hiddenPalaceLocation.TerrainType == Terrain.TOWN)
+            {
+                Put(0x1df7d, 0x5C);
+                Put(0x1df82, 0x5D);
+
+                Put(0x1df7e, 0x5E);
+
+                Put(0x1df83, 0x5F);
+            }
+        }
+
+        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.Ypos % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.Ypos % 30 / 15);
+        int ppu_addr2 = ppu_addr1 + 32;
+        int ppu1low = ppu_addr1 & 0x00ff;
+        int ppu1high = (ppu_addr1 >> 8) & 0xff;
+        int ppu2low = ppu_addr2 & 0x00ff;
+        int ppu2high = (ppu_addr2 >> 8) & 0xff;
+        Put(0x1df7a, (byte)ppu1high);
+        Put(0x1df7b, (byte)ppu1low);
+        Put(0x1df7f, (byte)ppu2high);
+        Put(0x1df80, (byte)ppu2low);
+
+    }
+
+    public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
+        int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
+    {
+        Put(0x1df79, (byte)(hiddenKasutoLocation.Ypos + hiddenKasutoLocation.ExternalWorld));
+        Put(0x1dfac, (byte)(hiddenKasutoLocation.Ypos - 30));
+        Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
+        Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + hiddenKasutoLocation.Secondpartofcave));
+        Put(0x1ccdb, (byte)(hiddenKasutoLocation.Ypos));
+        int connection = hiddenKasutoLocation.MemAddress - baseAddr;
+        Put(0x1df77, (byte)connection);
+        hiddenKasutoLocation.NeedHammer = true;
+        if (hiddenKasutoLocation == townAtNewKasuto || hiddenKasutoLocation == spellTower)
+        {
+            townAtNewKasuto.NeedHammer = true;
+            spellTower.NeedHammer = true;
+        }
+        if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
+        {
+            //Terrain t = terrains[hiddenKasutoLocation.MemAddress];
+            Put(0x1df75, (byte)hiddenKasutoTerrain);
+            if (hiddenKasutoTerrain == Terrain.PALACE)
+            {
+                Put(0x1dfb6, 0x60);
+                Put(0x1dfbb, 0x61);
+
+                Put(0x1dfc0, 0x62);
+
+                Put(0x1dfc5, 0x63);
+            }
+            else if (hiddenKasutoTerrain == Terrain.SWAMP)
+            {
+                Put(0x1dfb6, 0x6F);
+                Put(0x1dfbb, 0x6F);
+
+                Put(0x1dfc0, 0x6F);
+
+                Put(0x1dfc5, 0x6F);
+            }
+            else if (hiddenKasutoTerrain == Terrain.LAVA || hiddenKasutoTerrain == Terrain.WALKABLEWATER)
+            {
+                Put(0x1dfb6, 0x6E);
+                Put(0x1dfbb, 0x6E);
+
+                Put(0x1dfc0, 0x6E);
+
+                Put(0x1dfc5, 0x6E);
+            }
+            else if (hiddenKasutoTerrain == Terrain.FOREST)
+            {
+                Put(0x1dfb6, 0x68);
+                Put(0x1dfbb, 0x69);
+
+                Put(0x1dfc0, 0x6A);
+
+                Put(0x1dfc5, 0x6B);
+            }
+            else if (hiddenKasutoTerrain == Terrain.GRAVE)
+            {
+                Put(0x1dfb6, 0x70);
+                Put(0x1dfbb, 0x71);
+
+                Put(0x1dfc0, 0x7F);
+
+                Put(0x1dfc5, 0x7F);
+            }
+            else if (hiddenKasutoTerrain == Terrain.ROAD)
+            {
+                Put(0x1dfb6, 0xFE);
+                Put(0x1dfbb, 0xFE);
+
+                Put(0x1dfc0, 0xFE);
+
+                Put(0x1dfc5, 0xFE);
+            }
+            else if (hiddenKasutoTerrain == Terrain.BRIDGE)
+            {
+                Put(0x1dfb6, 0x5A);
+                Put(0x1dfbb, 0x5B);
+
+                Put(0x1dfc0, 0x5A);
+
+                Put(0x1dfc5, 0x5B);
+            }
+            else if (hiddenKasutoTerrain == Terrain.CAVE)
+            {
+                Put(0x1dfb6, 0x72);
+                Put(0x1dfbb, 0x73);
+
+                Put(0x1dfc0, 0x72);
+
+                Put(0x1dfc5, 0x73);
+            }
+            else if (hiddenKasutoTerrain == Terrain.DESERT)
+            {
+                Put(0x1dfb6, 0x6C);
+                Put(0x1dfbb, 0x6C);
+
+                Put(0x1dfc0, 0x6C);
+
+                Put(0x1dfc5, 0x6C);
+            }
+            else if (hiddenKasutoTerrain == Terrain.TOWN)
+            {
+                Put(0x1dfb6, 0x5C);
+                Put(0x1dfbb, 0x5D);
+
+                Put(0x1dfc0, 0x5E);
+
+                Put(0x1dfc5, 0x5F);
+            }
+        }
+    }
 }

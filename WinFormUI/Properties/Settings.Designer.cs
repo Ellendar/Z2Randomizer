@@ -264,7 +264,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
    <string>Name|Beginner</string>
-   <string>Flagset|RAhN6EAAFAViN1TRtcA$9TFCVAnTzFAmLh</string>
+   <string>Flagset|RAhN6EAAFAViN1TRtcA+9TFCVAnTzFAmLh</string>
    <string>Tooltip|This is great for people looking for a casual experience</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection customFlagsButton1
@@ -284,7 +284,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <string>Name|Standard</string>
-  <string>Flagset|RAAN6AAFesXtN1Tdt0g$8v4cYf4XT7AAWA</string>
+  <string>Flagset|RAAN6AAFesXtN1Tdt0g+8v4cYf4XT7AAWA</string>
   <string>Tooltip|Flags for the 2023 Standard Tournament</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection customFlagsButton2
@@ -304,7 +304,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <string>Name|Max Rando</string>
-  <string>Flagset|hEAjMsAFerXtN1TbkkH$8v4TX#4XS7AALy</string>
+  <string>Flagset|hEAjMsAFerXtN1TbkkH+8v4TX#4XS7AALy</string>
   <string>Tooltip|Flags for the 2023 Max Rando Tournament</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection customFlagsButton3
@@ -324,7 +324,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
   <string>Name|Random%</string>
-  <string>Flagset|hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy</string>
+  <string>Flagset|hEAK0sALvrpUWVXu20Y+8v9ttf9tb7AAJy</string>
   <string>Tooltip|Is it randomized? Who knows?</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection customFlagsButton4

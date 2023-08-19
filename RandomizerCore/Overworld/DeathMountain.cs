@@ -1,10 +1,6 @@
-﻿using Z2Randomizer.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Z2Randomizer.Core;
 
 namespace Z2Randomizer.Core.Overworld;
 
@@ -61,12 +57,13 @@ class DeathMountain : World
 
     private const int MAP_ADDR = 0x7a00;
 
-    public DeathMountain(Hyrule hy)
-        : base(hy)
+    public DeathMountain(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        LoadLocations(0x610C, 37, terrains, Continent.DM);
+        List<Location> locations = new();
+        locations.AddRange(rom.LoadLocations(0x610C, 37, terrains, Continent.DM));
         //loadLocations(0x6136, 2, terrains, continent.dm);
-        LoadLocations(0x6144, 1, terrains, Continent.DM);
+        locations.AddRange(rom.LoadLocations(0x6144, 1, terrains, Continent.DM));
+        locations.ForEach(AddLocation);
 
         //isHorizontal = hy.Props.DmIsHorizontal;
         isHorizontal = true;
@@ -132,34 +129,34 @@ class DeathMountain : World
         baseAddr = 0x610C;
         VANILLA_MAP_ADDR = 0x665c;
 
-        if (hy.Props.DmBiome == Biome.ISLANDS)
+        if (props.DmBiome == Biome.ISLANDS)
         {
-            this.biome = Biome.ISLANDS;
+            biome = Biome.ISLANDS;
         }
-        else if (hy.Props.DmBiome == Biome.CANYON || hy.Props.DmBiome == Biome.DRY_CANYON)
+        else if (props.DmBiome == Biome.CANYON || props.DmBiome == Biome.DRY_CANYON)
         {
-            this.biome = Biome.CANYON;
+            biome = Biome.CANYON;
             //MAP_ROWS = 75;
         }
-        else if(hy.Props.DmBiome == Biome.CALDERA)
+        else if(props.DmBiome == Biome.CALDERA)
         {
-            this.biome = Biome.CALDERA;
+            biome = Biome.CALDERA;
         }
-        else if(hy.Props.DmBiome == Biome.MOUNTAINOUS)
+        else if(props.DmBiome == Biome.MOUNTAINOUS)
         {
-            this.biome = Biome.MOUNTAINOUS;
+            biome = Biome.MOUNTAINOUS;
         }
-        else if(hy.Props.DmBiome == Biome.VANILLA)
+        else if(props.DmBiome == Biome.VANILLA)
         {
-            this.biome = Biome.VANILLA;
+            biome = Biome.VANILLA;
         }
-        else if(hy.Props.DmBiome == Biome.VANILLA_SHUFFLE)
+        else if(props.DmBiome == Biome.VANILLA_SHUFFLE)
         {
-            this.biome = Biome.VANILLA_SHUFFLE;
+            biome = Biome.VANILLA_SHUFFLE;
         }
         else
         {
-            this.biome = Biome.VANILLALIKE;
+            biome = Biome.VANILLALIKE;
         }
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
@@ -167,10 +164,10 @@ class DeathMountain : World
         
     }
 
-    public bool Terraform()
+    public override bool Terraform(RandomizerProperties props, ROM rom)
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.CanWalkOnWaterWithBoots)
+        if (props.CanWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }
@@ -181,15 +178,15 @@ class DeathMountain : World
         {
             location.CanShuffle = true;
         }
-        if (this.biome == Biome.VANILLA || this.biome == Biome.VANILLA_SHUFFLE)
+        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
             MAP_ROWS = 75;
             MAP_COLS = 64;
-            ReadVanillaMap();
-            if (this.biome == Biome.VANILLA_SHUFFLE)
+            map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
+            if (biome == Biome.VANILLA_SHUFFLE)
             {
                 ShuffleLocations(AllLocations);
-                if (hyrule.Props.VanillaShuffleUsesActualTerrain)
+                if (props.VanillaShuffleUsesActualTerrain)
                 {
                     magicCave.TerrainType = Terrain.ROCK;
                     foreach (Location location in AllLocations)
@@ -219,7 +216,7 @@ class DeathMountain : World
             {
                 map = new Terrain[MAP_ROWS, MAP_COLS];
                 Terrain riverT = Terrain.MOUNTAIN;
-                if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA && this.biome != Biome.ISLANDS)
+                if (biome != Biome.CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
@@ -244,7 +241,7 @@ class DeathMountain : World
                     }
                 }
 
-                if (this.biome == Biome.ISLANDS)
+                if (biome == Biome.ISLANDS)
                 {
                     riverT = water;
                     for (int i = 0; i < MAP_COLS; i++)
@@ -259,14 +256,14 @@ class DeathMountain : World
                         map[i, MAP_COLS - 1] = water;
                     }
 
-                    int cols = hyrule.RNG.Next(2, 4);
-                    int rows = hyrule.RNG.Next(2, 4);
+                    int cols = RNG.Next(2, 4);
+                    int rows = RNG.Next(2, 4);
                     List<int> pickedC = new List<int>();
                     List<int> pickedR = new List<int>();
 
                     while (cols > 0)
                     {
-                        int col = hyrule.RNG.Next(1, MAP_COLS);
+                        int col = RNG.Next(1, MAP_COLS);
                         if (!pickedC.Contains(col))
                         {
                             for (int i = 0; i < MAP_ROWS; i++)
@@ -283,7 +280,7 @@ class DeathMountain : World
 
                     while (rows > 0)
                     {
-                        int row = hyrule.RNG.Next(5, MAP_ROWS - 6);
+                        int row = RNG.Next(5, MAP_ROWS - 6);
                         if (!pickedR.Contains(row))
                         {
                             for (int i = 0; i < MAP_COLS; i++)
@@ -294,10 +291,10 @@ class DeathMountain : World
                                 }
                                 else if (map[row, i] == water)
                                 {
-                                    int adjust = hyrule.RNG.Next(-3, 4);
+                                    int adjust = RNG.Next(-3, 4);
                                     while (row + adjust < 1 || row + adjust > MAP_ROWS - 2)
                                     {
-                                        adjust = hyrule.RNG.Next(-3, 4);
+                                        adjust = RNG.Next(-3, 4);
                                     }
                                     row += adjust;
                                 }
@@ -310,12 +307,12 @@ class DeathMountain : World
 
 
                 }
-                else if (this.biome == Biome.CANYON)
+                else if (biome == Biome.CANYON)
                 {
                     riverT = water;
-                    horizontal = hyrule.RNG.NextDouble() > 0.5;
+                    horizontal = RNG.NextDouble() > 0.5;
 
-                    if (hyrule.Props.WestBiome == Biome.DRY_CANYON)
+                    if (props.WestBiome == Biome.DRY_CANYON)
                     {
                         riverT = Terrain.DESERT;
                     }
@@ -335,11 +332,11 @@ class DeathMountain : World
                     //this.randomTerrains.Add(terrain.lava);
 
                 }
-                else if (this.biome == Biome.CALDERA)
+                else if (biome == Biome.CALDERA)
                 {
                     DrawCenterMountain();
                 }
-                else if (this.biome == Biome.MOUNTAINOUS)
+                else if (biome == Biome.MOUNTAINOUS)
                 {
                     riverT = Terrain.MOUNTAIN;
                     for (int i = 0; i < MAP_COLS; i++)
@@ -355,14 +352,14 @@ class DeathMountain : World
                     }
 
 
-                    int cols = hyrule.RNG.Next(2, 4);
-                    int rows = hyrule.RNG.Next(2, 4);
+                    int cols = RNG.Next(2, 4);
+                    int rows = RNG.Next(2, 4);
                     List<int> pickedC = new List<int>();
                     List<int> pickedR = new List<int>();
 
                     while (cols > 0)
                     {
-                        int col = hyrule.RNG.Next(10, MAP_COLS - 11);
+                        int col = RNG.Next(10, MAP_COLS - 11);
                         if (!pickedC.Contains(col))
                         {
                             for (int i = 0; i < MAP_ROWS; i++)
@@ -379,7 +376,7 @@ class DeathMountain : World
 
                     while (rows > 0)
                     {
-                        int row = hyrule.RNG.Next(10, MAP_ROWS - 11);
+                        int row = RNG.Next(10, MAP_ROWS - 11);
                         if (!pickedR.Contains(row))
                         {
                             for (int i = 0; i < MAP_COLS; i++)
@@ -395,40 +392,40 @@ class DeathMountain : World
                     }
                 }
 
-                Direction raftDirection = (Direction)hyrule.RNG.Next(4);
-                if (this.biome == Biome.CANYON)
+                Direction raftDirection = (Direction)RNG.Next(4);
+                if (biome == Biome.CANYON)
                 {
-                    raftDirection = horizontal ? DirectionExtensions.RandomHorizontal(hyrule.RNG) : DirectionExtensions.RandomVertical(hyrule.RNG);
+                    raftDirection = horizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                 }
                 if (raft != null)
                 {
-                    if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
+                    if (biome != Biome.CANYON && biome != Biome.CALDERA)
                     {
                         MAP_COLS = 29;
                     }
-                    DrawOcean(raftDirection);
+                    DrawOcean(raftDirection, props.CanWalkOnWaterWithBoots);
                     MAP_COLS = 64;
                 }
 
-                Direction bridgeDirection = (Direction)hyrule.RNG.Next(4);
+                Direction bridgeDirection = (Direction)RNG.Next(4);
                 do
                 {
-                    if (this.biome != Biome.CANYON)
+                    if (biome != Biome.CANYON)
                     {
-                        bridgeDirection = (Direction)hyrule.RNG.Next(4);
+                        bridgeDirection = (Direction)RNG.Next(4);
                     }
                     else
                     {
-                        bridgeDirection = horizontal ? DirectionExtensions.RandomHorizontal(hyrule.RNG) : DirectionExtensions.RandomVertical(hyrule.RNG);
+                        bridgeDirection = horizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                     }
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
                 {
-                    if (this.biome != Biome.CANYON && this.biome != Biome.CALDERA)
+                    if (biome != Biome.CANYON && biome != Biome.CALDERA)
                     {
                         MAP_COLS = 29;
                     }
-                    DrawOcean(bridgeDirection);
+                    DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
                     MAP_COLS = 64;
                 }
                 int x = 0;
@@ -440,8 +437,8 @@ class DeathMountain : World
                         int tries = 0;
                         do
                         {
-                            x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                            y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                            x = RNG.Next(MAP_COLS - 2) + 1;
+                            y = RNG.Next(MAP_ROWS - 2) + 1;
                             tries++;
                         } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
                         if (tries >= 100)
@@ -455,14 +452,14 @@ class DeathMountain : World
                         if (location.TerrainType == Terrain.CAVE)
                         {
 
-                            Direction direction = (Direction)hyrule.RNG.Next(4);
+                            Direction direction = (Direction)RNG.Next(4);
 
-                            Terrain s = walkableTerrains[hyrule.RNG.Next(walkableTerrains.Count)];
-                            if (this.biome == Biome.VANILLALIKE)
+                            Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                            if (biome == Biome.VANILLALIKE)
                             {
                                 s = Terrain.ROAD;
                             }
-                            if (!hyrule.Props.SaneCaves || !connectionsDM.ContainsKey(location))
+                            if (!props.SaneCaves || !connectionsDM.ContainsKey(location))
                             {
                                 PlaceCave(x, y, direction, s);
                             }
@@ -497,8 +494,8 @@ class DeathMountain : World
                                 tries = 0;
                                 do
                                 {
-                                    x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                                    y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                                    x = RNG.Next(MAP_COLS - 2) + 1;
+                                    y = RNG.Next(MAP_ROWS - 2) + 1;
                                     tries++;
                                 } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
                                 if (tries >= 100)
@@ -508,7 +505,7 @@ class DeathMountain : World
 
                                 while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
                                 {
-                                    direction = (Direction)hyrule.RNG.Next(4);
+                                    direction = (Direction)RNG.Next(4);
                                 }
                                 if (connectionsDM[location].Count == 1)
                                 {
@@ -528,23 +525,23 @@ class DeathMountain : World
                                         crossing = true;
                                         if (direction == Direction.NORTH)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(7) - 3);
-                                            othery = y - (hyrule.RNG.Next(range) + offset);
+                                            otherx = x + (RNG.Next(7) - 3);
+                                            othery = y - (RNG.Next(range) + offset);
                                         }
                                         else if (direction == Direction.EAST)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(range) + offset);
-                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                            otherx = x + (RNG.Next(range) + offset);
+                                            othery = y + (RNG.Next(7) - 3);
                                         }
                                         else if (direction == Direction.SOUTH)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(7) - 3);
-                                            othery = y + (hyrule.RNG.Next(range) + offset);
+                                            otherx = x + (RNG.Next(7) - 3);
+                                            othery = y + (RNG.Next(range) + offset);
                                         }
                                         else //west
                                         {
-                                            otherx = x - (hyrule.RNG.Next(range) + offset);
-                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                            otherx = x - (RNG.Next(range) + offset);
+                                            othery = y + (RNG.Next(7) - 3);
                                         }
                                         tries++;
 
@@ -586,23 +583,23 @@ class DeathMountain : World
                                         crossing = true;
                                         if (direction == Direction.NORTH)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(7) - 3);
-                                            othery = y - (hyrule.RNG.Next(range) + offset);
+                                            otherx = x + (RNG.Next(7) - 3);
+                                            othery = y - (RNG.Next(range) + offset);
                                         }
                                         else if (direction == Direction.EAST)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(range) + offset);
-                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                            otherx = x + (RNG.Next(range) + offset);
+                                            othery = y + (RNG.Next(7) - 3);
                                         }
                                         else if (direction == Direction.SOUTH)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(7) - 3);
-                                            othery = y + (hyrule.RNG.Next(range) + offset);
+                                            otherx = x + (RNG.Next(7) - 3);
+                                            othery = y + (RNG.Next(range) + offset);
                                         }
                                         else //west
                                         {
-                                            otherx = x - (hyrule.RNG.Next(range) + offset);
-                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                            otherx = x - (RNG.Next(range) + offset);
+                                            othery = y + (RNG.Next(7) - 3);
                                         }
                                         tries++;
 
@@ -629,8 +626,8 @@ class DeathMountain : World
                                     tries = 0;
                                     do
                                     {
-                                        newx = x + hyrule.RNG.Next(7) - 3;
-                                        newy = y + hyrule.RNG.Next(7) - 3;
+                                        newx = x + RNG.Next(7) - 3;
+                                        newy = y + RNG.Next(7) - 3;
                                         tries++;
                                     } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
                                     if (tries >= 100)
@@ -657,23 +654,23 @@ class DeathMountain : World
                                         crossing = true;
                                         if (direction == Direction.NORTH)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(7) - 3);
-                                            othery = y - (hyrule.RNG.Next(range) + offset);
+                                            otherx = x + (RNG.Next(7) - 3);
+                                            othery = y - (RNG.Next(range) + offset);
                                         }
                                         else if (direction == Direction.EAST)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(range) + offset);
-                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                            otherx = x + (RNG.Next(range) + offset);
+                                            othery = y + (RNG.Next(7) - 3);
                                         }
                                         else if (direction == Direction.EAST)
                                         {
-                                            otherx = x + (hyrule.RNG.Next(7) - 3);
-                                            othery = y + (hyrule.RNG.Next(range) + offset);
+                                            otherx = x + (RNG.Next(7) - 3);
+                                            othery = y + (RNG.Next(range) + offset);
                                         }
                                         else //east
                                         {
-                                            otherx = x - (hyrule.RNG.Next(range) + offset);
-                                            othery = y + (hyrule.RNG.Next(7) - 3);
+                                            otherx = x - (RNG.Next(range) + offset);
+                                            othery = y + (RNG.Next(7) - 3);
                                         }
                                         tries++;
 
@@ -698,19 +695,19 @@ class DeathMountain : World
                     }
                 }
 
-
-                if (this.biome == Biome.VANILLALIKE)
+                //Vanillalike DM is weird since the terrain is very little and everything else is mostly road. Not touching this for now.
+                if (biome == Biome.VANILLALIKE)
                 {
                     PlaceRandomTerrain(5);
                 }
                 randomTerrains.Add(Terrain.ROAD);
-                if (!GrowTerrain())
+                if (!GrowTerrain(props.Climate))
                 {
                     return false;
                 }
-                if (this.biome == Biome.CALDERA)
+                if (biome == Biome.CALDERA)
                 {
-                    bool f = MakeCaldera();
+                    bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
                         return false;
@@ -719,7 +716,7 @@ class DeathMountain : World
                 walkableTerrains.Add(Terrain.ROAD);
                 if (raft != null)
                 {
-                    if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
+                    if (biome != Biome.CALDERA && biome != Biome.CANYON)
                     {
                         MAP_COLS = 29;
                     }
@@ -733,7 +730,7 @@ class DeathMountain : World
 
                 if (bridge != null)
                 {
-                    if (this.biome != Biome.CALDERA && this.biome != Biome.CANYON)
+                    if (biome != Biome.CALDERA && biome != Biome.CANYON)
                     {
                         MAP_COLS = 29;
                     }
@@ -748,8 +745,8 @@ class DeathMountain : World
 
                 do
                 {
-                    x = hyrule.RNG.Next(MAP_COLS - 2) + 1;
-                    y = hyrule.RNG.Next(MAP_ROWS - 2) + 1;
+                    x = RNG.Next(MAP_COLS - 2) + 1;
+                    y = RNG.Next(MAP_ROWS - 2) + 1;
                 } while (!walkableTerrains.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
 
                 map[y, x] = Terrain.ROCK;
@@ -757,16 +754,16 @@ class DeathMountain : World
                 magicCave.Xpos = x;
 
 
-                if (this.biome == Biome.CANYON || this.biome == Biome.ISLANDS)
+                if (biome == Biome.CANYON || biome == Biome.ISLANDS)
                 {
-                    ConnectIslands(25, false, riverT, false, false, false);
+                    ConnectIslands(25, false, riverT, false, false, false, props.CanWalkOnWaterWithBoots);
                 }
 
                 //check bytes and adjust
-                WriteMapToRom(false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+                WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
             }
         }
-        WriteMapToRom(true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0);
+        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
         
 
         visitation = new bool[MAP_ROWS, MAP_COLS];
@@ -782,24 +779,24 @@ class DeathMountain : World
         {
             if (!terrains.Keys.Contains(i))
             {
-                hyrule.ROMData.Put(i, 0x00);
+                rom.Put(i, 0x00);
             }
         }
         return true;
     }
-    private bool MakeCaldera()
+    private bool MakeCaldera(bool canWalkOnWaterWithBoots)
     {
         Terrain water = Terrain.WATER;
-        if (hyrule.Props.CanWalkOnWaterWithBoots)
+        if (canWalkOnWaterWithBoots)
         {
             water = Terrain.WALKABLEWATER;
         }
-        int centerx = hyrule.RNG.Next(21, 41);
-        int centery = hyrule.RNG.Next(17, 27);
+        int centerx = RNG.Next(21, 41);
+        int centery = RNG.Next(17, 27);
         if (isHorizontal)
         {
-            centerx = hyrule.RNG.Next(27, 37);
-            centery = hyrule.RNG.Next(17, 27);
+            centerx = RNG.Next(27, 37);
+            centery = RNG.Next(17, 27);
         }
 
         bool placeable = false;
@@ -807,13 +804,13 @@ class DeathMountain : World
         {
             if (isHorizontal)
             {
-                centerx = hyrule.RNG.Next(27, 37);
-                centery = hyrule.RNG.Next(17, 27);
+                centerx = RNG.Next(27, 37);
+                centery = RNG.Next(17, 27);
             }
             else
             {
-                centerx = hyrule.RNG.Next(21, 41);
-                centery = hyrule.RNG.Next(17, 27);
+                centerx = RNG.Next(21, 41);
+                centery = RNG.Next(17, 27);
             }
             placeable = true;
             for (int i = centery - 7; i < centery + 8; i++)
@@ -841,10 +838,10 @@ class DeathMountain : World
         }
         for (int i = 0; i < 10; i++)
         {
-            int lake = hyrule.RNG.Next(7, 11);
+            int lake = RNG.Next(7, 11);
             if (i == 0 || i == 9)
             {
-                lake = hyrule.RNG.Next(3, 6);
+                lake = RNG.Next(3, 6);
             }
             if (isHorizontal)
             {
@@ -989,14 +986,14 @@ class DeathMountain : World
 
         do
         {
-            int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
+            int cavenum1 = RNG.Next(connectionsDM.Keys.Count);
             cave1l = connectionsDM.Keys.ToList()[cavenum1];
             cave1r = connectionsDM[cave1l][0];
         } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
 
         do
         {
-            int cavenum1 = hyrule.RNG.Next(connectionsDM.Keys.Count);
+            int cavenum1 = RNG.Next(connectionsDM.Keys.Count);
             cave2l = connectionsDM.Keys.ToList()[cavenum1];
             cave2r = connectionsDM[cave2l][0];
         } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
@@ -1012,7 +1009,7 @@ class DeathMountain : World
         map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
 
 
-        int caveType = hyrule.RNG.Next(2);
+        int caveType = RNG.Next(2);
         if (isHorizontal)
         {
             bool f = HorizontalCave(caveType, centerx, centery, cave1l, cave1r);
@@ -1063,9 +1060,9 @@ class DeathMountain : World
     /// <summary>
     /// Updates the visitation matrix and location reachability 
     /// </summary>
-    public void UpdateVisit()
+    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
-        UpdateReachable();
+        UpdateReachable(itemGet, spellGet);
 
         foreach (Location location in AllLocations)
         {

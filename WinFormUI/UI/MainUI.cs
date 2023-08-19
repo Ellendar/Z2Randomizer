@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Z2Randomizer.Core.Overworld;
 using WinFormUI.UI;
 using System.Configuration;
+using Z2Randomizer.Core.Flags;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -16,7 +17,6 @@ public partial class MainUI : Form
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private Random r;
     private bool dontrunhandler;
-    private readonly String flags = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#$";
     private bool spawnNextSeed;
     private CheckBox[] small;
     private CheckBox[] large;
@@ -69,6 +69,7 @@ public partial class MainUI : Form
         large = new CheckBox[] { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox,
             largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
 
+        flagsTextBox.TextChanged += FlagBox_TextChanged;
         InitialiseCustomFlagsetButtons();
 
         dontrunhandler = false;
@@ -130,7 +131,7 @@ public partial class MainUI : Form
         experienceDropsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         allowPathEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeLavaInShuffleCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeLavaInShuffleCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         mixLargeAndSmallCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -179,7 +180,8 @@ public partial class MainUI : Form
         saneCaveShuffleBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         hideLessImportantLocationsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         allowBoulderBlockedConnectionsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        westBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        climateSelector.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        westBiomeSelector.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         dmBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         eastBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         mazeBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
@@ -605,11 +607,11 @@ public partial class MainUI : Form
     private void shuffleEncounters_CheckStateChanged(object sender, EventArgs e)
     {
         allowPathEnemiesCheckbox.Enabled = shuffleEncountersCheckbox.Checked;
-        includeLavaInShuffleCheckbox.Enabled = shuffleEncountersCheckbox.Checked;
+        includeLavaInShuffleCheckBox.Enabled = shuffleEncountersCheckbox.Checked;
         if (shuffleEncountersCheckbox.CheckState != CheckState.Checked)
         {
             allowPathEnemiesCheckbox.Checked = false;
-            includeLavaInShuffleCheckbox.Checked = false;
+            includeLavaInShuffleCheckBox.Checked = false;
         }
     }
 
@@ -737,7 +739,7 @@ public partial class MainUI : Form
         configuration.ShuffleGP = GetTripleCheckState(includeGPinShuffleCheckbox);
         configuration.ShuffleEncounters = GetTripleCheckState(shuffleEncountersCheckbox);
         configuration.AllowUnsafePathEncounters = allowPathEnemiesCheckbox.Checked;
-        configuration.IncludeLavaInEncounterShuffle = includeLavaInShuffleCheckbox.Checked;
+        configuration.IncludeLavaInEncounterShuffle = includeLavaInShuffleCheckBox.Checked;
         configuration.EncounterRate = encounterRateBox.SelectedIndex switch
         {
             0 => EncounterRate.NORMAL,
@@ -774,7 +776,12 @@ public partial class MainUI : Form
             3 => ContinentConnectionType.ANYTHING_GOES,
             _ => throw new Exception("Invalid ContinentConnection setting")
         };
-        configuration.WestBiome = westBiome.SelectedIndex switch
+        configuration.Climate = climateSelector.SelectedIndex switch
+        {
+            0 => Climates.Classic,
+            _ => throw new Exception("Invalid Climate setting")
+        };
+        configuration.WestBiome = westBiomeSelector.SelectedIndex switch
         {
             0 => Biome.VANILLA,
             1 => Biome.VANILLA_SHUFFLE,
@@ -1017,7 +1024,7 @@ public partial class MainUI : Form
     private void convertButton_Click(object send, EventArgs e)
     {
         String oldFlags = oldFlagsTextbox.Text.Trim();
-        if(oldFlags.Length == 0)
+        if (oldFlags.Length == 0)
         {
             return;
         }
@@ -1042,7 +1049,7 @@ public partial class MainUI : Form
     {
         dontrunhandler = true;
         flagsTextBox.Text = flagsTextBox.Text.Trim();
-        if(flagsTextBox.Text.Length == 0)
+        if (flagsTextBox.Text.Length == 0)
         {
             return;
         }
@@ -1129,7 +1136,7 @@ public partial class MainUI : Form
             //Overworld
             allowPalaceContinentSwapCheckbox.CheckState = ToCheckState(configuration.PalacesCanSwapContinents);
             includeGPinShuffleCheckbox.CheckState = ToCheckState(configuration.ShuffleGP);
-            includeLavaInShuffleCheckbox.CheckState = ToCheckState(configuration.IncludeLavaInEncounterShuffle);
+            includeLavaInShuffleCheckBox.CheckState = ToCheckState(configuration.IncludeLavaInEncounterShuffle);
             shuffleEncountersCheckbox.CheckState = ToCheckState(configuration.ShuffleEncounters);
             allowPathEnemiesCheckbox.CheckState = ToCheckState(configuration.AllowUnsafePathEncounters);
             encounterRateBox.SelectedIndex = configuration.EncounterRate switch
@@ -1166,7 +1173,15 @@ public partial class MainUI : Form
                 ContinentConnectionType.ANYTHING_GOES => 3,
                 _ => throw new Exception("Invalid ContinentConnection setting")
             };
-            westBiome.SelectedIndex = configuration.WestBiome switch
+            /*
+            climateSelector.SelectedIndex = configuration.Climate.Name switch
+            {
+                "Classic" => 0,
+                _ => throw new Exception("Invalid Climate setting")
+            };*/
+            //XXX: Temp override
+            climateSelector.SelectedIndex = 0;
+            westBiomeSelector.SelectedIndex = configuration.WestBiome switch
             {
                 Biome.VANILLA => 0,
                 Biome.VANILLA_SHUFFLE => 1,
@@ -1526,7 +1541,7 @@ public partial class MainUI : Form
 
         for (int i = 0; i < flagString.Length; i++)
         {
-            if (!flags.Contains(flagString[i]))
+            if (!FlagBuilder.ENCODING_TABLE.Contains(flagString[i]))
             {
                 MessageBox.Show("Invalid flags. Aborting seed generation.");
                 return;
@@ -1711,7 +1726,7 @@ public partial class MainUI : Form
 
     private void CheckVanillaPossible()
     {
-        if (VanillaPossible(eastBiome) || VanillaPossible(westBiome) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
+        if (VanillaPossible(eastBiome) || VanillaPossible(westBiomeSelector) || VanillaPossible(dmBiome) || VanillaPossible(mazeBiome))
         {
             shuffledVanillaShowsActualTerrain.Enabled = true;
             shuffledVanillaShowsActualTerrain.Checked = true;
@@ -1738,7 +1753,7 @@ public partial class MainUI : Form
     private void WestBiome_SelectedIndexChanged(object sender, EventArgs e)
     {
         CheckVanillaPossible();
-        if (westBiome.SelectedIndex == 0 || westBiome.SelectedIndex == 1)
+        if (westBiomeSelector.SelectedIndex == 0 || westBiomeSelector.SelectedIndex == 1)
         {
             generateBaguWoodsCheckbox.Checked = false;
             generateBaguWoodsCheckbox.Enabled = false;
@@ -1877,7 +1892,7 @@ public partial class MainUI : Form
 
         for (int i = 0; i < flagString.Length; i++)
         {
-            if (!flags.Contains(flagString[i]))
+            if (!FlagBuilder.ENCODING_TABLE.Contains(flagString[i]))
             {
                 MessageBox.Show("Invalid flags. Aborting seed generation.");
                 return false;
@@ -1936,4 +1951,5 @@ public partial class MainUI : Form
     {
         GenerateSpriteImage();
     }
+
 }

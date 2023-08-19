@@ -86,6 +86,10 @@ public class RandomizerConfiguration
     public Biome EastBiome { get; set; }
     public Biome DMBiome { get; set; }
     public Biome MazeBiome { get; set; }
+    //XXX: I need to work out how this is going to be stored in configuration / serialized. Maybe climate needs a 3rd type
+    //I really wish C# had Java's Enums.
+    [IgnoreInFlags]
+    public Climate Climate { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
 
     //Palaces
@@ -279,7 +283,7 @@ public class RandomizerConfiguration
         {'!', 60},
         {'@', 61},
         {'#', 62},
-        {'$', 63},
+        {'+', 63},
     };
 
 
@@ -406,6 +410,8 @@ public class RandomizerConfiguration
 
     public static RandomizerConfiguration FromLegacyFlags(string flags)
     {
+        //4.3 updated encoding table.
+        flags = flags.Replace("$", "+");
         RandomizerConfiguration config = new RandomizerConfiguration();
         BitArray bits;
         int i = 0;
@@ -1234,6 +1240,18 @@ public class RandomizerConfiguration
         {
             properties.MazeBiome = MazeBiome;
         }
+        if(Climate == null)
+        {
+            properties.Climate = random.Next(1) switch
+            {
+                0 => Climates.Classic,
+                _ => throw new Exception("Unrecognized climate")
+            };
+        }
+        else
+        {
+            properties.Climate = Climate;
+        }
         properties.VanillaShuffleUsesActualTerrain = VanillaShuffleUsesActualTerrain;
         properties.ShuffleHidden = ShuffleWhichLocationIsHidden == null ? random.Next(2) == 1 : (bool)ShuffleWhichLocationIsHidden;
         properties.CanWalkOnWaterWithBoots = GoodBoots == null ? random.Next(2) == 1 : (bool)GoodBoots;
@@ -1274,7 +1292,7 @@ public class RandomizerConfiguration
         properties.ShuffleSwordImmunity = ShuffleSwordImmunity;
         properties.ShuffleOverworldEnemies = ShuffleOverworldEnemies == null ? random.Next(2) == 1 : (bool)ShuffleOverworldEnemies;
         properties.ShufflePalaceEnemies = ShufflePalaceEnemies == null ? random.Next(2) == 1 : (bool)ShufflePalaceEnemies;
-        properties.MixPalaceEnemies = MixLargeAndSmallEnemies == null ? random.Next(2) == 1 : (bool)MixLargeAndSmallEnemies;
+        properties.MixLargeAndSmallEnemies = MixLargeAndSmallEnemies == null ? random.Next(2) == 1 : (bool)MixLargeAndSmallEnemies;
         properties.ShuffleDripper = ShuffleDripperEnemy;
         properties.ShuffleEnemyPalettes = ShuffleSpritePalettes;
         properties.ExpLevel = EnemyXPDrops;
@@ -1335,7 +1353,7 @@ public class RandomizerConfiguration
         properties.MagicCap = MagicLevelCap;
         properties.LifeCap = LifeLevelCap;
         properties.ScaleLevels = ScaleLevelRequirementsToCap;
-        properties.HideLocs = HideLessImportantLocations == null ? random.Next(2) == 1 : (bool)HideLessImportantLocations;
+        properties.HideLessImportantLocations = HideLessImportantLocations == null ? random.Next(2) == 1 : (bool)HideLessImportantLocations;
         properties.SaneCaves = RestrictConnectionCaveShuffle == null ? random.Next(2) == 1 : (bool)RestrictConnectionCaveShuffle;
         properties.SpellEnemy = RandomizeSpellSpellEnemy == null ? random.Next(2) == 1 : (bool)RandomizeSpellSpellEnemy;
 
@@ -1409,7 +1427,7 @@ public class RandomizerConfiguration
 
         if (!properties.ShuffleOverworldEnemies && !properties.ShufflePalaceEnemies)
         {
-            properties.MixPalaceEnemies = false;
+            properties.MixLargeAndSmallEnemies = false;
         }
 
         if (!properties.ShufflePalaceItems || !properties.ShuffleOverworldItems)

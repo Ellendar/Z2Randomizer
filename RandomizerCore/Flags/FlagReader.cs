@@ -80,7 +80,7 @@ public class FlagReader
         {'!', 60},
         {'@', 61},
         {'#', 62},
-        {'$', 63},
+        {'+', 63},
     };
 
     private List<bool> bits = new List<bool>();

@@ -74,7 +74,9 @@ partial class MainUI
         startWithCandleCheckbox = new CheckBox();
         shuffleStartingItemsCheckbox = new CheckBox();
         tabPage1 = new TabPage();
-        includeLavaInShuffleCheckbox = new CheckBox();
+        westBiomeSelector = new ComboBox();
+        westBiomeLabel = new Label();
+        includeLavaInShuffleCheckBox = new CheckBox();
         generateBaguWoodsCheckbox = new CheckBox();
         useGoodBootsCheckbox = new CheckBox();
         shuffleWhichLocationsAreHiddenCheckbox = new CheckBox();
@@ -83,11 +85,11 @@ partial class MainUI
         mazeIslandBiomeLabel = new Label();
         eastBiome = new ComboBox();
         dmBiome = new ComboBox();
-        westBiome = new ComboBox();
+        climateSelector = new ComboBox();
         eastContinentBindingLabel = new Label();
         deathMountainBiomeLabel = new Label();
         label39 = new Label();
-        westContinentLabel = new Label();
+        climateLabel = new Label();
         allowBoulderBlockedConnectionsCheckbox = new CheckBox();
         saneCaveShuffleBox = new CheckBox();
         hideLessImportantLocationsCheckbox = new CheckBox();
@@ -205,6 +207,7 @@ partial class MainUI
         useCommunityHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         tabPage3 = new TabPage();
+        spriteCreditLabel = new Label();
         beepFrequencyDropdown = new ComboBox();
         label10 = new Label();
         beepThresholdDropdown = new ComboBox();
@@ -251,7 +254,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        spriteCreditLabel = new Label();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -779,7 +781,9 @@ partial class MainUI
         // 
         // tabPage1
         // 
-        tabPage1.Controls.Add(includeLavaInShuffleCheckbox);
+        tabPage1.Controls.Add(westBiomeSelector);
+        tabPage1.Controls.Add(westBiomeLabel);
+        tabPage1.Controls.Add(includeLavaInShuffleCheckBox);
         tabPage1.Controls.Add(generateBaguWoodsCheckbox);
         tabPage1.Controls.Add(useGoodBootsCheckbox);
         tabPage1.Controls.Add(shuffleWhichLocationsAreHiddenCheckbox);
@@ -788,11 +792,11 @@ partial class MainUI
         tabPage1.Controls.Add(mazeIslandBiomeLabel);
         tabPage1.Controls.Add(eastBiome);
         tabPage1.Controls.Add(dmBiome);
-        tabPage1.Controls.Add(westBiome);
+        tabPage1.Controls.Add(climateSelector);
         tabPage1.Controls.Add(eastContinentBindingLabel);
         tabPage1.Controls.Add(deathMountainBiomeLabel);
         tabPage1.Controls.Add(label39);
-        tabPage1.Controls.Add(westContinentLabel);
+        tabPage1.Controls.Add(climateLabel);
         tabPage1.Controls.Add(allowBoulderBlockedConnectionsCheckbox);
         tabPage1.Controls.Add(saneCaveShuffleBox);
         tabPage1.Controls.Add(hideLessImportantLocationsCheckbox);
@@ -820,18 +824,41 @@ partial class MainUI
         tabPage1.ToolTipText = "When selected, will hide Kasuto behind a forest tile";
         tabPage1.UseVisualStyleBackColor = true;
         // 
-        // includeLavaInShuffle
+        // westBiomeSelector
         // 
-        includeLavaInShuffleCheckbox.AutoSize = true;
-        includeLavaInShuffleCheckbox.Location = new Point(7, 129);
-        includeLavaInShuffleCheckbox.Margin = new Padding(4, 3, 4, 3);
-        includeLavaInShuffleCheckbox.Name = "includeLavaInShuffle";
-        includeLavaInShuffleCheckbox.Size = new Size(145, 19);
-        includeLavaInShuffleCheckbox.TabIndex = 48;
-        includeLavaInShuffleCheckbox.Text = "Include Lava in Shuffle";
-        toolTip1.SetToolTip(includeLavaInShuffleCheckbox, "If checked, you may have enemies in path encounters");
-        includeLavaInShuffleCheckbox.UseVisualStyleBackColor = true;
-        includeLavaInShuffleCheckbox.CheckStateChanged += shuffleEncounters_CheckStateChanged;
+        westBiomeSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+        westBiomeSelector.FormattingEnabled = true;
+        westBiomeSelector.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+        westBiomeSelector.Location = new Point(416, 270);
+        westBiomeSelector.Margin = new Padding(4, 3, 4, 3);
+        westBiomeSelector.Name = "westBiomeSelector";
+        westBiomeSelector.Size = new Size(140, 23);
+        westBiomeSelector.TabIndex = 50;
+        toolTip1.SetToolTip(westBiomeSelector, "West Hyrule overworld map style.");
+        westBiomeSelector.SelectedIndexChanged += WestBiome_SelectedIndexChanged;
+        // 
+        // westBiomeLabel
+        // 
+        westBiomeLabel.AutoSize = true;
+        westBiomeLabel.Location = new Point(273, 273);
+        westBiomeLabel.Margin = new Padding(4, 0, 4, 0);
+        westBiomeLabel.Name = "westBiomeLabel";
+        westBiomeLabel.Size = new Size(129, 15);
+        westBiomeLabel.TabIndex = 49;
+        westBiomeLabel.Text = "West Continent Biome:";
+        toolTip1.SetToolTip(westBiomeLabel, "West Hyrule overworld map style.");
+        // 
+        // includeLavaInShuffleCheckBox
+        // 
+        includeLavaInShuffleCheckBox.AutoSize = true;
+        includeLavaInShuffleCheckBox.Location = new Point(7, 129);
+        includeLavaInShuffleCheckBox.Margin = new Padding(4, 3, 4, 3);
+        includeLavaInShuffleCheckBox.Name = "includeLavaInShuffleCheckBox";
+        includeLavaInShuffleCheckBox.Size = new Size(145, 19);
+        includeLavaInShuffleCheckBox.TabIndex = 48;
+        includeLavaInShuffleCheckBox.Text = "Include Lava in Shuffle";
+        toolTip1.SetToolTip(includeLavaInShuffleCheckBox, "If checked, you may have enemies in path encounters");
+        includeLavaInShuffleCheckBox.UseVisualStyleBackColor = true;
         // 
         // generateBaguWoodsCheckbox
         // 
@@ -889,7 +916,7 @@ partial class MainUI
         mazeBiome.DropDownStyle = ComboBoxStyle.DropDownList;
         mazeBiome.FormattingEnabled = true;
         mazeBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Random (with Vanilla)" });
-        mazeBiome.Location = new Point(422, 268);
+        mazeBiome.Location = new Point(416, 238);
         mazeBiome.Margin = new Padding(4, 3, 4, 3);
         mazeBiome.Name = "mazeBiome";
         mazeBiome.Size = new Size(140, 23);
@@ -900,7 +927,7 @@ partial class MainUI
         // mazeIslandBiomeLabel
         // 
         mazeIslandBiomeLabel.AutoSize = true;
-        mazeIslandBiomeLabel.Location = new Point(279, 271);
+        mazeIslandBiomeLabel.Location = new Point(273, 241);
         mazeIslandBiomeLabel.Margin = new Padding(4, 0, 4, 0);
         mazeIslandBiomeLabel.Name = "mazeIslandBiomeLabel";
         mazeIslandBiomeLabel.Size = new Size(109, 15);
@@ -913,7 +940,7 @@ partial class MainUI
         eastBiome.DropDownStyle = ComboBoxStyle.DropDownList;
         eastBiome.FormattingEnabled = true;
         eastBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Volcano", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
-        eastBiome.Location = new Point(422, 237);
+        eastBiome.Location = new Point(416, 207);
         eastBiome.Margin = new Padding(4, 3, 4, 3);
         eastBiome.Name = "eastBiome";
         eastBiome.Size = new Size(140, 23);
@@ -926,7 +953,7 @@ partial class MainUI
         dmBiome.DropDownStyle = ComboBoxStyle.DropDownList;
         dmBiome.FormattingEnabled = true;
         dmBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
-        dmBiome.Location = new Point(422, 205);
+        dmBiome.Location = new Point(416, 175);
         dmBiome.Margin = new Padding(4, 3, 4, 3);
         dmBiome.Name = "dmBiome";
         dmBiome.Size = new Size(140, 23);
@@ -934,23 +961,22 @@ partial class MainUI
         toolTip1.SetToolTip(dmBiome, "Death Mountain overworld map style.");
         dmBiome.SelectedIndexChanged += DmBiome_SelectedIndexChanged;
         // 
-        // westBiome
+        // climateSelector
         // 
-        westBiome.DropDownStyle = ComboBoxStyle.DropDownList;
-        westBiome.FormattingEnabled = true;
-        westBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
-        westBiome.Location = new Point(422, 175);
-        westBiome.Margin = new Padding(4, 3, 4, 3);
-        westBiome.Name = "westBiome";
-        westBiome.Size = new Size(140, 23);
-        westBiome.TabIndex = 39;
-        toolTip1.SetToolTip(westBiome, "West Hyrule overworld map style.");
-        westBiome.SelectedIndexChanged += WestBiome_SelectedIndexChanged;
+        climateSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+        climateSelector.FormattingEnabled = true;
+        climateSelector.Items.AddRange(new object[] { "Classic" });
+        climateSelector.Location = new Point(416, 145);
+        climateSelector.Margin = new Padding(4, 3, 4, 3);
+        climateSelector.Name = "climateSelector";
+        climateSelector.Size = new Size(140, 23);
+        climateSelector.TabIndex = 39;
+        toolTip1.SetToolTip(climateSelector, "Weather affects terrain shape/frequency/complexity");
         // 
         // eastContinentBindingLabel
         // 
         eastContinentBindingLabel.AutoSize = true;
-        eastContinentBindingLabel.Location = new Point(279, 240);
+        eastContinentBindingLabel.Location = new Point(273, 210);
         eastContinentBindingLabel.Margin = new Padding(4, 0, 4, 0);
         eastContinentBindingLabel.Name = "eastContinentBindingLabel";
         eastContinentBindingLabel.Size = new Size(124, 15);
@@ -961,7 +987,7 @@ partial class MainUI
         // deathMountainBiomeLabel
         // 
         deathMountainBiomeLabel.AutoSize = true;
-        deathMountainBiomeLabel.Location = new Point(279, 209);
+        deathMountainBiomeLabel.Location = new Point(273, 179);
         deathMountainBiomeLabel.Margin = new Padding(4, 0, 4, 0);
         deathMountainBiomeLabel.Name = "deathMountainBiomeLabel";
         deathMountainBiomeLabel.Size = new Size(133, 15);
@@ -972,22 +998,22 @@ partial class MainUI
         // label39
         // 
         label39.BorderStyle = BorderStyle.Fixed3D;
-        label39.Location = new Point(281, 170);
+        label39.Location = new Point(281, 136);
         label39.Margin = new Padding(4, 0, 4, 0);
         label39.Name = "label39";
         label39.Size = new Size(298, 2);
         label39.TabIndex = 35;
         // 
-        // westContinentLabel
+        // climateLabel
         // 
-        westContinentLabel.AutoSize = true;
-        westContinentLabel.Location = new Point(279, 179);
-        westContinentLabel.Margin = new Padding(4, 0, 4, 0);
-        westContinentLabel.Name = "westContinentLabel";
-        westContinentLabel.Size = new Size(129, 15);
-        westContinentLabel.TabIndex = 34;
-        westContinentLabel.Text = "West Continent Biome:";
-        toolTip1.SetToolTip(westContinentLabel, "West Hyrule overworld map style.");
+        climateLabel.AutoSize = true;
+        climateLabel.Location = new Point(273, 149);
+        climateLabel.Margin = new Padding(4, 0, 4, 0);
+        climateLabel.Name = "climateLabel";
+        climateLabel.Size = new Size(48, 15);
+        climateLabel.TabIndex = 34;
+        climateLabel.Text = "Climate";
+        toolTip1.SetToolTip(climateLabel, "West Hyrule overworld map style.");
         // 
         // allowBoulderBlockedConnectionsCheckbox
         // 
@@ -1030,7 +1056,7 @@ partial class MainUI
         // ContinentConnectionLabel
         // 
         ContinentConnectionLabel.AutoSize = true;
-        ContinentConnectionLabel.Location = new Point(279, 144);
+        ContinentConnectionLabel.Location = new Point(8, 289);
         ContinentConnectionLabel.Margin = new Padding(4, 0, 4, 0);
         ContinentConnectionLabel.Name = "ContinentConnectionLabel";
         ContinentConnectionLabel.Size = new Size(133, 15);
@@ -1043,10 +1069,10 @@ partial class MainUI
         continentConnectionBox.DropDownStyle = ComboBoxStyle.DropDownList;
         continentConnectionBox.FormattingEnabled = true;
         continentConnectionBox.Items.AddRange(new object[] { "Normal", "R+B Border Shuffle", "Transportation Shuffle", "Anything Goes" });
-        continentConnectionBox.Location = new Point(422, 141);
+        continentConnectionBox.Location = new Point(151, 286);
         continentConnectionBox.Margin = new Padding(4, 3, 4, 3);
         continentConnectionBox.Name = "continentConnectionBox";
-        continentConnectionBox.Size = new Size(140, 23);
+        continentConnectionBox.Size = new Size(113, 23);
         continentConnectionBox.TabIndex = 29;
         toolTip1.SetToolTip(continentConnectionBox, "Modes for how the different continents can connect to each other.");
         // 
@@ -1167,7 +1193,7 @@ partial class MainUI
         // allowPathEnemiesCheckbox
         // 
         allowPathEnemiesCheckbox.AutoSize = true;
-        allowPathEnemiesCheckbox.Location = new Point(7, 104);
+        allowPathEnemiesCheckbox.Location = new Point(7, 103);
         allowPathEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
         allowPathEnemiesCheckbox.Name = "allowPathEnemiesCheckbox";
         allowPathEnemiesCheckbox.Size = new Size(184, 19);
@@ -2509,6 +2535,15 @@ partial class MainUI
         tabPage3.Text = "Misc.";
         tabPage3.UseVisualStyleBackColor = true;
         // 
+        // spriteCreditLabel
+        // 
+        spriteCreditLabel.Anchor = AnchorStyles.Right;
+        spriteCreditLabel.Location = new Point(441, 227);
+        spriteCreditLabel.Name = "spriteCreditLabel";
+        spriteCreditLabel.Size = new Size(129, 23);
+        spriteCreditLabel.TabIndex = 42;
+        spriteCreditLabel.TextAlign = ContentAlignment.MiddleRight;
+        // 
         // beepFrequencyDropdown
         // 
         beepFrequencyDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -2829,7 +2864,6 @@ partial class MainUI
         flagsTextBox.Size = new Size(212, 23);
         flagsTextBox.TabIndex = 9;
         toolTip1.SetToolTip(flagsTextBox, "These flags represent the selected options. They can be copy/pasted.");
-        flagsTextBox.TextChanged += FlagBox_TextChanged;
         // 
         // updateButton
         // 
@@ -3001,15 +3035,6 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
-        // spriteCreditLabel
-        // 
-        spriteCreditLabel.Anchor = AnchorStyles.Right;
-        spriteCreditLabel.Location = new Point(441, 227);
-        spriteCreditLabel.Name = "spriteCreditLabel";
-        spriteCreditLabel.Size = new Size(129, 23);
-        spriteCreditLabel.TabIndex = 42;
-        spriteCreditLabel.TextAlign = ContentAlignment.MiddleRight;
-        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3127,7 +3152,6 @@ partial class MainUI
     private CheckBox shuffleXPStealersCheckbox;
     private TabPage tabPage3;
     private CheckBox tbirdRequiredCheckbox;
-    private CheckBox allowPathEnemiesCheckbox;
     private CheckBox shuffleEncountersCheckbox;
     private CheckBox shufflePalaceEnemiesCheckbox;
     private CheckBox shuffleOverworldEnemiesCheckbox;
@@ -3244,10 +3268,10 @@ partial class MainUI
     private CheckBox hideLessImportantLocationsCheckbox;
     private CheckBox allowBoulderBlockedConnectionsCheckbox;
     private Label label39;
-    private Label westContinentLabel;
+    private Label climateLabel;
     private ComboBox eastBiome;
     private ComboBox dmBiome;
-    private ComboBox westBiome;
+    private ComboBox climateSelector;
     private Label eastContinentBindingLabel;
     private Label deathMountainBiomeLabel;
     private CheckBox flashingOffCheckbox;
@@ -3278,7 +3302,7 @@ partial class MainUI
     private Label label5;
     private ComboBox startingGemsMaxList;
     private CheckBox swapUpAndDownstabCheckbox;
-    private CheckBox includeLavaInShuffleCheckbox;
+    private CheckBox includeLavaInShuffleCheckBox;
     private CheckBox useCustomRoomsBox;
     private Label FireSpellOptionLabel;
     private ComboBox FireSpellBox;
@@ -3294,5 +3318,8 @@ partial class MainUI
     private ComboBox beepThresholdDropdown;
     private Label label9;
     private Label spriteCreditLabel;
+    private ComboBox westBiomeSelector;
+    private Label westBiomeLabel;
+    private CheckBox allowPathEnemiesCheckbox;
 }
 

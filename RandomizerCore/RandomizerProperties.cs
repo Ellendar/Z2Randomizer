@@ -79,6 +79,7 @@ public class RandomizerProperties
     public bool DmIsHorizontal { get; set; }
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
+    public Climate Climate { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
@@ -108,7 +109,7 @@ public class RandomizerProperties
     public bool ShuffleSwordImmunity { get; set; }
     public bool ShuffleOverworldEnemies { get; set; }
     public bool ShufflePalaceEnemies { get; set; }
-    public bool MixPalaceEnemies { get; set; }
+    public bool MixLargeAndSmallEnemies { get; set; }
     public bool ShuffleDripper { get; set; }
     public bool ShuffleEnemyPalettes { get; set; }
     public StatEffectiveness ExpLevel { get; set; }
@@ -142,7 +143,7 @@ public class RandomizerProperties
     public int MagicCap { get; set; }
     public int LifeCap { get; set; }
     public bool ScaleLevels { get; set; }
-    public bool HideLocs { get; set; }
+    public bool HideLessImportantLocations { get; set; }
     public bool SaneCaves { get; set; }
     public bool SpellEnemy { get; set; }
 
