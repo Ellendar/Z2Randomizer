@@ -4,7 +4,7 @@
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
-
+using System.Numerics;
 
 public class Assembler
 {
@@ -37,9 +37,31 @@ public class Assembler
 
     public void byt(params byte[] bytes)
     {
-        _actions.Add(new () {
+        _actions.Add(new() {
             { "action", "byte" },
             { "bytes", bytes },
+        });
+    }
+    public void byt(params PropertyBag[] bytes)
+    {
+        _actions.Add(new() {
+            { "action", "byte" },
+            { "bytes", bytes },
+        });
+    }
+
+    public void word(params ushort[] words)
+    {
+        _actions.Add(new() {
+            { "action", "word" },
+            { "words", words },
+        });
+    }
+    public void word(params PropertyBag[] words)
+    {
+        _actions.Add(new() {
+            { "action", "word" },
+            { "words", words },
         });
     }
 
@@ -57,6 +79,46 @@ public class Assembler
             { "action", "segment" },
             { "name", name },
         });
+    }
+
+    public void reloc(string name)
+    {
+        _actions.Add(new()
+        {
+            { "action", "reloc" },
+            { "name", name },
+        });
+    }
+
+    public PropertyBag symbol(string name)
+    {
+        // kinda jank, but instead of eating the overhead for creating this token,
+        // just hardcode the symbol token
+        return new PropertyBag()
+        {
+            { "op", "sym" },
+            { "sym", name },
+        };
+    }
+
+    public void export(string name)
+    {
+        _actions.Add(new()
+        {
+            { "action", "reloc" },
+            { "name", name },
+        });
+    }
+
+    public void relocExportLabel(string name, params string[] segments)
+    {
+        if (segments.Length > 0)
+        {
+            segment(segments);
+        }
+        reloc(name);
+        label(name);
+        export(name);
     }
 
     public string module()
@@ -92,8 +154,20 @@ import { TokenStream } from "js65/tokenstream.js"
                 a.byte(...action["bytes"]);
                 break;
             }
+            case "word": {
+                a.word(...action["bytes"]);
+                break;
+            }
             case "org": {
                 a.org(action["addr"], action["name"]);
+                break;
+            }
+            case "reloc": {
+                a.reloc(action["name"]);
+                break;
+            }
+            case "export": {
+                a.export(action["name"]);
                 break;
             }
             case "segment": {
