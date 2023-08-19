@@ -9,6 +9,7 @@
 - Fixed a bug that could cause caves in volcano/caldera biomes to exit into mountains.
 - Slightly decreased the maximum distance of caves in volcano/caldera. This now makes volcano and caldera's distance identical to 4.0.4 volcano (which is slightly longer and less random than 4.0.4 caldera)
 
+
 ## Version 4.2.4 - July 27th, 2023
 
 - Fixed a bug where darunia's spell was sometimes not requiring the child

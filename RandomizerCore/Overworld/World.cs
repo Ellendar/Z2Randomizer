@@ -421,7 +421,8 @@ public abstract class World
             i++;
             if ((location.TerrainType != Terrain.BRIDGE && location.CanShuffle && !unimportantLocs.Contains(location) && location.PassThrough == 0) || location.NeedHammer)
             {
-                int x,y;
+                int x = 0;
+                int y = 0;
                 //Place the location in a spot that is not adjacent to any other location
                 do
                 {
@@ -449,8 +450,7 @@ public abstract class World
                     if (saneCaves && connections.ContainsKey(location))
                     {
                         PlaceCaveCount++;
-                        map[y, x] = Terrain.NONE;
-                        if (!PlaceSaneCave(direction, riverTerrain, location))
+                        if (!PlaceSaneCave(x, y, direction, entranceTerrain, riverTerrain, location))
                         {
                             return false;
                         }
@@ -479,9 +479,9 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || location.ActualTown.AppearsOnMap())
+                else if (location.TerrainType != Terrain.TOWN || location.ActualTown != Town.SPELL_TOWER) //don't place newkasuto2
                 {
-                    Terrain t;
+                    Terrain t = Terrain.NONE;
                     do
                     {
                         t = walkableTerrains[RNG.Next(walkableTerrains.Count)];
@@ -602,9 +602,8 @@ public abstract class World
         }
     }
 
-    protected bool PlaceSaneCave(Direction direction, Terrain riverTerrain, Location location)
+    protected bool PlaceSaneCave(int x, int y, Direction direction, Terrain entranceTerrain, Terrain riverTerrain, Location location)
     {
-        int x, y;
         if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
         {
             if (direction == Direction.NORTH)
@@ -629,7 +628,7 @@ public abstract class World
                 direction = Direction.WEST;
             }
         }
-
+        map[y, x] = Terrain.NONE;
         //Place the exit cave less than 5 rows or columns from the edge of the map, on an unoccupied square 
         //That is also not adjacent to any other location.
         do
@@ -642,9 +641,10 @@ public abstract class World
         {
             direction = (Direction)RNG.Next(4);
         }
-        int otherx, othery;
+        int otherx = 0;
+        int othery = 0;
         int tries = 0;
-        bool crossing;
+        bool crossing = true;
         do
         {
             int range = 12;
@@ -657,7 +657,7 @@ public abstract class World
             else if (biome == Biome.VOLCANO || biome == Biome.CALDERA)
             {
                 range = 10;
-                offset = 15;
+                offset = 20;
             }
             crossing = true;
             if (direction == Direction.NORTH)
@@ -2452,6 +2452,7 @@ public abstract class World
 
     public void DrawCenterMountain()
     {
+        isHorizontal = RNG.NextDouble() > 0.5;
         int top = (MAP_ROWS - 35) / 2; //20
         int bottom = MAP_ROWS - top; //55
         if (isHorizontal)

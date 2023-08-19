@@ -66,7 +66,6 @@ class DeathMountain : World
         locations.ForEach(AddLocation);
 
         isHorizontal = props.DmIsHorizontal;
-
         hammerCave = GetLocationByMem(0x6128);
         magicCave = GetLocationByMem(0x6144);
 
@@ -333,6 +332,7 @@ class DeathMountain : World
                 }
                 else if (biome == Biome.CALDERA)
                 {
+                    this.isHorizontal = RNG.NextDouble() > .5;
                     DrawCenterMountain();
                 }
                 else if (biome == Biome.MOUNTAINOUS)
