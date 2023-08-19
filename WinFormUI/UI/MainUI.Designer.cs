@@ -74,7 +74,7 @@ partial class MainUI
         startWithCandleCheckbox = new CheckBox();
         shuffleStartingItemsCheckbox = new CheckBox();
         tabPage1 = new TabPage();
-        includeLavaInShuffle = new CheckBox();
+        includeLavaInShuffleCheckBox = new CheckBox();
         generateBaguWoodsCheckbox = new CheckBox();
         useGoodBootsCheckbox = new CheckBox();
         shuffleWhichLocationsAreHiddenCheckbox = new CheckBox();
@@ -783,7 +783,7 @@ partial class MainUI
         // 
         tabPage1.Controls.Add(westBiomeSelector);
         tabPage1.Controls.Add(westBiomeLabel);
-        tabPage1.Controls.Add(includeLavaInShuffle);
+        tabPage1.Controls.Add(includeLavaInShuffleCheckBox);
         tabPage1.Controls.Add(generateBaguWoodsCheckbox);
         tabPage1.Controls.Add(useGoodBootsCheckbox);
         tabPage1.Controls.Add(shuffleWhichLocationsAreHiddenCheckbox);
@@ -826,15 +826,15 @@ partial class MainUI
         // 
         // includeLavaInShuffle
         // 
-        includeLavaInShuffle.AutoSize = true;
-        includeLavaInShuffle.Location = new Point(7, 129);
-        includeLavaInShuffle.Margin = new Padding(4, 3, 4, 3);
-        includeLavaInShuffle.Name = "includeLavaInShuffle";
-        includeLavaInShuffle.Size = new Size(145, 19);
-        includeLavaInShuffle.TabIndex = 48;
-        includeLavaInShuffle.Text = "Include Lava in Shuffle";
-        toolTip1.SetToolTip(includeLavaInShuffle, "If checked, you may have enemies in path encounters");
-        includeLavaInShuffle.UseVisualStyleBackColor = true;
+        includeLavaInShuffleCheckBox.AutoSize = true;
+        includeLavaInShuffleCheckBox.Location = new Point(7, 129);
+        includeLavaInShuffleCheckBox.Margin = new Padding(4, 3, 4, 3);
+        includeLavaInShuffleCheckBox.Name = "includeLavaInShuffle";
+        includeLavaInShuffleCheckBox.Size = new Size(145, 19);
+        includeLavaInShuffleCheckBox.TabIndex = 48;
+        includeLavaInShuffleCheckBox.Text = "Include Lava in Shuffle";
+        toolTip1.SetToolTip(includeLavaInShuffleCheckBox, "If checked, you may have enemies in path encounters");
+        includeLavaInShuffleCheckBox.UseVisualStyleBackColor = true;
         // 
         // generateBaguWoodsCheckbox
         // 
@@ -3302,7 +3302,7 @@ partial class MainUI
     private Label label5;
     private ComboBox startingGemsMaxList;
     private CheckBox swapUpAndDownstabCheckbox;
-    private CheckBox includeLavaInShuffle;
+    private CheckBox includeLavaInShuffleCheckBox;
     private CheckBox useCustomRoomsBox;
     private Label FireSpellOptionLabel;
     private ComboBox FireSpellBox;
