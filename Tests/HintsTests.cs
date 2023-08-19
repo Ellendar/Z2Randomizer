@@ -19,7 +19,7 @@ public class HintsTests
 
         foreach(string hint in hints)
         {
-            Assert.IsTrue(Regex.IsMatch(hint.ToUpper(), @"^[-A-Z0-9 /,.!?*\n$]+$"), "Hint contains an invalid character: " + hint);
+            Assert.IsTrue(Regex.IsMatch(hint.ToUpper(), @"^[A-Z0-9 /,.!?*\n$]+$"), "Hint contains an invalid character: " + hint);
             string[] parts = hint.Split('$');
             Assert.IsFalse(parts.Any(i => i.Length > MAX_HINT_LENGTH), "Hint has a part that is too long: " + hint);
         }

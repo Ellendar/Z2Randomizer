@@ -18,8 +18,10 @@ public partial class MainUI : Form
     private Random r;
     private bool dontrunhandler;
     private bool spawnNextSeed;
+    private Thread t;
     private CheckBox[] small;
     private CheckBox[] large;
+    private String oldFlags;
     private GeneratingSeedsForm f3;
     private RandomizerConfiguration config;
     private List<Button> customisableButtons = new List<Button>();

@@ -26,31 +26,25 @@ public class Enemies
 
 
 
-	public static readonly int[] Palace125Enemies = new int[] { 0x03, 0x04, 0x0C, 0x11, 0x12, 0x18, 0x19, 0x1A, 0x1D, 0x1E, 0x1F, 0x23 };
+	public static readonly int[] Palace125Enemies = new int[] { 3, 4, 12, 17, 18, 24, 25, 26, 29, 0x1E, 0x1F, 0x23 };
     public static readonly int[] Palace125FlyingEnemies = new int[] { 0x06, 0x07, 0x0E };
     public static readonly int[] Palace125Generators = new int[] { 0x0B, 0x0F, 0x1B, 0x0A };
     public static readonly int[] Palace125SmallEnemies = new int[] { 0x03, 0x04, 0x11, 0x12 };
     public static readonly int[] Palace125LargeEnemies = new int[] { 0x0C, 0x18, 0x19, 0x1A, 0x1D, 0x1E, 0x1F, 0x23 };
 
-    public static readonly int[] Palace346Enemies = new int[] { 0x03, 0x04, 0x0C, 0x11, 0x18, 0x19, 0x1A, 0x1D, 0x1F, 0x1E, 0x23 };
+    public static readonly int[] Palace346Enemies = new int[] { 3, 4, 12, 17, 24, 25, 26, 29, 0x1F, 0x1E, 0x23 };
     public static readonly int[] Palace346FlyingEnemies = new int[] { 0x06, 0x07, 0x0E };
-    public static readonly int[] Palace346Generators = new int[] { 0x0B, 0x0F, 0x1B  };
+    public static readonly int[] Palace346Generators = new int[] { 0x0B, 0x1B, 0x0F };
     public static readonly int[] Palace346SmallEnemies = new int[] { 0x03, 0x04, 0x11 };
     public static readonly int[] Palace346LargeEnemies = new int[] { 0x0C, 0x18, 0x19, 0x1A, 0x1D, 0x1F, 0x1E, 0x23 };
 
-    public static readonly int[] GPEnemies = new int[] { 0x03, 0x04, 0x11, 0x12, 0x18, 0x19, 0x1A, 0x1D };
+    public static readonly int[] GPEnemies = new int[] { 3, 4, 17, 18, 24, 25, 26, 0x1D };
     public static readonly int[] GPFlyingEnemies = new int[] { 0x06, 0x14, 0x15, 0x17, 0x1E };
     public static readonly int[] GPGenerators = new int[] { 0x0B, 0x0C, 0x0F, 0x16 };
-    public static readonly int[] GPSmallEnemies = new int[] { 03, 0x04, 0x11, 0x12 };
+    public static readonly int[] GPSmallEnemies = new int[] { 0x03, 0x04, 0x11, 0x12 };
     public static readonly int[] GPLargeEnemies = new int[] { 0x18, 0x19, 0x1A, 0x1D };
 
-	public static readonly int[] StandardPalaceEnemies = Palace125Enemies.Union(Palace346Enemies).ToArray();
-    public static readonly int[] StandardPalaceFlyingEnemies = Palace125FlyingEnemies.Union(Palace346FlyingEnemies).ToArray();
-    public static readonly int[] StandardPalaceGenerators = Palace125Generators.Union(Palace346Generators).ToArray();
-    public static readonly int[] StandardPalaceSmallEnemies = Palace125SmallEnemies.Union(Palace346SmallEnemies).ToArray();
-    public static readonly int[] StandardPalaceLargeEnemies = Palace125LargeEnemies.Union(Palace346LargeEnemies).ToArray();
-
-    //TODO: Turn this into constants and a lookup, then replace the above nonsense with const arrays of constants instead of garbage
+	//TODO: Turn this into constants and a lookup, then replace the above nonsense with const arrays of constants instead of garbage
     /*
 West Hyrule, Death Mountain:
 	00 - Fairy
