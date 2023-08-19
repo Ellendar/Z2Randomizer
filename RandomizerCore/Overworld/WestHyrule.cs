@@ -599,10 +599,9 @@ public class WestHyrule : World
                     }
                 }
 
-                PlaceRandomTerrain(props.Climate.SeedTerrainCount);
+                PlaceRandomTerrain(props.Climate);
 
-
-                if (!GrowTerrain())
+                if (!GrowTerrain(props.Climate))
                 {
                     return false;
                 }

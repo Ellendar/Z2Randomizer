@@ -8,7 +8,6 @@ using System.Reflection;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using System.Text.Json;
-using RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Core;
 
@@ -87,7 +86,10 @@ public class RandomizerConfiguration
     public Biome EastBiome { get; set; }
     public Biome DMBiome { get; set; }
     public Biome MazeBiome { get; set; }
-    public Climate? Climate { get; set; }
+    //XXX: I need to work out how this is going to be stored in configuration / serialized. Maybe climate needs a 3rd type
+    //I really wish C# had Java's Enums.
+    [IgnoreInFlags]
+    public Climate Climate { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
 
     //Palaces
@@ -408,6 +410,8 @@ public class RandomizerConfiguration
 
     public static RandomizerConfiguration FromLegacyFlags(string flags)
     {
+        //4.3 updated encoding table.
+        flags = flags.Replace("$", "+");
         RandomizerConfiguration config = new RandomizerConfiguration();
         BitArray bits;
         int i = 0;

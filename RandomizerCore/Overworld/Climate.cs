@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Z2Randomizer.Core;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.Core.Overworld;
 public class Climate
 {
     private readonly Dictionary<Terrain, float> DistanceCoefficients;
@@ -12,9 +12,11 @@ public class Climate
     public int SeedTerrainCount { get; }
     private int totalTerrainWeight;
     private Terrain[] terrainWeightTable;
+    public string Name { get; set; }
 
-    public Climate(Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount)
+    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount)
     {
+        Name = name;
         DistanceCoefficients = distanceCoefficients;
         TerrainWeights = terrainWeights;
         SeedTerrainCount = seedTerrainCount;

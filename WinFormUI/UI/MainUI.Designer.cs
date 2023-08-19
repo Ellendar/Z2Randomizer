@@ -74,6 +74,8 @@ partial class MainUI
         startWithCandleCheckbox = new CheckBox();
         shuffleStartingItemsCheckbox = new CheckBox();
         tabPage1 = new TabPage();
+        westBiomeSelector = new ComboBox();
+        westBiomeLabel = new Label();
         includeLavaInShuffleCheckBox = new CheckBox();
         generateBaguWoodsCheckbox = new CheckBox();
         useGoodBootsCheckbox = new CheckBox();
@@ -103,6 +105,7 @@ partial class MainUI
         includeGPinShuffleCheckbox = new CheckBox();
         allowPalaceContinentSwapCheckbox = new CheckBox();
         label4 = new Label();
+        allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
         noDuplicateRoomsCheckbox = new CheckBox();
@@ -251,9 +254,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        westBiomeLabel = new Label();
-        westBiomeSelector = new ComboBox();
-        allowPathEnemiesCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -824,12 +824,36 @@ partial class MainUI
         tabPage1.ToolTipText = "When selected, will hide Kasuto behind a forest tile";
         tabPage1.UseVisualStyleBackColor = true;
         // 
-        // includeLavaInShuffle
+        // westBiomeSelector
+        // 
+        westBiomeSelector.DropDownStyle = ComboBoxStyle.DropDownList;
+        westBiomeSelector.FormattingEnabled = true;
+        westBiomeSelector.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+        westBiomeSelector.Location = new Point(416, 270);
+        westBiomeSelector.Margin = new Padding(4, 3, 4, 3);
+        westBiomeSelector.Name = "westBiomeSelector";
+        westBiomeSelector.Size = new Size(140, 23);
+        westBiomeSelector.TabIndex = 50;
+        toolTip1.SetToolTip(westBiomeSelector, "West Hyrule overworld map style.");
+        westBiomeSelector.SelectedIndexChanged += WestBiome_SelectedIndexChanged;
+        // 
+        // westBiomeLabel
+        // 
+        westBiomeLabel.AutoSize = true;
+        westBiomeLabel.Location = new Point(273, 273);
+        westBiomeLabel.Margin = new Padding(4, 0, 4, 0);
+        westBiomeLabel.Name = "westBiomeLabel";
+        westBiomeLabel.Size = new Size(129, 15);
+        westBiomeLabel.TabIndex = 49;
+        westBiomeLabel.Text = "West Continent Biome:";
+        toolTip1.SetToolTip(westBiomeLabel, "West Hyrule overworld map style.");
+        // 
+        // includeLavaInShuffleCheckBox
         // 
         includeLavaInShuffleCheckBox.AutoSize = true;
         includeLavaInShuffleCheckBox.Location = new Point(7, 129);
         includeLavaInShuffleCheckBox.Margin = new Padding(4, 3, 4, 3);
-        includeLavaInShuffleCheckBox.Name = "includeLavaInShuffle";
+        includeLavaInShuffleCheckBox.Name = "includeLavaInShuffleCheckBox";
         includeLavaInShuffleCheckBox.Size = new Size(145, 19);
         includeLavaInShuffleCheckBox.TabIndex = 48;
         includeLavaInShuffleCheckBox.Text = "Include Lava in Shuffle";
@@ -941,7 +965,7 @@ partial class MainUI
         // 
         climateSelector.DropDownStyle = ComboBoxStyle.DropDownList;
         climateSelector.FormattingEnabled = true;
-        climateSelector.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+        climateSelector.Items.AddRange(new object[] { "Classic" });
         climateSelector.Location = new Point(416, 145);
         climateSelector.Margin = new Padding(4, 3, 4, 3);
         climateSelector.Name = "climateSelector";
@@ -1165,6 +1189,18 @@ partial class MainUI
         label4.Name = "label4";
         label4.Size = new Size(243, 1);
         label4.TabIndex = 18;
+        // 
+        // allowPathEnemiesCheckbox
+        // 
+        allowPathEnemiesCheckbox.AutoSize = true;
+        allowPathEnemiesCheckbox.Location = new Point(7, 103);
+        allowPathEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        allowPathEnemiesCheckbox.Name = "allowPathEnemiesCheckbox";
+        allowPathEnemiesCheckbox.Size = new Size(184, 19);
+        allowPathEnemiesCheckbox.TabIndex = 15;
+        allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
+        toolTip1.SetToolTip(allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
+        allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
         // 
         // shuffleEncountersCheckbox
         // 
@@ -2827,7 +2863,6 @@ partial class MainUI
         flagsTextBox.Size = new Size(212, 23);
         flagsTextBox.TabIndex = 9;
         toolTip1.SetToolTip(flagsTextBox, "These flags represent the selected options. They can be copy/pasted.");
-        flagsTextBox.TextChanged += FlagBox_TextChanged;
         // 
         // updateButton
         // 
@@ -2998,42 +3033,6 @@ partial class MainUI
         // 
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
-        // 
-        // westBiomeLabel
-        // 
-        westBiomeLabel.AutoSize = true;
-        westBiomeLabel.Location = new Point(273, 273);
-        westBiomeLabel.Margin = new Padding(4, 0, 4, 0);
-        westBiomeLabel.Name = "westBiomeLabel";
-        westBiomeLabel.Size = new Size(129, 15);
-        westBiomeLabel.TabIndex = 49;
-        westBiomeLabel.Text = "West Continent Biome:";
-        toolTip1.SetToolTip(westBiomeLabel, "West Hyrule overworld map style.");
-        // 
-        // comboBox1
-        // 
-        westBiomeSelector.DropDownStyle = ComboBoxStyle.DropDownList;
-        westBiomeSelector.FormattingEnabled = true;
-        westBiomeSelector.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
-        westBiomeSelector.Location = new Point(416, 270);
-        westBiomeSelector.Margin = new Padding(4, 3, 4, 3);
-        westBiomeSelector.Name = "comboBox1";
-        westBiomeSelector.Size = new Size(140, 23);
-        westBiomeSelector.TabIndex = 50;
-        toolTip1.SetToolTip(westBiomeSelector, "West Hyrule overworld map style.");
-        westBiomeSelector.SelectedIndexChanged += WestBiome_SelectedIndexChanged;
-        // 
-        // allowPathEnemiesCheckbox
-        // 
-        allowPathEnemiesCheckbox.AutoSize = true;
-        allowPathEnemiesCheckbox.Location = new Point(7, 103);
-        allowPathEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
-        allowPathEnemiesCheckbox.Name = "allowPathEnemiesCheckbox";
-        allowPathEnemiesCheckbox.Size = new Size(184, 19);
-        allowPathEnemiesCheckbox.TabIndex = 15;
-        allowPathEnemiesCheckbox.Text = "Allow Unsafe Path Encounters";
-        toolTip1.SetToolTip(allowPathEnemiesCheckbox, "If checked, you may have enemies in path encounters");
-        allowPathEnemiesCheckbox.UseVisualStyleBackColor = true;
         // 
         // MainUI
         // 

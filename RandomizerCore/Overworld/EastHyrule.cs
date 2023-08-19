@@ -586,18 +586,10 @@ public class EastHyrule : World
                     return false;
                 }
 
-                //WHAT?
-                if (props.HideLessImportantLocations)
-                {
-                    PlaceRandomTerrain(50);
-                }
-                else
-                {
-                    PlaceRandomTerrain(25);
+                PlaceRandomTerrain(props.Climate);
 
-                }
                 randomTerrains.Add(Terrain.LAVA);
-                if (!GrowTerrain())
+                if (!GrowTerrain(props.Climate))
                 {
                     return false;
                 }

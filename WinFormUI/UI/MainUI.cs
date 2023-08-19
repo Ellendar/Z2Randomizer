@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Z2Randomizer.Core.Overworld;
 using WinFormUI.UI;
 using System.Configuration;
+using Z2Randomizer.Core.Flags;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -16,7 +17,6 @@ public partial class MainUI : Form
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private Random r;
     private bool dontrunhandler;
-    private readonly String flags = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz1234567890!@#$";
     private bool spawnNextSeed;
     private Thread t;
     private CheckBox[] small;
@@ -71,6 +71,7 @@ public partial class MainUI : Form
         large = new CheckBox[] { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox,
             largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
 
+        flagsTextBox.TextChanged += FlagBox_TextChanged;
         InitialiseCustomFlagsetButtons();
 
         dontrunhandler = false;
@@ -777,6 +778,11 @@ public partial class MainUI : Form
             3 => ContinentConnectionType.ANYTHING_GOES,
             _ => throw new Exception("Invalid ContinentConnection setting")
         };
+        configuration.Climate = climateSelector.SelectedIndex switch
+        {
+            0 => Climates.Classic,
+            _ => throw new Exception("Invalid Climate setting")
+        };
         configuration.WestBiome = westBiomeSelector.SelectedIndex switch
         {
             0 => Biome.VANILLA,
@@ -1169,6 +1175,14 @@ public partial class MainUI : Form
                 ContinentConnectionType.ANYTHING_GOES => 3,
                 _ => throw new Exception("Invalid ContinentConnection setting")
             };
+            /*
+            climateSelector.SelectedIndex = configuration.Climate.Name switch
+            {
+                "Classic" => 0,
+                _ => throw new Exception("Invalid Climate setting")
+            };*/
+            //XXX: Temp override
+            climateSelector.SelectedIndex = 0;
             westBiomeSelector.SelectedIndex = configuration.WestBiome switch
             {
                 Biome.VANILLA => 0,
@@ -1529,7 +1543,7 @@ public partial class MainUI : Form
 
         for (int i = 0; i < flagString.Length; i++)
         {
-            if (!flags.Contains(flagString[i]))
+            if (!FlagBuilder.ENCODING_TABLE.Contains(flagString[i]))
             {
                 MessageBox.Show("Invalid flags. Aborting seed generation.");
                 return;
@@ -1880,7 +1894,7 @@ public partial class MainUI : Form
 
         for (int i = 0; i < flagString.Length; i++)
         {
-            if (!flags.Contains(flagString[i]))
+            if (!FlagBuilder.ENCODING_TABLE.Contains(flagString[i]))
             {
                 MessageBox.Show("Invalid flags. Aborting seed generation.");
                 return false;

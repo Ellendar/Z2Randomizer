@@ -2,13 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Collections;
-using System.Runtime.InteropServices;
 using NLog;
-using System.Threading.Channels;
-using System.Diagnostics;
-using Z2Randomizer.Core;
 //using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -1362,7 +1356,7 @@ public abstract class World
         return count == 4;
 
     }
-    protected bool GrowTerrain()
+    protected bool GrowTerrain(Climate climate)
     {
         TerrainGrowthAttempts++;
         Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
@@ -1388,13 +1382,13 @@ public abstract class World
                 if (map[i, j] == Terrain.NONE)
                 {
                     choices.Clear();
-                    double mindistance = Int32.MaxValue;
+                    double mindistance = int.MaxValue;
 
                     foreach (Tuple<int, int> t in placed)
                     {
-                        tx = t.Item1 - i;
-                        ty = t.Item2 - j;
-                        distance = Math.Sqrt(tx * tx + ty * ty);
+                        tx = Math.Abs(t.Item1 - i);
+                        ty = Math.Abs(t.Item2 - j);
+                        distance = climate.GetDistanceCoefficient(map[t.Item1, t.Item2]) * Math.Sqrt(tx * tx + ty * ty);
                         //distance = ((tx + (tx >> 31)) ^ (tx >> 31)) + ((ty + (ty >> 31)) ^ (ty >> 31));
                         //distance = Math.Abs(tx) + Math.Abs(ty);
                         if (distance < mindistance)
@@ -1427,6 +1421,7 @@ public abstract class World
         return true;
     }
 
+    //Keeping this around for vanilla DM support, but probably this gets removed in the future
     protected void PlaceRandomTerrain(int numberOfTerrainsToPlace)
     {
         //randomly place remaining Terrain
@@ -1436,6 +1431,24 @@ public abstract class World
             int x = 0;
             int y = 0;
             Terrain t = randomTerrains[RNG.Next(randomTerrains.Count)];
+            do
+            {
+                x = RNG.Next(MAP_COLS);
+                y = RNG.Next(MAP_ROWS);
+            } while (map[y, x] != Terrain.NONE);
+            map[y, x] = t;
+            placed++;
+        }
+    }
+
+    protected void PlaceRandomTerrain(Climate climate)
+    {
+        //randomly place remaining Terrain
+        int placed = 0;
+        while (placed < climate.SeedTerrainCount)
+        {
+            int x, y;
+            Terrain t = climate.GetRandomTerrain(RNG);
             do
             {
                 x = RNG.Next(MAP_COLS);

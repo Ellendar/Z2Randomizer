@@ -693,13 +693,13 @@ class DeathMountain : World
                     }
                 }
 
-
+                //Vanillalike DM is weird since the terrain is very little and everything else is mostly road. Not touching this for now.
                 if (biome == Biome.VANILLALIKE)
                 {
                     PlaceRandomTerrain(5);
                 }
                 randomTerrains.Add(Terrain.ROAD);
-                if (!GrowTerrain())
+                if (!GrowTerrain(props.Climate))
                 {
                     return false;
                 }

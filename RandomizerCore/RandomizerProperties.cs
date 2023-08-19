@@ -1,5 +1,4 @@
-﻿using RandomizerCore.Overworld;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Core.Overworld;

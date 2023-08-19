@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Z2Randomizer.Core;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.Core.Overworld;
 public class Climates
 {
     public static readonly Climate Classic = new Climate
     (
+        "Classic",
         new Dictionary<Terrain, float>
             {
                 { Terrain.DESERT, 1 },
