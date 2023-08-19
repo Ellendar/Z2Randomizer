@@ -437,7 +437,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.5" +
+            "4.2.4" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
@@ -1744,6 +1744,8 @@ public class Hyrule
                 world.ShuffleOverworldEnemies(ROMData, props.GeneratorsAlwaysMatch, props.MixLargeAndSmallEnemies);
             }
         }
+
+        //WRITE LOCATIONS HERE
     }
 
     private bool UpdateProgress(int v)
@@ -3380,7 +3382,7 @@ public class Hyrule
                 {
                     int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
                     int item = ROMData.GetByte(addr);
-                    if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
+                    if (false && (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr)))
                     {
                         if (UNSAFE_DEBUG)
                         {
