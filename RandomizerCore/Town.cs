@@ -34,4 +34,24 @@ public static class TownExtensions
             _ => 0
         };
     }
+
+    public static bool AppearsOnMap(this Town town)
+    {
+        return town switch
+        {
+            Town.RAURU => true,
+            Town.RUTO => true,
+            Town.SARIA_NORTH => true,
+            Town.SARIA_SOUTH => true,
+            Town.MIDO_WEST => true,
+            Town.MIDO_CHURCH => false,
+            Town.NABOORU => true,
+            Town.DARUNIA_WEST => true,
+            Town.DARUNIA_ROOF => false,
+            Town.NEW_KASUTO => true,
+            Town.SPELL_TOWER => false,
+            Town.OLD_KASUTO => true,
+            _ => false
+        };
+    }
 }

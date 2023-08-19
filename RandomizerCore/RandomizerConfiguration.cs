@@ -1021,6 +1021,10 @@ public class RandomizerConfiguration
     {
         RandomizerProperties properties = new RandomizerProperties();
 
+        properties.WestIsHorizontal = random.Next(2) == 1;
+        properties.EastIsHorizontal = random.Next(2) == 1;
+        properties.DmIsHorizontal = random.Next(2) == 1;
+
         //ROM Info
         properties.Filename = FileName;
         properties.saveRom = true;
@@ -1164,9 +1168,7 @@ public class RandomizerConfiguration
         properties.P7shuffle = ShuffleGP == null ? random.Next(2) == 1 : (bool)ShuffleGP;
         properties.HiddenPalace = HidePalace == null ? random.Next(2) == 1 : (bool)HidePalace;
         properties.HiddenKasuto = HideKasuto == null ? random.Next(2) == 1 : (bool)HideKasuto;
-        //As far as I can tell this was never properly rigged to the UI and was impossible to trigger.
-        //Further investigation is needed
-        properties.TownSwap = false;
+
         properties.EncounterRate = EncounterRate;
         properties.ContinentConnections = ContinentConnectionType;
         properties.BoulderBlockConnections = AllowConnectionCavesToBeBoulderBlocked;

@@ -15,7 +15,6 @@ public class RandomizerProperties
 {
     public RandomizerProperties()
     {
-
     }
 
     //ROM Info
@@ -77,6 +76,9 @@ public class RandomizerProperties
     public Biome EastBiome { get; set; }
     public Biome MazeBiome { get; set; }
     public Biome DmBiome { get; set; }
+    public bool DmIsHorizontal { get; set; }
+    public bool WestIsHorizontal { get; set; }
+    public bool EastIsHorizontal { get; set; }
     public Climate Climate { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
