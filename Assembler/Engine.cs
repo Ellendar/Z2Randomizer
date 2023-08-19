@@ -17,11 +17,12 @@ public class Assembler
         _engine = engine;
     }
 
-    public void code(string asm)
+    public void code(string asm, string name = "")
     {
         _actions.Append(new Dictionary<string, object>() {
             { "action", "code" },
             { "code", asm },
+            { "name", name ?? "" },
         });
     }
 
@@ -41,6 +42,21 @@ public class Assembler
         });
     }
 
+    public void org(uint addr, string name = "")
+    {
+        _actions.Append(new Dictionary<string, object>() {
+            { "action", "org" },
+            { "addr", addr },
+            { "name", name },
+        });
+    }
+    public void segment(params string[] name)
+    {
+        _actions.Append(new Dictionary<string, object>() {
+            { "action", "segment" },
+            { "name", name },
+        });
+    }
 
     public string module()
     {
@@ -48,20 +64,39 @@ public class Assembler
         _engine.Execute("""
     import { Assembler } from "js65/assembler.js"
     import { Cpu } from "js65/cpu.js"
+    import { Tokenizer } from "js65/tokenizer.js"
+    import { TokenStream } from "js65/tokenstream.js"
 
     (async function() {
         let a = new Assembler(Cpu.P02);
         for (const action of actions) {
             switch (action["action"]) {
-                case "code":
-                    
-                case "label":
+                case "code": {
+                    const opts = {lineContinuations: true};
+                    const toks = new TokenStream(undefined, undefined, opts);
+                    const tokenizer = new Tokenizer(action["code"], action["name"], opts);
+                    toks.enter(tokenizer);
+                    const pre = new Preprocessor(toks, a);
+                    await a.tokens(pre);
+                    break;
+                }
+                case "label": {
                     a.label(action["label"]);
                     a.export(action["label"]);
                     break;
-                case "byte":
+                }
+                case "byte": {
                     a.byte(...action["bytes"]);
                     break;
+                }
+                case "org": {
+                    a.org(action["addr"], action["name"]);
+                    break;
+                }
+                case "segment": {
+                    a.segment(...action["name"]);
+                    break;
+                }
             }
         }
         let module = JSON.stringify(a.module());
@@ -76,8 +111,6 @@ public class Engine
     private V8ScriptEngine _engine;
     public Engine() {
         _engine = new V8ScriptEngine();
-        _engine.ExecuteDocument("assembler.js");
-        _engine.ExecuteDocument("linker.js");
     }
 
     public Assembler Asm()

@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Assembler;
+using NLog;
 using RandomizerCore;
 using System;
 using System.Collections;
@@ -165,6 +166,8 @@ public class Hyrule
 
     public Hyrule(RandomizerConfiguration config, BackgroundWorker worker, bool saveRom = true)
     {
+        var engine = new Engine();
+
         WestHyrule.ResetStats();
         RNG = new Random(config.Seed);
         props = config.Export(RNG);
@@ -175,7 +178,7 @@ public class Hyrule
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
 
-        ROMData = new ROM(props.Filename);
+        ROMData = new ROM(props.Filename, engine);
         this.worker = worker;
 
 
@@ -419,6 +422,9 @@ public class Hyrule
         {
             return;
         }
+
+        ROMData.ApplyAsm();
+
         List<Hint> hints = ROMData.GetGameText();
         ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
         f = UpdateProgress(9);
