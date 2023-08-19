@@ -12,9 +12,9 @@
     <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.2" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="js65\" />
+	<Content Include="js65\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="js65\" />
-  </ItemGroup>
+
 </Project>

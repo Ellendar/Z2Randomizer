@@ -111,7 +111,7 @@ public class ROM
     };
 
     private byte[] ROMData;
-    private Engine _engine;
+    private readonly Engine _engine;
     private List<string> _modules = new ();
 
     public ROM(String filename, Engine engine)
@@ -807,13 +807,13 @@ public class ROM
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
-lda $f7
-cmp #$28
+  lda $f7
+  cmp #$28
 
 .org $a1dd
 CheckController1ForUpAMagic:
-lda $f7
-cmp #$28
+  lda $f7
+  cmp #$28
 """, "UpAController1.s");
         _modules.Add(a.module());
         //Put(0x21B0, 0xF7);
@@ -833,7 +833,7 @@ cmp #$28
 
     public void ApplyAsm()
     {
-
+        _engine.Apply(ROMData, _modules);
     }
 
     public void DashSpell()
