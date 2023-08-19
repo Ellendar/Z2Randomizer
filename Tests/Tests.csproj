@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
@@ -17,9 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj">
-      <ReferenceSourceTarget></ReferenceSourceTarget>
-    </ProjectReference>
+    <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
+    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
 
 </Project>
