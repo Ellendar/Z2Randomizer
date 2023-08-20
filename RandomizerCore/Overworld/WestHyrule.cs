@@ -107,6 +107,7 @@ public class WestHyrule : World
         locations.AddRange(rom.LoadLocations(0x465B, 2, terrains, Continent.WEST));
         locations.AddRange(rom.LoadLocations(0x465E, 8, terrains, Continent.WEST));
         locations.ForEach(AddLocation);
+
         start = GetLocationByMap(0x80, 0x00);
         //reachableAreas = new HashSet<string>();
         Location jumpCave = GetLocationByMap(9, 0);
@@ -457,7 +458,6 @@ public class WestHyrule : World
                         break;
 
                     case Biome.CANYON:
-                        isHorizontal = RNG.NextDouble() > .5;
                         riverTerrain = fillerWater;
                         if (props.WestBiome == Biome.DRY_CANYON)
                         {
@@ -476,7 +476,6 @@ public class WestHyrule : World
                         //this.randomTerrains.Add(terrain.lava);
                         break;
                     case Biome.CALDERA:
-                        this.isHorizontal = RNG.NextDouble() > .5;
                         DrawCenterMountain();
                         locationAtPalace3.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
@@ -1366,13 +1365,9 @@ public class WestHyrule : World
                         Location l2 = connections[location];
                         if (
                             location.NeedBagu 
-                            && (bagu.Reachable 
-                                || spellGet[Spell.FAIRY] 
-<<<<<<< HEAD
+                            && (bagu.Reachable
+                                || spellGet[Spell.FAIRY]
                                 || (spellGet.ContainsKey(Spell.DASH) && spellGet[Spell.DASH] && spellGet[Spell.JUMP])))
-=======
-                                || spellGet[Spell.DASH] && spellGet[Spell.JUMP]))
->>>>>>> f5d491c65fd3ea0efcdbe58c918729c1df867007
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;

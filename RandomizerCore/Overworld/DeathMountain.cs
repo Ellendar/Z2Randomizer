@@ -332,7 +332,6 @@ class DeathMountain : World
                 }
                 else if (biome == Biome.CALDERA)
                 {
-                    this.isHorizontal = RNG.NextDouble() > .5;
                     DrawCenterMountain();
                 }
                 else if (biome == Biome.MOUNTAINOUS)
