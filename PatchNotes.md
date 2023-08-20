@@ -1,5 +1,11 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.6 - August 20th, 2023
+
+- Fixed another bug that would prevent vertical DM from spawning.
+- Fixed a UI issue that would cause "Include lava in terrain shuffle" to sometimes not update properly.
+- Due to me screwing up the branch, 4.2.X releases will not have source on the github (hopefully this is the last one anyway).
+
 ## Version 4.2.5 - August 18th, 2023
 
 - Temporarily disabled Garfield sprite due to potential crashes. If you have already installed 4.2.4 it will still show up in the list, but crashes may result if you use it.
