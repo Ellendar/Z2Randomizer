@@ -48,16 +48,15 @@ public class Shuffler
         List<int> binRows = new List<int>();
         for (int i = 0; i < 7; i++)
         {
-            int group = r.Next(3);
-            int brickRow = r.Next(Graphics.brickgroup[group].GetLength(0));
-            int curtainRow = r.Next(Graphics.curtaingroup[group].GetLength(0));
+            int brickRow = r.Next(Sidescroll.PalaceColors.bricks.GetLength(0));
+            int curtainRow = r.Next(Sidescroll.PalaceColors.curtains.GetLength(0));
 
             int[] bricks = new int[3];
             int[] curtains = new int[3];
             for (int j = 0; j < 3; j++)
             {
-                bricks[j] = Graphics.brickgroup[group][brickRow, j];
-                curtains[j] = Graphics.curtaingroup[group][curtainRow, j];
+                bricks[j] = Sidescroll.PalaceColors.bricks[brickRow, j];
+                curtains[j] = Sidescroll.PalaceColors.curtains[curtainRow, j];
             }
 
             brickList.Add(bricks);
