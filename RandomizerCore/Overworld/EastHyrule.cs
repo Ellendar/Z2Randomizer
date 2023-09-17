@@ -162,53 +162,58 @@ public class EastHyrule : World
 
         biome = props.EastBiome;
         section = new SortedDictionary<Tuple<int, int>, string>
-    {
-        {Tuple.Create(0x3A, 0x0A), "mid2" },
-        {Tuple.Create(0x5B, 0x36), "south" },
-        { Tuple.Create(0x4C, 0x15), "south" },
-        { Tuple.Create(0x51, 0x11), "south" },
-        { Tuple.Create(0x54, 0x13), "south" },
-        { Tuple.Create(0x60, 0x18), "south" },
-        { Tuple.Create(0x5D, 0x23), "south" },
-        { Tuple.Create(0x64, 0x25), "south" },
-        { Tuple.Create(0x24, 0x09), "north2" },
-        { Tuple.Create(0x26, 0x0A), "north2" },
-        { Tuple.Create(0x38, 0x3F), "boots1" },
-        { Tuple.Create(0x34, 0x18), "mid2" },
-        { Tuple.Create(0x30, 0x1B), "north2" },
-        { Tuple.Create(0x47, 0x19), "mid2" },
-        { Tuple.Create(0x4E, 0x1F), "south" },
-        { Tuple.Create(0x4E, 0x31), "south" },
-        { Tuple.Create(0x4E, 0x39), "kasuto" },
-        { Tuple.Create(0x4B, 0x02), "vod" },
-        { Tuple.Create(0x4B, 0x04), "gp" },
-        { Tuple.Create(0x4D, 0x06), "vod" },
-        { Tuple.Create(0x4D, 0x0A), "south" },
-        { Tuple.Create(0x51, 0x1A), "south" },
-        { Tuple.Create(0x40, 0x35), "hammer2" },
-        { Tuple.Create(0x38, 0x22), "mid2" },
-        { Tuple.Create(0x2C, 0x30), "north2" },
-        { Tuple.Create(0x63, 0x39), "south" },
-        { Tuple.Create(0x44, 0x0D), "mid2" },
-        { Tuple.Create(0x5B, 0x04), "south" },
-        { Tuple.Create(0x63, 0x1B), "south" },
-        { Tuple.Create(0x53, 0x03), "vod" },
-        { Tuple.Create(0x56, 0x08), "south" },
-        { Tuple.Create(0x63, 0x08), "south" },
-        { Tuple.Create(0x28, 0x34), "north2" },
-        { Tuple.Create(0x34, 0x07), "mid2" },
-        { Tuple.Create(0x3C, 0x17), "mid2" },
-        { Tuple.Create(0x21, 0x03), "north2" },
-        { Tuple.Create(0x51, 0x3D), "kasuto" },
-        { Tuple.Create(0x63, 0x22), "south" },
-        { Tuple.Create(0x3C, 0x3E), "boots" },
-        { Tuple.Create(0x66, 0x2D), "south" },
-        { Tuple.Create(0x49, 0x04), "gp" }
-    };
+        {
+            {Tuple.Create(0x3A, 0x0A), "mid2" },
+            {Tuple.Create(0x5B, 0x36), "south" },
+            { Tuple.Create(0x4C, 0x15), "south" },
+            { Tuple.Create(0x51, 0x11), "south" },
+            { Tuple.Create(0x54, 0x13), "south" },
+            { Tuple.Create(0x60, 0x18), "south" },
+            { Tuple.Create(0x5D, 0x23), "south" },
+            { Tuple.Create(0x64, 0x25), "south" },
+            { Tuple.Create(0x24, 0x09), "north2" },
+            { Tuple.Create(0x26, 0x0A), "north2" },
+            { Tuple.Create(0x38, 0x3F), "boots1" },
+            { Tuple.Create(0x34, 0x18), "mid2" },
+            { Tuple.Create(0x30, 0x1B), "north2" },
+            { Tuple.Create(0x47, 0x19), "mid2" },
+            { Tuple.Create(0x4E, 0x1F), "south" },
+            { Tuple.Create(0x4E, 0x31), "south" },
+            { Tuple.Create(0x4E, 0x39), "kasuto" },
+            { Tuple.Create(0x4B, 0x02), "vod" },
+            { Tuple.Create(0x4B, 0x04), "gp" },
+            { Tuple.Create(0x4D, 0x06), "vod" },
+            { Tuple.Create(0x4D, 0x0A), "south" },
+            { Tuple.Create(0x51, 0x1A), "south" },
+            { Tuple.Create(0x40, 0x35), "hammer2" },
+            { Tuple.Create(0x38, 0x22), "mid2" },
+            { Tuple.Create(0x2C, 0x30), "north2" },
+            { Tuple.Create(0x63, 0x39), "south" },
+            { Tuple.Create(0x44, 0x0D), "mid2" },
+            { Tuple.Create(0x5B, 0x04), "south" },
+            { Tuple.Create(0x63, 0x1B), "south" },
+            { Tuple.Create(0x53, 0x03), "vod" },
+            { Tuple.Create(0x56, 0x08), "south" },
+            { Tuple.Create(0x63, 0x08), "south" },
+            { Tuple.Create(0x28, 0x34), "north2" },
+            { Tuple.Create(0x34, 0x07), "mid2" },
+            { Tuple.Create(0x3C, 0x17), "mid2" },
+            { Tuple.Create(0x21, 0x03), "north2" },
+            { Tuple.Create(0x51, 0x3D), "kasuto" },
+            { Tuple.Create(0x63, 0x22), "south" },
+            { Tuple.Create(0x3C, 0x3E), "boots" },
+            { Tuple.Create(0x66, 0x2D), "south" },
+            { Tuple.Create(0x49, 0x04), "gp" }
+        };
         townAtNewKasuto.ExternalWorld = 128;
         locationAtPalace6.ExternalWorld = 128;
         hiddenPalaceLocation = locationAtPalace6;
         hiddenKasutoLocation = townAtNewKasuto;
+
+        //Climate filtering
+        climate = props.Climate.Clone();
+        climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
+        //climate.DisallowTerrain(Terrain.LAVA);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -593,10 +598,10 @@ public class EastHyrule : World
                     return false;
                 }
 
-                PlaceRandomTerrain(props.Climate);
+                PlaceRandomTerrain(climate);
 
                 randomTerrains.Add(Terrain.LAVA);
-                if (!GrowTerrain(props.Climate))
+                if (!GrowTerrain(climate))
                 {
                     return false;
                 }

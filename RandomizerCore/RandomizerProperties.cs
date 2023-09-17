@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomizerCore.Sidescroll;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Core.Overworld;
@@ -96,11 +97,13 @@ public class RandomizerProperties
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
     //public bool createPalaces { get; set; }
-    public bool UseCommunityRooms { get; set; }
     public bool BlockersAnywhere { get; set; }
     public bool BossRoomConnect { get; set; }
     public bool NoDuplicateRooms { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
+    public bool AllowVanillaRooms { get; set; }
+    public bool AllowV4Rooms { get; set; }
+    public bool AllowV4_4Rooms { get; set; }
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }

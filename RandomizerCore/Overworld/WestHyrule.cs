@@ -218,85 +218,59 @@ public class WestHyrule : World
                 unimportantLocs.Add(GetLocationByMem(0x465B));
             }
         }
-        if (props.WestBiome == Biome.ISLANDS)
-        {
-            biome = Biome.ISLANDS;
-        }
-        else if (props.WestBiome == Biome.CANYON || props.WestBiome == Biome.DRY_CANYON)
-        {
-            biome = Biome.CANYON;
-        }
-        else if (props.WestBiome == Biome.MOUNTAINOUS)
-        {
-            biome = Biome.MOUNTAINOUS;
-        }
-        else if(props.WestBiome == Biome.CALDERA)
-        {
-            biome = Biome.CALDERA;
-        }
-        else if(props.WestBiome == Biome.MOUNTAINOUS)
-        {
-            biome = Biome.MOUNTAINOUS;
-        }
-        else if (props.WestBiome == Biome.VANILLA)
-        {
-            biome = Biome.VANILLA;
-        }
-        else if (props.WestBiome == Biome.VANILLA_SHUFFLE)
-        {
-            biome = Biome.VANILLA_SHUFFLE;
-        }
-        else
-        {
-            biome = Biome.VANILLALIKE;
-        }
+        biome = props.WestBiome;
+
+        //Climate filtering
+        climate = props.Climate.Clone();
+        climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
+        climate.DisallowTerrain(Terrain.LAVA);
 
         section = new SortedDictionary<Tuple<int, int>, string>{
             { Tuple.Create(0x34, 0x17), "north" },
-        { Tuple.Create(0x20, 0x1D), "north" },
-        { Tuple.Create(0x2A, 0x25), "north" },
-        { Tuple.Create(0x3C, 0x10), "north" },
-        { Tuple.Create(0x56, 0x14), "mid" },
-        { Tuple.Create(0x40, 0x3E), "parapa" },
-        { Tuple.Create(0x4D, 0x15), "mid" },
-        { Tuple.Create(0x39, 0x3D), "parapa" },
-        { Tuple.Create(0x47, 0x08), "mid" },
-        { Tuple.Create(0x5C, 0x30), "grave" },
-        { Tuple.Create(0x29, 0x30), "parapa" },
-        { Tuple.Create(0x2E, 0x37), "north" },
-        { Tuple.Create(0x3A, 0x01), "north" },
-        { Tuple.Create(0x3E, 0x03), "mid" },
-        { Tuple.Create(0x3E, 0x26), "mid" },
-        { Tuple.Create(0x45, 0x09), "hammer0" },
-        { Tuple.Create(0x3E, 0x36), "hammer" },
-        { Tuple.Create(0x60, 0x32), "grave" },
-        { Tuple.Create(0x66, 0x3B), "island" },
-        { Tuple.Create(0x52, 0x10), "mid" },
-        { Tuple.Create(0x57, 0x1A), "mid" },
-        { Tuple.Create(0x61, 0x1A), "dmexit" },
-        { Tuple.Create(0x61, 0x22), "grave" },
-        { Tuple.Create(0x40, 0x07), "mid" },
-        { Tuple.Create(0x43, 0x11), "mid" },
-        { Tuple.Create(0x57, 0x21), "mid" },
-        { Tuple.Create(0x4C, 0x14), "mid" },
-        { Tuple.Create(0x4D, 0x11), "mid" },
-        { Tuple.Create(0x4E, 0x13), "mid" },
-        { Tuple.Create(0x4D, 0x17), "mid" },
-        { Tuple.Create(0x44, 0x25), "mid" },
-        { Tuple.Create(0x66, 0x26), "grave" },
-        { Tuple.Create(0x4D, 0x3D), "grave" },
-        { Tuple.Create(0x5F, 0x0A), "lifesouth" },
-        { Tuple.Create(0x60, 0x15), "dmexit" },
-        { Tuple.Create(0x58, 0x32), "grave" },
-        { Tuple.Create(0x36, 0x2E), "north" },
-        { Tuple.Create(0x24, 0x02), "north" },
-        { Tuple.Create(0x5B, 0x08), "lifesouth" },
-        { Tuple.Create(0x59, 0x08), "mid" },
-        { Tuple.Create(0x4C, 0x15), "mid" },
-        { Tuple.Create(0x4B, 0x3C), "grave" },
-        { Tuple.Create(0x20, 0x3E), "parapa" },
-        { Tuple.Create(0x40, 0x0B), "mid" },
-        { Tuple.Create(0x62, 0x39), "island" }
+            { Tuple.Create(0x20, 0x1D), "north" },
+            { Tuple.Create(0x2A, 0x25), "north" },
+            { Tuple.Create(0x3C, 0x10), "north" },
+            { Tuple.Create(0x56, 0x14), "mid" },
+            { Tuple.Create(0x40, 0x3E), "parapa" },
+            { Tuple.Create(0x4D, 0x15), "mid" },
+            { Tuple.Create(0x39, 0x3D), "parapa" },
+            { Tuple.Create(0x47, 0x08), "mid" },
+            { Tuple.Create(0x5C, 0x30), "grave" },
+            { Tuple.Create(0x29, 0x30), "parapa" },
+            { Tuple.Create(0x2E, 0x37), "north" },
+            { Tuple.Create(0x3A, 0x01), "north" },
+            { Tuple.Create(0x3E, 0x03), "mid" },
+            { Tuple.Create(0x3E, 0x26), "mid" },
+            { Tuple.Create(0x45, 0x09), "hammer0" },
+            { Tuple.Create(0x3E, 0x36), "hammer" },
+            { Tuple.Create(0x60, 0x32), "grave" },
+            { Tuple.Create(0x66, 0x3B), "island" },
+            { Tuple.Create(0x52, 0x10), "mid" },
+            { Tuple.Create(0x57, 0x1A), "mid" },
+            { Tuple.Create(0x61, 0x1A), "dmexit" },
+            { Tuple.Create(0x61, 0x22), "grave" },
+            { Tuple.Create(0x40, 0x07), "mid" },
+            { Tuple.Create(0x43, 0x11), "mid" },
+            { Tuple.Create(0x57, 0x21), "mid" },
+            { Tuple.Create(0x4C, 0x14), "mid" },
+            { Tuple.Create(0x4D, 0x11), "mid" },
+            { Tuple.Create(0x4E, 0x13), "mid" },
+            { Tuple.Create(0x4D, 0x17), "mid" },
+            { Tuple.Create(0x44, 0x25), "mid" },
+            { Tuple.Create(0x66, 0x26), "grave" },
+            { Tuple.Create(0x4D, 0x3D), "grave" },
+            { Tuple.Create(0x5F, 0x0A), "lifesouth" },
+            { Tuple.Create(0x60, 0x15), "dmexit" },
+            { Tuple.Create(0x58, 0x32), "grave" },
+            { Tuple.Create(0x36, 0x2E), "north" },
+            { Tuple.Create(0x24, 0x02), "north" },
+            { Tuple.Create(0x5B, 0x08), "lifesouth" },
+            { Tuple.Create(0x59, 0x08), "mid" },
+            { Tuple.Create(0x4C, 0x15), "mid" },
+            { Tuple.Create(0x4B, 0x3C), "grave" },
+            { Tuple.Create(0x20, 0x3E), "parapa" },
+            { Tuple.Create(0x40, 0x0B), "mid" },
+            { Tuple.Create(0x62, 0x39), "island" }
         };
         lostWoods = new List<Location> { GetLocationByMem(0x4649), GetLocationByMem(0x464A), GetLocationByMem(0x464B), GetLocationByMem(0x464C), GetLocationByMem(0x4635) };
     }
@@ -599,9 +573,9 @@ public class WestHyrule : World
                     }
                 }
 
-                PlaceRandomTerrain(props.Climate);
+                PlaceRandomTerrain(climate);
 
-                if (!GrowTerrain(props.Climate))
+                if (!GrowTerrain(climate))
                 {
                     return false;
                 }

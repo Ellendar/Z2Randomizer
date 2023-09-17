@@ -10,8 +10,7 @@ public class Climate
     private readonly Dictionary<Terrain, int> TerrainWeights;
     private readonly Dictionary<Terrain, int> TerrainPercentages;
     public int SeedTerrainCount { get; }
-    private int totalTerrainWeight;
-    private Terrain[] terrainWeightTable;
+    private List<Terrain> terrainWeightTable;
     public string Name { get; set; }
 
     public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount)
@@ -20,17 +19,15 @@ public class Climate
         DistanceCoefficients = distanceCoefficients;
         TerrainWeights = terrainWeights;
         SeedTerrainCount = seedTerrainCount;
-        totalTerrainWeight = TerrainWeights.Values.Sum();
         //This is a lazy, not very efficient lookup method, but it has very fast lookups, and since terrain generation
         //is one of the most expensive operations and we're going to do tens of thousands of lookups easily,
         //this is probably good for now.
-        terrainWeightTable = new Terrain[totalTerrainWeight];
-        int terrainWeightTableIndex = 0;
+        terrainWeightTable = new();
         foreach(Terrain terrain in TerrainWeights.Keys)
         {
             for(int i = 0; i < TerrainWeights[terrain]; i++)
             {
-                terrainWeightTable[terrainWeightTableIndex++] = terrain;
+                terrainWeightTable.Add(terrain);
             }
         }
     }
@@ -46,7 +43,20 @@ public class Climate
 
     public Terrain GetRandomTerrain(Random r)
     {
-        return terrainWeightTable[r.Next(totalTerrainWeight)];
+        return terrainWeightTable[r.Next(terrainWeightTable.Count)];
+    }
+
+    public void DisallowTerrain(Terrain terrain)
+    {
+        for (int i = 0; i < TerrainWeights[terrain]; i++)
+        {
+            terrainWeightTable.RemoveAll(i => i == terrain);
+        }
+    }
+
+    public Climate Clone()
+    {
+        return new Climate(Name, DistanceCoefficients, TerrainWeights, SeedTerrainCount);
     }
 }
 

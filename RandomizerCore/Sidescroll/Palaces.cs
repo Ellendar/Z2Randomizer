@@ -1,4 +1,5 @@
 ﻿using NLog;
+using RandomizerCore.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -85,40 +86,26 @@ public class Palaces
         if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
         {
             roomPool.Clear();
-            roomPool.AddRange(PalaceRooms.Palace1Vanilla(props.UseCustomRooms));
-            roomPool.AddRange(PalaceRooms.Palace2Vanilla(props.UseCustomRooms));
-            roomPool.AddRange(PalaceRooms.Palace3Vanilla(props.UseCustomRooms));
-            roomPool.AddRange(PalaceRooms.Palace4Vanilla(props.UseCustomRooms));
-            roomPool.AddRange(PalaceRooms.Palace5Vanilla(props.UseCustomRooms));
-            roomPool.AddRange(PalaceRooms.Palace6Vanilla(props.UseCustomRooms));
-            if (props.UseCommunityRooms)
+            if(props.AllowVanillaRooms)
             {
-                roomPool.AddRange(PalaceRooms.RoomJamGTM(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.DMInPalaces(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.WinterSolstice(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.MaxRoomJam(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.DusterRoomJam(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.AaronRoomJam(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.KnightcrawlerRoomJam(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.TriforceOfCourage(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.BenthicKing(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.EasternShadow(props.UseCustomRooms));
-                roomPool.AddRange(PalaceRooms.EunosRooms(props.UseCustomRooms));
+                roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
+            }
+            
+            if (props.AllowV4Rooms)
+            {
+                roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
             }
 
-            gpRoomPool.AddRange(PalaceRooms.Palace7Vanilla(props.UseCustomRooms));
-            if (props.UseCommunityRooms)
+            if (props.AllowV4_4Rooms)
             {
-                gpRoomPool.AddRange(PalaceRooms.Link7777RoomJam(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.GTMNewGpRooms(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.GTMOldGPRooms(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.WinterSolsticeGP(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.EonRoomJam(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.TriforceOfCourageGP(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.EunosGpRooms(props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.FlippedGP(props.UseCustomRooms));
-
+                roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
+                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
             }
+
+            List<Room> Entrances = roomPool
+
             int[] sizes = new int[7];
 
             sizes[0] = r.Next(10, 17);

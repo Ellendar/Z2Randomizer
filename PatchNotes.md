@@ -1,5 +1,10 @@
 # Z2Randomizer Changelog
 
+## Version 4.2.7 - September 17th, 2023
+
+- Fixed an issue where items required to get Reflect spell could be behind Carock (thanks TrailZ)
+- Fixed a regression where overworld small items would not shuffle properly.
+
 ## Version 4.2.6 - August 20th, 2023
 
 - Fixed another bug that would prevent vertical DM from spawning.

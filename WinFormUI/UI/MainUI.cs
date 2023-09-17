@@ -779,6 +779,7 @@ public partial class MainUI : Form
         configuration.Climate = climateSelector.SelectedIndex switch
         {
             0 => Climates.Classic,
+            1 => Climates.Chaos,
             _ => throw new Exception("Invalid Climate setting")
         };
         configuration.WestBiome = westBiomeSelector.SelectedIndex switch

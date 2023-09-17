@@ -1245,6 +1245,7 @@ public class RandomizerConfiguration
             properties.Climate = random.Next(1) switch
             {
                 0 => Climates.Classic,
+                1 => Climates.Chaos,
                 _ => throw new Exception("Unrecognized climate")
             };
         }

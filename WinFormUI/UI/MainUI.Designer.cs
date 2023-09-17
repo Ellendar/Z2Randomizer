@@ -965,7 +965,7 @@ partial class MainUI
         // 
         climateSelector.DropDownStyle = ComboBoxStyle.DropDownList;
         climateSelector.FormattingEnabled = true;
-        climateSelector.Items.AddRange(new object[] { "Classic" });
+        climateSelector.Items.AddRange(new object[] { "Classic", "Chaos" });
         climateSelector.Location = new Point(416, 145);
         climateSelector.Margin = new Padding(4, 3, 4, 3);
         climateSelector.Name = "climateSelector";

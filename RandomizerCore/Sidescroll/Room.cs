@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NLog;
+using RandomizerCore.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -147,7 +148,11 @@ public class Room
     public int? NewMap { get; set; }
     public bool HasBoss { get; set; }
     public string Name { get; set; }
-    public string Group { get; set; }
+    //public string Group { get; set; }
+    public string Author { get; set; }
+    public RoomGroup Group { get; set; }
+    public bool IsThunderBirdRoom { get; set; }
+    public bool IsGPRoom { get; set; }
     public bool Enabled { get; set; }
     public bool IsEntrance { get; set; }
 

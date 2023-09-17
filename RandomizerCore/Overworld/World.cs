@@ -57,6 +57,7 @@ public abstract class World
     //private bool allreached;
 
     public int baseAddr;
+    protected Climate climate;
 
     protected Random RNG;
 
@@ -1393,8 +1394,7 @@ public abstract class World
                         //distance = Math.Abs(tx) + Math.Abs(ty);
                         if (distance < mindistance)
                         {
-                            choices = new List<Terrain>();
-                            choices.Add(map[t.Item1, t.Item2]);
+                            choices = new List<Terrain>{ map[t.Item1, t.Item2] };
                             mindistance = distance;
                         }
                         else if (distance == mindistance)
@@ -1445,9 +1445,9 @@ public abstract class World
     {
         //randomly place remaining Terrain
         int placed = 0;
+        int x, y;
         while (placed < climate.SeedTerrainCount)
         {
-            int x, y;
             Terrain t = climate.GetRandomTerrain(RNG);
             do
             {

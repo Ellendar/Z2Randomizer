@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RandomizerCore.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,8 +14,8 @@ namespace Z2Randomizer.Core.Sidescroll;
 //I looked at other options and this was the least hacky. I would be shocked if there weren't a better way.
 public class PalaceRooms
 {
-    private static Dictionary<string, List<Room>> roomsByGroup = new Dictionary<string, List<Room>>();
-    private static Dictionary<string, List<Room>> customRoomsByGroup = new Dictionary<string, List<Room>>();
+    private static readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new Dictionary<RoomGroup, List<Room>>();
+    private static readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new Dictionary<RoomGroup, List<Room>>();
 
     public static readonly string roomsMD5 = "qvtwG7ntEclgbAXcszrcjA==";
 
@@ -23,9 +24,7 @@ public class PalaceRooms
         if (File.Exists("PalaceRooms.json"))
         {
             string roomsJson = File.ReadAllText("PalaceRooms.json");
-
-            MD5 hasher = MD5.Create();
-            byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
+            byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
                 throw new Exception("Invalid PalaceRooms.json");
@@ -33,7 +32,7 @@ public class PalaceRooms
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
             {
-                Room room = new Room(obj.ToString());
+                Room room = new(obj.ToString());
                 if (room.Enabled)
                 {
                     if (!roomsByGroup.ContainsKey(room.Group))
@@ -80,15 +79,43 @@ public class PalaceRooms
         _ => throw new ArgumentException("Invalid palace number: " + palaceNum)
     };
 
-    public static Room Thunderbird(bool useCustomRooms)
-    { 
-        return useCustomRooms ? customRoomsByGroup["thunderbird"].First() : roomsByGroup["thunderbird"].First();
+
+    public static Room VanillaThunderbird(bool useCustomRooms = false)
+    {
+        if (useCustomRooms) {
+            return customRoomsByGroup[RoomGroup.VANILLA].First(i => i.IsThunderBirdRoom);
+        }
+        return roomsByGroup[RoomGroup.VANILLA].First(i => i.IsThunderBirdRoom);
     }
 
-    public static List<Room> TBirdRooms(bool useCustomRooms)
+    public static List<Room> TBirdRooms(bool useCustomRooms = false)
     {
-        return useCustomRooms ? customRoomsByGroup["tbirdRooms"]: roomsByGroup["tbirdRooms"];
+        if (useCustomRooms)
+        {
+            return customRoomsByGroup[RoomGroup.VANILLA].Where(i => i.IsThunderBirdRoom).ToList();
+        }
+        return roomsByGroup[RoomGroup.VANILLA].Where(i => i.IsThunderBirdRoom).ToList();
     }
+
+    public static List<Room> NormalPalaceRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    {
+        if (useCustomRooms)
+        {
+            return customRoomsByGroup[group].Where(i => !i.IsGPRoom).ToList();
+        }
+        return roomsByGroup[group].Where(i => !i.IsGPRoom).ToList();
+    }
+
+    public static List<Room> GPRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    {
+        if (useCustomRooms)
+        {
+            return customRoomsByGroup[group].Where(i => i.IsGPRoom).ToList();
+        }
+        return roomsByGroup[group].Where(i => i.IsGPRoom).ToList();
+    }
+
+    /*
     public static List<Room> BossRooms(bool useCustomRooms)
     {
         return useCustomRooms ? customRoomsByGroup["bossrooms"] : roomsByGroup["bossrooms"];
@@ -241,4 +268,5 @@ public class PalaceRooms
     {
         return useCustomRooms ? customRoomsByGroup["darkLinkRooms"] : roomsByGroup["darkLinkRooms"];
     }
+    */
 }
