@@ -108,6 +108,8 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
+        includev4_4RoomsCheckbox = new CheckBox();
+        includev4_0RoomsCheckbox = new CheckBox();
         noDuplicateRoomsCheckbox = new CheckBox();
         label7 = new Label();
         label5 = new Label();
@@ -116,7 +118,7 @@ partial class MainUI
         palaceStyleList = new ComboBox();
         bossRoomsExitToPalaceCheckbox = new CheckBox();
         blockingRoomsInAnyPalaceCheckbox = new CheckBox();
-        includeCommunityRoomsCheckbox = new CheckBox();
+        includeVanillaRoomsCheckbox = new CheckBox();
         randomizeBossItemCheckbox = new CheckBox();
         removeTbirdCheckbox = new CheckBox();
         shortGPCheckbox = new CheckBox();
@@ -1219,6 +1221,8 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(includev4_4RoomsCheckbox);
+        tabPage2.Controls.Add(includev4_0RoomsCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsCheckbox);
         tabPage2.Controls.Add(label7);
         tabPage2.Controls.Add(label5);
@@ -1227,7 +1231,7 @@ partial class MainUI
         tabPage2.Controls.Add(palaceStyleList);
         tabPage2.Controls.Add(bossRoomsExitToPalaceCheckbox);
         tabPage2.Controls.Add(blockingRoomsInAnyPalaceCheckbox);
-        tabPage2.Controls.Add(includeCommunityRoomsCheckbox);
+        tabPage2.Controls.Add(includeVanillaRoomsCheckbox);
         tabPage2.Controls.Add(randomizeBossItemCheckbox);
         tabPage2.Controls.Add(removeTbirdCheckbox);
         tabPage2.Controls.Add(shortGPCheckbox);
@@ -1244,6 +1248,33 @@ partial class MainUI
         tabPage2.TabIndex = 1;
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
+        // 
+        // checkBox2
+        // 
+        includev4_4RoomsCheckbox.AutoSize = true;
+        includev4_4RoomsCheckbox.Visible = false;
+        includev4_4RoomsCheckbox.Location = new Point(7, 113);
+        includev4_4RoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includev4_4RoomsCheckbox.Name = "includev4_4RoomsCheckbox";
+        includev4_4RoomsCheckbox.Size = new Size(129, 19);
+        includev4_4RoomsCheckbox.TabIndex = 27;
+        includev4_4RoomsCheckbox.Text = "Include v4.4 Rooms";
+        includev4_4RoomsCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(includev4_4RoomsCheckbox, "New Rooms first released in v4.4 are included in the room pool.");
+        includev4_4RoomsCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // includev4_0RoomsCheckbox
+        // 
+        includev4_0RoomsCheckbox.AutoSize = true;
+        includev4_0RoomsCheckbox.Location = new Point(7, 87);
+        includev4_0RoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includev4_0RoomsCheckbox.Name = "includev4_0RoomsCheckbox";
+        includev4_0RoomsCheckbox.Size = new Size(129, 19);
+        includev4_0RoomsCheckbox.TabIndex = 26;
+        includev4_0RoomsCheckbox.Text = "Include v4.0 Rooms";
+        includev4_0RoomsCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(includev4_0RoomsCheckbox, "New Rooms first released in v4.0 are included in the room pool.");
+        includev4_0RoomsCheckbox.UseVisualStyleBackColor = true;
         // 
         // noDuplicateRoomsCheckbox
         // 
@@ -1320,7 +1351,7 @@ partial class MainUI
         // bossRoomsExitToPalaceCheckbox
         // 
         bossRoomsExitToPalaceCheckbox.AutoSize = true;
-        bossRoomsExitToPalaceCheckbox.Location = new Point(7, 113);
+        bossRoomsExitToPalaceCheckbox.Location = new Point(281, 138);
         bossRoomsExitToPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
         bossRoomsExitToPalaceCheckbox.Name = "bossRoomsExitToPalaceCheckbox";
         bossRoomsExitToPalaceCheckbox.Size = new Size(163, 19);
@@ -1333,7 +1364,7 @@ partial class MainUI
         // blockingRoomsInAnyPalaceCheckbox
         // 
         blockingRoomsInAnyPalaceCheckbox.AutoSize = true;
-        blockingRoomsInAnyPalaceCheckbox.Location = new Point(7, 87);
+        blockingRoomsInAnyPalaceCheckbox.Location = new Point(281, 113);
         blockingRoomsInAnyPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
         blockingRoomsInAnyPalaceCheckbox.Name = "blockingRoomsInAnyPalaceCheckbox";
         blockingRoomsInAnyPalaceCheckbox.Size = new Size(251, 19);
@@ -1342,18 +1373,18 @@ partial class MainUI
         toolTip1.SetToolTip(blockingRoomsInAnyPalaceCheckbox, "When selected, a palace can be blocked by any of the item/spell blocked rooms");
         blockingRoomsInAnyPalaceCheckbox.UseVisualStyleBackColor = true;
         // 
-        // includeCommunityRoomsCheckbox
+        // includeVanillaRoomsCheckbox
         // 
-        includeCommunityRoomsCheckbox.AutoSize = true;
-        includeCommunityRoomsCheckbox.Location = new Point(7, 60);
-        includeCommunityRoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
-        includeCommunityRoomsCheckbox.Name = "includeCommunityRoomsCheckbox";
-        includeCommunityRoomsCheckbox.Size = new Size(172, 19);
-        includeCommunityRoomsCheckbox.TabIndex = 10;
-        includeCommunityRoomsCheckbox.Text = "Include Community Rooms";
-        includeCommunityRoomsCheckbox.ThreeState = true;
-        toolTip1.SetToolTip(includeCommunityRoomsCheckbox, "When selected, rooms created by the Zelda 2 community will be included in the room pool");
-        includeCommunityRoomsCheckbox.UseVisualStyleBackColor = true;
+        includeVanillaRoomsCheckbox.AutoSize = true;
+        includeVanillaRoomsCheckbox.Location = new Point(7, 62);
+        includeVanillaRoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includeVanillaRoomsCheckbox.Name = "includeVanillaRoomsCheckbox";
+        includeVanillaRoomsCheckbox.Size = new Size(142, 19);
+        includeVanillaRoomsCheckbox.TabIndex = 10;
+        includeVanillaRoomsCheckbox.Text = "Include Vanilla Rooms";
+        includeVanillaRoomsCheckbox.ThreeState = true;
+        includeVanillaRoomsCheckbox.UseVisualStyleBackColor = true;
+        includeVanillaRoomsCheckbox.CheckedChanged += includeCommunityRoomsCheckbox_CheckedChanged;
         // 
         // randomizeBossItemCheckbox
         // 
@@ -3284,7 +3315,7 @@ partial class MainUI
     private System.ComponentModel.BackgroundWorker backgroundWorker1;
     private CheckBox randomizeSpellSpellEnemyCheckbox;
     private CheckBox generateBaguWoodsCheckbox;
-    private CheckBox includeCommunityRoomsCheckbox;
+    private CheckBox includeVanillaRoomsCheckbox;
     private CheckBox blockingRoomsInAnyPalaceCheckbox;
     private CheckBox bossRoomsExitToPalaceCheckbox;
     private Label palaceStyleLabel;
@@ -3321,5 +3352,7 @@ partial class MainUI
     private ComboBox westBiomeSelector;
     private Label westBiomeLabel;
     private CheckBox allowPathEnemiesCheckbox;
+    private CheckBox includev4_4RoomsCheckbox;
+    private CheckBox includev4_0RoomsCheckbox;
 }
 

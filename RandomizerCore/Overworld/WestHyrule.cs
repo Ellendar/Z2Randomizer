@@ -1,12 +1,8 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Z2Randomizer.Core;
 
 namespace Z2Randomizer.Core.Overworld;
 
@@ -196,7 +192,7 @@ public class WestHyrule : World
         VANILLA_MAP_ADDR = 0x506C;
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
+        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
         if (props.HideLessImportantLocations)
         {
             unimportantLocs.Add(GetLocationByMem(0x4631));
@@ -223,7 +219,7 @@ public class WestHyrule : World
         //Climate filtering
         climate = props.Climate.Clone();
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
-        climate.DisallowTerrain(Terrain.LAVA);
+        //climate.DisallowTerrain(Terrain.LAVA);
 
         section = new SortedDictionary<Tuple<int, int>, string>{
             { Tuple.Create(0x34, 0x17), "north" },
@@ -340,7 +336,7 @@ public class WestHyrule : World
         {
             Terrain fillerWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
 
-            bytesWritten = 2000;
+            int bytesWritten = 2000;
 
             if(props.BagusWoods)
             {
@@ -353,6 +349,7 @@ public class WestHyrule : World
             }
             while (bytesWritten > MAP_SIZE_BYTES)
             {
+                AllLocations.ForEach(i => i.CanShuffle = true);
                 Terrain riverTerrain = Terrain.MOUNTAIN;
                 lifeSouth.CanShuffle = false;
                 lifeNorth.CanShuffle = false;
@@ -428,7 +425,7 @@ public class WestHyrule : World
                         lifeSouth.CanShuffle = false;
                         lifeNorth.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                         break;
 
                     case Biome.CANYON:
@@ -442,23 +439,23 @@ public class WestHyrule : World
                             bridge2.Ypos = 0;
                         }
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN };
-                        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
 
                         DrawCanyon(riverTerrain);
-                        this.walkableTerrains.Remove(Terrain.MOUNTAIN);
-                        //this.randomTerrains.Add(terrain.lava);
+                        walkableTerrains.Remove(Terrain.MOUNTAIN);
+                        //randomTerrainFilter.Add(Terrain.lava);
                         break;
                     case Biome.CALDERA:
                         DrawCenterMountain();
                         locationAtPalace3.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                         break;
 
                     case Biome.MOUNTAINOUS:
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
                         riverTerrain = Terrain.MOUNTAIN;
                         for (int i = 0; i < MAP_COLS; i++)
@@ -517,7 +514,7 @@ public class WestHyrule : World
                         break;
                     default:
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
+                        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                         //drawRoad();
                         DrawMountains();
                         //drawBridge();
@@ -620,12 +617,10 @@ public class WestHyrule : World
                 
                 PlaceHiddenLocations();
 
-                int bridges = 10;
 
                 if (biome == Biome.CANYON)
                 {
-                    bridges = 100;
-                    bool f = ConnectIslands(bridges, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
+                    bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -634,8 +629,7 @@ public class WestHyrule : World
                 }
                 if (biome == Biome.ISLANDS)
                 {
-                    bridges = 25;
-                    bool f = ConnectIslands(bridges, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
+                    bool f = ConnectIslands(25, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -644,10 +638,9 @@ public class WestHyrule : World
                 }
                 if (biome == Biome.MOUNTAINOUS)
                 {
-                    bridges = 15;
-                    this.walkableTerrains.Add(Terrain.ROAD);
+                    walkableTerrains.Add(Terrain.ROAD);
 
-                    bool h = ConnectIslands(bridges, true, riverTerrain, false, false, false, props.CanWalkOnWaterWithBoots);
+                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, props.CanWalkOnWaterWithBoots);
                     if (!h)
                     {
                         failedOnConnectIslands++;
@@ -656,10 +649,12 @@ public class WestHyrule : World
                 }
                 if (biome == Biome.VANILLALIKE)
                 {
-                    bridges = 4;
                     riverTerrain = fillerWater;
+                    //2 bridges over the mountains
                     ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, props.CanWalkOnWaterWithBoots);
-                    bool f = ConnectIslands(bridges, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
+                    //4 bridges including saria and the double bridge across arbitrary water
+                    //XXX: Testing
+                    bool f = ConnectIslands(4, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -687,7 +682,7 @@ public class WestHyrule : World
 
 
                 //check bytes and adjust
-                WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
                 logger.Debug("West:" + bytesWritten);
             }
         }
@@ -874,7 +869,7 @@ public class WestHyrule : World
                 }
 
                 //map[starty + lake / 2, startx] = terrain.forest;
-               // map[starty - (lake - (lake / 2)), startx] = terrain.forest;
+                //map[starty - (lake - (lake / 2)), startx] = terrain.forest;
                 if (i == 0)
                 {
                     map[starty + lake / 2, startx + 1] = Terrain.FOREST;
@@ -996,7 +991,7 @@ public class WestHyrule : World
             }
             else if (cavenum2 == 1)
             {
-                cave2l = GetLocationByMap(07, 0); //parappa
+                cave2l = GetLocationByMap(07, 0); //parapa
                 cave2r = GetLocationByMap(0xC7, 0);
             }
             else

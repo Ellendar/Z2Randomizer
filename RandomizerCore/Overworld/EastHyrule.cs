@@ -158,7 +158,7 @@ public class EastHyrule : World
         MAP_COLS = 64;
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-        randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER };
+        randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER };
 
         biome = props.EastBiome;
         section = new SortedDictionary<Tuple<int, int>, string>
@@ -359,7 +359,7 @@ public class EastHyrule : World
                 water = Terrain.WALKABLEWATER;
             }
 
-            bytesWritten = 2000;
+            int bytesWritten = 2000;
             locationAtGP.CanShuffle = false;
             Terrain riverTerrain = Terrain.MOUNTAIN;
             while (bytesWritten > MAP_SIZE_BYTES)
@@ -428,7 +428,7 @@ public class EastHyrule : World
                         }
                     }
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrains = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
 
 
 
@@ -443,7 +443,7 @@ public class EastHyrule : World
                     }
                     //riverT = terrain.lava;
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN };
-                    randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
 
 
                     DrawCanyon(riverTerrain);
@@ -460,7 +460,7 @@ public class EastHyrule : World
 
 
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrains = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water};
+                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water};
 
 
                 }
@@ -519,12 +519,12 @@ public class EastHyrule : World
                         }
                     }
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
                 }
                 else
                 {
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrains = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
                     MakeVolcano();
 
 
@@ -600,12 +600,12 @@ public class EastHyrule : World
 
                 PlaceRandomTerrain(climate);
 
-                randomTerrains.Add(Terrain.LAVA);
+                randomTerrainFilter.Add(Terrain.LAVA);
                 if (!GrowTerrain(climate))
                 {
                     return false;
                 }
-                randomTerrains.Remove(Terrain.LAVA);
+                randomTerrainFilter.Remove(Terrain.LAVA);
                 if (raft != null)
                 {
                     bool r = DrawRaft(false, raftDirection);
@@ -664,7 +664,7 @@ public class EastHyrule : World
                         location.CanShuffle = false;
                     }
                 }
-                WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
                 //logger.Debug("East:" + bytesWritten);
             }
             

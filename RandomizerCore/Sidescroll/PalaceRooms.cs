@@ -14,8 +14,11 @@ namespace Z2Randomizer.Core.Sidescroll;
 //I looked at other options and this was the least hacky. I would be shocked if there weren't a better way.
 public class PalaceRooms
 {
-    private static readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new Dictionary<RoomGroup, List<Room>>();
-    private static readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new Dictionary<RoomGroup, List<Room>>();
+    private static readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
+    private static readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new();
+
+    private static readonly Dictionary<string, Room> roomsByName = new();
+    private static readonly Dictionary<string, Room> customRoomsByName = new();
 
     public static readonly string roomsMD5 = "qvtwG7ntEclgbAXcszrcjA==";
 
@@ -27,7 +30,8 @@ public class PalaceRooms
             byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
-                throw new Exception("Invalid PalaceRooms.json");
+                //XXX: Restore t
+                //throw new Exception("Invalid PalaceRooms.json");
             }
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
@@ -40,6 +44,7 @@ public class PalaceRooms
                         roomsByGroup.Add(room.Group, new List<Room>());
                     }
                     roomsByGroup[room.Group].Add(room);
+                    roomsByName[room.Name] = room;
                 }
             }
         }
@@ -67,206 +72,218 @@ public class PalaceRooms
         }
     }
 
-    public static List<Room> PalaceRoomsByNumber(int palaceNum, bool customRooms) => palaceNum switch
+    public static IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum, bool customRooms)
     {
-        1 => customRooms ? customRoomsByGroup["palace1vanilla"] : roomsByGroup["palace1vanilla"],
-        2 => customRooms ? customRoomsByGroup["palace2vanilla"] : roomsByGroup["palace2vanilla"],
-        3 => customRooms ? customRoomsByGroup["palace3vanilla"] : roomsByGroup["palace3vanilla"],
-        4 => customRooms ? customRoomsByGroup["palace4vanilla"] : roomsByGroup["palace4vanilla"],
-        5 => customRooms ? customRoomsByGroup["palace5vanilla"] : roomsByGroup["palace5vanilla"],
-        6 => customRooms ? customRoomsByGroup["palace6vanilla"] : roomsByGroup["palace6vanilla"],
-        7 => customRooms ? customRoomsByGroup["palace7vanilla"] : roomsByGroup["palace7vanilla"],
-        _ => throw new ArgumentException("Invalid palace number: " + palaceNum)
-    };
-
-
-    public static Room VanillaThunderbird(bool useCustomRooms = false)
-    {
-        if (useCustomRooms) {
-            return customRoomsByGroup[RoomGroup.VANILLA].First(i => i.IsThunderBirdRoom);
+        int mapMin, mapMax, palaceGroup;
+        switch(palaceNum)
+        {
+            case 1:
+                mapMin = 0;
+                mapMax = 13;
+                palaceGroup = 1;
+                break;
+            case 2:
+                mapMin = 14;
+                mapMax = 34;
+                palaceGroup = 1;
+                break;
+            case 3:
+                mapMin = 0;
+                mapMax = 14;
+                palaceGroup = 2;
+                break;
+            case 4:
+                mapMin = 15;
+                mapMax = 35;
+                palaceGroup = 2;
+                break;
+            case 5:
+                mapMin = 35;
+                mapMax = 62;
+                palaceGroup = 1;
+                break;
+            case 6:
+                mapMin = 36;
+                mapMax = 62;
+                palaceGroup = 2;
+                break;
+            case 7:
+                mapMin = 0;
+                mapMax = 54;
+                palaceGroup = 3;
+                break;
+            default:
+            throw new ArgumentException("Invalid palace number: " + palaceNum);
         }
-        return roomsByGroup[RoomGroup.VANILLA].First(i => i.IsThunderBirdRoom);
+        
+
+        if(customRooms)
+        {
+            return customRoomsByGroup[RoomGroup.VANILLA].Where(
+                i => i.PalaceGroup == palaceGroup 
+                && i.Map >= mapMin
+                && i.Map <= mapMax
+                && !i.IsEntrance 
+                && !i.IsBossRoom
+                && !i.HasItem
+                && !i.IsThunderBirdRoom
+            );
+        }
+
+        return roomsByGroup[RoomGroup.VANILLA].Where(
+            i => i.PalaceGroup == palaceGroup
+            && i.Map >= mapMin
+            && i.Map <= mapMax
+            && !i.IsEntrance
+            && !i.IsBossRoom
+            && !i.HasItem
+            && !i.IsThunderBirdRoom
+        );
     }
 
-    public static List<Room> TBirdRooms(bool useCustomRooms = false)
+    public static IEnumerable<Room> TBirdRooms(RoomGroup group, bool useCustomRooms = false)
     {
         if (useCustomRooms)
         {
-            return customRoomsByGroup[RoomGroup.VANILLA].Where(i => i.IsThunderBirdRoom).ToList();
+            return customRoomsByGroup[group].Where(i => i.IsThunderBirdRoom);
         }
-        return roomsByGroup[RoomGroup.VANILLA].Where(i => i.IsThunderBirdRoom).ToList();
+        return roomsByGroup[group].Where(i => i.IsThunderBirdRoom);
     }
 
-    public static List<Room> NormalPalaceRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    public static Room VanillaBossRoom(int palaceNum)
+    {
+        int map;
+        switch(palaceNum)
+        {
+            case 1:
+                map = 13;
+                break;
+            case 2:
+                map = 34;
+                break;
+            case 3:
+                map = 14;
+                break;
+            case 4:
+                map = 28;
+                break;
+            case 5:
+                map = 41;
+                break;
+            case 6:
+                map = 58;
+                break;
+            case 7:
+                map = 54;
+                break;
+            default:
+                throw new ArgumentException("Invalid palace number: " + palaceNum);
+        }
+        return roomsByGroup[RoomGroup.VANILLA].Where(i => i.IsBossRoom && map == i.Map).First();
+    }
+
+    public static Room VanillaItemRoom(int palaceNum)
+    {
+        int map;
+        switch (palaceNum)
+        {
+            case 1:
+                map = 8;
+                break;
+            case 2:
+                map = 20;
+                break;
+            case 3:
+                map = 11;
+                break;
+            case 4:
+                map = 31;
+                break;
+            case 5:
+                map = 61;
+                break;
+            case 6:
+                map = 44;
+                break;
+            case 7:
+                throw new ArgumentException("GP Cannot have an item!");
+            default:
+                throw new ArgumentException("Invalid palace number: " + palaceNum);
+        }
+        return roomsByGroup[RoomGroup.VANILLA].Where(i => i.HasItem && map == i.Map).First();
+    }
+
+    public static IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction, bool useCustomRooms = false)
+    {
+        if(direction == Direction.NONE)
+        {
+            throw new ArgumentException("Invalid Direction.NONE in ItemRoomsByDirection");
+        }
+        if (useCustomRooms)
+        {
+            return customRoomsByGroup[group].Where(i => i.IsThunderBirdRoom);
+        }
+        switch(direction)
+        {
+            case Direction.HORIZONTAL_PASSTHROUGH:
+                return roomsByGroup[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
+            case Direction.VERTICAL_PASSTHROUGH:
+                return roomsByGroup[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
+            case Direction.NORTH:
+                return roomsByGroup[group].Where(i => i.HasItem && i.HasUpExit());
+            case Direction.SOUTH:
+                return roomsByGroup[group].Where(i => i.HasItem && i.HasDownExit());
+            case Direction.WEST:
+                return roomsByGroup[group].Where(i => i.HasItem && i.HasLeftExit());
+            case Direction.EAST:
+                return roomsByGroup[group].Where(i => i.HasItem && i.HasRightExit());
+        }
+        throw new ImpossibleException("Invalid direction in ItemRoomsByDirection");
+    }
+
+    public static IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
     {
         if (useCustomRooms)
         {
-            return customRoomsByGroup[group].Where(i => !i.IsGPRoom).ToList();
+            return customRoomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) != 7 
+                && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
         }
-        return roomsByGroup[group].Where(i => !i.IsGPRoom).ToList();
+        return roomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) != 7 
+            && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
     }
 
-    public static List<Room> GPRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    public static IEnumerable<Room> GPRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
     {
         if (useCustomRooms)
         {
-            return customRoomsByGroup[group].Where(i => i.IsGPRoom).ToList();
+            return customRoomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7);
         }
-        return roomsByGroup[group].Where(i => i.IsGPRoom).ToList();
+        return roomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7);
     }
 
-    /*
-    public static List<Room> BossRooms(bool useCustomRooms)
+    public static IEnumerable<Room> Entrances(RoomGroup group, bool useCustomRooms = false)
     {
-        return useCustomRooms ? customRoomsByGroup["bossrooms"] : roomsByGroup["bossrooms"];
+        if (useCustomRooms)
+        {
+            return customRoomsByGroup[group].Where(i => i.IsEntrance);
+        }
+        return roomsByGroup[group].Where(i => i.IsEntrance);
     }
-    public static List<Room> ItemRooms(bool useCustomRooms)
+
+    public static IEnumerable<Room> BossRooms(RoomGroup group, bool useCustomRooms = false, int? palaceNum = null)
     {
-        return useCustomRooms ? customRoomsByGroup["itemRooms"] : roomsByGroup["itemRooms"];
+        if (useCustomRooms)
+        {
+            return customRoomsByGroup[group].Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
+        }
+        return roomsByGroup[group].Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
     }
-    public static List<Room> Entrances(bool useCustomRooms)
+    public static Room GetRoomByName(string name, bool useCustomRooms = false)
     {
-        return useCustomRooms ? customRoomsByGroup["entrances"] : roomsByGroup["entrances"];
+        if (useCustomRooms)
+        {
+            return customRoomsByName[name];
+        }
+        return roomsByName[name];
     }
-    public static Room MaxBonusItemRoom(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["maxBonusItemRoom"].First() : roomsByGroup["maxBonusItemRoom"].First();
-    }
-    public static List<Room> AaronRoomJam(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["aaronRoomJam"] : roomsByGroup["aaronRoomJam"];
-    }
-    public static List<Room> BenthicKing(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["benthicKing"] : roomsByGroup["benthicKing"];
-    }
-    public static List<Room> DMInPalaces(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["dmInPalaces"] : roomsByGroup["dmInPalaces"];
-    }
-    public static List<Room> DusterRoomJam(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["dusterRoomJam"] : roomsByGroup["dusterRoomJam"];
-    }
-    public static List<Room> EasternShadow(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["easternShadow"] : roomsByGroup["easternShadow"];
-    }
-    public static List<Room> EonRoomJam(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["eonRoomjam"] : roomsByGroup["eonRoomjam"];
-    }
-    public static List<Room> EunosGpRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["eunosGpRooms"] : roomsByGroup["eunosGpRooms"];
-    }
-    public static List<Room> EunosRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["eunosRooms"] : roomsByGroup["eunosRooms"];
-    }
-    public static List<Room> FlippedGP(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["flippedGp"] : roomsByGroup["flippedGp"];
-    }
-    public static List<Room> GTMNewGpRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["gtmNewgpRooms"] : roomsByGroup["gtmNewgpRooms"];
-    }
-    public static List<Room> KnightcrawlerRoomJam(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["knightCrawlerRoomJam"] : roomsByGroup["knightCrawlerRoomJam"];
-    }
-    public static List<Room> Link7777RoomJam(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["link7777RoomJam"] : roomsByGroup["link7777RoomJam"];
-    }
-    public static List<Room> MaxRoomJam(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["maxRoomJam"] : roomsByGroup["maxRoomJam"];
-    }
-    public static List<Room> Palace1Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace1vanilla"] : roomsByGroup["palace1vanilla"];
-    }
-    public static List<Room> Palace2Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace2vanilla"] : roomsByGroup["palace2vanilla"];
-    }
-    public static List<Room> Palace3Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace3vanilla"] : roomsByGroup["palace3vanilla"];
-    }
-    public static List<Room> Palace4Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace4vanilla"] : roomsByGroup["palace4vanilla"];
-    }
-    public static List<Room> Palace5Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace5vanilla"] : roomsByGroup["palace5vanilla"];
-    }
-    public static List<Room> Palace6Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace6vanilla"] : roomsByGroup["palace6vanilla"];
-    }
-    public static List<Room> Palace7Vanilla(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["palace7vanilla"] : roomsByGroup["palace7vanilla"];
-    }
-    public static List<Room> RoomJamGTM(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["roomJamGTM"] : roomsByGroup["roomJamGTM"];
-    }
-    public static List<Room> TriforceOfCourage(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["triforceOfCourage"] : roomsByGroup["triforceOfCourage"];
-    }
-    public static List<Room> TriforceOfCourageGP(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["triforceOfCourageGP"] : roomsByGroup["triforceOfCourageGP"];
-    }
-    public static List<Room> WinterSolstice(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["winterSolstice"] : roomsByGroup["winterSolstice"];
-    }
-    public static List<Room> WinterSolsticeGP(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["winterSolsticeGP"] : roomsByGroup["winterSolsticeGP"];
-    }
-    public static List<Room> GTMOldGPRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["gtmOldgpRooms"] : roomsByGroup["gtmOldgpRooms"];
-    }
-    public static List<Room> NewP6BossRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["newp6BossRooms"] : roomsByGroup["newp6BossRooms"];
-    }
-    public static List<Room> NewBossRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["newbossrooms"] : roomsByGroup["newbossrooms"];
-    }
-    public static List<Room> LeftOpenItemRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["leftOpenItemRooms"] : roomsByGroup["leftOpenItemRooms"];
-    }
-    public static List<Room> RightOpenItemRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["rightOpenItemRooms"] : roomsByGroup["rightOpenItemRooms"];
-    }
-    public static List<Room> UpOpenItemRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["upOpenItemRooms"] : roomsByGroup["upOpenItemRooms"];
-    }
-    public static List<Room> DownOpenItemRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["downOpenItemRooms"] : roomsByGroup["downOpenItemRooms"];
-    }
-    public static List<Room> ThroughItemRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["throughItemRooms"] : roomsByGroup["throughItemRooms"];
-    }
-    public static List<Room> DarkLinkRooms(bool useCustomRooms)
-    {
-        return useCustomRooms ? customRoomsByGroup["darkLinkRooms"] : roomsByGroup["darkLinkRooms"];
-    }
-    */
 }

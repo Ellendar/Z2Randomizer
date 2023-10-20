@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Z2Randomizer.Core;
 
 public enum Direction { 
-    NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, NONE = 4
+    NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, HORIZONTAL_PASSTHROUGH = 4, VERTICAL_PASSTHROUGH = 5, NONE = 6
 }
 
 static class DirectionExtensions
@@ -89,6 +86,34 @@ static class DirectionExtensions
             0 => Direction.NORTH,
             1 => Direction.SOUTH,
             _ => throw new ImpossibleException("Invalid random in Direction.Random")
+        };
+    }
+
+    public static Direction RandomCardinal(Random r)
+    {
+        return r.Next(4) switch
+        {
+            0 => Direction.NORTH,
+            1 => Direction.SOUTH,
+            2 => Direction.EAST,
+            3 => Direction.WEST,
+            _ => throw new ImpossibleException("Invalid random in Direction.RandomCardinal")
+        };
+    }
+
+    public static readonly Direction[] ITEM_ROOM_ORIENTATIONS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.HORIZONTAL_PASSTHROUGH, Direction.VERTICAL_PASSTHROUGH };
+
+    public static Direction RandomItemRoomOrientation(Random r)
+    {
+        return r.Next(6) switch
+        {
+            0 => Direction.NORTH,
+            1 => Direction.SOUTH,
+            2 => Direction.EAST,
+            3 => Direction.WEST,
+            4 => Direction.VERTICAL_PASSTHROUGH,
+            5 => Direction.HORIZONTAL_PASSTHROUGH,
+            _ => throw new ImpossibleException("Invalid random in Direction.RandomItemRoomOrientation")
         };
     }
 }

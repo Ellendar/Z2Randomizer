@@ -157,9 +157,9 @@ class DeathMountain : World
             biome = Biome.VANILLALIKE;
         }
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
-        randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
-    
-        
+        randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
+
+        climate = props.Climate.Clone();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -170,7 +170,7 @@ class DeathMountain : World
             water = Terrain.WALKABLEWATER;
         }
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
-        randomTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+        randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
 
         foreach (Location location in AllLocations)
         {
@@ -208,7 +208,7 @@ class DeathMountain : World
         }
         else
         {
-            bytesWritten = 2000;
+            int bytesWritten = 2000;
             bool horizontal = false;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
@@ -315,18 +315,18 @@ class DeathMountain : World
                         riverT = Terrain.DESERT;
                     }
 
-                    this.walkableTerrains.Clear();
-                    this.walkableTerrains.Add(Terrain.GRASS);
-                    this.walkableTerrains.Add(Terrain.GRAVE);
-                    this.walkableTerrains.Add(Terrain.FOREST);
-                    this.walkableTerrains.Add(Terrain.DESERT);
-                    this.walkableTerrains.Add(Terrain.MOUNTAIN);
+                    walkableTerrains.Clear();
+                    walkableTerrains.Add(Terrain.GRASS);
+                    walkableTerrains.Add(Terrain.GRAVE);
+                    walkableTerrains.Add(Terrain.FOREST);
+                    walkableTerrains.Add(Terrain.DESERT);
+                    walkableTerrains.Add(Terrain.MOUNTAIN);
 
-                    this.randomTerrains.Remove(Terrain.SWAMP);
+                    randomTerrainFilter.Remove(Terrain.SWAMP);
                     DrawCanyon(riverT);
-                    this.walkableTerrains.Remove(Terrain.MOUNTAIN);
+                    walkableTerrains.Remove(Terrain.MOUNTAIN);
 
-                    this.randomTerrains.Remove(Terrain.SWAMP);
+                    randomTerrainFilter.Remove(Terrain.SWAMP);
                     //this.randomTerrains.Add(terrain.lava);
 
                 }
@@ -390,7 +390,7 @@ class DeathMountain : World
                     }
                 }
 
-                Direction raftDirection = (Direction)RNG.Next(4);
+                Direction raftDirection = DirectionExtensions.RandomCardinal(RNG);
                 if (biome == Biome.CANYON)
                 {
                     raftDirection = horizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
@@ -405,12 +405,12 @@ class DeathMountain : World
                     MAP_COLS = 64;
                 }
 
-                Direction bridgeDirection = (Direction)RNG.Next(4);
+                Direction bridgeDirection;
                 do
                 {
                     if (biome != Biome.CANYON)
                     {
-                        bridgeDirection = (Direction)RNG.Next(4);
+                        bridgeDirection = DirectionExtensions.RandomCardinal(RNG);
                     }
                     else
                     {
@@ -693,12 +693,11 @@ class DeathMountain : World
                     }
                 }
 
-                //Vanillalike DM is weird since the terrain is very little and everything else is mostly road. Not touching this for now.
                 if (biome == Biome.VANILLALIKE)
                 {
-                    PlaceRandomTerrain(5);
+                    PlaceRandomTerrain(climate, 5);
                 }
-                randomTerrains.Add(Terrain.ROAD);
+                randomTerrainFilter.Add(Terrain.ROAD);
                 if (!GrowTerrain(props.Climate))
                 {
                     return false;
@@ -758,7 +757,7 @@ class DeathMountain : World
                 }
 
                 //check bytes and adjust
-                WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
             }
         }
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);

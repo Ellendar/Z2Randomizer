@@ -111,7 +111,7 @@ class MazeIsland : World
         {
             MAP_ROWS = 23;
             MAP_COLS = 23;
-            bytesWritten = 2000;
+            int bytesWritten = 2000;
             foreach (Location location in AllLocations)
             {
                 location.CanShuffle = true;
@@ -578,7 +578,7 @@ class MazeIsland : World
 
                 //check bytes and adjust
                 MAP_COLS = 64;
-                WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
                 MAP_COLS = 23;
                 
             }

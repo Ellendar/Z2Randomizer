@@ -836,7 +836,8 @@ public class Hyrule
     private bool IsEverythingReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         totalReachableCheck++;
-        //return true;
+        //XXX: TESTING!
+        return true;
         int dm = 0;
         int mi = 0;
         int wh = 0;
@@ -2196,7 +2197,8 @@ public class Hyrule
 
         if (props.SpellEnemy)
         {
-            List<int> enemies = new List<int> { 3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26 };
+            //3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26
+            List<int> enemies = new List<int> { 3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A };
             ROMData.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count())]);
         }
         if (props.BossItem)

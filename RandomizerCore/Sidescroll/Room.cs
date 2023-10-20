@@ -81,7 +81,12 @@ public class Room
     public bool IsReachable { get; set; }
     public int ConnectionStartAddress { get; set; }
     public byte[] Connections { get; set; }
-    public bool IsDeadEnd { get; set; }
+    public bool IsDeadEnd {
+        get
+        {
+            return (HasLeftExit() ? 1 : 0) + (HasRightExit() ? 1 : 0) + (HasUpExit() ? 1 : 0) + (HasDownExit() ? 1 : 0) == 1;
+        } 
+    }
     public bool IsPlaced { get; set; }  
     public int LeftByte { get; set; }
     public int RightByte { get; set; }
@@ -146,90 +151,71 @@ public class Room
     public byte[] NewEnemies { get; set; }
     public byte[] SideView { get; set; }
     public int? NewMap { get; set; }
+    //Whether the room contains a boss, which is true of boss rooms, but also boss-containing passthrough/item rooms.
     public bool HasBoss { get; set; }
+    //Specifically indicates this is a "boss room" i.e. boss then a gem statue, then an exit.
+    public bool IsBossRoom { get; set; }
     public string Name { get; set; }
     //public string Group { get; set; }
     public string Author { get; set; }
     public RoomGroup Group { get; set; }
     public bool IsThunderBirdRoom { get; set; }
-    public bool IsGPRoom { get; set; }
     public bool Enabled { get; set; }
     public bool IsEntrance { get; set; }
+    public int? PalaceNumber { get; set; }
+    public string LinkedRoomName { get; set; }
 
-    public Room(
-        int map,
-        byte[] conn, 
-        byte[] enemies, 
-        byte[] sideview, 
-        byte bitmask, 
-        bool hasItem, 
-        bool hasBoss, 
-        bool hasDrop, 
-        int elevatorScreen, 
-        int memAddr, 
-        bool upDownRev, 
-        bool dropZone,
-        bool isEntrance,
-        Requirements requirements,
-        string name
-        )
+    public Room(Room room)
     {
-        Map = map;
-        Connections = conn;
-        Enemies = enemies;
-        NewEnemies = new byte[enemies.Length];
-        SideView = sideview;
-        HasBoss = hasBoss;
-        HasItem = hasItem;
-        LeftByte = conn[0];
-        DownByte = conn[1];
-        UpByte = conn[2];
-        RightByte = conn[3];
-        IsRoot = false;
-        IsReachable = false;
-        ConnectionStartAddress = memAddr;
-        IsPlaced = false;
-        /*
-        Left = null;
-        Right = null;
-        Up = null;
-        Down = null;
-        */
-        IsBeforeTbird = false;
-        isUpDownReversed = upDownRev;
-        this.bitmask = bitmask;
-        HasDrop = hasDrop;
-        ElevatorScreen = elevatorScreen;
-        int numExits = 0;
-        foreach (int con in Connections)
-        {
-            if (con < 0xFC && con > 3)
-            {
-                numExits++;
-            }
-        }
-        //this.numExits = numExits;
-        IsDeadEnd = numExits == 1;
-        IsDropZone = dropZone;
-        IsEntrance = isEntrance;
-        Requirements = requirements;
-        Name = name;
+        Map = room.Map;
+        Connections = (byte[])room.Connections.Clone();
+        Enemies = (byte[])room.Enemies.Clone();
+        NewEnemies = new byte[Enemies.Length];
+        SideView = (byte[])room.SideView.Clone();
+        bitmask = room.bitmask;
+        HasItem = room.HasItem;
+        HasBoss = room.HasBoss;
+        IsBossRoom = room.IsBossRoom;
+        HasDrop = room.HasDrop;
+        ElevatorScreen = room.ElevatorScreen;
+        ConnectionStartAddress = room.ConnectionStartAddress;
+        isUpDownReversed = room.isUpDownReversed;
+        IsDropZone = room.IsDropZone;
+        IsEntrance = room.IsEntrance;
+        IsThunderBirdRoom = room.IsThunderBirdRoom;
+        Requirements = room.Requirements;
+        Name = room.Name;
+        LinkedRoomName = room.LinkedRoomName;
+        Author = room.Author;
+        Enabled = room.Enabled;
+        Group = room.Group;
+
+        LeftByte = room.Connections[0];
+        downByte = room.Connections[1];
+        upByte = room.Connections[2];
+        RightByte = room.Connections[3];
     }
 
     public Room(string json)
     {
         dynamic roomData = JsonConvert.DeserializeObject(json);
         Name = roomData.name;
-        Group = roomData.group;
+        Group = Enum.Parse(typeof(RoomGroup), roomData.group.ToString().ToUpper());
+        Author = roomData.author;
         Map = roomData.map;
         Enabled = (bool)roomData.enabled;
         Connections = Convert.FromHexString(roomData.connections.ToString());
+        LeftByte = Connections[0];
+        DownByte = Connections[1];
+        upByte = Connections[2];
+        downByte = Connections[3];
         Enemies = Convert.FromHexString(roomData.enemies.ToString());
         NewEnemies = Enemies;
         SideView = Convert.FromHexString(roomData.sideviewData.ToString());
         bitmask = Convert.FromHexString(roomData.bitmask.ToString())[0];
         HasItem = roomData.hasItem;
         HasBoss = roomData.hasBoss;
+        IsBossRoom = roomData.isBossRoom;
         HasDrop = roomData.hasDrop;
         ElevatorScreen = roomData.elevatorScreen;
         //ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
@@ -237,7 +223,15 @@ public class Room
         isUpDownReversed = roomData.isUpDownReversed;
         IsDropZone = roomData.isDropZone;
         IsEntrance = roomData.isEntrance;
+        IsThunderBirdRoom = roomData.isThunderBirdRoom;
+        PalaceNumber = roomData.palaceNumber;
+        PalaceGroup = (int?)roomData.palaceGroup.Value ?? 0;
         Requirements = new Requirements(roomData.requirements.ToString());
+
+        IsPlaced = false;
+        IsRoot = false;
+        IsReachable = false;
+        IsBeforeTbird = false;
 
         byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
         if(SideView.Length != length)
@@ -300,7 +294,7 @@ public class Room
         //#76: If the item room is a boss item room, and it's in palace group 1, move the boss up 1 tile.
         //For some reason a bunch of the boss item rooms are fucked up in a bunch of different ways, so i'm keeping digshake's catch-all
         //though repositioned into the place it belongs.
-        if (PalaceGroup == 1 && HasItem && HasBoss)
+        if (PalaceGroup == 1 && HasItem && IsBossRoom)
         {
             NewEnemies[1] = 0x6C;
         }
@@ -520,25 +514,6 @@ public class Room
             exits++;
         }
         return exits;
-    }
-
-    public Room DeepCopy()
-    {
-        return new Room(Map, 
-            (byte[])Connections.Clone(), 
-            (byte[])Enemies.Clone(), 
-            (byte[])SideView.Clone(), 
-            bitmask, 
-            HasItem, 
-            HasBoss, 
-            HasDrop, 
-            ElevatorScreen, 
-            ConnectionStartAddress, 
-            isUpDownReversed, 
-            IsDropZone,
-            IsEntrance,
-            Requirements,
-            Name);
     }
 
     public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)
@@ -816,7 +791,7 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WriteValue(value.Name);
 
         writer.WritePropertyName("group");
-        writer.WriteValue(value.Group);
+        writer.WriteValue(value.Group.ToString());
 
         writer.WritePropertyName("map");
         writer.WriteValue(value.Map);
@@ -828,7 +803,7 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WriteValue(BitConverter.ToString(value.Connections).Replace("-", ""));
 
         writer.WritePropertyName("enemies");
-        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies.Length == 0 || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies ).Replace("-", ""));
+        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies.Length == 0 || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies).Replace("-", ""));
 
         writer.WritePropertyName("sideviewData");
         writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
@@ -845,6 +820,9 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WritePropertyName("hasBoss");
         writer.WriteValue(value.HasBoss);
 
+        writer.WritePropertyName("isBossRoom");
+        writer.WriteValue(value.IsBossRoom);
+
         writer.WritePropertyName("hasDrop");
         writer.WriteValue(value.HasDrop);
 
@@ -859,6 +837,21 @@ public class RoomJsonConverter : JsonConverter<Room>
 
         writer.WritePropertyName("isDropZone");
         writer.WriteValue(value.IsDropZone);
+
+        writer.WritePropertyName("isThunderBirdRoom");
+        writer.WriteValue(value.IsThunderBirdRoom);
+
+        writer.WritePropertyName("isEntrance");
+        writer.WriteValue(value.IsEntrance);
+
+        writer.WritePropertyName("palaceNumber");
+        writer.WriteValue(value.PalaceNumber);
+
+        writer.WritePropertyName("linkedRoomName");
+        writer.WriteValue(value.PalaceNumber);
+
+        writer.WritePropertyName("author");
+        writer.WriteValue(value.Author);
 
         writer.WriteEndObject();
     }

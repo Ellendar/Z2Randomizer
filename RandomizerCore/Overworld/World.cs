@@ -40,11 +40,11 @@ public abstract class World
     //private List<int> visitedEnemies;
     protected int MAP_ROWS;
     protected int MAP_COLS;
-    protected int bytesWritten;
-    protected List<Terrain> randomTerrains;
+    //protected int bytesWritten;
+    protected List<Terrain> randomTerrainFilter;
     protected List<Terrain> walkableTerrains;
     protected bool[,] visitation;
-    protected const int MAP_SIZE_BYTES = 1408;
+    protected const int MAP_SIZE_BYTES = 1400;
     protected List<Location> unimportantLocs;
     protected Biome biome;
     protected bool isHorizontal;
@@ -164,7 +164,7 @@ public abstract class World
     }
 
 
-    protected void Swap(Location l1, Location l2)
+    protected static void Swap(Location l1, Location l2)
     {
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
         (l2.Ypos, l1.Ypos) = (l1.Ypos, l2.Ypos);
@@ -420,7 +420,11 @@ public abstract class World
         foreach (Location location in AllLocations)
         {
             i++;
-            if ((location.TerrainType != Terrain.BRIDGE && location.CanShuffle && !unimportantLocs.Contains(location) && location.PassThrough == 0) || location.NeedHammer)
+            if ((location.TerrainType != Terrain.BRIDGE 
+                    && location.CanShuffle 
+                    && !unimportantLocs.Contains(location) 
+                    && location.PassThrough == 0) 
+                || location.NeedHammer)
             {
                 int x,y;
                 //Place the location in a spot that is not adjacent to any other location
@@ -1281,6 +1285,7 @@ public abstract class World
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Debug Method")]
     private string PrintTerrainGlobMap(int[,] mass)
     {
         char[] encoding = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q' };
@@ -1359,42 +1364,44 @@ public abstract class World
     }
     protected bool GrowTerrain(Climate climate)
     {
+        List<Terrain> randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToList();
         TerrainGrowthAttempts++;
         Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
-        List<Tuple<int, int>> placed = new List<Tuple<int, int>>();
-        for (int i = 0; i < MAP_ROWS; i++)
+        List<Tuple<int, int>> placed = new();
+        for (int y = 0; y < MAP_ROWS; y++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int x = 0; x < MAP_COLS; x++)
             {
-                if (map[i, j] != Terrain.NONE && randomTerrains.Contains(map[i, j]))
+                if (map[y, x] != Terrain.NONE && randomTerrains.Contains(map[y, x]))
                 {
-                    placed.Add(new Tuple<int, int>(i, j));
+                    placed.Add(new Tuple<int, int>(y, x));
                 }
             }
         }
 
-        int tx, ty;
+        int dy, dx;
         double distance;
         List<Terrain> choices = new List<Terrain>();
-        for (int i = 0; i < MAP_ROWS; i++)
+        for (int y = 0; y < MAP_ROWS; y++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int x = 0; x < MAP_COLS; x++)
             {
-                if (map[i, j] == Terrain.NONE)
+                if (map[y, x] == Terrain.NONE)
                 {
                     choices.Clear();
-                    double mindistance = int.MaxValue;
+                    double mindistance = double.MaxValue;
 
                     foreach (Tuple<int, int> t in placed)
                     {
-                        tx = Math.Abs(t.Item1 - i);
-                        ty = Math.Abs(t.Item2 - j);
-                        distance = climate.GetDistanceCoefficient(map[t.Item1, t.Item2]) * Math.Sqrt(tx * tx + ty * ty);
+                        dy = t.Item1 - y;
+                        dx = t.Item2 - x;
+                        distance = climate.GetDistanceCoefficient(map[t.Item1, t.Item2]) * Math.Sqrt(dy * dy + dx * dx);
                         //distance = ((tx + (tx >> 31)) ^ (tx >> 31)) + ((ty + (ty >> 31)) ^ (ty >> 31));
                         //distance = Math.Abs(tx) + Math.Abs(ty);
                         if (distance < mindistance)
                         {
-                            choices = new List<Terrain>{ map[t.Item1, t.Item2] };
+                            choices.Clear();
+                            choices.Add(map[t.Item1, t.Item2]);
                             mindistance = distance;
                         }
                         else if (distance == mindistance)
@@ -1402,18 +1409,21 @@ public abstract class World
                             choices.Add(map[t.Item1, t.Item2]);
                         }
                     }
-                    mapCopy[i, j] = choices[RNG.Next(choices.Count)];
+                    //XXX: TESTING
+                    //mapCopy[y, x] = choices[RNG.Next(choices.Count)];
+                    mapCopy[y, x] = Terrain.GRASS;
                 }
             }
         }
 
-        for (int i = 0; i < MAP_ROWS; i++)
+        //Write the locations that already had terrain before the growth back onto the copy before we clone over.
+        for (int y = 0; y < MAP_ROWS; y++)
         {
-            for (int j = 0; j < MAP_COLS; j++)
+            for (int x = 0; x < MAP_COLS; x++)
             {
-                if (map[i, j] != Terrain.NONE)
+                if (map[y, x] != Terrain.NONE)
                 {
-                    mapCopy[i, j] = map[i, j];
+                    mapCopy[y, x] = map[y, x];
                 }
             }
         }
@@ -1421,8 +1431,9 @@ public abstract class World
         return true;
     }
 
+    /*
     //Keeping this around for vanilla DM support, but probably this gets removed in the future
-    protected void PlaceRandomTerrain(int numberOfTerrainsToPlace)
+    protected void PlaceRandomTerrain(int numberOfTerrainsToPlace, Climate climate)
     {
         //randomly place remaining Terrain
         int placed = 0;
@@ -1430,7 +1441,7 @@ public abstract class World
         {
             int x = 0;
             int y = 0;
-            Terrain t = randomTerrains[RNG.Next(randomTerrains.Count)];
+            Terrain t = climate.GetRandomTerrain(RNG, randomTerrainFilter);
             do
             {
                 x = RNG.Next(MAP_COLS);
@@ -1440,22 +1451,35 @@ public abstract class World
             placed++;
         }
     }
+    */
 
-    protected void PlaceRandomTerrain(Climate climate)
+    protected void PlaceRandomTerrain(Climate climate, int seedCountMaximum = 500)
     {
-        //randomly place remaining Terrain
+        //If we fail to place terrain more than a certain number of times in a row, we're probably at/near the limit of the number of 
+        //places terrain could be placed given the initial layout
+        const int EXHAUSTION_LIMIT = 300;
+        int consecutivelyPlaced = 0;
         int placed = 0;
         int x, y;
-        while (placed < climate.SeedTerrainCount)
+        while (placed < int.Min(climate.SeedTerrainCount, seedCountMaximum) && consecutivelyPlaced < EXHAUSTION_LIMIT)
         {
-            Terrain t = climate.GetRandomTerrain(RNG);
+            consecutivelyPlaced = 0;
+            Terrain t = climate.GetRandomTerrain(RNG, randomTerrainFilter);
             do
             {
                 x = RNG.Next(MAP_COLS);
                 y = RNG.Next(MAP_ROWS);
-            } while (map[y, x] != Terrain.NONE);
-            map[y, x] = t;
-            placed++;
+                consecutivelyPlaced++;
+            } while (map[y, x] != Terrain.NONE && consecutivelyPlaced < EXHAUSTION_LIMIT);
+            if (consecutivelyPlaced < EXHAUSTION_LIMIT)
+            {
+                map[y, x] = t;
+                placed++;
+            }
+            else
+            {
+                logger.Trace("Exhaustion limit reached");
+            }
         }
     }
 
@@ -1467,9 +1491,9 @@ public abstract class World
     /// <param name="total">Total number of bytes to write</param>
     /// <param name="h1">For east: Hidden Palace Y - 30</param>
     /// <param name="h2">For east: Hidden palace X</param>
-    protected void WriteMapToRom(ROM romData, bool doWrite, int loc, int total, int h1, int h2, bool hiddenPalace, bool hiddenKasuto)
+    protected int WriteMapToRom(ROM romData, bool doWrite, int loc, int total, int h1, int h2, bool hiddenPalace, bool hiddenKasuto)
     {
-        bytesWritten = 0; //Number of bytes written so far
+        int bytesWritten = 0; //Number of bytes written so far
         Terrain currentTerrain = map[0, 0];
         int currentTerrainCount = 0;
         for (int y = 0; y < MAP_ROWS; y++)
@@ -1548,6 +1572,7 @@ public abstract class World
             loc++;
             bytesWritten++;
         }
+        int nonPaddingBytesWritten = bytesWritten;
 
         //Fill any remaining map space in the rom with filler. (Replace 0x0B with a constant)
         while (bytesWritten < total)
@@ -1556,6 +1581,8 @@ public abstract class World
             bytesWritten++;
             loc++;
         }
+
+        return nonPaddingBytesWritten;
     }
 
     protected void DrawOcean(Direction direction, bool walkableWater)

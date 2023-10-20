@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using NLog.Filters;
+using RandomizerCore.Flags;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Z2Randomizer.Core;
@@ -41,9 +44,26 @@ public class Climate
         return DistanceCoefficients[terrain];
     }
 
-    public Terrain GetRandomTerrain(Random r)
+    public Terrain GetRandomTerrain(Random r, IEnumerable<Terrain> whitelist)
     {
-        return terrainWeightTable[r.Next(terrainWeightTable.Count)];
+        Terrain result;
+        do
+        {
+            result = terrainWeightTable[r.Next(terrainWeightTable.Count)];
+        }
+        while (whitelist == null || !whitelist.Contains(result));
+
+        return result;
+    }
+
+    public IEnumerable<Terrain> RandomTerrains(IEnumerable<Terrain> filter)
+    {
+        if(filter == null) 
+        {
+            return terrainWeightTable.Distinct();
+        }
+        return filter.Intersect(terrainWeightTable.Distinct());
+        
     }
 
     public void DisallowTerrain(Terrain terrain)
@@ -58,5 +78,6 @@ public class Climate
     {
         return new Climate(Name, DistanceCoefficients, TerrainWeights, SeedTerrainCount);
     }
+
 }
 

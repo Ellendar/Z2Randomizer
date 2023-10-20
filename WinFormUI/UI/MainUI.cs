@@ -192,13 +192,16 @@ public partial class MainUI : Form
         randomizeSpellSpellEnemyCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         generateBaguWoodsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         palaceStyleList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeCommunityRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         blockingRoomsInAnyPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
+        includev4_4RoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
 
         TryLoadSpriteImageFromFile(romFileTextBox.Text);
@@ -840,7 +843,9 @@ public partial class MainUI : Form
             3 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
-        configuration.IncludeCommunityRooms = GetTripleCheckState(includeCommunityRoomsCheckbox);
+        configuration.IncludeVanillaRooms = GetTripleCheckState(includeVanillaRoomsCheckbox);
+        configuration.Includev4_0Rooms = GetTripleCheckState(includev4_0RoomsCheckbox);
+        configuration.Includev4_4Rooms = GetTripleCheckState(includev4_4RoomsCheckbox);
         configuration.BlockingRoomsInAnyPalace = blockingRoomsInAnyPalaceCheckbox.Checked;
         configuration.BossRoomsExitToPalace = GetTripleCheckState(bossRoomsExitToPalaceCheckbox);
         configuration.ShortGP = GetTripleCheckState(shortGPCheckbox);
@@ -1029,20 +1034,30 @@ public partial class MainUI : Form
         {
             return;
         }
-        RandomizerConfiguration oldSettings = ExportConfig();
+        var BeepFrequency = beepFrequencyDropdown.SelectedIndex;
+        var BeepThreshold = beepThresholdDropdown.SelectedIndex;
+        var DisableMusic = disableMusicCheckbox.CheckState;
+        var FastSpellCasting = fastSpellCheckbox.CheckState;
+        var UpAOnController1 = upAOnController1Checkbox.CheckState;
+        var RemoveFlashing = flashingOffCheckbox.CheckState;
+        var Sprite = characterSpriteList.SelectedIndex;
+        var Tunic = tunicColorList.SelectedIndex;
+        var ShieldTunic = shieldColorList.SelectedIndex;
+        var BeamSprite = beamSpriteList.SelectedIndex;
+
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
 
-        config.BeepFrequency = oldSettings.BeepFrequency;
-        config.BeepThreshold = oldSettings.BeepThreshold;
-        config.DisableMusic = oldSettings.DisableMusic;
-        config.FastSpellCasting = oldSettings.FastSpellCasting;
-        config.ShuffleSpritePalettes = oldSettings.ShuffleSpritePalettes;
-        config.UpAOnController1 = oldSettings.UpAOnController1;
-        config.RemoveFlashing = oldSettings.RemoveFlashing;
-        config.Sprite = oldSettings.Sprite;
-        config.Tunic = oldSettings.Tunic;
-        config.ShieldTunic = oldSettings.ShieldTunic;
-        config.BeamSprite = oldSettings.BeamSprite;
+        beepFrequencyDropdown.SelectedIndex = BeepFrequency;
+        beepThresholdDropdown.SelectedIndex = BeepThreshold;
+        disableMusicCheckbox.CheckState = DisableMusic;
+        fastSpellCheckbox.CheckState = FastSpellCasting;
+        upAOnController1Checkbox.CheckState = UpAOnController1;
+        flashingOffCheckbox.CheckState = RemoveFlashing;
+        characterSpriteList.SelectedIndex = Sprite;
+        tunicColorList.SelectedIndex = Tunic;
+        shieldColorList.SelectedIndex = ShieldTunic;
+        beamSpriteList.SelectedIndex = BeamSprite;
+
         flagsTextBox.Text = config.Serialize();
     }
 
@@ -1174,14 +1189,12 @@ public partial class MainUI : Form
                 ContinentConnectionType.ANYTHING_GOES => 3,
                 _ => throw new Exception("Invalid ContinentConnection setting")
             };
-            /*
             climateSelector.SelectedIndex = configuration.Climate.Name switch
             {
                 "Classic" => 0,
+                "Chaos" => 1,
                 _ => throw new Exception("Invalid Climate setting")
-            };*/
-            //XXX: Temp override
-            climateSelector.SelectedIndex = 0;
+            };
             westBiomeSelector.SelectedIndex = configuration.WestBiome switch
             {
                 Biome.VANILLA => 0,
@@ -1240,7 +1253,9 @@ public partial class MainUI : Form
                 PalaceStyle.RANDOM => 3,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
-            includeCommunityRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeCommunityRooms);
+            includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
+            includev4_0RoomsCheckbox.CheckState = ToCheckState(configuration.Includev4_0Rooms);
+            includev4_4RoomsCheckbox.CheckState = ToCheckState(configuration.Includev4_4Rooms);
             blockingRoomsInAnyPalaceCheckbox.Checked = configuration.BlockingRoomsInAnyPalace;
             bossRoomsExitToPalaceCheckbox.CheckState = ToCheckState(configuration.BossRoomsExitToPalace);
             shortGPCheckbox.CheckState = ToCheckState(configuration.ShortGP);
@@ -1831,8 +1846,12 @@ public partial class MainUI : Form
     {
         if (palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
         {
-            includeCommunityRoomsCheckbox.Enabled = false;
-            includeCommunityRoomsCheckbox.Checked = false;
+            includeVanillaRoomsCheckbox.Enabled = false;
+            includeVanillaRoomsCheckbox.Checked = true;
+            includev4_0RoomsCheckbox.Enabled = false;
+            includev4_0RoomsCheckbox.Checked = false;
+            includev4_4RoomsCheckbox.Enabled = false;
+            includev4_4RoomsCheckbox.Checked = false;
             blockingRoomsInAnyPalaceCheckbox.Enabled = false;
             blockingRoomsInAnyPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Checked = false;
@@ -1842,7 +1861,9 @@ public partial class MainUI : Form
         }
         else
         {
-            includeCommunityRoomsCheckbox.Enabled = true;
+            includeVanillaRoomsCheckbox.Enabled = true;
+            includev4_0RoomsCheckbox.Enabled = true;
+            includev4_4RoomsCheckbox.Enabled = true;
             blockingRoomsInAnyPalaceCheckbox.Enabled = true;
             bossRoomsExitToPalaceCheckbox.Enabled = true;
             noDuplicateRoomsCheckbox.Enabled = true;
@@ -1953,4 +1974,8 @@ public partial class MainUI : Form
         GenerateSpriteImage();
     }
 
+    private void includeCommunityRoomsCheckbox_CheckedChanged(object sender, EventArgs e)
+    {
+
+    }
 }

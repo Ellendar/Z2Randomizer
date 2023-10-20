@@ -32,7 +32,7 @@ public class Climates
                 { Terrain.WALKABLEWATER, 1 },
                 { Terrain.WATER, 1 },
                 { Terrain.MOUNTAIN, 1 },
-                { Terrain.ROAD, 0 }
+                { Terrain.ROAD, 1 }
             }, 
         30 
     );
@@ -51,7 +51,7 @@ public class Climates
                 { Terrain.WALKABLEWATER, 1 },
                 { Terrain.WATER, 1 },
                 { Terrain.MOUNTAIN, 1 },
-                { Terrain.ROAD, 1 }
+                { Terrain.ROAD, .2f }
            },
        //weights
        new Dictionary<Terrain, int>
@@ -65,7 +65,7 @@ public class Climates
                 { Terrain.WALKABLEWATER, 1 },
                 { Terrain.WATER, 1 },
                 { Terrain.MOUNTAIN, 5 },
-                { Terrain.ROAD, 0 }
+                { Terrain.ROAD, 5 }
            },
        300
    );

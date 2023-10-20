@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using RandomizerCore.Sidescroll;
 using System.Text;
 using Z2Randomizer.Core;
 using Z2Randomizer.Core.Sidescroll;
@@ -14,7 +15,7 @@ for (int j = 0; j < 3; j++)
     for (int i = 0; i < 63; i++)
     {
         int addr = connAddr[j] + i * 4;
-        Byte[] connectBytes = new Byte[4];
+        byte[] connectBytes = new byte[4];
         for (int k = 0; k < 4; k++)
         {
             connectBytes[k] = ROMData.GetByte(addr + k);
@@ -27,7 +28,7 @@ for (int j = 0; j < 3; j++)
             sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
         }
         int sideViewLength = ROMData.GetByte(sideViewPtr);
-        Byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewPtr + sideViewLength);
+        byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewPtr + sideViewLength);
 
         int enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
         if (j == 2)
@@ -36,9 +37,9 @@ for (int j = 0; j < 3; j++)
         }
 
         int enemyLength = ROMData.GetByte(enemyPtr);
-        Byte[] enemies = ROMData.GetBytes(enemyPtr, enemyPtr + enemyLength);
+        byte[] enemies = ROMData.GetBytes(enemyPtr, enemyPtr + enemyLength);
 
-        Byte bitmask = ROMData.GetByte(bit[j] + i / 2);
+        byte bitmask = ROMData.GetByte(bit[j] + i / 2);
 
         if (i % 2 == 0)
         {
@@ -49,10 +50,13 @@ for (int j = 0; j < 3; j++)
         {
             bitmask = (byte)(bitmask & 0x0F);
         }
-        r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, -1, addr, false, false, false, new Requirements(), null);
-        r.Group = "Bank# " + (j + 1);
+        //XXX: Refactor this
+        /*
+        r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, -1, addr, false, false, false, new Requirements(), null, "");
+        r.PalaceGroup = (j + 1);
+        r.Group = RoomGroup.V4_4;
         sb.Append(r.Serialize() + ",");
-
+        */
     }
 }
 sb[sb.Length - 1] = ']';

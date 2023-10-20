@@ -21,7 +21,7 @@ public class Palace
     private Room itemRoom;
     private Room bossRoom;
     private Room tbird;
-    private SortedDictionary<int, List<Room>> rooms;
+    private readonly SortedDictionary<int, List<Room>> rooms;
     /*
     private List<Room> upExits;
     private List<Room> downExits;
@@ -369,8 +369,7 @@ public class Palace
     {
         if (!r.IsBeforeTbird)
         {
-            //Using this map number as a signal is a terrible idea. Just use isBoss to determine which room is Tbird.
-            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
+            if ((Number == 7) && r.IsThunderBirdRoom)
             {
                 r.IsBeforeTbird = true;
                 return;
@@ -424,7 +423,7 @@ public class Palace
     {
         if (!r.IsPlaced)
         {
-            if ((Number == 7) && r.Map == PalaceRooms.Thunderbird(useCustomRooms).Map)
+            if ((Number == 7) && r.IsThunderBirdRoom)
             {
                 if (dir == 3)
                 {
@@ -665,7 +664,7 @@ public class Palace
         }
         foreach (Room r in AllRooms)
         {
-            if (r.Left == null && (r.HasLeftExit()))
+            if (r.Left == null && r.HasLeftExit())
             {
                 List<Room> l = rooms[r.LeftByte & 0xFC];
                 foreach (Room r2 in l)
@@ -677,7 +676,7 @@ public class Palace
                 }
             }
 
-            if (r.Right == null && (r.HasRightExit()))
+            if (r.Right == null && r.HasRightExit())
             {
                 List<Room> l = rooms[r.RightByte & 0xFC];
                 foreach (Room r2 in l)
@@ -689,7 +688,7 @@ public class Palace
                 }
             }
 
-            if (r.Up == null && (r.HasUpExit()))
+            if (r.Up == null && r.HasUpExit())
             {
                 List<Room> l = rooms[r.UpByte & 0xFC];
                 foreach (Room r2 in l)
@@ -701,7 +700,7 @@ public class Palace
                 }
             }
 
-            if (r.Down == null && (r.HasDownExit()))
+            if (r.Down == null && r.HasDownExit())
             {
                 List<Room> l = rooms[r.DownByte & 0xFC];
                 foreach (Room r2 in l)
@@ -770,7 +769,7 @@ public class Palace
                 remove = downExits[r];
             }
 
-            if (dropExits.Contains(remove) || remove.Map == PalaceRooms.Thunderbird(useCustomRooms).Map || remove == bossRoom)
+            if (dropExits.Contains(remove) || remove.IsThunderBirdRoom || remove == bossRoom)
             {
                 tries++;
                 continue;

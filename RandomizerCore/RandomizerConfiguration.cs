@@ -8,6 +8,7 @@ using System.Reflection;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using System.Text.Json;
+using RandomizerCore.Flags;
 
 namespace Z2Randomizer.Core;
 
@@ -86,15 +87,17 @@ public class RandomizerConfiguration
     public Biome EastBiome { get; set; }
     public Biome DMBiome { get; set; }
     public Biome MazeBiome { get; set; }
-    //XXX: I need to work out how this is going to be stored in configuration / serialized. Maybe climate needs a 3rd type
-    //I really wish C# had Java's Enums.
-    [IgnoreInFlags]
+    [CustomFlagSerializer(typeof(ClimateFlagSerializer))]
     public Climate Climate { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
 
     //Palaces
     public PalaceStyle PalaceStyle { get; set; }
-    public bool? IncludeCommunityRooms { get; set; }
+    //public bool? IncludeCommunityRooms { get; set; }
+    public bool? IncludeVanillaRooms { get; set; }
+    public bool? Includev4_0Rooms { get; set; }
+    public bool? Includev4_4Rooms { get; set; }
+
     public bool BlockingRoomsInAnyPalace { get; set; }
     public bool? BossRoomsExitToPalace { get; set; }
     public bool? ShortGP { get; set; }
@@ -340,7 +343,13 @@ public class RandomizerConfiguration
                 propertyType = propertyType.GetGenericArguments()[0];
                 isNullable = true;
             }
-            if (propertyType == typeof(bool))
+            if(Attribute.IsDefined(property, typeof(CustomFlagSerializerAttribute)))
+            {
+                CustomFlagSerializerAttribute attribute = (CustomFlagSerializerAttribute)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
+                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type);
+                property.SetValue(this, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
+            }
+            else if (propertyType == typeof(bool))
             {
                 if (isNullable)
                 {
@@ -878,7 +887,8 @@ public class RandomizerConfiguration
                 config.PalaceStyle = PalaceStyle.RECONSTRUCTED;
                 break;
         }
-        config.IncludeCommunityRooms = bits[2];
+        config.IncludeVanillaRooms = true;
+        config.Includev4_0Rooms = bits[2];
         config.BlockingRoomsInAnyPalace = bits[3];
         config.BossRoomsExitToPalace = bits[4];
 
@@ -952,7 +962,13 @@ public class RandomizerConfiguration
                 propertyType = propertyType.GetGenericArguments()[0];
                 isNullable = true;
             }
-            if (propertyType == typeof(bool))
+            if (Attribute.IsDefined(property, typeof(CustomFlagSerializerAttribute)))
+            {
+                CustomFlagSerializerAttribute attribute = (CustomFlagSerializerAttribute)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
+                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type);
+                flags.Append(serializer.Serialize(property.GetValue(this, null)), serializer.GetLimit());
+            }
+            else if (propertyType == typeof(bool))
             {
                 if (isNullable)
                 {
@@ -965,7 +981,7 @@ public class RandomizerConfiguration
             }
             else if (propertyType.IsEnum)
             {
-                limit = System.Enum.GetValues(propertyType).Length;
+                limit = Enum.GetValues(propertyType).Length;
                 int? index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
                 if (isNullable && index == null)
                 {
@@ -1196,7 +1212,7 @@ public class RandomizerConfiguration
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
-                2 => random.Next(2) == 1 ? Biome.DRY_CANYON : Biome.DRY_CANYON,
+                2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.VOLCANO,
                 4 => Biome.MOUNTAINOUS,
                 5 => Biome.VANILLA,
@@ -1240,7 +1256,7 @@ public class RandomizerConfiguration
         {
             properties.MazeBiome = MazeBiome;
         }
-        if(Climate == null)
+        if (Climate == null)
         {
             properties.Climate = random.Next(1) switch
             {
@@ -1280,7 +1296,14 @@ public class RandomizerConfiguration
         properties.ShortenGP = ShortGP == null ? random.Next(2) == 1 : (bool)ShortGP;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
-        properties.UseCommunityRooms = IncludeCommunityRooms == null ? random.Next(2) == 1 : (bool)IncludeCommunityRooms;
+
+        while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV4_4Rooms)) {
+            properties.AllowVanillaRooms = IncludeVanillaRooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
+            properties.AllowV4Rooms = Includev4_0Rooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
+            properties.AllowV4_4Rooms = false;
+            //properties.AllowV4_4Rooms = Includev4_4Rooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
+        }
+
         properties.BlockersAnywhere = BlockingRoomsInAnyPalace;
         properties.BossRoomConnect = BossRoomsExitToPalace == null ? random.Next(2) == 1 : (bool)BossRoomsExitToPalace;
         properties.NoDuplicateRooms = NoDuplicateRooms == null ? random.Next(2) == 1 : (bool)NoDuplicateRooms;
@@ -1469,7 +1492,8 @@ public class RandomizerConfiguration
 
         if (properties.PalaceStyle == PalaceStyle.VANILLA || properties.PalaceStyle == PalaceStyle.SHUFFLED)
         {
-            properties.UseCommunityRooms = false;
+            properties.AllowV4Rooms = false;
+            properties.AllowV4_4Rooms = false;
             properties.BlockersAnywhere = false;
             properties.BossRoomConnect = false;
         }
@@ -1488,7 +1512,7 @@ public class RandomizerConfiguration
         //Non-reconstructed is incompatable with no duplicate rooms.
         //Also, if community rooms is off, vanilla doesn't contain enough non-duplciate rooms to properly cover the number
         //of required rooms, often even in short GP.
-        if(properties.PalaceStyle != PalaceStyle.RECONSTRUCTED || !properties.UseCommunityRooms)
+        if(properties.PalaceStyle != PalaceStyle.RECONSTRUCTED || (!properties.AllowV4Rooms && !properties.AllowV4_4Rooms))
         {
             properties.NoDuplicateRooms = false;
         }

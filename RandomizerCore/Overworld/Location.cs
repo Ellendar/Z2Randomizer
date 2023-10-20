@@ -50,6 +50,10 @@ public class Location
 
     public bool NeedBagu { get; set; }
 
+    //This does 2 things and should only do 1. It both tracks whether the location is a location that should be possible to shuffle,
+    //and tracks whether this location has actually been shuffled already. This persistence doesn't always get reset properly,
+    //which causes a bunch of bugs. That said, tracking 100 references and reworking it everywhere is beyond what I want to mess with
+    //so for now i'm going to keep this crap design but I am mad about it.
     public bool CanShuffle { get; set; }
     /// <summary>
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
