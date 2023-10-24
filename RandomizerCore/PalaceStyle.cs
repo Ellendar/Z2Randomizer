@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Z2Randomizer.Core;
+﻿namespace Z2Randomizer.Core;
 
 public enum PalaceStyle
 {
-    VANILLA, SHUFFLED, RECONSTRUCTED, RANDOM
+    VANILLA, SHUFFLED, RECONSTRUCTED, RANDOM, NORMALIZED, RECONSTRUCTED_SHORTENED, RECONSTRUCTED_RANDOM_LENGTH
+}
+
+public static class PalaceStyleExtensions
+{
+    public static bool IsReconstructed(this PalaceStyle style)
+    {
+        return style == PalaceStyle.RECONSTRUCTED || style == PalaceStyle.RECONSTRUCTED_SHORTENED || style == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH;
+    }
 }

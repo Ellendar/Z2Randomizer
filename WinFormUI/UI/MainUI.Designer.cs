@@ -108,6 +108,8 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
+        gpStyleLabel = new Label();
+        gpStyleList = new ComboBox();
         includev4_4RoomsCheckbox = new CheckBox();
         includev4_0RoomsCheckbox = new CheckBox();
         noDuplicateRoomsCheckbox = new CheckBox();
@@ -121,7 +123,6 @@ partial class MainUI
         includeVanillaRoomsCheckbox = new CheckBox();
         randomizeBossItemCheckbox = new CheckBox();
         removeTbirdCheckbox = new CheckBox();
-        shortGPCheckbox = new CheckBox();
         restartAtPalacesCheckbox = new CheckBox();
         palacePaletteCheckbox = new CheckBox();
         tbirdRequiredCheckbox = new CheckBox();
@@ -1221,6 +1222,8 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(gpStyleLabel);
+        tabPage2.Controls.Add(gpStyleList);
         tabPage2.Controls.Add(includev4_4RoomsCheckbox);
         tabPage2.Controls.Add(includev4_0RoomsCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsCheckbox);
@@ -1234,7 +1237,6 @@ partial class MainUI
         tabPage2.Controls.Add(includeVanillaRoomsCheckbox);
         tabPage2.Controls.Add(randomizeBossItemCheckbox);
         tabPage2.Controls.Add(removeTbirdCheckbox);
-        tabPage2.Controls.Add(shortGPCheckbox);
         tabPage2.Controls.Add(restartAtPalacesCheckbox);
         tabPage2.Controls.Add(palacePaletteCheckbox);
         tabPage2.Controls.Add(tbirdRequiredCheckbox);
@@ -1249,11 +1251,33 @@ partial class MainUI
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
         // 
-        // checkBox2
+        // gpStyleLabel
+        // 
+        gpStyleLabel.AutoSize = true;
+        gpStyleLabel.Location = new Point(7, 65);
+        gpStyleLabel.Margin = new Padding(4, 0, 4, 0);
+        gpStyleLabel.Name = "gpStyleLabel";
+        gpStyleLabel.Size = new Size(103, 15);
+        gpStyleLabel.TabIndex = 29;
+        gpStyleLabel.Text = "Great Palace Style:";
+        toolTip1.SetToolTip(gpStyleLabel, "Palace modes: Shuffle - same rooms different order; Reconstructed: any rooms from the room pool can appear and palaces can change sizes.");
+        // 
+        // gpStyleList
+        // 
+        gpStyleList.DropDownStyle = ComboBoxStyle.DropDownList;
+        gpStyleList.FormattingEnabled = true;
+        gpStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed (Full)", "Reconstructed (Short)", "Reconstructed (Random Length)", "Random" });
+        gpStyleList.Location = new Point(7, 82);
+        gpStyleList.Margin = new Padding(4, 3, 4, 3);
+        gpStyleList.Name = "gpStyleList";
+        gpStyleList.Size = new Size(176, 23);
+        gpStyleList.TabIndex = 28;
+        toolTip1.SetToolTip(gpStyleList, "Controls what style GP (Palace 7) is.");
+        // 
+        // includev4_4RoomsCheckbox
         // 
         includev4_4RoomsCheckbox.AutoSize = true;
-        includev4_4RoomsCheckbox.Visible = false;
-        includev4_4RoomsCheckbox.Location = new Point(7, 113);
+        includev4_4RoomsCheckbox.Location = new Point(7, 162);
         includev4_4RoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
         includev4_4RoomsCheckbox.Name = "includev4_4RoomsCheckbox";
         includev4_4RoomsCheckbox.Size = new Size(129, 19);
@@ -1262,11 +1286,12 @@ partial class MainUI
         includev4_4RoomsCheckbox.ThreeState = true;
         toolTip1.SetToolTip(includev4_4RoomsCheckbox, "New Rooms first released in v4.4 are included in the room pool.");
         includev4_4RoomsCheckbox.UseVisualStyleBackColor = true;
+        includev4_4RoomsCheckbox.Visible = false;
         // 
         // includev4_0RoomsCheckbox
         // 
         includev4_0RoomsCheckbox.AutoSize = true;
-        includev4_0RoomsCheckbox.Location = new Point(7, 87);
+        includev4_0RoomsCheckbox.Location = new Point(7, 136);
         includev4_0RoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
         includev4_0RoomsCheckbox.Name = "includev4_0RoomsCheckbox";
         includev4_0RoomsCheckbox.Size = new Size(129, 19);
@@ -1376,7 +1401,7 @@ partial class MainUI
         // includeVanillaRoomsCheckbox
         // 
         includeVanillaRoomsCheckbox.AutoSize = true;
-        includeVanillaRoomsCheckbox.Location = new Point(7, 62);
+        includeVanillaRoomsCheckbox.Location = new Point(7, 111);
         includeVanillaRoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
         includeVanillaRoomsCheckbox.Name = "includeVanillaRoomsCheckbox";
         includeVanillaRoomsCheckbox.Size = new Size(142, 19);
@@ -1384,7 +1409,6 @@ partial class MainUI
         includeVanillaRoomsCheckbox.Text = "Include Vanilla Rooms";
         includeVanillaRoomsCheckbox.ThreeState = true;
         includeVanillaRoomsCheckbox.UseVisualStyleBackColor = true;
-        includeVanillaRoomsCheckbox.CheckedChanged += includeCommunityRoomsCheckbox_CheckedChanged;
         // 
         // randomizeBossItemCheckbox
         // 
@@ -1410,19 +1434,6 @@ partial class MainUI
         toolTip1.SetToolTip(removeTbirdCheckbox, "If checked, you must defeat thunderbird");
         removeTbirdCheckbox.UseVisualStyleBackColor = true;
         removeTbirdCheckbox.CheckStateChanged += RemoveTbird_CheckStateChanged;
-        // 
-        // shortGPCheckbox
-        // 
-        shortGPCheckbox.AutoSize = true;
-        shortGPCheckbox.Location = new Point(7, 160);
-        shortGPCheckbox.Margin = new Padding(4, 3, 4, 3);
-        shortGPCheckbox.Name = "shortGPCheckbox";
-        shortGPCheckbox.Size = new Size(135, 19);
-        shortGPCheckbox.TabIndex = 6;
-        shortGPCheckbox.Text = "Shorten Great Palace";
-        shortGPCheckbox.ThreeState = true;
-        toolTip1.SetToolTip(shortGPCheckbox, "When selected, the Great Palace will have fewer rooms than normal");
-        shortGPCheckbox.UseVisualStyleBackColor = true;
         // 
         // restartAtPalacesCheckbox
         // 
@@ -3212,7 +3223,6 @@ partial class MainUI
     private Label magicEffectivenessLabel;
     private Label attackEffectivenessLabel;
     private CheckBox restartAtPalacesCheckbox;
-    private CheckBox shortGPCheckbox;
     private CheckBox fastSpellCheckbox;
     private CheckBox randomizeJarRequirementsCheckbox;
     private CheckBox removeTbirdCheckbox;
@@ -3354,5 +3364,7 @@ partial class MainUI
     private CheckBox allowPathEnemiesCheckbox;
     private CheckBox includev4_4RoomsCheckbox;
     private CheckBox includev4_0RoomsCheckbox;
+    private Label gpStyleLabel;
+    private ComboBox gpStyleList;
 }
 

@@ -141,49 +141,68 @@ public class Palaces
             }           
         }
 
-        if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
+        if (props.NormalPalaceStyle.IsReconstructed())
         {
             roomPool.Clear();
-            if(props.AllowVanillaRooms)
+            if (props.AllowVanillaRooms)
             {
                 roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
             }
-            
+
             if (props.AllowV4Rooms)
             {
                 roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
-                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
             }
 
             if (props.AllowV4_4Rooms)
             {
                 roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
+            }
+        }
+
+
+        if (props.GPStyle.IsReconstructed())
+        {
+            gpRoomPool.Clear();
+            if (props.AllowVanillaRooms)
+            {
+                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
+            }
+
+            if (props.AllowV4Rooms)
+            {
+                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
+            }
+
+            if (props.AllowV4_4Rooms)
+            {
                 gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
             }
+        }
 
 
-            int[] sizes = new int[7];
+        int[] sizes = new int[7];
 
-            sizes[0] = r.Next(10, 17);
-            sizes[1] = r.Next(16, 25);
-            sizes[2] = r.Next(11, 18);
-            sizes[3] = r.Next(16, 25);
-            sizes[4] = r.Next(23, 63 - sizes[0] - sizes[1]);
-            sizes[5] = r.Next(22, 63 - sizes[2] - sizes[3]);
+        sizes[0] = r.Next(10, 17);
+        sizes[1] = r.Next(16, 25);
+        sizes[2] = r.Next(11, 18);
+        sizes[3] = r.Next(16, 25);
+        sizes[4] = r.Next(23, 63 - sizes[0] - sizes[1]);
+        sizes[5] = r.Next(22, 63 - sizes[2] - sizes[3]);
 
-            if (props.ShortenGP)
+        if (props.GPStyle == PalaceStyle.RECONSTRUCTED_SHORTENED)
+        {
+            sizes[6] = r.Next(27, 41);
+        }
+        else
+        {
+            sizes[6] = r.Next(54, 60);
+        }
+
+        for (int currentPalace = 1; currentPalace < 8; currentPalace++)
+        {
+            if (currentPalace == 7 && props.GPStyle.IsReconstructed() || currentPalace < 7 && props.NormalPalaceStyle.IsReconstructed())
             {
-                sizes[6] = r.Next(27, 41);
-            }
-            else
-            {
-                sizes[6] = r.Next(54, 60);
-            }
-
-            for (int currentPalace = 1; currentPalace < 8; currentPalace++)
-            {
-
                 Palace palace;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                 int tries = 0;
                 int innertries = 0;
@@ -250,10 +269,10 @@ public class Palaces
                         {
                             Direction itemRoomDirection;
                             Room itemRoom = null;
-                            while(itemRoom == null)
+                            while (itemRoom == null)
                             {
                                 itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                                if(!itemRoomsByDirection.ContainsKey(itemRoomDirection))
+                                if (!itemRoomsByDirection.ContainsKey(itemRoomDirection))
                                 {
                                     continue;
                                 }
@@ -322,9 +341,9 @@ public class Palaces
                         roomPlacementFailures = 0;
                         while (palace.AllRooms.Count < palace.MaxRooms)
                         {
-                            if(palaceRoomPool.Count == 0)
+                            if (palaceRoomPool.Count == 0)
                             {
-                                return null;
+                                throw new Exception("Palace room pool was empty");
                             }
                             int roomIndex = r.Next(palaceRoomPool.Count);
                             Room roomToAdd = new(palaceRoomPool[roomIndex]);
@@ -421,12 +440,12 @@ public class Palaces
                         || palace.AllRooms.Any(i => i.CountOpenExits() > 0)
                       );
 
-                    if(roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
+                    if (roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
                     {
                         palace.ShuffleRooms(r);
                         bool reachable = palace.AllReachable();
                         while (
-                            (!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd()) 
+                            (!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
                             && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT)
                             )
                         {
@@ -436,7 +455,7 @@ public class Palaces
                             tries++;
                             logger.Debug("Palace room shuffle attempt #" + tries);
                         }
-                    } 
+                    }
 
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 palace.Generations += tries;
@@ -481,13 +500,11 @@ public class Palaces
                 }
 
             }
-        }
-        //Not reconstructed
-        else
-        {
-            for (int currentPalace = 1; currentPalace < 8; currentPalace++)
+            //NOT RECONSTRUCTED
+            else
             {
                 Palace palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace], props.UseCustomRooms);
+                PalaceStyle palaceStyle = currentPalace == 7 ? props.GPStyle : props.NormalPalaceStyle;
                 //p.dumpMaps();
                 int palaceGroup = currentPalace switch
                 {
@@ -534,18 +551,22 @@ public class Palaces
                 bool removeTbird = (currentPalace == 7 && props.RemoveTbird);
                 palace.CreateTree(removeTbird);
 
+                //I broke shortened vanilla GP. I'm not sure anyone cares.
+                /*
                 if (currentPalace == 7 && props.ShortenGP)
                 {
                     palace.Shorten(r);
                 }
-                if (props.PalaceStyle == PalaceStyle.SHUFFLED)
+                */
+
+                if (palaceStyle == PalaceStyle.SHUFFLED)
                 {
                     palace.ShuffleRooms(r);
                 }
                 while (!palace.AllReachable() || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
                 {
                     palace.ResetRooms();
-                    if (props.PalaceStyle == PalaceStyle.SHUFFLED)
+                    if (palaceStyle == PalaceStyle.SHUFFLED)
                     {
                         palace.ShuffleRooms(r);
                     }
@@ -568,10 +589,11 @@ public class Palaces
             }
         }
 
+        Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
         //update pointers
-        if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
+        //if (props.NormalPalaceStyle.IsReconstructed())
+        if (true)
         {
-            Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
             if (enemyBytes > 0x400 || enemyBytesGP > 681)
             {
                 return new List<Palace>();
@@ -583,7 +605,7 @@ public class Palaces
             {
                 int sideViewAddr = FindFreeSpace(freeSpace, sv);
                 if (sideViewAddr == -1) //not enough space
-                return new List<Palace>();
+                    return new List<Palace>();
                 ROMData.Put(sideViewAddr, sv);
                 if (ROMData.GetByte(sideViewAddr + sv.Length) >= 0xD0)
                 {
@@ -594,24 +616,17 @@ public class Palaces
                 {
                     room.WriteSideViewPtr(sideViewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
-                    /*
-                    bool entrance = false;
-                    foreach (Palace p in palaces)
-                    {
-                        if (p.Root == room || p.BossRoom == room)
-                        {
-                            entrance = true;
-                        }
-                    }
-                    */
-                    //room.UpdateConnectors(ROMData, entrance);
                     room.UpdateConnectors();
                 }
             }
+        }
+        //if (props.GPStyle.IsReconstructed())
+        if(true)
+        {
             //GP Reconstructed
-            enemyAddr = Enemies.GPEnemyAddr;
+            int enemyAddr = Enemies.GPEnemyAddr;
             freeSpace = SetupFreeSpace(false, enemyBytesGP);
             foreach (byte[] sv in sideviewsgp.Keys)
             {
@@ -630,7 +645,7 @@ public class Palaces
                 {
                     room.WriteSideViewPtr(sideviewAddr, ROMData);
                     room.UpdateBitmask(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.Enemies.Length;
                     //room.UpdateConnectors(ROMData, room == palaces[6].Root);
                     room.UpdateConnectors();
@@ -645,14 +660,14 @@ public class Palaces
                 int enemiesLength = 0;
                 foreach (Room room in palaces[0].AllRooms.Union(palaces[1].AllRooms).Union(palaces[4].AllRooms).OrderBy(i => i.NewMap == 0 ? i.Map : i.NewMap))
                 {
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.Enemies.Length;
                     enemiesLength += room.Enemies.Length;
                 }
 
                 foreach (Room room in palaces[2].AllRooms.Union(palaces[3].AllRooms).Union(palaces[5].AllRooms).OrderBy(i => i.NewMap == 0 ? i.Map : i.NewMap))
                 {
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.Enemies.Length;
                     enemiesLength += room.Enemies.Length;
                 }
@@ -660,21 +675,21 @@ public class Palaces
                 enemyAddr = Enemies.GPEnemyAddr;
                 foreach (Room room in palaces[6].AllRooms)
                 {
-                    room.UpdateEnemies(enemyAddr, ROMData, props.PalaceStyle);
+                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.Enemies.Length;
                 }
             }
         }
-
+        
         if (props.ShuffleSmallItems || props.ExtraKeys)
         {
-            palaces[0].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
-            palaces[1].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
-            palaces[2].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
-            palaces[3].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
-            palaces[4].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
-            palaces[5].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
-            palaces[6].ShuffleSmallItems(5, true, r, props.ShuffleSmallItems, props.ExtraKeys, props.PalaceStyle == PalaceStyle.RECONSTRUCTED, ROMData);
+            palaces[0].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+            palaces[1].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+            palaces[2].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+            palaces[3].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+            palaces[4].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+            palaces[5].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+            palaces[6].ShuffleSmallItems(5, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
         }
         foreach(Palace palace in palaces)
         {

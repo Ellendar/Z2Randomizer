@@ -1410,8 +1410,8 @@ public abstract class World
                         }
                     }
                     //XXX: TESTING
-                    //mapCopy[y, x] = choices[RNG.Next(choices.Count)];
-                    mapCopy[y, x] = Terrain.GRASS;
+                    mapCopy[y, x] = choices[RNG.Next(choices.Count)];
+                    //mapCopy[y, x] = Terrain.GRASS;
                 }
             }
         }

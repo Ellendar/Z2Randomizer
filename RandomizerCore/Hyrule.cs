@@ -30,7 +30,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = false;
+    public const bool UNSAFE_DEBUG = true;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -836,8 +836,6 @@ public class Hyrule
     private bool IsEverythingReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         totalReachableCheck++;
-        //XXX: TESTING!
-        return true;
         int dm = 0;
         int mi = 0;
         int wh = 0;
@@ -1875,7 +1873,7 @@ public class Hyrule
             //write subroutine
             ROMData.Put(0x13f70, 0xA9);
             byte helmetRoom = 0x22;
-            if (props.PalaceStyle == PalaceStyle.RECONSTRUCTED)
+            if (props.NormalPalaceStyle.IsReconstructed())
             {
                 helmetRoom = (byte)palaces[1].BossRoom.NewMap;
             }
@@ -3120,7 +3118,58 @@ public class Hyrule
         ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Item);
         ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.Item);
         ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Item);
-        if (props.PalaceStyle != PalaceStyle.RECONSTRUCTED)
+        //if (props.NormalPalaceStyle == PalaceStyle.RECONSTRUCTED)
+        //{
+        ROMData.ElevatorBossFix(props.BossItem);
+        if (westHyrule.locationAtPalace1.PalaceNumber != 7)
+        {
+            palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace1.Item, ROMData);
+        }
+        if (westHyrule.locationAtPalace2.PalaceNumber != 7)
+        {
+            palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace2.Item, ROMData);
+        }
+        if (westHyrule.locationAtPalace3.PalaceNumber != 7)
+        {
+            palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace3.Item, ROMData);
+        }
+        if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
+        {
+            palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtPalace5.Item, ROMData);
+        }
+        if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
+        {
+            palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtPalace6.Item, ROMData);
+        }
+        if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
+        {
+            palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateItem(mazeIsland.locationAtPalace4.Item, ROMData);
+        }
+
+
+        if (eastHyrule.locationAtGP.PalaceNumber != 7)
+        {
+            palaces[eastHyrule.locationAtGP.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtGP.Item, ROMData);
+        }
+
+        Room root = palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Root;
+        ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        root = palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Root;
+        ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        root = palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Root;
+        ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        root = palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Root;
+        ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        root = palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Root;
+        ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        root = palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Root;
+        ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root;
+        ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        //XXX: Maybe this needs a refactor, maybe this is just pointless and the reconstructed version should be used everywhere
+        /*
+        }
+        else
         {
             if (westHyrule.locationAtPalace1.PalaceNumber != 7)
             {
@@ -3153,49 +3202,7 @@ public class Hyrule
                 ROMData.Put(itemLocs2[eastHyrule.locationAtGP.PalaceNumber - 1], (byte)eastHyrule.locationAtGP.Item);
             }
         }
-        else
-        {
-            ROMData.ElevatorBossFix(props.BossItem);
-            if (westHyrule.locationAtPalace1.PalaceNumber != 7)
-            {
-                palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace1.Item, ROMData);
-            }
-            if (westHyrule.locationAtPalace2.PalaceNumber != 7)
-            {
-                palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace2.Item, ROMData);
-            }
-            if (westHyrule.locationAtPalace3.PalaceNumber != 7)
-            {
-                palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateItem(westHyrule.locationAtPalace3.Item, ROMData);
-            }
-            if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
-            {
-                palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtPalace5.Item, ROMData);
-            }
-            if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
-            {
-                palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtPalace6.Item, ROMData);
-            }
-            if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
-            {
-                palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateItem(mazeIsland.locationAtPalace4.Item, ROMData);
-            }
-
-
-            if (eastHyrule.locationAtGP.PalaceNumber != 7)
-            {
-                palaces[eastHyrule.locationAtGP.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtGP.Item, ROMData);
-            }
-
-            ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Root.NewMap);
-            ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Root.NewMap);
-            ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Root.NewMap);
-            ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Root.NewMap);
-            ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Root.NewMap);
-            ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Root.NewMap);
-            ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root.NewMap);
-
-        }
+        */
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Item); //map 47
         ROMData.Put(0xDB8C, (byte)eastHyrule.townAtNewKasuto.Item); //map 46
 

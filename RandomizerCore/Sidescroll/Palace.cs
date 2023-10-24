@@ -980,7 +980,7 @@ public class Palace
         logger.Debug("Target: " + target + " Rooms: " + rooms);
     }
 
-    public void ShuffleSmallItems(int world, bool first, Random r, bool shuffleSmallItems, bool extraKeys, bool newMap, ROM ROMData)
+    public void ShuffleSmallItems(int world, bool first, Random r, bool shuffleSmallItems, bool extraKeys, ROM ROMData)
     {
         List<int> addresses = new List<int>();
         List<int> items = new List<int>();
@@ -996,11 +996,8 @@ public class Palace
         
         foreach (Room room in AllRooms)
         {
-            int i = startAddr + (room.Map * 2);
-            if(newMap)
-            {
-                i = startAddr + ((room.NewMap ?? room.Map) * 2);
-            }
+            int i = startAddr + ((room.NewMap ?? room.Map) * 2);
+
             int low = ROMData.GetByte(i);
             int hi = ROMData.GetByte(i + 1) * 256;
             int numBytes = ROMData.GetByte(hi + low + 16 - 0x8000 + (world * 0x4000));

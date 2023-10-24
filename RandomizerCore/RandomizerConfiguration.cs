@@ -92,7 +92,8 @@ public class RandomizerConfiguration
     public bool VanillaShuffleUsesActualTerrain { get; set; }
 
     //Palaces
-    public PalaceStyle PalaceStyle { get; set; }
+    public PalaceStyle NormalPalaceStyle { get; set; }
+    public PalaceStyle GPStyle { get; set; }
     //public bool? IncludeCommunityRooms { get; set; }
     public bool? IncludeVanillaRooms { get; set; }
     public bool? Includev4_0Rooms { get; set; }
@@ -100,7 +101,6 @@ public class RandomizerConfiguration
 
     public bool BlockingRoomsInAnyPalace { get; set; }
     public bool? BossRoomsExitToPalace { get; set; }
-    public bool? ShortGP { get; set; }
     public bool? TBirdRequired { get; set; }
     public bool RemoveTBird { get; set; }
     public bool RestartAtPalacesOnGameOver { get; set; }
@@ -548,7 +548,7 @@ public class RandomizerConfiguration
         config.ShuffleLifeExperience = bits[1];
         config.ShuffleMagicExperience = bits[2];
         config.RestartAtPalacesOnGameOver = bits[3];
-        config.ShortGP = bits[4];
+        bool ShortGP = bits[4];
         config.TBirdRequired = bits[5];
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
@@ -878,13 +878,16 @@ public class RandomizerConfiguration
         switch ((bits[1] ? 1 : 0) + (bits[5] ? 2 : 0))
         {
             case 0:
-                config.PalaceStyle = PalaceStyle.VANILLA;
+                config.NormalPalaceStyle = PalaceStyle.VANILLA;
+                config.GPStyle = PalaceStyle.VANILLA;
                 break;
             case 1:
-                config.PalaceStyle = PalaceStyle.SHUFFLED;
+                config.NormalPalaceStyle = PalaceStyle.SHUFFLED;
+                config.GPStyle = PalaceStyle.SHUFFLED;
                 break;
             case 2:
-                config.PalaceStyle = PalaceStyle.RECONSTRUCTED;
+                config.NormalPalaceStyle = PalaceStyle.RECONSTRUCTED;
+                config.GPStyle = ShortGP ? PalaceStyle.RECONSTRUCTED_SHORTENED : PalaceStyle.RECONSTRUCTED;
                 break;
         }
         config.IncludeVanillaRooms = true;
@@ -1275,9 +1278,29 @@ public class RandomizerConfiguration
         properties.BagusWoods = GenerateBaguWoods == null ? random.Next(2) == 1 : (bool)GenerateBaguWoods;
 
         //Palaces
-        if (PalaceStyle == PalaceStyle.RANDOM)
+        if (GPStyle == PalaceStyle.RANDOM)
         {
-            properties.PalaceStyle = random.Next(3) switch
+            properties.GPStyle = random.Next(4) switch
+            {
+                0 => PalaceStyle.VANILLA,
+                1 => PalaceStyle.SHUFFLED,
+                2 => PalaceStyle.RECONSTRUCTED,
+                3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
+                _ => throw new Exception("Invalid PalaceStyle")
+            };
+        }
+        else if (NormalPalaceStyle == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH)
+        {
+            properties.GPStyle = random.Next(2) == 0 ? PalaceStyle.RECONSTRUCTED : PalaceStyle.RECONSTRUCTED_SHORTENED;
+        }
+        else 
+        {
+            properties.GPStyle = GPStyle;
+        }
+
+        if (NormalPalaceStyle == PalaceStyle.RANDOM)
+        {
+            properties.NormalPalaceStyle = random.Next(3) switch
             {
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
@@ -1287,13 +1310,13 @@ public class RandomizerConfiguration
         }
         else
         {
-            properties.PalaceStyle = PalaceStyle;
+            properties.NormalPalaceStyle = NormalPalaceStyle;
         }
+
         properties.StartGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired == null ? random.Next(2) == 1 : (bool)TBirdRequired;
         properties.ShufflePalacePalettes = ChangePalacePallettes;
         properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
-        properties.ShortenGP = ShortGP == null ? random.Next(2) == 1 : (bool)ShortGP;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
 
@@ -1490,6 +1513,8 @@ public class RandomizerConfiguration
             properties.BagusWoods = false;
         }
 
+        //XXX: These need to be cleaned up to work with the new room types and the split palace styles.
+        /*
         if (properties.PalaceStyle == PalaceStyle.VANILLA || properties.PalaceStyle == PalaceStyle.SHUFFLED)
         {
             properties.AllowV4Rooms = false;
@@ -1503,6 +1528,7 @@ public class RandomizerConfiguration
             properties.ShortenGP = false;
             properties.RequireTbird = true;
         }
+        */
 
         if (properties.ReplaceFireWithDash)
         {
@@ -1512,7 +1538,7 @@ public class RandomizerConfiguration
         //Non-reconstructed is incompatable with no duplicate rooms.
         //Also, if community rooms is off, vanilla doesn't contain enough non-duplciate rooms to properly cover the number
         //of required rooms, often even in short GP.
-        if(properties.PalaceStyle != PalaceStyle.RECONSTRUCTED || (!properties.AllowV4Rooms && !properties.AllowV4_4Rooms))
+        if(!properties.NormalPalaceStyle.IsReconstructed() || (!properties.AllowV4Rooms && !properties.AllowV4_4Rooms))
         {
             properties.NoDuplicateRooms = false;
         }

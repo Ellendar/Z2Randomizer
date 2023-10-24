@@ -284,7 +284,7 @@ public class Room
         }
     }
 
-    public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle palaceStyle)
+    public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle normalPalaceStyle, PalaceStyle gpStyle)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if(NewEnemies[0] == 0)
@@ -326,7 +326,8 @@ public class Room
         }
 
         //Reconstructed palaces require us to rewrite the enemy pointers table.
-        if (palaceStyle == PalaceStyle.RECONSTRUCTED)
+        //XXX: This is probably wrong, but needs testing.
+        if (true)//palaceStyle == PalaceStyle.RECONSTRUCTED)
         {
             int memAddr = enemyAddr;
             //Write the updated pointers

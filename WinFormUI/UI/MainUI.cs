@@ -1,10 +1,8 @@
 ﻿using NLog;
 using Z2Randomizer.Core;
 using System.ComponentModel;
-using System.Diagnostics;
 using Z2Randomizer.Core.Overworld;
 using WinFormUI.UI;
-using System.Configuration;
 using Z2Randomizer.Core.Flags;
 
 namespace Z2Randomizer.WinFormUI;
@@ -15,7 +13,7 @@ public partial class MainUI : Form
     const string WIKI_URL = @"https://bitbucket.org/digshake/z2randomizer/wiki/Home";
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-    private Random r;
+    private readonly Random r;
     private bool dontrunhandler;
     private bool spawnNextSeed;
     private CheckBox[] small;
@@ -75,7 +73,6 @@ public partial class MainUI : Form
         dontrunhandler = false;
         mixLargeAndSmallCheckbox.Enabled = false;
         mixOverworldPalaceItemsCheckbox.Enabled = false;
-        shortGPCheckbox.Enabled = false;
         includePbagCavesInShuffleCheckbox.Enabled = false;
         includeGPinShuffleCheckbox.Enabled = false;
         tbirdRequiredCheckbox.Checked = true;
@@ -84,137 +81,139 @@ public partial class MainUI : Form
         var selectedSprite = Properties.Settings.Default.sprite;
         characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
 
-        this.Text = "Zelda 2 Randomizer Version "
+        Text = "Zelda 2 Randomizer Version "
             + typeof(MainUI).Assembly.GetName().Version.Major + "."
             + typeof(MainUI).Assembly.GetName().Version.Minor + "."
             + typeof(MainUI).Assembly.GetName().Version.Build;
 
-        flagsTextBox.DoubleClick += new System.EventHandler(this.flagBox_Clicked);
-        oldFlagsTextbox.DoubleClick += new System.EventHandler(this.oldFlagsTextbox_Clicked);
+        flagsTextBox.DoubleClick += new System.EventHandler(flagBox_Clicked);
+        shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        oldFlagsTextbox.DoubleClick += new System.EventHandler(oldFlagsTextbox_Clicked);
 
-        shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithCandleCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithGloveCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithRaftCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithBootsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithFluteCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithCrossCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithHammerCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithMagicKeyCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleStartingSpellsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithShieldCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithJumpCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithLifeCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithFairyCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithFireCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithReflectCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWithSpellCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startWIthThunderCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startHeartsMinList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startHeartsMaxList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        maxHeartsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingTechsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingGemsMinList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingGemsMaxList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        randomizeLivesBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleEnemyHPBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleAllExpCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleAtkExpNeededCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        lifeExpNeededCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        magicExpNeededCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleXPStealersCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleStealXPAmountCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleSwordImmunityBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        jumpAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleLifeRefillCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        experienceDropsList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        allowPathEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeLavaInShuffleCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        mixLargeAndSmallCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shufflePalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleOverworldItemsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        mixOverworldPalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleSmallItemsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleSpellLocationsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        disableMagicContainerRequirementCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        palacesHaveExtraKeysCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleDropFrequencyCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        palacePaletteCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        allowPalaceContinentSwapCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        attackEffectivenessList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        magicEffectivenessList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        lifeEffectivenessList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        restartAtPalacesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shortGPCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        randomizeJarRequirementsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        FireSpellBox.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        alwaysBeamCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includePbagCavesInShuffleCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeGPinShuffleCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleDripperEnemyCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleEnemyPalettesCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        hideKasutoList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        useCommunityHintsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        standardizeDropsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        randomizeDropsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shufflePbagAmountsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        atkCapList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        magCapList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        lifeCapList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        scaleLevelRequirementsToCapCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        enableTownNameHintsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        enableHelpfulHintsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        enableSpellItemHintsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        encounterRateBox.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingAttackLevelList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingMagicLevelList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        startingLifeLevelList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        continentConnectionBox.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        saneCaveShuffleBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        hideLessImportantLocationsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        allowBoulderBlockedConnectionsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        climateSelector.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        westBiomeSelector.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        dmBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        eastBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        mazeBiome.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffledVanillaShowsActualTerrain.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        shuffleWhichLocationsAreHiddenCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        randomizeBossItemCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        useGoodBootsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        randomizeSpellSpellEnemyCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        generateBaguWoodsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        palaceStyleList.SelectedIndexChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        blockingRoomsInAnyPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        includev4_4RoomsCheckbox.CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-        //townSwap.CheckStateChanged += new System.EventHandler(this.updateFlags);
+        flagsTextBox.TextChanged += new System.EventHandler(FlagBox_Changed);
+        shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithCandleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithGloveCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithRaftCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithBootsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithFluteCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithCrossCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithHammerCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithMagicKeyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleStartingSpellsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithShieldCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithJumpCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithLifeCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithFairyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithFireCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithReflectCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWithSpellCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startWIthThunderCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startHeartsMinList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startHeartsMaxList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        maxHeartsList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingTechsList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingGemsMinList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingGemsMaxList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        randomizeLivesBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleEnemyHPBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleAllExpCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleAtkExpNeededCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        lifeExpNeededCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        magicExpNeededCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleXPStealersCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleStealXPAmountCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleSwordImmunityBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        jumpAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleLifeRefillCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        tbirdRequiredCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        experienceDropsList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleEncountersCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        allowPathEnemiesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeLavaInShuffleCheckBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleOverworldEnemiesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shufflePalaceEnemiesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        mixLargeAndSmallCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shufflePalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleOverworldItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        mixOverworldPalaceItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleSmallItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleSpellLocationsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        disableMagicContainerRequirementCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        palacesHaveExtraKeysCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleDropFrequencyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        palacePaletteCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        allowPalaceContinentSwapCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        attackEffectivenessList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        magicEffectivenessList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        lifeEffectivenessList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        restartAtPalacesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        randomizeJarRequirementsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        FireSpellBox.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        alwaysBeamCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includePbagCavesInShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeGPinShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleDripperEnemyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleEnemyPalettesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        hideKasutoList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        useCommunityHintsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        standardizeDropsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        randomizeDropsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shufflePbagAmountsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        atkCapList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        magCapList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        lifeCapList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        scaleLevelRequirementsToCapCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        enableTownNameHintsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        enableHelpfulHintsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        enableSpellItemHintsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        encounterRateBox.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingAttackLevelList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingMagicLevelList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingLifeLevelList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        continentConnectionBox.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        saneCaveShuffleBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        hideLessImportantLocationsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        allowBoulderBlockedConnectionsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        climateSelector.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        westBiomeSelector.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        dmBiome.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        eastBiome.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        mazeBiome.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffledVanillaShowsActualTerrain.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        shuffleWhichLocationsAreHiddenCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        randomizeBossItemCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        useGoodBootsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        randomizeSpellSpellEnemyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        generateBaguWoodsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        palaceStyleList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        gpStyleList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        blockingRoomsInAnyPalaceCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includev4_4RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        //townSwap.CheckStateChanged += new System.EventHandler(updateFlags);
 
         TryLoadSpriteImageFromFile(romFileTextBox.Text);
 
         EnableLevelScaling(null, null);
         EastBiome_SelectedIndexChanged(null, null);
-        randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(this.RandomizeDropsChanged);
+        randomizeDropsCheckbox.CheckedChanged += new System.EventHandler(RandomizeDropsChanged);
         for (int i = 0; i < small.Count(); i++)
         {
-            small[i].CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-            small[i].CheckStateChanged += new System.EventHandler(this.AtLeastOneChecked);
-            large[i].CheckStateChanged += new System.EventHandler(this.UpdateFlagsTextbox);
-            large[i].CheckStateChanged += new System.EventHandler(this.AtLeastOneChecked);
+            small[i].CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+            small[i].CheckStateChanged += new System.EventHandler(AtLeastOneChecked);
+            large[i].CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+            large[i].CheckStateChanged += new System.EventHandler(AtLeastOneChecked);
         }
         String lastUsed = Properties.Settings.Default.lastused;
         if (lastUsed.Equals(""))
@@ -835,7 +834,7 @@ public partial class MainUI : Form
         configuration.VanillaShuffleUsesActualTerrain = shuffledVanillaShowsActualTerrain.Checked;
 
         //Palaces
-        configuration.PalaceStyle = palaceStyleList.SelectedIndex switch
+        configuration.NormalPalaceStyle = palaceStyleList.SelectedIndex switch
         {
             0 => PalaceStyle.VANILLA,
             1 => PalaceStyle.SHUFFLED,
@@ -843,12 +842,20 @@ public partial class MainUI : Form
             3 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
+        configuration.GPStyle = gpStyleList.SelectedIndex switch
+        {
+            0 => PalaceStyle.VANILLA,
+            1 => PalaceStyle.SHUFFLED,
+            2 => PalaceStyle.RECONSTRUCTED,
+            3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
+            4 => PalaceStyle.RANDOM,
+            _ => throw new Exception("Invalid GP Style setting")
+        };
         configuration.IncludeVanillaRooms = GetTripleCheckState(includeVanillaRoomsCheckbox);
         configuration.Includev4_0Rooms = GetTripleCheckState(includev4_0RoomsCheckbox);
         configuration.Includev4_4Rooms = GetTripleCheckState(includev4_4RoomsCheckbox);
         configuration.BlockingRoomsInAnyPalace = blockingRoomsInAnyPalaceCheckbox.Checked;
         configuration.BossRoomsExitToPalace = GetTripleCheckState(bossRoomsExitToPalaceCheckbox);
-        configuration.ShortGP = GetTripleCheckState(shortGPCheckbox);
         configuration.TBirdRequired = GetTripleCheckState(tbirdRequiredCheckbox);
         configuration.RemoveTBird = removeTbirdCheckbox.Checked;
         configuration.RestartAtPalacesOnGameOver = restartAtPalacesCheckbox.Checked;
@@ -1018,6 +1025,13 @@ public partial class MainUI : Form
         return configuration;
     }
 
+    private void FlagBox_Changed(object sender, EventArgs e)
+    {
+        if(flagsTextBox.Text != flagsTextBox.Text.Trim())
+        {
+            flagsTextBox.Text = flagsTextBox.Text.Trim();
+        }
+    }
     private void flagBox_Clicked(object send, EventArgs e)
     {
         flagsTextBox.SelectAll();
@@ -1245,7 +1259,7 @@ public partial class MainUI : Form
             shuffledVanillaShowsActualTerrain.Checked = configuration.VanillaShuffleUsesActualTerrain;
 
             //Palaces
-            palaceStyleList.SelectedIndex = configuration.PalaceStyle switch
+            palaceStyleList.SelectedIndex = configuration.NormalPalaceStyle switch
             {
                 PalaceStyle.VANILLA => 0,
                 PalaceStyle.SHUFFLED => 1,
@@ -1253,12 +1267,20 @@ public partial class MainUI : Form
                 PalaceStyle.RANDOM => 3,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
+            gpStyleList.SelectedIndex = configuration.GPStyle switch
+            {
+                PalaceStyle.VANILLA => 0,
+                PalaceStyle.SHUFFLED => 1,
+                PalaceStyle.RECONSTRUCTED => 2,
+                PalaceStyle.RECONSTRUCTED_SHORTENED => 3,
+                PalaceStyle.RANDOM => 4,
+                _ => throw new Exception("Invalid PalaceStyle setting")
+            };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
             includev4_0RoomsCheckbox.CheckState = ToCheckState(configuration.Includev4_0Rooms);
             includev4_4RoomsCheckbox.CheckState = ToCheckState(configuration.Includev4_4Rooms);
             blockingRoomsInAnyPalaceCheckbox.Checked = configuration.BlockingRoomsInAnyPalace;
             bossRoomsExitToPalaceCheckbox.CheckState = ToCheckState(configuration.BossRoomsExitToPalace);
-            shortGPCheckbox.CheckState = ToCheckState(configuration.ShortGP);
             tbirdRequiredCheckbox.CheckState = ToCheckState(configuration.TBirdRequired);
             removeTbirdCheckbox.Checked = configuration.RemoveTBird;
             restartAtPalacesCheckbox.Checked = configuration.RestartAtPalacesOnGameOver;
@@ -1871,13 +1893,10 @@ public partial class MainUI : Form
 
         if (palaceStyleList.SelectedIndex != 0)
         {
-            shortGPCheckbox.Enabled = true;
             tbirdRequiredCheckbox.Enabled = true;
         }
         else
         {
-            shortGPCheckbox.Checked = false;
-            shortGPCheckbox.Enabled = false;
             tbirdRequiredCheckbox.Enabled = false;
             tbirdRequiredCheckbox.Checked = true;
         }
@@ -1972,10 +1991,5 @@ public partial class MainUI : Form
     private void beamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
-    }
-
-    private void includeCommunityRoomsCheckbox_CheckedChanged(object sender, EventArgs e)
-    {
-
     }
 }
