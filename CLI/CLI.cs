@@ -6,8 +6,8 @@ class CLI
 {
 	private static Dictionary<string, string> MiscOptions = new Dictionary<string, string>()
 	{
-		{"--remove-flashing-upon-death", "n" },
-		{"--fast-spell-casting", "n"}
+		{"--remove-flashing-upon-death", "y" },
+		{"--fast-spell-casting", "y"}
 	};
 
 	static bool IsOptionValid(string option)
@@ -84,6 +84,7 @@ class CLI
 			Console.WriteLine("\nValid options are:");
 			string valid_options = GetMiscOptions();
 			Console.WriteLine(valid_options);
+			Console.WriteLine(e);
 			Console.ReadLine();
 		}
 	}
