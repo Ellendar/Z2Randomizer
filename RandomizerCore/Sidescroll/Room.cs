@@ -34,6 +34,7 @@ public class Room
     public int PalaceGroup { get; set; }
 
     public bool IsRoot { get; set; }
+    public Room LinkedRoom { get; set; }
     public Room Left { get; set; }
     public Room Right { get; set; }
     public Room Up
@@ -227,6 +228,7 @@ public class Room
         PalaceNumber = roomData.palaceNumber;
         PalaceGroup = (int?)roomData.palaceGroup.Value ?? 0;
         Requirements = new Requirements(roomData.requirements.ToString());
+        LinkedRoomName = roomData.linkedRoomName;
 
         IsPlaced = false;
         IsRoot = false;

@@ -20,6 +20,8 @@ public class PalaceRooms
     private static readonly Dictionary<string, Room> roomsByName = new();
     private static readonly Dictionary<string, Room> customRoomsByName = new();
 
+
+
     public static readonly string roomsMD5 = "qvtwG7ntEclgbAXcszrcjA==";
 
     static PalaceRooms()
@@ -44,8 +46,8 @@ public class PalaceRooms
                         roomsByGroup.Add(room.Group, new List<Room>());
                     }
                     roomsByGroup[room.Group].Add(room);
-                    roomsByName[room.Name] = room;
                 }
+                roomsByName[room.Name] = room;
             }
         }
         else
