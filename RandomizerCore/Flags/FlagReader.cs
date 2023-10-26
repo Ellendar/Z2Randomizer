@@ -87,6 +87,8 @@ public class FlagReader
     public int index = 0;
     public FlagReader(string flags)
     {
+        // NOTE: The '$' was replaced with '+' to help with command line usage
+        flags = flags.Replace('$', '+');
         foreach (char character in flags)
         {
             int decode = BASE64_DECODE[character];

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CommandLine": {
+      "commandName": "Project",
+      "commandLineArgs": "-f RAhN6EAAFAViN1TRtcA$9TFCVAnTzFAmLh -s 1234567 -r D:\\roms\\nes\\Zelda2.NES"
+    }
+  }
+}

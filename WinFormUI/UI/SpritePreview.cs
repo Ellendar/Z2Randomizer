@@ -33,7 +33,7 @@ namespace WinFormUI.UI
         public void ReloadSpriteFromROM(CharacterSprite sprite, string? tunicColor, string? shieldColor, string? beamSprite)
         {
             // make a temporary copy of the original ROM file and apply the sprite to it
-            var rom = new ROM(_rom.ToArray());
+            var rom = new ROM(_rom.ToArray(), null);
             rom.UpdateSprites(sprite, tunicColor, shieldColor, beamSprite);
 
             // now the original rom has the sprite and palette data applied,

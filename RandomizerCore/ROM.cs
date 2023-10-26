@@ -1,11 +1,11 @@
-﻿using NLog;
+﻿using Assembler;
+using NLog;
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Speech.Synthesis;
 using System.Text;
 using Z2Randomizer.Core.Overworld;
 
@@ -111,8 +111,9 @@ public class ROM
     };
 
     private byte[] ROMData;
+    private readonly Engine _engine;
 
-    public ROM(String filename)
+    public ROM(String filename, Engine engine)
     {
         try
         {
@@ -122,6 +123,7 @@ public class ROM
 
             BinaryReader br = new BinaryReader(fs, new ASCIIEncoding());
             ROMData = br.ReadBytes(257 * 1024);
+            _engine = engine;
 
         }
         catch (Exception err)
@@ -130,9 +132,10 @@ public class ROM
         }
     }
 
-    public ROM(byte[] data)
+    public ROM(byte[] data, Engine engine)
     {
         ROMData = data;
+        _engine = engine;
     }
 
     public Byte GetByte(int index)
@@ -561,6 +564,7 @@ public class ROM
 
     public void WriteFastCastMagic()
     {
+
         foreach (int addr in fastCastMagicAddr)
         {
             Put(addr, 0xEA);
@@ -797,10 +801,24 @@ public class ROM
 
     public void UpAController1()
     {
-        Put(0x21B0, 0xF7);
-        Put(0x21B2, 0x28);
-        Put(0x21EE, 0xF7);
-        Put(0x21F0, 0x28);
+        var a = _engine.Asm();
+        a.code("""
+.segment "PRG0"
+.org $a19f
+CheckController1ForUpAUnknown:
+  lda $f7
+  cmp #$28
+
+.org $a1dd
+CheckController1ForUpAMagic:
+  lda $f7
+  cmp #$28
+""", "UpAController1.s");
+        _engine.Modules.Add(a.Actions);
+        //Put(0x21B0, 0xF7);
+        //Put(0x21B2, 0x28);
+        //Put(0x21EE, 0xF7);
+        //Put(0x21F0, 0x28);
     }
 
     public void DisableFlashing()
@@ -810,6 +828,11 @@ public class ROM
         Put(0x2A03, 0x12);
         Put(0x1C9FA, 0x16);
         Put(0x1C9FC, 0x16);
+    }
+
+    public void ApplyAsm()
+    {
+        _engine.Apply(ROMData);
     }
 
     public void DashSpell()

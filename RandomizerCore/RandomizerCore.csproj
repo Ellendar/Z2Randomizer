@@ -65,6 +65,9 @@
     <PackageReference Include="NLog" Version="5.1.4" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Assembler\Assembler.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Sprites\Aneru.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

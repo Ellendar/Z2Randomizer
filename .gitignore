@@ -10,3 +10,6 @@
 /Statistics/Statistics.csproj.user
 /Statistics/db/*.sqlite
 .idea/
+*.nes
+*.user
+.vscode/
