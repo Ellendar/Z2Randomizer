@@ -837,32 +837,41 @@ CheckController1ForUpAMagic:
 
     public void DashSpell()
     {
-        /*
-         * push accumulator to stack (48)
-         * load 769 (AD 6F 07)
-         * check 4th bit (29 10)
-         * branch if equal to fire table (F0 X)
-         * pop stack to accumulator (68)
-         * compare to normal table D9 B3 93
-         * return (60)
-         * pop stack to accumulator (68)
-         * compare to dash table (D9 X X)
-         * return (60)
-         * two bytes for dash table
-         */
-        Put(0x2a50, new Byte[] { 0x48, 0xad, 0x6f, 0x07, 0x29, 0x10, 0xd0, 0x05, 0x68, 0xd9, 0xb3, 0x93, 0x60, 0x68, 0xd9, 0x52, 0xaa, 0x60, 0x30, 0xd0}); //, 0x20, 0xFD, 0x93, 0xa9, 0x18, 0x8d, 0xb3, 0x93, 0xa9, 0xE8, 0x8d, 0xb4, 0x93, 0x60 });
+        var a = _engine.Asm();
+        a.code("""
+.segment "PRG0"
+.reloc
+ReplaceFireWithDashSpell:
+    pha
+    lda $076f ; Current magic state
+    and #$10  ; fire is on
+    bne @HasFire
+        pla
+        cmp $93b3,y ; Table for Link's original max velocities
+        rts
+@HasFire:
+    pla
+    cmp @SecondaryVelocityTable,y
+    rts
+@SecondaryVelocityTable:
+.byte $30, $d0
+""");
 
-        //Jump to 97f1 
-        Put(0x140f, new Byte[] { 0x20, 0x40, 0xAA });
+        // Inside Links_Acceleration_Routine, patch the max speed compare to check if we cast dash
+        a.org(0x93ff);
+        a.code("jsr ReplaceFireWithDashSpell");
 
-        //put values back
-        Put(0xe60, new Byte[] { 0x14, 0x98 });
+        // Update the magic table to point to an rts ???
+        a.org(0x8e50);
+        a.byt(0x14, 0x98);
+
         List<char> dash = Util.ToGameText("DASH", false);
-
+        a.org(0x9c62);
         for(int i = 0; i < dash.Count; i++)
         {
-            Put(0x1c72 + i, (byte)dash[i]);
+            a.byt((byte)dash[i]);
         }
+        _engine.Modules.Add(a.Actions);
     }
 
     public void MoveAfterGem()
