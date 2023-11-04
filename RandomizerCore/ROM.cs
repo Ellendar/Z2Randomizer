@@ -113,7 +113,7 @@ public class ROM
     private byte[] ROMData;
     private readonly Engine _engine;
 
-    public ROM(String filename, Engine engine)
+    public ROM(string filename, Engine engine)
     {
         try
         {
@@ -138,14 +138,14 @@ public class ROM
         _engine = engine;
     }
 
-    public Byte GetByte(int index)
+    public byte GetByte(int index)
     {
         return ROMData[index];
     }
 
-    public Byte[] GetBytes(int start, int end)
+    public byte[] GetBytes(int start, int end)
     {
-        Byte[] bytes = new byte[end - start];
+        byte[] bytes = new byte[end - start];
         for(int i = start; i < end; i++)
         {
             bytes[i - start] = GetByte(i);
@@ -171,7 +171,7 @@ public class ROM
         }
     }
 
-    public void Dump(String filename)
+    public void Dump(string filename)
     {
         File.WriteAllBytes(filename, ROMData);
     }
@@ -306,7 +306,7 @@ public class ROM
             patcher.Patch(ROMData, charSprite.Path);
         }
 
-        Dictionary<String, int> colorMap = new Dictionary<String, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
+        Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
 
         /*colors to include
             Green (2A)
@@ -427,7 +427,7 @@ public class ROM
         {
             beamType = 5;
         }
-        byte[] newSprite = new Byte[32];
+        byte[] newSprite = new byte[32];
 
         if (beamType == 0 || beamType == 3 || beamType == 4)
         {
@@ -444,7 +444,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                Byte next = GetByte(0x20ab0 + i);
+                byte next = GetByte(0x20ab0 + i);
                 newSprite[i] = next;
             }
         }
@@ -453,7 +453,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                Byte next = GetByte(0x22af0 + i);
+                byte next = GetByte(0x22af0 + i);
                 newSprite[i] = next;
             }
         }
@@ -462,7 +462,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                Byte next = GetByte(0x22fb0 + i);
+                byte next = GetByte(0x22fb0 + i);
                 newSprite[i] = next;
             }
         }
@@ -471,7 +471,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                Byte next = GetByte(0x32ef0 + i);
+                byte next = GetByte(0x32ef0 + i);
                 newSprite[i] = next;
             }
         }
@@ -480,7 +480,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                Byte next = GetByte(0x34dd0 + i);
+                byte next = GetByte(0x34dd0 + i);
                 newSprite[i] = next;
             }
         }
@@ -703,7 +703,7 @@ public class ROM
         cdb5: 60            RTS                   # return to caller
         */
 
-        Put(0x1cda8, new Byte[] { 0x4c, 0xc6, 0xcd, 0xa0, 0x00, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0x10, 0xf9, 0xca, 0xf0, 0x0e, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0xd0, 0xf9, 0xe6, 0x03, 0xe6, 0x21, 0xca, 0xd0, 0xe8, 0x60 });
+        Put(0x1cda8, new byte[] { 0x4c, 0xc6, 0xcd, 0xa0, 0x00, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0x10, 0xf9, 0xca, 0xf0, 0x0e, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0xd0, 0xf9, 0xe6, 0x03, 0xe6, 0x21, 0xca, 0xd0, 0xe8, 0x60 });
 
         //# Fill with NOPs all the way to $cdc6
         for (int i = 0x1cdc6; i < 0x1cdd6; i++)
@@ -850,13 +850,13 @@ CheckController1ForUpAMagic:
          * return (60)
          * two bytes for dash table
          */
-        Put(0x2a50, new Byte[] { 0x48, 0xad, 0x6f, 0x07, 0x29, 0x10, 0xd0, 0x05, 0x68, 0xd9, 0xb3, 0x93, 0x60, 0x68, 0xd9, 0x52, 0xaa, 0x60, 0x30, 0xd0}); //, 0x20, 0xFD, 0x93, 0xa9, 0x18, 0x8d, 0xb3, 0x93, 0xa9, 0xE8, 0x8d, 0xb4, 0x93, 0x60 });
+        Put(0x2a50, new byte[] { 0x48, 0xad, 0x6f, 0x07, 0x29, 0x10, 0xd0, 0x05, 0x68, 0xd9, 0xb3, 0x93, 0x60, 0x68, 0xd9, 0x52, 0xaa, 0x60, 0x30, 0xd0}); //, 0x20, 0xFD, 0x93, 0xa9, 0x18, 0x8d, 0xb3, 0x93, 0xa9, 0xE8, 0x8d, 0xb4, 0x93, 0x60 });
 
         //Jump to 97f1 
-        Put(0x140f, new Byte[] { 0x20, 0x40, 0xAA });
+        Put(0x140f, new byte[] { 0x20, 0x40, 0xAA });
 
         //put values back
-        Put(0xe60, new Byte[] { 0x14, 0x98 });
+        Put(0xe60, new byte[] { 0x14, 0x98 });
         List<char> dash = Util.ToGameText("DASH", false);
 
         for(int i = 0; i < dash.Count; i++)
@@ -867,9 +867,9 @@ CheckController1ForUpAMagic:
 
     public void MoveAfterGem()
     {
-        Put(0x11b15, new Byte[] { 0xea, 0xea });
+        Put(0x11b15, new byte[] { 0xea, 0xea });
 
-        Put(0x11af5, new Byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
+        Put(0x11af5, new byte[] { 0x47, 0x9b, 0x56, 0x9b, 0x35, 0x9b });
     }
 
     public void ElevatorBossFix(bool bossItem)
@@ -1033,7 +1033,7 @@ CheckController1ForUpAMagic:
         List<Location> locations = new List<Location>();
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = new Byte[4] { 
+            byte[] bytes = new byte[4] { 
                 GetByte(startAddr + i), 
                 GetByte(startAddr + RomMap.overworldXOffset + i), 
                 GetByte(startAddr + RomMap.overworldMapOffset + i), 
@@ -1045,7 +1045,7 @@ CheckController1ForUpAMagic:
 
     public Location LoadLocation(int addr, Terrain t, Continent c)
     {
-        byte[] bytes = new Byte[4] { 
+        byte[] bytes = new byte[4] { 
             GetByte(addr), 
             GetByte(addr + RomMap.overworldXOffset), 
             GetByte(addr + RomMap.overworldMapOffset), 

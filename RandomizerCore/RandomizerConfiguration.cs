@@ -779,7 +779,7 @@ public class RandomizerConfiguration
                 config.WestBiome = Biome.MOUNTAINOUS;
                 break;
             case 7:
-                config.WestBiome = Biome.RANDOM_NO_VANILLA;
+                config.WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE;
                 break;
             case 8:
                 config.WestBiome = Biome.RANDOM;
@@ -812,7 +812,7 @@ public class RandomizerConfiguration
                 config.DMBiome = Biome.MOUNTAINOUS;
                 break;
             case 7:
-                config.DMBiome = Biome.RANDOM_NO_VANILLA;
+                config.DMBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE;
                 break;
             case 8:
                 config.DMBiome = Biome.RANDOM;
@@ -843,7 +843,7 @@ public class RandomizerConfiguration
                 config.EastBiome = Biome.MOUNTAINOUS;
                 break;
             case 7:
-                config.EastBiome = Biome.RANDOM_NO_VANILLA;
+                config.EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE;
                 break;
             case 8:
                 config.EastBiome = Biome.RANDOM;
@@ -1191,9 +1191,10 @@ public class RandomizerConfiguration
         properties.EncounterRate = EncounterRate;
         properties.ContinentConnections = ContinentConnectionType;
         properties.BoulderBlockConnections = AllowConnectionCavesToBeBoulderBlocked;
-        if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA)
+        int shuffleLimit = WestBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+        if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            properties.WestBiome = random.Next(WestBiome == Biome.RANDOM ? 7 : 5) switch
+            properties.WestBiome = random.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
@@ -1209,7 +1210,8 @@ public class RandomizerConfiguration
         {
             properties.WestBiome = WestBiome;
         }
-        if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA)
+        shuffleLimit = EastBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+        if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
             properties.EastBiome = random.Next(EastBiome == Biome.RANDOM ? 7 : 5) switch
             {
@@ -1227,7 +1229,8 @@ public class RandomizerConfiguration
         {
             properties.EastBiome = EastBiome;
         }
-        if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA)
+        shuffleLimit = DMBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+        if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
             properties.DmBiome = random.Next(DMBiome == Biome.RANDOM ? 7 : 5) switch
             {

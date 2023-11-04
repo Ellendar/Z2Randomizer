@@ -831,8 +831,8 @@ partial class MainUI
         // 
         westBiomeSelector.DropDownStyle = ComboBoxStyle.DropDownList;
         westBiomeSelector.FormattingEnabled = true;
-        westBiomeSelector.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
-        westBiomeSelector.Location = new Point(416, 270);
+        westBiomeSelector.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random", "Random (no Vanilla)", "Random (no Vanilla / Shuffle)" });
+        westBiomeSelector.Location = new Point(416, 174);
         westBiomeSelector.Margin = new Padding(4, 3, 4, 3);
         westBiomeSelector.Name = "westBiomeSelector";
         westBiomeSelector.Size = new Size(140, 23);
@@ -843,7 +843,7 @@ partial class MainUI
         // westBiomeLabel
         // 
         westBiomeLabel.AutoSize = true;
-        westBiomeLabel.Location = new Point(273, 273);
+        westBiomeLabel.Location = new Point(273, 177);
         westBiomeLabel.Margin = new Padding(4, 0, 4, 0);
         westBiomeLabel.Name = "westBiomeLabel";
         westBiomeLabel.Size = new Size(129, 15);
@@ -918,7 +918,7 @@ partial class MainUI
         // 
         mazeBiome.DropDownStyle = ComboBoxStyle.DropDownList;
         mazeBiome.FormattingEnabled = true;
-        mazeBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Random (with Vanilla)" });
+        mazeBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Random" });
         mazeBiome.Location = new Point(416, 238);
         mazeBiome.Margin = new Padding(4, 3, 4, 3);
         mazeBiome.Name = "mazeBiome";
@@ -942,7 +942,7 @@ partial class MainUI
         // 
         eastBiome.DropDownStyle = ComboBoxStyle.DropDownList;
         eastBiome.FormattingEnabled = true;
-        eastBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Volcano", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
+        eastBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Volcano", "Mountainous", "Random", "Random (no Vanilla)", "Random (no Vanilla / Shuffle)" });
         eastBiome.Location = new Point(416, 207);
         eastBiome.Margin = new Padding(4, 3, 4, 3);
         eastBiome.Name = "eastBiome";
@@ -955,8 +955,8 @@ partial class MainUI
         // 
         dmBiome.DropDownStyle = ComboBoxStyle.DropDownList;
         dmBiome.FormattingEnabled = true;
-        dmBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random (no Vanilla)", "Random (with Vanilla)" });
-        dmBiome.Location = new Point(416, 175);
+        dmBiome.Items.AddRange(new object[] { "Vanilla", "Vanilla (shuffled)", "Vanilla-Like", "Islands", "Canyon", "Caldera", "Mountainous", "Random", "Random (no Vanilla)", "Random (no Vanilla / Shuffle)" });
+        dmBiome.Location = new Point(416, 267);
         dmBiome.Margin = new Padding(4, 3, 4, 3);
         dmBiome.Name = "dmBiome";
         dmBiome.Size = new Size(140, 23);
@@ -990,7 +990,7 @@ partial class MainUI
         // deathMountainBiomeLabel
         // 
         deathMountainBiomeLabel.AutoSize = true;
-        deathMountainBiomeLabel.Location = new Point(273, 179);
+        deathMountainBiomeLabel.Location = new Point(273, 271);
         deathMountainBiomeLabel.Margin = new Padding(4, 0, 4, 0);
         deathMountainBiomeLabel.Name = "deathMountainBiomeLabel";
         deathMountainBiomeLabel.Size = new Size(133, 15);

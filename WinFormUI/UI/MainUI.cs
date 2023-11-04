@@ -793,8 +793,9 @@ public partial class MainUI : Form
             4 => Biome.CANYON,
             5 => Biome.CALDERA,
             6 => Biome.MOUNTAINOUS,
-            7 => Biome.RANDOM_NO_VANILLA,
-            8 => Biome.RANDOM,
+            7 => Biome.RANDOM,
+            8 => Biome.RANDOM_NO_VANILLA,
+            9 => Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
             _ => throw new Exception("Invalid WestBiome setting")
         };
         configuration.EastBiome = eastBiome.SelectedIndex switch
@@ -806,8 +807,9 @@ public partial class MainUI : Form
             4 => Biome.CANYON,
             5 => Biome.VOLCANO,
             6 => Biome.MOUNTAINOUS,
-            7 => Biome.RANDOM_NO_VANILLA,
-            8 => Biome.RANDOM,
+            7 => Biome.RANDOM,
+            8 => Biome.RANDOM_NO_VANILLA,
+            9 => Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
             _ => throw new Exception("Invalid EastBiome setting")
         };
         configuration.DMBiome = dmBiome.SelectedIndex switch
@@ -819,8 +821,9 @@ public partial class MainUI : Form
             4 => Biome.CANYON,
             5 => Biome.CALDERA,
             6 => Biome.MOUNTAINOUS,
-            7 => Biome.RANDOM_NO_VANILLA,
-            8 => Biome.RANDOM,
+            7 => Biome.RANDOM,
+            8 => Biome.RANDOM_NO_VANILLA,
+            9 => Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
             _ => throw new Exception("Invalid DMBiome setting")
         };
         configuration.MazeBiome = mazeBiome.SelectedIndex switch
@@ -1027,7 +1030,7 @@ public partial class MainUI : Form
 
     private void FlagBox_Changed(object sender, EventArgs e)
     {
-        if(flagsTextBox.Text != flagsTextBox.Text.Trim())
+        if (flagsTextBox.Text != flagsTextBox.Text.Trim())
         {
             flagsTextBox.Text = flagsTextBox.Text.Trim();
         }
@@ -1218,8 +1221,9 @@ public partial class MainUI : Form
                 Biome.CANYON => 4,
                 Biome.CALDERA => 5,
                 Biome.MOUNTAINOUS => 6,
-                Biome.RANDOM_NO_VANILLA => 7,
-                Biome.RANDOM => 8,
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 8,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 9,
                 _ => throw new Exception("Invalid WestBiome setting")
             };
             eastBiome.SelectedIndex = configuration.EastBiome switch
@@ -1231,8 +1235,9 @@ public partial class MainUI : Form
                 Biome.CANYON => 4,
                 Biome.VOLCANO => 5,
                 Biome.MOUNTAINOUS => 6,
-                Biome.RANDOM_NO_VANILLA => 7,
-                Biome.RANDOM => 8,
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 8,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 9,
                 _ => throw new Exception("Invalid EastBiome setting")
             };
             dmBiome.SelectedIndex = configuration.DMBiome switch
@@ -1244,8 +1249,9 @@ public partial class MainUI : Form
                 Biome.CANYON => 4,
                 Biome.CALDERA => 5,
                 Biome.MOUNTAINOUS => 6,
-                Biome.RANDOM_NO_VANILLA => 7,
-                Biome.RANDOM => 8,
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 8,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 9,
                 _ => throw new Exception("Invalid DMBiome setting")
             };
             mazeBiome.SelectedIndex = configuration.MazeBiome switch

@@ -18,8 +18,8 @@ internal class IpsPatcher
     public void Patch(byte[] romData, string patchName)
     {
         //FileStream romstream = new FileStream(romname, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-        MemoryStream romstream = new MemoryStream(romData);
-        FileStream ipsstream = new FileStream(patchName, FileMode.Open, FileAccess.Read);
+        MemoryStream romstream = new(romData);
+        FileStream ipsstream = new(patchName, FileMode.Open, FileAccess.Read);
         int lint = (int)ipsstream.Length;
         byte[] ipsbyte = new byte[ipsstream.Length];
         //byte[] romData = new byte[romstream.Length];

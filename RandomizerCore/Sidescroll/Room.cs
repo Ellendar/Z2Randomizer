@@ -31,7 +31,7 @@ public class Room
     public byte bitmask;
 
     public int Map { get; set; }
-    public int PalaceGroup { get; set; }
+    public int? PalaceGroup { get; set; }
 
     public bool IsRoot { get; set; }
     public Room LinkedRoom { get; set; }
@@ -166,6 +166,10 @@ public class Room
     public int? PalaceNumber { get; set; }
     public string LinkedRoomName { get; set; }
 
+    public Room()
+    {
+
+    }
     public Room(Room room)
     {
         Map = room.Map;
@@ -855,6 +859,9 @@ public class RoomJsonConverter : JsonConverter<Room>
 
         writer.WritePropertyName("author");
         writer.WriteValue(value.Author);
+
+        writer.WritePropertyName("palaceGroup");
+        writer.WriteValue(value.PalaceGroup);
 
         writer.WriteEndObject();
     }
