@@ -55,7 +55,7 @@ public class RandomizerProperties
     public bool StartWithDownstab { get; set; }
     public int StartLives { get; set; }
     public bool PermanentBeam { get; set; }
-    public bool UseCommunityHints { get; set; }
+    public bool UseCommunityText { get; set; }
     public int StartAtk { get; set; }
     public int StartMag { get; set; }
     public int StartLifeLvl { get; set; }

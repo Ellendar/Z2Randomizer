@@ -204,12 +204,11 @@ partial class MainUI
         smallEnemyPoolLabel = new Label();
         label19 = new Label();
         shuffleDropFrequencyCheckbox = new CheckBox();
-        tabPage10 = new TabPage();
+        miscTabPage = new TabPage();
         enableTownNameHintsCheckbox = new CheckBox();
         enableSpellItemHintsCheckbox = new CheckBox();
-        useCommunityHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
-        tabPage3 = new TabPage();
+        CustomTabPage = new TabPage();
         spriteCreditLabel = new Label();
         beepFrequencyDropdown = new ComboBox();
         label10 = new Label();
@@ -229,8 +228,6 @@ partial class MainUI
         characterSpriteList = new ComboBox();
         characterSpriteLabel = new Label();
         disableMusicCheckbox = new CheckBox();
-        shuffleEnemyPalettesCheckbox = new CheckBox();
-        alwaysBeamCheckbox = new CheckBox();
         fastSpellCheckbox = new CheckBox();
         romFileTextBox = new TextBox();
         seedTextBox = new TextBox();
@@ -257,6 +254,9 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
+        useCommunityTextCheckbox = new CheckBox();
+        shuffleEnemyPalettesCheckbox = new CheckBox();
+        alwaysBeamCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -269,8 +269,8 @@ partial class MainUI
         tabPage6.SuspendLayout();
         tabPage7.SuspendLayout();
         tabPage8.SuspendLayout();
-        tabPage10.SuspendLayout();
-        tabPage3.SuspendLayout();
+        miscTabPage.SuspendLayout();
+        CustomTabPage.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)spritePreviewBox).BeginInit();
         SuspendLayout();
         // 
@@ -284,8 +284,8 @@ partial class MainUI
         mainTabControl.Controls.Add(tabPage6);
         mainTabControl.Controls.Add(tabPage7);
         mainTabControl.Controls.Add(tabPage8);
-        mainTabControl.Controls.Add(tabPage10);
-        mainTabControl.Controls.Add(tabPage3);
+        mainTabControl.Controls.Add(miscTabPage);
+        mainTabControl.Controls.Add(CustomTabPage);
         mainTabControl.Location = new Point(15, 139);
         mainTabControl.Margin = new Padding(4, 3, 4, 3);
         mainTabControl.Name = "mainTabControl";
@@ -2480,19 +2480,20 @@ partial class MainUI
         toolTip1.SetToolTip(shuffleDropFrequencyCheckbox, "This option will shuffle how often enemies drop pbags and jars");
         shuffleDropFrequencyCheckbox.UseVisualStyleBackColor = true;
         // 
-        // tabPage10
+        // miscTabPage
         // 
-        tabPage10.Controls.Add(enableTownNameHintsCheckbox);
-        tabPage10.Controls.Add(enableSpellItemHintsCheckbox);
-        tabPage10.Controls.Add(useCommunityHintsCheckbox);
-        tabPage10.Controls.Add(enableHelpfulHintsCheckbox);
-        tabPage10.Location = new Point(4, 24);
-        tabPage10.Margin = new Padding(4, 3, 4, 3);
-        tabPage10.Name = "tabPage10";
-        tabPage10.Size = new Size(595, 331);
-        tabPage10.TabIndex = 10;
-        tabPage10.Text = "Hints";
-        tabPage10.UseVisualStyleBackColor = true;
+        miscTabPage.Controls.Add(shuffleEnemyPalettesCheckbox);
+        miscTabPage.Controls.Add(alwaysBeamCheckbox);
+        miscTabPage.Controls.Add(enableTownNameHintsCheckbox);
+        miscTabPage.Controls.Add(enableSpellItemHintsCheckbox);
+        miscTabPage.Controls.Add(enableHelpfulHintsCheckbox);
+        miscTabPage.Location = new Point(4, 24);
+        miscTabPage.Margin = new Padding(4, 3, 4, 3);
+        miscTabPage.Name = "miscTabPage";
+        miscTabPage.Size = new Size(595, 331);
+        miscTabPage.TabIndex = 10;
+        miscTabPage.Text = "Misc";
+        miscTabPage.UseVisualStyleBackColor = true;
         // 
         // enableTownNameHintsCheckbox
         // 
@@ -2520,18 +2521,6 @@ partial class MainUI
         toolTip1.SetToolTip(enableSpellItemHintsCheckbox, "The people who require spell items will tell you where the item can be found.");
         enableSpellItemHintsCheckbox.UseVisualStyleBackColor = true;
         // 
-        // useCommunityHintsCheckbox
-        // 
-        useCommunityHintsCheckbox.AutoSize = true;
-        useCommunityHintsCheckbox.Location = new Point(4, 78);
-        useCommunityHintsCheckbox.Margin = new Padding(2);
-        useCommunityHintsCheckbox.Name = "useCommunityHintsCheckbox";
-        useCommunityHintsCheckbox.Size = new Size(121, 19);
-        useCommunityHintsCheckbox.TabIndex = 21;
-        useCommunityHintsCheckbox.Text = "Community Hints";
-        toolTip1.SetToolTip(useCommunityHintsCheckbox, "When selected, will replace some text with hints submitted by the community");
-        useCommunityHintsCheckbox.UseVisualStyleBackColor = true;
-        // 
         // enableHelpfulHintsCheckbox
         // 
         enableHelpfulHintsCheckbox.AutoSize = true;
@@ -2545,37 +2534,36 @@ partial class MainUI
         toolTip1.SetToolTip(enableHelpfulHintsCheckbox, "Townspeople will give you helpful hints as to where items are located.");
         enableHelpfulHintsCheckbox.UseVisualStyleBackColor = true;
         // 
-        // tabPage3
+        // CustomTabPage
         // 
-        tabPage3.Controls.Add(spriteCreditLabel);
-        tabPage3.Controls.Add(beepFrequencyDropdown);
-        tabPage3.Controls.Add(label10);
-        tabPage3.Controls.Add(beepThresholdDropdown);
-        tabPage3.Controls.Add(label9);
-        tabPage3.Controls.Add(spritePreviewLabel);
-        tabPage3.Controls.Add(spritePreviewBox);
-        tabPage3.Controls.Add(useCustomRoomsBox);
-        tabPage3.Controls.Add(flashingOffCheckbox);
-        tabPage3.Controls.Add(upAOnController1Checkbox);
-        tabPage3.Controls.Add(beamSpriteList);
-        tabPage3.Controls.Add(beamSpriteLabel);
-        tabPage3.Controls.Add(shieldColorList);
-        tabPage3.Controls.Add(shieldColorLabel);
-        tabPage3.Controls.Add(tunicColorList);
-        tabPage3.Controls.Add(tunicColorLabel);
-        tabPage3.Controls.Add(characterSpriteList);
-        tabPage3.Controls.Add(characterSpriteLabel);
-        tabPage3.Controls.Add(disableMusicCheckbox);
-        tabPage3.Controls.Add(shuffleEnemyPalettesCheckbox);
-        tabPage3.Controls.Add(alwaysBeamCheckbox);
-        tabPage3.Controls.Add(fastSpellCheckbox);
-        tabPage3.Location = new Point(4, 24);
-        tabPage3.Margin = new Padding(4, 3, 4, 3);
-        tabPage3.Name = "tabPage3";
-        tabPage3.Size = new Size(595, 331);
-        tabPage3.TabIndex = 6;
-        tabPage3.Text = "Misc.";
-        tabPage3.UseVisualStyleBackColor = true;
+        CustomTabPage.Controls.Add(useCommunityTextCheckbox);
+        CustomTabPage.Controls.Add(spriteCreditLabel);
+        CustomTabPage.Controls.Add(beepFrequencyDropdown);
+        CustomTabPage.Controls.Add(label10);
+        CustomTabPage.Controls.Add(beepThresholdDropdown);
+        CustomTabPage.Controls.Add(label9);
+        CustomTabPage.Controls.Add(spritePreviewLabel);
+        CustomTabPage.Controls.Add(spritePreviewBox);
+        CustomTabPage.Controls.Add(useCustomRoomsBox);
+        CustomTabPage.Controls.Add(flashingOffCheckbox);
+        CustomTabPage.Controls.Add(upAOnController1Checkbox);
+        CustomTabPage.Controls.Add(beamSpriteList);
+        CustomTabPage.Controls.Add(beamSpriteLabel);
+        CustomTabPage.Controls.Add(shieldColorList);
+        CustomTabPage.Controls.Add(shieldColorLabel);
+        CustomTabPage.Controls.Add(tunicColorList);
+        CustomTabPage.Controls.Add(tunicColorLabel);
+        CustomTabPage.Controls.Add(characterSpriteList);
+        CustomTabPage.Controls.Add(characterSpriteLabel);
+        CustomTabPage.Controls.Add(disableMusicCheckbox);
+        CustomTabPage.Controls.Add(fastSpellCheckbox);
+        CustomTabPage.Location = new Point(4, 24);
+        CustomTabPage.Margin = new Padding(4, 3, 4, 3);
+        CustomTabPage.Name = "CustomTabPage";
+        CustomTabPage.Size = new Size(595, 331);
+        CustomTabPage.TabIndex = 6;
+        CustomTabPage.Text = "Customize";
+        CustomTabPage.UseVisualStyleBackColor = true;
         // 
         // spriteCreditLabel
         // 
@@ -2591,7 +2579,7 @@ partial class MainUI
         beepFrequencyDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
         beepFrequencyDropdown.FormattingEnabled = true;
         beepFrequencyDropdown.Items.AddRange(new object[] { "Normal", "Half Speed", "Quarter Speed", "Off" });
-        beepFrequencyDropdown.Location = new Point(4, 207);
+        beepFrequencyDropdown.Location = new Point(8, 228);
         beepFrequencyDropdown.Margin = new Padding(2);
         beepFrequencyDropdown.Name = "beepFrequencyDropdown";
         beepFrequencyDropdown.Size = new Size(142, 23);
@@ -2601,7 +2589,7 @@ partial class MainUI
         // label10
         // 
         label10.AutoSize = true;
-        label10.Location = new Point(0, 184);
+        label10.Location = new Point(4, 205);
         label10.Margin = new Padding(2, 0, 2, 0);
         label10.Name = "label10";
         label10.Size = new Size(91, 15);
@@ -2613,7 +2601,7 @@ partial class MainUI
         beepThresholdDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
         beepThresholdDropdown.FormattingEnabled = true;
         beepThresholdDropdown.Items.AddRange(new object[] { "Normal", "Half Bar", "Quarter Bar", "Two Bars" });
-        beepThresholdDropdown.Location = new Point(4, 151);
+        beepThresholdDropdown.Location = new Point(8, 172);
         beepThresholdDropdown.Margin = new Padding(2);
         beepThresholdDropdown.Name = "beepThresholdDropdown";
         beepThresholdDropdown.Size = new Size(142, 23);
@@ -2623,7 +2611,7 @@ partial class MainUI
         // label9
         // 
         label9.AutoSize = true;
-        label9.Location = new Point(0, 128);
+        label9.Location = new Point(4, 149);
         label9.Margin = new Padding(2, 0, 2, 0);
         label9.Name = "label9";
         label9.Size = new Size(88, 15);
@@ -2789,30 +2777,6 @@ partial class MainUI
         disableMusicCheckbox.Text = "Disable Music";
         toolTip1.SetToolTip(disableMusicCheckbox, "Disables most in game music");
         disableMusicCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // shuffleEnemyPalettesCheckbox
-        // 
-        shuffleEnemyPalettesCheckbox.AutoSize = true;
-        shuffleEnemyPalettesCheckbox.Location = new Point(4, 250);
-        shuffleEnemyPalettesCheckbox.Margin = new Padding(4, 3, 4, 3);
-        shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
-        shuffleEnemyPalettesCheckbox.Size = new Size(140, 19);
-        shuffleEnemyPalettesCheckbox.TabIndex = 22;
-        shuffleEnemyPalettesCheckbox.Text = "Shuffle Sprite Palettes";
-        toolTip1.SetToolTip(shuffleEnemyPalettesCheckbox, "When selected, sprite colors will be shuffled");
-        shuffleEnemyPalettesCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // alwaysBeamCheckbox
-        // 
-        alwaysBeamCheckbox.AutoSize = true;
-        alwaysBeamCheckbox.Location = new Point(4, 275);
-        alwaysBeamCheckbox.Margin = new Padding(4, 3, 4, 3);
-        alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
-        alwaysBeamCheckbox.Size = new Size(153, 19);
-        alwaysBeamCheckbox.TabIndex = 19;
-        alwaysBeamCheckbox.Text = "Permanent Beam Sword";
-        toolTip1.SetToolTip(alwaysBeamCheckbox, "Gives Link beam sword regardless of how much health he has");
-        alwaysBeamCheckbox.UseVisualStyleBackColor = true;
         // 
         // fastSpellCheckbox
         // 
@@ -3077,6 +3041,42 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
+        // useCommunityTextCheckbox
+        // 
+        useCommunityTextCheckbox.AutoSize = true;
+        useCommunityTextCheckbox.Location = new Point(4, 126);
+        useCommunityTextCheckbox.Margin = new Padding(2);
+        useCommunityTextCheckbox.Name = "useCommunityTextCheckbox";
+        useCommunityTextCheckbox.Size = new Size(114, 19);
+        useCommunityTextCheckbox.TabIndex = 43;
+        useCommunityTextCheckbox.Text = "Community Text";
+        toolTip1.SetToolTip(useCommunityTextCheckbox, "When selected, will replace some text with text submitted by the community");
+        useCommunityTextCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // shuffleEnemyPalettesCheckbox
+        // 
+        shuffleEnemyPalettesCheckbox.AutoSize = true;
+        shuffleEnemyPalettesCheckbox.Location = new Point(4, 78);
+        shuffleEnemyPalettesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
+        shuffleEnemyPalettesCheckbox.Size = new Size(140, 19);
+        shuffleEnemyPalettesCheckbox.TabIndex = 25;
+        shuffleEnemyPalettesCheckbox.Text = "Shuffle Sprite Palettes";
+        toolTip1.SetToolTip(shuffleEnemyPalettesCheckbox, "When selected, sprite colors will be shuffled");
+        shuffleEnemyPalettesCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // alwaysBeamCheckbox
+        // 
+        alwaysBeamCheckbox.AutoSize = true;
+        alwaysBeamCheckbox.Location = new Point(4, 103);
+        alwaysBeamCheckbox.Margin = new Padding(4, 3, 4, 3);
+        alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
+        alwaysBeamCheckbox.Size = new Size(153, 19);
+        alwaysBeamCheckbox.TabIndex = 24;
+        alwaysBeamCheckbox.Text = "Permanent Beam Sword";
+        toolTip1.SetToolTip(alwaysBeamCheckbox, "Gives Link beam sword regardless of how much health he has");
+        alwaysBeamCheckbox.UseVisualStyleBackColor = true;
+        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3132,10 +3132,10 @@ partial class MainUI
         tabPage7.PerformLayout();
         tabPage8.ResumeLayout(false);
         tabPage8.PerformLayout();
-        tabPage10.ResumeLayout(false);
-        tabPage10.PerformLayout();
-        tabPage3.ResumeLayout(false);
-        tabPage3.PerformLayout();
+        miscTabPage.ResumeLayout(false);
+        miscTabPage.PerformLayout();
+        CustomTabPage.ResumeLayout(false);
+        CustomTabPage.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)spritePreviewBox).EndInit();
         ResumeLayout(false);
         PerformLayout();
@@ -3192,7 +3192,7 @@ partial class MainUI
     private CheckBox shuffleSwordImmunityBox;
     private CheckBox shuffleStealXPAmountCheckbox;
     private CheckBox shuffleXPStealersCheckbox;
-    private TabPage tabPage3;
+    private TabPage CustomTabPage;
     private CheckBox tbirdRequiredCheckbox;
     private CheckBox shuffleEncountersCheckbox;
     private CheckBox shufflePalaceEnemiesCheckbox;
@@ -3227,11 +3227,9 @@ partial class MainUI
     private CheckBox randomizeJarRequirementsCheckbox;
     private CheckBox removeTbirdCheckbox;
     private CheckBox includePbagCavesInShuffleCheckbox;
-    private CheckBox alwaysBeamCheckbox;
     private CheckBox includeGPinShuffleCheckbox;
     private Button discordButton;
     private CheckBox shuffleDripperEnemyCheckbox;
-    private CheckBox shuffleEnemyPalettesCheckbox;
     private ComboBox hiddenPalaceList;
     private Label hiddenPalaceLabel;
     private CheckBox disableMusicCheckbox;
@@ -3282,10 +3280,9 @@ partial class MainUI
     private CheckBox shuffleLifeRefillCheckbox;
     private Label levelCapLabel;
     private CheckBox scaleLevelRequirementsToCapCheckbox;
-    private TabPage tabPage10;
+    private TabPage miscTabPage;
     private CheckBox enableTownNameHintsCheckbox;
     private CheckBox enableSpellItemHintsCheckbox;
-    private CheckBox useCommunityHintsCheckbox;
     private CheckBox enableHelpfulHintsCheckbox;
     private ComboBox encounterRateBox;
     private Label encounterRateLabel;
@@ -3366,5 +3363,8 @@ partial class MainUI
     private CheckBox includev4_0RoomsCheckbox;
     private Label gpStyleLabel;
     private ComboBox gpStyleList;
+    private CheckBox shuffleEnemyPalettesCheckbox;
+    private CheckBox alwaysBeamCheckbox;
+    private CheckBox useCommunityTextCheckbox;
 }
 

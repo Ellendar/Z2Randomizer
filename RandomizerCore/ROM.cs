@@ -176,9 +176,9 @@ public class ROM
         File.WriteAllBytes(filename, ROMData);
     }
 
-    public List<Hint> GetGameText()
+    public List<Text> GetGameText()
     {
-        List<Hint> texts = new List<Hint>();
+        List<Text> texts = new List<Text>();
         for (int i = textAddrStartinROM; i <= textAddrEndinROM; i += 2)
         {
             List<char> t = new List<char>();
@@ -193,13 +193,13 @@ public class ROM
                 c = GetByte(addr);
             }
             t.Add((char)0xFF);
-            texts.Add(new Hint(t));
+            texts.Add(new Text(t));
 
         }
         return texts;
     }
 
-    public void WriteHints(List<Hint> texts)
+    public void WriteHints(List<Text> texts)
     {
         int textptr = 0xE390;
         int ptr = 0xE390 - 0x4010;

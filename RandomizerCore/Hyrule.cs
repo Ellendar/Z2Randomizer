@@ -425,8 +425,8 @@ public class Hyrule
 
         ROMData.ApplyAsm();
 
-        List<Hint> hints = ROMData.GetGameText();
-        ROMData.WriteHints(Hints.GenerateHints(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
+        List<Text> hints = ROMData.GetGameText();
+        ROMData.WriteHints(Hints.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
         f = UpdateProgress(9);
         if (!f)
         {

@@ -182,25 +182,26 @@ public class RandomizerConfiguration
     public bool LargeEnemiesCanDrop1up { get; set; }
     public bool LargeEnemiesCanDropKey { get; set; }
 
-    //Hints
+    //Misc
     public bool? EnableHelpfulHints { get; set; }
     public bool? EnableSpellItemHints { get; set; }
     public bool? EnableTownNameHints { get; set; }
-    public bool UseCommunityHints { get; set; }
+    public bool JumpAlwaysOn { get; set; }
+    public bool DashAlwaysOn { get; set; }
+    public bool ShuffleSpritePalettes { get; set; }
+    public bool PermanmentBeamSword { get; set; }
 
-    //Misc
+    //Custom
+    [IgnoreInFlags]
+    public bool UseCommunityText { get; set; }
     [IgnoreInFlags]
     public byte BeepFrequency { get; set; }
     [IgnoreInFlags]
     public byte BeepThreshold { get; set; }
     [IgnoreInFlags]
     public bool DisableMusic { get; set; }
-    public bool JumpAlwaysOn { get; set; }
-    public bool DashAlwaysOn { get; set; }
-    public bool PermanmentBeamSword { get; set; }
     [IgnoreInFlags]
     public bool FastSpellCasting { get; set; }
-    public bool ShuffleSpritePalettes { get; set; }
     [IgnoreInFlags]
     public bool UpAOnController1 { get; set; }
     [IgnoreInFlags]
@@ -618,7 +619,7 @@ public class RandomizerConfiguration
                 break;
         }
         config.RandomizeNewKasutoJarRequirements = bits[3];
-        config.UseCommunityHints = bits[4];
+        config.UseCommunityText = bits[4];
         config.ShuffleSpritePalettes = bits[5];
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
@@ -1174,7 +1175,7 @@ public class RandomizerConfiguration
 
         properties.StartLives = ShuffleStartingLives ? random.Next(2, 6) : 3;
         properties.PermanentBeam = PermanmentBeamSword;
-        properties.UseCommunityHints = UseCommunityHints;
+        properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
         properties.StartMag = StartingMagicLevel;
         properties.StartLifeLvl = StartingMagicLevel;

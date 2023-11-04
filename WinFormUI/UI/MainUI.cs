@@ -159,7 +159,7 @@ public partial class MainUI : Form
         hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         hideKasutoList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
-        useCommunityHintsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        useCommunityTextCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         standardizeDropsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         randomizeDropsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shufflePbagAmountsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -982,7 +982,7 @@ public partial class MainUI : Form
         configuration.EnableHelpfulHints = GetTripleCheckState(enableHelpfulHintsCheckbox);
         configuration.EnableSpellItemHints = GetTripleCheckState(enableSpellItemHintsCheckbox);
         configuration.EnableTownNameHints = GetTripleCheckState(enableTownNameHintsCheckbox);
-        configuration.UseCommunityHints = useCommunityHintsCheckbox.Checked;
+        configuration.UseCommunityText = useCommunityTextCheckbox.Checked;
 
         //Misc
         configuration.DisableMusic = disableMusicCheckbox.Checked;
@@ -1414,7 +1414,7 @@ public partial class MainUI : Form
             enableHelpfulHintsCheckbox.CheckState = ToCheckState(configuration.EnableHelpfulHints);
             enableSpellItemHintsCheckbox.CheckState = ToCheckState(configuration.EnableSpellItemHints);
             enableTownNameHintsCheckbox.CheckState = ToCheckState(configuration.EnableTownNameHints);
-            useCommunityHintsCheckbox.Checked = configuration.UseCommunityHints;
+            useCommunityTextCheckbox.Checked = configuration.UseCommunityText;
 
             //Misc
             //disableLowHealthBeepCheckbox.Checked = configuration.DisableLowHealthBeep;
