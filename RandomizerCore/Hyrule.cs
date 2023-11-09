@@ -219,6 +219,8 @@ public class Hyrule
         ROMData.UpdateMapPointers();
         ROMData.FixContinentTransitions();
 
+        ROMData.BuffCarrock();
+
         if (props.ReplaceFireWithDash)
         {
             ROMData.DashSpell();

@@ -835,6 +835,139 @@ CheckController1ForUpAMagic:
         _engine.Apply(ROMData);
     }
 
+    public void BuffCarrock()
+    {
+        var a = _engine.Asm();
+        a.code("""
+.segment "PRG4"
+; Hook into carrock's update code to add the new position calculation
+.org $aec4
+    jmp ChooseNewCarrockXPosition
+.free $aed3 - *
+
+; Force Carrock to teleport only on the side opposite of the player
+.reloc
+ChooseNewCarrockXPosition:
+    ; roll a random number and force carrock to only appear on the opposite side
+    ; remove the MSB from the random value and we will replace it with the opposite
+    ; bit from Link's MSB
+    lda $051b,x
+    ; By shifting links opposite side bit twice, we can force Carrock to be closer to the wall
+    asl
+    ;asl
+    sta $4e,x
+
+    ; Since Link's position can be from roughly $00fb - 01ef
+    ; We can offset this by flipping the high bit, and then checking if its greater than
+    ; $80 - $10 (which would be like starting the range from F0 - 70)
+    lda $4d
+    eor #$80
+    cmp #$70
+
+    ; At this point, the carry contains the bit for the opposite side of the screen for link
+    ; So shift it back into bosses position
+    ror $4e,x
+    ;cmp #$70
+    ;ror $4e,x
+
+    ; Vanilla checks to see if carrock is too close to the right edge, and prevents going
+    ; offscreen by dividing the position by two if it would
+    lda #$e0
+    cmp $4e,x
+    bcs @SetXHighPos
+        sbc #$10 - 1
+        sta $4e,x
+@SetXHighPos:
+    lda #1
+    sta $3c,x
+    rts
+
+.org $996f
+    jsr MoveSinWaveWifiShot
+
+.define ProjectileEnemyData $bc
+.define ProjectileYPosition $30
+EnemyYVelocity = $057e
+; SinWaveVelocityIncrement = $ba1c
+
+.reloc
+SinWaveVelocityIncrement:
+    .byte $04, $fc
+SinWaveMaxVelocityExtant:
+    .byte $28, $d4
+
+MoveSinWaveWifiShot:
+    ; Wifi shot id from carrock is $9 (and this number is premultiplied by 2)
+    cmp #$12
+    bne @NotAWifiShotFromCarrock
+    ; Now check to see if we set the flag for sin waves.
+    ; We write b0 to 71,x if this wifi is a sin wave so we can check the high bit if its set then its a sin wav
+    lda $71,x
+    bpl @NotAWifiShotFromCarrock
+        lda ProjectileEnemyData,x
+        and #$01
+        tay
+        lda EnemyYVelocity,x
+        clc
+        adc SinWaveVelocityIncrement,y
+        sta EnemyYVelocity,x
+        cmp SinWaveMaxVelocityExtant,y
+        bne @NotAtMaxVelocity
+            inc ProjectileEnemyData,x
+@NotAtMaxVelocity:
+        lsr
+        lsr
+        lsr
+        lsr
+        cmp #$08
+        bcc @PositiveVelocity
+            ora #$f0
+@PositiveVelocity:
+        adc ProjectileYPosition,x
+        sta ProjectileYPosition,x
+    ldy #$12
+@NotAWifiShotFromCarrock:
+    ; Perform the original patched call
+    lda $6ec0,y
+    rts
+
+.org $af08
+    jsr RandomizeWifiShotType
+
+.reloc
+RandomizeWifiShotType:
+    ; Fetch a random number and 50/50 chance its a straight shot
+    bit $051c
+    bmi @StraightShot
+        lda #0
+        bvc @HiPositionShot
+            ; Shooting from the bottom should start by arcing upwards
+            lda #1
+    @HiPositionShot:
+        sta ProjectileEnemyData,y
+        lda #0
+        sta EnemyYVelocity,y
+        lda #$b0
+        ; Firing a sin wave shot, so set the flag for sin wave and then follow through setting up the position
+        sta $0071,y
+        bne @WriteInitCoord
+@StraightShot:
+    lda #0
+    sta $0071,y
+    lda #$b0
+    ; we are shooting straight so clear out the flag
+    ; 50/50 chance that the shot starts high or low
+@WriteInitCoord:
+    bvc @WriteShotYCoord
+        clc
+        adc #$10
+@WriteShotYCoord:
+    sta $0030,y
+    rts
+""");
+        _engine.Modules.Add(a.Actions);
+    }
+
     public void DashSpell()
     {
         var a = _engine.Asm();
@@ -863,14 +996,11 @@ ReplaceFireWithDashSpell:
 
         // Update the magic table to point to an rts ???
         a.org(0x8e50);
-        a.byt(0x14, 0x98);
+        a.word(0x9814);
 
-        List<char> dash = Util.ToGameText("DASH", false);
+        byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
         a.org(0x9c62);
-        for(int i = 0; i < dash.Count; i++)
-        {
-            a.byt((byte)dash[i]);
-        }
+        a.byt(dash);
         _engine.Modules.Add(a.Actions);
     }
 

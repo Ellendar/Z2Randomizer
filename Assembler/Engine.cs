@@ -198,8 +198,22 @@ UPDATE_REFS target @ refs
 .segment "PRG7"   :bank $07 :size $4000 :mem $c000 :off $1c010
 .segment "CHR"    :size $20000 :off $20010 :out
 
+; Mark unused areas in the ROM so the linker can place stuff here
 
 FREE "PRG0" [$AA40, $c000)
+
+FREE "PRG4" [$83DC, $8470)
+FREE "PRG4" [$84f0, $8500)
+FREE "PRG4" [$8508, $850C)
+FREE "PRG4" [$870E, $871B)
+FREE "PRG4" [$8817, $88A0)
+FREE "PRG4" [$8EC3, $9400)
+FREE "PRG4" [$9EE0, $a000)
+FREE "PRG4" [$A1E3, $A1F8)
+FREE "PRG4" [$A3FB, $A440)
+FREE "PRG4" [$A539, $A640)
+FREE "PRG4" [$A765, $A900)
+FREE "PRG4" [$BEFD, $BF00)
 FREE "PRG4" [$bf60, $c000)
 
 """, "__init.s");
@@ -249,7 +263,7 @@ async function processAction(a, action) {
             break;
         }
         case "word": {
-            a.word(...action["bytes"]);
+            a.word(...action["words"]);
             break;
         }
         case "org": {
