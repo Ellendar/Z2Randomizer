@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using NLog;
+using RandomizerCore;
+using Z2Randomizer.Core.Sidescroll;
 //using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -63,6 +67,7 @@ public abstract class World
 
     private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
+    private const int MAXIMUM_BRIDGE_ATTEMPTS = 2000;
 
 
     protected abstract List<Location> GetPathingStarts();
@@ -416,6 +421,7 @@ public abstract class World
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
+        //return true;
         int i = 0;
         foreach (Location location in AllLocations)
         {
@@ -511,36 +517,24 @@ public abstract class World
     /// <summary>
     /// Returns true iff 
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="otherx"></param>
-    /// <param name="y"></param>
-    /// <param name="othery"></param>
+    /// <param name="x1"></param>
+    /// <param name="x2"></param>
+    /// <param name="y1"></param>
+    /// <param name="y2"></param>
     /// <param name="riverT"></param>
     /// <returns></returns>
-    protected bool CrossingWater(int x, int otherx, int y, int othery, Terrain riverT)
+    protected bool CrossingWater(int x1, int x2, int y1, int y2, Terrain riverTerrain)
     {
-        int smallx = x;
-        int largex = otherx;
-        if (x > otherx)
-        {
-            smallx = otherx;
-            largex = x;
-        }
+        int smallx = Math.Min(x1, x2);
+        int largex = Math.Max(x1, x2);
 
-        int smally = y;
-        int largey = othery;
-
-        if (y > othery)
+        int smally = Math.Min(y1, y2);
+        int largey = Math.Max(y1, y2);
+        for (int y = smally; y < largey; y++)
         {
-            smally = othery;
-            largey = y;
-        }
-
-        for (int i = smally; i < largey; i++)
-        {
-            for (int j = smallx; j < largex; j++)
+            for (int x = smallx; x < largex; x++)
             {
-                if (i > 0 && i < MAP_ROWS && j > 0 && j < MAP_COLS && map[i, j] == riverT)
+                if (y > 0 && y < MAP_ROWS && x > 0 && x < MAP_COLS && map[y, x] == riverTerrain)
                 {
                     return true;
                 }
@@ -758,21 +752,21 @@ public abstract class World
     /// <summary>
     /// Creates "bridges" connecting contiguous landmasses with terrain from either connected landmass, or various kinds of special connections.
     /// </summary>
-    /// <param name="numBridges">Number of bridges to create</param>
+    /// <param name="maxBridges">Maximum number of bridges to create</param>
     /// <param name="placeTown">If true, one of the bridges is the saria river crossing</param>
     /// <param name="riverTerrain">Type of terrain the rivers are crossing over. Usually this is water, but on Mountanous, the "bridges" are over mountains</param>
     /// <param name="riverDevil">If true, one of the bridges will be a road blocked by the river devil</param>
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int numBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, bool canWalkOnWater)
+    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, bool canWalkOnWater)
     {
-        int[,] mass = GetTerrainGlobs();
-        Dictionary<int, List<int>> connectMass = new Dictionary<int, List<int>>();
-        int bridges = numBridges;
+        int[,] globs = GetTerrainGlobs();
+        Dictionary<int, List<int>> massConnections = new Dictionary<int, List<int>>();
+        int remainingBridges = maxBridges;
         int TerrainCycle = 0;
         int tries = 0;
-        while (bridges > 0 && tries < 2000)
+        while (remainingBridges > 0 && tries < MAXIMUM_BRIDGE_ATTEMPTS)
         {
             tries++;
             int x = RNG.Next(MAP_COLS - 2) + 1;
@@ -798,7 +792,7 @@ public abstract class World
                 length = 100;
             }
 
-            int startMass = mass[y, x];
+            int startMass = globs[y, x];
 
 
             if (GetLocationByCoords(Tuple.Create(y + 30, x)) != null
@@ -912,15 +906,16 @@ public abstract class World
                     || GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
                 {
                     length = 100;
+                    Debug.WriteLine(GetGlobDebug(globs));
                 }
-                endMass = mass[y, x];
+                endMass = globs[y, x];
             }
 
             if ((riverTerrain != Terrain.DESERT && biome != Biome.CALDERA && biome != Biome.VOLCANO)
                 && (startMass == 0
                     || endMass == 0
                     || endMass == startMass
-                    || (connectMass.ContainsKey(startMass) && connectMass[startMass].Contains(endMass))
+                    || (massConnections.ContainsKey(startMass) && massConnections[startMass].Contains(endMass))
                 )
             )
             {
@@ -935,26 +930,26 @@ public abstract class World
                 && walkableTerrains.Contains(map[y, x])
                 && map[y, x] != riverTerrain)
             {
-                if (!connectMass.ContainsKey(startMass))
+                if (!massConnections.ContainsKey(startMass))
                 {
                     List<int> c = new List<int>();
                     c.Add(endMass);
-                    connectMass[startMass] = c;
+                    massConnections[startMass] = c;
                 }
                 else
                 {
-                    connectMass[startMass].Add(endMass);
+                    massConnections[startMass].Add(endMass);
                 }
 
-                if (!connectMass.ContainsKey(endMass))
+                if (!massConnections.ContainsKey(endMass))
                 {
                     List<int> c = new List<int>();
                     c.Add(startMass);
-                    connectMass[endMass] = c;
+                    massConnections[endMass] = c;
                 }
                 else
                 {
-                    connectMass[endMass].Add(startMass);
+                    massConnections[endMass].Add(startMass);
                 }
 
                 Terrain terrain = map[y, x];
@@ -1221,9 +1216,14 @@ public abstract class World
 
                 }
 
-                bridges--;
+                remainingBridges--;
 
             }
+        }
+        if(tries == MAXIMUM_BRIDGE_ATTEMPTS)
+        {
+            //TODO: eventually add a minimum check here
+            //return false;
         }
         return !placeTown;
     }
@@ -1411,7 +1411,7 @@ public abstract class World
                     }
                     //XXX: TESTING
                     mapCopy[y, x] = choices[RNG.Next(choices.Count)];
-                    //mapCopy[y, x] = Terrain.GRASS;
+                    //mapCopy[y, x] = Terrain.ROAD;
                 }
             }
         }
@@ -2345,7 +2345,73 @@ public abstract class World
         int drawRight = RNG.Next(0, 5);
         Terrain tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
         Terrain tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
-        if (!isHorizontal)
+        if (isHorizontal)
+        {
+
+            int rivery = RNG.Next(15, MAP_ROWS - 15);
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                drawLeft++;
+                drawRight++;
+                map[rivery, x] = riverT;
+                map[rivery + 1, x] = riverT;
+                int adjust = RNG.Next(-3, 3);
+                int leftM = RNG.Next(14, 17);
+                if (rivery - leftM > 0)
+                {
+                    map[rivery - leftM + 3, x] = tleft;
+                }
+                if (drawLeft % 5 == 0)
+                {
+                    tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                }
+                for (int i = rivery - leftM; i >= 0; i--)
+                {
+                    map[i, x] = Terrain.MOUNTAIN;
+                }
+
+                int rightM = RNG.Next(14, 17);
+
+                if (rivery + rightM < MAP_ROWS)
+                {
+                    map[rivery + rightM - 3, x] = tright;
+                }
+
+                if (drawRight % 5 == 0)
+                {
+                    tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                }
+                for (int i = rivery + 1 + rightM; i < MAP_ROWS; i++)
+                {
+                    map[i, x] = Terrain.MOUNTAIN;
+                }
+                while (rivery + adjust + 1 > MAP_ROWS - 15 || rivery + adjust < 15)
+                {
+                    adjust = RNG.Next(-1, 2);
+                }
+                if (adjust > 0)
+                {
+                    int curr = 0;
+                    while (curr < adjust)
+                    {
+                        map[rivery, x] = riverT;
+                        rivery++;
+                        curr++;
+                    }
+                }
+                else
+                {
+                    int curr = 0;
+                    while (curr > adjust)
+                    {
+                        map[rivery, x] = riverT;
+                        rivery--;
+                        curr--;
+                    }
+                }
+            }
+        }
+        else
         {
             int riverx = RNG.Next(15, MAP_COLS - 15);
             for (int y = 0; y < MAP_ROWS; y++)
@@ -2409,71 +2475,7 @@ public abstract class World
                     }
                 }
             }
-        }
-        else
-        {
-            int rivery = RNG.Next(15, MAP_ROWS - 15);
-            for (int x = 0; x < MAP_COLS; x++)
-            {
-                drawLeft++;
-                drawRight++;
-                map[rivery, x] = riverT;
-                map[rivery + 1, x] = riverT;
-                int adjust = RNG.Next(-3, 3);
-                int leftM = RNG.Next(14, 17);
-                if (rivery - leftM > 0)
-                {
-                    map[rivery - leftM + 3, x] = tleft;
-                }
-                if (drawLeft % 5 == 0)
-                {
-                    tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
-                }
-                for (int i = rivery - leftM; i >= 0; i--)
-                {
-                    map[i, x] = Terrain.MOUNTAIN;
-                }
 
-                int rightM = RNG.Next(14, 17);
-
-                if (rivery + rightM < MAP_ROWS)
-                {
-                    map[rivery + rightM - 3, x] = tright;
-                }
-
-                if (drawRight % 5 == 0)
-                {
-                    tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
-                }
-                for (int i = rivery + 1 + rightM; i < MAP_ROWS; i++)
-                {
-                    map[i, x] = Terrain.MOUNTAIN;
-                }
-                while (rivery + adjust + 1 > MAP_ROWS - 15 || rivery + adjust < 15)
-                {
-                    adjust = RNG.Next(-1, 2);
-                }
-                if (adjust > 0)
-                {
-                    int curr = 0;
-                    while (curr < adjust)
-                    {
-                        map[rivery, x] = riverT;
-                        rivery++;
-                        curr++;
-                    }
-                }
-                else
-                {
-                    int curr = 0;
-                    while (curr > adjust)
-                    {
-                        map[rivery, x] = riverT;
-                        rivery--;
-                        curr--;
-                    }
-                }
-            }
         }
     }
 
@@ -2779,6 +2781,68 @@ public abstract class World
             map[cavey, cavex - 1] = Terrain.MOUNTAIN;
         }
         return true;
+    }
+
+    public string GetGlobDebug(int[,] globs)
+    {
+        StringBuilder debug = new();
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                if(globs[y,x] < 10)
+                {
+                    debug.Append(globs[y, x]);
+                }
+                else if(globs[y, x] < 36)
+                {
+                    debug.Append((char)(globs[y, x] + 55));
+                }
+                else if (globs[y, x] < 62)
+                {
+                    debug.Append((char)(globs[y, x] + 87));
+                }
+                else
+                {
+                    debug.Append('_');
+                }
+            }
+            debug.Append('\n');
+        }
+        return debug.ToString();
+    }
+
+    public string GetMapDebug()
+    {
+        StringBuilder debug = new();
+        for(int y = 0; y < MAP_ROWS; y++)
+        {
+            for(int x  = 0; x < MAP_COLS; x++)
+            {
+                debug.Append(map[y,x] switch {
+                    Terrain.TOWN => 'T',
+                    Terrain.CAVE => 'C',
+                    Terrain.PALACE => 'P',
+                    Terrain.BRIDGE => "=",
+                    Terrain.DESERT => 'D',
+                    Terrain.GRASS => 'G',
+                    Terrain.FOREST => 'F',
+                    Terrain.SWAMP => 'S',
+                    Terrain.GRAVE => 'G',
+                    Terrain.ROAD => 'R',
+                    Terrain.LAVA => 'L',
+                    Terrain.MOUNTAIN => 'M',
+                    Terrain.WATER => '-',
+                    Terrain.WALKABLEWATER => 'W',
+                    Terrain.ROCK => 'X',
+                    Terrain.SPIDER => 'P',
+                    Terrain.NONE => ' ',
+                    _ => throw new Exception("Invalid Terrain")
+                });
+            }
+            debug.Append('\n');
+        }
+        return debug.ToString();
     }
 
     public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);

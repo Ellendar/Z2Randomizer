@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -332,7 +333,7 @@ public class WestHyrule : World
 
             }
         }
-        else
+        else //Not vanilla
         {
             Terrain fillerWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
 
@@ -440,7 +441,6 @@ public class WestHyrule : World
                         }
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN };
                         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
-
 
                         DrawCanyon(riverTerrain);
                         walkableTerrains.Remove(Terrain.MOUNTAIN);
@@ -595,7 +595,7 @@ public class WestHyrule : World
                         return false;
                     }
                 }
-                
+
                 if (biome == Biome.CALDERA)
                 {
 
@@ -620,9 +620,11 @@ public class WestHyrule : World
 
                 if (biome == Biome.CANYON)
                 {
+                    //Debug.WriteLine(GetMapDebug());
                     bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
+                        //Debug.WriteLine(GetMapDebug());
                         failedOnConnectIslands++;
                         return false;
                     }

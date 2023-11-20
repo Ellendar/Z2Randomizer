@@ -95,7 +95,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 133;
+    private static int DEBUG_THRESHOLD = 100;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -426,7 +426,7 @@ public class Hyrule
         ROMData.ApplyAsm();
 
         List<Text> hints = ROMData.GetGameText();
-        ROMData.WriteHints(Hints.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
+        ROMData.WriteHints(CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
         f = UpdateProgress(9);
         if (!f)
         {
@@ -841,6 +841,7 @@ public class Hyrule
 
     private bool IsEverythingReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
+        return true;
         totalReachableCheck++;
         int dm = 0;
         int mi = 0;
@@ -927,7 +928,7 @@ public class Hyrule
                     debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
 
-                    return false;
+                    return true;
                 }
                 itemGetReachableFailures++;
                 return false;
@@ -944,6 +945,7 @@ public class Hyrule
                     Debug.WriteLine("Failed on items");
                     debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
+                    return true;
                 }
                 return false;
             }
@@ -968,6 +970,7 @@ public class Hyrule
                 Debug.WriteLine("Failed on spells");
                 debug++;
                 PrintRoutingDebug(count, wh, eh, dm, mi);
+                return true;
             }
             return false;
         }

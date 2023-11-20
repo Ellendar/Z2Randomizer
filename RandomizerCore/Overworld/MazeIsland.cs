@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Z2Randomizer.Core;
+using System.Data;
 
 namespace Z2Randomizer.Core.Overworld;
 
@@ -197,16 +198,16 @@ class MazeIsland : World
                 //generate maze
                 int currx = 2;
                 int curry = starty;
-                Stack<Tuple<int, int>> s = new Stack<Tuple<int, int>>();
+                Stack<Tuple<int, int>> stack = new Stack<Tuple<int, int>>();
                 bool canPlaceCave = true;
                 while (MoreToVisit(visited))
                 {
-                    List<Tuple<int, int>> n = GetListOfNeighbors(currx, curry, visited);
-                    if (n.Count > 0)
+                    List<Tuple<int, int>> neighbors = GetListOfNeighbors(currx, curry, visited);
+                    if (neighbors.Count > 0)
                     {
                         canPlaceCave = true;
-                        Tuple<int, int> next = n[RNG.Next(n.Count)];
-                        s.Push(next);
+                        Tuple<int, int> next = neighbors[RNG.Next(neighbors.Count)];
+                        stack.Push(next);
                         if (next.Item1 > currx)
                         {
                             map[curry, currx + 1] = Terrain.ROAD;
@@ -227,7 +228,7 @@ class MazeIsland : World
                         curry = next.Item2;
                         visited[curry, currx] = true;
                     }
-                    else if (s.Count > 0)
+                    else if (stack.Count > 0)
                     {
                         if (cave1 != null && cave1.CanShuffle && GetLocationByCoords(Tuple.Create(curry + 30, currx)) == null)
                         {
@@ -247,7 +248,7 @@ class MazeIsland : World
                             SealDeadEnd(curry, currx);
 
                         }
-                        Tuple<int, int> n2 = s.Pop();
+                        Tuple<int, int> n2 = stack.Pop();
                         currx = n2.Item1;
                         curry = n2.Item2;
                     }
@@ -257,14 +258,14 @@ class MazeIsland : World
 
                 bool canPlace = false;
 
-                int p4x = RNG.Next(15) + 3;
-                int p4y = RNG.Next(MAP_ROWS - 6) + 3;
+                int palace4x = RNG.Next(15) + 3;
+                int palace4y = RNG.Next(MAP_ROWS - 6) + 3;
                 while (!canPlace)
                 {
-                    p4x = RNG.Next(15) + 3;
-                    p4y = RNG.Next(MAP_ROWS - 6) + 3;
+                    palace4x = RNG.Next(15) + 3;
+                    palace4y = RNG.Next(MAP_ROWS - 6) + 3;
                     canPlace = true;
-                    if (map[p4y, p4x] != Terrain.ROAD)
+                    if (map[palace4y, palace4x] != Terrain.ROAD)
                     {
                         canPlace = false;
                     }
@@ -273,24 +274,24 @@ class MazeIsland : World
                     {
                         for (int j = -1; j < 2; j++)
                         {
-                            if (GetLocationByCoords(Tuple.Create(p4y + i + 30, p4x + j)) != null)
+                            if (GetLocationByCoords(Tuple.Create(palace4y + i + 30, palace4x + j)) != null)
                             {
                                 canPlace = false;
                             }
                         }
                     }
                 }
-                locationAtPalace4.Xpos = p4x;
-                locationAtPalace4.Ypos = p4y + 30;
-                map[p4y, p4x] = Terrain.PALACE;
-                map[p4y + 1, p4x] = Terrain.ROAD;
-                map[p4y - 1, p4x] = Terrain.ROAD;
-                map[p4y, p4x + 1] = Terrain.ROAD;
-                map[p4y, p4x - 1] = Terrain.ROAD;
-                map[p4y + 1, p4x + 1] = Terrain.ROAD;
-                map[p4y - 1, p4x - 1] = Terrain.ROAD;
-                map[p4y - 1, p4x + 1] = Terrain.ROAD;
-                map[p4y + 1, p4x - 1] = Terrain.ROAD;
+                locationAtPalace4.Xpos = palace4x;
+                locationAtPalace4.Ypos = palace4y + 30;
+                map[palace4y, palace4x] = Terrain.PALACE;
+                map[palace4y + 1, palace4x] = Terrain.ROAD;
+                map[palace4y - 1, palace4x] = Terrain.ROAD;
+                map[palace4y, palace4x + 1] = Terrain.ROAD;
+                map[palace4y, palace4x - 1] = Terrain.ROAD;
+                map[palace4y + 1, palace4x + 1] = Terrain.ROAD;
+                map[palace4y - 1, palace4x - 1] = Terrain.ROAD;
+                map[palace4y - 1, palace4x + 1] = Terrain.ROAD;
+                map[palace4y + 1, palace4x - 1] = Terrain.ROAD;
 
                 //draw a river
                 int riverstart = starty;
@@ -301,248 +302,278 @@ class MazeIsland : World
 
                 int riverend = RNG.Next(10) * 2 + 1;
 
-                Location rs = new Location();
-                rs.Xpos = 1;
-                rs.Ypos = riverstart + 30;
+                Location riverStart = new Location();
+                riverStart.Xpos = 1;
+                riverStart.Ypos = riverstart + 30;
 
-                Location re = new Location();
-                re.Xpos = 21;
-                re.Ypos = riverend + 30;
-                DrawLine(rs, re, Terrain.WALKABLEWATER);
+                Location riverEnd = new Location();
+                riverEnd.Xpos = 21;
+                riverEnd.Ypos = riverend + 30;
+                DrawLine(riverStart, riverEnd, Terrain.WALKABLEWATER);
 
+                //Place raft
                 Direction raftDirection = Direction.EAST;
                 if (raft != null)
                 {
 
                     raftDirection = (Direction)RNG.Next(4);
 
-                    int bx = 0;
-                    int by = 0;
+                    int raftX = 0;
+                    int raftY = 0;
                     if (raftDirection == Direction.NORTH)
                     {
 
-                        bx = RNG.Next(2, MAP_COLS - 1);
-                        while (by != 2)
+                        raftX = RNG.Next(2, MAP_COLS - 1);
+                        while (raftY != 2)
                         {
-                            bx = RNG.Next(2, MAP_COLS - 1);
-                            by = 0;
-                            while (by < MAP_ROWS && map[by, bx] != Terrain.ROAD)
+                            raftX = RNG.Next(2, MAP_COLS - 1);
+                            raftY = 0;
+                            while (raftY < MAP_ROWS && map[raftY, raftX] != Terrain.ROAD)
                             {
-                                by++;
+                                raftY++;
                             }
                         }
-                        by--;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.raft.Ypos = by + 30;
-                        this.raft.Xpos = bx;
-                        by--;
+                        raftY--;
+                        map[raftY, raftX] = Terrain.BRIDGE;
+                        raft.Ypos = raftY + 30;
+                        raft.Xpos = raftX;
+                        raftY--;
 
-                        while (by >= 0)
+                        while (raftY >= 0)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[raftY, raftX] != Terrain.PALACE && map[raftY, raftX] != Terrain.CAVE)
                             {
-                                map[by, bx] = Terrain.WALKABLEWATER;
+                                map[raftY, raftX] = Terrain.WALKABLEWATER;
 
                             }
-                            by--;
+                            raftY--;
                         }
                     }
                     else if (raftDirection == Direction.SOUTH)
                     {
-                        by = MAP_ROWS - 1;
-                        bx = RNG.Next(2, MAP_COLS - 1);
-                        while (by != MAP_ROWS - 3)
+                        raftY = MAP_ROWS - 1;
+                        raftX = RNG.Next(2, MAP_COLS - 1);
+                        while (raftY != MAP_ROWS - 3)
                         {
-                            by = MAP_ROWS - 1;
-                            bx = RNG.Next(2, MAP_COLS - 1);
-                            while (by > 0 && map[by, bx] != Terrain.ROAD)
+                            raftY = MAP_ROWS - 1;
+                            raftX = RNG.Next(2, MAP_COLS - 1);
+                            while (raftY > 0 && map[raftY, raftX] != Terrain.ROAD)
                             {
-                                by--;
+                                raftY--;
                             }
                         }
-                        by++;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.raft.Ypos = by + 30;
-                        this.raft.Xpos = bx;
-                        by++;
+                        raftY++;
+                        map[raftY, raftX] = Terrain.BRIDGE;
+                        raft.Ypos = raftY + 30;
+                        raft.Xpos = raftX;
+                        raftY++;
 
-                        while (by < MAP_ROWS)
+                        while (raftY < MAP_ROWS)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[raftY, raftX] != Terrain.PALACE && map[raftY, raftX] != Terrain.CAVE)
                             {
-                                map[by, bx] = Terrain.WALKABLEWATER;
+                                map[raftY, raftX] = Terrain.WALKABLEWATER;
 
                             }
-                            by++;
+                            raftY++;
                         }
                     }
                     else if (raftDirection == Direction.WEST)
                     {
-                        while (bx != 2)
+                        while (raftX != 2)
                         {
-                            bx = 0;
-                            by = RNG.Next(2, MAP_ROWS - 2);
-                            while (bx < MAP_COLS && map[by, bx] != Terrain.ROAD)
+                            raftX = 0;
+                            raftY = RNG.Next(2, MAP_ROWS - 2);
+                            while (raftX < MAP_COLS && map[raftY, raftX] != Terrain.ROAD)
                             {
-                                bx++;
+                                raftX++;
                             }
                         }
 
-                        bx--;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.raft.Ypos = by + 30;
-                        this.raft.Xpos = bx;
-                        bx--;
+                        raftX--;
+                        map[raftY, raftX] = Terrain.BRIDGE;
+                        raft.Ypos = raftY + 30;
+                        raft.Xpos = raftX;
+                        raftX--;
 
-                        while (bx >= 0)
+                        while (raftX >= 0)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[raftY, raftX] != Terrain.PALACE && map[raftY, raftX] != Terrain.CAVE)
                             {
-                                map[by, bx] = Terrain.WALKABLEWATER;
+                                map[raftY, raftX] = Terrain.WALKABLEWATER;
 
                             }
-                            bx--;
+                            raftX--;
                         }
                     }
                     else
                     {
-                        while (bx != MAP_COLS - 3)
+                        while (raftX != MAP_COLS - 3)
                         {
-                            bx = MAP_COLS - 1;
-                            by = RNG.Next(2, MAP_ROWS - 2);
-                            while (bx > 0 && map[by, bx] != Terrain.ROAD)
+                            raftX = MAP_COLS - 1;
+                            raftY = RNG.Next(2, MAP_ROWS - 2);
+                            while (raftX > 0 && map[raftY, raftX] != Terrain.ROAD)
                             {
-                                bx--;
+                                raftX--;
                             }
                         }
-                        bx++;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.raft.Ypos = by + 30;
-                        this.raft.Xpos = bx;
-                        bx++;
-                        while (bx < MAP_COLS)
+                        raftX++;
+                        map[raftY, raftX] = Terrain.BRIDGE;
+                        raft.Ypos = raftY + 30;
+                        raft.Xpos = raftX;
+                        raftX++;
+                        while (raftX < MAP_COLS)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[raftY, raftX] != Terrain.PALACE && map[raftY, raftX] != Terrain.CAVE)
                             {
-                                map[by, bx] = Terrain.WALKABLEWATER;
+                                map[raftY, raftX] = Terrain.WALKABLEWATER;
 
                             }
-                            bx++;
+                            raftX++;
                         }
                     }
                 }
 
-
-                Direction bridgeDirection = Direction.WEST;
-                while (bridgeDirection == raftDirection)
+                //Place bridge
+                Direction bridgeDirection;
+                do
                 {
                     bridgeDirection = (Direction)RNG.Next(4);
-                }
+                } while (bridgeDirection == raftDirection);
+
+                //TODO: refactor this so it's not replicating the same code 4 times
                 if (bridge != null)
                 {
-                    int bx = 0;
-                    int by = 0;
+                    int bridgeX = 0;
+                    int bridgeY = 0;
                     if (bridgeDirection == Direction.NORTH)
                     {
-                        bx = RNG.Next(2, MAP_COLS - 1);
-                        while (by < MAP_ROWS && map[by, bx] != Terrain.ROAD)
+                        bridgeX = RNG.Next(2, MAP_COLS - 1);
+                        while (bridgeY < MAP_ROWS && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
-                            by++;
+                            bridgeY++;
                         }
                         
-                        by--;
+                        bridgeY--;
 
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.bridge.Ypos = by + 30;
-                        this.bridge.Xpos = bx;
-                        while (by >= 0)
+                        map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                        bridge.Ypos = bridgeY + 30;
+                        bridge.Xpos = bridgeX;
+                        while (bridgeY >= 0)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[bridgeY, bridgeX] == Terrain.PALACE
+                                || map[bridgeY, bridgeX] == Terrain.CAVE
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
                             {
-                                map[by, bx] = Terrain.BRIDGE;
-
+                                return false;
                             }
-                            by--;
+                            else
+                            {
+                                map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                            }
+                            bridgeY--;
                         }
                     }
                     else if (bridgeDirection == Direction.SOUTH)
                     {
-                        by = MAP_ROWS - 1;
-                        bx = RNG.Next(2, MAP_COLS - 1);
-                        while (by > 0 && map[by, bx] != Terrain.ROAD)
+                        bridgeY = MAP_ROWS - 1;
+                        bridgeX = RNG.Next(2, MAP_COLS - 1);
+                        while (bridgeY > 0 && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
-                            by--;
+                            bridgeY--;
                         }
 
-                        by++;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.bridge.Ypos = by + 30;
-                        this.bridge.Xpos = bx;
+                        bridgeY++;
+                        map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                        bridge.Ypos = bridgeY + 30;
+                        bridge.Xpos = bridgeX;
 
-                        while (by < MAP_ROWS)
+                        while (bridgeY < MAP_ROWS)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[bridgeY, bridgeX] == Terrain.PALACE
+                                || map[bridgeY, bridgeX] == Terrain.CAVE
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
                             {
-                                map[by, bx] = Terrain.BRIDGE;
-
+                                return false;
                             }
-                            by++;
+                            else
+                            {
+                                map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                            }
+                            bridgeY++;
                         }
                     }
                     else if (bridgeDirection == Direction.WEST)
                     {
-                        by = RNG.Next(2, MAP_ROWS - 2);
-                        while(by == riverend || by == riverstart)
+                        bridgeY = RNG.Next(2, MAP_ROWS - 2);
+                        while(bridgeY == riverend || bridgeY == riverstart)
                         {
-                            by = RNG.Next(2, MAP_ROWS - 2);
-
+                            bridgeY = RNG.Next(2, MAP_ROWS - 2);
                         }
-                        while (bx < MAP_COLS && map[by, bx] != Terrain.ROAD)
+                        while (bridgeX < MAP_COLS && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
-                            bx++;
+                            bridgeX++;
                         }
 
-                        bx--;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.bridge.Ypos = by + 30;
-                        this.bridge.Xpos = bx;
+                        bridgeX--;
+                        map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                        bridge.Ypos = bridgeY + 30;
+                        bridge.Xpos = bridgeX;
 
-                        while (bx >= 0)
+                        while (bridgeX >= 0)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[bridgeY, bridgeX] == Terrain.PALACE 
+                                || map[bridgeY, bridgeX] == Terrain.CAVE
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
                             {
-                                map[by, bx] = Terrain.BRIDGE;
-
+                                return false;
                             }
-                            bx--;
+                            else
+                            {
+                                map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                            }
+                            bridgeX--;
                         }
                     }
                     else
                     {
-                        bx = MAP_COLS + 3;
-                        by = RNG.Next(2, MAP_ROWS - 2);
-                        while (by == riverend || by == riverstart)
+                        bridgeX = MAP_COLS + 3;
+                        bridgeY = RNG.Next(2, MAP_ROWS - 2);
+                        while (bridgeY == riverend || bridgeY == riverstart)
                         {
-                            by = RNG.Next(2, MAP_ROWS - 2);
+                            bridgeY = RNG.Next(2, MAP_ROWS - 2);
 
                         }
-                        while (bx > 0 && map[by, bx] != Terrain.ROAD)
+                        while (bridgeX > 0 && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
-                            bx--;
+                            bridgeX--;
                         }
-                        bx++;
-                        map[by, bx] = Terrain.BRIDGE;
-                        this.bridge.Ypos = by + 30;
-                        this.bridge.Xpos = bx;
+                        bridgeX++;
+                        map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                        bridge.Ypos = bridgeY + 30;
+                        bridge.Xpos = bridgeX;
 
-                        while (bx < MAP_COLS)
+                        while (bridgeX < MAP_COLS)
                         {
-                            if (map[by, bx] != Terrain.PALACE && map[by, bx] != Terrain.CAVE)
+                            if (map[bridgeY, bridgeX] == Terrain.PALACE
+                                || map[bridgeY, bridgeX] == Terrain.CAVE
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
                             {
-                                map[by, bx] = Terrain.BRIDGE;
-
+                                return false;
                             }
-                            bx++;
+                            else
+                            {
+                                map[bridgeY, bridgeX] = Terrain.BRIDGE;
+                            }
+                            bridgeX++;
                         }
                     }
                 }
@@ -786,7 +817,14 @@ class MazeIsland : World
             {
                 for (int j = 0; j < MAP_COLS; j++)
                 {
-                    if (!visitation[i,j] && ((map[i, j] == Terrain.WALKABLEWATER && itemGet[Item.BOOTS]) || map[i,j] == Terrain.ROAD || map[i,j] == Terrain.PALACE || map[i, j] == Terrain.BRIDGE))
+                    if (!visitation[i, j]
+                    && (
+                        (map[i, j] == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
+                        || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE
+                        || map[i, j] == Terrain.BRIDGE
+                        || map[i, j] == Terrain.CAVE
+                        )
+                    )
                     {
                         if (i - 1 >= 0)
                         {
