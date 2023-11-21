@@ -300,7 +300,7 @@ public class Room
         //#76: If the item room is a boss item room, and it's in palace group 1, move the boss up 1 tile.
         //For some reason a bunch of the boss item rooms are fucked up in a bunch of different ways, so i'm keeping digshake's catch-all
         //though repositioned into the place it belongs.
-        if (PalaceGroup == 1 && HasItem && IsBossRoom)
+        if (PalaceGroup == 1 && HasItem && HasBoss)
         {
             NewEnemies[1] = 0x6C;
         }
