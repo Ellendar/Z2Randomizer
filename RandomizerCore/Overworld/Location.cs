@@ -12,7 +12,7 @@ public class Location
     private int appear2loweruponexit;
     private Tuple<int, int> coords;
     public Item Item { get; set; }
-    public bool itemGet;
+    public bool ItemGet { get; set; }
 
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }
@@ -121,7 +121,7 @@ public class Location
         MemAddress = mem;
         CanShuffle = true;
         Item = Item.DO_NOT_USE;
-        itemGet = false;
+        ItemGet = false;
         Reachable = false;
         PalaceNumber = 0;
         ActualTown = 0;

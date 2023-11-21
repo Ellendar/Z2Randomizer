@@ -1949,7 +1949,7 @@ public abstract class World
         {
             location.CanShuffle = true;
             location.Reachable = false;
-            location.itemGet = false;
+            location.ItemGet = false;
         }
     }
 
