@@ -196,7 +196,7 @@ public partial class MainUI : Form
         bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
-        noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        noDuplicateRoomsByLayoutCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -866,7 +866,7 @@ public partial class MainUI : Form
         configuration.RandomizeBossItemDrop = randomizeBossItemCheckbox.Checked;
         configuration.PalacesToCompleteMin = startingGemsMinList.SelectedIndex;
         configuration.PalacesToCompleteMax = startingGemsMaxList.SelectedIndex;
-        configuration.NoDuplicateRooms = noDuplicateRoomsCheckbox.Checked;
+        configuration.NoDuplicateRooms = noDuplicateRoomsByLayoutCheckbox.Checked;
 
         //Levels
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
@@ -1294,7 +1294,7 @@ public partial class MainUI : Form
             randomizeBossItemCheckbox.Checked = configuration.RandomizeBossItemDrop;
             startingGemsMinList.SelectedIndex = configuration.PalacesToCompleteMin;
             startingGemsMaxList.SelectedIndex = configuration.PalacesToCompleteMax;
-            noDuplicateRoomsCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRooms);
+            noDuplicateRoomsByLayoutCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRooms);
 
             //Levels
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
@@ -1884,8 +1884,8 @@ public partial class MainUI : Form
             blockingRoomsInAnyPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Enabled = false;
-            noDuplicateRoomsCheckbox.Checked = false;
-            noDuplicateRoomsCheckbox.Enabled = false;
+            noDuplicateRoomsByLayoutCheckbox.Checked = false;
+            noDuplicateRoomsByLayoutCheckbox.Enabled = false;
         }
         else
         {
@@ -1894,7 +1894,7 @@ public partial class MainUI : Form
             includev4_4RoomsCheckbox.Enabled = true;
             blockingRoomsInAnyPalaceCheckbox.Enabled = true;
             bossRoomsExitToPalaceCheckbox.Enabled = true;
-            noDuplicateRoomsCheckbox.Enabled = true;
+            noDuplicateRoomsByLayoutCheckbox.Enabled = true;
         }
 
         if (palaceStyleList.SelectedIndex != 0)

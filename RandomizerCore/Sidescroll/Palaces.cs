@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using static Z2Randomizer.Core.Util;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -338,13 +339,21 @@ public class Palaces
 
                             roomToAdd.PalaceGroup = palaceGroup;
                             roomToAdd.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
-                            bool added;
+                            bool added = true;
                             if (roomToAdd.HasDrop && palaceRoomPool.Count(i => i.IsDropZone && i != roomToAdd) == 0)
                             {
                                 //Debug.WriteLine(palace.AllRooms.Count + " - 0");
                                 added = false;
                             }
-                            else
+                            if(props.NoDuplicateRoomsBySideview)
+                            {
+                                if(palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, roomToAdd.SideView)))
+                                {
+                                    Room test = palace.AllRooms.First(i => byteArrayEqualityComparer.Equals(i.SideView, roomToAdd.SideView));
+                                    added = false;
+                                }
+                            }
+                            if(added)
                             {
                                 added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
                                 if (added && roomToAdd.LinkedRoomName != null)

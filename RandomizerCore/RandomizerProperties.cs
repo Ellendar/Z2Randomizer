@@ -16,6 +16,8 @@ public class RandomizerProperties
 {
     public RandomizerProperties()
     {
+        //XXX: Debug
+        NoDuplicateRoomsBySideview = true;
     }
 
     //ROM Info
@@ -100,6 +102,7 @@ public class RandomizerProperties
     public bool BlockersAnywhere { get; set; }
     public bool BossRoomConnect { get; set; }
     public bool NoDuplicateRooms { get; set; }
+    public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
     public bool AllowVanillaRooms { get; set; }
     public bool AllowV4Rooms { get; set; }

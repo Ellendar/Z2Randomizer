@@ -112,7 +112,7 @@ partial class MainUI
         gpStyleList = new ComboBox();
         includev4_4RoomsCheckbox = new CheckBox();
         includev4_0RoomsCheckbox = new CheckBox();
-        noDuplicateRoomsCheckbox = new CheckBox();
+        noDuplicateRoomsByLayoutCheckbox = new CheckBox();
         label7 = new Label();
         label5 = new Label();
         startingGemsMaxList = new ComboBox();
@@ -205,10 +205,13 @@ partial class MainUI
         label19 = new Label();
         shuffleDropFrequencyCheckbox = new CheckBox();
         miscTabPage = new TabPage();
+        shuffleEnemyPalettesCheckbox = new CheckBox();
+        alwaysBeamCheckbox = new CheckBox();
         enableTownNameHintsCheckbox = new CheckBox();
         enableSpellItemHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         CustomTabPage = new TabPage();
+        useCommunityTextCheckbox = new CheckBox();
         spriteCreditLabel = new Label();
         beepFrequencyDropdown = new ComboBox();
         label10 = new Label();
@@ -254,9 +257,7 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        useCommunityTextCheckbox = new CheckBox();
-        shuffleEnemyPalettesCheckbox = new CheckBox();
-        alwaysBeamCheckbox = new CheckBox();
+        noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1222,11 +1223,12 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(noDuplicateRoomsByEnemiesCheckbox);
         tabPage2.Controls.Add(gpStyleLabel);
         tabPage2.Controls.Add(gpStyleList);
         tabPage2.Controls.Add(includev4_4RoomsCheckbox);
         tabPage2.Controls.Add(includev4_0RoomsCheckbox);
-        tabPage2.Controls.Add(noDuplicateRoomsCheckbox);
+        tabPage2.Controls.Add(noDuplicateRoomsByLayoutCheckbox);
         tabPage2.Controls.Add(label7);
         tabPage2.Controls.Add(label5);
         tabPage2.Controls.Add(startingGemsMaxList);
@@ -1301,19 +1303,19 @@ partial class MainUI
         toolTip1.SetToolTip(includev4_0RoomsCheckbox, "New Rooms first released in v4.0 are included in the room pool.");
         includev4_0RoomsCheckbox.UseVisualStyleBackColor = true;
         // 
-        // noDuplicateRoomsCheckbox
+        // noDuplicateRoomsByLayoutCheckbox
         // 
-        noDuplicateRoomsCheckbox.AutoSize = true;
-        noDuplicateRoomsCheckbox.Location = new Point(281, 87);
-        noDuplicateRoomsCheckbox.Margin = new Padding(4, 3, 4, 3);
-        noDuplicateRoomsCheckbox.Name = "noDuplicateRoomsCheckbox";
-        noDuplicateRoomsCheckbox.RightToLeft = RightToLeft.No;
-        noDuplicateRoomsCheckbox.Size = new Size(135, 19);
-        noDuplicateRoomsCheckbox.TabIndex = 25;
-        noDuplicateRoomsCheckbox.Text = "No Duplicate Rooms";
-        noDuplicateRoomsCheckbox.ThreeState = true;
-        toolTip1.SetToolTip(noDuplicateRoomsCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
-        noDuplicateRoomsCheckbox.UseVisualStyleBackColor = true;
+        noDuplicateRoomsByLayoutCheckbox.AutoSize = true;
+        noDuplicateRoomsByLayoutCheckbox.Location = new Point(281, 87);
+        noDuplicateRoomsByLayoutCheckbox.Margin = new Padding(4, 3, 4, 3);
+        noDuplicateRoomsByLayoutCheckbox.Name = "noDuplicateRoomsByLayoutCheckbox";
+        noDuplicateRoomsByLayoutCheckbox.RightToLeft = RightToLeft.No;
+        noDuplicateRoomsByLayoutCheckbox.Size = new Size(198, 19);
+        noDuplicateRoomsByLayoutCheckbox.TabIndex = 25;
+        noDuplicateRoomsByLayoutCheckbox.Text = "No Duplicate Rooms (By Layout)";
+        noDuplicateRoomsByLayoutCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(noDuplicateRoomsByLayoutCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations cannot appear more than once per layout.");
+        noDuplicateRoomsByLayoutCheckbox.UseVisualStyleBackColor = true;
         // 
         // label7
         // 
@@ -1376,7 +1378,7 @@ partial class MainUI
         // bossRoomsExitToPalaceCheckbox
         // 
         bossRoomsExitToPalaceCheckbox.AutoSize = true;
-        bossRoomsExitToPalaceCheckbox.Location = new Point(281, 138);
+        bossRoomsExitToPalaceCheckbox.Location = new Point(281, 162);
         bossRoomsExitToPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
         bossRoomsExitToPalaceCheckbox.Name = "bossRoomsExitToPalaceCheckbox";
         bossRoomsExitToPalaceCheckbox.Size = new Size(163, 19);
@@ -1389,7 +1391,7 @@ partial class MainUI
         // blockingRoomsInAnyPalaceCheckbox
         // 
         blockingRoomsInAnyPalaceCheckbox.AutoSize = true;
-        blockingRoomsInAnyPalaceCheckbox.Location = new Point(281, 113);
+        blockingRoomsInAnyPalaceCheckbox.Location = new Point(281, 137);
         blockingRoomsInAnyPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
         blockingRoomsInAnyPalaceCheckbox.Name = "blockingRoomsInAnyPalaceCheckbox";
         blockingRoomsInAnyPalaceCheckbox.Size = new Size(251, 19);
@@ -2495,6 +2497,30 @@ partial class MainUI
         miscTabPage.Text = "Misc";
         miscTabPage.UseVisualStyleBackColor = true;
         // 
+        // shuffleEnemyPalettesCheckbox
+        // 
+        shuffleEnemyPalettesCheckbox.AutoSize = true;
+        shuffleEnemyPalettesCheckbox.Location = new Point(4, 78);
+        shuffleEnemyPalettesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
+        shuffleEnemyPalettesCheckbox.Size = new Size(140, 19);
+        shuffleEnemyPalettesCheckbox.TabIndex = 25;
+        shuffleEnemyPalettesCheckbox.Text = "Shuffle Sprite Palettes";
+        toolTip1.SetToolTip(shuffleEnemyPalettesCheckbox, "When selected, sprite colors will be shuffled");
+        shuffleEnemyPalettesCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // alwaysBeamCheckbox
+        // 
+        alwaysBeamCheckbox.AutoSize = true;
+        alwaysBeamCheckbox.Location = new Point(4, 103);
+        alwaysBeamCheckbox.Margin = new Padding(4, 3, 4, 3);
+        alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
+        alwaysBeamCheckbox.Size = new Size(153, 19);
+        alwaysBeamCheckbox.TabIndex = 24;
+        alwaysBeamCheckbox.Text = "Permanent Beam Sword";
+        toolTip1.SetToolTip(alwaysBeamCheckbox, "Gives Link beam sword regardless of how much health he has");
+        alwaysBeamCheckbox.UseVisualStyleBackColor = true;
+        // 
         // enableTownNameHintsCheckbox
         // 
         enableTownNameHintsCheckbox.AutoSize = true;
@@ -2564,6 +2590,18 @@ partial class MainUI
         CustomTabPage.TabIndex = 6;
         CustomTabPage.Text = "Customize";
         CustomTabPage.UseVisualStyleBackColor = true;
+        // 
+        // useCommunityTextCheckbox
+        // 
+        useCommunityTextCheckbox.AutoSize = true;
+        useCommunityTextCheckbox.Location = new Point(4, 126);
+        useCommunityTextCheckbox.Margin = new Padding(2);
+        useCommunityTextCheckbox.Name = "useCommunityTextCheckbox";
+        useCommunityTextCheckbox.Size = new Size(114, 19);
+        useCommunityTextCheckbox.TabIndex = 43;
+        useCommunityTextCheckbox.Text = "Community Text";
+        toolTip1.SetToolTip(useCommunityTextCheckbox, "When selected, will replace some text with text submitted by the community");
+        useCommunityTextCheckbox.UseVisualStyleBackColor = true;
         // 
         // spriteCreditLabel
         // 
@@ -3041,41 +3079,19 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
-        // useCommunityTextCheckbox
+        // noDuplicateRoomsByEnemiesCheckbox
         // 
-        useCommunityTextCheckbox.AutoSize = true;
-        useCommunityTextCheckbox.Location = new Point(4, 126);
-        useCommunityTextCheckbox.Margin = new Padding(2);
-        useCommunityTextCheckbox.Name = "useCommunityTextCheckbox";
-        useCommunityTextCheckbox.Size = new Size(114, 19);
-        useCommunityTextCheckbox.TabIndex = 43;
-        useCommunityTextCheckbox.Text = "Community Text";
-        toolTip1.SetToolTip(useCommunityTextCheckbox, "When selected, will replace some text with text submitted by the community");
-        useCommunityTextCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // shuffleEnemyPalettesCheckbox
-        // 
-        shuffleEnemyPalettesCheckbox.AutoSize = true;
-        shuffleEnemyPalettesCheckbox.Location = new Point(4, 78);
-        shuffleEnemyPalettesCheckbox.Margin = new Padding(4, 3, 4, 3);
-        shuffleEnemyPalettesCheckbox.Name = "shuffleEnemyPalettesCheckbox";
-        shuffleEnemyPalettesCheckbox.Size = new Size(140, 19);
-        shuffleEnemyPalettesCheckbox.TabIndex = 25;
-        shuffleEnemyPalettesCheckbox.Text = "Shuffle Sprite Palettes";
-        toolTip1.SetToolTip(shuffleEnemyPalettesCheckbox, "When selected, sprite colors will be shuffled");
-        shuffleEnemyPalettesCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // alwaysBeamCheckbox
-        // 
-        alwaysBeamCheckbox.AutoSize = true;
-        alwaysBeamCheckbox.Location = new Point(4, 103);
-        alwaysBeamCheckbox.Margin = new Padding(4, 3, 4, 3);
-        alwaysBeamCheckbox.Name = "alwaysBeamCheckbox";
-        alwaysBeamCheckbox.Size = new Size(153, 19);
-        alwaysBeamCheckbox.TabIndex = 24;
-        alwaysBeamCheckbox.Text = "Permanent Beam Sword";
-        toolTip1.SetToolTip(alwaysBeamCheckbox, "Gives Link beam sword regardless of how much health he has");
-        alwaysBeamCheckbox.UseVisualStyleBackColor = true;
+        noDuplicateRoomsByEnemiesCheckbox.AutoSize = true;
+        noDuplicateRoomsByEnemiesCheckbox.Location = new Point(281, 112);
+        noDuplicateRoomsByEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        noDuplicateRoomsByEnemiesCheckbox.Name = "noDuplicateRoomsByEnemiesCheckbox";
+        noDuplicateRoomsByEnemiesCheckbox.RightToLeft = RightToLeft.No;
+        noDuplicateRoomsByEnemiesCheckbox.Size = new Size(247, 19);
+        noDuplicateRoomsByEnemiesCheckbox.TabIndex = 30;
+        noDuplicateRoomsByEnemiesCheckbox.Text = "No Duplicate Rooms (By Layout/Enemies)";
+        noDuplicateRoomsByEnemiesCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(noDuplicateRoomsByEnemiesCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
+        noDuplicateRoomsByEnemiesCheckbox.UseVisualStyleBackColor = true;
         // 
         // MainUI
         // 
@@ -3344,7 +3360,7 @@ partial class MainUI
     private CheckBox useCustomRoomsBox;
     private Label FireSpellOptionLabel;
     private ComboBox FireSpellBox;
-    private CheckBox noDuplicateRoomsCheckbox;
+    private CheckBox noDuplicateRoomsByLayoutCheckbox;
     private CheckBox generatorsMatchCheckBox;
     private ContextMenuStrip customisableButtonContextMenu;
     private Label spritePreviewLabel;
@@ -3366,5 +3382,6 @@ partial class MainUI
     private CheckBox shuffleEnemyPalettesCheckbox;
     private CheckBox alwaysBeamCheckbox;
     private CheckBox useCommunityTextCheckbox;
+    private CheckBox noDuplicateRoomsByEnemiesCheckbox;
 }
 
