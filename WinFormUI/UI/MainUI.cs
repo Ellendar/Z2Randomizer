@@ -10,7 +10,7 @@ namespace Z2Randomizer.WinFormUI;
 public partial class MainUI : Form
 {
     const string DISCORD_URL = @"http://z2r.gg/discord";
-    const string WIKI_URL = @"https://bitbucket.org/digshake/z2randomizer/wiki/Home";
+    const string WIKI_URL = @"https://github.com/Ellendar/Z2Randomizer/wiki";
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private readonly Random r;
@@ -197,6 +197,7 @@ public partial class MainUI : Form
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         noDuplicateRoomsByLayoutCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        noDuplicateRoomsByEnemiesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -866,7 +867,8 @@ public partial class MainUI : Form
         configuration.RandomizeBossItemDrop = randomizeBossItemCheckbox.Checked;
         configuration.PalacesToCompleteMin = startingGemsMinList.SelectedIndex;
         configuration.PalacesToCompleteMax = startingGemsMaxList.SelectedIndex;
-        configuration.NoDuplicateRooms = noDuplicateRoomsByLayoutCheckbox.Checked;
+        configuration.NoDuplicateRoomsByLayout = noDuplicateRoomsByLayoutCheckbox.Checked;
+        configuration.NoDuplicateRoomsByEnemies = noDuplicateRoomsByEnemiesCheckbox.Checked;
 
         //Levels
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
@@ -1294,7 +1296,8 @@ public partial class MainUI : Form
             randomizeBossItemCheckbox.Checked = configuration.RandomizeBossItemDrop;
             startingGemsMinList.SelectedIndex = configuration.PalacesToCompleteMin;
             startingGemsMaxList.SelectedIndex = configuration.PalacesToCompleteMax;
-            noDuplicateRoomsByLayoutCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRooms);
+            noDuplicateRoomsByLayoutCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRoomsByLayout);
+            noDuplicateRoomsByEnemiesCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRoomsByEnemies);
 
             //Levels
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
@@ -1886,6 +1889,8 @@ public partial class MainUI : Form
             bossRoomsExitToPalaceCheckbox.Enabled = false;
             noDuplicateRoomsByLayoutCheckbox.Checked = false;
             noDuplicateRoomsByLayoutCheckbox.Enabled = false;
+            noDuplicateRoomsByEnemiesCheckbox.Checked = false;
+            noDuplicateRoomsByEnemiesCheckbox.Enabled = false;
         }
         else
         {
@@ -1895,6 +1900,7 @@ public partial class MainUI : Form
             blockingRoomsInAnyPalaceCheckbox.Enabled = true;
             bossRoomsExitToPalaceCheckbox.Enabled = true;
             noDuplicateRoomsByLayoutCheckbox.Enabled = true;
+            noDuplicateRoomsByEnemiesCheckbox.Enabled = true;
         }
 
         if (palaceStyleList.SelectedIndex != 0)
@@ -1979,23 +1985,36 @@ public partial class MainUI : Form
         spriteCreditLabel.Text = _spritePreview?.Credit;
     }
 
-    private void characterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    private void CharacterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
     }
 
-    private void tunicColorList_SelectedIndexChanged(object sender, EventArgs e)
+    private void TunicColorList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
     }
 
-    private void shieldColorList_SelectedIndexChanged(object sender, EventArgs e)
+    private void ShieldColorList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
     }
 
-    private void beamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    private void BeamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
+    }
+    
+    private void DuplicateRoomExclusionHandler(object sender, EventArgs e)
+    {
+        if(noDuplicateRoomsByEnemiesCheckbox.Checked)
+        {
+            noDuplicateRoomsByLayoutCheckbox.Checked = false;
+        }
+
+        if (noDuplicateRoomsByLayoutCheckbox.Checked)
+        {
+            noDuplicateRoomsByEnemiesCheckbox.Checked = false;
+        }
     }
 }

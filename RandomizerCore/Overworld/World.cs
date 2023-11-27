@@ -725,8 +725,7 @@ public abstract class World
             if (location.CanShuffle)
             {
                 int tries = 0;
-                int x = 0;
-                int y = 0;
+                int x, y;
                 do
                 {
                     x = RNG.Next(MAP_COLS);

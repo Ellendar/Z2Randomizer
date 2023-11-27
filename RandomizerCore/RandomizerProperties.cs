@@ -16,8 +16,6 @@ public class RandomizerProperties
 {
     public RandomizerProperties()
     {
-        //XXX: Debug
-        NoDuplicateRoomsBySideview = true;
     }
 
     //ROM Info

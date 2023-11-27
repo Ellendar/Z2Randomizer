@@ -1316,6 +1316,7 @@ partial class MainUI
         noDuplicateRoomsByLayoutCheckbox.ThreeState = true;
         toolTip1.SetToolTip(noDuplicateRoomsByLayoutCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations cannot appear more than once per layout.");
         noDuplicateRoomsByLayoutCheckbox.UseVisualStyleBackColor = true;
+        noDuplicateRoomsByLayoutCheckbox.CheckedChanged += DuplicateRoomExclusionHandler;
         // 
         // label7
         // 
@@ -2723,7 +2724,7 @@ partial class MainUI
         beamSpriteList.Size = new Size(142, 23);
         beamSpriteList.TabIndex = 31;
         toolTip1.SetToolTip(beamSpriteList, "Allows you to select what the beam sprite will be");
-        beamSpriteList.SelectedIndexChanged += beamSpriteList_SelectedIndexChanged;
+        beamSpriteList.SelectedIndexChanged += BeamSpriteList_SelectedIndexChanged;
         // 
         // beamSpriteLabel
         // 
@@ -2746,7 +2747,7 @@ partial class MainUI
         shieldColorList.Size = new Size(142, 23);
         shieldColorList.TabIndex = 29;
         toolTip1.SetToolTip(shieldColorList, "Changes the tunic color for shield");
-        shieldColorList.SelectedIndexChanged += shieldColorList_SelectedIndexChanged;
+        shieldColorList.SelectedIndexChanged += ShieldColorList_SelectedIndexChanged;
         // 
         // shieldColorLabel
         // 
@@ -2769,7 +2770,7 @@ partial class MainUI
         tunicColorList.Size = new Size(142, 23);
         tunicColorList.TabIndex = 27;
         toolTip1.SetToolTip(tunicColorList, "Changes the normal tunic color");
-        tunicColorList.SelectedIndexChanged += tunicColorList_SelectedIndexChanged;
+        tunicColorList.SelectedIndexChanged += TunicColorList_SelectedIndexChanged;
         // 
         // tunicColorLabel
         // 
@@ -2792,7 +2793,7 @@ partial class MainUI
         characterSpriteList.Size = new Size(142, 23);
         characterSpriteList.TabIndex = 25;
         toolTip1.SetToolTip(characterSpriteList, "Changes the playable character sprite");
-        characterSpriteList.SelectedIndexChanged += characterSpriteList_SelectedIndexChanged;
+        characterSpriteList.SelectedIndexChanged += CharacterSpriteList_SelectedIndexChanged;
         // 
         // characterSpriteLabel
         // 
@@ -3092,6 +3093,7 @@ partial class MainUI
         noDuplicateRoomsByEnemiesCheckbox.ThreeState = true;
         toolTip1.SetToolTip(noDuplicateRoomsByEnemiesCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
         noDuplicateRoomsByEnemiesCheckbox.UseVisualStyleBackColor = true;
+        noDuplicateRoomsByEnemiesCheckbox.CheckedChanged += DuplicateRoomExclusionHandler;
         // 
         // MainUI
         // 

@@ -110,7 +110,8 @@ public class RandomizerConfiguration
     public int PalacesToCompleteMin { get; set; }
     [Limit(7)]
     public int PalacesToCompleteMax { get; set; }
-    public bool NoDuplicateRooms { get; set; }
+    public bool NoDuplicateRoomsByLayout { get; set; }
+    public bool NoDuplicateRoomsByEnemies { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
 
     //Levels
@@ -1333,7 +1334,8 @@ public class RandomizerConfiguration
 
         properties.BlockersAnywhere = BlockingRoomsInAnyPalace;
         properties.BossRoomConnect = BossRoomsExitToPalace == null ? random.Next(2) == 1 : (bool)BossRoomsExitToPalace;
-        properties.NoDuplicateRooms = NoDuplicateRooms == null ? random.Next(2) == 1 : (bool)NoDuplicateRooms;
+        properties.NoDuplicateRooms = NoDuplicateRoomsByEnemies == null ? random.Next(2) == 1 : (bool)NoDuplicateRoomsByEnemies;
+        properties.NoDuplicateRoomsBySideview = NoDuplicateRoomsByLayout == null ? random.Next(2) == 1 : (bool)NoDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = GeneratorsAlwaysMatch;
 
         //Enemies
