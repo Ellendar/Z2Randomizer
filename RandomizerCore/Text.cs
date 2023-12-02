@@ -6,25 +6,25 @@ using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
 
-public class Hint
+public class Text
 {
     public string RawText { get; }
-    public List<char> Text { get; private set; }
+    public List<char> TextChars { get; private set; }
 
-    public Hint()
+    public Text()
     {
-        Text = Util.ToGameText("I know$nothing", true);
+        TextChars = Util.ToGameText("I know$nothing", true);
     }
 
-    public Hint(List<char> text)
+    public Text(List<char> text)
     {
         RawText = new string(text.ToArray());
-        Text = text;
+        TextChars = text;
     }
-    public Hint(string text)
+    public Text(string text)
     {
         RawText = text;
-        Text = Util.ToGameText(text, true);
+        TextChars = Util.ToGameText(text, true);
     }
 
     public void GenerateHelpfulHint(Location location)
@@ -133,7 +133,7 @@ public class Hint
                 break;
         }
 
-        Text = Util.ToGameText(hint, true).ToList();
+        TextChars = Util.ToGameText(hint, true).ToList();
     }
 
 }

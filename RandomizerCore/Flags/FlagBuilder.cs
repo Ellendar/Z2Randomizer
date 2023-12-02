@@ -53,6 +53,10 @@ public class FlagBuilder
     }
     public FlagBuilder Append(int value, int extent)
     {
+        if(value >= extent)
+        {
+            throw new ArgumentException("Value is greater than extent in FlagBuilder.Append(int, int)");
+        }
         BitArray argBits = new BitArray(new int[] {value});
         for (int i = (int)Math.Log(extent - 1, 2); i >= 0; i--)
         {

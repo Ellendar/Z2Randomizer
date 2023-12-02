@@ -10,7 +10,7 @@ namespace Z2Randomizer.WinFormUI;
 public partial class MainUI : Form
 {
     const string DISCORD_URL = @"http://z2r.gg/discord";
-    const string WIKI_URL = @"https://bitbucket.org/digshake/z2randomizer/wiki/Home";
+    const string WIKI_URL = @"https://github.com/Ellendar/Z2Randomizer/wiki";
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private readonly Random r;
@@ -159,7 +159,7 @@ public partial class MainUI : Form
         hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         hideKasutoList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
-        useCommunityHintsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        useCommunityTextCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         standardizeDropsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         randomizeDropsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shufflePbagAmountsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -196,7 +196,8 @@ public partial class MainUI : Form
         bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
-        noDuplicateRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        noDuplicateRoomsByLayoutCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        noDuplicateRoomsByEnemiesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -782,6 +783,7 @@ public partial class MainUI : Form
         {
             0 => Climates.Classic,
             1 => Climates.Chaos,
+            2 => Climates.Wetlands,
             _ => throw new Exception("Invalid Climate setting")
         };
         configuration.WestBiome = westBiomeSelector.SelectedIndex switch
@@ -793,8 +795,9 @@ public partial class MainUI : Form
             4 => Biome.CANYON,
             5 => Biome.CALDERA,
             6 => Biome.MOUNTAINOUS,
-            7 => Biome.RANDOM_NO_VANILLA,
-            8 => Biome.RANDOM,
+            7 => Biome.RANDOM,
+            8 => Biome.RANDOM_NO_VANILLA,
+            9 => Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
             _ => throw new Exception("Invalid WestBiome setting")
         };
         configuration.EastBiome = eastBiome.SelectedIndex switch
@@ -806,8 +809,9 @@ public partial class MainUI : Form
             4 => Biome.CANYON,
             5 => Biome.VOLCANO,
             6 => Biome.MOUNTAINOUS,
-            7 => Biome.RANDOM_NO_VANILLA,
-            8 => Biome.RANDOM,
+            7 => Biome.RANDOM,
+            8 => Biome.RANDOM_NO_VANILLA,
+            9 => Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
             _ => throw new Exception("Invalid EastBiome setting")
         };
         configuration.DMBiome = dmBiome.SelectedIndex switch
@@ -819,8 +823,9 @@ public partial class MainUI : Form
             4 => Biome.CANYON,
             5 => Biome.CALDERA,
             6 => Biome.MOUNTAINOUS,
-            7 => Biome.RANDOM_NO_VANILLA,
-            8 => Biome.RANDOM,
+            7 => Biome.RANDOM,
+            8 => Biome.RANDOM_NO_VANILLA,
+            9 => Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
             _ => throw new Exception("Invalid DMBiome setting")
         };
         configuration.MazeBiome = mazeBiome.SelectedIndex switch
@@ -863,7 +868,8 @@ public partial class MainUI : Form
         configuration.RandomizeBossItemDrop = randomizeBossItemCheckbox.Checked;
         configuration.PalacesToCompleteMin = startingGemsMinList.SelectedIndex;
         configuration.PalacesToCompleteMax = startingGemsMaxList.SelectedIndex;
-        configuration.NoDuplicateRooms = noDuplicateRoomsCheckbox.Checked;
+        configuration.NoDuplicateRoomsByLayout = noDuplicateRoomsByLayoutCheckbox.Checked;
+        configuration.NoDuplicateRoomsByEnemies = noDuplicateRoomsByEnemiesCheckbox.Checked;
 
         //Levels
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
@@ -979,7 +985,7 @@ public partial class MainUI : Form
         configuration.EnableHelpfulHints = GetTripleCheckState(enableHelpfulHintsCheckbox);
         configuration.EnableSpellItemHints = GetTripleCheckState(enableSpellItemHintsCheckbox);
         configuration.EnableTownNameHints = GetTripleCheckState(enableTownNameHintsCheckbox);
-        configuration.UseCommunityHints = useCommunityHintsCheckbox.Checked;
+        configuration.UseCommunityText = useCommunityTextCheckbox.Checked;
 
         //Misc
         configuration.DisableMusic = disableMusicCheckbox.Checked;
@@ -1027,7 +1033,7 @@ public partial class MainUI : Form
 
     private void FlagBox_Changed(object sender, EventArgs e)
     {
-        if(flagsTextBox.Text != flagsTextBox.Text.Trim())
+        if (flagsTextBox.Text != flagsTextBox.Text.Trim())
         {
             flagsTextBox.Text = flagsTextBox.Text.Trim();
         }
@@ -1207,6 +1213,7 @@ public partial class MainUI : Form
             {
                 "Classic" => 0,
                 "Chaos" => 1,
+                "Wetlands" => 2,
                 _ => throw new Exception("Invalid Climate setting")
             };
             westBiomeSelector.SelectedIndex = configuration.WestBiome switch
@@ -1218,8 +1225,9 @@ public partial class MainUI : Form
                 Biome.CANYON => 4,
                 Biome.CALDERA => 5,
                 Biome.MOUNTAINOUS => 6,
-                Biome.RANDOM_NO_VANILLA => 7,
-                Biome.RANDOM => 8,
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 8,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 9,
                 _ => throw new Exception("Invalid WestBiome setting")
             };
             eastBiome.SelectedIndex = configuration.EastBiome switch
@@ -1231,8 +1239,9 @@ public partial class MainUI : Form
                 Biome.CANYON => 4,
                 Biome.VOLCANO => 5,
                 Biome.MOUNTAINOUS => 6,
-                Biome.RANDOM_NO_VANILLA => 7,
-                Biome.RANDOM => 8,
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 8,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 9,
                 _ => throw new Exception("Invalid EastBiome setting")
             };
             dmBiome.SelectedIndex = configuration.DMBiome switch
@@ -1244,8 +1253,9 @@ public partial class MainUI : Form
                 Biome.CANYON => 4,
                 Biome.CALDERA => 5,
                 Biome.MOUNTAINOUS => 6,
-                Biome.RANDOM_NO_VANILLA => 7,
-                Biome.RANDOM => 8,
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 8,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 9,
                 _ => throw new Exception("Invalid DMBiome setting")
             };
             mazeBiome.SelectedIndex = configuration.MazeBiome switch
@@ -1288,7 +1298,8 @@ public partial class MainUI : Form
             randomizeBossItemCheckbox.Checked = configuration.RandomizeBossItemDrop;
             startingGemsMinList.SelectedIndex = configuration.PalacesToCompleteMin;
             startingGemsMaxList.SelectedIndex = configuration.PalacesToCompleteMax;
-            noDuplicateRoomsCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRooms);
+            noDuplicateRoomsByLayoutCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRoomsByLayout);
+            noDuplicateRoomsByEnemiesCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRoomsByEnemies);
 
             //Levels
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;
@@ -1408,7 +1419,7 @@ public partial class MainUI : Form
             enableHelpfulHintsCheckbox.CheckState = ToCheckState(configuration.EnableHelpfulHints);
             enableSpellItemHintsCheckbox.CheckState = ToCheckState(configuration.EnableSpellItemHints);
             enableTownNameHintsCheckbox.CheckState = ToCheckState(configuration.EnableTownNameHints);
-            useCommunityHintsCheckbox.Checked = configuration.UseCommunityHints;
+            useCommunityTextCheckbox.Checked = configuration.UseCommunityText;
 
             //Misc
             //disableLowHealthBeepCheckbox.Checked = configuration.DisableLowHealthBeep;
@@ -1878,8 +1889,10 @@ public partial class MainUI : Form
             blockingRoomsInAnyPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Checked = false;
             bossRoomsExitToPalaceCheckbox.Enabled = false;
-            noDuplicateRoomsCheckbox.Checked = false;
-            noDuplicateRoomsCheckbox.Enabled = false;
+            noDuplicateRoomsByLayoutCheckbox.Checked = false;
+            noDuplicateRoomsByLayoutCheckbox.Enabled = false;
+            noDuplicateRoomsByEnemiesCheckbox.Checked = false;
+            noDuplicateRoomsByEnemiesCheckbox.Enabled = false;
         }
         else
         {
@@ -1888,7 +1901,8 @@ public partial class MainUI : Form
             includev4_4RoomsCheckbox.Enabled = true;
             blockingRoomsInAnyPalaceCheckbox.Enabled = true;
             bossRoomsExitToPalaceCheckbox.Enabled = true;
-            noDuplicateRoomsCheckbox.Enabled = true;
+            noDuplicateRoomsByLayoutCheckbox.Enabled = true;
+            noDuplicateRoomsByEnemiesCheckbox.Enabled = true;
         }
 
         if (palaceStyleList.SelectedIndex != 0)
@@ -1973,23 +1987,36 @@ public partial class MainUI : Form
         spriteCreditLabel.Text = _spritePreview?.Credit;
     }
 
-    private void characterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    private void CharacterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
     }
 
-    private void tunicColorList_SelectedIndexChanged(object sender, EventArgs e)
+    private void TunicColorList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
     }
 
-    private void shieldColorList_SelectedIndexChanged(object sender, EventArgs e)
+    private void ShieldColorList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
     }
 
-    private void beamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
+    private void BeamSpriteList_SelectedIndexChanged(object sender, EventArgs e)
     {
         GenerateSpriteImage();
+    }
+    
+    private void DuplicateRoomExclusionHandler(object sender, EventArgs e)
+    {
+        if(noDuplicateRoomsByEnemiesCheckbox.Checked)
+        {
+            noDuplicateRoomsByLayoutCheckbox.Checked = false;
+        }
+
+        if (noDuplicateRoomsByLayoutCheckbox.Checked)
+        {
+            noDuplicateRoomsByEnemiesCheckbox.Checked = false;
+        }
     }
 }

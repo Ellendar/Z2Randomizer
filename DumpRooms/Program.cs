@@ -1,10 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Assembler;
 using RandomizerCore.Sidescroll;
 using System.Text;
+using System.Text.Json;
 using Z2Randomizer.Core;
 using Z2Randomizer.Core.Sidescroll;
 
-ROM ROMData = new ROM(args[0]);
+var engine = new Engine();
+ROM ROMData = new ROM(args[0], engine);
 int[] connAddr = new int[] { 0x1072B, 0x12208, 0x1472B };
 int[] side = new int[] { 0x10533, 0x12010, 0x14533 };
 int[] enemy = new int[] { 0x105b1, 0x1208E, 0x145b1 };
@@ -50,14 +53,38 @@ for (int j = 0; j < 3; j++)
         {
             bitmask = (byte)(bitmask & 0x0F);
         }
-        //XXX: Refactor this
-        /*
-        r = new Room(i, connectBytes, enemies, sideView, bitmask, false, false, false, -1, addr, false, false, false, new Requirements(), null, "");
+
+        r = new Room
+        {
+            bitmask = bitmask,
+            Connections = connectBytes,
+            ElevatorScreen = -1,
+            Enabled = true,
+            Enemies = enemies,
+            Group = RoomGroup.V4_4,
+            Author = "",
+            HasBoss = false,
+            IsBossRoom = false,
+            HasDrop = false,
+            HasItem = false,
+            IsThunderBirdRoom = false,
+            PalaceNumber = null,
+            PalaceGroup = null,
+            LinkedRoomName = null,
+            IsDropZone = false,
+            IsEntrance = false,
+            isUpDownReversed = false,
+            Map = i,
+            ConnectionStartAddress = sideViewPtr,
+            Name = "",
+            Requirements = new Requirements(),
+            SideView = sideView,
+        };
         r.PalaceGroup = (j + 1);
-        r.Group = RoomGroup.V4_4;
         sb.Append(r.Serialize() + ",");
-        */
     }
 }
 sb[sb.Length - 1] = ']';
-File.WriteAllText("Rooms.dump", sb.ToString());
+var jsonElement = JsonSerializer.Deserialize<JsonElement>(sb.ToString());
+string prettyPrintedJson = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions() { WriteIndented = true, });
+File.WriteAllText("Rooms.dump", prettyPrintedJson);

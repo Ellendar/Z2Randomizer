@@ -31,7 +31,7 @@ public class Room
     public byte bitmask;
 
     public int Map { get; set; }
-    public int PalaceGroup { get; set; }
+    public int? PalaceGroup { get; set; }
 
     public bool IsRoot { get; set; }
     public Room LinkedRoom { get; set; }
@@ -166,6 +166,10 @@ public class Room
     public int? PalaceNumber { get; set; }
     public string LinkedRoomName { get; set; }
 
+    public Room()
+    {
+
+    }
     public Room(Room room)
     {
         Map = room.Map;
@@ -296,7 +300,7 @@ public class Room
         //#76: If the item room is a boss item room, and it's in palace group 1, move the boss up 1 tile.
         //For some reason a bunch of the boss item rooms are fucked up in a bunch of different ways, so i'm keeping digshake's catch-all
         //though repositioned into the place it belongs.
-        if (PalaceGroup == 1 && HasItem && IsBossRoom)
+        if (PalaceGroup == 1 && HasItem && HasBoss)
         {
             NewEnemies[1] = 0x6C;
         }
@@ -855,6 +859,9 @@ public class RoomJsonConverter : JsonConverter<Room>
 
         writer.WritePropertyName("author");
         writer.WriteValue(value.Author);
+
+        writer.WritePropertyName("palaceGroup");
+        writer.WriteValue(value.PalaceGroup);
 
         writer.WriteEndObject();
     }

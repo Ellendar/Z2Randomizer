@@ -55,7 +55,7 @@ public class RandomizerProperties
     public bool StartWithDownstab { get; set; }
     public int StartLives { get; set; }
     public bool PermanentBeam { get; set; }
-    public bool UseCommunityHints { get; set; }
+    public bool UseCommunityText { get; set; }
     public int StartAtk { get; set; }
     public int StartMag { get; set; }
     public int StartLifeLvl { get; set; }
@@ -100,6 +100,7 @@ public class RandomizerProperties
     public bool BlockersAnywhere { get; set; }
     public bool BossRoomConnect { get; set; }
     public bool NoDuplicateRooms { get; set; }
+    public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
     public bool AllowVanillaRooms { get; set; }
     public bool AllowV4Rooms { get; set; }

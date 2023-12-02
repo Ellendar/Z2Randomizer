@@ -10,12 +10,12 @@ public class HintsTests
     [TestMethod]
     public void EnsureAllHintsAreValid()
     {
-        List<string> hints = Hints.GENERIC_WIZARD_TEXTS
-            .Union(Hints.RIVER_MAN_TEXTS).ToList()
-            .Union(Hints.BAGU_TEXTS).ToList();
+        List<string> hints = CustomTexts.GENERIC_WIZARD_TEXTS
+            .Union(CustomTexts.RIVER_MAN_TEXTS).ToList()
+            .Union(CustomTexts.BAGU_TEXTS).ToList();
 
-        Hints.WIZARD_TEXTS_BY_SPELL.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
-        Hints.WIZARD_TEXTS_BY_TOWN.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
+        CustomTexts.WIZARD_TEXTS_BY_SPELL.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
+        CustomTexts.WIZARD_TEXTS_BY_TOWN.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
 
         foreach(string hint in hints)
         {

@@ -110,7 +110,8 @@ public class RandomizerConfiguration
     public int PalacesToCompleteMin { get; set; }
     [Limit(7)]
     public int PalacesToCompleteMax { get; set; }
-    public bool NoDuplicateRooms { get; set; }
+    public bool NoDuplicateRoomsByLayout { get; set; }
+    public bool NoDuplicateRoomsByEnemies { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
 
     //Levels
@@ -182,25 +183,26 @@ public class RandomizerConfiguration
     public bool LargeEnemiesCanDrop1up { get; set; }
     public bool LargeEnemiesCanDropKey { get; set; }
 
-    //Hints
+    //Misc
     public bool? EnableHelpfulHints { get; set; }
     public bool? EnableSpellItemHints { get; set; }
     public bool? EnableTownNameHints { get; set; }
-    public bool UseCommunityHints { get; set; }
+    public bool JumpAlwaysOn { get; set; }
+    public bool DashAlwaysOn { get; set; }
+    public bool ShuffleSpritePalettes { get; set; }
+    public bool PermanmentBeamSword { get; set; }
 
-    //Misc
+    //Custom
+    [IgnoreInFlags]
+    public bool UseCommunityText { get; set; }
     [IgnoreInFlags]
     public byte BeepFrequency { get; set; }
     [IgnoreInFlags]
     public byte BeepThreshold { get; set; }
     [IgnoreInFlags]
     public bool DisableMusic { get; set; }
-    public bool JumpAlwaysOn { get; set; }
-    public bool DashAlwaysOn { get; set; }
-    public bool PermanmentBeamSword { get; set; }
     [IgnoreInFlags]
     public bool FastSpellCasting { get; set; }
-    public bool ShuffleSpritePalettes { get; set; }
     [IgnoreInFlags]
     public bool UpAOnController1 { get; set; }
     [IgnoreInFlags]
@@ -618,7 +620,7 @@ public class RandomizerConfiguration
                 break;
         }
         config.RandomizeNewKasutoJarRequirements = bits[3];
-        config.UseCommunityHints = bits[4];
+        config.UseCommunityText = bits[4];
         config.ShuffleSpritePalettes = bits[5];
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
@@ -779,7 +781,7 @@ public class RandomizerConfiguration
                 config.WestBiome = Biome.MOUNTAINOUS;
                 break;
             case 7:
-                config.WestBiome = Biome.RANDOM_NO_VANILLA;
+                config.WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE;
                 break;
             case 8:
                 config.WestBiome = Biome.RANDOM;
@@ -812,7 +814,7 @@ public class RandomizerConfiguration
                 config.DMBiome = Biome.MOUNTAINOUS;
                 break;
             case 7:
-                config.DMBiome = Biome.RANDOM_NO_VANILLA;
+                config.DMBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE;
                 break;
             case 8:
                 config.DMBiome = Biome.RANDOM;
@@ -843,7 +845,7 @@ public class RandomizerConfiguration
                 config.EastBiome = Biome.MOUNTAINOUS;
                 break;
             case 7:
-                config.EastBiome = Biome.RANDOM_NO_VANILLA;
+                config.EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE;
                 break;
             case 8:
                 config.EastBiome = Biome.RANDOM;
@@ -1174,7 +1176,7 @@ public class RandomizerConfiguration
 
         properties.StartLives = ShuffleStartingLives ? random.Next(2, 6) : 3;
         properties.PermanentBeam = PermanmentBeamSword;
-        properties.UseCommunityHints = UseCommunityHints;
+        properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
         properties.StartMag = StartingMagicLevel;
         properties.StartLifeLvl = StartingMagicLevel;
@@ -1191,9 +1193,10 @@ public class RandomizerConfiguration
         properties.EncounterRate = EncounterRate;
         properties.ContinentConnections = ContinentConnectionType;
         properties.BoulderBlockConnections = AllowConnectionCavesToBeBoulderBlocked;
-        if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA)
+        if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA || WestBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            properties.WestBiome = random.Next(WestBiome == Biome.RANDOM ? 7 : 5) switch
+            int shuffleLimit = WestBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            properties.WestBiome = random.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
@@ -1209,8 +1212,9 @@ public class RandomizerConfiguration
         {
             properties.WestBiome = WestBiome;
         }
-        if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA)
+        if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA || EastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
+            int shuffleLimit = EastBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
             properties.EastBiome = random.Next(EastBiome == Biome.RANDOM ? 7 : 5) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -1227,8 +1231,9 @@ public class RandomizerConfiguration
         {
             properties.EastBiome = EastBiome;
         }
-        if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA)
+        if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA || DMBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
+            int shuffleLimit = DMBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
             properties.DmBiome = random.Next(DMBiome == Biome.RANDOM ? 7 : 5) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -1261,10 +1266,11 @@ public class RandomizerConfiguration
         }
         if (Climate == null)
         {
-            properties.Climate = random.Next(1) switch
+            properties.Climate = random.Next(3) switch
             {
                 0 => Climates.Classic,
                 1 => Climates.Chaos,
+                2 => Climates.Wetlands,
                 _ => throw new Exception("Unrecognized climate")
             };
         }
@@ -1329,7 +1335,8 @@ public class RandomizerConfiguration
 
         properties.BlockersAnywhere = BlockingRoomsInAnyPalace;
         properties.BossRoomConnect = BossRoomsExitToPalace == null ? random.Next(2) == 1 : (bool)BossRoomsExitToPalace;
-        properties.NoDuplicateRooms = NoDuplicateRooms == null ? random.Next(2) == 1 : (bool)NoDuplicateRooms;
+        properties.NoDuplicateRooms = NoDuplicateRoomsByEnemies == null ? random.Next(2) == 1 : (bool)NoDuplicateRoomsByEnemies;
+        properties.NoDuplicateRoomsBySideview = NoDuplicateRoomsByLayout == null ? random.Next(2) == 1 : (bool)NoDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = GeneratorsAlwaysMatch;
 
         //Enemies

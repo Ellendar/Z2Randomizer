@@ -535,11 +535,11 @@ public class EastHyrule : World
 
                 if (props.HiddenKasuto)
                 {
-                    DrawHiddenKasuto(props.ShuffleHidden);
+                    RandomizeHiddenKasuto(props.ShuffleHidden);
                 }
                 if (props.HiddenPalace)
                 {
-                    bool hp = DrawHiddenPalace(rom, props.ShuffleHidden);
+                    bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
                     if (!hp)
                     {
                         return false;
@@ -1331,7 +1331,7 @@ public class EastHyrule : World
         return true;
     }
 
-    private void DrawHiddenKasuto(bool shuffleHidden)
+    private void RandomizeHiddenKasuto(bool shuffleHidden)
     {
         if (shuffleHidden)
         {
@@ -1359,7 +1359,7 @@ public class EastHyrule : World
         //map[hkLoc.Ypos - 30, hkLoc.Xpos] = terrain.forest;
     }
 
-    private bool DrawHiddenPalace(ROM rom, bool shuffleHidden)
+    private bool RandomizeHiddenPalace(ROM rom, bool shuffleHidden, bool hiddenKasuto)
     {
         bool done = false;
         int xpos = RNG.Next(6, MAP_COLS - 6);
@@ -1382,6 +1382,11 @@ public class EastHyrule : World
             xpos = RNG.Next(6, MAP_COLS - 6);
             ypos = RNG.Next(6, MAP_ROWS - 6);
             done = true;
+            //#124
+            if(hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
+            {
+                continue;
+            }
             for (int i = ypos - 3; i < ypos + 4; i++)
             {
                 for (int j = xpos - 3; j < xpos + 4; j++)
