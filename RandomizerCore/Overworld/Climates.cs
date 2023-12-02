@@ -95,8 +95,8 @@ public class Climates
                 { Terrain.SWAMP, 2 },
                 { Terrain.GRAVE, 2 },
                 { Terrain.LAVA, 1 },
-                { Terrain.WALKABLEWATER, 6 },
-                { Terrain.WATER, 6 },
+                { Terrain.WALKABLEWATER, 3 },
+                { Terrain.WATER, 3 },
                 { Terrain.MOUNTAIN, 2 },
                 { Terrain.ROAD, 3 }
         },

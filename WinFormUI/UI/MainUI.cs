@@ -202,6 +202,7 @@ public partial class MainUI : Form
         includeVanillaRoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includev4_4RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        HardBossesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(updateFlags);
 
         TryLoadSpriteImageFromFile(romFileTextBox.Text);
@@ -870,6 +871,7 @@ public partial class MainUI : Form
         configuration.PalacesToCompleteMax = startingGemsMaxList.SelectedIndex;
         configuration.NoDuplicateRoomsByLayout = noDuplicateRoomsByLayoutCheckbox.Checked;
         configuration.NoDuplicateRoomsByEnemies = noDuplicateRoomsByEnemiesCheckbox.Checked;
+        configuration.HardBosses = HardBossesCheckbox.Checked;
 
         //Levels
         configuration.ShuffleAttackExperience = shuffleAtkExpNeededCheckbox.Checked;
@@ -1300,6 +1302,7 @@ public partial class MainUI : Form
             startingGemsMaxList.SelectedIndex = configuration.PalacesToCompleteMax;
             noDuplicateRoomsByLayoutCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRoomsByLayout);
             noDuplicateRoomsByEnemiesCheckbox.CheckState = ToCheckState(configuration.NoDuplicateRoomsByEnemies);
+            HardBossesCheckbox.CheckState = ToCheckState(configuration.HardBosses);
 
             //Levels
             shuffleAtkExpNeededCheckbox.Checked = configuration.ShuffleAttackExperience;

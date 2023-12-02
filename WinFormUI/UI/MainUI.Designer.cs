@@ -258,6 +258,7 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
+        HardBossesCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1223,6 +1224,7 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(HardBossesCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsByEnemiesCheckbox);
         tabPage2.Controls.Add(gpStyleLabel);
         tabPage2.Controls.Add(gpStyleList);
@@ -3095,6 +3097,19 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
+        // HardBossesCheckbox
+        // 
+        HardBossesCheckbox.AutoSize = true;
+        HardBossesCheckbox.Location = new Point(281, 187);
+        HardBossesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        HardBossesCheckbox.Name = "HardBossesCheckbox";
+        HardBossesCheckbox.Size = new Size(102, 19);
+        HardBossesCheckbox.TabIndex = 31;
+        HardBossesCheckbox.Text = "Harder Carock";
+        HardBossesCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(HardBossesCheckbox, "Carock has learned some new tricks. No more crouching in the corner!\r\n");
+        HardBossesCheckbox.UseVisualStyleBackColor = true;
+        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3385,5 +3400,6 @@ partial class MainUI
     private CheckBox alwaysBeamCheckbox;
     private CheckBox useCommunityTextCheckbox;
     private CheckBox noDuplicateRoomsByEnemiesCheckbox;
+    private CheckBox HardBossesCheckbox;
 }
 

@@ -113,6 +113,7 @@ public class RandomizerConfiguration
     public bool NoDuplicateRoomsByLayout { get; set; }
     public bool NoDuplicateRoomsByEnemies { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
+    public bool HardBosses { get; set; }
 
     //Levels
     public bool ShuffleAttackExperience { get; set; }
@@ -937,6 +938,7 @@ public class RandomizerConfiguration
 
         //New flags that didn't exist in 4.0.4
         config.SwapUpAndDownStab = false;
+        config.HardBosses = false;
 
 
         return config;
@@ -1338,6 +1340,7 @@ public class RandomizerConfiguration
         properties.NoDuplicateRooms = NoDuplicateRoomsByEnemies == null ? random.Next(2) == 1 : (bool)NoDuplicateRoomsByEnemies;
         properties.NoDuplicateRoomsBySideview = NoDuplicateRoomsByLayout == null ? random.Next(2) == 1 : (bool)NoDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = GeneratorsAlwaysMatch;
+        properties.HardBosses = HardBosses;
 
         //Enemies
         properties.ShuffleEnemyHP = ShuffleEnemyHP;

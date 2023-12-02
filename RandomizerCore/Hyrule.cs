@@ -219,7 +219,11 @@ public class Hyrule
         ROMData.UpdateMapPointers();
         ROMData.FixContinentTransitions();
 
-        ROMData.BuffCarrock();
+        if(props.HardBosses)
+        {
+            ROMData.BuffCarrock();
+        }
+        
 
         if (props.ReplaceFireWithDash)
         {
