@@ -835,34 +835,173 @@ CheckController1ForUpAMagic:
         _engine.Apply(ROMData);
     }
 
+    public void BuffCarrock()
+    {
+        var a = _engine.Asm();
+        a.code("""
+.segment "PRG4"
+; Hook into carrock's update code to add the new position calculation
+.org $aec4
+    jmp ChooseNewCarrockXPosition
+.free $aed3 - *
+
+; Force Carrock to teleport only on the side opposite of the player
+.reloc
+ChooseNewCarrockXPosition:
+    ; roll a random number and force carrock to only appear on the opposite side
+    ; remove the MSB from the random value and we will replace it with the opposite
+    ; bit from Link's MSB
+    lda $051b,x
+    ; By shifting links opposite side bit twice, we can force Carrock to be closer to the wall
+    asl
+    ;asl
+    sta $4e,x
+
+    ; Since Link's position can be from roughly $00fb - 01ef
+    ; We can offset this by flipping the high bit, and then checking if its greater than
+    ; $80 - $10 (which would be like starting the range from F0 - 70)
+    lda $4d
+    eor #$80
+    cmp #$70
+
+    ; At this point, the carry contains the bit for the opposite side of the screen for link
+    ; So shift it back into bosses position
+    ror $4e,x
+    ;cmp #$70
+    ;ror $4e,x
+
+    ; Vanilla checks to see if carrock is too close to the right edge, and prevents going
+    ; offscreen by dividing the position by two if it would
+    lda #$e0
+    cmp $4e,x
+    bcs @SetXHighPos
+        sbc #$10 - 1
+        sta $4e,x
+@SetXHighPos:
+    lda #1
+    sta $3c,x
+    rts
+
+.org $996f
+    jsr MoveSinWaveWifiShot
+
+.define ProjectileEnemyData $bc
+.define ProjectileYPosition $30
+EnemyYVelocity = $057e
+; SinWaveVelocityIncrement = $ba1c
+
+.reloc
+SinWaveVelocityIncrement:
+    .byte $04, $fc
+SinWaveMaxVelocityExtant:
+    .byte $28, $d4
+
+MoveSinWaveWifiShot:
+    ; Wifi shot id from carrock is $9 (and this number is premultiplied by 2)
+    cmp #$12
+    bne @NotAWifiShotFromCarrock
+    ; Now check to see if we set the flag for sin waves.
+    ; We write b0 to 71,x if this wifi is a sin wave so we can check the high bit if its set then its a sin wav
+    lda $71,x
+    bpl @NotAWifiShotFromCarrock
+        lda ProjectileEnemyData,x
+        and #$01
+        tay
+        lda EnemyYVelocity,x
+        clc
+        adc SinWaveVelocityIncrement,y
+        sta EnemyYVelocity,x
+        cmp SinWaveMaxVelocityExtant,y
+        bne @NotAtMaxVelocity
+            inc ProjectileEnemyData,x
+@NotAtMaxVelocity:
+        lsr
+        lsr
+        lsr
+        lsr
+        cmp #$08
+        bcc @PositiveVelocity
+            ora #$f0
+@PositiveVelocity:
+        adc ProjectileYPosition,x
+        sta ProjectileYPosition,x
+    ldy #$12
+@NotAWifiShotFromCarrock:
+    ; Perform the original patched call
+    lda $6ec0,y
+    rts
+
+.org $af08
+    jsr RandomizeWifiShotType
+
+.reloc
+RandomizeWifiShotType:
+    ; Fetch a random number and 50/50 chance its a straight shot
+    bit $051c
+    bmi @StraightShot
+        lda #0
+        bvc @HiPositionShot
+            ; Shooting from the bottom should start by arcing upwards
+            lda #1
+    @HiPositionShot:
+        sta ProjectileEnemyData,y
+        lda #0
+        sta EnemyYVelocity,y
+        lda #$b0
+        ; Firing a sin wave shot, so set the flag for sin wave and then follow through setting up the position
+        sta $0071,y
+        bne @WriteInitCoord
+@StraightShot:
+    lda #0
+    sta $0071,y
+    lda #$b0
+    ; we are shooting straight so clear out the flag
+    ; 50/50 chance that the shot starts high or low
+@WriteInitCoord:
+    bvc @WriteShotYCoord
+        clc
+        adc #$10
+@WriteShotYCoord:
+    sta $0030,y
+    rts
+""");
+        _engine.Modules.Add(a.Actions);
+    }
+
     public void DashSpell()
     {
-        /*
-         * push accumulator to stack (48)
-         * load 769 (AD 6F 07)
-         * check 4th bit (29 10)
-         * branch if equal to fire table (F0 X)
-         * pop stack to accumulator (68)
-         * compare to normal table D9 B3 93
-         * return (60)
-         * pop stack to accumulator (68)
-         * compare to dash table (D9 X X)
-         * return (60)
-         * two bytes for dash table
-         */
-        Put(0x2a50, new byte[] { 0x48, 0xad, 0x6f, 0x07, 0x29, 0x10, 0xd0, 0x05, 0x68, 0xd9, 0xb3, 0x93, 0x60, 0x68, 0xd9, 0x52, 0xaa, 0x60, 0x30, 0xd0}); //, 0x20, 0xFD, 0x93, 0xa9, 0x18, 0x8d, 0xb3, 0x93, 0xa9, 0xE8, 0x8d, 0xb4, 0x93, 0x60 });
+        var a = _engine.Asm();
+        a.code("""
+.segment "PRG0"
+.reloc
+ReplaceFireWithDashSpell:
+    pha
+    lda $076f ; Current magic state
+    and #$10  ; fire is on
+    bne @HasFire
+        pla
+        cmp $93b3,y ; Table for Link's original max velocities
+        rts
+@HasFire:
+    pla
+    cmp @SecondaryVelocityTable,y
+    rts
+@SecondaryVelocityTable:
+.byte $30, $d0
+""");
 
-        //Jump to 97f1 
-        Put(0x140f, new byte[] { 0x20, 0x40, 0xAA });
+        // Inside Links_Acceleration_Routine, patch the max speed compare to check if we cast dash
+        a.org(0x93ff);
+        a.code("jsr ReplaceFireWithDashSpell");
 
-        //put values back
-        Put(0xe60, new byte[] { 0x14, 0x98 });
-        List<char> dash = Util.ToGameText("DASH", false);
+        // Update the magic table to point to an rts ???
+        a.org(0x8e50);
+        a.word(0x9814);
 
-        for(int i = 0; i < dash.Count; i++)
-        {
-            Put(0x1c72 + i, (byte)dash[i]);
-        }
+        byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
+        a.org(0x9c62);
+        a.byt(dash);
+        _engine.Modules.Add(a.Actions);
     }
 
     public void MoveAfterGem()
