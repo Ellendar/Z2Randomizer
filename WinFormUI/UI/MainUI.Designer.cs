@@ -108,6 +108,7 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
+        noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         gpStyleLabel = new Label();
         gpStyleList = new ComboBox();
         includev4_4RoomsCheckbox = new CheckBox();
@@ -257,7 +258,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -969,7 +969,7 @@ partial class MainUI
         // 
         climateSelector.DropDownStyle = ComboBoxStyle.DropDownList;
         climateSelector.FormattingEnabled = true;
-        climateSelector.Items.AddRange(new object[] { "Classic", "Chaos" });
+        climateSelector.Items.AddRange(new object[] { "Classic", "Chaos", "Wetlands" });
         climateSelector.Location = new Point(416, 145);
         climateSelector.Margin = new Padding(4, 3, 4, 3);
         climateSelector.Name = "climateSelector";
@@ -1252,6 +1252,21 @@ partial class MainUI
         tabPage2.TabIndex = 1;
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
+        // 
+        // noDuplicateRoomsByEnemiesCheckbox
+        // 
+        noDuplicateRoomsByEnemiesCheckbox.AutoSize = true;
+        noDuplicateRoomsByEnemiesCheckbox.Location = new Point(281, 112);
+        noDuplicateRoomsByEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        noDuplicateRoomsByEnemiesCheckbox.Name = "noDuplicateRoomsByEnemiesCheckbox";
+        noDuplicateRoomsByEnemiesCheckbox.RightToLeft = RightToLeft.No;
+        noDuplicateRoomsByEnemiesCheckbox.Size = new Size(247, 19);
+        noDuplicateRoomsByEnemiesCheckbox.TabIndex = 30;
+        noDuplicateRoomsByEnemiesCheckbox.Text = "No Duplicate Rooms (By Layout/Enemies)";
+        noDuplicateRoomsByEnemiesCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(noDuplicateRoomsByEnemiesCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
+        noDuplicateRoomsByEnemiesCheckbox.UseVisualStyleBackColor = true;
+        noDuplicateRoomsByEnemiesCheckbox.CheckedChanged += DuplicateRoomExclusionHandler;
         // 
         // gpStyleLabel
         // 
@@ -3079,21 +3094,6 @@ partial class MainUI
         // 
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
-        // 
-        // noDuplicateRoomsByEnemiesCheckbox
-        // 
-        noDuplicateRoomsByEnemiesCheckbox.AutoSize = true;
-        noDuplicateRoomsByEnemiesCheckbox.Location = new Point(281, 112);
-        noDuplicateRoomsByEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
-        noDuplicateRoomsByEnemiesCheckbox.Name = "noDuplicateRoomsByEnemiesCheckbox";
-        noDuplicateRoomsByEnemiesCheckbox.RightToLeft = RightToLeft.No;
-        noDuplicateRoomsByEnemiesCheckbox.Size = new Size(247, 19);
-        noDuplicateRoomsByEnemiesCheckbox.TabIndex = 30;
-        noDuplicateRoomsByEnemiesCheckbox.Text = "No Duplicate Rooms (By Layout/Enemies)";
-        noDuplicateRoomsByEnemiesCheckbox.ThreeState = true;
-        toolTip1.SetToolTip(noDuplicateRoomsByEnemiesCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
-        noDuplicateRoomsByEnemiesCheckbox.UseVisualStyleBackColor = true;
-        noDuplicateRoomsByEnemiesCheckbox.CheckedChanged += DuplicateRoomExclusionHandler;
         // 
         // MainUI
         // 

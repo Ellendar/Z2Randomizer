@@ -37,11 +37,13 @@ public class Climate
 
     public float GetDistanceCoefficient(Terrain terrain) 
     { 
-        if(!DistanceCoefficients.ContainsKey(terrain))
+        if(!DistanceCoefficients.TryGetValue(terrain, out float value))
         {
             return 0;
         }
-        return DistanceCoefficients[terrain];
+        //Returning the reciprocal of the distance makes the sizes of terrains scale proportionately with the coefficient's value
+        //I feel this is the most intuitive way to represent this, but maybe I am wrong.
+        return 1f / value;
     }
 
     public Terrain GetRandomTerrain(Random r, IEnumerable<Terrain> whitelist)

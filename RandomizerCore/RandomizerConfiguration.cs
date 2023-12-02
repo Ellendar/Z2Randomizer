@@ -1266,10 +1266,11 @@ public class RandomizerConfiguration
         }
         if (Climate == null)
         {
-            properties.Climate = random.Next(1) switch
+            properties.Climate = random.Next(3) switch
             {
                 0 => Climates.Classic,
                 1 => Climates.Chaos,
+                2 => Climates.Wetlands,
                 _ => throw new Exception("Unrecognized climate")
             };
         }

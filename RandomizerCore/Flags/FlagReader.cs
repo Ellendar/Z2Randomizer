@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Transactions;
-using System.Xml.Linq;
 
 namespace Z2Randomizer.Core.Flags;
 

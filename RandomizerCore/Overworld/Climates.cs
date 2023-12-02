@@ -70,6 +70,39 @@ public class Climates
        300
    );
 
+    public static readonly Climate Wetlands = new(
+        "Wetlands",
+        //Size
+        new Dictionary<Terrain, float>
+        {
+                { Terrain.DESERT, 1 },
+                { Terrain.GRASS, 1 },
+                { Terrain.FOREST, 1 },
+                { Terrain.SWAMP, 2 },
+                { Terrain.GRAVE, 1 },
+                { Terrain.LAVA, 1 },
+                { Terrain.WALKABLEWATER, 1 },
+                { Terrain.WATER, 1 },
+                { Terrain.MOUNTAIN, 1 },
+                { Terrain.ROAD, 1 }
+        },
+        //Frequency
+        new Dictionary<Terrain, int>
+        {
+                { Terrain.DESERT, 0 },
+                { Terrain.GRASS, 2 },
+                { Terrain.FOREST, 2 },
+                { Terrain.SWAMP, 2 },
+                { Terrain.GRAVE, 2 },
+                { Terrain.LAVA, 1 },
+                { Terrain.WALKABLEWATER, 6 },
+                { Terrain.WATER, 6 },
+                { Terrain.MOUNTAIN, 2 },
+                { Terrain.ROAD, 3 }
+        },
+        30
+    );
+
 }
 
 

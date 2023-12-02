@@ -12,7 +12,7 @@ internal static class ListExtensions
     {
         for (int iteratedIndex = list.Count - 1; iteratedIndex > 0; --iteratedIndex)
         {
-            int shuffleIndex = RNG.Next(0, list.Count + 1);
+            int shuffleIndex = RNG.Next(0, iteratedIndex + 1);
             (list[iteratedIndex], list[shuffleIndex]) = (list[shuffleIndex], list[iteratedIndex]);
         }
     }

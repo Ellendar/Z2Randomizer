@@ -455,7 +455,7 @@ public abstract class World
                 if (location.TerrainType == Terrain.CAVE)
                 {
                     Direction direction = (Direction)RNG.Next(4);
-                    Terrain entranceTerrain = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                    Terrain entranceTerrain = climate.GetRandomTerrain(RNG, walkableTerrains);
 
                     if (saneCaves && connections.ContainsKey(location))
                     {
@@ -477,7 +477,7 @@ public abstract class World
                 }
                 else if (location.TerrainType == Terrain.PALACE)
                 {
-                    Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                    Terrain s = climate.GetRandomTerrain(RNG, walkableTerrains);
                     map[y + 1, x] = s;
                     map[y + 1, x + 1] = s;
                     map[y + 1, x - 1] = s;
@@ -495,7 +495,7 @@ public abstract class World
                     Terrain t;
                     do
                     {
-                        t = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                        t = climate.GetRandomTerrain(RNG, walkableTerrains);
                     } while (t == location.TerrainType);
                     map[y + 1, x] = t;
                     map[y + 1, x + 1] = t;
@@ -713,8 +713,8 @@ public abstract class World
         location2.CanShuffle = false;
         location2.Xpos = otherx;
         location2.Ypos = othery + 30;
-        PlaceCave(x, y, direction, walkableTerrains[RNG.Next(walkableTerrains.Count)]);
-        PlaceCave(otherx, othery, direction.Reverse(), walkableTerrains[RNG.Next(walkableTerrains.Count)]);
+        PlaceCave(x, y, direction, climate.GetRandomTerrain(RNG, walkableTerrains));
+        PlaceCave(otherx, othery, direction.Reverse(), climate.GetRandomTerrain(RNG, walkableTerrains));
         return true;
     }
 
@@ -905,7 +905,7 @@ public abstract class World
                     || GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
                 {
                     length = 100;
-                    Debug.WriteLine(GetGlobDebug(globs));
+                    //Debug.WriteLine(GetGlobDebug(globs));
                 }
                 endMass = globs[y, x];
             }
