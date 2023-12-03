@@ -274,7 +274,7 @@ public class EastHyrule : World
                 ChooseConn("vod", connections, true);
                 ChooseConn("gp", connections, true);
 
-                if(!props.ShuffleHidden)
+                if (!props.ShuffleHidden)
                 {
                     townAtNewKasuto.CanShuffle = false;
                     locationAtPalace6.CanShuffle = false;
@@ -333,8 +333,8 @@ public class EastHyrule : World
 
             if (props.HiddenKasuto)
             {
-                
-                if(connections.ContainsKey(hiddenKasutoLocation) || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge)
+
+                if (connections.ContainsKey(hiddenKasutoLocation) || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge)
                 {
                     return false;
                 }
@@ -460,7 +460,7 @@ public class EastHyrule : World
 
 
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water};
+                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
 
 
                 }
@@ -667,7 +667,7 @@ public class EastHyrule : World
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
                 //logger.Debug("East:" + bytesWritten);
             }
-            
+
         }
         if (props.HiddenPalace)
         {
@@ -676,7 +676,7 @@ public class EastHyrule : World
         }
         if (props.HiddenKasuto)
         {
-            rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome, 
+            rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
                 baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
         }
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
@@ -690,7 +690,7 @@ public class EastHyrule : World
                 visitation[i, j] = false;
             }
         }
-        
+
 
         return true;
     }
@@ -710,7 +710,7 @@ public class EastHyrule : World
         }
         int palacex = RNG.Next(xmin, xmax);
         int palacey = RNG.Next(ymin, ymax);
-        
+
         if (biome == Biome.VOLCANO || biome == Biome.CANYON)
         {
             bool placeable = false;
@@ -866,10 +866,10 @@ public class EastHyrule : World
             int minadjust = -1;
             int maxadjust = 2;
             int c = 0;
-            while (startx > 1 
-                && startx < MAP_COLS - 1 
-                && starty > 1 
-                && starty < MAP_ROWS - 1 
+            while (startx > 1
+                && startx < MAP_COLS - 1
+                && starty > 1
+                && starty < MAP_ROWS - 1
                 && (((biome == Biome.VOLCANO || biome == Biome.CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || (biome != Biome.VOLCANO && biome != Biome.CANYON && c < length)))
             {
                 c++;
@@ -1336,14 +1336,14 @@ public class EastHyrule : World
         if (shuffleHidden)
         {
             hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            while (hiddenKasutoLocation == null 
-                || hiddenKasutoLocation == raft 
-                || hiddenKasutoLocation == bridge 
-                || hiddenKasutoLocation == cave1 
-                || hiddenKasutoLocation == cave2 
-                || connections.ContainsKey(hiddenKasutoLocation) 
-                || !hiddenKasutoLocation.CanShuffle 
-                || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough !=0))
+            while (hiddenKasutoLocation == null
+                || hiddenKasutoLocation == raft
+                || hiddenKasutoLocation == bridge
+                || hiddenKasutoLocation == cave1
+                || hiddenKasutoLocation == cave2
+                || connections.ContainsKey(hiddenKasutoLocation)
+                || !hiddenKasutoLocation.CanShuffle
+                || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
             {
                 hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
             }
@@ -1367,7 +1367,7 @@ public class EastHyrule : World
         if (shuffleHidden)
         {
             hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            while(hiddenPalaceLocation == null || hiddenPalaceLocation == raft || hiddenPalaceLocation == bridge || hiddenPalaceLocation == cave1 || hiddenPalaceLocation == cave2 || connections.ContainsKey(hiddenPalaceLocation) || !hiddenPalaceLocation.CanShuffle || hiddenPalaceLocation == hiddenKasutoLocation || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenPalaceLocation.TerrainType == Terrain.LAVA && hiddenPalaceLocation.PassThrough != 0))
+            while (hiddenPalaceLocation == null || hiddenPalaceLocation == raft || hiddenPalaceLocation == bridge || hiddenPalaceLocation == cave1 || hiddenPalaceLocation == cave2 || connections.ContainsKey(hiddenPalaceLocation) || !hiddenPalaceLocation.CanShuffle || hiddenPalaceLocation == hiddenKasutoLocation || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenPalaceLocation.TerrainType == Terrain.LAVA && hiddenPalaceLocation.PassThrough != 0))
             {
                 hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
             }
@@ -1383,7 +1383,7 @@ public class EastHyrule : World
             ypos = RNG.Next(6, MAP_ROWS - 6);
             done = true;
             //#124
-            if(hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
+            if (hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
             {
                 continue;
             }
@@ -1449,13 +1449,13 @@ public class EastHyrule : World
     public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         UpdateReachable(itemGet, spellGet);
-        
+
         foreach (Location location in AllLocations)
         {
             if (location.Ypos > 30 && visitation[location.Ypos - 30, location.Xpos])
             {
-                if ((!location.NeedRecorder || (location.NeedRecorder && itemGet[Item.FLUTE]) ) 
-                    && (!location.NeedHammer || (location.NeedHammer && itemGet[Item.HAMMER]) )
+                if ((!location.NeedRecorder || (location.NeedRecorder && itemGet[Item.FLUTE]))
+                    && (!location.NeedHammer || (location.NeedHammer && itemGet[Item.HAMMER]))
                     && (!location.NeedBoots || (location.NeedBoots && itemGet[Item.BOOTS])))
                 {
                     location.Reachable = true;
@@ -1665,7 +1665,7 @@ public class EastHyrule : World
             }
         }
 
-        
+
     }
     protected override List<Location> GetPathingStarts()
     {
@@ -1691,5 +1691,46 @@ public class EastHyrule : World
     public override string GetName()
     {
         return "East";
+    }
+
+    public override IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto)
+    {
+        HashSet<Location> requiredLocations = new()
+        {
+            locationAtPalace5,
+            locationAtPalace6,
+            waterTile,
+            desertTile,
+            townAtDarunia,
+            townAtNewKasuto,
+            spellTower,
+            townAtNabooru,
+            townAtOldKasuto,
+            locationAtGP,
+            pbagCave1,
+            pbagCave2,
+            vodcave1,
+            vodcave2
+        };
+
+        if(hiddenPalace)
+        {
+            requiredLocations.Add(hiddenPalaceLocation);
+            requiredLocations.Add(hiddenPalaceCallSpot);
+        }
+
+        if(hiddenKasuto)
+        {
+            requiredLocations.Add(hiddenKasutoLocation);
+        }
+
+        foreach (Location key in connections.Keys)
+        {
+            if (requiredLocations.TryGetValue(key, out Location value))
+            {
+                requiredLocations.Add(key);
+            }
+        }
+        return requiredLocations;
     }
 }

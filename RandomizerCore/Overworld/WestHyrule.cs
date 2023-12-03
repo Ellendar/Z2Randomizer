@@ -11,20 +11,20 @@ public class WestHyrule : World
 {
     private readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
-    public Location start;
-    public Location fairy;
+    public Location northPalace;
+    public Location locationAtMido;
     public Location bagu;
-    public Location jump;
-    public Location medCave;
+    public Location locationAtRuto;
+    public Location medicineCave;
     public Location trophyCave;
     public Location locationAtPalace1;
     public Location locationAtPalace2;
     public Location locationAtPalace3;
     public Location jar;
-    public Location heart1;
-    public Location heart2;
-    public Location lifeNorth;
-    public Location lifeSouth;
+    public Location grassTile;
+    public Location heartContainerCave;
+    public Location locationAtSariaNorth;
+    public Location locationAtSariaSouth;
     public Location shieldTown;
     public Location bridge1;
     public Location bridge2;
@@ -105,21 +105,21 @@ public class WestHyrule : World
         locations.AddRange(rom.LoadLocations(0x465E, 8, terrains, Continent.WEST));
         locations.ForEach(AddLocation);
 
-        start = GetLocationByMap(0x80, 0x00);
+        northPalace = GetLocationByMap(0x80, 0x00);
         //reachableAreas = new HashSet<string>();
         Location jumpCave = GetLocationByMap(9, 0);
         jumpCave.NeedJump = true;
-        medCave = GetLocationByMap(0x0E, 0);
+        medicineCave = GetLocationByMap(0x0E, 0);
         Location heartCave = GetLocationByMap(0x10, 0);
         Location fairyCave = GetLocationByMap(0x12, 0);
         fairyCave.NeedFairy = true;
-        jump = GetLocationByMap(0xC5, 4);
+        locationAtRuto = GetLocationByMap(0xC5, 4);
         bagu = GetLocationByMap(0x18, 4);
-        fairy = GetLocationByMap(0xCB, 4);
-        lifeNorth = GetLocationByMap(0xC8, 4);
-        lifeSouth = GetLocationByMap(0x06, 4);
-        lifeNorth.NeedBagu = true;
-        lifeSouth.NeedBagu = true;
+        locationAtMido = GetLocationByMap(0xCB, 4);
+        locationAtSariaNorth = GetLocationByMap(0xC8, 4);
+        locationAtSariaSouth = GetLocationByMap(0x06, 4);
+        locationAtSariaNorth.NeedBagu = true;
+        locationAtSariaSouth.NeedBagu = true;
         trophyCave = GetLocationByMap(0xE1, 0);
         raft = GetLocationByMem(0x4658);
         locationAtPalace1 = GetLocationByMem(0x4663);
@@ -129,8 +129,8 @@ public class WestHyrule : World
         locationAtPalace3 = GetLocationByMem(0x4665);
         locationAtPalace3.PalaceNumber = 3;
         jar = GetLocationByMem(0x4632);
-        heart1 = GetLocationByMem(0x463F);
-        heart2 = GetLocationByMem(0x4634);
+        grassTile = GetLocationByMem(0x463F);
+        heartContainerCave = GetLocationByMem(0x4634);
         shieldTown = GetLocationByMem(0x465C);
         pbagCave = GetLocationByMem(0x463D);
 
@@ -168,10 +168,10 @@ public class WestHyrule : World
         connections.Add(fairyCave2, fairyCave);
         caveConn.Add(fairyCave2, fairyCave);
         graveConn.Add(fairyCave, fairyCave2);
-        connections.Add(lifeNorth, lifeSouth);
-        connections.Add(lifeSouth, lifeNorth);
-        cityConn.Add(lifeSouth, lifeNorth);
-        cityConn.Add(lifeNorth, lifeSouth);
+        connections.Add(locationAtSariaNorth, locationAtSariaSouth);
+        connections.Add(locationAtSariaSouth, locationAtSariaNorth);
+        cityConn.Add(locationAtSariaSouth, locationAtSariaNorth);
+        cityConn.Add(locationAtSariaNorth, locationAtSariaSouth);
         connections.Add(bridge1, bridge2);
         connections.Add(bridge2, bridge1);
         bridgeConn.Add(bridge1, bridge2);
@@ -352,8 +352,8 @@ public class WestHyrule : World
             {
                 AllLocations.ForEach(i => i.CanShuffle = true);
                 Terrain riverTerrain = Terrain.MOUNTAIN;
-                lifeSouth.CanShuffle = false;
-                lifeNorth.CanShuffle = false;
+                locationAtSariaSouth.CanShuffle = false;
+                locationAtSariaNorth.CanShuffle = false;
 
                 map = new Terrain[MAP_ROWS, MAP_COLS];
 
@@ -423,8 +423,8 @@ public class WestHyrule : World
                                 rows--;
                             }
                         }
-                        lifeSouth.CanShuffle = false;
-                        lifeNorth.CanShuffle = false;
+                        locationAtSariaSouth.CanShuffle = false;
+                        locationAtSariaNorth.CanShuffle = false;
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
                         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                         break;
@@ -509,8 +509,8 @@ public class WestHyrule : World
                                 rows--;
                             }
                         }
-                        lifeSouth.CanShuffle = false;
-                        lifeNorth.CanShuffle = false;
+                        locationAtSariaSouth.CanShuffle = false;
+                        locationAtSariaNorth.CanShuffle = false;
                         break;
                     default:
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
@@ -699,14 +699,14 @@ public class WestHyrule : World
             }
         }
 
-        visitation[start.Ypos - 30, start.Xpos] = true;
+        visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
         return true;
     }
 
     public void SetStart()
     {
-        visitation[start.Ypos - 30, start.Xpos] = true;
-        start.Reachable = true;
+        visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
+        northPalace.Reachable = true;
     }
 
     private bool PlaceBagu()
@@ -1321,7 +1321,7 @@ public class WestHyrule : World
 
     public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
-        visitation[start.Ypos - 30, start.Xpos] = true;
+        visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
         UpdateReachable(itemGet, spellGet);
 
         foreach (Location location in AllLocations)
@@ -1365,16 +1365,16 @@ public class WestHyrule : World
                 }
             }
         }
-        if (lifeNorth.Reachable && lifeNorth.ActualTown == Town.NEW_KASUTO)
+        if (locationAtSariaNorth.Reachable && locationAtSariaNorth.ActualTown == Town.NEW_KASUTO)
         {
-            lifeSouth.Reachable = true;
+            locationAtSariaSouth.Reachable = true;
         }
     }
 
     protected override List<Location> GetPathingStarts()
     {
         return connections.Keys.Where(i => i.Reachable)
-            .Union(new List<Location>() { start })
+            .Union(new List<Location>() { northPalace })
             .Union(GetContinentConnections().Where(i => i.Reachable))
             .ToList();
     }
@@ -1382,5 +1382,38 @@ public class WestHyrule : World
     public override string GetName()
     {
         return "West";
+    }
+
+    public override IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto)
+    {
+        HashSet<Location> requiredLocations = new()
+        {
+            northPalace,
+            locationAtMido,
+            bagu,
+            locationAtRuto,
+            medicineCave,
+            trophyCave,
+            locationAtPalace1,
+            locationAtPalace2,
+            locationAtPalace3,
+            grassTile,
+            heartContainerCave,
+            locationAtSariaNorth,
+            locationAtSariaSouth,
+            shieldTown,
+            bridge1,
+            bridge2,
+            pbagCave
+        };
+
+        foreach (Location key in connections.Keys)
+        {
+            if (requiredLocations.TryGetValue(key, out Location value))
+            {
+                requiredLocations.Add(key);
+            }
+        }
+        return requiredLocations;
     }
 }

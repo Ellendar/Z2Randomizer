@@ -603,8 +603,8 @@ public class Hyrule
     {
         List<Item> shufflableItems = new List<Item> { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MEDICINE, Item.TROPHY, Item.HEART_CONTAINER, Item.HEART_CONTAINER, Item.MAGIC_CONTAINER, Item.MAGIC_KEY, Item.MAGIC_CONTAINER, Item.HAMMER, Item.CHILD, Item.MAGIC_CONTAINER };
         List<Item> smallItems = new List<Item> { Item.BLUE_JAR, Item.RED_JAR, Item.SMALL_BAG, Item.MEDIUM_BAG, Item.LARGE_BAG, Item.XL_BAG, Item.ONEUP, Item.KEY };
-        Location kidLoc = mazeIsland.kid;
-        Location medicineLoc = westHyrule.medCave;
+        Location kidLoc = mazeIsland.childDrop;
+        Location medicineLoc = westHyrule.medicineCave;
         Location trophyLoc = westHyrule.trophyCave;
         heartContainersInItemPool = maxHearts - startHearts;
 
@@ -851,7 +851,6 @@ public class Hyrule
     private bool IsEverythingReachable(Dictionary<Item, bool> ItemGet, Dictionary<Spell, bool> spellGet)
     {
         //XXX: Debug
-        return true;
         totalReachableCheck++;
         int dm = 0;
         int mi = 0;
@@ -985,7 +984,12 @@ public class Hyrule
             return false;
         }
 
-        bool retval = (CanGet(westHyrule.Locations[Terrain.TOWN])
+        bool retval =
+            CanGet(westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
+            && CanGet(eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
+            && CanGet(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
+            && CanGet(mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto));
+            /*(CanGet(westHyrule.Locations[Terrain.TOWN])
             && CanGet(eastHyrule.Locations[Terrain.TOWN])
             && CanGet(westHyrule.locationAtPalace1)
             && CanGet(westHyrule.locationAtPalace2)
@@ -998,6 +1002,7 @@ public class Hyrule
             && CanGet(westHyrule.bagu)
             && (!Props.HiddenKasuto || (CanGet(eastHyrule.hiddenKasutoLocation)))
             && (!Props.HiddenPalace || (CanGet(eastHyrule.hiddenPalaceLocation))));
+            */
         if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
@@ -1009,9 +1014,9 @@ public class Hyrule
         return retval;
     }
 
-    private bool CanGet(List<Location> l)
+    private bool CanGet(IEnumerable<Location> locations)
     {
-        return l.All(i => i.Reachable);
+        return locations.All(i => i.Reachable);
     }
     private bool CanGet(Location location)
     {
@@ -1821,10 +1826,10 @@ public class Hyrule
     private void ResetTowns()
     {
         westHyrule.shieldTown.ActualTown = Town.RAURU;
-        westHyrule.jump.ActualTown = Town.RUTO;
-        westHyrule.lifeNorth.ActualTown = Town.SARIA_NORTH;
-        westHyrule.lifeSouth.ActualTown = Town.SARIA_SOUTH;
-        westHyrule.fairy.ActualTown = Town.MIDO_WEST;
+        westHyrule.locationAtRuto.ActualTown = Town.RUTO;
+        westHyrule.locationAtSariaNorth.ActualTown = Town.SARIA_NORTH;
+        westHyrule.locationAtSariaSouth.ActualTown = Town.SARIA_SOUTH;
+        westHyrule.locationAtMido.ActualTown = Town.MIDO_WEST;
         eastHyrule.townAtNabooru.ActualTown = Town.NABOORU;
         eastHyrule.townAtDarunia.ActualTown = Town.DARUNIA_WEST;
         eastHyrule.townAtNewKasuto.ActualTown = Town.NEW_KASUTO;
@@ -1954,19 +1959,19 @@ public class Hyrule
         {
             itemLocs.Add(eastHyrule.locationAtGP);
         }
-        itemLocs.Add(westHyrule.heart1);
-        itemLocs.Add(westHyrule.heart2);
+        itemLocs.Add(westHyrule.grassTile);
+        itemLocs.Add(westHyrule.heartContainerCave);
         itemLocs.Add(westHyrule.jar);
-        itemLocs.Add(westHyrule.medCave);
+        itemLocs.Add(westHyrule.medicineCave);
         itemLocs.Add(westHyrule.trophyCave);
         itemLocs.Add(eastHyrule.waterTile);
         itemLocs.Add(eastHyrule.desertTile);
         itemLocs.Add(eastHyrule.townAtNewKasuto);
         itemLocs.Add(eastHyrule.spellTower);
-        itemLocs.Add(deathMountain.magicCave);
+        itemLocs.Add(deathMountain.specRock);
         itemLocs.Add(deathMountain.hammerCave);
-        itemLocs.Add(mazeIsland.kid);
-        itemLocs.Add(mazeIsland.magic);
+        itemLocs.Add(mazeIsland.childDrop);
+        itemLocs.Add(mazeIsland.magicContainerDrop);
 
 
         if (props.PbagItemShuffle)
@@ -2741,7 +2746,7 @@ public class Hyrule
             ROMData.Put(0x1eeb6, 0x57);
         }
 
-        if (eastHyrule.townAtNewKasuto.Item == Item.TROPHY || eastHyrule.spellTower.Item == Item.TROPHY || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
+        if (eastHyrule.townAtNewKasuto.Item == Item.TROPHY || eastHyrule.spellTower.Item == Item.TROPHY || westHyrule.locationAtSariaNorth.Item == Item.TROPHY || westHyrule.locationAtSariaSouth.Item == Item.TROPHY)
         {
             for (int i = 0; i < 32; i++)
             {
@@ -2751,7 +2756,7 @@ public class Hyrule
             ROMData.Put(0x1eeb8, 0x21);
         }
 
-        if (eastHyrule.townAtNewKasuto.Item == Item.MEDICINE || eastHyrule.spellTower.Item == Item.MEDICINE || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
+        if (eastHyrule.townAtNewKasuto.Item == Item.MEDICINE || eastHyrule.spellTower.Item == Item.MEDICINE || westHyrule.locationAtSariaNorth.Item == Item.TROPHY || westHyrule.locationAtSariaSouth.Item == Item.TROPHY)
         {
             for (int i = 0; i < 32; i++)
             {
@@ -2761,7 +2766,7 @@ public class Hyrule
             ROMData.Put(0x1eeba, 0x23);
         }
 
-        if (eastHyrule.townAtNewKasuto.Item == Item.CHILD || eastHyrule.spellTower.Item == Item.CHILD || westHyrule.lifeNorth.Item == Item.TROPHY || westHyrule.lifeSouth.Item == Item.TROPHY)
+        if (eastHyrule.townAtNewKasuto.Item == Item.CHILD || eastHyrule.spellTower.Item == Item.CHILD || westHyrule.locationAtSariaNorth.Item == Item.TROPHY || westHyrule.locationAtSariaSouth.Item == Item.TROPHY)
         {
             for (int i = 0; i < 32; i++)
             {
@@ -3101,7 +3106,7 @@ public class Hyrule
 
         ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Item);
         ROMData.Put(0x502A, (byte)westHyrule.jar.Item);
-        ROMData.Put(0x4DD7, (byte)westHyrule.heart2.Item);
+        ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Item);
         //logger.WriteLine(westHyrule.heart1.item);
         //logger.WriteLine(westHyrule.heart2.item);
         //logger.WriteLine(westHyrule.medCave.item);
@@ -3137,10 +3142,10 @@ public class Hyrule
         int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 
 
-        ROMData.Put(0x5069, (byte)westHyrule.medCave.Item);
-        ROMData.Put(0x4ff5, (byte)westHyrule.heart1.Item);
+        ROMData.Put(0x5069, (byte)westHyrule.medicineCave.Item);
+        ROMData.Put(0x4ff5, (byte)westHyrule.grassTile.Item);
 
-        ROMData.Put(0x65C3, (byte)deathMountain.magicCave.Item);
+        ROMData.Put(0x65C3, (byte)deathMountain.specRock.Item);
         ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Item);
         ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.Item);
         ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Item);
@@ -3232,8 +3237,8 @@ public class Hyrule
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Item); //map 47
         ROMData.Put(0xDB8C, (byte)eastHyrule.townAtNewKasuto.Item); //map 46
 
-        ROMData.Put(0xA5A8, (byte)mazeIsland.magic.Item);
-        ROMData.Put(0xA58B, (byte)mazeIsland.kid.Item);
+        ROMData.Put(0xA5A8, (byte)mazeIsland.magicContainerDrop.Item);
+        ROMData.Put(0xA58B, (byte)mazeIsland.childDrop.Item);
 
         if (props.PbagItemShuffle)
         {

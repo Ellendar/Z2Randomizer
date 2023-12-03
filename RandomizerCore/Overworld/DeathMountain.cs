@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SD.Tools.BCLExtensions.CollectionsRelated;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,7 +54,7 @@ class DeathMountain : World
 
     public Dictionary<Location, List<Location>> connectionsDM;
     public Location hammerCave;
-    public Location magicCave;
+    public Location specRock;
 
     private const int MAP_ADDR = 0x7a00;
 
@@ -67,7 +68,7 @@ class DeathMountain : World
 
         isHorizontal = props.DmIsHorizontal;
         hammerCave = GetLocationByMem(0x6128);
-        magicCave = GetLocationByMem(0x6144);
+        specRock = GetLocationByMem(0x6144);
 
         //reachableAreas = new HashSet<string>();
         connectionsDM = new Dictionary<Location, List<Location>>
@@ -186,7 +187,7 @@ class DeathMountain : World
                 ShuffleLocations(AllLocations);
                 if (props.VanillaShuffleUsesActualTerrain)
                 {
-                    magicCave.TerrainType = Terrain.ROCK;
+                    specRock.TerrainType = Terrain.ROCK;
                     foreach (Location location in AllLocations)
                     {
                         map[location.Ypos - 30, location.Xpos] = location.TerrainType;
@@ -430,7 +431,7 @@ class DeathMountain : World
                 int y = 0;
                 foreach (Location location in AllLocations)
                 {
-                    if (location.TerrainType != Terrain.BRIDGE && location != magicCave && location.CanShuffle)
+                    if (location.TerrainType != Terrain.BRIDGE && location != specRock && location.CanShuffle)
                     {
                         int tries = 0;
                         do
@@ -452,16 +453,13 @@ class DeathMountain : World
 
                             Direction direction = (Direction)RNG.Next(4);
 
-                            Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                            //Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                            Terrain s = climate.GetRandomTerrain(RNG, walkableTerrains);
                             if (biome == Biome.VANILLALIKE)
                             {
                                 s = Terrain.ROAD;
                             }
-                            if (!props.SaneCaves || !connectionsDM.ContainsKey(location))
-                            {
-                                PlaceCave(x, y, direction, s);
-                            }
-                            else
+                            if (props.SaneCaves && connectionsDM.ContainsKey(location))
                             {
                                 if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
                                 {
@@ -563,7 +561,7 @@ class DeathMountain : World
                                     PlaceCave(x, y, direction, s);
                                     PlaceCave(otherx, othery, direction.Reverse(), s);
                                 }
-                                else
+                                else //4-way caves
                                 {
                                     int otherx = 0;
                                     int othery = 0;
@@ -610,13 +608,13 @@ class DeathMountain : World
                                         return false;
                                     }
 
-                                    List<Location> l2 = connectionsDM[location];
+                                    List<Location> caveExits = connectionsDM[location];
                                     location.CanShuffle = false;
                                     location.Xpos = x;
                                     location.Ypos = y + 30;
-                                    l2[0].CanShuffle = false;
-                                    l2[0].Xpos = otherx;
-                                    l2[0].Ypos = othery + 30;
+                                    caveExits[0].CanShuffle = false;
+                                    caveExits[0].Xpos = otherx;
+                                    caveExits[0].Ypos = othery + 30;
                                     PlaceCave(x, y, direction, s);
                                     PlaceCave(otherx, othery, direction.Reverse(), s);
                                     int newx = 0;
@@ -632,9 +630,9 @@ class DeathMountain : World
                                     {
                                         return false;
                                     }
-                                    l2[1].Xpos = newx;
-                                    l2[1].Ypos = newy + 30;
-                                    l2[1].CanShuffle = false;
+                                    caveExits[1].Xpos = newx;
+                                    caveExits[1].Ypos = newy + 30;
+                                    caveExits[1].CanShuffle = false;
                                     PlaceCave(newx, newy, direction, s);
                                     y = newy;
                                     x = newx;
@@ -682,13 +680,17 @@ class DeathMountain : World
                                     }
 
                                     location.CanShuffle = false;
-                                    l2[2].CanShuffle = false;
-                                    l2[2].Xpos = otherx;
-                                    l2[2].Ypos = othery + 30;
+                                    caveExits[2].CanShuffle = false;
+                                    caveExits[2].Xpos = otherx;
+                                    caveExits[2].Ypos = othery + 30;
                                     PlaceCave(otherx, othery, direction.Reverse(), s);
                                 }
-
                             }
+                            else
+                            {
+                                PlaceCave(x, y, direction, s);
+                            }
+                            
                         }
                     }
                 }
@@ -747,8 +749,8 @@ class DeathMountain : World
                 } while (!walkableTerrains.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
 
                 map[y, x] = Terrain.ROCK;
-                magicCave.Ypos = y + 30;
-                magicCave.Xpos = x;
+                specRock.Ypos = y + 30;
+                specRock.Xpos = x;
 
 
                 if (biome == Biome.CANYON || biome == Biome.ISLANDS)
@@ -1089,5 +1091,24 @@ class DeathMountain : World
     public override string GetName()
     {
         return "Death Mountain";
+    }
+
+    public override IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto)
+    {
+        HashSet<Location> requiredLocations = new()
+        {
+            hammerCave,
+            specRock
+        };
+        requiredLocations.AddRange(connectionsDM.Keys);
+
+        foreach (Location key in connections.Keys)
+        {
+            if (requiredLocations.TryGetValue(key, out Location value))
+            {
+                requiredLocations.Add(key);
+            }
+        }
+        return requiredLocations;
     }
 }

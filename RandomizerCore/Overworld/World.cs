@@ -14,7 +14,7 @@ namespace Z2Randomizer.Core.Overworld;
 public abstract class World
 {
     protected readonly Logger logger = LogManager.GetCurrentClassLogger();
-    protected SortedDictionary<String, List<Location>> areasByLocation;
+    protected SortedDictionary<string, List<Location>> areasByLocation;
     /*private List<Location> caves;
     private List<Location> towns;
     private List<Location> palaces;
@@ -2845,4 +2845,6 @@ public abstract class World
     }
 
     public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);
+
+    public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 }

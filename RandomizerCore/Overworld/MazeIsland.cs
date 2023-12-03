@@ -32,8 +32,8 @@ class MazeIsland : World
             { 0xA149, Terrain.ROAD }
     };
 
-    public Location kid;
-    public Location magic;
+    public Location childDrop;
+    public Location magicContainerDrop;
     public Location locationAtPalace4;
 
     private const int MAP_ADDR = 0xba00;
@@ -59,8 +59,8 @@ class MazeIsland : World
         enemyPtr = 0xA08E;
         overworldMaps = new List<int>();
 
-        kid = GetLocationByMem(0xA143);
-        magic = GetLocationByMem(0xA133);
+        childDrop = GetLocationByMem(0xA143);
+        magicContainerDrop = GetLocationByMem(0xA133);
         locationAtPalace4 = GetLocationByMem(0xA140);
         locationAtPalace4.PalaceNumber = 4;
         locationAtPalace4.World = locationAtPalace4.World | 0x03;
@@ -104,8 +104,8 @@ class MazeIsland : World
                     location.PassThrough = 0;
                 }
                 bridge.PassThrough = 0;
-                magic.PassThrough = 0;
-                kid.PassThrough = 0;
+                magicContainerDrop.PassThrough = 0;
+                childDrop.PassThrough = 0;
             }
         }
         else
@@ -585,7 +585,7 @@ class MazeIsland : World
                     {
                         int x = 0;
                         int y = 0;
-                        if (location != magic && location != kid)
+                        if (location != magicContainerDrop && location != childDrop)
                         {
                             do
                             {
@@ -888,5 +888,29 @@ class MazeIsland : World
     public override string GetName()
     {
         return "Maze Island";
+    }
+
+    public override IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto)
+    {
+        /*
+            public Location childDrop;
+            public Location magicContainerDrop;
+            public Location locationAtPalace4;
+        */
+        HashSet<Location> requiredLocations = new()
+        {
+            childDrop,
+            magicContainerDrop,
+            locationAtPalace4
+        };
+
+        foreach (Location key in connections.Keys)
+        {
+            if (requiredLocations.TryGetValue(key, out Location value))
+            {
+                requiredLocations.Add(key);
+            }
+        }
+        return requiredLocations;
     }
 }
