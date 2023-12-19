@@ -682,6 +682,10 @@ public class WestHyrule : World
                     }
                 }
 
+                if (!ValidateCaves())
+                {
+                    return false;
+                }
 
                 //check bytes and adjust
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
@@ -1414,6 +1418,6 @@ public class WestHyrule : World
                 requiredLocations.Add(key);
             }
         }
-        return requiredLocations;
+        return requiredLocations.Where(i => i != null);
     }
 }

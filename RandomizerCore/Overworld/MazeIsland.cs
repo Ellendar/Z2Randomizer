@@ -607,6 +607,11 @@ class MazeIsland : World
                     }
                 }
 
+                if (!ValidateCaves())
+                {
+                    return false;
+                }
+
                 //check bytes and adjust
                 MAP_COLS = 64;
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
@@ -911,6 +916,6 @@ class MazeIsland : World
                 requiredLocations.Add(key);
             }
         }
-        return requiredLocations;
+        return requiredLocations.Where(i => i != null);
     }
 }

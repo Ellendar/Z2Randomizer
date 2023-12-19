@@ -108,6 +108,7 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
+        HardBossesCheckbox = new CheckBox();
         noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         gpStyleLabel = new Label();
         gpStyleList = new ComboBox();
@@ -258,7 +259,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        HardBossesCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -970,7 +970,7 @@ partial class MainUI
         // 
         climateSelector.DropDownStyle = ComboBoxStyle.DropDownList;
         climateSelector.FormattingEnabled = true;
-        climateSelector.Items.AddRange(new object[] { "Classic", "Chaos", "Wetlands" });
+        climateSelector.Items.AddRange(new object[] { "Classic", "Chaos", "Wetlands", "Great Lakes", "Scrubland" });
         climateSelector.Location = new Point(416, 145);
         climateSelector.Margin = new Padding(4, 3, 4, 3);
         climateSelector.Name = "climateSelector";
@@ -1254,6 +1254,19 @@ partial class MainUI
         tabPage2.TabIndex = 1;
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
+        // 
+        // HardBossesCheckbox
+        // 
+        HardBossesCheckbox.AutoSize = true;
+        HardBossesCheckbox.Location = new Point(281, 187);
+        HardBossesCheckbox.Margin = new Padding(4, 3, 4, 3);
+        HardBossesCheckbox.Name = "HardBossesCheckbox";
+        HardBossesCheckbox.Size = new Size(102, 19);
+        HardBossesCheckbox.TabIndex = 31;
+        HardBossesCheckbox.Text = "Harder Carock";
+        HardBossesCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(HardBossesCheckbox, "Carock has learned some new tricks. No more crouching in the corner!\r\n");
+        HardBossesCheckbox.UseVisualStyleBackColor = true;
         // 
         // noDuplicateRoomsByEnemiesCheckbox
         // 
@@ -3096,19 +3109,6 @@ partial class MainUI
         // 
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
-        // 
-        // HardBossesCheckbox
-        // 
-        HardBossesCheckbox.AutoSize = true;
-        HardBossesCheckbox.Location = new Point(281, 187);
-        HardBossesCheckbox.Margin = new Padding(4, 3, 4, 3);
-        HardBossesCheckbox.Name = "HardBossesCheckbox";
-        HardBossesCheckbox.Size = new Size(102, 19);
-        HardBossesCheckbox.TabIndex = 31;
-        HardBossesCheckbox.Text = "Harder Carock";
-        HardBossesCheckbox.ThreeState = true;
-        toolTip1.SetToolTip(HardBossesCheckbox, "Carock has learned some new tricks. No more crouching in the corner!\r\n");
-        HardBossesCheckbox.UseVisualStyleBackColor = true;
         // 
         // MainUI
         // 

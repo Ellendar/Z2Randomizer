@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Z2Randomizer.Core;
 
+//These indexes correspond to the 4bit representation used in the rom. Do not change them.
 public enum Terrain
 {
     TOWN = 0,
@@ -23,6 +20,33 @@ public enum Terrain
     WATER = 12,
     WALKABLEWATER = 13,
     ROCK = 14,
-    SPIDER = 15,
+    RIVER_DEVIL = 15,
     NONE = 16
+}
+
+static class TerrainExtensions
+{
+    public static bool IsWalkable(this Terrain terrain)
+    {
+        return terrain switch
+        {
+            Terrain.TOWN => true,
+            Terrain.CAVE => true,
+            Terrain.PALACE => true,
+            Terrain.BRIDGE => true,
+            Terrain.DESERT => true,
+            Terrain.GRASS => true,
+            Terrain.FOREST => true,
+            Terrain.SWAMP => true,
+            Terrain.GRAVE => true,
+            Terrain.ROAD => true,
+            Terrain.LAVA => true,
+            Terrain.MOUNTAIN => false,
+            Terrain.WATER => false,
+            Terrain.WALKABLEWATER => true,
+            Terrain.ROCK => true,
+            Terrain.RIVER_DEVIL => true,
+            Terrain.NONE => false,
+        };
+    }
 }

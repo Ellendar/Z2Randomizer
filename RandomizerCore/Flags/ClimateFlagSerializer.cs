@@ -12,13 +12,15 @@ public class ClimateFlagSerializer : IFlagSerializer
             0 => Climates.Classic,
             1 => Climates.Chaos,
             2 => Climates.Wetlands,
+            3 => Climates.GreatLakes,
+            4 => Climates.Scrubland,
             _ => throw new ArgumentException("Unrecognized climate index in ClimateFlagSerializer")
         };
     }
 
     public int GetLimit()
     {
-        return 3;
+        return 5;
     }
 
     public int Serialize(Object climate)
@@ -32,6 +34,8 @@ public class ClimateFlagSerializer : IFlagSerializer
             "Classic" => 0,
             "Chaos" => 1,
             "Wetlands" => 2,
+            "GreatLakes" => 3,
+            "Scrubland" => 4,
             _ => throw new ArgumentException("Unrecognized climate type in ClimateFlagSerializer")
         };
     }

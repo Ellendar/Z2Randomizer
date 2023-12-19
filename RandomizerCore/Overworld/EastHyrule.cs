@@ -447,7 +447,7 @@ public class EastHyrule : World
 
 
                     DrawCanyon(riverTerrain);
-                    this.walkableTerrains.Remove(Terrain.MOUNTAIN);
+                    walkableTerrains.Remove(Terrain.MOUNTAIN);
 
                     locationAtGP.CanShuffle = false;
 
@@ -656,6 +656,11 @@ public class EastHyrule : World
 
                 }
 
+                if(!ValidateCaves())
+                {
+                    return false;
+                }
+
                 foreach (Location location in AllLocations)
                 {
                     if (location.CanShuffle)
@@ -826,7 +831,7 @@ public class EastHyrule : World
         }
         bool cavePlaced = false;
         Location vodcave1, vodcave2, vodcave3, vodcave4;
-        this.canyonShort = RNG.NextDouble() > .5;
+        canyonShort = RNG.NextDouble() > .5;
         if (canyonShort)
         {
             vodcave1 = GetLocationByMem(0x8640);
@@ -1403,10 +1408,10 @@ public class EastHyrule : World
         {
             return false;
         }
-        Terrain t = walkableTerrains[RNG.Next(walkableTerrains.Count())];
+        Terrain t = climate.GetRandomTerrain(RNG, walkableTerrains);
         while (t == Terrain.FOREST)
         {
-            t = walkableTerrains[RNG.Next(walkableTerrains.Count())];
+            t = climate.GetRandomTerrain(RNG, walkableTerrains);
         }
         //t = terrain.desert;
         for (int i = ypos - 3; i < ypos + 4; i++)
@@ -1540,7 +1545,7 @@ public class EastHyrule : World
                 {
                     if (!placedSpider)
                     {
-                        map[y2, x2] = Terrain.SPIDER;
+                        map[y2, x2] = Terrain.RIVER_DEVIL;
                         placedSpider = true;
                     }
                     else if (map[y2, x2 + 1] == Terrain.NONE && (((y2 > 0 && map[y2 - 1, x2] == Terrain.ROAD) && (y2 < MAP_ROWS - 1 && map[y2 + 1, x2] == Terrain.ROAD)) || ((x2 > 0 && map[y2, x2 - 0] == Terrain.ROAD) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] == Terrain.ROAD))))
@@ -1623,7 +1628,7 @@ public class EastHyrule : World
                 {
                     if (!placedSpider)
                     {
-                        map[y2, x2] = Terrain.SPIDER;
+                        map[y2, x2] = Terrain.RIVER_DEVIL;
                         placedSpider = true;
                     }
                     else if (map[y2, x2 + 1] == Terrain.NONE && (((y2 > 0 && map[y2 - 1, x2] == Terrain.ROAD) && (y2 < MAP_ROWS - 1 && map[y2 + 1, x2] == Terrain.ROAD)) || ((x2 > 0 && map[y2, x2 - 0] == Terrain.ROAD) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] == Terrain.ROAD))))
@@ -1731,6 +1736,6 @@ public class EastHyrule : World
                 requiredLocations.Add(key);
             }
         }
-        return requiredLocations;
+        return requiredLocations.Where(i => i != null);
     }
 }

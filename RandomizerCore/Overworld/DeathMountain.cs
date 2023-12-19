@@ -648,6 +648,7 @@ class DeathMountain : World
                                             offset = 5;
                                         }
                                         crossing = true;
+
                                         if (direction == Direction.NORTH)
                                         {
                                             otherx = x + (RNG.Next(7) - 3);
@@ -658,12 +659,12 @@ class DeathMountain : World
                                             otherx = x + (RNG.Next(range) + offset);
                                             othery = y + (RNG.Next(7) - 3);
                                         }
-                                        else if (direction == Direction.EAST)
+                                        else if (direction == Direction.SOUTH)
                                         {
                                             otherx = x + (RNG.Next(7) - 3);
                                             othery = y + (RNG.Next(range) + offset);
                                         }
-                                        else //east
+                                        else //west
                                         {
                                             otherx = x - (RNG.Next(range) + offset);
                                             othery = y + (RNG.Next(7) - 3);
@@ -756,6 +757,11 @@ class DeathMountain : World
                 if (biome == Biome.CANYON || biome == Biome.ISLANDS)
                 {
                     ConnectIslands(25, false, riverT, false, false, false, props.CanWalkOnWaterWithBoots);
+                }
+
+                if (!ValidateCaves())
+                {
+                    return false;
                 }
 
                 //check bytes and adjust
@@ -1109,6 +1115,6 @@ class DeathMountain : World
                 requiredLocations.Add(key);
             }
         }
-        return requiredLocations;
+        return requiredLocations.Where(i => i != null);
     }
 }

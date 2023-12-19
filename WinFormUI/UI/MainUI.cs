@@ -785,6 +785,8 @@ public partial class MainUI : Form
             0 => Climates.Classic,
             1 => Climates.Chaos,
             2 => Climates.Wetlands,
+            3 => Climates.GreatLakes,
+            4 => Climates.Scrubland,
             _ => throw new Exception("Invalid Climate setting")
         };
         configuration.WestBiome = westBiomeSelector.SelectedIndex switch
@@ -1216,6 +1218,8 @@ public partial class MainUI : Form
                 "Classic" => 0,
                 "Chaos" => 1,
                 "Wetlands" => 2,
+                "GreatLakes" => 3,
+                "Scrubland" => 4,
                 _ => throw new Exception("Invalid Climate setting")
             };
             westBiomeSelector.SelectedIndex = configuration.WestBiome switch

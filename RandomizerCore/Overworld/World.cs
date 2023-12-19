@@ -1125,7 +1125,7 @@ public abstract class World
                                     List<Location> locs = Locations[terrain];
                                     if (riverDevil)
                                     {
-                                        map[y, x] = Terrain.SPIDER;
+                                        map[y, x] = Terrain.RIVER_DEVIL;
                                         riverDevil = false;
                                         placed = true;
                                     }
@@ -1153,7 +1153,7 @@ public abstract class World
                                         bool placed = false;
                                         if (riverDevil)
                                         {
-                                            map[y, x] = Terrain.SPIDER;
+                                            map[y, x] = Terrain.RIVER_DEVIL;
                                             riverDevil = false;
                                             placed = true;
                                         }
@@ -1181,7 +1181,7 @@ public abstract class World
                                     {
                                         if (riverDevil)
                                         {
-                                            map[y, x] = Terrain.SPIDER;
+                                            map[y, x] = Terrain.RIVER_DEVIL;
                                             riverDevil = false;
                                             placed = true;
                                         }
@@ -1892,7 +1892,7 @@ public abstract class World
                 || walkableTerrains.Contains(terrain)
                 || (terrain == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
                 || (terrain == Terrain.ROCK && itemGet[Item.HAMMER])
-                || (terrain == Terrain.SPIDER && itemGet[Item.FLUTE]))
+                || (terrain == Terrain.RIVER_DEVIL && itemGet[Item.FLUTE]))
                 //East desert jump blocker
                 && !(
                     needJump
@@ -2342,8 +2342,9 @@ public abstract class World
     {
         int drawLeft = RNG.Next(0, 5);
         int drawRight = RNG.Next(0, 5);
-        Terrain tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
-        Terrain tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+        Terrain tleft = climate.GetRandomTerrain(RNG, walkableTerrains);
+        Terrain tright = climate.GetRandomTerrain(RNG, walkableTerrains);
+
         if (isHorizontal)
         {
 
@@ -2362,7 +2363,7 @@ public abstract class World
                 }
                 if (drawLeft % 5 == 0)
                 {
-                    tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                    tleft = climate.GetRandomTerrain(RNG, walkableTerrains); ;
                 }
                 for (int i = rivery - leftM; i >= 0; i--)
                 {
@@ -2378,7 +2379,7 @@ public abstract class World
 
                 if (drawRight % 5 == 0)
                 {
-                    tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                    tright = climate.GetRandomTerrain(RNG, walkableTerrains); ;
                 }
                 for (int i = rivery + 1 + rightM; i < MAP_ROWS; i++)
                 {
@@ -2427,7 +2428,7 @@ public abstract class World
                 }
                 if (drawLeft % 5 == 0)
                 {
-                    tleft = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                    tleft = climate.GetRandomTerrain(RNG, walkableTerrains); ;
                 }
                 for (int i = riverx - leftM; i >= 0; i--)
                 {
@@ -2443,7 +2444,7 @@ public abstract class World
 
                 if (drawRight % 5 == 0)
                 {
-                    tright = walkableTerrains[RNG.Next(walkableTerrains.Count)];
+                    tright = climate.GetRandomTerrain(RNG, walkableTerrains);
                 }
                 for (int i = riverx + 1 + rightM; i < MAP_COLS; i++)
                 {
@@ -2814,11 +2815,12 @@ public abstract class World
     public string GetMapDebug()
     {
         StringBuilder debug = new();
-        for(int y = 0; y < MAP_ROWS; y++)
+        for (int y = 0; y < MAP_ROWS; y++)
         {
-            for(int x  = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MAP_COLS; x++)
             {
-                debug.Append(map[y,x] switch {
+                debug.Append(map[y, x] switch
+                {
                     Terrain.TOWN => 'T',
                     Terrain.CAVE => 'C',
                     Terrain.PALACE => 'P',
@@ -2834,7 +2836,7 @@ public abstract class World
                     Terrain.WATER => '-',
                     Terrain.WALKABLEWATER => 'W',
                     Terrain.ROCK => 'X',
-                    Terrain.SPIDER => 'P',
+                    Terrain.RIVER_DEVIL => 'P',
                     Terrain.NONE => ' ',
                     _ => throw new Exception("Invalid Terrain")
                 });
@@ -2842,6 +2844,28 @@ public abstract class World
             debug.Append('\n');
         }
         return debug.ToString();
+    }
+
+    public bool ValidateCaves()
+    {
+        for(int y = 0; y < MAP_ROWS; y++)
+        {
+            for(int x = 0; x < MAP_COLS; x++)
+            {
+                if (map[y,x] == Terrain.CAVE)
+                {
+                    if (!map[y + 1, x].IsWalkable()
+                        && !map[y - 1, x].IsWalkable()
+                        && !map[y, x + 1].IsWalkable()
+                        && !map[y, x - 1].IsWalkable())
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);
