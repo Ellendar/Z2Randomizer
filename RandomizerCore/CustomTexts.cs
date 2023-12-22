@@ -119,6 +119,7 @@ public class CustomTexts
         "Hurry!$I have to$preheat$the oven",
         "Poyo!",
         "Sploosh$Kaboom!",
+        "Let me$read my$Vogon$Poetry"
     };
 
     public static readonly String[] RIVER_MAN_TEXTS = 
@@ -180,6 +181,7 @@ public class CustomTexts
         "Do the$Safety$Dance",
         "easy mode$activated",
         "Never$gonna give$you up",
+        "Are you$Scrooge$McDuck?"
     };
 
     public static readonly String[] UPSTAB_TEXTS =
@@ -198,6 +200,17 @@ public class CustomTexts
         "Thanks$for not$skipping$me",
     };
 
+    public static readonly string[] KNOW_NOTHING_TEXTS =
+    {
+        "I Know$Nothing",
+        "Knowledge$Is Not$Mine",
+        "I Like$Wasting$Your Time",
+        "This Is$About As$Useful As$I Am",
+        "Nothing$Know I",
+        "Try To$Get A$Guide",
+        "Git Gud"
+    };
+
     public static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
     {
         { Town.RAURU, new string[] { } },
@@ -214,15 +227,15 @@ public class CustomTexts
 
     public static readonly Dictionary<Spell, string[]> WIZARD_TEXTS_BY_SPELL = new()
     {
-        { Spell.SHIELD, new string[] { "Have you$tried not$dying?" } },
+        { Spell.SHIELD, new string[] { "Have you$tried not$dying?", "I Already$Have One", "Is This$A Red$Ring?" } },
         { Spell.JUMP, new string[] { "I get up$and nothin$gets me$down", "Kris Kross$will make$you..." } },
-        { Spell.LIFE, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar" } },
-        { Spell.FAIRY, new string[] { } },
-        { Spell.FIRE, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless" } },
-        { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast" } },
-        { Spell.REFLECT, new string[] { "I am not$Mirror$Shield", "Crysta$was$here" } },
-        { Spell.SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?" } },
-        { Spell.THUNDER, new string[] { "With this$you can$now beat$the game" } },
+        { Spell.LIFE, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal" } },
+        { Spell.FAIRY, new string[] { "HEY!$LISTEN", "Just$don't say$Hey$listen!", "Watch Out$For Iron" } },
+        { Spell.FIRE, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love" } },
+        { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast",  } },
+        { Spell.REFLECT, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
+        { Spell.SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
+        { Spell.THUNDER, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!",  } },
         { Spell.UPSTAB, UPSTAB_TEXTS },
         { Spell.DOWNSTAB, DOWNSTAB_TEXTS }
     };

@@ -1332,7 +1332,7 @@ public class RandomizerConfiguration
 
         while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV4_4Rooms)) {
             properties.AllowVanillaRooms = IncludeVanillaRooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
-            properties.AllowV4Rooms = Includev4_0Rooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
+            properties.AllowV4Rooms = Includev4_0Rooms == null ? random.Next(2) == 1 : (bool)Includev4_0Rooms;
             properties.AllowV4_4Rooms = false;
             //properties.AllowV4_4Rooms = Includev4_4Rooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
         }
