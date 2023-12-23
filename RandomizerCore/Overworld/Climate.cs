@@ -26,18 +26,18 @@ public class Climate
         //is one of the most expensive operations and we're going to do tens of thousands of lookups easily,
         //this is probably good for now.
         terrainWeightTable = new();
-        foreach(Terrain terrain in TerrainWeights.Keys)
+        foreach (Terrain terrain in TerrainWeights.Keys)
         {
-            for(int i = 0; i < TerrainWeights[terrain]; i++)
+            for (int i = 0; i < TerrainWeights[terrain]; i++)
             {
                 terrainWeightTable.Add(terrain);
             }
         }
     }
 
-    public float GetDistanceCoefficient(Terrain terrain) 
-    { 
-        if(!DistanceCoefficients.TryGetValue(terrain, out float value))
+    public float GetDistanceCoefficient(Terrain terrain)
+    {
+        if (!DistanceCoefficients.TryGetValue(terrain, out float value))
         {
             return 0;
         }
@@ -60,12 +60,12 @@ public class Climate
 
     public IEnumerable<Terrain> RandomTerrains(IEnumerable<Terrain> filter)
     {
-        if(filter == null) 
+        if (filter == null)
         {
             return terrainWeightTable.Distinct();
         }
         return filter.Intersect(terrainWeightTable.Distinct());
-        
+
     }
 
     public void DisallowTerrain(Terrain terrain)
@@ -81,5 +81,35 @@ public class Climate
         return new Climate(Name, DistanceCoefficients, TerrainWeights, SeedTerrainCount);
     }
 
+    /// <summary>
+    /// If death mountain has distance coefficients that are too small relative to the growth of mountains,
+    /// there isn't ever enough open space to walk around between caves and it never properly generates.
+    /// In order to resolve that, if the aggregate weighted terrain growth factor is less than that of mountain
+    /// (times the factor provided in constraintLimitFactor), increase the growth factor of each terrain type
+    /// by the relative difference between mountain terrain growth and that terrain growth.
+    /// </summary>
+    /// <param name="walkableTerrains">Types of terrains that can be randomly generated that need to be scaled.</param>
+    /// <param name="constraintLimitFactor">The relative permissible factor between walkable and mountain terrain growths</param>
+    public void ApplyDeathMountainSafety(IEnumerable<Terrain> walkableTerrains, float constraintLimitFactor = 1f)
+    {
+        float totalRandomGrowthFactors = 0f;
+        float totalWalkableTerrainWeight = 0f;
+        foreach (Terrain terrain in walkableTerrains)
+        {
+            totalRandomGrowthFactors += TerrainWeights[terrain] * DistanceCoefficients[terrain];
+            totalWalkableTerrainWeight += TerrainWeights[terrain];
+        }
+        float aggregateWalkableTerrainGrowth = totalRandomGrowthFactors / totalWalkableTerrainWeight;
+        float mountainTerrainGrowth = DistanceCoefficients[Terrain.MOUNTAIN];
+
+        float aggregateTerrainGrowthInsuffiency = (mountainTerrainGrowth * constraintLimitFactor) - aggregateWalkableTerrainGrowth;
+        if (aggregateTerrainGrowthInsuffiency > 0)
+        {
+            foreach (Terrain terrain in walkableTerrains)
+            {
+                DistanceCoefficients[terrain] *= (mountainTerrainGrowth * constraintLimitFactor) / aggregateTerrainGrowthInsuffiency;
+            }
+        }
+    }
 }
 

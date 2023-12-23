@@ -937,7 +937,7 @@ public class Hyrule
                     debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
 
-                    return true;
+                    return false;
                 }
                 itemGetReachableFailures++;
                 return false;
@@ -954,7 +954,7 @@ public class Hyrule
                     Debug.WriteLine("Failed on items");
                     debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
-                    return true;
+                    return false;
                 }
                 return false;
             }
@@ -979,7 +979,7 @@ public class Hyrule
                 Debug.WriteLine("Failed on spells");
                 debug++;
                 PrintRoutingDebug(count, wh, eh, dm, mi);
-                return true;
+                return false;
             }
             return false;
         }
