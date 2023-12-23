@@ -12,7 +12,7 @@ public class Climate
     private readonly Dictionary<Terrain, float> DistanceCoefficients;
     private readonly Dictionary<Terrain, int> TerrainWeights;
     private readonly Dictionary<Terrain, int> TerrainPercentages;
-    public int SeedTerrainCount { get; }
+    public int SeedTerrainCount { get; set; }
     private List<Terrain> terrainWeightTable;
     public string Name { get; set; }
 

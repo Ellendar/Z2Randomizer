@@ -161,6 +161,7 @@ class DeathMountain : World
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
         climate = props.Climate.Clone();
+        climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

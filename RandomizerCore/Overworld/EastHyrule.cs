@@ -212,6 +212,7 @@ public class EastHyrule : World
 
         //Climate filtering
         climate = props.Climate.Clone();
+        climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
     }

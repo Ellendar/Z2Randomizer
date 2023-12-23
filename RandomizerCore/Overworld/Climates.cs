@@ -67,7 +67,7 @@ public class Climates
                 { Terrain.MOUNTAIN, 5 },
                 { Terrain.ROAD, 5 }
            },
-       300
+       220
    );
 
     public static readonly Climate Wetlands = new(
