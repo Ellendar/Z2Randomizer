@@ -138,6 +138,16 @@ public class Palaces
             }           
         }
 
+        //If we're using a room set that has no entraces, we still need to have something, so add the vanilla entrances.
+        for (int palaceNum = 1; palaceNum < 8; palaceNum++)
+        {
+            if (!entrancesByPalaceNumber.ContainsKey(palaceNum) || entrancesByPalaceNumber[palaceNum].Count == 0)
+            {
+                entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
+                    .Where(i => i.PalaceNumber == palaceNum).ToList());
+            }
+        }
+
         if (props.NormalPalaceStyle.IsReconstructed())
         {
             roomPool.Clear();

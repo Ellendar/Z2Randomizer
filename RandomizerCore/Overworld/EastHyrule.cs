@@ -242,7 +242,6 @@ public class EastHyrule : World
                 GetLocationByMem(0x864B),
                 GetLocationByMem(0x864C)
             };
-
         }
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
@@ -353,17 +352,40 @@ public class EastHyrule : World
         }
         else
         {
-            Terrain water = Terrain.WATER;
-            if (props.CanWalkOnWaterWithBoots)
-            {
-                water = Terrain.WALKABLEWATER;
-            }
+            Terrain fillerWater = props.CanWalkOnWaterWithBoots ? Terrain.WALKABLEWATER : Terrain.WATER;
 
             int bytesWritten = 2000;
             locationAtGP.CanShuffle = false;
             Terrain riverTerrain = Terrain.MOUNTAIN;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
+                //This double initialization for locations for non-vanilla maps is not well written, at some point I should clean this up
+                foreach (Location location in AllLocations)
+                {
+                    location.CanShuffle = true;
+                    location.NeedHammer = false;
+                    location.NeedRecorder = false;
+                    if (location != raft && location != bridge && location != cave1 && location != cave2)
+                    {
+                        location.TerrainType = terrains[location.MemAddress];
+                    }
+                }
+                if (props.HideLessImportantLocations)
+                {
+                    unimportantLocs = new List<Location>
+                    {
+                        GetLocationByMem(0x862F),
+                        GetLocationByMem(0x8630),
+                        GetLocationByMem(0x8644),
+                        GetLocationByMem(0x8646),
+                        GetLocationByMem(0x8647),
+                        GetLocationByMem(0x8648),
+                        GetLocationByMem(0x864A),
+                        GetLocationByMem(0x864B),
+                        GetLocationByMem(0x864C)
+                    };
+                }
+
                 map = new Terrain[MAP_ROWS, MAP_COLS];
 
                 for (int i = 0; i < MAP_ROWS; i++)
@@ -376,17 +398,17 @@ public class EastHyrule : World
 
                 if (biome == Biome.ISLANDS)
                 {
-                    riverTerrain = water;
+                    riverTerrain = fillerWater;
                     for (int i = 0; i < MAP_COLS; i++)
                     {
-                        map[0, i] = water;
-                        map[MAP_ROWS - 1, i] = water;
+                        map[0, i] = fillerWater;
+                        map[MAP_ROWS - 1, i] = fillerWater;
                     }
 
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
-                        map[i, 0] = water;
-                        map[i, MAP_COLS - 1] = water;
+                        map[i, 0] = fillerWater;
+                        map[i, MAP_COLS - 1] = fillerWater;
                     }
                     MakeVolcano();
                     int cols = RNG.Next(2, 4);
@@ -403,7 +425,7 @@ public class EastHyrule : World
                             {
                                 if (map[i, col] == Terrain.NONE)
                                 {
-                                    map[i, col] = water;
+                                    map[i, col] = fillerWater;
                                 }
                             }
                             pickedC.Add(col);
@@ -420,7 +442,7 @@ public class EastHyrule : World
                             {
                                 if (map[row, i] == Terrain.NONE)
                                 {
-                                    map[row, i] = water;
+                                    map[row, i] = fillerWater;
                                 }
                             }
                             pickedR.Add(row);
@@ -428,7 +450,7 @@ public class EastHyrule : World
                         }
                     }
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
 
 
@@ -436,14 +458,14 @@ public class EastHyrule : World
                 }
                 else if (biome == Biome.CANYON)
                 {
-                    riverTerrain = water;
+                    riverTerrain = fillerWater;
                     if (props.EastBiome == Biome.DRY_CANYON)
                     {
                         riverTerrain = Terrain.DESERT;
                     }
                     //riverT = terrain.lava;
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN };
-                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
 
                     DrawCanyon(riverTerrain);
@@ -460,7 +482,7 @@ public class EastHyrule : World
 
 
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
 
                 }
@@ -519,12 +541,12 @@ public class EastHyrule : World
                         }
                     }
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                 }
                 else
                 {
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
-                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, water };
+                    randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
                     MakeVolcano();
 
 
@@ -639,7 +661,7 @@ public class EastHyrule : World
                 {
                     ConnectIslands(4, false, Terrain.MOUNTAIN, false, false, true, props.CanWalkOnWaterWithBoots);
 
-                    ConnectIslands(3, false, water, true, false, false, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(3, false, fillerWater, true, false, false, props.CanWalkOnWaterWithBoots);
 
                 }
                 if (biome == Biome.ISLANDS)
@@ -656,7 +678,7 @@ public class EastHyrule : World
 
                 }
 
-                if(!ValidateCaves())
+                if (!ValidateCaves())
                 {
                     return false;
                 }
