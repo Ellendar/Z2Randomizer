@@ -4812,7 +4812,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 67423,
-    "name": "",
+    "name": "Vanilla Horsehead Room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements":
@@ -4839,7 +4839,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 67507,
-    "name": "",
+    "name": "Vanilla Helmethead Room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements":
@@ -4866,7 +4866,7 @@
     "linkedRoomName": null,
     "map": 14,
     "memoryAddress": 74304,
-    "name": "",
+    "name": "Vanilla Rebo Room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements":
@@ -4893,7 +4893,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 74360,
-    "name": "",
+    "name": "Vanilla Carock Room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements":
@@ -4920,7 +4920,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 67535,
-    "name": "",
+    "name": "Vanilla Gooma Room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements":
@@ -4947,9 +4947,9 @@
     "linkedRoomName": null,
     "map": 58,
     "memoryAddress": 74480,
-    "name": "",
+    "name": "Vanilla Barba Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 6,
     "requirements":
         [
         ],
@@ -4974,9 +4974,9 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 83971,
-    "name": "",
+    "name": "Vanilla Dark Link Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "requirements":
         [
         ],

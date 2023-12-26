@@ -22,7 +22,9 @@ static class BiomeExtensions
             Biome.CANYON => 300,
             Biome.DRY_CANYON => 300,
             Biome.MOUNTAINOUS => 250,
-            Biome.CALDERA => 300
+            Biome.CALDERA => 300,
+            Biome.VOLCANO => 300,
+            _ => throw new Exception("Unrecognized Biome in SeedTerrainLimit")
         };
     }
 }
