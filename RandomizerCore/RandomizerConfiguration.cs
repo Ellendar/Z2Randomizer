@@ -1205,8 +1205,8 @@ public class RandomizerConfiguration
                 2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.CALDERA,
                 4 => Biome.MOUNTAINOUS,
-                5 => Biome.VANILLA,
-                6 => Biome.VANILLA_SHUFFLE,
+                5 => Biome.VANILLA_SHUFFLE,
+                6 => Biome.VANILLA,
                 _ => throw new Exception("Invalid Biome")
             };
         }
