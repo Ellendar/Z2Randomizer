@@ -92,9 +92,9 @@ public class Palaces
             for (int palaceNum = 1; palaceNum < 8; palaceNum++)
             {
                 entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
-                    .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum ).ToList());
-                bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
+                bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.VANILLA, props.UseCustomRooms)
+                    .Where(i => (i.PalaceNumber == null && palaceNum < 6) || i.PalaceNumber == palaceNum).ToList());
                 tbirdRooms.AddRange(PalaceRooms.TBirdRooms(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
