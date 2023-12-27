@@ -266,6 +266,8 @@ public class Palaces
                         palace.AllRooms.Add(palace.Root);
 
                         palace.BossRoom = new(bossRoomsByPalaceNumber[currentPalace].ElementAt(r.Next(bossRoomsByPalaceNumber[currentPalace].Count)));
+                        palace.BossRoom.Enemies = PalaceRooms.VanillaBossRoom(currentPalace).Enemies;
+                        palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
                         palace.BossRoom.PalaceGroup = palaceGroup;
                         palace.AllRooms.Add(palace.BossRoom);
 
@@ -870,17 +872,19 @@ public class Palaces
     }
     private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
     {
-        List<RequirementType> requireables = new List<RequirementType>();
-        requireables.Add(RequirementType.KEY);
-        requireables.Add(RequirementType.UPSTAB);
-        requireables.Add(RequirementType.DOWNSTAB);
-        requireables.Add(RequirementType.JUMP);
-        requireables.Add(RequirementType.FAIRY);
+        List<RequirementType> requireables = new List<RequirementType>
+        {
+            RequirementType.KEY,
+            RequirementType.UPSTAB,
+            RequirementType.DOWNSTAB,
+            RequirementType.JUMP,
+            RequirementType.FAIRY
+        };
         for(int i = 0; i < 6; i++)
         {
             //If there is at least one palace that would be clearable with everything but the glove
             //that palace could contain the glove, so we're not deadlocked.
-            if (palaces[i].IsTraversable(requireables, Item.GLOVE))
+            if (palaces[i].CanClearAllRooms(requireables, Item.GLOVE))
             {
                 return true;
             }
@@ -905,7 +909,7 @@ public class Palaces
             requireables.Add(RequirementType.FAIRY);
 
             //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
-            if (!palace2.IsTraversable(requireables, Item.GLOVE))
+            if (!palace2.CanClearAllRooms(requireables, Item.GLOVE))
             {
                 return false;
             }
@@ -937,13 +941,13 @@ public class Palaces
                 requireables.Add(RequirementType.FAIRY);
             }
             //If we can clear P2 with this stuff, we can also get the glove
-            if (palace2.IsTraversable(requireables, Item.GLOVE))
+            if (palace2.CanClearAllRooms(requireables, Item.GLOVE))
             {
                 requireables.Add(RequirementType.GLOVE);
             }
             //If we can't clear 3 with all the items available on west/DM, we can never raft out, and so we're stuck forever
             //so start over
-            if (!palace3.IsTraversable(requireables, Item.RAFT))
+            if (!palace3.CanClearAllRooms(requireables, Item.RAFT))
             {
                 return false;
             }

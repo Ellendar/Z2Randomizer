@@ -1107,7 +1107,7 @@ public class Hyrule
                 Palace palace = palaces[location.PalaceNumber - 1];
                 hasItemNow = CanGet(location)
                     && (SpellGet[Spell.FAIRY] || ItemGet[Item.MAGIC_KEY])
-                    && palace.IsTraversable(GetRequireables(), location.Item, debug);
+                    && palace.CanGetItem(GetRequireables());
                 /*
                 && (!palace.NeedDstab || (palace.NeedDstab && SpellGet[Spell.DOWNSTAB])) 
                 && (!palace.NeedFairy || (palace.NeedFairy && SpellGet[Spell.FAIRY])) 

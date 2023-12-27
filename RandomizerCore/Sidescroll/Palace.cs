@@ -1117,61 +1117,55 @@ public class Palace
         }
     }
 
-    public bool IsTraversable(IEnumerable<RequirementType> requireables, Item palaceItem, int debug = 0)
+    public bool CanClearAllRooms(IEnumerable<RequirementType> requireables, Item palaceItem)
     {
         if(palaceItem == Item.GLOVE)
         {
-            /*
-            if(debug != 0)
+            if (CanGetItem(requireables))
             {
-                Debug.WriteLine(debug);
+                requireables = new List<RequirementType>(requireables);
+                ((List<RequirementType>)requireables).Add(RequirementType.GLOVE);
             }
-            */
-            List<Room> pendingRooms = new List<Room>() { AllRooms.First(i => i.IsEntrance) };
-            List<Room> coveredRooms = new List<Room>();
+            else return false;
+        }
 
-            while(pendingRooms.Count > 0)
-            {
-                Room room = pendingRooms.First();
-                if(room == ItemRoom)
-                {
-                    requireables = new List<RequirementType>(requireables).ToList();
-                    ((List<RequirementType>)requireables).Add(RequirementType.GLOVE);
-                    break;
-                }
-                coveredRooms.Add(room);
-                pendingRooms.Remove(room);
-                if(room.Left != null && room.Left.IsTraversable(requireables) && !coveredRooms.Contains(room.Left))
-                {
-                    pendingRooms.Add(room.Left);
-                }
-                if (room.Right != null && room.Right.IsTraversable(requireables) && !coveredRooms.Contains(room.Right))
-                {
-                    pendingRooms.Add(room.Right);
-                }
-                if (room.Up != null && room.Up.IsTraversable(requireables) && !coveredRooms.Contains(room.Up))
-                {
-                    pendingRooms.Add(room.Up);
-                }
-                if (room.Down != null && room.Down.IsTraversable(requireables) && !coveredRooms.Contains(room.Down))
-                {
-                    pendingRooms.Add(room.Down);
-                }
-            }
-        }
-        /*
-        if(Hyrule.UNSAFE_DEBUG)
-        {
-            StringBuilder sb = new();
-            foreach(Room room in rooms.Values.SelectMany(i => i))
-            {
-                sb.Append(room.Requirements.ToString());
-            }
-            Debug.WriteLine(sb.ToString());
-        }
-        */
         bool retVal = AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
         return retVal;
+    }
+
+    public bool CanGetItem(IEnumerable<RequirementType> requireables)
+    {
+        List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
+        List<Room> coveredRooms = new();
+
+        while (pendingRooms.Count > 0)
+        {
+            Room room = pendingRooms.First();
+            if (room == ItemRoom)
+            {
+                return true;
+            }
+            coveredRooms.Add(room);
+            pendingRooms.Remove(room);
+            if (room.Left != null && room.Left.IsTraversable(requireables) && !coveredRooms.Contains(room.Left))
+            {
+                pendingRooms.Add(room.Left);
+            }
+            if (room.Right != null && room.Right.IsTraversable(requireables) && !coveredRooms.Contains(room.Right))
+            {
+                pendingRooms.Add(room.Right);
+            }
+            if (room.Up != null && room.Up.IsTraversable(requireables) && !coveredRooms.Contains(room.Up))
+            {
+                pendingRooms.Add(room.Up);
+            }
+            if (room.Down != null && room.Down.IsTraversable(requireables) && !coveredRooms.Contains(room.Down))
+            {
+                pendingRooms.Add(room.Down);
+            }
+        }
+
+        return false;
     }
 
     public int GetPalaceGroup()

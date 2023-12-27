@@ -5001,7 +5001,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 67423,
-    "name": "",
+    "name": "Horsehead no key item room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements":
@@ -5219,7 +5219,7 @@
     "memoryAddress": 83971,
     "name": "",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "requirements":
         [
         ],
@@ -5246,7 +5246,7 @@
     "memoryAddress": 83967,
     "name": "",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "requirements":
         [
         ],
@@ -5273,7 +5273,7 @@
     "memoryAddress": 83967,
     "name": "",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "requirements":
         [
         ],
@@ -5300,7 +5300,7 @@
     "memoryAddress": 83967,
     "name": "",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "requirements":
         [
         ],
@@ -5327,7 +5327,7 @@
     "memoryAddress": 83967,
     "name": "",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "requirements":
         [
         ],
@@ -11087,7 +11087,7 @@
     "hasBoss": true,
     "hasDrop": false,
     "hasItem": true,
-    "isBossRoom": true,
+    "isBossRoom": false,
     "isDropZone": false,
     "isEntrance": false,
     "isThunderBirdRoom": false,
