@@ -2,7 +2,6 @@
 using NLog;
 using RandomizerCore;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -95,7 +94,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 100;
+    private static int DEBUG_THRESHOLD = 120;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -379,29 +378,33 @@ public class Hyrule
         //pop stack (1)
         //rts (1)
 
-        spellEnters = new Dictionary<int, int>();
-        spellEnters.Add(0, 0x90);
-        spellEnters.Add(1, 0x94);
-        spellEnters.Add(2, 0x98);
-        spellEnters.Add(3, 0x9C);
-        spellEnters.Add(4, 0xA0);
-        spellEnters.Add(5, 0xA4);
-        spellEnters.Add(6, 0x4D);
-        spellEnters.Add(7, 0xAC);
-        spellEnters.Add(8, 0xB0);
-        spellEnters.Add(9, 0xB4);
+        spellEnters = new Dictionary<int, int>
+        {
+            { 0, 0x90 },
+            { 1, 0x94 },
+            { 2, 0x98 },
+            { 3, 0x9C },
+            { 4, 0xA0 },
+            { 5, 0xA4 },
+            { 6, 0x4D },
+            { 7, 0xAC },
+            { 8, 0xB0 },
+            { 9, 0xB4 }
+        };
 
-        spellExits = new Dictionary<int, int>();
-        spellExits.Add(0, 0xC1);
-        spellExits.Add(1, 0xC5);
-        spellExits.Add(2, 0xC9);
-        spellExits.Add(3, 0xCD);
-        spellExits.Add(4, 0xD1);
-        spellExits.Add(5, 0xD5);
-        spellExits.Add(6, 0x6A);
-        spellExits.Add(7, 0xDD);
-        spellExits.Add(8, 0xE1);
-        spellExits.Add(9, 0xE5);
+        spellExits = new Dictionary<int, int>
+        {
+            { 0, 0xC1 },
+            { 1, 0xC5 },
+            { 2, 0xC9 },
+            { 3, 0xCD },
+            { 4, 0xD1 },
+            { 5, 0xD5 },
+            { 6, 0x6A },
+            { 7, 0xDD },
+            { 8, 0xE1 },
+            { 9, 0xE5 }
+        };
 
         ShortenWizards();
         accessibleMagicContainers = 4;
@@ -449,7 +452,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.2.5" +
+            "4.3.0" +
             File.ReadAllText(config.GetRoomsFile()) +
             finalRNGState
         ));
@@ -850,7 +853,6 @@ public class Hyrule
 
     private bool IsEverythingReachable(Dictionary<Item, bool> ItemGet, Dictionary<Spell, bool> spellGet)
     {
-        //XXX: Debug
         totalReachableCheck++;
         int dm = 0;
         int mi = 0;
@@ -1006,6 +1008,24 @@ public class Hyrule
         if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
+            if(UNSAFE_DEBUG)
+            {
+                List<Location> missingLocations = new();
+                missingLocations.AddRange(westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
+                missingLocations.AddRange(eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
+                missingLocations.AddRange(mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
+
+                List<Location> nonDmLocations = new(missingLocations);
+                missingLocations.AddRange(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
+
+                Debug.WriteLine("Unreachable locations:");
+                Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
+                if(debug > 2000)
+                {
+                    return false;
+                }
+                return false;
+            }
         }
         if (UNSAFE_DEBUG && retval)
         {
@@ -1745,18 +1765,6 @@ public class Hyrule
                 {
                     break;
                 }
-
-                /*
-                int west = westHyrule.AllLocations.Count(i => i.Reachable);
-                int east = eastHyrule.AllLocations.Count(i => i.Reachable);
-                int maze = mazeIsland.AllLocations.Count(i => i.Reachable);
-                int dm = deathMountain.AllLocations.Count(i => i.Reachable);
-
-                logger.Trace("wr: " + west + " / " + westHyrule.AllLocations.Count);
-                logger.Trace("er: " + east + " / " + eastHyrule.AllLocations.Count);
-                logger.Trace("dm: " + dm + " / " + deathMountain.AllLocations.Count);
-                logger.Trace("maze: " + maze + " / " + mazeIsland.AllLocations.Count);
-                */
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
         } while (!IsEverythingReachable(ItemGet, SpellGet));
 
@@ -1825,7 +1833,7 @@ public class Hyrule
 
     private void ResetTowns()
     {
-        westHyrule.shieldTown.ActualTown = Town.RAURU;
+        westHyrule.locationAtRauru.ActualTown = Town.RAURU;
         westHyrule.locationAtRuto.ActualTown = Town.RUTO;
         westHyrule.locationAtSariaNorth.ActualTown = Town.SARIA_NORTH;
         westHyrule.locationAtSariaSouth.ActualTown = Town.SARIA_SOUTH;

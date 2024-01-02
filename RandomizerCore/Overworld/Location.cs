@@ -186,7 +186,7 @@ public class Location
             (Continent.EAST, 100, 37, 1) => "THUNDER_TOWN_E_BRIDGE",
             (Continent.EAST, 36, 9, 6) => "REFLECT_TOWN_CLIFF_1",
             (Continent.EAST, 38, 10, 23) => "REFLECT_TOWN_CLIFF_2",
-            (Continent.EAST, 56, 63, 7) => "P5_HEART",
+            (Continent.EAST, 56, 63, 7) => "WATER_TILE",
             (Continent.EAST, 52, 24, 8) => "FIRE_TOWN_CAVE_EXIT",
             (Continent.EAST, 48, 27, 8) => "FIRE_TOWN_CAVE_ENTRACE",
             (Continent.EAST, 71, 25, 9) => "SUNKEN_PBAG_CAVE",
@@ -202,7 +202,7 @@ public class Location
             (Continent.EAST, 64, 53, 33) => "P5_500P_BAG",
             (Continent.EAST, 56, 34, 57) => "FIRE_TOWN_RED_JAR",
             (Continent.EAST, 44, 48, 57) => "DAZZLE_LIFE",
-            (Continent.EAST, 99, 57, 46) => "P6_HEART",
+            (Continent.EAST, 99, 57, 46) => "DESERT_TILE",
             (Continent.EAST, 68, 13, 45) => "FIRE_TOWN_FAIRY",
             (Continent.EAST, 91, 4, 62) => "DEATH_VALLEY_500P_BAG",
             (Continent.EAST, 99, 27, 62) => "DEATH_VALLEY_RED_JAR",
@@ -345,7 +345,7 @@ public class Location
         LocationBytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + World);
     }
 
-    private string GetDebuggerDisplay()
+    public string GetDebuggerDisplay()
     {
         return Continent.ToString()
             + " " + TerrainType.ToString()

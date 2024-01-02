@@ -1,6 +1,7 @@
 ﻿using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -128,40 +129,22 @@ class DeathMountain : World
         baseAddr = 0x610C;
         VANILLA_MAP_ADDR = 0x665c;
 
-        if (props.DmBiome == Biome.ISLANDS)
+        biome = props.DmBiome switch
         {
-            biome = Biome.ISLANDS;
-        }
-        else if (props.DmBiome == Biome.CANYON || props.DmBiome == Biome.DRY_CANYON)
-        {
-            biome = Biome.CANYON;
-            //MAP_ROWS = 75;
-        }
-        else if(props.DmBiome == Biome.CALDERA)
-        {
-            biome = Biome.CALDERA;
-        }
-        else if(props.DmBiome == Biome.MOUNTAINOUS)
-        {
-            biome = Biome.MOUNTAINOUS;
-        }
-        else if(props.DmBiome == Biome.VANILLA)
-        {
-            biome = Biome.VANILLA;
-        }
-        else if(props.DmBiome == Biome.VANILLA_SHUFFLE)
-        {
-            biome = Biome.VANILLA_SHUFFLE;
-        }
-        else
-        {
-            biome = Biome.VANILLALIKE;
-        }
+            Biome.DRY_CANYON => Biome.CANYON,
+            _ => props.DmBiome
+        };
+
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
         climate = props.Climate.Clone();
-        climate.ApplyDeathMountainSafety(walkableTerrains, 1);
+        float dmOpennessFactor = biome switch
+        {
+            Biome.CANYON => 2f,
+            _ => 1f
+        };
+        climate.ApplyDeathMountainSafety(walkableTerrains, dmOpennessFactor);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
     }
 
@@ -212,7 +195,6 @@ class DeathMountain : World
         else
         {
             int bytesWritten = 2000;
-            bool horizontal = false;
             while (bytesWritten > MAP_SIZE_BYTES)
             {
                 map = new Terrain[MAP_ROWS, MAP_COLS];
@@ -311,12 +293,6 @@ class DeathMountain : World
                 else if (biome == Biome.CANYON)
                 {
                     riverT = water;
-                    horizontal = RNG.NextDouble() > 0.5;
-
-                    if (props.WestBiome == Biome.DRY_CANYON)
-                    {
-                        riverT = Terrain.DESERT;
-                    }
 
                     walkableTerrains.Clear();
                     walkableTerrains.Add(Terrain.GRASS);
@@ -327,6 +303,7 @@ class DeathMountain : World
 
                     randomTerrainFilter.Remove(Terrain.SWAMP);
                     DrawCanyon(riverT);
+                    //Debug.WriteLine(GetMapDebug());
                     walkableTerrains.Remove(Terrain.MOUNTAIN);
 
                     randomTerrainFilter.Remove(Terrain.SWAMP);
@@ -396,7 +373,7 @@ class DeathMountain : World
                 Direction raftDirection = DirectionExtensions.RandomCardinal(RNG);
                 if (biome == Biome.CANYON)
                 {
-                    raftDirection = horizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
+                    raftDirection = props.DmIsHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                 }
                 if (raft != null)
                 {
@@ -417,7 +394,7 @@ class DeathMountain : World
                     }
                     else
                     {
-                        bridgeDirection = horizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
+                        bridgeDirection = props.DmIsHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                     }
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
@@ -703,10 +680,12 @@ class DeathMountain : World
                     PlaceRandomTerrain(climate, 5);
                 }
                 randomTerrainFilter.Add(Terrain.ROAD);
-                if (!GrowTerrain(props.Climate))
+                //Debug.WriteLine(GetMapDebug());
+                if (!GrowTerrain(climate))
                 {
                     return false;
                 }
+                //Debug.WriteLine(GetMapDebug());
                 if (biome == Biome.CALDERA)
                 {
                     bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);

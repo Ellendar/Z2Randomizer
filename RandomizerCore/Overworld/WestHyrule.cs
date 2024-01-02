@@ -25,7 +25,7 @@ public class WestHyrule : World
     public Location heartContainerCave;
     public Location locationAtSariaNorth;
     public Location locationAtSariaSouth;
-    public Location shieldTown;
+    public Location locationAtRauru;
     public Location bridge1;
     public Location bridge2;
     public Location pbagCave;
@@ -114,12 +114,16 @@ public class WestHyrule : World
         Location fairyCave = GetLocationByMap(0x12, 0);
         fairyCave.NeedFairy = true;
         locationAtRuto = GetLocationByMap(0xC5, 4);
+        locationAtRuto.Name = "Ruto";
         bagu = GetLocationByMap(0x18, 4);
         locationAtMido = GetLocationByMap(0xCB, 4);
+        locationAtMido.Name = "Mido";
         locationAtSariaNorth = GetLocationByMap(0xC8, 4);
         locationAtSariaSouth = GetLocationByMap(0x06, 4);
         locationAtSariaNorth.NeedBagu = true;
+        locationAtSariaNorth.Name = "Saria North";
         locationAtSariaSouth.NeedBagu = true;
+        locationAtSariaSouth.Name = "Saria South";
         trophyCave = GetLocationByMap(0xE1, 0);
         raft = GetLocationByMem(0x4658);
         locationAtPalace1 = GetLocationByMem(0x4663);
@@ -131,7 +135,8 @@ public class WestHyrule : World
         jar = GetLocationByMem(0x4632);
         grassTile = GetLocationByMem(0x463F);
         heartContainerCave = GetLocationByMem(0x4634);
-        shieldTown = GetLocationByMem(0x465C);
+        locationAtRauru = GetLocationByMem(0x465C);
+        locationAtRauru.Name = "Rauru";
         pbagCave = GetLocationByMem(0x463D);
 
 
@@ -1406,7 +1411,7 @@ public class WestHyrule : World
             heartContainerCave,
             locationAtSariaNorth,
             locationAtSariaSouth,
-            shieldTown,
+            locationAtRauru,
             bridge1,
             bridge2,
             pbagCave

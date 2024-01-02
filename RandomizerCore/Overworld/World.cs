@@ -67,7 +67,16 @@ public abstract class World
 
     private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
-    private const int MAXIMUM_BRIDGE_ATTEMPTS = 2000;
+    private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_ATTEMPTS = new()
+    {
+        { Biome.ISLANDS, 4000 },
+        { Biome.VOLCANO, 3000 },
+        { Biome.DRY_CANYON, 2000 },
+        { Biome.VANILLALIKE, 2000 },
+        { Biome.CALDERA, 3000 },
+        { Biome.CANYON, 2000 },
+        { Biome.MOUNTAINOUS, 4000 }
+    };
 
 
     protected abstract List<Location> GetPathingStarts();
@@ -454,16 +463,22 @@ public abstract class World
                 //Connect the cave
                 if (location.TerrainType == Terrain.CAVE)
                 {
-                    Direction direction = (Direction)RNG.Next(4);
+                    List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+                    Direction direction = caveDirections[RNG.Next(4)];
                     Terrain entranceTerrain = climate.GetRandomTerrain(RNG, walkableTerrains);
 
                     if (saneCaves && connections.ContainsKey(location))
                     {
                         PlaceCaveCount++;
                         map[y, x] = Terrain.NONE;
-                        if (!PlaceSaneCave(direction, riverTerrain, location))
+                        while(!PlaceSaneCave(direction, riverTerrain, location))
                         {
-                            return false;
+                            caveDirections.Remove(direction);
+                            if(caveDirections.Count == 0)
+                            {
+                                return false;
+                            }
+                            direction = caveDirections[RNG.Next(caveDirections.Count)];
                         }
                     }
                     else
@@ -688,6 +703,7 @@ public abstract class World
             }
             if (tries++ >= 100)
             {
+                //Debug.WriteLine(GetMapDebug());
                 return false;
             }
         } while (
@@ -760,12 +776,14 @@ public abstract class World
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
     protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, bool canWalkOnWater)
     {
+        int maxBridgeAttempts = MAXIMUM_BRIDGE_ATTEMPTS[biome];
+        maxBridgeAttempts *= canWalkOnWater ? 1 : 2;
         int[,] globs = GetTerrainGlobs();
         Dictionary<int, List<int>> massConnections = new Dictionary<int, List<int>>();
         int remainingBridges = maxBridges;
         int TerrainCycle = 0;
         int tries = 0;
-        while (remainingBridges > 0 && tries < MAXIMUM_BRIDGE_ATTEMPTS)
+        while (remainingBridges > 0 && tries < maxBridgeAttempts)
         {
             tries++;
             int x = RNG.Next(MAP_COLS - 2) + 1;
@@ -1218,11 +1236,6 @@ public abstract class World
                 remainingBridges--;
 
             }
-        }
-        if(tries == MAXIMUM_BRIDGE_ATTEMPTS)
-        {
-            //TODO: eventually add a minimum check here
-            //return false;
         }
         return !placeTown;
     }

@@ -78,7 +78,10 @@ public class Climate
 
     public Climate Clone()
     {
-        return new Climate(Name, DistanceCoefficients, TerrainWeights, SeedTerrainCount);
+        return new(Name, 
+            new Dictionary<Terrain, float>(DistanceCoefficients), 
+            new Dictionary<Terrain, int>(TerrainWeights), 
+            SeedTerrainCount);
     }
 
     /// <summary>
@@ -102,12 +105,11 @@ public class Climate
         float aggregateWalkableTerrainGrowth = totalRandomGrowthFactors / totalWalkableTerrainWeight;
         float mountainTerrainGrowth = DistanceCoefficients[Terrain.MOUNTAIN];
 
-        float aggregateTerrainGrowthInsuffiency = (mountainTerrainGrowth * constraintLimitFactor) - aggregateWalkableTerrainGrowth;
-        if (aggregateTerrainGrowthInsuffiency > 0)
+        if (mountainTerrainGrowth * constraintLimitFactor > aggregateWalkableTerrainGrowth)
         {
             foreach (Terrain terrain in walkableTerrains)
             {
-                DistanceCoefficients[terrain] *= (mountainTerrainGrowth * constraintLimitFactor) / aggregateTerrainGrowthInsuffiency;
+                DistanceCoefficients[terrain] *= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
             }
         }
     }

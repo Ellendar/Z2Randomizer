@@ -1744,7 +1744,9 @@ public class EastHyrule : World
         if(hiddenPalace)
         {
             requiredLocations.Add(hiddenPalaceLocation);
-            requiredLocations.Add(hiddenPalaceCallSpot);
+            //support for the hidden palace call spot is extremely spotty. It effectively doesn't exist in the logic
+            //and is only created to hold coordinates that are later written to the rom. Ignoring it for now.
+            //requiredLocations.Add(hiddenPalaceCallSpot);
         }
 
         if(hiddenKasuto)
