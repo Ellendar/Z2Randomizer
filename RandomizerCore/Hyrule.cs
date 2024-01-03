@@ -30,7 +30,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -466,7 +466,6 @@ public class Hyrule
 
         if (UNSAFE_DEBUG)
         {
-            //XXX: Debug
             PrintSpoiler(LogLevel.Error);
             //DEBUG
             StringBuilder sb = new();
@@ -3205,7 +3204,7 @@ public class Hyrule
         ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
         root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root;
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
-        //XXX: Maybe this needs a refactor, maybe this is just pointless and the reconstructed version should be used everywhere
+        //Maybe this needs a refactor, maybe this is just pointless and the reconstructed version should be used everywhere
         /*
         }
         else

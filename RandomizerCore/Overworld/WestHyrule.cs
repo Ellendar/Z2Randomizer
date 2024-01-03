@@ -661,7 +661,6 @@ public class WestHyrule : World
                     //2 bridges over the mountains
                     ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, props.CanWalkOnWaterWithBoots);
                     //4 bridges including saria and the double bridge across arbitrary water
-                    //XXX: Testing
                     bool f = ConnectIslands(4, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {

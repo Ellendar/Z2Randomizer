@@ -1278,7 +1278,6 @@ partial class MainUI
         noDuplicateRoomsByEnemiesCheckbox.Size = new Size(247, 19);
         noDuplicateRoomsByEnemiesCheckbox.TabIndex = 30;
         noDuplicateRoomsByEnemiesCheckbox.Text = "No Duplicate Rooms (By Layout/Enemies)";
-        noDuplicateRoomsByEnemiesCheckbox.ThreeState = true;
         toolTip1.SetToolTip(noDuplicateRoomsByEnemiesCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations can still have one of each variation.");
         noDuplicateRoomsByEnemiesCheckbox.UseVisualStyleBackColor = true;
         noDuplicateRoomsByEnemiesCheckbox.CheckedChanged += DuplicateRoomExclusionHandler;
@@ -1343,7 +1342,6 @@ partial class MainUI
         noDuplicateRoomsByLayoutCheckbox.Size = new Size(198, 19);
         noDuplicateRoomsByLayoutCheckbox.TabIndex = 25;
         noDuplicateRoomsByLayoutCheckbox.Text = "No Duplicate Rooms (By Layout)";
-        noDuplicateRoomsByLayoutCheckbox.ThreeState = true;
         toolTip1.SetToolTip(noDuplicateRoomsByLayoutCheckbox, "Each room will only show up at most once in a palace. Rooms that have multiple variations cannot appear more than once per layout.");
         noDuplicateRoomsByLayoutCheckbox.UseVisualStyleBackColor = true;
         noDuplicateRoomsByLayoutCheckbox.CheckedChanged += DuplicateRoomExclusionHandler;

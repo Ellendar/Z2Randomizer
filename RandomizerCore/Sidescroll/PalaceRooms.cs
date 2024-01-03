@@ -32,7 +32,7 @@ public class PalaceRooms
             byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
-                //XXX: Restore t
+                //XXX: Restore this
                 //throw new Exception("Invalid PalaceRooms.json");
             }
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);

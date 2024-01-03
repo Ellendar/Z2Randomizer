@@ -2016,12 +2016,11 @@ public partial class MainUI : Form
     
     private void DuplicateRoomExclusionHandler(object sender, EventArgs e)
     {
-        if(noDuplicateRoomsByEnemiesCheckbox.Checked)
+        if(noDuplicateRoomsByEnemiesCheckbox.Checked && noDuplicateRoomsByEnemiesCheckbox.Equals(sender))
         {
             noDuplicateRoomsByLayoutCheckbox.Checked = false;
         }
-
-        if (noDuplicateRoomsByLayoutCheckbox.Checked)
+        else if(noDuplicateRoomsByLayoutCheckbox.Checked && noDuplicateRoomsByLayoutCheckbox.Equals(sender))
         {
             noDuplicateRoomsByEnemiesCheckbox.Checked = false;
         }

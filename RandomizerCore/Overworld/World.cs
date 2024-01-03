@@ -1421,7 +1421,6 @@ public abstract class World
                             choices.Add(map[t.Item1, t.Item2]);
                         }
                     }
-                    //XXX: TESTING
                     mapCopy[y, x] = choices[RNG.Next(choices.Count)];
                     //mapCopy[y, x] = Terrain.ROAD;
                 }
