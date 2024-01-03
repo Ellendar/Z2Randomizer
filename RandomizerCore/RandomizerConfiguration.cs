@@ -1330,6 +1330,12 @@ public class RandomizerConfiguration
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
 
+        //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
+        //if we get to this point, use vanilla rooms
+        if(!((IncludeVanillaRooms ?? true) || (Includev4_0Rooms ?? true) || (Includev4_4Rooms ?? true)))
+        {
+            properties.AllowVanillaRooms = true;
+        }
         while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV4_4Rooms)) {
             properties.AllowVanillaRooms = IncludeVanillaRooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
             properties.AllowV4Rooms = Includev4_0Rooms == null ? random.Next(2) == 1 : (bool)Includev4_0Rooms;
@@ -1525,9 +1531,7 @@ public class RandomizerConfiguration
             properties.BagusWoods = false;
         }
 
-        //XXX: These need to be cleaned up to work with the new room types and the split palace styles.
-        /*
-        if (properties.PalaceStyle == PalaceStyle.VANILLA || properties.PalaceStyle == PalaceStyle.SHUFFLED)
+        if (properties.NormalPalaceStyle == PalaceStyle.VANILLA || properties.NormalPalaceStyle == PalaceStyle.SHUFFLED)
         {
             properties.AllowV4Rooms = false;
             properties.AllowV4_4Rooms = false;
@@ -1535,12 +1539,10 @@ public class RandomizerConfiguration
             properties.BossRoomConnect = false;
         }
 
-        if (properties.PalaceStyle == PalaceStyle.VANILLA)
+        if (properties.GPStyle == PalaceStyle.VANILLA)
         {
-            properties.ShortenGP = false;
             properties.RequireTbird = true;
         }
-        */
 
         if (properties.ReplaceFireWithDash)
         {
@@ -1553,6 +1555,7 @@ public class RandomizerConfiguration
         if(!properties.NormalPalaceStyle.IsReconstructed() || (!properties.AllowV4Rooms && !properties.AllowV4_4Rooms))
         {
             properties.NoDuplicateRooms = false;
+            properties.NoDuplicateRoomsBySideview = false;
         }
 
         string debug = JsonSerializer.Serialize(properties);

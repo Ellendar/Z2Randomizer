@@ -1318,6 +1318,7 @@ partial class MainUI
         toolTip1.SetToolTip(includev4_4RoomsCheckbox, "New Rooms first released in v4.4 are included in the room pool.");
         includev4_4RoomsCheckbox.UseVisualStyleBackColor = true;
         includev4_4RoomsCheckbox.Visible = false;
+        includev4_4RoomsCheckbox.CheckedChanged += AtLeastOneRoomTypeRequiredHandler;
         // 
         // includev4_0RoomsCheckbox
         // 
@@ -1331,6 +1332,7 @@ partial class MainUI
         includev4_0RoomsCheckbox.ThreeState = true;
         toolTip1.SetToolTip(includev4_0RoomsCheckbox, "New Rooms first released in v4.0 are included in the room pool.");
         includev4_0RoomsCheckbox.UseVisualStyleBackColor = true;
+        includev4_0RoomsCheckbox.CheckedChanged += AtLeastOneRoomTypeRequiredHandler;
         // 
         // noDuplicateRoomsByLayoutCheckbox
         // 
@@ -1440,6 +1442,7 @@ partial class MainUI
         includeVanillaRoomsCheckbox.Text = "Include Vanilla Rooms";
         includeVanillaRoomsCheckbox.ThreeState = true;
         includeVanillaRoomsCheckbox.UseVisualStyleBackColor = true;
+        includeVanillaRoomsCheckbox.CheckedChanged += AtLeastOneRoomTypeRequiredHandler;
         // 
         // randomizeBossItemCheckbox
         // 

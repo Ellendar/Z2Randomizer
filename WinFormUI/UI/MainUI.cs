@@ -2025,4 +2025,12 @@ public partial class MainUI : Form
             noDuplicateRoomsByEnemiesCheckbox.Checked = false;
         }
     }
+
+    private void AtLeastOneRoomTypeRequiredHandler(object sender, EventArgs e)
+    {
+        if(!includeVanillaRoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked)
+        {
+            ((CheckBox)sender).Checked = true;
+        }
+    }
 }
