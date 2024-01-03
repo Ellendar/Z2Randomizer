@@ -887,6 +887,7 @@ ChooseNewCarrockXPosition:
 
 .define ProjectileEnemyData $bc
 .define ProjectileYPosition $30
+.define ProjectileXVelocity $77
 EnemyYVelocity = $057e
 ; SinWaveVelocityIncrement = $ba1c
 
@@ -963,6 +964,21 @@ RandomizeWifiShotType:
         adc #$10
 @WriteShotYCoord:
     sta $0030,y
+    ; roll a random number to see if we shoot a fast beam
+    lda $051c
+    and #1
+    beq @Exit
+        lda ProjectileXVelocity,y
+        bmi @NegativeVelocity
+           clc
+           adc #$10
+           bne @DoneVelocityUpdate
+@NegativeVelocity:
+        sec
+        sbc #$10
+@DoneVelocityUpdate:
+        sta ProjectileXVelocity,y
+@Exit:
     rts
 """);
         _engine.Modules.Add(a.Actions);
