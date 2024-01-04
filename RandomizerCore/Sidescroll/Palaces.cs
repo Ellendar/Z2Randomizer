@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using Assembler;
+using NLog;
 using RandomizerCore.Sidescroll;
 using SD.Tools.Algorithmia.GeneralDataStructures;
 using System;
@@ -66,7 +67,7 @@ public class Palaces
         {7, 0x8665 }
     };
 
-    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData, bool raftIsRequired)
+    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData, bool raftIsRequired, Engine engine)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -627,7 +628,7 @@ public class Palaces
             }
         }
 
-        Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
+        //Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
         //update pointers
         //if (props.NormalPalaceStyle.IsReconstructed())
         if (true)
@@ -636,52 +637,68 @@ public class Palaces
             {
                 return new List<Palace>();
             }
+            var a = engine.Asm();
+            int i = 0;
             //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
             //so we just start at the 125 pointer address
             int enemyAddr = Enemies.NormalPalaceEnemyAddr;
             foreach (byte[] sv in sideviews.Keys)
             {
-                int sideViewAddr = FindFreeSpace(freeSpace, sv);
-                if (sideViewAddr == -1) //not enough space
-                    return new List<Palace>();
-                ROMData.Put(sideViewAddr, sv);
-                if (ROMData.GetByte(sideViewAddr + sv.Length) >= 0xD0)
-                {
-                    ROMData.Put(sideViewAddr + sv.Length, 0x00);
-                }
+                var name = "Sideview_" + i++;
+                a.segment("PRG4");
+                a.reloc();
+                a.label(name);
+                a.byt(sv);
+                //int sideViewAddr = FindFreeSpace(freeSpace, sv);
+                //if (sideViewAddr == -1) //not enough space
+                    //return new List<Palace>();
+                
+                //ROMData.Put(sideViewAddr, sv);
+                //if (ROMData.GetByte(sideViewAddr + sv.Length) >= 0xD0)
+                //{
+                //    ROMData.Put(sideViewAddr + sv.Length, 0x00);
+                //}
                 List<Room> rooms = sideviews[sv];
                 foreach (Room room in rooms)
                 {
-                    room.WriteSideViewPtr(sideViewAddr, ROMData);
+                    room.WriteSideViewPtr(a, name);
                     room.UpdateBitmask(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
                     room.UpdateConnectors();
                 }
             }
+            engine.Modules.Add(a.Actions);
         }
         //if (props.GPStyle.IsReconstructed())
         if(true)
         {
+            var a = engine.Asm();
+            int i = 0;
             //GP Reconstructed
             int enemyAddr = Enemies.GPEnemyAddr;
-            freeSpace = SetupFreeSpace(false, enemyBytesGP);
+            //freeSpace = SetupFreeSpace(false, enemyBytesGP);
             foreach (byte[] sv in sideviewsgp.Keys)
             {
-                int sideviewAddr = FindFreeSpace(freeSpace, sv);
-                if (sideviewAddr == -1) //not enough space
-                {
-                    return new List<Palace>();
-                }
-                ROMData.Put(sideviewAddr, sv);
-                if (ROMData.GetByte(sideviewAddr + sv.Length) >= 0xD0)
-                {
-                    ROMData.Put(sideviewAddr + sv.Length, 0x00);
-                }
+                var name = "SideviewGP_" + i++;
+                a.segment("PRG5", "PRG7");
+                a.reloc();
+                a.label(name);
+                a.byt(sv);
+                //int sideviewAddr = FindFreeSpace(freeSpace, sv);
+                //if (sideviewAddr == -1) //not enough space
+                //{
+                //    return new List<Palace>();
+                //}
+                //ROMData.Put(sideviewAddr, sv);
+                //if (ROMData.GetByte(sideviewAddr + sv.Length) >= 0xD0)
+                //{
+                //    ROMData.Put(sideviewAddr + sv.Length, 0x00);
+                //}
                 List<Room> rooms = sideviewsgp[sv];
                 foreach (Room room in rooms)
                 {
-                    room.WriteSideViewPtr(sideviewAddr, ROMData);
+                    room.WriteSideViewPtr(a, name);
                     room.UpdateBitmask(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.Enemies.Length;
@@ -689,6 +706,7 @@ public class Palaces
                     room.UpdateConnectors();
                 }
             }
+            engine.Modules.Add(a.Actions);
         }
         else //Not reconstructed
         {

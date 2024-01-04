@@ -417,7 +417,7 @@ public class Hyrule
         bool raftIsRequired = IsRaftAlwaysRequired(props);
         while (palaces == null || palaces.Count != 7)
         {
-            palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData, raftIsRequired);
+            palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData, raftIsRequired, engine);
             if (palaces == null)
             {
                 continue;

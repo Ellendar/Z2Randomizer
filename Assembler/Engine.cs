@@ -64,11 +64,28 @@ public class Assembler
         });
     }
 
-    public void org(uint addr, string name = "")
+    public void org(ushort addr, string name = "")
     {
-        Actions.Add(new () {
+        Actions.Add(new() {
             { "action", "org" },
             { "addr", addr },
+            { "name", name },
+        });
+    }
+
+    // Converts from file address space to CPU address space, just a helper function
+    // since all the current addresses in the randomizer are in file address space
+    public void romorg(int addr, string name = "")
+    {
+        // adjustment for the ines header
+        int romaddr = addr - 0x10;
+        byte segment = (byte) (romaddr / 0x4000);
+        ushort cpuoffset = (ushort) (segment == 7 ? 0xc000 : 0x8000);
+        ushort cpuaddr = (ushort) ((romaddr % 0x4000) + cpuoffset);
+
+        Actions.Add(new() {
+            { "action", "org" },
+            { "addr", cpuaddr },
             { "name", name },
         });
     }
@@ -80,7 +97,7 @@ public class Assembler
         });
     }
 
-    public void reloc(string name)
+    public void reloc(string name = "")
     {
         Actions.Add(new()
         {
@@ -125,6 +142,8 @@ public class Engine
 {
     private V8ScriptEngine _engine;
     public List<List<PropertyBag>> Modules { get; } = new();
+    private List<PropertyBag> InitModule { get; } = new();
+
     public Engine() {
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
         // follow this tutorial for how https://microsoft.github.io/ClearScript/Details/Build.html#_Debugging_with_ClearScript_2
@@ -216,8 +235,17 @@ FREE "PRG4" [$A765, $A900)
 FREE "PRG4" [$BEFD, $BF00)
 FREE "PRG4" [$bf60, $c000)
 
+FREE "PRG5" [$835e, $835e + 385)
+FREE "PRG5" [$862f, $862f + 251)
+FREE "PRG5" [$8827, $8827 + 137)
+FREE "PRG5" [$93be, $93be + 82)
+FREE "PRG5" [$a55f, $A5FF)
+
+FREE "PRG7" [$f369, $FCFB);
+
+
 """, "__init.s");
-        Modules.Add(a.Actions);
+        InitModule = a.Actions;
     }
 
     public Assembler Asm()
@@ -231,6 +259,7 @@ FREE "PRG4" [$bf60, $c000)
         data.WriteBytes(rom, 0, data.Length, 0);
         _engine.Script.romdata = data;
         _engine.Script.modules = Modules;
+        _engine.Script.initmodule = InitModule;
         _engine.Execute(new DocumentInfo { Category = ModuleCategory.Standard }, /* language=javascript */ """
 
 import { Assembler } from "js65/assembler.js"
@@ -290,8 +319,16 @@ async function processAction(a, action) {
     debugger;
     // Assemble all of the modules
     const assembled = [];
+    // Setup the original code as overwriteMode require to make it so the code is
+    // only overwritten if its freed first
+    let initmod = new Assembler(Cpu.P02, {overwriteMode: 'require'});
+    for (const action of initmodule) {
+        await processAction(initmod, action);
+    }
+    assembled.push(initmod);
     for (const module of modules) {
-        let a = new Assembler(Cpu.P02);
+        // Set all custom modules to overwrite mode forbid to prevent patches from overwriting each other
+        let a = new Assembler(Cpu.P02, {overwriteMode: 'forbid'});
         for (const action of module) {
             await processAction(a, action);
         }
