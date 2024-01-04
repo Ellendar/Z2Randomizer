@@ -235,13 +235,16 @@ FREE "PRG4" [$A765, $A900)
 FREE "PRG4" [$BEFD, $BF00)
 FREE "PRG4" [$bf60, $c000)
 
-FREE "PRG5" [$835e, $835e + 385)
-FREE "PRG5" [$862f, $862f + 251)
-FREE "PRG5" [$8827, $8827 + 137)
-FREE "PRG5" [$93be, $93be + 82)
-FREE "PRG5" [$a55f, $A5FF)
+FREE "PRG5" [$834e, $84d0)
+FREE "PRG5" [$861f, $871b)
+FREE "PRG5" [$8817, $88a0)
+FREE "PRG5" [$93ae, $9400)
+FREE "PRG5" [$a54f, $a600)
+FREE "PRG5" [$bda1, $c000)
 
-FREE "PRG7" [$f369, $FCFB);
+; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
+; free space for patches
+FREE "PRG7" [$f369, $fcfb);
 
 
 """, "__init.s");

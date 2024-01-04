@@ -649,15 +649,6 @@ public class Palaces
                 a.reloc();
                 a.label(name);
                 a.byt(sv);
-                //int sideViewAddr = FindFreeSpace(freeSpace, sv);
-                //if (sideViewAddr == -1) //not enough space
-                    //return new List<Palace>();
-                
-                //ROMData.Put(sideViewAddr, sv);
-                //if (ROMData.GetByte(sideViewAddr + sv.Length) >= 0xD0)
-                //{
-                //    ROMData.Put(sideViewAddr + sv.Length, 0x00);
-                //}
                 List<Room> rooms = sideviews[sv];
                 foreach (Room room in rooms)
                 {
@@ -677,7 +668,6 @@ public class Palaces
             int i = 0;
             //GP Reconstructed
             int enemyAddr = Enemies.GPEnemyAddr;
-            //freeSpace = SetupFreeSpace(false, enemyBytesGP);
             foreach (byte[] sv in sideviewsgp.Keys)
             {
                 var name = "SideviewGP_" + i++;
@@ -685,16 +675,6 @@ public class Palaces
                 a.reloc();
                 a.label(name);
                 a.byt(sv);
-                //int sideviewAddr = FindFreeSpace(freeSpace, sv);
-                //if (sideviewAddr == -1) //not enough space
-                //{
-                //    return new List<Palace>();
-                //}
-                //ROMData.Put(sideviewAddr, sv);
-                //if (ROMData.GetByte(sideviewAddr + sv.Length) >= 0xD0)
-                //{
-                //    ROMData.Put(sideviewAddr + sv.Length, 0x00);
-                //}
                 List<Room> rooms = sideviewsgp[sv];
                 foreach (Room room in rooms)
                 {
