@@ -163,9 +163,11 @@ public class Hyrule
         }
     }
 
+    private Engine _engine;
+
     public Hyrule(RandomizerConfiguration config, BackgroundWorker worker, bool saveRom = true)
     {
-        var engine = new Engine();
+        _engine = new Engine();
 
         WestHyrule.ResetStats();
         RNG = new Random(config.Seed);
@@ -177,7 +179,7 @@ public class Hyrule
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
 
-        ROMData = new ROM(props.Filename, engine);
+        ROMData = new ROM(props.Filename, _engine);
         this.worker = worker;
 
 
@@ -417,7 +419,7 @@ public class Hyrule
         bool raftIsRequired = IsRaftAlwaysRequired(props);
         while (palaces == null || palaces.Count != 7)
         {
-            palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData, raftIsRequired, engine);
+            palaces = Palaces.CreatePalaces(worker, RNG, props, ROMData, raftIsRequired, _engine);
             if (palaces == null)
             {
                 continue;
@@ -431,6 +433,8 @@ public class Hyrule
         {
             return;
         }
+
+        AddCropGuideBoxesToFileSelect();
 
         ROMData.ApplyAsm();
 
@@ -3272,8 +3276,6 @@ public class Hyrule
             }
         }
 
-        AddCropGuideBoxesToFileSelect(ROMData);
-
         //Update raft animation
         bool firstRaft = false;
         foreach (World w in worlds)
@@ -3480,51 +3482,48 @@ public class Hyrule
         return new byte[] { (byte)(val & 0xff), (byte)(val >> 8) };
     }
 
-    private void AddCropGuideBoxesToFileSelect(ROM rom)
+    private void AddCropGuideBoxesToFileSelect()
     {
-        byte hasINes = 0x10;
+        var a = _engine.Asm();
+        a.code("""
+.segment "PRG5"
+.org $b28d
+    jsr CustomFileSelectUpdates
 
-        var freeAddr = 0x17da2;
-        var hookTitleScreenDraw = 0x1728d;
-        byte whiteTile = 0xfd;
-        byte blueTile = 0xfe;
-        var addr = PrgToCpuAddr(freeAddr);
+.reloc
+CustomFileSelectUpdates:
+    cpy #$01
+    beq @Skip
+        sta $0726  ; perform the original hooked code before exiting
+        rts
+@Skip:
+    ldx #$20     ; copy 32 + 1 bytes of data from the rom (+1 for terminator)
+@Loop:
+        lda CustomFileSelectData,x
+        sta $0302,x
+        dex
+        bpl @Loop    ; while x >= 0
+    lda #0    ; use the draw handler for $302
+    sta $0725 ; tell the code to draw from $302
+    inc $073E ; increase the "state" count
+    pla       ; we need to double return here to break out of the hook and the calling function
+    pla
+    rts
 
-        // Hook into the title screen drawing to redirect it to our custom draw routine.
-        rom.Put(hasINes + hookTitleScreenDraw, new byte[] { 0x20, addr[0], addr[1] }); // replace sta $0726 with jsr $BDB1 ; CustomFileSelectUpdates
-
-        // and add the custom write code to the free space
-        rom.Put(hasINes + freeAddr, new byte[]
-        {
-            // CustomFileSelectUpdates:
-            0xc0, 0x01,       //  cpy #$02
-            0xf0, 0x04,       //  beq Skip
-            0x8d, 0x26, 0x07, //    sta $0726  ; perform the original hooked code before exiting
-            0x60,             //    rts
-            // Skip:
-            0xa2, 0x20,       //  ldx #$20     ; copy 32 + 1 bytes of data from the rom (+1 for terminator)
-            // Loop:
-            0xbd, 0xc0, 0xbd, //  lda CustomFileSelectData,x
-            0x9d, 0x02, 0x03, //  sta $0302,x
-            0xca,             //  dex
-            0x10, 0xf7,       //  bpl Loop    ; while x >= 0
-            0xa9, 0x00,       //  lda #0    ; use the draw handler for $302
-            0x8d, 0x25, 0x07, //  sta $0725 ; tell the code to draw from $302
-            0xee, 0x3e, 0x07, //  inc $073E ; increase the "state" count
-            0x68,             //  pla       ; we need to double return here to break out of the hook and the calling function
-            0x68,             //  pla
-            0x60,             //  rts
-            // CustomFileSelectData:
-            0x20, 0x00, 0x01, whiteTile,
-            0x20, 0x1f, 0x01, whiteTile,
-            0x23, 0xa0, 0x01, whiteTile,
-            0x23, 0xbf, 0x01, whiteTile,
-            0x20, 0x21, 0x01, blueTile,
-            0x20, 0x3e, 0x01, blueTile,
-            0x23, 0x81, 0x01, blueTile,
-            0x23, 0x9e, 0x01, blueTile,
-            0xff
-        });
+.define whiteTile $fd
+.define blueTile $fe
+CustomFileSelectData:
+    .byte $20, $00, $01, whiteTile
+    .byte $20, $1f, $01, whiteTile
+    .byte $23, $a0, $01, whiteTile
+    .byte $23, $bf, $01, whiteTile
+    .byte $20, $21, $01, blueTile
+    .byte $20, $3e, $01, blueTile
+    .byte $23, $81, $01, blueTile
+    .byte $23, $9e, $01, blueTile
+    .byte $ff
+""", "crop_guides.s");
+        _engine.Modules.Add(a.Actions);
     }
 
     public List<Location> AllLocationsForReal()
