@@ -8,11 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Z2Randomizer.WinFormUI.Properties {
+namespace WinFormUI.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.5.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -238,135 +238,57 @@ namespace Z2Randomizer.WinFormUI.Properties {
                 this["useCustomRooms"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-  <string>Name|Not set</string>
+  <string>Name|Custom</string>
   <string>Flagset|</string>
   <string>Tooltip|Right click to set your custom flagset</string>
 </ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customizableButtonBase
-        {
-            get
-            {
+        public global::System.Collections.Specialized.StringCollection customizableButtonBase {
+            get {
                 return ((global::System.Collections.Specialized.StringCollection)(this["customizableButtonBase"]));
             }
-            set
-            {
+            set {
                 this["customizableButtonBase"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-   <string>Name|Beginner</string>
-   <string>Flagset|RAhN6EAAFAViN1TRtcA+9TFCVAnTzFAmLh</string>
-   <string>Tooltip|This is great for people looking for a casual experience</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customFlagsButton1
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton1"]));
+        public global::System.Collections.Specialized.StringCollection customizableButton1 {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton1"]));
             }
-            set
-            {
-                this["customFlagsButton1"] = value;
+            set {
+                this["customizableButton1"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-  <string>Name|Standard</string>
-  <string>Flagset|RAAN6AAFesXtN1Tdt0g+8v4cYf4XT7AAWA</string>
-  <string>Tooltip|Flags for the 2023 Standard Tournament</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customFlagsButton2
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton2"]));
+        public global::System.Collections.Specialized.StringCollection customizableButton2 {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton2"]));
             }
-            set
-            {
-                this["customFlagsButton2"] = value;
+            set {
+                this["customizableButton2"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-  <string>Name|Max Rando</string>
-  <string>Flagset|hEAjMsAFerXtN1TbkkH+8v4TX#4XS7AALy</string>
-  <string>Tooltip|Flags for the 2023 Max Rando Tournament</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customFlagsButton3
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton3"]));
+        public global::System.Collections.Specialized.StringCollection customizableButton3 {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton3"]));
             }
-            set
-            {
-                this["customFlagsButton3"] = value;
+            set {
+                this["customizableButton3"] = value;
             }
         }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-  <string>Name|Random%</string>
-  <string>Flagset|hEAK0sALvrpUWVXu20Y+8v9ttf9tb7AAJy</string>
-  <string>Tooltip|Is it randomized? Who knows?</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customFlagsButton4
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton4"]));
-            }
-            set
-            {
-                this["customFlagsButton4"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customFlagsButton5
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton5"]));
-            }
-            set
-            {
-                this["customFlagsButton5"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customFlagsButton6
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customFlagsButton6"]));
-            }
-            set
-            {
-                this["customFlagsButton6"] = value;
-            }
-        }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
@@ -388,6 +310,18 @@ namespace Z2Randomizer.WinFormUI.Properties {
             }
             set {
                 this["beepThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool useCommunityText {
+            get {
+                return ((bool)(this["useCommunityText"]));
+            }
+            set {
+                this["useCommunityText"] = value;
             }
         }
     }

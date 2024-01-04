@@ -518,6 +518,7 @@ public partial class MainUI : Form
         Properties.Settings.Default.lastused = flagsTextBox.Text.Trim();
         Properties.Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
         Properties.Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
+        Properties.Settings.Default.communityText = useCommunityTextCheckbox.Checked;
         Properties.Settings.Default.lastseed = seedTextBox.Text.Trim();
         Properties.Settings.Default.Save();
         try
@@ -1426,7 +1427,6 @@ public partial class MainUI : Form
             enableHelpfulHintsCheckbox.CheckState = ToCheckState(configuration.EnableHelpfulHints);
             enableSpellItemHintsCheckbox.CheckState = ToCheckState(configuration.EnableSpellItemHints);
             enableTownNameHintsCheckbox.CheckState = ToCheckState(configuration.EnableTownNameHints);
-            useCommunityTextCheckbox.Checked = configuration.UseCommunityText;
 
             //Misc
             //disableLowHealthBeepCheckbox.Checked = configuration.DisableLowHealthBeep;
