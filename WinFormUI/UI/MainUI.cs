@@ -3,6 +3,7 @@ using Z2Randomizer.Core;
 using System.ComponentModel;
 using Z2Randomizer.Core.Overworld;
 using WinFormUI.UI;
+
 using Z2Randomizer.Core.Flags;
 
 namespace Z2Randomizer.WinFormUI;
@@ -27,7 +28,7 @@ public partial class MainUI : Form
 
     public MainUI()
     {
-        if (Properties.Settings.Default.update)
+        if (WinFormUI.Properties.Settings.Default.update)
         {
             Properties.Settings.Default.Upgrade();
             Properties.Settings.Default.update = false;
@@ -244,12 +245,12 @@ public partial class MainUI : Form
     {
 
         //customisable buttons - config settings are stored using the name of the control as the key, so order does not specifically matter. 
-        customisableButtons.Add(customFlagsButton1);
-        customisableButtons.Add(customFlagsButton2);
-        customisableButtons.Add(customFlagsButton3);
-        customisableButtons.Add(customFlagsButton4);
-        customisableButtons.Add(customFlagsButton5);
-        customisableButtons.Add(customFlagsButton6);
+        customisableButtons.Add(customizableButton1);
+        customisableButtons.Add(customizableButton2);
+        customisableButtons.Add(customizableButton3);
+        customisableButtons.Add(customizableButton4);
+        customisableButtons.Add(customizableButton5);
+        customisableButtons.Add(customizableButton6);
 
 
         // could probably implement a custom toolstrip item here so we can figure out whether things should be enabled or not
@@ -518,7 +519,7 @@ public partial class MainUI : Form
         Properties.Settings.Default.lastused = flagsTextBox.Text.Trim();
         Properties.Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
         Properties.Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
-        Properties.Settings.Default.communityText = useCommunityTextCheckbox.Checked;
+        Properties.Settings.Default.useCommunityText = useCommunityTextCheckbox.Checked;
         Properties.Settings.Default.lastseed = seedTextBox.Text.Trim();
         Properties.Settings.Default.Save();
         try
@@ -2013,14 +2014,14 @@ public partial class MainUI : Form
     {
         GenerateSpriteImage();
     }
-    
+
     private void DuplicateRoomExclusionHandler(object sender, EventArgs e)
     {
-        if(noDuplicateRoomsByEnemiesCheckbox.Checked && noDuplicateRoomsByEnemiesCheckbox.Equals(sender))
+        if (noDuplicateRoomsByEnemiesCheckbox.Checked && noDuplicateRoomsByEnemiesCheckbox.Equals(sender))
         {
             noDuplicateRoomsByLayoutCheckbox.Checked = false;
         }
-        else if(noDuplicateRoomsByLayoutCheckbox.Checked && noDuplicateRoomsByLayoutCheckbox.Equals(sender))
+        else if (noDuplicateRoomsByLayoutCheckbox.Checked && noDuplicateRoomsByLayoutCheckbox.Equals(sender))
         {
             noDuplicateRoomsByEnemiesCheckbox.Checked = false;
         }
@@ -2028,9 +2029,14 @@ public partial class MainUI : Form
 
     private void AtLeastOneRoomTypeRequiredHandler(object sender, EventArgs e)
     {
-        if(!includeVanillaRoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked)
+        if (!includeVanillaRoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked)
         {
             ((CheckBox)sender).Checked = true;
         }
+    }
+
+    private void customFlagsButton2_Click(object sender, EventArgs e)
+    {
+
     }
 }
