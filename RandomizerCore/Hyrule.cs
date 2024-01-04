@@ -435,6 +435,7 @@ public class Hyrule
         }
 
         AddCropGuideBoxesToFileSelect();
+        ROMData.ChangeMapperToMMC5();
 
         ROMData.ApplyAsm();
 
