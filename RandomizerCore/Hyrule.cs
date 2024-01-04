@@ -1968,7 +1968,7 @@ public class Hyrule
         }
         itemLocs.Add(westHyrule.grassTile);
         itemLocs.Add(westHyrule.heartContainerCave);
-        itemLocs.Add(westHyrule.jar);
+        itemLocs.Add(westHyrule.magicContainerCave);
         itemLocs.Add(westHyrule.medicineCave);
         itemLocs.Add(westHyrule.trophyCave);
         itemLocs.Add(eastHyrule.waterTile);
@@ -3112,7 +3112,7 @@ public class Hyrule
         }
 
         ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Item);
-        ROMData.Put(0x502A, (byte)westHyrule.jar.Item);
+        ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Item);
         ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Item);
         //logger.WriteLine(westHyrule.heart1.item);
         //logger.WriteLine(westHyrule.heart2.item);

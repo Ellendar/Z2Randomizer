@@ -20,7 +20,7 @@ public class WestHyrule : World
     public Location locationAtPalace1;
     public Location locationAtPalace2;
     public Location locationAtPalace3;
-    public Location jar;
+    public Location magicContainerCave;
     public Location grassTile;
     public Location heartContainerCave;
     public Location locationAtSariaNorth;
@@ -132,7 +132,7 @@ public class WestHyrule : World
         locationAtPalace2.PalaceNumber = 2;
         locationAtPalace3 = GetLocationByMem(0x4665);
         locationAtPalace3.PalaceNumber = 3;
-        jar = GetLocationByMem(0x4632);
+        magicContainerCave = GetLocationByMem(0x4632);
         grassTile = GetLocationByMem(0x463F);
         heartContainerCave = GetLocationByMem(0x4634);
         locationAtRauru = GetLocationByMem(0x465C);
@@ -1398,22 +1398,28 @@ public class WestHyrule : World
         HashSet<Location> requiredLocations = new()
         {
             northPalace,
+            locationAtRauru,
             locationAtMido,
-            bagu,
             locationAtRuto,
+            locationAtSariaNorth,
+            locationAtSariaSouth,
+            bagu,
+
             medicineCave,
             trophyCave,
+            heartContainerCave,
+            pbagCave,
+            magicContainerCave,
+
+            //Connector caves
+            cave1,
+            cave2,
+
             locationAtPalace1,
             locationAtPalace2,
             locationAtPalace3,
+
             grassTile,
-            heartContainerCave,
-            locationAtSariaNorth,
-            locationAtSariaSouth,
-            locationAtRauru,
-            bridge1,
-            bridge2,
-            pbagCave
         };
 
         foreach (Location key in connections.Keys)
