@@ -1410,16 +1410,11 @@ public class WestHyrule : World
             heartContainerCave,
             pbagCave,
             magicContainerCave,
-
-            //Connector caves
-            cave1,
-            cave2,
+            grassTile,
 
             locationAtPalace1,
             locationAtPalace2,
             locationAtPalace3,
-
-            grassTile,
         };
 
         foreach (Location key in connections.Keys)

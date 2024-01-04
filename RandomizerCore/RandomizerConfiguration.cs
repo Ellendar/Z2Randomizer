@@ -1299,7 +1299,7 @@ public class RandomizerConfiguration
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
-        else if (NormalPalaceStyle == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH)
+        else if (GPStyle == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH)
         {
             properties.GPStyle = random.Next(2) == 0 ? PalaceStyle.RECONSTRUCTED : PalaceStyle.RECONSTRUCTED_SHORTENED;
         }
