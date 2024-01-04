@@ -1887,55 +1887,37 @@ public class Hyrule
                 eastHyrule.locationAtGP.World = eastHyrule.locationAtGP.World & 0xFC;
                 eastHyrule.locationAtGP.World = eastHyrule.locationAtGP.World | 0x02;
             }
-
-            /*
-            subroutine start bf60(13f70)
-
-            instruction: 20 60 bf
-
-            subroutine:
-                load 22 into accumulator    A9 22
-                xor with $561               4D 61 05
-                return                      60
-
-
-            Gooma / helmet head fix (CHECK THESE):
-                13c96 = d0--hitbox / exp / hp
-                13d88 = d0--sprite info
-                13ad6 = d0--behavior
-                11b2d = d0(don't need?)
-                */
-
-            //write subroutine
-            ROMData.Put(0x13f70, 0xA9);
             byte helmetRoom = 0x22;
             if (props.NormalPalaceStyle.IsReconstructed())
             {
                 helmetRoom = (byte)palaces[1].BossRoom.NewMap;
             }
-            ROMData.Put(0x13f71, helmetRoom);
-            ROMData.Put(0x13f72, 0x4D);
-            ROMData.Put(0x13f73, 0x61);
-            ROMData.Put(0x13f74, 0x05);
-            ROMData.Put(0x13f75, 0x60);
+            var a = _engine.Asm();
+            a.assign("HelmetRoom", helmetRoom);
+            a.code("""
+.segment "PRG4"
 
-            //jump to subroutine
-            ROMData.Put(0x13c93, 0x20);
-            ROMData.Put(0x13c94, 0x60);
-            ROMData.Put(0x13c95, 0xBF);
+.reloc
+HelmetHeadGoomaFix:
+    lda #<HelmetRoom
+    eor $561
+    rts
 
-            ROMData.Put(0x13d85, 0x20);
-            ROMData.Put(0x13d86, 0x60);
-            ROMData.Put(0x13d87, 0xBF);
+.org $bac3
+    jsr HelmetHeadGoomaFix
+.org $bc83
+    jsr HelmetHeadGoomaFix
+.org $bd75
+    jsr HelmetHeadGoomaFix
 
-            ROMData.Put(0x13ad3, 0x20);
-            ROMData.Put(0x13ad4, 0x60);
-            ROMData.Put(0x13ad5, 0xBF);
+; Also fix a key glitch
+.org $9b27
+    nop
+    nop
+    nop
 
-            //fix for key glitch
-            ROMData.Put(0x11b37, 0xea);
-            ROMData.Put(0x11b38, 0xea);
-            ROMData.Put(0x11b39, 0xea);
+""", "helmethead_gooma_fix.s");
+            _engine.Modules.Add(a.Actions);
         }
 
     }
