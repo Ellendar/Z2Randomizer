@@ -132,9 +132,29 @@ public class Assembler
         {
             segment(segments);
         }
-        reloc(name);
+        reloc();
         label(name);
         export(name);
+    }
+
+    // Assign defines a constant value or expression
+    public void assign(string name, int value)
+    {
+        Actions.Add(new() {
+            { "action", "assign" },
+            { "value", value },
+            { "name", name },
+        });
+    }
+
+    // Set defines a non-constant value (which can be redefined with a second set)
+    public void set(string name, int value)
+    {
+        Actions.Add(new() {
+            { "action", "set" },
+            { "value", value },
+            { "name", name },
+        });
     }
 }
 
@@ -147,8 +167,8 @@ public class Engine
     public Engine() {
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
         // follow this tutorial for how https://microsoft.github.io/ClearScript/Details/Build.html#_Debugging_with_ClearScript_2
-        //_engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
-        _engine = new V8ScriptEngine();
+        _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
+        //_engine = new V8ScriptEngine();
 
         // Setup the initial segments for the randomizer
         var a = Asm();
@@ -314,6 +334,14 @@ async function processAction(a, action) {
             a.segment(...action["name"]);
             break;
         }
+        case "assign": {
+            a.assign(action["name"], action["value"]);
+            break;
+        }
+        case "set": {
+            a.set(action["name"], action["value"]);
+            break;
+        }
     }
 }
 
@@ -322,16 +350,13 @@ async function processAction(a, action) {
     debugger;
     // Assemble all of the modules
     const assembled = [];
-    // Setup the original code as overwriteMode require to make it so the code is
-    // only overwritten if its freed first
-    let initmod = new Assembler(Cpu.P02, {overwriteMode: 'require'});
+    let initmod = new Assembler(Cpu.P02);
     for (const action of initmodule) {
         await processAction(initmod, action);
     }
     assembled.push(initmod);
     for (const module of modules) {
-        // Set all custom modules to overwrite mode forbid to prevent patches from overwriting each other
-        let a = new Assembler(Cpu.P02, {overwriteMode: 'forbid'});
+        let a = new Assembler(Cpu.P02);
         for (const action of module) {
             await processAction(a, action);
         }
