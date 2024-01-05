@@ -8,11 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WinFormUI.Properties {
+namespace Z2Randomizer.WinFormUI.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -288,7 +288,46 @@ namespace WinFormUI.Properties {
                 this["customizableButton3"] = value;
             }
         }
-        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customizableButton4
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton4"]));
+            }
+            set
+            {
+                this["customizableButton3"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customizableButton5
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton5"]));
+            }
+            set
+            {
+                this["customizableButton3"] = value;
+            }
+        }
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection customizableButton6
+        {
+            get
+            {
+                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton6"]));
+            }
+            set
+            {
+                this["customizableButton3"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]

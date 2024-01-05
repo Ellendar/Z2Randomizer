@@ -246,12 +246,12 @@ partial class MainUI
         flagsLabel = new Label();
         toolTip1 = new ToolTip(components);
         wikiButton = new Button();
-        customFlagsButton1 = new Button();
-        customFlagsButton2 = new Button();
-        customFlagsButton3 = new Button();
-        customFlagsButton4 = new Button();
-        customFlagsButton5 = new Button();
-        customFlagsButton6 = new Button();
+        customizableButton1 = new Button();
+        customizableButton2 = new Button();
+        customizableButton3 = new Button();
+        customizableButton4 = new Button();
+        customizableButton5 = new Button();
+        customizableButton6 = new Button();
         discordButton = new Button();
         oldFlagsTextbox = new TextBox();
         convertButton = new Button();
@@ -2975,75 +2975,75 @@ partial class MainUI
         wikiButton.UseVisualStyleBackColor = true;
         wikiButton.Click += WikiBtn_Click;
         // 
-        // customFlagsButton1
+        // customizableButton1
         // 
-        customFlagsButton1.AutoEllipsis = true;
-        customFlagsButton1.Location = new Point(16, 504);
-        customFlagsButton1.Margin = new Padding(4, 3, 4, 3);
-        customFlagsButton1.Name = "customFlagsButton1";
-        customFlagsButton1.Size = new Size(96, 27);
-        customFlagsButton1.TabIndex = 18;
-        customFlagsButton1.Text = "Beginner";
-        toolTip1.SetToolTip(customFlagsButton1, "This preset is great for people who are looking for a casual experience.");
-        customFlagsButton1.UseVisualStyleBackColor = true;
+        customizableButton1.AutoEllipsis = true;
+        customizableButton1.Location = new Point(16, 504);
+        customizableButton1.Margin = new Padding(4, 3, 4, 3);
+        customizableButton1.Name = "customizableButton1";
+        customizableButton1.Size = new Size(96, 27);
+        customizableButton1.TabIndex = 18;
+        customizableButton1.Text = "Beginner";
+        toolTip1.SetToolTip(customizableButton1, "This preset is great for people who are looking for a casual experience.");
+        customizableButton1.UseVisualStyleBackColor = true;
         // 
-        // customFlagsButton2
+        // customizableButton2
         // 
-        customFlagsButton2.AutoEllipsis = true;
-        customFlagsButton2.Location = new Point(116, 504);
-        customFlagsButton2.Margin = new Padding(4, 3, 4, 3);
-        customFlagsButton2.Name = "customFlagsButton2";
-        customFlagsButton2.Size = new Size(96, 27);
-        customFlagsButton2.TabIndex = 19;
-        customFlagsButton2.Text = "Standard";
-        toolTip1.SetToolTip(customFlagsButton2, "Flags for the 2023 Standard Tournament");
-        customFlagsButton2.UseVisualStyleBackColor = true;
+        customizableButton2.AutoEllipsis = true;
+        customizableButton2.Location = new Point(116, 504);
+        customizableButton2.Margin = new Padding(4, 3, 4, 3);
+        customizableButton2.Name = "customizableButton2";
+        customizableButton2.Size = new Size(96, 27);
+        customizableButton2.TabIndex = 19;
+        customizableButton2.Text = "Standard";
+        toolTip1.SetToolTip(customizableButton2, "Flags for the 2023 Standard Tournament");
+        customizableButton2.UseVisualStyleBackColor = true;
         // 
-        // customFlagsButton3
+        // customizableButton3
         // 
-        customFlagsButton3.AutoEllipsis = true;
-        customFlagsButton3.Location = new Point(216, 504);
-        customFlagsButton3.Margin = new Padding(4, 3, 4, 3);
-        customFlagsButton3.Name = "customFlagsButton3";
-        customFlagsButton3.Size = new Size(96, 27);
-        customFlagsButton3.TabIndex = 20;
-        customFlagsButton3.Text = "Max Rando";
-        toolTip1.SetToolTip(customFlagsButton3, "Flags for the 2023 Max Rando Tournament");
-        customFlagsButton3.UseVisualStyleBackColor = true;
+        customizableButton3.AutoEllipsis = true;
+        customizableButton3.Location = new Point(216, 504);
+        customizableButton3.Margin = new Padding(4, 3, 4, 3);
+        customizableButton3.Name = "customizableButton3";
+        customizableButton3.Size = new Size(96, 27);
+        customizableButton3.TabIndex = 20;
+        customizableButton3.Text = "Max Rando";
+        toolTip1.SetToolTip(customizableButton3, "Flags for the 2023 Max Rando Tournament");
+        customizableButton3.UseVisualStyleBackColor = true;
         // 
-        // customFlagsButton4
+        // customizableButton4
         // 
-        customFlagsButton4.AutoEllipsis = true;
-        customFlagsButton4.Location = new Point(316, 504);
-        customFlagsButton4.Margin = new Padding(4, 3, 4, 3);
-        customFlagsButton4.Name = "customFlagsButton4";
-        customFlagsButton4.Size = new Size(96, 27);
-        customFlagsButton4.TabIndex = 21;
-        customFlagsButton4.Text = "Random%";
-        toolTip1.SetToolTip(customFlagsButton4, "Is it randomized? Who knows?");
-        customFlagsButton4.UseVisualStyleBackColor = true;
+        customizableButton4.AutoEllipsis = true;
+        customizableButton4.Location = new Point(316, 504);
+        customizableButton4.Margin = new Padding(4, 3, 4, 3);
+        customizableButton4.Name = "customizableButton4";
+        customizableButton4.Size = new Size(96, 27);
+        customizableButton4.TabIndex = 21;
+        customizableButton4.Text = "Random%";
+        toolTip1.SetToolTip(customizableButton4, "Is it randomized? Who knows?");
+        customizableButton4.UseVisualStyleBackColor = true;
         // 
-        // customFlagsButton5
+        // customizableButton5
         // 
-        customFlagsButton5.AutoEllipsis = true;
-        customFlagsButton5.Location = new Point(416, 504);
-        customFlagsButton5.Margin = new Padding(4, 3, 4, 3);
-        customFlagsButton5.Name = "customFlagsButton5";
-        customFlagsButton5.Size = new Size(96, 27);
-        customFlagsButton5.TabIndex = 22;
-        toolTip1.SetToolTip(customFlagsButton5, "Unused (for now)");
-        customFlagsButton5.UseVisualStyleBackColor = true;
+        customizableButton5.AutoEllipsis = true;
+        customizableButton5.Location = new Point(416, 504);
+        customizableButton5.Margin = new Padding(4, 3, 4, 3);
+        customizableButton5.Name = "customizableButton5";
+        customizableButton5.Size = new Size(96, 27);
+        customizableButton5.TabIndex = 22;
+        toolTip1.SetToolTip(customizableButton5, "Unused (for now)");
+        customizableButton5.UseVisualStyleBackColor = true;
         // 
-        // customFlagsButton6
+        // customizableButton6
         // 
-        customFlagsButton6.AutoEllipsis = true;
-        customFlagsButton6.Location = new Point(516, 504);
-        customFlagsButton6.Margin = new Padding(4, 3, 4, 3);
-        customFlagsButton6.Name = "customFlagsButton6";
-        customFlagsButton6.Size = new Size(96, 27);
-        customFlagsButton6.TabIndex = 23;
-        toolTip1.SetToolTip(customFlagsButton6, "Unused (for now)");
-        customFlagsButton6.UseVisualStyleBackColor = true;
+        customizableButton6.AutoEllipsis = true;
+        customizableButton6.Location = new Point(516, 504);
+        customizableButton6.Margin = new Padding(4, 3, 4, 3);
+        customizableButton6.Name = "customizableButton6";
+        customizableButton6.Size = new Size(96, 27);
+        customizableButton6.TabIndex = 23;
+        toolTip1.SetToolTip(customizableButton6, "Unused (for now)");
+        customizableButton6.UseVisualStyleBackColor = true;
         // 
         // discordButton
         // 
@@ -3121,12 +3121,12 @@ partial class MainUI
         Controls.Add(oldFlagsLabel);
         Controls.Add(oldFlagsTextbox);
         Controls.Add(discordButton);
-        Controls.Add(customFlagsButton6);
-        Controls.Add(customFlagsButton5);
-        Controls.Add(customFlagsButton4);
-        Controls.Add(customFlagsButton3);
-        Controls.Add(customFlagsButton2);
-        Controls.Add(customFlagsButton1);
+        Controls.Add(customizableButton6);
+        Controls.Add(customizableButton5);
+        Controls.Add(customizableButton4);
+        Controls.Add(customizableButton3);
+        Controls.Add(customizableButton2);
+        Controls.Add(customizableButton1);
         Controls.Add(wikiButton);
         Controls.Add(flagsLabel);
         Controls.Add(updateButton);
@@ -3245,12 +3245,6 @@ partial class MainUI
     private CheckBox shuffleSmallItemsCheckbox;
     private CheckBox palacesHaveExtraKeysCheckbox;
     private CheckBox palacePaletteCheckbox;
-    private Button customFlagsButton6;
-    private Button customFlagsButton5;
-    private Button customFlagsButton4;
-    private Button customFlagsButton3;
-    private Button customFlagsButton2;
-    private Button customFlagsButton1;
     private CheckBox allowPalaceContinentSwapCheckbox;
     private Label label4;
     private Label label12;
@@ -3402,5 +3396,11 @@ partial class MainUI
     private CheckBox useCommunityTextCheckbox;
     private CheckBox noDuplicateRoomsByEnemiesCheckbox;
     private CheckBox HardBossesCheckbox;
+    private Button customizableButton1;
+    private Button customizableButton2;
+    private Button customizableButton3;
+    private Button customizableButton4;
+    private Button customizableButton5;
+    private Button customizableButton6;
 }
 
