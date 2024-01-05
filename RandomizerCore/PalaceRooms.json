@@ -1960,34 +1960,7 @@
         ],
     "sideviewData": "38600F08D2087095640F0CD20E7071D208D60E7075D60880B281B281719073D80E80B2A32304F1F050A223D7086001762782C2640F08D20E"
     },
-    {
-    "author": "palace5vanilla",
-    "bitmask": "0F",
-    "connections": "FC0000CC",
-    "elevatorScreen": -1,
-    "enabled": true,
-    "enemies": "091E067F0C739A4A85",
-    "group": "vanilla",
-    "hasBoss": false,
-    "hasDrop": false,
-    "hasItem": false,
-    "isBossRoom": false,
-    "isDropZone": false,
-    "isEntrance": false,
-    "isThunderBirdRoom": false,
-    "isUpDownReversed": false,
-    "linkedRoomName": null,
-    "map": 50,
-    "memoryAddress": 67571,
-    "name": "",
-    "palaceGroup": 1,
-    "palaceNumber": null,
-    "requirements":
-        [
-        ],
-    "sideviewData": "13600808E2008AC26009D60FD6089071800F08"
-    },
-    {
+  {
     "author": "palace5vanilla",
     "bitmask": "0F",
     "connections": "C70000FC",
@@ -2003,10 +1976,36 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": null,
+    "linkedRoomName": "Segmented deadend/key room right side",
     "map": 50,
     "memoryAddress": 67571,
-    "name": "",
+    "name": "Segmented deadend/key room left side",
+    "palaceGroup": 1,
+    "palaceNumber": null,
+    "requirements": [
+    ],
+    "sideviewData": "13600808E2008AC26009D60FD6089071800F08"
+  },
+	{
+    "author": "palace5vanilla",
+    "bitmask": "0F",
+    "connections": "FC0000CC",
+    "elevatorScreen": -1,
+    "enabled": false,
+    "enemies": "091E067F0C739A4A85",
+    "group": "vanilla",
+    "hasBoss": false,
+    "hasDrop": false,
+    "hasItem": false,
+    "isBossRoom": false,
+    "isDropZone": false,
+    "isEntrance": false,
+    "isThunderBirdRoom": false,
+    "isUpDownReversed": false,
+    "linkedRoomName": "Segmented deadend/key room left side",
+    "map": 50,
+    "memoryAddress": 67571,
+    "name": "Segmented deadend/key room right side",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements":
@@ -4350,10 +4349,10 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": true,
-    "linkedRoomName": null,
+    "linkedRoomName": "GP segmented drop/1up room right side",
     "map": 41,
     "memoryAddress": 83919,
-    "name": "",
+    "name": "GP segmented drop/1up room left side",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements":
@@ -4361,12 +4360,12 @@
         ],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
     },
-    {
+  {
     "author": "palace7vanilla",
     "bitmask": "0F",
     "connections": "FCFCFCA8",
     "elevatorScreen": -1,
-    "enabled": true,
+    "enabled": false,
     "enemies": "0728193D043644",
     "group": "vanilla",
     "hasBoss": false,
@@ -4377,17 +4376,16 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": null,
+    "linkedRoomName": "GP segmented drop/1up room left side",
     "map": 41,
     "memoryAddress": 83919,
-    "name": "",
+    "name": "GP segmented drop/1up room right side",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements":
-        [
-        ],
+    "requirements": [
+    ],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
-    },
+  },
     {
     "author": "palace7vanilla",
     "bitmask": "0F",
@@ -13727,6 +13725,33 @@
     "sideviewData": "1E60000810AFE10010AFE20010AFE300D00EF7500006B0900106B090D50F"
     },
     {
+    "author": "flippedGp",
+    "bitmask": "0F",
+    "connections": "FC5200A0",
+    "elevatorScreen": -1,
+    "enabled": true,
+    "enemies": "0717D9334432C4",
+    "group": "V4_0",
+    "hasBoss": false,
+    "hasDrop": true,
+    "hasItem": false,
+    "isBossRoom": false,
+    "isDropZone": false,
+    "isEntrance": false,
+    "isThunderBirdRoom": false,
+    "isUpDownReversed": false,
+    "linkedRoomName": null,
+    "map": 41,
+    "memoryAddress": 83919,
+    "name": "",
+    "palaceGroup": null,
+    "palaceNumber": 7,
+    "requirements":
+        [
+        ],
+    "sideviewData": "4B600E08D408980F12D20FD40860C7B006B106B1064100B006B106B106B1064100B00661B3B006B106B1064100B006619380239095430061C94300440063B34100639B410044004400D30E"
+    },
+        {
     "author": "flippedGp",
     "bitmask": "0F",
     "connections": "FC5200A0",

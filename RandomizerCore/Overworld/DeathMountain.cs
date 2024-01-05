@@ -141,7 +141,7 @@ class DeathMountain : World
         climate = props.Climate.Clone();
         float dmOpennessFactor = biome switch
         {
-            Biome.CANYON => 2f,
+            Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
             _ => 1f
         };
         climate.ApplyDeathMountainSafety(walkableTerrains, dmOpennessFactor);

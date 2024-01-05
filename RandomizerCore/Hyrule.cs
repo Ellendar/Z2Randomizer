@@ -2975,6 +2975,12 @@ public class Hyrule
             ROMData.Put(0x1eeb6, 0xAD);
         }
 
+        foreach (Palace palace in palaces)
+        {
+            palace.ValidateRoomConnections();
+            palace.UpdateRom(ROMData);
+        }
+
         ROMData.AddCredits();
         //fixes improper exit from p6/new kasuto
         //if (eastHyrule.palace6.PalNum != 7)
@@ -3114,37 +3120,6 @@ public class Hyrule
         ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Item);
         ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Item);
         ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Item);
-        //logger.WriteLine(westHyrule.heart1.item);
-        //logger.WriteLine(westHyrule.heart2.item);
-        //logger.WriteLine(westHyrule.medCave.item);
-        //logger.WriteLine(westHyrule.trophyCave.item);
-        //logger.WriteLine(westHyrule.jar.item);
-        //logger.WriteLine(deathMountain.magicCave.item);
-        //logger.WriteLine(deathMountain.hammerCave.item);
-        //logger.WriteLine(westHyrule.palace1.PalNum + " " + westHyrule.palace1.item);
-        //logger.WriteLine(westHyrule.palace2.PalNum + " " + westHyrule.palace2.item);
-        //logger.WriteLine(westHyrule.palace3.PalNum + " " + westHyrule.palace3.item);
-        //logger.WriteLine(mazeIsland.palace4.PalNum + " " + mazeIsland.palace4.item);
-        //logger.WriteLine(eastHyrule.palace5.PalNum + " " + eastHyrule.palace5.item);
-        //logger.WriteLine(eastHyrule.palace6.PalNum + " " + eastHyrule.palace6.item);
-        //logger.WriteLine(eastHyrule.gp.PalNum + " " + eastHyrule.gp.item);
-        //logger.WriteLine(eastHyrule.heart1.item);
-        //logger.WriteLine(eastHyrule.heart2.item);
-        //logger.WriteLine(mazeIsland.magic.item);
-        //logger.WriteLine(mazeIsland.kid.item);
-        //logger.WriteLine(eastHyrule.newKasuto.item);
-        //logger.WriteLine(eastHyrule.newKasuto2.item);
-        //logger.WriteLine(eastHyrule.pbagCave1.item);
-        //logger.WriteLine(eastHyrule.pbagCave2.item);
-        //logger.WriteLine(eastHyrule.gp.item);
-        //logger.WriteLine(spellMap[spells.life]);
-        //logger.WriteLine(spellMap[spells.shield]);
-        //logger.WriteLine(spellMap[spells.fire]);
-        //logger.WriteLine(spellMap[spells.reflect]);
-        //logger.WriteLine(spellMap[spells.jump]);
-        //logger.WriteLine(spellMap[spells.thunder]);
-        //logger.WriteLine(spellMap[spells.fairy]);
-        //logger.WriteLine(spellMap[spells.spell]);
 
         int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 

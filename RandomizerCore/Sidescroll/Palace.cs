@@ -407,7 +407,7 @@ public class Palace
                 return false;
             }
         }
-        CheckPaths(root, 2);
+        CheckPaths(root, Direction.WEST);
         foreach (Room r in AllRooms)
         {
             if (!r.IsPlaced)
@@ -417,15 +417,15 @@ public class Palace
         }
         return true;
     }
-    //0 = up, 1 = down, 2 = left, 3 = right
-    //WARNING: This is different from the overworld direction order... For some reason.
-    private void CheckPaths(Room r, int dir)
+
+    private void CheckPaths(Room r, Direction originDirection)
     {
         if (!r.IsPlaced)
         {
+            //For required thunderbird, you can't path backwards into tbird room
             if ((Number == 7) && r.IsThunderBirdRoom)
             {
-                if (dir == 3)
+                if (originDirection == Direction.EAST)
                 {
                     r.IsPlaced = false;
                     return;
@@ -434,22 +434,22 @@ public class Palace
             r.IsPlaced = true;
             if (r.Left != null)
             {
-                CheckPaths(r.Left, 3);
+                CheckPaths(r.Left, Direction.EAST);
             }
 
             if (r.Right != null)
             {
-                CheckPaths(r.Right, 2);
+                CheckPaths(r.Right, Direction.WEST);
             }
 
             if (r.Up != null)
             {
-                CheckPaths(r.Up, 1);
+                CheckPaths(r.Up, Direction.SOUTH);
             }
 
             if (r.Down != null)
             {
-                CheckPaths(r.Down, 0);
+                CheckPaths(r.Down, Direction.NORTH);
             }
         }
     }
@@ -633,6 +633,47 @@ public class Palace
 
     public void UpdateRom(ROM ROMData)
     {
+        List<Room> roomsToRemove = new();
+        //Unify the parts of segmented rooms back together
+        foreach (Room room in AllRooms.ToList())
+        {
+            //If this is the primary room of a linked room pair
+            if (room.LinkedRoomName != null && room.Enabled)
+            {
+                Room linkedRoom = room.LinkedRoom;
+                //set each blank exit on the master room that has a counterpart in the linked room
+                if (linkedRoom.HasLeftExit() && room.Left == null && linkedRoom.Left != null)
+                {
+                    room.Left = linkedRoom.Left;
+                    room.LeftByte = linkedRoom.LeftByte;
+                }
+                if (linkedRoom.HasRightExit() && room.Right == null && linkedRoom.Right != null)
+                {
+                    room.Right = linkedRoom.Right;
+                    room.RightByte = linkedRoom.RightByte;
+                }
+                if (linkedRoom.HasUpExit() && room.Up == null && linkedRoom.Up != null)
+                {
+                    room.Up = linkedRoom.Up;
+                    room.UpByte = linkedRoom.UpByte;
+                }
+                if (linkedRoom.HasDownExit() && room.Down == null && linkedRoom.Down != null)
+                {
+                    room.Down = linkedRoom.Down;
+                    room.DownByte = linkedRoom.DownByte;
+                }
+
+                //set each room that links to the secondary room to point to the master room instead
+                AllRooms.Where(i => i.Left == linkedRoom).ToList().ForEach(i => i.Left = room);
+                AllRooms.Where(i => i.Right == linkedRoom).ToList().ForEach(i => i.Right = room);
+                AllRooms.Where(i => i.Up == linkedRoom).ToList().ForEach(i => i.Up = room);
+                AllRooms.Where(i => i.Down == linkedRoom).ToList().ForEach(i => i.Down = room);
+
+                //remove the linked room from the rooms pool
+                roomsToRemove.Add(linkedRoom);
+            }
+        }
+        AllRooms = AllRooms.Except(roomsToRemove).ToList();
         foreach (Room r in AllRooms)
         {
             r.UpdateConnectionBytes();

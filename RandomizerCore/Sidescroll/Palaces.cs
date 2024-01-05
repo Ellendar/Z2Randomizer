@@ -308,6 +308,8 @@ public class Palaces
                                 segmentedItemRoom2.NewMap = palace.ItemRoom.NewMap;
                                 segmentedItemRoom2.PalaceGroup = palaceGroup;
                                 segmentedItemRoom2.SetItem((Item)currentPalace);
+                                segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
+                                segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
                                 palace.AllRooms.Add(segmentedItemRoom2);
                                 palace.SetOpenRoom(segmentedItemRoom2);
                             }
@@ -372,6 +374,8 @@ public class Palaces
                                 {
                                     Room linkedRoom = PalaceRooms.GetRoomByName(roomToAdd.LinkedRoomName, props.UseCustomRooms);
                                     linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
+                                    linkedRoom.LinkedRoom = roomToAdd;
+                                    roomToAdd.LinkedRoom = linkedRoom;
                                     palace.AddRoom(linkedRoom, props.BlockersAnywhere);
                                 }
                             }
@@ -403,6 +407,8 @@ public class Palaces
                                         {
                                             Room linkedRoom = PalaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms);
                                             linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
+                                            linkedRoom.LinkedRoom = dropZoneRoom;
+                                            dropZoneRoom.LinkedRoom = linkedRoom;
                                             palace.AddRoom(linkedRoom, props.BlockersAnywhere);
                                             dropZoneRoom.LinkedRoom = linkedRoom;
                                         }
@@ -542,6 +548,8 @@ public class Palaces
                     {
                         Room linkedRoom = new Room(PalaceRooms.GetRoomByName(room.LinkedRoomName, props.UseCustomRooms));
                         linkedRoom.PalaceGroup = palaceGroup;
+                        linkedRoom.LinkedRoom = room;
+                        room.LinkedRoom = linkedRoom;
                         palace.AllRooms.Add(linkedRoom);
                     }
                 }
@@ -571,47 +579,6 @@ public class Palaces
                 palaces.Add(palace);
             }
         }
-
-        //On second thought, we're not going to merge the rooms until we can have some sort of exit-exit
-        //connection/requirement graph, otherwise clearability will be impossible to properly implement.
-        /*
-        //Unify the parts of segmented rooms back together
-        foreach(Palace palace in palaces)
-        {
-            foreach(Room room in palace.AllRooms.ToList())
-            {
-                //If this is the primary room of a linked room pair
-                if(room.LinkedRoomName != null && room.Enabled)
-                {
-                    Room linkedRoom = room.LinkedRoom;
-                    //set each blank exit on the master room that has a counterpart in the linked room
-                    if(room.HasLeftExit() && room.Left == null && linkedRoom.Left != null)
-                    {
-                        room.Left = linkedRoom.Left;
-                    }
-                    if (room.HasRightExit() && room.Right == null && linkedRoom.Right != null)
-                    {
-                        room.Right = linkedRoom.Right;
-                    }
-                    if (room.HasUpExit() && room.Up == null && linkedRoom.Up != null)
-                    {
-                        room.Up = linkedRoom.Up;
-                    }
-                    if (room.HasDownExit() && room.Down == null && linkedRoom.Down != null)
-                    {
-                        room.Down = linkedRoom.Down;
-                    }
-
-                    //set each room that links to the secondary room to point to the master room instead
-                    palace.AllRooms.Where(i => i.Left == linkedRoom).ToList().ForEach(i => i.Left = room);
-                    palace.AllRooms.Where(i => i.Right == linkedRoom).ToList().ForEach(i => i.Right = room);
-                    palace.AllRooms.Where(i => i.Up == linkedRoom).ToList().ForEach(i => i.Up = room);
-                    palace.AllRooms.Where(i => i.Down == linkedRoom).ToList().ForEach(i => i.Down = room);
-
-                }
-            }
-        }
-        */
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {
@@ -728,11 +695,6 @@ public class Palaces
             palaces[4].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
             palaces[5].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
             palaces[6].ShuffleSmallItems(5, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-        }
-        foreach(Palace palace in palaces)
-        {
-            palace.ValidateRoomConnections();
-            palace.UpdateRom(ROMData);
         }
 
         return palaces;
