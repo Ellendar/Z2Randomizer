@@ -259,35 +259,30 @@ public class Room
         Connections[3] = (byte)RightByte;
     }
 
-    public void WriteSideViewPtr(int addr, ROM ROMData)
+    public void WriteSideViewPtr(Assembler.Assembler a, string label)
     {
         if(PalaceGroup <= 0 || PalaceGroup > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
+        int addr;
         if(PalaceGroup == 1)
         {
-            int memAddr = addr - 0x8010;
-            ROMData.Put(sideview1 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview1 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            a.segment("PRG4");
+            addr = sideview1;
         }
         else if(PalaceGroup == 2)
         {
-            int memAddr = addr - 0x8010;
-            ROMData.Put(sideview2 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview2 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            a.segment("PRG4");
+            addr = sideview2;
         }
         else
         {
-            int memAddr = addr - 0xC010;
-            if(addr > 0x1f310)
-            {
-                memAddr = addr - 0x10010;
-            }
-            ROMData.Put(sideview3 + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(sideview3 + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-
+            a.segment("PRG5", "PRG7");
+            addr = sideview3;
         }
+        a.romorg(addr + (NewMap ?? Map) * 2);
+        a.word(a.symbol(label));
     }
 
     public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle normalPalaceStyle, PalaceStyle gpStyle)

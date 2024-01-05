@@ -830,6 +830,105 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
+    public void ChangeMapperToMMC5()
+    {
+        var a = _engine.Asm();
+        a.code("""
+
+; TODO common macpack or something to consolidate macros
+.macro FREE_UNTIL end
+  .assert * <= end
+  .free end - *
+.endmacro
+
+.segment "HEADER"
+.org $6
+.byte $52   ; Set the mapper to MMC5
+
+
+.segment "PRG7"
+
+bank7_code0 = $c000
+
+.org $c4d0
+    lda     #$44            ; vertical mirroring
+    sta     $5105
+.org $ff70
+bank7_reset:
+    sei
+    cld
+    ldx     #$00
+    stx     $2000
+    stx     $5101           ; CHR mode 1x8k banks
+    inx
+    stx     $5100           ; two 16k PRG banks
+    stx     $5103           ; Allow writing to WRAM
+wait_ppu:
+    lda     $2002
+    bpl     wait_ppu
+    dex
+    beq     wait_ppu
+    txs
+    stx     $5117           ; Top bank is last bank
+    lda     #2
+    sta     $5102           ; Allow writing to WRAM
+    lda     #$50            ; horizontal mirroring
+    sta     $5105
+    jsr     bank7_chr_bank_switch__load_A
+    lda     #$07
+    jsr     bank7_Load_Bank_A_0x8000
+    jmp     bank7_code0
+
+FREE_UNTIL $FFB1
+
+.org $ffb1
+bank7_chr_bank_switch__load_A:
+    lsr
+    sta     $5127
+    sta     $512b
+    lda     #0
+    clc
+    rts
+FREE_UNTIL $FFC5
+
+.org $FFC5
+bank7_Load_Bank_0_at_0x8000:
+    lda     #$00
+    beq     bank7_Load_Bank_A_0x8000
+bank7_Load_Bank_769_at_0x8000:
+    lda     $0769
+bank7_Load_Bank_A_0x8000:
+    asl
+    ora     #$80
+    sta     $5115
+    lda     #0
+    rts
+
+FREE_UNTIL $ffe0
+
+.segment "PRG0"
+; Clean up stuff in bank zero - make it go via bank7's routines.
+.org $8149
+    lda     #$50            ; horizontal mirroring
+    sta     $5105
+.org $8150
+    jsr     $ffb1
+.org $a86b
+    jsr     $ffb1
+
+.segment "PRG5"
+; Clean up stuff in bank 5 - make it go via bank7's routines.
+.org $a712
+    lda     #$50            ; horizontal mirroring
+    sta     $5105
+.org $a728
+    jsr     $ffb1
+
+""", "mmc5_conversion.s");
+
+        _engine.Modules.Add(a.Actions);
+    }
+
     public void ApplyAsm()
     {
         _engine.Apply(ROMData);
@@ -840,6 +939,20 @@ CheckController1ForUpAMagic:
         var a = _engine.Asm();
         a.code("""
 .segment "PRG4"
+
+.define ProjectileEnemyData $bc
+.define ProjectileYPosition $30
+.define ProjectileXVelocity $77
+.define EnemyType           $a1
+.define LinkXPosition       $4d
+.define EnemyXPositionLo    $4e
+.define EnemyXPositionHi    $3c
+.define RNG                 $051b
+.define SinWaveExtra        $07c0
+
+EnemyYVelocity = $057e
+; SinWaveVelocityIncrement = $ba1c
+
 ; Hook into carrock's update code to add the new position calculation
 .org $aec4
     jmp ChooseNewCarrockXPosition
@@ -851,44 +964,36 @@ ChooseNewCarrockXPosition:
     ; roll a random number and force carrock to only appear on the opposite side
     ; remove the MSB from the random value and we will replace it with the opposite
     ; bit from Link's MSB
-    lda $051b,x
+    lda RNG,x
     ; By shifting links opposite side bit twice, we can force Carrock to be closer to the wall
     asl
-    ;asl
-    sta $4e,x
+    sta EnemyXPositionLo,x
 
     ; Since Link's position can be from roughly $00fb - 01ef
     ; We can offset this by flipping the high bit, and then checking if its greater than
     ; $80 - $10 (which would be like starting the range from F0 - 70)
-    lda $4d
+    lda LinkXPosition
     eor #$80
     cmp #$70
 
     ; At this point, the carry contains the bit for the opposite side of the screen for link
     ; So shift it back into bosses position
-    ror $4e,x
-    ;cmp #$70
-    ;ror $4e,x
+    ror EnemyXPositionLo,x
 
     ; Vanilla checks to see if carrock is too close to the right edge, and prevents going
     ; offscreen by dividing the position by two if it would
     lda #$e0
-    cmp $4e,x
+    cmp EnemyXPositionLo,x
     bcs @SetXHighPos
         sbc #$10 - 1
-        sta $4e,x
+        sta EnemyXPositionLo,x
 @SetXHighPos:
     lda #1
-    sta $3c,x
+    sta EnemyXPositionHi,x
     rts
 
 .org $996f
     jsr MoveSinWaveWifiShot
-
-.define ProjectileEnemyData $bc
-.define ProjectileYPosition $30
-EnemyYVelocity = $057e
-; SinWaveVelocityIncrement = $ba1c
 
 .reloc
 SinWaveVelocityIncrement:
@@ -897,13 +1002,10 @@ SinWaveMaxVelocityExtant:
     .byte $28, $d4
 
 MoveSinWaveWifiShot:
-    ; Wifi shot id from carrock is $9 (and this number is premultiplied by 2)
-    cmp #$12
-    bne @NotAWifiShotFromCarrock
     ; Now check to see if we set the flag for sin waves.
-    ; We write b0 to 71,x if this wifi is a sin wave so we can check the high bit if its set then its a sin wav
-    lda $71,x
-    bpl @NotAWifiShotFromCarrock
+    ; We write b0 to SinWaveExtra,x if this wifi is a sin wave so we can check the high bit if its set then its a sin wav
+    lda SinWaveExtra,x
+    bpl @NotAWifiShot
         lda ProjectileEnemyData,x
         and #$01
         tay
@@ -926,7 +1028,7 @@ MoveSinWaveWifiShot:
         adc ProjectileYPosition,x
         sta ProjectileYPosition,x
     ldy #$12
-@NotAWifiShotFromCarrock:
+@NotAWifiShot:
     ; Perform the original patched call
     lda $6ec0,y
     rts
@@ -936,10 +1038,19 @@ MoveSinWaveWifiShot:
 
 .reloc
 RandomizeWifiShotType:
+    ldx $10
+    lda EnemyType,x
+    cmp #$22 ; check if its spawned by carock and skip it. carock code id is 0x22
+    beq @CarockShot
+        ; Do the original code since its not our new buffed carock
+        lda #$c0
+        sta ProjectileYPosition,y
+        rts
+@CarockShot:
     ; Fetch a random number and 50/50 chance its a straight shot
-    bit $051c
+    lda #0
+    bit RNG+1
     bmi @StraightShot
-        lda #0
         bvc @HiPositionShot
             ; Shooting from the bottom should start by arcing upwards
             lda #1
@@ -949,11 +1060,10 @@ RandomizeWifiShotType:
         sta EnemyYVelocity,y
         lda #$b0
         ; Firing a sin wave shot, so set the flag for sin wave and then follow through setting up the position
-        sta $0071,y
+        sta SinWaveExtra,y
         bne @WriteInitCoord
 @StraightShot:
-    lda #0
-    sta $0071,y
+    sta SinWaveExtra,y
     lda #$b0
     ; we are shooting straight so clear out the flag
     ; 50/50 chance that the shot starts high or low
@@ -962,7 +1072,22 @@ RandomizeWifiShotType:
         clc
         adc #$10
 @WriteShotYCoord:
-    sta $0030,y
+    sta ProjectileYPosition,y
+    ; roll a random number to see if we shoot a fast beam
+    lda RNG+1
+    and #1
+    beq @Exit
+        lda ProjectileXVelocity,y
+        bmi @NegativeVelocity
+           clc
+           adc #$10
+           bne @DoneVelocityUpdate ; unconditional
+@NegativeVelocity:
+        sec
+        sbc #$10
+@DoneVelocityUpdate:
+        sta ProjectileXVelocity,y
+@Exit:
     rts
 """);
         _engine.Modules.Add(a.Actions);
