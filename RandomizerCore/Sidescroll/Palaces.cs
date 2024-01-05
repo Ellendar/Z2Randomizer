@@ -723,63 +723,6 @@ public class Palaces
             //}
         }
     }
-    /*
-    private static Room SelectBossRoom(int palaceNumber, Random r, bool useCustomRooms, bool)
-    {
-        if(useCommunityRooms)
-        {
-            if (palaceNumber == 7)
-            {
-                return PalaceRooms.DarkLinkRooms(useCustomRooms)[r.Next(PalaceRooms.DarkLinkRooms(useCustomRooms).Count)].DeepCopy();
-            }
-            if (palaceNumber == 6)
-            {
-                return PalaceRooms.NewP6BossRooms(useCustomRooms)[r.Next(PalaceRooms.NewP6BossRooms(useCustomRooms).Count)].DeepCopy();
-            }
-            Room room = PalaceRooms.NewBossRooms(useCustomRooms)[r.Next(PalaceRooms.NewBossRooms(useCustomRooms).Count)].DeepCopy();
-            room.Enemies = PalaceRooms.BossRooms(useCustomRooms)[palaceNumber - 1].Enemies;
-            return room;
-        }
-        else
-        {
-            return palaceNumber switch
-            {
-                1 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 13).First().DeepCopy(),
-                2 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 34).First().DeepCopy(),
-                3 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 14).First().DeepCopy(),
-                4 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 28).First().DeepCopy(),
-                5 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 41).First().DeepCopy(),
-                6 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 58).First().DeepCopy(),
-                7 => PalaceRooms.BossRooms(useCustomRooms).Where(i => i.Map == 54).First().DeepCopy(),
-                _ => throw new ImpossibleException("Unable to find vanilla boss room")
-            };
-        }
-    }
-    */
-
-    /*
-    public static Room GenerateItemRoom(Random r, bool useCustomRooms, bool useCommunityRooms)
-    {
-        if(!useCommunityRooms)
-        {
-            return PalaceRooms.ItemRooms(useCustomRooms)[r.Next(PalaceRooms.ItemRooms(useCustomRooms).Count)].DeepCopy();
-        }
-        return r.Next(5) switch
-        {
-            //left
-            0 => PalaceRooms.LeftOpenItemRooms(useCustomRooms)[r.Next(PalaceRooms.LeftOpenItemRooms(useCustomRooms).Count)].DeepCopy(),
-            //right
-            1 => PalaceRooms.RightOpenItemRooms(useCustomRooms)[r.Next(PalaceRooms.RightOpenItemRooms(useCustomRooms).Count)].DeepCopy(),
-            //up
-            2 => PalaceRooms.UpOpenItemRooms(useCustomRooms)[r.Next(PalaceRooms.UpOpenItemRooms(useCustomRooms).Count)].DeepCopy(),
-            //down
-            3 => PalaceRooms.DownOpenItemRooms(useCustomRooms)[r.Next(PalaceRooms.DownOpenItemRooms(useCustomRooms).Count)].DeepCopy(),
-            //Through
-            4 => PalaceRooms.ThroughItemRooms(useCustomRooms)[r.Next(PalaceRooms.ThroughItemRooms(useCustomRooms).Count)].DeepCopy(),
-            _ => throw new Exception("Invalid item room direction selection."),
-        };
-    }
-    */
 
     private static Dictionary<int, int> SetupFreeSpace(bool bank4, int enemyData)
     {
