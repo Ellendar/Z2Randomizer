@@ -112,7 +112,7 @@ public class Palaces
                 entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.V4_0, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.V4_0, props.UseCustomRooms)
-                    .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
+                    .Where(i => (i.PalaceNumber == null && palaceNum < 6) || i.PalaceNumber == palaceNum).ToList());
                 tbirdRooms.AddRange(PalaceRooms.TBirdRooms(RoomGroup.V4_0, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
@@ -129,7 +129,7 @@ public class Palaces
                 entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.V4_4, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.V4_4, props.UseCustomRooms)
-                    .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
+                    .Where(i => (i.PalaceNumber == null && palaceNum < 6) || i.PalaceNumber == palaceNum).ToList());
                 tbirdRooms.AddRange(PalaceRooms.TBirdRooms(RoomGroup.V4_4, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
