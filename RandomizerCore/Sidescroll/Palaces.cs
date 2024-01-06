@@ -518,13 +518,12 @@ public class Palaces
 
                 palace.Root = new(entrancesByPalaceNumber[currentPalace].First());
                 palace.Root.PalaceGroup = palaceGroup;
-                palace.BossRoom = PalaceRooms.VanillaBossRoom(currentPalace);
+                palace.BossRoom = new(PalaceRooms.VanillaBossRoom(currentPalace));
                 palace.BossRoom.PalaceGroup = palaceGroup;
                 palace.AllRooms.Add(palace.Root);
                 if (currentPalace != 7)
                 {
-                    Room itemRoom = null;
-                    itemRoom = new(PalaceRooms.VanillaItemRoom(currentPalace));
+                    Room itemRoom = new(PalaceRooms.VanillaItemRoom(currentPalace));
 
                     palace.ItemRoom = itemRoom;
                     palace.ItemRoom.PalaceGroup = palaceGroup;
@@ -547,7 +546,7 @@ public class Palaces
                     
                     if(room.LinkedRoomName != null)
                     {
-                        Room linkedRoom = new Room(PalaceRooms.GetRoomByName(room.LinkedRoomName, props.UseCustomRooms));
+                        Room linkedRoom = new(PalaceRooms.GetRoomByName(room.LinkedRoomName, props.UseCustomRooms));
                         linkedRoom.PalaceGroup = palaceGroup;
                         linkedRoom.LinkedRoom = room;
                         room.LinkedRoom = linkedRoom;
@@ -571,6 +570,10 @@ public class Palaces
                 }
                 while (!palace.AllReachable() || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
                 {
+                    if(palaceStyle == PalaceStyle.VANILLA)
+                    {
+                        throw new Exception("Vanilla palace (" + currentPalace + ") was not all reachable. This should be impossible.");
+                    }
                     palace.ResetRooms();
                     if (palaceStyle == PalaceStyle.SHUFFLED)
                     {
