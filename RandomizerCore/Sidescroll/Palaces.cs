@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using static Z2Randomizer.Core.Util;
 
 namespace Z2Randomizer.Core.Sidescroll;
@@ -209,9 +210,9 @@ public class Palaces
 
         for (int currentPalace = 1; currentPalace < 8; currentPalace++)
         {
+            Palace palace;
             if (currentPalace == 7 && props.GPStyle.IsReconstructed() || currentPalace < 7 && props.NormalPalaceStyle.IsReconstructed())
             {
-                Palace palace;// = new Palace(i, palaceAddr[i], palaceConnectionLocs[i], this.ROMData);
                 int tries = 0;
                 int innertries = 0;
                 int palaceGroup = currentPalace switch
@@ -468,40 +469,11 @@ public class Palaces
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 palace.Generations += tries;
                 palaces.Add(palace);
-                foreach (Room room in palace.AllRooms)
-                {
-                    if (currentPalace == 7)
-                    {
-                        enemyBytesGP += room.Enemies.Length;
-                        if (sideviewsgp.ContainsKey(room.SideView))
-                        {
-                            sideviewsgp[room.SideView].Add(room);
-                        }
-                        else
-                        {
-                            List<Room> l = new List<Room> { room };
-                            sideviewsgp.Add(room.SideView, l);
-                        }
-                    }
-                    else
-                    {
-                        enemyBytes += room.Enemies.Length;
-                        if (sideviews.ContainsKey(room.SideView))
-                        {
-                            sideviews[room.SideView].Add(room);
-                        }
-                        else
-                        {
-                            List<Room> l = new List<Room> { room };
-                            sideviews.Add(room.SideView, l);
-                        }
-                    }
-                }
             }
             //NOT RECONSTRUCTED
             else
             {
-                Palace palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace], props.UseCustomRooms);
+                palace = new Palace(currentPalace, palaceAddr[currentPalace], palaceConnectionLocs[currentPalace], props.UseCustomRooms);
                 PalaceStyle palaceStyle = currentPalace == 7 ? props.GPStyle : props.NormalPalaceStyle;
                 //p.dumpMaps();
                 int palaceGroup = currentPalace switch
@@ -581,6 +553,35 @@ public class Palaces
                     }
                 }
                 palaces.Add(palace);
+            }
+            foreach (Room room in palace.AllRooms)
+            {
+                if (currentPalace == 7)
+                {
+                    enemyBytesGP += room.Enemies.Length;
+                    if (sideviewsgp.ContainsKey(room.SideView))
+                    {
+                        sideviewsgp[room.SideView].Add(room);
+                    }
+                    else
+                    {
+                        List<Room> l = new List<Room> { room };
+                        sideviewsgp.Add(room.SideView, l);
+                    }
+                }
+                else
+                {
+                    enemyBytes += room.Enemies.Length;
+                    if (sideviews.ContainsKey(room.SideView))
+                    {
+                        sideviews[room.SideView].Add(room);
+                    }
+                    else
+                    {
+                        List<Room> l = new List<Room> { room };
+                        sideviews.Add(room.SideView, l);
+                    }
+                }
             }
         }
 
