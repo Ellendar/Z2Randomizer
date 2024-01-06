@@ -12,7 +12,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -122,42 +122,6 @@ namespace Z2Randomizer.WinFormUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string custom1 {
-            get {
-                return ((string)(this["custom1"]));
-            }
-            set {
-                this["custom1"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string custom2 {
-            get {
-                return ((string)(this["custom2"]));
-            }
-            set {
-                this["custom2"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string custom3 {
-            get {
-                return ((string)(this["custom3"]));
-            }
-            set {
-                this["custom3"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string lastused {
             get {
                 return ((string)(this["lastused"]));
@@ -241,26 +205,11 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
-  <string>Name|Custom</string>
-  <string>Flagset|</string>
-  <string>Tooltip|Right click to set your custom flagset</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection customizableButtonBase {
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RChN6EAABAViWVRLtBcbi+3mLCqCLviyAAWA\", \"Name\": \"Beginner\", \"Tooltip\"" +
+            ": \"This is great for people looking for a casual experience\"}")]
+        public string customizableButton1 {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButtonBase"]));
-            }
-            set {
-                this["customizableButtonBase"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customizableButton1 {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton1"]));
+                return ((string)(this["customizableButton1"]));
             }
             set {
                 this["customizableButton1"] = value;
@@ -269,9 +218,11 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customizableButton2 {
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAAN6AAFesXtWVRLtagax+2cs5w@sunyAAsA\", \"Name\": \"Standard\", \"Tooltip\"" +
+            ": \"Flags for the 2023 Standard Tournament\"}")]
+        public string customizableButton2 {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton2"]));
+                return ((string)(this["customizableButton2"]));
             }
             set {
                 this["customizableButton2"] = value;
@@ -280,54 +231,17 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customizableButton3 {
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAjMsAFesXtWVRLtVdZQ+2csmv@sukyAAsA\", \"Name\": \"Max Rando\", \"Tooltip" +
+            "\": \"Flags for the 2023 Max Rando Tournament\"}")]
+        public string customizableButton3 {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton3"]));
+                return ((string)(this["customizableButton3"]));
             }
             set {
                 this["customizableButton3"] = value;
             }
         }
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customizableButton4
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton4"]));
-            }
-            set
-            {
-                this["customizableButton3"] = value;
-            }
-        }
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customizableButton5
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton5"]));
-            }
-            set
-            {
-                this["customizableButton3"] = value;
-            }
-        }
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection customizableButton6
-        {
-            get
-            {
-                return ((global::System.Collections.Specialized.StringCollection)(this["customizableButton6"]));
-            }
-            set
-            {
-                this["customizableButton3"] = value;
-            }
-        }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
@@ -354,6 +268,19 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"\", \"Name\": \"Not set\", \"Tooltip\": \"Right click to set your custom fla" +
+            "gset\"}")]
+        public string customizableButtonBase {
+            get {
+                return ((string)(this["customizableButtonBase"]));
+            }
+            set {
+                this["customizableButtonBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool useCommunityText {
             get {
@@ -361,6 +288,43 @@ namespace Z2Randomizer.WinFormUI.Properties {
             }
             set {
                 this["useCommunityText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0sALirpUe5RLvbgZQ+2c4YX@4X4yAASA\", \"Name\": \"Random%\", \"Tooltip\":" +
+            " \"Is it randomized? Who knows?\"}")]
+        public string customizableButton4 {
+            get {
+                return ((string)(this["customizableButton4"]));
+            }
+            set {
+                this["customizableButton4"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string customizableButton5 {
+            get {
+                return ((string)(this["customizableButton5"]));
+            }
+            set {
+                this["customizableButton5"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string customizableButton6 {
+            get {
+                return ((string)(this["customizableButton6"]));
+            }
+            set {
+                this["customizableButton6"] = value;
             }
         }
     }

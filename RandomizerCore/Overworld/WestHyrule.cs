@@ -533,7 +533,7 @@ public class WestHyrule : World
                 {
                     raftDirection = (Direction)RNG.Next(4);
                 }
-                else if (biome == Biome.CANYON)
+                else if (biome == Biome.CANYON || biome == Biome.CALDERA)
                 {
                     raftDirection = isHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                 }
@@ -559,11 +559,15 @@ public class WestHyrule : World
                 {
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
                 }
-                bool b = PlaceLocations(riverTerrain, props.SaneCaves);
-                if (!b)
+
+                if (biome == Biome.CALDERA)
                 {
-                    failedOnPlaceLocations++;
-                    return false;
+                    bool g = MakeCaldera(props.CanWalkOnWaterWithBoots, props.SaneCaves);
+                    if (!g)
+                    {
+                        failedOnMakeCaldera++;
+                        return false;
+                    }
                 }
 
                 if (props.BagusWoods)
@@ -578,12 +582,22 @@ public class WestHyrule : World
 
                 PlaceRandomTerrain(climate);
 
+                bool b = PlaceLocations(riverTerrain, props.SaneCaves);
+                if (!b)
+                {
+                    failedOnPlaceLocations++;
+                    return false;
+                }
+
                 if (!GrowTerrain(climate))
                 {
                     return false;
                 }
 
-
+                //This is ass-backwards. We should be placing the raft (and the seed water associated with it) between
+                //seed terrain and grow. Instead we're just randomly hoping there is water on the edge, and if there isn't
+                //we're regenerating the whole expensive-ass operation. Making this change carries consequences across all
+                //continents so it's a later thing.
                 if (raft != null)
                 {
                     if (!DrawRaft(false, raftDirection))
@@ -611,16 +625,9 @@ public class WestHyrule : World
                         failedOnIslandConnection++;
                         return false;
                     }
-
-                    bool g = MakeCaldera(props.CanWalkOnWaterWithBoots, props.SaneCaves);
-                    if (!g)
-                    {
-                        failedOnMakeCaldera++;
-                        return false;
-                    }
                 }
+
                 PlaceRocks(props.BoulderBlockConnections);
-                
                 PlaceHiddenLocations();
 
 
@@ -773,13 +780,7 @@ public class WestHyrule : World
         {
             water = Terrain.WALKABLEWATER;
         }
-        int centerx = RNG.Next(21, 41);
-        int centery = RNG.Next(32, 42);
-        if (isHorizontal)
-        {
-            centerx = RNG.Next(27, 37);
-            centery = RNG.Next(22, 52);
-        }
+        int centerx, centery;
 
         bool placeable = false;
         do
@@ -978,7 +979,7 @@ public class WestHyrule : World
         }
         else if (cavenum1 == 1)
         {
-            cave1l = GetLocationByMap(07, 0); //parappa
+            cave1l = GetLocationByMap(07, 0); //parapa
             cave1r = GetLocationByMap(0xC7, 0);
         }
         else
@@ -1022,8 +1023,17 @@ public class WestHyrule : World
             {
                 return false;
             }
+            cave1l.CanShuffle = false;
+            cave1r.CanShuffle = false;
+            Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
+            map[cave1l.Ypos - 30, cave1l.Xpos - 1] = caveExitTerrain;
+            map[cave1l.Ypos - 29, cave1l.Xpos - 1] = caveExitTerrain;
+            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveExitTerrain;
+            map[cave1r.Ypos - 30, cave1r.Xpos + 1] = caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveExitTerrain;
+            map[cave1r.Ypos - 31, cave1r.Xpos + 1] = caveExitTerrain;
 
-            if(caves > 1)
+            if (caves > 1)
             {
                 if(caveType == 0)
                 {
@@ -1038,6 +1048,15 @@ public class WestHyrule : World
                 {
                     return false;
                 }
+                cave2l.CanShuffle = false;
+                cave2r.CanShuffle = false;
+                caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
+                map[cave2l.Ypos - 30, cave2l.Xpos - 1] = caveExitTerrain;
+                map[cave2l.Ypos - 29, cave2l.Xpos - 1] = caveExitTerrain;
+                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveExitTerrain;
+                map[cave2r.Ypos - 30, cave2r.Xpos + 1] = caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveExitTerrain;
+                map[cave2r.Ypos - 31, cave2r.Xpos + 1] = caveExitTerrain;
             }
             
             if(caves == 1)
@@ -1088,6 +1107,16 @@ public class WestHyrule : World
             {
                 return false;
             }
+            cave1l.CanShuffle = false;
+            cave1r.CanShuffle = false;
+            Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
+
+            map[cave1l.Ypos - 31, cave1l.Xpos] = caveExitTerrain;
+            map[cave1l.Ypos - 31, cave1l.Xpos + 1] = caveExitTerrain;
+            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos] = caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos - 1] = caveExitTerrain;
 
             if (caves > 1)
             {
@@ -1104,6 +1133,15 @@ public class WestHyrule : World
                 {
                     return false;
                 }
+                cave2l.CanShuffle = false;
+                cave2r.CanShuffle = false;
+                caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
+                map[cave2l.Ypos - 31, cave2l.Xpos] = caveExitTerrain;
+                map[cave2l.Ypos - 31, cave2l.Xpos + 1] = caveExitTerrain;
+                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos] = caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos - 1] = caveExitTerrain;
             }
 
             if (caves == 1)

@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,62 +37,33 @@ namespace Z2Randomizer.WinFormUI
             IsEmpty = false;
         }
 
-        public CustomisedButtonSettings(StringCollection customButtonSettings)
+        public CustomisedButtonSettings(string customButtonSettingsJson)
         {
-            if (customButtonSettings != null)
+            if ((customButtonSettingsJson ?? "") != "")
             {
-                foreach (var buttonSetting in customButtonSettings)
-                {
-                    if (buttonSetting == null)
-                    {
-                        continue;
-                    }
+                dynamic settings = JObject.Parse(customButtonSettingsJson);
 
-                    var split = buttonSetting.Split('|');
+                Name = settings.Name;
+                Flagset = settings.Flagset;
+                Tooltip = settings.Tooltip;
 
-                    if (split.Length != 2)
-                    {
-                        continue;
-                    }
-
-                    switch (split[0])
-                    {
-                        case "Name":
-                            {
-                                Name = split[1];
-                                break;
-                            }
-                        case "Tooltip":
-                            {
-                                Tooltip = split[1];
-                                break;
-                            }
-                        case "Flagset":
-                            {
-                                Flagset = split[1];
-                                break;
-                            }
-                    }
-
-                    IsCustomised = true;
-                    IsEmpty = false;
-                }
+                IsCustomised = true;
+                IsEmpty = false;
             }
         }
 
-        public StringCollection Export()
+        public string Export()
         {
             if (IsCustomised)
             {
-                StringCollection sc = new StringCollection();
-                sc.Add($"{nameof(Name)}|{Name}");
-                sc.Add($"{nameof(Flagset)}|{Flagset}");
-                sc.Add($"{nameof(Tooltip)}|{Tooltip}");
-                return sc;
+                dynamic settings = new ExpandoObject();
+                settings.Name = Name;
+                settings.Flagset = Flagset;
+                settings.Tooltip = Tooltip;
+
+                return JsonConvert.SerializeObject(settings);
             }
-
-            return new StringCollection();
-
+            return "";
         }
     }
 }

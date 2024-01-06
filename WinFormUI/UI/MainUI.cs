@@ -5,6 +5,8 @@ using Z2Randomizer.Core.Overworld;
 using WinFormUI.UI;
 
 using Z2Randomizer.Core.Flags;
+using Newtonsoft.Json;
+using Z2Randomizer.WinFormUI.Properties;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -268,18 +270,45 @@ public partial class MainUI : Form
             button.AutoEllipsis = false;
             button.AutoSize = false;
 
-            var setting = (System.Collections.Specialized.StringCollection)Properties.Settings.Default[button.Name];
-            var customButtonSettings = new CustomisedButtonSettings(setting);
-
-            if (customButtonSettings.IsEmpty)
-            {
-                customButtonSettings = new CustomisedButtonSettings(Properties.Settings.Default.customizableButtonBase);
-                customButtonSettings.IsCustomised = false;
-            }
-
-            SetCustomFlagsetButtonProperties(button, customButtonSettings);
-
             button.MouseUp += CustomFlagsetButtonOnClick;
+
+            string settingJson = (string)Properties.Settings.Default[button.Name];
+
+            CustomisedButtonSettings customButtonSettings;
+            try
+            {
+                //TODO: replace this with real json validation
+                if(settingJson.Length == 0)
+                {
+                    SetCustomFlagsetButtonPropertiesToDefault(button);
+                    continue;
+                }
+                customButtonSettings = new CustomisedButtonSettings(settingJson);
+
+                try
+                {
+                    RandomizerConfiguration config = new(customButtonSettings.Flagset);
+                }
+                catch (Exception)
+                {
+                    SetCustomFlagsetButtonPropertiesToDefault(button);
+                    throw new Exception("Saved custom flags were invalid. Resetting to default");
+                }
+
+                if (customButtonSettings.IsEmpty)
+                {
+                    SetCustomFlagsetButtonProperties(button);
+                }
+                else
+                {
+                    SetCustomFlagsetButtonProperties(button, customButtonSettings);
+                }
+            }
+            catch(JsonReaderException e)
+            {
+                logger.Warn("Saved custom button is not JSON", e);
+                SetCustomFlagsetButtonProperties(button);
+            }
         }
     }
 
@@ -353,7 +382,7 @@ public partial class MainUI : Form
                                 , MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
                         if (result == DialogResult.Yes)
                         {
-                            customButtonSettings = new CustomisedButtonSettings(Properties.Settings.Default.customizableButtonBase);
+                            customButtonSettings = new CustomisedButtonSettings((string)Properties.Settings.Default["customizableButtonBase"]);
                             customButtonSettings.IsCustomised = false;
                             SetCustomFlagsetButtonProperties(button, customButtonSettings);
                             Properties.Settings.Default[button.Name] = new System.Collections.Specialized.StringCollection();
@@ -399,6 +428,32 @@ public partial class MainUI : Form
         else
         {
             button.ForeColor = SystemColors.WindowText;
+        }
+    }
+
+    private void SetCustomFlagsetButtonProperties(Button button)
+    {
+        CustomisedButtonSettings baseCustomButtonSettings = new CustomisedButtonSettings((string)Properties.Settings.Default["customizableButtonBase"]);
+        baseCustomButtonSettings.IsCustomised = false;
+        SetCustomFlagsetButtonProperties(button, baseCustomButtonSettings);
+    }
+
+    private void SetCustomFlagsetButtonPropertiesToDefault(Button button)
+    {
+        string defaultJson = (string)Settings.Default.Properties[button.Name].DefaultValue;
+        if(defaultJson == null || defaultJson.Length == 0)
+        {
+            SetCustomFlagsetButtonProperties(button);
+        }
+        try
+        {
+            CustomisedButtonSettings defaultCustomButtonSettings = new CustomisedButtonSettings();
+            defaultCustomButtonSettings.IsCustomised = false;
+            SetCustomFlagsetButtonProperties(button, defaultCustomButtonSettings);
+        }
+        catch 
+        {
+            SetCustomFlagsetButtonProperties(button);
         }
     }
 
@@ -858,7 +913,8 @@ public partial class MainUI : Form
             1 => PalaceStyle.SHUFFLED,
             2 => PalaceStyle.RECONSTRUCTED,
             3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
-            4 => PalaceStyle.RANDOM,
+            4 => PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH,
+            5 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid GP Style setting")
         };
         configuration.IncludeVanillaRooms = GetTripleCheckState(includeVanillaRoomsCheckbox);
@@ -1291,7 +1347,8 @@ public partial class MainUI : Form
                 PalaceStyle.SHUFFLED => 1,
                 PalaceStyle.RECONSTRUCTED => 2,
                 PalaceStyle.RECONSTRUCTED_SHORTENED => 3,
-                PalaceStyle.RANDOM => 4,
+                PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH => 4,
+                PalaceStyle.RANDOM => 5,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
@@ -1885,7 +1942,8 @@ public partial class MainUI : Form
 
     private void PalaceBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
+        if ((palaceStyleList.SelectedIndex == 0 || palaceStyleList.SelectedIndex == 1)
+            && (gpStyleList.SelectedIndex == 0 || gpStyleList.SelectedIndex == 1))
         {
             includeVanillaRoomsCheckbox.Enabled = false;
             includeVanillaRoomsCheckbox.Checked = true;
@@ -2033,10 +2091,5 @@ public partial class MainUI : Form
         {
             ((CheckBox)sender).Checked = true;
         }
-    }
-
-    private void customFlagsButton2_Click(object sender, EventArgs e)
-    {
-
     }
 }

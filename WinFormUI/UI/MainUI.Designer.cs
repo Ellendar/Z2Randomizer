@@ -1304,6 +1304,7 @@ partial class MainUI
         gpStyleList.Size = new Size(176, 23);
         gpStyleList.TabIndex = 28;
         toolTip1.SetToolTip(gpStyleList, "Controls what style GP (Palace 7) is.");
+        gpStyleList.SelectedIndexChanged += PalaceBox_SelectedIndexChanged;
         // 
         // includev4_4RoomsCheckbox
         // 

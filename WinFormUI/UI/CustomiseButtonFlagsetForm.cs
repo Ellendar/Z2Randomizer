@@ -42,7 +42,7 @@ namespace Z2Randomizer.WinFormUI
                 {
                     if (settings.IsCustomised)
                     {
-                        this.txtName.Text = settings.Name;
+                        txtName.Text = settings.Name;
                         txtFlagset.Text = settings.Flagset;
                         txtToolTip.Text = settings.Tooltip;
                     }

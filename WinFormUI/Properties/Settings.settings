@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WinFormUI.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Z2Randomizer.WinFormUI.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="filePath" Type="System.String" Scope="User">
@@ -26,15 +26,6 @@
     <Setting Name="shield" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">7</Value>
     </Setting>
-    <Setting Name="custom1" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="custom2" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="custom3" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="lastused" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
@@ -56,22 +47,14 @@
     <Setting Name="useCustomRooms" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="customizableButtonBase" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
-&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
-  &lt;string&gt;Name|Custom&lt;/string&gt;
-  &lt;string&gt;Flagset|&lt;/string&gt;
-  &lt;string&gt;Tooltip|Right click to set your custom flagset&lt;/string&gt;
-&lt;/ArrayOfString&gt;</Value>
+    <Setting Name="customizableButton1" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{"Flagset": "RChN6EAABAViWVRLtBcbi+3mLCqCLviyAAWA", "Name": "Beginner", "Tooltip": "This is great for people looking for a casual experience"}</Value>
     </Setting>
-    <Setting Name="customizableButton1" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="customizableButton2" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{"Flagset": "RAAN6AAFesXtWVRLtagax+2cs5w@sunyAAsA", "Name": "Standard", "Tooltip": "Flags for the 2023 Standard Tournament"}</Value>
     </Setting>
-    <Setting Name="customizableButton2" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="customizableButton3" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="customizableButton3" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{"Flagset": "hEAjMsAFesXtWVRLtVdZQ+2csmv@sukyAAsA", "Name": "Max Rando", "Tooltip": "Flags for the 2023 Max Rando Tournament"}</Value>
     </Setting>
     <Setting Name="beepFrequency" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -79,8 +62,20 @@
     <Setting Name="beepThreshold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="customizableButtonBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{"Flagset": "", "Name": "Not set", "Tooltip": "Right click to set your custom flagset"}</Value>
+    </Setting>
     <Setting Name="useCommunityText" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="customizableButton4" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{"Flagset": "hEAK0sALirpUe5RLvbgZQ+2c4YX@4X4yAASA", "Name": "Random%", "Tooltip": "Is it randomized? Who knows?"}</Value>
+    </Setting>
+    <Setting Name="customizableButton5" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="customizableButton6" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

@@ -476,6 +476,7 @@ public abstract class World
                             caveDirections.Remove(direction);
                             if(caveDirections.Count == 0)
                             {
+                                //Debug.WriteLine(GetMapDebug());
                                 return false;
                             }
                             direction = caveDirections[RNG.Next(caveDirections.Count)];
@@ -1973,6 +1974,7 @@ public abstract class World
 
         int tries = 0;
         int length = 0;
+        //Debug.WriteLine(GetMapDebug());
 
         do
         {
@@ -2031,7 +2033,7 @@ public abstract class World
                 deltax = 0;
                 deltay = -1;
             }
-            else
+            else //EAST
             {
                 raftx = MAP_COLS - 1;
                 int rtries = 0;
@@ -2748,6 +2750,7 @@ public abstract class World
         }
         else
         {
+            //Debug.WriteLine(GetMapDebug());
             int cavey = centery;
             int cavex = RNG.Next(centerx - 2, centerx + 3);
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
