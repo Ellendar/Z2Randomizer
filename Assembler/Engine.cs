@@ -167,8 +167,8 @@ public class Engine
     public Engine() {
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
         // follow this tutorial for how https://microsoft.github.io/ClearScript/Details/Build.html#_Debugging_with_ClearScript_2
-        _engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
-        //_engine = new V8ScriptEngine();
+        //_engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
+        _engine = new V8ScriptEngine();
 
         // Setup the initial segments for the randomizer
         var a = Asm();
