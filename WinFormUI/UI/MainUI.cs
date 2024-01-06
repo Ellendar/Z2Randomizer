@@ -1854,7 +1854,10 @@ public partial class MainUI : Form
 
     private bool VanillaPossible(ComboBox cb)
     {
-        if (cb.SelectedIndex == 0 || cb.SelectedIndex == 1 || cb.GetItemText(cb.SelectedItem).Equals("Random (with Vanilla)"))
+        if (cb.SelectedIndex == 0 
+            || cb.SelectedIndex == 1 
+            || cb.GetItemText(cb.SelectedItem).Equals("Random") 
+            || cb.GetItemText(cb.SelectedItem).Equals("Random (no Vanilla)"))
         {
             return true;
         }
