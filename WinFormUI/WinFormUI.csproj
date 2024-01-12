@@ -26,9 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj">
-      <ReferenceSourceTarget></ReferenceSourceTarget>
-    </ProjectReference>
+    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

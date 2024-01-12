@@ -624,7 +624,7 @@ public class Palaces
                 foreach (Room room in rooms)
                 {
                     room.WriteSideViewPtr(a, name);
-                    room.UpdateBitmask(ROMData);
+                    room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
                     room.UpdateConnectors();
@@ -650,7 +650,7 @@ public class Palaces
                 foreach (Room room in rooms)
                 {
                     room.WriteSideViewPtr(a, name);
-                    room.UpdateBitmask(ROMData);
+                    room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.Enemies.Length;
                     //room.UpdateConnectors(ROMData, room == palaces[6].Root);

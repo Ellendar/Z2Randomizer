@@ -21,13 +21,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_86871ED6EABD43DCA7D0F27EDD20B6FE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_94EC71DD165A43C09436F29102CAC5DA"
+        "MsmKey" = "8:_7C3D89C4F1D9470A925E37A9E2189AA0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -118,7 +112,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5 "
+                "FrameworkVersion" = "8:v4.5  "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -223,9 +217,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
-        "ProductCode" = "8:{4543F105-1132-44B9-8BDA-D1BFA11A1FB6}"
-        "PackageCode" = "8:{79D175EA-979D-4899-817D-FCAE62832204}"
-        "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
+        "ProductCode" = "8:{9BEF0619-F42D-46BE-AB47-20F4963E1A76}"
+        "PackageCode" = "8:{5729F6F2-4DD7-4659-89B1-B9EE3437D93C}"
+        "UpgradeCode" = "8:{B1166C33-B6F6-4358-A1E8-43F64106364C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -757,7 +751,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_86871ED6EABD43DCA7D0F27EDD20B6FE"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_7C3D89C4F1D9470A925E37A9E2189AA0"
             {
             "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net7.0-windows\\apphost.exe"
             "TargetName" = "8:"
@@ -777,39 +771,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
+            "OutputConfiguration" = "8:Release|Any CPU"
             "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}"
             "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_94EC71DD165A43C09436F29102CAC5DA"
-            {
-            "SourcePath" = "8:"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:PublishItems"
-            "OutputProjectGuid" = "8:{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}"
-            "ShowKeyOutput" = "11:TRUE"
-            "PublishProfilePath" = "8:Properties\\PublishProfiles\\ProdPublishProfile.pubxml"
                 "ExcludeFilters"
                 {
                 }

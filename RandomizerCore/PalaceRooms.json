@@ -3925,7 +3925,7 @@
     {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC00C2B8",
+    "connections": "FCC2FCB8",
     "elevatorScreen": -1,
     "enabled": false,
     "enemies": "050B560496",
@@ -3953,7 +3953,7 @@
     {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "B300FCFC",
+    "connections": "B3FCFCFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050B560496",
@@ -4336,7 +4336,7 @@
     {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "A3FCB6FC",
+    "connections": "A3B6FCFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0728193D043644",
@@ -4375,7 +4375,7 @@
     "isDropZone": false,
     "isEntrance": false,
     "isThunderBirdRoom": false,
-    "isUpDownReversed": false,
+    "isUpDownReversed": true,
     "linkedRoomName": "GP segmented drop/1up room left side",
     "map": 41,
     "memoryAddress": 83919,

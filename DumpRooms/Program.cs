@@ -56,7 +56,7 @@ for (int j = 0; j < 3; j++)
 
         r = new Room
         {
-            bitmask = bitmask,
+            itemGetBits = bitmask,
             Connections = connectBytes,
             ElevatorScreen = -1,
             Enabled = true,

@@ -422,6 +422,7 @@ public class Palace
     {
         if (!r.IsPlaced)
         {
+            //Debug.WriteLine(r.PalaceGroup + " " + r.Map);
             //For required thunderbird, you can't path backwards into tbird room
             if ((Number == 7) && r.IsThunderBirdRoom)
             {
@@ -741,6 +742,9 @@ public class Palace
                     {
                         r.Up = r2;
                     }
+                    else if (r2.Map == (r.UpByte & 0xFC) / 4 && r2.IsDropZone) {
+                        r.Up = r2;
+                    }
                 }
             }
 
@@ -749,7 +753,11 @@ public class Palace
                 List<Room> l = rooms[r.DownByte & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if (r2.Map == (r.DownByte & 0xFC) / 4)
+                    if ((r2.UpByte & 0xFC) / 4 == r.Map)
+                    {
+                        r.Down = r2;
+                    }
+                    else if (r2.Map == (r.DownByte & 0xFC) / 4 && r2.IsDropZone)
                     {
                         r.Down = r2;
                     }

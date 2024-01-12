@@ -14,6 +14,7 @@ public partial class MainUI : Form
 {
     const string DISCORD_URL = @"http://z2r.gg/discord";
     const string WIKI_URL = @"https://github.com/Ellendar/Z2Randomizer/wiki";
+    const string BLANK_CUSTOM_FLAGS_JSON = """{"Flagset": "", "Name": "Not set", "Tooltip": "Right click to set your custom flagset"}""";
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private readonly Random r;
@@ -307,7 +308,7 @@ public partial class MainUI : Form
             catch(JsonReaderException e)
             {
                 logger.Warn("Saved custom button is not JSON", e);
-                SetCustomFlagsetButtonProperties(button);
+                SetCustomFlagsetButtonPropertiesToDefault(button);
             }
         }
     }
@@ -403,8 +404,6 @@ public partial class MainUI : Form
     {
 
         // found that this was being repeated a lot, so made it a function
-
-
         button.Text = customButtonSettings.Name;
         button.Tag = customButtonSettings;
         toolTip1.SetToolTip(button, customButtonSettings.Tooltip);
@@ -420,6 +419,7 @@ public partial class MainUI : Form
                     (!string.IsNullOrWhiteSpace(customButtonSettings.Tooltip) ? Environment.NewLine + customButtonSettings.Tooltip : string.Empty));
         }
 
+
         if (!customButtonSettings.IsCustomised)
         {
             // set some indicator that this button is not customised
@@ -433,14 +433,23 @@ public partial class MainUI : Form
 
     private void SetCustomFlagsetButtonProperties(Button button)
     {
-        CustomisedButtonSettings baseCustomButtonSettings = new CustomisedButtonSettings((string)Properties.Settings.Default["customizableButtonBase"]);
-        baseCustomButtonSettings.IsCustomised = false;
-        SetCustomFlagsetButtonProperties(button, baseCustomButtonSettings);
+        try
+        {
+            CustomisedButtonSettings baseCustomButtonSettings = new CustomisedButtonSettings(BLANK_CUSTOM_FLAGS_JSON);
+            baseCustomButtonSettings.IsCustomised = false;
+            SetCustomFlagsetButtonProperties(button, baseCustomButtonSettings);
+        }
+        catch(Exception e)
+        {
+            logger.Error(e);
+            throw;
+        }
     }
 
     private void SetCustomFlagsetButtonPropertiesToDefault(Button button)
     {
         string defaultJson = (string)Settings.Default.Properties[button.Name].DefaultValue;
+        //logger.Warn(defaultJson);
         if(defaultJson == null || defaultJson.Length == 0)
         {
             SetCustomFlagsetButtonProperties(button);

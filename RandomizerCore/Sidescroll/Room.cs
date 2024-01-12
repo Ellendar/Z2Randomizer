@@ -21,14 +21,14 @@ public class Room
     private const int sideview1 = 0x10533;
     private const int sideview2 = 0x12010;
     private const int sideview3 = 0x14533;
-    private const int bitmask1 = 0x17ba5;
-    private const int bitmask2 = 0x17bc5;
-    private const int bitmask3 = 0x17be5;
+    private const int Group1ItemGetStartAddress = 0x17ba5;
+    private const int Group2ItemGetStartAddress = 0x17bc5;
+    private const int Group3ItemGetStartAddress = 0x17be5;
     private const int connectors1 = 0x1072b;
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
-    public byte bitmask;
+    public byte itemGetBits;
 
     public int Map { get; set; }
     public int? PalaceGroup { get; set; }
@@ -177,7 +177,7 @@ public class Room
         Enemies = (byte[])room.Enemies.Clone();
         NewEnemies = new byte[Enemies.Length];
         SideView = (byte[])room.SideView.Clone();
-        bitmask = room.bitmask;
+        itemGetBits = room.itemGetBits;
         HasItem = room.HasItem;
         HasBoss = room.HasBoss;
         IsBossRoom = room.IsBossRoom;
@@ -194,6 +194,7 @@ public class Room
         Author = room.Author;
         Enabled = room.Enabled;
         Group = room.Group;
+        PalaceGroup = room.PalaceGroup;
 
         LeftByte = room.Connections[0];
         downByte = room.Connections[1];
@@ -217,7 +218,7 @@ public class Room
         Enemies = Convert.FromHexString(roomData.enemies.ToString());
         NewEnemies = Enemies;
         SideView = Convert.FromHexString(roomData.sideviewData.ToString());
-        bitmask = Convert.FromHexString(roomData.bitmask.ToString())[0];
+        itemGetBits = Convert.FromHexString(roomData.bitmask.ToString())[0];
         HasItem = roomData.hasItem;
         HasBoss = roomData.hasBoss;
         IsBossRoom = roomData.isBossRoom;
@@ -367,34 +368,34 @@ public class Room
         ROMData.Put(enemyAddr, NewEnemies);
     }
 
-    public void UpdateBitmask(ROM ROMData)
+    public void UpdateItemGetBits(ROM ROMData)
     {
         if (PalaceGroup <= 0 || PalaceGroup > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int ptr = bitmask1;
+        int ptr = Group1ItemGetStartAddress;
 
         if (PalaceGroup == 2)
         {
-            ptr = bitmask2;
+            ptr = Group2ItemGetStartAddress;
         }
         else if(PalaceGroup == 3)
         {
-            ptr = bitmask3;
+            ptr = Group3ItemGetStartAddress;
         }
         if(NewMap % 2 == 0)
         {
             byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0x0F);
-            old = (byte)((bitmask << 4) | old);
+            old = (byte)((itemGetBits << 4) | old);
             ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
         }
         else
         {
             byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0xF0);
-            old = (byte)((bitmask) | old);
+            old = (byte)((itemGetBits) | old);
             ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
         }
     }
@@ -811,7 +812,7 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
 
         writer.WritePropertyName("bitmask");
-        writer.WriteValue(BitConverter.ToString(new Byte[] { value.bitmask }).Replace("-", ""));
+        writer.WriteValue(BitConverter.ToString(new Byte[] { value.itemGetBits }).Replace("-", ""));
 
         writer.WritePropertyName("requirements");
         writer.WriteRawValue(value.Requirements.Serialize());
