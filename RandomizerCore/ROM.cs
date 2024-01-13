@@ -940,7 +940,6 @@ FREE_UNTIL $ffe0
         a.code("""
 .segment "PRG4"
 
-.define ProjectileEnemyData $bc
 .define ProjectileYPosition $30
 .define ProjectileXVelocity $77
 .define EnemyType           $a1
@@ -948,7 +947,7 @@ FREE_UNTIL $ffe0
 .define EnemyXPositionLo    $4e
 .define EnemyXPositionHi    $3c
 .define RNG                 $051b
-.define SinWaveExtra        $07c0
+.define ProjectileEnemyData $07c0
 
 EnemyYVelocity = $057e
 ; SinWaveVelocityIncrement = $ba1c
@@ -1003,8 +1002,8 @@ SinWaveMaxVelocityExtant:
 
 MoveSinWaveWifiShot:
     ; Now check to see if we set the flag for sin waves.
-    ; We write b0 to SinWaveExtra,x if this wifi is a sin wave so we can check the high bit if its set then its a sin wav
-    lda SinWaveExtra,x
+    ; We write b0 to ProjectileEnemyData,x if this wifi is a sin wave so we can check the high bit if its set then its a sin wav
+    lda ProjectileEnemyData,x
     bpl @NotAWifiShot
         lda ProjectileEnemyData,x
         and #$01
@@ -1058,12 +1057,13 @@ RandomizeWifiShotType:
         sta ProjectileEnemyData,y
         lda #0
         sta EnemyYVelocity,y
-        lda #$b0
+        lda ProjectileEnemyData,y
+        ora #$b0
         ; Firing a sin wave shot, so set the flag for sin wave and then follow through setting up the position
-        sta SinWaveExtra,y
+        sta ProjectileEnemyData,y
         bne @WriteInitCoord
 @StraightShot:
-    sta SinWaveExtra,y
+    sta ProjectileEnemyData,y
     lda #$b0
     ; we are shooting straight so clear out the flag
     ; 50/50 chance that the shot starts high or low

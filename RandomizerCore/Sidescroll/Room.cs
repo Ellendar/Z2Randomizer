@@ -384,7 +384,7 @@ public class Room
         {
             ptr = Group3ItemGetStartAddress;
         }
-        if((Map) % 2 == 0)
+        if((NewMap ?? Map) % 2 == 0)
         {
             byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
             old = (byte)(old & 0x0F);
