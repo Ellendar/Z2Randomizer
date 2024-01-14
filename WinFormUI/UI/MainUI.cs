@@ -31,11 +31,11 @@ public partial class MainUI : Form
 
     public MainUI()
     {
-        if (WinFormUI.Properties.Settings.Default.update)
+        if (Settings.Default.update)
         {
-            Properties.Settings.Default.Upgrade();
-            Properties.Settings.Default.update = false;
-            Properties.Settings.Default.Save();
+            Settings.Default.Upgrade();
+            Settings.Default.update = false;
+            Settings.Default.Save();
         }
 
         validFlagStringLength = new RandomizerConfiguration().Serialize().Length;
@@ -53,18 +53,18 @@ public partial class MainUI : Form
 
         startingTechsList.SelectedIndex = 0;
         //allowPathEnemiesCheckbox.Enabled = false;
-        romFileTextBox.Text = Properties.Settings.Default.filePath;
-        tunicColorList.SelectedIndex = Properties.Settings.Default.tunic;
-        shieldColorList.SelectedIndex = Properties.Settings.Default.shield;
-        fastSpellCheckbox.Checked = Properties.Settings.Default.spells;
-        beamSpriteList.SelectedIndex = Properties.Settings.Default.beams;
-        disableMusicCheckbox.Checked = Properties.Settings.Default.music;
-        upAOnController1Checkbox.Checked = Properties.Settings.Default.upac1;
-        seedTextBox.Text = Properties.Settings.Default.lastseed;
-        flashingOffCheckbox.Checked = Properties.Settings.Default.noflash;
-        useCustomRoomsBox.Checked = Properties.Settings.Default.useCustomRooms;
-        beepFrequencyDropdown.SelectedIndex = Properties.Settings.Default.beepFrequency;
-        beepThresholdDropdown.SelectedIndex = Properties.Settings.Default.beepThreshold;
+        romFileTextBox.Text = Settings.Default.filePath;
+        tunicColorList.SelectedIndex = Settings.Default.tunic;
+        shieldColorList.SelectedIndex = Settings.Default.shield;
+        fastSpellCheckbox.Checked = Settings.Default.spells;
+        beamSpriteList.SelectedIndex = Settings.Default.beams;
+        disableMusicCheckbox.Checked = Settings.Default.music;
+        upAOnController1Checkbox.Checked = Settings.Default.upac1;
+        seedTextBox.Text = Settings.Default.lastseed;
+        flashingOffCheckbox.Checked = Settings.Default.noflash;
+        useCustomRoomsBox.Checked = Settings.Default.useCustomRooms;
+        beepFrequencyDropdown.SelectedIndex = Settings.Default.beepFrequency;
+        beepThresholdDropdown.SelectedIndex = Settings.Default.beepThreshold;
 
         small = new CheckBox[] { smallEnemiesBlueJarCheckbox, smallEnemiesRedJarCheckbox, smallEnemiesSmallBagCheckbox, smallEnemiesMediumBagCheckbox,
             smallEnemiesLargeBagCheckbox, smallEnemiesXLBagCheckbox, smallEnemies1UpCheckbox, smallEnemiesKeyCheckbox };
@@ -82,7 +82,7 @@ public partial class MainUI : Form
         tbirdRequiredCheckbox.Checked = true;
         hiddenPalaceList.SelectedIndex = 0;
         hideKasutoList.SelectedIndex = 0;
-        var selectedSprite = Properties.Settings.Default.sprite;
+        var selectedSprite = Settings.Default.sprite;
         characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
 
         Text = "Zelda 2 Randomizer Version "
@@ -221,7 +221,7 @@ public partial class MainUI : Form
             large[i].CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
             large[i].CheckStateChanged += new System.EventHandler(AtLeastOneChecked);
         }
-        String lastUsed = Properties.Settings.Default.lastused;
+        String lastUsed = Settings.Default.lastused;
         if (lastUsed.Equals(""))
         {
             //updateFlags(null, null);
@@ -273,7 +273,7 @@ public partial class MainUI : Form
 
             button.MouseUp += CustomFlagsetButtonOnClick;
 
-            string settingJson = (string)Properties.Settings.Default[button.Name];
+            string settingJson = (string)Settings.Default[button.Name];
 
             CustomisedButtonSettings customButtonSettings;
             try
@@ -286,14 +286,20 @@ public partial class MainUI : Form
                 }
                 customButtonSettings = new CustomisedButtonSettings(settingJson);
 
+                if(customButtonSettings.Flagset == "")
+                {
+                    SetCustomFlagsetButtonProperties(button, customButtonSettings);
+                    continue;
+                }
                 try
                 {
                     RandomizerConfiguration config = new(customButtonSettings.Flagset);
                 }
                 catch (Exception)
                 {
+                    logger.Warn("Saved custom flags were invalid. Resetting to default");
                     SetCustomFlagsetButtonPropertiesToDefault(button);
-                    throw new Exception("Saved custom flags were invalid. Resetting to default");
+                    continue;
                 }
 
                 if (customButtonSettings.IsEmpty)
@@ -355,8 +361,8 @@ public partial class MainUI : Form
                     {
                         customButtonSettings = (CustomisedButtonSettings)button.Tag;
                         SetCustomFlagsetButtonProperties(button, customButtonSettings);
-                        Properties.Settings.Default[button.Name] = customButtonSettings.Export();
-                        Properties.Settings.Default.Save();
+                        Settings.Default[button.Name] = customButtonSettings.Export();
+                        Settings.Default.Save();
                     }
                     break;
                 }
@@ -377,18 +383,15 @@ public partial class MainUI : Form
             case "clear":
                 {
                     customButtonSettings = (CustomisedButtonSettings)button.Tag;
-                    if (customButtonSettings.IsCustomised)
+                    var result = MessageBox.Show("Are you sure you want to clear this custom Flagset?", "Confirm"
+                            , MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                    if (result == DialogResult.Yes)
                     {
-                        var result = MessageBox.Show("Are you sure you want to clear this custom Flagset?", "Confirm"
-                                , MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-                        if (result == DialogResult.Yes)
-                        {
-                            customButtonSettings = new CustomisedButtonSettings((string)Properties.Settings.Default["customizableButtonBase"]);
-                            customButtonSettings.IsCustomised = false;
-                            SetCustomFlagsetButtonProperties(button, customButtonSettings);
-                            Properties.Settings.Default[button.Name] = new System.Collections.Specialized.StringCollection();
-                            Properties.Settings.Default.Save();
-                        }
+                        customButtonSettings = new CustomisedButtonSettings((string)Settings.Default["customizableButtonBase"]);
+                        customButtonSettings.IsCustomised = false;
+                        SetCustomFlagsetButtonProperties(button, customButtonSettings);
+                        Settings.Default[button.Name] = Settings.Default["customizableButtonBase"];
+                        Settings.Default.Save();
                     }
                     break;
                 }
@@ -402,7 +405,10 @@ public partial class MainUI : Form
     /// <param name="customButtonSettings"></param>
     private void SetCustomFlagsetButtonProperties(Button button, CustomisedButtonSettings customButtonSettings)
     {
-
+        if(customButtonSettings.Flagset == "")
+        {
+            customButtonSettings.IsCustomised = false;
+        }
         // found that this was being repeated a lot, so made it a function
         button.Text = customButtonSettings.Name;
         button.Tag = customButtonSettings;
@@ -570,22 +576,22 @@ public partial class MainUI : Form
     {
         String flagString = flagsTextBox.Text.Trim();
 
-        Properties.Settings.Default.filePath = romFileTextBox.Text.Trim();
-        Properties.Settings.Default.beams = beamSpriteList.SelectedIndex;
-        Properties.Settings.Default.spells = fastSpellCheckbox.Checked;
-        Properties.Settings.Default.tunic = tunicColorList.SelectedIndex;
-        Properties.Settings.Default.shield = shieldColorList.SelectedIndex;
-        Properties.Settings.Default.music = disableMusicCheckbox.Checked;
-        Properties.Settings.Default.sprite = characterSpriteList.SelectedIndex;
-        Properties.Settings.Default.upac1 = upAOnController1Checkbox.Checked;
-        Properties.Settings.Default.noflash = flashingOffCheckbox.Checked;
-        Properties.Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
-        Properties.Settings.Default.lastused = flagsTextBox.Text.Trim();
-        Properties.Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
-        Properties.Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
-        Properties.Settings.Default.useCommunityText = useCommunityTextCheckbox.Checked;
-        Properties.Settings.Default.lastseed = seedTextBox.Text.Trim();
-        Properties.Settings.Default.Save();
+        Settings.Default.filePath = romFileTextBox.Text.Trim();
+        Settings.Default.beams = beamSpriteList.SelectedIndex;
+        Settings.Default.spells = fastSpellCheckbox.Checked;
+        Settings.Default.tunic = tunicColorList.SelectedIndex;
+        Settings.Default.shield = shieldColorList.SelectedIndex;
+        Settings.Default.music = disableMusicCheckbox.Checked;
+        Settings.Default.sprite = characterSpriteList.SelectedIndex;
+        Settings.Default.upac1 = upAOnController1Checkbox.Checked;
+        Settings.Default.noflash = flashingOffCheckbox.Checked;
+        Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
+        Settings.Default.lastused = flagsTextBox.Text.Trim();
+        Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
+        Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
+        Settings.Default.useCommunityText = useCommunityTextCheckbox.Checked;
+        Settings.Default.lastseed = seedTextBox.Text.Trim();
+        Settings.Default.Save();
         try
         {
             Int32.Parse(seedTextBox.Text.Trim());
