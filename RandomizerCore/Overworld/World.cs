@@ -775,8 +775,14 @@ public abstract class World
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, bool canWalkOnWater)
+    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, 
+        bool canWalkOnWater, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
     {
+        if (!((deadZoneMinX == null && deadZoneMaxX == null && deadZoneMinY == null && deadZoneMaxY == null)
+            || (deadZoneMinX != null && deadZoneMaxX != null && deadZoneMinY != null && deadZoneMaxY != null)))
+        {
+            throw new ArgumentException("ConnectIslands dead zone is improperly defined. 0 or 4 values must be specified.");
+        };
         int maxBridgeAttempts = MAXIMUM_BRIDGE_ATTEMPTS[biome];
         maxBridgeAttempts *= canWalkOnWater ? 1 : 2;
         int[,] globs = GetTerrainGlobs();
@@ -789,6 +795,10 @@ public abstract class World
             tries++;
             int x = RNG.Next(MAP_COLS - 2) + 1;
             int y = RNG.Next(MAP_ROWS - 2) + 1;
+            if(deadZoneMaxX != null && x >= deadZoneMinX && x <= deadZoneMaxX && y >= deadZoneMinY && y <= deadZoneMaxY)
+            {
+                continue;
+            }
             Direction waterDirection = NextToWater(x, y, riverTerrain);
             int waterTries = 0;
             while (waterDirection == Direction.NONE && waterTries < 2000)// || (this.bio == biome.canyon && (waterdir == Direction.NORTH || waterdir == Direction.SOUTH)))

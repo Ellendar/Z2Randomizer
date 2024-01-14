@@ -30,6 +30,10 @@ public class WestHyrule : World
     public Location bridge2;
     public Location pbagCave;
     private int bridgeCount;
+    private int calderaCenterX, calderaCenterY;
+
+    private const int CALDERA_DEAD_ZONE_X = 7;
+    private const int CALDERA_DEAD_ZONE_Y = 7;
 
     private Dictionary<Location, Location> bridgeConn;
     private Dictionary<Location, Location> cityConn;
@@ -619,7 +623,9 @@ public class WestHyrule : World
                 if (biome == Biome.CALDERA)
                 {
 
-                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots);
+                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots,
+                        calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
+                        calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
                     if (!f)
                     {
                         failedOnIslandConnection++;
@@ -780,25 +786,24 @@ public class WestHyrule : World
         {
             water = Terrain.WALKABLEWATER;
         }
-        int centerx, centery;
 
         bool placeable = false;
         do
         {
             if (isHorizontal)
             {
-                centerx = RNG.Next(27, 37);
-                centery = RNG.Next(22, 52);
+                calderaCenterX = RNG.Next(27, 37);
+                calderaCenterY = RNG.Next(22, 52);
             }
             else
             {
-                centerx = RNG.Next(21, 41);
-                centery = RNG.Next(32, 42);
+                calderaCenterX = RNG.Next(21, 41);
+                calderaCenterY = RNG.Next(32, 42);
             }
             placeable = true;
-            for (int i = centery - 7; i < centery + 8; i++)
+            for (int i = calderaCenterY - 7; i < calderaCenterY + 8; i++)
             {
-                for (int j = centerx - 7; j < centerx + 8; j++)
+                for (int j = calderaCenterX - 7; j < calderaCenterX + 8; j++)
                 {
                     if (map[i, j] != Terrain.MOUNTAIN)
                     {
@@ -808,14 +813,14 @@ public class WestHyrule : World
             }
         } while (!placeable);
 
-        int startx = centerx - 5;
-        int starty = centery;
+        int startx = calderaCenterX - 5;
+        int starty = calderaCenterY;
         int deltax = 1;
         int deltay = 0;
         if (!isHorizontal)
         {
-            startx = centerx;
-            starty = centery - 5;
+            startx = calderaCenterX;
+            starty = calderaCenterY - 5;
             deltax = 0;
             deltay = 1;
         }
@@ -1018,7 +1023,7 @@ public class WestHyrule : World
         int caveType = RNG.Next(2);
         if (isHorizontal)
         {
-            bool f = HorizontalCave(caveType, centerx, centery, cave1l, cave1r);
+            bool f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if(!f)
             {
                 return false;
@@ -1043,7 +1048,7 @@ public class WestHyrule : World
                 {
                     caveType = 0;
                 }
-                f = HorizontalCave(caveType, centerx, centery, cave2l, cave2r);
+                f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
                 if (!f)
                 {
                     return false;
@@ -1066,8 +1071,8 @@ public class WestHyrule : World
                 {
                     delta = 1;
                 }
-                int palacex = centerx;
-                int palacey = RNG.Next(centery - 2, centery + 3);
+                int palacex = calderaCenterX;
+                int palacey = RNG.Next(calderaCenterY - 2, calderaCenterY + 3);
                 while (map[palacey, palacex] != Terrain.MOUNTAIN)
                 {
                     palacex += delta;
@@ -1086,8 +1091,8 @@ public class WestHyrule : World
                 {
                     delta = 1;
                 }
-                int palacex = RNG.Next(centerx - 2, centerx + 3);
-                int palacey = centery;
+                int palacex = RNG.Next(calderaCenterX - 2, calderaCenterX + 3);
+                int palacey = calderaCenterY;
                 while (map[palacey, palacex] != Terrain.MOUNTAIN)
                 {
                     palacey += delta;
@@ -1102,7 +1107,7 @@ public class WestHyrule : World
         }
         else //Vertical
         {
-            bool f = VerticalCave(caveType, centerx, centery, cave1l, cave1r);
+            bool f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
@@ -1128,7 +1133,7 @@ public class WestHyrule : World
                 {
                     caveType = 0;
                 }
-                f = VerticalCave(caveType, centerx, centery, cave2l, cave2r);
+                f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
                 if (!f)
                 {
                     return false;
@@ -1151,8 +1156,8 @@ public class WestHyrule : World
                 {
                     delta = 1;
                 }
-                int palacex = RNG.Next(centerx - 2, centerx + 3);
-                int palacey = centery;
+                int palacex = RNG.Next(calderaCenterX - 2, calderaCenterX + 3);
+                int palacey = calderaCenterY;
                 while (map[palacey, palacex] != Terrain.MOUNTAIN)
                 {
                     palacey += delta;
@@ -1172,8 +1177,8 @@ public class WestHyrule : World
                 {
                     delta = 1;
                 }
-                int palacex = centerx;
-                int palacey = RNG.Next(centery - 2, centery + 3);
+                int palacex = calderaCenterX;
+                int palacey = RNG.Next(calderaCenterY - 2, calderaCenterY + 3);
                 while (map[palacey, palacex] != Terrain.MOUNTAIN)
                 {
                     palacex += delta;
