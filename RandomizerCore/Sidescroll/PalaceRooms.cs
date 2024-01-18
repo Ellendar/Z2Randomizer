@@ -258,9 +258,11 @@ public class PalaceRooms
     {
         if (useCustomRooms)
         {
-            return customRoomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7);
+            return customRoomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7
+                && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
         }
-        return roomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7);
+        return roomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7
+            && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
     }
 
     public static IEnumerable<Room> Entrances(RoomGroup group, bool useCustomRooms = false)

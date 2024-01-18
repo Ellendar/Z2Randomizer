@@ -1,10 +1,12 @@
 ﻿using Assembler;
 using NLog;
+using RandomizerCore;
 using RandomizerCore.Sidescroll;
 using SD.Tools.Algorithmia.GeneralDataStructures;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Numerics;

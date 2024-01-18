@@ -40,6 +40,8 @@ public class WestHyrule : World
     private Dictionary<Location, Location> caveConn;
     private Dictionary<Location, Location> graveConn;
 
+    private static int debug = 0;
+
     private List<Location> lostWoods;
 
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
@@ -622,7 +624,8 @@ public class WestHyrule : World
 
                 if (biome == Biome.CALDERA)
                 {
-
+                    //debug++;
+                    //Debug.WriteLine(debug);
                     bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots,
                         calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
                         calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
@@ -971,12 +974,12 @@ public class WestHyrule : World
         Location cave1r = new Location();
         Location cave2l = new Location();
         Location cave2r = new Location();
-        int numCaves = 2;
+        int availableConnectorCount = 2;
         if(useSaneCaves)
         {
-            numCaves++;
+            availableConnectorCount++;
         }
-        int cavenum1 = RNG.Next(numCaves);
+        int cavenum1 = RNG.Next(availableConnectorCount);
         if(cavenum1 == 0)
         {
             cave1l = GetLocationByMap(9, 0);//jump cave
@@ -996,10 +999,10 @@ public class WestHyrule : World
         map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
         if (caves > 1)
         {
-            int cavenum2 = RNG.Next(numCaves);
+            int cavenum2 = RNG.Next(availableConnectorCount);
             while(cavenum2 == cavenum1)
             {
-                cavenum2 = RNG.Next(numCaves);
+                cavenum2 = RNG.Next(availableConnectorCount);
             }
             if (cavenum2 == 0)
             {
@@ -1020,10 +1023,10 @@ public class WestHyrule : World
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
         }
         //
-        int caveType = RNG.Next(2);
+        int caveOrientation = RNG.Next(2);
         if (isHorizontal)
         {
-            bool f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
+            bool f = HorizontalCave(caveOrientation, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if(!f)
             {
                 return false;
@@ -1031,24 +1034,24 @@ public class WestHyrule : World
             cave1l.CanShuffle = false;
             cave1r.CanShuffle = false;
             Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-            map[cave1l.Ypos - 30, cave1l.Xpos - 1] = caveExitTerrain;
-            map[cave1l.Ypos - 29, cave1l.Xpos - 1] = caveExitTerrain;
-            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveExitTerrain;
-            map[cave1r.Ypos - 30, cave1r.Xpos + 1] = caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveExitTerrain;
-            map[cave1r.Ypos - 31, cave1r.Xpos + 1] = caveExitTerrain;
+            map[cave1l.Ypos - 30, cave1l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1l.Ypos - 29, cave1l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Ypos - 30, cave1r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1r.Ypos - 31, cave1r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
 
             if (caves > 1)
             {
-                if(caveType == 0)
+                if(caveOrientation == 0)
                 {
-                    caveType = 1;
+                    caveOrientation = 1;
                 }
                 else
                 {
-                    caveType = 0;
+                    caveOrientation = 0;
                 }
-                f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
+                f = HorizontalCave(caveOrientation, calderaCenterX, calderaCenterY, cave2l, cave2r);
                 if (!f)
                 {
                     return false;
@@ -1056,18 +1059,18 @@ public class WestHyrule : World
                 cave2l.CanShuffle = false;
                 cave2r.CanShuffle = false;
                 caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Ypos - 30, cave2l.Xpos - 1] = caveExitTerrain;
-                map[cave2l.Ypos - 29, cave2l.Xpos - 1] = caveExitTerrain;
-                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveExitTerrain;
-                map[cave2r.Ypos - 30, cave2r.Xpos + 1] = caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveExitTerrain;
-                map[cave2r.Ypos - 31, cave2r.Xpos + 1] = caveExitTerrain;
+                map[cave2l.Ypos - 30, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Ypos - 29, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2r.Ypos - 30, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Ypos - 31, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             }
             
             if(caves == 1)
             {
                 int delta = -1;
-                if(caveType == 0) //palace goes right
+                if(caveOrientation == 0) //palace goes right
                 {
                     delta = 1;
                 }
@@ -1107,7 +1110,7 @@ public class WestHyrule : World
         }
         else //Vertical
         {
-            bool f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
+            bool f = VerticalCave(caveOrientation, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
@@ -1116,24 +1119,24 @@ public class WestHyrule : World
             cave1r.CanShuffle = false;
             Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
 
-            map[cave1l.Ypos - 31, cave1l.Xpos] = caveExitTerrain;
-            map[cave1l.Ypos - 31, cave1l.Xpos + 1] = caveExitTerrain;
-            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos] = caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos - 1] = caveExitTerrain;
+            map[cave1l.Ypos - 31, cave1l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Ypos - 31, cave1l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1r.Ypos - 29, cave1r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
 
             if (caves > 1)
             {
-                if (caveType == 0)
+                if (caveOrientation == 0)
                 {
-                    caveType = 1;
+                    caveOrientation = 1;
                 }
                 else
                 {
-                    caveType = 0;
+                    caveOrientation = 0;
                 }
-                f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
+                f = VerticalCave(caveOrientation, calderaCenterX, calderaCenterY, cave2l, cave2r);
                 if (!f)
                 {
                     return false;
@@ -1141,18 +1144,18 @@ public class WestHyrule : World
                 cave2l.CanShuffle = false;
                 cave2r.CanShuffle = false;
                 caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Ypos - 31, cave2l.Xpos] = caveExitTerrain;
-                map[cave2l.Ypos - 31, cave2l.Xpos + 1] = caveExitTerrain;
-                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos] = caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos - 1] = caveExitTerrain;
+                map[cave2l.Ypos - 31, cave2l.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2l.Ypos - 31, cave2l.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2r.Ypos - 29, cave2r.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
             }
 
             if (caves == 1)
             {
                 int delta = -1;
-                if (caveType == 0) //palace goes down
+                if (caveOrientation == 0) //palace goes down
                 {
                     delta = 1;
                 }

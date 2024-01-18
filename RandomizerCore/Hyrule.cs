@@ -1012,6 +1012,7 @@ public class Hyrule
         if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
+            /*
             if(UNSAFE_DEBUG)
             {
                 List<Location> missingLocations = new();
@@ -1030,6 +1031,7 @@ public class Hyrule
                 }
                 return false;
             }
+            */
         }
         if (UNSAFE_DEBUG && retval)
         {

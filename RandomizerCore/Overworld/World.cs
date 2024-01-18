@@ -782,7 +782,7 @@ public abstract class World
             || (deadZoneMinX != null && deadZoneMaxX != null && deadZoneMinY != null && deadZoneMaxY != null)))
         {
             throw new ArgumentException("ConnectIslands dead zone is improperly defined. 0 or 4 values must be specified.");
-        };
+        }
         int maxBridgeAttempts = MAXIMUM_BRIDGE_ATTEMPTS[biome];
         maxBridgeAttempts *= canWalkOnWater ? 1 : 2;
         int[,] globs = GetTerrainGlobs();
@@ -793,25 +793,28 @@ public abstract class World
         while (remainingBridges > 0 && tries < maxBridgeAttempts)
         {
             tries++;
-            int x = RNG.Next(MAP_COLS - 2) + 1;
-            int y = RNG.Next(MAP_ROWS - 2) + 1;
+            int x, y;
+            /*
             if(deadZoneMaxX != null && x >= deadZoneMinX && x <= deadZoneMaxX && y >= deadZoneMinY && y <= deadZoneMaxY)
             {
                 continue;
             }
-            Direction waterDirection = NextToWater(x, y, riverTerrain);
+            */
+            Direction waterDirection;
             int waterTries = 0;
-            while (waterDirection == Direction.NONE && waterTries < 2000)// || (this.bio == biome.canyon && (waterdir == Direction.NORTH || waterdir == Direction.SOUTH)))
+            do
             {
                 x = RNG.Next(MAP_COLS - 2) + 1;
                 y = RNG.Next(MAP_ROWS - 2) + 1;
                 waterDirection = NextToWater(x, y, riverTerrain);
                 waterTries++;
-            }
-            if (waterTries >= 2000)
-            {
-                return false;
-            }
+                if (waterTries >= 2000)
+                {
+                    return false;
+                }
+            } while (waterDirection == Direction.NONE
+                || (deadZoneMaxX != null && x >= deadZoneMinX && x <= deadZoneMaxX && y >= deadZoneMinY && y <= deadZoneMaxY));
+
             int deltaX = waterDirection.DeltaX();
             int deltaY = waterDirection.DeltaY();
             int length = 0;
@@ -2606,9 +2609,9 @@ public abstract class World
         }
     }
 
-    protected bool HorizontalCave(int caveType, int centerx, int centery, Location cave1l, Location cave1r)
+    protected bool HorizontalCave(int caveOritentation, int centerx, int centery, Location cave1l, Location cave1r)
     {
-        if (caveType == 0) //first cave left
+        if (caveOritentation == 0) //first cave left
         {
             int cavey = RNG.Next(centery - 2, centery + 3);
             int cavex = centerx;

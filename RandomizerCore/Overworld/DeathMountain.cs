@@ -777,15 +777,9 @@ class DeathMountain : World
         {
             water = Terrain.WALKABLEWATER;
         }
-        int centerx = RNG.Next(21, 41);
-        int centery = RNG.Next(17, 27);
-        if (isHorizontal)
-        {
-            centerx = RNG.Next(27, 37);
-            centery = RNG.Next(17, 27);
-        }
+        int centerx, centery;
 
-        bool placeable = false;
+        bool placeable;
         do
         {
             if (isHorizontal)
@@ -965,10 +959,7 @@ class DeathMountain : World
             starty += deltay;
         }
 
-        Location cave1l = new Location();
-        Location cave1r = new Location();
-        Location cave2l = new Location();
-        Location cave2r = new Location();
+        Location cave1l, cave1r, cave2l, cave2r;
 
         do
         {
