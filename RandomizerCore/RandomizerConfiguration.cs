@@ -1210,24 +1210,31 @@ public class RandomizerConfiguration
                 _ => throw new Exception("Invalid Biome")
             };
         }
-        else
+        else if(WestBiome == Biome.CANYON)
         {
+            properties.WestBiome = random.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
+        }
+        else {
             properties.WestBiome = WestBiome;
         }
         if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA || EastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
             int shuffleLimit = EastBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
-            properties.EastBiome = random.Next(EastBiome == Biome.RANDOM ? 7 : 5) switch
+            properties.EastBiome = random.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
                 2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.VOLCANO,
                 4 => Biome.MOUNTAINOUS,
-                5 => Biome.VANILLA,
-                6 => Biome.VANILLA_SHUFFLE,
+                5 => Biome.VANILLA_SHUFFLE,
+                6 => Biome.VANILLA,
                 _ => throw new Exception("Invalid Biome")
             };
+        }
+        else if (EastBiome == Biome.CANYON)
+        {
+            properties.EastBiome = random.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
         }
         else
         {
@@ -1236,17 +1243,21 @@ public class RandomizerConfiguration
         if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA || DMBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
             int shuffleLimit = DMBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
-            properties.DmBiome = random.Next(DMBiome == Biome.RANDOM ? 7 : 5) switch
+            properties.DmBiome = random.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
                 1 => Biome.ISLANDS,
                 2 => random.Next(2) == 1 ? Biome.CANYON : Biome.DRY_CANYON,
                 3 => Biome.CALDERA,
                 4 => Biome.MOUNTAINOUS,
-                5 => Biome.VANILLA,
-                6 => Biome.VANILLA_SHUFFLE,
+                5 => Biome.VANILLA_SHUFFLE,
+                6 => Biome.VANILLA,
                 _ => throw new Exception("Invalid Biome")
             };
+        }
+        else if (DMBiome == Biome.CANYON)
+        {
+            properties.DmBiome = random.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
         }
         else
         {

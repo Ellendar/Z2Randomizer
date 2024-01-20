@@ -457,10 +457,10 @@ public class EastHyrule : World
 
 
                 }
-                else if (biome == Biome.CANYON)
+                else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     riverTerrain = fillerWater;
-                    if (props.EastBiome == Biome.DRY_CANYON)
+                    if (biome == Biome.DRY_CANYON)
                     {
                         riverTerrain = Terrain.DESERT;
                     }
@@ -569,11 +569,11 @@ public class EastHyrule : World
                     }
                 }
                 Direction raftDirection = Direction.WEST;
-                if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON)
+                if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                 {
                     raftDirection = (Direction)RNG.Next(4);
                 }
-                else if (biome == Biome.CANYON || biome == Biome.VOLCANO)
+                else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.VOLCANO)
                 {
                     raftDirection = isHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
 
@@ -587,7 +587,7 @@ public class EastHyrule : World
                 Direction bridgeDirection;
                 do
                 {
-                    if (biome != Biome.CANYON && biome != Biome.VOLCANO)
+                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.VOLCANO)
                     {
                         bridgeDirection = (Direction)RNG.Next(4);
                     }
@@ -606,7 +606,7 @@ public class EastHyrule : World
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
                 }
 
-                if (biome == Biome.VOLCANO || biome == Biome.CANYON)
+                if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     bool f = MakeVolcano();
                     if (!f)
@@ -673,7 +673,7 @@ public class EastHyrule : World
                 {
                     ConnectIslands(20, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots);
                 }
-                if (biome == Biome.CANYON)
+                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     ConnectIslands(15, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots);
 
@@ -739,9 +739,9 @@ public class EastHyrule : World
         int palacex = RNG.Next(xmin, xmax);
         int palacey = RNG.Next(ymin, ymax);
 
-        if (biome == Biome.VOLCANO || biome == Biome.CANYON)
+        if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
         {
-            bool placeable = false;
+            bool placeable;
             do
             {
                 palacex = RNG.Next(xmin, xmax);
@@ -796,7 +796,7 @@ public class EastHyrule : World
         locationAtGP.CanShuffle = false;
 
         int length = 20;
-        if (biome != Biome.CANYON && biome != Biome.VOLCANO)
+        if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.VOLCANO)
         {
             length = RNG.Next(5, 16);
         }
@@ -804,7 +804,7 @@ public class EastHyrule : World
         int deltay = 0;
         int starty = palacey;
         int startx = palacex + 4;
-        if (biome != Biome.CANYON)
+        if (biome != Biome.CANYON && biome != Biome.DRY_CANYON)
         {
             if (palacex > MAP_COLS / 2)
             {
@@ -872,7 +872,9 @@ public class EastHyrule : World
 
         int forced = 0;
         int vodRoutes = RNG.Next(1, 3);
-        bool horizontalPath = (isHorizontal && biome != Biome.CANYON) || (!isHorizontal && biome == Biome.CANYON);
+        //bool horizontalPath = (isHorizontal && biome != Biome.CANYON) || (!isHorizontal && biome == Biome.CANYON);
+        bool horizontalPath = isHorizontal ^ (biome == Biome.CANYON || biome == Biome.DRY_CANYON);
+
         if (biome != Biome.VOLCANO)
         {
             vodRoutes = 1;
@@ -898,7 +900,7 @@ public class EastHyrule : World
                 && startx < MAP_COLS - 1
                 && starty > 1
                 && starty < MAP_ROWS - 1
-                && (((biome == Biome.VOLCANO || biome == Biome.CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || (biome != Biome.VOLCANO && biome != Biome.CANYON && c < length)))
+                && (((biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON) && map[starty, startx] == Terrain.MOUNTAIN) || (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON && c < length)))
             {
                 c++;
                 map[starty, startx] = Terrain.LAVA;
@@ -910,7 +912,7 @@ public class EastHyrule : World
                 }
                 if (adjust > 0)
                 {
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         if (deltax != 0)
                         {
@@ -928,7 +930,7 @@ public class EastHyrule : World
                         if (horizontalPath)
                         {
                             map[starty + i, startx] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                             {
                                 if (map[starty + i, startx - 1] != Terrain.LAVA && map[starty + i, startx - 1] != Terrain.CAVE)
                                 {
@@ -948,7 +950,7 @@ public class EastHyrule : World
                         else
                         {
                             map[starty, startx + i] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                             {
                                 if (map[starty - 1, startx + i] != Terrain.LAVA && map[starty - 1, startx + i] != Terrain.CAVE)
                                 {
@@ -966,7 +968,7 @@ public class EastHyrule : World
                             }
                         }
                     }
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         if (deltax != 0)
                         {
@@ -982,7 +984,7 @@ public class EastHyrule : World
                 }
                 else if (adjust < 0)
                 {
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         if (deltax != 0)
                         {
@@ -999,7 +1001,7 @@ public class EastHyrule : World
                         for (int i = 0; i <= Math.Abs(adjust); i++)
                         {
                             map[starty - i, startx] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                             {
                                 if (map[starty - i, startx - 1] != Terrain.LAVA && map[starty - i, startx - 1] != Terrain.CAVE)
                                 {
@@ -1023,7 +1025,7 @@ public class EastHyrule : World
                         for (int i = 0; i <= Math.Abs(adjust); i++)
                         {
                             map[starty, startx - i] = Terrain.LAVA;
-                            if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                             {
                                 if (map[starty - 1, startx - i] != Terrain.LAVA && map[starty - 1, startx - i] != Terrain.CAVE)
                                 {
@@ -1041,7 +1043,7 @@ public class EastHyrule : World
                             }
                         }
                     }
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         if (deltax != 0)
                         {
@@ -1056,7 +1058,7 @@ public class EastHyrule : World
                 }
                 else
                 {
-                    if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+                    if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         if (deltax != 0)
                         {
@@ -1127,7 +1129,8 @@ public class EastHyrule : World
                     }
                     else if (adjust > 0)
                     {
-                        if ((isHorizontal && biome != Biome.CANYON) || (!isHorizontal && biome == Biome.CANYON))
+                        //if ((isHorizontal && biome != Biome.CANYON) || (!isHorizontal && biome == Biome.CANYON))
+                        if(isHorizontal ^ (biome == Biome.CANYON || biome == Biome.DRY_CANYON))
                         {
                             if (map[starty - 1, startx - 1] == Terrain.MOUNTAIN && map[starty - 1, startx + 1] == Terrain.MOUNTAIN)
                             {
@@ -1245,7 +1248,7 @@ public class EastHyrule : World
                             startx += RNG.Next(5, 10);
                         }
                     }
-                    if (map[starty, startx] != Terrain.MOUNTAIN && (biome == Biome.VOLCANO || biome == Biome.CANYON))
+                    if (map[starty, startx] != Terrain.MOUNTAIN && (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON))
                     {
                         return false;
                     }
@@ -1301,7 +1304,7 @@ public class EastHyrule : World
 
             }
 
-            if (biome != Biome.VOLCANO && biome != Biome.CANYON)
+            if (biome != Biome.VOLCANO && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
             {
                 map[starty, startx] = Terrain.LAVA;
                 if (deltax != 0)

@@ -218,7 +218,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
         "ProductCode" = "8:{9BEF0619-F42D-46BE-AB47-20F4963E1A76}"
-        "PackageCode" = "8:{42225094-FE63-4DFF-83B1-4FA00EBB1660}"
+        "PackageCode" = "8:{FEEBD41D-D4CE-4297-B0A9-0D95237D3BAE}"
         "UpgradeCode" = "8:{B1166C33-B6F6-4358-A1E8-43F64106364C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -349,7 +349,7 @@
             "Target" = "8:_2D6B6665B7654884B9A95FF56D4D56B5"
             "Folder" = "8:_2836974F02AE481582FD5BD51CDF1670"
             "WorkingFolder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
-            "Icon" = "8:"
+            "Icon" = "8:_1CCB6BD983624AEB9B091031D25B8DA1"
             "Feature" = "8:"
             }
         }
@@ -753,7 +753,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2D6B6665B7654884B9A95FF56D4D56B5"
             {
-            "SourcePath" = "8:..\\WinFormUI\\obj\\Debug\\net7.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net7.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"

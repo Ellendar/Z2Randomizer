@@ -199,7 +199,7 @@ class DeathMountain : World
             {
                 map = new Terrain[MAP_ROWS, MAP_COLS];
                 Terrain riverT = Terrain.MOUNTAIN;
-                if (biome != Biome.CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
+                if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
@@ -290,7 +290,7 @@ class DeathMountain : World
 
 
                 }
-                else if (biome == Biome.CANYON)
+                else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     riverT = water;
 
@@ -371,13 +371,13 @@ class DeathMountain : World
                 }
 
                 Direction raftDirection = DirectionExtensions.RandomCardinal(RNG);
-                if (biome == Biome.CANYON)
+                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     raftDirection = props.DmIsHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                 }
                 if (raft != null)
                 {
-                    if (biome != Biome.CANYON && biome != Biome.CALDERA)
+                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
                     {
                         MAP_COLS = 29;
                     }
@@ -388,7 +388,7 @@ class DeathMountain : World
                 Direction bridgeDirection;
                 do
                 {
-                    if (biome != Biome.CANYON)
+                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         bridgeDirection = DirectionExtensions.RandomCardinal(RNG);
                     }
@@ -399,7 +399,7 @@ class DeathMountain : World
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
                 {
-                    if (biome != Biome.CANYON && biome != Biome.CALDERA)
+                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
                     {
                         MAP_COLS = 29;
                     }
@@ -697,7 +697,7 @@ class DeathMountain : World
                 walkableTerrains.Add(Terrain.ROAD);
                 if (raft != null)
                 {
-                    if (biome != Biome.CALDERA && biome != Biome.CANYON)
+                    if (biome != Biome.CALDERA && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         MAP_COLS = 29;
                     }
@@ -711,7 +711,7 @@ class DeathMountain : World
 
                 if (bridge != null)
                 {
-                    if (biome != Biome.CALDERA && biome != Biome.CANYON)
+                    if (biome != Biome.CALDERA && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                     {
                         MAP_COLS = 29;
                     }
@@ -735,7 +735,7 @@ class DeathMountain : World
                 specRock.Xpos = x;
 
 
-                if (biome == Biome.CANYON || biome == Biome.ISLANDS)
+                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.ISLANDS)
                 {
                     ConnectIslands(25, false, riverT, false, false, false, props.CanWalkOnWaterWithBoots);
                 }

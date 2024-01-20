@@ -442,8 +442,9 @@ public class WestHyrule : World
                         break;
 
                     case Biome.CANYON:
+                    case Biome.DRY_CANYON:
                         riverTerrain = fillerWater;
-                        if (props.WestBiome == Biome.DRY_CANYON)
+                        if (biome == Biome.DRY_CANYON)
                         {
                             riverTerrain = Terrain.DESERT;
                             bridge1.CanShuffle = false;
@@ -535,11 +536,11 @@ public class WestHyrule : World
                 }
 
                 Direction raftDirection = Direction.EAST;
-                if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON)
+                if (props.ContinentConnections != ContinentConnectionType.NORMAL && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
                 {
                     raftDirection = (Direction)RNG.Next(4);
                 }
-                else if (biome == Biome.CANYON || biome == Biome.CALDERA)
+                else if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.CALDERA)
                 {
                     raftDirection = isHorizontal ? DirectionExtensions.RandomHorizontal(RNG) : DirectionExtensions.RandomVertical(RNG);
                 }
@@ -552,7 +553,7 @@ public class WestHyrule : World
                 Direction bridgeDirection = (Direction)RNG.Next(4);
                 do
                 {
-                    if (biome != Biome.CANYON && biome != Biome.CALDERA)
+                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
                     {
                         bridgeDirection = (Direction)RNG.Next(4);
                     }
@@ -640,7 +641,7 @@ public class WestHyrule : World
                 PlaceHiddenLocations();
 
 
-                if (biome == Biome.CANYON)
+                if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     //Debug.WriteLine(GetMapDebug());
                     bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
