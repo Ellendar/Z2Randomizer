@@ -270,7 +270,7 @@ public class Palaces
                         palace.AllRooms.Add(palace.Root);
 
                         palace.BossRoom = new(bossRoomsByPalaceNumber[currentPalace].ElementAt(r.Next(bossRoomsByPalaceNumber[currentPalace].Count)));
-                        palace.BossRoom.Enemies = PalaceRooms.VanillaBossRoom(currentPalace).Enemies;
+                        palace.BossRoom.Enemies = (byte[])PalaceRooms.VanillaBossRoom(currentPalace).Enemies.Clone();
                         palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
                         palace.BossRoom.PalaceGroup = palaceGroup;
                         palace.AllRooms.Add(palace.BossRoom);
@@ -308,7 +308,7 @@ public class Palaces
                             {
                                 Room segmentedItemRoom1, segmentedItemRoom2;
                                 segmentedItemRoom1 = palace.ItemRoom;
-                                segmentedItemRoom2 = PalaceRooms.GetRoomByName(segmentedItemRoom1.LinkedRoomName, props.UseCustomRooms);
+                                segmentedItemRoom2 = new(PalaceRooms.GetRoomByName(segmentedItemRoom1.LinkedRoomName, props.UseCustomRooms));
                                 segmentedItemRoom2.NewMap = palace.ItemRoom.NewMap;
                                 segmentedItemRoom2.PalaceGroup = palaceGroup;
                                 segmentedItemRoom2.SetItem((Item)currentPalace);
@@ -376,7 +376,7 @@ public class Palaces
                                 added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
                                 if (added && roomToAdd.LinkedRoomName != null)
                                 {
-                                    Room linkedRoom = PalaceRooms.GetRoomByName(roomToAdd.LinkedRoomName, props.UseCustomRooms);
+                                    Room linkedRoom = new(PalaceRooms.GetRoomByName(roomToAdd.LinkedRoomName, props.UseCustomRooms));
                                     linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
                                     linkedRoom.LinkedRoom = roomToAdd;
                                     roomToAdd.LinkedRoom = linkedRoom;
@@ -409,7 +409,7 @@ public class Palaces
                                         bool added2 = palace.AddRoom(dropZoneRoom, props.BlockersAnywhere);
                                         if (added2 && dropZoneRoom.LinkedRoomName != null)
                                         {
-                                            Room linkedRoom = PalaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms);
+                                            Room linkedRoom = new(PalaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms));
                                             linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
                                             linkedRoom.LinkedRoom = dropZoneRoom;
                                             dropZoneRoom.LinkedRoom = linkedRoom;

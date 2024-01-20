@@ -790,7 +790,7 @@ public class WestHyrule : World
             water = Terrain.WALKABLEWATER;
         }
 
-        bool placeable = false;
+        bool placeable;
         do
         {
             if (isHorizontal)
@@ -969,11 +969,8 @@ public class WestHyrule : World
             startx += deltax;
             starty += deltay;
         }
-        int caves = RNG.Next(2) + 1;
-        Location cave1l = new Location();
-        Location cave1r = new Location();
-        Location cave2l = new Location();
-        Location cave2r = new Location();
+        int caveCount = RNG.Next(2) + 1;
+        Location cave1l, cave1r, cave2l = null, cave2r = null;
         int availableConnectorCount = 2;
         if(useSaneCaves)
         {
@@ -997,7 +994,7 @@ public class WestHyrule : World
         }
         map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
-        if (caves > 1)
+        if (caveCount > 1)
         {
             int cavenum2 = RNG.Next(availableConnectorCount);
             while(cavenum2 == cavenum1)
@@ -1034,14 +1031,14 @@ public class WestHyrule : World
             cave1l.CanShuffle = false;
             cave1r.CanShuffle = false;
             Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-            map[cave1l.Ypos - 30, cave1l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1l.Ypos - 29, cave1l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Ypos - 30, cave1r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1r.Ypos - 31, cave1r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Ypos - 30, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Ypos - 29, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1r.Ypos - 30, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Ypos - 31, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
 
-            if (caves > 1)
+            if (caveCount > 1)
             {
                 if(caveOrientation == 0)
                 {
@@ -1067,7 +1064,7 @@ public class WestHyrule : World
                 map[cave2r.Ypos - 31, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             }
             
-            if(caves == 1)
+            if(caveCount == 1)
             {
                 int delta = -1;
                 if(caveOrientation == 0) //palace goes right
@@ -1126,7 +1123,7 @@ public class WestHyrule : World
             map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             map[cave1r.Ypos - 29, cave1r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
 
-            if (caves > 1)
+            if (caveCount > 1)
             {
                 if (caveOrientation == 0)
                 {
@@ -1144,15 +1141,15 @@ public class WestHyrule : World
                 cave2l.CanShuffle = false;
                 cave2r.CanShuffle = false;
                 caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Ypos - 31, cave2l.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2l.Ypos - 31, cave2l.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2r.Ypos - 29, cave2r.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Ypos - 31, cave2l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Ypos - 31, cave2l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2r.Ypos - 29, cave2r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Ypos - 29, cave2r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             }
 
-            if (caves == 1)
+            if (caveCount == 1)
             {
                 int delta = -1;
                 if (caveOrientation == 0) //palace goes down
