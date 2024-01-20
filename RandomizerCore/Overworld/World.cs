@@ -2609,9 +2609,9 @@ public abstract class World
         }
     }
 
-    protected bool HorizontalCave(int caveOritentation, int centerx, int centery, Location cave1l, Location cave1r)
+    protected bool HorizontalCave(int caveOrientation, int centerx, int centery, Location cave1l, Location cave1r)
     {
-        if (caveOritentation == 0) //first cave left
+        if (caveOrientation == 0) //first cave left
         {
             int cavey = RNG.Next(centery - 2, centery + 3);
             int cavex = centerx;
