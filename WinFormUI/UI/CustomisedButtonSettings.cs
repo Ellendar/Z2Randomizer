@@ -47,8 +47,8 @@ namespace Z2Randomizer.WinFormUI
                 Flagset = settings.Flagset;
                 Tooltip = settings.Tooltip;
 
-                IsCustomised = true;
-                IsEmpty = false;
+                IsCustomised = !(Flagset == "");
+                IsEmpty = (Flagset == "");
             }
         }
 

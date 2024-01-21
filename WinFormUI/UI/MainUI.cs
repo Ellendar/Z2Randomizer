@@ -456,9 +456,10 @@ public partial class MainUI : Form
     {
         string defaultJson = (string)Settings.Default.Properties[button.Name].DefaultValue;
         //logger.Warn(defaultJson);
-        if(defaultJson == null || defaultJson.Length == 0)
+        if (defaultJson == null || defaultJson.Length == 0)
         {
             SetCustomFlagsetButtonProperties(button);
+            return;
         }
         try
         {
