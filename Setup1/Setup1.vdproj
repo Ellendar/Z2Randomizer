@@ -21,7 +21,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2D6B6665B7654884B9A95FF56D4D56B5"
+        "MsmKey" = "8:_2FFFB7A7D1A64E98967DCB3990A50DD2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_748662A80CE34E6A90AEEF52BDC906ED"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BB3D8193D68E4F149C2157E8828E8077"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -112,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5   "
+                "FrameworkVersion" = "8:v4.5    "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -218,7 +230,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
         "ProductCode" = "8:{262CAB4C-9ED2-41DA-8EFE-6A3D171D8438}"
-        "PackageCode" = "8:{FEEBD41D-D4CE-4297-B0A9-0D95237D3BAE}"
+        "PackageCode" = "8:{7960D92C-1830-48AA-B67F-E26F6BC688FB}"
         "UpgradeCode" = "8:{B04C4299-26B3-4E9F-8554-8D6095734119}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -346,7 +358,7 @@
             "ShowCmd" = "3:1"
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_2D6B6665B7654884B9A95FF56D4D56B5"
+            "Target" = "8:_BB3D8193D68E4F149C2157E8828E8077"
             "Folder" = "8:_2836974F02AE481582FD5BD51CDF1670"
             "WorkingFolder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
             "Icon" = "8:_1CCB6BD983624AEB9B091031D25B8DA1"
@@ -751,7 +763,63 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2D6B6665B7654884B9A95FF56D4D56B5"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2FFFB7A7D1A64E98967DCB3990A50DD2"
+            {
+            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net7.0\\Z2R.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{5277C962-4F26-422B-9982-3F1EE81E0975}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_748662A80CE34E6A90AEEF52BDC906ED"
+            {
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net7.0\\DumpRooms.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{25230EEF-2BB9-4472-96E3-40AE6EDCF5DE}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BB3D8193D68E4F149C2157E8828E8077"
             {
             "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net7.0-windows\\apphost.exe"
             "TargetName" = "8:"
