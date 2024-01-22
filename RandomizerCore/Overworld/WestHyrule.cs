@@ -1452,6 +1452,7 @@ public class WestHyrule : World
         {
             pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
         }
+        pendingCoordinates.Add((northPalace.Ypos - 30, northPalace.Xpos));
         int y, x;
         do
         {
