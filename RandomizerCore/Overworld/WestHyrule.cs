@@ -234,52 +234,52 @@ public class WestHyrule : World
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
 
-        section = new SortedDictionary<Tuple<int, int>, string>{
-            { Tuple.Create(0x34, 0x17), "north" },
-            { Tuple.Create(0x20, 0x1D), "north" },
-            { Tuple.Create(0x2A, 0x25), "north" },
-            { Tuple.Create(0x3C, 0x10), "north" },
-            { Tuple.Create(0x56, 0x14), "mid" },
-            { Tuple.Create(0x40, 0x3E), "parapa" },
-            { Tuple.Create(0x4D, 0x15), "mid" },
-            { Tuple.Create(0x39, 0x3D), "parapa" },
-            { Tuple.Create(0x47, 0x08), "mid" },
-            { Tuple.Create(0x5C, 0x30), "grave" },
-            { Tuple.Create(0x29, 0x30), "parapa" },
-            { Tuple.Create(0x2E, 0x37), "north" },
-            { Tuple.Create(0x3A, 0x01), "north" },
-            { Tuple.Create(0x3E, 0x03), "mid" },
-            { Tuple.Create(0x3E, 0x26), "mid" },
-            { Tuple.Create(0x45, 0x09), "hammer0" },
-            { Tuple.Create(0x3E, 0x36), "hammer" },
-            { Tuple.Create(0x60, 0x32), "grave" },
-            { Tuple.Create(0x66, 0x3B), "island" },
-            { Tuple.Create(0x52, 0x10), "mid" },
-            { Tuple.Create(0x57, 0x1A), "mid" },
-            { Tuple.Create(0x61, 0x1A), "dmexit" },
-            { Tuple.Create(0x61, 0x22), "grave" },
-            { Tuple.Create(0x40, 0x07), "mid" },
-            { Tuple.Create(0x43, 0x11), "mid" },
-            { Tuple.Create(0x57, 0x21), "mid" },
-            { Tuple.Create(0x4C, 0x14), "mid" },
-            { Tuple.Create(0x4D, 0x11), "mid" },
-            { Tuple.Create(0x4E, 0x13), "mid" },
-            { Tuple.Create(0x4D, 0x17), "mid" },
-            { Tuple.Create(0x44, 0x25), "mid" },
-            { Tuple.Create(0x66, 0x26), "grave" },
-            { Tuple.Create(0x4D, 0x3D), "grave" },
-            { Tuple.Create(0x5F, 0x0A), "lifesouth" },
-            { Tuple.Create(0x60, 0x15), "dmexit" },
-            { Tuple.Create(0x58, 0x32), "grave" },
-            { Tuple.Create(0x36, 0x2E), "north" },
-            { Tuple.Create(0x24, 0x02), "north" },
-            { Tuple.Create(0x5B, 0x08), "lifesouth" },
-            { Tuple.Create(0x59, 0x08), "mid" },
-            { Tuple.Create(0x4C, 0x15), "mid" },
-            { Tuple.Create(0x4B, 0x3C), "grave" },
-            { Tuple.Create(0x20, 0x3E), "parapa" },
-            { Tuple.Create(0x40, 0x0B), "mid" },
-            { Tuple.Create(0x62, 0x39), "island" }
+        section = new SortedDictionary<(int, int), string>{
+            { (0x34, 0x17), "north" },
+            { (0x20, 0x1D), "north" },
+            { (0x2A, 0x25), "north" },
+            { (0x3C, 0x10), "north" },
+            { (0x56, 0x14), "mid" },
+            { (0x40, 0x3E), "parapa" },
+            { (0x4D, 0x15), "mid" },
+            { (0x39, 0x3D), "parapa" },
+            { (0x47, 0x08), "mid" },
+            { (0x5C, 0x30), "grave" },
+            { (0x29, 0x30), "parapa" },
+            { (0x2E, 0x37), "north" },
+            { (0x3A, 0x01), "north" },
+            { (0x3E, 0x03), "mid" },
+            { (0x3E, 0x26), "mid" },
+            { (0x45, 0x09), "hammer0" },
+            { (0x3E, 0x36), "hammer" },
+            { (0x60, 0x32), "grave" },
+            { (0x66, 0x3B), "island" },
+            { (0x52, 0x10), "mid" },
+            { (0x57, 0x1A), "mid" },
+            { (0x61, 0x1A), "dmexit" },
+            { (0x61, 0x22), "grave" },
+            { (0x40, 0x07), "mid" },
+            { (0x43, 0x11), "mid" },
+            { (0x57, 0x21), "mid" },
+            { (0x4C, 0x14), "mid" },
+            { (0x4D, 0x11), "mid" },
+            { (0x4E, 0x13), "mid" },
+            { (0x4D, 0x17), "mid" },
+            { (0x44, 0x25), "mid" },
+            { (0x66, 0x26), "grave" },
+            { (0x4D, 0x3D), "grave" },
+            { (0x5F, 0x0A), "lifesouth" },
+            { (0x60, 0x15), "dmexit" },
+            { (0x58, 0x32), "grave" },
+            { (0x36, 0x2E), "north" },
+            { (0x24, 0x02), "north" },
+            { (0x5B, 0x08), "lifesouth" },
+            { (0x59, 0x08), "mid" },
+            { (0x4C, 0x15), "mid" },
+            { (0x4B, 0x3C), "grave" },
+            { (0x20, 0x3E), "parapa" },
+            { (0x40, 0x0B), "mid" },
+            { (0x62, 0x39), "island" }
         };
         lostWoods = new List<Location> { GetLocationByMem(0x4649), GetLocationByMem(0x464A), GetLocationByMem(0x464B), GetLocationByMem(0x464C), GetLocationByMem(0x4635) };
     }
@@ -704,15 +704,20 @@ public class WestHyrule : World
                     }
                 }
 
-                if (!ValidateCaves())
-                {
-                    return false;
-                }
-
                 //check bytes and adjust
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
                 logger.Debug("West:" + bytesWritten);
             }
+        }
+
+        if (!ValidateBasicRouting())
+        {
+            return false;
+        }
+
+        if (!ValidateCaves())
+        {
+            return false;
         }
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
 
@@ -740,7 +745,7 @@ public class WestHyrule : World
         int y = RNG.Next(6, MAP_ROWS - 7);
         int x = RNG.Next(6, MAP_COLS - 7);
         int tries = 0;
-        while((map[y, x] != Terrain.NONE || GetLocationByCoords(Tuple.Create(y + 30, x)) != null) && tries < 1000)
+        while((map[y, x] != Terrain.NONE || GetLocationByCoords((y + 30, x)) != null) && tries < 1000)
         {
             y = RNG.Next(6, MAP_ROWS - 7);
             x = RNG.Next(6, MAP_COLS - 7);
@@ -759,7 +764,7 @@ public class WestHyrule : World
         {
             int newx = RNG.Next(x - 3, x + 4);
             int newy = RNG.Next(y - 3, y + 4);
-            while((map[newy, newx] != Terrain.NONE || GetLocationByCoords(Tuple.Create(newy + 30, newx)) != null) && tries < 100)
+            while((map[newy, newx] != Terrain.NONE || GetLocationByCoords((newy + 30, newx)) != null) && tries < 100)
             {
                 newx = RNG.Next(x - 3, x + 4);
                 newy = RNG.Next(y - 3, y + 4);
@@ -1208,7 +1213,7 @@ public class WestHyrule : World
             }
             if (boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
-                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords(Tuple.Create(cave.Ypos - 30, cave.Xpos + 2)) == null)
+                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null)
                 {
                     map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.ROCK;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1220,7 +1225,7 @@ public class WestHyrule : World
                     cave.Xpos++;
                     rockNum--;
                 }
-                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords(Tuple.Create(cave.Ypos - 30, cave.Xpos - 2)) == null)
+                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null)
                 {
                     map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.ROCK;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1232,7 +1237,7 @@ public class WestHyrule : World
                     cave.Xpos--;
                     rockNum--;
                 }
-                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords(Tuple.Create(cave.Ypos - 32, cave.Xpos)) == null)
+                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null)
                 {
                     map[cave.Ypos - 29, cave.Xpos] = Terrain.ROCK;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1244,7 +1249,7 @@ public class WestHyrule : World
                     cave.Ypos--;
                     rockNum--;
                 }
-                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords(Tuple.Create(cave.Ypos - 28, cave.Xpos)) == null)
+                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null)
                 {
                     map[cave.Ypos - 31, cave.Xpos] = Terrain.ROCK;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1432,6 +1437,68 @@ public class WestHyrule : World
             .ToList();
     }
 
+    /// <summary>
+    /// Determines if all locations on this continent could be reached, assuming you had everything and could reach every entrance.
+    /// If the answer is no, there's no point in bothering with the rest of a world generation.
+    /// </summary>
+    /// <returns></returns>
+    public bool ValidateBasicRouting()
+    {
+        List<Location> unreachedLocations = RequiredLocations(false, false).ToList();
+
+        bool[,] visitedCoordinates = new bool[MAP_ROWS, MAP_COLS];
+        List<(int, int)> pendingCoordinates = new();
+        foreach (Location location in GetContinentConnections())
+        {
+            pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
+        }
+        int y, x;
+        do
+        {
+            (int, int) coordinate = pendingCoordinates.First();
+            y = coordinate.Item1;
+            x = coordinate.Item2;
+            pendingCoordinates.Remove(coordinate);
+            if (visitedCoordinates[y, x])
+            {
+                continue;
+            }
+            visitedCoordinates[y, x] = true;
+            //if there is a location at this coordinate
+            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            if (here != null)
+            {
+                //it's reachable
+                unreachedLocations.Remove(here);
+                //if it's a connection cave, add the exit(s) to the pending locations
+                if (connections.ContainsKey(here))
+                {
+                    pendingCoordinates.Add((connections[here].Ypos - 30, connections[here].Xpos));
+                }
+            }
+
+            //for each adjacent direction, if it's not off the map, and it's potentially walkable terrain, crawl it
+            if (x > 0 && map[y, x - 1].IsWalkable())
+            {
+                pendingCoordinates.Add((y, x - 1));
+            }
+            if (x < MAP_COLS - 1 && map[y, x + 1].IsWalkable())
+            {
+                pendingCoordinates.Add((y, x + 1));
+            }
+            if (y > 0 && map[y - 1, x].IsWalkable())
+            {
+                pendingCoordinates.Add((y - 1, x));
+            }
+            if (y < MAP_ROWS - 1 && map[y + 1, x].IsWalkable())
+            {
+                pendingCoordinates.Add((y + 1, x));
+            }
+        } while (pendingCoordinates.Count > 0);
+
+        return !unreachedLocations.Any();
+    }
+
     public override string GetName()
     {
         return "West";
@@ -1461,11 +1528,11 @@ public class WestHyrule : World
             locationAtPalace3,
         };
 
-        foreach (Location key in connections.Keys)
+        foreach (Location location in connections.Keys)
         {
-            if (requiredLocations.TryGetValue(key, out Location value))
+            if (!requiredLocations.Contains(location) && location.Ypos != 0)
             {
-                requiredLocations.Add(key);
+                requiredLocations.Add(location);
             }
         }
         return requiredLocations.Where(i => i != null);

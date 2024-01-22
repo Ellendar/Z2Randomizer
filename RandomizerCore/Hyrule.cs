@@ -25,7 +25,7 @@ public class Hyrule
     //The higher you set it, the more likely a given terrain is to find a set of items that works, resulting in fewer terrain generations.
     //It will also increase the number of seeds that have more arcane solutions, where only a specific item route works.
     //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
-    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 40;
+    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 100;
 
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
@@ -1012,7 +1012,6 @@ public class Hyrule
         if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
-            /*
             if(UNSAFE_DEBUG)
             {
                 List<Location> missingLocations = new();
@@ -1025,13 +1024,13 @@ public class Hyrule
 
                 Debug.WriteLine("Unreachable locations:");
                 Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
-                if(debug > 2000)
+
+                if(nonDmLocations.Count == 0 && UNSAFE_DEBUG)
                 {
                     return false;
                 }
                 return false;
             }
-            */
         }
         if (UNSAFE_DEBUG && retval)
         {

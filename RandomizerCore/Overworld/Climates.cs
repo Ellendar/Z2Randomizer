@@ -169,6 +169,19 @@ public class Climates
         30
     );
 
+    public static Climate ByName(string name)
+    {
+        //This could probably all be done with reflection but quick fix for now.
+        return name switch
+        {
+            "Classic" => Classic,
+            "Chaos" => Chaos,
+            "Wetlands" => Wetlands,
+            "Scrubland" => Scrubland,
+            "GreatLakes" => GreatLakes,
+            _ => throw new Exception("Unable to map Climate: " + name + " by name.")
+        };
+    }
 }
 
 

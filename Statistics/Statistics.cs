@@ -15,21 +15,11 @@ namespace Z2Randomizer.Statistics;
 /// </summary>
 class Statistics
 {
-
-    //private static readonly string FLAGS = "AAAN6AAFeqGkWVXZt0Y$8v4BX#4XRx$$sh"; //Standard
-    //private static readonly string FLAGS = "hEAK0sALvrpUWVXu20Y$8v9ttf9tb7AAJy"; //Max Rando
-    private static readonly string FLAGS = "hEAK0sALvrpUWVXu20g$8v9ttf9tb7AAJy"; //Random%
-    
-    //private static readonly string FLAGS = "hEAjMsAFerXs2NTbkkg$o6Vqv@sukyAAWh"; //Max Rando all mountains
-    //private static readonly string FLAGS = "AAAe6B$zeqGjAAGZt0g$o6XAv@hEig$$WA"; //Standard vanilla overworld
-    //private static readonly string FLAGS = "hEAjMsAFerXtN1Tbkkg$o6Vqv@sukyAAWh"; //Bad seed
-
-
-    //private static readonly string FLAGS = "AAAN6AAFeqGkEAGZt0g$o6XAv@suig$$WA"; //Caldera/Volcano
+    private static readonly string FLAGS = "hEAK0sALirpUe5RLvbgZQ+2c4YX@4X4yAASA"; //Random%
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
     private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-    private static readonly int LIMIT = 200;
+    private static readonly int LIMIT = 100;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
     {

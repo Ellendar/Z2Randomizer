@@ -38,7 +38,7 @@ public abstract class World
     protected List<int> largeEnemies;
     protected int enemyPtr;
     protected List<int> overworldMaps;
-    protected SortedDictionary<Tuple<int, int>, Location> locsByCoords;
+    protected SortedDictionary<(int, int), Location> locsByCoords;
     //protected Hyrule hyrule;
     protected Terrain[,] map;
     //private List<int> visitedEnemies;
@@ -53,7 +53,7 @@ public abstract class World
     protected Biome biome;
     protected bool isHorizontal;
     protected int VANILLA_MAP_ADDR;
-    protected SortedDictionary<Tuple<int, int>, string> section;
+    protected SortedDictionary<(int, int), string> section;
     public Location raft;
     public Location bridge;
     public Location cave1;
@@ -134,7 +134,7 @@ public abstract class World
         }
         //Locations = new List<Location>[11] { Towns, Caves, Palaces, Bridges, Deserts, Grasses, Forests, Swamps, Graves, Roads, Lavas };
         AllLocations = new List<Location>();
-        locsByCoords = new SortedDictionary<Tuple<int, int>, Location>();
+        locsByCoords = new SortedDictionary<(int, int), Location>();
         //reachableAreas = new HashSet<string>();
         unimportantLocs = new List<Location>();
         areasByLocation = new SortedDictionary<string, List<Location>>();
@@ -353,7 +353,7 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByCoords(Tuple<int, int> coords)
+    protected Location GetLocationByCoords((int, int)coords)
     {
         Location location = null;
         foreach (Location loc in AllLocations)
@@ -748,7 +748,7 @@ public abstract class World
                     x = RNG.Next(MAP_COLS);
                     y = RNG.Next(MAP_ROWS);
                     tries++;
-                } while ((map[y, x] != location.TerrainType || GetLocationByCoords(Tuple.Create(y + 30, x)) != null) && tries < 2000);
+                } while ((map[y, x] != location.TerrainType || GetLocationByCoords((y + 30, x)) != null) && tries < 2000);
 
                 if (tries < 2000)
                 {
@@ -778,6 +778,7 @@ public abstract class World
     protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, 
         bool canWalkOnWater, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
     {
+        int maxBridgeLength = canWalkOnWater ? MAXIMUM_BRIDGE_LENGTH * 2 : MAXIMUM_BRIDGE_LENGTH;
         if (!((deadZoneMinX == null && deadZoneMaxX == null && deadZoneMinY == null && deadZoneMaxY == null)
             || (deadZoneMinX != null && deadZoneMaxX != null && deadZoneMinY != null && deadZoneMaxY != null)))
         {
@@ -826,11 +827,11 @@ public abstract class World
             int startMass = globs[y, x];
 
 
-            if (GetLocationByCoords(Tuple.Create(y + 30, x)) != null
-                || GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null
-                || GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null
-                || GetLocationByCoords(Tuple.Create(y + 31, x)) != null
-                || GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
+            if (GetLocationByCoords((y + 30, x)) != null
+                || GetLocationByCoords((y + 30, x + 1)) != null
+                || GetLocationByCoords((y + 30, x - 1)) != null
+                || GetLocationByCoords((y + 31, x)) != null
+                || GetLocationByCoords((y + 29, x)) != null)
             {
                 length = 100;
             }
@@ -840,20 +841,20 @@ public abstract class World
 
             while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && map[y, x] == riverTerrain)
             {
-                if (x + 1 < MAP_COLS && GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null)
+                if (x + 1 < MAP_COLS && GetLocationByCoords((y + 30, x + 1)) != null)
                 {
                     length = 100;
                 }
-                if (x - 1 > 0 && GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null)
+                if (x - 1 > 0 && GetLocationByCoords((y + 30, x - 1)) != null)
                 {
                     length = 100;
                 }
 
-                if (y + 1 < MAP_ROWS && GetLocationByCoords(Tuple.Create(y + 31, x)) != null)
+                if (y + 1 < MAP_ROWS && GetLocationByCoords((y + 31, x)) != null)
                 {
                     length = 100;
                 }
-                if (y - 1 > 0 && GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
+                if (y - 1 > 0 && GetLocationByCoords((y + 29, x)) != null)
                 {
                     length = 100;
                 }
@@ -930,11 +931,11 @@ public abstract class World
             int endMass = 0;
             if (y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
             {
-                if (GetLocationByCoords(Tuple.Create(y + 30, x)) != null
-                    || GetLocationByCoords(Tuple.Create(y + 30, x + 1)) != null
-                    || GetLocationByCoords(Tuple.Create(y + 30, x - 1)) != null
-                    || GetLocationByCoords(Tuple.Create(y + 31, x)) != null
-                    || GetLocationByCoords(Tuple.Create(y + 29, x)) != null)
+                if (GetLocationByCoords((y + 30, x)) != null
+                    || GetLocationByCoords((y + 30, x + 1)) != null
+                    || GetLocationByCoords((y + 30, x - 1)) != null
+                    || GetLocationByCoords((y + 31, x)) != null
+                    || GetLocationByCoords((y + 29, x)) != null)
                 {
                     length = 100;
                     //Debug.WriteLine(GetGlobDebug(globs));
@@ -953,7 +954,7 @@ public abstract class World
                 length = 100;
             }
             if (
-                (placeTown && length < MAXIMUM_BRIDGE_LENGTH || (length < MAXIMUM_BRIDGE_LENGTH && length > MINIMUM_BRIDGE_LENGTH))
+                (placeTown && length < maxBridgeLength || (length < maxBridgeLength && length > MINIMUM_BRIDGE_LENGTH))
                 && x > 0
                 && x < MAP_COLS - 1
                 && y > 0
@@ -1393,14 +1394,14 @@ public abstract class World
         List<Terrain> randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToList();
         TerrainGrowthAttempts++;
         Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
-        List<Tuple<int, int>> placed = new();
+        List<(int, int)> placed = new();
         for (int y = 0; y < MAP_ROWS; y++)
         {
             for (int x = 0; x < MAP_COLS; x++)
             {
                 if (map[y, x] != Terrain.NONE && randomTerrains.Contains(map[y, x]))
                 {
-                    placed.Add(new Tuple<int, int>(y, x));
+                    placed.Add((y, x));
                 }
             }
         }
@@ -1417,7 +1418,7 @@ public abstract class World
                     choices.Clear();
                     double mindistance = double.MaxValue;
 
-                    foreach (Tuple<int, int> t in placed)
+                    foreach ((int, int)t in placed)
                     {
                         dy = t.Item1 - y;
                         dx = t.Item2 - x;
@@ -1705,128 +1706,7 @@ public abstract class World
             }
         }
     }
-    /*
-    protected void LegacyUpdateReachable()
-    {
-        bool needJump = false;
-        Location location = GetLocationByMem(0x8646);
-        int jumpBlockY = -1;
-        int jumpBlockX = -1;
-        if (location != null)
-        {
-            needJump = location.NeedJump;
-            jumpBlockY = location.Ypos - 30;
-            jumpBlockX = location.Xpos;
-        }
-
-        bool needFairy = false;
-        location = GetLocationByMem(0x8644);
-        int fairyBlockY = -1;
-        int fairyBlockX = -1;
-        if (location != null)
-        {
-            needFairy = location.NeedFairy;
-            fairyBlockY = location.Ypos - 30;
-            fairyBlockX = location.Xpos;
-        }
-        bool hasFairySpell = spellGet[Spell.FAIRY];
-        bool hasJumpSpell = spellGet[Spell.JUMP];
-        bool hasHammer = itemGet[Item.HAMMER];
-        bool hasBoots = itemGet[Item.BOOTS];
-        bool hasFlute = itemGet[Item.FLUTE];
-        bool changed = true;
-        while (changed)
-        {
-            changed = false;
-            for (int y = 0; y < MAP_ROWS; y++)
-            {
-                for (int x = 0; x < MAP_COLS; x++)
-                {
-                    Terrain terrain = map[y, x];
-                    if (location != null && location.TerrainType == Terrain.SWAMP)
-                    {
-                        needFairy = location.NeedFairy;
-                    }
-                    if (location != null && location.TerrainType == Terrain.DESERT)
-                    {
-                        needJump = location.NeedJump;
-                    }
-                    //If this isn't already marked as visited, and it is visitable:
-                    if (!visitation[y, x]
-                        //East desert jump blocker
-                        && !(
-                            needJump
-                            && jumpBlockY == y
-                            && jumpBlockX == x
-                            && (!hasJumpSpell && !hasFairySpell)
-                        )
-                        //Fairy cave is traversable
-                        && !(needFairy && fairyBlockY == y && fairyBlockX == x && !hasFairySpell)
-                        //This map tile is a traversable terrain type
-                        && (
-                            terrain == Terrain.LAVA
-                            || terrain == Terrain.BRIDGE
-                            || terrain == Terrain.CAVE
-                            || terrain == Terrain.ROAD
-                            || terrain == Terrain.PALACE
-                            || terrain == Terrain.TOWN
-                            || (terrain == Terrain.WALKABLEWATER && hasBoots)
-                            || walkableTerrains.Contains(terrain)
-                            || (terrain == Terrain.ROCK && hasHammer)
-                            || (terrain == Terrain.SPIDER && hasFlute)
-                        )
-                    )
-                    //If an adjacent tile is visited, this one must also be.
-                    {
-                        if (y - 1 >= 0)
-                        {
-                            if (visitation[y - 1, x])
-                            {
-                                visitation[y, x] = true;
-                                changed = true;
-                                continue;
-                            }
-
-                        }
-
-                        if (y + 1 < MAP_ROWS)
-                        {
-                            if (visitation[y + 1, x])
-                            {
-                                visitation[y, x] = true;
-                                changed = true;
-                                continue;
-
-                            }
-                        }
-
-                        if (x - 1 >= 0)
-                        {
-                            if (visitation[y, x - 1])
-                            {
-                                visitation[y, x] = true;
-                                changed = true;
-                                continue;
-
-                            }
-                        }
-
-                        if (x + 1 < MAP_COLS)
-                        {
-                            if (visitation[y, x + 1])
-                            {
-                                visitation[y, x] = true;
-                                changed = true;
-                                continue;
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    */
+  
     protected void UpdateReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         //Setup
@@ -1873,22 +1753,6 @@ public abstract class World
         }
 
         OnUpdateReachableTrigger();
-
-        /*
-        if(hyrule.debug >= 1604)
-        {
-            StringBuilder sb = new();
-            sb.AppendLine(GetName());
-            for (int y = 0; y < MAP_ROWS; y++)
-            {
-                for (int x = 0; x < MAP_COLS; x++)
-                {
-                    sb.Append(visitation[y, x] ? 'x' : ' ');
-                }
-                sb.Append('\n');
-            }
-            Debug.Write(sb.ToString());
-        }*/
     }
 
     protected virtual void OnUpdateReachableTrigger()

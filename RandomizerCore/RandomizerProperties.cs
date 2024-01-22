@@ -1,5 +1,4 @@
-﻿using RandomizerCore.Sidescroll;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Core.Overworld;
@@ -80,6 +79,7 @@ public class RandomizerProperties
     public bool DmIsHorizontal { get; set; }
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
+
     public Climate Climate { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }

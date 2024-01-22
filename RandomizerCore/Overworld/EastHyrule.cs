@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -161,49 +162,49 @@ public class EastHyrule : World
         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER };
 
         biome = props.EastBiome;
-        section = new SortedDictionary<Tuple<int, int>, string>
+        section = new SortedDictionary<(int, int), string>()
         {
-            {Tuple.Create(0x3A, 0x0A), "mid2" },
-            {Tuple.Create(0x5B, 0x36), "south" },
-            { Tuple.Create(0x4C, 0x15), "south" },
-            { Tuple.Create(0x51, 0x11), "south" },
-            { Tuple.Create(0x54, 0x13), "south" },
-            { Tuple.Create(0x60, 0x18), "south" },
-            { Tuple.Create(0x5D, 0x23), "south" },
-            { Tuple.Create(0x64, 0x25), "south" },
-            { Tuple.Create(0x24, 0x09), "north2" },
-            { Tuple.Create(0x26, 0x0A), "north2" },
-            { Tuple.Create(0x38, 0x3F), "boots1" },
-            { Tuple.Create(0x34, 0x18), "mid2" },
-            { Tuple.Create(0x30, 0x1B), "north2" },
-            { Tuple.Create(0x47, 0x19), "mid2" },
-            { Tuple.Create(0x4E, 0x1F), "south" },
-            { Tuple.Create(0x4E, 0x31), "south" },
-            { Tuple.Create(0x4E, 0x39), "kasuto" },
-            { Tuple.Create(0x4B, 0x02), "vod" },
-            { Tuple.Create(0x4B, 0x04), "gp" },
-            { Tuple.Create(0x4D, 0x06), "vod" },
-            { Tuple.Create(0x4D, 0x0A), "south" },
-            { Tuple.Create(0x51, 0x1A), "south" },
-            { Tuple.Create(0x40, 0x35), "hammer2" },
-            { Tuple.Create(0x38, 0x22), "mid2" },
-            { Tuple.Create(0x2C, 0x30), "north2" },
-            { Tuple.Create(0x63, 0x39), "south" },
-            { Tuple.Create(0x44, 0x0D), "mid2" },
-            { Tuple.Create(0x5B, 0x04), "south" },
-            { Tuple.Create(0x63, 0x1B), "south" },
-            { Tuple.Create(0x53, 0x03), "vod" },
-            { Tuple.Create(0x56, 0x08), "south" },
-            { Tuple.Create(0x63, 0x08), "south" },
-            { Tuple.Create(0x28, 0x34), "north2" },
-            { Tuple.Create(0x34, 0x07), "mid2" },
-            { Tuple.Create(0x3C, 0x17), "mid2" },
-            { Tuple.Create(0x21, 0x03), "north2" },
-            { Tuple.Create(0x51, 0x3D), "kasuto" },
-            { Tuple.Create(0x63, 0x22), "south" },
-            { Tuple.Create(0x3C, 0x3E), "boots" },
-            { Tuple.Create(0x66, 0x2D), "south" },
-            { Tuple.Create(0x49, 0x04), "gp" }
+            { (0x3A, 0x0A), "mid2" },
+            { (0x5B, 0x36), "south" },
+            { (0x4C, 0x15), "south" },
+            { (0x51, 0x11), "south" },
+            { (0x54, 0x13), "south" },
+            { (0x60, 0x18), "south" },
+            { (0x5D, 0x23), "south" },
+            { (0x64, 0x25), "south" },
+            { (0x24, 0x09), "north2" },
+            { (0x26, 0x0A), "north2" },
+            { (0x38, 0x3F), "boots1" },
+            { (0x34, 0x18), "mid2" },
+            { (0x30, 0x1B), "north2" },
+            { (0x47, 0x19), "mid2" },
+            { (0x4E, 0x1F), "south" },
+            { (0x4E, 0x31), "south" },
+            { (0x4E, 0x39), "kasuto" },
+            { (0x4B, 0x02), "vod" },
+            { (0x4B, 0x04), "gp" },
+            { (0x4D, 0x06), "vod" },
+            { (0x4D, 0x0A), "south" },
+            { (0x51, 0x1A), "south" },
+            { (0x40, 0x35), "hammer2" },
+            { (0x38, 0x22), "mid2" },
+            { (0x2C, 0x30), "north2" },
+            { (0x63, 0x39), "south" },
+            { (0x44, 0x0D), "mid2" },
+            { (0x5B, 0x04), "south" },
+            { (0x63, 0x1B), "south" },
+            { (0x53, 0x03), "vod" },
+            { (0x56, 0x08), "south" },
+            { (0x63, 0x08), "south" },
+            { (0x28, 0x34), "north2" },
+            { (0x34, 0x07), "mid2" },
+            { (0x3C, 0x17), "mid2" },
+            { (0x21, 0x03), "north2" },
+            { (0x51, 0x3D), "kasuto" },
+            { (0x63, 0x22), "south" },
+            { (0x3C, 0x3E), "boots" },
+            { (0x66, 0x2D), "south" },
+            { (0x49, 0x04), "gp" }
         };
         townAtNewKasuto.ExternalWorld = 128;
         locationAtPalace6.ExternalWorld = 128;
@@ -328,8 +329,8 @@ public class EastHyrule : World
                 }
 
             }
-            hiddenKasutoLocation = GetLocationByCoords(Tuple.Create(81, 61));
-            hiddenPalaceLocation = GetLocationByCoords(Tuple.Create(102, 45));
+            hiddenKasutoLocation = GetLocationByCoords((81, 61));
+            hiddenPalaceLocation = GetLocationByCoords((102, 45));
 
             if (props.HiddenKasuto)
             {
@@ -679,11 +680,6 @@ public class EastHyrule : World
 
                 }
 
-                if (!ValidateCaves())
-                {
-                    return false;
-                }
-
                 foreach (Location location in AllLocations)
                 {
                     if (location.CanShuffle)
@@ -707,6 +703,17 @@ public class EastHyrule : World
             rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
                 baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
         }
+
+        if (!ValidateBasicRouting())
+        {
+            return false;
+        }
+
+        if (!ValidateCaves())
+        {
+            return false;
+        }
+
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
 
 
@@ -941,7 +948,7 @@ public class EastHyrule : World
                                     map[starty + i, startx + 1] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location location = GetLocationByCoords(Tuple.Create(starty + i + 30, startx));
+                            Location location = GetLocationByCoords((starty + i + 30, startx));
                             if (location != null && !location.CanShuffle)
                             {
                                 return false;
@@ -961,7 +968,7 @@ public class EastHyrule : World
                                     map[starty + 1, startx + i] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location location = GetLocationByCoords(Tuple.Create(starty + 30, startx + i));
+                            Location location = GetLocationByCoords((starty + 30, startx + i));
                             if (location != null && !location.CanShuffle)
                             {
                                 return false;
@@ -1012,7 +1019,7 @@ public class EastHyrule : World
                                     map[starty - i, startx + 1] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location l = GetLocationByCoords(Tuple.Create(starty - i + 30, startx));
+                            Location l = GetLocationByCoords((starty - i + 30, startx));
                             if (l != null && !l.CanShuffle)
                             {
                                 return false;
@@ -1036,7 +1043,7 @@ public class EastHyrule : World
                                     map[starty + 1, startx - i] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location l = GetLocationByCoords(Tuple.Create(starty + 30, startx - i));
+                            Location l = GetLocationByCoords((starty + 30, startx - i));
                             if (l != null && !l.CanShuffle)
                             {
                                 return false;
@@ -1074,7 +1081,7 @@ public class EastHyrule : World
                     if (map[starty, startx] != Terrain.CAVE)
                     {
                         map[starty, startx] = Terrain.LAVA;
-                        if (GetLocationByCoords(Tuple.Create(starty + 30 + deltay, startx + deltax)) != null)
+                        if (GetLocationByCoords((starty + 30 + deltay, startx + deltax)) != null)
                         {
                             return false;
                         }
@@ -1105,7 +1112,7 @@ public class EastHyrule : World
                     {
                         if (horizontalPath)
                         {
-                            if (GetLocationByCoords(Tuple.Create(starty + 30, startx - 1)) == null && GetLocationByCoords(Tuple.Create(starty + 30, startx + 1)) == null)
+                            if (GetLocationByCoords((starty + 30, startx - 1)) == null && GetLocationByCoords((starty + 30, startx + 1)) == null)
                             {
                                 f.Xpos = startx;
                                 f.Ypos = starty + 30;
@@ -1116,7 +1123,7 @@ public class EastHyrule : World
                         }
                         else
                         {
-                            if (GetLocationByCoords(Tuple.Create(starty + 30 - 1, startx)) == null && GetLocationByCoords(Tuple.Create(starty + 30 + 1, startx)) == null)
+                            if (GetLocationByCoords((starty + 30 - 1, startx)) == null && GetLocationByCoords((starty + 30 + 1, startx)) == null)
                             {
                                 f.Xpos = startx;
                                 f.Ypos = starty + 30;
@@ -1279,7 +1286,7 @@ public class EastHyrule : World
                 }
                 if (horizontalPath)
                 {
-                    if (GetLocationByCoords(Tuple.Create(starty + 30, startx + deltax)) != null)
+                    if (GetLocationByCoords((starty + 30, startx + deltax)) != null)
                     {
                         map[starty, startx] = Terrain.MOUNTAIN;
                         startx -= deltax;
@@ -1291,7 +1298,7 @@ public class EastHyrule : World
                 }
                 else
                 {
-                    if (GetLocationByCoords(Tuple.Create(starty + 30 + deltay, startx)) != null)
+                    if (GetLocationByCoords((starty + 30 + deltay, startx)) != null)
                     {
                         map[starty, startx] = Terrain.MOUNTAIN;
                         starty -= deltay;
@@ -1711,6 +1718,81 @@ public class EastHyrule : World
             .ToList();
     }
 
+    /// <summary>
+    /// Determines if all locations on this continent could be reached, assuming you had everything and could reach every entrance.
+    /// If the answer is no, there's no point in bothering with the rest of a world generation.
+    /// </summary>
+    /// <returns></returns>
+    public bool ValidateBasicRouting()
+    {
+        List<Location> unreachedLocations = RequiredLocations(false, false).ToList();
+        //SpellTower's connection logic isn't implemented here, nor do we care since we're assuming you have everything.
+        unreachedLocations.Remove(spellTower);
+
+        bool[,] visitedCoordinates = new bool[MAP_ROWS, MAP_COLS];
+        List<(int, int)> pendingCoordinates = new();
+        foreach (Location location in GetContinentConnections())
+        {
+            pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
+        }
+        int y, x;
+        do
+        {
+            (int, int) coordinate = pendingCoordinates.First();
+            y = coordinate.Item1;
+            x = coordinate.Item2;
+            pendingCoordinates.Remove(coordinate);
+            if (visitedCoordinates[y, x])
+            {
+                continue;
+            }
+            visitedCoordinates[y, x] = true;
+            //if there is a location at this coordinate
+            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            if (here != null)
+            {
+                //it's reachable
+                unreachedLocations.Remove(here);
+                //if it's a connection cave, add the exit(s) to the pending locations
+                if (connections.ContainsKey(here))
+                {
+                    pendingCoordinates.Add((connections[here].Ypos - 30, connections[here].Xpos));
+                }
+            }
+
+            //for each adjacent direction, if it's not off the map, and it's potentially walkable terrain, crawl it
+            if (x > 0 && map[y, x - 1].IsWalkable())
+            {
+                pendingCoordinates.Add((y, x - 1));
+            }
+            if (x < MAP_COLS - 1 && map[y, x + 1].IsWalkable())
+            {
+                pendingCoordinates.Add((y, x + 1));
+            }
+            if (y > 0 && map[y - 1, x].IsWalkable())
+            {
+                pendingCoordinates.Add((y - 1, x));
+            }
+            if (y < MAP_ROWS - 1 && map[y + 1, x].IsWalkable())
+            {
+                pendingCoordinates.Add((y + 1, x));
+            }
+        } while (pendingCoordinates.Count > 0);
+
+
+        if(unreachedLocations.Count == 2 && Hyrule.UNSAFE_DEBUG) 
+        {
+            Debug.WriteLine(unreachedLocations.First().Name);
+            Debug.WriteLine(GetMapDebug());
+        }
+        else if (unreachedLocations.Count <= 3 && Hyrule.UNSAFE_DEBUG)
+        {
+            //unreachedLocations.ForEach(i => Debug.WriteLine(i.Name));
+        }
+
+        return !unreachedLocations.Any();
+    }
+
     protected override void OnUpdateReachableTrigger()
     {
         if (AllLocations.Where(i => i.ActualTown == Town.NEW_KASUTO).FirstOrDefault()?.Reachable ?? false)
@@ -1757,11 +1839,11 @@ public class EastHyrule : World
             requiredLocations.Add(hiddenKasutoLocation);
         }
 
-        foreach (Location key in connections.Keys)
+        foreach (Location location in connections.Keys)
         {
-            if (requiredLocations.TryGetValue(key, out Location value))
+            if (!requiredLocations.Contains(location) && location.Ypos != 0)
             {
-                requiredLocations.Add(key);
+                requiredLocations.Add(location);
             }
         }
         return requiredLocations.Where(i => i != null);

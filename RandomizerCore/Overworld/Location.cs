@@ -10,7 +10,7 @@ public class Location
 {
     Logger logger = LogManager.GetCurrentClassLogger();
     private int appear2loweruponexit;
-    private Tuple<int, int> coords;
+    private (int, int)coords;
     public Item Item { get; set; }
     public bool ItemGet { get; set; }
 
@@ -27,11 +27,11 @@ public class Location
 
     public int World { get; set; }
 
-    public Tuple<int, int> Coords
+    public (int, int) Coords
     {
         get
         {
-            return Tuple.Create(Ypos, Xpos);
+            return (Ypos, Xpos);
         }
 
         set
@@ -350,7 +350,7 @@ public class Location
         return Continent.ToString()
             + " " + TerrainType.ToString()
             + " " + Name
-            + " (" + Xpos + "," + (Ypos - 30) + ") _"
+            + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
             + (Item == Item.DO_NOT_USE ? "" : Item.ToString());
     }

@@ -192,7 +192,7 @@ class DeathMountain : World
                 }
             }
         }
-        else
+        else //Not vanilla/shuffle
         {
             int bytesWritten = 2000;
             while (bytesWritten > MAP_SIZE_BYTES)
@@ -749,6 +749,11 @@ class DeathMountain : World
                 bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
             }
         }
+        if(!ValidateBasicRouting())
+        {
+            return false;
+        }
+
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
         
 
@@ -1066,6 +1071,68 @@ class DeathMountain : World
             .ToList();
     }
 
+    /// <summary>
+    /// Determines if all locations on this continent could be reached, assuming you had everything and could reach every entrance.
+    /// If the answer is no, there's no point in bothering with the rest of a world generation.
+    /// </summary>
+    /// <returns></returns>
+    public bool ValidateBasicRouting()
+    {
+        List<Location> unreachedLocations = RequiredLocations(false, false).ToList();
+
+        bool[,] visitedCoordinates = new bool[MAP_ROWS, MAP_COLS];
+        List<(int, int)> pendingCoordinates = new();
+        foreach(Location location in GetContinentConnections())
+        {
+            pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
+        }
+        int y, x;
+        do
+        {
+            (int, int) coordinate = pendingCoordinates.First();
+            y = coordinate.Item1;
+            x = coordinate.Item2;
+            pendingCoordinates.Remove(coordinate);
+            if(visitedCoordinates[y, x])
+            {
+                continue;
+            }
+            visitedCoordinates[y, x] = true;
+            //if there is a location at this coordinate
+            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            if (here != null)
+            {
+                //it's reachable
+                unreachedLocations.Remove(here);
+                //if it's a connection cave, add the exit(s) to the pending locations
+                if(connectionsDM.ContainsKey(here))
+                {
+                    connectionsDM[here].ForEach(i => pendingCoordinates.Add((i.Ypos - 30, i.Xpos)));
+                }
+            }
+
+            //for each adjacent direction, if it's not off the map, and it's potentially walkable terrain, crawl it
+            if(x > 0 && map[y, x - 1].IsWalkable())
+            {
+                pendingCoordinates.Add((y, x - 1));
+            }
+            if (x < MAP_COLS - 1 && map[y, x + 1].IsWalkable())
+            {
+                pendingCoordinates.Add((y, x + 1));
+            }
+            if (y > 0 && map[y - 1, x].IsWalkable())
+            {
+                pendingCoordinates.Add((y - 1, x));
+            }
+            if (y < MAP_ROWS - 1 && map[y + 1, x].IsWalkable())
+            {
+                pendingCoordinates.Add((y + 1, x));
+            }
+        } while (pendingCoordinates.Count > 0);
+
+        return !unreachedLocations.Any();
+    }
+
     public override string GetName()
     {
         return "Death Mountain";
@@ -1079,14 +1146,8 @@ class DeathMountain : World
             specRock
         };
         requiredLocations.AddRange(connectionsDM.Keys);
+        requiredLocations.AddRange(GetContinentConnections());
 
-        foreach (Location key in connections.Keys)
-        {
-            if (requiredLocations.TryGetValue(key, out Location value))
-            {
-                requiredLocations.Add(key);
-            }
-        }
         return requiredLocations.Where(i => i != null);
     }
 }

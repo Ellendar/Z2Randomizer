@@ -198,15 +198,15 @@ class MazeIsland : World
                 //generate maze
                 int currx = 2;
                 int curry = starty;
-                Stack<Tuple<int, int>> stack = new Stack<Tuple<int, int>>();
+                Stack<(int, int)> stack = new();
                 bool canPlaceCave = true;
                 while (MoreToVisit(visited))
                 {
-                    List<Tuple<int, int>> neighbors = GetListOfNeighbors(currx, curry, visited);
+                    List<(int, int)> neighbors = GetListOfNeighbors(currx, curry, visited);
                     if (neighbors.Count > 0)
                     {
                         canPlaceCave = true;
-                        Tuple<int, int> next = neighbors[RNG.Next(neighbors.Count)];
+                        (int, int)next = neighbors[RNG.Next(neighbors.Count)];
                         stack.Push(next);
                         if (next.Item1 > currx)
                         {
@@ -230,7 +230,7 @@ class MazeIsland : World
                     }
                     else if (stack.Count > 0)
                     {
-                        if (cave1 != null && cave1.CanShuffle && GetLocationByCoords(Tuple.Create(curry + 30, currx)) == null)
+                        if (cave1 != null && cave1.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null)
                         {
                             map[curry, currx] = Terrain.CAVE;
                             cave1.Ypos = curry + 30;
@@ -239,7 +239,7 @@ class MazeIsland : World
                             canPlaceCave = false;
                             SealDeadEnd(curry, currx);
                         }
-                        else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords(Tuple.Create(curry + 30, currx)) == null && canPlaceCave)
+                        else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null && canPlaceCave)
                         {
                             map[curry, currx] = Terrain.CAVE;
                             cave2.Ypos = curry + 30;
@@ -248,7 +248,7 @@ class MazeIsland : World
                             SealDeadEnd(curry, currx);
 
                         }
-                        Tuple<int, int> n2 = stack.Pop();
+                        (int, int)n2 = stack.Pop();
                         currx = n2.Item1;
                         curry = n2.Item2;
                     }
@@ -274,7 +274,7 @@ class MazeIsland : World
                     {
                         for (int j = -1; j < 2; j++)
                         {
-                            if (GetLocationByCoords(Tuple.Create(palace4y + i + 30, palace4x + j)) != null)
+                            if (GetLocationByCoords((palace4y + i + 30, palace4x + j)) != null)
                             {
                                 canPlace = false;
                             }
@@ -591,7 +591,7 @@ class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) || GetLocationByCoords((y + 30, x + 1)) != null || GetLocationByCoords((y + 30, x - 1)) != null || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
                         }
                         else
                         {
@@ -599,7 +599,7 @@ class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD || GetLocationByCoords(new Tuple<int, int>(y + 30, x + 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x - 1)) != null || GetLocationByCoords(new Tuple<int, int>(y + 31, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 29, x)) != null || GetLocationByCoords(new Tuple<int, int>(y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD || GetLocationByCoords((y + 30, x + 1)) != null || GetLocationByCoords((y + 30, x - 1)) != null || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
                         }
 
                         location.Xpos = x;
@@ -700,28 +700,28 @@ class MazeIsland : World
         return false;
     }
 
-    private List<Tuple<int, int>> GetListOfNeighbors(int currx, int curry, bool[,] v)
+    private List<(int, int)> GetListOfNeighbors(int currx, int curry, bool[,] v)
     {
-        List<Tuple<int, int>> x = new List<Tuple<int, int>>();
+        List<(int, int)> x = new List<(int, int)>();
 
         if (currx - 2 > 1 && v[curry, currx - 2] == false)
         {
-            x.Add(new Tuple<int, int>(currx - 2, curry));
+            x.Add((currx - 2, curry));
         }
 
         if (currx + 2 < MAP_COLS && v[curry, currx + 2] == false)
         {
-            x.Add(new Tuple<int, int>(currx + 2, curry));
+            x.Add((currx + 2, curry));
         }
 
         if (curry - 2 > 1 && v[curry - 2, currx] == false)
         {
-            x.Add(new Tuple<int, int>(currx, curry - 2));
+            x.Add((currx, curry - 2));
         }
 
         if (curry + 2 < MAP_ROWS && v[curry + 2, currx] == false)
         {
-            x.Add(new Tuple<int, int>(currx, curry + 2));
+            x.Add((currx, curry + 2));
         }
         return x;
     }
@@ -742,7 +742,7 @@ class MazeIsland : World
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords(new Tuple<int, int>(y + 30, x)) == null)
+                        if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords((y + 30, x)) == null)
                         {
                             if(map[y, x] == Terrain.MOUNTAIN)
                             {
@@ -781,7 +781,7 @@ class MazeIsland : World
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords(new Tuple<int, int>(y + 30, x)) == null)
+                        if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords((y + 30, x)) == null)
                         {
                             if (map[y, x] == Terrain.MOUNTAIN)
                             {
