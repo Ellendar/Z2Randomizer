@@ -604,91 +604,74 @@ public class Palaces
         //Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
         //update pointers
         //if (props.NormalPalaceStyle.IsReconstructed())
-        if (true)
+        if (enemyBytes > 0x400 || enemyBytesGP > 681)
         {
-            if (enemyBytes > 0x400 || enemyBytesGP > 681)
+            return new List<Palace>();
+        }
+        var a = engine.Asm();
+        int i = 0;
+        //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
+        //so we just start at the 125 pointer address
+        int enemyAddr = Enemies.NormalPalaceEnemyAddr;
+        foreach (byte[] sv in sideviews.Keys)
+        {
+            var name = "Sideview_" + i++;
+            try
             {
-                return new List<Palace>();
-            }
-            var a = engine.Asm();
-            int i = 0;
-            //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
-            //so we just start at the 125 pointer address
-            int enemyAddr = Enemies.NormalPalaceEnemyAddr;
-            foreach (byte[] sv in sideviews.Keys)
-            {
-                var name = "Sideview_" + i++;
                 a.segment("PRG4");
                 a.reloc();
                 a.label(name);
                 a.byt(sv);
-                List<Room> rooms = sideviews[sv];
-                foreach (Room room in rooms)
-                {
-                    room.WriteSideViewPtr(a, name);
-                    room.UpdateItemGetBits(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectors();
-                }
-            }
-            engine.Modules.Add(a.Actions);
-        }
-        //if (props.GPStyle.IsReconstructed())
-        if(true)
-        {
-            var a = engine.Asm();
-            int i = 0;
-            //GP Reconstructed
-            int enemyAddr = Enemies.GPEnemyAddr;
-            foreach (byte[] sv in sideviewsgp.Keys)
+            } 
+            catch(Exception e)
             {
-                var name = "SideviewGP_" + i++;
+                logger.Warn(e);
+                return new List<Palace>();
+            }
+
+            List<Room> rooms = sideviews[sv];
+            foreach (Room room in rooms)
+            {
+                room.WriteSideViewPtr(a, name);
+                room.UpdateItemGetBits(ROMData);
+                room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
+                enemyAddr += room.NewEnemies.Length;
+                room.UpdateConnectors();
+            }
+        }
+        engine.Modules.Add(a.Actions);
+        //if (props.GPStyle.IsReconstructed())
+        a = engine.Asm();
+        i = 0;
+        //GP Reconstructed
+        enemyAddr = Enemies.GPEnemyAddr;
+        foreach (byte[] sv in sideviewsgp.Keys)
+        {
+            var name = "SideviewGP_" + i++;
+            try 
+            {
                 a.segment("PRG5", "PRG7");
                 a.reloc();
                 a.label(name);
                 a.byt(sv);
-                List<Room> rooms = sideviewsgp[sv];
-                foreach (Room room in rooms)
+            } 
+                catch(Exception e)
                 {
-                    room.WriteSideViewPtr(a, name);
-                    room.UpdateItemGetBits(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.Enemies.Length;
-                    //room.UpdateConnectors(ROMData, room == palaces[6].Root);
-                    room.UpdateConnectors();
-                }
+                logger.Warn(e);
+                return new List<Palace>();
             }
-            engine.Modules.Add(a.Actions);
-        }
-        else //Not reconstructed
-        {
-            if (props.ShufflePalaceEnemies) 
+            List<Room> rooms = sideviewsgp[sv];
+            foreach (Room room in rooms)
             {
-                int enemyAddr = Enemies.NormalPalaceEnemyAddr;
-                int enemiesLength = 0;
-                foreach (Room room in palaces[0].AllRooms.Union(palaces[1].AllRooms).Union(palaces[4].AllRooms).OrderBy(i => i.NewMap == 0 ? i.Map : i.NewMap))
-                {
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.Enemies.Length;
-                    enemiesLength += room.Enemies.Length;
-                }
-
-                foreach (Room room in palaces[2].AllRooms.Union(palaces[3].AllRooms).Union(palaces[5].AllRooms).OrderBy(i => i.NewMap == 0 ? i.Map : i.NewMap))
-                {
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.Enemies.Length;
-                    enemiesLength += room.Enemies.Length;
-                }
-
-                enemyAddr = Enemies.GPEnemyAddr;
-                foreach (Room room in palaces[6].AllRooms)
-                {
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.Enemies.Length;
-                }
+                room.WriteSideViewPtr(a, name);
+                room.UpdateItemGetBits(ROMData);
+                room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
+                enemyAddr += room.Enemies.Length;
+                //room.UpdateConnectors(ROMData, room == palaces[6].Root);
+                room.UpdateConnectors();
             }
         }
+        engine.Modules.Add(a.Actions);
         
         if (props.ShuffleSmallItems || props.ExtraKeys)
         {
@@ -704,27 +687,16 @@ public class Palaces
         return palaces;
     }
 
+    //This method (and the entire separation of mapNo and mapNoGP) is a digshakeism that should be refactored out
     private static void IncrementMapNo(ref int mapNo, ref int mapNoGp, int i)
     {
         if (i < 7)
         {
             mapNo++;
-            //if (bossRooms.Contains(mapNo) && (i == 1 || i == 2 || i == 5))
-            //{
-            //    mapNo++;
-            //}
-            //else if(bossRooms2.Contains(mapNo) && (i == 3 || i == 4 || i == 6))
-            //{
-            //    mapNo++;
-            //}
         }
         else
         {
             mapNoGp++;
-            //while (bossRooms3.Contains(mapNoGp))
-            //{
-            //    mapNoGp++;
-            //}
         }
     }
 
