@@ -2926,7 +2926,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 83767,
-    "name": "",
+    "name": "P7 Bridge 3",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3030,7 +3030,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 83783,
-    "name": "",
+    "name": "Beer Bridge",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3378,7 +3378,7 @@
     "linkedRoomName": null,
     "map": 37,
     "memoryAddress": 83903,
-    "name": "",
+    "name": "P7 Bridge 37",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3482,7 +3482,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 83907,
-    "name": "",
+    "name": "P7 Bridge 38",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4168,7 +4168,7 @@
     "linkedRoomName": null,
     "map": 50,
     "memoryAddress": 83955,
-    "name": "",
+    "name": "P7 Bridge 50",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [

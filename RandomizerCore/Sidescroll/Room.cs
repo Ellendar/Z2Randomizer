@@ -212,9 +212,9 @@ public class Room
         Enabled = (bool)roomData.enabled;
         Connections = Convert.FromHexString(roomData.connections.ToString());
         LeftByte = Connections[0];
-        DownByte = Connections[1];
+        downByte = Connections[1];
         upByte = Connections[2];
-        downByte = Connections[3];
+        RightByte = Connections[3];
         Enemies = Convert.FromHexString(roomData.enemies.ToString());
         NewEnemies = Enemies;
         SideView = Convert.FromHexString(roomData.sideviewData.ToString());

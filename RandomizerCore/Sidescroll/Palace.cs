@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Numerics;
 using Z2Randomizer.Core.Overworld;
 using System.Text;
+using RandomizerCore;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -494,7 +495,7 @@ public class Palace
         return false;
     }
 
-    public void ShuffleRooms(Random r)
+    public void OldShuffleRooms(Random r)
     {
         List<Room> upExits = AllRooms.Where(i => i.HasUpExit()).ToList();
         List<Room> downExits = AllRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
@@ -601,6 +602,123 @@ public class Palace
         if (Number == 6)
         {
             foreach (Room room in dropExits)
+            {
+                /*
+                //There was an issue here with dropexits with null Down references breaking this.
+                //I have no idea why this code exists, so for now I just coalesced it out.
+                if(room.Down == null)
+                {
+                    logger.Warn("Null Down exit from a dropExit.");
+                    int db = room.DownByte;
+                    room.DownByte = (db & 0xFC) + 1;
+                }
+                else 
+                */
+                if (room.Down.Map == 0xBC)
+                {
+                    int db = room.DownByte;
+                    room.DownByte = (db & 0xFC) + 2;
+                }
+                else
+                {
+                    int db = room.DownByte;
+                    room.DownByte = (db & 0xFC) + 1;
+                }
+            }
+        }
+    }
+
+    public void ShuffleRooms(Random r)
+    {
+        List<Room> roomsWithUpExits = AllRooms.Where(i => i.HasUpExit()).ToList();
+        List<Room> roomsWithDownExits = AllRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
+        List<Room> roomsWithLeftExits = AllRooms.Where(i => i.HasLeftExit()).ToList();
+        List<Room> roomsWithRightExits = AllRooms.Where(i => i.HasRightExit()).ToList();
+        List<Room> roomsWithDropExits = AllRooms.Where(i => i.HasDrop).ToList();
+
+        for (int i = 0; i < roomsWithUpExits.Count; i++)
+        {
+            Room selectedRoom = roomsWithUpExits[i];
+            Room swapRoom = roomsWithUpExits.Sample(r);
+            selectedRoom.Up.Down = swapRoom;
+            swapRoom.Up.Down = selectedRoom;
+
+            (selectedRoom.Up, swapRoom.Up) = (swapRoom.Up, selectedRoom.Up);
+            (selectedRoom.UpByte, swapRoom.UpByte) = (swapRoom.UpByte, selectedRoom.UpByte);
+            (swapRoom.Up.DownByte, selectedRoom.Up.DownByte) = (selectedRoom.Up.DownByte, swapRoom.Up.DownByte);
+
+            if (roomsWithUpExits.Any(i => i.Up == null))
+            {
+                logger.Error("Up Exits desynched!");
+            }
+        }
+        for (int i = 0; i < roomsWithDropExits.Count; i++)
+        {
+            int swap = r.Next(i, roomsWithDropExits.Count);
+
+            Room temp = roomsWithDropExits[i].Down;
+            int tempByte = roomsWithDropExits[i].DownByte;
+
+            roomsWithDropExits[i].Down = roomsWithDropExits[swap].Down;
+            roomsWithDropExits[i].DownByte = roomsWithDropExits[swap].DownByte;
+            roomsWithDropExits[swap].Down = temp;
+            roomsWithDropExits[swap].DownByte = tempByte;
+        }
+
+        for (int i = 0; i < roomsWithDownExits.Count; i++)
+        {
+            Room selectedRoom = roomsWithDownExits[i];
+            Room swapRoom = roomsWithDownExits.Sample(r);
+            selectedRoom.Down.Up = swapRoom;
+            swapRoom.Down.Up = selectedRoom;
+
+            (selectedRoom.Down, swapRoom.Down) = (swapRoom.Down, selectedRoom.Down);
+            (selectedRoom.DownByte, swapRoom.DownByte) = (swapRoom.DownByte, selectedRoom.DownByte);
+            (swapRoom.Down.UpByte, selectedRoom.Down.UpByte) = (selectedRoom.Down.UpByte, swapRoom.Down.UpByte);
+
+            if (roomsWithDownExits.Any(i => i.Down == null))
+            {
+                logger.Error("Down Exits desynched!");
+            }
+        }
+
+        for (int i = 0; i < roomsWithLeftExits.Count; i++)
+        {
+
+            Room selectedRoom = roomsWithLeftExits[i];
+            Room swapRoom = roomsWithLeftExits.Sample(r);
+            selectedRoom.Left.Right = swapRoom;
+            swapRoom.Left.Right = selectedRoom;
+
+            (selectedRoom.Left, swapRoom.Left) = (swapRoom.Left, selectedRoom.Left);
+            (selectedRoom.LeftByte, swapRoom.LeftByte) = (swapRoom.LeftByte, selectedRoom.LeftByte);
+            (swapRoom.Left.RightByte, selectedRoom.Left.RightByte) = (selectedRoom.Left.RightByte, swapRoom.Left.RightByte);
+
+            if (roomsWithLeftExits.Any(i => i.Left == null))
+            {
+                logger.Error("Left Exits desynched!");
+            }
+        }
+
+        for (int i = 0; i < roomsWithRightExits.Count; i++)
+        {
+            Room selectedRoom = roomsWithRightExits[i];
+            Room swapRoom = roomsWithRightExits.Sample(r);
+            selectedRoom.Right.Left = swapRoom;
+            swapRoom.Right.Left = selectedRoom;
+
+            (selectedRoom.Right, swapRoom.Right) = (swapRoom.Right, selectedRoom.Right);
+            (selectedRoom.RightByte, swapRoom.RightByte) = (swapRoom.RightByte, selectedRoom.RightByte);
+            (swapRoom.Right.LeftByte, selectedRoom.Right.LeftByte) = (selectedRoom.Right.LeftByte, swapRoom.Right.LeftByte);
+
+            if (roomsWithRightExits.Any(i => i.Right == null))
+            {
+                logger.Error("Right Exits desynched!");
+            }
+        }
+        if (Number == 6)
+        {
+            foreach (Room room in roomsWithDropExits)
             {
                 /*
                 //There was an issue here with dropexits with null Down references breaking this.
