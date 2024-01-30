@@ -700,51 +700,6 @@ public class Palaces
         }
     }
 
-    private static Dictionary<int, int> SetupFreeSpace(bool bank4, int enemyData)
-    {
-        Dictionary<int, int> freeSpace = new Dictionary<int, int>();
-        if (bank4)
-        {
-            freeSpace.Add(0x103EC, 147);
-            freeSpace.Add(0x10649, 225);
-            freeSpace.Add(0x10827, 88);
-            freeSpace.Add(0x10cb0, 1887);
-            //Bugfix for tyvarius's seed with a scuffed P3 entrance. This was 1 byte too long, which caused the sideview data to overflow
-            //into the palace set 2 sideview pointer data starting at 0x12010
-            freeSpace.Add(0x11ef0, 287);
-            freeSpace.Add(0x12124, 78);
-            freeSpace.Add(0x1218b, 124);
-            freeSpace.Add(0x12304, 1547);
-        }
-        else
-        {
-            freeSpace.Add(0x1435e, 385);
-            freeSpace.Add(0x1462f, 251);
-            freeSpace.Add(0x14827, 137);
-            //freeSpace.Add(0x148b0 + enemyData, 681 - enemyData);
-            freeSpace.Add(0x153be, 82);
-            freeSpace.Add(0x1655f, 177);
-            //freeSpace.Add(0x17db1, 447);
-            freeSpace.Add(0x1f369, 1869);
-        }
-        return freeSpace;
-    }
-
-    private static int FindFreeSpace(Dictionary<int, int> freeSpace, byte[] sv)
-    {
-        foreach (int addr in freeSpace.Keys)
-        {
-            if (freeSpace[addr] >= sv.Length)
-            {
-                int oldSize = freeSpace[addr];
-                freeSpace.Remove(addr);
-                freeSpace.Add(addr + sv.Length, oldSize - sv.Length);
-                return addr;
-            }
-        }
-        return -1;
-    }
-
     private static bool ValidatePalaces(RandomizerProperties props, bool raftIsRequired, List<Palace> palaces)
     {
         return CanGetGlove(props, palaces[1])
