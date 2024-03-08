@@ -1,13 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using Assembler;
+using Microsoft.ClearScript;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using RandomizerCore.Sidescroll;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
+[DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Room
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -269,21 +274,21 @@ public class Room
         int addr;
         if(PalaceGroup == 1)
         {
-            a.segment("PRG4");
+            a.Segment("PRG4");
             addr = sideview1;
         }
         else if(PalaceGroup == 2)
         {
-            a.segment("PRG4");
+            a.Segment("PRG4");
             addr = sideview2;
         }
         else
         {
-            a.segment("PRG5", "PRG7");
+            a.Segment("PRG5", "PRG7");
             addr = sideview3;
         }
-        a.romorg(addr + (NewMap ?? Map) * 2);
-        a.word(a.symbol(label));
+        a.RomOrg(addr + (NewMap ?? Map) * 2);
+        a.Word(a.Symbol(label));
     }
 
     public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle normalPalaceStyle, PalaceStyle gpStyle)
@@ -775,6 +780,17 @@ public class Room
     public bool IsTraversable(IEnumerable<RequirementType> requireables)
     {
         return Requirements.AreSatisfiedBy(requireables);
+    }
+
+    public string GetDebuggerDisplay()
+    {
+        StringBuilder sb = new();
+        sb.Append(Map);
+        sb.Append(" (" + NewMap + ") ");
+        sb.Append(Name);
+        sb.Append(" [" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
+        sb.Append(" [" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
+        return sb.ToString();
     }
 }
 

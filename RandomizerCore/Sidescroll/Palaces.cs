@@ -1,4 +1,5 @@
 ﻿using Assembler;
+using Microsoft.ClearScript;
 using NLog;
 using RandomizerCore;
 using RandomizerCore.Sidescroll;
@@ -70,7 +71,7 @@ public class Palaces
         {7, 0x8665 }
     };
 
-    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData, bool raftIsRequired, Engine engine)
+    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData, bool raftIsRequired)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -79,13 +80,11 @@ public class Palaces
         List<Palace> palaces = new List<Palace>();
         List<Room> roomPool = new List<Room>();
         List<Room> gpRoomPool = new List<Room>();
-        Dictionary<byte[], List<Room>> sideviews = new Dictionary<byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
-        Dictionary<byte[], List<Room>> sideviewsgp = new Dictionary<byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
-        int enemyBytes = 0;
-        int enemyBytesGP = 0;
+        //Dictionary<byte[], List<Room>> sideviews = new Dictionary<byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
+        //Dictionary<byte[], List<Room>> sideviewsgp = new Dictionary<byte[], List<Room>>(new Util.StandardByteArrayEqualityComparer());
         int mapNo = 0;
         int mapNoGp = 0;
-        //This is unfortunate because there is no list-backed MutliValueDictionary like apache has, so we have to deal with
+        //This is unfortunate because there is no list-backed MutliValueDictionary like Apache has, so we have to deal with
         //O(n) random access.
         MultiValueDictionary<int, Room> entrancesByPalaceNumber = new();
         MultiValueDictionary<int, Room> bossRoomsByPalaceNumber = new();
@@ -556,132 +555,12 @@ public class Palaces
                 }
                 palaces.Add(palace);
             }
-            foreach (Room room in palace.AllRooms)
-            {
-                if (currentPalace == 7)
-                {
-                    enemyBytesGP += room.Enemies.Length;
-                    if (sideviewsgp.ContainsKey(room.SideView))
-                    {
-                        sideviewsgp[room.SideView].Add(room);
-                    }
-                    else
-                    {
-                        List<Room> l = new List<Room> { room };
-                        sideviewsgp.Add(room.SideView, l);
-                    }
-                }
-                else
-                {
-                    enemyBytes += room.Enemies.Length;
-                    if (sideviews.ContainsKey(room.SideView))
-                    {
-                        sideviews[room.SideView].Add(room);
-                    }
-                    else
-                    {
-                        List<Room> l = new List<Room> { room };
-                        sideviews.Add(room.SideView, l);
-                    }
-                }
-            }
+        
         }
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {
             return null;
-        }
-
-        //Randomize Enemies
-        if (props.ShufflePalaceEnemies)
-        {
-            foreach (Palace palace in palaces)
-            {
-                palace.RandomizeEnemies(props, r);
-            }
-        }
-
-        //Dictionary<int, int> freeSpace = SetupFreeSpace(true, 0);
-        //update pointers
-        //if (props.NormalPalaceStyle.IsReconstructed())
-        if (enemyBytes > 0x400 || enemyBytesGP > 681)
-        {
-            return new List<Palace>();
-        }
-        var a = engine.Asm();
-        int i = 0;
-        //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
-        //so we just start at the 125 pointer address
-        int enemyAddr = Enemies.NormalPalaceEnemyAddr;
-        foreach (byte[] sv in sideviews.Keys)
-        {
-            var name = "Sideview_" + i++;
-            try
-            {
-                a.segment("PRG4");
-                a.reloc();
-                a.label(name);
-                a.byt(sv);
-            } 
-            catch(Exception e)
-            {
-                logger.Warn(e);
-                return new List<Palace>();
-            }
-
-            List<Room> rooms = sideviews[sv];
-            foreach (Room room in rooms)
-            {
-                room.WriteSideViewPtr(a, name);
-                room.UpdateItemGetBits(ROMData);
-                room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                enemyAddr += room.NewEnemies.Length;
-                room.UpdateConnectors();
-            }
-        }
-        engine.Modules.Add(a.Actions);
-        //if (props.GPStyle.IsReconstructed())
-        a = engine.Asm();
-        i = 0;
-        //GP Reconstructed
-        enemyAddr = Enemies.GPEnemyAddr;
-        foreach (byte[] sv in sideviewsgp.Keys)
-        {
-            var name = "SideviewGP_" + i++;
-            try 
-            {
-                a.segment("PRG5", "PRG7");
-                a.reloc();
-                a.label(name);
-                a.byt(sv);
-            } 
-                catch(Exception e)
-                {
-                logger.Warn(e);
-                return new List<Palace>();
-            }
-            List<Room> rooms = sideviewsgp[sv];
-            foreach (Room room in rooms)
-            {
-                room.WriteSideViewPtr(a, name);
-                room.UpdateItemGetBits(ROMData);
-                room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                enemyAddr += room.Enemies.Length;
-                //room.UpdateConnectors(ROMData, room == palaces[6].Root);
-                room.UpdateConnectors();
-            }
-        }
-        engine.Modules.Add(a.Actions);
-        
-        if (props.ShuffleSmallItems || props.ExtraKeys)
-        {
-            palaces[0].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-            palaces[1].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-            palaces[2].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-            palaces[3].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-            palaces[4].ShuffleSmallItems(4, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-            palaces[5].ShuffleSmallItems(4, false, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-            palaces[6].ShuffleSmallItems(5, true, r, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
         }
 
         return palaces;

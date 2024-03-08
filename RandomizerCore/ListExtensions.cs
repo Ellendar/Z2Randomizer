@@ -14,6 +14,10 @@ internal static class ListExtensions
             (list[iteratedIndex], list[shuffleIndex]) = (list[shuffleIndex], list[iteratedIndex]);
         }
     }
+    public static T Sample<T>(this T[] list, Random RNG)
+    {
+        return list[RNG.Next(list.Length)];
+    }
 
     public static T Sample<T>(this List<T> list, Random RNG)
     {

@@ -111,9 +111,8 @@ public class ROM
     };
 
     private byte[] ROMData;
-    private readonly Engine _engine;
 
-    public ROM(string filename, Engine engine)
+    public ROM(string filename)
     {
         try
         {
@@ -123,7 +122,6 @@ public class ROM
 
             BinaryReader br = new BinaryReader(fs, new ASCIIEncoding());
             ROMData = br.ReadBytes(257 * 1024);
-            _engine = engine;
 
         }
         catch (Exception err)
@@ -132,10 +130,9 @@ public class ROM
         }
     }
 
-    public ROM(byte[] data, Engine engine)
+    public ROM(byte[] data)
     {
         ROMData = data;
-        _engine = engine;
     }
 
     public byte GetByte(int index)
@@ -799,10 +796,10 @@ public class ROM
         Put(0x5b2, new byte[] { 0xea, 0xea });
     }
 
-    public void UpAController1()
+    public void UpAController1(Engine engine)
     {
-        var a = _engine.Asm();
-        a.code("""
+        Assembler.Assembler assembler = new(engine);
+        assembler.Code("""
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
@@ -814,7 +811,7 @@ CheckController1ForUpAMagic:
   lda $f7
   cmp #$28
 """, "UpAController1.s");
-        _engine.Modules.Add(a.Actions);
+        engine.Modules.Add(assembler.Actions);
         //Put(0x21B0, 0xF7);
         //Put(0x21B2, 0x28);
         //Put(0x21EE, 0xF7);
@@ -830,10 +827,10 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
-    public void ChangeMapperToMMC5()
+    public void ChangeMapperToMMC5(Engine engine)
     {
-        var a = _engine.Asm();
-        a.code("""
+        Assembler.Assembler assembler = new(engine);
+        assembler.Code("""
 
 ; TODO common macpack or something to consolidate macros
 .macro FREE_UNTIL end
@@ -926,18 +923,18 @@ FREE_UNTIL $ffe0
 
 """, "mmc5_conversion.s");
 
-        _engine.Modules.Add(a.Actions);
+        engine.Modules.Add(assembler.Actions);
     }
 
-    public void ApplyAsm()
+    public void ApplyAsm(Engine engine)
     {
-        _engine.Apply(ROMData);
+        engine.Apply(ROMData);
     }
 
-    public void BuffCarrock()
+    public void BuffCarrock(Engine engine)
     {
-        var a = _engine.Asm();
-        a.code("""
+        Assembler.Assembler assembler = new(engine);
+        assembler.Code("""
 .segment "PRG4"
 
 .define ProjectileYPosition $30
@@ -1090,13 +1087,13 @@ RandomizeWifiShotType:
 @Exit:
     rts
 """);
-        _engine.Modules.Add(a.Actions);
+        engine.Modules.Add(assembler.Actions);
     }
 
-    public void DashSpell()
+    public void DashSpell(Engine engine)
     {
-        var a = _engine.Asm();
-        a.code("""
+        Assembler.Assembler assembler = new(engine);
+        assembler.Code("""
 .segment "PRG0"
 .reloc
 ReplaceFireWithDashSpell:
@@ -1116,17 +1113,17 @@ ReplaceFireWithDashSpell:
 """);
 
         // Inside Links_Acceleration_Routine, patch the max speed compare to check if we cast dash
-        a.org(0x93ff);
-        a.code("jsr ReplaceFireWithDashSpell");
+        assembler.Org(0x93ff);
+        assembler.Code("jsr ReplaceFireWithDashSpell");
 
         // Update the magic table to point to an rts ???
-        a.org(0x8e50);
-        a.word(0x9814);
+        assembler.Org(0x8e50);
+        assembler.Word(0x9814);
 
         byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
-        a.org(0x9c62);
-        a.byt(dash);
-        _engine.Modules.Add(a.Actions);
+        assembler.Org(0x9c62);
+        assembler.Byt(dash);
+        engine.Modules.Add(assembler.Actions);
     }
 
     public void MoveAfterGem()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomizerCore;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -164,6 +165,7 @@ public class CustomTexts
         "Tingle$Tingle$Kooloo$Limpah!",
         "Is this a$pedestal$seed?",
         "Does$Spec rock$wear$glasses?",
+        "Everyone$gets a$bridge",
     };
 
     public static readonly String[] DOWNSTAB_TEXTS =
@@ -192,7 +194,7 @@ public class CustomTexts
         "press up$to go in$doors",
         "are you$santa$claus?",
         "SHORYUKEN!",
-        "you wasted$your time",
+        "you wasted$your time?",
         "Mario can$do this$without$magic",
         "downstab$is the$best stab",
         "Tiger$Uppercut!",
@@ -208,13 +210,27 @@ public class CustomTexts
         "This Is$About As$Useful As$I Am",
         "Nothing$Know I",
         "Try To$Get A$Guide",
-        "Git Gud"
+        "Git Gud",
+        "What?$Yeah!$Okay!",
+        "No hint$for you",
+        "What$timeline$is this?",
+        "your$call is$important$please hold",
+
+    };
+
+    public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
+    {
+        "all signs$point to$no",
+        "come back$as$adult link",
+        "quit$wasting$my time",
+        "Youre$sixteen$pixels$short",
+
     };
 
     public static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
     {
         { Town.RAURU, new string[] { } },
-        { Town.RUTO, new string[] { } },
+        { Town.RUTO, new string[] { "A winner$is you"} },
         { Town.SARIA_NORTH, new string[] { "Water$you$doing?" } },
         { Town.MIDO_WEST, new string[] { } },
         { Town.MIDO_CHURCH, new string[] { } },
@@ -222,7 +238,7 @@ public class CustomTexts
         { Town.DARUNIA_ROOF, new string[] { } },
         { Town.DARUNIA_WEST, new string[] { "You saved$a kid$for this?", "Dont$forget to$get upstab" } },
         { Town.NEW_KASUTO, new string[] { } },
-        { Town.OLD_KASUTO, new string[] { } }
+        { Town.OLD_KASUTO, new string[] { "Sorry$about the$moas" } }
     };
 
     public static readonly Dictionary<Spell, string[]> WIZARD_TEXTS_BY_SPELL = new()
@@ -232,7 +248,7 @@ public class CustomTexts
         { Spell.LIFE, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal" } },
         { Spell.FAIRY, new string[] { "HEY!$LISTEN", "Just$don't say$Hey$listen!", "Watch Out$For Iron" } },
         { Spell.FIRE, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love" } },
-        { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast",  } },
+        { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through!"  } },
         { Spell.REFLECT, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
         { Spell.SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
         { Spell.THUNDER, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!",  } },
@@ -282,14 +298,21 @@ public class CustomTexts
             placedIndex = GenerateHelpfulHints(texts, itemLocs, r, props.SpellItemHints);
         }
 
-        if (props.HelpfulHints)
+        if (props.UseCommunityText)
         {
-            GenerateKnowNothings(texts, placedIndex, props.BagusWoods);
+            if(props.HelpfulHints)
+            {
+                GenerateKnowNothings(texts, placedIndex, r, props.BagusWoods, props.UseCommunityText);
+            }
+
+            //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
+            //enough magic containers and container requirements are on.
+            texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(r));
         }
 
         if (props.TownNameHints)
         {
-            GenerateTownNameHints(texts, spellMap, props.ReplaceFireWithDash);
+            GenerateTownNameHints(texts, spellMap, props.CombineFire);
         }
 
         return texts;
@@ -349,19 +372,19 @@ public class CustomTexts
         return baguHint;
     }
 
-    private static void GenerateTownNameHints(List<Text> hints, Dictionary<Town, Spell> spellMap, bool useDash)
+    private static void GenerateTownNameHints(List<Text> texts, Dictionary<Town, Spell> spellMap, bool linkedFire)
     {
-        hints[rauruSign] = GenerateTownHint(spellMap[Town.RAURU]);
-        hints[rutoSign] = GenerateTownHint(spellMap[Town.RUTO]);
-        hints[sariaSign] = GenerateTownHint(spellMap[Town.SARIA_NORTH]);
-        hints[midoSign] = GenerateTownHint(spellMap[Town.MIDO_WEST]);
-        hints[nabooruSign] = GenerateTownHint(spellMap[Town.NABOORU]);
-        hints[daruniaSign] = GenerateTownHint(spellMap[Town.DARUNIA_WEST]);
-        hints[newKasutoSign] = GenerateTownHint(spellMap[Town.NEW_KASUTO]);
-        hints[oldKasutoSign] = GenerateTownHint(spellMap[Town.OLD_KASUTO]);
+        texts[rauruSign] = GenerateTownHint(spellMap[Town.RAURU], linkedFire);
+        texts[rutoSign] = GenerateTownHint(spellMap[Town.RUTO], linkedFire);
+        texts[sariaSign] = GenerateTownHint(spellMap[Town.SARIA_NORTH], linkedFire);
+        texts[midoSign] = GenerateTownHint(spellMap[Town.MIDO_WEST], linkedFire);
+        texts[nabooruSign] = GenerateTownHint(spellMap[Town.NABOORU], linkedFire);
+        texts[daruniaSign] = GenerateTownHint(spellMap[Town.DARUNIA_WEST], linkedFire);
+        texts[newKasutoSign] = GenerateTownHint(spellMap[Town.NEW_KASUTO], linkedFire);
+        texts[oldKasutoSign] = GenerateTownHint(spellMap[Town.OLD_KASUTO], linkedFire);
     }
 
-    public static Text GenerateTownHint(Spell spell)
+    public static Text GenerateTownHint(Spell spell, bool linkedFire)
     {
         String text = "";
         switch (spell)
@@ -379,7 +402,7 @@ public class CustomTexts
                 text += "fairy$";
                 break;
             case Spell.FIRE:
-                text += "fire$";
+                text += "fire" + (linkedFire ? "!$" : "$");
                 break;
             case Spell.DASH:
                 text += "dash$";
@@ -422,7 +445,7 @@ public class CustomTexts
         }
     }
 
-    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndex, bool useBaguWoods)
+    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndex, Random r, bool useBaguWoods, bool useCommunityText)
     {
         List<int> stationary = new List<int>();
         stationary.AddRange(rauruHints);
@@ -444,18 +467,18 @@ public class CustomTexts
         moving.AddRange(daruniaMoving);
         moving.AddRange(newkasutoMoving);
 
-        Text knowNothing = new Text();
-        for (int i = 0; i < stationary.Count(); i++)
+        Text defaultKnowNothing = new();
+        for (int i = 0; i < stationary.Count; i++)
         {
             if (!placedIndex.Contains(stationary[i]))
             {
-                hints[stationary[i]] = knowNothing;
+                hints[stationary[i]] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS[r.Next(KNOW_NOTHING_TEXTS.Length)]) : defaultKnowNothing;
             }
         }
 
-        for (int i = 0; i < moving.Count(); i++)
+        for (int i = 0; i < moving.Count; i++)
         {
-            hints[moving[i]] = knowNothing;
+            hints[moving[i]] =  useCommunityText ? new Text(KNOW_NOTHING_TEXTS[r.Next(KNOW_NOTHING_TEXTS.Length)]) : defaultKnowNothing;
         }
     }
 

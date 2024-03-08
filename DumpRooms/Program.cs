@@ -7,7 +7,7 @@ using Z2Randomizer.Core;
 using Z2Randomizer.Core.Sidescroll;
 
 var engine = new Engine();
-ROM ROMData = new ROM(args[0], engine);
+ROM ROMData = new ROM(args[0]);
 int[] connAddr = new int[] { 0x1072B, 0x12208, 0x1472B };
 int[] side = new int[] { 0x10533, 0x12010, 0x14533 };
 int[] enemy = new int[] { 0x105b1, 0x1208E, 0x145b1 };

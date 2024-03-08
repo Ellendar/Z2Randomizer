@@ -2107,7 +2107,7 @@ partial class MainUI
         shufflePbagAmountsCheckbox.Name = "shufflePbagAmountsCheckbox";
         shufflePbagAmountsCheckbox.Size = new Size(145, 19);
         shufflePbagAmountsCheckbox.TabIndex = 19;
-        shufflePbagAmountsCheckbox.Text = "Shuffle Pbag Amounts";
+        shufflePbagAmountsCheckbox.Text = "Randomize Pbag Amounts";
         shufflePbagAmountsCheckbox.ThreeState = true;
         toolTip1.SetToolTip(shufflePbagAmountsCheckbox, "If selected, the pbag amounts will be randomized.");
         shufflePbagAmountsCheckbox.UseVisualStyleBackColor = true;

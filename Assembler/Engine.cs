@@ -5,174 +5,25 @@ using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
 
-public class Assembler
-{
-    private readonly V8ScriptEngine _engine;
-
-    public List<PropertyBag> Actions { get; } = new();
-
-    public Assembler(V8ScriptEngine engine)
-    {
-        _engine = engine;
-        _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
-    }
-
-    public void code(string asm, string name = "")
-    {
-        Actions.Add(new () {
-            { "action", "code" },
-            { "code", asm },
-            { "name", name },
-        });
-    }
-
-    public void label(string lb)
-    {
-        Actions.Add(new () {
-            { "action", "label" },
-            { "label", lb },
-        });
-    }
-
-    public void byt(params byte[] bytes)
-    {
-        Actions.Add(new() {
-            { "action", "byte" },
-            { "bytes", bytes },
-        });
-    }
-    public void byt(params PropertyBag[] bytes)
-    {
-        Actions.Add(new() {
-            { "action", "byte" },
-            { "bytes", bytes },
-        });
-    }
-
-    public void word(params ushort[] words)
-    {
-        Actions.Add(new() {
-            { "action", "word" },
-            { "words", words },
-        });
-    }
-    public void word(params PropertyBag[] words)
-    {
-        Actions.Add(new() {
-            { "action", "word" },
-            { "words", words },
-        });
-    }
-
-    public void org(ushort addr, string name = "")
-    {
-        Actions.Add(new() {
-            { "action", "org" },
-            { "addr", addr },
-            { "name", name },
-        });
-    }
-
-    // Converts from file address space to CPU address space, just a helper function
-    // since all the current addresses in the randomizer are in file address space
-    public void romorg(int addr, string name = "")
-    {
-        // adjustment for the ines header
-        int romaddr = addr - 0x10;
-        byte segment = (byte) (romaddr / 0x4000);
-        ushort cpuoffset = (ushort) (segment == 7 ? 0xc000 : 0x8000);
-        ushort cpuaddr = (ushort) ((romaddr % 0x4000) + cpuoffset);
-
-        Actions.Add(new() {
-            { "action", "org" },
-            { "addr", cpuaddr },
-            { "name", name },
-        });
-    }
-    public void segment(params string[] name)
-    {
-        Actions.Add(new () {
-            { "action", "segment" },
-            { "name", name },
-        });
-    }
-
-    public void reloc(string name = "")
-    {
-        Actions.Add(new()
-        {
-            { "action", "reloc" },
-            { "name", name },
-        });
-    }
-
-    public PropertyBag symbol(string name)
-    {
-        // kinda jank, but instead of eating the overhead for creating this token,
-        // just hardcode the symbol token
-        return new PropertyBag()
-        {
-            { "op", "sym" },
-            { "sym", name },
-        };
-    }
-
-    public void export(string name)
-    {
-        Actions.Add(new()
-        {
-            { "action", "reloc" },
-            { "name", name },
-        });
-    }
-
-    public void relocExportLabel(string name, params string[] segments)
-    {
-        if (segments.Length > 0)
-        {
-            segment(segments);
-        }
-        reloc();
-        label(name);
-        export(name);
-    }
-
-    // Assign defines a constant value or expression
-    public void assign(string name, int value)
-    {
-        Actions.Add(new() {
-            { "action", "assign" },
-            { "value", value },
-            { "name", name },
-        });
-    }
-
-    // Set defines a non-constant value (which can be redefined with a second set)
-    public void set(string name, int value)
-    {
-        Actions.Add(new() {
-            { "action", "set" },
-            { "value", value },
-            { "name", name },
-        });
-    }
-}
-
 public class Engine
 {
-    private V8ScriptEngine _engine;
-    public List<List<PropertyBag>> Modules { get; } = new();
-    private List<PropertyBag> InitModule { get; } = new();
+    internal V8ScriptEngine scriptEngine;
+    public List<List<PropertyBag>> Modules { get; set; } = new();
+    private Actions InitModule { get; } = new();
 
-    public Engine() {
+    public Engine() : this(new V8ScriptEngine())
+    {
+        
+    }
+    public Engine(V8ScriptEngine scriptEngine) {
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
         // follow this tutorial for how https://microsoft.github.io/ClearScript/Details/Build.html#_Debugging_with_ClearScript_2
         //_engine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
-        _engine = new V8ScriptEngine();
+        this.scriptEngine = scriptEngine;
 
         // Setup the initial segments for the randomizer
-        var a = Asm();
-        a.code("""
+        Assembler assembler = new(scriptEngine);
+        assembler.Code("""
 ;;; Initialization. This must come before all other modules.
 
 ;;; Tag for labels that we expect to override vanilla
@@ -268,22 +119,19 @@ FREE "PRG7" [$f369, $fcfb);
 
 
 """, "__init.s");
-        InitModule = a.Actions;
-    }
-
-    public Assembler Asm()
-    {
-        return new Assembler(_engine);
+        InitModule = assembler.Actions;
     }
 
     public void Apply(byte[] rom)
     {
-        var data = (ITypedArray<byte>) _engine.Evaluate($"new Uint8Array({rom.Length});");
+        var data = (ITypedArray<byte>) scriptEngine.Evaluate($"new Uint8Array({rom.Length});");
         data.WriteBytes(rom, 0, data.Length, 0);
-        _engine.Script.romdata = data;
-        _engine.Script.modules = Modules;
-        _engine.Script.initmodule = InitModule;
-        _engine.Execute(new DocumentInfo { Category = ModuleCategory.Standard }, /* language=javascript */ """
+        scriptEngine.Script.romdata = data;
+        scriptEngine.Script.modules = Modules;
+        scriptEngine.Script.initmodule = InitModule;
+        try
+        {
+            scriptEngine.Execute(new DocumentInfo { Category = ModuleCategory.Standard }, /* language=javascript */ """
 
 import { Assembler } from "js65/assembler.js"
 import { base64 } from 'js65/deps/deno.land/x/b64@1.1.27/src/base64.js';
@@ -373,8 +221,13 @@ async function processAction(a, action) {
     out.apply(romdata);
 })();
 """);
-        // Copy the patched bytes back into the final rom.
-        data.ReadBytes(0, (ulong)rom.Length, rom, 0);
+            // Copy the patched bytes back into the final rom.
+            data.ReadBytes(0, (ulong)rom.Length, rom, 0);
+        }
+        catch(Exception)
+        {
+            throw;
+        }
     }
 }
 
