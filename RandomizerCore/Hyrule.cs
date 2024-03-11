@@ -535,7 +535,7 @@ public class Hyrule
                     room.WriteSideViewPtr(validationAssembler, name);
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.Enemies.Length;
+                    enemyAddr += room.NewEnemies.Length;
                     room.UpdateConnectors();
                 }
             }
