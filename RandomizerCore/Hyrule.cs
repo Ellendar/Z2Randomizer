@@ -435,7 +435,8 @@ public class Hyrule
                 palaces[6].ShuffleSmallItems(5, true, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
             }
 
-            Assembler.Assembler assembler = new(_engine);
+            Assembler.Assembler sideview_module = new(_engine);
+            Assembler.Assembler gp_sideview_module = new(_engine);
 
             //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
             //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
@@ -443,7 +444,6 @@ public class Hyrule
             //guaranteed to succeed iff running on the original engine would succeed.
             //Jrowe feel free to engineer a less insane fix here. 
             Engine validationEngine = new Engine();
-            Assembler.Assembler validationAssembler = new(validationEngine);
             ROM testRom = new ROM(props.Filename);
 
             int i = 0;
@@ -480,20 +480,14 @@ public class Hyrule
             foreach (byte[] sv in sideviews.Keys)
             {
                 var name = "Sideview_" + i++;
-                assembler.Segment("PRG4");
-                assembler.Reloc();
-                assembler.Label(name);
-                assembler.Byt(sv);
-                validationAssembler.Segment("PRG4");
-                validationAssembler.Reloc();
-                validationAssembler.Label(name);
-                validationAssembler.Byt(sv);
-
+                sideview_module.Segment("PRG4");
+                sideview_module.Reloc();
+                sideview_module.Label(name);
+                sideview_module.Byt(sv);
                 List<Room> rooms = sideviews[sv];
                 foreach (Room room in rooms)
                 {
-                    room.WriteSideViewPtr(assembler, name);
-                    room.WriteSideViewPtr(validationAssembler, name);
+                    room.WriteSideViewPtr(sideview_module, name);
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
@@ -501,10 +495,6 @@ public class Hyrule
                 }
             }
 
-            _engine.Modules.Add(assembler.Actions);
-            validationEngine.Modules.Add(assembler.Actions);
-            assembler = new(_engine);
-            validationAssembler = new(validationEngine);
 
             i = 0;
             //GP Reconstructed
@@ -512,27 +502,14 @@ public class Hyrule
             foreach (byte[] sv in sideviewsgp.Keys)
             {
                 var name = "SideviewGP_" + i++;
-                try
-                {
-                    assembler.Segment("PRG5", "PRG7");
-                    assembler.Reloc();
-                    assembler.Label(name);
-                    assembler.Byt(sv);
-                    validationAssembler.Segment("PRG5", "PRG7");
-                    validationAssembler.Reloc();
-                    validationAssembler.Label(name);
-                    validationAssembler.Byt(sv);
-                }
-                catch (Exception e)
-                {
-                    logger.Warn(e);
-                    continue;
-                }
+                gp_sideview_module.Segment("PRG5", "PRG7");
+                gp_sideview_module.Reloc();
+                gp_sideview_module.Label(name);
+                gp_sideview_module.Byt(sv);
                 List<Room> rooms = sideviewsgp[sv];
                 foreach (Room room in rooms)
                 {
-                    room.WriteSideViewPtr(assembler, name);
-                    room.WriteSideViewPtr(validationAssembler, name);
+                    room.WriteSideViewPtr(gp_sideview_module, name);
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
@@ -542,6 +519,8 @@ public class Hyrule
             
             try
             {
+                validationEngine.Modules.Add(sideview_module.Actions);
+                validationEngine.Modules.Add(gp_sideview_module.Actions);
                 ApplyAsmPatches(props, validationEngine);
                 testRom.ApplyAsm(validationEngine);
             }
@@ -550,6 +529,9 @@ public class Hyrule
                 logger.Trace("Room packing failed. Retrying.");
                 continue;
             }
+
+            _engine.Modules.Add(sideview_module.Actions);
+            _engine.Modules.Add(gp_sideview_module.Actions);
         }
 
         firstProcessOverworldTimestamp = DateTime.Now;
