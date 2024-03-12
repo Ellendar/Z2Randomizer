@@ -3782,7 +3782,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FCC2FCB8",
+    "connections": "FCFCC2B8",
     "elevatorScreen": -1,
     "enabled": false,
     "enemies": "050B560496",

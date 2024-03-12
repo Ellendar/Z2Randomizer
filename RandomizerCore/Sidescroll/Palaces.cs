@@ -450,23 +450,30 @@ public class Palaces
                         || palace.AllRooms.Any(i => i.CountOpenExits() > 0)
                       );
 
+                    int shuffleIterations = 0;
                     if (roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
                     {
-                        palace.ShuffleRooms(r);
-                        bool reachable = palace.AllReachable();
-                        while (
-                            (!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
-                            && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT)
-                            )
+                        bool reachable = false;
+                        do
                         {
+                            //XXX: Debug
+                            if (currentPalace == 7)
+                            {
+                                int i = 2;
+                                //goto outer;
+                            }
                             palace.ResetRooms();
                             palace.ShuffleRooms(r);
                             reachable = palace.AllReachable();
                             tries++;
                             logger.Debug("Palace room shuffle attempt #" + tries);
                         }
+                        while (
+                            (!reachable || (currentPalace == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
+                            && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT)
+                            );
                     }
-
+                    outer:;
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 palace.Generations += tries;
                 palaces.Add(palace);
