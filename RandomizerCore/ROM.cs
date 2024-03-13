@@ -939,6 +939,7 @@ FREE_UNTIL $ffe0
 
 .define ProjectileYPosition $30
 .define ProjectileXVelocity $77
+.define ProjectileType      $87
 .define EnemyType           $a1
 .define LinkXPosition       $4d
 .define EnemyXPositionLo    $4e
@@ -988,6 +989,29 @@ ChooseNewCarrockXPosition:
     sta EnemyXPositionHi,x
     rts
 
+
+; Inside what I presume to be where the projectile gets cleared
+; there's a bunch of branching and two byte instructions which makes it annoying to patch this spot
+.org $adcc
+    jsr CheckProjectileType
+    nop
+
+.reloc
+CheckProjectileType:
+    ; If we are clearing out a wifi shot, also clear out the extra RAM
+    lda ProjectileType,x
+    cmp #$09
+    bne @OriginalCompare
+        ; Is a wifi shot so we want to clear out the extra ram
+        lda #0
+        sta ProjectileEnemyData,x
+        ; fallthrough
+@OriginalCompare:
+    ; Not a wifi shot so do the original compare and leave
+    cmp #$08
+    rts
+
+; Inside a funciton that updates motion for (maybe?) all projectiles
 .org $996f
     jsr MoveSinWaveWifiShot
 
