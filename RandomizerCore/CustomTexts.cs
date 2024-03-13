@@ -215,7 +215,12 @@ public class CustomTexts
         "No hint$for you",
         "What$timeline$is this?",
         "your$call is$important$please hold",
-
+        "silence$is golden",
+        "Bless you",
+        "Hola!",
+        "I am not$a vire$in$disguise",
+        "Woah!$Dude!",
+        "PAY ME$AND I'LL$TALK"
     };
 
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
@@ -224,7 +229,12 @@ public class CustomTexts
         "come back$as$adult link",
         "quit$wasting$my time",
         "Youre$sixteen$pixels$short",
-
+        "Do you$have a$diploma?",
+        "The magic$class did$not help$you enough",
+        "Show me$your$credits!",
+        "I cannot$contain$my laughter",
+        "You must$construct$addtional$pylons",
+        "bet you$forgot$this flag$was on"
     };
 
     public static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
@@ -251,7 +261,7 @@ public class CustomTexts
         { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through!"  } },
         { Spell.REFLECT, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
         { Spell.SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
-        { Spell.THUNDER, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!",  } },
+        { Spell.THUNDER, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage" } },
         { Spell.UPSTAB, UPSTAB_TEXTS },
         { Spell.DOWNSTAB, DOWNSTAB_TEXTS }
     };

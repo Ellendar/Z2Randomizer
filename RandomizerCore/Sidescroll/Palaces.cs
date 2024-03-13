@@ -71,7 +71,7 @@ public class Palaces
         {7, 0x8665 }
     };
 
-    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, ROM ROMData, bool raftIsRequired)
+    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, bool raftIsRequired)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -450,18 +450,11 @@ public class Palaces
                         || palace.AllRooms.Any(i => i.CountOpenExits() > 0)
                       );
 
-                    int shuffleIterations = 0;
                     if (roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
                     {
                         bool reachable = false;
                         do
                         {
-                            //XXX: Debug
-                            if (currentPalace == 7)
-                            {
-                                int i = 2;
-                                //goto outer;
-                            }
                             palace.ResetRooms();
                             palace.ShuffleRooms(r);
                             reachable = palace.AllReachable();
@@ -473,7 +466,6 @@ public class Palaces
                             && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT)
                             );
                     }
-                    outer:;
                 } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 palace.Generations += tries;
                 palaces.Add(palace);

@@ -333,40 +333,25 @@ public class Room
         }
 
         //Reconstructed palaces require us to rewrite the enemy pointers table.
-        //XXX: This is probably wrong, but needs testing.
-        if (true)//palaceStyle == PalaceStyle.RECONSTRUCTED)
+        int memAddr = enemyAddr;
+        //Write the updated pointers
+        if (PalaceGroup == 1)
         {
-            int memAddr = enemyAddr;
-            //Write the updated pointers
-            if (PalaceGroup == 1)
-            {
-                memAddr -= 0x98b0;
-                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-            }
-            else if (PalaceGroup == 2)
-            {
-                memAddr -= 0x98b0;
-                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-            }
-            else
-            {
-                memAddr -= 0xd8b0;
-                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-                ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-            }
+            memAddr -= 0x98b0;
+            ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
-        //For non-reconstructed, we're not rewriting the sideviews, so we need to use the vanilla
-        //non-contiguous enemy data space. We can just read the vanilla enemy pointer and overwrite the
-        //vanilla data inline
+        else if (PalaceGroup == 2)
+        {
+            memAddr -= 0x98b0;
+            ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+        }
         else
         {
-            int low = ROMData.GetByte(enemyPtr + (NewMap ?? Map) * 2);
-            int high = ROMData.GetByte(enemyPtr + (NewMap ?? Map) * 2 + 1);
-            high = high << 8;
-            high = high & 0x0FFF;
-            enemyAddr = high + low + baseEnemyAddr;
+            memAddr -= 0xd8b0;
+            ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
 
 
