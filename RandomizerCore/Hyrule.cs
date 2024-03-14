@@ -410,6 +410,10 @@ public class Hyrule
         while (palaces == null || palaces.Count != 7)
         {
             palaces = Palaces.CreatePalaces(worker, RNG, props, raftIsRequired);
+            if(palaces == null)
+            {
+                continue;
+            }
 
             //Randomize Enemies
             if (props.ShufflePalaceEnemies)

@@ -15,7 +15,8 @@ namespace Z2Randomizer.Statistics;
 /// </summary>
 class Statistics
 {
-    private static readonly string FLAGS = "hEAK0sALirpUe5RLvbgZQ+2c4YX@4X4yAASA"; //Random%
+    private static readonly string FLAGS = "hEAK0sALirpUe5RLkbgZQ+2c4YX@4X4yAASA"; //Random%
+    //"hEAK0sALirpUe5RLkbgZQ+2c4YX@4X4yAASA" v4 only Random%
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
     private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";

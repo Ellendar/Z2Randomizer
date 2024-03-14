@@ -306,15 +306,11 @@ public class CustomTexts
         if (props.HelpfulHints)
         {
             placedIndex = GenerateHelpfulHints(texts, itemLocs, r, props.SpellItemHints);
+            GenerateKnowNothings(texts, placedIndex, r, props.BagusWoods, props.UseCommunityText);
         }
 
         if (props.UseCommunityText)
         {
-            if(props.HelpfulHints)
-            {
-                GenerateKnowNothings(texts, placedIndex, r, props.BagusWoods, props.UseCommunityText);
-            }
-
             //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
             //enough magic containers and container requirements are on.
             texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(r));
@@ -501,26 +497,22 @@ public class CustomTexts
         List<Item> smallItems = new List<Item> { Item.BLUE_JAR, Item.XL_BAG, Item.KEY, Item.MEDIUM_BAG, Item.MAGIC_CONTAINER, Item.HEART_CONTAINER, Item.ONEUP, Item.RED_JAR, Item.SMALL_BAG, Item.LARGE_BAG };
         List<int> placedTowns = new List<int>();
 
-        List<Item> it = new List<Item>();
-        for (int i = 0; i < itemLocs.Count(); i++)
-        {
-            it.Add(itemLocs[i].Item);
-        }
+        List<Item> items = itemLocs.Select(i => i.Item).ToList();
 
         if (useSpellItemHints)
         {
-            it.Remove(Item.TROPHY);
-            it.Remove(Item.CHILD);
-            it.Remove(Item.MEDICINE);
+            items.Remove(Item.TROPHY);
+            items.Remove(Item.CHILD);
+            items.Remove(Item.MEDICINE);
         }
 
         for (int i = 0; i < HELPFUL_HINTS_COUNT; i++)
         {
-            Item doThis = it[r.Next(it.Count())];
+            Item doThis = items[r.Next(items.Count)];
             int tries = 0;
             while (((placedSmall && smallItems.Contains(doThis)) || placedItems.Contains(doThis)) && tries < 1000)
             {
-                doThis = it[r.Next(it.Count())];
+                doThis = items[r.Next(items.Count)];
                 tries++;
             }
             int j = 0;
@@ -528,7 +520,7 @@ public class CustomTexts
             {
                 j++;
             }
-            Text hint = new Text();
+            Text hint = new();
             hint.GenerateHelpfulHint(itemLocs[j]);
             int town = r.Next(9);
             while (placedTowns.Contains(town))

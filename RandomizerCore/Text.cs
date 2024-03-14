@@ -6,9 +6,10 @@ using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
 
+[DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Text
 {
-    public string RawText { get; }
+    public string RawText { get; private set; }
     public List<char> TextChars { get; private set; }
 
     public Text()
@@ -133,7 +134,13 @@ public class Text
                 break;
         }
 
-        TextChars = Util.ToGameText(hint, true).ToList();
+        RawText = hint;
+        TextChars = Util.ToGameText(hint, true);
+    }
+
+    public string GetDebuggerDisplay()
+    {
+        return RawText;
     }
 
 }

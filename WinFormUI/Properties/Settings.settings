@@ -51,10 +51,10 @@
       <Value Profile="(Default)">{"Flagset": "RChN6EAABAViWVRLtBcbi+3mLCqCLviyAAWA", "Name": "Beginner", "Tooltip": "This is great for people looking for a casual experience"}</Value>
     </Setting>
     <Setting Name="customizableButton2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "RAAN6AAFesXtWVRLtagax+2cs5w@sunyAAsA", "Name": "Standard", "Tooltip": "Flags for the 2023 Standard Tournament"}</Value>
+      <Value Profile="(Default)">{"Flagset": "RAAN6AAFeqXtWVRstSgax+2csjw@suiyAAWA", "Name": "Standard", "Tooltip": "Flags for the 2023 Standard Tournament"}</Value>
     </Setting>
     <Setting Name="customizableButton3" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "hEAjMsAFesXtWVRLtVdZQ+2csmv@sukyAAsA", "Name": "Max Rando", "Tooltip": "Flags for the 2023 Max Rando Tournament"}</Value>
+      <Value Profile="(Default)">{"Flagset": "hEAjMsAFerXtWVRstVdZQ+2csmv@sukyAAWA", "Name": "Max Rando", "Tooltip": "Flags for the 2023 Max Rando Tournament"}</Value>
     </Setting>
     <Setting Name="beepFrequency" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -69,7 +69,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="customizableButton4" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "hEAK0sALirpUe5RLvbgZQ+2c4YX@4X4yAASA", "Name": "Random%", "Tooltip": "Is it randomized? Who knows?"}</Value>
+      <Value Profile="(Default)">{"Flagset": "hEAK0sAListUe5RtWbgZQ+2c4YX@4X4yAAsA", "Name": "Random%", "Tooltip": "Is it randomized? Who knows?"}</Value>
     </Setting>
     <Setting Name="customizableButton5" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
