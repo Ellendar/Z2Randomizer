@@ -403,8 +403,6 @@ public class Hyrule
         startRandomizeEnemiesTimestamp = DateTime.Now;
         RandomizeEnemyStats();
 
-        ApplyAsmPatches(props, _engine);
-
         bool raftIsRequired = IsRaftAlwaysRequired(props);
         
         while (palaces == null || palaces.Count != 7)
@@ -439,8 +437,8 @@ public class Hyrule
                 palaces[6].ShuffleSmallItems(5, true, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
             }
 
-            Assembler.Assembler sideview_module = new(_engine);
-            Assembler.Assembler gp_sideview_module = new(_engine);
+            Assembler.Assembler sideview_module = new();
+            Assembler.Assembler gp_sideview_module = new();
 
             //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
             //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
@@ -536,6 +534,8 @@ public class Hyrule
 
             _engine.Modules.Add(sideview_module.Actions);
             _engine.Modules.Add(gp_sideview_module.Actions);
+            ApplyAsmPatches(props, _engine);
+            ROMData.ApplyAsm(_engine);
         }
 
         firstProcessOverworldTimestamp = DateTime.Now;
@@ -546,7 +546,6 @@ public class Hyrule
             return;
         }
 
-        ROMData.ApplyAsm(_engine);
 
         List<Text> hints = ROMData.GetGameText();
         ROMData.WriteHints(CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
@@ -3522,7 +3521,7 @@ public class Hyrule
 
     private void AddCropGuideBoxesToFileSelect(Engine engine)
     {
-        Assembler.Assembler assembler = new(engine);
+        Assembler.Assembler assembler = new();
         assembler.Code("""
 .segment "PRG5"
 .org $b28d
@@ -3696,7 +3695,7 @@ CustomFileSelectData:
         {
             helmetRoom = (byte)palaces[1].BossRoom.NewMap;
         }
-        Assembler.Assembler assembler = new(engine);
+        Assembler.Assembler assembler = new();
         assembler.Assign("HelmetRoom", helmetRoom);
         assembler.Code("""
 .segment "PRG4"

@@ -798,7 +798,7 @@ public class ROM
 
     public void UpAController1(Engine engine)
     {
-        Assembler.Assembler assembler = new(engine);
+        Assembler.Assembler assembler = new();
         assembler.Code("""
 .segment "PRG0"
 .org $a19f
@@ -829,7 +829,7 @@ CheckController1ForUpAMagic:
 
     public void ChangeMapperToMMC5(Engine engine)
     {
-        Assembler.Assembler assembler = new(engine);
+        Assembler.Assembler assembler = new();
         assembler.Code("""
 
 ; TODO common macpack or something to consolidate macros
@@ -933,7 +933,7 @@ FREE_UNTIL $ffe0
 
     public void BuffCarrock(Engine engine)
     {
-        Assembler.Assembler assembler = new(engine);
+        Assembler.Assembler assembler = new();
         assembler.Code("""
 .segment "PRG4"
 
@@ -1116,7 +1116,7 @@ RandomizeWifiShotType:
 
     public void DashSpell(Engine engine)
     {
-        Assembler.Assembler assembler = new(engine);
+        Assembler.Assembler assembler = new();
         assembler.Code("""
 .segment "PRG0"
 .reloc

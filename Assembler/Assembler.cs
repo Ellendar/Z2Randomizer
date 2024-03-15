@@ -5,19 +5,12 @@ namespace Assembler;
 
 public class Assembler
 {
-    private readonly V8ScriptEngine _engine;
+    //private readonly V8ScriptEngine _engine;
 
     public Actions Actions { get; set; } = new();
 
-    public Assembler(V8ScriptEngine engine)
+    public Assembler()
     {
-        _engine = engine;
-        _engine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
-    }
-
-    public Assembler(Engine engine) : this(engine.scriptEngine)
-    {
-
     }
 
     public void Code(string asm, string name = "")

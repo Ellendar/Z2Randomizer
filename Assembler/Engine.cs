@@ -11,9 +11,10 @@ public class Engine
     public List<List<PropertyBag>> Modules { get; set; } = new();
     private Actions InitModule { get; } = new();
 
-    public Engine() : this(new V8ScriptEngine())
+    public Engine()
     {
-        
+        scriptEngine = new();
+        scriptEngine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
     }
     public Engine(V8ScriptEngine scriptEngine) {
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
@@ -22,7 +23,7 @@ public class Engine
         this.scriptEngine = scriptEngine;
 
         // Setup the initial segments for the randomizer
-        Assembler assembler = new(scriptEngine);
+        Assembler assembler = new();
         assembler.Code("""
 ;;; Initialization. This must come before all other modules.
 
