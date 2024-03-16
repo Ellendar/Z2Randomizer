@@ -15,12 +15,10 @@ public class Engine
     {
         scriptEngine = new();
         scriptEngine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
-    }
-    public Engine(V8ScriptEngine scriptEngine) {
+
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
         // follow this tutorial for how https://microsoft.github.io/ClearScript/Details/Build.html#_Debugging_with_ClearScript_2
         //this.scriptEngine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.EnableRemoteDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
-        this.scriptEngine = scriptEngine;
 
         // Setup the initial segments for the randomizer
         Assembler assembler = new();

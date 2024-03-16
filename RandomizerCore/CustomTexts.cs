@@ -234,7 +234,8 @@ public class CustomTexts
         "Show me$your$credits!",
         "I cannot$contain$my laughter",
         "You must$construct$addtional$pylons",
-        "bet you$forgot$this flag$was on"
+        "bet you$forgot$this flag$was on",
+        "I'll tell$you when$you're$older"
     };
 
     public static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()

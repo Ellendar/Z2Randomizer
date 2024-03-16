@@ -6851,12 +6851,9 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
-      [
-        "GLOVE",
-        "KEY"
-      ]
+        "GLOVE"
     ],
-    "sideviewData": "18600010DD0E80B2DC00DB0E810502F1F050B071D5006001"
+    "sideviewData": "16600010DD0E80B2DC00DB0EF35000F1B071D5006001"
   },
   {
     "author": "winterSolstice",

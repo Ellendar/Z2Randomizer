@@ -32,7 +32,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = false;
+    public const bool UNSAFE_DEBUG = true;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -96,7 +96,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 120;
+    private static int DEBUG_THRESHOLD = 110;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -405,7 +405,8 @@ public class Hyrule
 
         bool raftIsRequired = IsRaftAlwaysRequired(props);
         
-        while (palaces == null || palaces.Count != 7)
+        bool passedValidation = false;
+        while (palaces == null || palaces.Count != 7 || passedValidation == false)
         {
             palaces = Palaces.CreatePalaces(worker, RNG, props, raftIsRequired);
             if(palaces == null)
@@ -504,6 +505,7 @@ public class Hyrule
             foreach (byte[] sv in sideviewsgp.Keys)
             {
                 var name = "SideviewGP_" + i++;
+
                 gp_sideview_module.Segment("PRG5", "PRG7");
                 gp_sideview_module.Reloc();
                 gp_sideview_module.Label(name);
@@ -526,12 +528,13 @@ public class Hyrule
                 ApplyAsmPatches(props, validationEngine);
                 testRom.ApplyAsm(validationEngine);
             }
-            catch
+            catch(Exception e)
             {
-                logger.Trace("Room packing failed. Retrying.");
+                logger.Warn("Room packing failed. Retrying.", e);
                 continue;
             }
 
+            passedValidation = true;
             _engine.Modules.Add(sideview_module.Actions);
             _engine.Modules.Add(gp_sideview_module.Actions);
             ApplyAsmPatches(props, _engine);
@@ -1045,13 +1048,12 @@ public class Hyrule
         {
             if (ItemGet[item] == false)
             {
-                if (UNSAFE_DEBUG && count > DEBUG_THRESHOLD)
+                if (UNSAFE_DEBUG && count >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on critical item");
-                    debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
 
-                    return false;
+                    return true;
                 }
                 itemGetReachableFailures++;
                 return false;
@@ -1066,7 +1068,6 @@ public class Hyrule
                 if (UNSAFE_DEBUG && count > DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on items");
-                    debug++;
                     PrintRoutingDebug(count, wh, eh, dm, mi);
                     return false;
                 }
@@ -3726,21 +3727,21 @@ HelmetHeadGoomaFix:
     private void ApplyAsmPatches(RandomizerProperties props, Engine engine)
     {
         ROMData.ChangeMapperToMMC5(engine);
-        AddCropGuideBoxesToFileSelect(engine);
+        //AddCropGuideBoxesToFileSelect(engine);
 
         if (props.HardBosses)
         {
-            ROMData.BuffCarrock(engine);
+            //ROMData.BuffCarrock(engine);
         }
 
         if (props.ReplaceFireWithDash)
         {
-            ROMData.DashSpell(engine);
+            //ROMData.DashSpell(engine);
         }
 
         if (props.UpAC1)
         {
-            ROMData.UpAController1(engine);
+            //ROMData.UpAController1(engine);
         }
     }
 }
