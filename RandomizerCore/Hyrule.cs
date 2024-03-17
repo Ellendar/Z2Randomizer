@@ -181,7 +181,6 @@ public class Hyrule
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
 
-        ROMData = new ROM(props.Filename);
         this.worker = worker;
 
 
@@ -199,7 +198,12 @@ public class Hyrule
         reachableAreas = new HashSet<string>();
         //areasByLocation = new SortedDictionary<string, List<Location>>();
 
-        kasutoJars = shuffler.ShuffleKasutoJars(ROMData, RNG);
+
+        ROMData = new ROM(props.Filename);
+        if (props.KasutoJars)
+        {
+            kasutoJars = RNG.Next(5, 8);
+        }
 
         bool raftIsRequired = IsRaftAlwaysRequired(props);
         bool passedValidation = false;
@@ -237,6 +241,8 @@ public class Hyrule
 
             Assembler.Assembler sideview_module = new();
             Assembler.Assembler gp_sideview_module = new();
+            //Assembler.Assembler validation_sideview_module = new();
+            //Assembler.Assembler validation_gp_sideview_module = new();
 
             //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
             //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
@@ -244,7 +250,6 @@ public class Hyrule
             //guaranteed to succeed iff running on the original engine would succeed.
             //Jrowe feel free to engineer a less insane fix here. 
             Engine validationEngine = new Engine();
-            ROM testRom = new ROM(props.Filename);
 
             int i = 0;
             //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
@@ -323,6 +328,7 @@ public class Hyrule
                 validationEngine.Modules.Add(sideview_module.Actions);
                 validationEngine.Modules.Add(gp_sideview_module.Actions);
                 ApplyAsmPatches(props, validationEngine);
+                ROM testRom = new(ROMData);
                 testRom.ApplyAsm(validationEngine);
             }
             catch(Exception e)
@@ -349,6 +355,7 @@ public class Hyrule
             ROMData.DisableMusic();
         }
 
+        ROMData.WriteKasutoJarAmount(kasutoJars);
         ROMData.DoHackyFixes();
         shuffler.ShuffleDrops(ROMData, RNG);
         shuffler.ShufflePbagAmounts(ROMData, RNG);

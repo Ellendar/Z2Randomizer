@@ -207,17 +207,6 @@ public class Shuffler
         }
     }
 
-    public int ShuffleKasutoJars(ROM ROMData, Random r)
-    {
-        int kasutoJars = 7;
-        if (props.KasutoJars)
-        {
-            kasutoJars = r.Next(5, 8);
-            ROMData.WriteKasutoJarAmount(kasutoJars);
-        }
-        return kasutoJars;
-    }
-
     public void ShuffleBossDrop(ROM ROMData, Random r)
     {
         int drop = drops[r.Next(drops.Count())];

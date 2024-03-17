@@ -130,6 +130,13 @@ public class ROM
         }
     }
 
+    public ROM(ROM clone)
+    {
+        int length = clone.ROMData.Length;
+        ROMData = new byte[length];
+        Array.Copy(clone.ROMData, ROMData, length);
+    }
+
     public ROM(byte[] data)
     {
         ROMData = data;
