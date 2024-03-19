@@ -579,6 +579,7 @@ public class WestHyrule : World
 
                 if (props.BagusWoods)
                 {
+                    debug++;
                     bool f = PlaceBagu();
                     if (!f)
                     {
@@ -742,6 +743,8 @@ public class WestHyrule : World
 
     private bool PlaceBagu()
     {
+        bagu.CanShuffle = true;
+        lostWoods.ForEach(i => i.CanShuffle = true);
         int y = RNG.Next(6, MAP_ROWS - 7);
         int x = RNG.Next(6, MAP_COLS - 7);
         int tries = 0;
@@ -756,6 +759,7 @@ public class WestHyrule : World
         }
         bagu.Ypos = y + 30;
         bagu.Xpos = x;
+        bagu.CanShuffle = false;
         map[y, x] = Terrain.FOREST;
 
         int placed = 0;
@@ -773,18 +777,16 @@ public class WestHyrule : World
             lostWoods[placed].Ypos = newy + 30;
             lostWoods[placed].Xpos = newx;
             map[newy, newx] = Terrain.FOREST;
+            lostWoods[placed].CanShuffle = false;
             placed++;
         }
         if(tries >= 3000 && placed < 3)
         {
             return false;
         }
-        else
+        for(int i = placed; i < lostWoods.Count; i++)
         {
-            for(int i = placed; i < lostWoods.Count; i++)
-            {
-                lostWoods[placed].Ypos = 0;
-            }
+            lostWoods[placed].Ypos = 0;
         }
         return true;
     }
