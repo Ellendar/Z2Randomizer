@@ -71,7 +71,7 @@ public class CustomTexts
 
     private static readonly int[][] hintIndexes = { rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint };
 
-    public static readonly String[] GENERIC_WIZARD_TEXTS =
+    public static readonly string[] GENERIC_WIZARD_TEXTS =
     {
         "do you know$why we$stopped$the car?",
         "link...$i am your$father",
@@ -123,7 +123,7 @@ public class CustomTexts
         "Let me$read my$Vogon$Poetry"
     };
 
-    public static readonly String[] RIVER_MAN_TEXTS = 
+    public static readonly string[] RIVER_MAN_TEXTS = 
     {
         "bagu said$what? that$jerk!",
         "try not$to drown",
@@ -142,7 +142,7 @@ public class CustomTexts
         "No running$by$the pool",
     };
 
-    public static readonly String[] BAGU_TEXTS =
+    public static readonly string[] BAGU_TEXTS =
     {
         "have you$seen error$around?",
         "tell the$riverman$i said hes$an idiot",
@@ -168,7 +168,7 @@ public class CustomTexts
         "Everyone$gets a$bridge",
     };
 
-    public static readonly String[] DOWNSTAB_TEXTS =
+    public static readonly string[] DOWNSTAB_TEXTS =
     {
         "stick them$with the$pointy end",
         "youll stab$your eye$out",
@@ -186,7 +186,7 @@ public class CustomTexts
         "Are you$Scrooge$McDuck?"
     };
 
-    public static readonly String[] UPSTAB_TEXTS =
+    public static readonly string[] UPSTAB_TEXTS =
     {
         "bet you$wish this$was$downstab",
         "you$probably$wont need$this",
@@ -328,7 +328,7 @@ public class CustomTexts
     {
         int baguy = bagu.Ypos - 30;
         int bagux = bagu.Xpos;
-        String hint = "BAGU IN$";
+        string hint = "BAGU IN$";
         if (baguy < 25)
         {
             if (bagux < 21)
@@ -393,7 +393,7 @@ public class CustomTexts
 
     public static Text GenerateTownHint(Spell spell, bool linkedFire)
     {
-        String text = "";
+        string text = "";
         switch (spell)
         {
             case Spell.SHIELD:
@@ -438,7 +438,7 @@ public class CustomTexts
                 {
                     throw new ArgumentException("Spell/Town is required to generate wizard text");
                 }
-                List<String> possibleWizardHints = GENERIC_WIZARD_TEXTS
+                List<string> possibleWizardHints = GENERIC_WIZARD_TEXTS
                     .Union(WIZARD_TEXTS_BY_TOWN[town ?? Town.RAURU])
                     .Union(WIZARD_TEXTS_BY_SPELL[spell ?? Spell.SHIELD]).ToList();
                 int selectedHintIndex = r.Next(possibleWizardHints.Count());
@@ -588,6 +588,10 @@ public class CustomTexts
             {
                 Text wizardHint;
                 Spell spell = spellMap[town];
+                do
+                {
+                    wizardHint = GenerateCommunityText(HintType.WIZARD, r, town, spell);
+                } while (usedWizardHints.Contains(wizardHint));
                 //TODO: eventually when up/downstab are in the generic spell pool, they can use generic hints again.
                 if(spell == Spell.DOWNSTAB)
                 {
@@ -599,10 +603,6 @@ public class CustomTexts
                     hints[spellTextIndexes[town]] = new Text(UPSTAB_TEXTS[r.Next(UPSTAB_TEXTS.Length)]);
                     continue;
                 }
-                do
-                {
-                    wizardHint = GenerateCommunityText(HintType.WIZARD, r, town, spell);
-                } while (usedWizardHints.Contains(wizardHint));
                 usedWizardHints.Add(wizardHint);
                 hints[spellTextIndexes[town]] = wizardHint;
             }
@@ -612,7 +612,8 @@ public class CustomTexts
 
             Text bridgeHint = GenerateCommunityText(HintType.BRIDGE, r);
             hints[bridgeTextIndex] = bridgeHint;
-
+        //TODO: Add in a routine that cleans out any extraneous scripts that were either unused in the NA version
+        //      Or are now unused with the randomizer.
         } while (TextLength(hints) > maxTextLength);
     }
 

@@ -62,6 +62,7 @@ public partial class MainUI : Form
         upAOnController1Checkbox.Checked = Settings.Default.upac1;
         seedTextBox.Text = Settings.Default.lastseed;
         flashingOffCheckbox.Checked = Settings.Default.noflash;
+        useCommunityTextCheckbox.Checked = Settings.Default.useCommunityText;
         useCustomRoomsBox.Checked = Settings.Default.useCustomRooms;
         beepFrequencyDropdown.SelectedIndex = Settings.Default.beepFrequency;
         beepThresholdDropdown.SelectedIndex = Settings.Default.beepThreshold;

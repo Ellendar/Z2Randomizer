@@ -38,10 +38,14 @@
     <Version>4.2.5</Version>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="CustomRooms.json" />
     <None Remove="nlog.config" />
     <None Remove="PalaceRooms.json" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CustomRooms.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

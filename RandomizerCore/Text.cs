@@ -7,7 +7,7 @@ using Z2Randomizer.Core.Overworld;
 namespace Z2Randomizer.Core;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-public class Text
+public class Text : IEquatable<Text>
 {
     public string RawText { get; private set; }
     public List<char> TextChars { get; private set; }
@@ -19,7 +19,7 @@ public class Text
 
     public Text(List<char> text)
     {
-        RawText = new string(text.ToArray());
+        RawText = Util.FromGameText(text);
         TextChars = text;
     }
     public Text(string text)
@@ -143,4 +143,19 @@ public class Text
         return RawText;
     }
 
+    public override bool Equals(object obj)
+    {
+        return Equals(obj as Text);
+    }
+
+    public bool Equals(Text other)
+    {
+        return other is not null &&
+               EqualityComparer<List<char>>.Default.Equals(TextChars, other.TextChars);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TextChars);
+    }
 }

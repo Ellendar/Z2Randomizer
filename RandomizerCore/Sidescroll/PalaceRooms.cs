@@ -22,7 +22,7 @@ public class PalaceRooms
 
 
 
-    public static readonly string roomsMD5 = "qvtwG7ntEclgbAXcszrcjA==";
+    public static readonly string roomsMD5 = "1ZCqgRjf2CevUzbgrpNoOw==";
 
     static PalaceRooms()
     {
@@ -32,8 +32,7 @@ public class PalaceRooms
             byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
-                //XXX: Restore this
-                //throw new Exception("Invalid PalaceRooms.json");
+                throw new Exception("Invalid PalaceRooms.json");
             }
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
@@ -58,10 +57,12 @@ public class PalaceRooms
         if (File.Exists("CustomRooms.json"))
         {
             string roomsJson = File.ReadAllText("CustomRooms.json");
+            byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
+
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
             {
-                Room room = new Room(obj.ToString());
+                Room room = new(obj.ToString());
                 if (room.Enabled)
                 {
                     if (!customRoomsByGroup.ContainsKey(room.Group))
@@ -70,6 +71,7 @@ public class PalaceRooms
                     }
                     customRoomsByGroup[room.Group].Add(room);
                 }
+                customRoomsByName[room.Name] = room;
             }
         }
     }

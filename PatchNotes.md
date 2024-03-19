@@ -1,5 +1,44 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.0 - ?
+
+### New features
+- Added support for the 2024 Room Jam! Check out the RoomJam channels in the discord for how you can design/submit new rooms.
+- Overworld generation now guarantees that all caves will eventually be accessable. It is no longer possible to have unreachable caves that contained unneccessary items.
+- Added a separate option for biomes to be random, random (no vanilla), and random (no vanilla/shuffle).
+- Significantly reworked the palace generation logic to better support weird or unusual room types. As a result of this, segmented rooms are much more likely to contain both halves.
+- Vanilla and community rooms can be independently selected. Try a run with just community rooms and no vanilla.
+- Updated the normal/GP palace style settings. You can now select different palace styles for normal/GP palace styles/lengths.
+- Added an option for harder carock. (Thanks jroweboy)
+- Experimental feature: Climates.
+	- Where biomes change the shape of the terrain, climates control the types/sizes/frequency of terrain that appears.
+	- This feature is still experimental and may cause generation times to be longer than normal if used.
+	- Possible options:
+		- Classic: Even weights. Works just like previous versions.
+		- Chaos: Terrain shifts quickly and unpredictably. In a future update this will probably include more nonstandard terrain typ
+		- Wetlands: Swamps? Check. Deserts? Nope. More swamps? Double check.
+		- Great lakes: Bigger lakes, more forests.
+		- Scrubland: A nice clear climate free of swamps and high in grass and desert.
+- Updated the default preset flags. Saved flags will now be reset to the defaults whenever an update changes the flags format (which includes this update). Sorry for the inconvenience.
+- Community hints have been renamed "Community Text" and are no longer part of the flag string. They can be enabled/disabled and the seed will be the same. This should allow people to use them (or not) in races as they like.
+- Added community text for "I know nothing" and "Come back when you are ready" replacements.
+- Added a bunch of new community text options. Thanks to everyone in the #community-text channel in the discord for their suggestions.
+- Added a setting for different kinds of "No duplicate rooms" flags.
+	- No Duplicate Rooms (By Layout/Enemies) - Like the old no duplicate rooms. A room is considered to be a duplicate if it has the same layout and the same enemies.
+	- No Duplicate Rooms (By Layout) - Only considers the layout of the room to determine what is a duplicate.
+	- These options may not be available when the list of available rooms is too small to support the number of required rooms.
+- Moved the bagu's woods hint from the bot to the river man (on both sides of the river)
+
+
+### Bug Fixes
+- Fixed a bug where palace/overworld items were improperly shuffled. This has several impacts, but most notably fixes the "candle always in palaces" bug.
+- Fixed a bug were leaving Maze Island via a cave was not in logic.
+- Fixed a bug where canyon biomes in the east were always dry
+- Fixed a bug where one of the caves in 4-way Death Mountain groups was sometimes facing the wrong direction.
+- Reworked caldera biome generation to fix several possible bugs resulting in caves not exiting properly. This also makes different caldera connection types properly weighted.
+- Avoided a bug where leaving a hidden palace that was on the same column as hidden kasuto caused a wrong warp. It is now not possible that these two will have the same X-coordinate.
+- Fixed an issue where helpful hints on the sleepy saria bot were sometimes suppressed.
+
 ## Version 4.2.7 - September 17th, 2023
 
 - Fixed an issue where items required to get Reflect spell could be behind Carock (thanks TrailZ)
