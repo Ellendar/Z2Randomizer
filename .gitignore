@@ -13,3 +13,4 @@
 *.nes
 *.user
 .vscode/
+.DS_Store

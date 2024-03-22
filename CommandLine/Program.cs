@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using McMaster.Extensions.CommandLineUtils;
+using NLog;
 using System.ComponentModel;
 using Z2Randomizer.Core;
 
@@ -24,11 +25,13 @@ public class Program
 
     private RandomizerConfiguration? configuration;
 
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private int OnExecute()
     {
         if (Flags == null || Flags == string.Empty)
         {
-            Console.WriteLine("The flag string is required");
+            logger.Error("The flag string is required");
             return -1;
         }
 
@@ -43,24 +46,32 @@ public class Program
 
         if (Rom == null || Rom == string.Empty)
         {
-            Console.WriteLine("The ROM path is required");
+            logger.Error("The ROM path is required");
             return -2;
         } 
         else if (!File.Exists(Rom))
         {
-            Console.WriteLine($"The specified ROM file does not exist: {Rom}");
+            logger.Error($"The specified ROM file does not exist: {Rom}");
             return -3;
         }
 
         this.configuration.FileName = Rom;
 
-        Console.WriteLine($"Flags: {Flags}");
-        Console.WriteLine($"Rom: {Rom}");
-        Console.WriteLine($"Seed: {Seed}");
+        logger.Info($"Flags: {Flags}");
+        logger.Info($"Rom: {Rom}");
+        logger.Info($"Seed: {Seed}");
 
-        var playerOptionsService = new PlayerOptionsService();
-        var playerOptions = playerOptionsService.LoadFromFile(this.PlayerOptions);
-        playerOptionsService.ApplyOptionsToConfiguration(playerOptions, configuration);
+        try
+        {
+            var playerOptionsService = new PlayerOptionsService();
+            var playerOptions = playerOptionsService.LoadFromFile(this.PlayerOptions);
+            playerOptionsService.ApplyOptionsToConfiguration(playerOptions, configuration);
+        }
+        catch (Exception exception)
+        {
+            logger.Fatal(exception);
+            return -4;
+        }
 
         Randomize();
 
@@ -88,12 +99,12 @@ public class Program
 
         if (generationException == null)
         {
-            Console.WriteLine("File " + "Z2_" + this.Seed + "_" + this.Flags + ".nes" + " has been created!");
+            logger.Info("File " + "Z2_" + this.Seed + "_" + this.Flags + ".nes" + " has been created!");
         }
         else
         {
-            Console.Error.WriteLine("An exception occurred generating the rom: \n" + generationException.Message);
-            Console.Error.WriteLine(generationException.StackTrace);
+            logger.Error("An exception occurred generating the rom");
+            logger.Fatal(generationException);
         }
     }
 
@@ -112,35 +123,35 @@ public class Program
     {
         if (eventArgs.ProgressPercentage == 2)
         {
-            Console.WriteLine("Generating Western Hyrule");
+            logger.Info("Generating Western Hyrule");
         }
         else if (eventArgs.ProgressPercentage == 3)
         {
-            Console.WriteLine("Generating Death Mountain");
+            logger.Info("Generating Death Mountain");
         }
         else if (eventArgs.ProgressPercentage == 4)
         {
-            Console.WriteLine("Generating East Hyrule");
+            logger.Info("Generating East Hyrule");
         }
         else if (eventArgs.ProgressPercentage == 5)
         {
-            Console.WriteLine("Generating Maze Island");
+            logger.Info("Generating Maze Island");
         }
         else if (eventArgs.ProgressPercentage == 6)
         {
-            Console.WriteLine("Shuffling Items and Spells");
+            logger.Info("Shuffling Items and Spells");
         }
         else if (eventArgs.ProgressPercentage == 7)
         {
-            Console.WriteLine("Running Seed Completability Checks");
+            logger.Info("Running Seed Completability Checks");
         }
         else if (eventArgs.ProgressPercentage == 8)
         {
-            Console.WriteLine("Generating Hints");
+            logger.Info("Generating Hints");
         }
         else if (eventArgs.ProgressPercentage == 9)
         {
-            Console.WriteLine("Finishing up");
+            logger.Info("Finishing up");
         }
     }
 }
