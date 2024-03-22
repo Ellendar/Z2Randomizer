@@ -1,5 +1,6 @@
 ﻿using CommandLine.Models;
 using Newtonsoft.Json;
+using NLog;
 using System.Reflection;
 using Z2Randomizer.Core;
 
@@ -7,6 +8,7 @@ namespace CommandLine
 {
     public class PlayerOptionsService
     {
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static string[] SupportedTunicColors =
         {
             "Default",
@@ -29,14 +31,14 @@ namespace CommandLine
             this.spriteOptions = CharacterSprite.Options();
         }
 
-        public PlayerOptions LoadFromFile(string? path)
+        public PlayerOptions? LoadFromFile(string? path)
         {
             if (path == null)
             {
-                Console.WriteLine("Using DefaultPlayerOptions.json to apply player options.");
+                logger.Info("Using DefaultPlayerOptions.json to apply player options.");
                 var directory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                path = Path.Combine(directory, "DefaultPlayerOptions.json");
-                Console.WriteLine(path);
+                path = Path.Combine(directory!, "DefaultPlayerOptions.json");
+                logger.Debug(path);
             }
 
             if (!File.Exists(path))
@@ -80,24 +82,30 @@ namespace CommandLine
             configuration.FastSpellCasting = playerOptions.FastSpellCasting;
 
             var sprite = GetSprite(playerOptions.Sprite);
-            configuration.Sprite = sprite.SelectionIndex;
+            // If somehow sprite is null, default to Link
+            configuration.Sprite = sprite?.SelectionIndex ?? 0;
         }
 
-        private void ValidateTunicColor(string color)
+        private void ValidateTunicColor(string? color)
         {
-            if (!SupportedTunicColors.Contains(color))
+            if (color == null || !SupportedTunicColors.Contains(color))
             {
                 throw new Exception($"Unsupported tunic color. \n" +
                     $"Supported colors are {JsonConvert.SerializeObject(SupportedTunicColors)}");
             }
         }
 
-        public void Validate(PlayerOptions playerOptions)
+        public void Validate(PlayerOptions? playerOptions)
         {
-            ValidateTunicColor(playerOptions.TunicColor);
-            ValidateTunicColor(playerOptions.ShieldTunicColor);
+            CharacterSprite? selectedSprite = null;
+            if (playerOptions != null)
+            {
+                ValidateTunicColor(playerOptions.TunicColor);
+                ValidateTunicColor(playerOptions.ShieldTunicColor);
 
-            var selectedSprite = GetSprite(playerOptions.Sprite);
+                selectedSprite = GetSprite(playerOptions.Sprite);
+            }
+
             if (selectedSprite == null)
             {
                 var validSprites = spriteOptions.Select(sprite => sprite.DisplayName).ToArray();
@@ -106,7 +114,7 @@ namespace CommandLine
             }
         }
 
-        public CharacterSprite GetSprite(string name)
+        public CharacterSprite? GetSprite(string? name)
         {
             return this.spriteOptions.FirstOrDefault(sprite => string.Equals(
                 sprite.DisplayName, name, StringComparison.CurrentCultureIgnoreCase));

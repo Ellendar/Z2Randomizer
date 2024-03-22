@@ -12,16 +12,16 @@ public class Program
         => CommandLineApplication.Execute<Program>(args);
 
     [Option(ShortName = "f", Description = "Flag string")]
-    public string Flags { get; }
+    public string? Flags { get; }
 
     [Option(ShortName = "r", Description = "Path to the base ROM file")]
-    public string Rom { get; }
+    public string? Rom { get; }
 
     [Option(ShortName = "s", Description = "[Optional] Seed used to generate the shuffled ROM")]
     public int? Seed { get; set; }
 
     [Option(ShortName = "po", Description = "[Optional] Specifies a player options file to use for misc settings")]
-    public string PlayerOptions { get; }
+    public string? PlayerOptions { get; }
 
     private RandomizerConfiguration? configuration;
 
@@ -65,6 +65,11 @@ public class Program
         {
             var playerOptionsService = new PlayerOptionsService();
             var playerOptions = playerOptionsService.LoadFromFile(this.PlayerOptions);
+            if (playerOptions == null)
+            {
+                throw new Exception("Could not load player options");
+            }
+
             playerOptionsService.ApplyOptionsToConfiguration(playerOptions, configuration);
         }
         catch (Exception exception)
@@ -80,10 +85,10 @@ public class Program
 
     public void Randomize()
     {
-        Exception generationException = null;
+        Exception? generationException = null;
         var worker = new BackgroundWorker();
-        worker.DoWork += new DoWorkEventHandler(RandomizationWorker);
-        worker.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
+        worker.DoWork += new DoWorkEventHandler(RandomizationWorker!);
+        worker.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged!);
         worker.WorkerReportsProgress = true;
         worker.WorkerSupportsCancellation = true;
         worker.RunWorkerCompleted += (completed_sender, completed_event) =>
@@ -110,10 +115,10 @@ public class Program
 
     private void RandomizationWorker(object sender, DoWorkEventArgs e)
     {
-        BackgroundWorker worker = sender as BackgroundWorker;
+        BackgroundWorker? worker = sender as BackgroundWorker;
 
         new Hyrule(this.configuration, worker, true);
-        if (worker.CancellationPending)
+        if (worker!.CancellationPending)
         {
             e.Cancel = true;
         }
