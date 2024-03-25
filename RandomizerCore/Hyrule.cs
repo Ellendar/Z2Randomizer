@@ -171,7 +171,7 @@ public class Hyrule
     {
         _engine = new Engine();
 
-        WestHyrule.ResetStats();
+        World.ResetStats();
         RNG = new Random(config.Seed);
         props = config.Export(RNG);
         props.saveRom = saveRom;
@@ -3174,43 +3174,7 @@ public class Hyrule
         ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
         root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root;
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
-        //Maybe this needs a refactor, maybe this is just pointless and the reconstructed version should be used everywhere
-        /*
-        }
-        else
-        {
-            if (westHyrule.locationAtPalace1.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[westHyrule.locationAtPalace1.PalaceNumber - 1], (byte)westHyrule.locationAtPalace1.Item);
-            }
-            if (westHyrule.locationAtPalace2.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[westHyrule.locationAtPalace2.PalaceNumber - 1], (byte)westHyrule.locationAtPalace2.Item);
-            }
-            if (westHyrule.locationAtPalace3.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[westHyrule.locationAtPalace3.PalaceNumber - 1], (byte)westHyrule.locationAtPalace3.Item);
-            }
-            if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[eastHyrule.locationAtPalace5.PalaceNumber - 1], (byte)eastHyrule.locationAtPalace5.Item);
-            }
-            if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[eastHyrule.locationAtPalace6.PalaceNumber - 1], (byte)eastHyrule.locationAtPalace6.Item);
-            }
-            if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[mazeIsland.locationAtPalace4.PalaceNumber - 1], (byte)mazeIsland.locationAtPalace4.Item);
-            }
 
-
-            if (eastHyrule.locationAtGP.PalaceNumber != 7)
-            {
-                ROMData.Put(itemLocs2[eastHyrule.locationAtGP.PalaceNumber - 1], (byte)eastHyrule.locationAtGP.Item);
-            }
-        }
-        */
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Item); //map 47
         ROMData.Put(0xDB8C, (byte)eastHyrule.townAtNewKasuto.Item); //map 46
 

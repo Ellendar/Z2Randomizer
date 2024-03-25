@@ -343,7 +343,6 @@ public class Palaces
                         palace.MaxRooms = sizes[currentPalace - 1];
 
                         //add rooms
-                        bool dropped = false;
                         roomPlacementFailures = 0;
                         while (palace.AllRooms.Count < palace.MaxRooms)
                         {
@@ -357,7 +356,7 @@ public class Palaces
                             roomToAdd.PalaceGroup = palaceGroup;
                             roomToAdd.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
                             bool added = true;
-                            if (roomToAdd.HasDrop && palaceRoomPool.Count(i => i.IsDropZone && i != roomToAdd) == 0)
+                            if (roomToAdd.HasDrop && !palaceRoomPool.Any(i => i.IsDropZone && i != roomToAdd))
                             {
                                 //Debug.WriteLine(palace.AllRooms.Count + " - 0");
                                 added = false;
@@ -389,7 +388,11 @@ public class Palaces
                                     palaceRoomPool.RemoveAt(roomIndex);
                                 }
                                 IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
-                                if (roomToAdd.HasDrop && !dropped)
+                                if (roomToAdd.LinkedRoom?.HasDrop ?? false)
+                                {
+                                    roomToAdd = roomToAdd.LinkedRoom;
+                                }
+                                if (roomToAdd.HasDrop)
                                 {
                                     int numDrops = r.Next(Math.Min(3, palace.MaxRooms - palace.AllRooms.Count), Math.Min(6, palace.MaxRooms - palace.AllRooms.Count));
                                     numDrops = Math.Min(numDrops, palaceRoomPool.Count(i => i.IsDropZone) + 1);

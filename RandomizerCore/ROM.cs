@@ -513,12 +513,6 @@ public class ROM
         foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
         {
             Put(spellTextPointers[town], currentSpellPointers[spellMap[town].VanillaTown()]);
-            /*
-            textPointers[i, 0] = GetByte(spellTextPointers[i]);
-            textPointers[i, 1] = GetByte(spellTextPointers[i] + 1);
-            Put(spellTextPointers[i], (byte)textPointers[spellMap[Towns.STRICT_SPELL_LOCATIONS[i]]], 0]);
-            Put(spellTextPointers[i] + 1, (byte)textPointers[spellMap[Towns.STRICT_SPELL_LOCATIONS[i]], 1]);
-            */
         }
     }
 
