@@ -14,11 +14,11 @@ namespace CommandLine.Models
 
         public bool RemoveFlashingUponDeath { get; set; }
 
-        public string Sprite { get; set; }
+        public string? Sprite { get; set; }
 
-        public string TunicColor { get; set; }
+        public string? TunicColor { get; set; }
 
-        public string ShieldTunicColor { get; set; }
+        public string? ShieldTunicColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public BeamSprite BeamSprite { get; set; }
