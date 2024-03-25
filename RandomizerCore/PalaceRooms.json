@@ -2,10 +2,10 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0F",
-    "connections": "0F000214",
+    "connections": "0FFF0214",
     "elevatorScreen": 2,
     "enabled": true,
-    "enemies": "050F0B00CB",
+    "enemies": "050F0BFFCB",
     "group": "VANILLA",
     "hasBoss": false,
     "hasDrop": false,
@@ -31,7 +31,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0F",
-    "connections": "FC000010",
+    "connections": "FCFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "09740C109F23C445C4",
@@ -57,7 +57,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0F",
-    "connections": "13000018",
+    "connections": "13FFFF18",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "070F0B138600CB",
@@ -83,7 +83,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "09",
-    "connections": "172B001C",
+    "connections": "172BFF1C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "05155F10DF",
@@ -109,7 +109,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "09",
-    "connections": "27001AFC",
+    "connections": "27FF1AFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "091806124E1C461686",
@@ -161,7 +161,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0D",
-    "connections": "23000028",
+    "connections": "23FFFF28",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "096704490446C468C4",
@@ -187,7 +187,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0F",
-    "connections": "FC001E30",
+    "connections": "FCFF1E30",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0778581D9F16DF",
@@ -213,7 +213,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0B",
-    "connections": "FC1E0008",
+    "connections": "FC1EFF08",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "05728C17CC",
@@ -239,7 +239,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0F",
-    "connections": "2F000034",
+    "connections": "2FFFFF34",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05705E75D8",
@@ -265,7 +265,7 @@
   {
     "author": "palace1vanilla",
     "bitmask": "0F",
-    "connections": "070000FC",
+    "connections": "07FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B7A04764C7E4C78DE5DC5",
@@ -317,7 +317,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "4700004C",
+    "connections": "47FFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D0B4A79047C44718476C4048A",
@@ -369,7 +369,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "43000048",
+    "connections": "43FFFF48",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D4044054D4B444684488401CD",
@@ -395,7 +395,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "FC000060",
+    "connections": "FCFFFF60",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07146310A345C4",
@@ -421,7 +421,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "FC006278",
+    "connections": "FCFF6278",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D209673847584778469845D84",
@@ -447,7 +447,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "3F000044",
+    "connections": "3FFFFF44",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "091D0E705872980F8D",
@@ -473,7 +473,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "770000FC",
+    "connections": "77FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05785E74DE",
@@ -499,7 +499,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0A",
-    "connections": "FC5A0040",
+    "connections": "FC5AFF40",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0777467C462A85",
@@ -551,7 +551,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0D",
-    "connections": "53000058",
+    "connections": "53FFFF58",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "030B48",
@@ -577,7 +577,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "FC005A68",
+    "connections": "FCFF5A68",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "074F07785873D8",
@@ -603,7 +603,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "6700006C",
+    "connections": "67FFFF6C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "1344161C234F174A5612A3459740D618E34BD7",
@@ -630,7 +630,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "09",
-    "connections": "6B7C0070",
+    "connections": "6B7CFF70",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D1E0646461186038D0C8D19C6",
@@ -656,7 +656,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "FC006E80",
+    "connections": "FCFF6E80",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "075C843F9E7AC5",
@@ -682,7 +682,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "6F0000FC",
+    "connections": "6FFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097A04764C7E4C78DE",
@@ -708,7 +708,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "7F000084",
+    "connections": "7FFFFF84",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0750CC51CC52D9",
@@ -736,7 +736,7 @@
   {
     "author": "palace2vanilla",
     "bitmask": "0F",
-    "connections": "83000088",
+    "connections": "83FFFF88",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "071C23769878D9",
@@ -762,7 +762,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "05",
-    "connections": "FC000208",
+    "connections": "FCFF0208",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "077B5E7A831FA3",
@@ -788,7 +788,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "09",
-    "connections": "0700000C",
+    "connections": "07FFFF0C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D7F0B58435D435183538370CB",
@@ -814,7 +814,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0F",
-    "connections": "0B000010",
+    "connections": "0BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F070B48",
@@ -840,7 +840,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0F",
-    "connections": "0F000014",
+    "connections": "0FFFFF14",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "095C035F43459E54C3",
@@ -866,7 +866,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0B",
-    "connections": "13260018",
+    "connections": "1326FF18",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B5C037F1924434F5912DF",
@@ -892,7 +892,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0F",
-    "connections": "23001628",
+    "connections": "23FF1628",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D7F1B78447A4443857F8470DB",
@@ -918,7 +918,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0F",
-    "connections": "170000FC",
+    "connections": "17FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057C590847",
@@ -944,7 +944,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0E",
-    "connections": "1F300024",
+    "connections": "1F30FF24",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "097A197F0C724C7F99",
@@ -970,7 +970,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0F",
-    "connections": "2700002C",
+    "connections": "27FFFF2C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "095E044E59578453C4",
@@ -997,7 +997,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "05",
-    "connections": "FC000020",
+    "connections": "FCFFFF20",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077F1B7B8570DB",
@@ -1023,7 +1023,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0F",
-    "connections": "FC002234",
+    "connections": "FCFF2234",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "051E5F79DE",
@@ -1049,7 +1049,7 @@
   {
     "author": "palace3vanilla",
     "bitmask": "0B",
-    "connections": "33000038",
+    "connections": "33FFFF38",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "074B5A4B9979D9",
@@ -1083,7 +1083,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "47003E4C",
+    "connections": "47FF3E4C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "057F5D75DD",
@@ -1109,7 +1109,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "43560048",
+    "connections": "4356FF48",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B7E1E724C764C7D9910CE",
@@ -1135,7 +1135,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "4B5E00FC",
+    "connections": "4B5EFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "05176318A3",
@@ -1161,7 +1161,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "07",
-    "connections": "FC000044",
+    "connections": "FCFFFF44",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05771E109E",
@@ -1187,7 +1187,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "53004658",
+    "connections": "53FF4658",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "097F0B735D72DD70CB",
@@ -1239,7 +1239,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "FC680054",
+    "connections": "FC68FF54",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "072B103B432783",
@@ -1265,7 +1265,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "570000FC",
+    "connections": "57FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D10501B4F1090148F10D02BC5",
@@ -1317,7 +1317,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "5F790064",
+    "connections": "5F79FF64",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057F8C74DE",
@@ -1344,7 +1344,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "FC00506C",
+    "connections": "FCFF506C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "051D6317A3",
@@ -1370,7 +1370,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "83007688",
+    "connections": "83FF7688",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B715D76447A4473DD75C4",
@@ -1396,7 +1396,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0D",
-    "connections": "FC89007C",
+    "connections": "FC89FF7C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "095E867E8C72CC77DE",
@@ -1422,7 +1422,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "630000FC",
+    "connections": "63FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B10501090249E10D02BC5",
@@ -1448,7 +1448,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "6B000070",
+    "connections": "6BFFFF70",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0509197A99",
@@ -1474,7 +1474,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0D",
-    "connections": "FC000084",
+    "connections": "FCFFFF84",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077F1B7B8570DB",
@@ -1500,7 +1500,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0D",
-    "connections": "8700008C",
+    "connections": "87FFFF8C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "09241029100B4F048F",
@@ -1526,7 +1526,7 @@
   {
     "author": "palace4vanilla",
     "bitmask": "0F",
-    "connections": "8B0000FC",
+    "connections": "8BFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D1050225E1090169F10D062CE",
@@ -1552,7 +1552,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "FC008E94",
+    "connections": "FCFF8E94",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D209677916B915F9143D137D1",
@@ -1578,7 +1578,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "93000098",
+    "connections": "93FFFF98",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0770464E461F86",
@@ -1605,7 +1605,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0B",
-    "connections": "9700009C",
+    "connections": "97FFFF9C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050B4A048A",
@@ -1631,7 +1631,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "9BB200FC",
+    "connections": "9BB2FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0777590C4D7399",
@@ -1657,7 +1657,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "AF009FB4",
+    "connections": "AFFF9FB4",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "071F06725D74DD",
@@ -1683,7 +1683,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0B",
-    "connections": "AB0000B0",
+    "connections": "ABFFFFB0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "054F070B48",
@@ -1709,7 +1709,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0E",
-    "connections": "B30000FC",
+    "connections": "B3FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0F7C12734378527183749270D207CD",
@@ -1735,7 +1735,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0A",
-    "connections": "FCC200AC",
+    "connections": "FCC2FFAC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B1F0770587E582A8515D8",
@@ -1761,7 +1761,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "BF00A8C4",
+    "connections": "BFFFA8C4",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D7B1D7D0479447E5D75DD7AC4",
@@ -1787,7 +1787,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "BBDA00C0",
+    "connections": "BBDAFFC0",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D1E0646461186038D0C8D19C6",
@@ -1813,7 +1813,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "C30000C8",
+    "connections": "C3FFFFC8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "090F0F3A59379900CF",
@@ -1891,7 +1891,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "C70000FC",
+    "connections": "C7FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "091E067F0C739A4A85",
@@ -1917,7 +1917,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "FC0000CC",
+    "connections": "FCFFFFCC",
     "elevatorScreen": -1,
     "enabled": false,
     "enemies": "091E067F0C739A4A85",
@@ -1943,7 +1943,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0D",
-    "connections": "D300BAFC",
+    "connections": "D3FFBAFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B1B06705D7F5D19867E9D",
@@ -1969,7 +1969,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0E",
-    "connections": "FCBA00A4",
+    "connections": "FCBAFFA4",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "077F187D5A14D9",
@@ -1995,7 +1995,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "09",
-    "connections": "EF00DAFC",
+    "connections": "EFFFDAFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "090B4A1B061C46048A",
@@ -2021,7 +2021,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "DB0000E0",
+    "connections": "DBFFFFE0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B1B06705D7F5D19867E9D",
@@ -2047,7 +2047,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0D",
-    "connections": "CBEB00FC",
+    "connections": "CBEBFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "071B23176313A3",
@@ -2073,7 +2073,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "FC0000D4",
+    "connections": "FCFFFFD4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077B1A199970D8",
@@ -2099,7 +2099,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "07",
-    "connections": "FC0000F0",
+    "connections": "FCFFFFF0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D7E193145044D31997F9906CD",
@@ -2125,7 +2125,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0F",
-    "connections": "DF0000E4",
+    "connections": "DFFFFFE4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "037C5A",
@@ -2151,7 +2151,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "09",
-    "connections": "E700CFFC",
+    "connections": "E7FFCFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B360C735D5B45348C779D",
@@ -2177,7 +2177,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "09",
-    "connections": "E3FB00E8",
+    "connections": "E3FBFFE8",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B791D7D5D038D0C8D74DD",
@@ -2203,7 +2203,7 @@
   {
     "author": "palace5vanilla",
     "bitmask": "0B",
-    "connections": "F700E6FC",
+    "connections": "F7FFE6FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B0F1B791D775D7A9D00DB",
@@ -2255,7 +2255,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0B",
-    "connections": "FC000098",
+    "connections": "FCFFFF98",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B1A23104C134C12E318C7",
@@ -2281,7 +2281,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0D",
-    "connections": "FC009AA0",
+    "connections": "FCFF9AA0",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "07755D789D7D9E",
@@ -2307,7 +2307,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "9FB500A4",
+    "connections": "9FB5FFA4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077B1A2E45799A",
@@ -2333,7 +2333,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "FCC100FC",
+    "connections": "FCC1FFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057B1A799A",
@@ -2359,7 +2359,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0B",
-    "connections": "A30000A8",
+    "connections": "A3FFFFA8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0F40567A5D4F57759D469673DD45D7",
@@ -2385,7 +2385,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "FCDD00C4",
+    "connections": "FCDDFFC4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0376DA",
@@ -2411,7 +2411,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "A7B800AC",
+    "connections": "A7B8FFAC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "09280E7F1A4B4E7E9E",
@@ -2437,7 +2437,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0D",
-    "connections": "FCA100FC",
+    "connections": "FCA1FFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "051A061786",
@@ -2463,7 +2463,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "09",
-    "connections": "C30000C8",
+    "connections": "C3FFFFC8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D5A431B4F5F43148F5E8353C3",
@@ -2490,7 +2490,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0D",
-    "connections": "FC00AABC",
+    "connections": "FCFFAABC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B715D1D63759D72DD16E3",
@@ -2516,7 +2516,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "AB00BEB0",
+    "connections": "ABFFBEB0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "094F07725D40C575DD",
@@ -2543,7 +2543,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "C70000CC",
+    "connections": "C7FFFFCC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07715D70997F9D",
@@ -2569,7 +2569,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "BB0000FC",
+    "connections": "BBFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0978077F193E4E77D9",
@@ -2596,7 +2596,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "CB0000D0",
+    "connections": "CBFFFFD0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B2F0E074D208E088D21CE",
@@ -2623,7 +2623,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0E",
-    "connections": "CFE200D4",
+    "connections": "CFE2FFD4",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0915637F4774C315CE",
@@ -2675,7 +2675,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "D30000D8",
+    "connections": "D3FFFFD8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "036A60",
@@ -2701,7 +2701,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "EF00E2F4",
+    "connections": "EFFFE2F4",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D781D1C237B5D728C13E374DD",
@@ -2727,7 +2727,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "D7E500FC",
+    "connections": "D7E5FFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "070F9A1CCE1DCE",
@@ -2753,7 +2753,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "03",
-    "connections": "FC0000F0",
+    "connections": "FCFFFFF0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097F1B7145129970DB",
@@ -2779,7 +2779,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "F30000F8",
+    "connections": "F3FFFFF8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0771597F477799",
@@ -2805,7 +2805,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0F",
-    "connections": "FCF900E8",
+    "connections": "FCF9FFE8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0311E3",
@@ -2832,7 +2832,7 @@
   {
     "author": "palace6vanilla",
     "bitmask": "0D",
-    "connections": "F70000FC",
+    "connections": "F7FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D1E0E71467086118E72C62C0C",
@@ -2858,7 +2858,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "0700030C",
+    "connections": "07FF030C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "034D1D",
@@ -2884,7 +2884,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC1A0008",
+    "connections": "FC1AFF08",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "077A447D447F44",
@@ -2910,7 +2910,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "0B000010",
+    "connections": "0BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F0F00CF",
@@ -2936,7 +2936,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "1700041C",
+    "connections": "17FF041C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "01",
@@ -2962,7 +2962,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "0F0000FC",
+    "connections": "0FFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "055B5D1BD5",
@@ -2988,7 +2988,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC240018",
+    "connections": "FC24FF18",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "050B560496",
@@ -3014,7 +3014,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "1B000020",
+    "connections": "1BFFFF20",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "01",
@@ -3040,7 +3040,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC001428",
+    "connections": "FCFF1428",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D65517751795170D172D164D1",
@@ -3067,7 +3067,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "1F3000FC",
+    "connections": "1F30FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0371DD",
@@ -3093,7 +3093,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "273F002C",
+    "connections": "273FFF2C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "09205428543E4522D4",
@@ -3119,7 +3119,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC002334",
+    "connections": "FCFF2334",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "050B560496",
@@ -3146,7 +3146,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "3B002AFC",
+    "connections": "3BFF2AFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0370D1",
@@ -3173,7 +3173,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "2B0092FC",
+    "connections": "2BFF92FC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05215D389D",
@@ -3200,7 +3200,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "334300FC",
+    "connections": "3343FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0578594784",
@@ -3231,7 +3231,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC47003C",
+    "connections": "FC47FF3C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "03195D",
@@ -3257,7 +3257,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "8F000094",
+    "connections": "8FFFFF94",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050B560496",
@@ -3335,7 +3335,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC006390",
+    "connections": "FCFF6390",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D72117D11655432C564D419D1",
@@ -3362,7 +3362,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "93000098",
+    "connections": "93FFFF98",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "03075E",
@@ -3414,7 +3414,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC004750",
+    "connections": "FCFF4750",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "090B56718374830496",
@@ -3466,7 +3466,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "9700009C",
+    "connections": "97FFFF9C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "034C59",
@@ -3492,7 +3492,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "57004B5C",
+    "connections": "57FF4B5C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "054D1D5ADD",
@@ -3544,7 +3544,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "9BAC00FC",
+    "connections": "9BACFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "090B56528404965A84",
@@ -3570,7 +3570,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC640058",
+    "connections": "FC64FF58",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B77513851739152D176D1",
@@ -3596,7 +3596,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "5B6C00FC",
+    "connections": "5B6CFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B7E117A510B56049635C5",
@@ -3622,7 +3622,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC009FB0",
+    "connections": "FCFF9FB0",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "076543709A64C3",
@@ -3649,7 +3649,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC005468",
+    "connections": "FCFF5468",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0765447944759A",
@@ -3676,7 +3676,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC005F70",
+    "connections": "FCFF5F70",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0765447944759A",
@@ -3703,7 +3703,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "AF0000B4",
+    "connections": "AFFFFFB4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "031805",
@@ -3730,7 +3730,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "677400FC",
+    "connections": "6774FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B5D03514355435A845D84",
@@ -3756,7 +3756,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "6F7C00FC",
+    "connections": "6F7CFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "055E117995",
@@ -3835,7 +3835,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC006B78",
+    "connections": "FCFF6B78",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "071854749D10D4",
@@ -3861,7 +3861,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC007380",
+    "connections": "FCFF7380",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0514977C9D",
@@ -3887,7 +3887,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC0000C4",
+    "connections": "FCFFFFC4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0317DE",
@@ -3913,7 +3913,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "B700AABC",
+    "connections": "B7FFAABC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "054A1D6144",
@@ -3939,7 +3939,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "778700FC",
+    "connections": "7787FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "097C15775552845A84",
@@ -3965,7 +3965,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "7F8B00FC",
+    "connections": "7F8BFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "05785A1897",
@@ -3996,7 +3996,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "C300D2C8",
+    "connections": "C3FFD2C8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "096C152C43218363D5",
@@ -4048,7 +4048,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "BB0000FC",
+    "connections": "BBFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "055B5A1AD5",
@@ -4126,7 +4126,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC0000D4",
+    "connections": "FCFFFFD4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0577057745",
@@ -4152,7 +4152,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "C70000CC",
+    "connections": "C7FFFFCC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F0F00CF",
@@ -4178,7 +4178,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "A3B6FCFC",
+    "connections": "A3FCB6FC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0728193D043644",
@@ -4230,7 +4230,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "FC0087A4",
+    "connections": "FCFF87A4",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B7A430B567E4372830496",
@@ -4256,7 +4256,7 @@
   {
     "author": "palace7vanilla",
     "bitmask": "0F",
-    "connections": "CB0000FC",
+    "connections": "CBFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "072F5743970CC0",
@@ -4282,7 +4282,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC1200FC",
+    "connections": "FC12FFFC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "01",
@@ -4308,7 +4308,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC4E00FC",
+    "connections": "FC4EFFFC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "034A05",
@@ -4334,7 +4334,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC0400FC",
+    "connections": "FC04FFFC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "034A05",
@@ -4360,7 +4360,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC4A00FC",
+    "connections": "FC4AFFFC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "054A050847",
@@ -4386,7 +4386,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC9000FC",
+    "connections": "FC90FFFC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "01",
@@ -4412,7 +4412,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC9A00FC",
+    "connections": "FC9AFFFC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "034A05",
@@ -4438,7 +4438,7 @@
   {
     "author": "entrances",
     "bitmask": "0F",
-    "connections": "FC0A00FC",
+    "connections": "FC0AFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "030160",
@@ -4464,7 +4464,7 @@
   {
     "author": "itemRooms",
     "bitmask": "0F",
-    "connections": "FC000024",
+    "connections": "FCFFFF24",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057658789E",
@@ -4490,7 +4490,7 @@
   {
     "author": "itemRooms",
     "bitmask": "0F",
-    "connections": "FC000054",
+    "connections": "FCFFFF54",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097F1974990A8D1CC5",
@@ -4516,7 +4516,7 @@
   {
     "author": "itemRooms",
     "bitmask": "0F",
-    "connections": "2B0000FC",
+    "connections": "2BFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057D197F5A",
@@ -4542,7 +4542,7 @@
   {
     "author": "itemRooms",
     "bitmask": "0F",
-    "connections": "7B0000FC",
+    "connections": "7BFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "071463165F769A",
@@ -4568,7 +4568,7 @@
   {
     "author": "itemRooms",
     "bitmask": "0F",
-    "connections": "FC0000F8",
+    "connections": "FCFFFFF8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07755A76981CC5",
@@ -4594,7 +4594,7 @@
   {
     "author": "itemRooms",
     "bitmask": "0F",
-    "connections": "AF0000FC",
+    "connections": "AFFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "036A60",
@@ -4620,7 +4620,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "330000FC",
+    "connections": "33FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056C6066D4",
@@ -4646,7 +4646,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "870000FC",
+    "connections": "87FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057C6166D4",
@@ -4672,7 +4672,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "370000FC",
+    "connections": "37FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057A6066D4",
@@ -4698,7 +4698,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "6F0000FC",
+    "connections": "6FFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056B6266D4",
@@ -4724,7 +4724,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "A30000FC",
+    "connections": "A3FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056C6166D4",
@@ -4750,7 +4750,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "E70000FC",
+    "connections": "E7FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057B6166D4",
@@ -4776,7 +4776,7 @@
   {
     "author": "bossrooms",
     "bitmask": "0F",
-    "connections": "D70000FC",
+    "connections": "D7FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "031D63",
@@ -4802,7 +4802,7 @@
   {
     "author": "newbossrooms",
     "bitmask": "0F",
-    "connections": "330000FC",
+    "connections": "33FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056C6066D4",
@@ -4828,7 +4828,7 @@
   {
     "author": "newbossrooms",
     "bitmask": "0F",
-    "connections": "FC6900FC",
+    "connections": "FC69FFFC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "056C6066D4",
@@ -4854,7 +4854,7 @@
   {
     "author": "newbossrooms",
     "bitmask": "0F",
-    "connections": "FC0069FC",
+    "connections": "FCFF69FC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "057C6166D4",
@@ -4906,7 +4906,7 @@
   {
     "author": "newp6BossRooms",
     "bitmask": "0F",
-    "connections": "E70000FC",
+    "connections": "E7FFFFFC",
     "elevatorScreen": -1,
     "enabled": false,
     "enemies": "057B6166D4",
@@ -4958,7 +4958,7 @@
   {
     "author": "darkLinkRooms",
     "bitmask": "0F",
-    "connections": "D70000FC",
+    "connections": "D7FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "031D63",
@@ -5036,7 +5036,7 @@
   {
     "author": "tbirdRooms",
     "bitmask": "0F",
-    "connections": "D30000D8",
+    "connections": "D3FFFFD8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0321A2",
@@ -5062,7 +5062,7 @@
   {
     "author": "tbirdRooms",
     "bitmask": "0F",
-    "connections": "FC0069D8",
+    "connections": "FCFF69D8",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0321A2",
@@ -5088,7 +5088,7 @@
   {
     "author": "tbirdRooms",
     "bitmask": "0F",
-    "connections": "FC6900D8",
+    "connections": "FC69FFD8",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0321A2",
@@ -5114,7 +5114,7 @@
   {
     "author": "thunderbird",
     "bitmask": "0F",
-    "connections": "D30000D8",
+    "connections": "D3FFFFD8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0321A2",
@@ -5140,7 +5140,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "09",
-    "connections": "FF040004",
+    "connections": "FF04FF04",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "095D4E67D912050458",
@@ -5166,7 +5166,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0B",
-    "connections": "44320044",
+    "connections": "4432FF44",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0921467E0414DF0880",
@@ -5192,7 +5192,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "09",
-    "connections": "1B020028",
+    "connections": "1BFFFF28",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0911C518CC6E5E1E05",
@@ -5244,7 +5244,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0F",
-    "connections": "07000020",
+    "connections": "07FFFF20",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B155F1F5F199F481647D7",
@@ -5270,7 +5270,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "04",
-    "connections": "77000230",
+    "connections": "77FFFF30",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "054E0F40CF",
@@ -5296,7 +5296,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0F",
-    "connections": "2F003214",
+    "connections": "2FFF3214",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0575DA645A",
@@ -5322,7 +5322,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0F",
-    "connections": "0F000268",
+    "connections": "0FFFFF68",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B259B2D044B0444C421C4",
@@ -5348,7 +5348,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0F",
-    "connections": "27000210",
+    "connections": "27FFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077705085F0C1F",
@@ -5374,7 +5374,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0D",
-    "connections": "13000008",
+    "connections": "13FFFF08",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0732DE0E1F60C4",
@@ -5400,7 +5400,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0F",
-    "connections": "FC000074",
+    "connections": "FCFFFF74",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0921580D4E40C44B04",
@@ -5426,7 +5426,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0D",
-    "connections": "FF00002C",
+    "connections": "FFFFFF2C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "071E0446C468C4",
@@ -5452,7 +5452,7 @@
   {
     "author": "roomJamGTM",
     "bitmask": "0D",
-    "connections": "170000FC",
+    "connections": "17FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097A04764C7E4410E3",
@@ -5504,7 +5504,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "07690069",
+    "connections": "0769FF69",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "07125F1F9F7E4C",
@@ -5530,7 +5530,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "69000010",
+    "connections": "69FFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B7F5971C45B845C046A04",
@@ -5556,7 +5556,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "0F00FC14",
+    "connections": "0FFFFC14",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057C5B1C92",
@@ -5582,7 +5582,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "13000018",
+    "connections": "13FFFF18",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05530F5CCF",
@@ -5608,7 +5608,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "09",
-    "connections": "17FC001C",
+    "connections": "17FCFF1C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "092991439138513E11",
@@ -5660,7 +5660,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0D",
-    "connections": "23000028",
+    "connections": "23FFFF28",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0941C471992D442544",
@@ -5686,7 +5686,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "09",
-    "connections": "2700FC69",
+    "connections": "27FFFC69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0774CB4C582C0B",
@@ -5712,7 +5712,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "6900FC30",
+    "connections": "69FFFC30",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D59915C915F91505156515351",
@@ -5738,7 +5738,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "2F000034",
+    "connections": "2FFFFF34",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0553592A98",
@@ -5764,7 +5764,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0A",
-    "connections": "69FC0040",
+    "connections": "69FCFF40",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07574450C4419E",
@@ -5790,7 +5790,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "3F0000FC",
+    "connections": "3FFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "072E8E70587298",
@@ -5816,7 +5816,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "43000048",
+    "connections": "43FFFF48",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "096F044B4460847C9E",
@@ -5842,7 +5842,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "4700004C",
+    "connections": "47FFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B0B4A4E04484440C4048A",
@@ -5868,7 +5868,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0D",
-    "connections": "53000058",
+    "connections": "53FFFF58",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0572527A99",
@@ -5894,7 +5894,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "09",
-    "connections": "6BFC0070",
+    "connections": "6BFCFF70",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0765465F437A86",
@@ -5920,7 +5920,7 @@
   {
     "author": "dmInPalaces",
     "bitmask": "0F",
-    "connections": "6F0000FC",
+    "connections": "6FFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07764C7E4C78DE",
@@ -6024,7 +6024,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FC000074",
+    "connections": "FCFFFF74",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0906233344618441C4",
@@ -6102,7 +6102,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "AF03E0FC",
+    "connections": "AFFFE0FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "071E5A39843D04",
@@ -6154,7 +6154,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "5300006C",
+    "connections": "53FFFF6C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D0B4A79047C44518476C4048A",
@@ -6232,7 +6232,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FF000014",
+    "connections": "FFFFFF14",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "072D9E76523818",
@@ -6258,7 +6258,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "07020208",
+    "connections": "07FFFF08",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07085F0E8B039F",
@@ -6284,7 +6284,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "D70000FC",
+    "connections": "D7FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "095044764C718C09E3",
@@ -6310,7 +6310,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "0F0262FC",
+    "connections": "0FFF62FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0D551110991A4414513C113C9E",
@@ -6336,7 +6336,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "6300B869",
+    "connections": "63FFB869",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "054A923C99",
@@ -6362,7 +6362,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "CF000060",
+    "connections": "CFFFFF60",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "074E0C0BA3548E",
@@ -6388,7 +6388,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "BF005AFC",
+    "connections": "BFFF5AFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0D1E5947182F1832055D921184",
@@ -6414,7 +6414,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0B",
-    "connections": "830300F8",
+    "connections": "83FFFFF8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "051E5B6C04",
@@ -6440,7 +6440,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FF02C2C4",
+    "connections": "FFFFC2C4",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "073C99319A3F18",
@@ -6466,7 +6466,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0E",
-    "connections": "FC5A0044",
+    "connections": "FC5AFF44",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "071499075A2A84",
@@ -6492,7 +6492,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0E",
-    "connections": "5B00FCFC",
+    "connections": "5BFFFCFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0F50527F837ADA7183749208480C23",
@@ -6518,7 +6518,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "9F0103A4",
+    "connections": "9FFFFFA4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0509CF060F",
@@ -6570,7 +6570,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FC000028",
+    "connections": "FCFFFF28",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07178A31461A8A",
@@ -6596,7 +6596,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0D",
-    "connections": "47000270",
+    "connections": "47FFFF70",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B0B06305A4E5A19864E9A",
@@ -6622,7 +6622,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "09",
-    "connections": "C300037C",
+    "connections": "C3FFFF7C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B0CA3016327442D444E92",
@@ -6648,7 +6648,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "09",
-    "connections": "E7000258",
+    "connections": "E7FFFF58",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "094544160F4E8419CF",
@@ -6700,7 +6700,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "09",
-    "connections": "FF26000C",
+    "connections": "FF26FF0C",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "0B21051B1906DF039102D0",
@@ -6726,7 +6726,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "0B000060",
+    "connections": "0BFFFF60",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0500E30F23",
@@ -6778,7 +6778,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0B",
-    "connections": "F39100BC",
+    "connections": "F391FFBC",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "0B6B9138C467917B040B63",
@@ -6805,7 +6805,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FFF201EC",
+    "connections": "FFF2FFEC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "050B8F1190",
@@ -6831,7 +6831,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "1300094C",
+    "connections": "13FF094C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D734B78445D4475C44C8570CB",
@@ -6858,7 +6858,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FF8900E4",
+    "connections": "FF89FFE4",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "093F8447863E44028E",
@@ -6914,7 +6914,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FF860040",
+    "connections": "FF86FF40",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B150E3291614E51C3798E",
@@ -6940,7 +6940,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "A3000004",
+    "connections": "A3FFFF04",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05174F194F",
@@ -6966,7 +6966,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0D",
-    "connections": "FCB42800",
+    "connections": "FCB428FF",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "09791D7E51715177DD",
@@ -6992,7 +6992,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0B",
-    "connections": "87000048",
+    "connections": "87FFFF48",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0F4F457A44405645D746961D9F1863",
@@ -7018,7 +7018,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "771300F4",
+    "connections": "7713FFF4",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "09370448C4294C13DF",
@@ -7044,7 +7044,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "23000380",
+    "connections": "23FFFF80",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0944DE014D074D0D4D",
@@ -7097,7 +7097,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "370000B0",
+    "connections": "37FFFFB0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0700DF008D0F1F",
@@ -7123,7 +7123,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "077B00FC",
+    "connections": "077BFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0926903B446C101D9A",
@@ -7176,7 +7176,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0F",
-    "connections": "FF00B468",
+    "connections": "FFFFB468",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "05194F164F",
@@ -7204,7 +7204,7 @@
   {
     "author": "winterSolstice",
     "bitmask": "0D",
-    "connections": "3F4600D0",
+    "connections": "3F46FFD0",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B7E1024D01F451E9A5084",
@@ -7257,7 +7257,7 @@
   {
     "author": "aaronRoomJam",
     "bitmask": "0F",
-    "connections": "2B000010",
+    "connections": "2BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "09340C109F43C465C4",
@@ -7283,7 +7283,7 @@
   {
     "author": "aaronRoomJam",
     "bitmask": "0D",
-    "connections": "69000034",
+    "connections": "69FFFF34",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "09480447C4078D0B4D",
@@ -7309,7 +7309,7 @@
   {
     "author": "dusterRoomJam",
     "bitmask": "0B",
-    "connections": "FC1E0008",
+    "connections": "FC1EFF08",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "035098",
@@ -7335,7 +7335,7 @@
   {
     "author": "dusterRoomJam",
     "bitmask": "0F",
-    "connections": "070000FC",
+    "connections": "07FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097AC452997C1E5DC5",
@@ -7361,7 +7361,7 @@
   {
     "author": "dusterRoomJam",
     "bitmask": "0F",
-    "connections": "FC000010",
+    "connections": "FCFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "071A1F77592984",
@@ -7387,7 +7387,7 @@
   {
     "author": "knightCrawlerRoomJam",
     "bitmask": "0F",
-    "connections": "C30000C4",
+    "connections": "C3FFFFC4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "1170C4069709566F4511A31E63609E7F04",
@@ -7413,7 +7413,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "3B000398",
+    "connections": "3BFFFF98",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "035D1D",
@@ -7439,7 +7439,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "1700381C",
+    "connections": "17FF381C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "01",
@@ -7465,7 +7465,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "FC001428",
+    "connections": "FCFF1428",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D6451795156516F9172D153D1",
@@ -7491,7 +7491,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "273F0010",
+    "connections": "273FFF10",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "09205428543E4520D4",
@@ -7517,7 +7517,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "A30092FC",
+    "connections": "A3FF92FC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05215D319D",
@@ -7543,7 +7543,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "FC002334",
+    "connections": "FCFF2334",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "050B560496",
@@ -7569,7 +7569,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "334300FC",
+    "connections": "3343FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0578594784",
@@ -7673,7 +7673,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "57004B5C",
+    "connections": "57FF4B5C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "054D1D5ADD",
@@ -7725,7 +7725,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "FC005468",
+    "connections": "FCFF5468",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0764447944759A",
@@ -7751,7 +7751,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "677400FC",
+    "connections": "6774FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B5A035E0352435A845D84",
@@ -7777,7 +7777,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "FC005F70",
+    "connections": "FCFF5F70",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0764447944759A",
@@ -7803,7 +7803,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "6F7C00FC",
+    "connections": "6F7CFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "055E117995",
@@ -7829,7 +7829,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "778700FC",
+    "connections": "7787FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "097C15745550845B84",
@@ -7855,7 +7855,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "7F8B00FC",
+    "connections": "7F8BFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "05785A1897",
@@ -7933,7 +7933,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "FC006390",
+    "connections": "FCFF6390",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D72117D11655452C564D419D1",
@@ -7959,7 +7959,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "8F000094",
+    "connections": "8FFFFF94",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050B560496",
@@ -7985,7 +7985,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "0FAC00FC",
+    "connections": "0FACFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "090B56508404965B84",
@@ -8037,7 +8037,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "FC009FB0",
+    "connections": "FCFF9FB0",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "076543709A64C3",
@@ -8063,7 +8063,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "B700AABC",
+    "connections": "B7FFAABC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "054A1D6144",
@@ -8089,7 +8089,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FCA90024",
+    "connections": "FCA9FF24",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "07274414840917",
@@ -8141,7 +8141,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "77000034",
+    "connections": "77FFFF34",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05630F6CCF",
@@ -8193,7 +8193,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FC740020",
+    "connections": "FC74FF20",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "050B560496",
@@ -8219,7 +8219,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "0700001C",
+    "connections": "07FFFF1C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D635135125551239768913AD2",
@@ -8245,7 +8245,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "5B4AB700",
+    "connections": "5B4AB7FF",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "09205428543E4529DA",
@@ -8271,7 +8271,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "D7FC02A4",
+    "connections": "D7FCFFA4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05840F8BCF",
@@ -8297,7 +8297,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "ABFC039C",
+    "connections": "ABFCFF9C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050B560496",
@@ -8349,7 +8349,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "0B039E44",
+    "connections": "0BFF9E44",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "03765D",
@@ -8375,7 +8375,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FC00A808",
+    "connections": "FCFFA808",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "090B56618364830496",
@@ -8401,7 +8401,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FC360058",
+    "connections": "FC36FF58",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B42042244019E10C445C4",
@@ -8453,7 +8453,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "67006B84",
+    "connections": "67FF6B84",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "034740",
@@ -8479,7 +8479,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "1B000060",
+    "connections": "1BFFFF60",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0715554A955E5A",
@@ -8505,7 +8505,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "A3600070",
+    "connections": "A360FF70",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B6B046F036C5D68C451DD",
@@ -8531,7 +8531,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "BB0003C8",
+    "connections": "BBFFFFC8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0725121E5E6E9A",
@@ -8557,7 +8557,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "6B860088",
+    "connections": "6B86FF88",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0528980D1E",
@@ -8583,7 +8583,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FC00140C",
+    "connections": "FCFF140C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "073C06349D10D4",
@@ -8609,7 +8609,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "978A0050",
+    "connections": "978AFF50",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0912D767447F833E18",
@@ -8635,7 +8635,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FC00BAC0",
+    "connections": "FCFFBAC0",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0514977C8C",
@@ -8661,7 +8661,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "B3000078",
+    "connections": "B3FFFF78",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "031D4B",
@@ -8687,7 +8687,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "8700005C",
+    "connections": "87FFFF5C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "032085",
@@ -8713,7 +8713,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "334200C4",
+    "connections": "3342FFC4",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "093758081746D80AD7",
@@ -8739,7 +8739,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "FC003868",
+    "connections": "FCFF3868",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B731109477C110F870487",
@@ -8869,7 +8869,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "CB0003CC",
+    "connections": "CBFFFFCC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "075551709A6891",
@@ -8895,7 +8895,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "8B5C00FC",
+    "connections": "8B5CFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "05409A3F04",
@@ -8921,7 +8921,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "9F460210",
+    "connections": "9F46FF10",
     "elevatorScreen": 2,
     "enabled": false,
     "enemies": "0B6D1D06984A836B832445",
@@ -8947,7 +8947,7 @@
   {
     "author": "gtmNewgpRooms",
     "bitmask": "0F",
-    "connections": "AF3E00FC",
+    "connections": "AF3EFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "072A5729971C04",
@@ -8999,7 +8999,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "69FC0008",
+    "connections": "69FCFF08",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077D1D2F4460D9",
@@ -9025,7 +9025,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "0700690C",
+    "connections": "07FF690C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0509560256",
@@ -9051,7 +9051,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "0B000010",
+    "connections": "0BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0760C44E843059",
@@ -9077,7 +9077,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "1B000020",
+    "connections": "1BFFFF20",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B248042C45E8454445184",
@@ -9103,7 +9103,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "1F3000FC",
+    "connections": "1F30FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "054B9D519A",
@@ -9129,7 +9129,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "27FC002C",
+    "connections": "27FCFF2C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0930D1208500960856",
@@ -9155,7 +9155,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "334300FC",
+    "connections": "3343FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0548594784",
@@ -9181,7 +9181,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "3B002AFC",
+    "connections": "3BFF2AFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "075A434E114791",
@@ -9233,7 +9233,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "57004B5C",
+    "connections": "57FF4B5C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B54863646584665C64E86",
@@ -9259,7 +9259,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "5BFC0069",
+    "connections": "5BFCFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "072E1122D15098",
@@ -9285,7 +9285,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "6900FC80",
+    "connections": "69FFFC80",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "075A174F5D5800",
@@ -9311,7 +9311,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "7F8B00FC",
+    "connections": "7F8BFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "05449A0697",
@@ -9337,7 +9337,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "A300B6A8",
+    "connections": "A3FFB6A8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0764596F846F44",
@@ -9389,7 +9389,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "AF0000B4",
+    "connections": "AFFFFFB4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07155110911B91",
@@ -9415,7 +9415,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "B700AABC",
+    "connections": "B7FFAABC",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "05445D43C4",
@@ -9441,7 +9441,7 @@
   {
     "author": "gtmOldgpRooms",
     "bitmask": "0F",
-    "connections": "BB000069",
+    "connections": "BBFFFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056F5A5A95",
@@ -9467,7 +9467,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "C7D30040",
+    "connections": "C7D3FF40",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "071C971484145A",
@@ -9493,7 +9493,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "0F006988",
+    "connections": "0FFF6988",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "034E57",
@@ -9519,7 +9519,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "2303FCAC",
+    "connections": "23FFFCAC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050A560296",
@@ -9545,7 +9545,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "67820098",
+    "connections": "6782FF98",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "054A44445D",
@@ -9571,7 +9571,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "FC025024",
+    "connections": "FCFF5024",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "094F9D3B5D549138C4",
@@ -9597,7 +9597,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "CB020230",
+    "connections": "CBFFFF30",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0515DE415A",
@@ -9623,7 +9623,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "9B0002BC",
+    "connections": "9BFFFFBC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "03595A",
@@ -9650,7 +9650,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "0703036C",
+    "connections": "07FFFF6C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "030099",
@@ -9676,7 +9676,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "6F0300B4",
+    "connections": "6FFFFFB4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "036F5D",
@@ -9702,7 +9702,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "570203D0",
+    "connections": "57FFFFD0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "031D99",
@@ -9728,7 +9728,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "9F00B7B0",
+    "connections": "9FFFB7B0",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0514D74F1D",
@@ -9754,7 +9754,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "AB020380",
+    "connections": "ABFFFF80",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "031F40",
@@ -9780,7 +9780,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "FC000034",
+    "connections": "FCFFFF34",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B4B14375546053183769D",
@@ -9806,7 +9806,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "FC0000C0",
+    "connections": "FCFFFFC0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0570447784",
@@ -9832,7 +9832,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "FCFF0054",
+    "connections": "FCFFFF54",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097F847F0463007684",
@@ -9858,7 +9858,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "0B03034C",
+    "connections": "0BFFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "037859",
@@ -9884,7 +9884,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "FC000058",
+    "connections": "FCFFFF58",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "090B56630004967244",
@@ -9910,7 +9910,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "8F020260",
+    "connections": "8FFFFF60",
     "elevatorScreen": -1,
     "enabled": false,
     "enemies": "0D45D15B11125747515F5150D1",
@@ -9936,7 +9936,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "5BBA0390",
+    "connections": "5BBAFF90",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "037F45",
@@ -9962,7 +9962,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "475A02FC",
+    "connections": "475AFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "051A9E4E58",
@@ -9988,7 +9988,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "3B00B37C",
+    "connections": "3BFFB37C",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0505C00559",
@@ -10014,7 +10014,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "3F020338",
+    "connections": "3FFFFF38",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056A8B2644",
@@ -10040,7 +10040,7 @@
   {
     "author": "winterSolsticeGP",
     "bitmask": "0F",
-    "connections": "270002C8",
+    "connections": "27FFFFC8",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "070B946D545D15",
@@ -10066,7 +10066,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "13000018",
+    "connections": "13FFFF18",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "071159139910D9",
@@ -10092,7 +10092,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0E",
-    "connections": "2F000034",
+    "connections": "2FFFFF34",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0518581799",
@@ -10118,7 +10118,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "3F000044",
+    "connections": "3FFFFF44",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0933476F2360A36FA3",
@@ -10146,7 +10146,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "4700004C",
+    "connections": "47FFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D2C11196317A323D147D14811",
@@ -10172,7 +10172,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "9BB200FC",
+    "connections": "9BB2FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "07394737077E99",
@@ -10198,7 +10198,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0D",
-    "connections": "CBEB00FC",
+    "connections": "CBEBFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "071B0717477B9A",
@@ -10224,7 +10224,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "0B000010",
+    "connections": "0BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056F0B6F4B",
@@ -10250,7 +10250,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "43560048",
+    "connections": "4356FF48",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0B5F1E7F5F5B5F77D92647",
@@ -10276,7 +10276,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "6B000070",
+    "connections": "6BFFFF70",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0518597A99",
@@ -10302,7 +10302,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "C70000CC",
+    "connections": "C7FFFFCC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07715D70997F9E",
@@ -10328,7 +10328,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0F",
-    "connections": "CB0000D0",
+    "connections": "CBFFFFD0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B615A2823619A19C061DA",
@@ -10356,7 +10356,7 @@
   {
     "author": "triforceOfCourage",
     "bitmask": "0E",
-    "connections": "CFE200D4",
+    "connections": "CFE2FFD4",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0975637F5F414774E3",
@@ -10382,7 +10382,7 @@
   {
     "author": "triforceOfCourageGP",
     "bitmask": "0F",
-    "connections": "1F3000FC",
+    "connections": "1F30FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0362DD",
@@ -10408,7 +10408,7 @@
   {
     "author": "triforceOfCourageGP",
     "bitmask": "0F",
-    "connections": "FC004750",
+    "connections": "FCFF4750",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "095246449853D83A94",
@@ -10434,7 +10434,7 @@
   {
     "author": "triforceOfCourageGP",
     "bitmask": "0F",
-    "connections": "FC006B78",
+    "connections": "FCFF6B78",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "071854489A10D4",
@@ -10460,7 +10460,7 @@
   {
     "author": "triforceOfCourageGP",
     "bitmask": "0F",
-    "connections": "FC007380",
+    "connections": "FCFF7380",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "051497589A",
@@ -10486,7 +10486,7 @@
   {
     "author": "triforceOfCourageGP",
     "bitmask": "0F",
-    "connections": "FC0087A4",
+    "connections": "FCFF87A4",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B23C630966B515A983496",
@@ -10590,7 +10590,7 @@
   {
     "author": "leftOpenItemRooms",
     "bitmask": "0F",
-    "connections": "830000FC",
+    "connections": "83FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0508A3354B",
@@ -10642,7 +10642,7 @@
   {
     "author": "leftOpenItemRooms",
     "bitmask": "0F",
-    "connections": "2B0000FC",
+    "connections": "2BFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "037860",
@@ -10668,7 +10668,7 @@
   {
     "author": "leftOpenItemRooms",
     "bitmask": "0F",
-    "connections": "33000000",
+    "connections": "33FFFFFF",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "036A60",
@@ -10694,7 +10694,7 @@
   {
     "author": "rightOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC000069",
+    "connections": "FCFFFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07789E76591BC5",
@@ -10720,7 +10720,7 @@
   {
     "author": "rightOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC000069",
+    "connections": "FCFFFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07755A76981BC5",
@@ -10746,7 +10746,7 @@
   {
     "author": "rightOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC000069",
+    "connections": "FCFFFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "091BC50A8D7F197499",
@@ -10772,7 +10772,7 @@
   {
     "author": "rightOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC000024",
+    "connections": "FCFFFF24",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "09325E5A1F7D983316",
@@ -10824,7 +10824,7 @@
   {
     "author": "upOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC0069FC",
+    "connections": "FCFF69FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "07765E3B857D98",
@@ -10850,7 +10850,7 @@
   {
     "author": "upOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC001EFC",
+    "connections": "FCFF1EFC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "077B981D631F5F",
@@ -10876,7 +10876,7 @@
   {
     "author": "upOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC006EFC",
+    "connections": "FCFF6EFC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "077B44695E4F16",
@@ -10902,7 +10902,7 @@
   {
     "author": "upOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC008EFC",
+    "connections": "FCFF8EFC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "074F057E5A7951",
@@ -10928,7 +10928,7 @@
   {
     "author": "downOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC1E00FC",
+    "connections": "FC1EFFFC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0579597898",
@@ -10954,7 +10954,7 @@
   {
     "author": "downOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC6900FC",
+    "connections": "FC69FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "07774C1E5F26C5",
@@ -10980,7 +10980,7 @@
   {
     "author": "downOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC6900FC",
+    "connections": "FC69FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "077759174E788C",
@@ -11006,7 +11006,7 @@
   {
     "author": "downOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC6900FC",
+    "connections": "FC69FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "091D6374585C913E91",
@@ -11032,7 +11032,7 @@
   {
     "author": "downOpenItemRooms",
     "bitmask": "0F",
-    "connections": "FC6900FC",
+    "connections": "FC69FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "076C844E846C5E",
@@ -11110,7 +11110,7 @@
   {
     "author": "throughItemRooms",
     "bitmask": "0F",
-    "connections": "691E0069",
+    "connections": "691EFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "057C192D12",
@@ -11136,7 +11136,7 @@
   {
     "author": "throughItemRooms",
     "bitmask": "0F",
-    "connections": "69000010",
+    "connections": "69FFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "077F0C17A31863",
@@ -11162,7 +11162,7 @@
   {
     "author": "throughItemRooms",
     "bitmask": "0F",
-    "connections": "13000018",
+    "connections": "13FFFF18",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "097A5913D9190E788C",
@@ -11188,7 +11188,7 @@
   {
     "author": "throughItemRooms",
     "bitmask": "0F",
-    "connections": "4700004C",
+    "connections": "47FFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07558461C4505E",
@@ -11214,7 +11214,7 @@
   {
     "author": "throughItemRooms",
     "bitmask": "0F",
-    "connections": "69FC0069",
+    "connections": "69FCFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0960D962596D925951",
@@ -11240,7 +11240,7 @@
   {
     "author": "benthicKing",
     "bitmask": "0F",
-    "connections": "69001208",
+    "connections": "69FF1208",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "01",
@@ -11292,7 +11292,7 @@
   {
     "author": "benthicKing",
     "bitmask": "09",
-    "connections": "37004430",
+    "connections": "37FF4430",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0D1E0646461186038D0C8D19C6",
@@ -11318,7 +11318,7 @@
   {
     "author": "benthicKing",
     "bitmask": "09",
-    "connections": "47000040",
+    "connections": "47FFFF40",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "091806124E1C461686",
@@ -11344,7 +11344,7 @@
   {
     "author": "benthicKing",
     "bitmask": "0F",
-    "connections": "433A003C",
+    "connections": "433AFF3C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0D209673847584778469845D84",
@@ -11788,7 +11788,7 @@
   {
     "author": "eunosRooms",
     "bitmask": "0F",
-    "connections": "336D0038",
+    "connections": "336DFF38",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "05335903D9",
@@ -11842,7 +11842,7 @@
   {
     "author": "eunosRooms",
     "bitmask": "0F",
-    "connections": "23001628",
+    "connections": "23FF1628",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "0975DD4C85715B7E9B",
@@ -11868,7 +11868,7 @@
   {
     "author": "eunosRooms",
     "bitmask": "0F",
-    "connections": "4700004C",
+    "connections": "47FFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0D0B4A6F044144684470CC048A",
@@ -11894,7 +11894,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "9700009C",
+    "connections": "97FFFF9C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "035699",
@@ -11920,7 +11920,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "0B000010",
+    "connections": "0BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F0F00CF",
@@ -11946,7 +11946,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "1B000020",
+    "connections": "1BFFFF20",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "03059E",
@@ -11972,7 +11972,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "0F0000FC",
+    "connections": "0FFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "054D191C45",
@@ -11998,7 +11998,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "BB0000FC",
+    "connections": "BBFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "071C5A4C171540",
@@ -12024,7 +12024,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "CB0000FC",
+    "connections": "CBFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "07155706170840",
@@ -12154,7 +12154,7 @@
   {
     "author": "eunosGpRooms",
     "bitmask": "0F",
-    "connections": "AF0000B4",
+    "connections": "AFFFFFB4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "051805199A",
@@ -12180,7 +12180,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "1B7700FC",
+    "connections": "1B77FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "077A847D84209D",
@@ -12206,7 +12206,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "73006954",
+    "connections": "73FF6954",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "033D9D",
@@ -12232,7 +12232,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "23000018",
+    "connections": "23FFFF18",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F0F00CF",
@@ -12258,7 +12258,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "23000018",
+    "connections": "23FFFF18",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F0F00CF",
@@ -12284,7 +12284,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FC000058",
+    "connections": "FCFFFF58",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "056F9D0300",
@@ -12310,7 +12310,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "696900FC",
+    "connections": "6969FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "050B560496",
@@ -12336,7 +12336,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "0F002904",
+    "connections": "0FFF2904",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "01",
@@ -12362,7 +12362,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "3F000038",
+    "connections": "3FFFFF38",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "01",
@@ -12388,7 +12388,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FFB9000C",
+    "connections": "FFB9FF0C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "031959",
@@ -12414,7 +12414,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "AB0078FC",
+    "connections": "ABFF78FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0D6B117D117F11769178916A91",
@@ -12440,7 +12440,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "D7190030",
+    "connections": "D719FF30",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "094E4651867E861514",
@@ -12466,7 +12466,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF2200D4",
+    "connections": "FF22FFD4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0508D42E9D",
@@ -12492,7 +12492,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "2B0050FC",
+    "connections": "2BFF50FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "096B156F1558957895",
@@ -12518,7 +12518,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF3C008C",
+    "connections": "FF3CFF8C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0555997A11",
@@ -12544,7 +12544,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "1FA300FC",
+    "connections": "1FA3FFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "03195D",
@@ -12570,7 +12570,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF00341C",
+    "connections": "FFFF341C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "055B513391",
@@ -12674,7 +12674,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "CB0040FC",
+    "connections": "CBFF40FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "090B56718474840496",
@@ -12700,7 +12700,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF3300C0",
+    "connections": "FF33FFC0",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "050D9E3A05",
@@ -12726,7 +12726,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "0B8F00FC",
+    "connections": "0B8FFFFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B3F113852389232D17AD1",
@@ -12752,7 +12752,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "130048AC",
+    "connections": "13FF48AC",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "055A1D4D9D",
@@ -12778,7 +12778,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF4800C8",
+    "connections": "FF48FFC8",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "050D9E3A05",
@@ -12804,7 +12804,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FC0300FC",
+    "connections": "FCFFFFFC",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "035A80",
@@ -12820,7 +12820,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 83851,
-    "name": "",
+    "name": "Bugged Exitless flippedGP room",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12830,7 +12830,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "CF00A9FC",
+    "connections": "CFFFA9FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "074D046B04585A",
@@ -12856,7 +12856,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF7F0090",
+    "connections": "FF7FFF90",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0B5D43515155435A845D84",
@@ -12882,7 +12882,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "690069FC",
+    "connections": "69FF69FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "073BC669466C5A",
@@ -12908,7 +12908,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF400008",
+    "connections": "FF40FF08",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0570D54886",
@@ -12934,7 +12934,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "B70007FC",
+    "connections": "B7FF07FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "073415749D2A97",
@@ -12960,7 +12960,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF27007C",
+    "connections": "FF27FF7C",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0937954F9222575D44",
@@ -12986,7 +12986,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "7B0068FC",
+    "connections": "7BFF68FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "051995115E",
@@ -13012,7 +13012,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF8400B8",
+    "connections": "FF84FFB8",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "0576993944",
@@ -13090,7 +13090,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "370057FC",
+    "connections": "37FF57FC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0D7DD17D1178846A8466846045",
@@ -13116,7 +13116,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "69000069",
+    "connections": "69FFFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "03075E",
@@ -13142,7 +13142,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "C70000A4",
+    "connections": "C7FFFFA4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "034C59",
@@ -13168,7 +13168,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FFAF00C4",
+    "connections": "FFAFFFC4",
     "elevatorScreen": 0,
     "enabled": true,
     "enemies": "090B565F0404965544",
@@ -13194,7 +13194,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "A7003BFC",
+    "connections": "A7FF3BFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "0B7A460B566B8672860496",
@@ -13220,7 +13220,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FC5200A0",
+    "connections": "FC52FFA0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0717D9334432C4",
@@ -13246,7 +13246,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FC5200A0",
+    "connections": "FC52FFA0",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0717D9334432C4",
@@ -13298,7 +13298,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "5B009CFC",
+    "connections": "5BFF9CFC",
     "elevatorScreen": 3,
     "enabled": true,
     "enemies": "074D03765A5A83",
@@ -13324,7 +13324,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "BB0000B4",
+    "connections": "BBFFFFB4",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0317C5",
@@ -13402,7 +13402,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "830020B0",
+    "connections": "83FF20B0",
     "elevatorScreen": 1,
     "enabled": true,
     "enemies": "05669D56C4",
@@ -13428,7 +13428,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF000069",
+    "connections": "FFFFFF69",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "055E9A0300",
@@ -13454,7 +13454,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "530000FC",
+    "connections": "53FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "03171E",
@@ -13480,7 +13480,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "9FD50098",
+    "connections": "9FD5FF98",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0964CB2C4321831B84",
@@ -13506,7 +13506,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "5F00004C",
+    "connections": "5FFFFF4C",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "050F0F00CF",
@@ -13532,7 +13532,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF000064",
+    "connections": "FFFFFF64",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "072F5743970300",
@@ -13558,7 +13558,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FF0000FC",
+    "connections": "FFFFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05798579C5",

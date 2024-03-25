@@ -96,7 +96,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 110;
+    private static int DEBUG_THRESHOLD = 130;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -544,6 +544,13 @@ public class Hyrule
         if (props.saveRom)
         {
             ROMData.Dump(newFileName);
+        }
+
+        Room search = palaces[6].AllRooms.FirstOrDefault(i => i.Name.Contains("L7 Top Side", StringComparison.OrdinalIgnoreCase));
+        if (search != null)
+        {
+            Debug.WriteLine(newFileName);
+            Debug.WriteLine(search.GetDebuggerDisplay());
         }
 
         if (UNSAFE_DEBUG)

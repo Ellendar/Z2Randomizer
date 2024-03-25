@@ -10,6 +10,6 @@ namespace RandomizerCore.Flags;
 internal interface IFlagSerializer
 {
     public int GetLimit();
-    public int Serialize(Object obj);
-    public Climate Deserialize(int option);
+    public int Serialize(object obj);
+    public object Deserialize(int option);
 }

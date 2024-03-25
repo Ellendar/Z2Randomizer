@@ -55,7 +55,8 @@ public class RandomizerConfiguration
     public int? MaxHeartContainers { get; set; }
     public bool? StartWithUpstab { get; set; }
     public bool? StartWithDownstab { get; set; }
-    public bool ShuffleStartingLives { get; set; }
+    [CustomFlagSerializer(typeof(StartingLivesSerializer))]
+    public int? StartingLives { get; set; }
     [Limit(8)]
     [Minimum(1)]
     public int StartingAttackLevel { get; set; }
@@ -457,7 +458,7 @@ public class RandomizerConfiguration
         config.StartWithReflect = bits[0];
         config.StartWithSpell = bits[1];
         config.StartWithThunder = bits[2];
-        config.ShuffleStartingLives = bits[3];
+        config.StartingLives = bits[3] ? 7 : 3;
         config.RemoveTBird = bits[4];
         config.RestrictConnectionCaveShuffle = bits[5];
 
@@ -1176,7 +1177,7 @@ public class RandomizerConfiguration
         properties.SwapUpAndDownStab = SwapUpAndDownStab == null ? random.Next(2) == 1 : (bool)SwapUpAndDownStab;
 
 
-        properties.StartLives = ShuffleStartingLives ? random.Next(2, 6) : 3;
+        properties.StartLives = StartingLives == null ? random.Next(2, 6) : (int)StartingLives;
         properties.PermanentBeam = PermanmentBeamSword;
         properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;

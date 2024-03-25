@@ -5,7 +5,7 @@ namespace RandomizerCore.Flags;
 
 public class ClimateFlagSerializer : IFlagSerializer
 {
-    public Climate Deserialize(int option)
+    public object Deserialize(int option)
     {
         return option switch
         {

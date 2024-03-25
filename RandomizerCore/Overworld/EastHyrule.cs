@@ -1782,8 +1782,8 @@ public class EastHyrule : World
 
         if(unreachedLocations.Count == 2 && Hyrule.UNSAFE_DEBUG) 
         {
-            Debug.WriteLine(unreachedLocations.First().Name);
-            Debug.WriteLine(GetMapDebug());
+            //Debug.WriteLine(unreachedLocations.First().Name);
+            //Debug.WriteLine(GetMapDebug());
         }
         else if (unreachedLocations.Count <= 3 && Hyrule.UNSAFE_DEBUG)
         {

@@ -92,7 +92,7 @@ public class Palace
 
     public bool AddRoom(Room r, bool blockersAnywhere)
     {
-        bool placed = false;
+        bool placed;
         r.PalaceGroup = GetPalaceGroup();
 
         if (netDeadEnds > 3 && r.IsDeadEnd)
@@ -612,7 +612,7 @@ public class Palace
         foreach (Room room in AllRooms.ToList())
         {
             //If this is the primary room of a linked room pair
-            if (room.LinkedRoomName != null && room.Enabled)
+            if (room.LinkedRoomName != null && room.Enabled && room.LinkedRoom != null)
             {
                 Room linkedRoom = room.LinkedRoom;
                 //set each blank exit on the master room that has a counterpart in the linked room

@@ -205,7 +205,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RChN6EAABAViWVRLtBcbi+3mLCqCLviyAAWA\", \"Name\": \"Beginner\", \"Tooltip\"" +
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAhN6FAABRFJUNmCsyX5D+@KCiLATrZ!AAFR\", \"Name\": \"Beginner\", \"Tooltip\"" +
             ": \"This is great for people looking for a casual experience\"}")]
         public string customizableButton1 {
             get {
@@ -218,7 +218,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAAN6AAFeqXtWVRstSgax+2csjw@suiyAAWA\", \"Name\": \"Standard\", \"Tooltip\"" +
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAAN6BABYRFs2NmCs3Y5c+!59qtxbtJdAAFR\", \"Name\": \"Standard\", \"Tooltip\"" +
             ": \"Flags for the 2023 Standard Tournament\"}")]
         public string customizableButton2 {
             get {
@@ -231,7 +231,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAjMsAFerXtWVRstVdZQ+2csmv@sukyAAWA\", \"Name\": \"Max Rando\", \"Tooltip" +
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAB0thBYbWs4WELs4HGD+!59rMgbtJ!AAFR\", \"Name\": \"Max Rando\", \"Tooltip" +
             "\": \"Flags for the 2023 Max Rando Tournament\"}")]
         public string customizableButton3 {
             get {
@@ -293,7 +293,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0sAListUe5RtWbgZQ+2c4YX@4X4yAAsA\", \"Name\": \"Random%\", \"Tooltip\":" +
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0thCqbs36emL4XpGD+!5@W4xeWvdAALh\", \"Name\": \"Random%\", \"Tooltip\":" +
             " \"Is it randomized? Who knows?\"}")]
         public string customizableButton4 {
             get {

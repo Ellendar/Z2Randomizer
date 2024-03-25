@@ -368,7 +368,7 @@ public class Palaces
                                 {
                                     Room test = palace.AllRooms.First(i => byteArrayEqualityComparer.Equals(i.SideView, roomToAdd.SideView));
                                     added = false;
-                                }
+                                } 
                             }
                             if(added)
                             {
@@ -406,23 +406,29 @@ public class Palaces
                                         Room dropZoneRoom = new(possibleDropZones[r.Next(0, possibleDropZones.Count)]);
                                         dropZoneRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
                                         bool added2 = palace.AddRoom(dropZoneRoom, props.BlockersAnywhere);
-                                        if (added2 && dropZoneRoom.LinkedRoomName != null)
-                                        {
-                                            Room linkedRoom = new(PalaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms));
-                                            linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
-                                            linkedRoom.LinkedRoom = dropZoneRoom;
-                                            dropZoneRoom.LinkedRoom = linkedRoom;
-                                            palace.AddRoom(linkedRoom, props.BlockersAnywhere);
-                                            dropZoneRoom.LinkedRoom = linkedRoom;
-                                        }
                                         if (added2)
                                         {
                                             if (props.NoDuplicateRooms)
                                             {
                                                 palaceRoomPool.Remove(dropZoneRoom);
                                             }
-                                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                                             continueDropping = dropZoneRoom.HasDrop;
+                                            if(dropZoneRoom.LinkedRoomName != null)
+                                            {
+                                                Room linkedRoom = new(PalaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms));
+                                                linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
+                                                if (palace.AddRoom(linkedRoom, props.BlockersAnywhere))
+                                                {
+                                                    linkedRoom.LinkedRoom = dropZoneRoom;
+                                                    dropZoneRoom.LinkedRoom = linkedRoom;
+                                                    //If the drop zone isn't a drop, but is linked to a room that is a drop, keep dropping from the linked room
+                                                    if (!continueDropping && linkedRoom.HasDrop)
+                                                    {
+                                                        continueDropping = true;
+                                                    }
+                                                }
+                                            }
+                                            IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                                             j++;
                                         }
                                         else if (++dropPlacementFailures > DROP_PLACEMENT_FAILURE_LIMIT)
@@ -452,10 +458,12 @@ public class Palaces
 
                     if (roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
                     {
+                        int count = 0;
                         bool reachable = false;
                         do
                         {
                             palace.ResetRooms();
+                            count++;
                             palace.ShuffleRooms(r);
                             reachable = palace.AllReachable();
                             tries++;

@@ -210,40 +210,47 @@ public class Room
     public Room(string json)
     {
         dynamic roomData = JsonConvert.DeserializeObject(json);
-        Name = roomData.name;
-        Group = Enum.Parse(typeof(RoomGroup), roomData.group.ToString().ToUpper());
-        Author = roomData.author;
-        Map = roomData.map;
-        Enabled = (bool)roomData.enabled;
-        Connections = Convert.FromHexString(roomData.connections.ToString());
-        LeftByte = Connections[0];
-        downByte = Connections[1];
-        upByte = Connections[2];
-        RightByte = Connections[3];
-        Enemies = Convert.FromHexString(roomData.enemies.ToString());
-        NewEnemies = Enemies;
-        SideView = Convert.FromHexString(roomData.sideviewData.ToString());
-        itemGetBits = Convert.FromHexString(roomData.bitmask.ToString())[0];
-        HasItem = roomData.hasItem;
-        HasBoss = roomData.hasBoss;
-        IsBossRoom = roomData.isBossRoom;
-        HasDrop = roomData.hasDrop;
-        ElevatorScreen = roomData.elevatorScreen;
-        //ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
-        ConnectionStartAddress = roomData.memoryAddress;
-        isUpDownReversed = roomData.isUpDownReversed;
-        IsDropZone = roomData.isDropZone;
-        IsEntrance = roomData.isEntrance;
-        IsThunderBirdRoom = roomData.isThunderBirdRoom;
-        PalaceNumber = roomData.palaceNumber;
-        PalaceGroup = (int?)roomData.palaceGroup.Value ?? 0;
-        Requirements = new Requirements(roomData.requirements.ToString());
-        LinkedRoomName = roomData.linkedRoomName;
+        try
+        {
+            Name = roomData.name;
+            Group = Enum.Parse(typeof(RoomGroup), roomData.group.ToString().ToUpper());
+            Author = roomData.author;
+            Map = roomData.map;
+            Enabled = (bool)roomData.enabled;
+            Connections = Convert.FromHexString(roomData.connections.ToString());
+            LeftByte = Connections[0];
+            downByte = Connections[1];
+            upByte = Connections[2];
+            RightByte = Connections[3];
+            Enemies = Convert.FromHexString(roomData.enemies.ToString());
+            NewEnemies = Enemies;
+            SideView = Convert.FromHexString(roomData.sideviewData.ToString());
+            itemGetBits = Convert.FromHexString(roomData.bitmask.ToString())[0];
+            HasItem = roomData.hasItem;
+            HasBoss = roomData.hasBoss;
+            IsBossRoom = roomData.isBossRoom;
+            HasDrop = roomData.hasDrop;
+            ElevatorScreen = roomData.elevatorScreen;
+            //ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
+            ConnectionStartAddress = roomData.memoryAddress;
+            isUpDownReversed = roomData.isUpDownReversed;
+            IsDropZone = roomData.isDropZone;
+            IsEntrance = roomData.isEntrance;
+            IsThunderBirdRoom = roomData.isThunderBirdRoom;
+            PalaceNumber = roomData.palaceNumber;
+            PalaceGroup = (int?)roomData.palaceGroup.Value ?? 0;
+            Requirements = new Requirements(roomData.requirements.ToString());
+            LinkedRoomName = roomData.linkedRoomName;
 
-        IsPlaced = false;
-        IsRoot = false;
-        IsReachable = false;
-        IsBeforeTbird = false;
+            IsPlaced = false;
+            IsRoot = false;
+            IsReachable = false;
+            IsBeforeTbird = false;
+        }
+        catch
+        {
+            throw;
+        }
 
         byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
         if(SideView.Length != length)
@@ -448,25 +455,25 @@ public class Room
 
     public bool HasUpExit()
     {
-        if (!isUpDownReversed)
+        if (isUpDownReversed)
         {
-            return (upByte < 0xFC && upByte > 0x03) || (Map == 4 && upByte == 0x02) || (Map == 1 && upByte == 0x02) || (Map == 2 && upByte == 0x03);
+            return (downByte < 0xFC && downByte > 0x03);
         }
         else
         {
-            return (downByte < 0xFC && downByte > 0x03);
+            return (upByte < 0xFC && upByte > 0x03);// || (Map == 4 && upByte == 0x02) || (Map == 1 && upByte == 0x02) || (Map == 2 && upByte == 0x03);
         }
     }
 
     public bool HasDownExit()
     {
-        if (!isUpDownReversed)
+        if (isUpDownReversed)
         {
-            return (downByte < 0xFC && downByte > 0x03);
+            return (upByte < 0xFC && upByte > 0x03);
         }
         else
         {
-            return (upByte < 0xFC && upByte > 0x03);
+            return (downByte < 0xFC && downByte > 0x03);
         }
     }
 

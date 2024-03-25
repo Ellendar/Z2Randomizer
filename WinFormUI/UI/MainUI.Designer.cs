@@ -36,6 +36,8 @@ partial class MainUI
         components = new System.ComponentModel.Container();
         mainTabControl = new TabControl();
         tabPage4 = new TabPage();
+        StartingLivesLabel = new Label();
+        startingLivesBox = new ComboBox();
         label3 = new Label();
         label2 = new Label();
         label1 = new Label();
@@ -48,7 +50,6 @@ partial class MainUI
         startingLifeLabel = new Label();
         startingMagicLabel = new Label();
         startingAttackLabel = new Label();
-        randomizeLivesBox = new CheckBox();
         startingTechsLabel = new Label();
         startingTechsList = new ComboBox();
         startingHeartContainersLabel = new Label();
@@ -297,6 +298,8 @@ partial class MainUI
         // 
         // tabPage4
         // 
+        tabPage4.Controls.Add(StartingLivesLabel);
+        tabPage4.Controls.Add(startingLivesBox);
         tabPage4.Controls.Add(label3);
         tabPage4.Controls.Add(label2);
         tabPage4.Controls.Add(label1);
@@ -309,7 +312,6 @@ partial class MainUI
         tabPage4.Controls.Add(startingLifeLabel);
         tabPage4.Controls.Add(startingMagicLabel);
         tabPage4.Controls.Add(startingAttackLabel);
-        tabPage4.Controls.Add(randomizeLivesBox);
         tabPage4.Controls.Add(startingTechsLabel);
         tabPage4.Controls.Add(startingTechsList);
         tabPage4.Controls.Add(startingHeartContainersLabel);
@@ -323,6 +325,29 @@ partial class MainUI
         tabPage4.TabIndex = 3;
         tabPage4.Text = "Start Configuration";
         tabPage4.UseVisualStyleBackColor = true;
+        // 
+        // StartingLivesLabel
+        // 
+        StartingLivesLabel.AutoSize = true;
+        StartingLivesLabel.Location = new Point(400, 256);
+        StartingLivesLabel.Margin = new Padding(4, 0, 4, 0);
+        StartingLivesLabel.Name = "StartingLivesLabel";
+        StartingLivesLabel.Size = new Size(77, 15);
+        StartingLivesLabel.TabIndex = 35;
+        StartingLivesLabel.Text = "Starting Lives";
+        // 
+        // startingLivesBox
+        // 
+        startingLivesBox.DropDownStyle = ComboBoxStyle.DropDownList;
+        startingLivesBox.FormattingEnabled = true;
+        startingLivesBox.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "8", "16", "Random(2-5)" });
+        startingLivesBox.Location = new Point(402, 274);
+        startingLivesBox.Margin = new Padding(4, 3, 4, 3);
+        startingLivesBox.Name = "startingLivesBox";
+        startingLivesBox.Size = new Size(140, 23);
+        startingLivesBox.TabIndex = 34;
+        startingLivesBox.SelectedIndex = 2;
+        toolTip1.SetToolTip(startingLivesBox, "Number of lives you start with.");
         // 
         // label3
         // 
@@ -468,22 +493,10 @@ partial class MainUI
         startingAttackLabel.Text = "Atk";
         toolTip1.SetToolTip(startingAttackLabel, "Starting Attack Level");
         // 
-        // randomizeLivesBox
-        // 
-        randomizeLivesBox.AutoSize = true;
-        randomizeLivesBox.Location = new Point(400, 257);
-        randomizeLivesBox.Margin = new Padding(4, 3, 4, 3);
-        randomizeLivesBox.Name = "randomizeLivesBox";
-        randomizeLivesBox.Size = new Size(175, 19);
-        randomizeLivesBox.TabIndex = 15;
-        randomizeLivesBox.Text = "Randomize Number of Lives";
-        toolTip1.SetToolTip(randomizeLivesBox, "Start with anywhere from 2-5 lives");
-        randomizeLivesBox.UseVisualStyleBackColor = true;
-        // 
         // startingTechsLabel
         // 
         startingTechsLabel.AutoSize = true;
-        startingTechsLabel.Location = new Point(398, 211);
+        startingTechsLabel.Location = new Point(400, 210);
         startingTechsLabel.Margin = new Padding(4, 0, 4, 0);
         startingTechsLabel.Name = "startingTechsLabel";
         startingTechsLabel.Size = new Size(80, 15);
@@ -2105,7 +2118,7 @@ partial class MainUI
         shufflePbagAmountsCheckbox.Location = new Point(4, 215);
         shufflePbagAmountsCheckbox.Margin = new Padding(2);
         shufflePbagAmountsCheckbox.Name = "shufflePbagAmountsCheckbox";
-        shufflePbagAmountsCheckbox.Size = new Size(145, 19);
+        shufflePbagAmountsCheckbox.Size = new Size(167, 19);
         shufflePbagAmountsCheckbox.TabIndex = 19;
         shufflePbagAmountsCheckbox.Text = "Randomize Pbag Amounts";
         shufflePbagAmountsCheckbox.ThreeState = true;
@@ -3212,7 +3225,6 @@ partial class MainUI
     private Button generateRomButton;
     private Label startingHeartContainersLabel;
     private ComboBox startHeartsMinList;
-    private CheckBox randomizeLivesBox;
     private Label startingTechsLabel;
     private ComboBox startingTechsList;
     private TabPage tabPage6;
@@ -3403,5 +3415,7 @@ partial class MainUI
     private Button customizableButton4;
     private Button customizableButton5;
     private Button customizableButton6;
+    private Label StartingLivesLabel;
+    private ComboBox startingLivesBox;
 }
 

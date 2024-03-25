@@ -120,7 +120,7 @@ public partial class MainUI : Form
         startingTechsList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         startingGemsMinList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         startingGemsMaxList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
-        randomizeLivesBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        startingLivesBox.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleEnemyHPBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleAllExpCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleAtkExpNeededCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -280,14 +280,14 @@ public partial class MainUI : Form
             try
             {
                 //TODO: replace this with real json validation
-                if(settingJson.Length == 0)
+                if (settingJson.Length == 0)
                 {
                     SetCustomFlagsetButtonPropertiesToDefault(button);
                     continue;
                 }
                 customButtonSettings = new CustomisedButtonSettings(settingJson);
 
-                if(customButtonSettings.Flagset == "")
+                if (customButtonSettings.Flagset == "")
                 {
                     SetCustomFlagsetButtonProperties(button, customButtonSettings);
                     continue;
@@ -312,7 +312,7 @@ public partial class MainUI : Form
                     SetCustomFlagsetButtonProperties(button, customButtonSettings);
                 }
             }
-            catch(JsonReaderException e)
+            catch (JsonReaderException e)
             {
                 logger.Warn("Saved custom button is not JSON", e);
                 SetCustomFlagsetButtonPropertiesToDefault(button);
@@ -406,7 +406,7 @@ public partial class MainUI : Form
     /// <param name="customButtonSettings"></param>
     private void SetCustomFlagsetButtonProperties(Button button, CustomisedButtonSettings customButtonSettings)
     {
-        if(customButtonSettings.Flagset == "")
+        if (customButtonSettings.Flagset == "")
         {
             customButtonSettings.IsCustomised = false;
         }
@@ -446,7 +446,7 @@ public partial class MainUI : Form
             baseCustomButtonSettings.IsCustomised = false;
             SetCustomFlagsetButtonProperties(button, baseCustomButtonSettings);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             logger.Error(e);
             throw;
@@ -468,7 +468,7 @@ public partial class MainUI : Form
             defaultCustomButtonSettings.IsCustomised = false;
             SetCustomFlagsetButtonProperties(button, defaultCustomButtonSettings);
         }
-        catch 
+        catch
         {
             SetCustomFlagsetButtonProperties(button);
         }
@@ -807,7 +807,18 @@ public partial class MainUI : Form
             default:
                 throw new Exception("Invalid Techs setting");
         }
-        configuration.ShuffleStartingLives = randomizeLivesBox.Checked;
+        configuration.StartingLives = startingLivesBox.SelectedIndex switch
+        {
+            0 => 1,
+            1 => 2,
+            2 => 3,
+            3 => 4,
+            4 => 5,
+            5 => 8,
+            6 => 16,
+            7 => null,
+            _ => throw new Exception("Invalid starting lives index")
+        };
         configuration.StartingAttackLevel = startingAttackLevelList.SelectedIndex + 1;
         configuration.StartingMagicLevel = startingMagicLevelList.SelectedIndex + 1;
         configuration.StartingLifeLevel = startingLifeLevelList.SelectedIndex + 1;
@@ -1128,7 +1139,7 @@ public partial class MainUI : Form
 
     private void convertButton_Click(object send, EventArgs e)
     {
-        String oldFlags = oldFlagsTextbox.Text.Trim();
+        string oldFlags = oldFlagsTextbox.Text.Trim();
         if (oldFlags.Length == 0)
         {
             return;
@@ -1144,8 +1155,6 @@ public partial class MainUI : Form
         var ShieldTunic = shieldColorList.SelectedIndex;
         var BeamSprite = beamSpriteList.SelectedIndex;
 
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
-
         beepFrequencyDropdown.SelectedIndex = BeepFrequency;
         beepThresholdDropdown.SelectedIndex = BeepThreshold;
         disableMusicCheckbox.CheckState = DisableMusic;
@@ -1157,6 +1166,7 @@ public partial class MainUI : Form
         shieldColorList.SelectedIndex = ShieldTunic;
         beamSpriteList.SelectedIndex = BeamSprite;
 
+        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags(oldFlags);
         flagsTextBox.Text = config.Serialize();
     }
 
@@ -1243,7 +1253,17 @@ public partial class MainUI : Form
                 (true, true) => 3,
                 (_, _) => 4
             };
-            randomizeLivesBox.Checked = configuration.ShuffleStartingLives;
+            startingLivesBox.SelectedIndex = configuration.StartingLives switch
+            {
+                1 => 0,
+                2 => 1,
+                3 => 2,
+                4 => 3,
+                5 => 4,
+                8 => 5,
+                16 => 6,
+                null => 7
+            };
             startingAttackLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
             startingMagicLevelList.SelectedIndex = configuration.StartingMagicLevel - 1;
             startingLifeLevelList.SelectedIndex = configuration.StartingLifeLevel - 1;
@@ -1871,9 +1891,9 @@ public partial class MainUI : Form
 
     private bool VanillaPossible(ComboBox cb)
     {
-        if (cb.SelectedIndex == 0 
-            || cb.SelectedIndex == 1 
-            || cb.GetItemText(cb.SelectedItem).Equals("Random") 
+        if (cb.SelectedIndex == 0
+            || cb.SelectedIndex == 1
+            || cb.GetItemText(cb.SelectedItem).Equals("Random")
             || cb.GetItemText(cb.SelectedItem).Equals("Random (no Vanilla)"))
         {
             return true;
