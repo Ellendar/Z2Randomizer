@@ -6,16 +6,12 @@
 .endmacro
 
 .segment "HEADER"
-.org $0
-.byte $4E, $45, $53, $1A ; NES\r magic bytes
-.byte $08
-.byte $10
+.org $6
 .byte $52 ; Mapper 5
 .byte $08 ; use NES 2.0 header
-.byte $00
-.byte $00
+
+.org $a
 .byte $70 ; reserve 8kb of PRG NVRAM (SRAM)
-.byte $00, $00, $00, $00, $01
 
 .segment "PRG7"
 

@@ -52,7 +52,7 @@ UPDATE_REFS target @ refs
 .endmacro
 
 
-.segment "HEADER" :size $10 :mem $00
+.segment "HEADER" :bank $00 :size $0010 :mem $0000 :off $00000
 .segment "PRG0"   :bank $00 :size $4000 :mem $8000 :off $00010
 .segment "PRG1"   :bank $01 :size $4000 :mem $8000 :off $04010
 .segment "PRG2"   :bank $02 :size $4000 :mem $8000 :off $08010
