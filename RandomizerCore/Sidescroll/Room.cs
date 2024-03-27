@@ -461,7 +461,7 @@ public class Room
         }
         else
         {
-            return (upByte < 0xFC && upByte > 0x03);// || (Map == 4 && upByte == 0x02) || (Map == 1 && upByte == 0x02) || (Map == 2 && upByte == 0x03);
+            return (upByte < 0xFC);// || (Map == 4 && upByte == 0x02) || (Map == 1 && upByte == 0x02) || (Map == 2 && upByte == 0x03);
         }
     }
 
@@ -469,25 +469,25 @@ public class Room
     {
         if (isUpDownReversed)
         {
-            return (upByte < 0xFC && upByte > 0x03);
+            return (upByte < 0xFC);
         }
         else
         {
-            return (downByte < 0xFC && downByte > 0x03);
+            return (downByte < 0xFC);
         }
     }
 
     public bool HasLeftExit()
     {
 
-        return (LeftByte < 0xFC && LeftByte > 0x03);
+        return (LeftByte < 0xFC);
 
     }
 
     public bool HasRightExit()
     {
 
-        return (RightByte < 0xFC && RightByte > 0x03);
+        return (RightByte < 0xFC);
 
     }
 

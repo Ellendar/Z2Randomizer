@@ -65,8 +65,20 @@ public abstract class World
 
     protected Random RNG;
 
-    private const int MAXIMUM_BRIDGE_LENGTH = 10;
+    //private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
+
+    private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
+    {
+        { Biome.ISLANDS, 10 },
+        { Biome.VOLCANO, 10 },
+        { Biome.DRY_CANYON, 10 },
+        { Biome.VANILLALIKE, 10 },
+        { Biome.CALDERA, 10 },
+        { Biome.CANYON, 10 },
+        { Biome.MOUNTAINOUS, 15 }
+    };
+
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_ATTEMPTS = new()
     {
         { Biome.ISLANDS, 4000 },
@@ -776,9 +788,10 @@ public abstract class World
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
     protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, 
-        bool canWalkOnWater, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
+        bool canWalkOnWater, Biome biome, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
     {
-        int maxBridgeLength = canWalkOnWater ? MAXIMUM_BRIDGE_LENGTH * 2 : MAXIMUM_BRIDGE_LENGTH;
+        int maxBridgeLength = MAXIMUM_BRIDGE_LENGTH[biome];
+        maxBridgeLength = canWalkOnWater ? maxBridgeLength : (int)(maxBridgeLength * 1.5);
         if (!((deadZoneMinX == null && deadZoneMaxX == null && deadZoneMinY == null && deadZoneMaxY == null)
             || (deadZoneMinX != null && deadZoneMaxX != null && deadZoneMinY != null && deadZoneMaxY != null)))
         {

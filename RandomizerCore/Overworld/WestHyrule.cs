@@ -628,7 +628,7 @@ public class WestHyrule : World
                 {
                     //debug++;
                     //Debug.WriteLine(debug);
-                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots,
+                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots, biome,
                         calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
                         calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
                     if (!f)
@@ -645,7 +645,7 @@ public class WestHyrule : World
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     //Debug.WriteLine(GetMapDebug());
-                    bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
+                    bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         //Debug.WriteLine(GetMapDebug());
@@ -655,7 +655,7 @@ public class WestHyrule : World
                 }
                 if (biome == Biome.ISLANDS)
                 {
-                    bool f = ConnectIslands(25, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
+                    bool f = ConnectIslands(25, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -666,7 +666,7 @@ public class WestHyrule : World
                 {
                     walkableTerrains.Add(Terrain.ROAD);
 
-                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, props.CanWalkOnWaterWithBoots);
+                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!h)
                     {
                         failedOnConnectIslands++;
@@ -677,9 +677,9 @@ public class WestHyrule : World
                 {
                     riverTerrain = fillerWater;
                     //2 bridges over the mountains
-                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     //4 bridges including saria and the double bridge across arbitrary water
-                    bool f = ConnectIslands(4, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots);
+                    bool f = ConnectIslands(4, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         failedOnConnectIslands++;

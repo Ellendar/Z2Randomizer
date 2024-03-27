@@ -661,22 +661,22 @@ public class EastHyrule : World
                 PlaceHiddenLocations();
                 if (biome == Biome.VANILLALIKE)
                 {
-                    ConnectIslands(4, false, Terrain.MOUNTAIN, false, false, true, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(4, false, Terrain.MOUNTAIN, false, false, true, props.CanWalkOnWaterWithBoots, biome);
 
-                    ConnectIslands(3, false, fillerWater, true, false, false, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(3, false, fillerWater, true, false, false, props.CanWalkOnWaterWithBoots, biome);
 
                 }
                 if (biome == Biome.ISLANDS)
                 {
-                    ConnectIslands(100, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(100, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots, biome);
                 }
                 if (biome == Biome.MOUNTAINOUS)
                 {
-                    ConnectIslands(20, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(20, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots, biome);
                 }
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
-                    ConnectIslands(15, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(15, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots, biome);
 
                 }
 

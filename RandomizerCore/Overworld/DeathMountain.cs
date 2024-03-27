@@ -737,7 +737,7 @@ class DeathMountain : World
 
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.ISLANDS)
                 {
-                    ConnectIslands(25, false, riverT, false, false, false, props.CanWalkOnWaterWithBoots);
+                    ConnectIslands(25, false, riverT, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                 }
 
                 if (!ValidateCaves())
