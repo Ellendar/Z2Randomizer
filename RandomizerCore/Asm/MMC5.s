@@ -6,9 +6,16 @@
 .endmacro
 
 .segment "HEADER"
-.org $6
-.byte $52   ; Set the mapper to MMC5
-
+.org $0
+.byte $4E, $45, $53, $1A ; NES\r magic bytes
+.byte $08
+.byte $10
+.byte $52 ; Mapper 5
+.byte $08 ; use NES 2.0 header
+.byte $00
+.byte $00
+.byte $70 ; reserve 8kb of PRG NVRAM (SRAM)
+.byte $00, $00, $00, $00, $01
 
 .segment "PRG7"
 
@@ -41,6 +48,7 @@ wait_ppu:
     jsr     bank7_chr_bank_switch__load_A
     lda     #$07
     jsr     bank7_Load_Bank_A_0x8000
+    sta     $5113           ; Explicitly switching to PRG RAM bank 0 works around a bug in nintendulator
     jmp     bank7_code0
 
 FREE_UNTIL $FFB1
