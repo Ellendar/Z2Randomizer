@@ -41,6 +41,9 @@
     <None Remove="CustomRooms.json" />
     <None Remove="nlog.config" />
     <None Remove="PalaceRooms.json" />
+    <None Remove="Asm\" />
+    <None Remove="Asm\BuffCarock.s" />
+    <None Remove="Asm\MMC5.s" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomRooms.json">
@@ -156,5 +159,12 @@
     <None Update="WinSparkle_0_8_0_x64.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Asm\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Asm\BuffCarock.s" />
+    <EmbeddedResource Include="Asm\MMC5.s" />
   </ItemGroup>
 </Project>
