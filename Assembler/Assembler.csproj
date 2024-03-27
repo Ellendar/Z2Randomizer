@@ -18,4 +18,10 @@
 	</Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Init.s" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Init.s" />
+  </ItemGroup>
 </Project>
