@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Reflection;
+using System.Threading.Tasks;
 using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
@@ -127,4 +130,22 @@ public class Util
     }
 
     public static IEqualityComparer<byte[]> byteArrayEqualityComparer = new StandardByteArrayEqualityComparer();
-} 
+}
+
+internal static class AssemblyExtensions
+{
+    public static string ReadResource(this Assembly assembly, string name)
+    {
+        // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
+        using var stream = assembly.GetManifestResourceStream(name);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+    public static async Task<string> ReadResourceAsync(this Assembly assembly, string name)
+    {
+        // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
+        await using var stream = assembly.GetManifestResourceStream(name)!;
+        using StreamReader reader = new(stream);
+        return await reader.ReadToEndAsync();
+    }
+}
