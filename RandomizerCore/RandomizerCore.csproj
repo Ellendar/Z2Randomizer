@@ -43,6 +43,7 @@
     <None Remove="PalaceRooms.json" />
     <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
+    <None Remove="Asm\MMC5.s" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomRooms.json">
@@ -164,5 +165,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Asm\BuffCarock.s" />
+    <EmbeddedResource Include="Asm\MMC5.s" />
   </ItemGroup>
 </Project>
