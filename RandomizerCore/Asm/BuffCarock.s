@@ -179,6 +179,7 @@ RandomizeWifiShotType:
 ; Hook the function that clears out the projectile to also clear the extra carock info
 .org $e453
     jsr ClearExtraDataOnProjectileHit
+    nop
 
 .reloc
 ClearExtraDataOnProjectileHit:
