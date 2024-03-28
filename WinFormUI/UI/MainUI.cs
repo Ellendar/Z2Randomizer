@@ -1542,7 +1542,9 @@ public partial class MainUI : Form
         catch (Exception e)
         {
             logger.Error(e, e.Message);
-            MessageBox.Show("Invalid flags entered!");
+            Settings.Default.lastused = "";
+            Settings.Default.Save();
+            MessageBox.Show("Invalid flags entered. Restart the randomizer to reset the flags to beginner flags.");
         }
         dontrunhandler = false;
     }
