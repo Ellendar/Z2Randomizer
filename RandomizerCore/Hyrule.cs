@@ -3622,10 +3622,10 @@ HelmetHeadGoomaFix:
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadItemRoomDespawn(engine);
 
-        //if (props.RandomRecoilDistance)
-        //{
-        ROMData.CustomRecoil(engine, RNG);
-        //}
+        if (props.RandomizeKnockback)
+        {
+            ROMData.RandomizeKnockback(engine, RNG);
+        }
 
         if (props.HardBosses)
         {

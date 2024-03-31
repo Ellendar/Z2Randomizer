@@ -841,7 +841,7 @@ CheckController1ForUpAMagic:
     {
         engine.Apply(ROMData);
     }
-    public void CustomRecoil(Engine engine, Random RNG)
+    public void RandomizeKnockback(Engine engine, Random RNG)
     {
         Assembler.Assembler a = new();
 
