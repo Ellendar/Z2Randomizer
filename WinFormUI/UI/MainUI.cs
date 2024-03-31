@@ -60,7 +60,6 @@ public partial class MainUI : Form
         beamSpriteList.SelectedIndex = Settings.Default.beams;
         disableMusicCheckbox.Checked = Settings.Default.music;
         upAOnController1Checkbox.Checked = Settings.Default.upac1;
-        seedTextBox.Text = Settings.Default.lastseed;
         flashingOffCheckbox.Checked = Settings.Default.noflash;
         useCommunityTextCheckbox.Checked = Settings.Default.useCommunityText;
         useCustomRoomsBox.Checked = Settings.Default.useCustomRooms;
@@ -72,7 +71,6 @@ public partial class MainUI : Form
         large = new CheckBox[] { largeEnemiesBlueJarCheckbox, largeEnemiesRedJarCheckbox, largeEnemiesSmallBagCheckbox, largeEnemiesMediumBagCheckbox,
             largeEnemiesLargeBagCheckbox, largeEnemiesXLBagCheckbox, largeEnemies1UpCheckbox, largeEnemiesKeyCheckbox };
 
-        flagsTextBox.TextChanged += FlagBox_TextChanged;
         InitialiseCustomFlagsetButtons();
 
         dontrunhandler = false;
@@ -161,6 +159,7 @@ public partial class MainUI : Form
         includeGPinShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleDripperEnemyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleEnemyPalettesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        randomizeKnockbackCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         hiddenPalaceList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         hideKasutoList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         removeSpellitemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -233,6 +232,18 @@ public partial class MainUI : Form
             dontrunhandler = true;
             flagsTextBox.Text = lastUsed;
             dontrunhandler = false;
+        }
+
+        flagsTextBox.TextChanged += FlagBox_TextChanged;
+
+        seedTextBox.Text = Settings.Default.lastseed;
+        try
+        {
+            FlagBox_TextChanged(null!, null!);
+        }
+        catch(Exception e)
+        {
+            seedTextBox.Text = (string)Settings.Default.Properties["customizableButton1"].DefaultValue;
         }
 
         string path = Directory.GetCurrentDirectory();
@@ -1083,6 +1094,7 @@ public partial class MainUI : Form
         configuration.DashAlwaysOn = dashAlwaysOnCheckbox.Checked;
         configuration.FastSpellCasting = fastSpellCheckbox.Checked;
         configuration.ShuffleSpritePalettes = shuffleEnemyPalettesCheckbox.Checked;
+        configuration.RandomizeKnockback = randomizeKnockbackCheckbox.Checked;
         configuration.PermanmentBeamSword = alwaysBeamCheckbox.Checked;
         configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
@@ -1529,8 +1541,9 @@ public partial class MainUI : Form
             jumpAlwaysOnCheckbox.Checked = configuration.JumpAlwaysOn;
             dashAlwaysOnCheckbox.Checked = configuration.DashAlwaysOn;
             //fastSpellCheckbox.Checked = configuration.FastSpellCasting;
-            //shuffleEnemyPalettesCheckbox.Checked = configuration.ShuffleSpritePalettes;
+            shuffleEnemyPalettesCheckbox.Checked = configuration.ShuffleSpritePalettes;
             alwaysBeamCheckbox.Checked = configuration.PermanmentBeamSword;
+            randomizeKnockbackCheckbox.Checked = configuration.RandomizeKnockback;
             //upAOnController1Checkbox.Checked = configuration.UpAOnController1;
             //flashingOffCheckbox.Checked = configuration.RemoveFlashing;
             //characterSpriteList.SelectedIndex = configuration.Sprite.SelectionIndex;

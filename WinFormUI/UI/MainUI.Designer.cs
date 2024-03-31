@@ -208,6 +208,7 @@ partial class MainUI
         label19 = new Label();
         shuffleDropFrequencyCheckbox = new CheckBox();
         miscTabPage = new TabPage();
+        randomizeKnockbackCheckbox = new CheckBox();
         shuffleEnemyPalettesCheckbox = new CheckBox();
         alwaysBeamCheckbox = new CheckBox();
         enableTownNameHintsCheckbox = new CheckBox();
@@ -346,7 +347,6 @@ partial class MainUI
         startingLivesBox.Name = "startingLivesBox";
         startingLivesBox.Size = new Size(140, 23);
         startingLivesBox.TabIndex = 34;
-        startingLivesBox.SelectedIndex = 2;
         toolTip1.SetToolTip(startingLivesBox, "Number of lives you start with.");
         // 
         // label3
@@ -2530,6 +2530,7 @@ partial class MainUI
         // 
         // miscTabPage
         // 
+        miscTabPage.Controls.Add(randomizeKnockbackCheckbox);
         miscTabPage.Controls.Add(shuffleEnemyPalettesCheckbox);
         miscTabPage.Controls.Add(alwaysBeamCheckbox);
         miscTabPage.Controls.Add(enableTownNameHintsCheckbox);
@@ -2542,6 +2543,22 @@ partial class MainUI
         miscTabPage.TabIndex = 10;
         miscTabPage.Text = "Misc";
         miscTabPage.UseVisualStyleBackColor = true;
+        // 
+        // checkBox1
+        // 
+        randomizeKnockbackCheckbox.AutoSize = true;
+        randomizeKnockbackCheckbox.Checked = false;
+        randomizeKnockbackCheckbox.CheckState = CheckState.Checked;
+        randomizeKnockbackCheckbox.Enabled = true;
+        randomizeKnockbackCheckbox.Location = new Point(4, 128);
+        randomizeKnockbackCheckbox.Margin = new Padding(4, 3, 4, 3);
+        randomizeKnockbackCheckbox.Name = "???";
+        randomizeKnockbackCheckbox.Size = new Size(191, 19);
+        randomizeKnockbackCheckbox.TabIndex = 26;
+        randomizeKnockbackCheckbox.Text = "???";
+        randomizeKnockbackCheckbox.ThreeState = false;
+        toolTip1.SetToolTip(randomizeKnockbackCheckbox, "What does this do? I'm sure it's fine...");
+        randomizeKnockbackCheckbox.UseVisualStyleBackColor = true;
         // 
         // shuffleEnemyPalettesCheckbox
         // 
@@ -3417,5 +3434,6 @@ partial class MainUI
     private Button customizableButton6;
     private Label StartingLivesLabel;
     private ComboBox startingLivesBox;
+    private CheckBox randomizeKnockbackCheckbox;
 }
 

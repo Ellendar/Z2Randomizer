@@ -219,6 +219,7 @@ public class RandomizerConfiguration
     public string BeamSprite { get; set; }
     [IgnoreInFlags]
     public bool UseCustomRooms { get; set; }
+    public bool RandomizeKnockback { get; set; }
 
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.
@@ -940,6 +941,7 @@ public class RandomizerConfiguration
         //New flags that didn't exist in 4.0.4
         config.SwapUpAndDownStab = false;
         config.HardBosses = false;
+        config.RandomizeKnockback = false;
 
 
         return config;
@@ -1492,6 +1494,7 @@ public class RandomizerConfiguration
         properties.UpAC1 = UpAOnController1;
         properties.RemoveFlashing = RemoveFlashing;
         properties.UseCustomRooms = UseCustomRooms;
+        properties.RandomizeKnockback = RandomizeKnockback;
 
         //"Server" side validation
         //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML)

@@ -35,9 +35,11 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
-    <Version>4.2.5</Version>
+    <Version>4.3.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Asm\DashSpell.s" />
+    <None Remove="Asm\Recoil.s" />
     <None Remove="CustomRooms.json" />
     <None Remove="nlog.config" />
     <None Remove="PalaceRooms.json" />
@@ -161,10 +163,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Asm\" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Asm\BuffCarock.s" />
     <EmbeddedResource Include="Asm\MMC5.s" />
+    <EmbeddedResource Include="Asm\DashSpell.s" />
+    <EmbeddedResource Include="Asm\Recoil.s" />
   </ItemGroup>
 </Project>
