@@ -841,6 +841,40 @@ CheckController1ForUpAMagic:
     {
         engine.Apply(ROMData);
     }
+    public void CustomRecoil(Engine engine, Random RNG)
+    {
+        Assembler.Assembler a = new();
+
+        // 0x23 is the max enemy id and we have 3 tables for each randomized value
+        byte enemy_count = 0x24;
+        byte[] x_arr = new byte[enemy_count];
+        byte[] y_lo_arr = new byte[enemy_count];
+        byte[] y_hi_arr = new byte[enemy_count];
+        ushort recoilTableXAddr = (ushort) (0xbfff - enemy_count * 3);
+        a.Set("RecoilTableX", recoilTableXAddr);
+        a.Set("RecoilTableYLo", recoilTableXAddr + enemy_count);
+        a.Set("RecoilTableYHi", recoilTableXAddr + enemy_count * 2);
+        for (int i = 0; i < 7; i++)
+        {
+            // this is heavily biased towards higher than default knockback... muhahahaha
+            a.Segment($"PRG{i}");
+            a.Org(recoilTableXAddr);
+            for (int j = 0; j < enemy_count; j++)
+            {
+                x_arr[j] = (byte)RNG.Next(0x01, 0x40);
+                ushort y_val = (ushort)RNG.Next(0x50, 0xa00);
+                y_val = (ushort)(~y_val + 1); // convert to a negative number
+                y_lo_arr[j] = (byte)(y_val & 0xff);
+                y_hi_arr[j] = (byte)((y_val >> 8) & 0xff);
+            }
+            a.Byt(x_arr);
+            a.Byt(y_lo_arr);
+            a.Byt(y_hi_arr);
+        }
+        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
+        engine.Modules.Add(a.Actions);
+    }
+
 
     public void BuffCarrock(Engine engine)
     {
@@ -852,32 +886,7 @@ CheckController1ForUpAMagic:
     public void DashSpell(Engine engine)
     {
         Assembler.Assembler assembler = new();
-        assembler.Code("""
-.segment "PRG0"
-.reloc
-ReplaceFireWithDashSpell:
-    pha
-    lda $076f ; Current magic state
-    and #$10  ; fire is on
-    bne @HasFire
-        pla
-        cmp $93b3,y ; Table for Link's original max velocities
-        rts
-@HasFire:
-    pla
-    cmp @SecondaryVelocityTable,y
-    rts
-@SecondaryVelocityTable:
-.byte $30, $d0
-""");
-
-        // Inside Links_Acceleration_Routine, patch the max speed compare to check if we cast dash
-        assembler.Org(0x93ff);
-        assembler.Code("jsr ReplaceFireWithDashSpell");
-
-        // Update the magic table to point to an rts ???
-        assembler.Org(0x8e50);
-        assembler.Word(0x9814);
+        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
 
         byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
         assembler.Org(0x9c62);

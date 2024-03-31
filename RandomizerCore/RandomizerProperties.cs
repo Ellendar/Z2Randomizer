@@ -206,6 +206,7 @@ public class RandomizerProperties
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }
+    //public bool RandomRecoilDistance { get; set; }
 
     //For Statistics
     [Key]

@@ -208,6 +208,7 @@ partial class MainUI
         label19 = new Label();
         shuffleDropFrequencyCheckbox = new CheckBox();
         miscTabPage = new TabPage();
+        checkBox1 = new CheckBox();
         shuffleEnemyPalettesCheckbox = new CheckBox();
         alwaysBeamCheckbox = new CheckBox();
         enableTownNameHintsCheckbox = new CheckBox();
@@ -346,7 +347,6 @@ partial class MainUI
         startingLivesBox.Name = "startingLivesBox";
         startingLivesBox.Size = new Size(140, 23);
         startingLivesBox.TabIndex = 34;
-        startingLivesBox.SelectedIndex = 2;
         toolTip1.SetToolTip(startingLivesBox, "Number of lives you start with.");
         // 
         // label3
@@ -2530,6 +2530,7 @@ partial class MainUI
         // 
         // miscTabPage
         // 
+        miscTabPage.Controls.Add(checkBox1);
         miscTabPage.Controls.Add(shuffleEnemyPalettesCheckbox);
         miscTabPage.Controls.Add(alwaysBeamCheckbox);
         miscTabPage.Controls.Add(enableTownNameHintsCheckbox);
@@ -2542,6 +2543,22 @@ partial class MainUI
         miscTabPage.TabIndex = 10;
         miscTabPage.Text = "Misc";
         miscTabPage.UseVisualStyleBackColor = true;
+        // 
+        // checkBox1
+        // 
+        checkBox1.AutoSize = true;
+        checkBox1.Checked = true;
+        checkBox1.CheckState = CheckState.Checked;
+        checkBox1.Enabled = false;
+        checkBox1.Location = new Point(4, 128);
+        checkBox1.Margin = new Padding(4, 3, 4, 3);
+        checkBox1.Name = "checkBox1";
+        checkBox1.Size = new Size(191, 19);
+        checkBox1.TabIndex = 26;
+        checkBox1.Text = "Experimental: DO NOT DISABLE";
+        checkBox1.ThreeState = true;
+        toolTip1.SetToolTip(checkBox1, "This checkbox is just a distraction. Don't believe its lies! Disable it!");
+        checkBox1.UseVisualStyleBackColor = true;
         // 
         // shuffleEnemyPalettesCheckbox
         // 
@@ -3417,5 +3434,6 @@ partial class MainUI
     private Button customizableButton6;
     private Label StartingLivesLabel;
     private ComboBox startingLivesBox;
+    private CheckBox checkBox1;
 }
 

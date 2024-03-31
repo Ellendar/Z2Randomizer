@@ -220,6 +220,9 @@ public class RandomizerConfiguration
     [IgnoreInFlags]
     public bool UseCustomRooms { get; set; }
 
+    // Not ignoring in flags, but always enabling it for April 1st shenanigans
+    //public bool RandomRecoilDistance { get; set; }
+
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.
     //There should be a seperate class that does the full encode/decode cycle for both projects.
@@ -1492,6 +1495,7 @@ public class RandomizerConfiguration
         properties.UpAC1 = UpAOnController1;
         properties.RemoveFlashing = RemoveFlashing;
         properties.UseCustomRooms = UseCustomRooms;
+        //properties.RandomRecoilDistance = RandomRecoilDistance;
 
         //"Server" side validation
         //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML)

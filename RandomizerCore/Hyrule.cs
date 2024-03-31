@@ -327,7 +327,7 @@ public class Hyrule
             {
                 validationEngine.Modules.Add(sideview_module.Actions);
                 validationEngine.Modules.Add(gp_sideview_module.Actions);
-                ApplyAsmPatches(props, validationEngine);
+                ApplyAsmPatches(props, validationEngine, RNG);
                 ROM testRom = new(ROMData);
                 testRom.ApplyAsm(validationEngine);
             }
@@ -340,7 +340,7 @@ public class Hyrule
             passedValidation = true;
             _engine.Modules.Add(sideview_module.Actions);
             _engine.Modules.Add(gp_sideview_module.Actions);
-            ApplyAsmPatches(props, _engine);
+            ApplyAsmPatches(props, _engine, RNG);
             ROMData.ApplyAsm(_engine);
         }
 
@@ -3616,11 +3616,16 @@ HelmetHeadGoomaFix:
         engine.Modules.Add(assembler.Actions);
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Engine engine)
+    private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG)
     {
         ROMData.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadItemRoomDespawn(engine);
+
+        //if (props.RandomRecoilDistance)
+        //{
+        ROMData.CustomRecoil(engine, RNG);
+        //}
 
         if (props.HardBosses)
         {
