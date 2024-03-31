@@ -862,7 +862,7 @@ CheckController1ForUpAMagic:
             for (int j = 0; j < enemy_count; j++)
             {
                 x_arr[j] = (byte)RNG.Next(0x01, 0x40);
-                ushort y_val = (ushort)RNG.Next(0x50, 0xa00);
+                ushort y_val = (ushort)RNG.Next(0x50, 0x700);
                 y_val = (ushort)(~y_val + 1); // convert to a negative number
                 y_lo_arr[j] = (byte)(y_val & 0xff);
                 y_hi_arr[j] = (byte)((y_val >> 8) & 0xff);
