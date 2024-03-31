@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5      "
+                "FrameworkVersion" = "8:v4.5       "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -228,8 +228,8 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
-        "ProductCode" = "8:{262CAB4C-9ED2-41DA-8EFE-6A3D171D8438}"
+        "ProductName" = "8:Z2Randomizer Community Fork"
+        "ProductCode" = "8:{F9E47C97-2881-4799-AFB8-409386FD349A}"
         "PackageCode" = "8:{55EB9B97-347E-4FE5-BFBD-AF0FCA7735B4}"
         "UpgradeCode" = "8:{B04C4299-26B3-4E9F-8554-8D6095734119}"
         "AspNetVersion" = "8:4.0.30319.0"

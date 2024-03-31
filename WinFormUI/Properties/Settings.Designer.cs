@@ -205,8 +205,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAhN6FAABRFJUNmCsyX5D+@KCiLATrZ!AAFR\", \"Name\": \"Beginner\", \"Tooltip\"" +
-            ": \"This is great for people looking for a casual experience\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAhN6FAABRFJUNmCsyX5D+@KCiLATrZ!AAFRA\", \"Name\": \"Beginner\", \"Tooltip" +
+            "\": \"This is great for people looking for a casual experience\"}")]
         public string customizableButton1 {
             get {
                 return ((string)(this["customizableButton1"]));
@@ -218,8 +218,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAAN6BABYRFs2NmCs3Y5c+!59qtxbtJdAAFR\", \"Name\": \"Standard\", \"Tooltip\"" +
-            ": \"Flags for the 2023 Standard Tournament\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAAN6BABYRFs2NmCs3Y5c+!59qtxbtJdAAFRA\", \"Name\": \"Standard\", \"Tooltip" +
+            "\": \"Flags for the 2023 Standard Tournament\"}")]
         public string customizableButton2 {
             get {
                 return ((string)(this["customizableButton2"]));
@@ -231,8 +231,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAB0thBYbWs4WELs4HGD+!59rMgbtJ!AAFR\", \"Name\": \"Max Rando\", \"Tooltip" +
-            "\": \"Flags for the 2023 Max Rando Tournament\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAB0thBYbWs4WELs4HGD+!59rMgbtJ!AAFRA\", \"Name\": \"Max Rando\", \"Toolti" +
+            "p\": \"Flags for the 2023 Max Rando Tournament\"}")]
         public string customizableButton3 {
             get {
                 return ((string)(this["customizableButton3"]));
@@ -293,8 +293,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0thCqbs36emL4XpGD+!5@W4xeWvdAALh\", \"Name\": \"Random%\", \"Tooltip\":" +
-            " \"Is it randomized? Who knows?\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0thCqbs36emL4XpGD+!5@W4xeWvdAALhA\", \"Name\": \"Random%\", \"Tooltip\"" +
+            ": \"Is it randomized? Who knows?\"}")]
         public string customizableButton4 {
             get {
                 return ((string)(this["customizableButton4"]));

@@ -22,7 +22,7 @@ public class PalaceRooms
 
 
 
-    public static readonly string roomsMD5 = "hgJmoNKXPcFQWwoOZuX2FQ==";
+    public static readonly string roomsMD5 = "pYmlw3+wEs3kW32lp3UaBA==";
 
     static PalaceRooms()
     {
@@ -32,8 +32,7 @@ public class PalaceRooms
             byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
-                //XXX: Validation
-                //throw new Exception("Invalid PalaceRooms.json");
+                throw new Exception("Invalid PalaceRooms.json");
             }
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
             foreach (var obj in rooms)
