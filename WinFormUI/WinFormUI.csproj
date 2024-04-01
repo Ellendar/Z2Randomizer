@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -41,9 +41,7 @@
     <Compile Update="UI\GeneratingSeedsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="UI\MainUI.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Update="UI\MainUI.cs" />
     <Compile Update="UI\WinSparkle.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

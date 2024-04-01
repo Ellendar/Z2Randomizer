@@ -96,10 +96,10 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.6.0.x64"
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.8.0.x64"
                     {
-                    "Name" = "8:.NET Runtime 6.0.7 (x64)"
-                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.6.0.x64"
+                    "Name" = "8:.NET Runtime 8.0.0 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.8.0.x64"
                     }
                 }
             }
@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5       "
+                "FrameworkVersion" = "8:v4.5         "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -229,8 +229,8 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{F9E47C97-2881-4799-AFB8-409386FD349A}"
-        "PackageCode" = "8:{55EB9B97-347E-4FE5-BFBD-AF0FCA7735B4}"
+        "ProductCode" = "8:{38C5D3A0-E2A1-42CF-A640-3B78EC84B6BC}"
+        "PackageCode" = "8:{A20B5256-8C81-417E-88B2-A1D20455C82A}"
         "UpgradeCode" = "8:{B04C4299-26B3-4E9F-8554-8D6095734119}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -765,7 +765,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_29F166287F504E1B842D03D78AF85460"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net7.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -793,7 +793,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BB3D8193D68E4F149C2157E8828E8077"
             {
-            "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net7.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net8.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -821,7 +821,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BD0C5F40CFE54C4F933C4C6C0856834A"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net7.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
