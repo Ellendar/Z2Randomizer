@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5         "
+                "FrameworkVersion" = "8:v4.5          "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -229,13 +229,13 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{38C5D3A0-E2A1-42CF-A640-3B78EC84B6BC}"
-        "PackageCode" = "8:{A20B5256-8C81-417E-88B2-A1D20455C82A}"
-        "UpgradeCode" = "8:{B04C4299-26B3-4E9F-8554-8D6095734119}"
+        "ProductCode" = "8:{99E37B3A-79FF-4FD6-ACFF-C1720F1D5463}"
+        "PackageCode" = "8:{E5B56E3B-017D-4D2A-80E4-C07E42B9E2D7}"
+        "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
-        "DetectNewerInstalledVersion" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
+        "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
         "ProductVersion" = "8:4.3.0"
         "Manufacturer" = "8:Ellendar"
