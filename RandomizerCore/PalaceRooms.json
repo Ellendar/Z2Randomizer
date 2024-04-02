@@ -4804,7 +4804,7 @@
     "bitmask": "0F",
     "connections": "33FFFFFC",
     "elevatorScreen": -1,
-    "enabled": true,
+    "enabled": false,
     "enemies": "056C6066D4",
     "group": "V4_0",
     "hasBoss": true,
@@ -4818,7 +4818,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 67423,
-    "name": "Horsehead no key item room",
+    "name": "Mystery duplicate vanilla boss room",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7413,7 +7413,7 @@
   {
     "author": "link7777RoomJam",
     "bitmask": "0F",
-    "connections": "3BFFFF98",
+    "connections": "3BFF3B98",
     "elevatorScreen": 2,
     "enabled": true,
     "enemies": "035D1D",
@@ -7429,7 +7429,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "Previously void elevator GP sloped inverse T room",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [

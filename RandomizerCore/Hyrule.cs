@@ -546,7 +546,7 @@ public class Hyrule
             ROMData.Dump(newFileName);
         }
 
-        Room search = palaces[6].AllRooms.FirstOrDefault(i => i.Name.Contains("L7 Top Side", StringComparison.OrdinalIgnoreCase));
+        Room search = palaces[6].AllRooms.FirstOrDefault(i => i.Name.Contains("Previously void elevator GP sloped inverse T room", StringComparison.OrdinalIgnoreCase));
         if (search != null)
         {
             Debug.WriteLine(newFileName);

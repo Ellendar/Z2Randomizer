@@ -221,7 +221,7 @@ public partial class MainUI : Form
             large[i].CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
             large[i].CheckStateChanged += new System.EventHandler(AtLeastOneChecked);
         }
-        String lastUsed = Settings.Default.lastused;
+        string lastUsed = Settings.Default.lastused;
         if (lastUsed.Equals(""))
         {
             //updateFlags(null, null);
@@ -249,7 +249,7 @@ public partial class MainUI : Form
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
         WinSparkle.win_sparkle_set_appcast_url("https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml");
-        String version = +typeof(MainUI).Assembly.GetName().Version.Major + "."
+        string version = +typeof(MainUI).Assembly.GetName().Version.Major + "."
             + typeof(MainUI).Assembly.GetName().Version.Minor + "."
             + typeof(MainUI).Assembly.GetName().Version.Build;
         WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", version); // THIS CALL NOT IMPLEMENTED YET
@@ -585,10 +585,8 @@ public partial class MainUI : Form
         */
     }
 
-    private void generateBtn_Click(object sender, EventArgs e)
+    private void SaveDefaults()
     {
-        String flagString = flagsTextBox.Text.Trim();
-
         Settings.Default.filePath = romFileTextBox.Text.Trim();
         Settings.Default.beams = beamSpriteList.SelectedIndex;
         Settings.Default.spells = fastSpellCheckbox.Checked;
@@ -605,9 +603,17 @@ public partial class MainUI : Form
         Settings.Default.useCommunityText = useCommunityTextCheckbox.Checked;
         Settings.Default.lastseed = seedTextBox.Text.Trim();
         Settings.Default.Save();
+    }
+
+    private void generateBtn_Click(object sender, EventArgs e)
+    {
+        string flagString = flagsTextBox.Text.Trim();
+
+        SaveDefaults();
+
         try
         {
-            Int32.Parse(seedTextBox.Text.Trim());
+            int.Parse(seedTextBox.Text.Trim());
         }
         catch (Exception)
         {
@@ -709,7 +715,7 @@ public partial class MainUI : Form
         if (!dontrunhandler)
         {
             RandomizerConfiguration config = ExportConfig();
-            String flags = config.Serialize();
+            string flags = config.Serialize();
             flagsTextBox.Text = flags;
         }
     }
@@ -1695,7 +1701,8 @@ public partial class MainUI : Form
 
     private void Bulk_Generate_Click(object sender, EventArgs e)
     {
-        String flagString = flagsTextBox.Text;
+        string flagString = flagsTextBox.Text;
+        SaveDefaults();
 
         if (flagString.Length != validFlagStringLength)
         {

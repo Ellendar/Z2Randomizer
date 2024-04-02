@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 4.3.0 - ?
+## Version 4.3.0 - March 31st, 2024
 
 ### New features
 - Added support for the 2024 Room Jam! Check out the RoomJam channels in the discord for how you can design/submit new rooms.
@@ -28,7 +28,8 @@
 	- No Duplicate Rooms (By Layout) - Only considers the layout of the room to determine what is a duplicate.
 	- These options may not be available when the list of available rooms is too small to support the number of required rooms.
 - Moved the bagu's woods hint from the bot to the river man (on both sides of the river)
-
+- Added a selector for starting lives.
+- ???
 
 ### Bug Fixes
 - Fixed a bug where palace/overworld items were improperly shuffled. This has several impacts, but most notably fixes the "candle always in palaces" bug.
