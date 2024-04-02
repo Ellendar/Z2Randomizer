@@ -1,5 +1,11 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.1 - April 1st, 2024
+
+- Fixed an incorrect elevator room in GP
+- Fixed an issue where a palace could have an extra P1 boss room
+- Fixed an issue where the UI would not save last used flags during batch generation
+
 ## Version 4.3.0 - March 31st, 2024
 
 ### New features
