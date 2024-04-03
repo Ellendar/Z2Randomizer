@@ -597,14 +597,14 @@ public class Palaces
     }
     private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
     {
-        List<RequirementType> requireables = new List<RequirementType>
-        {
+        List<RequirementType> requireables =
+        [
             RequirementType.KEY,
             RequirementType.UPSTAB,
             RequirementType.DOWNSTAB,
             RequirementType.JUMP,
             RequirementType.FAIRY
-        };
+        ];
         for(int i = 0; i < 6; i++)
         {
             //If there is at least one palace that would be clearable with everything but the glove

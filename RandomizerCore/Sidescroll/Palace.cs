@@ -615,6 +615,10 @@ public class Palace
             if (room.LinkedRoomName != null && room.Enabled && room.LinkedRoom != null)
             {
                 Room linkedRoom = room.LinkedRoom;
+                if(room.isUpDownReversed != linkedRoom.isUpDownReversed)
+                {
+                    throw new Exception("Inconsistent isUpDownReversed in linked rooms");
+                }
                 //set each blank exit on the master room that has a counterpart in the linked room
                 if (linkedRoom.HasLeftExit() && room.Left == null && linkedRoom.Left != null)
                 {

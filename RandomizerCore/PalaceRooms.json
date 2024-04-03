@@ -3821,7 +3821,7 @@
     "isDropZone": true,
     "isEntrance": false,
     "isThunderBirdRoom": false,
-    "isUpDownReversed": false,
+    "isUpDownReversed": true,
     "linkedRoomName": "L7 Bottom Side",
     "map": 45,
     "memoryAddress": 83935,

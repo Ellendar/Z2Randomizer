@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.2 - April 3rd, 2024
+
+- Fixed yet another issue with the L7 room
+
 ## Version 4.3.1 - April 1st, 2024
 
 - Fixed an incorrect elevator room in GP
