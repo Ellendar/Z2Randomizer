@@ -26,9 +26,9 @@ public class PalaceRooms
 
     static PalaceRooms()
     {
-        if (File.Exists("PalaceRooms.json"))
+        if (Util.FileExists("PalaceRooms.json"))
         {
-            string roomsJson = File.ReadAllText("PalaceRooms.json");
+            string roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
             byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
             if (roomsMD5 != Convert.ToBase64String(hash))
             {
@@ -54,9 +54,9 @@ public class PalaceRooms
             throw new Exception("Unable to find PalaceRooms.json. Consider reinstalling or contact Ellendar.");
         }
 
-        if (File.Exists("CustomRooms.json"))
+        if (Util.FileExists("CustomRooms.json"))
         {
-            string roomsJson = File.ReadAllText("CustomRooms.json");
+            string roomsJson = Util.ReadAllTextFromFile("CustomRooms.json");
             byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
 
             dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
