@@ -535,7 +535,7 @@ public class Hyrule
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
             "4.3.2" +
-            File.ReadAllText(config.GetRoomsFile()) +
+            Util.ReadAllTextFromFile(config.GetRoomsFile()) +
             finalRNGState
         ));
         UpdateRom(hash);
