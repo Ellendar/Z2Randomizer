@@ -223,25 +223,24 @@ public class PalaceRooms
         {
             throw new ArgumentException("Invalid Direction.NONE in ItemRoomsByDirection");
         }
-        if (useCustomRooms)
-        {
-            return customRoomsByGroup[group].Where(i => i.IsThunderBirdRoom);
-        }
+
+        Dictionary<RoomGroup, List<Room>> rooms = useCustomRooms ? customRoomsByGroup : roomsByGroup;
         switch(direction)
         {
             case Direction.HORIZONTAL_PASSTHROUGH:
-                return roomsByGroup[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
+                return rooms[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
             case Direction.VERTICAL_PASSTHROUGH:
-                return roomsByGroup[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
+                return rooms[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
             case Direction.NORTH:
-                return roomsByGroup[group].Where(i => i.HasItem && i.HasUpExit());
+                return rooms[group].Where(i => i.HasItem && i.HasUpExit());
             case Direction.SOUTH:
-                return roomsByGroup[group].Where(i => i.HasItem && i.HasDownExit());
+                return rooms[group].Where(i => i.HasItem && i.HasDownExit());
             case Direction.WEST:
-                return roomsByGroup[group].Where(i => i.HasItem && i.HasLeftExit());
+                return rooms[group].Where(i => i.HasItem && i.HasLeftExit());
             case Direction.EAST:
-                return roomsByGroup[group].Where(i => i.HasItem && i.HasRightExit());
+                return rooms[group].Where(i => i.HasItem && i.HasRightExit());
         }
+
         throw new ImpossibleException("Invalid direction in ItemRoomsByDirection");
     }
 
