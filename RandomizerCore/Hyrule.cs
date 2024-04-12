@@ -594,55 +594,62 @@ public class Hyrule
     */
 
 
-    private void RandomizeAttackEffectiveness(bool ohko)
+    private void RandomizeAttackEffectiveness(StatEffectiveness attackEffectiveness)
     {
-        if (!ohko)
+        int[] attackValues = new int[8];
+        for (int i = 0; i < 8; i++)
         {
-            int[] attackValues = new int[8];
-            for (int i = 0; i < 8; i++)
+            attackValues[i] = ROMData.GetByte(0x1E67D + i);
+        }
+
+        int[] newAttackValues = new int[8];
+        for (int i = 0; i < 8; i++)
+        {
+            double minAtk = attackValues[i] - attackValues[i] * .333;
+            double maxAtk = attackValues[i] + attackValues[i] * .5;
+
+            double attack;
+            if (attackEffectiveness == StatEffectiveness.AVERAGE)
             {
-                attackValues[i] = ROMData.GetByte(0x1E67D + i);
-            }
-
-            int[] newAttackValues = new int[8];
-            for (int i = 0; i < 8; i++)
-            {
-                double minAtk = attackValues[i] - attackValues[i] * .333;
-                double maxAtk = attackValues[i] + attackValues[i] * .5;
-
-                double next = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
-
+                attack = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
                 if (i == 0)
                 {
-                    newAttackValues[i] = (int)Math.Round(Math.Max(next, 2));
+                    attack = (int)Math.Round(Math.Max(attack, 2));
                 }
                 else
                 {
-                    if (next < newAttackValues[i - 1])
+                    if (attack < newAttackValues[i - 1])
                     {
-                        newAttackValues[i] = newAttackValues[i - 1];
+                        attack = newAttackValues[i - 1];
                     }
                     else
                     {
-                        newAttackValues[i] = (int)Math.Round(next);
+                        attack = (int)Math.Round(attack);
                     }
                 }
-                newAttackValues[i] = (int)Math.Min(newAttackValues[i], maxAtk);
-                newAttackValues[i] = (int)Math.Max(newAttackValues[i], minAtk);
+                attack = (int)Math.Min(attack, maxAtk);
+                attack = (int)Math.Max(attack, minAtk);
             }
-
-
-            for (int i = 0; i < 8; i++)
+            else if (attackEffectiveness == StatEffectiveness.HIGH)
             {
-                ROMData.Put(0x1E67D + i, (byte)newAttackValues[i]);
+                attack = (int)(attackValues[i] + (attackValues[i] * .5));
             }
+            else if (attackEffectiveness == StatEffectiveness.LOW)
+            {
+                attack = (int)(attackValues[i] - (attackValues[i] * .5));
+            }
+            else
+            {
+                throw new Exception("Invalid Attack Effectiveness");
+            }
+
+            newAttackValues[i] = (int)attack;
         }
-        else
+
+
+        for (int i = 0; i < 8; i++)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                ROMData.Put(0x1E67D + i, (byte)192);
-            }
+            ROMData.Put(0x1E67D + i, (byte)newAttackValues[i]);
         }
     }
 
@@ -1249,12 +1256,14 @@ public class Hyrule
             }
         }
 
+        StatEffectiveness currentStatEffectiveness = isMag ? props.MagicEffectiveness : props.LifeEffectiveness;
+
         for (int j = 0; j < 8; j++)
         {
             for (int i = 0; i < numBanks; i++)
             {
                 int nextVal = life[i, j];
-                if ((props.LifeEffectiveness == StatEffectiveness.AVERAGE && !isMag) || (props.MagicEffectiveness == StatEffectiveness.AVERAGE && isMag))
+                if (currentStatEffectiveness == StatEffectiveness.AVERAGE)
                 {
                     int max = (int)(life[i, j] + life[i, j] * .5);
                     int min = (int)(life[i, j] - life[i, j] * .5);
@@ -1323,7 +1332,10 @@ public class Hyrule
 
         if (props.AttackEffectiveness == StatEffectiveness.MAX)
         {
-            RandomizeAttackEffectiveness(true);
+            for (int i = 0; i < 8; i++)
+            {
+                ROMData.Put(0x1E67D + i, (byte)192);
+            }
             ROMData.Put(0x005432, (byte)193);
             ROMData.Put(0x009432, (byte)193);
             ROMData.Put(0x11436, (byte)193);
@@ -2564,7 +2576,7 @@ public class Hyrule
 
         ROMData.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
 
-        RandomizeAttackEffectiveness(false);
+        RandomizeAttackEffectiveness(props.AttackEffectiveness);
 
         RandomizeLifeOrMagicEffectiveness(true);
 
