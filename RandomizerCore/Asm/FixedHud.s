@@ -23,6 +23,7 @@ RunAudioFrameOrLagFrame:
             jmp HandleLagFrame
         +
         jsr $9000 ; audio handler
+-
     pla
     tay
     pla
@@ -32,23 +33,22 @@ RunAudioFrameOrLagFrame:
 ; Put our lovely lag frame handler in bank 6 because its pretty empty
 ; And since its a lag frame anyway, it doesn't matter what we do since the game will do nothing
 ; for a whole frame anyway.
-.reloc
 HandleLagFrame:
-    ; set the scroll to zero if the player has that flag on
+    ; To allow for testing between the flag on or off, I made it a soft flag 
     lda #PREVENT_HUD_FLASH_ON_LAG
-    beq ++
+    beq -
     ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
     lda $fe
     and #$10
-    beq ++
+    beq -
     ; Check that we are in the side view mode
     lda $0736
     cmp #$0b
-    bne ++
+    bne -
     ; Check if we even have a sprite zero on the screen
     lda $200
     cmp #$f0
-    bcs ++
+    bcs -
     ; keep all flags except for the nametable select to always use nametable 0
     lda $ff
     and #$fc
@@ -56,6 +56,49 @@ HandleLagFrame:
     lda #0
     sta $2005
     sta $2005
+
+    ; Here be dragons :) Write directly to OAM through OAMDATA to set a "lag sprite"
+    ; There's two sources of corruptions when doing this that we need to avoid.
+    ; The first is when you write to OAMADDR, it will corrupt the 8 bytes at that address
+    ; The second is before the start of the frame you need to make sure OAMADDR is at 0
+    ; So the magic trick is if we write 8 bytes starting from $f8, then we'll overwrite the corruption
+    ; and also end with the address 0
+
+    ; But theres one hold up, the sprites at $f8 and $fc are the life bar sprites, so instead
+    ; we can start the write from $f4 and write to the end still
+    lda #$f4
+    sta $2003 ; OAMADDR
+    ; and write a Hand sprite
+    
+    lda #$0e  ; y = 14
+    sta $2004 ; OAMDATA
+    lda #$8E  ; tile = hand sprite
+    sta $2004 ; OAMDATA
+    lda #1    ; attr = palette 1
+    sta $2004 ; OAMDATA
+    lda #$a0  ; x = 160
+    sta $2004 ; OAMDATA
+
+    ; Load the current health/magic bar into here
+    lda $200 + $f8
+    sta $2004 ; OAMDATA
+    lda $200 + $f9
+    sta $2004 ; OAMDATA
+    lda $200 + $fa
+    sta $2004 ; OAMDATA
+    lda $200 + $fb
+    sta $2004 ; OAMDATA
+    lda $200 + $fc
+    sta $2004 ; OAMDATA
+    lda $200 + $fd
+    sta $2004 ; OAMDATA
+    lda $200 + $fe
+    sta $2004 ; OAMDATA
+    lda $200 + $ff
+    sta $2004 ; OAMDATA
+
+    ; That should prevent corruption
+
     ; Use the MMC5 "in frame" flag to wait for the frame to start before waiting for sprite zero
 -
     bit $5204
@@ -73,7 +116,7 @@ HandleLagFrame:
     sta $2000
     stx $2005
     sty $2005
-    ++
+
     pla
     tay
     pla

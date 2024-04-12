@@ -33,7 +33,6 @@ bank7_reset:
     cld
     ldx #$00
     stx $2000
-    stx $5101           ; CHR mode 1x8k banks
     inx
     stx $5103           ; Allow writing to WRAM
 wait_ppu:
@@ -49,6 +48,7 @@ wait_ppu:
     stx $5102           ; Allow writing to WRAM
     inx
     stx $5100           ; mode 3 is 4 8kb PRG banks
+    stx $5101           ; mode 3 is CHR mode 1x8k banks
     lda #$50            ; horizontal mirroring
     sta $5105
     jsr SwapCHR
@@ -60,11 +60,30 @@ wait_ppu:
 
 .reloc
 SwapCHR:
-    lsr
+    ; 1kb sprite banks are 20-27 and the 1kb bg banks are 28-2b
+    asl
+    asl
+    sta $5120
+    ; clc ; the asl clears it for now
+    adc #1
+    sta $5121
+    adc #1
+    sta $5122
+    adc #1
+    sta $5123
+    adc #1
+    sta $5124
+    sta $5128
+    adc #1
+    sta $5125
+    sta $5129
+    adc #1
+    sta $5126
+    sta $512a
+    adc #1
     sta $5127
     sta $512b
     lda #0
-    clc
     rts
 
 .reloc

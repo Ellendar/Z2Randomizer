@@ -1105,6 +1105,7 @@ public partial class MainUI : Form
         configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
         configuration.UseCustomRooms = useCustomRoomsBox.Checked;
+        configuration.DisableHUDLag = disableHUDLag.Checked;
         configuration.Sprite = characterSpriteList.SelectedIndex;
         configuration.BeepFrequency = beepFrequencyDropdown.SelectedIndex switch
         {

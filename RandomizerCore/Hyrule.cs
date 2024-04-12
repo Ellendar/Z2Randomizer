@@ -3604,10 +3604,10 @@ FixSoftlock:
         engine.Modules.Add(a.Actions);
     }
 
-    public void ApplyHudFixes(Engine engine)
+    public void ApplyHudFixes(Engine engine, bool preventFlash)
     {
         Assembler.Assembler a = new();
-        a.Assign("PREVENT_HUD_FLASH_ON_LAG", 0);
+        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
         engine.Modules.Add(a.Actions);
     }
@@ -3691,7 +3691,7 @@ StandardizeDrops:
         {
         }
         FixSoftLock(engine);
-        ApplyHudFixes(engine);
+        ApplyHudFixes(engine, props.DisableHUDLag);
         RandomizeStartingValues(engine);
         
         ROMData.FixContinentTransitions(engine);
