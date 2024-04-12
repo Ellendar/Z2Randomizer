@@ -88,10 +88,47 @@ public class Util
         (p2.Item, p1.Item) = (p1.Item, p2.Item);
         (p2.Name, p1.Name) = (p1.Name, p2.Name);
     }
+
     public static string ByteArrayToHexString(byte[] bytes)
     {
         string hex = BitConverter.ToString(bytes);
         return hex.Replace("-", "");
+    }
+
+    /// <summary>
+    /// Cross platform safe method for finding files that defaults to current working directory with a fallback of the directory
+    /// that the executable is running from.
+    /// </summary>
+    /// <param name="fileName">The </param>
+    /// <returns>Whether the file exists in the current working directory or in the directory of the executable.</returns>
+    public static bool FileExists(string fileName)
+    {
+        bool exists = File.Exists(fileName);
+        if (!exists)
+        {
+            string absoluteFilePath = FilePathFromAssemblyLocation(fileName);
+            exists = File.Exists(absoluteFilePath);
+        }
+
+        return exists;
+    }
+
+    public static string ReadAllTextFromFile(string fileName)
+    {
+        string fileToLoad = fileName;
+        if (!File.Exists(fileName))
+        {
+            fileToLoad = FilePathFromAssemblyLocation(fileName);
+        }
+
+        return File.ReadAllText(fileToLoad);
+    }
+
+    private static string FilePathFromAssemblyLocation(string fileName)
+    {
+        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        return Path.Combine(executingDirectory, fileName);
     }
 
     /// <summary>
