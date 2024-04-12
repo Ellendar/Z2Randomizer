@@ -616,33 +616,6 @@ public class ROM
         Put(0x1a975, 0);
     }
 
-    /// <summary>
-    /// I assume this fixes the XP on screen transition softlock, but who knows with all these magic bytes.
-    /// </summary>
-    public void FixSoftLock()
-    {
-        Put(0x1E19A, (byte)0x20);
-        Put(0x1E19B, (byte)0xAA);
-        Put(0x1E19C, (byte)0xFE);
-
-        Put(0x1FEBA, (byte)0xEE);
-        Put(0x1FEBB, (byte)0x26);
-        Put(0x1FEBC, (byte)0x07);
-        Put(0x1FEBD, (byte)0xAD);
-        Put(0x1FEBE, (byte)0x4C);
-        Put(0x1FEBF, (byte)0x07);
-        Put(0x1FEC0, (byte)0xC9);
-        Put(0x1FEC1, (byte)0x02);
-        Put(0x1FEC2, (byte)0xF0);
-        Put(0x1FEC3, (byte)0x05);
-        Put(0x1FEC4, (byte)0xA2);
-        Put(0x1FEC5, (byte)0x00);
-        Put(0x1FEC6, (byte)0x8E);
-        Put(0x1FEC7, (byte)0x4C);
-        Put(0x1FEC8, (byte)0x07);
-        Put(0x1FEC9, (byte)0x60);
-    }
-
     public void SetLevelCap(int atkMax, int magicMax, int lifeMax)
     {
 
@@ -763,8 +736,93 @@ public class ROM
         Put(0x851a, new byte[] { 0xf0, 0xb9 }); //maze island
     }
 
-    public void FixContinentTransitions()
+    public void FixContinentTransitions(Engine engine)
     {
+        Assembler.Assembler a = new();
+        a.Code("""
+
+.macpack common
+.import SwapPRG
+
+CurrentRegion = $0706
+PRG_bank = $0769
+
+.segment "PRG7"
+
+; Patch switching the bank when loading the overworld
+.org $cd4a
+    ldy CurrentRegion
+    lda ExpandedRegionBankTable,y
+    sta PRG_bank
+    jsr SwapPRG
+    beq $cd5f ; unconditional jmp to skip the freespace
+FREE_UNTIL $cd5f
+
+.org $c506
+    tay
+    lda ExpandedRegionBankTable+1,y
+    asl a
+    tay
+
+.org $cd84
+    tay
+    lda ExpandedRegionBankTable+1,y
+    asl a
+    tay
+
+.org $ce32
+    lda ExpandedRegionBankTable+4,y
+
+.reloc
+ExpandedRegionBankTable:
+    .byte $01, $01, $02, $02, $00, $10, $20, $20, $30, $30, $30, $30, $40, $50, $60, $60, $30
+    .byte $00, $02, $00, $02
+
+.org $C265
+; Change the pointer table for Item presence to include only the low byte
+; Since the high byte is always $06
+bank7_Pointer_table_for_Item_Presence:
+    .byte .lobyte($0600)
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($0620)
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($0640)
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($06C0)
+; Add these new pointers for item presence as well
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($06C0)
+FREE_UNTIL $C285
+
+; Patch loading from the table to use the new address
+.org $c2b8
+    lda bank7_Pointer_table_for_Item_Presence,y
+    sta $00
+    lda #06
+    sta $01
+    nop
+.assert * = $C2C2
+
+; Remove vanilla check to see if you are in east hyrule when using the raft
+.segment "PRG0"
+.org $85a2
+    nop
+    nop
+
+""");
+        engine.Modules.Add(a.Actions);
         //https://github.com/cfrantz/z2doc/wiki/add-an-extra-overworld
         Put(0x1FFF0, new byte[] { 0x01, 0x01, 0x02, 0x02, 0x00, 0x10, 0x20, 0x20, 0x30, 0x30, 0x30, 0x30, 0x40, 0x50, 0x60, 0x60, 0x30 });
 

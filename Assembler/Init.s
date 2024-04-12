@@ -88,8 +88,12 @@ FREE "PRG5" [$93ae, $9400)
 FREE "PRG5" [$a54f, $a600)
 FREE "PRG5" [$bda1, $c000)
 
+FREE "PRG6" [$878c, $9000)
+FREE "PRG6" [$9da8, $9fff)
+FREE "PRG6" [$ac09, $bfff)
+
 ; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
-; free space for patches
-FREE "PRG7" [$f369, $fcfb);
+; free space for patches. Keep it disabled as much as possible
+; FREE "PRG7" [$f369, $fcfb);
 
 

@@ -360,111 +360,13 @@ public class Hyrule
         shuffler.ShuffleDrops(ROMData, RNG);
         shuffler.ShufflePbagAmounts(ROMData, RNG);
 
-        ROMData.FixSoftLock();
         ROMData.ExtendMapSize();
         ROMData.DisableTurningPalacesToStone();
         ROMData.UpdateMapPointers();
-        ROMData.FixContinentTransitions();
 
         if (props.DashAlwaysOn)
         {
             ROMData.Put(0x13C3, new byte[] { 0x30, 0xD0 });
-        }
-
-        /*
-        Up + A:
-        1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
-        1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
-        d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
-        feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-        CAD0(1CAE0): (20bcd3) c902 10
-        CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-        CF92: (1CFA2): Jump to feb3(20b3fe)
-
-        */
-
-        if (props.UpARestartsAtPalaces)
-        {
-            ROMData.Put(0x1cbba, 0x20);
-            ROMData.Put(0x1cbbb, 0x9a);
-            ROMData.Put(0x1cbbc, 0xd3);
-
-            ROMData.Put(0x1d3aa, 0x8d);
-            ROMData.Put(0x1d3ab, 0x07);
-            ROMData.Put(0x1d3ac, 0x07);
-            ROMData.Put(0x1d3ad, 0xad);
-            ROMData.Put(0x1d3ae, 0x07);
-            ROMData.Put(0x1d3af, 0x07);
-            ROMData.Put(0x1d3b0, 0xc9);
-            ROMData.Put(0x1d3b1, 0x03);
-            ROMData.Put(0x1d3b2, 0x30);
-            ROMData.Put(0x1d3b3, 0x12);
-            ROMData.Put(0x1d3b4, 0xad);
-            ROMData.Put(0x1d3b5, 0xb0);
-            ROMData.Put(0x1d3b6, 0x0f);
-            ROMData.Put(0x1d3b7, 0xc9);
-            ROMData.Put(0x1d3b8, 0x01);
-            ROMData.Put(0x1d3b9, 0xf0);
-            ROMData.Put(0x1d3ba, 0x0b);
-            ROMData.Put(0x1d3bb, 0xad);
-            ROMData.Put(0x1d3bc, 0x61);
-            ROMData.Put(0x1d3bd, 0x05);
-            ROMData.Put(0x1d3be, 0x8d);
-            ROMData.Put(0x1d3bf, 0xb1);
-            ROMData.Put(0x1d3c0, 0x0f);
-            ROMData.Put(0x1d3c1, 0xa9);
-            ROMData.Put(0x1d3c2, 0x01);
-            ROMData.Put(0x1d3c3, 0x8D);
-            ROMData.Put(0x1d3c4, 0xB0);
-            ROMData.Put(0x1d3c5, 0x0F);
-            ROMData.Put(0x1d3c6, 0xad);
-            ROMData.Put(0x1d3c7, 0x07);
-            ROMData.Put(0x1d3c8, 0x07);
-            ROMData.Put(0x1d3c9, 0x29);
-            ROMData.Put(0x1d3ca, 0x07);
-            ROMData.Put(0x1d3cb, 0x60);
-            ROMData.Put(0x1d3cc, 0xad);
-            ROMData.Put(0x1d3cd, 0xb1);
-            ROMData.Put(0x1d3ce, 0x0f);
-            ROMData.Put(0x1d3cf, 0x8d);
-            ROMData.Put(0x1d3d0, 0x61);
-            ROMData.Put(0x1d3d1, 0x05);
-            ROMData.Put(0x1d3d2, 0x20);
-            ROMData.Put(0x1d3d3, 0x57);
-            ROMData.Put(0x1d3d4, 0xa0);
-            ROMData.Put(0x1d3d5, 0xad);
-            ROMData.Put(0x1d3d6, 0x07);
-            ROMData.Put(0x1d3d7, 0x07);
-            ROMData.Put(0x1d3d8, 0x60);
-
-            //feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-            ROMData.Put(0x1feca, 0x8c);
-            ROMData.Put(0x1fecb, 0x07);
-            ROMData.Put(0x1fecc, 0x07);
-            ROMData.Put(0x1fecd, 0xa9);
-            ROMData.Put(0x1fece, 0x00);
-            ROMData.Put(0x1fecf, 0x8d);
-            ROMData.Put(0x1fed0, 0xb0);
-            ROMData.Put(0x1fed1, 0x0f);
-            ROMData.Put(0x1fed2, 0x60);
-
-            //CAD0(1CAE0): (20b7d3) c902 10
-            ROMData.Put(0x1cae0, 0x20);
-            ROMData.Put(0x1cae1, 0xbc);
-            ROMData.Put(0x1cae2, 0xd3);
-            ROMData.Put(0x1cae3, 0xc9);
-            ROMData.Put(0x1cae4, 0x03);
-            ROMData.Put(0x1cae5, 0x10);
-
-            //CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-            ROMData.Put(0x1caf3, 0xea);
-            ROMData.Put(0x1caf4, 0xea);
-            ROMData.Put(0x1caf5, 0xea);
-
-            //CF92: (1CFA2): Jump to feba(20bafe)
-            ROMData.Put(0x1cfa2, 0x20);
-            ROMData.Put(0x1cfa3, 0xba);
-            ROMData.Put(0x1cfa4, 0xfe);
         }
 
         if (props.PermanentBeam)
@@ -473,37 +375,9 @@ public class Hyrule
             ROMData.Put(0x186d, 0xEA);
         }
 
-        if (props.StandardizeDrops)
-        {
-            ROMData.Put(0x1e8bd, 0x20);
-            ROMData.Put(0x1e8be, 0x4c);
-            ROMData.Put(0x1e8bf, 0xff);
-
-            ROMData.Put(0x1ff5c, 0xc0);
-            ROMData.Put(0x1ff5d, 0x02);
-            ROMData.Put(0x1ff5e, 0xd0);
-            ROMData.Put(0x1ff5f, 0x07);
-            ROMData.Put(0x1ff60, 0xad);
-            ROMData.Put(0x1ff61, 0xfe);
-            ROMData.Put(0x1ff62, 0x06);
-            ROMData.Put(0x1ff63, 0xee);
-            ROMData.Put(0x1ff64, 0xfe);
-            ROMData.Put(0x1ff65, 0x06);
-            ROMData.Put(0x1ff66, 0x60);
-            ROMData.Put(0x1ff67, 0xad);
-            ROMData.Put(0x1ff68, 0xff);
-            ROMData.Put(0x1ff69, 0x06);
-            ROMData.Put(0x1ff6a, 0xee);
-            ROMData.Put(0x1ff6b, 0xff);
-            ROMData.Put(0x1ff6c, 0x06);
-            ROMData.Put(0x1ff6d, 0x60);
-
-        }
-
         ShortenWizards();
 
-        startRandomizeStartingValuesTimestamp = DateTime.Now;
-        RandomizeStartingValues();
+        // startRandomizeStartingValuesTimestamp = DateTime.Now;
         startRandomizeEnemiesTimestamp = DateTime.Now;
         RandomizeEnemyStats();
 
@@ -2226,7 +2100,7 @@ public class Hyrule
             ROMData.Put(addr[swap], temp);
         }
     }
-    private void RandomizeStartingValues()
+    private void RandomizeStartingValues(Engine engine)
     {
 
         ROMData.Put(0x17AF3, (byte)props.StartAtk);
@@ -2246,7 +2120,7 @@ public class Hyrule
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(ROMData, RNG);
+            shuffler.ShuffleBossDrop(ROMData, RNG, engine);
         }
 
         if (props.RemoveSpellItems)
@@ -3618,14 +3492,168 @@ HelmetHeadGoomaFix:
 .org $bd75
     jsr HelmetHeadGoomaFix
 
-; Also fix a key glitch
 .org $9b27
+; Also fix a key glitch
     nop
     nop
     nop
 
 """, "helmethead_gooma_fix.s");
         engine.Modules.Add(assembler.Actions);
+    }
+
+    private void RestartWithPalaceUpA(Engine engine) {
+        
+        /*
+        Up + A:
+        1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
+        1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
+        d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
+        feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
+        CAD0(1CAE0): (20bcd3) c902 10
+        CAE3(1CAF3): NOP NOP NOP(EAEAEA)
+        CF92: (1CFA2): Jump to feb3(20b3fe)
+
+        */
+
+        Assembler.Assembler a = new();
+        a.Code("""
+update_next_level_exp = $a057
+
+;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
+world_state = $707
+area_code = $561
+
+.segment "PRG7"
+
+.org $cbaa
+    jsr PalacePatch
+
+.reloc
+PalacePatch:
+    sta world_state
+    ; lda $0707 ; don't need to reload 707 here
+    ; if < 3 do the original patch
+    cmp #$03
+    bmi @Exit
+    ; or if our temp flag is already set, do the original code
+    lda $07b0
+    cmp #$01
+    beq ReloadExpForReset
+        lda area_code
+        sta $07b1 ; store the area code into a temp ram location
+        lda #$01
+        sta $07b0 ; set a flag in another empty ram location
+        lda world_state
+@Exit:
+        rts
+ReloadExpForReset:
+    lda $07b1
+    sta area_code
+    jsr update_next_level_exp
+    lda world_state
+    rts
+
+.org $cad0
+    jsr ReloadExpForReset
+    cmp #3
+    bpl $cade ; *+9
+
+.org $cae3
+    ; Don't clear area code on reset
+    nop
+    nop
+    nop
+
+.org $cf92
+    jsr SaveWorldStateAndClearFlag
+
+.reloc
+SaveWorldStateAndClearFlag:
+    ; Precondition y = 0
+    sty world_state
+    sty $07b0
+    rts
+
+""", "restart_palace_upa.s");
+        engine.Modules.Add(a.Actions);
+
+    }
+
+    /// <summary>
+    /// I assume this fixes the XP on screen transition softlock, but who knows with all these magic bytes.
+    /// </summary>
+    private void FixSoftLock(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Code("""
+.segment "PRG7"
+.org $e18a
+    jsr FixSoftlock
+
+.reloc
+FixSoftlock:
+    inc $0726
+    lda $074c ; branch if dialog type is not "talking"
+    cmp #$02
+    beq +
+        ldx #$00  ; otherwise close the talking dialog
+        stx $074c
++   rts
+""", "fix_softlock.s");
+        engine.Modules.Add(a.Actions);
+    }
+
+    public void ApplyHudFixes(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Assign("PREVENT_HUD_FLASH_ON_LAG", 0);
+        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
+        engine.Modules.Add(a.Actions);
+    }
+    
+    public void StandardizeDrops(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Code("""
+.segment "PRG7"
+.org $e8ad
+    jsr StandardizeDrops
+.reloc
+StandardizeDrops:
+    cpy #$02
+    bne +
+        lda $06fe
+        inc $06fe
+        rts
++   lda $06ff
+    inc $06ff
+    rts
+""", "standardize_drops.s");
+        engine.Modules.Add(a.Actions);
+        ROMData.Put(0x1e8bd, 0x20);
+        ROMData.Put(0x1e8be, 0x4c);
+        ROMData.Put(0x1e8bf, 0xff);
+
+        ROMData.Put(0x1ff5c, 0xc0);
+        ROMData.Put(0x1ff5d, 0x02);
+        ROMData.Put(0x1ff5e, 0xd0);
+        ROMData.Put(0x1ff5f, 0x07);
+        ROMData.Put(0x1ff60, 0xad);
+        ROMData.Put(0x1ff61, 0xfe);
+        ROMData.Put(0x1ff62, 0x06);
+        ROMData.Put(0x1ff63, 0xee);
+        ROMData.Put(0x1ff64, 0xfe);
+        ROMData.Put(0x1ff65, 0x06);
+        ROMData.Put(0x1ff66, 0x60);
+        ROMData.Put(0x1ff67, 0xad);
+        ROMData.Put(0x1ff68, 0xff);
+        ROMData.Put(0x1ff69, 0x06);
+        ROMData.Put(0x1ff6a, 0xee);
+        ROMData.Put(0x1ff6b, 0xff);
+        ROMData.Put(0x1ff6c, 0x06);
+        ROMData.Put(0x1ff6d, 0x60);
+
     }
 
     private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG)
@@ -3653,5 +3681,19 @@ HelmetHeadGoomaFix:
         {
             ROMData.UpAController1(engine);
         }
+        
+        if (props.UpARestartsAtPalaces)
+        {
+            RestartWithPalaceUpA(engine);
+        }
+
+        if (props.StandardizeDrops)
+        {
+        }
+        FixSoftLock(engine);
+        ApplyHudFixes(engine);
+        RandomizeStartingValues(engine);
+        
+        ROMData.FixContinentTransitions(engine);
     }
 }
