@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
@@ -1774,59 +1775,63 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int y, int x, Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet, 
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet, 
         int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
     {
+        Stack<(int, int)> to_visit = new();
+        // push the initial coord to the visitation stack
+        to_visit.Push((start_y, start_x));
         try
         {
-            if (covered[y, x])
+            while (to_visit.Count > 0)
             {
-                return;
-            }
-            covered[y, x] = true;
+                var (y, x) = to_visit.Pop();
+                // This shouldn't happen during the loop but could maybe happen from the function caller
+                if (covered[y, x])
+                {
+                    continue;
+                }
+                covered[y, x] = true;
 
-            Terrain terrain = map[y, x];
-            if ((terrain == Terrain.LAVA
-                || terrain == Terrain.BRIDGE
-                || terrain == Terrain.CAVE
-                || terrain == Terrain.ROAD
-                || terrain == Terrain.PALACE
-                || terrain == Terrain.TOWN
-                || walkableTerrains.Contains(terrain)
-                || (terrain == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
-                || (terrain == Terrain.ROCK && itemGet[Item.HAMMER])
-                || (terrain == Terrain.RIVER_DEVIL && itemGet[Item.FLUTE]))
-                //East desert jump blocker
-                && !(
-                    needJump
-                    && jumpBlockY == y
-                    && jumpBlockX == x
-                    && (!spellGet[Spell.JUMP] && !spellGet[Spell.FAIRY])
+                Terrain terrain = map[y, x];
+                if ((terrain == Terrain.LAVA
+                    || terrain == Terrain.BRIDGE
+                    || terrain == Terrain.CAVE
+                    || terrain == Terrain.ROAD
+                    || terrain == Terrain.PALACE
+                    || terrain == Terrain.TOWN
+                    || walkableTerrains.Contains(terrain)
+                    || (terrain == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
+                    || (terrain == Terrain.ROCK && itemGet[Item.HAMMER])
+                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Item.FLUTE]))
+                    //East desert jump blocker
+                    && !(
+                        needJump
+                        && jumpBlockY == y
+                        && jumpBlockX == x
+                        && (!spellGet[Spell.JUMP] && !spellGet[Spell.FAIRY])
+                    )
+                    //Fairy cave is traversable
+                    && !(needFairy && fairyBlockY == y && fairyBlockX == x && !spellGet[Spell.FAIRY])
                 )
-                //Fairy cave is traversable
-                && !(needFairy && fairyBlockY == y && fairyBlockX == x && !spellGet[Spell.FAIRY])
-            )
-            {
-                visitation[y, x] = true;
-
-                if (y - 1 >= 0)
                 {
-                    UpdateReachable(ref covered, y - 1, x, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
-                }
-
-                if (y + 1 < MAP_ROWS)
-                {
-                    UpdateReachable(ref covered, y + 1, x, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
-                }
-
-                if (x - 1 >= 0)
-                {
-                    UpdateReachable(ref covered, y, x - 1, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
-                }
-
-                if (x + 1 < MAP_COLS)
-                {
-                    UpdateReachable(ref covered, y, x + 1, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                    visitation[y, x] = true;
+                    if (y - 1 >= 0 && !covered[y - 1, x])
+                    {
+                        to_visit.Push((y - 1, x));
+                    }
+                    if (y + 1 < MAP_ROWS && !covered[y + 1, x])
+                    {
+                        to_visit.Push((y + 1, x));
+                    }
+                    if (x - 1 >= 0 && !covered[y, x - 1])
+                    {
+                        to_visit.Push((y, x - 1));
+                    }
+                    if (x + 1 < MAP_COLS && !covered[y, x + 1])
+                    {
+                        to_visit.Push((y, x + 1));
+                    }
                 }
             }
         }
