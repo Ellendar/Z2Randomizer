@@ -2031,7 +2031,7 @@ public partial class MainUI : Form
             noDuplicateRoomsByEnemiesCheckbox.Enabled = true;
         }
 
-        if (palaceStyleList.SelectedIndex != 0)
+        if (gpStyleList.SelectedIndex != 0)
         {
             tbirdRequiredCheckbox.Enabled = true;
         }

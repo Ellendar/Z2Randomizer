@@ -1525,6 +1525,12 @@ public class RandomizerConfiguration
             properties.RemoveTbird = false;
         }
 
+        //#180 Remove tbird doesn't currently work with vanilla, so make sure even if it comes up on random it works properly.
+        if(properties.GPStyle == PalaceStyle.VANILLA)
+        {
+            properties.RemoveTbird = false;
+        }
+
         if (!properties.SwapPalaceCont)
         {
             properties.P7shuffle = false;
