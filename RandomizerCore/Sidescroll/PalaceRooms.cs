@@ -22,7 +22,7 @@ public class PalaceRooms
 
 
 
-    public static readonly string roomsMD5 = "bALtB+T2aJuye3op9TW3sg==";
+    public static readonly string roomsMD5 = "07/KYDpfa37HFYYRn8Je/A==";
 
     static PalaceRooms()
     {
