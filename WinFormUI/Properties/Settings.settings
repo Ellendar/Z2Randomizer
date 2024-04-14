@@ -51,7 +51,7 @@
       <Value Profile="(Default)">{"Flagset": "RAhN6FAABRFJUNmCsyX5D+@KCiLATrZ!AAFRA", "Name": "Beginner", "Tooltip": "This is great for people looking for a casual experience"}</Value>
     </Setting>
     <Setting Name="customizableButton2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "RAAN6BABYRFs2NmCs3Y5c+!59qtxbtJdAAFRA", "Name": "Standard", "Tooltip": "Flags for the 2023 Standard Tournament"}</Value>
+      <Value Profile="(Default)">{"Flagset": "RAAN6BABYbFs2NmCs3Y5c+!59qtgbtJdAAFRA", "Name": "Standard", "Tooltip": "Standard Flags commonly used for races."}</Value>
     </Setting>
     <Setting Name="customizableButton3" Type="System.String" Scope="User">
       <Value Profile="(Default)">{"Flagset": "hEAB0thBYbWs4WELs4HGD+!59rMgbtJ!AAFRA", "Name": "Max Rando", "Tooltip": "Flags for the 2023 Max Rando Tournament"}</Value>
