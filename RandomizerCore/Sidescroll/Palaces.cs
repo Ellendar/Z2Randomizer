@@ -665,6 +665,7 @@ public class Palaces
             {
                 requireables.Add(RequirementType.JUMP);
                 requireables.Add(RequirementType.FAIRY);
+                requireables.Add(RequirementType.DOWNSTAB);
             }
             //If we can clear P2 with this stuff, we can also get the glove
             if (palace2.CanClearAllRooms(requireables, Item.GLOVE))
