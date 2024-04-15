@@ -205,7 +205,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAhN6FAABRFJUNmCsyX5D+@KCiLATrZ!AAFRA\", \"Name\": \"Beginner\", \"Tooltip" +
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RChN6GAABRFJUNmCsyX5t+@KChsAjtZdAAFRA\", \"Name\": \"Beginner\", \"Tooltip" +
             "\": \"This is great for people looking for a casual experience\"}")]
         public string customizableButton1 {
             get {
@@ -293,7 +293,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0thCqbs36emL4XpGD+!5@W4xeWvdAALhA\", \"Name\": \"Random%\", \"Tooltip\"" +
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0thCqbs36emL4XpGU+!5@W4xeWvdAALhA\", \"Name\": \"Random%\", \"Tooltip\"" +
             ": \"Is it randomized? Who knows?\"}")]
         public string customizableButton4 {
             get {
