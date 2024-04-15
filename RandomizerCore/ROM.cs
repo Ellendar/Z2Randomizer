@@ -651,74 +651,72 @@ public class ROM
 
     }
 
-    public void ExtendMapSize()
+    public void ExtendMapSize(Engine engine)
     {
         //Implements CF's map size hack:
         //https://github.com/cfrantz/z2doc/wiki/bigger-overworlds
+        Assembler.Assembler a = new();
+        a.Code("""
+.macpack common
 
-        /*
-         * cd9b: a000          LDY #$00              # Initialize start index
-        cd9d: b102          LDA ($02,Y)           # load from source
-        cd9f: 9120          STA ($20,Y)           # store to dest
-        cda1: c8            INY
-        cda2: 10f9          BPL $f9 (target=cd9d) # do it 128 times
-        cda4: ca            DEX                   # decrement counter
-        cda5: f00e          BEQ $0e (target=cdb5) # done yet?
-        cda7: b102          LDA ($02,Y)           # load from source
-        cda9: 9120          STA ($20,Y)           # store to dest
-        cdab: c8            INY
-        cdac: d0f9          BNE $f9 (target=cda7) # 128 more times
-        cdae: e603          INC $03               # increment source pointer
-        cdb0: e621          INC $21               # increment dest pointer
-        cdb2: ca            DEX                   # decrement counter
-        cdb3: d0e8          BNE $e8 (target=cd9d) # not done? do it again.
-        cdb5: 60            RTS                   # return to caller
-        */
+.segment "PRG0"
+; Update the pointer to the overworld data
+.org $87f7
+    lda #$7a
 
-        Put(0x1cda8, new byte[] { 0x4c, 0xc6, 0xcd, 0xa0, 0x00, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0x10, 0xf9, 0xca, 0xf0, 0x0e, 0xb1, 0x02, 0x91, 0x20, 0xc8, 0xd0, 0xf9, 0xe6, 0x03, 0xe6, 0x21, 0xca, 0xd0, 0xe8, 0x60 });
+.segment "PRG7"
+.org $cd98
+    jsr LoadMapData
+    jmp $cdf5
 
-        //# Fill with NOPs all the way to $cdc6
-        for (int i = 0x1cdc6; i < 0x1cdd6; i++)
-        {
-            Put(i, 0xea);
-        }
+FREE_UNTIL $cdf5
 
-        /*
-         * cdc6: ae0607        LDX $0706       # load overworld number into X
-            cdc9: bd27cd        LDA $cd27,X     # overworld to map pointer offset
-            cdcc: aa            TAX             # into index X
-            cdcd: bd0885        LDA $8508,X     # put ROM pointer into $02-$03
-            cdd0: 8502          STA $02
-            cdd2: bd0985        LDA $8509,X
-            cdd5: 8503          STA $03
-        */
-        Put(0x1cdd6, new byte[] { 0xae, 0x06, 0x07, 0xbd, 0xf1, 0xff, 0xaa, 0xbd, 0x08, 0x85, 0x85, 0x02, 0xbd, 0x09, 0x85, 0x85, 0x03 });
+.reloc
+LoadDataThroughPointers:
+    ldy #$00
+    --  lda ($02),y
+        sta ($20),y
+        iny
+        bpl --
+        dex
+        beq +
+    -   lda ($02),y
+        sta ($20),y
+        iny
+        bne -
+        inc $03
+        inc $21
+        dex
+        bne --
++   rts
 
-        /*
-         * cdd7: a900          LDA #$00        # put destination $7c00 into $20-$21
-            cdd9: 8520          STA $20
-            cddb: a97c          LDA #$7a
-            cddd: 8521          STA $21
-            cddf: a207          LDX #$07        # 7 half-pages == 896 bytes
-            cde1: 209bcd        JSR $cd9b       # copy
-        */
+.reloc
+.import RaftWorldMappingTable
+LoadMapData:
+    ldx $0706
+    lda RaftWorldMappingTable,x
+    tax
+    lda $8508,x
+    sta $02
+    lda $8508+1,x
+    sta $03
+    lda #$00
+    sta $20
+    lda #$7a
+    sta $21
+    ldx #$0b
+    jsr LoadDataThroughPointers
+    lda #$a0
+    sta $02
+    lda #$88
+    sta $03
+    lda #$70
+    sta $21
+    ldx #$08
+    jmp LoadDataThroughPointers
 
-        Put(0x1cde7, new byte[] { 0xa9, 0x00, 0x85, 0x20, 0xa9, 0x7a, 0x85, 0x21, 0xa2, 0x0b, 0x20, 0x9b, 0xcd });
-
-        /*
-         * cde4: a9a0          LDA #$a0        # load source $88a0 into $02-$03
-            cde6: 8502          STA $02
-            cde8: a988          LDA #$88
-            cdea: 8503          STA $03
-            cdec: a970          LDA #$70        # load dest $7000 into $20-$21 (address
-            cdee: 8521          STA $21         #   $20 should still be 0)
-            cdf0: a208          LDX #$08        # 8 half-pages == 1024 bytes
-            cdf2: 209bcd        JSR $cd9b       # copy
-        */
-
-        Put(0x1cdf4, new byte[] { 0xa9, 0xa0, 0x85, 0x02, 0xa9, 0x88, 0x85, 0x03, 0xa9, 0x70, 0x85, 0x21, 0xa2, 0x08, 0x20, 0x9b, 0xcd });
-
-        Put(0x808, 0x7a);
+""", "extend_map_size.s");
+        engine.Modules.Add(a.Actions);
     }
 
     public void DisableTurningPalacesToStone()
@@ -760,13 +758,13 @@ FREE_UNTIL $cd5f
 
 .org $c506
     tay
-    lda ExpandedRegionBankTable+1,y
+    lda RaftWorldMappingTable,y
     asl a
     tay
 
 .org $cd84
     tay
-    lda ExpandedRegionBankTable+1,y
+    lda RaftWorldMappingTable,y
     asl a
     tay
 
@@ -776,7 +774,10 @@ FREE_UNTIL $cd5f
 .reloc
 ExpandedRegionBankTable:
     .byte $01, $01, $02, $02, $00, $10, $20, $20, $30, $30, $30, $30, $40, $50, $60, $60, $30
+.reloc
+RaftWorldMappingTable:
     .byte $00, $02, $00, $02
+.export RaftWorldMappingTable
 
 .org $C265
 ; Change the pointer table for Item presence to include only the low byte
@@ -823,37 +824,6 @@ FREE_UNTIL $C285
 
 """);
         engine.Modules.Add(a.Actions);
-        //https://github.com/cfrantz/z2doc/wiki/add-an-extra-overworld
-        Put(0x1FFF0, new byte[] { 0x01, 0x01, 0x02, 0x02, 0x00, 0x10, 0x20, 0x20, 0x30, 0x30, 0x30, 0x30, 0x40, 0x50, 0x60, 0x60, 0x30 });
-
-        /*
-         * cd4a: ad0607        LDA $0706     # Get overworld number
-            cd4d: 0a            ASL A         # times 4
-            cd4e: 0a            ASL A
-            cd4f: 0d0a07        ORA $070a     # plus previous overworld number
-            cd52: a8            TAY           # into index Y
-            cd53: b9e0ff        LDA $ffe0,Y   # load bank from lookup table
-            cd56: 8d6907        STA $0769     # store in bank-to-switch-to
-            cd59: 8d6907        STA $0769
-            cd5c: 20ccff        JSR $ffcc     # load bank
-            cd5f: ade0bf        LDA $bfe0     # load pseudo-bank
-        */
-        Put(0x1cd5a, new byte[] { 0xad, 0x06, 0x07, 0xea, 0xea, 0xea, 0xea, 0xea, 0xa8, 0xb9, 0xe0, 0xff, 0x8d, 0x69, 0x07, 0x8d, 0x69, 0x07, 0x020, 0xcc, 0xff });
-
-        Put(0x1cd94, new byte[] { 0xa8, 0xb9, 0xf1, 0xff, 0x0a, 0xa8 });
-        Put(0x1c516, new byte[] { 0xa8, 0xb9, 0xf1, 0xff, 0x0a, 0xa8 });
-        Put(0x20001, new byte[] { 0x00, 0x02, 0x00, 0x02 });
-        Put(0x1ce43, new byte[] { 0xe4, 0xff });
-        //put(0x1cdd2, new byte[] { 0xf0, 0xff });
-
-        //update item memory locations:
-        Put(0x1f310, GetBytes(0x1c275, 0x1c295));
-        Put(0x1f330, new byte[] { 0x60, 0x06, 0x60, 0x06, 0x80, 0x06, 0xa0, 0x06, 0xc0, 0x06 });
-        Put(0x1c2c9, new byte[] { 0x00, 0xF3 });
-        Put(0x1c2ce, new byte[] { 0x01, 0xF3 });
-
-        //fix raft check
-        Put(0x5b2, new byte[] { 0xea, 0xea });
     }
 
     public void UpAController1(Engine engine)

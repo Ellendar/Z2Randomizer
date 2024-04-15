@@ -360,7 +360,6 @@ public class Hyrule
         shuffler.ShuffleDrops(ROMData, RNG);
         shuffler.ShufflePbagAmounts(ROMData, RNG);
 
-        ROMData.ExtendMapSize();
         ROMData.DisableTurningPalacesToStone();
         ROMData.UpdateMapPointers();
 
@@ -3503,26 +3502,15 @@ HelmetHeadGoomaFix:
     }
 
     private void RestartWithPalaceUpA(Engine engine) {
-        
-        /*
-        Up + A:
-        1cbba(cbaa): insert jump to d39a (1d3aa) (209ad3)
-        1d3aa(d39a): store 707(8D0707) compare to 3(c903) less than 2 jump(3012) Load FB1 (ADb10f)compare with zero(c901) branch if zero(f00B) Load 561(AD6105) store accumulator into side memory(8Db00f) load accumulator with 1(a901) store to fb1(8db10f) return (60)
-        d3bc(1d3cc): Load accumulator with fbo (adb00f)store to 561(8d6105) load 707(AD0707) return (60)
-        feb3(1fec3): Store y into 707(8c0707) load 0(a900) stor into fb1(8db10f) return (60)
-        CAD0(1CAE0): (20bcd3) c902 10
-        CAE3(1CAF3): NOP NOP NOP(EAEAEA)
-        CF92: (1CFA2): Jump to feb3(20b3fe)
-
-        */
-
         Assembler.Assembler a = new();
         a.Code("""
 update_next_level_exp = $a057
 
 ;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
-world_state = $707
-area_code = $561
+world_number = $707
+room_code = $561
+temp_room_code = $6fe
+temp_room_flag = $6ff
 
 .segment "PRG7"
 
@@ -3531,33 +3519,30 @@ area_code = $561
 
 .reloc
 PalacePatch:
-    sta world_state
-    ; lda $0707 ; don't need to reload 707 here
+    sta world_number
     ; if < 3 do the original patch
     cmp #$03
-    bmi @Exit
+    bcc @Exit
     ; or if our temp flag is already set, do the original code
-    lda $07b0
-    cmp #$01
-    beq ReloadExpForReset
-        lda area_code
-        sta $07b1 ; store the area code into a temp ram location
-        lda #$01
-        sta $07b0 ; set a flag in another empty ram location
-        lda world_state
+    lda temp_room_flag
+    bne ReloadExpForReset
+        lda room_code
+        sta temp_room_code ; store the area code into a temp ram location
+        inc temp_room_flag ; set a flag in another empty ram location
 @Exit:
-        rts
+    lda world_number
+    rts
 ReloadExpForReset:
-    lda $07b1
-    sta area_code
+    lda temp_room_code
+    sta room_code
     jsr update_next_level_exp
-    lda world_state
+    lda world_number
     rts
 
 .org $cad0
     jsr ReloadExpForReset
     cmp #3
-    bpl $cade ; *+9
+    bcs $cade ; *+9
 
 .org $cae3
     ; Don't clear area code on reset
@@ -3571,8 +3556,8 @@ ReloadExpForReset:
 .reloc
 SaveWorldStateAndClearFlag:
     ; Precondition y = 0
-    sty world_state
-    sty $07b0
+    sty world_number
+    sty temp_room_flag
     rts
 
 """, "restart_palace_upa.s");
@@ -3631,29 +3616,6 @@ StandardizeDrops:
     rts
 """, "standardize_drops.s");
         engine.Modules.Add(a.Actions);
-        ROMData.Put(0x1e8bd, 0x20);
-        ROMData.Put(0x1e8be, 0x4c);
-        ROMData.Put(0x1e8bf, 0xff);
-
-        ROMData.Put(0x1ff5c, 0xc0);
-        ROMData.Put(0x1ff5d, 0x02);
-        ROMData.Put(0x1ff5e, 0xd0);
-        ROMData.Put(0x1ff5f, 0x07);
-        ROMData.Put(0x1ff60, 0xad);
-        ROMData.Put(0x1ff61, 0xfe);
-        ROMData.Put(0x1ff62, 0x06);
-        ROMData.Put(0x1ff63, 0xee);
-        ROMData.Put(0x1ff64, 0xfe);
-        ROMData.Put(0x1ff65, 0x06);
-        ROMData.Put(0x1ff66, 0x60);
-        ROMData.Put(0x1ff67, 0xad);
-        ROMData.Put(0x1ff68, 0xff);
-        ROMData.Put(0x1ff69, 0x06);
-        ROMData.Put(0x1ff6a, 0xee);
-        ROMData.Put(0x1ff6b, 0xff);
-        ROMData.Put(0x1ff6c, 0x06);
-        ROMData.Put(0x1ff6d, 0x60);
-
     }
 
     private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG)
@@ -3689,10 +3651,12 @@ StandardizeDrops:
 
         if (props.StandardizeDrops)
         {
+            StandardizeDrops(engine);
         }
         FixSoftLock(engine);
         ApplyHudFixes(engine, props.DisableHUDLag);
         RandomizeStartingValues(engine);
+        ROMData.ExtendMapSize(engine);
         
         ROMData.FixContinentTransitions(engine);
     }
