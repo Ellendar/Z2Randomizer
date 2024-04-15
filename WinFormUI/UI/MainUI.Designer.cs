@@ -2552,12 +2552,12 @@ partial class MainUI
         randomizeKnockbackCheckbox.Enabled = true;
         randomizeKnockbackCheckbox.Location = new Point(4, 128);
         randomizeKnockbackCheckbox.Margin = new Padding(4, 3, 4, 3);
-        randomizeKnockbackCheckbox.Name = "???";
+        randomizeKnockbackCheckbox.Name = "Randomize Knockback";
         randomizeKnockbackCheckbox.Size = new Size(191, 19);
         randomizeKnockbackCheckbox.TabIndex = 26;
-        randomizeKnockbackCheckbox.Text = "???";
+        randomizeKnockbackCheckbox.Text = "Randomize Knockback";
         randomizeKnockbackCheckbox.ThreeState = false;
-        toolTip1.SetToolTip(randomizeKnockbackCheckbox, "What does this do? I'm sure it's fine...");
+        toolTip1.SetToolTip(randomizeKnockbackCheckbox, "Randomizes knockback when link and enemies collide.");
         randomizeKnockbackCheckbox.UseVisualStyleBackColor = true;
         // 
         // shuffleEnemyPalettesCheckbox
