@@ -307,7 +307,7 @@ public partial class MainUI : Form
                 {
                     RandomizerConfiguration config = new(customButtonSettings.Flagset);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     logger.Warn("Saved custom flags were invalid. Resetting to default");
                     SetCustomFlagsetButtonPropertiesToDefault(button);
