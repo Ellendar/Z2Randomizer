@@ -3,6 +3,7 @@
   "FastSpellCasting": true,
   "RemapUpAToUpSelect": false,
   "RemoveFlashingUponDeath": true,
+  "DisableHUDLag": false,
   "Sprite": "Link",
   "TunicColor": "Default",
   "ShieldTunicColor": "Default",

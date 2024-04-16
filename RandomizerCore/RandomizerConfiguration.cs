@@ -219,6 +219,8 @@ public class RandomizerConfiguration
     public string BeamSprite { get; set; }
     [IgnoreInFlags]
     public bool UseCustomRooms { get; set; }
+    [IgnoreInFlags]
+    public bool DisableHUDLag { get; set; }
     public bool RandomizeKnockback { get; set; }
 
 
@@ -321,6 +323,7 @@ public class RandomizerConfiguration
         ShieldTunic = "Orange";
         BeamSprite = "Default";
         UseCustomRooms = false;
+        DisableHUDLag = false;
     }
 
     public RandomizerConfiguration(string flags) : this()
@@ -942,6 +945,7 @@ public class RandomizerConfiguration
         config.SwapUpAndDownStab = false;
         config.HardBosses = false;
         config.RandomizeKnockback = false;
+        config.DisableHUDLag = false;
 
 
         return config;
@@ -1494,6 +1498,7 @@ public class RandomizerConfiguration
         properties.UpAC1 = UpAOnController1;
         properties.RemoveFlashing = RemoveFlashing;
         properties.UseCustomRooms = UseCustomRooms;
+        properties.DisableHUDLag = DisableHUDLag;
         properties.RandomizeKnockback = RandomizeKnockback;
 
         //"Server" side validation

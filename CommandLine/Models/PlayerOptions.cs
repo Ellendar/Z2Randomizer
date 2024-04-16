@@ -14,6 +14,8 @@ namespace CommandLine.Models
 
         public bool RemoveFlashingUponDeath { get; set; }
 
+        public bool DisableHUDLag { get; set; }
+
         public string? Sprite { get; set; }
 
         public string? TunicColor { get; set; }

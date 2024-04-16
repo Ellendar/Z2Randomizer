@@ -261,6 +261,7 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
+        disableHUDLag = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -2544,12 +2545,11 @@ partial class MainUI
         miscTabPage.Text = "Misc";
         miscTabPage.UseVisualStyleBackColor = true;
         // 
-        // checkBox1
+        // randomizeKnockbackCheckbox
         // 
         randomizeKnockbackCheckbox.AutoSize = true;
-        randomizeKnockbackCheckbox.Checked = false;
+        randomizeKnockbackCheckbox.Checked = true;
         randomizeKnockbackCheckbox.CheckState = CheckState.Checked;
-        randomizeKnockbackCheckbox.Enabled = true;
         randomizeKnockbackCheckbox.Location = new Point(4, 128);
         randomizeKnockbackCheckbox.Margin = new Padding(4, 3, 4, 3);
         randomizeKnockbackCheckbox.Name = "Randomize Knockback";
@@ -2625,6 +2625,7 @@ partial class MainUI
         // 
         // CustomTabPage
         // 
+        CustomTabPage.Controls.Add(disableHUDLag);
         CustomTabPage.Controls.Add(useCommunityTextCheckbox);
         CustomTabPage.Controls.Add(spriteCreditLabel);
         CustomTabPage.Controls.Add(beepFrequencyDropdown);
@@ -2680,7 +2681,7 @@ partial class MainUI
         beepFrequencyDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
         beepFrequencyDropdown.FormattingEnabled = true;
         beepFrequencyDropdown.Items.AddRange(new object[] { "Normal", "Half Speed", "Quarter Speed", "Off" });
-        beepFrequencyDropdown.Location = new Point(8, 228);
+        beepFrequencyDropdown.Location = new Point(8, 249);
         beepFrequencyDropdown.Margin = new Padding(2);
         beepFrequencyDropdown.Name = "beepFrequencyDropdown";
         beepFrequencyDropdown.Size = new Size(142, 23);
@@ -2690,7 +2691,7 @@ partial class MainUI
         // label10
         // 
         label10.AutoSize = true;
-        label10.Location = new Point(4, 205);
+        label10.Location = new Point(4, 226);
         label10.Margin = new Padding(2, 0, 2, 0);
         label10.Name = "label10";
         label10.Size = new Size(91, 15);
@@ -2702,7 +2703,7 @@ partial class MainUI
         beepThresholdDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
         beepThresholdDropdown.FormattingEnabled = true;
         beepThresholdDropdown.Items.AddRange(new object[] { "Normal", "Half Bar", "Quarter Bar", "Two Bars" });
-        beepThresholdDropdown.Location = new Point(8, 172);
+        beepThresholdDropdown.Location = new Point(8, 193);
         beepThresholdDropdown.Margin = new Padding(2);
         beepThresholdDropdown.Name = "beepThresholdDropdown";
         beepThresholdDropdown.Size = new Size(142, 23);
@@ -2712,7 +2713,7 @@ partial class MainUI
         // label9
         // 
         label9.AutoSize = true;
-        label9.Location = new Point(4, 149);
+        label9.Location = new Point(4, 170);
         label9.Margin = new Padding(2, 0, 2, 0);
         label9.Name = "label9";
         label9.Size = new Size(88, 15);
@@ -3142,6 +3143,18 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
+        // disableHUDLag
+        // 
+        disableHUDLag.AutoSize = true;
+        disableHUDLag.Location = new Point(4, 149);
+        disableHUDLag.Margin = new Padding(2);
+        disableHUDLag.Name = "disableHUDLag";
+        disableHUDLag.Size = new Size(161, 19);
+        disableHUDLag.TabIndex = 44;
+        disableHUDLag.Text = "Disable HUD Flash on Lag";
+        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens. A glove icon is added to the HUD as a visual indicator for lag");
+        disableHUDLag.UseVisualStyleBackColor = true;
+        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3435,5 +3448,6 @@ partial class MainUI
     private Label StartingLivesLabel;
     private ComboBox startingLivesBox;
     private CheckBox randomizeKnockbackCheckbox;
+    private CheckBox disableHUDLag;
 }
 
