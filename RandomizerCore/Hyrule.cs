@@ -636,7 +636,7 @@ public class Hyrule
             }
             else if (attackEffectiveness == StatEffectiveness.LOW)
             {
-                attack = (int)(attackValues[i] - (attackValues[i] * .5));
+                attack = (int)Math.Round(attackValues[i] - (attackValues[i] * .5), MidpointRounding.ToPositiveInfinity);
             }
             else
             {
