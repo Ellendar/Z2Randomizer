@@ -3525,13 +3525,15 @@ PalacePatch:
     bcc @Exit
     ; or if our temp flag is already set, do the original code
     lda temp_room_flag
-    bne ReloadExpForReset
+    bne @Exit
         lda room_code
         sta temp_room_code ; store the area code into a temp ram location
         inc temp_room_flag ; set a flag in another empty ram location
 @Exit:
     lda world_number
     rts
+
+.reloc
 ReloadExpForReset:
     lda temp_room_code
     sta room_code
