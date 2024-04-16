@@ -23,22 +23,22 @@ public class Palaces
     private const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
     private const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
 
-    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.KEY };
-    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE };
-    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE};
-    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP};
-    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
-    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE};
-    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = new RequirementType[] { 
-        RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE};
+    private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [ 
+        RequirementType.KEY ];
+    private static readonly RequirementType[] VANILLA_P2_ALLOWED_BLOCKERS = [ 
+        RequirementType.KEY, RequirementType.JUMP, RequirementType.GLOVE ];
+    private static readonly RequirementType[] VANILLA_P3_ALLOWED_BLOCKERS = [ 
+        RequirementType.KEY, RequirementType.DOWNSTAB, RequirementType.UPSTAB, RequirementType.GLOVE];
+    private static readonly RequirementType[] VANILLA_P4_ALLOWED_BLOCKERS = [ 
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP];
+    private static readonly RequirementType[] VANILLA_P5_ALLOWED_BLOCKERS = [ 
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP];
+    private static readonly RequirementType[] VANILLA_P6_ALLOWED_BLOCKERS = [ 
+        RequirementType.KEY, RequirementType.FAIRY, RequirementType.JUMP, RequirementType.GLOVE];
+    private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [ 
+        RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE];
 
-    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = new RequirementType[][] { 
+    public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [ 
         VANILLA_P1_ALLOWED_BLOCKERS,
         VANILLA_P2_ALLOWED_BLOCKERS,
         VANILLA_P3_ALLOWED_BLOCKERS,
@@ -46,7 +46,7 @@ public class Palaces
         VANILLA_P5_ALLOWED_BLOCKERS,
         VANILLA_P6_ALLOWED_BLOCKERS,
         VANILLA_P7_ALLOWED_BLOCKERS
-    };
+    ];
 
 
     private static readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
@@ -404,7 +404,8 @@ public class Palaces
                                         List<Room> possibleDropZones = palaceRoomPool.Where(i => i.IsDropZone).ToList();
                                         if (possibleDropZones.Count == 0)
                                         {
-                                            throw new ImpossibleException();
+                                            logger.Info("Exhausted all available drop zones");
+                                            return null;
                                         }
                                         Room dropZoneRoom = new(possibleDropZones[r.Next(0, possibleDropZones.Count)]);
                                         dropZoneRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
@@ -664,6 +665,7 @@ public class Palaces
             {
                 requireables.Add(RequirementType.JUMP);
                 requireables.Add(RequirementType.FAIRY);
+                requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
             }
             //If we can clear P2 with this stuff, we can also get the glove
             if (palace2.CanClearAllRooms(requireables, Item.GLOVE))

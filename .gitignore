@@ -14,3 +14,4 @@
 *.user
 .vscode/
 .DS_Store
+*.log

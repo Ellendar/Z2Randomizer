@@ -1155,8 +1155,8 @@ public class Palace
             else return false;
         }
 
-        bool retVal = AllRooms.All(i => i.Requirements.AreSatisfiedBy(requireables));
-        return retVal;
+        List<Room> unclearableRooms = AllRooms.Where(i => !i.Requirements.AreSatisfiedBy(requireables)).ToList();
+        return unclearableRooms.Count == 0;
     }
 
     public bool CanGetItem(IEnumerable<RequirementType> requireables)

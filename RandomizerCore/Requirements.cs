@@ -122,17 +122,17 @@ public class Requirements
         {
             return false;
         }
+
+        bool compositeRequirementSatisfied = CompositeRequirements.Length == 0;
         foreach (RequirementType[] compositeRequirement in CompositeRequirements)
         {
-            foreach (RequirementType requirement in compositeRequirement)
+            if(compositeRequirement.All(i => requireables.Contains(i)))
             {
-                if (!requireables.Contains(requirement))
-                {
-                    return false;
-                }
+                compositeRequirementSatisfied = true;
+                break;
             }
         }
-        return true;
+        return compositeRequirementSatisfied;
     }
 
     public bool HasHardRequirement(RequirementType requireable)

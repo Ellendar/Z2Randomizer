@@ -1594,7 +1594,7 @@
     "linkedRoomName": null,
     "map": 37,
     "memoryAddress": 67519,
-    "name": "",
+    "name": "Eco key room",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -6874,7 +6874,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 74288,
-    "name": "",
+    "name": "Up elevator block columns right turn",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [

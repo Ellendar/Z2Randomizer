@@ -1105,6 +1105,7 @@ public partial class MainUI : Form
         configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
         configuration.UseCustomRooms = useCustomRoomsBox.Checked;
+        configuration.DisableHUDLag = disableHUDLag.Checked;
         configuration.Sprite = characterSpriteList.SelectedIndex;
         configuration.BeepFrequency = beepFrequencyDropdown.SelectedIndex switch
         {
@@ -2031,7 +2032,7 @@ public partial class MainUI : Form
             noDuplicateRoomsByEnemiesCheckbox.Enabled = true;
         }
 
-        if (palaceStyleList.SelectedIndex != 0)
+        if (gpStyleList.SelectedIndex != 0)
         {
             tbirdRequiredCheckbox.Enabled = true;
         }

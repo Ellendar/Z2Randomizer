@@ -79,6 +79,7 @@ namespace CommandLine
             configuration.Tunic = playerOptions.TunicColor;
             configuration.ShieldTunic = playerOptions.ShieldTunicColor;
             configuration.DisableMusic = playerOptions.DisableMusic;
+            configuration.DisableHUDLag = playerOptions.DisableHUDLag;
             configuration.FastSpellCasting = playerOptions.FastSpellCasting;
 
             var sprite = GetSprite(playerOptions.Sprite);
