@@ -52,28 +52,6 @@ ChooseNewCarrockXPosition:
     sta EnemyXPositionHi,x
     rts
 
-
-; Inside what I presume to be where the projectile gets cleared when it moves offscreen
-; there's a bunch of branching and two byte instructions which makes it annoying to patch this spot
-.org $adcc
-    jsr CheckProjectileType
-    nop
-
-.reloc
-CheckProjectileType:
-    ; If we are clearing out a wifi shot, also clear out the extra RAM
-    lda ProjectileType,x
-    cmp #$09
-    bne @OriginalCompare
-        ; Is a wifi shot so we want to clear out the extra ram
-        lda #0
-        sta ProjectileEnemyData,x
-        ; fallthrough
-@OriginalCompare:
-    ; Not a wifi shot so do the original compare and leave
-    cmp #$08
-    rts
-
 ; Inside a funciton that updates motion for (maybe?) all projectiles
 .org $996f
     jsr MoveSinWaveWifiShot
@@ -174,16 +152,19 @@ RandomizeWifiShotType:
 @Exit:
     rts
 
-.segment "PRG7"
-; Link is Hit by projectile code.
-; Hook the function that clears out the projectile to also clear the extra carock info
-.org $e453
-    jsr ClearExtraDataOnProjectileHit
+; Trying to hook other places for clearing the extra sin wave data didn't work well
+; So just hook into carock's death routine that starts the explosion. This means the beams
+; will stop "sin waving" at this point but whatever.
+.org $b231
+    jsr ClearProjectilesOnCarockDeath
     nop
-
 .reloc
-ClearExtraDataOnProjectileHit:
+; Its fine to scratch both A and Y as they are reloaded before use
+ClearProjectilesOnCarockDeath:
+    inc $b6,x
     lda #0
-    sta ProjectileType,x
-    sta ProjectileEnemyData,x
+    ldy #5
+    -   sta ProjectileEnemyData,y
+        dey
+        bpl -
     rts
