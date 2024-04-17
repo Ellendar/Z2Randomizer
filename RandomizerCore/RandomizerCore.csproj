@@ -39,7 +39,9 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
+    <None Remove="Asm\ExpandedPauseMenu.s" />
     <None Remove="Asm\FixedHud.s" />
+    <None Remove="Asm\Graphics\item_sprites.chr" />
     <None Remove="Asm\Recoil.s" />
     <None Remove="CustomRooms.json" />
     <None Remove="nlog.config" />
@@ -165,7 +167,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Asm\BuffCarock.s" />
+    <EmbeddedResource Include="Asm\ExpandedPauseMenu.s" />
     <EmbeddedResource Include="Asm\FixedHud.s" />
+    <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
     <EmbeddedResource Include="Asm\MMC5.s" />
     <EmbeddedResource Include="Asm\DashSpell.s" />
     <EmbeddedResource Include="Asm\Recoil.s" />
