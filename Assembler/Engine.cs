@@ -151,4 +151,11 @@ internal static class AssemblyExtensions
         using StreamReader reader = new(stream);
         return await reader.ReadToEndAsync();
     }
+    public static byte[] ReadBinaryResource(this Assembly assembly, string name)
+    {
+        // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
+        using var stream = assembly.GetManifestResourceStream(name);
+        using var reader = new BinaryReader(stream);
+        return reader.ReadBytes((int)stream.Length);
+    }
 }

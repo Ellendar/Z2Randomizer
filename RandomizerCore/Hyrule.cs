@@ -2129,6 +2129,7 @@ public class Hyrule
             ROMData.Put(0xF586, 0xEA);
         }
         ROMData.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
+        ROMData.Put(0x20010 + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
 
         if (props.EncounterRate == EncounterRate.NONE)
         {
@@ -3599,6 +3600,13 @@ FixSoftlock:
         engine.Modules.Add(a.Actions);
     }
     
+    public void ExpandedPauseMenu(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
+        engine.Modules.Add(a.Actions);
+    }
+    
     public void StandardizeDrops(Engine engine)
     {
         Assembler.Assembler a = new();
@@ -3659,7 +3667,7 @@ StandardizeDrops:
         ApplyHudFixes(engine, props.DisableHUDLag);
         RandomizeStartingValues(engine);
         ROMData.ExtendMapSize(engine);
-        
+        ExpandedPauseMenu(engine);
         ROMData.FixContinentTransitions(engine);
     }
 }

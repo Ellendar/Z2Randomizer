@@ -748,10 +748,11 @@ PRG_bank = $0769
 .segment "PRG7"
 
 ; Patch switching the bank when loading the overworld
-.org $cd4a
+.org $cd48
+    bne +
     ldy CurrentRegion
     lda ExpandedRegionBankTable,y
-    sta PRG_bank
++   sta PRG_bank
     jsr SwapPRG
     beq $cd5f ; unconditional jmp to skip the freespace
 FREE_UNTIL $cd5f
