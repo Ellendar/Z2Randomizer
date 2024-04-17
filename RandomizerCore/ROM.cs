@@ -808,13 +808,18 @@ bank7_Pointer_table_for_Item_Presence:
 FREE_UNTIL $C285
 
 ; Patch loading from the table to use the new address
-.org $c2b8
+.org $c2b6
+    tay
     lda bank7_Pointer_table_for_Item_Presence,y
     sta $00
     lda #06
     sta $01
-    nop
-.assert * = $C2C2
+    lda $0561
+    lsr a
+    tay
+    lda ($00),y
+    rts
+FREE_UNTIL $c2ca
 
 ; Remove vanilla check to see if you are in east hyrule when using the raft
 .segment "PRG0"

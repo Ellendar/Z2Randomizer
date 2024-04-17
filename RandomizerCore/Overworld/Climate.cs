@@ -9,9 +9,8 @@ using Z2Randomizer.Core;
 namespace Z2Randomizer.Core.Overworld;
 public class Climate
 {
-    private readonly Dictionary<Terrain, float> DistanceCoefficients;
-    private readonly Dictionary<Terrain, int> TerrainWeights;
-    private readonly Dictionary<Terrain, int> TerrainPercentages;
+    public float[] DistanceCoefficients { get; }
+    private readonly int[] TerrainWeights;
     public int SeedTerrainCount { get; set; }
     private List<Terrain> terrainWeightTable;
     public string Name { get; set; }
@@ -19,31 +18,29 @@ public class Climate
     public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount)
     {
         Name = name;
-        DistanceCoefficients = distanceCoefficients;
-        TerrainWeights = terrainWeights;
+        // Precompute distance coefficients into a inverse list
+        DistanceCoefficients = new float[(int)Terrain.NONE];
+        foreach (var pair in distanceCoefficients)
+        {
+            DistanceCoefficients[(int)pair.Key] = 1f / pair.Value;
+        }
+        TerrainWeights = new int[(int)Terrain.NONE];
+        foreach (var pair in terrainWeights)
+        {
+            TerrainWeights[(int)pair.Key] = pair.Value;
+        }
         SeedTerrainCount = seedTerrainCount;
         //This is a lazy, not very efficient lookup method, but it has very fast lookups, and since terrain generation
         //is one of the most expensive operations and we're going to do tens of thousands of lookups easily,
         //this is probably good for now.
         terrainWeightTable = new();
-        foreach (Terrain terrain in TerrainWeights.Keys)
+        for (int terrain = 0; terrain < (int)Terrain.NONE; terrain++)
         {
-            for (int i = 0; i < TerrainWeights[terrain]; i++)
+            for (int i = 0; i < TerrainWeights[(int)terrain]; i++)
             {
-                terrainWeightTable.Add(terrain);
+                terrainWeightTable.Add((Terrain)terrain);
             }
         }
-    }
-
-    public float GetDistanceCoefficient(Terrain terrain)
-    {
-        if (!DistanceCoefficients.TryGetValue(terrain, out float value))
-        {
-            return 0;
-        }
-        //Returning the reciprocal of the distance makes the sizes of terrains scale proportionately with the coefficient's value
-        //I feel this is the most intuitive way to represent this, but maybe I am wrong.
-        return 1f / value;
     }
 
     public Terrain GetRandomTerrain(Random r, IEnumerable<Terrain> whitelist)
@@ -70,7 +67,7 @@ public class Climate
 
     public void DisallowTerrain(Terrain terrain)
     {
-        for (int i = 0; i < TerrainWeights[terrain]; i++)
+        for (int i = 0; i < TerrainWeights[(int)terrain]; i++)
         {
             terrainWeightTable.RemoveAll(i => i == terrain);
         }
@@ -79,8 +76,12 @@ public class Climate
     public Climate Clone()
     {
         return new(Name, 
-            new Dictionary<Terrain, float>(DistanceCoefficients), 
-            new Dictionary<Terrain, int>(TerrainWeights), 
+            new Dictionary<Terrain, float>(DistanceCoefficients
+                .Select((value, index) => new { value, index })
+                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
+        new Dictionary<Terrain, int>(TerrainWeights
+                .Select((value, index) => new { value, index })
+                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)), 
             SeedTerrainCount);
     }
 
@@ -99,17 +100,17 @@ public class Climate
         float totalWalkableTerrainWeight = 0f;
         foreach (Terrain terrain in walkableTerrains)
         {
-            totalRandomGrowthFactors += TerrainWeights[terrain] * DistanceCoefficients[terrain];
-            totalWalkableTerrainWeight += TerrainWeights[terrain];
+            totalRandomGrowthFactors += TerrainWeights[(int)terrain] * DistanceCoefficients[(int)terrain];
+            totalWalkableTerrainWeight += TerrainWeights[(int)terrain];
         }
         float aggregateWalkableTerrainGrowth = totalRandomGrowthFactors / totalWalkableTerrainWeight;
-        float mountainTerrainGrowth = DistanceCoefficients[Terrain.MOUNTAIN];
+        float mountainTerrainGrowth = DistanceCoefficients[(int)Terrain.MOUNTAIN];
 
         if (mountainTerrainGrowth * constraintLimitFactor > aggregateWalkableTerrainGrowth)
         {
             foreach (Terrain terrain in walkableTerrains)
             {
-                DistanceCoefficients[terrain] *= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
+                DistanceCoefficients[(int)terrain] *= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
             }
         }
     }
