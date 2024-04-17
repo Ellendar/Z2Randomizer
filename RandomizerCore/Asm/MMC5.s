@@ -51,6 +51,9 @@ wait_ppu:
     stx $5101           ; mode 3 is CHR mode 1x8k banks
     lda #$50            ; horizontal mirroring
     sta $5105
+    ; Set the last sprite bank to a fixed bank for items
+    lda #$68
+    sta $5127
     jsr SwapCHR
     lda #$07
     jsr SwapPRG
@@ -64,7 +67,6 @@ SwapCHR:
     asl
     asl
     sta $5120
-    ; clc ; the asl clears it for now
     adc #1
     sta $5121
     adc #1
@@ -81,7 +83,7 @@ SwapCHR:
     sta $5126
     sta $512a
     adc #1
-    sta $5127
+    ; sta $5127 ; Reserve the last sprite bank for new custom item tiles
     sta $512b
     lda #0
     rts
@@ -244,3 +246,13 @@ LoadAreaBGMetatile:
     ; switch back to 0 just in case
     jmp SwapToPRG0
 
+
+; Move sprites out of the last fixed bank
+; Instead of using the blank tile sprites to cover the right 8px on the overworld, just use
+; any other full color sprite (since the palette is all black this is fine)
+.org $878c
+    lda #$7f
+
+; link's overworld sprite has an invisible half that needs moved outta the new sprite bank as well
+.org $8739
+    lda #$73
