@@ -9,6 +9,7 @@ using System.Numerics;
 using Z2Randomizer.Core.Overworld;
 using System.Text;
 using RandomizerCore;
+using NLog.Targets;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -23,6 +24,12 @@ public class Palace
     private Room bossRoom;
     private Room tbird;
     private readonly SortedDictionary<int, List<Room>> rooms;
+
+    public static readonly Item[] SHUFFLABLE_SMALL_ITEMS = [
+        Item.KEY, 
+        Item.SMALL_BAG, Item.MEDIUM_BAG, Item.LARGE_BAG, Item.XL_BAG, 
+        Item.BLUE_JAR, Item.RED_JAR, Item.ONEUP
+    ];
     /*
     private List<Room> upExits;
     private List<Room> downExits;
@@ -1009,62 +1016,79 @@ public class Palace
         logger.Debug("Target: " + target + " Rooms: " + rooms);
     }
 
-    public void ShuffleSmallItems(int world, bool first, Random r, bool shuffleSmallItems, bool extraKeys, ROM ROMData)
+    public void RandomizeSmallItems(Random r, bool extraKeys)
     {
-        List<int> addresses = new List<int>();
-        List<int> items = new List<int>();
-        int startAddr;
-        if (first)
-        {
-            startAddr = 0x8523 - 0x8000 + (world * 0x4000) + 0x10;
-        }
-        else
-        {
-            startAddr = 0xA000 - 0x8000 + (world * 0x4000) + 0x10;
-        }
-        
         foreach (Room room in AllRooms)
         {
-            int i = startAddr + ((room.NewMap ?? room.Map) * 2);
-
-            int low = ROMData.GetByte(i);
-            int hi = ROMData.GetByte(i + 1) * 256;
-            int numBytes = ROMData.GetByte(hi + low + 16 - 0x8000 + (world * 0x4000));
-            for (int j = 4; j < numBytes; j = j + 2)
+            int sideviewIndex = room.PalaceNumber == 7 ? 5 : 4; //Header bytes
+            while(sideviewIndex < room.SideView.Length)
             {
-                int yPos = ROMData.GetByte(hi + low + j + 16 - 0x8000 + (world * 0x4000)) & 0xF0;
-                yPos = yPos >> 4;
-                if (ROMData.GetByte(hi + low + j + 1 + 16 - 0x8000 + (world * 0x4000)) == 0x0F && yPos < 13)
+                int firstByte = room.SideView[sideviewIndex++];
+                int secondByte = room.SideView[sideviewIndex++];
+                int ypos = (firstByte & 0xF0) >> 4;
+                if(secondByte == 15 && ypos < 13)
                 {
-                    int addr = hi + low + j + 2 + 16 - 0x8000 + (world * 0x4000);
-                    int item = ROMData.GetByte(addr);
-                    if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
+                    int thirdByte = room.SideView[sideviewIndex++];
+                    if (!SHUFFLABLE_SMALL_ITEMS.Contains((Item)thirdByte))
                     {
-                        addresses.Add(addr);
-                        items.Add(item);
+                        continue;
                     }
-
-                    j++;
+                    double d = r.NextDouble();
+                    if(room.PalaceNumber == 7)
+                    {
+                        if (d <= 1)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.ONEUP;
+                        }
+                    }
+                    else
+                    {
+                        if(extraKeys)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.KEY;
+                        }
+                        //35 Key
+                        //10 BlueJar
+                        //10 RedJar
+                        //10 Small bag
+                        //15 Medium Bag
+                        //10 Large Bag
+                        //5 XL bag
+                        //5 1Up
+                        else if(d <= .35)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.KEY;
+                        }
+                        else if (d <= .45)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.BLUE_JAR;
+                        }
+                        else if (d <= .55)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.RED_JAR;
+                        }
+                        else if (d <= .65)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.SMALL_BAG;
+                        }
+                        else if (d <= .80)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.MEDIUM_BAG;
+                        }
+                        else if (d <= .90)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.LARGE_BAG;
+                        }
+                        else if (d <= .95)
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.XL_BAG;
+                        }
+                        else
+                        {
+                            room.SideView[sideviewIndex - 1] = (int)Item.ONEUP;
+                        }
+                    }
                 }
-            }
-        }
-        for (int i = 0; i < items.Count; i++)
-        {
-            int swap = r.Next(i, items.Count);
-            int temp = items[swap];
-            items[swap] = items[i];
-            items[i] = temp;
-        }
-        for (int i = 0; i < addresses.Count; i++)
-        {
-            if (shuffleSmallItems)
-            {
-                ROMData.Put(addresses[i], (byte)items[i]);
-            }
-
-            if (extraKeys && Number != 7)
-            {
-                ROMData.Put(addresses[i], (byte)0x08);
             }
         }
     }

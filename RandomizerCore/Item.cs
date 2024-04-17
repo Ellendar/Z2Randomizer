@@ -23,10 +23,10 @@ public enum Item {
     XL_BAG = 13,
     MAGIC_CONTAINER = 14,
     HEART_CONTAINER = 15,
-    BLUE_JAR = 16,
-    RED_JAR = 17,
-    ONEUP = 18,
-    MEDICINE = 21,
-    TROPHY = 20,
-    CHILD = 19
+    BLUE_JAR = 0x10,
+    RED_JAR = 0x11,
+    ONEUP = 0x12,
+    CHILD = 0x13,
+    TROPHY = 0x14,
+    MEDICINE = 0x15
 }

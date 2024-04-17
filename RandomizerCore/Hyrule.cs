@@ -230,13 +230,13 @@ public class Hyrule
 
             if (props.ShuffleSmallItems || props.ExtraKeys)
             {
-                palaces[0].ShuffleSmallItems(4, true, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-                palaces[1].ShuffleSmallItems(4, true, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-                palaces[2].ShuffleSmallItems(4, false, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-                palaces[3].ShuffleSmallItems(4, false, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-                palaces[4].ShuffleSmallItems(4, true, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-                palaces[5].ShuffleSmallItems(4, false, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
-                palaces[6].ShuffleSmallItems(5, true, RNG, props.ShuffleSmallItems, props.ExtraKeys, ROMData);
+                palaces[0].RandomizeSmallItems(RNG, props.ExtraKeys);
+                palaces[1].RandomizeSmallItems(RNG, props.ExtraKeys);
+                palaces[2].RandomizeSmallItems(RNG, props.ExtraKeys);
+                palaces[3].RandomizeSmallItems(RNG, props.ExtraKeys);
+                palaces[4].RandomizeSmallItems(RNG, props.ExtraKeys);
+                palaces[5].RandomizeSmallItems(RNG, props.ExtraKeys);
+                palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
             }
 
             Assembler.Assembler sideview_module = new();
