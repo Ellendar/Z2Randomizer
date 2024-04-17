@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using Z2Randomizer.Core.Sidescroll;
-using Z2Randomizer.Core;
 using RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Tests;
