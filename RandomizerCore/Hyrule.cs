@@ -82,9 +82,9 @@ public class Hyrule
     public Dictionary<Item, bool> ItemGet { get; set; }
     //private bool[] spellGet;
 
-    public WestHyrule westHyrule;
-    public EastHyrule eastHyrule;
-    private MazeIsland mazeIsland;
+    public WestHyrule? westHyrule;
+    public EastHyrule? eastHyrule;
+    private MazeIsland? mazeIsland;
     private DeathMountain deathMountain;
 
     private Shuffler shuffler;
@@ -341,8 +341,6 @@ public class Hyrule
             passedValidation = true;
             _engine.Modules.Add(sideview_module.Actions);
             _engine.Modules.Add(gp_sideview_module.Actions);
-            ApplyAsmPatches(props, _engine, RNG, ROMData);
-            ROMData.ApplyAsm(_engine);
         }
 
         //Allows casting magic without requeueing a spell
@@ -419,6 +417,10 @@ public class Hyrule
         {
             return;
         }
+        
+        ApplyAsmPatches(props, _engine, RNG, ROMData);
+        ROMData.ApplyAsm(_engine);
+
         MD5 hasher = MD5.Create();
         byte[] finalRNGState = new byte[32];
         RNG.NextBytes(finalRNGState);
@@ -2935,20 +2937,6 @@ public class Hyrule
         //if (!props.palacePalette)
         //{
 
-        ROMData.Put(0x1FFF4, (byte)palPalettes[westHyrule.locationAtPalace1.PalaceNumber]);
-
-        ROMData.Put(0x1FFF5, (byte)palPalettes[westHyrule.locationAtPalace2.PalaceNumber]);
-
-        ROMData.Put(0x1FFF6, (byte)palPalettes[westHyrule.locationAtPalace3.PalaceNumber]);
-
-        ROMData.Put(0x20000, (byte)palPalettes[mazeIsland.locationAtPalace4.PalaceNumber]);
-
-        ROMData.Put(0x1FFFC, (byte)palPalettes[eastHyrule.locationAtPalace5.PalaceNumber]);
-
-        ROMData.Put(0x1FFFD, (byte)palPalettes[eastHyrule.locationAtPalace6.PalaceNumber]);
-
-        ROMData.Put(0x1FFFE, (byte)palPalettes[eastHyrule.locationAtGP.PalaceNumber]);
-
         //}
 
         if (props.ShuffleDripper)
@@ -3697,6 +3685,113 @@ CheckIfEndOfData:
         engine.Modules.Add(a.Actions);
     }
 
+    public void FixContinentTransitions(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Assign("P1Palette", (byte)palPalettes[westHyrule?.locationAtPalace1.PalaceNumber ?? 0]);
+        a.Assign("P2Palette", (byte)palPalettes[westHyrule?.locationAtPalace2.PalaceNumber ?? 1]);
+        a.Assign("P3Palette", (byte)palPalettes[westHyrule?.locationAtPalace3.PalaceNumber ?? 2]);
+        a.Assign("P4Palette", (byte)palPalettes[mazeIsland?.locationAtPalace4.PalaceNumber ?? 3]);
+        a.Assign("P5Palette", (byte)palPalettes[eastHyrule?.locationAtPalace5.PalaceNumber ?? 4]);
+        a.Assign("P6Palette", (byte)palPalettes[eastHyrule?.locationAtPalace6.PalaceNumber ?? 5]);
+        a.Assign("PGreatPalette", (byte)palPalettes[eastHyrule?.locationAtGP.PalaceNumber ?? 6]);
+        a.Code("""
+
+.macpack common
+.import SwapPRG
+
+CurrentRegion = $0706
+PRG_bank = $0769
+
+.segment "PRG7"
+
+; Patch switching the bank when loading the overworld
+.org $cd48
+    bne +
+    ldy CurrentRegion
+    lda ExpandedRegionBankTable,y
++   sta PRG_bank
+    jsr SwapPRG
+    beq $cd5f ; unconditional jmp to skip the freespace
+FREE_UNTIL $cd5f
+
+.org $c506
+    tay
+    lda RaftWorldMappingTable,y
+    asl a
+    tay
+
+.org $cd84
+    tay
+    lda RaftWorldMappingTable,y
+    asl a
+    tay
+
+.org $ce32
+    lda PalacePaletteOffset,y
+
+.reloc
+ExpandedRegionBankTable:
+    .byte $01, $01, $02, $02
+PalacePaletteOffset:
+    .byte P1Palette, P2Palette, P3Palette, $20, $30, $30, $30, $30, P5Palette, P6Palette, PGreatPalette, $60, P4Palette
+.reloc
+RaftWorldMappingTable:
+    .byte $00, $02, $00, $02
+.export RaftWorldMappingTable
+
+.org $C265
+; Change the pointer table for Item presence to include only the low byte
+; Since the high byte is always $06
+bank7_Pointer_table_for_Item_Presence:
+    .byte .lobyte($0600)
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($0620)
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($0640)
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($06C0)
+; Add these new pointers for item presence as well
+    .byte .lobyte($0660)
+    .byte .lobyte($0660)
+    .byte .lobyte($0680)
+    .byte .lobyte($06A0)
+    .byte .lobyte($06C0)
+FREE_UNTIL $C285
+
+; Patch loading from the table to use the new address
+.org $c2b6
+    tay
+    lda bank7_Pointer_table_for_Item_Presence,y
+    sta $00
+    lda #06
+    sta $01
+    lda $0561
+    lsr a
+    tay
+    lda ($00),y
+    rts
+FREE_UNTIL $c2ca
+
+; Remove vanilla check to see if you are in east hyrule when using the raft
+.segment "PRG0"
+.org $85a2
+    nop
+    nop
+
+""", "fix_continent_transitions.s");
+        engine.Modules.Add(a.Actions);
+    }
+
     private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG, ROM rom)
     {
         rom.ChangeMapperToMMC5(engine);
@@ -3737,6 +3832,6 @@ CheckIfEndOfData:
         RandomizeStartingValues(engine, rom);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
-        rom.FixContinentTransitions(engine);
+        FixContinentTransitions(engine);
     }
 }
