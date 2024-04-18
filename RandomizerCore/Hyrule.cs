@@ -655,14 +655,6 @@ public class Hyrule
             ItemGet[Item.TROPHY] = true;
             ItemGet[Item.MEDICINE] = true;
             ItemGet[Item.CHILD] = true;
-
-        }
-
-        if (SpellGet[SpellMap[Town.MIDO_WEST]])
-        {
-            shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
-            ItemGet[Item.MEDICINE] = true;
-            startMed = true;
         }
 
         if (SpellGet[SpellMap[Town.RUTO]])
@@ -670,6 +662,25 @@ public class Hyrule
             shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Item.TROPHY] = true;
             startTrophy = true;
+            ROMData.Put(0x17b14, 0x10); //Trophy
+        }
+
+        if (SpellGet[SpellMap[Town.SARIA_NORTH]])
+        {
+            ROMData.Put(0x17b15, 0x01); //Mirror
+        }
+
+        if (SpellGet[SpellMap[Town.MIDO_WEST]])
+        {
+            shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
+            ItemGet[Item.MEDICINE] = true;
+            startMed = true;
+            ROMData.Put(0x17b16, 0x40); //Medicine
+        }
+
+        if (SpellGet[SpellMap[Town.NABOORU]])
+        {
+            ROMData.Put(0x17b17, 0x01); //Water
         }
 
         if (SpellGet[SpellMap[Town.DARUNIA_WEST]])
@@ -677,6 +688,7 @@ public class Hyrule
             shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Item.CHILD] = true;
             startKid = true;
+            ROMData.Put(0x17b18, 0x20); //Child
         }
 
         //TODO: Clean up the readability of this logic
