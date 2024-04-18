@@ -15,8 +15,8 @@ namespace Z2Randomizer.Statistics;
 /// </summary>
 class Statistics
 {
-    private static readonly string FLAGS = "hEAErqAFeqYCAAAsrVeRgxtcsmv@suiyAAWA"; //Random% vanilla
-    //private static readonly string FLAGS = "hEAK0sALirpUe5RLkbgZQ+2c4YX@4X4yAASA"; //Random%
+    private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
+    //private static readonly string FLAGS = "hEAK0thCqbs36emL4XpGU+!5@W4xeWvdAALhA"; //Random%
     //"hEAK0sALirpUe5RLkbgZQ+2c4YX@4X4yAASA" v4 only Random%
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
@@ -35,7 +35,7 @@ class Statistics
             {
                 RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
                 int seed = random.Next(1000000000);
-                //int seed = 246099122;
+                //int seed = 38955385;
                 config.Seed = seed;
                 config.FileName = VANILLA_ROM_PATH;
                 BackgroundWorker backgroundWorker = new BackgroundWorker()

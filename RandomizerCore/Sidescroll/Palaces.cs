@@ -404,7 +404,7 @@ public class Palaces
                                         List<Room> possibleDropZones = palaceRoomPool.Where(i => i.IsDropZone).ToList();
                                         if (possibleDropZones.Count == 0)
                                         {
-                                            logger.Info("Exhausted all available drop zones");
+                                            logger.Debug("Exhausted all available drop zones");
                                             return null;
                                         }
                                         Room dropZoneRoom = new(possibleDropZones[r.Next(0, possibleDropZones.Count)]);

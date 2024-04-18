@@ -334,7 +334,7 @@ public class Hyrule
             }
             catch(Exception e)
             {
-                logger.Warn("Room packing failed. Retrying.", e);
+                logger.Debug("Room packing failed. Retrying.", e);
                 continue;
             }
 

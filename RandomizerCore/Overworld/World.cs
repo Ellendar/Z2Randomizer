@@ -2764,10 +2764,12 @@ public abstract class World
             {
                 if (map[y,x] == Terrain.CAVE)
                 {
-                    if (!map[y + 1, x].IsWalkable()
-                        && !map[y - 1, x].IsWalkable()
-                        && !map[y, x + 1].IsWalkable()
-                        && !map[y, x - 1].IsWalkable())
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
                     {
                         return false;
                     }
