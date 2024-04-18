@@ -6,6 +6,16 @@
 		<description>Most recent changes.</description>
 		<language>en</language>
 		<item>
+			<title>Version 4.3.3</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Thursday, 18 Apr 2024 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.3.3/Z2Randomizer_4_3_3.msi" sparkle:version="4.3.3" />
+		</item>
+		<item>
 			<title>Version 4.3.2</title>
 			<description>
 				<![CDATA[

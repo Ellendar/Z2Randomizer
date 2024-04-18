@@ -407,7 +407,7 @@ public class Hyrule
             //Assembly.GetExecutingAssembly().GetName().Version.Revision +
             //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.3.2" +
+            "4.3.3" +
             Util.ReadAllTextFromFile(config.GetRoomsFile()) +
             finalRNGState
         ));
@@ -419,12 +419,14 @@ public class Hyrule
             ROMData.Dump(newFileName);
         }
 
+        /*
         Room search = palaces[6].AllRooms.FirstOrDefault(i => i.Name.Contains("Previously void elevator GP sloped inverse T room", StringComparison.OrdinalIgnoreCase));
         if (search != null)
         {
             Debug.WriteLine(newFileName);
             Debug.WriteLine(search.GetDebuggerDisplay());
         }
+        */
 
         if (UNSAFE_DEBUG)
         {

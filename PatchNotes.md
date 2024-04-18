@@ -1,5 +1,38 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.3 - April 18th, 2024
+
+### New features
+
+- Updated the pause screen to now show icons for up/down stab, trophy/medicine/child, and bagu's note/mirror/water
+- Added an option in customize to prevent the HUD from flashing when lag happens. This does not increase or decrease the amount of lag.
+- Renamed "Remove spell items" to "Start with spell items". This functions the same but it now shows you the items you start with in the pause screen.
+- Updated "Shuffle small items". Now instead of shuffling the small items between different rooms in that palace, small items are selected at random from a weighted list. The current weights are:
+	- 35% Small Key
+	- 10% Blue Jar
+	- 10% Red Jar
+	- 10% Small PBag
+	- 15% Medium PBag
+	- 10% Large PBag
+	- 5% XL PBag
+	- 5% 1Up
+- The Jig is up. ??? Is now properly labeled as "Knockback Randomizer". This will likely be toned down in a future release but for now enjoy the wackyness.
+- Slightly updated the default saved flags.
+
+### Bug Fixes
+
+- Fixed "Palaces have extra keys" to once again have extra keys.
+- Fixed a bug where high/low attack didn't work properly.
+- Slightly adjusted the rouding used in these curves from the old versions.
+	- High attack now 3/4/6/9/13/18/27/36
+	- Low attack now 1/2/3/4/5/6/9/12
+- Fixed several bugs related to hard carock
+- Fixed a bug where some rooms with complex requirements we not properly handled.
+- Fixed a bug in one of the logic safeties that didn't properly consider up/down stab being available on the west.
+- Fixed a rare bug that would break generation if the palace room pool ran out of drop exits.
+- Fixed a UI issue related to palace styles enabling/disabling the wrong options.
+- Fixed an issue where glove blocks could appear in P5 with "blockers anywhere" off.
+
 ## Version 4.3.2 - April 3rd, 2024
 
 - Fixed yet another issue with the L7 room
