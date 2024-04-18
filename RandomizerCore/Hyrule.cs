@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -327,8 +328,8 @@ public class Hyrule
             {
                 validationEngine.Modules.Add(sideview_module.Actions);
                 validationEngine.Modules.Add(gp_sideview_module.Actions);
-                ApplyAsmPatches(props, validationEngine, RNG);
                 ROM testRom = new(ROMData);
+                ApplyAsmPatches(props, validationEngine, RNG, testRom);
                 testRom.ApplyAsm(validationEngine);
             }
             catch(Exception e)
@@ -340,7 +341,7 @@ public class Hyrule
             passedValidation = true;
             _engine.Modules.Add(sideview_module.Actions);
             _engine.Modules.Add(gp_sideview_module.Actions);
-            ApplyAsmPatches(props, _engine, RNG);
+            ApplyAsmPatches(props, _engine, RNG, ROMData);
             ROMData.ApplyAsm(_engine);
         }
 
@@ -469,12 +470,12 @@ public class Hyrule
     */
 
 
-    private void RandomizeAttackEffectiveness(StatEffectiveness attackEffectiveness)
+    private void RandomizeAttackEffectiveness(ROM rom, StatEffectiveness attackEffectiveness)
     {
         int[] attackValues = new int[8];
         for (int i = 0; i < 8; i++)
         {
-            attackValues[i] = ROMData.GetByte(0x1E67D + i);
+            attackValues[i] = rom.GetByte(0x1E67D + i);
         }
 
         int[] newAttackValues = new int[8];
@@ -534,7 +535,7 @@ public class Hyrule
 
         for (int i = 0; i < 8; i++)
         {
-            ROMData.Put(0x1E67D + i, (byte)newAttackValues[i]);
+            rom.Put(0x1E67D + i, (byte)newAttackValues[i]);
         }
     }
 
@@ -1131,7 +1132,7 @@ public class Hyrule
         accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.ItemGet == true && i.Item == Item.MAGIC_CONTAINER).Count();
         return changed;
     }
-    private void RandomizeLifeOrMagicEffectiveness(bool isMag)
+    private void RandomizeLifeOrMagicEffectiveness(ROM rom, bool isMag)
     {
 
         int numBanks = 7;
@@ -1146,7 +1147,7 @@ public class Hyrule
         {
             for (int j = 0; j < 8; j++)
             {
-                int lifeVal = ROMData.GetByte(start + (i * 8) + j);
+                int lifeVal = rom.GetByte(start + (i * 8) + j);
                 int highPart = (lifeVal & 0xF0) >> 4;
                 int lowPart = lifeVal & 0x0F;
                 life[i, j] = highPart * 8 + lowPart / 2;
@@ -1204,7 +1205,7 @@ public class Hyrule
             {
                 int highPart = (life[i, j] / 8) << 4;
                 int lowPart = (life[i, j] % 8);
-                ROMData.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
+                rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
             }
         }
 
@@ -1962,14 +1963,14 @@ public class Hyrule
         }
     }
 
-    private void RandomizeExperience(int start, int cap)
+    private void RandomizeExperience(ROM rom, int start, int cap)
     {
         int[] exp = new int[8];
 
         for (int i = 0; i < exp.Length; i++)
         {
-            exp[i] = ROMData.GetByte(start + i) * 256;
-            exp[i] = exp[i] + ROMData.GetByte(start + 24 + i);
+            exp[i] = rom.GetByte(start + i) * 256;
+            exp[i] = exp[i] + rom.GetByte(start + 24 + i);
         }
 
         for (int i = 0; i < exp.Length; i++)
@@ -2018,18 +2019,18 @@ public class Hyrule
 
         for (int i = 0; i < exp.Length; i++)
         {
-            ROMData.Put(start + i, (byte)(cappedExp[i] / 256));
-            ROMData.Put(start + 24 + i, (byte)(cappedExp[i] % 256));
+            rom.Put(start + i, (byte)(cappedExp[i] / 256));
+            rom.Put(start + 24 + i, (byte)(cappedExp[i] % 256));
         }
 
         for (int i = 0; i < exp.Length; i++)
         {
 
-            ROMData.Put(start + 2057 + i, IntToText(cappedExp[i] / 1000));
+            rom.Put(start + 2057 + i, IntToText(cappedExp[i] / 1000));
             cappedExp[i] = cappedExp[i] - ((cappedExp[i] / 1000) * 1000);
-            ROMData.Put(start + 2033 + i, IntToText(cappedExp[i] / 100));
+            rom.Put(start + 2033 + i, IntToText(cappedExp[i] / 100));
             cappedExp[i] = cappedExp[i] - ((cappedExp[i] / 100) * 100);
-            ROMData.Put(start + 2009 + i, IntToText(cappedExp[i] / 10));
+            rom.Put(start + 2009 + i, IntToText(cappedExp[i] / 10));
         }
     }
 
@@ -2042,7 +2043,7 @@ public class Hyrule
     /// <param name="mask">What part of the byte value at each address contains the configuration we care about.</param>
     /// <exception cref="ArgumentException">Iff there are 0 addresses in the space to shuffle, as this would cause a divide by zero
     /// while determining the proportion.</exception>
-    private void RandomizeBits(List<int> addr, int mask = 0b00010000)
+    private void RandomizeBits(ROM rom, List<int> addr, int mask = 0b00010000)
     {
         if(addr.Count == 0)
         {
@@ -2053,7 +2054,7 @@ public class Hyrule
         double count = 0;
         foreach (int i in addr)
         {
-            if ((ROMData.GetByte(i) & mask) > 0)
+            if ((rom.GetByte(i) & mask) > 0)
             {
                 count++;
             }
@@ -2065,20 +2066,20 @@ public class Hyrule
         foreach (int i in addr)
         {
             int part1 = 0;
-            int part2 = ROMData.GetByte(i) & notMask;
+            int part2 = rom.GetByte(i) & notMask;
             if (RNG.NextDouble() <= fraction)
             {
                 part1 = mask;
             }
-            ROMData.Put(i, (byte)(part1 + part2));
+            rom.Put(i, (byte)(part1 + part2));
         }
     }
 
-    private void RandomizeEnemyExp(List<int> addr)
+    private void RandomizeEnemyExp(ROM rom, List<int> addr)
     {
         foreach (int i in addr)
         {
-            byte exp = ROMData.GetByte(i);
+            byte exp = rom.GetByte(i);
             int high = exp & 0xF0;
             int low = exp & 0x0F;
 
@@ -2107,43 +2108,43 @@ public class Hyrule
             {
                 low = 15;
             }
-            ROMData.Put(i, (byte)(high + low));
+            rom.Put(i, (byte)(high + low));
         }
     }
 
     //Updated to use fisher-yates. Eventually i'll catch all of these. N is small enough here it REALLY makes a difference
-    private void ShuffleEncounters(List<int> addr)
+    private void ShuffleEncounters(ROM rom, List<int> addr)
     {
         for (int i = addr.Count - 1; i > 0; --i)
         {
             int swap = RNG.Next(i + 1);
 
-            byte temp = ROMData.GetByte(addr[i]);
-            ROMData.Put(addr[i], ROMData.GetByte(addr[swap]));
-            ROMData.Put(addr[swap], temp);
+            byte temp = rom.GetByte(addr[i]);
+            rom.Put(addr[i], rom.GetByte(addr[swap]));
+            rom.Put(addr[swap], temp);
         }
     }
-    private void RandomizeStartingValues(Engine engine)
+    private void RandomizeStartingValues(Engine engine, ROM rom)
     {
 
-        ROMData.Put(0x17AF3, (byte)props.StartAtk);
-        ROMData.Put(0x17AF4, (byte)props.StartMag);
-        ROMData.Put(0x17AF5, (byte)props.StartLifeLvl);
+        rom.Put(0x17AF3, (byte)props.StartAtk);
+        rom.Put(0x17AF4, (byte)props.StartMag);
+        rom.Put(0x17AF5, (byte)props.StartLifeLvl);
 
         if (props.RemoveFlashing)
         {
-            ROMData.DisableFlashing();
+            rom.DisableFlashing();
         }
 
         if (props.SpellEnemy)
         {
             //3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26
             List<int> enemies = new List<int> { 3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A };
-            ROMData.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count())]);
+            rom.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count)]);
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(ROMData, RNG, engine);
+            shuffler.ShuffleBossDrop(rom, RNG, engine);
         }
 
         if (props.StartWithSpellItems)
@@ -2152,32 +2153,32 @@ public class Hyrule
             //ROMData.Put(0xF585, 0x01);
             //ROMData.Put(0xF586, 0xEA);
             //Instead of patching out the checks for the spell items, actually update the default save data so you start with them.
-            ROMData.Put(0x17b14, 0x10); //Trophy
-            ROMData.Put(0x17b15, 0x01); //Mirror
-            ROMData.Put(0x17b16, 0x40); //Medicine
-            ROMData.Put(0x17b17, 0x01); //Water
-            ROMData.Put(0x17b18, 0x20); //Child
+            rom.Put(0x17b14, 0x10); //Trophy
+            rom.Put(0x17b15, 0x01); //Mirror
+            rom.Put(0x17b16, 0x40); //Medicine
+            rom.Put(0x17b17, 0x01); //Water
+            rom.Put(0x17b18, 0x20); //Child
         }
-        ROMData.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
-        ROMData.Put(0x20010 + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        rom.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
+        rom.Put(0x20010 + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
 
         if (props.EncounterRate == EncounterRate.NONE)
         {
-            ROMData.Put(0x294, 0x60); //skips the whole routine
+            rom.Put(0x294, 0x60); //skips the whole routine
         }
 
         if (props.EncounterRate == EncounterRate.HALF)
         {
             //terrain timers
-            ROMData.Put(0x250, 0x40);
-            ROMData.Put(0x251, 0x30);
-            ROMData.Put(0x252, 0x30);
-            ROMData.Put(0x253, 0x40);
-            ROMData.Put(0x254, 0x12);
-            ROMData.Put(0x255, 0x06);
+            rom.Put(0x250, 0x40);
+            rom.Put(0x251, 0x30);
+            rom.Put(0x252, 0x30);
+            rom.Put(0x253, 0x40);
+            rom.Put(0x254, 0x12);
+            rom.Put(0x255, 0x06);
 
             //initial overworld timer
-            ROMData.Put(0x88A, 0x10);
+            rom.Put(0x88A, 0x10);
 
             /*
              * insert jump to a8aa at 2a3 (4c AA A8)
@@ -2192,40 +2193,40 @@ public class Hyrule
              * jump to encounter spawn 8298 (4C 98 82)
              * jump to rts 829f (4C 93 82)
              */
-            ROMData.Put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
+            rom.Put(0x29f, new byte[] { 0x4C, 0xAA, 0xA8 });
 
-            ROMData.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
+            rom.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
         }
 
         //CMP      #$20                      ; 0x1d4e4 $D4D4 C9 20
-        ROMData.Put(0x1d4e5, props.BeepThreshold);
+        rom.Put(0x1d4e5, props.BeepThreshold);
         if (props.BeepFrequency == 0)
         {
             //C9 20 - EA 38
             //CMP 20 -> NOP SEC
-            ROMData.Put(0x1D4E4, (byte)0xEA);
-            ROMData.Put(0x1D4E5, (byte)0x38);
+            rom.Put(0x1D4E4, (byte)0xEA);
+            rom.Put(0x1D4E5, (byte)0x38);
         }
         else
         {
             //LDA      #$30                      ; 0x193c1 $93B1 A9 30
-            ROMData.Put(0x193c2, props.BeepFrequency);
+            rom.Put(0x193c2, props.BeepFrequency);
         }
 
         if (props.ShuffleLifeRefill)
         {
             int lifeRefill = RNG.Next(1, 6);
-            ROMData.Put(0xE7A, (byte)(lifeRefill * 16));
+            rom.Put(0xE7A, (byte)(lifeRefill * 16));
         }
 
         if (props.ShuffleStealExpAmt)
         {
-            int small = ROMData.GetByte(0x1E30E);
-            int big = ROMData.GetByte(0x1E314);
+            int small = rom.GetByte(0x1E30E);
+            int big = rom.GetByte(0x1E314);
             small = RNG.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
             big = RNG.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
-            ROMData.Put(0x1E30E, (byte)small);
-            ROMData.Put(0x1E314, (byte)big);
+            rom.Put(0x1E30E, (byte)small);
+            rom.Put(0x1E314, (byte)big);
         }
 
         List<int> addr = new List<int>();
@@ -2244,17 +2245,17 @@ public class Hyrule
 
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(addr);
+            RandomizeBits(rom, addr);
         }
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(addr, 0x20);
+            RandomizeBits(rom, addr, 0x20);
         }
 
         if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(addr);
+            RandomizeEnemyExp(rom, addr);
         }
         addr = new List<int>();
         for (int i = 0x94E8; i < 0x94ED; i++)
@@ -2271,16 +2272,16 @@ public class Hyrule
         }
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(addr);
+            RandomizeBits(rom, addr);
         }
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(addr, 0x20);
+            RandomizeBits(rom, addr, 0x20);
         }
         if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(addr);
+            RandomizeEnemyExp(rom, addr);
         }
 
         addr = new List<int>();
@@ -2304,16 +2305,16 @@ public class Hyrule
 
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(addr);
+            RandomizeBits(rom, addr);
         }
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(addr, 0x20);
+            RandomizeBits(rom, addr, 0x20);
         }
         if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(addr);
+            RandomizeEnemyExp(rom, addr);
         }
 
         addr = new List<int>();
@@ -2346,16 +2347,16 @@ public class Hyrule
 
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(addr);
+            RandomizeBits(rom, addr);
         }
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(addr, 0x20);
+            RandomizeBits(rom, addr, 0x20);
         }
         if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(addr);
+            RandomizeEnemyExp(rom, addr);
         }
 
         addr = new List<int>();
@@ -2381,16 +2382,16 @@ public class Hyrule
 
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(addr);
+            RandomizeBits(rom, addr);
         }
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(addr, 0x20);
+            RandomizeBits(rom, addr, 0x20);
         }
         if (props.ExpLevel != StatEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(addr);
+            RandomizeEnemyExp(rom, addr);
         }
 
         if (props.ExpLevel != StatEffectiveness.VANILLA)
@@ -2403,7 +2404,7 @@ public class Hyrule
             addr.Add(0x12A06);
             addr.Add(0x12A07);
             addr.Add(0x15507);
-            RandomizeEnemyExp(addr);
+            RandomizeEnemyExp(rom, addr);
         }
 
         if (props.ShuffleEncounters)
@@ -2424,7 +2425,7 @@ public class Hyrule
                 addr.Add(0x4423);
             }
 
-            ShuffleEncounters(addr);
+            ShuffleEncounters(rom, addr);
 
             addr = new List<int>();
             addr.Add(0x841B); // 0x62: East grass
@@ -2445,52 +2446,52 @@ public class Hyrule
                 addr.Add(0x8424);
             }
 
-            ShuffleEncounters(addr);
+            ShuffleEncounters(rom, addr);
         }
 
         if (props.JumpAlwaysOn)
         {
-            ROMData.Put(0x1482, ROMData.GetByte(0x1480));
-            ROMData.Put(0x1483, ROMData.GetByte(0x1481));
-            ROMData.Put(0x1486, ROMData.GetByte(0x1484));
-            ROMData.Put(0x1487, ROMData.GetByte(0x1485));
+            rom.Put(0x1482, rom.GetByte(0x1480));
+            rom.Put(0x1483, rom.GetByte(0x1481));
+            rom.Put(0x1486, rom.GetByte(0x1484));
+            rom.Put(0x1487, rom.GetByte(0x1485));
 
         }
 
         if (props.DisableMagicRecs)
         {
-            ROMData.Put(0xF539, (byte)0xC9);
-            ROMData.Put(0xF53A, (byte)0);
+            rom.Put(0xF539, (byte)0xC9);
+            rom.Put(0xF53A, (byte)0);
         }
 
         if (props.ShuffleAtkExp)
         {
-            RandomizeExperience(0x1669, props.AttackCap);
+            RandomizeExperience(rom, 0x1669, props.AttackCap);
         }
 
         if (props.ShuffleMagicExp)
         {
-            RandomizeExperience(0x1671, props.MagicCap);
+            RandomizeExperience(rom, 0x1671, props.MagicCap);
         }
 
         if (props.ShuffleLifeExp)
         {
-            RandomizeExperience(0x1679, props.LifeCap);
+            RandomizeExperience(rom, 0x1679, props.LifeCap);
         }
 
-        ROMData.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
+        rom.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
 
-        RandomizeAttackEffectiveness(props.AttackEffectiveness);
+        RandomizeAttackEffectiveness(rom, props.AttackEffectiveness);
 
-        RandomizeLifeOrMagicEffectiveness(true);
+        RandomizeLifeOrMagicEffectiveness(rom, true);
 
-        RandomizeLifeOrMagicEffectiveness(false);
+        RandomizeLifeOrMagicEffectiveness(rom, false);
 
-        ROMData.Put(0x17B10, (byte)props.StartGems);
+        rom.Put(0x17B10, (byte)props.StartGems);
 
 
         startHearts = props.StartHearts;
-        ROMData.Put(0x17B00, (byte)startHearts);
+        rom.Put(0x17B00, (byte)startHearts);
 
 
         maxHearts = props.MaxHearts;
@@ -2498,26 +2499,26 @@ public class Hyrule
         heartContainersInItemPool = maxHearts - startHearts;
 
 
-        ROMData.Put(0x1C369, (byte)props.StartLives);
+        rom.Put(0x1C369, (byte)props.StartLives);
 
-        ROMData.Put(0x17B12, (byte)((props.StartWithUpstab ? 0x04 : 0) + (props.StartWithDownstab ? 0x10 : 0)));
+        rom.Put(0x17B12, (byte)((props.StartWithUpstab ? 0x04 : 0) + (props.StartWithDownstab ? 0x10 : 0)));
 
         //Swap up and Downstab
         if (props.SwapUpAndDownStab)
         {
             //Swap the ORAs that determine which stab to give you
-            ROMData.Put(0xF4DF, 0x04);
-            ROMData.Put(0xF4F7, 0x10);
+            rom.Put(0xF4DF, 0x04);
+            rom.Put(0xF4F7, 0x10);
             //Swap the ANDs that check whether or not you have the stab
-            ROMData.Put(0xF4D3, 0x04);
-            ROMData.Put(0xF4EB, 0x10);
+            rom.Put(0xF4D3, 0x04);
+            rom.Put(0xF4EB, 0x10);
         }
 
         if (props.LifeEffectiveness == StatEffectiveness.MAX)
         {
             for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
             {
-                ROMData.Put(i, 0);
+                rom.Put(i, 0);
             }
         }
 
@@ -2525,7 +2526,7 @@ public class Hyrule
         {
             for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
             {
-                ROMData.Put(i, 0xFF);
+                rom.Put(i, 0xFF);
             }
         }
 
@@ -2533,19 +2534,19 @@ public class Hyrule
         {
             for (int i = 0xD8B; i < 0xD8b + 64; i++)
             {
-                ROMData.Put(i, 0);
+                rom.Put(i, 0);
             }
         }
 
         if (props.ShufflePalacePalettes)
         {
-            shuffler.ShufflePalacePalettes(ROMData, RNG);
+            shuffler.ShufflePalacePalettes(rom, RNG);
         }
 
         if (props.ShuffleItemDropFrequency)
         {
             int drop = RNG.Next(5) + 4;
-            ROMData.Put(0x1E8B0, (byte)drop);
+            rom.Put(0x1E8B0, (byte)drop);
         }
 
     }
@@ -3686,30 +3687,30 @@ CheckIfEndOfData:
         engine.Modules.Add(a.Actions);
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG)
+    private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG, ROM rom)
     {
-        ROMData.ChangeMapperToMMC5(engine);
+        rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadItemRoomDespawn(engine);
 
         if (props.RandomizeKnockback)
         {
-            ROMData.RandomizeKnockback(engine, RNG);
+            rom.RandomizeKnockback(engine, RNG);
         }
 
         if (props.HardBosses)
         {
-            ROMData.BuffCarrock(engine);
+            rom.BuffCarrock(engine);
         }
 
         if (props.ReplaceFireWithDash)
         {
-            ROMData.DashSpell(engine);
+            rom.DashSpell(engine);
         }
 
         if (props.UpAC1)
         {
-            ROMData.UpAController1(engine);
+            rom.UpAController1(engine);
         }
         
         if (props.UpARestartsAtPalaces)
@@ -3723,9 +3724,9 @@ CheckIfEndOfData:
         }
         FixSoftLock(engine);
         ApplyHudFixes(engine, props.DisableHUDLag);
-        RandomizeStartingValues(engine);
-        ROMData.ExtendMapSize(engine);
+        RandomizeStartingValues(engine, rom);
+        rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
-        ROMData.FixContinentTransitions(engine);
+        rom.FixContinentTransitions(engine);
     }
 }
