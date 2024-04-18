@@ -3510,8 +3510,8 @@ update_next_level_exp = $a057
 ;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
 world_number = $707
 room_code = $561
-temp_room_code = $6fe
-temp_room_flag = $6ff
+temp_room_code = $110
+temp_room_flag = $111
 
 .segment "PRG7"
 
@@ -3625,6 +3625,34 @@ StandardizeDrops:
     inc $06ff
     rts
 """, "standardize_drops.s");
+        engine.Modules.Add(a.Actions);
+    }
+
+    public void PreventSideviewOutOfBounds(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Code("""
+; In vanilla, sideview loading routinely reads a few extra bytes past the end of sideview data,
+; and if you are unlucky, it'll read a $dx byte which is valid and will make the room get blocked off
+; This changes it so during background rendering, it'll properly check for bounds
+
+.segment "PRG7"
+.org $C78A ; Where the bg rendering reloads the data offset to get the next command byte
+  jsr CheckIfEndOfData
+
+.reloc
+CheckIfEndOfData:
+  ldy $072f ; load the current data offset
+  cpy $072e ; if it is at the end of the sideview
+  beq @EndOfData
+    rts     ; otherwise do nothing
+@EndOfData:
+  pla       ; pop the return address so we can choose where to go back to
+  pla
+  lda #$4f  ; Set the cursor to the end of the sideview since we are outta data
+  sta $010a
+  jmp $c795 ; jump back to the background rendering code after where it loads the next byte
+""", "prevent_sideview_oob.s");
         engine.Modules.Add(a.Actions);
     }
 
