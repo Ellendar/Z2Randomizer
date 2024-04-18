@@ -389,6 +389,28 @@ public class Hyrule
             return;
         }
 
+        //If you start with a spell, also start with its corresponding spell item if applicable.
+        if (props.StartWithSpell(SpellMap[Town.RUTO]))
+        {
+            ROMData.Put(0x17b14, 0x10); //Trophy
+        }
+        if (props.StartWithSpell(SpellMap[Town.SARIA_NORTH]))
+        {
+            ROMData.Put(0x17b15, 0x01); //Mirror
+        }
+        if (props.StartWithSpell(SpellMap[Town.MIDO_WEST]))
+        {
+            ROMData.Put(0x17b16, 0x40); //Medicine
+        }
+        if (props.StartWithSpell(SpellMap[Town.NABOORU]))
+        {
+            ROMData.Put(0x17b17, 0x01); //Water
+        }
+        if (props.StartWithSpell(SpellMap[Town.DARUNIA_WEST]))
+        {
+            ROMData.Put(0x17b18, 0x20); //Child
+        }
+
 
         List<Text> hints = ROMData.GetGameText();
         ROMData.WriteHints(CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
@@ -665,12 +687,6 @@ public class Hyrule
             shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Item.TROPHY] = true;
             startTrophy = true;
-            ROMData.Put(0x17b14, 0x10); //Trophy
-        }
-
-        if (SpellGet[SpellMap[Town.SARIA_NORTH]])
-        {
-            ROMData.Put(0x17b15, 0x01); //Mirror
         }
 
         if (SpellGet[SpellMap[Town.MIDO_WEST]])
@@ -678,12 +694,6 @@ public class Hyrule
             shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Item.MEDICINE] = true;
             startMed = true;
-            ROMData.Put(0x17b16, 0x40); //Medicine
-        }
-
-        if (SpellGet[SpellMap[Town.NABOORU]])
-        {
-            ROMData.Put(0x17b17, 0x01); //Water
         }
 
         if (SpellGet[SpellMap[Town.DARUNIA_WEST]])
@@ -691,7 +701,6 @@ public class Hyrule
             shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Item.CHILD] = true;
             startKid = true;
-            ROMData.Put(0x17b18, 0x20); //Child
         }
 
         //TODO: Clean up the readability of this logic
@@ -2159,6 +2168,7 @@ public class Hyrule
             rom.Put(0x17b17, 0x01); //Water
             rom.Put(0x17b18, 0x20); //Child
         }
+
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
         rom.Put(0x20010 + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
 
