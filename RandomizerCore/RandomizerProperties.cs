@@ -161,7 +161,7 @@ public class RandomizerProperties
     public bool KasutoJars { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }
-    public bool RemoveSpellItems { get; set; }
+    public bool StartWithSpellItems { get; set; }
     public bool ShufflePbagXp { get; set; }
 
     //Drops

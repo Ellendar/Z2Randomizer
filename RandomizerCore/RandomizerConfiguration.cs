@@ -1448,7 +1448,7 @@ public class RandomizerConfiguration
         properties.ExtraKeys = PalacesContainExtraKeys == null ? random.Next(2) == 1 : (bool)PalacesContainExtraKeys;
         properties.KasutoJars = RandomizeNewKasutoJarRequirements;
         properties.PbagItemShuffle = IncludePBagCavesInItemShuffle == null ? random.Next(2) == 1 : (bool)IncludePBagCavesInItemShuffle;
-        properties.RemoveSpellItems = RemoveSpellItems == null ? random.Next(2) == 1 : (bool)RemoveSpellItems;
+        properties.StartWithSpellItems = RemoveSpellItems == null ? random.Next(2) == 1 : (bool)RemoveSpellItems;
         properties.ShufflePbagXp = ShufflePBagAmounts == null ? random.Next(2) == 1 : (bool)ShufflePBagAmounts;
 
         //Drops
@@ -1541,7 +1541,7 @@ public class RandomizerConfiguration
             properties.P7shuffle = false;
         }
 
-        if (properties.RemoveSpellItems)
+        if (properties.StartWithSpellItems)
         {
             properties.SpellItemHints = false;
         }

@@ -509,7 +509,17 @@ public class Hyrule
             }
             else if (attackEffectiveness == StatEffectiveness.LOW)
             {
-                attack = (int)Math.Round(attackValues[i] - (attackValues[i] * .5), MidpointRounding.ToPositiveInfinity);
+                //Low attack does really dumb stuff with rounding regardless of what you do because the values are so low
+                //This causes at least 1 level to to literal nothing. To avoid this, we just have a linear increase from 1-6
+                //Meeting up at 6 where the curve would be anyway.
+                if (i <= 6)
+                {
+                    attack = i;
+                }
+                else
+                {
+                    attack = (int)Math.Round(attackValues[i] - (attackValues[i] * .5), MidpointRounding.ToPositiveInfinity);
+                }
             }
             else
             {
@@ -637,7 +647,7 @@ public class Hyrule
             }
         }
 
-        if (props.RemoveSpellItems)
+        if (props.StartWithSpellItems)
         {
             shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
             shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
@@ -1302,15 +1312,15 @@ public class Hyrule
         {
             requireables.Add(RequirementType.EIGHT_CONTAINERS);
         }
-        if (ItemGet[Item.TROPHY] || props.RemoveSpellItems)
+        if (ItemGet[Item.TROPHY] || props.StartWithSpellItems)
         {
             requireables.Add(RequirementType.TROPHY);
         }
-        if (ItemGet[Item.MEDICINE] || props.RemoveSpellItems)
+        if (ItemGet[Item.MEDICINE] || props.StartWithSpellItems)
         {
             requireables.Add(RequirementType.MEDICINE);
         }
-        if (ItemGet[Item.CHILD] || props.RemoveSpellItems)
+        if (ItemGet[Item.CHILD] || props.StartWithSpellItems)
         {
             requireables.Add(RequirementType.CHILD);
         }
@@ -2122,11 +2132,17 @@ public class Hyrule
             shuffler.ShuffleBossDrop(ROMData, RNG, engine);
         }
 
-        if (props.RemoveSpellItems)
+        if (props.StartWithSpellItems)
         {
-            ROMData.Put(0xF584, 0xA9);
-            ROMData.Put(0xF585, 0x01);
-            ROMData.Put(0xF586, 0xEA);
+            //ROMData.Put(0xF584, 0xA9);
+            //ROMData.Put(0xF585, 0x01);
+            //ROMData.Put(0xF586, 0xEA);
+            //Instead of patching out the checks for the spell items, actually update the default save data so you start with them.
+            ROMData.Put(0x17b14, 0x10); //Trophy
+            ROMData.Put(0x17b15, 0x01); //Mirror
+            ROMData.Put(0x17b16, 0x40); //Medicine
+            ROMData.Put(0x17b17, 0x01); //Water
+            ROMData.Put(0x17b18, 0x20); //Child
         }
         ROMData.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
         ROMData.Put(0x20010 + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));

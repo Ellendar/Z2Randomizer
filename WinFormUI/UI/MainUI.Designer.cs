@@ -2134,9 +2134,9 @@ partial class MainUI
         removeSpellitemsCheckbox.Name = "removeSpellitemsCheckbox";
         removeSpellitemsCheckbox.Size = new Size(129, 19);
         removeSpellitemsCheckbox.TabIndex = 18;
-        removeSpellitemsCheckbox.Text = "Remove Spell Items";
+        removeSpellitemsCheckbox.Text = "Start With Spell Items";
         removeSpellitemsCheckbox.ThreeState = true;
-        toolTip1.SetToolTip(removeSpellitemsCheckbox, "When checked, you no longer need the trophy, medicine, or kid to access the respective spells");
+        toolTip1.SetToolTip(removeSpellitemsCheckbox, "When checked, you start with the trophy, medicine, child, water, and mirror");
         removeSpellitemsCheckbox.UseVisualStyleBackColor = true;
         removeSpellitemsCheckbox.CheckStateChanged += SpellItemBox_CheckStateChanged;
         // 
