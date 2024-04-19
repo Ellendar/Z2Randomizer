@@ -1,4 +1,5 @@
-﻿using SD.Tools.BCLExtensions.CollectionsRelated;
+﻿using RandomizerCore;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1042,9 +1043,9 @@ class DeathMountain : World
     /// <summary>
     /// Updates the visitation matrix and location reachability 
     /// </summary>
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
-        UpdateReachable(itemGet, spellGet);
+        UpdateReachable(itemGet);
 
         foreach (Location location in AllLocations)
         {

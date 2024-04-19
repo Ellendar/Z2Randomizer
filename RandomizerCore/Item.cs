@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer.Core;
 
+/*
 public enum Item {
     CANDLE = 0,
     GLOVE = 1,
@@ -30,3 +31,4 @@ public enum Item {
     TROPHY = 0x14,
     MEDICINE = 0x15
 }
+*/

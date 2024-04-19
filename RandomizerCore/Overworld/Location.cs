@@ -2,6 +2,7 @@
 using Z2Randomizer.Core;
 using System;
 using System.Diagnostics;
+using RandomizerCore;
 
 namespace Z2Randomizer.Core.Overworld;
 
@@ -11,7 +12,7 @@ public class Location
     Logger logger = LogManager.GetCurrentClassLogger();
     private int appear2loweruponexit;
     private (int, int)coords;
-    public Item Item { get; set; }
+    public Collectable Collectable { get; set; }
     public bool ItemGet { get; set; }
 
     public Terrain TerrainType { get; set; }
@@ -120,7 +121,7 @@ public class Location
         TerrainType = t;
         MemAddress = mem;
         CanShuffle = true;
-        Item = Item.DO_NOT_USE;
+        Collectable = Collectable.DO_NOT_USE;
         ItemGet = false;
         Reachable = false;
         PalaceNumber = 0;
@@ -352,6 +353,6 @@ public class Location
             + " " + Name
             + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
-            + (Item == Item.DO_NOT_USE ? "" : Item.ToString());
+            + (Collectable == Collectable.DO_NOT_USE ? "" : Collectable.ToString());
     }
 }

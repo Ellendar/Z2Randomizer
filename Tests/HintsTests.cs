@@ -15,7 +15,7 @@ public class HintsTests
             .Union(CustomTexts.BAGU_TEXTS).ToList();
 
         CustomTexts.WIZARD_TEXTS_BY_SPELL.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
-        CustomTexts.WIZARD_TEXTS_BY_TOWN.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
+        CustomTexts.WIZARD_SPELL_TEXTS_BY_TOWN.Values.SelectMany(i => i).ToList().ForEach(hints.Add);
 
         foreach(string hint in hints)
         {
