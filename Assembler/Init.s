@@ -96,6 +96,6 @@ FREE "PRG6" [$ac09, $bfff)
 
 ; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
 ; free space for patches. Keep it disabled as much as possible
-; FREE "PRG7" [$f369, $fcfb);
-
+; FREE "PRG7" [$f369, $fcfb)
+FREE "PRG7" [$f3d0, $fcfb) ; allow code in the ganon laugh sfx but not the hurt sfx
 
