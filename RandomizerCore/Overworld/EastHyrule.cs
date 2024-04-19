@@ -148,7 +148,7 @@ public class EastHyrule : World
         townAtOldKasuto = GetLocationByMem(0x8662);
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
-        locationAtGP.Item = Item.DO_NOT_USE;
+        locationAtGP.Collectable = Item.DO_NOT_USE;
         pbagCave1 = GetLocationByMem(0x863C);
         pbagCave2 = GetLocationByMem(0x863D);
         VANILLA_MAP_ADDR = 0x9056;
@@ -1484,7 +1484,7 @@ public class EastHyrule : World
         }
     }
 
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         UpdateReachable(itemGet, spellGet);
 

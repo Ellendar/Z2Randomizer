@@ -16,7 +16,7 @@ internal class Towns
         { Town.SARIA_NORTH, new Requirements() },
         { Town.MIDO_WEST, new Requirements(new RequirementType[] {RequirementType.MEDICINE }) },
         { Town.MIDO_CHURCH, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
-        { Town.NABOORU, new Requirements(new RequirementType[] {RequirementType.FIVE_CONTAINERS }) },
+        { Town.NABOORU_WIZARD, new Requirements(new RequirementType[] {RequirementType.FIVE_CONTAINERS }) },
         { Town.DARUNIA_WEST, new Requirements(new RequirementType[] { }, new RequirementType[][] { new RequirementType[]{ RequirementType.CHILD, RequirementType.SIX_CONTAINERS }}) },
         { Town.DARUNIA_ROOF, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
         { Town.NEW_KASUTO, new Requirements(new RequirementType[] {RequirementType.SEVEN_CONTAINERS })  },
@@ -25,5 +25,5 @@ internal class Towns
     };
 
     public static readonly Town[] STRICT_SPELL_LOCATIONS = { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
-        Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
+        Town.NABOORU_WIZARD, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
 }

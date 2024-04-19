@@ -1,4 +1,5 @@
-﻿using RandomizerCore;
+﻿using NLog;
+using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +10,8 @@ namespace Z2Randomizer.Core;
 
 public class CustomTexts
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private static readonly int[] rauruHints = new int[] { 32, 12, 30 }; //Three houses, first screen
     private static readonly int[] rutoHints = new int[] { 18, 33, 25, 26 }; //error is 25 and 26, two houses, outside left
     private static readonly int[] sariaHints = new int[] { 50, 28 };//moving middle screen, sleeping thing, stationary right
@@ -62,7 +65,7 @@ public class CustomTexts
         { Town.SARIA_NORTH, 35 },
         { Town.MIDO_WEST, 46 },
         { Town.MIDO_CHURCH, 47 },
-        { Town.NABOORU, 70 },
+        { Town.NABOORU_WIZARD, 70 },
         { Town.DARUNIA_ROOF, 82 },
         { Town.DARUNIA_WEST, 81 },
         { Town.NEW_KASUTO, 93 },
@@ -169,7 +172,7 @@ public class CustomTexts
     };
 
     public static readonly string[] DOWNSTAB_TEXTS =
-    {
+    [
         "stick them$with the$pointy end",
         "youll stab$your eye$out",
         "press down$you idiot",
@@ -184,10 +187,10 @@ public class CustomTexts
         "easy mode$activated",
         "Never$gonna give$you up",
         "Are you$Scrooge$McDuck?"
-    };
+    ];
 
     public static readonly string[] UPSTAB_TEXTS =
-    {
+    [
         "bet you$wish this$was$downstab",
         "you$probably$wont need$this",
         "press up$you idiot",
@@ -200,10 +203,10 @@ public class CustomTexts
         "Tiger$Uppercut!",
         "Never$gonna let$you down",
         "Thanks$for not$skipping$me",
-    };
+    ];
 
     public static readonly string[] KNOW_NOTHING_TEXTS =
-    {
+    [
         "I Know$Nothing",
         "Knowledge$Is Not$Mine",
         "I Like$Wasting$Your Time",
@@ -221,10 +224,10 @@ public class CustomTexts
         "I am not$a vire$in$disguise",
         "Woah!$Dude!",
         "PAY ME$AND I'LL$TALK"
-    };
+    ];
 
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
-    {
+    [
         "all signs$point to$no",
         "come back$as$adult link",
         "quit$wasting$my time",
@@ -236,43 +239,50 @@ public class CustomTexts
         "You must$construct$addtional$pylons",
         "bet you$forgot$this flag$was on",
         "I'll tell$you when$you're$older"
-    };
+    ];
 
-    public static readonly Dictionary<Town, string[]> WIZARD_TEXTS_BY_TOWN = new()
+    public static readonly Dictionary<Town, string[]> WIZARD_SPELL_TEXTS_BY_TOWN = new()
     {
         { Town.RAURU, new string[] { } },
         { Town.RUTO, new string[] { "A winner$is you"} },
         { Town.SARIA_NORTH, new string[] { "Water$you$doing?" } },
         { Town.MIDO_WEST, new string[] { } },
         { Town.MIDO_CHURCH, new string[] { } },
-        { Town.NABOORU, new string[] { } },
+        { Town.NABOORU_WIZARD, new string[] { } },
         { Town.DARUNIA_ROOF, new string[] { } },
         { Town.DARUNIA_WEST, new string[] { "You saved$a kid$for this?", "Dont$forget to$get upstab" } },
         { Town.NEW_KASUTO, new string[] { } },
         { Town.OLD_KASUTO, new string[] { "Sorry$about the$moas" } }
     };
 
-    public static readonly Dictionary<Spell, string[]> WIZARD_TEXTS_BY_SPELL = new()
+    public static readonly Dictionary<Collectable, string[]> WIZARD_SPELL_TEXTS_BY_COLLECTABLE = new()
     {
-        { Spell.SHIELD, new string[] { "Have you$tried not$dying?", "I Already$Have One", "Is This$A Red$Ring?" } },
-        { Spell.JUMP, new string[] { "I get up$and nothin$gets me$down", "Kris Kross$will make$you..." } },
-        { Spell.LIFE, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal" } },
-        { Spell.FAIRY, new string[] { "HEY!$LISTEN", "Just$don't say$Hey$listen!", "Watch Out$For Iron" } },
-        { Spell.FIRE, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love" } },
-        { Spell.DASH, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through!"  } },
-        { Spell.REFLECT, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
-        { Spell.SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
-        { Spell.THUNDER, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage" } },
-        { Spell.UPSTAB, UPSTAB_TEXTS },
-        { Spell.DOWNSTAB, DOWNSTAB_TEXTS }
+        { Collectable.SHIELD_SPELL, new string[] { "Have you$tried not$dying?", "I Already$Have One", "Is This$A Red$Ring?" } },
+        { Collectable.JUMP_SPELL, new string[] { "I get up$and nothin$gets me$down", "Kris Kross$will make$you..." } },
+        { Collectable.LIFE_SPELL, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal" } },
+        { Collectable.FAIRY_SPELL, new string[] { "HEY!$LISTEN", "Just$don't say$Hey$listen!", "Watch Out$For Iron" } },
+        { Collectable.FIRE_SPELL, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love" } },
+        { Collectable.DASH_SPELL, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through!"  } },
+        { Collectable.REFLECT_SPELL, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
+        { Collectable.SPELL_SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
+        { Collectable.THUNDER_SPELL, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage" } },
+        { Collectable.UPSTAB, UPSTAB_TEXTS },
+        { Collectable.DOWNSTAB, DOWNSTAB_TEXTS }
     };
+
+    public static string DEFAULT_WIZARD_COLLECTABLE = "YOU GOT$THE$%%";
+
+    public static string[] COMMUNITY_NONSPELL_GET_TEXT =
+    [
+        "GET$EQUIPPED$WITH$%"
+    ];
 
     public static List<Text> GenerateTexts(
         List<Location> itemLocs, 
         bool startsWithTrophy, 
         bool startsWithMedicine, 
         bool startsWithKid, 
-        Dictionary<Town, Spell> spellMap, 
+        Dictionary<Town, Collectable> spellMap, 
         Location bagu,
         List<Text> texts,
         RandomizerProperties props,
@@ -380,70 +390,65 @@ public class CustomTexts
         return baguHint;
     }
 
-    private static void GenerateTownNameHints(List<Text> texts, Dictionary<Town, Spell> spellMap, bool linkedFire)
+    private static void GenerateTownNameHints(List<Text> texts, Dictionary<Town, Collectable> spellMap, bool linkedFire)
     {
-        texts[rauruSign] = GenerateTownHint(spellMap[Town.RAURU], linkedFire);
-        texts[rutoSign] = GenerateTownHint(spellMap[Town.RUTO], linkedFire);
-        texts[sariaSign] = GenerateTownHint(spellMap[Town.SARIA_NORTH], linkedFire);
-        texts[midoSign] = GenerateTownHint(spellMap[Town.MIDO_WEST], linkedFire);
-        texts[nabooruSign] = GenerateTownHint(spellMap[Town.NABOORU], linkedFire);
-        texts[daruniaSign] = GenerateTownHint(spellMap[Town.DARUNIA_WEST], linkedFire);
-        texts[newKasutoSign] = GenerateTownHint(spellMap[Town.NEW_KASUTO], linkedFire);
-        texts[oldKasutoSign] = GenerateTownHint(spellMap[Town.OLD_KASUTO], linkedFire);
+        texts[rauruSign] = GenerateTownSignHint(spellMap[Town.RAURU], linkedFire);
+        texts[rutoSign] = GenerateTownSignHint(spellMap[Town.RUTO], linkedFire);
+        texts[sariaSign] = GenerateTownSignHint(spellMap[Town.SARIA_NORTH], linkedFire);
+        texts[midoSign] = GenerateTownSignHint(spellMap[Town.MIDO_WEST], linkedFire);
+        texts[nabooruSign] = GenerateTownSignHint(spellMap[Town.NABOORU_WIZARD], linkedFire);
+        texts[daruniaSign] = GenerateTownSignHint(spellMap[Town.DARUNIA_WEST], linkedFire);
+        texts[newKasutoSign] = GenerateTownSignHint(spellMap[Town.NEW_KASUTO], linkedFire);
+        texts[oldKasutoSign] = GenerateTownSignHint(spellMap[Town.OLD_KASUTO], linkedFire);
     }
 
-    public static Text GenerateTownHint(Spell spell, bool linkedFire)
+    public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
     {
-        string text = "";
-        switch (spell)
+        string text = spell.EnglishText();
+        if(spell == Collectable.FIRE_SPELL && linkedFire)
         {
-            case Spell.SHIELD:
-                text += "shield$";
-                break;
-            case Spell.JUMP:
-                text += "jump";
-                break;
-            case Spell.LIFE:
-                text += "life$";
-                break;
-            case Spell.FAIRY:
-                text += "fairy$";
-                break;
-            case Spell.FIRE:
-                text += "fire" + (linkedFire ? "!$" : "$");
-                break;
-            case Spell.DASH:
-                text += "dash$";
-                break;
-            case Spell.REFLECT:
-                text += "reflect$";
-                break;
-            case Spell.SPELL:
-                text += "spell$";
-                break;
-            case Spell.THUNDER:
-                text += "thunder$";
-                break;
-
+            text += "!";
         }
-        text += "town";
+        text += "$town";
         return new Text(text);
     }
 
-    public static Text GenerateCommunityText(HintType type, Random r, Town? town = null, Spell? spell = null)
+    public static Text GenerateCommunityText(HintType type, Random r, Town? town = null, Collectable? collectable = null)
     {
         switch (type)
         {
             case HintType.WIZARD:
-                if (town == null || spell == null)
+                if (town == null || collectable == null)
                 {
                     throw new ArgumentException("Spell/Town is required to generate wizard text");
                 }
-                List<string> possibleWizardHints = GENERIC_WIZARD_TEXTS
-                    .Union(WIZARD_TEXTS_BY_TOWN[town ?? Town.RAURU])
-                    .Union(WIZARD_TEXTS_BY_SPELL[spell ?? Spell.SHIELD]).ToList();
-                int selectedHintIndex = r.Next(possibleWizardHints.Count());
-                return new Text(possibleWizardHints[selectedHintIndex]);
+                Collectable c = (collectable ?? Collectable.DO_NOT_USE);
+                if ((collectable ?? Collectable.DO_NOT_USE).IsSpell())
+                {
+                    List<string> possibleWizardHints = GENERIC_WIZARD_TEXTS
+                      .Union(WIZARD_SPELL_TEXTS_BY_TOWN[town ?? Town.RAURU])
+                      .Union(WIZARD_SPELL_TEXTS_BY_COLLECTABLE[c]).ToList();
+                    int selectedHintIndex = r.Next(possibleWizardHints.Count());
+                    return new Text(possibleWizardHints[selectedHintIndex]);
+                }
+                else
+                {
+                    int textIndex = r.Next(COMMUNITY_NONSPELL_GET_TEXT.Length);
+                    string collectableWizardText = COMMUNITY_NONSPELL_GET_TEXT[textIndex];
+                    if (collectableWizardText.Contains("%%"))
+                    {
+                        return new Text(collectableWizardText.Replace("%%", c.EnglishText()));
+                    }
+                    else if (collectableWizardText.Contains("%"))
+                    {
+                        return new Text(collectableWizardText.Replace("%", c.SingleLineText()));
+                    }
+                    else
+                    {
+                        logger.Error("Invalid collectable in hint generation");
+                        return new Text("THIS TEXT$IS BROKEN$TELL$ELLENDAR");
+                    }
+                }
             case HintType.BAGU:
                 return new Text(BAGU_TEXTS[r.Next(BAGU_TEXTS.Count())]);
             case HintType.BRIDGE:
@@ -499,7 +504,7 @@ public class CustomTexts
         List<Item> smallItems = new List<Item> { Item.BLUE_JAR, Item.XL_BAG, Item.KEY, Item.MEDIUM_BAG, Item.MAGIC_CONTAINER, Item.HEART_CONTAINER, Item.ONEUP, Item.RED_JAR, Item.SMALL_BAG, Item.LARGE_BAG };
         List<int> placedTowns = new List<int>();
 
-        List<Item> items = itemLocs.Select(i => i.Item).ToList();
+        List<Item> items = itemLocs.Select(i => i.Collectable).ToList();
 
         if (useSpellItemHints)
         {
@@ -518,7 +523,7 @@ public class CustomTexts
                 tries++;
             }
             int j = 0;
-            while (itemLocs[j].Item != doThis)
+            while (itemLocs[j].Collectable != doThis)
             {
                 j++;
             }
@@ -559,19 +564,19 @@ public class CustomTexts
 
         foreach (Location itemLocation in itemLocs)
         {
-            if (itemLocation.Item == Item.TROPHY && !startsWithTrophy)
+            if (itemLocation.Collectable == Collectable.TROPHY && !startsWithTrophy)
             {
                 Text trophyHint = new Text();
                 trophyHint.GenerateHelpfulHint(itemLocation);
                 hints[trophyIndex] = trophyHint;
             }
-            else if (itemLocation.Item == Item.MEDICINE && !startsWithMedicine)
+            else if (itemLocation.Collectable == Collectable.MEDICINE && !startsWithMedicine)
             {
                 Text medHint = new Text();
                 medHint.GenerateHelpfulHint(itemLocation);
                 hints[medIndex] = medHint;
             }
-            else if (itemLocation.Item == Item.CHILD && !startsWithKid)
+            else if (itemLocation.Collectable == Collectable.CHILD && !startsWithKid)
             {
                 Text kidHint = new Text();
                 kidHint.GenerateHelpfulHint(itemLocation);
@@ -580,7 +585,7 @@ public class CustomTexts
         }
     }
 
-    private static void GenerateCommunityText(List<Text> hints, Dictionary<Town, Spell> spellMap, Random r)
+    private static void GenerateCommunityText(List<Text> hints, Dictionary<Town, Collectable> spellMap, Random r)
     {
         List<Text> usedWizardHints = new List<Text>();
         do
@@ -588,18 +593,18 @@ public class CustomTexts
             foreach(Town town in spellMap.Keys)
             {
                 Text wizardHint;
-                Spell spell = spellMap[town];
+                Collectable collectable = spellMap[town];
                 do
                 {
-                    wizardHint = GenerateCommunityText(HintType.WIZARD, r, town, spell);
+                    wizardHint = GenerateCommunityText(HintType.WIZARD, r, town, collectable);
                 } while (usedWizardHints.Contains(wizardHint));
                 //TODO: eventually when up/downstab are in the generic spell pool, they can use generic hints again.
-                if(spell == Spell.DOWNSTAB)
+                if(collectable == Spell.DOWNSTAB)
                 {
                     hints[spellTextIndexes[town]] = new Text(DOWNSTAB_TEXTS[r.Next(DOWNSTAB_TEXTS.Length)]);
                     continue;
                 }
-                if (spell == Spell.UPSTAB)
+                if (collectable == Spell.UPSTAB)
                 {
                     hints[spellTextIndexes[town]] = new Text(UPSTAB_TEXTS[r.Next(UPSTAB_TEXTS.Length)]);
                     continue;

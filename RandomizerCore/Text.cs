@@ -30,7 +30,7 @@ public class Text : IEquatable<Text>
 
     public void GenerateHelpfulHint(Location location)
     {
-        Item hintItem = location.Item;
+        Item hintItem = location.Collectable;
         string hint = "";
         if (location.PalaceNumber == 1)
         {

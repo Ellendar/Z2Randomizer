@@ -812,7 +812,7 @@ class MazeIsland : World
             }
         }
     }
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         bool changed = true;
         while (changed)

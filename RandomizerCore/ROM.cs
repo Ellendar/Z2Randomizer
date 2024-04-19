@@ -105,7 +105,7 @@ public class ROM
         {Town.RUTO, 0xEFFE },
         {Town.SARIA_NORTH, 0xF014 },
         {Town.MIDO_WEST, 0xF02A },
-        {Town.NABOORU, 0xF05A },
+        {Town.NABOORU_WIZARD, 0xF05A },
         {Town.DARUNIA_WEST, 0xf070 },
         {Town.NEW_KASUTO, 0xf088 },
         {Town.OLD_KASUTO, 0xf08e }

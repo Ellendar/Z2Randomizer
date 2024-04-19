@@ -8,12 +8,15 @@ public enum Town
     SARIA_SOUTH = 4,
     MIDO_WEST = 5,
     MIDO_CHURCH = 6,
-    NABOORU = 7,
+    NABOORU_WIZARD = 7,
     DARUNIA_WEST = 8,
     DARUNIA_ROOF = 9,
     NEW_KASUTO = 10,
     SPELL_TOWER = 11,
-    OLD_KASUTO = 12
+    OLD_KASUTO = 12,
+    SARIA_TABLE = 13,
+    BAGU = 14,
+    NABOORU_FOUNTAIN = 15,
 }
 
 public static class TownExtensions
@@ -27,7 +30,7 @@ public static class TownExtensions
             Town.RUTO => 2,
             Town.SARIA_NORTH => 3,
             Town.MIDO_WEST => 4,
-            Town.NABOORU => 5,
+            Town.NABOORU_WIZARD => 5,
             Town.DARUNIA_WEST => 6,
             Town.NEW_KASUTO => 7,
             Town.OLD_KASUTO => 8,
@@ -45,7 +48,7 @@ public static class TownExtensions
             Town.SARIA_SOUTH => true,
             Town.MIDO_WEST => true,
             Town.MIDO_CHURCH => false,
-            Town.NABOORU => true,
+            Town.NABOORU_WIZARD => true,
             Town.DARUNIA_WEST => true,
             Town.DARUNIA_ROOF => false,
             Town.NEW_KASUTO => true,

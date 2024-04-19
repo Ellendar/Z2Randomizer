@@ -1379,7 +1379,7 @@ public class WestHyrule : World
     }
 
 
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet, Dictionary<Spell, bool> spellGet)
     {
         visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
         UpdateReachable(itemGet, spellGet);
