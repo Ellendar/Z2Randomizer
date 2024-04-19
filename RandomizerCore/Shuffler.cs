@@ -267,7 +267,7 @@ DontSwitchMusicIfInPalace2:
     cmp #$02
     beq +
         ; Restore track 0
-        lda #$10
+        lda #$00
         sta $eb
 +   rts
 """);

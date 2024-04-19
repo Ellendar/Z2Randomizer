@@ -125,6 +125,20 @@ SwapPRG:
 .org $a728
     jsr     SwapCHR
 
+.org $a6a3
+    jsr ClearStackRAM
+
+.reloc
+ClearStackRAM:
+    lda #0
+    ldx #$d0 - $20
+    ; clear stack RAM we can use for variables
+@Loop2:
+        sta $100 + $20 - 1,x
+        dex
+        bne @Loop2
+    jmp $d281 ; clear rest of ram
+
 .segment "PRG7"
 ; Update the pointers to the bank switches
 

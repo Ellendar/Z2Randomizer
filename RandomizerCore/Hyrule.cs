@@ -3537,8 +3537,8 @@ update_next_level_exp = $a057
 ;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
 world_number = $707
 room_code = $561
-temp_room_code = $110
-temp_room_flag = $111
+temp_room_code = $120
+temp_room_flag = $121
 
 .segment "PRG7"
 
@@ -3570,9 +3570,9 @@ ReloadExpForReset:
     rts
 
 .org $cad0
-    jsr ReloadExpForReset
-    cmp #3
-    bcs $cade ; *+9
+    jsr ReloadExpForReset ; Refresh the room marker and load the world number
+    cmp #3                ; World 3 or greater (palaces)
+    bcs $cade ; *+9       ; jump to restore/continue routine
 
 .org $cae3
     ; Don't clear area code on reset
@@ -3831,5 +3831,6 @@ FREE_UNTIL $c2ca
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
         FixContinentTransitions(engine);
+        PreventSideviewOutOfBounds(engine);
     }
 }
