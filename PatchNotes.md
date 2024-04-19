@@ -1,5 +1,12 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.4 - April 18th, 2024
+
+- Fixed a bug where some properties were sometimes randomized outside their valid ranges.
+- Fixed a bug where the spell items were sometimes incorrectly assigned based on starting spells.
+- Fixed an issue where palace pallettes would sometimes not properly load.
+- Fixed an issue the file naming cursor was not displayed properly
+
 ## Version 4.3.3 - April 18th, 2024
 
 ### New features
