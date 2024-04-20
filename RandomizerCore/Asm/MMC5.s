@@ -128,6 +128,27 @@ SwapPRG:
 .org $a6a3
     jsr ClearStackRAM
 
+; Fix sword flashing on title screen bug
+
+; Switch the OAM position of an unused sprite and the glitchy sword tile
+; and move that just off to the left. This sprite just doesn't seem to glitch?
+
+.org $A7C1 + 22 * 4
+    .byte $80,$E8,$20,$70
+
+.org $A7C1 + 26 * 4
+    .byte $8F,$EA,$02,$78
+
+; Star twinkle animation, twinkle one less so the sword doesn't twinkle.
+.org $a8cf
+    ldx #$6b - 4
+.org $a8d7
+    inc $0267 + 4,x
+    lda $0267 + 4,x
+    and #$23
+    sta $0267 + 4,x
+
+
 .reloc
 ClearStackRAM:
     lda #0
