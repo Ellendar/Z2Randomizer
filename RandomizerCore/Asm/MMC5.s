@@ -107,6 +107,23 @@ SwapPRG:
     rts
 
 
+.segment "PRG7"
+; Patch the save and exit command list to add a clear ram chunk
+.org $FE80
+    .word (ClearPartialDevRAM)
+
+.reloc
+ClearPartialDevRAM:
+    ; Clear the stack ram we use for variables, but leave 16 untouched for things that
+    ; should persist across resets. Because why not.
+    lda #0
+    ldx #$c0 - $20
+@Loop2:
+        sta $100 + $20 - 1,x
+        dex
+        bne @Loop2
+    jmp $CF05
+
 .segment "PRG0"
 ; Clean up stuff in bank zero - make it go via bank7's routines.
 .org $8149
@@ -125,8 +142,20 @@ SwapPRG:
 .org $a728
     jsr     SwapCHR
 
+; Patch power off/ soft reset to clear out some stack ram for use
 .org $a6a3
     jsr ClearStackRAM
+
+.reloc
+ClearStackRAM:
+    lda #0
+    ldx #$d0 - $20
+    ; clear stack RAM we can use for variables
+@Loop2:
+        sta $100 + $20 - 1,x
+        dex
+        bne @Loop2
+    jmp $d281 ; clear rest of ram
 
 ; Fix sword flashing on title screen bug
 
@@ -147,18 +176,6 @@ SwapPRG:
     lda $0267 + 4,x
     and #$23
     sta $0267 + 4,x
-
-
-.reloc
-ClearStackRAM:
-    lda #0
-    ldx #$d0 - $20
-    ; clear stack RAM we can use for variables
-@Loop2:
-        sta $100 + $20 - 1,x
-        dex
-        bne @Loop2
-    jmp $d281 ; clear rest of ram
 
 .segment "PRG7"
 ; Update the pointers to the bank switches
