@@ -1,5 +1,16 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.5 - April 21st, 2024
+
+There is a known issue that may still affect this release. If your first seed after updating gets stuck on "Generating Palaces", uninstalling and reinstalling will fix it.
+We will be looking at different installation techniques in the future if this keeps happening.
+
+- Fixed a bug where climate expansion was incorrect.
+- Fixed a bug causing artifacts on the title screen for some hardware.
+- Fixed a bug where rooms could randomly have uninented walls blocking progress.
+- Fixed a bug where up+A in GP could take you to the wrong room.
+- Fixed a bug where the incorrect sound would play when picking up some small items.
+
 ## Version 4.3.4 - April 18th, 2024
 
 - Fixed a bug where some properties were sometimes randomized outside their valid ranges.

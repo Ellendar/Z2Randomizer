@@ -278,7 +278,6 @@ public class CustomTexts
         RandomizerProperties props,
         Random r)
     {
-        //
         if (props.ReplaceFireWithDash)
         {
             texts[70] = new Text(Util.ToGameText("USE THIS$TO GO$FAST", true));
