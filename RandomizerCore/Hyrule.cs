@@ -494,6 +494,18 @@ public class Hyrule
 
     private void RandomizeAttackEffectiveness(ROM rom, StatEffectiveness attackEffectiveness)
     {
+        if (attackEffectiveness == StatEffectiveness.MAX)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                ROMData.Put(0x1E67D + i, 192);
+            }
+            return;
+        }
+        if(attackEffectiveness == StatEffectiveness.VANILLA)
+        {
+            return;
+        }
         int[] attackValues = new int[8];
         for (int i = 0; i < 8; i++)
         {

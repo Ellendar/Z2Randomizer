@@ -7,7 +7,7 @@ We will be looking at different installation techniques in the future if this ke
 
 - Fixed a bug where climate expansion was incorrect.
 - Fixed a bug causing artifacts on the title screen for some hardware.
-- Fixed a bug where rooms could randomly have uninented walls blocking progress.
+- Fixed a bug where rooms could randomly have unintented walls blocking progress.
 - Fixed a bug where up+A in GP could take you to the wrong room.
 - Fixed a bug where the incorrect sound would play when picking up some small items.
 
