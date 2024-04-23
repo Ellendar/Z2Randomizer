@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5               "
+                "FrameworkVersion" = "8:v4.5                "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -230,7 +230,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
         "ProductCode" = "8:{086C5D06-3405-458C-BE79-BF1A45E34332}"
-        "PackageCode" = "8:{F3EB41C9-0330-4839-9D8E-370C41CA3F3D}"
+        "PackageCode" = "8:{DF4C2291-B221-4F8C-AD5F-70BC4747BB59}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -765,7 +765,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_29F166287F504E1B842D03D78AF85460"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\x64\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -793,7 +793,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BB3D8193D68E4F149C2157E8828E8077"
             {
-            "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net8.0-windows7.0\\apphost.exe"
+            "SourcePath" = "8:..\\WinFormUI\\obj\\x64\\Release\\net8.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -821,7 +821,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BD0C5F40CFE54C4F933C4C6C0856834A"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\x64\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
