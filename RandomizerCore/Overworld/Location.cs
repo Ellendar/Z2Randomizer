@@ -41,14 +41,13 @@ public class Location
         }
     }
 
+    //TODO: Remove all of these location requirement properties, and refactor the whole thing to just use the requirements system.
+    //Probably this happens in conjunction with custom overworld.
     public bool NeedJump { get; set; }
-
     public bool NeedHammer { get; set; }
     public bool NeedBoots { get; set; }
     public bool NeedFairy { get; set; }
-
-    public bool NeedRecorder { get; set; }
-
+    public bool NeedFlute { get; set; }
     public bool NeedBagu { get; set; }
 
     //This does 2 things and should only do 1. It both tracks whether the location is a location that should be possible to shuffle,
@@ -333,7 +332,7 @@ public class Location
     //at the very end.
     public void UpdateBytes()
     {
-        if (NeedHammer || NeedRecorder)
+        if (NeedHammer || NeedFlute)
         {
             LocationBytes[0] = 0;
         }

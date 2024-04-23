@@ -1,4 +1,6 @@
-﻿namespace Z2Randomizer.Core;
+﻿using System;
+
+namespace Z2Randomizer.Core;
 
 public enum Town
 {
@@ -8,7 +10,7 @@ public enum Town
     SARIA_SOUTH = 4,
     MIDO_WEST = 5,
     MIDO_CHURCH = 6,
-    NABOORU_WIZARD = 7,
+    NABOORU = 7,
     DARUNIA_WEST = 8,
     DARUNIA_ROOF = 9,
     NEW_KASUTO = 10,
@@ -30,7 +32,7 @@ public static class TownExtensions
             Town.RUTO => 2,
             Town.SARIA_NORTH => 3,
             Town.MIDO_WEST => 4,
-            Town.NABOORU_WIZARD => 5,
+            Town.NABOORU => 5,
             Town.DARUNIA_WEST => 6,
             Town.NEW_KASUTO => 7,
             Town.OLD_KASUTO => 8,
@@ -48,13 +50,39 @@ public static class TownExtensions
             Town.SARIA_SOUTH => true,
             Town.MIDO_WEST => true,
             Town.MIDO_CHURCH => false,
-            Town.NABOORU_WIZARD => true,
+            Town.NABOORU => true,
             Town.DARUNIA_WEST => true,
             Town.DARUNIA_ROOF => false,
             Town.NEW_KASUTO => true,
             Town.SPELL_TOWER => false,
             Town.OLD_KASUTO => true,
-            _ => false
+            Town.SARIA_TABLE => false,
+            Town.BAGU => true, //Maybe this should be false because bagu has special handling
+            Town.NABOORU_FOUNTAIN => false,
+            _ => throw new Exception("Unrecognized town: " + town.ToString())
+        };
+    }
+
+    public static bool IsUnderConsiderationForReachable(this Town town)
+    {
+        return town switch
+        {
+            Town.RAURU => true,
+            Town.RUTO => true,
+            Town.SARIA_NORTH => true,
+            Town.SARIA_SOUTH => true,
+            Town.MIDO_WEST => true,
+            Town.MIDO_CHURCH => false,
+            Town.NABOORU => true,
+            Town.DARUNIA_WEST => true,
+            Town.DARUNIA_ROOF => false,
+            Town.NEW_KASUTO => true,
+            Town.SPELL_TOWER => false,
+            Town.OLD_KASUTO => true,
+            Town.SARIA_TABLE => false,
+            Town.BAGU => true,
+            Town.NABOORU_FOUNTAIN => false,
+            _ => throw new Exception("Unrecognized town: " + town.ToString())
         };
     }
 }

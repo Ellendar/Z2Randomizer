@@ -1,7 +1,9 @@
-﻿using System;
+﻿using RandomizerCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Core.Overworld;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Z2Randomizer.Core;
 
@@ -156,6 +158,10 @@ public class RandomizerProperties
     public bool ShuffleOverworldItems { get; set; }
     public bool ShufflePalaceItems { get; set; }
     public bool MixOverworldPalaceItems { get; set; }
+    public bool IncludeSpellsInShuffle { get; set; }
+    public bool IncludeSwordTechsInShuffle { get; set; }
+    //Bagu's note / fountain water / saria mirror
+    public bool IncludeQuestItemsInShuffle { get; set; }
     public bool ShuffleSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
     public bool KasutoJars { get; set; }
@@ -197,12 +203,12 @@ public class RandomizerProperties
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
-    public String BeamSprite { get; set; }
+    public string BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
     [NotMapped]
     public CharacterSprite CharSprite { get; set; }
-    public String TunicColor { get; set; }
-    public String ShieldColor { get; set; }
+    public string TunicColor { get; set; }
+    public string ShieldColor { get; set; }
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }
@@ -213,21 +219,29 @@ public class RandomizerProperties
     [Key]
     public int Id { get; set; }
 
-    public bool StartWithSpell(Spell spell)
+    public bool StartWithCollectable(Collectable collectable)
     {
-        return spell switch
+        return collectable switch
         {
-            Spell.SHIELD => StartShield,
-            Spell.JUMP => StartJump,
-            Spell.LIFE => StartLife,
-            Spell.FAIRY => StartFairy,
-            Spell.FIRE => StartFire,
-            Spell.DASH => StartFire,
-            Spell.REFLECT => StartReflect,
-            Spell.SPELL => StartSpell,
-            Spell.THUNDER => StartThunder,
-            Spell.UPSTAB => StartWithUpstab,
-            Spell.DOWNSTAB => StartWithDownstab,
+            Collectable.SHIELD_SPELL => StartShield,
+            Collectable.JUMP_SPELL => StartJump,
+            Collectable.LIFE_SPELL => StartLife,
+            Collectable.FAIRY_SPELL => StartFairy,
+            Collectable.FIRE_SPELL => StartFire,
+            Collectable.DASH_SPELL => StartFire,
+            Collectable.REFLECT_SPELL => StartReflect,
+            Collectable.SPELL_SPELL => StartSpell,
+            Collectable.THUNDER_SPELL => StartThunder,
+            Collectable.UPSTAB => StartWithUpstab,
+            Collectable.DOWNSTAB => StartWithDownstab,
+            Collectable.CANDLE => StartCandle,
+            Collectable.GLOVE => StartGlove,
+            Collectable.RAFT => StartRaft,
+            Collectable.BOOTS => StartBoots,
+            Collectable.FLUTE => StartFlute,
+            Collectable.CROSS => StartCross,
+            Collectable.HAMMER => StartHammer,
+            Collectable.MAGIC_KEY => StartKey,
             _ => throw new ImpossibleException("Unrecognized spell")
         };
     }

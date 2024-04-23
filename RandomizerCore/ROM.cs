@@ -49,7 +49,7 @@ public class ROM
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private const int textAddrStartinROM = 0xEFCE;
+    private const int textPointerTableStart = 0xEFCE;
     private const int textAddrEndinROM = 0xF090;
     private const int textAddrOffset = 0x4010;
 
@@ -62,7 +62,7 @@ public class ROM
     private readonly int[] brickSprites = { 0x29650, 0x2B650, 0x2D650, 0x33650, 0x35650, 0x37650, 0x39650 };
     private readonly int[] inBrickSprites = { 0x29690, 0x2B690, 0x2D690, 0x33690, 0x35690, 0x37690, 0x39690 };
 
-    private const int textEndByte = 0xFF;
+    private const int STRING_TERMINATOR = 0xFF;
     private const int creditsLineOneAddr = 0x15377;
     private const int creditsLineTwoAddr = 0x15384;
 
@@ -99,6 +99,8 @@ public class ROM
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
+    //On second thought, all text processing should be moved to customTexts.
+    /*
     private readonly Dictionary<Town, int> spellTextPointers = new()
     {
         {Town.RAURU, 0xEFEC },
@@ -108,8 +110,13 @@ public class ROM
         {Town.NABOORU_WIZARD, 0xF05A },
         {Town.DARUNIA_WEST, 0xf070 },
         {Town.NEW_KASUTO, 0xf088 },
-        {Town.OLD_KASUTO, 0xf08e }
-    };
+        {Town.OLD_KASUTO, 0xf08e },
+        {Town.MIDO_CHURCH, textPointerTableStart + 47 * 2 },
+        {Town.DARUNIA_ROOF, textPointerTableStart + 82 * 2 },
+        {Town.BAGU, textPointerTableStart + 48 * 2 },
+        {Town.SARIA_TABLE, textPointerTableStart + 21 * 2 },
+        {Town.NABOORU_FOUNTAIN, textPointerTableStart + 63 * 2 },
+    };*/
 
     private byte[] ROMData;
 
@@ -183,15 +190,15 @@ public class ROM
 
     public List<Text> GetGameText()
     {
-        List<Text> texts = new List<Text>();
-        for (int i = textAddrStartinROM; i <= textAddrEndinROM; i += 2)
+        List<Text> texts = [];
+        for (int i = textPointerTableStart; i <= textAddrEndinROM; i += 2)
         {
-            List<char> t = new List<char>();
+            List<char> t = [];
             int addr = GetByte(i);
             addr += (GetByte(i + 1) << 8);
             addr += textAddrOffset;
             int c = GetByte(addr);
-            while (c != textEndByte)
+            while (c != STRING_TERMINATOR)
             {
                 addr++;
                 t.Add((char)c);
@@ -500,20 +507,6 @@ public class ROM
                     Put(loc + i, newSprite[i]);
                 }
             }
-        }
-    }
-
-    public void UpdateSpellText(Dictionary<Town, Spell> spellMap)
-    {
-        Dictionary<Town, byte[]> currentSpellPointers = new();
-        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
-        {
-            currentSpellPointers[town] = new byte[]{ GetByte(spellTextPointers[town]), GetByte(spellTextPointers[town] + 1)};
-        }
-
-        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
-        {
-            Put(spellTextPointers[town], currentSpellPointers[spellMap[town].VanillaTown()]);
         }
     }
 
@@ -1057,11 +1050,11 @@ CheckController1ForUpAMagic:
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
-        hiddenPalaceLocation.NeedRecorder = true;
+        hiddenPalaceLocation.NeedFlute = true;
         if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
         {
-            townAtNewKasuto.NeedRecorder = true;
-            spellTower.NeedRecorder = true;
+            townAtNewKasuto.NeedFlute = true;
+            spellTower.NeedFlute = true;
         }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {

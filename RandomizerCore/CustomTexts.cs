@@ -12,39 +12,41 @@ public class CustomTexts
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly int[] rauruHints = new int[] { 32, 12, 30 }; //Three houses, first screen
-    private static readonly int[] rutoHints = new int[] { 18, 33, 25, 26 }; //error is 25 and 26, two houses, outside left
-    private static readonly int[] sariaHints = new int[] { 50, 28 };//moving middle screen, sleeping thing, stationary right
-    private static readonly int[] sariaHintsWithBaguWoods = new int[] { 28 };
-    private static readonly int[] kingsTomb = new int[] { 51 };
-    private static readonly int[] midoHints = new int[] { 45 };//moving old lady left, moving kid middle, inside house right
-    private static readonly int[] nabooruHints = new int[] { 67, 64, 97 };//inside house right, moving bagu middle, stationary left, moving left, persistent left
-    private static readonly int[] daruniaHints = new int[] { 77, 73 }; //wall first screen, outside last screen
-    private static readonly int[] newkasutoHints = new int[] { 83, 68, 92 }; //outside first screen, wall first screen
-    private static readonly int[] oldkasutoHint = new int[] { 74 };
+    private static readonly int[] rauruHints = [32, 12, 30]; //Three houses, first screen
+    private static readonly int[] rutoHints = [18, 33, 25, 26]; //error is 25 and 26, two houses, outside left
+    private static readonly int[] sariaHints = [50, 28];//moving middle screen, sleeping thing, stationary right
+    private static readonly int[] sariaHintsWithBaguWoods = [28];
+    private static readonly int[] kingsTomb = [51];
+    private static readonly int[] midoHints = [45];//moving old lady left, moving kid middle, inside house right
+    private static readonly int[] nabooruHints = [67, 64, 97];//inside house right, moving bagu middle, stationary left, moving left, persistent left
+    private static readonly int[] daruniaHints = [77, 73]; //wall first screen, outside last screen
+    private static readonly int[] newkasutoHints = [83, 68, 92]; //outside first screen, wall first screen
+    private static readonly int[] oldkasutoHint = [74];
 
-    private static readonly int[] rauruMoving = { 9, 10, };
-    private static readonly int[] rutoMoving = { 19, 17 };
-    private static readonly int[] sariaMoving = { 27 };
-    private static readonly int[] movingMido = { 40, 39 };
-    private static readonly int[] movingNabooru = { 61, 60 };
-    private static readonly int[] daruniaMoving = { 72, 75, };
-    private static readonly int[] newkasutoMoving = { 88, 89 };
+    private static readonly int[] rauruMoving = [9, 10,];
+    private static readonly int[] rutoMoving = [19, 17];
+    private static readonly int[] sariaMoving = [27];
+    private static readonly int[] movingMido = [40, 39];
+    private static readonly int[] movingNabooru = [61, 60];
+    private static readonly int[] daruniaMoving = [72, 75,];
+    private static readonly int[] newkasutoMoving = [88, 89];
 
     //Indexes in the hints list
-    private const int rauruSign = 11;
-    private const int rutoSign = 20;
-    private const int sariaSign = 29;
-    private const int midoSign = 41;
-    private const int nabooruSign = 62;
-    private const int daruniaSign = 76;
-    private const int newKasutoSign = 86;
-    private const int oldKasutoSign = 94;
+    private static readonly Dictionary<Town, int> TOWN_SIGN_INDEXES = new()
+    {
+        {Town.RAURU, 11},
+        {Town.RUTO, 20},
+        {Town.SARIA_NORTH, 29},
+        {Town.MIDO_WEST, 41},
+        {Town.NABOORU, 62},
+        {Town.DARUNIA_WEST, 76},
+        {Town.NEW_KASUTO, 86},
+        {Town.OLD_KASUTO, 94},
+    };
 
     private const int maxTextLength = 3134;
     private const int numberOfTextEntries = 98;
     //TODO: This should just be a listing of every text index by continent, but for now it's a pile.
-    private const int baguTextIndex = 48;
     private const int bridgeTextIndex = 37;
     private const int riverManTextIndex = 36;
     //private const int downstabTextIndex = 47;
@@ -52,6 +54,10 @@ public class CustomTexts
     private const int trophyIndex = 13;
     private const int medIndex = 43;
     private const int kidIndex = 79;
+    private const int baguTextIndex = 48;
+    private const int waterIndex = 63;
+    private const int mirrorIndex = 21;
+
     private const int HELPFUL_HINTS_COUNT = 4;
 
     private const int errorTextIndex1 = 25;
@@ -65,7 +71,7 @@ public class CustomTexts
         { Town.SARIA_NORTH, 35 },
         { Town.MIDO_WEST, 46 },
         { Town.MIDO_CHURCH, 47 },
-        { Town.NABOORU_WIZARD, 70 },
+        { Town.NABOORU, 70 },
         { Town.DARUNIA_ROOF, 82 },
         { Town.DARUNIA_WEST, 81 },
         { Town.NEW_KASUTO, 93 },
@@ -248,7 +254,7 @@ public class CustomTexts
         { Town.SARIA_NORTH, new string[] { "Water$you$doing?" } },
         { Town.MIDO_WEST, new string[] { } },
         { Town.MIDO_CHURCH, new string[] { } },
-        { Town.NABOORU_WIZARD, new string[] { } },
+        { Town.NABOORU, new string[] { } },
         { Town.DARUNIA_ROOF, new string[] { } },
         { Town.DARUNIA_WEST, new string[] { "You saved$a kid$for this?", "Dont$forget to$get upstab" } },
         { Town.NEW_KASUTO, new string[] { } },
@@ -279,9 +285,6 @@ public class CustomTexts
 
     public static List<Text> GenerateTexts(
         List<Location> itemLocs, 
-        bool startsWithTrophy, 
-        bool startsWithMedicine, 
-        bool startsWithKid, 
         Dictionary<Town, Collectable> spellMap, 
         Location bagu,
         List<Text> texts,
@@ -304,7 +307,7 @@ public class CustomTexts
 
         if (props.SpellItemHints)
         {
-            GenerateSpellHints(itemLocs, texts, startsWithTrophy, startsWithMedicine, startsWithKid);
+            GenerateSpellHints(itemLocs, texts, props);
         }
 
         List<int> placedIndex = new List<int>();
@@ -392,14 +395,14 @@ public class CustomTexts
 
     private static void GenerateTownNameHints(List<Text> texts, Dictionary<Town, Collectable> spellMap, bool linkedFire)
     {
-        texts[rauruSign] = GenerateTownSignHint(spellMap[Town.RAURU], linkedFire);
-        texts[rutoSign] = GenerateTownSignHint(spellMap[Town.RUTO], linkedFire);
-        texts[sariaSign] = GenerateTownSignHint(spellMap[Town.SARIA_NORTH], linkedFire);
-        texts[midoSign] = GenerateTownSignHint(spellMap[Town.MIDO_WEST], linkedFire);
-        texts[nabooruSign] = GenerateTownSignHint(spellMap[Town.NABOORU_WIZARD], linkedFire);
-        texts[daruniaSign] = GenerateTownSignHint(spellMap[Town.DARUNIA_WEST], linkedFire);
-        texts[newKasutoSign] = GenerateTownSignHint(spellMap[Town.NEW_KASUTO], linkedFire);
-        texts[oldKasutoSign] = GenerateTownSignHint(spellMap[Town.OLD_KASUTO], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.RAURU]] = GenerateTownSignHint(spellMap[Town.RAURU], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.RUTO]] = GenerateTownSignHint(spellMap[Town.RUTO], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.SARIA_NORTH]] = GenerateTownSignHint(spellMap[Town.SARIA_NORTH], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.MIDO_WEST]] = GenerateTownSignHint(spellMap[Town.MIDO_WEST], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.NABOORU]] = GenerateTownSignHint(spellMap[Town.NABOORU], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.DARUNIA_WEST]] = GenerateTownSignHint(spellMap[Town.DARUNIA_WEST], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.NEW_KASUTO]] = GenerateTownSignHint(spellMap[Town.NEW_KASUTO], linkedFire);
+        texts[TOWN_SIGN_INDEXES[Town.OLD_KASUTO]] = GenerateTownSignHint(spellMap[Town.OLD_KASUTO], linkedFire);
     }
 
     public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
@@ -450,7 +453,7 @@ public class CustomTexts
                     }
                 }
             case HintType.BAGU:
-                return new Text(BAGU_TEXTS[r.Next(BAGU_TEXTS.Count())]);
+                return new Text(BAGU_TEXTS[r.Next(BAGU_TEXTS.Length)]);
             case HintType.BRIDGE:
                 return new Text(RIVER_MAN_TEXTS[r.Next(RIVER_MAN_TEXTS.Length)]);
             default:
@@ -460,25 +463,29 @@ public class CustomTexts
 
     private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndex, Random r, bool useBaguWoods, bool useCommunityText)
     {
-        List<int> stationary = new List<int>();
-        stationary.AddRange(rauruHints);
-        stationary.AddRange(rutoHints);
-        stationary.AddRange(useBaguWoods ? sariaHintsWithBaguWoods : sariaHints);
-        stationary.AddRange(midoHints);
-        stationary.AddRange(nabooruHints);
-        stationary.AddRange(daruniaHints);
-        stationary.AddRange(newkasutoHints);
-        stationary.AddRange(kingsTomb);
-        stationary.AddRange(oldkasutoHint);
+        List<int> stationary =
+        [
+            .. rauruHints,
+            .. rutoHints,
+            .. useBaguWoods ? sariaHintsWithBaguWoods : sariaHints,
+            .. midoHints,
+            .. nabooruHints,
+            .. daruniaHints,
+            .. newkasutoHints,
+            .. kingsTomb,
+            .. oldkasutoHint,
+        ];
 
-        List<int> moving = new List<int>();
-        moving.AddRange(rauruMoving);
-        moving.AddRange(rutoMoving);
-        moving.AddRange(sariaMoving);
-        moving.AddRange(movingMido);
-        moving.AddRange(movingNabooru);
-        moving.AddRange(daruniaMoving);
-        moving.AddRange(newkasutoMoving);
+        List<int> moving =
+        [
+            .. rauruMoving,
+            .. rutoMoving,
+            .. sariaMoving,
+            .. movingMido,
+            .. movingNabooru,
+            .. daruniaMoving,
+            .. newkasutoMoving,
+        ];
 
         Text defaultKnowNothing = new();
         for (int i = 0; i < stationary.Count; i++)
@@ -499,23 +506,23 @@ public class CustomTexts
     {
         List<int> placedIndex = new List<int>();
 
-        List<Item> placedItems = new List<Item>();
+        List<Collectable> placedItems = [];
         bool placedSmall = false;
-        List<Item> smallItems = new List<Item> { Item.BLUE_JAR, Item.XL_BAG, Item.KEY, Item.MEDIUM_BAG, Item.MAGIC_CONTAINER, Item.HEART_CONTAINER, Item.ONEUP, Item.RED_JAR, Item.SMALL_BAG, Item.LARGE_BAG };
-        List<int> placedTowns = new List<int>();
+        List<Collectable> smallItems = [Collectable.BLUE_JAR, Collectable.XL_BAG, Collectable.KEY, Collectable.MEDIUM_BAG, Collectable.MAGIC_CONTAINER, Collectable.HEART_CONTAINER, Collectable.ONEUP, Collectable.RED_JAR, Collectable.SMALL_BAG, Collectable.LARGE_BAG];
+        List<int> placedTowns = [];
 
-        List<Item> items = itemLocs.Select(i => i.Collectable).ToList();
+        List<Collectable> items = itemLocs.Select(i => i.Collectable).ToList();
 
         if (useSpellItemHints)
         {
-            items.Remove(Item.TROPHY);
-            items.Remove(Item.CHILD);
-            items.Remove(Item.MEDICINE);
+            items.Remove(Collectable.TROPHY);
+            items.Remove(Collectable.CHILD);
+            items.Remove(Collectable.MEDICINE);
         }
 
         for (int i = 0; i < HELPFUL_HINTS_COUNT; i++)
         {
-            Item doThis = items[r.Next(items.Count)];
+            Collectable doThis = items[r.Next(items.Count)];
             int tries = 0;
             while (((placedSmall && smallItems.Contains(doThis)) || placedItems.Contains(doThis)) && tries < 1000)
             {
@@ -559,24 +566,36 @@ public class CustomTexts
         return placedIndex;
     }
 
-    private static void GenerateSpellHints(List<Location> itemLocs, List<Text> hints, bool startsWithTrophy, bool startsWithMedicine, bool startsWithKid)
+    private static void GenerateSpellHints(List<Location> itemLocs, List<Text> hints, RandomizerProperties props)
     {
 
         foreach (Location itemLocation in itemLocs)
         {
-            if (itemLocation.Collectable == Collectable.TROPHY && !startsWithTrophy)
+            if (itemLocation.Collectable == Collectable.TROPHY && !props.StartWithSpellItems)
             {
                 Text trophyHint = new Text();
                 trophyHint.GenerateHelpfulHint(itemLocation);
                 hints[trophyIndex] = trophyHint;
             }
-            else if (itemLocation.Collectable == Collectable.MEDICINE && !startsWithMedicine)
+            else if (itemLocation.Collectable == Collectable.MEDICINE && !props.StartWithSpellItems)
             {
                 Text medHint = new Text();
                 medHint.GenerateHelpfulHint(itemLocation);
                 hints[medIndex] = medHint;
             }
-            else if (itemLocation.Collectable == Collectable.CHILD && !startsWithKid)
+            else if (itemLocation.Collectable == Collectable.CHILD && !props.StartWithSpellItems)
+            {
+                Text kidHint = new Text();
+                kidHint.GenerateHelpfulHint(itemLocation);
+                hints[kidIndex] = kidHint;
+            }
+            else if (itemLocation.Collectable == Collectable.MIRROR && !props.StartWithSpellItems)
+            {
+                Text waterHint = new Text();
+                waterHint.GenerateHelpfulHint(itemLocation);
+                hints[kidIndex] = waterHint;
+            }
+            else if (itemLocation.Collectable == Collectable.WATER && !props.StartWithSpellItems)
             {
                 Text kidHint = new Text();
                 kidHint.GenerateHelpfulHint(itemLocation);
@@ -598,17 +617,6 @@ public class CustomTexts
                 {
                     wizardHint = GenerateCommunityText(HintType.WIZARD, r, town, collectable);
                 } while (usedWizardHints.Contains(wizardHint));
-                //TODO: eventually when up/downstab are in the generic spell pool, they can use generic hints again.
-                if(collectable == Spell.DOWNSTAB)
-                {
-                    hints[spellTextIndexes[town]] = new Text(DOWNSTAB_TEXTS[r.Next(DOWNSTAB_TEXTS.Length)]);
-                    continue;
-                }
-                if (collectable == Spell.UPSTAB)
-                {
-                    hints[spellTextIndexes[town]] = new Text(UPSTAB_TEXTS[r.Next(UPSTAB_TEXTS.Length)]);
-                    continue;
-                }
                 usedWizardHints.Add(wizardHint);
                 hints[spellTextIndexes[town]] = wizardHint;
             }

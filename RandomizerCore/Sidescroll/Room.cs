@@ -3,6 +3,7 @@ using Microsoft.ClearScript;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
+using RandomizerCore;
 using RandomizerCore.Sidescroll;
 using System;
 using System.Collections.Generic;
@@ -397,7 +398,11 @@ public class Room
         }
     }
 
-    public void SetItem(Item it)
+    //A: this method is broken and always assumes the item to be set is the first collectable instruction in the room, \
+    //which is not always true
+    //B: This was only called in a place that was completely pointless anyway. So for now we're killing it.
+    /*
+    public void SetItem(Collectable item)
     {
         for(int i = 4; i < SideView.Length; i+=2)
         {
@@ -405,13 +410,14 @@ public class Room
             yPos >>= 4;
             if(yPos < 13 && SideView[i+1] == 0x0F)
             {
-                SideView[i + 2] = (byte)it;
+                SideView[i + 2] = (byte)item;
                 return;
             }
         }
     }
+    */
 
-    public void UpdateItem(Item i, ROM ROMData)
+    public void UpdateItem(Collectable i, ROM ROMData)
     {
         if (PalaceGroup <= 0 || PalaceGroup > 3)
         {

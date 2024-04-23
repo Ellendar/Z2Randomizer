@@ -25,10 +25,15 @@ public class Palace
     private Room tbird;
     private readonly SortedDictionary<int, List<Room>> rooms;
 
-    public static readonly Item[] SHUFFLABLE_SMALL_ITEMS = [
-        Item.KEY, 
-        Item.SMALL_BAG, Item.MEDIUM_BAG, Item.LARGE_BAG, Item.XL_BAG, 
-        Item.BLUE_JAR, Item.RED_JAR, Item.ONEUP
+    public static readonly Collectable[] SHUFFLABLE_SMALL_ITEMS = [
+        Collectable.KEY,
+        Collectable.SMALL_BAG,
+        Collectable.MEDIUM_BAG,
+        Collectable.LARGE_BAG,
+        Collectable.XL_BAG,
+        Collectable.BLUE_JAR,
+        Collectable.RED_JAR,
+        Collectable.ONEUP
     ];
     /*
     private List<Room> upExits;
@@ -195,7 +200,7 @@ public class Palace
         }
     }
 
-    public void UpdateItem(Item i, ROM ROMData)
+    public void UpdateItem(Collectable i, ROM ROMData)
     {
         itemRoom.UpdateItem(i, ROMData);
     }
@@ -1029,7 +1034,7 @@ public class Palace
                 if(secondByte == 15 && ypos < 13)
                 {
                     int thirdByte = room.SideView[sideviewIndex++];
-                    if (!SHUFFLABLE_SMALL_ITEMS.Contains((Item)thirdByte))
+                    if (!SHUFFLABLE_SMALL_ITEMS.Contains((Collectable)thirdByte))
                     {
                         continue;
                     }
@@ -1038,14 +1043,14 @@ public class Palace
                     {
                         if (d <= 1)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.ONEUP;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.ONEUP;
                         }
                     }
                     else
                     {
                         if(extraKeys)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.KEY;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.KEY;
                         }
                         //35 Key
                         //10 BlueJar
@@ -1057,35 +1062,35 @@ public class Palace
                         //5 1Up
                         else if(d <= .35)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.KEY;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.KEY;
                         }
                         else if (d <= .45)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.BLUE_JAR;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.BLUE_JAR;
                         }
                         else if (d <= .55)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.RED_JAR;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.RED_JAR;
                         }
                         else if (d <= .65)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.SMALL_BAG;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.SMALL_BAG;
                         }
                         else if (d <= .80)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.MEDIUM_BAG;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.MEDIUM_BAG;
                         }
                         else if (d <= .90)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.LARGE_BAG;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.LARGE_BAG;
                         }
                         else if (d <= .95)
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.XL_BAG;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.XL_BAG;
                         }
                         else
                         {
-                            room.SideView[sideviewIndex - 1] = (int)Item.ONEUP;
+                            room.SideView[sideviewIndex - 1] = (int)Collectable.ONEUP;
                         }
                     }
                 }
@@ -1167,14 +1172,16 @@ public class Palace
         }
     }
 
-    public bool CanClearAllRooms(IEnumerable<RequirementType> requireables, Item palaceItem)
+    public bool CanClearAllRooms(IEnumerable<RequirementType> requireables, Collectable palaceItem)
     {
-        if(palaceItem == Item.GLOVE)
+        //If the palace's item can be reached with the current items, it can be used to clear the rest of the palace.
+        RequirementType? palaceItemRequirement = palaceItem.AsRequirement();
+        if(palaceItemRequirement != null)
         {
             if (CanGetItem(requireables))
             {
                 requireables = new List<RequirementType>(requireables);
-                ((List<RequirementType>)requireables).Add(RequirementType.GLOVE);
+                ((List<RequirementType>)requireables).Add((RequirementType)palaceItemRequirement);
             }
             else return false;
         }
