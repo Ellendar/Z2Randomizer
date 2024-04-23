@@ -1,5 +1,12 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.6 - April 23rd, 2024
+
+There is a known issue in this release: If you are using a custom sprite, sometimes heart/magic containers will have incorrect graphics if found in a palace. They will still work normally, the issue is just cosmetic. Please look forward to a fix in the next release.
+
+- Fixed a bug where vanilla attack would cause seeds not to generate.
+- Fixed an issue with the installer where updates would cause it to stick on "generating palaces"
+
 ## Version 4.3.5 - April 21st, 2024
 
 There is a known issue that may still affect this release. If your first seed after updating gets stuck on "Generating Palaces", uninstalling and reinstalling will fix it.
