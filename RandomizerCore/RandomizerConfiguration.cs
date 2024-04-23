@@ -67,6 +67,7 @@ public class RandomizerConfiguration
     [Minimum(1)]
     public int StartingLifeLevel { get; set; }
 
+
     //Overworld
     public bool? PalacesCanSwapContinents { get; set; }
     public bool? ShuffleGP { get; set; }
@@ -163,6 +164,10 @@ public class RandomizerConfiguration
     public bool RandomizeNewKasutoJarRequirements { get; set; }
     public bool? RemoveSpellItems { get; set; }
     public bool? ShufflePBagAmounts { get; set; }
+    public bool? IncludeSpellsInShuffle { get; set; }
+    public bool? IncludeSwordTechsInShuffle { get; set; }
+    //Bagu's note / fountain water / saria mirror
+    public bool? IncludeQuestItemsInShuffle { get; set; }
 
     //Drops
     public bool ShuffleItemDropFrequency { get; set; }
@@ -1060,7 +1065,7 @@ public class RandomizerConfiguration
         properties.saveRom = true;
         properties.Seed = Seed;
 
-        //Items
+        //Start Configuration
         properties.StartCandle = !StartWithCandle && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithCandle;
         properties.StartGlove = !StartWithGlove && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithGlove;
         properties.StartRaft = !StartWithRaft && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithRaft;
@@ -1070,7 +1075,6 @@ public class RandomizerConfiguration
         properties.StartHammer = !StartWithHammer && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithHammer;
         properties.StartKey = !StartWithMagicKey && ShuffleStartingItems ? random.NextDouble() > .75 : StartWithMagicKey;
 
-        //Spells
         properties.StartShield = !StartWithShield && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithShield;
         properties.StartJump = !StartWithJump && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithJump;
         properties.StartLife = !StartWithLife && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithLife;
@@ -1450,6 +1454,9 @@ public class RandomizerConfiguration
         properties.PbagItemShuffle = IncludePBagCavesInItemShuffle == null ? random.Next(2) == 1 : (bool)IncludePBagCavesInItemShuffle;
         properties.StartWithSpellItems = RemoveSpellItems == null ? random.Next(2) == 1 : (bool)RemoveSpellItems;
         properties.ShufflePbagXp = ShufflePBagAmounts == null ? random.Next(2) == 1 : (bool)ShufflePBagAmounts;
+        properties.IncludeQuestItemsInShuffle = IncludeQuestItemsInShuffle == null ? random.Next(2) == 1 : (bool)IncludeQuestItemsInShuffle;
+        properties.IncludeSpellsInShuffle = IncludeSpellsInShuffle == null ? random.Next(2) == 1 : (bool)IncludeSpellsInShuffle;
+        properties.IncludeSwordTechsInShuffle = IncludeSwordTechsInShuffle == null ? random.Next(2) == 1 : (bool)IncludeSwordTechsInShuffle;
 
         //Drops
         properties.ShuffleItemDropFrequency = ShuffleItemDropFrequency;
@@ -1575,10 +1582,22 @@ public class RandomizerConfiguration
             properties.CombineFire = false;
         }
 
+        //If spells are in the shuffle pool, shuffle spells means nothing, so diable it
+        if(properties.IncludeSpellsInShuffle)
+        {
+            properties.ShuffleSpellLocations = false;
+        }
+
+        //Same principle with sword techs in the pool meaning swap stabs is meaningless.
+        if (properties.IncludeSwordTechsInShuffle)
+        {
+            properties.SwapUpAndDownStab = false;
+        }
+
         //Non-reconstructed is incompatable with no duplicate rooms.
         //Also, if community rooms is off, vanilla doesn't contain enough non-duplciate rooms to properly cover the number
         //of required rooms, often even in short GP.
-        if(!properties.NormalPalaceStyle.IsReconstructed() || (!properties.AllowV4Rooms && !properties.AllowV4_4Rooms))
+        if (!properties.NormalPalaceStyle.IsReconstructed() || (!properties.AllowV4Rooms && !properties.AllowV4_4Rooms))
         {
             properties.NoDuplicateRooms = false;
             properties.NoDuplicateRoomsBySideview = false;

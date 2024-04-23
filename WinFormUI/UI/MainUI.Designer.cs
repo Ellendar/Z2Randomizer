@@ -175,6 +175,9 @@ partial class MainUI
         shuffleXPStealersCheckbox = new CheckBox();
         shuffleEnemyHPBox = new CheckBox();
         tabPage7 = new TabPage();
+        includeQuestItemsInShuffleCheckbox = new CheckBox();
+        includeSwordTechsInShuffleCheckbox = new CheckBox();
+        includeSpellsInShuffleCheckbox = new CheckBox();
         shufflePbagAmountsCheckbox = new CheckBox();
         removeSpellitemsCheckbox = new CheckBox();
         includePbagCavesInShuffleCheckbox = new CheckBox();
@@ -215,6 +218,7 @@ partial class MainUI
         enableSpellItemHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         CustomTabPage = new TabPage();
+        disableHUDLag = new CheckBox();
         useCommunityTextCheckbox = new CheckBox();
         spriteCreditLabel = new Label();
         beepFrequencyDropdown = new ComboBox();
@@ -261,7 +265,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        disableHUDLag = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1332,7 +1335,6 @@ partial class MainUI
         includev4_4RoomsCheckbox.ThreeState = true;
         toolTip1.SetToolTip(includev4_4RoomsCheckbox, "New Rooms first released in v4.4 are included in the room pool.");
         includev4_4RoomsCheckbox.UseVisualStyleBackColor = true;
-        includev4_4RoomsCheckbox.Visible = false;
         includev4_4RoomsCheckbox.CheckedChanged += AtLeastOneRoomTypeRequiredHandler;
         // 
         // includev4_0RoomsCheckbox
@@ -2096,6 +2098,9 @@ partial class MainUI
         // 
         // tabPage7
         // 
+        tabPage7.Controls.Add(includeQuestItemsInShuffleCheckbox);
+        tabPage7.Controls.Add(includeSwordTechsInShuffleCheckbox);
+        tabPage7.Controls.Add(includeSpellsInShuffleCheckbox);
         tabPage7.Controls.Add(shufflePbagAmountsCheckbox);
         tabPage7.Controls.Add(removeSpellitemsCheckbox);
         tabPage7.Controls.Add(includePbagCavesInShuffleCheckbox);
@@ -2113,10 +2118,51 @@ partial class MainUI
         tabPage7.Text = "Items";
         tabPage7.UseVisualStyleBackColor = true;
         // 
+        // includeQuestItemsInShuffleCheckbox
+        // 
+        includeQuestItemsInShuffleCheckbox.AutoSize = true;
+        includeQuestItemsInShuffleCheckbox.Location = new Point(4, 159);
+        includeQuestItemsInShuffleCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includeQuestItemsInShuffleCheckbox.Name = "includeQuestItemsInShuffleCheckbox";
+        includeQuestItemsInShuffleCheckbox.Size = new Size(184, 19);
+        includeQuestItemsInShuffleCheckbox.TabIndex = 22;
+        includeQuestItemsInShuffleCheckbox.Text = "Include Quest Items In Shuffle";
+        includeQuestItemsInShuffleCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(includeQuestItemsInShuffleCheckbox, "If checked, bagu's mirror, the fountain water, and the saria mirror will be shuffled into the item pool.");
+        includeQuestItemsInShuffleCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // includeSwordTechsInShuffleCheckbox
+        // 
+        includeSwordTechsInShuffleCheckbox.AutoSize = true;
+        includeSwordTechsInShuffleCheckbox.Location = new Point(4, 134);
+        includeSwordTechsInShuffleCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includeSwordTechsInShuffleCheckbox.Name = "includeSwordTechsInShuffleCheckbox";
+        includeSwordTechsInShuffleCheckbox.Size = new Size(186, 19);
+        includeSwordTechsInShuffleCheckbox.TabIndex = 21;
+        includeSwordTechsInShuffleCheckbox.Text = "Include Sword Techs In Shuffle";
+        includeSwordTechsInShuffleCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(includeSwordTechsInShuffleCheckbox, "If checked, upstab and downstab will be mixed into the item pool.\r\n");
+        includeSwordTechsInShuffleCheckbox.UseVisualStyleBackColor = true;
+        includeSwordTechsInShuffleCheckbox.CheckedChanged += SwordTechExclusionHandler;
+        // 
+        // includeSpellsInShuffleCheckbox
+        // 
+        includeSpellsInShuffleCheckbox.AutoSize = true;
+        includeSpellsInShuffleCheckbox.Location = new Point(4, 109);
+        includeSpellsInShuffleCheckbox.Margin = new Padding(4, 3, 4, 3);
+        includeSpellsInShuffleCheckbox.Name = "includeSpellsInShuffleCheckbox";
+        includeSpellsInShuffleCheckbox.Size = new Size(151, 19);
+        includeSpellsInShuffleCheckbox.TabIndex = 20;
+        includeSpellsInShuffleCheckbox.Text = "Include Spells In Shuffle";
+        includeSpellsInShuffleCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(includeSpellsInShuffleCheckbox, "If checked, the wizards in each town could have normal items, and spells could be in item locations.\r\n");
+        includeSpellsInShuffleCheckbox.UseVisualStyleBackColor = true;
+        includeSpellsInShuffleCheckbox.CheckedChanged += SpellShuffleExclusionHandler;
+        // 
         // shufflePbagAmountsCheckbox
         // 
         shufflePbagAmountsCheckbox.AutoSize = true;
-        shufflePbagAmountsCheckbox.Location = new Point(4, 215);
+        shufflePbagAmountsCheckbox.Location = new Point(281, 109);
         shufflePbagAmountsCheckbox.Margin = new Padding(2);
         shufflePbagAmountsCheckbox.Name = "shufflePbagAmountsCheckbox";
         shufflePbagAmountsCheckbox.Size = new Size(167, 19);
@@ -2129,10 +2175,10 @@ partial class MainUI
         // removeSpellitemsCheckbox
         // 
         removeSpellitemsCheckbox.AutoSize = true;
-        removeSpellitemsCheckbox.Location = new Point(4, 188);
+        removeSpellitemsCheckbox.Location = new Point(281, 82);
         removeSpellitemsCheckbox.Margin = new Padding(2);
         removeSpellitemsCheckbox.Name = "removeSpellitemsCheckbox";
-        removeSpellitemsCheckbox.Size = new Size(129, 19);
+        removeSpellitemsCheckbox.Size = new Size(138, 19);
         removeSpellitemsCheckbox.TabIndex = 18;
         removeSpellitemsCheckbox.Text = "Start With Spell Items";
         removeSpellitemsCheckbox.ThreeState = true;
@@ -2143,7 +2189,7 @@ partial class MainUI
         // includePbagCavesInShuffleCheckbox
         // 
         includePbagCavesInShuffleCheckbox.AutoSize = true;
-        includePbagCavesInShuffleCheckbox.Location = new Point(4, 83);
+        includePbagCavesInShuffleCheckbox.Location = new Point(4, 82);
         includePbagCavesInShuffleCheckbox.Margin = new Padding(4, 3, 4, 3);
         includePbagCavesInShuffleCheckbox.Name = "includePbagCavesInShuffleCheckbox";
         includePbagCavesInShuffleCheckbox.Size = new Size(209, 19);
@@ -2156,7 +2202,7 @@ partial class MainUI
         // randomizeJarRequirementsCheckbox
         // 
         randomizeJarRequirementsCheckbox.AutoSize = true;
-        randomizeJarRequirementsCheckbox.Location = new Point(4, 163);
+        randomizeJarRequirementsCheckbox.Location = new Point(281, 57);
         randomizeJarRequirementsCheckbox.Margin = new Padding(4, 3, 4, 3);
         randomizeJarRequirementsCheckbox.Name = "randomizeJarRequirementsCheckbox";
         randomizeJarRequirementsCheckbox.Size = new Size(244, 19);
@@ -2168,7 +2214,7 @@ partial class MainUI
         // palacesHaveExtraKeysCheckbox
         // 
         palacesHaveExtraKeysCheckbox.AutoSize = true;
-        palacesHaveExtraKeysCheckbox.Location = new Point(4, 136);
+        palacesHaveExtraKeysCheckbox.Location = new Point(281, 30);
         palacesHaveExtraKeysCheckbox.Margin = new Padding(4, 3, 4, 3);
         palacesHaveExtraKeysCheckbox.Name = "palacesHaveExtraKeysCheckbox";
         palacesHaveExtraKeysCheckbox.Size = new Size(166, 19);
@@ -2181,7 +2227,7 @@ partial class MainUI
         // shuffleSmallItemsCheckbox
         // 
         shuffleSmallItemsCheckbox.AutoSize = true;
-        shuffleSmallItemsCheckbox.Location = new Point(4, 110);
+        shuffleSmallItemsCheckbox.Location = new Point(281, 5);
         shuffleSmallItemsCheckbox.Margin = new Padding(4, 3, 4, 3);
         shuffleSmallItemsCheckbox.Name = "shuffleSmallItemsCheckbox";
         shuffleSmallItemsCheckbox.Size = new Size(127, 19);
@@ -2552,11 +2598,10 @@ partial class MainUI
         randomizeKnockbackCheckbox.CheckState = CheckState.Checked;
         randomizeKnockbackCheckbox.Location = new Point(4, 128);
         randomizeKnockbackCheckbox.Margin = new Padding(4, 3, 4, 3);
-        randomizeKnockbackCheckbox.Name = "Randomize Knockback";
-        randomizeKnockbackCheckbox.Size = new Size(191, 19);
+        randomizeKnockbackCheckbox.Name = "randomizeKnockbackCheckbox";
+        randomizeKnockbackCheckbox.Size = new Size(146, 19);
         randomizeKnockbackCheckbox.TabIndex = 26;
         randomizeKnockbackCheckbox.Text = "Randomize Knockback";
-        randomizeKnockbackCheckbox.ThreeState = false;
         toolTip1.SetToolTip(randomizeKnockbackCheckbox, "Randomizes knockback when link and enemies collide.");
         randomizeKnockbackCheckbox.UseVisualStyleBackColor = true;
         // 
@@ -2654,6 +2699,18 @@ partial class MainUI
         CustomTabPage.TabIndex = 6;
         CustomTabPage.Text = "Customize";
         CustomTabPage.UseVisualStyleBackColor = true;
+        // 
+        // disableHUDLag
+        // 
+        disableHUDLag.AutoSize = true;
+        disableHUDLag.Location = new Point(4, 149);
+        disableHUDLag.Margin = new Padding(2);
+        disableHUDLag.Name = "disableHUDLag";
+        disableHUDLag.Size = new Size(161, 19);
+        disableHUDLag.TabIndex = 44;
+        disableHUDLag.Text = "Disable HUD Flash on Lag";
+        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens. A glove icon is added to the HUD as a visual indicator for lag");
+        disableHUDLag.UseVisualStyleBackColor = true;
         // 
         // useCommunityTextCheckbox
         // 
@@ -3143,18 +3200,6 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
-        // disableHUDLag
-        // 
-        disableHUDLag.AutoSize = true;
-        disableHUDLag.Location = new Point(4, 149);
-        disableHUDLag.Margin = new Padding(2);
-        disableHUDLag.Name = "disableHUDLag";
-        disableHUDLag.Size = new Size(161, 19);
-        disableHUDLag.TabIndex = 44;
-        disableHUDLag.Text = "Disable HUD Flash on Lag";
-        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens. A glove icon is added to the HUD as a visual indicator for lag");
-        disableHUDLag.UseVisualStyleBackColor = true;
-        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3449,5 +3494,8 @@ partial class MainUI
     private ComboBox startingLivesBox;
     private CheckBox randomizeKnockbackCheckbox;
     private CheckBox disableHUDLag;
+    private CheckBox includeQuestItemsInShuffleCheckbox;
+    private CheckBox includeSwordTechsInShuffleCheckbox;
+    private CheckBox includeSpellsInShuffleCheckbox;
 }
 
