@@ -1,12 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Assembler;
+
 using RandomizerCore.Sidescroll;
 using System.Text;
 using System.Text.Json;
 using Z2Randomizer.Core;
 using Z2Randomizer.Core.Sidescroll;
 
-var engine = new Engine();
 ROM ROMData = new ROM(args[0]);
 int[] connAddr = [0x1072B, 0x12208, 0x1472B];
 int[] side = [0x10533, 0x12010, 0x14533];

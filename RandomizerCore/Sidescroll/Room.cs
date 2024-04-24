@@ -1,7 +1,4 @@
-﻿using Assembler;
-using Microsoft.ClearScript;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using NLog;
 using RandomizerCore.Sidescroll;
 using System;
@@ -9,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using RandomizerCore.Asm;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -265,7 +263,7 @@ public class Room
         return JsonConvert.SerializeObject(this, Formatting.None, new RoomJsonConverter());
     }
 
-    public void WriteSideViewPtr(Assembler.Assembler a, string label)
+    public void WriteSideViewPtr(AsmModule a, string label)
     {
         if(PalaceGroup <= 0 || PalaceGroup > 3)
         {

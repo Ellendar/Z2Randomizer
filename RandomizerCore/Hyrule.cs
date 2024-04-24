@@ -1,10 +1,7 @@
-﻿using Assembler;
-using NLog;
+﻿using NLog;
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,6 +10,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using RandomizerCore.Asm;
 using Z2Randomizer.Core.Overworld;
 using Z2Randomizer.Core.Sidescroll;
 
@@ -74,7 +74,6 @@ public class Hyrule
     private int maxHearts;
     private int heartContainersInItemPool;
     private int kasutoJars;
-    private readonly BackgroundWorker worker;
 
     //private Character character;
 
@@ -165,17 +164,14 @@ public class Hyrule
         }
     }
 
-    private Engine _engine;
     private List<Text> _hints;
+    private IAsmEngine _engine;
 
-    public Hyrule(RandomizerConfiguration config, BackgroundWorker worker, bool saveRom = true)
+    public Hyrule(RandomizerConfiguration config, IAsmEngine engine)
     {
-        _engine = new Engine();
-
         World.ResetStats();
         RNG = new Random(config.Seed);
         props = config.Export(RNG);
-        props.saveRom = saveRom;
         if(UNSAFE_DEBUG) 
         {
             string export = JsonSerializer.Serialize(props);
@@ -183,287 +179,280 @@ public class Hyrule
         }
         Flags = config.Serialize();
         Seed = config.Seed;
-        logger.Info("Started generation for " + Flags + " / " + config.Seed);
-
-        this.worker = worker;
-
-
-        //character = new Character(props);
-        shuffler = new Shuffler(props);
-
-        palaces = new List<Palace>();
-        ItemGet = new Dictionary<Item, bool>();
-        foreach (Item item in Enum.GetValues(typeof(Item)))
+        _engine = engine;
+    }
+    
+    public async Task<byte[]?> Randomize(Action<string> progress, CancellationToken ct)
+    {
+        return await Task.Run(() =>
         {
-            ItemGet.Add(item, false);
-        }
-        accessibleMagicContainers = 4;
-        SpellGet = new Dictionary<Spell, bool>();
-        reachableAreas = new HashSet<string>();
-        //areasByLocation = new SortedDictionary<string, List<Location>>();
+            Assembler assembler = new();
+            logger.Info("Started generation for " + Flags + " / " + Seed);
+            //character = new Character(props);
+            shuffler = new Shuffler(props);
 
-
-        ROMData = new ROM(props.Filename);
-        _hints = ROMData.GetGameText();
-        if (props.KasutoJars)
-        {
-            kasutoJars = RNG.Next(5, 8);
-        }
-
-        bool raftIsRequired = IsRaftAlwaysRequired(props);
-        bool passedValidation = false;
-        while (palaces == null || palaces.Count != 7 || passedValidation == false)
-        {
-            palaces = Palaces.CreatePalaces(worker, RNG, props, raftIsRequired);
-            if(palaces == null)
+            palaces = new List<Palace>();
+            ItemGet = new Dictionary<Item, bool>();
+            foreach (Item item in Enum.GetValues(typeof(Item)))
             {
-                continue;
+                ItemGet.Add(item, false);
+            }
+            accessibleMagicContainers = 4;
+            SpellGet = new Dictionary<Spell, bool>();
+            reachableAreas = new HashSet<string>();
+            //areasByLocation = new SortedDictionary<string, List<Location>>();
+
+            ROMData = new ROM(props.Filename);
+            _hints = ROMData.GetGameText();
+            if (props.KasutoJars)
+            {
+                kasutoJars = RNG.Next(5, 8);
             }
 
-            //Randomize Enemies
-            if (props.ShufflePalaceEnemies)
+            bool raftIsRequired = IsRaftAlwaysRequired(props);
+            bool passedValidation = false;
+            while (palaces.Count != 7 || passedValidation == false)
             {
-                palaces.ForEach(i => i.RandomizeEnemies(props, RNG));
+                palaces = Palaces.CreatePalaces(ct, RNG, props, raftIsRequired);
+                if(palaces.Count == 0)
+                {
+                    continue;
+                }
+
+                //Randomize Enemies
+                if (props.ShufflePalaceEnemies)
+                {
+                    palaces.ForEach(i => i.RandomizeEnemies(props, RNG));
+                }
+
+                if (props.ShuffleSmallItems || props.ExtraKeys)
+                {
+                    palaces[0].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[1].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[2].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[3].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[4].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[5].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
+                }
+
+                AsmModule sideview_module = new();
+                AsmModule gp_sideview_module = new();
+                //AssemblerCommon.AssemblerCommon validation_sideview_module = new();
+                //AssemblerCommon.AssemblerCommon validation_gp_sideview_module = new();
+
+                //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
+                //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
+                //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
+                //guaranteed to succeed iff running on the original engine would succeed.
+                //Jrowe feel free to engineer a less insane fix here. 
+                Assembler validationEngine = new();
+
+                int i = 0;
+                //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
+                //so we just start at the 125 pointer address
+                int enemyAddr = Enemies.NormalPalaceEnemyAddr;
+                Dictionary<byte[], List<Room>> sideviews = new(new Util.StandardByteArrayEqualityComparer());
+                Dictionary<byte[], List<Room>> sideviewsgp = new(new Util.StandardByteArrayEqualityComparer());
+                foreach (Room room in palaces.Where(i => i.Number < 7).SelectMany(i => i.AllRooms))
+                {
+                    if (sideviews.ContainsKey(room.SideView))
+                    {
+                        sideviews[room.SideView].Add(room);
+                    }
+                    else
+                    {
+                        List<Room> l = new List<Room> { room };
+                        sideviews.Add(room.SideView, l);
+                    }
+                }
+                foreach (Room room in palaces.Where(i => i.Number == 7).SelectMany(i => i.AllRooms))
+                {
+                    if (sideviewsgp.ContainsKey(room.SideView))
+                    {
+                        sideviewsgp[room.SideView].Add(room);
+                    }
+                    else
+                    {
+                        List<Room> l = new List<Room> { room };
+                        sideviewsgp.Add(room.SideView, l);
+                    }
+                }
+
+                foreach (byte[] sv in sideviews.Keys)
+                {
+                    var name = "Sideview_" + i++;
+                    sideview_module.Segment("PRG4", "PRG7");
+                    sideview_module.Reloc();
+                    sideview_module.Label(name);
+                    sideview_module.Byt(sv);
+                    List<Room> rooms = sideviews[sv];
+                    foreach (Room room in rooms)
+                    {
+                        room.WriteSideViewPtr(sideview_module, name);
+                        room.UpdateItemGetBits(ROMData);
+                        room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
+                        enemyAddr += room.NewEnemies.Length;
+                        room.UpdateConnectionBytes();
+                        room.UpdateConnectionStartAddress();
+                    }
+                }
+
+                i = 0;
+                //GP Reconstructed
+                enemyAddr = Enemies.GPEnemyAddr;
+                foreach (byte[] sv in sideviewsgp.Keys)
+                {
+                    var name = "SideviewGP_" + i++;
+
+                    gp_sideview_module.Segment("PRG5", "PRG7");
+                    gp_sideview_module.Reloc();
+                    gp_sideview_module.Label(name);
+                    gp_sideview_module.Byt(sv);
+                    List<Room> rooms = sideviewsgp[sv];
+                    foreach (Room room in rooms)
+                    {
+                        room.WriteSideViewPtr(gp_sideview_module, name);
+                        room.UpdateItemGetBits(ROMData);
+                        room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
+                        enemyAddr += room.NewEnemies.Length;
+                        room.UpdateConnectionBytes();
+                        room.UpdateConnectionStartAddress();
+                    }
+                }
+                
+                try
+                {
+                    validationEngine.Add(sideview_module);
+                    validationEngine.Add(gp_sideview_module);
+                    ROM testRom = new(ROMData);
+                    ApplyAsmPatches(props, validationEngine, RNG, testRom);
+                    testRom.ApplyAsm(_engine, validationEngine).Wait(ct);
+                }
+                catch(Exception e)
+                {
+                    logger.Debug(e, "Room packing failed. Retrying.");
+                    continue;
+                }
+
+                passedValidation = true;
+                assembler.Add(sideview_module);
+                assembler.Add(gp_sideview_module);
             }
 
-            if (props.ShuffleSmallItems || props.ExtraKeys)
+            //Allows casting magic without requeueing a spell
+            if (props.FastCast)
             {
-                palaces[0].RandomizeSmallItems(RNG, props.ExtraKeys);
-                palaces[1].RandomizeSmallItems(RNG, props.ExtraKeys);
-                palaces[2].RandomizeSmallItems(RNG, props.ExtraKeys);
-                palaces[3].RandomizeSmallItems(RNG, props.ExtraKeys);
-                palaces[4].RandomizeSmallItems(RNG, props.ExtraKeys);
-                palaces[5].RandomizeSmallItems(RNG, props.ExtraKeys);
-                palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
+                ROMData.WriteFastCastMagic();
             }
 
-            Assembler.Assembler sideview_module = new();
-            Assembler.Assembler gp_sideview_module = new();
-            //Assembler.Assembler validation_sideview_module = new();
-            //Assembler.Assembler validation_gp_sideview_module = new();
-
-            //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
-            //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
-            //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
-            //guaranteed to succeed iff running on the original engine would succeed.
-            //Jrowe feel free to engineer a less insane fix here. 
-            Engine validationEngine = new Engine();
-
-            int i = 0;
-            //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
-            //so we just start at the 125 pointer address
-            int enemyAddr = Enemies.NormalPalaceEnemyAddr;
-            Dictionary<byte[], List<Room>> sideviews = new(new Util.StandardByteArrayEqualityComparer());
-            Dictionary<byte[], List<Room>> sideviewsgp = new(new Util.StandardByteArrayEqualityComparer());
-            foreach (Room room in palaces.Where(i => i.Number < 7).SelectMany(i => i.AllRooms))
+            if (props.DisableMusic)
             {
-                if (sideviews.ContainsKey(room.SideView))
-                {
-                    sideviews[room.SideView].Add(room);
-                }
-                else
-                {
-                    List<Room> l = new List<Room> { room };
-                    sideviews.Add(room.SideView, l);
-                }
-            }
-            foreach (Room room in palaces.Where(i => i.Number == 7).SelectMany(i => i.AllRooms))
-            {
-                if (sideviewsgp.ContainsKey(room.SideView))
-                {
-                    sideviewsgp[room.SideView].Add(room);
-                }
-                else
-                {
-                    List<Room> l = new List<Room> { room };
-                    sideviewsgp.Add(room.SideView, l);
-                }
+                ROMData.DisableMusic();
             }
 
-            foreach (byte[] sv in sideviews.Keys)
+            ROMData.WriteKasutoJarAmount(kasutoJars);
+            ROMData.DoHackyFixes();
+            shuffler.ShuffleDrops(ROMData, RNG);
+            shuffler.ShufflePbagAmounts(ROMData, RNG);
+
+            ROMData.DisableTurningPalacesToStone();
+            ROMData.UpdateMapPointers();
+
+            if (props.DashAlwaysOn)
             {
-                var name = "Sideview_" + i++;
-                sideview_module.Segment("PRG4", "PRG7");
-                sideview_module.Reloc();
-                sideview_module.Label(name);
-                sideview_module.Byt(sv);
-                List<Room> rooms = sideviews[sv];
-                foreach (Room room in rooms)
-                {
-                    room.WriteSideViewPtr(sideview_module, name);
-                    room.UpdateItemGetBits(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectionBytes();
-                    room.UpdateConnectionStartAddress();
-                }
+                ROMData.Put(0x13C3, new byte[] { 0x30, 0xD0 });
+            }
+
+            if (props.PermanentBeam)
+            {
+                ROMData.Put(0x186c, 0xEA);
+                ROMData.Put(0x186d, 0xEA);
+            }
+
+            ShortenWizards();
+
+            // startRandomizeStartingValuesTimestamp = DateTime.Now;
+            startRandomizeEnemiesTimestamp = DateTime.Now;
+            RandomizeEnemyStats();
+
+            firstProcessOverworldTimestamp = DateTime.Now;
+            ProcessOverworld(progress, ct);
+            bool f = UpdateProgress(progress, ct, 8);
+            if (!f)
+            {
+                return null;
+            }
+
+            //If you start with a spell, also start with its corresponding spell item if applicable.
+            if (props.StartWithSpell(SpellMap[Town.RUTO]))
+            {
+                ROMData.Put(0x17b14, 0x10); //Trophy
+            }
+            if (props.StartWithSpell(SpellMap[Town.SARIA_NORTH]))
+            {
+                ROMData.Put(0x17b15, 0x01); //Mirror
+            }
+            if (props.StartWithSpell(SpellMap[Town.MIDO_WEST]))
+            {
+                ROMData.Put(0x17b16, 0x40); //Medicine
+            }
+            if (props.StartWithSpell(SpellMap[Town.NABOORU]))
+            {
+                ROMData.Put(0x17b17, 0x01); //Water
+            }
+            if (props.StartWithSpell(SpellMap[Town.DARUNIA_WEST]))
+            {
+                ROMData.Put(0x17b18, 0x20); //Child
             }
 
 
-            i = 0;
-            //GP Reconstructed
-            enemyAddr = Enemies.GPEnemyAddr;
-            foreach (byte[] sv in sideviewsgp.Keys)
+            List<Text> hints = ROMData.GetGameText();
+            ROMData.WriteHints(CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
+            f = UpdateProgress(progress, ct, 9);
+            if (!f)
             {
-                var name = "SideviewGP_" + i++;
-
-                gp_sideview_module.Segment("PRG5", "PRG7");
-                gp_sideview_module.Reloc();
-                gp_sideview_module.Label(name);
-                gp_sideview_module.Byt(sv);
-                List<Room> rooms = sideviewsgp[sv];
-                foreach (Room room in rooms)
-                {
-                    room.WriteSideViewPtr(gp_sideview_module, name);
-                    room.UpdateItemGetBits(ROMData);
-                    room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
-                    enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectionBytes();
-                    room.UpdateConnectionStartAddress();
-                }
+                return null;
             }
             
-            try
+            ApplyAsmPatches(props, assembler, RNG, ROMData);
+            var assemblerTask = ROMData.ApplyAsm(_engine, assembler);
+            assemblerTask.Wait(ct);
+            var rom = assemblerTask.Result;
+            ROMData = new ROM(rom!);
+
+            MD5 hasher = MD5.Create();
+            byte[] finalRNGState = new byte[32];
+            RNG.NextBytes(finalRNGState);
+            var version = Assembly.GetEntryAssembly().GetName().Version;
+            var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
+            byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
+                Flags +
+                Seed +
+                versionstr +
+                // TODO get room file hash
+                // Util.ReadAllTextFromFile(config.GetRoomsFile()) +
+                Util.ByteArrayToHexString(finalRNGState)
+            ));
+            UpdateRom(hash);
+
+            if (UNSAFE_DEBUG)
             {
-                validationEngine.Modules.Add(sideview_module.Actions);
-                validationEngine.Modules.Add(gp_sideview_module.Actions);
-                ROM testRom = new(ROMData);
-                ApplyAsmPatches(props, validationEngine, RNG, testRom);
-                testRom.ApplyAsm(validationEngine);
-            }
-            catch(Exception e)
-            {
-                logger.Debug(e, "Room packing failed. Retrying.");
-                continue;
-            }
-
-            passedValidation = true;
-            _engine.Modules.Add(sideview_module.Actions);
-            _engine.Modules.Add(gp_sideview_module.Actions);
-        }
-
-        //Allows casting magic without requeueing a spell
-        if (props.FastCast)
-        {
-            ROMData.WriteFastCastMagic();
-        }
-
-        if (props.DisableMusic)
-        {
-            ROMData.DisableMusic();
-        }
-
-        ROMData.WriteKasutoJarAmount(kasutoJars);
-        ROMData.DoHackyFixes();
-        shuffler.ShuffleDrops(ROMData, RNG);
-        shuffler.ShufflePbagAmounts(ROMData, RNG);
-
-        ROMData.DisableTurningPalacesToStone();
-        ROMData.UpdateMapPointers();
-
-        if (props.DashAlwaysOn)
-        {
-            ROMData.Put(0x13C3, new byte[] { 0x30, 0xD0 });
-        }
-
-        if (props.PermanentBeam)
-        {
-            ROMData.Put(0x186c, 0xEA);
-            ROMData.Put(0x186d, 0xEA);
-        }
-
-        ShortenWizards();
-
-        // startRandomizeStartingValuesTimestamp = DateTime.Now;
-        startRandomizeEnemiesTimestamp = DateTime.Now;
-        RandomizeEnemyStats();
-
-        firstProcessOverworldTimestamp = DateTime.Now;
-        ProcessOverworld();
-        bool f = UpdateProgress(8);
-        if (!f)
-        {
-            return;
-        }
-
-        //If you start with a spell, also start with its corresponding spell item if applicable.
-        if (props.StartWithSpell(SpellMap[Town.RUTO]))
-        {
-            ROMData.Put(0x17b14, 0x10); //Trophy
-        }
-        if (props.StartWithSpell(SpellMap[Town.SARIA_NORTH]))
-        {
-            ROMData.Put(0x17b15, 0x01); //Mirror
-        }
-        if (props.StartWithSpell(SpellMap[Town.MIDO_WEST]))
-        {
-            ROMData.Put(0x17b16, 0x40); //Medicine
-        }
-        if (props.StartWithSpell(SpellMap[Town.NABOORU]))
-        {
-            ROMData.Put(0x17b17, 0x01); //Water
-        }
-        if (props.StartWithSpell(SpellMap[Town.DARUNIA_WEST]))
-        {
-            ROMData.Put(0x17b18, 0x20); //Child
-        }
-
-
-        _hints = CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, _hints, props, RNG);
-        f = UpdateProgress(9);
-        if (!f)
-        {
-            return;
-        }
-        
-        ApplyAsmPatches(props, _engine, RNG, ROMData);
-        ROMData.ApplyAsm(_engine);
-
-        MD5 hasher = MD5.Create();
-        byte[] finalRNGState = new byte[32];
-        RNG.NextBytes(finalRNGState);
-
-        var version = Assembly.GetEntryAssembly().GetName().Version;
-        var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
-        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
-            Flags +
-            Seed +
-            versionstr +
-            Util.ReadAllTextFromFile(config.GetRoomsFile()) +
-            Util.ByteArrayToHexString(finalRNGState)
-        ));
-        UpdateRom(hash);
-        char os_sep = Path.DirectorySeparatorChar;
-        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf(os_sep) + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
-        if (props.saveRom)
-        {
-            ROMData.Dump(newFileName);
-        }
-
-        /*
-        Room search = palaces[6].AllRooms.FirstOrDefault(i => i.Name.Contains("Previously void elevator GP sloped inverse T room", StringComparison.OrdinalIgnoreCase));
-        if (search != null)
-        {
-            Debug.WriteLine(newFileName);
-            Debug.WriteLine(search.GetDebuggerDisplay());
-        }
-        */
-
-        if (UNSAFE_DEBUG)
-        {
-            PrintSpoiler(LogLevel.Error);
-            //DEBUG
-            StringBuilder sb = new();
-            foreach (Palace palace in palaces)
-            {
-                sb.AppendLine("Palace: " + palace.Number);
-                foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
+                PrintSpoiler(LogLevel.Error);
+                //DEBUG
+                StringBuilder sb = new();
+                foreach (Palace palace in palaces)
                 {
-                    sb.AppendLine(room.Debug());
+                    sb.AppendLine("Palace: " + palace.Number);
+                    foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
+                    {
+                        sb.AppendLine(room.Debug());
+                    }
+                    File.WriteAllText("rooms.log", sb.ToString());
                 }
             }
-            File.WriteAllText("rooms.log", sb.ToString());
-        }
+            return ROMData.rawdata;
+        });
     }
 
 
@@ -1348,7 +1337,7 @@ public class Hyrule
         return requireables;
     }
 
-    private void ProcessOverworld()
+    private void ProcessOverworld(Action<string> progress, CancellationToken ct)
     {
         if (props.ShuffleSmallItems)
         {
@@ -1603,7 +1592,7 @@ public class Hyrule
             do //while (wtries < 10 && !EverythingReachable());
             {
                 //GENERATE WEST
-                bool shouldContinue = UpdateProgress(2);
+                bool shouldContinue = UpdateProgress(progress, ct, 2);
                 if (!shouldContinue)
                 {
                     return;
@@ -1619,7 +1608,7 @@ public class Hyrule
                 timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
-                shouldContinue = UpdateProgress(3);
+                shouldContinue = UpdateProgress(progress, ct, 3);
                 if (!shouldContinue)
                 {
                     return;
@@ -1634,7 +1623,7 @@ public class Hyrule
                 timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
-                shouldContinue = UpdateProgress(4);
+                shouldContinue = UpdateProgress(progress, ct, 4);
                 if (!shouldContinue)
                 {
                     return;
@@ -1649,7 +1638,7 @@ public class Hyrule
                 timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
-                shouldContinue = UpdateProgress(5);
+                shouldContinue = UpdateProgress(progress, ct, 5);
                 if (!shouldContinue)
                 {
                     return;
@@ -1663,7 +1652,7 @@ public class Hyrule
                 mazeIsland.ResetVisitabilityState();
                 timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
-                shouldContinue = UpdateProgress(6);
+                shouldContinue = UpdateProgress(progress, ct, 6);
                 if (!shouldContinue)
                 {
                     return;
@@ -1736,15 +1725,38 @@ public class Hyrule
         }
     }
 
-    private bool UpdateProgress(int v)
+    private bool UpdateProgress(Action<string> progress, CancellationToken ct, int v)
     {
-        if (worker != null)
+        if (ct.IsCancellationRequested)
         {
-            if (worker.CancellationPending)
-            {
-                return false;
-            }
-            worker.ReportProgress(v);
+            return false;
+        }
+        switch (v)
+        {
+            case 2:
+                progress.Invoke("Generating Western Hyrule");
+                break;
+            case 3:
+                progress.Invoke("Generating Death Mountain");
+                break;
+            case 4:
+                progress.Invoke("Generating East Hyrule");
+                break;
+            case 5:
+                progress.Invoke("Generating Maze Island");
+                break;
+            case 6:
+                progress.Invoke("Shuffling Items and Spells");
+                break;
+            case 7:
+                progress.Invoke("Running Seed Completability Checks");
+                break;
+            case 8:
+                progress.Invoke("Generating Hints");
+                break;
+            case 9:
+                progress.Invoke("Finishing up");
+                break;
         }
         return true;
     }
@@ -2130,7 +2142,7 @@ public class Hyrule
             rom.Put(addr[swap], temp);
         }
     }
-    private void RandomizeStartingValues(Engine engine, ROM rom)
+    private void RandomizeStartingValues(Assembler a, ROM rom)
     {
 
         rom.Put(0x17AF3, (byte)props.StartAtk);
@@ -2150,7 +2162,7 @@ public class Hyrule
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(rom, RNG, engine);
+            shuffler.ShuffleBossDrop(rom, RNG, a);
         }
 
         if (props.StartWithSpellItems)
@@ -3335,10 +3347,9 @@ public class Hyrule
         return new byte[] { (byte)(val & 0xff), (byte)(val >> 8) };
     }
 
-    private void AddCropGuideBoxesToFileSelect(Engine engine)
+    private void AddCropGuideBoxesToFileSelect(Assembler a)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code("""
+        a.Module().Code("""
 .segment "PRG5"
 .org $b28d
     jsr CustomFileSelectUpdates
@@ -3376,7 +3387,6 @@ CustomFileSelectData:
     .byte $23, $9e, $01, blueTile
     .byte $ff
 """, "crop_guides.s");
-        engine.Modules.Add(assembler.Actions);
     }
 
     public List<Location> AllLocationsForReal()
@@ -3504,16 +3514,17 @@ CustomFileSelectData:
         return spellLocations;
     }
 
-    private void FixHelmetheadItemRoomDespawn(Engine engine)
+    private void FixHelmetheadItemRoomDespawn(Assembler asm)
     {
         byte helmetRoom = 0x22;
         if (props.NormalPalaceStyle.IsReconstructed())
         {
             helmetRoom = (byte)palaces[1].BossRoom.NewMap;
         }
-        Assembler.Assembler assembler = new();
-        assembler.Assign("HelmetRoom", helmetRoom);
-        assembler.Code("""
+
+        var a = asm.Module();
+        a.Assign("HelmetRoom", helmetRoom);
+        a.Code("""
 .segment "PRG4"
 
 .reloc
@@ -3536,12 +3547,10 @@ HelmetHeadGoomaFix:
     nop
 
 """, "helmethead_gooma_fix.s");
-        engine.Modules.Add(assembler.Actions);
     }
 
-    private void RestartWithPalaceUpA(Engine engine) {
-        Assembler.Assembler a = new();
-        a.Code("""
+    private void RestartWithPalaceUpA(Assembler a) {
+        a.Module().Code("""
 update_next_level_exp = $a057
 
 ;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
@@ -3601,17 +3610,14 @@ SaveWorldStateAndClearFlag:
     rts
 
 """, "restart_palace_upa.s");
-        engine.Modules.Add(a.Actions);
-
     }
 
     /// <summary>
     /// I assume this fixes the XP on screen transition softlock, but who knows with all these magic bytes.
     /// </summary>
-    private void FixSoftLock(Engine engine)
+    private void FixSoftLock(Assembler a)
     {
-        Assembler.Assembler a = new();
-        a.Code("""
+        a.Module().Code("""
 .segment "PRG7"
 .org $e18a
     jsr FixSoftlock
@@ -3626,28 +3632,23 @@ FixSoftlock:
         stx $074c
 +   rts
 """, "fix_softlock.s");
-        engine.Modules.Add(a.Actions);
     }
 
-    public void ApplyHudFixes(Engine engine, bool preventFlash)
+    public void ApplyHudFixes(Assembler asm, bool preventFlash)
     {
-        Assembler.Assembler a = new();
+        var a = asm.Module();
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
-        engine.Modules.Add(a.Actions);
     }
     
-    public void ExpandedPauseMenu(Engine engine)
-    {
-        Assembler.Assembler a = new();
-        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
-        engine.Modules.Add(a.Actions);
+    public void ExpandedPauseMenu(Assembler a)
+    {;
+        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
     
-    public void StandardizeDrops(Engine engine)
+    public void StandardizeDrops(Assembler a)
     {
-        Assembler.Assembler a = new();
-        a.Code("""
+        a.Module().Code("""
 .segment "PRG7"
 .org $e8ad
     jsr StandardizeDrops
@@ -3662,13 +3663,11 @@ StandardizeDrops:
     inc $06ff
     rts
 """, "standardize_drops.s");
-        engine.Modules.Add(a.Actions);
     }
 
-    public void PreventSideviewOutOfBounds(Engine engine)
+    public void PreventSideviewOutOfBounds(Assembler a)
     {
-        Assembler.Assembler a = new();
-        a.Code("""
+        a.Module().Code("""
 ; In vanilla, sideview loading routinely reads a few extra bytes past the end of sideview data,
 ; and if you are unlucky, it'll read a $dx byte which is valid and will make the room get blocked off
 ; This changes it so during background rendering, it'll properly check for bounds
@@ -3690,12 +3689,11 @@ CheckIfEndOfData:
   sta $010a
   jmp $c795 ; jump back to the background rendering code after where it loads the next byte
 """, "prevent_sideview_oob.s");
-        engine.Modules.Add(a.Actions);
     }
 
-    public void FixContinentTransitions(Engine engine)
+    public void FixContinentTransitions(Assembler asm)
     {
-        Assembler.Assembler a = new();
+        var a = asm.Module();
         a.Assign("P1Palette", (byte)palPalettes[westHyrule?.locationAtPalace1.PalaceNumber ?? 0]);
         a.Assign("P2Palette", (byte)palPalettes[westHyrule?.locationAtPalace2.PalaceNumber ?? 1]);
         a.Assign("P3Palette", (byte)palPalettes[westHyrule?.locationAtPalace3.PalaceNumber ?? 2]);
@@ -3797,12 +3795,11 @@ FREE_UNTIL $c2ca
     nop
 
 """, "fix_continent_transitions.s");
-        engine.Modules.Add(a.Actions);
     }
 
-    public void UpdateHints(Engine engine, List<Text> hints)
+    public void UpdateHints(Assembler asm, List<Text> hints)
     {
-        Assembler.Assembler a = new();
+        var a = asm.Module();
         // Clear out the ROM for the existing tables
         a.Free("PRG3", 0xA380, 0xB082);
 
@@ -3833,10 +3830,9 @@ FREE_UNTIL $c2ca
             var hint = hints[i];
             a.Word(a.Symbol($"HintText{i}"));
         }
-        engine.Modules.Add(a.Actions);
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG, ROM rom)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, ROM rom)
     {
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);

@@ -1,8 +1,8 @@
-﻿using Assembler;
-using NLog;
+﻿using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RandomizerCore.Asm;
 
 namespace Z2Randomizer.Core;
 
@@ -208,13 +208,12 @@ public class Shuffler
         }
     }
 
-    public void ShuffleBossDrop(ROM ROMData, Random r, Engine engine)
+    public void ShuffleBossDrop(ROM ROMData, Random r, Assembler a)
     {
         int drop = drops[r.Next(drops.Count())];
         ROMData.Put(0x1de29, (byte)(drop - 0x80));
 
-        Assembler.Assembler a = new();
-        a.Code("""
+        a.Module().Code("""
 .segment "PRG7"
 .org $E79A
     ; Branch if scroll frozen
@@ -271,6 +270,5 @@ DontSwitchMusicIfInPalace2:
         sta $eb
 +   rts
 """);
-        engine.Modules.Add(a.Actions);
     }
 }

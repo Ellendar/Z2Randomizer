@@ -8,6 +8,7 @@ using Z2Randomizer.Core.Flags;
 using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
 using System.Reflection;
+using CommandLine;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -1955,11 +1956,19 @@ public partial class MainUI : Form
     private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
     {
         BackgroundWorker worker = sender as BackgroundWorker;
-
-        new Hyrule(config, worker);
-        if (worker.CancellationPending)
+        var cts = new CancellationTokenSource();
+        var ct = cts.Token;
+        var engine = new DesktopJsEngine();
+        var rando = new Hyrule(config, engine);
+        var task = rando.Randomize(str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
+        while (!task.IsCompleted)
         {
-            e.Cancel = true;
+            if (worker.CancellationPending)
+            {
+                e.Cancel = true;
+                cts.Cancel();
+            }
+            Thread.Sleep(50);
         }
     }
 

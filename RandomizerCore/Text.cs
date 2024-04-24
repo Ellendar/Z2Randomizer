@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;

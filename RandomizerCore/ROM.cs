@@ -1,13 +1,13 @@
-﻿using Assembler;
-using NLog;
+﻿using NLog;
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
+using RandomizerCore.Asm;
 using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
@@ -111,7 +111,7 @@ public class ROM
         {Town.OLD_KASUTO, 0xf08e }
     };
 
-    private byte[] ROMData;
+    public byte[] rawdata { get; }
 
     public ROM(string filename)
     {
@@ -122,7 +122,7 @@ public class ROM
             fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
 
             BinaryReader br = new BinaryReader(fs, new ASCIIEncoding());
-            ROMData = br.ReadBytes(257 * 1024);
+            rawdata = br.ReadBytes(257 * 1024);
 
         }
         catch (Exception err)
@@ -133,19 +133,19 @@ public class ROM
 
     public ROM(ROM clone)
     {
-        int length = clone.ROMData.Length;
-        ROMData = new byte[length];
-        Array.Copy(clone.ROMData, ROMData, length);
+        int length = clone.rawdata.Length;
+        rawdata = new byte[length];
+        Array.Copy(clone.rawdata, rawdata, length);
     }
 
     public ROM(byte[] data)
     {
-        ROMData = data;
+        rawdata = data;
     }
 
     public byte GetByte(int index)
     {
-        return ROMData[index];
+        return rawdata[index];
     }
 
     public byte[] GetBytes(int start, int end)
@@ -160,7 +160,7 @@ public class ROM
 
     public void Put(int index, byte data)
     {
-        ROMData[index] = data;
+        rawdata[index] = data;
     }
 
     public void Put(int index, string data)
@@ -172,13 +172,13 @@ public class ROM
     {
         for (int i = 0; i < data.Length; i++)
         {
-            ROMData[index + i] = data[i];
+            rawdata[index + i] = data[i];
         }
     }
 
     public void Dump(string filename)
     {
-        File.WriteAllBytes(filename, ROMData);
+        File.WriteAllBytes(filename, rawdata);
     }
 
     public List<Text> GetGameText()
@@ -308,7 +308,7 @@ public class ROM
         else
         {
             IpsPatcher patcher = new();
-            patcher.Patch(ROMData, charSprite.Path);
+            patcher.Patch(rawdata, charSprite.Path);
         }
 
         Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
@@ -651,12 +651,11 @@ public class ROM
 
     }
 
-    public void ExtendMapSize(Engine engine)
+    public void ExtendMapSize(Assembler a)
     {
         //Implements CF's map size hack:
         //https://github.com/cfrantz/z2doc/wiki/bigger-overworlds
-        Assembler.Assembler a = new();
-        a.Code("""
+        a.Module().Code("""
 .macpack common
 
 .segment "PRG0"
@@ -716,7 +715,6 @@ LoadMapData:
     jmp LoadDataThroughPointers
 
 """, "extend_map_size.s");
-        engine.Modules.Add(a.Actions);
     }
 
     public void DisableTurningPalacesToStone()
@@ -734,10 +732,9 @@ LoadMapData:
         Put(0x851a, new byte[] { 0xf0, 0xb9 }); //maze island
     }
 
-    public void UpAController1(Engine engine)
+    public void UpAController1(Assembler a)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code("""
+        a.Module().Code("""
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
@@ -749,7 +746,6 @@ CheckController1ForUpAMagic:
   lda $f7
   cmp #$28
 """, "UpAController1.s");
-        engine.Modules.Add(assembler.Actions);
         //Put(0x21B0, 0xF7);
         //Put(0x21B2, 0x28);
         //Put(0x21EE, 0xF7);
@@ -765,22 +761,18 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
-    public void ChangeMapperToMMC5(Engine engine)
+    public void ChangeMapperToMMC5(Assembler a)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
-
-        engine.Modules.Add(assembler.Actions);
+        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
-    public void ApplyAsm(Engine engine)
+    public async Task<byte[]?> ApplyAsm(IAsmEngine engine, Assembler asm)
     {
-        engine.Apply(ROMData);
+        return await engine.Apply(rawdata, asm);
     }
-    public void RandomizeKnockback(Engine engine, Random RNG)
+    public void RandomizeKnockback(Assembler asm, Random RNG)
     {
-        Assembler.Assembler a = new();
-
+        var a = asm.Module();
         // 0x23 is the max enemy id and we have 3 tables for each randomized value
         byte enemy_count = 0x24;
         byte[] x_arr = new byte[enemy_count];
@@ -790,7 +782,7 @@ CheckController1ForUpAMagic:
         a.Set("RecoilTableX", recoilTableXAddr);
         a.Set("RecoilTableYLo", recoilTableXAddr + enemy_count);
         a.Set("RecoilTableYHi", recoilTableXAddr + enemy_count * 2);
-        for (int i = 0; i < 7; i++)
+        for (var i = 0; i < 7; i++)
         {
             // this is heavily biased towards higher than default knockback... muhahahaha
             a.Segment($"PRG{i}");
@@ -808,26 +800,22 @@ CheckController1ForUpAMagic:
             a.Byt(y_hi_arr);
         }
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
-        engine.Modules.Add(a.Actions);
     }
 
 
-    public void BuffCarrock(Engine engine)
+    public void BuffCarrock(Assembler a)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
-        engine.Modules.Add(assembler.Actions);
+        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
     }
 
-    public void DashSpell(Engine engine)
+    public void DashSpell(Assembler asm)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
+        var a = asm.Module();
+        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
 
         byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
-        assembler.Org(0x9c62);
-        assembler.Byt(dash);
-        engine.Modules.Add(assembler.Actions);
+        a.Org(0x9c62);
+        a.Byt(dash);
     }
 
     public void MoveAfterGem()

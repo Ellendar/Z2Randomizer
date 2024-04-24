@@ -25,8 +25,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpRooms", "DumpRooms\Dump
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "CommandLine\CommandLine.csproj", "{5277C962-4F26-422B-9982-3F1EE81E0975}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assembler", "Assembler\Assembler.csproj", "{985AF39A-F067-46E1-8ACE-5332F81C4FDC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossPlatformUI", "CrossPlatformUI\CrossPlatformUI\CrossPlatformUI.csproj", "{C6EDEAA8-B9A6-4BC0-9D85-B4232EE0F405}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossPlatformUI.Desktop", "CrossPlatformUI\CrossPlatformUI.Desktop\CrossPlatformUI.Desktop.csproj", "{CAA9F6B9-05DE-4D07-B989-B9051D63240F}"
