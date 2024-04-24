@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+<<<<<<< HEAD
     <Platforms>AnyCPU;x64</Platforms>
     <Version>4.3.6</Version>
   </PropertyGroup>
@@ -22,6 +23,9 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IsTrimmable>False</IsTrimmable>
+=======
+    <Version>4.4.0</Version>
+>>>>>>> 82ba520502f40066d2f8d3d4ac616492d868f346
   </PropertyGroup>
 
   <ItemGroup>
