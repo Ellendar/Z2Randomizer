@@ -8,6 +8,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -217,14 +218,7 @@ public class Hyrule
             //Randomize Enemies
             if (props.ShufflePalaceEnemies)
             {
-                foreach (Palace palace in palaces)
-                {
-                    do
-                    {
-                        palace.RandomizeEnemies(props, RNG);
-                    }
-                    while (palace.AllRooms.Sum(i => i.Enemies.Length) > (palace.Number == 7 ? 0x2A9 : 0x400));
-                }
+                palaces.ForEach(i => i.RandomizeEnemies(props, RNG));
             }
 
             if (props.ShuffleSmallItems || props.ExtraKeys)
@@ -432,7 +426,7 @@ public class Hyrule
             //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
             "4.3.6" +
             Util.ReadAllTextFromFile(config.GetRoomsFile()) +
-            finalRNGState
+            Util.ByteArrayToHexString(finalRNGState)
         ));
         UpdateRom(hash);
         char os_sep = Path.DirectorySeparatorChar;

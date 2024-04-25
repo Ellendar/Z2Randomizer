@@ -592,6 +592,12 @@ public class Palaces
 
     private static bool ValidatePalaces(RandomizerProperties props, bool raftIsRequired, List<Palace> palaces)
     {
+        //Enforce aggregate max length of enemy data
+        if (palaces.Where(i => i.Number != 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x400
+            || palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x2A9)
+        {
+            return false;
+        }
         return CanGetGlove(props, palaces[1])
             && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])
             && AtLeastOnePalaceCanHaveGlove(props, palaces);
