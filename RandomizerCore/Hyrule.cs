@@ -278,7 +278,7 @@ public class Hyrule
             foreach (byte[] sv in sideviews.Keys)
             {
                 var name = "Sideview_" + i++;
-                sideview_module.Segment("PRG4");
+                sideview_module.Segment("PRG4", "PRG7");
                 sideview_module.Reloc();
                 sideview_module.Label(name);
                 sideview_module.Byt(sv);

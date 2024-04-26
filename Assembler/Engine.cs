@@ -4,9 +4,11 @@ using System.Reflection;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
+using NLog;
 
 public class Engine
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     internal V8ScriptEngine scriptEngine;
     public List<List<PropertyBag>> Modules { get; set; } = new();
     private Actions InitModule { get; } = new();
@@ -128,8 +130,9 @@ async function processAction(a, action) {
             // Copy the patched bytes back into the final rom.
             data.ReadBytes(0, (ulong)rom.Length, rom, 0);
         }
-        catch(Exception)
+        catch(Exception e)
         {
+            logger.Debug(e, "Exception while running the assembler");
             throw;
         }
     }
