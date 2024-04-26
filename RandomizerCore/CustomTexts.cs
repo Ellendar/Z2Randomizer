@@ -276,8 +276,10 @@ public class CustomTexts
         Location bagu,
         List<Text> texts,
         RandomizerProperties props,
-        Random r)
+        Random hashRNG)
     {
+        // Make a new RNG for community text so that it doesn't affect the final hash.
+        var nonhashRNG = new Random(hashRNG.Next());
         if (props.ReplaceFireWithDash)
         {
             texts[70] = new Text(Util.ToGameText("USE THIS$TO GO$FAST", true));
@@ -289,7 +291,7 @@ public class CustomTexts
         }
         if (props.UseCommunityText)
         {
-            GenerateCommunityText(texts, spellMap, r);
+            GenerateCommunityText(texts, spellMap, nonhashRNG);
         }
 
         if (props.SpellItemHints)
@@ -305,17 +307,17 @@ public class CustomTexts
         }
         if (props.HelpfulHints)
         {
-            placedIndex = GenerateHelpfulHints(texts, itemLocs, r, props.SpellItemHints);
-            GenerateKnowNothings(texts, placedIndex, r, props.BagusWoods, props.UseCommunityText);
+            placedIndex = GenerateHelpfulHints(texts, itemLocs, hashRNG, props.SpellItemHints);
+            GenerateKnowNothings(texts, placedIndex, nonhashRNG, props.BagusWoods, props.UseCommunityText);
         }
 
         if (props.UseCommunityText)
         {
             //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
             //enough magic containers and container requirements are on.
-            texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(r));
+            texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG));
             //Old kasuto guy has a different vanilla not enough containers message
-            texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(r));
+            texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG));
         }
 
         if (props.TownNameHints)

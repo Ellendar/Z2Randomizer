@@ -152,4 +152,16 @@ public class Assembler
             { "name", name },
         });
     }
+
+    public void Free(string segment, ushort startorg, ushort endorg) {
+        if (endorg <= startorg) {
+            throw new Exception($"Free called with bad range: Start {startorg:04X} End {endorg:04X}");
+        }
+        Segment(segment);
+        Org(startorg);
+        Actions.Add(new() {
+            { "action", "free" },
+            { "size", endorg - startorg },
+        });
+    }
 }

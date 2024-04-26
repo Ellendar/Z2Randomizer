@@ -68,6 +68,7 @@ UPDATE_REFS target @ refs
 ; FREE "PRG0" [$AA40, $c000)
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
+FREE "PRG3" [$B803, $bfff)
 
 FREE "PRG4" [$83DC, $8470)
 FREE "PRG4" [$84f0, $8500)

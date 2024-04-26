@@ -166,6 +166,7 @@ public class Hyrule
     }
 
     private Engine _engine;
+    private List<Text> _hints;
 
     public Hyrule(RandomizerConfiguration config, BackgroundWorker worker, bool saveRom = true)
     {
@@ -200,6 +201,7 @@ public class Hyrule
 
 
         ROMData = new ROM(props.Filename);
+        _hints = ROMData.GetGameText();
         if (props.KasutoJars)
         {
             kasutoJars = RNG.Next(5, 8);
@@ -402,8 +404,7 @@ public class Hyrule
         }
 
 
-        List<Text> hints = ROMData.GetGameText();
-        ROMData.WriteHints(CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, hints, props, RNG));
+        _hints = CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, _hints, props, RNG);
         f = UpdateProgress(9);
         if (!f)
         {
@@ -3796,6 +3797,42 @@ FREE_UNTIL $c2ca
         engine.Modules.Add(a.Actions);
     }
 
+    public void UpdateHints(Engine engine, List<Text> hints)
+    {
+        Assembler.Assembler a = new();
+        // Clear out the ROM for the existing tables
+        a.Free("PRG3", 0xA380, 0xB082);
+
+        // Update the pointers to the text tables
+        a.Segment("PRG3");
+        a.Org(0xB423);
+        a.Word(a.Symbol("Towns_in_West_Hyrule"));
+        a.Word(a.Symbol("Towns_in_East_Hyrule"));
+
+        for (var i = 0; i < hints.Count; i++) {
+            var hint = hints[i];
+            a.Reloc();
+            a.Label($"HintText{i}");
+            a.Byt(hint.TextChars.Select(c => (byte)c).ToArray());
+        }
+
+        a.Reloc();
+        a.Label("Towns_in_West_Hyrule");
+        // There are 53 texts in this first table
+        for (var i = 0; i < 53; i++) {
+            var hint = hints[i];
+            a.Word(a.Symbol($"HintText{i}"));
+        }
+        // and the rest (47) are in this table
+        a.Reloc();
+        a.Label("Towns_in_East_Hyrule");
+        for (var i = 53; i < hints.Count; i++) {
+            var hint = hints[i];
+            a.Word(a.Symbol($"HintText{i}"));
+        }
+        engine.Modules.Add(a.Actions);
+    }
+
     private void ApplyAsmPatches(RandomizerProperties props, Engine engine, Random RNG, ROM rom)
     {
         rom.ChangeMapperToMMC5(engine);
@@ -3838,5 +3875,7 @@ FREE_UNTIL $c2ca
         ExpandedPauseMenu(engine);
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
+
+        UpdateHints(engine, _hints);
     }
 }

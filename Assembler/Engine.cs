@@ -96,6 +96,9 @@ async function processAction(a, action) {
             a.set(action["name"], action["value"]);
             break;
         }
+        case "free": {
+            a.free(action["size"]);
+        }
     }
 }
 
