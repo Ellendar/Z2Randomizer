@@ -417,15 +417,13 @@ public class Hyrule
         MD5 hasher = MD5.Create();
         byte[] finalRNGState = new byte[32];
         RNG.NextBytes(finalRNGState);
+
+        var version = Assembly.GetEntryAssembly().GetName().Version;
+        var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
         byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
             Flags +
             Seed +
-            //Assembly.GetExecutingAssembly().GetName().Version.Major +
-            //Assembly.GetExecutingAssembly().GetName().Version.Minor +
-            //Assembly.GetExecutingAssembly().GetName().Version.Revision +
-            //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
-            //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
-            "4.3.6" +
+            versionstr +
             Util.ReadAllTextFromFile(config.GetRoomsFile()) +
             Util.ByteArrayToHexString(finalRNGState)
         ));
