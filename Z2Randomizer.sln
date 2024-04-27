@@ -25,12 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpRooms", "DumpRooms\Dump
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "CommandLine\CommandLine.csproj", "{5277C962-4F26-422B-9982-3F1EE81E0975}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossPlatformUI", "CrossPlatformUI\CrossPlatformUI\CrossPlatformUI.csproj", "{C6EDEAA8-B9A6-4BC0-9D85-B4232EE0F405}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossPlatformUI", "CrossPlatformUI\CrossPlatformUI.csproj", "{EBFA8512-1EA5-4D8C-B4AC-AB5B48A6D568}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossPlatformUI.Desktop", "CrossPlatformUI\CrossPlatformUI.Desktop\CrossPlatformUI.Desktop.csproj", "{CAA9F6B9-05DE-4D07-B989-B9051D63240F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossPlatformUI.Desktop", "CrossPlatformUI.Desktop\CrossPlatformUI.Desktop.csproj", "{ABC31E74-02FF-46EB-B3B2-4E6AE43B456C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrossPlatformUI.Browser", "CrossPlatformUI\CrossPlatformUI.Browser\CrossPlatformUI.Browser.csproj", "{55B86B06-92BD-486A-A72F-16EE53A58D57}"
-EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossPlatformUI.Browser", "CrossPlatformUI.Browser\CrossPlatformUI.Browser.csproj", "{1C1A049E-235C-4CD0-B6FA-D53AC418F4DA}"
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
