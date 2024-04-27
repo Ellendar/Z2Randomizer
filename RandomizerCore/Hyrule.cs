@@ -801,19 +801,6 @@ public class Hyrule
             }
         }
 
-        for (int i = 0; i < 64; i++)
-        {
-            byte heartByte = ROMData.GetByte(0x27810 + i);
-            ROMData.Put(0x29810 + i, heartByte);
-            ROMData.Put(0x2B810 + i, heartByte);
-            ROMData.Put(0x2D810 + i, heartByte);
-            ROMData.Put(0x33810 + i, heartByte);
-            ROMData.Put(0x35810 + i, heartByte);
-            ROMData.Put(0x37810 + i, heartByte);
-            ROMData.Put(0x39810 + i, heartByte);
-        }
-
-
     }
 
     private bool IsEverythingReachable(Dictionary<Item, bool> ItemGet, Dictionary<Spell, bool> spellGet)
@@ -2609,6 +2596,19 @@ public class Hyrule
                 ROMData.Put(location.MemAddress + overworldWorldOff, location.LocationBytes[3]);
             }
             ROMData.RemoveUnusedConnectors(world);
+        }
+
+        // Copy heart and medicine container sprite tiles to the new location.
+        for (int i = 0; i < 64; i++)
+        {
+            byte heartByte = ROMData.GetByte(0x27810 + i);
+            ROMData.Put(0x29810 + i, heartByte);
+            ROMData.Put(0x2B810 + i, heartByte);
+            ROMData.Put(0x2D810 + i, heartByte);
+            ROMData.Put(0x33810 + i, heartByte);
+            ROMData.Put(0x35810 + i, heartByte);
+            ROMData.Put(0x37810 + i, heartByte);
+            ROMData.Put(0x39810 + i, heartByte);
         }
 
 
