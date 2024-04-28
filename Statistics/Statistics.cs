@@ -2,6 +2,8 @@
 using Z2Randomizer.Core;
 using System;
 using System.ComponentModel;
+using CommandLine;
+using System.Threading;
 
 namespace Z2Randomizer.Statistics;
 
@@ -28,6 +30,7 @@ class Statistics
         StatisticsDbContext dbContext = new StatisticsDbContext(DB_PATH);
 
         Random random = new Random();
+        var engine = new DesktopJsEngine();
         logger.Info("Started statistics generation with limit: " + LIMIT);
         try
         {
@@ -38,14 +41,11 @@ class Statistics
                 //int seed = 38955385;
                 config.Seed = seed;
                 config.FileName = VANILLA_ROM_PATH;
-                BackgroundWorker backgroundWorker = new BackgroundWorker()
-                {
-                    WorkerReportsProgress = true,
-                    WorkerSupportsCancellation = true
-                };
                 DateTime startTime = DateTime.Now;
                 logger.Info("Starting seed# " + i + " at: " + startTime);
-                Hyrule hyrule = new Hyrule(config, backgroundWorker, false);
+                Hyrule hyrule = new Hyrule(config, engine);
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+                hyrule.Randomize((str) => logger.Trace(str), tokenSource.Token).Wait(tokenSource.Token);
                 DateTime endTime = DateTime.Now;
                 Result result = new Result(hyrule);
                 result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
