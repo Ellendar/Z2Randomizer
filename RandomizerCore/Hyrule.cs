@@ -176,8 +176,11 @@ public class Hyrule
         RNG = new Random(config.Seed);
         props = config.Export(RNG);
         props.saveRom = saveRom;
-        string export = JsonSerializer.Serialize(props);
-        Debug.WriteLine(export);
+        if(UNSAFE_DEBUG) 
+        {
+            string export = JsonSerializer.Serialize(props);
+            Debug.WriteLine(export);
+        }
         Flags = config.Serialize();
         Seed = config.Seed;
         logger.Info("Started generation for " + Flags + " / " + config.Seed);
