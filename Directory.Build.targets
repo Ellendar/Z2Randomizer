@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
         <Version>4.3.7</Version>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     </PropertyGroup>
 </Project>

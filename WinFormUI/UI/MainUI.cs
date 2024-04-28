@@ -7,6 +7,7 @@ using WinFormUI.UI;
 using Z2Randomizer.Core.Flags;
 using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
+using System.Reflection;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -84,10 +85,9 @@ public partial class MainUI : Form
         var selectedSprite = Settings.Default.sprite;
         characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
 
-        Text = "Zelda 2 Randomizer Version "
-            + typeof(MainUI).Assembly.GetName().Version.Major + "."
-            + typeof(MainUI).Assembly.GetName().Version.Minor + "."
-            + typeof(MainUI).Assembly.GetName().Version.Build;
+        var exeversion = Assembly.GetExecutingAssembly().GetName().Version!;
+        var versionstr = $"{exeversion.Major}.{exeversion.Minor}.{exeversion.Build}";
+        Text = $"Zelda 2 Randomizer Version {versionstr}";
 
         flagsTextBox.DoubleClick += new System.EventHandler(flagBox_Clicked);
         shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
