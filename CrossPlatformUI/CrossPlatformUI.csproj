@@ -20,6 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\RandomizerCore\RandomizerCore.csproj" />
+      <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
     </ItemGroup>
 </Project>
