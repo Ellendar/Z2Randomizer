@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿
+using ReactiveUI;
 
 namespace CrossPlatformUI.ViewModels;
 

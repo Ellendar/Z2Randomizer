@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using CrossPlatformUI.ViewModels;
@@ -6,10 +5,11 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views;
 
-public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+public partial class RomFileView : ReactiveUserControl<RomFileViewModel>
 {
-    public MainWindow()
+    public RomFileView()
     {
+        InitializeComponent();
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);
     }

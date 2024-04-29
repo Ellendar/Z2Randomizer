@@ -6,11 +6,15 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
+    <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
-
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <vm:MainViewModel />
+    </Design.DataContext>
+    <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto" >
+        <StackPanel Orientation="Vertical">
+            <TextBlock>Flag String</TextBlock>
+            <TextBox Text="{Binding Flags}"></TextBox>
+        </StackPanel>
+    </Grid>
 </UserControl>

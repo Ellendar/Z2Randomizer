@@ -1,12 +1,44 @@
 <Window xmlns="https://github.com/avaloniaui"
+        xmlns:rxui="http://reactiveui.net"
+        xmlns:app="clr-namespace:CrossPlatformUI"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:CrossPlatformUI.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:CrossPlatformUI.Views"
+        xmlns:viewModels="clr-namespace:CrossPlatformUI.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CrossPlatformUI.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="CrossPlatformUI">
-        <views:MainView />
+        x:DataType="viewModels:MainWindowViewModel"
+        SizeToContent="3"
+        MinHeight="400"
+        MinWidth="800"
+        Title="Z2Randomizer">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
+            <rxui:RoutedViewHost.DefaultContent>
+                <!-- <views:MainView/> -->
+            </rxui:RoutedViewHost.DefaultContent>
+            <rxui:RoutedViewHost.ViewLocator>
+                <!-- See AppViewLocator.cs section below -->
+                <app:AppViewLocator />
+            </rxui:RoutedViewHost.ViewLocator>
+        </rxui:RoutedViewHost>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="15">
+            <StackPanel.Styles>
+                <Style Selector="StackPanel > :is(Control)">
+                    <Setter Property="Margin" Value="2" />
+                </Style>
+                <Style Selector="StackPanel > TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+            </StackPanel.Styles>
+            <Button Content="Reload ROM" Command="{Binding LoadRom}" />
+            <!-- <Button Content="Go back" Command="{Binding GoBack}" /> -->
+            <!-- <TextBlock Text="{Binding Router.NavigationStack.Count}" /> -->
+        </StackPanel>
+    </Grid>
 </Window>
