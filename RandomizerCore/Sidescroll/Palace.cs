@@ -230,10 +230,10 @@ public class Palace
         if (!placed && open.HasRightExit() && open.Right == null && r.HasLeftExit() && r.Left == null)
         {
             open.Right = r;
-            open.RightByte = (r.NewMap ?? r.Map) * 4;
+            open.RightByte = (byte)((r.NewMap ?? r.Map) * 4);
 
             r.Left = open;
-            r.LeftByte = (open.NewMap ?? open.Map) * 4 + 3;
+            r.LeftByte = (byte)((open.NewMap ?? open.Map) * 4 + 3);
 
             placed = true;
         }
@@ -241,10 +241,10 @@ public class Palace
         if (!placed && open.HasLeftExit() && open.Left == null && r.HasRightExit() && r.Right == null)
         {
             open.Left = r;
-            open.LeftByte = (r.NewMap ?? r.Map) * 4 + 3;
+            open.LeftByte = (byte)((r.NewMap ?? r.Map) * 4 + 3);
 
             r.Right = open;
-            r.RightByte = (open.NewMap ?? open.Map) * 4;
+            r.RightByte = (byte)((open.NewMap ?? open.Map) * 4);
 
             placed = true;
         }
@@ -252,10 +252,10 @@ public class Palace
         if (!placed && open.HasUpExit() && open.Up == null && r.HasDownExit() && r.Down == null && !r.HasDrop)
         {
             open.Up = r;
-            open.UpByte = (r.NewMap ?? r.Map) * 4 + r.ElevatorScreen;
+            open.UpByte = (byte)((r.NewMap ?? r.Map) * 4 + r.ElevatorScreen);
 
             r.Down = open;
-            r.DownByte = (open.NewMap ?? open.Map) * 4 + open.ElevatorScreen;
+            r.DownByte = (byte)((open.NewMap ?? open.Map) * 4 + open.ElevatorScreen);
 
             placed = true;
         }
@@ -264,10 +264,10 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = (r.NewMap ?? r.Map) * 4 + r.ElevatorScreen;
+            open.DownByte = (byte)((r.NewMap ?? r.Map) * 4 + r.ElevatorScreen);
 
             r.Up = open;
-            r.UpByte = (open.NewMap ?? open.Map) * 4 + open.ElevatorScreen;
+            r.UpByte = (byte)((open.NewMap ?? open.Map) * 4 + open.ElevatorScreen);
 
             placed = true;
         }
@@ -276,7 +276,7 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = (r.NewMap ?? r.Map) * 4;
+            open.DownByte = (byte)((r.NewMap ?? r.Map) * 4);
             r.IsDropZone = false;
             placed = true;
         }
@@ -285,7 +285,7 @@ public class Palace
         {
 
             r.Down = open;
-            r.DownByte = (open.NewMap ?? open.Map) * 4;
+            r.DownByte = (byte)((open.NewMap ?? open.Map) * 4);
             open.IsDropZone = false;
             placed = true;
         }
@@ -548,7 +548,7 @@ public class Palace
             int swap = r.Next(i, roomsWithDropExits.Count);
 
             Room temp = roomsWithDropExits[i].Down;
-            int tempByte = roomsWithDropExits[i].DownByte;
+            byte tempByte = roomsWithDropExits[i].DownByte;
 
             roomsWithDropExits[i].Down = roomsWithDropExits[swap].Down;
             roomsWithDropExits[i].DownByte = roomsWithDropExits[swap].DownByte;
@@ -614,12 +614,12 @@ public class Palace
                 if (room.Down.Map == 0xBC)
                 {
                     int db = room.DownByte;
-                    room.DownByte = (db & 0xFC) + 2;
+                    room.DownByte = (byte)((db & 0xFC) + 2);
                 }
                 else
                 {
                     int db = room.DownByte;
-                    room.DownByte = (db & 0xFC) + 1;
+                    room.DownByte = (byte)((db & 0xFC) + 1);
                 }
             }
         }
@@ -677,13 +677,69 @@ public class Palace
             }
         }
         AllRooms = AllRooms.Except(roomsToRemove).ToList();
+        AllRooms.ForEach(r => r.UpdateConnectionBytes());
+
+        //Update connections
+        foreach(Room room in AllRooms.Where(r => r.PageCount != 4))
+        {
+            if (room.PageCount <= 1)
+            {
+                throw new Exception("Palaces cannot have fewer than 2 pages");
+            }
+            if (room.PageCount > 4)
+            {
+                throw new Exception("Palaces cannot have more than 4 pages");
+            }
+            if (room.PageCount == 2)
+            {
+                if(room.Right != null)
+                {
+                    room.Right.Connections[0] = (byte)((room.NewMap ?? room.Map) * 4 + 1);
+                }
+                if (room.Up != null || room.Down != null)
+                {
+                    throw new Exception("Up/Down not supported for 2 screen rooms");
+                }
+            }
+            if (room.PageCount == 3)
+            {
+                if (room.Right != null)
+                {
+                    room.Right.Connections[0] = (byte)((room.NewMap ?? room.Map) * 4 + 2);
+                }
+                if (room.Up != null || room.Down != null)
+                {
+                    logger.Debug("Up/Down in 3 screen rooms is weird");
+                }
+            }
+        }
+
         foreach (Room r in AllRooms)
         {
-            r.UpdateConnectionBytes();
-            for (int i = 0; i < 4; i++)
+
+            //If a room is fewer than 4 pages, "right" doesn't actually work.
+            //Exits in Z2 point you not based on how you exit, but what page you exit from.
+            //Because of that the right exit from a 2 page map is actually the down connection
+            //this standardizes the exits so 2 page rooms are always left / right
+            //3 page rooms are always left / down / right
+            //and then 4 page rooms are always left / down / up / right
+            ROMData.Put(r.ConnectionStartAddress + 0, r.Connections[0]);
+            if(r.PageCount == 2)
             {
-                ROMData.Put(r.ConnectionStartAddress + i, r.Connections[i]);
+                ROMData.Put(r.ConnectionStartAddress + 1, r.Connections[3]);
+                ROMData.Put(r.ConnectionStartAddress + 2, 0xFF);
+                ROMData.Put(r.ConnectionStartAddress + 3, 0xFF);
+                continue;
             }
+            ROMData.Put(r.ConnectionStartAddress + 1, r.Connections[1]);
+            if (r.PageCount == 3)
+            {
+                ROMData.Put(r.ConnectionStartAddress + 2, r.Connections[3]);
+                ROMData.Put(r.ConnectionStartAddress + 3, 0xFF);
+                continue;
+            }
+            ROMData.Put(r.ConnectionStartAddress + 2, r.Connections[2]);
+            ROMData.Put(r.ConnectionStartAddress + 3, r.Connections[3]);
         }
     }
 

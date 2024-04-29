@@ -96,7 +96,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 130;
+    private static int DEBUG_THRESHOLD = 170;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -294,7 +294,8 @@ public class Hyrule
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectors();
+                    room.UpdateConnectionBytes();
+                    room.UpdateConnectionStartAddress();
                 }
             }
 
@@ -317,7 +318,8 @@ public class Hyrule
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
                     enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectors();
+                    room.UpdateConnectionBytes();
+                    room.UpdateConnectionStartAddress();
                 }
             }
             

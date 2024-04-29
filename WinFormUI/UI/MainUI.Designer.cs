@@ -215,6 +215,7 @@ partial class MainUI
         enableSpellItemHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         CustomTabPage = new TabPage();
+        disableHUDLag = new CheckBox();
         useCommunityTextCheckbox = new CheckBox();
         spriteCreditLabel = new Label();
         beepFrequencyDropdown = new ComboBox();
@@ -223,7 +224,6 @@ partial class MainUI
         label9 = new Label();
         spritePreviewLabel = new Label();
         spritePreviewBox = new PictureBox();
-        useCustomRoomsBox = new CheckBox();
         flashingOffCheckbox = new CheckBox();
         upAOnController1Checkbox = new CheckBox();
         beamSpriteList = new ComboBox();
@@ -261,7 +261,7 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        disableHUDLag = new CheckBox();
+        useCustomRoomsBox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1238,6 +1238,7 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(useCustomRoomsBox);
         tabPage2.Controls.Add(HardBossesCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsByEnemiesCheckbox);
         tabPage2.Controls.Add(gpStyleLabel);
@@ -2132,7 +2133,7 @@ partial class MainUI
         removeSpellitemsCheckbox.Location = new Point(4, 188);
         removeSpellitemsCheckbox.Margin = new Padding(2);
         removeSpellitemsCheckbox.Name = "removeSpellitemsCheckbox";
-        removeSpellitemsCheckbox.Size = new Size(129, 19);
+        removeSpellitemsCheckbox.Size = new Size(138, 19);
         removeSpellitemsCheckbox.TabIndex = 18;
         removeSpellitemsCheckbox.Text = "Start With Spell Items";
         removeSpellitemsCheckbox.ThreeState = true;
@@ -2552,11 +2553,10 @@ partial class MainUI
         randomizeKnockbackCheckbox.CheckState = CheckState.Checked;
         randomizeKnockbackCheckbox.Location = new Point(4, 128);
         randomizeKnockbackCheckbox.Margin = new Padding(4, 3, 4, 3);
-        randomizeKnockbackCheckbox.Name = "Randomize Knockback";
-        randomizeKnockbackCheckbox.Size = new Size(191, 19);
+        randomizeKnockbackCheckbox.Name = "randomizeKnockbackCheckbox";
+        randomizeKnockbackCheckbox.Size = new Size(146, 19);
         randomizeKnockbackCheckbox.TabIndex = 26;
         randomizeKnockbackCheckbox.Text = "Randomize Knockback";
-        randomizeKnockbackCheckbox.ThreeState = false;
         toolTip1.SetToolTip(randomizeKnockbackCheckbox, "Randomizes knockback when link and enemies collide.");
         randomizeKnockbackCheckbox.UseVisualStyleBackColor = true;
         // 
@@ -2634,7 +2634,6 @@ partial class MainUI
         CustomTabPage.Controls.Add(label9);
         CustomTabPage.Controls.Add(spritePreviewLabel);
         CustomTabPage.Controls.Add(spritePreviewBox);
-        CustomTabPage.Controls.Add(useCustomRoomsBox);
         CustomTabPage.Controls.Add(flashingOffCheckbox);
         CustomTabPage.Controls.Add(upAOnController1Checkbox);
         CustomTabPage.Controls.Add(beamSpriteList);
@@ -2655,10 +2654,22 @@ partial class MainUI
         CustomTabPage.Text = "Customize";
         CustomTabPage.UseVisualStyleBackColor = true;
         // 
+        // disableHUDLag
+        // 
+        disableHUDLag.AutoSize = true;
+        disableHUDLag.Location = new Point(4, 123);
+        disableHUDLag.Margin = new Padding(2);
+        disableHUDLag.Name = "disableHUDLag";
+        disableHUDLag.Size = new Size(161, 19);
+        disableHUDLag.TabIndex = 44;
+        disableHUDLag.Text = "Disable HUD Flash on Lag";
+        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens. A glove icon is added to the HUD as a visual indicator for lag");
+        disableHUDLag.UseVisualStyleBackColor = true;
+        // 
         // useCommunityTextCheckbox
         // 
         useCommunityTextCheckbox.AutoSize = true;
-        useCommunityTextCheckbox.Location = new Point(4, 126);
+        useCommunityTextCheckbox.Location = new Point(4, 100);
         useCommunityTextCheckbox.Margin = new Padding(2);
         useCommunityTextCheckbox.Name = "useCommunityTextCheckbox";
         useCommunityTextCheckbox.Size = new Size(114, 19);
@@ -2737,18 +2748,6 @@ partial class MainUI
         spritePreviewBox.Size = new Size(98, 194);
         spritePreviewBox.TabIndex = 36;
         spritePreviewBox.TabStop = false;
-        // 
-        // useCustomRoomsBox
-        // 
-        useCustomRoomsBox.AutoSize = true;
-        useCustomRoomsBox.Location = new Point(4, 102);
-        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
-        useCustomRoomsBox.Name = "useCustomRoomsBox";
-        useCustomRoomsBox.Size = new Size(130, 19);
-        useCustomRoomsBox.TabIndex = 35;
-        useCustomRoomsBox.Text = "Use Custom Rooms";
-        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
-        useCustomRoomsBox.UseVisualStyleBackColor = true;
         // 
         // flashingOffCheckbox
         // 
@@ -3143,17 +3142,17 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
-        // disableHUDLag
+        // useCustomRoomsBox
         // 
-        disableHUDLag.AutoSize = true;
-        disableHUDLag.Location = new Point(4, 149);
-        disableHUDLag.Margin = new Padding(2);
-        disableHUDLag.Name = "disableHUDLag";
-        disableHUDLag.Size = new Size(161, 19);
-        disableHUDLag.TabIndex = 44;
-        disableHUDLag.Text = "Disable HUD Flash on Lag";
-        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens. A glove icon is added to the HUD as a visual indicator for lag");
-        disableHUDLag.UseVisualStyleBackColor = true;
+        useCustomRoomsBox.AutoSize = true;
+        useCustomRoomsBox.Location = new Point(281, 212);
+        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
+        useCustomRoomsBox.Name = "useCustomRoomsBox";
+        useCustomRoomsBox.Size = new Size(130, 19);
+        useCustomRoomsBox.TabIndex = 36;
+        useCustomRoomsBox.Text = "Use Custom Rooms";
+        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
+        useCustomRoomsBox.UseVisualStyleBackColor = true;
         // 
         // MainUI
         // 
@@ -3412,7 +3411,6 @@ partial class MainUI
     private ComboBox startingGemsMaxList;
     private CheckBox swapUpAndDownstabCheckbox;
     private CheckBox includeLavaInShuffleCheckBox;
-    private CheckBox useCustomRoomsBox;
     private Label FireSpellOptionLabel;
     private ComboBox FireSpellBox;
     private CheckBox noDuplicateRoomsByLayoutCheckbox;
@@ -3449,5 +3447,6 @@ partial class MainUI
     private ComboBox startingLivesBox;
     private CheckBox randomizeKnockbackCheckbox;
     private CheckBox disableHUDLag;
+    private CheckBox useCustomRoomsBox;
 }
 

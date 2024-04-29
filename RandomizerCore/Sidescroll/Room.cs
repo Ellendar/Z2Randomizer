@@ -17,8 +17,8 @@ public class Room
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private int upByte;
-    private int downByte;
+    private byte upByte;
+    private byte downByte;
     private Room up;
     private Room down;
     public bool isUpDownReversed;
@@ -94,9 +94,9 @@ public class Room
         } 
     }
     public bool IsPlaced { get; set; }  
-    public int LeftByte { get; set; }
-    public int RightByte { get; set; }
-    public int UpByte
+    public byte LeftByte { get; set; }
+    public byte RightByte { get; set; }
+    public byte UpByte
     {
         get
         {
@@ -118,7 +118,7 @@ public class Room
         }
     }
 
-    public int DownByte
+    public byte DownByte
     {
         get
         {
@@ -170,6 +170,7 @@ public class Room
     public bool IsEntrance { get; set; }
     public int? PalaceNumber { get; set; }
     public string LinkedRoomName { get; set; }
+    public int PageCount { get; private set; }
 
     public Room()
     {
@@ -262,14 +263,6 @@ public class Room
     public string Serialize()
     {
         return JsonConvert.SerializeObject(this, Formatting.None, new RoomJsonConverter());
-    }
-
-    public void UpdateConnectionBytes()
-    {
-        Connections[0] = (byte)LeftByte;
-        Connections[1] = (byte)downByte;
-        Connections[2] = (byte)upByte;
-        Connections[3] = (byte)RightByte;
     }
 
     public void WriteSideViewPtr(Assembler.Assembler a, string label)
@@ -445,9 +438,17 @@ public class Room
 
     }
 
-    public void UpdateConnectors()
+    public void UpdateConnectionBytes()
     {
-        this.UpdateConnectionBytes();
+        PageCount = ((SideView[1] & 0b01100000) >> 5) + 1;
+        Connections[0] = LeftByte;
+        Connections[1] = downByte;
+        Connections[2] = upByte;
+        Connections[3] = RightByte;
+    }
+
+    public void UpdateConnectionStartAddress()
+    {
         ConnectionStartAddress = PalaceGroup switch
         {
             1 => connectors1 + (NewMap ?? Map) * 4,
@@ -455,7 +456,6 @@ public class Room
             3 => connectors3 + (NewMap ?? Map) * 4,
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
-        //ROMData.Put(connectors1 + (NewMap ?? Map) * 4 + i, Connections[i]);
     }
 
     public bool HasUpExit()

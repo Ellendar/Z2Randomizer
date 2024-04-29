@@ -1,5 +1,12 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.9 - April 29th, 2024
+
+- Fixed a bug that could result in text/items being incorrect
+- Moved "Use Custom Rooms" to the palace tab.
+- Fixed handling for 2/3 screen rooms (Room Jam)
+- Fixed a few bugs related to Room Jam rooms
+
 ## Version 4.3.8 - April 28th, 2024
 
 - Fixed a bug generating text
