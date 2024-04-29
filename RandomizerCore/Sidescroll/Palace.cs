@@ -465,10 +465,28 @@ public class Palace
 
     private bool CanEnterBossFromLeft(Room b)
     {
-        List<Room> reachable = new List<Room>();
-        List<Room> roomsToCheck = new List<Room>();
-        reachable.Add(root.Down);
-        roomsToCheck.Add(root.Down);
+        List<Room> reachable = [];
+        List<Room> roomsToCheck = [];
+
+        Room entrance = AllRooms.First(i => i.IsEntrance);
+
+        if(entrance.Down != null)
+        {
+            reachable.Add(entrance.Down);
+            roomsToCheck.Add(entrance.Down);
+        }
+
+        if (entrance.Up != null)
+        {
+            reachable.Add(entrance.Up);
+            roomsToCheck.Add(entrance.Up);
+        }
+
+        if (entrance.Right != null)
+        {
+            reachable.Add(entrance.Right);
+            roomsToCheck.Add(entrance.Right);
+        }
 
         while (roomsToCheck.Count > 0)
         {

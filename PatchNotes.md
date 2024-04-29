@@ -1,5 +1,12 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.8 - April 28th, 2024
+
+Special thanks to jroweboy for the bugfixes in this patch.
+
+- Fixed a bug generating text
+- Fixed an issue preventing up entrances from working. (for custom rooms)
+
 ## Version 4.3.7 - April 28th, 2024
 
 Special thanks to jroweboy for the bugfixes in this patch.
