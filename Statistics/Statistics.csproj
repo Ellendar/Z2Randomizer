@@ -10,9 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
-    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj">
-      <ReferenceSourceTarget></ReferenceSourceTarget>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
