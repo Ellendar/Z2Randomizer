@@ -417,12 +417,17 @@ public class Room
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
+        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8));
 
         if (PalaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
+            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8));
         }
+        // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
+        // otherwise we want to use the bank offset for PRG4 (0x10000)
+        sideViewPtr -= 0x8000;
+        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
+        sideViewPtr += 0x10; // Add the offset for the iNES header
         int ptr = sideViewPtr + 4;
         byte data = ROMData.GetByte(ptr);
         data = (byte)(data & 0xF0);
