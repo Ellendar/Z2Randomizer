@@ -3819,15 +3819,15 @@ FREE_UNTIL $c2ca
 
         a.Reloc();
         a.Label("Towns_in_West_Hyrule");
-        // There are 53 texts in this first table
-        for (var i = 0; i < 53; i++) {
+        // There are 52 texts in this first table
+        for (var i = 0; i < 52; i++) {
             var hint = hints[i];
             a.Word(a.Symbol($"HintText{i}"));
         }
-        // and the rest (47) are in this table
+        // and the rest are in this table
         a.Reloc();
         a.Label("Towns_in_East_Hyrule");
-        for (var i = 53; i < hints.Count; i++) {
+        for (var i = 52; i < hints.Count; i++) {
             var hint = hints[i];
             a.Word(a.Symbol($"HintText{i}"));
         }
