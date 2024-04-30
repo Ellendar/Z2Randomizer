@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoWin32Manifest>true</NoWin32Manifest>
-	<UseApplicationTrust>false</UseApplicationTrust>
+    <UseApplicationTrust>false</UseApplicationTrust>
     <StartupObject>Z2Randomizer.WinFormUI.Program</StartupObject>
     <UseWPF>False</UseWPF>
     <ApplicationIcon>UI\1st.ico</ApplicationIcon>

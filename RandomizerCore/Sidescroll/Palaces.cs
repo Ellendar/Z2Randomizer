@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using RandomizerCore;
 using static Z2Randomizer.Core.Util;
 
 namespace Z2Randomizer.Core.Sidescroll;
