@@ -285,8 +285,6 @@ public class CustomTexts
 
     public static List<Text> GenerateTexts(
         List<Location> itemLocs, 
-        Dictionary<Town, Collectable> spellMap, 
-        Location bagu,
         List<Text> texts,
         RandomizerProperties props,
         Random hashRNG)

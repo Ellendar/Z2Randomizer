@@ -124,10 +124,21 @@ public class EastHyrule : World
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNewKasuto = GetLocationByMem(0x8660);
-        spellTower = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
+
+        //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
+        spellTower = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
+        spellTower.Collectable = Collectable.MAGIC_KEY;
+        fountain = new Location(townAtNabooru.LocationBytes, townAtNabooru.TerrainType, townAtNabooru.MemAddress, Continent.EAST);
+        fountain.Collectable = Collectable.WATER;
+
+        if (locationAtPalace5 == null)
+        {
+            locationAtPalace5 = GetLocationByMem(0x8657);
+            locationAtPalace5.PalaceNumber = 5;
+        }
 
         hiddenPalaceCallSpot = new Location();
         hiddenPalaceCallSpot.Xpos = 0;

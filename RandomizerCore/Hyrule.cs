@@ -68,7 +68,7 @@ public class Hyrule
     //Unused
     public HashSet<String> reachableAreas;
     //Which vanilla spell corresponds with which shuffled spell
-    private Dictionary<Town, Collectable> WizardCollectables { get; set; }
+    //private Dictionary<Town, Collectable> WizardCollectables { get; set; }
     //Locations that contain an item
     private List<Location> itemLocs;
     //Locations that are pbags in vanilla that are turned into hearts because maxhearts - startinghearts > 4
@@ -381,54 +381,57 @@ public class Hyrule
             startRandomizeEnemiesTimestamp = DateTime.Now;
             RandomizeEnemyStats();
 
-            firstProcessOverworldTimestamp = DateTime.Now;
-            ProcessOverworld(progress, ct);
-            bool f = UpdateProgress(progress, ct, 8);
-            if (!f)
+        if (props.PermanentBeam)
+        {
+            ROMData.Put(0x186c, 0xEA);
+            ROMData.Put(0x186d, 0xEA);
+        }
+
+        ShortenWizards();
+
+        // startRandomizeStartingValuesTimestamp = DateTime.Now;
+        startRandomizeEnemiesTimestamp = DateTime.Now;
+        RandomizeEnemyStats();
+
+        firstProcessOverworldTimestamp = DateTime.Now;
+        ProcessOverworld();
+        if (props.CombineFire)
+        {
+            LinkFire();
+        }
+        bool f = UpdateProgress(8);
+        if (!f)
+        {
+            return;
+        }
+
+        //If you start with a spell, also start with its corresponding spell item if applicable.
+        //This is specifically only true if the collectable behind the wizard is a spell and spells are not in the general pool
+        //if that's the case, you already know the check is clear just from looking at the menu.
+        //If it's not the case, you have no idea what that wizard has, so it's a live check.
+        if(!props.IncludeSpellsInShuffle)
+        {
+            if (props.StartWithCollectable(westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable))
             {
                 return null;
             }
-
-            //If you start with a spell, also start with its corresponding spell item if applicable.
-            //This is specifically only true if the collectable behind the wizard is a spell and spells are not in the general pool
-            //if that's the case, you already know the check is clear just from looking at the menu.
-            //If it's not the case, you have no idea what that wizard has, so it's a live check.
-            if(!props.IncludeSpellsInShuffle)
+            if (props.StartWithCollectable(westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectable))
             {
-                if (props.StartWithCollectable(WizardCollectables[Town.RUTO]))
-                {
-                    ROMData.Put(0x17b14, 0x10); //Trophy
-                }
-                if (props.StartWithCollectable(WizardCollectables[Town.SARIA_NORTH]))
-                {
-                    ROMData.Put(0x17b15, 0x01); //Mirror
-                }
-                if (props.StartWithCollectable(WizardCollectables[Town.MIDO_WEST]))
-                {
-                    ROMData.Put(0x17b16, 0x40); //Medicine
-                }
-                if (props.StartWithCollectable(WizardCollectables[Town.NABOORU]))
-                {
-                    ROMData.Put(0x17b17, 0x01); //Water
-                }
-                if (props.StartWithCollectable(WizardCollectables[Town.DARUNIA_WEST]))
-                {
-                    ROMData.Put(0x17b18, 0x20); //Child
-                }
             }
-
-            _hints = CustomTexts.GenerateTexts(itemLocs, WizardCollectables, westHyrule.bagu, _hints, props, RNG);
-            f = UpdateProgress(progress, ct, 9);
-            if (!f)
+            if (props.StartWithCollectable(westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable))
             {
                 return null;
             }
-            
-            ApplyAsmPatches(props, assembler, RNG, ROMData);
-            var assemblerTask = ROMData.ApplyAsm(_engine, assembler);
-            assemblerTask.Wait(ct);
-            var rom = assemblerTask.Result;
-            ROMData = new ROM(rom!);
+            if (props.StartWithCollectable(eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectable))
+            {
+                ROMData.Put(0x17b17, 0x01); //Water
+            }
+            if (props.StartWithCollectable(eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable))
+            {
+                ROMData.Put(0x17b18, 0x20); //Child
+            }
+        }
+        
 
             MD5 hasher = MD5.Create();
             byte[] finalRNGState = new byte[32];
@@ -445,7 +448,55 @@ public class Hyrule
             ));
             UpdateRom(hash);
 
-            if (UNSAFE_DEBUG)
+        List<Text> hints = ROMData.GetGameText();
+        ROMData.WriteHints(CustomTexts.GenerateTexts(itemLocs, hints, props, RNG));
+        f = UpdateProgress(9);
+        if (!f)
+        {
+            return;
+        }
+        
+        ApplyAsmPatches(props, _engine, RNG, ROMData);
+        ROMData.ApplyAsm(_engine);
+
+        MD5 hasher = MD5.Create();
+        byte[] finalRNGState = new byte[32];
+        RNG.NextBytes(finalRNGState);
+        byte[] hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(
+            Flags +
+            Seed +
+            //Assembly.GetExecutingAssembly().GetName().Version.Major +
+            //Assembly.GetExecutingAssembly().GetName().Version.Minor +
+            //Assembly.GetExecutingAssembly().GetName().Version.Revision +
+            //TODO: Since the modularization split, ExecutingAssembly's version data always returns 0.0.0.0
+            //Eventually we need to turn this back into a read from the assembly, but for now I'm just adding an awful hard write of the version.
+            "4.3.6" +
+            Util.ReadAllTextFromFile(config.GetRoomsFile()) +
+            finalRNGState
+        ));
+        UpdateRom(hash);
+        char os_sep = Path.DirectorySeparatorChar;
+        string newFileName = props.Filename.Substring(0, props.Filename.LastIndexOf(os_sep) + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+        if (props.saveRom)
+        {
+            ROMData.Dump(newFileName);
+        }
+
+        /*
+        Room search = palaces[6].AllRooms.FirstOrDefault(i => i.Name.Contains("Previously void elevator GP sloped inverse T room", StringComparison.OrdinalIgnoreCase));
+        if (search != null)
+        {
+            Debug.WriteLine(newFileName);
+            Debug.WriteLine(search.GetDebuggerDisplay());
+        }
+        */
+
+        if (UNSAFE_DEBUG)
+        {
+            PrintSpoiler(LogLevel.Error);
+            //DEBUG
+            StringBuilder sb = new();
+            foreach (Palace palace in palaces)
             {
                 PrintSpoiler(LogLevel.Error);
                 //DEBUG
@@ -611,7 +662,7 @@ public class Hyrule
             shufflableItems.Add(Collectable.SPELL_SPELL);
             shufflableItems.Add(Collectable.THUNDER_SPELL);
         }
-        else
+        else if(props.ShuffleSpellLocations)
         {
             ShuffleSpells();
         }
@@ -620,6 +671,10 @@ public class Hyrule
         {
             shufflableItems.Add(Collectable.UPSTAB);
             shufflableItems.Add(Collectable.DOWNSTAB);
+        }
+        else
+        {
+            HandleSwapUpAndDownstab();
         }
 
         heartContainersInItemPool = maxHearts - startHearts;
@@ -638,7 +693,6 @@ public class Hyrule
 
         //TODO: Refactor these puts out of this class
         ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (byte)1 : (byte)0);
-
         ROMData.Put(RomMap.START_GLOVE, props.StartGlove ? (byte)1 : (byte)0);
         ROMData.Put(RomMap.START_RAFT, props.StartRaft ? (byte)1 : (byte)0);
         ROMData.Put(RomMap.START_BOOTS, props.StartBoots ? (byte)1 : (byte)0);
@@ -646,6 +700,7 @@ public class Hyrule
         ROMData.Put(RomMap.START_CROSS, props.StartCross ? (byte)1 : (byte)0);
         ROMData.Put(RomMap.START_HAMMER, props.StartHammer ? (byte)1 : (byte)0);
         ROMData.Put(RomMap.START_MAGICAL_KEY, props.StartKey ? (byte)1 : (byte)0);
+
         ItemGet[Collectable.CANDLE] = props.StartCandle;
         ItemGet[Collectable.GLOVE] = props.StartGlove;
         ItemGet[Collectable.RAFT] = props.StartRaft;
@@ -671,6 +726,7 @@ public class Hyrule
             }
         }
 
+        //For heart containers beyond 4, replace small items in the pool as available.
         if (heartContainersInItemPool > 4)
         {
             if (props.PbagItemShuffle)
@@ -726,19 +782,19 @@ public class Hyrule
             ItemGet[Collectable.CHILD] = true;
         }
 
-        if (ItemGet[WizardCollectables[Town.RUTO]])
+        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable])
         {
             shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Collectable.TROPHY] = true;
         }
 
-        if (ItemGet[WizardCollectables[Town.MIDO_WEST]])
+        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable])
         {
             shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Collectable.MEDICINE] = true;
         }
 
-        if (ItemGet[WizardCollectables[Town.DARUNIA_WEST]])
+        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable])
         {
             shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Collectable.CHILD] = true;
@@ -832,15 +888,13 @@ public class Hyrule
         int prevCount = 0;
         int loopCount = 0;
         debug++;
-        Dictionary<Collectable, Location> spellLocations = GetSpellLocations();
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count 
             + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
         //logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
         //   " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
         bool updateItemsResult = false;
-        bool updateSpellsResult = false;
-        while (prevCount != count || updateItemsResult || updateSpellsResult)
+        while (prevCount != count || updateItemsResult)
         {
             prevCount = count;
             westHyrule.UpdateVisit(itemGet);
@@ -879,8 +933,6 @@ public class Hyrule
             mazeIsland.UpdateVisit(itemGet);
 
             updateItemsResult |= UpdateItemGets();
-
-
 
             count = 0;
             dm = 0;
@@ -1833,16 +1885,28 @@ public class Hyrule
             deathMountain.hammerCave,
             mazeIsland.childDrop,
             mazeIsland.magicContainerDrop,
+            westHyrule.bagu,
+            westHyrule.mirrorTable,
+            eastHyrule.fountain,
+            westHyrule.locationAtRauru,
+            westHyrule.locationAtRuto,
+            westHyrule.locationAtSariaNorth,
+            westHyrule.locationAtMido,
+            eastHyrule.townAtNabooru,
+            eastHyrule.townAtDarunia,
+            eastHyrule.townAtNewKasuto,
+            eastHyrule.townAtOldKasuto,
+            westHyrule.locationAtSariaSouth,
+            eastHyrule.daruniaRoof,
+            westHyrule.pbagCave,
+            eastHyrule.pbagCave1,
+            eastHyrule.pbagCave2,
         ];
 
-
-        if (props.PbagItemShuffle)
-        {
-            itemLocs.Add(westHyrule.pbagCave);
-            itemLocs.Add(eastHyrule.pbagCave1);
-            itemLocs.Add(eastHyrule.pbagCave2);
-        }
-
+        //Design change that is maybe wrong, these are going to be in the item pool and tracked
+        //regardless of whether they're shuffled or not. I guess the pbag caves can stay special,
+        //but maybe long term they shouldn't be
+        /*
         if (props.IncludeQuestItemsInShuffle)
         {
             itemLocs.Add(westHyrule.bagu);
@@ -1867,7 +1931,7 @@ public class Hyrule
             itemLocs.Add(westHyrule.locationAtSariaSouth);
             itemLocs.Add(eastHyrule.daruniaRoof);
         }
-
+        */
 
         return itemLocs;
     }
@@ -1879,11 +1943,9 @@ public class Hyrule
     /// <exception cref="Exception"></exception>
     private void ShuffleSpells()
     {
-        WizardCollectables = new();
-        
         foreach(Collectable collectable in ItemGet.Keys)
         {
-            if(collectable.IsSpell() || collectable == Collectable.UPSTAB || collectable == Collectable.DOWNSTAB)
+            if(collectable.IsSpell())// || collectable == Collectable.UPSTAB || collectable == Collectable.DOWNSTAB)
             {
                 ItemGet[collectable] = false;
             }
@@ -1894,7 +1956,8 @@ public class Hyrule
 
         foreach (Collectable spell in Enum.GetValues(typeof(Collectable)))
         {
-            if (props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
+            if (!spell.IsSpell()
+                || props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
                 || !props.ReplaceFireWithDash && spell == Collectable.DASH_SPELL
                 || spell == Collectable.UPSTAB
                 || spell == Collectable.DOWNSTAB)
@@ -1902,50 +1965,32 @@ public class Hyrule
                 continue;
             }
             Town town = unallocatedTowns[RNG.Next(unallocatedTowns.Count)];
+            asdads
             unallocatedTowns.Remove(town);
-            if (props.ShuffleSpellLocations)
-            {
-                WizardCollectables.Add(town, spell);
-            }
-            else
-            {
-                WizardCollectables.Add(town, town switch
-                {
-                    Town.RAURU => Collectable.SHIELD_SPELL,
-                    Town.RUTO => Collectable.JUMP_SPELL,
-                    Town.SARIA_NORTH => Collectable.LIFE_SPELL,
-                    Town.MIDO_WEST => Collectable.FAIRY_SPELL,
-                    Town.NABOORU => props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL,
-                    Town.DARUNIA_WEST => Collectable.REFLECT_SPELL,
-                    Town.NEW_KASUTO => Collectable.SPELL_SPELL,
-                    Town.OLD_KASUTO => Collectable.THUNDER_SPELL,
-                    _ => throw new Exception("Unrecognized vanilla spell location")
-                });
-            }
-        }
-        WizardCollectables.Add(Town.DARUNIA_ROOF, props.SwapUpAndDownStab ? Collectable.DOWNSTAB : Collectable.UPSTAB);
-        WizardCollectables.Add(Town.MIDO_CHURCH, props.SwapUpAndDownStab ? Collectable.UPSTAB : Collectable.DOWNSTAB);
-        ItemGet.Add(Collectable.DOWNSTAB, false);
-        ItemGet.Add(Collectable.UPSTAB, false);
-
-        int i = 0;
-        foreach (Town town in Towns.STRICT_SPELL_LOCATIONS)
-        {
-            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i++, props.StartWithCollectable(WizardCollectables[town]) ? (byte)1 : (byte)0);
-            ItemGet[WizardCollectables[town]] = props.StartWithCollectable(WizardCollectables[town]);
-        }
-
-        if (props.CombineFire)
-        {
-            int newFire = RNG.Next(7);
-            if (newFire > 3)
-            {
-                newFire++;
-            }
-            byte newnewFire = (byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
-            ROMData.Put(0xDCF, newnewFire);
         }
     }
+
+    private void HandleSwapUpAndDownstab()
+    {
+        //Stabs
+        WizardCollectables.Add(Town.DARUNIA_ROOF, props.SwapUpAndDownStab ? Collectable.DOWNSTAB : Collectable.UPSTAB);
+        WizardCollectables.Add(Town.MIDO_CHURCH, props.SwapUpAndDownStab ? Collectable.UPSTAB : Collectable.DOWNSTAB);
+        ItemGet.TryAdd(Collectable.DOWNSTAB, false);
+        ItemGet.TryAdd(Collectable.UPSTAB, false);
+    }
+
+    private void LinkFire()
+    {
+        //LinkedFire
+        int newFire = RNG.Next(7);
+        if (newFire > 3)
+        {
+            newFire++;
+        }
+        byte newnewFire = (byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
+        ROMData.Put(0xDCF, newnewFire);
+    }
+
 
     private void RandomizeExperience(ROM rom, int start, int cap)
     {
@@ -3010,6 +3055,8 @@ public class Hyrule
             }
         }
 
+        //WRITE UPDATES TO WIZARD/QUEST COLLECTABLES HERE
+
         ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Collectable);
         ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Collectable);
         ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Collectable);
@@ -3362,45 +3409,55 @@ CustomFileSelectData:
     public string SpellDebug()
     {
         StringBuilder sb = new StringBuilder();
-        if (!ItemGet[WizardCollectables[Town.RAURU]])
+        Collectable c = westHyrule.AllLocations.First(i => i.ActualTown == Town.RAURU).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Rauru: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.RAURU]));
+            sb.AppendLine("Rauru: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.RUTO]])
+        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Ruto: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.RUTO]));
+            sb.AppendLine("Ruto: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.RAURU]])
+        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Saria: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.RAURU]));
+            sb.AppendLine("Saria: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.MIDO_WEST]])
+        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Mido West: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.MIDO_WEST]));
+            sb.AppendLine("Mido West: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.MIDO_CHURCH]])
+        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_CHURCH).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Mido Tower: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.MIDO_CHURCH]));
+            sb.AppendLine("Mido Tower: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.NABOORU]])
+        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Nabooru: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.NABOORU]));
+            sb.AppendLine("Nabooru: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.DARUNIA_WEST]])
+        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Darunia West: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.DARUNIA_WEST]));
+            sb.AppendLine("Darunia West: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.DARUNIA_ROOF]])
+        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_ROOF).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Darunia Roof: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.DARUNIA_ROOF]));
+            sb.AppendLine("Darunia Roof: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.NEW_KASUTO]])
+        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("New Kasuto: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.NEW_KASUTO]));
+            sb.AppendLine("New Kasuto: " + Enum.GetName(typeof(Collectable), c));
         }
-        if (!ItemGet[WizardCollectables[Town.OLD_KASUTO]])
+        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.OLD_KASUTO).Collectable;
+        if (!ItemGet[c])
         {
-            sb.AppendLine("Old Kasuto: " + Enum.GetName(typeof(Collectable), WizardCollectables[Town.OLD_KASUTO]));
+            sb.AppendLine("Old Kasuto: " + Enum.GetName(typeof(Collectable), c));
         }
         return sb.ToString();
     }
@@ -3452,13 +3509,16 @@ CustomFileSelectData:
         return false;
     }
 
+    /*
     private Dictionary<Collectable, Location> GetSpellLocations()
     {
         Dictionary<Collectable, Location> spellLocations = new();
         foreach (Location location in AllLocationsForReal())
         {
             //Primary locations for towns are checked to see if they're reachable
-            if (location.ActualTown > 0 && location.ActualTown.IsUnderConsiderationForReachable())
+            if (location.ActualTown > 0 
+                && location.ActualTown.IsUnderConsiderationForReachable()
+                && WizardCollectables.ContainsKey(location.ActualTown))
             {
                 spellLocations.Add(WizardCollectables[location.ActualTown], location);
             }
@@ -3483,6 +3543,7 @@ CustomFileSelectData:
 
         return spellLocations;
     }
+    */
 
     private void FixHelmetheadItemRoomDespawn(Assembler asm)
     {
