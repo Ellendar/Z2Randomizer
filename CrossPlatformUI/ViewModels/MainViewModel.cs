@@ -27,6 +27,7 @@ public class MainViewModel : ReactiveValidationObject, IRoutableViewModel
     public MainViewModel(IScreen screen)
     {
         HostScreen = screen;
+        config = new();
         this.ValidationRule(
             viewModel => viewModel.config, 
             cfg => !string.IsNullOrWhiteSpace(cfg?.Serialize()),

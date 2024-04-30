@@ -1,4 +1,5 @@
 using System.Reactive;
+using Avalonia.ReactiveUI;
 using ReactiveUI;
 
 namespace CrossPlatformUI.ViewModels;
@@ -10,8 +11,8 @@ public class MainWindowViewModel : ViewModelBase, IScreen
     public RoutingState Router { get; } = new ();
 
     // The command that navigates a user to first view model.
-    // public ReactiveCommand<Unit, IRoutableViewModel> GoNext { get; }
     public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
+    public ReactiveCommand<Unit, IRoutableViewModel> GenerateRom { get; }
 
     // The command that navigates a user back.
     public ReactiveCommand<Unit, IRoutableViewModel> GoBack => Router.NavigateBack!;
@@ -29,10 +30,14 @@ public class MainWindowViewModel : ViewModelBase, IScreen
         //
 
         romFileViewModel = new(this);
-
+        
         if (romFileViewModel.RomData != null)
         {
-            
+            Router.Navigate.Execute(romFileViewModel);
+        }
+        else
+        {
+            Router.Navigate.Execute(new MainViewModel(this));
         }
         
         // GoNext = ReactiveCommand.CreateFromObservable(
@@ -41,6 +46,9 @@ public class MainWindowViewModel : ViewModelBase, IScreen
 
         LoadRom = ReactiveCommand.CreateFromObservable(
             () => Router.Navigate.Execute(romFileViewModel)
+        );
+        LoadRom = ReactiveCommand.CreateFromObservable(
+            () => Router.Navigate.Execute(new GenerateRomViewModel())
         );
     }
 }

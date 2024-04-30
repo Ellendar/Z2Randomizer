@@ -27,7 +27,7 @@
                 <app:AppViewLocator />
             </rxui:RoutedViewHost.ViewLocator>
         </rxui:RoutedViewHost>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="15">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="15">
             <StackPanel.Styles>
                 <Style Selector="StackPanel > :is(Control)">
                     <Setter Property="Margin" Value="2" />
@@ -37,8 +37,7 @@
                 </Style>
             </StackPanel.Styles>
             <Button Content="Reload ROM" Command="{Binding LoadRom}" />
-            <!-- <Button Content="Go back" Command="{Binding GoBack}" /> -->
-            <!-- <TextBlock Text="{Binding Router.NavigationStack.Count}" /> -->
+            <Button HorizontalAlignment="Right" Content="Generate" Command="{Binding GenerateRom}" />
         </StackPanel>
     </Grid>
 </Window>
