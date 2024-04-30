@@ -7,6 +7,8 @@ using WinFormUI.UI;
 using Z2Randomizer.Core.Flags;
 using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
+using System.Reflection;
+using CommandLine;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -84,10 +86,10 @@ public partial class MainUI : Form
         var selectedSprite = Settings.Default.sprite;
         characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
 
+        var version = Assembly.GetEntryAssembly().GetName().Version;
+        var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
         Text = "Zelda 2 Randomizer Version "
-            + typeof(MainUI).Assembly.GetName().Version.Major + "."
-            + typeof(MainUI).Assembly.GetName().Version.Minor + "."
-            + typeof(MainUI).Assembly.GetName().Version.Build;
+            + versionString;
 
         flagsTextBox.DoubleClick += new System.EventHandler(flagBox_Clicked);
         shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -252,10 +254,7 @@ public partial class MainUI : Form
         string path = Directory.GetCurrentDirectory();
         logger.Debug(path);
         WinSparkle.win_sparkle_set_appcast_url("https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml");
-        string version = +typeof(MainUI).Assembly.GetName().Version.Major + "."
-            + typeof(MainUI).Assembly.GetName().Version.Minor + "."
-            + typeof(MainUI).Assembly.GetName().Version.Build;
-        WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", version); // THIS CALL NOT IMPLEMENTED YET
+        WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", versionString); // THIS CALL NOT IMPLEMENTED YET
         WinSparkle.win_sparkle_init();
     }
 
@@ -1966,11 +1965,19 @@ public partial class MainUI : Form
     private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
     {
         BackgroundWorker worker = sender as BackgroundWorker;
-
-        new Hyrule(config, worker);
-        if (worker.CancellationPending)
+        var cts = new CancellationTokenSource();
+        var ct = cts.Token;
+        var engine = new DesktopJsEngine();
+        var rando = new Hyrule(config, engine);
+        var task = rando.Randomize(str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
+        while (!task.IsCompleted)
         {
-            e.Cancel = true;
+            if (worker.CancellationPending)
+            {
+                e.Cancel = true;
+                cts.Cancel();
+            }
+            Thread.Sleep(50);
         }
     }
 

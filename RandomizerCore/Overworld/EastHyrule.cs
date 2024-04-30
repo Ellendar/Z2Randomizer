@@ -2,8 +2,6 @@
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Z2Randomizer.Core.Overworld;
@@ -122,7 +120,7 @@ public class EastHyrule : World
         locationAtPalace6 = GetLocationByMem(0x8664);
         locationAtPalace6.PalaceNumber = 6;
         townAtDarunia = GetLocationByMem(0x865E);
-        locationAtPalace5 = GetLocationByMap(0x23, 0x0E);
+        locationAtPalace5 = GetLocationByMap(0x23, 0x0E) ?? GetLocationByMem(0x8657);
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNewKasuto = GetLocationByMem(0x8660);
@@ -130,12 +128,6 @@ public class EastHyrule : World
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
-
-        if (locationAtPalace5 == null)
-        {
-            locationAtPalace5 = GetLocationByMem(0x8657);
-            locationAtPalace5.PalaceNumber = 5;
-        }
 
         hiddenPalaceCallSpot = new Location();
         hiddenPalaceCallSpot.Xpos = 0;

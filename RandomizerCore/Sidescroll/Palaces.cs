@@ -1,16 +1,11 @@
-﻿using Assembler;
-using Microsoft.ClearScript;
-using NLog;
-using RandomizerCore;
+﻿using NLog;
 using RandomizerCore.Sidescroll;
 using SD.Tools.Algorithmia.GeneralDataStructures;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Numerics;
+using System.Threading;
 using static Z2Randomizer.Core.Util;
 
 namespace Z2Randomizer.Core.Sidescroll;
@@ -71,7 +66,7 @@ public class Palaces
         {7, 0x8665 }
     };
 
-    public static List<Palace> CreatePalaces(BackgroundWorker worker, Random r, RandomizerProperties props, bool raftIsRequired)
+    public static List<Palace> CreatePalaces(CancellationToken ct, Random r, RandomizerProperties props, bool raftIsRequired)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -230,9 +225,9 @@ public class Palaces
 
                 do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
                 {
-                    if (worker != null && worker.CancellationPending)
+                    if (ct.IsCancellationRequested)
                     {
-                        return null;
+                        return new();
                     }
 
                     tries = 0;
@@ -571,7 +566,7 @@ public class Palaces
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {
-            return null;
+            return new();
         }
 
         return palaces;
@@ -592,6 +587,12 @@ public class Palaces
 
     private static bool ValidatePalaces(RandomizerProperties props, bool raftIsRequired, List<Palace> palaces)
     {
+        //Enforce aggregate max length of enemy data
+        if (palaces.Where(i => i.Number != 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x400
+            || palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x2A9)
+        {
+            return false;
+        }
         return CanGetGlove(props, palaces[1])
             && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])
             && AtLeastOnePalaceCanHaveGlove(props, palaces);

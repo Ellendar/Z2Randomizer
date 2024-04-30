@@ -1,7 +1,4 @@
-﻿using Assembler;
-using Microsoft.ClearScript;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using NLog;
 using RandomizerCore;
 using RandomizerCore.Sidescroll;
@@ -10,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using RandomizerCore.Asm;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -18,8 +16,8 @@ public class Room
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private int upByte;
-    private int downByte;
+    private byte upByte;
+    private byte downByte;
     private Room up;
     private Room down;
     public bool isUpDownReversed;
@@ -95,9 +93,9 @@ public class Room
         } 
     }
     public bool IsPlaced { get; set; }  
-    public int LeftByte { get; set; }
-    public int RightByte { get; set; }
-    public int UpByte
+    public byte LeftByte { get; set; }
+    public byte RightByte { get; set; }
+    public byte UpByte
     {
         get
         {
@@ -119,7 +117,7 @@ public class Room
         }
     }
 
-    public int DownByte
+    public byte DownByte
     {
         get
         {
@@ -171,6 +169,7 @@ public class Room
     public bool IsEntrance { get; set; }
     public int? PalaceNumber { get; set; }
     public string LinkedRoomName { get; set; }
+    public int PageCount { get; private set; }
 
     public Room()
     {
@@ -265,15 +264,7 @@ public class Room
         return JsonConvert.SerializeObject(this, Formatting.None, new RoomJsonConverter());
     }
 
-    public void UpdateConnectionBytes()
-    {
-        Connections[0] = (byte)LeftByte;
-        Connections[1] = (byte)downByte;
-        Connections[2] = (byte)upByte;
-        Connections[3] = (byte)RightByte;
-    }
-
-    public void WriteSideViewPtr(Assembler.Assembler a, string label)
+    public void WriteSideViewPtr(AsmModule a, string label)
     {
         if(PalaceGroup <= 0 || PalaceGroup > 3)
         {
@@ -423,12 +414,17 @@ public class Room
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
+        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8));
 
         if (PalaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8)) + 0x8010;
+            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8));
         }
+        // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
+        // otherwise we want to use the bank offset for PRG4 (0x10000)
+        sideViewPtr -= 0x8000;
+        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
+        sideViewPtr += 0x10; // Add the offset for the iNES header
         int ptr = sideViewPtr + 4;
         byte data = ROMData.GetByte(ptr);
         data = (byte)(data & 0xF0);
@@ -446,9 +442,17 @@ public class Room
 
     }
 
-    public void UpdateConnectors()
+    public void UpdateConnectionBytes()
     {
-        this.UpdateConnectionBytes();
+        PageCount = ((SideView[1] & 0b01100000) >> 5) + 1;
+        Connections[0] = LeftByte;
+        Connections[1] = downByte;
+        Connections[2] = upByte;
+        Connections[3] = RightByte;
+    }
+
+    public void UpdateConnectionStartAddress()
+    {
         ConnectionStartAddress = PalaceGroup switch
         {
             1 => connectors1 + (NewMap ?? Map) * 4,
@@ -456,7 +460,6 @@ public class Room
             3 => connectors3 + (NewMap ?? Map) * 4,
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
-        //ROMData.Put(connectors1 + (NewMap ?? Map) * 4 + i, Connections[i]);
     }
 
     public bool HasUpExit()

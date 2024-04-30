@@ -227,10 +227,10 @@ public class PalaceRooms
         Dictionary<RoomGroup, List<Room>> rooms = useCustomRooms ? customRoomsByGroup : roomsByGroup;
         switch(direction)
         {
-            case Direction.HORIZONTAL_PASSTHROUGH:
-                return rooms[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
-            case Direction.VERTICAL_PASSTHROUGH:
-                return rooms[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
+            //case Direction.HORIZONTAL_PASSTHROUGH:
+            //    return rooms[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
+            //case Direction.VERTICAL_PASSTHROUGH:
+            //    return rooms[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
             case Direction.NORTH:
                 return rooms[group].Where(i => i.HasItem && i.HasUpExit());
             case Direction.SOUTH:

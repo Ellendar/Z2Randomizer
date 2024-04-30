@@ -1,18 +1,15 @@
-﻿using Microsoft.ClearScript.V8;
-using Microsoft.ClearScript;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
-namespace Assembler;
+namespace RandomizerCore.Asm;
 
-public class Assembler
+[DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
+public class AsmModule
 {
-    //private readonly V8ScriptEngine _engine;
-
-    public Actions Actions { get; set; } = new();
-
-    public Assembler()
-    {
-    }
-
+    public readonly List<Dictionary<string, object>> Actions = [];
+    
     public void Code(string asm, string name = "")
     {
         Actions.Add(new() {
@@ -37,7 +34,7 @@ public class Assembler
             { "bytes", bytes },
         });
     }
-    public void Byt(params PropertyBag[] bytes)
+    public void Byt(params Dictionary<string, object>[] bytes)
     {
         Actions.Add(new() {
             { "action", "byte" },
@@ -52,7 +49,7 @@ public class Assembler
             { "words", words },
         });
     }
-    public void Word(params PropertyBag[] words)
+    public void Word(params Dictionary<string, object>[] words)
     {
         Actions.Add(new() {
             { "action", "word" },
@@ -102,11 +99,11 @@ public class Assembler
         });
     }
 
-    public PropertyBag Symbol(string name)
+    public Dictionary<string, object> Symbol(string name)
     {
         // kinda jank, but instead of eating the overhead for creating this token,
         // just hardcode the symbol token
-        return new PropertyBag()
+        return new Dictionary<string, object>
         {
             { "op", "sym" },
             { "sym", name },
@@ -151,5 +148,47 @@ public class Assembler
             { "value", value },
             { "name", name },
         });
+    }
+
+    public void Free(string segment, ushort startorg, ushort endorg) {
+        if (endorg <= startorg) {
+            throw new Exception($"Free called with bad range: Start {startorg:04X} End {endorg:04X}");
+        }
+        Segment(segment);
+        Org(startorg);
+        Actions.Add(new() {
+            { "action", "free" },
+            { "size", endorg - startorg },
+        });
+    }
+    
+    public string GetDebuggerDisplay()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.Append('[');
+        int count = 0;
+        foreach (var dict in Actions) 
+        {
+            count++;
+            sb.Append('{');
+            int count2 = 0;
+            foreach(KeyValuePair<string, object> property in dict)
+            {
+                sb.Append(property.Key + " : " + property.Value + ",");
+                count2++;
+            }
+            if(count2 > 0)
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+            sb.Append("},");
+        }
+        if (count > 0)
+        {
+            sb.Remove(sb.Length - 1, 1);
+        }
+        sb.Append(']');
+
+        return sb.ToString();
     }
 }

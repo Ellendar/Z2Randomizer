@@ -330,9 +330,9 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByMap(int map, int world)
+    protected Location? GetLocationByMap(int map, int world)
     {
-        Location l = null;
+        Location? l = null;
         foreach (Location loc in AllLocations)
         {
             if (loc.LocationBytes[2] == map && loc.World == world)

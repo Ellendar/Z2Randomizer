@@ -1,5 +1,26 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.9 - April 29th, 2024
+
+- Fixed a bug that could result in text/items being incorrect
+- Moved "Use Custom Rooms" to the palace tab.
+- Fixed handling for 2/3 screen rooms (Room Jam)
+- Fixed a few bugs related to Room Jam rooms
+
+## Version 4.3.8 - April 28th, 2024
+
+- Fixed a bug generating text
+- Fixed an issue preventing up entrances from working. (for custom rooms)
+
+## Version 4.3.7 - April 28th, 2024
+
+Special thanks to jroweboy for the bugfixes in this patch.
+
+- Fixed an issue where heart/magic container graphics could display incorrectly when custom sprites were used.
+- Fixed an issue where enemy shuffle could behave differently if community text was on.
+- Fixed an issue where palace generation could fail if there were too many enemies in palaces 1-6
+- Fixed an issue where the hash incorrectly did not contain information that could affect the seed.
+
 ## Version 4.3.6 - April 23rd, 2024
 
 There is a known issue in this release: If you are using a custom sprite, sometimes heart/magic containers will have incorrect graphics if found in a palace. They will still work normally, the issue is just cosmetic. Please look forward to a fix in the next release.

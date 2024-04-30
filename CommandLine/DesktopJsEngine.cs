@@ -1,47 +1,58 @@
-﻿namespace Assembler;
-
-using System.Reflection;
+﻿
+using System.Collections;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
+using NLog;
+using RandomizerCore.Asm;
 
-public class Engine
+namespace CommandLine;
+
+using System.Reflection;
+
+public class DesktopJsEngine : IAsmEngine
 {
-    internal V8ScriptEngine scriptEngine;
-    public List<List<PropertyBag>> Modules { get; set; } = new();
-    private Actions InitModule { get; } = new();
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    public Engine()
+    private readonly V8ScriptEngine scriptEngine;
+
+    public DesktopJsEngine()
     {
         scriptEngine = new();
-        scriptEngine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
-
         // If you need to debug the javascript, add these flags and connect to the debugger through vscode.
         // follow this tutorial for how https://microsoft.github.io/ClearScript/Details/Build.html#_Debugging_with_ClearScript_2
-        //this.scriptEngine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.EnableRemoteDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
-        
-        // Setup the initial segments for the randomizer
-        Assembler assembler = new();
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("Assembler.Init.s"), "__init.s");
-        InitModule = assembler.Actions;
+        // scriptEngine = new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging | V8ScriptEngineFlags.EnableRemoteDebugging | V8ScriptEngineFlags.AwaitDebuggerAndPauseOnStart);
+
+        scriptEngine.DocumentSettings.AccessFlags = DocumentAccessFlags.EnableFileLoading;
     }
-
-    public void Apply(byte[] rom)
+    
+    public async Task<byte[]?> Apply(byte[] rom, Assembler asm)
     {
-        var data = (ITypedArray<byte>) scriptEngine.Evaluate($"new Uint8Array({rom.Length});");
-        data.WriteBytes(rom, 0, data.Length, 0);
-        scriptEngine.Script.romdata = data;
-        scriptEngine.Script.modules = Modules;
-        scriptEngine.Script.initmodule = InitModule;
-        try
+        return await Task.Run(() =>
         {
-            scriptEngine.Execute(new DocumentInfo { Category = ModuleCategory.Standard }, /* language=javascript */ """
+            var data = (ITypedArray<byte>) scriptEngine.Evaluate($"new Uint8Array({rom.Length});");
+            data.WriteBytes(rom, 0, data.Length, 0);
+            var initmodule = new AsmModule();
+            var assembly = Assembly.Load("RandomizerCore");
+            initmodule.Code(assembly.ReadResource("RandomizerCore.Asm.Init.s"), "__init.s");
+            asm.Modules.Insert(0, initmodule);
+            var modules = new List<List<PropertyBag>>();
+            foreach (var module in asm.Modules)
+            {
+                var outmodule = new List<PropertyBag>();
+                foreach (var dict in module.Actions)
+                {
+                    outmodule.Add(dict.ToPropertyBag());
+                }
+                modules.Add(outmodule);
+            }
+            scriptEngine.Script.romdata = data;
+            scriptEngine.Script.modules = modules;
 
+            scriptEngine.Execute(new DocumentInfo { Category = ModuleCategory.Standard },  /* language=javascript */ """
 import { Assembler } from "js65/assembler.js"
-import { base64 } from 'js65/deps/deno.land/x/b64@1.1.27/src/base64.js';
 import { Cpu } from "js65/cpu.js"
 import { Linker } from "js65/linker.js"
-import { ModuleZ } from "js65/module.js";
 import { Preprocessor } from "js65/preprocessor.js"
 import { Tokenizer } from "js65/tokenizer.js"
 import { TokenStream } from "js65/tokenstream.js"
@@ -94,19 +105,16 @@ async function processAction(a, action) {
             a.set(action["name"], action["value"]);
             break;
         }
+        case "free": {
+            a.free(action["size"]);
+        }
     }
 }
-
 // This anon function runs the assembler and linker
 (async function() {
     debugger;
     // Assemble all of the modules
     const assembled = [];
-    let initmod = new Assembler(Cpu.P02);
-    for (const action of initmodule) {
-        await processAction(initmod, action);
-    }
-    assembled.push(initmod);
     for (const module of modules) {
         let a = new Assembler(Cpu.P02);
         for (const action of module) {
@@ -125,13 +133,10 @@ async function processAction(a, action) {
     out.apply(romdata);
 })();
 """);
-            // Copy the patched bytes back into the final rom.
-            data.ReadBytes(0, (ulong)rom.Length, rom, 0);
-        }
-        catch(Exception)
-        {
-            throw;
-        }
+            byte[] outdata = new byte[rom.Length];
+            data.ReadBytes(0, (ulong)outdata.Length, outdata, 0);
+            return outdata;
+        });
     }
 }
 
@@ -140,7 +145,7 @@ internal static class AssemblyExtensions
     public static string ReadResource(this Assembly assembly, string name)
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
-        using var stream = assembly.GetManifestResourceStream(name);
+        using var stream = assembly.GetManifestResourceStream(name)!;
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
@@ -154,8 +159,52 @@ internal static class AssemblyExtensions
     public static byte[] ReadBinaryResource(this Assembly assembly, string name)
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
-        using var stream = assembly.GetManifestResourceStream(name);
+        using var stream = assembly.GetManifestResourceStream(name)!;
         using var reader = new BinaryReader(stream);
         return reader.ReadBytes((int)stream.Length);
+    }
+}
+
+internal static class DictionaryExtensions
+{
+    public static PropertyBag ToPropertyBag(this IDictionary<string, object> dictionary)
+    {
+        var bag = new PropertyBag();
+        foreach (var kvp in dictionary)
+        {
+            switch (kvp.Value)
+            {
+                case IDictionary<string, object> objects:
+                {
+                    var inner = objects.ToPropertyBag();
+                    bag.Add(kvp.Key, inner);
+                    break;
+                }
+                case ICollection list:
+                {
+                    var itemList = new List<object>();
+                    foreach (var item in list)
+                    {
+                        if (item is IDictionary<string, object> objs)
+                        {
+                            var bagitem = objs.ToPropertyBag();
+                            itemList.Add(bagitem);
+                        }
+                        else
+                        {
+                            itemList.Add(item);
+                        }
+                    }
+
+                    bag.Add(kvp.Key, itemList);
+                    break;
+                }
+                default:
+                    bag.Add(kvp.Key, kvp.Value);
+                    break;
+            }
+        }
+
+        return bag;
     }
 }

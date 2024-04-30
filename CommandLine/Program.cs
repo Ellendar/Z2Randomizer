@@ -1,13 +1,14 @@
-﻿using CommandLine;
+﻿using System.Diagnostics.CodeAnalysis;
+using CommandLine;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
-using System.ComponentModel;
 using Z2Randomizer.Core;
 
 namespace Z2Randomizer.CommandLine;
 
 public class Program
 {
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
     public static int Main(string[] args)
         => CommandLineApplication.Execute<Program>(args);
 
@@ -27,9 +28,11 @@ public class Program
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
     private int OnExecute()
     {
-        if (Flags == null || Flags == string.Empty)
+        SetNlogLogLevel(LogLevel.Info);
+        if (string.IsNullOrEmpty(Flags))
         {
             logger.Error("The flag string is required");
             return -1;
@@ -55,7 +58,7 @@ public class Program
             return -3;
         }
 
-        this.configuration.FileName = Rom;
+        configuration.FileName = Rom;
 
         logger.Info($"Flags: {Flags}");
         logger.Info($"Rom: {Rom}");
@@ -78,85 +81,70 @@ public class Program
             return -4;
         }
 
-        Randomize();
+        Randomize().Wait();
 
         return 0;
     }
 
-    public void Randomize()
+    public async Task Randomize()
     {
-        Exception? generationException = null;
-        var worker = new BackgroundWorker();
-        worker.DoWork += new DoWorkEventHandler(RandomizationWorker!);
-        worker.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged!);
-        worker.WorkerReportsProgress = true;
-        worker.WorkerSupportsCancellation = true;
-        worker.RunWorkerCompleted += (completed_sender, completed_event) =>
-        {
-            generationException = completed_event.Error;
-        };
-        worker.RunWorkerAsync();
+        // Exception? generationException = null;
+        // var worker = new BackgroundWorker();
+        // worker.DoWork += new DoWorkEventHandler(RandomizationWorker!);
+        // worker.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged!);
+        // worker.WorkerReportsProgress = true;
+        // worker.WorkerSupportsCancellation = true;
+        // worker.RunWorkerCompleted += (completed_sender, completed_event) =>
+        // {
+        //     generationException = completed_event.Error;
+        // };
+        // worker.RunWorkerAsync();
+        var cts = new CancellationTokenSource();
+        var engine = new DesktopJsEngine();
+        var randomizer = new Hyrule(configuration!, engine);
+        var rom = await randomizer.Randomize((str) => { logger.Info(str); }, cts.Token);
 
-        while (worker.IsBusy)
+        if (rom != null)
         {
-            Thread.Sleep(50);
-        }
-
-        if (generationException == null)
-        {
+            char os_sep = Path.DirectorySeparatorChar;
+            var filename = configuration!.FileName;
+            string newFileName = filename.Substring(0, filename.LastIndexOf(os_sep) + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+            File.WriteAllBytes(newFileName, rom);
             logger.Info("File " + "Z2_" + this.Seed + "_" + this.Flags + ".nes" + " has been created!");
         }
         else
         {
             logger.Error("An exception occurred generating the rom");
-            logger.Fatal(generationException);
         }
     }
 
-    private void RandomizationWorker(object sender, DoWorkEventArgs e)
+    private static void SetNlogLogLevel(LogLevel level)
     {
-        BackgroundWorker? worker = sender as BackgroundWorker;
+        // Uncomment these to enable NLog logging. NLog exceptions are swallowed by default.
+        ////NLog.Common.InternalLogger.LogFile = @"C:\Temp\nlog.debug.log";
+        ////NLog.Common.InternalLogger.LogLevel = LogLevel.Debug;
 
-        new Hyrule(this.configuration, worker, true);
-        if (worker!.CancellationPending)
+        if (level == LogLevel.Off)
         {
-            e.Cancel = true;
+            LogManager.DisableLogging();
         }
-    }
+        else
+        {
+            if (!LogManager.IsLoggingEnabled())
+            {
+                LogManager.EnableLogging();
+            }
 
-    private void BackgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs eventArgs)
-    {
-        if (eventArgs.ProgressPercentage == 2)
-        {
-            logger.Info("Generating Western Hyrule");
+            foreach (var rule in LogManager.Configuration.LoggingRules)
+            {
+                // Iterate over all levels up to and including the target, (re)enabling them.
+                for (int i = level.Ordinal; i <= 5; i++)
+                {
+                    rule.EnableLoggingForLevel(LogLevel.FromOrdinal(i));
+                }
+            }
         }
-        else if (eventArgs.ProgressPercentage == 3)
-        {
-            logger.Info("Generating Death Mountain");
-        }
-        else if (eventArgs.ProgressPercentage == 4)
-        {
-            logger.Info("Generating East Hyrule");
-        }
-        else if (eventArgs.ProgressPercentage == 5)
-        {
-            logger.Info("Generating Maze Island");
-        }
-        else if (eventArgs.ProgressPercentage == 6)
-        {
-            logger.Info("Shuffling Items and Spells");
-        }
-        else if (eventArgs.ProgressPercentage == 7)
-        {
-            logger.Info("Running Seed Completability Checks");
-        }
-        else if (eventArgs.ProgressPercentage == 8)
-        {
-            logger.Info("Generating Hints");
-        }
-        else if (eventArgs.ProgressPercentage == 9)
-        {
-            logger.Info("Finishing up");
-        }
+
+        LogManager.ReconfigExistingLoggers();
     }
 }

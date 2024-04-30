@@ -101,18 +101,18 @@ static class DirectionExtensions
         };
     }
 
-    public static readonly Direction[] ITEM_ROOM_ORIENTATIONS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST, Direction.HORIZONTAL_PASSTHROUGH, Direction.VERTICAL_PASSTHROUGH };
+    public static readonly Direction[] ITEM_ROOM_ORIENTATIONS = [Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST];
 
     public static Direction RandomItemRoomOrientation(Random r)
     {
-        return r.Next(6) switch
+        return r.Next(4) switch
         {
             0 => Direction.NORTH,
             1 => Direction.SOUTH,
             2 => Direction.EAST,
             3 => Direction.WEST,
-            4 => Direction.VERTICAL_PASSTHROUGH,
-            5 => Direction.HORIZONTAL_PASSTHROUGH,
+            //4 => Direction.VERTICAL_PASSTHROUGH,
+            //5 => Direction.HORIZONTAL_PASSTHROUGH,
             _ => throw new ImpossibleException("Invalid random in Direction.RandomItemRoomOrientation")
         };
     }

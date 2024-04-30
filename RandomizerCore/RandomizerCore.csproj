@@ -23,6 +23,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>false</UseWindowsForms>
     <Platforms>AnyCPU;x64</Platforms>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -36,11 +37,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
-<<<<<<< HEAD
-    <Version>4.3.6</Version>
-=======
-    <Version>4.4.0</Version>
->>>>>>> 82ba520502f40066d2f8d3d4ac616492d868f346
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
@@ -72,7 +68,6 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -82,101 +77,17 @@
     <PackageReference Include="NLog" Version="5.2.6" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Assembler\Assembler.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Sprites\Aneru.ips">
+    <None Update="Sprites\*.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Black_Mage.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Cheese_Link.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Crystalis.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Dragonlord.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Error.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Fighter.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Glitch_Witch.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Hoodie_Link.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Iron_Knuckle.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\JANKY.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Lady_Link.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Midna.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Miria.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Olympia.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Pyramid.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Ruto.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Samus.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Simon.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Stalfos.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Taco.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Vase_Lady.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\White_Air_Knight.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\White_Mage.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Yoshi.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Sprites\Zelda.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="WinSparkle.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="WinSparkle_0_8_0_x64.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Asm\BuffCarock.s" />
-    <EmbeddedResource Include="Asm\ExpandedPauseMenu.s" />
-    <EmbeddedResource Include="Asm\FixedHud.s" />
+    <EmbeddedResource Include="Asm\*.s" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
-    <EmbeddedResource Include="Asm\MMC5.s" />
-    <EmbeddedResource Include="Asm\DashSpell.s" />
-    <EmbeddedResource Include="Asm\Recoil.s" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="js65\**" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>
