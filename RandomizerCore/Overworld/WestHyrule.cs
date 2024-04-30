@@ -1,4 +1,5 @@
 ﻿using NLog;
+using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ public class WestHyrule : World
     public Location northPalace;
     public Location locationAtMido;
     public Location bagu;
+    public Location mirrorTable;
     public Location locationAtRuto;
     public Location medicineCave;
     public Location trophyCave;
@@ -120,6 +122,7 @@ public class WestHyrule : World
         locationAtRuto = GetLocationByMap(0xC5, 4);
         locationAtRuto.Name = "Ruto";
         bagu = GetLocationByMap(0x18, 4);
+        bagu.ActualTown = Town.BAGU;
         locationAtMido = GetLocationByMap(0xCB, 4);
         locationAtMido.Name = "Mido";
         locationAtSariaNorth = GetLocationByMap(0xC8, 4);
@@ -1377,10 +1380,10 @@ public class WestHyrule : World
     }
 
 
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
         visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
-        UpdateReachable(itemGet, spellGet);
+        UpdateReachable(itemGet);
 
         foreach (Location location in AllLocations)
         {
@@ -1394,21 +1397,21 @@ public class WestHyrule : World
                         Location l2 = connections[location];
                         if (
                             location.NeedBagu 
-                            && (bagu.Reachable
-                                || spellGet[Spell.FAIRY]
-                                || (spellGet.ContainsKey(Spell.DASH) && spellGet[Spell.DASH] && spellGet[Spell.JUMP])))
+                            && (itemGet[Collectable.BAGUS_NOTE]
+                                || itemGet[Collectable.FAIRY_SPELL]
+                                || (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL])))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
-                        if (location.NeedFairy && spellGet[Spell.FAIRY])
+                        if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
-                        if (location.NeedJump && (spellGet[Spell.JUMP] || spellGet[Spell.FAIRY]))
+                        if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;

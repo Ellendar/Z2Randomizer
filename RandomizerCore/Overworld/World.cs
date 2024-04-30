@@ -355,7 +355,7 @@ public abstract class World
             AllReached = true;
             foreach (Location location in AllLocations)
             {
-                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.Item != Item.DO_NOT_USE)
+                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.Collectable != Collectable.DO_NOT_USE)
                 {
                     if (!location.Reachable)
                     {
@@ -1721,7 +1721,7 @@ public abstract class World
         }
     }
   
-    protected void UpdateReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    protected void UpdateReachable(Dictionary<Collectable, bool> itemGet)
     {
         //Setup
         bool needJump = false;
@@ -1762,7 +1762,7 @@ public abstract class World
         {
             if (start.Ypos >= 30 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
             }
         }
 
@@ -1775,7 +1775,7 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet, 
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Collectable, bool> itemGet, 
         int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
     {
         Stack<(int, int)> to_visit = new();
@@ -1801,18 +1801,18 @@ public abstract class World
                     || terrain == Terrain.PALACE
                     || terrain == Terrain.TOWN
                     || walkableTerrains.Contains(terrain)
-                    || (terrain == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
-                    || (terrain == Terrain.ROCK && itemGet[Item.HAMMER])
-                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Item.FLUTE]))
+                    || (terrain == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
+                    || (terrain == Terrain.ROCK && itemGet[Collectable.HAMMER])
+                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Collectable.FLUTE]))
                     //East desert jump blocker
                     && !(
                         needJump
                         && jumpBlockY == y
                         && jumpBlockX == x
-                        && (!spellGet[Spell.JUMP] && !spellGet[Spell.FAIRY])
+                        && (!itemGet[Collectable.JUMP_SPELL] && !itemGet[Collectable.FAIRY_SPELL])
                     )
                     //Fairy cave is traversable
-                    && !(needFairy && fairyBlockY == y && fairyBlockX == x && !spellGet[Spell.FAIRY])
+                    && !(needFairy && fairyBlockY == y && fairyBlockX == x && !itemGet[Collectable.FAIRY_SPELL])
                 )
                 {
                     visitation[y, x] = true;
@@ -2780,7 +2780,7 @@ public abstract class World
         return true;
     }
 
-    public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);
+    public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 }

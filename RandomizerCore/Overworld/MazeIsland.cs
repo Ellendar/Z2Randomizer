@@ -2,6 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data;
+using RandomizerCore;
 
 namespace Z2Randomizer.Core.Overworld;
 
@@ -808,7 +812,7 @@ class MazeIsland : World
             }
         }
     }
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
         bool changed = true;
         while (changed)
@@ -820,7 +824,7 @@ class MazeIsland : World
                 {
                     if (!visitation[i, j]
                     && (
-                        (map[i, j] == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
+                        (map[i, j] == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
                         || map[i, j] == Terrain.ROAD || map[i, j] == Terrain.PALACE
                         || map[i, j] == Terrain.BRIDGE
                         || map[i, j] == Terrain.CAVE

@@ -158,6 +158,9 @@ public partial class MainUI : Form
         removeTbirdCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         alwaysBeamCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includePbagCavesInShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeSpellsInShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeQuestItemsInShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        includeSwordTechsInShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includeGPinShuffleCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleDripperEnemyCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleEnemyPalettesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -243,7 +246,7 @@ public partial class MainUI : Form
         {
             FlagBox_TextChanged(null!, null!);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             seedTextBox.Text = (string)Settings.Default.Properties["customizableButton1"].DefaultValue;
         }
@@ -529,7 +532,7 @@ public partial class MainUI : Form
         {
             rom = new FileInfo(fileName);
         }
-        catch (Exception _ex) { return; }
+        catch (Exception) { return; }
 
         // basic validation that they selected a "validish" rom before drawing a sprite from it
         if (rom?.Length == 0x10 + 128 * 1024 + 128 * 1024)
@@ -726,12 +729,12 @@ public partial class MainUI : Form
         configuration.FileName = romFileTextBox.Text.Trim();
         try
         {
-            configuration.Seed = Int32.Parse(seedTextBox.Text.Trim());
+            configuration.Seed = int.Parse(seedTextBox.Text.Trim());
         }
         catch (FormatException)
         {
             seedTextBox.Text = r.Next(1000000000).ToString();
-            configuration.Seed = Int32.Parse(seedTextBox.Text.Trim());
+            configuration.Seed = int.Parse(seedTextBox.Text.Trim());
         }
 
         //Start Configuration
@@ -1064,6 +1067,9 @@ public partial class MainUI : Form
         configuration.RandomizeNewKasutoJarRequirements = randomizeJarRequirementsCheckbox.Checked;
         configuration.RemoveSpellItems = GetTripleCheckState(removeSpellitemsCheckbox);
         configuration.ShufflePBagAmounts = GetTripleCheckState(shufflePbagAmountsCheckbox);
+        configuration.IncludeSpellsInShuffle = GetTripleCheckState(includeSpellsInShuffleCheckbox);
+        configuration.IncludeSwordTechsInShuffle = GetTripleCheckState(includeSwordTechsInShuffleCheckbox);
+        configuration.IncludeQuestItemsInShuffle = GetTripleCheckState(includeQuestItemsInShuffleCheckbox);
 
         //Drops
         configuration.ShuffleItemDropFrequency = shuffleDropFrequencyCheckbox.Checked;
@@ -1513,6 +1519,9 @@ public partial class MainUI : Form
             randomizeJarRequirementsCheckbox.Checked = configuration.RandomizeNewKasutoJarRequirements;
             removeSpellitemsCheckbox.CheckState = ToCheckState(configuration.RemoveSpellItems);
             shufflePbagAmountsCheckbox.CheckState = ToCheckState(configuration.ShufflePBagAmounts);
+            includeSpellsInShuffleCheckbox.CheckState = ToCheckState(configuration.IncludeSpellsInShuffle);
+            includeSwordTechsInShuffleCheckbox.CheckState = ToCheckState(configuration.IncludeSwordTechsInShuffle);
+            includeQuestItemsInShuffleCheckbox.CheckState = ToCheckState(configuration.IncludeQuestItemsInShuffle);
 
             //Drops
             shuffleDropFrequencyCheckbox.Checked = configuration.ShuffleItemDropFrequency;
@@ -2158,6 +2167,32 @@ public partial class MainUI : Form
         if (!includeVanillaRoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked && !includev4_0RoomsCheckbox.Checked)
         {
             ((CheckBox)sender).Checked = true;
+        }
+    }
+
+    private void SpellShuffleExclusionHandler(object sender, EventArgs e)
+    {
+        if (includeSpellsInShuffleCheckbox.CheckState == CheckState.Checked)
+        {
+            shuffleSpellLocationsCheckbox.CheckState = CheckState.Unchecked;
+            shuffleSpellLocationsCheckbox.Enabled = false;
+        }
+        else
+        {
+            shuffleSpellLocationsCheckbox.Enabled = true;
+        }
+    }
+
+    private void SwordTechExclusionHandler(object sender, EventArgs e)
+    {
+        if (includeSwordTechsInShuffleCheckbox.CheckState == CheckState.Checked)
+        {
+            swapUpAndDownstabCheckbox.CheckState = CheckState.Unchecked;
+            swapUpAndDownstabCheckbox.Enabled = false;
+        }
+        else
+        {
+            swapUpAndDownstabCheckbox.Enabled = true;
         }
     }
 }

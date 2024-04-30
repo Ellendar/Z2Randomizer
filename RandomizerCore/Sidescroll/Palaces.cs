@@ -295,7 +295,7 @@ public class Palaces
                             }
                             IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
                             palace.ItemRoom.NewMap = mapNo;
-                            palace.ItemRoom.SetItem((Item)currentPalace);
+                            //palace.ItemRoom.SetItem((Item)currentPalace);
                             IncrementMapNo(ref mapNo, ref mapNoGp, currentPalace);
 
                             if (palace.ItemRoom.LinkedRoomName != null)
@@ -305,7 +305,7 @@ public class Palaces
                                 segmentedItemRoom2 = new(PalaceRooms.GetRoomByName(segmentedItemRoom1.LinkedRoomName, props.UseCustomRooms));
                                 segmentedItemRoom2.NewMap = palace.ItemRoom.NewMap;
                                 segmentedItemRoom2.PalaceGroup = palaceGroup;
-                                segmentedItemRoom2.SetItem((Item)currentPalace);
+                                //segmentedItemRoom2.SetItem((Item)currentPalace);
                                 segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
                                 segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
                                 palace.AllRooms.Add(segmentedItemRoom2);
@@ -611,7 +611,7 @@ public class Palaces
         {
             //If there is at least one palace that would be clearable with everything but the glove
             //that palace could contain the glove, so we're not deadlocked.
-            if (palaces[i].CanClearAllRooms(requireables, Item.GLOVE))
+            if (palaces[i].CanClearAllRooms(requireables, Collectable.GLOVE))
             {
                 return true;
             }
@@ -636,7 +636,7 @@ public class Palaces
             requireables.Add(RequirementType.FAIRY);
 
             //If we can't clear 2 without the items available, we can never get the glove, so the palace is unbeatable
-            if (!palace2.CanClearAllRooms(requireables, Item.GLOVE))
+            if (!palace2.CanClearAllRooms(requireables, Collectable.GLOVE))
             {
                 return false;
             }
@@ -669,13 +669,13 @@ public class Palaces
                 requireables.Add(props.SwapUpAndDownStab ? RequirementType.UPSTAB : RequirementType.DOWNSTAB);
             }
             //If we can clear P2 with this stuff, we can also get the glove
-            if (palace2.CanClearAllRooms(requireables, Item.GLOVE))
+            if (palace2.CanClearAllRooms(requireables, Collectable.GLOVE))
             {
                 requireables.Add(RequirementType.GLOVE);
             }
             //If we can't clear 3 with all the items available on west/DM, we can never raft out, and so we're stuck forever
             //so start over
-            if (!palace3.CanClearAllRooms(requireables, Item.RAFT))
+            if (!palace3.CanClearAllRooms(requireables, Collectable.RAFT))
             {
                 return false;
             }

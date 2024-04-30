@@ -1,4 +1,5 @@
 ﻿using NLog;
+using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,9 +63,12 @@ public class EastHyrule : World
 
     public Location locationAtPalace5;
     public Location locationAtPalace6;
+    public Location fountain;
     public Location waterTile;
     public Location desertTile;
     public Location townAtDarunia;
+    //This is never properly initialized. Figure it out later.
+    public Location daruniaRoof;
     public Location townAtNewKasuto;
     public Location spellTower;
     public Location townAtNabooru;
@@ -87,19 +91,19 @@ public class EastHyrule : World
     {
         isHorizontal = props.EastIsHorizontal;
         baseAddr = 0x862F;
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0x863E, 6, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x863A, 2, terrains, Continent.EAST));
-
-        locations.AddRange(rom.LoadLocations(0x862F, 11, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8644, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x863C, 2, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8646, 10, terrains, Continent.EAST));
-        //loadLocations(0x8657, 2, terrains, continent.east);
-        locations.AddRange(rom.LoadLocations(0x865C, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x865E, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8660, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8662, 4, terrains, Continent.EAST));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0x863E, 6, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x863A, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x862F, 11, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8644, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x863C, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8646, 10, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x865C, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x865E, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8660, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8662, 4, terrains, Continent.EAST),
+        ];
         locations.ForEach(AddLocation);
 
         //reachableAreas = new HashSet<string>();
@@ -130,17 +134,17 @@ public class EastHyrule : World
         hiddenPalaceCallSpot.Ypos = 0;
 
         enemyAddr = 0x88B0;
-        enemies = new List<int> { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-        generators = new List<int> { 0x0B, 0x0F, 0x17 };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
-        largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+        enemies = [03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
+        flyingEnemies = [0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15];
+        generators = [0x0B, 0x0F, 0x17];
+        smallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
+        largeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
         enemyPtr = 0x85B1;
         townAtNabooru = GetLocationByMem(0x865C);
         townAtOldKasuto = GetLocationByMem(0x8662);
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
-        locationAtGP.Item = Item.DO_NOT_USE;
+        locationAtGP.Collectable = Collectable.DO_NOT_USE;
         pbagCave1 = GetLocationByMem(0x863C);
         pbagCave2 = GetLocationByMem(0x863D);
         VANILLA_MAP_ADDR = 0x9056;
@@ -216,7 +220,7 @@ public class EastHyrule : World
         {
             location.CanShuffle = true;
             location.NeedHammer = false;
-            location.NeedRecorder = false;
+            location.NeedFlute = false;
             if (location != raft && location != bridge && location != cave1 && location != cave2)
             {
                 location.TerrainType = terrains[location.MemAddress];
@@ -358,7 +362,7 @@ public class EastHyrule : World
                 {
                     location.CanShuffle = true;
                     location.NeedHammer = false;
-                    location.NeedRecorder = false;
+                    location.NeedFlute = false;
                     if (location != raft && location != bridge && location != cave1 && location != cave2)
                     {
                         location.TerrainType = terrains[location.MemAddress];
@@ -1476,30 +1480,30 @@ public class EastHyrule : World
         }
     }
 
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
-        UpdateReachable(itemGet, spellGet);
+        UpdateReachable(itemGet);
 
         foreach (Location location in AllLocations)
         {
             if (location.Ypos > 30 && visitation[location.Ypos - 30, location.Xpos])
             {
-                if ((!location.NeedRecorder || (location.NeedRecorder && itemGet[Item.FLUTE]))
-                    && (!location.NeedHammer || (location.NeedHammer && itemGet[Item.HAMMER]))
-                    && (!location.NeedBoots || (location.NeedBoots && itemGet[Item.BOOTS])))
+                if ((!location.NeedFlute || (location.NeedFlute && itemGet[Collectable.FLUTE]))
+                    && (!location.NeedHammer || (location.NeedHammer && itemGet[Collectable.HAMMER]))
+                    && (!location.NeedBoots || (location.NeedBoots && itemGet[Collectable.BOOTS])))
                 {
                     location.Reachable = true;
-                    if (connections.Keys.Contains(location))
+                    if (connections.ContainsKey(location))
                     {
                         Location connectedLocation = connections[location];
 
-                        if (location.NeedFairy && spellGet[Spell.FAIRY])
+                        if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
                         {
                             connectedLocation.Reachable = true;
                             visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
                         }
 
-                        if (location.NeedJump && (spellGet[Spell.JUMP] || spellGet[Spell.FAIRY]))
+                        if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
                         {
                             connectedLocation.Reachable = true;
                             visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
