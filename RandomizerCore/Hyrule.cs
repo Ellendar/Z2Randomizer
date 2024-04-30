@@ -193,7 +193,7 @@ public class Hyrule
         return await Task.Run(() =>
         {
             Assembler assembler = new();
-            logger.Info("Started generation for " + Flags + " / " + config.Seed);
+            logger.Info("Started generation for " + Flags + " / " + Seed);
             //character = new Character(props);
             shuffler = new Shuffler(props);
 
@@ -395,29 +395,29 @@ public class Hyrule
             //If it's not the case, you have no idea what that wizard has, so it's a live check.
             if(!props.IncludeSpellsInShuffle)
             {
-                if (props.StartWithSpell(SpellMap[Town.RUTO]))
+                if (props.StartWithCollectable(WizardCollectables[Town.RUTO]))
                 {
                     ROMData.Put(0x17b14, 0x10); //Trophy
                 }
-                if (props.StartWithSpell(SpellMap[Town.SARIA_NORTH]))
+                if (props.StartWithCollectable(WizardCollectables[Town.SARIA_NORTH]))
                 {
                     ROMData.Put(0x17b15, 0x01); //Mirror
                 }
-                if (props.StartWithSpell(SpellMap[Town.MIDO_WEST]))
+                if (props.StartWithCollectable(WizardCollectables[Town.MIDO_WEST]))
                 {
                     ROMData.Put(0x17b16, 0x40); //Medicine
                 }
-                if (props.StartWithSpell(SpellMap[Town.NABOORU]))
+                if (props.StartWithCollectable(WizardCollectables[Town.NABOORU]))
                 {
                     ROMData.Put(0x17b17, 0x01); //Water
                 }
-                if (props.StartWithSpell(SpellMap[Town.DARUNIA_WEST]))
+                if (props.StartWithCollectable(WizardCollectables[Town.DARUNIA_WEST]))
                 {
                     ROMData.Put(0x17b18, 0x20); //Child
                 }
             }
 
-            _hints = CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, _hints, props, RNG);
+            _hints = CustomTexts.GenerateTexts(itemLocs, WizardCollectables, westHyrule.bagu, _hints, props, RNG);
             f = UpdateProgress(progress, ct, 9);
             if (!f)
             {
