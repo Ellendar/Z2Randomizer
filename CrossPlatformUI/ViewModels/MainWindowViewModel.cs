@@ -33,13 +33,10 @@ public class MainWindowViewModel : ViewModelBase, IScreen
         RomFileViewModel = new(this);
         MainViewModel = new(this);
         
+        Router.Navigate.Execute(MainViewModel);
         if (!RomFileViewModel.HasRomData)
         {
             Router.Navigate.Execute(RomFileViewModel);
-        }
-        else
-        {
-            Router.Navigate.Execute(MainViewModel);
         }
         
         // GoNext = ReactiveCommand.CreateFromObservable(

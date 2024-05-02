@@ -1892,7 +1892,9 @@ public class Hyrule
         List<Town> unallocatedTowns = new List<Town> { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
             Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
 
-        foreach (Collectable spell in Enum.GetValues(typeof(Collectable)))
+        var filteredToJustSpells = Enum.GetValues(typeof(Collectable)).Cast<Collectable>().ToList()
+            .Where(x => x.ToString().EndsWith("_SPELL"));
+        foreach (Collectable spell in filteredToJustSpells)
         {
             if (props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
                 || !props.ReplaceFireWithDash && spell == Collectable.DASH_SPELL

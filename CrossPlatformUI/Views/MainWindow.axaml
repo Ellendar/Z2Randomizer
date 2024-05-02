@@ -20,7 +20,7 @@
         </Grid.RowDefinitions>
         <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
             <rxui:RoutedViewHost.DefaultContent>
-                <!-- <views:MainView/> -->
+                <views:MainView/>
             </rxui:RoutedViewHost.DefaultContent>
             <rxui:RoutedViewHost.ViewLocator>
                 <!-- See AppViewLocator.cs section below -->
