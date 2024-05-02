@@ -2,6 +2,7 @@
 using Z2Randomizer.Core;
 using System;
 using System.ComponentModel;
+using System.IO;
 using CommandLine;
 using System.Threading;
 
@@ -40,12 +41,12 @@ class Statistics
                 int seed = random.Next(1000000000);
                 //int seed = 38955385;
                 config.Seed = seed;
-                config.FileName = VANILLA_ROM_PATH;
+                var vanillaRomData = File.ReadAllBytes(VANILLA_ROM_PATH);
                 DateTime startTime = DateTime.Now;
                 logger.Info("Starting seed# " + i + " at: " + startTime);
                 Hyrule hyrule = new Hyrule(config, engine);
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
-                hyrule.Randomize((str) => logger.Trace(str), tokenSource.Token).Wait(tokenSource.Token);
+                hyrule.Randomize(vanillaRomData, (str) => logger.Trace(str), tokenSource.Token).Wait(tokenSource.Token);
                 DateTime endTime = DateTime.Now;
                 Result result = new Result(hyrule);
                 result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;

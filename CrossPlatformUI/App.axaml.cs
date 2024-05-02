@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
@@ -20,9 +22,22 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
+    public static ServiceCollection? ServiceContainer;
+    
     public override void OnFrameworkInitializationCompleted()
     {
-        var services = new ServiceCollection();
+        // Remove built-in validation plugins
+        // Get an array of plugins to remove
+        var dataValidationPluginsToRemove =
+            BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
+
+        // remove each entry found
+        foreach (var plugin in dataValidationPluginsToRemove)
+        {
+            BindingPlugins.DataValidators.Remove(plugin);
+        }
+        
+        ServiceContainer ??= new ();
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
@@ -31,7 +46,7 @@ public partial class App : Application
                     DataContext = new MainWindowViewModel()
                 };
 
-                services.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
+                ServiceContainer.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:
                 singleViewPlatform.MainView = new MainView
@@ -39,12 +54,12 @@ public partial class App : Application
                     DataContext = new MainWindowViewModel()
                 };
 
-                services.AddSingleton<IFilesService>(x => new FilesService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
+                ServiceContainer.AddSingleton<IFilesService>(x => new FilesService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
                 break;
         }
 
-        services.AddSingleton<RandomizerConfigService>(x => new RandomizerConfigService());
-        Services = services.BuildServiceProvider();
+        ServiceContainer.AddSingleton<RandomizerConfigService>(x => new RandomizerConfigService());
+        Services = ServiceContainer.BuildServiceProvider();
         
         base.OnFrameworkInitializationCompleted();
     }

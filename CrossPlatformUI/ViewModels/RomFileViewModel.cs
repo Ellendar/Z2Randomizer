@@ -11,10 +11,12 @@ namespace CrossPlatformUI.ViewModels;
 
 public class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
-    public string? UrlPathSegment { get; } = Guid.NewGuid().ToString().Substring(0, 5);
+    public string? UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
     public IScreen HostScreen { get; }
 
     public byte[]? RomData { get; private set; }
+
+    public bool HasRomData { get => RomData != null; set => this.RaisePropertyChanged(); }
 
     public RomFileViewModel(IScreen hostScreen)
     {
@@ -23,7 +25,8 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
     }
     
     public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
-    async Task OpenFileInternal(CancellationToken token)
+
+    private async Task OpenFileInternal(CancellationToken token)
     {
         try
         {
@@ -38,6 +41,7 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
                 await using var readStream = await file.OpenReadAsync();
                 using var reader = new BinaryReader(readStream);
                 RomData = ReadAllBytes(reader);
+                HasRomData = true;
             }
             else
             {

@@ -725,8 +725,6 @@ public partial class MainUI : Form
     private RandomizerConfiguration ExportConfig()
     {
         RandomizerConfiguration configuration = new RandomizerConfiguration();
-
-        configuration.FileName = romFileTextBox.Text.Trim();
         try
         {
             configuration.Seed = int.Parse(seedTextBox.Text.Trim());
@@ -1969,7 +1967,8 @@ public partial class MainUI : Form
         var ct = cts.Token;
         var engine = new DesktopJsEngine();
         var rando = new Hyrule(config, engine);
-        var task = rando.Randomize(str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
+        byte[] vanillaRomData = File.ReadAllBytes(romFileTextBox.Text.Trim());
+        var task = rando.Randomize(vanillaRomData, str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
         while (!task.IsCompleted)
         {
             if (worker.CancellationPending)
@@ -1983,37 +1982,32 @@ public partial class MainUI : Form
 
     private void BackgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
     {
-        if (e.ProgressPercentage == 2)
+        switch (e.ProgressPercentage)
         {
-            f3.setText("Generating Western Hyrule");
-        }
-        else if (e.ProgressPercentage == 3)
-        {
-            f3.setText("Generating Death Mountain");
-        }
-        else if (e.ProgressPercentage == 4)
-        {
-            f3.setText("Generating East Hyrule");
-        }
-        else if (e.ProgressPercentage == 5)
-        {
-            f3.setText("Generating Maze Island");
-        }
-        else if (e.ProgressPercentage == 6)
-        {
-            f3.setText("Shuffling Items and Spells");
-        }
-        else if (e.ProgressPercentage == 7)
-        {
-            f3.setText("Running Seed Completability Checks");
-        }
-        else if (e.ProgressPercentage == 8)
-        {
-            f3.setText("Generating Hints");
-        }
-        else if (e.ProgressPercentage == 9)
-        {
-            f3.setText("Finishing up");
+            case 2:
+                f3.setText("Generating Western Hyrule");
+                break;
+            case 3:
+                f3.setText("Generating Death Mountain");
+                break;
+            case 4:
+                f3.setText("Generating East Hyrule");
+                break;
+            case 5:
+                f3.setText("Generating Maze Island");
+                break;
+            case 6:
+                f3.setText("Shuffling Items and Spells");
+                break;
+            case 7:
+                f3.setText("Running Seed Completability Checks");
+                break;
+            case 8:
+                f3.setText("Generating Hints");
+                break;
+            case 9:
+                f3.setText("Finishing up");
+                break;
         }
     }
 

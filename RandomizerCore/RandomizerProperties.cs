@@ -20,10 +20,8 @@ public class RandomizerProperties
     }
 
     //ROM Info
-    public string Filename { get; set; }
     public int Seed { get; set; }
     public string Flags { get; set; }
-    public bool saveRom = true;
 
     //Items
     //public bool shuffleItems;

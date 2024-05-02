@@ -25,7 +25,7 @@ public class Program
     public string? PlayerOptions { get; }
 
     private RandomizerConfiguration? configuration;
-
+    private byte[]? vanillaRomData;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
@@ -47,18 +47,21 @@ public class Program
         } 
         this.configuration.Seed = Seed.Value;
 
-        if (Rom == null || Rom == string.Empty)
+        if (string.IsNullOrEmpty(Rom))
         {
             logger.Error("The ROM path is required");
             return -2;
-        } 
-        else if (!File.Exists(Rom))
+        }
+
+        if (!File.Exists(Rom))
         {
             logger.Error($"The specified ROM file does not exist: {Rom}");
             return -3;
         }
 
-        configuration.FileName = Rom;
+        // configuration.FileName = Rom;
+
+        vanillaRomData = File.ReadAllBytes(Rom);
 
         logger.Info($"Flags: {Flags}");
         logger.Info($"Rom: {Rom}");
@@ -102,13 +105,13 @@ public class Program
         var cts = new CancellationTokenSource();
         var engine = new DesktopJsEngine();
         var randomizer = new Hyrule(configuration!, engine);
-        var rom = await randomizer.Randomize((str) => { logger.Info(str); }, cts.Token);
+        var rom = await randomizer.Randomize(vanillaRomData!, (str) => { logger.Info(str); }, cts.Token);
 
         if (rom != null)
         {
             char os_sep = Path.DirectorySeparatorChar;
-            var filename = configuration!.FileName;
-            string newFileName = filename.Substring(0, filename.LastIndexOf(os_sep) + 1) + "Z2_" + Seed + "_" + Flags + ".nes";
+            var filename = Rom!;
+            string newFileName = filename[..(filename.LastIndexOf(os_sep) + 1)] + $"Z2_{Seed}_{Flags}.nes";
             File.WriteAllBytes(newFileName, rom);
             logger.Info("File " + "Z2_" + this.Seed + "_" + this.Flags + ".nes" + " has been created!");
         }

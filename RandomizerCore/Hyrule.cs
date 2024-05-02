@@ -188,7 +188,7 @@ public class Hyrule
         _engine = engine;
     }
     
-    public async Task<byte[]?> Randomize(Action<string> progress, CancellationToken ct)
+    public async Task<byte[]?> Randomize(byte[] vanillaRomData, Action<string> progress, CancellationToken ct)
     {
         return await Task.Run(() =>
         {
@@ -207,7 +207,7 @@ public class Hyrule
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
 
-            ROMData = new ROM(props.Filename);
+            ROMData = new ROM(vanillaRomData);
             _hints = ROMData.GetGameText();
             if (props.KasutoJars)
             {
@@ -461,7 +461,7 @@ public class Hyrule
                 }
             }
             return ROMData.rawdata;
-        });
+        }, ct);
     }
 
 
@@ -590,7 +590,7 @@ public class Hyrule
             shufflableItems.Add(eastHyrule.pbagCave2.Collectable);
         }
 
-        if(props.IncludeQuestItemsInShuffle)
+        if(UNSAFE_DEBUG && props.IncludeQuestItemsInShuffle)
         {
             westHyrule.bagu.Collectable = Collectable.BAGUS_NOTE;
             westHyrule.mirrorTable.Collectable = Collectable.MIRROR;
@@ -600,7 +600,7 @@ public class Hyrule
             shufflableItems.Add(Collectable.WATER);
         }
 
-        if(props.IncludeSpellsInShuffle)
+        if(UNSAFE_DEBUG && props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
             shufflableItems.Add(Collectable.JUMP_SPELL);

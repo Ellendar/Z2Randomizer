@@ -17,7 +17,8 @@ public class MainWindowViewModel : ViewModelBase, IScreen
     // The command that navigates a user back.
     public ReactiveCommand<Unit, IRoutableViewModel> GoBack => Router.NavigateBack!;
 
-    private RomFileViewModel romFileViewModel;
+    public RomFileViewModel RomFileViewModel { get; }
+    public MainViewModel MainViewModel { get; }
     
     public MainWindowViewModel()
     {
@@ -29,15 +30,16 @@ public class MainWindowViewModel : ViewModelBase, IScreen
         // your view models, or to reuse existing view models.
         //
 
-        romFileViewModel = new(this);
+        RomFileViewModel = new(this);
+        MainViewModel = new(this);
         
-        if (romFileViewModel.RomData != null)
+        if (!RomFileViewModel.HasRomData)
         {
-            Router.Navigate.Execute(romFileViewModel);
+            Router.Navigate.Execute(RomFileViewModel);
         }
         else
         {
-            Router.Navigate.Execute(new MainViewModel(this));
+            Router.Navigate.Execute(MainViewModel);
         }
         
         // GoNext = ReactiveCommand.CreateFromObservable(
@@ -45,10 +47,10 @@ public class MainWindowViewModel : ViewModelBase, IScreen
         // );
 
         LoadRom = ReactiveCommand.CreateFromObservable(
-            () => Router.Navigate.Execute(romFileViewModel)
+            () => Router.Navigate.Execute(RomFileViewModel)
         );
-        LoadRom = ReactiveCommand.CreateFromObservable(
-            () => Router.Navigate.Execute(new GenerateRomViewModel())
+        GenerateRom = ReactiveCommand.CreateFromObservable(
+            () => Router.Navigate.Execute(new GenerateRomViewModel(this, MainViewModel.Config, RomFileViewModel.RomData))
         );
     }
 }

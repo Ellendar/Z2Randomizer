@@ -17,11 +17,7 @@ public class RandomizerConfiguration
     Logger logger = LogManager.GetCurrentClassLogger();
     //Meta
     [IgnoreInFlags]
-    public bool SaveRom { get; set; }
-    [IgnoreInFlags]
     public int Seed { get; set; }
-    [IgnoreInFlags]
-    public string FileName { get; set; }
 
     //Start Configuration
     public bool ShuffleStartingItems { get; set; }
@@ -304,8 +300,6 @@ public class RandomizerConfiguration
 
     public RandomizerConfiguration()
     {
-        SaveRom = true;
-
         StartingAttackLevel = 1;
         StartingMagicLevel = 1;
         StartingLifeLevel = 1;
@@ -1061,8 +1055,6 @@ public class RandomizerConfiguration
         properties.DmIsHorizontal = random.Next(2) == 1;
 
         //ROM Info
-        properties.Filename = FileName;
-        properties.saveRom = true;
         properties.Seed = Seed;
 
         //Start Configuration

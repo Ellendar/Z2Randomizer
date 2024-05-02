@@ -37,7 +37,7 @@
                 </Style>
             </StackPanel.Styles>
             <Button Content="Reload ROM" Command="{Binding LoadRom}" />
-            <Button HorizontalAlignment="Right" Content="Generate" Command="{Binding GenerateRom}" />
+            <Button HorizontalAlignment="Right" IsEnabled="{Binding RomFileViewModel.HasRomData}" Content="Generate" Command="{Binding GenerateRom}" />
         </StackPanel>
     </Grid>
 </Window>
