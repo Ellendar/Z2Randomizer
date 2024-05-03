@@ -170,28 +170,31 @@ public class Hyrule
         }
     }
 
-    private List<Text> _hints;
-    private IAsmEngine _engine;
+    private List<Text> hints;
+    private readonly IAsmEngine engine;
+    private readonly PalaceRooms palaceRooms;
 
-    public Hyrule(RandomizerConfiguration config, IAsmEngine engine)
+    public Hyrule(IAsmEngine engine, PalaceRooms rooms)
     {
-        World.ResetStats();
-        RNG = new Random(config.Seed);
-        props = config.Export(RNG);
-        if(UNSAFE_DEBUG) 
-        {
-            string export = JsonSerializer.Serialize(props);
-            Debug.WriteLine(export);
-        }
-        Flags = config.Serialize();
-        Seed = config.Seed;
-        _engine = engine;
+        this.engine = engine;
+        palaceRooms = rooms;
     }
     
-    public async Task<byte[]?> Randomize(byte[] vanillaRomData, Action<string> progress, CancellationToken ct)
+    public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Action<string> progress, CancellationToken ct)
     {
         return await Task.Run(() =>
         {
+            World.ResetStats();
+            RNG = new Random(config.Seed);
+            props = config.Export(RNG);
+            if(UNSAFE_DEBUG) 
+            {
+                string export = JsonSerializer.Serialize(props);
+                Debug.WriteLine(export);
+            }
+            Flags = config.Serialize();
+            Seed = config.Seed;
+            
             Assembler assembler = new();
             logger.Info("Started generation for " + Flags + " / " + Seed);
             //character = new Character(props);
@@ -208,7 +211,7 @@ public class Hyrule
             //areasByLocation = new SortedDictionary<string, List<Location>>();
 
             ROMData = new ROM(vanillaRomData);
-            _hints = ROMData.GetGameText();
+            hints = ROMData.GetGameText();
             if (props.KasutoJars)
             {
                 kasutoJars = RNG.Next(5, 8);
@@ -218,7 +221,7 @@ public class Hyrule
             bool passedValidation = false;
             while (palaces.Count != 7 || passedValidation == false)
             {
-                palaces = Palaces.CreatePalaces(ct, RNG, props, raftIsRequired);
+                palaces = Palaces.CreatePalaces(ct, RNG, props, palaceRooms, raftIsRequired);
                 if(palaces.Count == 0)
                 {
                     continue;
@@ -332,7 +335,7 @@ public class Hyrule
                     validationEngine.Add(gp_sideview_module);
                     ROM testRom = new(ROMData);
                     ApplyAsmPatches(props, validationEngine, RNG, testRom);
-                    testRom.ApplyAsm(_engine, validationEngine).Wait(ct);
+                    testRom.ApplyAsm(engine, validationEngine).Wait(ct);
                 }
                 catch(Exception e)
                 {
@@ -417,7 +420,7 @@ public class Hyrule
                 }
             }
 
-            _hints = CustomTexts.GenerateTexts(itemLocs, WizardCollectables, westHyrule.bagu, _hints, props, RNG);
+            hints = CustomTexts.GenerateTexts(itemLocs, WizardCollectables, westHyrule.bagu, hints, props, RNG);
             f = UpdateProgress(progress, ct, 9);
             if (!f)
             {
@@ -425,7 +428,7 @@ public class Hyrule
             }
             
             ApplyAsmPatches(props, assembler, RNG, ROMData);
-            var assemblerTask = ROMData.ApplyAsm(_engine, assembler);
+            var assemblerTask = ROMData.ApplyAsm(engine, assembler);
             assemblerTask.Wait(ct);
             var rom = assemblerTask.Result;
             ROMData = new ROM(rom!);
@@ -3847,6 +3850,6 @@ FREE_UNTIL $c2ca
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
 
-        UpdateHints(engine, _hints);
+        UpdateHints(engine, hints);
     }
 }

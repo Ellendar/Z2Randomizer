@@ -7,6 +7,8 @@ using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Z2Randomizer.Core.Sidescroll;
+
 namespace CrossPlatformUI.ViewModels;
 
 public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
@@ -26,8 +28,12 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
         {
             var tokenSource = new CancellationTokenSource();
             var engine = App.Current?.Services?.GetService<IAsmEngine>();
-            var hyrule = new Hyrule(config, engine!);
-            var output = await hyrule.Randomize(vanillaRomData, (str) => Progress = str, tokenSource.Token );
+            var fileService = App.Current?.Services?.GetService<IFilesService>();
+            // var roomsJson = await fileService!.OpenFileAsync();
+            // var customJson = config.UseCustomRooms ? await fileService!.OpenFileAsync() : null;
+            var palaceRooms = new PalaceRooms("", null);
+            var randomizer = new Hyrule(engine!, palaceRooms);
+            var output = await randomizer.Randomize(vanillaRomData, config, str => Progress = str, tokenSource.Token );
             Disposable
                 .Create(() =>
                 {

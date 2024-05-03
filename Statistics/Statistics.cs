@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using CommandLine;
 using System.Threading;
+using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.Statistics;
 
@@ -30,28 +31,31 @@ class Statistics
     {
         StatisticsDbContext dbContext = new StatisticsDbContext(DB_PATH);
 
+        RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
         Random random = new Random();
         var engine = new DesktopJsEngine();
+        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
+        var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
+        var palaceRooms = new PalaceRooms(roomsJson, customJson);
+        var randomizer = new Hyrule(engine, palaceRooms);
         logger.Info("Started statistics generation with limit: " + LIMIT);
         try
         {
             for (int i = 0; i < LIMIT; i++)
             {
-                RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
                 int seed = random.Next(1000000000);
                 //int seed = 38955385;
                 config.Seed = seed;
                 var vanillaRomData = File.ReadAllBytes(VANILLA_ROM_PATH);
                 DateTime startTime = DateTime.Now;
                 logger.Info("Starting seed# " + i + " at: " + startTime);
-                Hyrule hyrule = new Hyrule(config, engine);
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
-                hyrule.Randomize(vanillaRomData, (str) => logger.Trace(str), tokenSource.Token).Wait(tokenSource.Token);
+                randomizer.Randomize(vanillaRomData, config, (str) => logger.Trace(str), tokenSource.Token).Wait(tokenSource.Token);
                 DateTime endTime = DateTime.Now;
-                Result result = new Result(hyrule);
+                Result result = new Result(randomizer);
                 result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
                 dbContext.Add(result);
-                dbContext.Add(hyrule.Props);
+                dbContext.Add(randomizer.Props);
                 logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
                 //dbContext.SaveChanges();
             }

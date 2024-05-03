@@ -2,7 +2,6 @@
 using RandomizerCore.Sidescroll;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -10,76 +9,66 @@ using System.Text.RegularExpressions;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
-//We want this to be statically initialized for performance in bulk seed generation, but C# doesn't allow static overrides
-//I looked at other options and this was the least hacky. I would be shocked if there weren't a better way.
-public class PalaceRooms
+public partial class PalaceRooms
 {
-    private static readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
-    private static readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new();
+    private readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
+    private readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new();
 
-    private static readonly Dictionary<string, Room> roomsByName = new();
-    private static readonly Dictionary<string, Room> customRoomsByName = new();
+    private readonly Dictionary<string, Room> roomsByName = new();
+    private readonly Dictionary<string, Room> customRoomsByName = new();
 
 
+    private const string RoomsMd5 = "dKNxFT6dZjJevgj9khD11Q==";
 
-    public static readonly string roomsMD5 = "dKNxFT6dZjJevgj9khD11Q==";
-
-    static PalaceRooms()
+    public PalaceRooms(string palaceJson, string? customJson)
     {
-        if (Util.FileExists("PalaceRooms.json"))
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes(RemoveNewLines().Replace(palaceJson, "")));
+        if (RoomsMd5 != Convert.ToBase64String(hash))
         {
-            string roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
-            byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
-            if (roomsMD5 != Convert.ToBase64String(hash))
-            {
-                throw new Exception("Invalid PalaceRooms.json");
-            }
-            dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
-            foreach (var obj in rooms)
-            {
-                Room room = new(obj.ToString());
-                if (room.Enabled)
-                {
-                    if (!roomsByGroup.ContainsKey(room.Group))
-                    {
-                        roomsByGroup.Add(room.Group, new List<Room>());
-                    }
-                    roomsByGroup[room.Group].Add(room);
-                }
-                roomsByName[room.Name] = room;
-            }
+            throw new Exception("Invalid PalaceRooms.json");
         }
-        else
+        dynamic rooms = JsonConvert.DeserializeObject(palaceJson)!;
+        foreach (var obj in rooms)
         {
-            throw new Exception("Unable to find PalaceRooms.json. Consider reinstalling or contact Ellendar.");
+            Room room = new(obj.ToString());
+            if (room.Enabled)
+            {
+                if (!roomsByGroup.TryGetValue(room.Group, out var value))
+                {
+                    value = [];
+                    roomsByGroup.Add(room.Group, value);
+                }
+
+                value.Add(room);
+            }
+            roomsByName[room.Name] = room;
         }
 
-        if (Util.FileExists("CustomRooms.json"))
+        if (customJson == null) return;
+        
+        dynamic customRooms = JsonConvert.DeserializeObject(customJson)!;
+        foreach (var obj in customRooms)
         {
-            string roomsJson = Util.ReadAllTextFromFile("CustomRooms.json");
-            byte[] hash = MD5.HashData(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
-
-            dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
-            foreach (var obj in rooms)
+            Room room = new(obj.ToString());
+            if (room.Enabled)
             {
-                Room room = new(obj.ToString());
-                if (room.Enabled)
+                if (!customRoomsByGroup.TryGetValue(room.Group, out var value))
                 {
-                    if (!customRoomsByGroup.ContainsKey(room.Group))
-                    {
-                        customRoomsByGroup.Add(room.Group, new List<Room>());
-                    }
-                    customRoomsByGroup[room.Group].Add(room);
+                    value = [];
+                    customRoomsByGroup.Add(room.Group, value);
                 }
-                customRoomsByName[room.Name] = room;
+
+                value.Add(room);
             }
+            customRoomsByName[room.Name] = room;
         }
+        
     }
 
-    public static IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum, bool customRooms)
+    public IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum, bool customRooms)
     {
         int mapMin, mapMax, palaceGroup;
-        switch(palaceNum)
+        switch (palaceNum)
         {
             case 1:
                 mapMin = 0;
@@ -121,174 +110,105 @@ public class PalaceRooms
         }
         
 
-        if(customRooms)
-        {
-            return customRoomsByGroup[RoomGroup.VANILLA].Where(
-                i => i.PalaceGroup == palaceGroup 
-                && i.Map >= mapMin
-                && i.Map <= mapMax
-                && !i.IsEntrance 
-                && !i.IsBossRoom
-                && !i.HasItem
-                && !i.IsThunderBirdRoom
-            );
-        }
-
-        return roomsByGroup[RoomGroup.VANILLA].Where(
+        var roomgroup = customRooms ? customRoomsByGroup[RoomGroup.VANILLA] : roomsByGroup[RoomGroup.VANILLA];
+        return roomgroup.Where(
             i => i.PalaceGroup == palaceGroup
-            && i.Map >= mapMin
-            && i.Map <= mapMax
-            && !i.IsEntrance
-            && !i.IsBossRoom
-            && !i.HasItem
-            && !i.IsThunderBirdRoom
+                 && i.Map >= mapMin
+                 && i.Map <= mapMax
+                 && i is { IsEntrance: false, IsBossRoom: false, HasItem: false, IsThunderBirdRoom: false }
         );
     }
 
-    public static IEnumerable<Room> TBirdRooms(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> ThunderBirdRooms(RoomGroup group, bool useCustomRooms = false)
     {
-        if (useCustomRooms)
-        {
-            return customRoomsByGroup[group].Where(i => i.IsThunderBirdRoom);
-        }
-        return roomsByGroup[group].Where(i => i.IsThunderBirdRoom);
+        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        return roomgroup.Where(i => i.IsThunderBirdRoom);
     }
 
-    public static Room VanillaBossRoom(int palaceNum)
+    public Room VanillaBossRoom(int palaceNum)
     {
-        int map;
-        switch(palaceNum)
+        var map = palaceNum switch
         {
-            case 1:
-                map = 13;
-                break;
-            case 2:
-                map = 34;
-                break;
-            case 3:
-                map = 14;
-                break;
-            case 4:
-                map = 28;
-                break;
-            case 5:
-                map = 41;
-                break;
-            case 6:
-                map = 58;
-                break;
-            case 7:
-                map = 54;
-                break;
-            default:
-                throw new ArgumentException("Invalid palace number: " + palaceNum);
-        }
-        return roomsByGroup[RoomGroup.VANILLA].Where(i => i.IsBossRoom && map == i.Map).First();
+            1 => 13,
+            2 => 34,
+            3 => 14,
+            4 => 28,
+            5 => 41,
+            6 => 58,
+            7 => 54,
+            _ => throw new ArgumentException("Invalid palace number: " + palaceNum)
+        };
+        return roomsByGroup[RoomGroup.VANILLA].First(i => i.IsBossRoom && map == i.Map);
     }
 
-    public static Room VanillaItemRoom(int palaceNum)
+    public Room VanillaItemRoom(int palaceNum)
     {
-        int map;
-        switch (palaceNum)
+        var map = palaceNum switch
         {
-            case 1:
-                map = 8;
-                break;
-            case 2:
-                map = 20;
-                break;
-            case 3:
-                map = 11;
-                break;
-            case 4:
-                map = 31;
-                break;
-            case 5:
-                map = 61;
-                break;
-            case 6:
-                map = 44;
-                break;
-            case 7:
-                throw new ArgumentException("GP Cannot have an item!");
-            default:
-                throw new ArgumentException("Invalid palace number: " + palaceNum);
-        }
-        return roomsByGroup[RoomGroup.VANILLA].Where(i => i.HasItem && map == i.Map).First();
+            1 => 8,
+            2 => 20,
+            3 => 11,
+            4 => 31,
+            5 => 61,
+            6 => 44,
+            7 => throw new ArgumentException("GP Cannot have an item!"),
+            _ => throw new ArgumentException("Invalid palace number: " + palaceNum)
+        };
+        return roomsByGroup[RoomGroup.VANILLA].First(i => i.HasItem && map == i.Map);
     }
 
-    public static IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction, bool useCustomRooms = false)
+    public IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction, bool useCustomRooms = false)
     {
         if(direction == Direction.NONE)
         {
             throw new ArgumentException("Invalid Direction.NONE in ItemRoomsByDirection");
         }
 
-        Dictionary<RoomGroup, List<Room>> rooms = useCustomRooms ? customRoomsByGroup : roomsByGroup;
-        switch(direction)
+        var rooms = useCustomRooms ? customRoomsByGroup : roomsByGroup;
+        return direction switch
         {
             //case Direction.HORIZONTAL_PASSTHROUGH:
             //    return rooms[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
             //case Direction.VERTICAL_PASSTHROUGH:
             //    return rooms[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
-            case Direction.NORTH:
-                return rooms[group].Where(i => i.HasItem && i.HasUpExit());
-            case Direction.SOUTH:
-                return rooms[group].Where(i => i.HasItem && i.HasDownExit());
-            case Direction.WEST:
-                return rooms[group].Where(i => i.HasItem && i.HasLeftExit());
-            case Direction.EAST:
-                return rooms[group].Where(i => i.HasItem && i.HasRightExit());
-        }
-
-        throw new ImpossibleException("Invalid direction in ItemRoomsByDirection");
+            Direction.NORTH => rooms[group].Where(i => i.HasItem && i.HasUpExit()),
+            Direction.SOUTH => rooms[group].Where(i => i.HasItem && i.HasDownExit()),
+            Direction.WEST => rooms[group].Where(i => i.HasItem && i.HasLeftExit()),
+            Direction.EAST => rooms[group].Where(i => i.HasItem && i.HasRightExit()),
+            _ => throw new ImpossibleException("Invalid direction in ItemRoomsByDirection")
+        };
     }
 
-    public static IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
     {
-        if (useCustomRooms)
-        {
-            return customRoomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) != 7 
-                && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
-        }
-        return roomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) != 7 
-            && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
+        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        return roomgroup.Where(i => (i.PalaceNumber ?? 1) != 7 
+            && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
-    public static IEnumerable<Room> GPRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> GpRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
     {
-        if (useCustomRooms)
-        {
-            return customRoomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7
-                && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
-        }
-        return roomsByGroup[group].Where(i => (i.PalaceNumber ?? 1) == 7
-            && !i.IsThunderBirdRoom && !i.HasItem && !i.IsBossRoom && !i.IsEntrance);
+        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        return roomgroup.Where(i => (i.PalaceNumber ?? 1) == 7
+            && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
-    public static IEnumerable<Room> Entrances(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> Entrances(RoomGroup group, bool useCustomRooms = false)
     {
-        if (useCustomRooms)
-        {
-            return customRoomsByGroup[group].Where(i => i.IsEntrance);
-        }
-        return roomsByGroup[group].Where(i => i.IsEntrance);
+        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        return roomgroup.Where(i => i.IsEntrance);
     }
 
-    public static IEnumerable<Room> BossRooms(RoomGroup group, bool useCustomRooms = false, int? palaceNum = null)
+    public IEnumerable<Room> BossRooms(RoomGroup group, bool useCustomRooms = false, int? palaceNum = null)
     {
-        if (useCustomRooms)
-        {
-            return customRoomsByGroup[group].Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
-        }
-        return roomsByGroup[group].Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
+        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        return roomgroup.Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
     }
-    public static Room GetRoomByName(string name, bool useCustomRooms = false)
+    public Room GetRoomByName(string name, bool useCustomRooms = false)
     {
-        if (useCustomRooms)
-        {
-            return customRoomsByName[name];
-        }
-        return roomsByName[name];
+        return useCustomRooms ? customRoomsByName[name] : roomsByName[name];
     }
+
+    [GeneratedRegex(@"[\n\r\f]")]
+    private static partial Regex RemoveNewLines();
 }

@@ -3,6 +3,7 @@ using CommandLine;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
 using Z2Randomizer.Core;
+using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.CommandLine;
 
@@ -104,8 +105,11 @@ public class Program
         // worker.RunWorkerAsync();
         var cts = new CancellationTokenSource();
         var engine = new DesktopJsEngine();
-        var randomizer = new Hyrule(configuration!, engine);
-        var rom = await randomizer.Randomize(vanillaRomData!, (str) => { logger.Info(str); }, cts.Token);
+        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
+        var customJson = configuration!.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
+        var palaceRooms = new PalaceRooms(roomsJson, customJson);
+        var randomizer = new Hyrule(engine, palaceRooms);
+        var rom = await randomizer.Randomize(vanillaRomData!, configuration, (str) => { logger.Info(str); }, cts.Token);
 
         if (rom != null)
         {
