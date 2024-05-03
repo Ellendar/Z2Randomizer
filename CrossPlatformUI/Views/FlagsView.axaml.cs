@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
@@ -6,9 +7,9 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views;
 
-public partial class MainView : ReactiveUserControl<MainViewModel>
+public partial class FlagsView : ReactiveUserControl<FlagsViewModel>
 {
-    public MainView()
+    public FlagsView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);

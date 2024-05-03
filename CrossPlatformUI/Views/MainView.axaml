@@ -1,4 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:rxui="http://reactiveui.net"
+             xmlns:app="clr-namespace:CrossPlatformUI"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,15 +8,31 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
-    <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto" >
-        <StackPanel Orientation="Vertical">
-            <TextBlock>Flag String</TextBlock>
-            <TextBox Text="{Binding Flags}"></TextBox>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
+            <rxui:RoutedViewHost.DefaultContent>
+                <!-- <views:MainView/> -->
+            </rxui:RoutedViewHost.DefaultContent>
+            <rxui:RoutedViewHost.ViewLocator>
+                <!-- See AppViewLocator.cs section below -->
+                <app:AppViewLocator />
+            </rxui:RoutedViewHost.ViewLocator>
+        </rxui:RoutedViewHost>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="15">
+            <StackPanel.Styles>
+                <Style Selector="StackPanel > :is(Control)">
+                    <Setter Property="Margin" Value="2" />
+                </Style>
+                <Style Selector="StackPanel > TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center" />
+                </Style>
+            </StackPanel.Styles>
+            <Button Content="Reload ROM" Command="{Binding LoadRom}" />
+            <Button HorizontalAlignment="Right" IsEnabled="{Binding RomFileViewModel.HasRomData}" Content="Generate" Command="{Binding GenerateRom}" />
         </StackPanel>
     </Grid>
 </UserControl>

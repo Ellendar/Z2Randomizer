@@ -43,7 +43,7 @@ public partial class App : Application
             case IClassicDesktopStyleApplicationLifetime desktop:
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel()
+                    DataContext = new MainViewModel()
                 };
 
                 ServiceContainer.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
@@ -51,7 +51,7 @@ public partial class App : Application
             case ISingleViewApplicationLifetime singleViewPlatform:
                 singleViewPlatform.MainView = new MainView
                 {
-                    DataContext = new MainWindowViewModel()
+                    DataContext = new MainViewModel()
                 };
 
                 ServiceContainer.AddSingleton<IFilesService>(x => new FilesService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));

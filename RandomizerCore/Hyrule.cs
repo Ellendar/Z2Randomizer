@@ -628,7 +628,7 @@ public class Hyrule
         {
             ItemGet[item] = false;
         }
-        foreach (Location location in itemLocs)
+        foreach (Location? location in itemLocs)
         {
             location.ItemGet = false;
         }
@@ -1927,8 +1927,8 @@ public class Hyrule
         }
         WizardCollectables.Add(Town.DARUNIA_ROOF, props.SwapUpAndDownStab ? Collectable.DOWNSTAB : Collectable.UPSTAB);
         WizardCollectables.Add(Town.MIDO_CHURCH, props.SwapUpAndDownStab ? Collectable.UPSTAB : Collectable.DOWNSTAB);
-        ItemGet.Add(Collectable.DOWNSTAB, false);
-        ItemGet.Add(Collectable.UPSTAB, false);
+        // ItemGet.Add(Collectable.DOWNSTAB, false);
+        // ItemGet.Add(Collectable.UPSTAB, false);
 
         int i = 0;
         foreach (Town town in Towns.STRICT_SPELL_LOCATIONS)
