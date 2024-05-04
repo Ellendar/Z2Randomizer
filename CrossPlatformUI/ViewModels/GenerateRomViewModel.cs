@@ -24,24 +24,22 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
     {
         HostScreen = screen;
         Activator = new ViewModelActivator();
-        this.WhenActivated(async (CompositeDisposable disposables) =>
+
+        this.WhenActivated(Randomize);
+        return;
+
+        async void Randomize(CompositeDisposable disposables)
         {
             var tokenSource = new CancellationTokenSource();
             var engine = App.Current?.Services?.GetService<IAsmEngine>();
-            var fileService = App.Current?.Services?.GetService<IFilesService>();
             // var roomsJson = await fileService!.OpenFileAsync();
             // var customJson = config.UseCustomRooms ? await fileService!.OpenFileAsync() : null;
             var palaceRooms = new PalaceRooms("", null);
             var randomizer = new Hyrule(engine!, palaceRooms);
-            var output = await randomizer.Randomize(vanillaRomData, config, str => Progress = str, tokenSource.Token );
-            Disposable
-                .Create(() =>
-                {
-                    tokenSource?.Cancel();
-                })
+            var output = await randomizer.Randomize(vanillaRomData, config, str => Progress = str, tokenSource.Token);
+            Disposable.Create(() => { tokenSource?.Cancel(); })
                 .DisposeWith(disposables);
-            
-        });
+        }
     }
 
     // Reference to IScreen that owns the routable view model.
@@ -49,4 +47,5 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
     // Unique identifier for the routable view model.
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString().Substring(0, 5);
     public ViewModelActivator Activator { get; }
+    
 }
