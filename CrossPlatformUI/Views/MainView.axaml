@@ -5,34 +5,27 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
-            <rxui:RoutedViewHost.DefaultContent>
-                <!-- <views:MainView/> -->
-            </rxui:RoutedViewHost.DefaultContent>
-            <rxui:RoutedViewHost.ViewLocator>
-                <!-- See AppViewLocator.cs section below -->
-                <app:AppViewLocator />
-            </rxui:RoutedViewHost.ViewLocator>
-        </rxui:RoutedViewHost>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="15">
-            <StackPanel.Styles>
-                <Style Selector="StackPanel > :is(Control)">
-                    <Setter Property="Margin" Value="2" />
-                </Style>
-                <Style Selector="StackPanel > TextBlock">
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                </Style>
-            </StackPanel.Styles>
-            <Button Content="Reload ROM" Command="{Binding LoadRom}" />
-            <Button HorizontalAlignment="Right" IsEnabled="{Binding RomFileViewModel.HasRomData}" Content="Generate" Command="{Binding GenerateRom}" />
-        </StackPanel>
-    </Grid>
+    <dialogHost:DialogHost CloseOnClickAway="False">
+        <dialogHost:DialogHost.DialogContent>
+            <views:GenerateRomView DataContext="{Binding GenerateRomViewModel}"/>
+        </dialogHost:DialogHost.DialogContent>
+        <Grid RowDefinitions="*,Auto">
+            <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
+                <rxui:RoutedViewHost.ViewLocator>
+                    <app:AppViewLocator />
+                </rxui:RoutedViewHost.ViewLocator>
+            </rxui:RoutedViewHost>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Reload ROM" IsEnabled="{Binding CanLoadRom}" 
+                        Command="{Binding LoadRom}" />
+                <Button HorizontalAlignment="Right" IsEnabled="{Binding RomFileViewModel.HasRomData}" Content="Generate" 
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=OpenDialogCommand}" />
+            </StackPanel>
+        </Grid>
+    </dialogHost:DialogHost>
 </UserControl>

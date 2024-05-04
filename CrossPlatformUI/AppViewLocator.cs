@@ -13,7 +13,7 @@ public class AppViewLocator : ReactiveUI.IViewLocator
         MainWindowViewModel context => new MainWindow { DataContext = context },
         RomFileViewModel context => new RomFileView { DataContext = context },
         GenerateRomViewModel context => new GenerateRomView { DataContext = context },
-        FlagsViewModel context => new FlagsView { DataContext = context },
+        HeaderViewModel context => new HeaderView { DataContext = context },
         _ => throw new ArgumentOutOfRangeException(nameof(viewModel))
     };
 }

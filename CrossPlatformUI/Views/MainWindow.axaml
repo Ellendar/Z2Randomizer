@@ -14,5 +14,5 @@
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    <views:MainView />
+    <views:MainView/>
 </Window>

@@ -4,10 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:CrossPlatformUI.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:DataType="viewModels:FlagsViewModel"
-             x:Class="CrossPlatformUI.Views.FlagsView">
-    <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto" >
+             x:DataType="viewModels:HeaderViewModel"
+             x:Class="CrossPlatformUI.Views.HeaderView">
+    <Grid ColumnDefinitions="*, *" RowDefinitions="Auto">
         <StackPanel Orientation="Vertical">
+            <TextBlock>Seed</TextBlock>
+            <TextBox Text="{Binding Seed}"></TextBox>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Vertical">
             <TextBlock>Flag String</TextBlock>
             <TextBox Text="{Binding Flags}"></TextBox>
         </StackPanel>

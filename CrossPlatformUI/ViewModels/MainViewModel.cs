@@ -13,6 +13,8 @@ public class MainViewModel : ReactiveValidationObject, IScreen
 
     private RandomizerConfiguration config;
     public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
+    private bool canLoadRom;
+    public bool CanLoadRom { get => canLoadRom; set => this.RaiseAndSetIfChanged(ref canLoadRom, value); }
 
     // The Router associated with this Screen.
     // Required by the IScreen interface.
@@ -26,11 +28,21 @@ public class MainViewModel : ReactiveValidationObject, IScreen
     public ReactiveCommand<Unit, IRoutableViewModel> GoBack => Router.NavigateBack!;
 
     public RomFileViewModel RomFileViewModel { get; }
+    public HeaderViewModel HeaderViewModel { get; }
+    public GenerateRomViewModel GenerateRomViewModel { get; }
 
     
     public MainViewModel()
     {
+        Router.CurrentViewModel.Subscribe(view =>
+        {
+            CanLoadRom = view != RomFileViewModel;
+        });
+        Config = new();
         RomFileViewModel = new(this);
+        GenerateRomViewModel = new(this);
+        HeaderViewModel = new(this);
+        Router.Navigate.Execute(HeaderViewModel);
         if (!RomFileViewModel.HasRomData)
         {
             Router.Navigate.Execute(RomFileViewModel);
@@ -44,10 +56,9 @@ public class MainViewModel : ReactiveValidationObject, IScreen
             () => Router.Navigate.Execute(RomFileViewModel)
         );
         GenerateRom = ReactiveCommand.CreateFromObservable(
-            () => Router.Navigate.Execute(new GenerateRomViewModel(this, Config, RomFileViewModel.RomData))
+            () => Router.Navigate.Execute()
         );
         
-        config = new();
         this.ValidationRule(
             viewModel => viewModel.config, 
             cfg => !string.IsNullOrWhiteSpace(cfg?.Serialize()),

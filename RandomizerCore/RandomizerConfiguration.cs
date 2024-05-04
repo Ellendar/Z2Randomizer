@@ -2,19 +2,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 using System.Reflection;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
-using System.Text.Json;
 using RandomizerCore.Flags;
 
 namespace Z2Randomizer.Core;
 
 public class RandomizerConfiguration
 {
-    Logger logger = LogManager.GetCurrentClassLogger();
+    private readonly Logger logger = LogManager.GetCurrentClassLogger();
     //Meta
     [IgnoreInFlags]
     public int Seed { get; set; }

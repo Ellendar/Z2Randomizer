@@ -7,9 +7,9 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views;
 
-public partial class FlagsView : ReactiveUserControl<FlagsViewModel>
+public partial class HeaderView : ReactiveUserControl<HeaderViewModel>
 {
-    public FlagsView()
+    public HeaderView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);

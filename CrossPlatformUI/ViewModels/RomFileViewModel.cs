@@ -39,17 +39,17 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
         {
             await using var readStream = await file.OpenReadAsync();
             RomData = new byte[(uint)fileprops.Size];
-            var read = await readStream.ReadAtLeastAsync(RomData,  1024 * 256 + 0x10);
-            if (read != 1024 * 256 + 0x10)
+            var read = await readStream.ReadAsync(RomData, token);
+            if (read == 1024 * 256 + 0x10)
             {
                 // I dunno
+                HasRomData = true;
+                HostScreen.Router.NavigateBack.Execute();
             }
-            HasRomData = true;
         }
         else
         {
             throw new Exception("File exceeded 1MB limit.");
         }
-        HostScreen.Router.NavigateBack.Execute();
     }
 }

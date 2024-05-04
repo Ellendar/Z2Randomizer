@@ -20,7 +20,7 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
     {
     }
 
-    public GenerateRomViewModel(IScreen screen, RandomizerConfiguration config, byte[] vanillaRomData)
+    public GenerateRomViewModel(MainViewModel screen)
     {
         HostScreen = screen;
         Activator = new ViewModelActivator();
@@ -36,8 +36,9 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             // var customJson = config.UseCustomRooms ? await fileService!.OpenFileAsync() : null;
             var palaceRooms = new PalaceRooms("", null);
             var randomizer = new Hyrule(engine!, palaceRooms);
-            var output = await randomizer.Randomize(vanillaRomData, config, str => Progress = str, tokenSource.Token);
-            Disposable.Create(() => { tokenSource?.Cancel(); })
+            var host = (HostScreen as MainViewModel)!;
+            var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, host.Config, str => Progress = str, tokenSource.Token);
+            Disposable.Create(() => { tokenSource.Cancel(); })
                 .DisposeWith(disposables);
         }
     }

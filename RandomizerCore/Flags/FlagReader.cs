@@ -79,15 +79,14 @@ public class FlagReader
         {'+', 63},
     };
 
-    private List<bool> bits = new List<bool>();
+    private readonly List<bool> bits = [];
     public int index = 0;
     public FlagReader(string flags)
     {
         // NOTE: The '$' was replaced with '+' to help with command line usage
         flags = flags.Replace('$', '+');
-        foreach (char character in flags)
+        foreach (var decode in flags.Select(character => BASE64_DECODE[character]))
         {
-            int decode = BASE64_DECODE[character];
             bits.Add((decode & 0b100000) > 0);
             bits.Add((decode & 0b010000) > 0);
             bits.Add((decode & 0b001000) > 0);
