@@ -295,7 +295,7 @@ public class CustomTexts
         }
         else
         {
-            ShuffleWizardTexts(texts, spellMap);
+            ShuffleWizardTexts(texts, spellMap, props.ReplaceFireWithDash);
         }
 
         if (props.SpellItemHints)
@@ -436,7 +436,7 @@ public class CustomTexts
         return new Text(text);
     }
 
-    public static Text ShuffleWizardTexts(List<Text> texts, Dictionary<Town, Spell> spellMap, bool fireDash)
+    public static void ShuffleWizardTexts(List<Text> texts, Dictionary<Town, Spell> spellMap, bool fireDash)
     {
         Dictionary<Spell, Text> vanillaSpellTexts = new()
         {
@@ -458,7 +458,10 @@ public class CustomTexts
         {
             vanillaSpellTexts[Spell.FIRE] = texts[spellTextIndexes[Town.NABOORU]];
         }
-        
+        foreach(Town town in spellMap.Keys)
+        {
+            texts[spellTextIndexes[town]] = vanillaSpellTexts[spellMap[town]];
+        }
     }
 
     public static Text GenerateCommunityText(HintType type, Random r, Town? town = null, Spell? spell = null)
