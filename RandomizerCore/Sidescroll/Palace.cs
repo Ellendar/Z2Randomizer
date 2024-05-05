@@ -750,12 +750,6 @@ public class Palace
         {
             if (rooms.ContainsKey(r.Map * 4))
             {
-                /*
-                List<Room> l = rooms[r.Map * 4];
-                l.Add(r);
-                rooms.Remove(r.Map * 4);
-                rooms.Add(r.Map * 4, l);
-                */
                 rooms[r.Map * 4].Add(r);
             }
             else

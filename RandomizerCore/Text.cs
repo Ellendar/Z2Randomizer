@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Web.Services.Description;
 using Z2Randomizer.Core.Overworld;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Z2Randomizer.Core;
 
@@ -10,22 +13,23 @@ namespace Z2Randomizer.Core;
 public class Text : IEquatable<Text>
 {
     public string RawText { get; private set; }
-    public List<char> TextChars { get; private set; }
+    public byte[] EncodedText { get; private set; }
 
     public Text()
     {
-        TextChars = Util.ToGameText("I know$nothing", true);
+        RawText = "I know$nothing";
+        EncodedText = Util.ToGameText("I know$nothing", true);
     }
 
-    public Text(List<char> text)
+    public Text(byte[] text) : this()
     {
         RawText = Util.FromGameText(text);
-        TextChars = text;
+        EncodedText = text;
     }
     public Text(string text)
     {
         RawText = text;
-        TextChars = Util.ToGameText(text, true);
+        EncodedText = Util.ToGameText(text, true);
     }
 
     public void GenerateHelpfulHint(Location location)
@@ -135,7 +139,7 @@ public class Text : IEquatable<Text>
         }
 
         RawText = hint;
-        TextChars = Util.ToGameText(hint, true);
+        EncodedText = Util.ToGameText(hint, true);
     }
 
     public string GetDebuggerDisplay()
@@ -151,11 +155,11 @@ public class Text : IEquatable<Text>
     public bool Equals(Text other)
     {
         return other is not null &&
-               EqualityComparer<List<char>>.Default.Equals(TextChars, other.TextChars);
+               EncodedText.SequenceEqual(other.EncodedText);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TextChars);
+        return HashCode.Combine(EncodedText);
     }
 }
