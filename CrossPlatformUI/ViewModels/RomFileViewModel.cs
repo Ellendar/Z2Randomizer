@@ -28,7 +28,7 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
 
     private async Task OpenFileInternal(CancellationToken token)
     {
-        var filesService = App.Current?.Services?.GetService<IFilesService>();
+        var filesService = App.Current?.Services?.GetService<IFileDialogService>();
         if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
 
         var file = await filesService.OpenFileAsync();

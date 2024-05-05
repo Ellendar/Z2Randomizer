@@ -11,7 +11,7 @@
         <local:ViewLocator/>
     </Application.DataTemplates>
     <Application.Styles>
-        <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="DeepPurple" SecondaryColor="LightBlue" />
+        <themes:MaterialTheme PrimaryColor="DeepPurple" SecondaryColor="LightBlue" />
         
         <dialogHostAvalonia:DialogHostStyles />
         

@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Disposables;
+using System.Runtime.Serialization;
 using System.Threading;
 using CrossPlatformUI.Services;
 using RandomizerCore.Asm;

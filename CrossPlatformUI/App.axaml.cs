@@ -46,7 +46,7 @@ public partial class App : Application
                     DataContext = new MainViewModel()
                 };
 
-                ServiceContainer.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
+                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(desktop.MainWindow));
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:
                 singleViewPlatform.MainView = new MainView
@@ -54,11 +54,10 @@ public partial class App : Application
                     DataContext = new MainViewModel()
                 };
 
-                ServiceContainer.AddSingleton<IFilesService>(x => new FilesService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
+                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
                 break;
         }
 
-        ServiceContainer.AddSingleton<RandomizerConfigService>(x => new RandomizerConfigService());
         Services = ServiceContainer.BuildServiceProvider();
         
         base.OnFrameworkInitializationCompleted();

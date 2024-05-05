@@ -4,7 +4,7 @@ using Avalonia.Platform.Storage;
 
 namespace CrossPlatformUI.Services;
 
-public class FilesService(TopLevel? target) : IFilesService
+public class FileDialogService(TopLevel? target) : IFileDialogService
 {
     public async Task<IStorageFile?> OpenFileAsync()
     {

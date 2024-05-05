@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 using Avalonia.Data;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
@@ -6,6 +7,7 @@ using Z2Randomizer.Core;
 
 namespace CrossPlatformUI.ViewModels;
 
+[DataContract]
 public class HeaderViewModel : ReactiveValidationObject, IRoutableViewModel
 {
     public HeaderViewModel(MainViewModel mainViewModel)
@@ -13,13 +15,15 @@ public class HeaderViewModel : ReactiveValidationObject, IRoutableViewModel
         config = mainViewModel.Config;
         HostScreen = mainViewModel;
     }
-
+    
+    [DataMember]
     public string Flags
     {
         get => config.Serialize();
         set => this.ValueOrException(ref config, () => new RandomizerConfiguration(value), "Invalid Flags");
     }
     
+    [DataMember]
     public string Seed
     {
         get => seed;
@@ -28,9 +32,11 @@ public class HeaderViewModel : ReactiveValidationObject, IRoutableViewModel
 
     private RandomizerConfiguration config;
     private string seed;
-
+    
+    [IgnoreDataMember]
     // Unique identifier for the routable view model.
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString().Substring(0, 5);
+    [IgnoreDataMember]
     public IScreen HostScreen { get; }
     
 }
