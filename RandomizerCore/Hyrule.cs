@@ -3183,10 +3183,9 @@ public class Hyrule
         int spellNameBase = 0x1c3a, effectBase = 0x00e58, spellCostBase = 0xd8b, functionBase = 0xdcb;
 
         int[,] magLevels = new int[8, 8];
-        int[,] magNames = new int[8, 7];
+        Text[] magNames = new Text[8];
         int[] magEffects = new int[16];
         int[] magFunction = new int[8];
-        ROMData.UpdateSpellText(SpellMap);
 
         for (int i = 0; i < magFunction.Count(); i++)
         {
@@ -3206,10 +3205,7 @@ public class Hyrule
                 magLevels[i, j] = ROMData.GetByte(spellCostBase + (SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 8 + j));
             }
 
-            for (int j = 0; j < 7; j++)
-            {
-                magNames[i, j] = ROMData.GetByte(spellNameBase + (SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 0xe + j));
-            }
+            magNames[i] = new Text(ROMData.GetBytes(spellNameBase + (SpellMap[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 0xe), 7));
         }
 
         for (int i = 0; i < magFunction.Count(); i++)
@@ -3230,10 +3226,7 @@ public class Hyrule
                 ROMData.Put(spellCostBase + (i * 8) + j, (byte)magLevels[i, j]);
             }
 
-            for (int j = 0; j < 7; j++)
-            {
-                ROMData.Put(spellNameBase + (i * 0xe) + j, (byte)magNames[i, j]);
-            }
+            ROMData.Put(spellNameBase + (i * 0xe), magNames[i].EncodedText);
         }
 
         //fix for rope graphical glitch
@@ -3816,7 +3809,7 @@ FREE_UNTIL $c2ca
             var hint = hints[i];
             a.Reloc();
             a.Label($"HintText{i}");
-            a.Byt(hint.TextChars.Select(c => (byte)c).ToArray());
+            a.Byt(hint.EncodedText.Select(c => (byte)c).ToArray());
         }
 
         a.Reloc();

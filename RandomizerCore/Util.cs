@@ -6,6 +6,7 @@ using System.Text;
 using System.Reflection;
 using System.Threading.Tasks;
 using Z2Randomizer.Core.Overworld;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Z2Randomizer.Core;
 
@@ -17,43 +18,43 @@ public class Util
         return (byte)(((b * 0x80200802ul) & 0x0884422110ul) * 0x0101010101ul >> 32);
     }
 
-    public static List<char> ToGameText(string rawText, bool endByte)
+    public static byte[] ToGameText(string rawText, bool endByte)
     {
         List<char> rawTextChars = rawText.ToUpper().ToCharArray().ToList();
-        StringBuilder output = new StringBuilder();
+        List<byte> encodedText = [];
         for (int i = 0; i < rawTextChars.Count; i++)
         {
             if (rawTextChars[i] >= '0' && rawTextChars[i] <= '9')
-                output.Append((char)(rawTextChars[i] + 0xA0));
+                encodedText.Add((byte)((byte)rawTextChars[i] + 0xA0));
             else if (rawTextChars[i] >= 'A' && rawTextChars[i] <= 'Z')
-                output.Append((char)(rawTextChars[i] + 0x99));
-            else output.Append(rawTextChars[i] switch
+                encodedText.Add((byte)((byte)rawTextChars[i] + 0x99));
+            else encodedText.Add(rawTextChars[i] switch
             {
-                '.' => (char)0xcf,
-                '/' => (char)0xce,
-                ',' => (char)0x9c,
-                '!' => (char)0x36,
-                '?' => (char)0x34,
-                '*' => (char)0x32,
-                ' ' => (char)0xf4,
-                '\n' => (char)0xfd,
-                '$' => (char)0xfd,
-                '-' => (char)0xf6,
-                '_' => (char)0xc5,
-                _ => ""
+                '.' => 0xcf,
+                '/' => 0xce,
+                ',' => 0x9c,
+                '!' => 0x36,
+                '?' => 0x34,
+                '*' => 0x32,
+                ' ' => 0xf4,
+                '\n' => 0xfd,
+                '$' => 0xfd,
+                '-' => 0xf6,
+                '_' => 0xc5,
+                _ => 0xf4
             });
         }
         if (endByte)
         {
-            output.Append((char)textEndByte);
+            encodedText.Add(textEndByte);
         }
 
-        return output.ToString().ToCharArray().ToList();
+        return encodedText.ToArray();
     }
 
-    public static string FromGameText(IEnumerable<char> rawText)
+    public static string FromGameText(byte[] rawText)
     {
-        StringBuilder output = new StringBuilder();
+        StringBuilder output = new();
         foreach(char rawChar in rawText)
         {
             if (rawChar >= 0xD0 && rawChar <= 0xD9)

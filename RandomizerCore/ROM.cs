@@ -99,18 +99,6 @@ public class ROM
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
-    private readonly Dictionary<Town, int> spellTextPointers = new()
-    {
-        {Town.RAURU, 0xEFEC },
-        {Town.RUTO, 0xEFFE },
-        {Town.SARIA_NORTH, 0xF014 },
-        {Town.MIDO_WEST, 0xF02A },
-        {Town.NABOORU, 0xF05A },
-        {Town.DARUNIA_WEST, 0xf070 },
-        {Town.NEW_KASUTO, 0xf088 },
-        {Town.OLD_KASUTO, 0xf08e }
-    };
-
     private byte[] ROMData;
 
     public ROM(string filename)
@@ -148,10 +136,10 @@ public class ROM
         return ROMData[index];
     }
 
-    public byte[] GetBytes(int start, int end)
+    public byte[] GetBytes(int start, int length)
     {
-        byte[] bytes = new byte[end - start];
-        for(int i = start; i < end; i++)
+        byte[] bytes = new byte[length];
+        for(int i = start; i < start + length; i++)
         {
             bytes[i - start] = GetByte(i);
         }
@@ -186,19 +174,19 @@ public class ROM
         List<Text> texts = new List<Text>();
         for (int i = textAddrStartinROM; i <= textAddrEndinROM; i += 2)
         {
-            List<char> t = new List<char>();
+            List<byte> encodedText = new List<byte>();
             int addr = GetByte(i);
             addr += (GetByte(i + 1) << 8);
             addr += textAddrOffset;
-            int c = GetByte(addr);
+            byte c = GetByte(addr);
             while (c != textEndByte)
             {
                 addr++;
-                t.Add((char)c);
+                encodedText.Add(c);
                 c = GetByte(addr);
             }
-            t.Add((char)0xFF);
-            texts.Add(new Text(t));
+            encodedText.Add(0xFF);
+            texts.Add(new Text(encodedText.ToArray()));
 
         }
         return texts;
@@ -217,9 +205,9 @@ public class ROM
             Put(ptrptr, (byte)low);
             Put(ptrptr + 1, (byte)high);
             ptrptr = ptrptr + 2;
-            for (int j = 0; j < texts[i].TextChars.Count; j++)
+            for (int j = 0; j < texts[i].EncodedText.Length; j++)
             {
-                Put(textptr, (byte)texts[i].TextChars[j]);
+                Put(textptr, texts[i].EncodedText[j]);
                 textptr++;
                 ptr++;
             }
@@ -261,16 +249,16 @@ public class ROM
 
     public void AddCredits()
     {
-        List<char> randoby = Util.ToGameText("RANDO BY  ", false);
-        for (int i = 0; i < randoby.Count; i++)
+        byte[] randoby = Util.ToGameText("RANDO BY  ", false);
+        for (int i = 0; i < randoby.Length; i++)
         {
-            Put(creditsLineOneAddr + i, (byte)randoby[i]);
+            Put(creditsLineOneAddr + i, randoby[i]);
         }
 
-        List<char> digshake = Util.ToGameText("DIGSHAKE ", true);
-        for (int i = 0; i < digshake.Count; i++)
+        byte[] digshake = Util.ToGameText("DIGSHAKE ", true);
+        for (int i = 0; i < digshake.Length; i++)
         {
-            Put(creditsLineTwoAddr + i, (byte)digshake[i]);
+            Put(creditsLineTwoAddr + i, digshake[i]);
         }
     }
 
@@ -500,20 +488,6 @@ public class ROM
                     Put(loc + i, newSprite[i]);
                 }
             }
-        }
-    }
-
-    public void UpdateSpellText(Dictionary<Town, Spell> spellMap)
-    {
-        Dictionary<Town, byte[]> currentSpellPointers = new();
-        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
-        {
-            currentSpellPointers[town] = new byte[]{ GetByte(spellTextPointers[town]), GetByte(spellTextPointers[town] + 1)};
-        }
-
-        foreach(Town town in Towns.STRICT_SPELL_LOCATIONS)
-        {
-            Put(spellTextPointers[town], currentSpellPointers[spellMap[town].VanillaTown()]);
         }
     }
 

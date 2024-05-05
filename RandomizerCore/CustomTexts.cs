@@ -293,6 +293,10 @@ public class CustomTexts
         {
             GenerateCommunityText(texts, spellMap, nonhashRNG);
         }
+        else
+        {
+            ShuffleWizardTexts(texts, spellMap);
+        }
 
         if (props.SpellItemHints)
         {
@@ -430,6 +434,31 @@ public class CustomTexts
         }
         text += "town";
         return new Text(text);
+    }
+
+    public static Text ShuffleWizardTexts(List<Text> texts, Dictionary<Town, Spell> spellMap, bool fireDash)
+    {
+        Dictionary<Spell, Text> vanillaSpellTexts = new()
+        {
+            [Spell.SHIELD] = texts[spellTextIndexes[Town.RAURU]],
+            [Spell.JUMP] = texts[spellTextIndexes[Town.RUTO]],
+            [Spell.LIFE] = texts[spellTextIndexes[Town.SARIA_NORTH]],
+            [Spell.FAIRY] = texts[spellTextIndexes[Town.MIDO_WEST]],
+            [Spell.DOWNSTAB] = texts[spellTextIndexes[Town.MIDO_CHURCH]],
+            [Spell.UPSTAB] = texts[spellTextIndexes[Town.DARUNIA_ROOF]],
+            [Spell.REFLECT] = texts[spellTextIndexes[Town.DARUNIA_WEST]],
+            [Spell.SPELL] = texts[spellTextIndexes[Town.NEW_KASUTO]],
+            [Spell.THUNDER] = texts[spellTextIndexes[Town.OLD_KASUTO]]
+        };
+        if(fireDash)
+        {
+            vanillaSpellTexts[Spell.DASH] = new Text("USE THIS$TO GO$FAST");
+        }
+        else
+        {
+            vanillaSpellTexts[Spell.FIRE] = texts[spellTextIndexes[Town.NABOORU]];
+        }
+        
     }
 
     public static Text GenerateCommunityText(HintType type, Random r, Town? town = null, Spell? spell = null)
@@ -587,7 +616,8 @@ public class CustomTexts
         List<Text> usedWizardHints = new List<Text>();
         do
         {
-            foreach(Town town in spellMap.Keys)
+            usedWizardHints.Clear();
+            foreach (Town town in spellMap.Keys)
             {
                 Text wizardHint;
                 Spell spell = spellMap[town];
@@ -625,7 +655,7 @@ public class CustomTexts
         int sum = 0;
         for (int i = 0; i < texts.Count(); i++)
         {
-            sum += texts[i].TextChars.Count;
+            sum += texts[i].EncodedText.Length;
         }
         return sum;
     }

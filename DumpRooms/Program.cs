@@ -31,7 +31,7 @@ for (int j = 0; j < 3; j++)
             sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
         }
         int sideViewLength = ROMData.GetByte(sideViewPtr);
-        byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewPtr + sideViewLength);
+        byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewLength);
 
         int enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
         if (j == 2)
@@ -40,7 +40,7 @@ for (int j = 0; j < 3; j++)
         }
 
         int enemyLength = ROMData.GetByte(enemyPtr);
-        byte[] enemies = ROMData.GetBytes(enemyPtr, enemyPtr + enemyLength);
+        byte[] enemies = ROMData.GetBytes(enemyPtr, enemyLength);
 
         byte bitmask = ROMData.GetByte(bit[j] + i / 2);
 
