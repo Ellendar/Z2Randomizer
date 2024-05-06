@@ -16,10 +16,11 @@ internal sealed class Program
     private static Task Main(string[] args) => BuildAvaloniaApp()
         .WithInterFont()
         .UseReactiveUI()
-        .AfterSetup(async _ =>
+        .AfterSetup(_ =>
         {
             App.ServiceContainer ??= new ();
             App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
+            App.SuspensionDriver = new LocalStoragePersistenceService();
         })
         .StartBrowserAppAsync("out");
 

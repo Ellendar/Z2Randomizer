@@ -6,6 +6,7 @@
         <WasmMainJSPath>wwwroot\main.js</WasmMainJSPath>
         <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     </PropertyGroup>
 
     <ItemGroup>

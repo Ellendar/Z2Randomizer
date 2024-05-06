@@ -22,7 +22,8 @@ sealed class Program
             {
                 App.ServiceContainer ??= new ();
                 App.ServiceContainer.AddSingleton<IAsmEngine>(x => new DesktopJsEngine());
-                App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
+                App.SuspensionDriver = new LocalFilePersistenceService();
+                // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
             })
             .StartWithClassicDesktopLifetime(args);
     }

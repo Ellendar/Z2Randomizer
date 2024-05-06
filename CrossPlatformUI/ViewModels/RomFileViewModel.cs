@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reactive;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using CrossPlatformUI.Services;
@@ -9,11 +10,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CrossPlatformUI.ViewModels;
 
+[DataContract]
 public class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
     public string? UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
     public IScreen HostScreen { get; }
 
+    [DataMember]
     public byte[]? RomData { get; private set; }
 
     public bool HasRomData { get => RomData != null; set => this.RaisePropertyChanged(); }
@@ -40,11 +43,16 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
             await using var readStream = await file.OpenReadAsync();
             RomData = new byte[(uint)fileprops.Size];
             var read = await readStream.ReadAsync(RomData, token);
+            // TODO: Better validation
             if (read == 1024 * 256 + 0x10)
             {
-                // I dunno
                 HasRomData = true;
                 HostScreen.Router.NavigateBack.Execute();
+                // Manually save the state 
+                if (OperatingSystem.IsBrowser())
+                {
+                    await App.PersistState();
+                }
             }
         }
         else
