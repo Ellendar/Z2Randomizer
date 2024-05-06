@@ -3,6 +3,7 @@
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:local="using:CrossPlatformUI"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="CrossPlatformUI.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -12,6 +13,7 @@
     </Application.DataTemplates>
     <Application.Styles>
         <themes:MaterialTheme PrimaryColor="DeepPurple" SecondaryColor="LightBlue" />
+        <avalonia:MaterialIconStyles />
         
         <dialogHostAvalonia:DialogHostStyles />
         

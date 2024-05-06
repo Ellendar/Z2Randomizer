@@ -9,17 +9,16 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:HeaderViewModel"
              x:Class="CrossPlatformUI.Views.HeaderView">
-    <Grid ColumnDefinitions="*, *" RowDefinitions="Auto">
-        <StackPanel Orientation="Horizontal">
-            <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}" />
-            <!-- <Button ToolTip.Tip="Generate a random number as your Seed"> -->
-            <!--     <avalonia:MaterialIcon Kind="DiceMultipleOutline" /> -->
-            <!-- </Button> -->
-            <controls:FloatingButton Classes="Mini">
-                <avalonia:MaterialIcon Kind="DiceMultipleOutline" />
-            </controls:FloatingButton>
+    <Grid ColumnDefinitions="*, *" RowDefinitions="Auto" Margin="4">
+        <StackPanel>
+            <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
+                <TextBox.InnerRightContent>
+                    <Button ToolTip.Tip="Generate a random number as your Seed" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}"
+                            Content="{avalonia:MaterialIconExt DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
+                </TextBox.InnerRightContent>
+            </TextBox>
         </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Vertical">
+        <StackPanel Grid.Column="1">
             <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}" />
         </StackPanel>
     </Grid>
