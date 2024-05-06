@@ -639,6 +639,7 @@ public class WestHyrule : World
                 }
 
                 PlaceRocks(props.BoulderBlockConnections);
+                //Debug.WriteLine(GetMapDebug());
                 PlaceHiddenLocations();
 
 
@@ -1226,6 +1227,7 @@ public class WestHyrule : World
                     }
                     cave.Xpos++;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null)
                 {
@@ -1238,6 +1240,7 @@ public class WestHyrule : World
                     }
                     cave.Xpos--;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null)
                 {
@@ -1250,6 +1253,7 @@ public class WestHyrule : World
                     }
                     cave.Ypos--;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null)
                 {
@@ -1262,8 +1266,8 @@ public class WestHyrule : World
                     }
                     cave.Ypos++;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
-                cavePicked = cave.MemAddress;
             }
             else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
             {
@@ -1271,24 +1275,26 @@ public class WestHyrule : World
                 {
                     map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN)
                 {
                     map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN)
                 {
                     map[cave.Ypos - 29, cave.Xpos] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN)
                 {
                     map[cave.Ypos - 31, cave.Xpos] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
-                cavePicked = cave.MemAddress;
-
             }
         }
     }

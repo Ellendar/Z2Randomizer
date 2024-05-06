@@ -2764,6 +2764,8 @@ public abstract class World
             {
                 if (map[y,x] == Terrain.CAVE)
                 {
+                    //If all 4 sides of a cave are unwalkable terrain, you can never leave the cave
+                    //and you softlock since you can't turn around
                     if (
                         (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
                         && (y == 0 || !map[y - 1, x].IsWalkable())
@@ -2772,6 +2774,44 @@ public abstract class World
                     )
                     {
                         return false;
+                    }
+                    //If a cave exits into a lake, you softlock unless you have the boots, and the previous case
+                    //(correctly) considers walkable water as walkable, so we need to cover that case here.
+                    if (
+                        y + 1 < MAP_ROWS && map[y + 1, x] == Terrain.WALKABLEWATER
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
+                    {
+                        map[y + 1, x] = Terrain.ROAD;
+                    }
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && y > 0 && map[y - 1, x] == Terrain.WALKABLEWATER
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
+                    {
+                        map[y - 1, x] = Terrain.ROAD;
+                    }
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && x + 1 < MAP_COLS && map[y, x + 1] == Terrain.WALKABLEWATER
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
+                    {
+                        map[y, x + 1] = Terrain.ROAD;
+                    }
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && x > 0 && map[y, x - 1] == Terrain.WALKABLEWATER
+                    )
+                    {
+                        map[y, x - 1] = Terrain.ROAD;
                     }
                 }
             }

@@ -21,7 +21,7 @@ public class Palaces
 
     private const int PALACE_SHUFFLE_ATTEMPT_LIMIT = 100;
     private const int DROP_PLACEMENT_FAILURE_LIMIT = 100;
-    private const int ROOM_PLACEMENT_FAILURE_LIMIT = 100;
+    private const int ROOM_PLACEMENT_FAILURE_LIMIT = 200;
 
     private static readonly RequirementType[] VANILLA_P1_ALLOWED_BLOCKERS = [ 
         RequirementType.KEY ];
@@ -141,7 +141,7 @@ public class Palaces
             }           
         }
 
-        //If we're using a room set that has no entraces, we still need to have something, so add the vanilla entrances.
+        //If we're using a room set that has no entraces or boss rooms, we still need to have something, so add the vanilla ones.
         for (int palaceNum = 1; palaceNum < 8; palaceNum++)
         {
             if (!entrancesByPalaceNumber.ContainsKey(palaceNum) || entrancesByPalaceNumber[palaceNum].Count == 0)
@@ -149,6 +149,15 @@ public class Palaces
                 entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == palaceNum).ToList());
             }
+            if (!bossRoomsByPalaceNumber.ContainsKey(palaceNum) || bossRoomsByPalaceNumber[palaceNum].Count == 0)
+            {
+                bossRoomsByPalaceNumber.Add(palaceNum, PalaceRooms.VanillaBossRoom(palaceNum));
+            }
+        }
+
+        if(tbirdRooms.Count == 0)
+        {
+            tbirdRooms.Add(PalaceRooms.TBirdRooms(RoomGroup.VANILLA, props.UseCustomRooms).First());
         }
 
         if (props.NormalPalaceStyle.IsReconstructed())
@@ -443,7 +452,15 @@ public class Palaces
                                     }
                                 }
                             }
-                            else if (++roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
+                            else
+                            {
+                                roomPlacementFailures ++;
+                                if (Hyrule.UNSAFE_DEBUG)
+                                {
+                                    //Debug.WriteLine("Failed to place room: " + roomToAdd.GetDebuggerDisplay());
+                                }
+                            }
+                            if (roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
                             {
                                 break;
                             }

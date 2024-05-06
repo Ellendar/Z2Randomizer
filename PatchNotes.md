@@ -1,5 +1,15 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.10 - May 5, 2024
+
+- Fixed a bug where wizards would display text based on their town and not the spell they had when community text was off.
+- Fixed an issue where rock blocked caves could "double up" and be offset by 2 with two rocks.
+- Added a safety so if a cave exits directly into water, there is a one tile road so you can turn around and go back in.
+- Increased the number of allowed room placement failures before a palace is rejected. This should result in fewer seeds where GP takes a long time to generate.
+- (Room Jam) Fixed some issues that arise when using only room jam rooms in the pool (still doesn't work properly until we have more GP rooms.
+- (Room Jam) Fixed a drop room with invalid exit data.
+- (Room Jam) Updated the default custom rooms file to contain more submitted rooms.
+
 ## Version 4.3.9 - April 29th, 2024
 
 - Fixed a bug that could result in text/items being incorrect
