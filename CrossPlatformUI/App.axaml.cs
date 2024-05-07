@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reactive;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
@@ -20,31 +22,43 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
+    public static ServiceCollection? ServiceContainer;
+    
     public override void OnFrameworkInitializationCompleted()
     {
-        var services = new ServiceCollection();
+        // Remove built-in validation plugins
+        // Get an array of plugins to remove
+        var dataValidationPluginsToRemove =
+            BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
+
+        // remove each entry found
+        foreach (var plugin in dataValidationPluginsToRemove)
+        {
+            BindingPlugins.DataValidators.Remove(plugin);
+        }
+        
+        ServiceContainer ??= new ();
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel()
+                    DataContext = new MainViewModel()
                 };
 
-                services.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
+                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(desktop.MainWindow));
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:
                 singleViewPlatform.MainView = new MainView
                 {
-                    DataContext = new MainWindowViewModel()
+                    DataContext = new MainViewModel()
                 };
 
-                services.AddSingleton<IFilesService>(x => new FilesService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
+                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
                 break;
         }
 
-        services.AddSingleton<RandomizerConfigService>(x => new RandomizerConfigService());
-        Services = services.BuildServiceProvider();
+        Services = ServiceContainer.BuildServiceProvider();
         
         base.OnFrameworkInitializationCompleted();
     }

@@ -42,8 +42,52 @@ public enum Collectable
     THUNDER_SPELL = 0x24
 }
 
+
 public static class CollectableExtensions
 {
+    public static bool IsMajorItem(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.CANDLE => true,
+            Collectable.GLOVE => true,
+            Collectable.RAFT => true,
+            Collectable.BOOTS => true,
+            Collectable.FLUTE => true,
+            Collectable.CROSS => true,
+            Collectable.HAMMER => true,
+            Collectable.MAGIC_KEY => true,
+            Collectable.KEY => false,
+            Collectable.DO_NOT_USE => false,
+            Collectable.SMALL_BAG => false,
+            Collectable.MEDIUM_BAG => false,
+            Collectable.LARGE_BAG => false,
+            Collectable.XL_BAG => false,
+            Collectable.MAGIC_CONTAINER => true,
+            Collectable.HEART_CONTAINER => true,
+            Collectable.BLUE_JAR => false,
+            Collectable.RED_JAR => false,
+            Collectable.ONEUP => false,
+            Collectable.CHILD => true,
+            Collectable.TROPHY => true,
+            Collectable.MEDICINE => true,
+            Collectable.UPSTAB => true,
+            Collectable.DOWNSTAB => true,
+            Collectable.MIRROR => true,
+            Collectable.BAGUS_NOTE => true,
+            Collectable.WATER => true,
+            Collectable.SHIELD_SPELL => true,
+            Collectable.JUMP_SPELL => true,
+            Collectable.LIFE_SPELL => true,
+            Collectable.FAIRY_SPELL => true,
+            Collectable.FIRE_SPELL => true,
+            Collectable.DASH_SPELL => true,
+            Collectable.REFLECT_SPELL => true,
+            Collectable.SPELL_SPELL => true,
+            Collectable.THUNDER_SPELL => true,
+            _ => true
+        };
+    }
     public static string EnglishText(this Collectable collectable)
     {
         return collectable switch

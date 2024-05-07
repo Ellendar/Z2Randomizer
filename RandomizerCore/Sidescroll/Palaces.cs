@@ -67,7 +67,7 @@ public class Palaces
         {7, 0x8665 }
     };
 
-    public static List<Palace> CreatePalaces(CancellationToken ct, Random r, RandomizerProperties props, bool raftIsRequired)
+    public static List<Palace> CreatePalaces(CancellationToken ct, Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -90,15 +90,15 @@ public class Palaces
         {
             for (int palaceNum = 1; palaceNum < 8; palaceNum++)
             {
-                entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
+                entrancesByPalaceNumber.AddRange(palaceNum, palaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
-                bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.VANILLA, props.UseCustomRooms)
+                bossRoomsByPalaceNumber.AddRange(palaceNum, palaceRooms.BossRooms(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => (i.PalaceNumber == null && palaceNum < 6) || i.PalaceNumber == palaceNum).ToList());
-                tbirdRooms.AddRange(PalaceRooms.TBirdRooms(RoomGroup.VANILLA, props.UseCustomRooms)
+                tbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
                 {
-                    itemRoomsByDirection.AddRange(direction, PalaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction, props.UseCustomRooms).ToList());
+                    itemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction, props.UseCustomRooms).ToList());
                 }
             }  
         }
@@ -107,15 +107,15 @@ public class Palaces
         {
             for (int palaceNum = 1; palaceNum < 8; palaceNum++)
             {
-                entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.V4_0, props.UseCustomRooms)
+                entrancesByPalaceNumber.AddRange(palaceNum, palaceRooms.Entrances(RoomGroup.V4_0, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
-                bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.V4_0, props.UseCustomRooms)
+                bossRoomsByPalaceNumber.AddRange(palaceNum, palaceRooms.BossRooms(RoomGroup.V4_0, props.UseCustomRooms)
                     .Where(i => (i.PalaceNumber == null && palaceNum < 6) || i.PalaceNumber == palaceNum).ToList());
-                tbirdRooms.AddRange(PalaceRooms.TBirdRooms(RoomGroup.V4_0, props.UseCustomRooms)
+                tbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V4_0, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
                 {
-                    itemRoomsByDirection.AddRange(direction, PalaceRooms.ItemRoomsByDirection(RoomGroup.V4_0, direction, props.UseCustomRooms).ToList());
+                    itemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_0, direction, props.UseCustomRooms).ToList());
                 }
             }
         }
@@ -124,15 +124,15 @@ public class Palaces
         {
             for(int palaceNum = 1; palaceNum < 8; palaceNum++)
             {
-                entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.V4_4, props.UseCustomRooms)
+                entrancesByPalaceNumber.AddRange(palaceNum, palaceRooms.Entrances(RoomGroup.V4_4, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
-                bossRoomsByPalaceNumber.AddRange(palaceNum, PalaceRooms.BossRooms(RoomGroup.V4_4, props.UseCustomRooms)
+                bossRoomsByPalaceNumber.AddRange(palaceNum, palaceRooms.BossRooms(RoomGroup.V4_4, props.UseCustomRooms)
                     .Where(i => (i.PalaceNumber == null && palaceNum < 6) || i.PalaceNumber == palaceNum).ToList());
-                tbirdRooms.AddRange(PalaceRooms.TBirdRooms(RoomGroup.V4_4, props.UseCustomRooms)
+                tbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V4_4, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNum).ToList());
                 foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
                 {
-                    itemRoomsByDirection.AddRange(direction, PalaceRooms.ItemRoomsByDirection(RoomGroup.V4_4, direction, props.UseCustomRooms).ToList());
+                    itemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_4, direction, props.UseCustomRooms).ToList());
                 }
             }           
         }
@@ -142,7 +142,7 @@ public class Palaces
         {
             if (!entrancesByPalaceNumber.ContainsKey(palaceNum) || entrancesByPalaceNumber[palaceNum].Count == 0)
             {
-                entrancesByPalaceNumber.AddRange(palaceNum, PalaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
+                entrancesByPalaceNumber.AddRange(palaceNum, palaceRooms.Entrances(RoomGroup.VANILLA, props.UseCustomRooms)
                     .Where(i => i.PalaceNumber == palaceNum).ToList());
             }
         }
@@ -152,17 +152,17 @@ public class Palaces
             roomPool.Clear();
             if (props.AllowVanillaRooms)
             {
-                roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
+                roomPool.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
             }
 
             if (props.AllowV4Rooms)
             {
-                roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
+                roomPool.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
             }
 
             if (props.AllowV4_4Rooms)
             {
-                roomPool.AddRange(PalaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
+                roomPool.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
             }
         }
 
@@ -172,17 +172,17 @@ public class Palaces
             gpRoomPool.Clear();
             if (props.AllowVanillaRooms)
             {
-                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
+                gpRoomPool.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.VANILLA, props.UseCustomRooms));
             }
 
             if (props.AllowV4Rooms)
             {
-                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
+                gpRoomPool.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.V4_0, props.UseCustomRooms));
             }
 
             if (props.AllowV4_4Rooms)
             {
-                gpRoomPool.AddRange(PalaceRooms.GPRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
+                gpRoomPool.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.V4_4, props.UseCustomRooms));
             }
         }
 
@@ -265,7 +265,7 @@ public class Palaces
                         palace.AllRooms.Add(palace.Root);
 
                         palace.BossRoom = new(bossRoomsByPalaceNumber[currentPalace].ElementAt(r.Next(bossRoomsByPalaceNumber[currentPalace].Count)));
-                        palace.BossRoom.Enemies = (byte[])PalaceRooms.VanillaBossRoom(currentPalace).Enemies.Clone();
+                        palace.BossRoom.Enemies = (byte[])palaceRooms.VanillaBossRoom(currentPalace).Enemies.Clone();
                         palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
                         palace.BossRoom.PalaceGroup = palaceGroup;
                         palace.AllRooms.Add(palace.BossRoom);
@@ -303,7 +303,7 @@ public class Palaces
                             {
                                 Room segmentedItemRoom1, segmentedItemRoom2;
                                 segmentedItemRoom1 = palace.ItemRoom;
-                                segmentedItemRoom2 = new(PalaceRooms.GetRoomByName(segmentedItemRoom1.LinkedRoomName, props.UseCustomRooms));
+                                segmentedItemRoom2 = new(palaceRooms.GetRoomByName(segmentedItemRoom1.LinkedRoomName, props.UseCustomRooms));
                                 segmentedItemRoom2.NewMap = palace.ItemRoom.NewMap;
                                 segmentedItemRoom2.PalaceGroup = palaceGroup;
                                 //segmentedItemRoom2.SetItem((Item)currentPalace);
@@ -370,7 +370,7 @@ public class Palaces
                                 added = palace.AddRoom(roomToAdd, props.BlockersAnywhere);
                                 if (added && roomToAdd.LinkedRoomName != null)
                                 {
-                                    Room linkedRoom = new(PalaceRooms.GetRoomByName(roomToAdd.LinkedRoomName, props.UseCustomRooms));
+                                    Room linkedRoom = new(palaceRooms.GetRoomByName(roomToAdd.LinkedRoomName, props.UseCustomRooms));
                                     linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
                                     linkedRoom.LinkedRoom = roomToAdd;
                                     roomToAdd.LinkedRoom = linkedRoom;
@@ -415,7 +415,7 @@ public class Palaces
                                             continueDropping = dropZoneRoom.HasDrop;
                                             if(dropZoneRoom.LinkedRoomName != null)
                                             {
-                                                Room linkedRoom = new(PalaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms));
+                                                Room linkedRoom = new(palaceRooms.GetRoomByName(dropZoneRoom.LinkedRoomName, props.UseCustomRooms));
                                                 linkedRoom.NewMap = currentPalace < 7 ? mapNo : mapNoGp;
                                                 if (palace.AddRoom(linkedRoom, props.BlockersAnywhere))
                                                 {
@@ -498,12 +498,12 @@ public class Palaces
 
                 palace.Root = new(entrancesByPalaceNumber[currentPalace].First());
                 palace.Root.PalaceGroup = palaceGroup;
-                palace.BossRoom = new(PalaceRooms.VanillaBossRoom(currentPalace));
+                palace.BossRoom = new(palaceRooms.VanillaBossRoom(currentPalace));
                 palace.BossRoom.PalaceGroup = palaceGroup;
                 palace.AllRooms.Add(palace.Root);
                 if (currentPalace != 7)
                 {
-                    Room itemRoom = new(PalaceRooms.VanillaItemRoom(currentPalace));
+                    Room itemRoom = new(palaceRooms.VanillaItemRoom(currentPalace));
 
                     palace.ItemRoom = itemRoom;
                     palace.ItemRoom.PalaceGroup = palaceGroup;
@@ -512,13 +512,13 @@ public class Palaces
                 palace.AllRooms.Add(palace.BossRoom);
                 if (currentPalace == 7)
                 {
-                    Room bird = new(PalaceRooms.TBirdRooms(RoomGroup.VANILLA, props.UseCustomRooms).First());
+                    Room bird = new(palaceRooms.ThunderBirdRooms(RoomGroup.VANILLA, props.UseCustomRooms).First());
                     bird.PalaceGroup = palaceGroup;
                     palace.AllRooms.Add(bird);
                     palace.Tbird = bird;
 
                 }
-                foreach (Room v in PalaceRooms.VanillaPalaceRoomsByPalaceNumber(currentPalace, props.UseCustomRooms))
+                foreach (Room v in palaceRooms.VanillaPalaceRoomsByPalaceNumber(currentPalace, props.UseCustomRooms))
                 {
                     Room room = new(v);
                     room.PalaceGroup = palaceGroup;
@@ -526,7 +526,7 @@ public class Palaces
                     
                     if(room.LinkedRoomName != null)
                     {
-                        Room linkedRoom = new(PalaceRooms.GetRoomByName(room.LinkedRoomName, props.UseCustomRooms));
+                        Room linkedRoom = new(palaceRooms.GetRoomByName(room.LinkedRoomName, props.UseCustomRooms));
                         linkedRoom.PalaceGroup = palaceGroup;
                         linkedRoom.LinkedRoom = room;
                         room.LinkedRoom = linkedRoom;

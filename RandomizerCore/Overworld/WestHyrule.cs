@@ -14,6 +14,7 @@ public class WestHyrule : World
     public Location locationAtMido;
     public Location bagu;
     public Location mirrorTable;
+    public Location midoChurch;
     public Location locationAtRuto;
     public Location medicineCave;
     public Location trophyCave;
@@ -119,31 +120,41 @@ public class WestHyrule : World
         Location heartCave = GetLocationByMap(0x10, 0);
         Location fairyCave = GetLocationByMap(0x12, 0);
         fairyCave.NeedFairy = true;
-        locationAtRuto = GetLocationByMap(0xC5, 4);
-        locationAtRuto.Name = "Ruto";
         bagu = GetLocationByMap(0x18, 4);
         bagu.ActualTown = Town.BAGU;
-        locationAtMido = GetLocationByMap(0xCB, 4);
-        locationAtMido.Name = "Mido";
+        bagu.Collectable = Collectable.BAGUS_NOTE;
+
+        locationAtRauru = GetLocationByMem(0x465C);
+        locationAtRauru.Name = "Rauru";
+        locationAtRauru.Collectable = Collectable.SHIELD_SPELL;
+        locationAtRuto = GetLocationByMap(0xC5, 4);
+        locationAtRuto.Name = "Ruto";
+        locationAtRuto.Collectable = Collectable.JUMP_SPELL;
         locationAtSariaNorth = GetLocationByMap(0xC8, 4);
         locationAtSariaSouth = GetLocationByMap(0x06, 4);
         locationAtSariaNorth.NeedBagu = true;
         locationAtSariaNorth.Name = "Saria North";
         locationAtSariaSouth.NeedBagu = true;
         locationAtSariaSouth.Name = "Saria South";
+        locationAtSariaNorth.Collectable = Collectable.FAIRY_SPELL;
+        locationAtMido = GetLocationByMap(0xCB, 4);
+        locationAtMido.Name = "Mido";
+        locationAtMido.Collectable = Collectable.LIFE_SPELL;
+
+
         trophyCave = GetLocationByMap(0xE1, 0);
         raft = GetLocationByMem(0x4658);
+
         locationAtPalace1 = GetLocationByMem(0x4663);
         locationAtPalace1.PalaceNumber = 1;
         locationAtPalace2 = GetLocationByMem(0x4664);
         locationAtPalace2.PalaceNumber = 2;
         locationAtPalace3 = GetLocationByMem(0x4665);
         locationAtPalace3.PalaceNumber = 3;
+
         magicContainerCave = GetLocationByMem(0x4632);
         grassTile = GetLocationByMem(0x463F);
         heartContainerCave = GetLocationByMem(0x4634);
-        locationAtRauru = GetLocationByMem(0x465C);
-        locationAtRauru.Name = "Rauru";
         pbagCave = GetLocationByMem(0x463D);
 
 
@@ -153,6 +164,17 @@ public class WestHyrule : World
         Location fairyCave2 = GetLocationByMap(0xD3, 0);
         bridge1 = GetLocationByMap(0x04, 0);
         bridge2 = GetLocationByMap(0xC5, 0);
+
+        //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
+        mirrorTable = new Location(locationAtSariaNorth.LocationBytes, locationAtSariaNorth.TerrainType, locationAtSariaNorth.MemAddress, Continent.WEST);
+        mirrorTable.Collectable = Collectable.MIRROR;
+        mirrorTable.ActualTown = Town.SARIA_TABLE;
+        AddLocation(mirrorTable);
+        midoChurch = new Location(locationAtMido.LocationBytes, locationAtMido.TerrainType, locationAtMido.MemAddress, Continent.WEST);
+        midoChurch.Collectable = Collectable.DOWNSTAB;
+        midoChurch.ActualTown = Town.MIDO_CHURCH;
+        AddLocation(midoChurch);
+
 
         if (props.SaneCaves)
         {
@@ -1426,9 +1448,23 @@ public class WestHyrule : World
                 }
             }
         }
-        if (locationAtSariaNorth.Reachable && locationAtSariaNorth.ActualTown == Town.NEW_KASUTO)
+        Location actualSariaNorth = AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH);
+        Location actualSariaSouth = AllLocations.First(i => i.ActualTown == Town.SARIA_SOUTH);
+        if(actualSariaNorth.Reachable && 
+            (itemGet[Collectable.FAIRY_SPELL] ||
+            itemGet[Collectable.BAGUS_NOTE] ||
+            (itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
+        )    
         {
-            locationAtSariaSouth.Reachable = true;
+            actualSariaSouth.Reachable = true;
+        }
+        if (actualSariaSouth.Reachable &&
+            (itemGet[Collectable.FAIRY_SPELL] ||
+            itemGet[Collectable.BAGUS_NOTE] ||
+            (itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
+)
+        {
+            actualSariaNorth.Reachable = true;
         }
     }
 

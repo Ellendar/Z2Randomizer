@@ -11,10 +11,12 @@ namespace CrossPlatformUI.ViewModels;
 
 public class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
-    public string? UrlPathSegment { get; } = Guid.NewGuid().ToString().Substring(0, 5);
+    public string? UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
     public IScreen HostScreen { get; }
 
     public byte[]? RomData { get; private set; }
+
+    public bool HasRomData { get => RomData != null; set => this.RaisePropertyChanged(); }
 
     public RomFileViewModel(IScreen hostScreen)
     {
@@ -23,43 +25,31 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
     }
     
     public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
-    async Task OpenFileInternal(CancellationToken token)
+
+    private async Task OpenFileInternal(CancellationToken token)
     {
-        try
+        var filesService = App.Current?.Services?.GetService<IFileDialogService>();
+        if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
+
+        var file = await filesService.OpenFileAsync();
+        if (file is null) return;
+
+        var fileprops = await file.GetBasicPropertiesAsync();
+        if (fileprops.Size <= 1024 * 1024 * 1)
         {
-            var filesService = App.Current?.Services?.GetService<IFilesService>();
-            if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
-
-            var file = await filesService.OpenFileAsync();
-            if (file is null) return;
-
-            if ((await file.GetBasicPropertiesAsync()).Size <= 1024 * 1024 * 1)
+            await using var readStream = await file.OpenReadAsync();
+            RomData = new byte[(uint)fileprops.Size];
+            var read = await readStream.ReadAsync(RomData, token);
+            if (read == 1024 * 256 + 0x10)
             {
-                await using var readStream = await file.OpenReadAsync();
-                using var reader = new BinaryReader(readStream);
-                RomData = ReadAllBytes(reader);
-            }
-            else
-            {
-                throw new Exception("File exceeded 1MB limit.");
+                // I dunno
+                HasRomData = true;
+                HostScreen.Router.NavigateBack.Execute();
             }
         }
-        catch (Exception e)
+        else
         {
-            // ErrorMessages?.Add(e.Message);
+            throw new Exception("File exceeded 1MB limit.");
         }
-
-        HostScreen.Router.NavigateBack.Execute();
-    }
-
-    private static byte[] ReadAllBytes(BinaryReader reader)
-    {
-        const int bufferSize = 4096;
-        using var ms = new MemoryStream();
-        var buffer = new byte[bufferSize];
-        int count;
-        while ((count = reader.Read(buffer, 0, buffer.Length)) != 0)
-            ms.Write(buffer, 0, count);
-        return ms.ToArray();
     }
 }

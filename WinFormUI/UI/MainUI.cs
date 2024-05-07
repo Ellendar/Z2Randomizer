@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
 using System.Reflection;
 using CommandLine;
+using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -31,8 +32,11 @@ public partial class MainUI : Form
 
     private readonly int validFlagStringLength;
 
+    private Hyrule randomizer;
+
     public MainUI()
     {
+        
         if (Settings.Default.update)
         {
             Settings.Default.Upgrade();
@@ -623,6 +627,13 @@ public partial class MainUI : Form
             return;
         }
         config = ExportConfig();
+        
+        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
+        var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
+        var palaceRooms = new PalaceRooms(roomsJson, customJson);
+        var engine = new DesktopJsEngine();
+        randomizer = new Hyrule(engine, palaceRooms);
+        
         // f3 = new GeneratingSeedsForm();
         //f3.Show();
 
@@ -655,8 +666,7 @@ public partial class MainUI : Form
         Exception generationException = null;
         backgroundWorker1 = new BackgroundWorker();
         backgroundWorker1.DoWork += new DoWorkEventHandler(BackgroundWorker1_DoWork);
-        backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
-        backgroundWorker1.WorkerReportsProgress = true;
+        backgroundWorker1.WorkerReportsProgress = false;
         backgroundWorker1.WorkerSupportsCancellation = true;
         backgroundWorker1.RunWorkerCompleted += (completed_sender, completed_event) =>
         {
@@ -725,8 +735,6 @@ public partial class MainUI : Form
     private RandomizerConfiguration ExportConfig()
     {
         RandomizerConfiguration configuration = new RandomizerConfiguration();
-
-        configuration.FileName = romFileTextBox.Text.Trim();
         try
         {
             configuration.Seed = int.Parse(seedTextBox.Text.Trim());
@@ -1710,6 +1718,7 @@ public partial class MainUI : Form
 
     private void Bulk_Generate_Click(object sender, EventArgs e)
     {
+        
         string flagString = flagsTextBox.Text;
         SaveDefaults();
 
@@ -1736,21 +1745,23 @@ public partial class MainUI : Form
             config = ExportConfig();
             f3 = new GeneratingSeedsForm();
             f3.Show();
+            var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
+            var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
+            var palaceRooms = new PalaceRooms(roomsJson, customJson);
+            var engine = new DesktopJsEngine();
+            randomizer = new Hyrule(engine, palaceRooms);
             int i = 0;
             spawnNextSeed = true;
             while (i < numSeeds)
             {
-
                 f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
-
 
                 config.Seed = r.Next(1000000000);
                 if (spawnNextSeed)
                 {
                     backgroundWorker1 = new BackgroundWorker();
                     backgroundWorker1.DoWork += new DoWorkEventHandler(BackgroundWorker1_DoWork);
-                    backgroundWorker1.ProgressChanged += new ProgressChangedEventHandler(BackgroundWorker1_ProgressChanged);
-                    backgroundWorker1.WorkerReportsProgress = true;
+                    backgroundWorker1.WorkerReportsProgress = false;
                     backgroundWorker1.WorkerSupportsCancellation = true;
                     backgroundWorker1.RunWorkerAsync();
                     f3.setText("Generating Palaces");
@@ -1967,9 +1978,8 @@ public partial class MainUI : Form
         BackgroundWorker worker = sender as BackgroundWorker;
         var cts = new CancellationTokenSource();
         var ct = cts.Token;
-        var engine = new DesktopJsEngine();
-        var rando = new Hyrule(config, engine);
-        var task = rando.Randomize(str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
+        byte[] vanillaRomData = File.ReadAllBytes(romFileTextBox.Text.Trim());
+        var task = randomizer.Randomize(vanillaRomData, config, str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
         while (!task.IsCompleted)
         {
             if (worker.CancellationPending)
@@ -1978,42 +1988,6 @@ public partial class MainUI : Form
                 cts.Cancel();
             }
             Thread.Sleep(50);
-        }
-    }
-
-    private void BackgroundWorker1_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e)
-    {
-        if (e.ProgressPercentage == 2)
-        {
-            f3.setText("Generating Western Hyrule");
-        }
-        else if (e.ProgressPercentage == 3)
-        {
-            f3.setText("Generating Death Mountain");
-        }
-        else if (e.ProgressPercentage == 4)
-        {
-            f3.setText("Generating East Hyrule");
-        }
-        else if (e.ProgressPercentage == 5)
-        {
-            f3.setText("Generating Maze Island");
-        }
-        else if (e.ProgressPercentage == 6)
-        {
-            f3.setText("Shuffling Items and Spells");
-        }
-        else if (e.ProgressPercentage == 7)
-        {
-            f3.setText("Running Seed Completability Checks");
-        }
-        else if (e.ProgressPercentage == 8)
-        {
-            f3.setText("Generating Hints");
-        }
-        else if (e.ProgressPercentage == 9)
-        {
-            f3.setText("Finishing up");
         }
     }
 

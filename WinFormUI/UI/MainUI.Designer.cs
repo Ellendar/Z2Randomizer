@@ -3160,7 +3160,6 @@ partial class MainUI
         backgroundWorker1.WorkerReportsProgress = true;
         backgroundWorker1.WorkerSupportsCancellation = true;
         backgroundWorker1.DoWork += BackgroundWorker1_DoWork;
-        backgroundWorker1.ProgressChanged += BackgroundWorker1_ProgressChanged;
         // 
         // oldFlagsLabel
         // 

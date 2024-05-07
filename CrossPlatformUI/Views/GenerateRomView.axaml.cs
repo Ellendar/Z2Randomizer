@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
@@ -6,12 +7,11 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views;
 
-public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+public partial class GenerateRomView : ReactiveUserControl<GenerateRomViewModel>
 {
-    public MainWindow()
+    public GenerateRomView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);
-        InitializeComponent();
     }
 }

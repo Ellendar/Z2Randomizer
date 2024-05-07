@@ -14,11 +14,10 @@ public enum Town
     DARUNIA_WEST = 8,
     DARUNIA_ROOF = 9,
     NEW_KASUTO = 10,
-    SPELL_TOWER = 11,
-    OLD_KASUTO = 12,
-    SARIA_TABLE = 13,
-    BAGU = 14,
-    NABOORU_FOUNTAIN = 15,
+    OLD_KASUTO = 11,
+    SARIA_TABLE = 12,
+    BAGU = 13,
+    NABOORU_FOUNTAIN = 14,
 }
 
 public static class TownExtensions
@@ -54,7 +53,6 @@ public static class TownExtensions
             Town.DARUNIA_WEST => true,
             Town.DARUNIA_ROOF => false,
             Town.NEW_KASUTO => true,
-            Town.SPELL_TOWER => false,
             Town.OLD_KASUTO => true,
             Town.SARIA_TABLE => false,
             Town.BAGU => true, //Maybe this should be false because bagu has special handling
@@ -77,7 +75,6 @@ public static class TownExtensions
             Town.DARUNIA_WEST => true,
             Town.DARUNIA_ROOF => false,
             Town.NEW_KASUTO => true,
-            Town.SPELL_TOWER => false,
             Town.OLD_KASUTO => true,
             Town.SARIA_TABLE => false,
             Town.BAGU => true,

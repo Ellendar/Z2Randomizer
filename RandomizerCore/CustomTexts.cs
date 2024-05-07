@@ -284,7 +284,9 @@ public class CustomTexts
     ];
 
     public static List<Text> GenerateTexts(
-        List<Location> itemLocs, 
+        List<Location> itemLocs,
+        Dictionary<Town, Collectable> spellMap,
+        Location baguLocation,
         List<Text> texts,
         RandomizerProperties props,
         Random hashRNG)
@@ -313,7 +315,7 @@ public class CustomTexts
         List<int> placedIndex = new List<int>();
         if (props.BagusWoods)
         {
-            texts[riverManTextIndex] = GenerateBaguHint(bagu);
+            texts[riverManTextIndex] = GenerateBaguHint(baguLocation);
             //sariaHints.Remove(baguText);
         }
         if (props.HelpfulHints)
@@ -604,15 +606,15 @@ public class CustomTexts
         }
     }
 
-    private static void GenerateCommunityText(List<Text> hints, Dictionary<Town, Collectable> spellMap, Random r)
+    private static void GenerateCommunityText(List<Text> hints, Dictionary<Town, Collectable> itemGet, Random r)
     {
-        List<Text> usedWizardHints = new List<Text>();
+        List<Text> usedWizardHints = [];
         do
         {
-            foreach(Town town in spellMap.Keys)
+            foreach(Town town in itemGet.Keys)
             {
                 Text wizardHint;
-                Collectable collectable = spellMap[town];
+                Collectable collectable = itemGet[town];
                 do
                 {
                     wizardHint = GenerateCommunityText(HintType.WIZARD, r, town, collectable);
@@ -626,8 +628,6 @@ public class CustomTexts
 
             Text bridgeHint = GenerateCommunityText(HintType.BRIDGE, r);
             hints[bridgeTextIndex] = bridgeHint;
-        //TODO: Add in a routine that cleans out any extraneous scripts that were either unused in the NA version
-        //      Or are now unused with the randomizer.
         } while (TextLength(hints) > maxTextLength);
     }
 

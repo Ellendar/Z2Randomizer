@@ -1,20 +1,31 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:rxui="http://reactiveui.net"
+             xmlns:app="clr-namespace:CrossPlatformUI"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
-    <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto" >
-        <StackPanel Orientation="Vertical">
-            <TextBlock>Flag String</TextBlock>
-            <TextBox Text="{Binding Flags}"></TextBox>
-        </StackPanel>
-    </Grid>
+    <dialogHost:DialogHost CloseOnClickAway="False">
+        <dialogHost:DialogHost.DialogContent>
+            <views:GenerateRomView DataContext="{Binding GenerateRomViewModel}"/>
+        </dialogHost:DialogHost.DialogContent>
+        <Grid RowDefinitions="*,Auto">
+            <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
+                <rxui:RoutedViewHost.ViewLocator>
+                    <app:AppViewLocator />
+                </rxui:RoutedViewHost.ViewLocator>
+            </rxui:RoutedViewHost>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Reload ROM" IsEnabled="{Binding CanLoadRom}" 
+                        Command="{Binding LoadRom}" />
+                <Button HorizontalAlignment="Right" IsEnabled="{Binding RomFileViewModel.HasRomData}" Content="Generate" 
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=OpenDialogCommand}" />
+            </StackPanel>
+        </Grid>
+    </dialogHost:DialogHost>
 </UserControl>

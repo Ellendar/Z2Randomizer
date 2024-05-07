@@ -20,7 +20,6 @@ internal class Towns
         { Town.DARUNIA_WEST, new Requirements([], [[RequirementType.CHILD, RequirementType.SIX_CONTAINERS]]) },
         { Town.DARUNIA_ROOF, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
         { Town.NEW_KASUTO, new Requirements(new RequirementType[] {RequirementType.SEVEN_CONTAINERS })  },
-        { Town.SPELL_TOWER, new Requirements(new RequirementType[] {RequirementType.SPELL })  },
         { Town.OLD_KASUTO, new Requirements(new RequirementType[] { RequirementType.EIGHT_CONTAINERS }) },
         { Town.NABOORU_FOUNTAIN, new Requirements() },
         { Town.BAGU, new Requirements() },
