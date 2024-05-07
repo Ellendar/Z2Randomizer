@@ -6,6 +6,8 @@
         <WasmMainJSPath>wwwroot\main.js</WasmMainJSPath>
         <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     </PropertyGroup>
 

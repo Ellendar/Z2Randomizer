@@ -16,13 +16,12 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
-
         BuildAvaloniaApp()
             .AfterSetup(_ =>
             {
                 App.ServiceContainer ??= new ();
                 App.ServiceContainer.AddSingleton<IAsmEngine>(x => new DesktopJsEngine());
-                App.SuspensionDriver = new LocalFilePersistenceService();
+                App.SyncSuspensionDriver = new LocalFilePersistenceService();
                 // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
             })
             .StartWithClassicDesktopLifetime(args);

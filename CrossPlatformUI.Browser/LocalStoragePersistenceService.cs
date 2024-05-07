@@ -5,13 +5,14 @@ using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
+using CrossPlatformUI.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReactiveUI;
 
 namespace CrossPlatformUI.Browser;
 
-public partial class LocalStoragePersistenceService : ISuspensionDriver
+public partial class LocalStoragePersistenceService : ISuspendSyncService //: ISuspensionDriver
 {
     [JSImport("globalThis.window.localStorage.setItem")]
     private static partial void SetItem(string key, string value);
@@ -31,47 +32,40 @@ public partial class LocalStoragePersistenceService : ISuspensionDriver
         TypeNameHandling = TypeNameHandling.All,
     };
     
-    public IObservable<object> LoadState()
+    public object LoadState()
     {
-        return Task.Run(() =>
-        {
-            var data = GetItem("appstate");
-            var ret = JsonConvert.DeserializeObject<object>(data ?? "{}", serializerSettings);
-            return ret!;
-        }).ToObservable();
+        var data = GetItem("appstate");
+        var ret = JsonConvert.DeserializeObject<object>(data ?? "{}", serializerSettings);
+        return ret!;
     }
 
-    public IObservable<Unit> SaveState(object state)
+    public void SaveState(object state)
     {
-        return Task.Run(Action).ToObservable();
-        async void Action()
+        var json = JsonConvert.SerializeObject(state, serializerSettings);
+        var next = JObject.Parse(json);
+        try
         {
-            var json = JsonConvert.SerializeObject(state, serializerSettings);
-            var next = JObject.Parse(json);
-            try
+            var settings = GetItem("appstate");
+            var orig = JObject.Parse(settings ?? "{}");
+            orig.Merge(next, new JsonMergeSettings
             {
-                var settings = GetItem("appstate");
-                var orig = JObject.Parse(settings ?? "{}");
-                orig.Merge(next, new JsonMergeSettings
-                {
-                    // union array values together to avoid duplicates
-                    MergeArrayHandling = MergeArrayHandling.Union,
-                });
-                next = orig;
-            }
-            catch (Exception e) when (e is JsonException or IOException) { }
-
-            var stringbuild = new StringBuilder();
-            await using var sw = new StringWriter(stringbuild);
-            await using var writer = new JsonTextWriter(sw);
-            writer.Formatting = Formatting.None;
-            next.WriteTo(writer);
-            SetItem("appstate", stringbuild.ToString());
+                // union array values together to avoid duplicates
+                MergeArrayHandling = MergeArrayHandling.Union,
+            });
+            next = orig;
         }
+        catch (Exception e) when (e is JsonException or IOException) { }
+
+        var stringbuild = new StringBuilder();
+        using var sw = new StringWriter(stringbuild);
+        using var writer = new JsonTextWriter(sw);
+        writer.Formatting = Formatting.None;
+        next.WriteTo(writer);
+        SetItem("appstate", stringbuild.ToString());
     }
 
-    public IObservable<Unit> InvalidateState()
+    public void InvalidateState()
     {
-        return Task.Run(Clear).ToObservable();
+        Clear();
     }
 }

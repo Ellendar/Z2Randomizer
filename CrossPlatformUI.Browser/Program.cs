@@ -20,7 +20,7 @@ internal sealed class Program
         {
             App.ServiceContainer ??= new ();
             App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
-            App.SuspensionDriver = new LocalStoragePersistenceService();
+            App.SyncSuspensionDriver = new LocalStoragePersistenceService();
         })
         .StartBrowserAppAsync("out");
 
