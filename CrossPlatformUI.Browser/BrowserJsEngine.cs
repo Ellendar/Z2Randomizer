@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
-using Microsoft.JSInterop;
 using RandomizerCore.Asm;
 
 namespace CrossPlatformUI.Browser;

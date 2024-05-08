@@ -9,6 +9,7 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <WasmEmitSymbolMap>false</WasmEmitSymbolMap>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <RunAOTCompilation>true</RunAOTCompilation>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,5 +23,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <TrimmerRootAssembly Include="RandomizerCore" />
     </ItemGroup>
 </Project>
