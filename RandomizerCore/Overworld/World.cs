@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using NLog;
 using RandomizerCore;
-using Z2Randomizer.Core.Sidescroll;
 //using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Z2Randomizer.Core.Overworld;

@@ -1,15 +1,9 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Speech.Synthesis;
 using System.Diagnostics;
-using System.Numerics;
-using Z2Randomizer.Core.Overworld;
-using System.Text;
 using RandomizerCore;
-using NLog.Targets;
 
 namespace Z2Randomizer.Core.Sidescroll;
 

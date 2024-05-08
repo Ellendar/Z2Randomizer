@@ -11,7 +11,7 @@ using RandomizerCore.Asm;
 
 namespace CrossPlatformUI.Browser;
 
-internal sealed class Program
+internal sealed partial class Program
 {
     private static Task Main(string[] args) => BuildAvaloniaApp()
         .WithInterFont()

@@ -50,13 +50,16 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             Disposable.Create(() => { tokenSource.Cancel(); })
                 .DisposeWith(disposables);
             await App.PersistState();
-            // var engine = App.Current?.Services?.GetService<IAsmEngine>();
-            // var roomsJson = await fileService!.OpenFileAsync();
-            // var customJson = config.UseCustomRooms ? await fileService!.OpenFileAsync() : null;
-            // var palaceRooms = new PalaceRooms("", null);
-            // var randomizer = new Hyrule(engine!, palaceRooms);
-            // var host = (HostScreen as MainViewModel)!;
-            // var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, host.Config, str => Progress = str, tokenSource.Token);
+            var engine = App.Current?.Services?.GetService<IAsmEngine>();
+            var files = App.Current?.Services?.GetService<IFileService>();
+            var host = (HostScreen as MainViewModel)!;
+            var config = host.Config;
+            var roomsJson = await files!.OpenLocalFile("PalaceRooms.json");
+            var customJson = config.UseCustomRooms ? await files!.OpenLocalFile("CustomRooms.json") : null;
+            var palaceRooms = new PalaceRooms(roomsJson, customJson);
+            var randomizer = new Hyrule(engine!, palaceRooms);
+            var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, host.Config, str => Progress = str, tokenSource.Token);
+            
         }
     }
 

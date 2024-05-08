@@ -1,11 +1,11 @@
 <Project>
   <PropertyGroup>
     <Nullable>enable</Nullable>
-    <AvaloniaVersion>11.0.10</AvaloniaVersion>
-    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <TrimmerSingleWarn>false</TrimmerSingleWarn>
-    <PublishTrimmed>true</PublishTrimmed>
+    <AvaloniaVersion>11.1.0-beta2</AvaloniaVersion>
+<!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
+<!--    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>-->
+<!--    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>-->
+<!--    <TrimmerSingleWarn>false</TrimmerSingleWarn>-->
+<!--    <PublishTrimmed>true</PublishTrimmed>-->
   </PropertyGroup>
 </Project>
