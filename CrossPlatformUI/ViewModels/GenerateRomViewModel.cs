@@ -35,7 +35,7 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             var engine = App.Current?.Services?.GetService<IAsmEngine>();
             // var roomsJson = await fileService!.OpenFileAsync();
             // var customJson = config.UseCustomRooms ? await fileService!.OpenFileAsync() : null;
-            var palaceRooms = new PalaceRooms("", null);
+            var palaceRooms = new PalaceRooms("", false);
             var randomizer = new Hyrule(engine!, palaceRooms);
             var host = (HostScreen as MainViewModel)!;
             var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, host.Config, str => Progress = str, tokenSource.Token);

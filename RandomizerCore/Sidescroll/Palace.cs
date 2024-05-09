@@ -1,15 +1,9 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Speech.Synthesis;
 using System.Diagnostics;
-using System.Numerics;
-using Z2Randomizer.Core.Overworld;
-using System.Text;
 using RandomizerCore;
-using NLog.Targets;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -19,11 +13,12 @@ public class Palace
 
     private const bool DROPS_ARE_BLOCKERS = false;
     private const int OUTSIDE_ROOM_EXIT = 0b11111100;
-    private Room root;
+    private Room entrance;
     private Room itemRoom;
     private Room bossRoom;
     private Room tbird;
     private readonly SortedDictionary<int, List<Room>> rooms;
+    internal bool IsValid { get; set; } = false;
 
     public static readonly Collectable[] SHUFFLABLE_SMALL_ITEMS = [
         Collectable.KEY,
@@ -35,26 +30,15 @@ public class Palace
         Collectable.RED_JAR,
         Collectable.ONEUP
     ];
-    /*
-    private List<Room> upExits;
-    private List<Room> downExits;
-    private List<Room> leftExits;
-    private List<Room> rightExits;
-    private List<Room> dropExits;
-    private List<Room> onlyp7DownExits;
-    */
-    //private ROM ROMData;
+
     private int numRooms;
-    private int baseAddr;
-    private int connAddr;
     private List<Room> openRooms;
     private int maxRooms;
     private int netDeadEnds;
-    private bool useCustomRooms;
 
     internal List<Room> AllRooms { get; private set; }
 
-    public Room Root { get => root; set => root = value; }
+    public Room Root { get => entrance; set => entrance = value; }
     public Room ItemRoom { get => itemRoom; set => itemRoom = value; }
     public Room BossRoom { get => bossRoom; set => bossRoom = value; }
     public int NumRooms { get => numRooms; set => numRooms = value; }
@@ -65,28 +49,14 @@ public class Palace
     //DEBUG
     public int Generations { get; set; }
 
-    public Palace(int number, int baseAddr, int connAddr, bool useCustomRooms)
+    public Palace(int number)
     {
         Number = number;
-        root = null;
-        /*
-        upExits = new List<Room>();
-        downExits = new List<Room>();
-        leftExits = new List<Room>();
-        rightExits = new List<Room>();
-        dropExits = new List<Room>();
-        onlyp7DownExits = new List<Room>();
-        */
+        entrance = null;
         rooms = new SortedDictionary<int, List<Room>>();
         AllRooms = new List<Room>();
         numRooms = 0;
-        this.baseAddr = baseAddr;
-        this.connAddr = connAddr;
-        //this.ROMData = ROMData;
         openRooms = new List<Room>();
-        this.useCustomRooms = useCustomRooms;
-        //dumpMaps();
-        //createTree();
         if (Number < 7)
         {
             netDeadEnds = 3;
@@ -235,10 +205,10 @@ public class Palace
         if (!placed && open.HasRightExit() && open.Right == null && r.HasLeftExit() && r.Left == null)
         {
             open.Right = r;
-            open.RightByte = (byte)((r.NewMap ?? r.Map) * 4);
+            open.RightByte = (byte)(r.Map * 4);
 
             r.Left = open;
-            r.LeftByte = (byte)((open.NewMap ?? open.Map) * 4 + 3);
+            r.LeftByte = (byte)(open.Map * 4 + 3);
 
             placed = true;
         }
@@ -246,10 +216,10 @@ public class Palace
         if (!placed && open.HasLeftExit() && open.Left == null && r.HasRightExit() && r.Right == null)
         {
             open.Left = r;
-            open.LeftByte = (byte)((r.NewMap ?? r.Map) * 4 + 3);
+            open.LeftByte = (byte)(r.Map * 4 + 3);
 
             r.Right = open;
-            r.RightByte = (byte)((open.NewMap ?? open.Map) * 4);
+            r.RightByte = (byte)(open.Map * 4);
 
             placed = true;
         }
@@ -257,10 +227,10 @@ public class Palace
         if (!placed && open.HasUpExit() && open.Up == null && r.HasDownExit() && r.Down == null && !r.HasDrop)
         {
             open.Up = r;
-            open.UpByte = (byte)((r.NewMap ?? r.Map) * 4 + r.ElevatorScreen);
+            open.UpByte = (byte)(r.Map * 4 + r.ElevatorScreen);
 
             r.Down = open;
-            r.DownByte = (byte)((open.NewMap ?? open.Map) * 4 + open.ElevatorScreen);
+            r.DownByte = (byte)(open.Map * 4 + open.ElevatorScreen);
 
             placed = true;
         }
@@ -269,10 +239,10 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = (byte)((r.NewMap ?? r.Map) * 4 + r.ElevatorScreen);
+            open.DownByte = (byte)(r.Map * 4 + r.ElevatorScreen);
 
             r.Up = open;
-            r.UpByte = (byte)((open.NewMap ?? open.Map) * 4 + open.ElevatorScreen);
+            r.UpByte = (byte)(open.Map * 4 + open.ElevatorScreen);
 
             placed = true;
         }
@@ -281,7 +251,7 @@ public class Palace
         {
 
             open.Down = r;
-            open.DownByte = (byte)((r.NewMap ?? r.Map) * 4);
+            open.DownByte = (byte)(r.Map * 4);
             r.IsDropZone = false;
             placed = true;
         }
@@ -290,7 +260,7 @@ public class Palace
         {
 
             r.Down = open;
-            r.DownByte = (byte)((open.NewMap ?? open.Map) * 4);
+            r.DownByte = (byte)(open.Map * 4);
             open.IsDropZone = false;
             placed = true;
         }
@@ -324,7 +294,7 @@ public class Palace
 
     public bool RequiresThunderbird()
     {
-        CheckSpecialPaths(root, 2);
+        CheckSpecialPaths(entrance, 2);
         return !bossRoom.IsBeforeTbird;
     }
 
@@ -368,7 +338,7 @@ public class Palace
                 }
                 roomsToCheck.Remove(c);
             }
-            if (!reachable.Contains(root) && !reachable.Contains(end))
+            if (!reachable.Contains(entrance) && !reachable.Contains(end))
             {
                 return true;
             }
@@ -420,7 +390,7 @@ public class Palace
                 return false;
             }
         }
-        CheckPaths(root, Direction.WEST);
+        CheckPaths(entrance, Direction.WEST);
         foreach (Room r in AllRooms)
         {
             if (!r.IsPlaced)
@@ -699,7 +669,7 @@ public class Palace
             {
                 if(room.Right != null)
                 {
-                    room.Right.Connections[0] = (byte)((room.NewMap ?? room.Map) * 4 + 1);
+                    room.Right.Connections[0] = (byte)(room.Map * 4 + 1);
                 }
                 if (room.Up != null || room.Down != null)
                 {
@@ -710,7 +680,7 @@ public class Palace
             {
                 if (room.Right != null)
                 {
-                    room.Right.Connections[0] = (byte)((room.NewMap ?? room.Map) * 4 + 2);
+                    room.Right.Connections[0] = (byte)(room.Map * 4 + 2);
                 }
                 if (room.Up != null || room.Down != null)
                 {
@@ -826,9 +796,9 @@ public class Palace
                     }
                 }
             }
-            if ((r.UpByte & 0xFC) == 0 && (root.DownByte & 0xFC) / 4 == r.Map)
+            if ((r.UpByte & 0xFC) == 0 && (entrance.DownByte & 0xFC) / 4 == r.Map)
             {
-                r.Up = root;
+                r.Up = entrance;
             }
         }
         if (removeTbird)
@@ -955,7 +925,7 @@ public class Palace
                             continue;
                         }
 
-                        if (remove.Left.Up == null || remove.Left.Up != root)
+                        if (remove.Left.Up == null || remove.Left.Up != entrance)
                         {
                             tries++;
                             continue;
@@ -989,7 +959,7 @@ public class Palace
                             continue;
                         }
 
-                        if (remove.Right.Up == null || remove.Right.Up == root)
+                        if (remove.Right.Up == null || remove.Right.Up == entrance)
                         {
                             tries++;
                             continue;
@@ -1174,7 +1144,7 @@ public class Palace
 
     public List<Room> CheckBlocks()
     {
-        return CheckBlocksHelper(new List<Room>(), new List<Room>(), root);
+        return CheckBlocksHelper(new List<Room>(), new List<Room>(), entrance);
     }
 
     private List<Room> CheckBlocksHelper(List<Room> c, List<Room> blockers, Room r)
@@ -1338,5 +1308,22 @@ public class Palace
                 r.DownByte = OUTSIDE_ROOM_EXIT;
             }
         }
+    }
+
+    public int AssignMapNumbers(int currentMap)
+    {
+        entrance.Map = currentMap;
+        bossRoom.Map = ++currentMap;
+        itemRoom.Map = ++currentMap;
+        IEnumerable<Room> normalRooms = AllRooms.Where(i => i != entrance && i != bossRoom && i != itemRoom);
+        foreach(Room room in normalRooms)
+        {
+            room.Map = ++currentMap;
+        }
+        if(currentMap >= 63)
+        {
+            throw new Exception("Map number has exceeded maximum");
+        }
+        return currentMap;
     }
 }

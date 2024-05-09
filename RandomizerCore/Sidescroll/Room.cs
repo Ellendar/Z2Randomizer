@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using RandomizerCore;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.Core.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -155,7 +155,7 @@ public class Room
     public byte[] Enemies { get; set; }
     public byte[] NewEnemies { get; set; }
     public byte[] SideView { get; set; }
-    public int? NewMap { get; set; }
+    //public int? NewMap { get; set; }
     //Whether the room contains a boss, which is true of boss rooms, but also boss-containing passthrough/item rooms.
     public bool HasBoss { get; set; }
     //Specifically indicates this is a "boss room" i.e. boss then a gem statue, then an exit.
@@ -286,11 +286,11 @@ public class Room
             a.Segment("PRG5", "PRG7");
             addr = sideview3;
         }
-        a.RomOrg(addr + (NewMap ?? Map) * 2);
+        a.RomOrg(addr + Map * 2);
         a.Word(a.Symbol(label));
     }
 
-    public void UpdateEnemies(int enemyAddr, ROM ROMData, PalaceStyle normalPalaceStyle, PalaceStyle gpStyle)
+    public void UpdateEnemies(int enemyAddr, ROM ROMData)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if(NewEnemies[0] == 0)
@@ -337,20 +337,20 @@ public class Room
         if (PalaceGroup == 1)
         {
             memAddr -= 0x98b0;
-            ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(Core.Enemies.Palace125EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else if (PalaceGroup == 2)
         {
             memAddr -= 0x98b0;
-            ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(Core.Enemies.Palace346EnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
         else
         {
             memAddr -= 0xd8b0;
-            ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(Core.Enemies.GPEnemyPtr + (NewMap ?? Map) * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            ROMData.Put(Core.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+            ROMData.Put(Core.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
         }
 
 
@@ -373,19 +373,19 @@ public class Room
         {
             ptr = Group3ItemGetStartAddress;
         }
-        if((NewMap ?? Map) % 2 == 0)
+        if(Map % 2 == 0)
         {
-            byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
+            byte old = ROMData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0x0F);
             old = (byte)((itemGetBits << 4) | old);
-            ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
+            ROMData.Put(ptr + Map / 2, old);
         }
         else
         {
-            byte old = ROMData.GetByte(ptr + (NewMap ?? Map) / 2);
+            byte old = ROMData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0xF0);
             old = (byte)((itemGetBits) | old);
-            ROMData.Put(ptr + (NewMap ?? Map) / 2, old);
+            ROMData.Put(ptr + Map / 2, old);
         }
     }
 
@@ -414,11 +414,11 @@ public class Room
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int sideViewPtr = (ROMData.GetByte(sideview1 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview1 + 1 + (NewMap ?? Map) * 2) << 8));
+        int sideViewPtr = (ROMData.GetByte(sideview1 + Map * 2) + (ROMData.GetByte(sideview1 + 1 + Map * 2) << 8));
 
         if (PalaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + (NewMap ?? Map) * 2) + (ROMData.GetByte(sideview2 + 1 + (NewMap ?? Map) * 2) << 8));
+            sideViewPtr = (ROMData.GetByte(sideview2 + Map * 2) + (ROMData.GetByte(sideview2 + 1 + Map * 2) << 8));
         }
         // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
         // otherwise we want to use the bank offset for PRG4 (0x10000)
@@ -455,9 +455,9 @@ public class Room
     {
         ConnectionStartAddress = PalaceGroup switch
         {
-            1 => connectors1 + (NewMap ?? Map) * 4,
-            2 => connectors2 + (NewMap ?? Map) * 4,
-            3 => connectors3 + (NewMap ?? Map) * 4,
+            1 => connectors1 + Map * 4,
+            2 => connectors2 + Map * 4,
+            3 => connectors3 + Map * 4,
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
     }
@@ -677,7 +677,7 @@ public class Room
     public string Debug()
     {
         StringBuilder sb = new();
-        sb.Append("Map: " + (NewMap ?? Map) + " Name: " + Name + " Sideview: ");
+        sb.Append("Map: " + Map + " Name: " + Name + " Sideview: ");
         sb.Append(BitConverter.ToString(SideView).Replace("-", ""));
         sb.Append(" Enemies: ");
         sb.Append(BitConverter.ToString(NewEnemies[0] == 0 ? Enemies : NewEnemies).Replace("-", ""));
@@ -787,7 +787,6 @@ public class Room
     {
         StringBuilder sb = new();
         sb.Append(Map);
-        sb.Append(" (" + NewMap + ") ");
         sb.Append(Name);
         sb.Append(" [" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
         sb.Append(" [" + BitConverter.ToString(Enemies).Replace("-", "") + "]");

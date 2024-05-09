@@ -107,7 +107,7 @@ public class Program
         var engine = new DesktopJsEngine();
         var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = configuration!.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
-        var palaceRooms = new PalaceRooms(roomsJson, customJson);
+        var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson : roomsJson, configuration!.UseCustomRooms);
         var randomizer = new Hyrule(engine, palaceRooms);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, (str) => { logger.Info(str); }, cts.Token);
 

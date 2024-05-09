@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.Core.Sidescroll;
 using System.Text;
 using System.Text.Json;
 using Z2Randomizer.Core;

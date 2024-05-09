@@ -311,7 +311,7 @@ public class Hyrule
                     {
                         room.WriteSideViewPtr(sideview_module, name);
                         room.UpdateItemGetBits(ROMData);
-                        room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
+                        room.UpdateEnemies(enemyAddr, ROMData);
                         enemyAddr += room.NewEnemies.Length;
                         room.UpdateConnectionBytes();
                         room.UpdateConnectionStartAddress();
@@ -334,7 +334,7 @@ public class Hyrule
                     {
                         room.WriteSideViewPtr(gp_sideview_module, name);
                         room.UpdateItemGetBits(ROMData);
-                        room.UpdateEnemies(enemyAddr, ROMData, props.NormalPalaceStyle, props.GPStyle);
+                        room.UpdateEnemies(enemyAddr, ROMData);
                         enemyAddr += room.NewEnemies.Length;
                         room.UpdateConnectionBytes();
                         room.UpdateConnectionStartAddress();
@@ -477,7 +477,7 @@ public class Hyrule
                 foreach (Palace palace in palaces)
                 {
                     sb.AppendLine("Palace: " + palace.Number);
-                    foreach (Room room in palace.AllRooms.OrderBy(i => i.NewMap ?? i.Map))
+                    foreach (Room room in palace.AllRooms.OrderBy(i => i.Map))
                     {
                         sb.AppendLine(room.Debug());
                     }
@@ -3080,19 +3080,19 @@ public class Hyrule
         }
 
         Room root = palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Root;
-        ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)root.Map);
         root = palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Root;
-        ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)root.Map);
         root = palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Root;
-        ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)root.Map);
         root = palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Root;
-        ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)root.Map);
         root = palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Root;
-        ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)root.Map);
         root = palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Root;
-        ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)root.Map);
         root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root;
-        ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)(root.NewMap == null ? root.Map : root.NewMap));
+        ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)root.Map);
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
         ROMData.Put(0xDB8C, (byte)eastHyrule.townAtNewKasuto.Collectable); //map 46
@@ -3315,13 +3315,13 @@ public class Hyrule
     public void PrintSpoiler(LogLevel logLevel)
     {
         logger.Log(logLevel, "ITEMS:");
-        foreach (Collectable item in SHUFFLABLE_STARTING_ITEMS)
+        foreach (Collectable item in Enum.GetValues(typeof(Collectable)))
         {
-            logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + itemLocs.Where(i => i.Collectable == item).FirstOrDefault()?.Name);
-        }
-        foreach (Collectable item in SHUFFLABLE_STARTING_ITEMS)
-        {
-            logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + itemLocs.Where(i => i.Collectable == item).FirstOrDefault()?.Name);
+            if (item.IsMajorItem())
+            {
+                logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + itemLocs.Where(i => i.Collectable == item).FirstOrDefault()?.Name);
+
+            }
         }
     }
 
@@ -3496,12 +3496,16 @@ CustomFileSelectData:
         return false;
     }
 
-    private void FixHelmetheadItemRoomDespawn(Assembler asm)
+    private void FixHelmetheadBossRoom(Assembler asm)
     {
-        byte helmetRoom = 0x22;
-        if (props.NormalPalaceStyle.IsReconstructed())
+        byte helmetRoom;
+        if (props.PalaceStyles[1] == PalaceStyle.VANILLA)
         {
-            helmetRoom = (byte)palaces[1].BossRoom.NewMap;
+            helmetRoom = 0x22;
+        }
+        else
+        {
+            helmetRoom = (byte)palaces[1].BossRoom.Map;
         }
 
         var a = asm.Module();
@@ -3818,7 +3822,7 @@ FREE_UNTIL $c2ca
     {
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
-        FixHelmetheadItemRoomDespawn(engine);
+        FixHelmetheadBossRoom(engine);
 
         if (props.RandomizeKnockback)
         {

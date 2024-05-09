@@ -10,6 +10,7 @@ using Z2Randomizer.WinFormUI.Properties;
 using System.Reflection;
 using CommandLine;
 using Z2Randomizer.Core.Sidescroll;
+using System;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -36,7 +37,7 @@ public partial class MainUI : Form
 
     public MainUI()
     {
-        
+
         if (Settings.Default.update)
         {
             Settings.Default.Upgrade();
@@ -627,13 +628,13 @@ public partial class MainUI : Form
             return;
         }
         config = ExportConfig();
-        
-        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
-        var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
-        var palaceRooms = new PalaceRooms(roomsJson, customJson);
+
+        var palaceRooms = new PalaceRooms(
+            config.UseCustomRooms ? Util.ReadAllTextFromFile("PalaceRooms.json") : Util.ReadAllTextFromFile("CustomRooms.json"),
+            config.UseCustomRooms);
         var engine = new DesktopJsEngine();
         randomizer = new Hyrule(engine, palaceRooms);
-        
+
         // f3 = new GeneratingSeedsForm();
         //f3.Show();
 
@@ -959,7 +960,10 @@ public partial class MainUI : Form
             0 => PalaceStyle.VANILLA,
             1 => PalaceStyle.SHUFFLED,
             2 => PalaceStyle.RECONSTRUCTED,
-            3 => PalaceStyle.RANDOM,
+            3 => PalaceStyle.CARTESIAN,
+            4 => PalaceStyle.CHAOS,
+            5 => PalaceStyle.RANDOM_ALL,
+            6 => PalaceStyle.RANDOM_PER_PALACE,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
         configuration.GPStyle = gpStyleList.SelectedIndex switch
@@ -967,11 +971,13 @@ public partial class MainUI : Form
             0 => PalaceStyle.VANILLA,
             1 => PalaceStyle.SHUFFLED,
             2 => PalaceStyle.RECONSTRUCTED,
-            3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
-            4 => PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH,
-            5 => PalaceStyle.RANDOM,
+            3 => PalaceStyle.CARTESIAN,
+            4 => PalaceStyle.CHAOS,
+            5 => PalaceStyle.RANDOM_ALL,
             _ => throw new Exception("Invalid GP Style setting")
         };
+        configuration.ShortenNormalPalaces = GetTripleCheckState(shortenNormalPalaceCheckbox);
+        configuration.ShortenGP = GetTripleCheckState(shortenGPCheckbox);
         configuration.IncludeVanillaRooms = GetTripleCheckState(includeVanillaRoomsCheckbox);
         configuration.Includev4_0Rooms = GetTripleCheckState(includev4_0RoomsCheckbox);
         configuration.Includev4_4Rooms = GetTripleCheckState(includev4_4RoomsCheckbox);
@@ -1407,7 +1413,10 @@ public partial class MainUI : Form
                 PalaceStyle.VANILLA => 0,
                 PalaceStyle.SHUFFLED => 1,
                 PalaceStyle.RECONSTRUCTED => 2,
-                PalaceStyle.RANDOM => 3,
+                PalaceStyle.CARTESIAN => 3,
+                PalaceStyle.CHAOS => 4,
+                PalaceStyle.RANDOM_ALL => 5,
+                PalaceStyle.RANDOM_PER_PALACE => 6,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             gpStyleList.SelectedIndex = configuration.GPStyle switch
@@ -1415,9 +1424,9 @@ public partial class MainUI : Form
                 PalaceStyle.VANILLA => 0,
                 PalaceStyle.SHUFFLED => 1,
                 PalaceStyle.RECONSTRUCTED => 2,
-                PalaceStyle.RECONSTRUCTED_SHORTENED => 3,
-                PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH => 4,
-                PalaceStyle.RANDOM => 5,
+                PalaceStyle.CARTESIAN => 3,
+                PalaceStyle.CHAOS => 4,
+                PalaceStyle.RANDOM_ALL => 5,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
@@ -1718,7 +1727,7 @@ public partial class MainUI : Form
 
     private void Bulk_Generate_Click(object sender, EventArgs e)
     {
-        
+
         string flagString = flagsTextBox.Text;
         SaveDefaults();
 
@@ -1745,9 +1754,8 @@ public partial class MainUI : Form
             config = ExportConfig();
             f3 = new GeneratingSeedsForm();
             f3.Show();
-            var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
-            var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
-            var palaceRooms = new PalaceRooms(roomsJson, customJson);
+            var palaceRooms = new PalaceRooms(Util.ReadAllTextFromFile(config.UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json"),
+                config.UseCustomRooms);
             var engine = new DesktopJsEngine();
             randomizer = new Hyrule(engine, palaceRooms);
             int i = 0;
@@ -2168,5 +2176,10 @@ public partial class MainUI : Form
         {
             swapUpAndDownstabCheckbox.Enabled = true;
         }
+    }
+
+    private void label11_Click(object sender, EventArgs e)
+    {
+
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.Core.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +12,18 @@ namespace Z2Randomizer.Core.Sidescroll;
 public partial class PalaceRooms
 {
     private readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
-    private readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new();
+    //private readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new();
 
     private readonly Dictionary<string, Room> roomsByName = new();
-    private readonly Dictionary<string, Room> customRoomsByName = new();
+    //private readonly Dictionary<string, Room> customRoomsByName = new();
 
 
     private const string RoomsMd5 = "dKNxFT6dZjJevgj9khD11Q==";
 
-    public PalaceRooms(string palaceJson, string? customJson)
+    public PalaceRooms(string palaceJson, bool doValidation)
     {
         var hash = MD5.HashData(Encoding.UTF8.GetBytes(RemoveNewLines().Replace(palaceJson, "")));
-        if (RoomsMd5 != Convert.ToBase64String(hash))
+        if (doValidation && RoomsMd5 != Convert.ToBase64String(hash))
         {
             throw new Exception("Invalid PalaceRooms.json");
         }
@@ -43,29 +43,9 @@ public partial class PalaceRooms
             }
             roomsByName[room.Name] = room;
         }
-
-        if (customJson == null) return;
-        
-        dynamic customRooms = JsonConvert.DeserializeObject(customJson)!;
-        foreach (var obj in customRooms)
-        {
-            Room room = new(obj.ToString());
-            if (room.Enabled)
-            {
-                if (!customRoomsByGroup.TryGetValue(room.Group, out var value))
-                {
-                    value = [];
-                    customRoomsByGroup.Add(room.Group, value);
-                }
-
-                value.Add(room);
-            }
-            customRoomsByName[room.Name] = room;
-        }
-        
     }
 
-    public IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum, bool customRooms)
+    public IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum)
     {
         int mapMin, mapMax, palaceGroup;
         switch (palaceNum)
@@ -110,7 +90,7 @@ public partial class PalaceRooms
         }
         
 
-        var roomgroup = customRooms ? customRoomsByGroup[RoomGroup.VANILLA] : roomsByGroup[RoomGroup.VANILLA];
+        var roomgroup = roomsByGroup[RoomGroup.VANILLA];
         return roomgroup.Where(
             i => i.PalaceGroup == palaceGroup
                  && i.Map >= mapMin
@@ -119,9 +99,9 @@ public partial class PalaceRooms
         );
     }
 
-    public IEnumerable<Room> ThunderBirdRooms(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> ThunderBirdRooms(RoomGroup group)
     {
-        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        var roomgroup = roomsByGroup[group];
         return roomgroup.Where(i => i.IsThunderBirdRoom);
     }
 
@@ -157,14 +137,14 @@ public partial class PalaceRooms
         return roomsByGroup[RoomGroup.VANILLA].First(i => i.HasItem && map == i.Map);
     }
 
-    public IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction, bool useCustomRooms = false)
+    public IEnumerable<Room> ItemRoomsByDirection(RoomGroup group, Direction direction)
     {
         if(direction == Direction.NONE)
         {
             throw new ArgumentException("Invalid Direction.NONE in ItemRoomsByDirection");
         }
 
-        var rooms = useCustomRooms ? customRoomsByGroup : roomsByGroup;
+        var rooms = roomsByGroup;
         return direction switch
         {
             //case Direction.HORIZONTAL_PASSTHROUGH:
@@ -179,34 +159,47 @@ public partial class PalaceRooms
         };
     }
 
-    public IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group)
     {
-        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        var roomgroup = roomsByGroup[group];
         return roomgroup.Where(i => (i.PalaceNumber ?? 1) != 7 
             && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
-    public IEnumerable<Room> GpRoomsByGroup(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> GpRoomsByGroup(RoomGroup group)
     {
-        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        var roomgroup = roomsByGroup[group];
         return roomgroup.Where(i => (i.PalaceNumber ?? 1) == 7
             && i is { IsThunderBirdRoom: false, HasItem: false, IsBossRoom: false, IsEntrance: false });
     }
 
-    public IEnumerable<Room> Entrances(RoomGroup group, bool useCustomRooms = false)
+    public IEnumerable<Room> Entrances(RoomGroup group)
     {
-        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        var roomgroup = roomsByGroup[group];
         return roomgroup.Where(i => i.IsEntrance);
     }
 
-    public IEnumerable<Room> BossRooms(RoomGroup group, bool useCustomRooms = false, int? palaceNum = null)
+    public IEnumerable<Room> BossRooms(RoomGroup group, int? palaceNum = null)
     {
-        var roomgroup = useCustomRooms ? customRoomsByGroup[group] : roomsByGroup[group];
+        var roomgroup = roomsByGroup[group];
         return roomgroup.Where(i => i.IsBossRoom && (palaceNum == null || palaceNum == i.PalaceNumber));
     }
-    public Room GetRoomByName(string name, bool useCustomRooms = false)
+    public Room GetRoomByName(string name)
     {
-        return useCustomRooms ? customRoomsByName[name] : roomsByName[name];
+        return roomsByName[name];
+    }
+
+    public Dictionary<string, Room> LinkedRooms(RoomGroup group, int? palaceNum = null)
+    {
+        Dictionary<string, Room> linkedRooms = [];
+        foreach (Room room in roomsByGroup[group])
+        {
+            if(room.Enabled && room.LinkedRoomName != null)
+            {
+                linkedRooms.Add(room.LinkedRoomName, GetRoomByName(room.LinkedRoomName));
+            }
+        }
+        return linkedRooms;
     }
 
     [GeneratedRegex(@"[\n\r\f]")]

@@ -1,0 +1,83 @@
+﻿using NLog;
+using System;
+using System.Linq;
+using System.Numerics;
+using System.Threading;
+
+namespace Z2Randomizer.Core.Sidescroll;
+
+public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
+{
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+    internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    {
+        VanillaRoomPool roomPool = (VanillaRoomPool)rooms;
+        if(roomPool.BossRooms.Count != 1
+            || roomPool.ItemRoom == null
+            || roomPool.TbirdRooms.Count != 1)
+        {
+            throw new Exception("Invalid vanilla palace room pool");
+        }
+        Palace palace = new(palaceNumber);
+
+        int palaceGroup = palaceNumber switch
+        {
+            1 => 1,
+            2 => 1,
+            3 => 2,
+            4 => 2,
+            5 => 1,
+            6 => 2,
+            7 => 3,
+            _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
+        };
+
+        palace.Root = new(roomPool.Entrances.First());
+        palace.Root.PalaceGroup = palaceGroup;
+        palace.BossRoom = new(roomPool.BossRooms.First());
+        palace.BossRoom.PalaceGroup = palaceGroup;
+        palace.AllRooms.Add(palace.Root);
+        if (palaceNumber != 7)
+        {
+            Room itemRoom = new(roomPool.ItemRoom);
+
+            palace.ItemRoom = itemRoom;
+            palace.ItemRoom.PalaceGroup = palaceGroup;
+            palace.AllRooms.Add(palace.ItemRoom);
+        }
+        palace.AllRooms.Add(palace.BossRoom);
+        if (palaceNumber == 7)
+        {
+            Room bird = new(roomPool.TbirdRooms.First());
+            bird.PalaceGroup = palaceGroup;
+            palace.AllRooms.Add(bird);
+            palace.Tbird = bird;
+
+        }
+        foreach (Room v in roomPool.NormalRooms)
+        {
+            Room room = new(v);
+            room.PalaceGroup = palaceGroup;
+            palace.AllRooms.Add(room);
+
+            if (room.LinkedRoomName != null)
+            {
+                Room linkedRoom = new(roomPool.LinkedRooms[room.LinkedRoomName]);
+                linkedRoom.PalaceGroup = palaceGroup;
+                linkedRoom.LinkedRoom = room;
+                room.LinkedRoom = linkedRoom;
+                palace.AllRooms.Add(linkedRoom);
+            }
+        }
+        bool removeTbird = (palaceNumber == 7 && props.RemoveTbird);
+        palace.CreateTree(removeTbird);
+
+        if(!palace.AllReachable() || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
+        {
+            throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
+        }
+        palace.IsValid = true;
+        return palace;
+    }
+}

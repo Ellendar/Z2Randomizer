@@ -2,13 +2,10 @@
 
 public enum PalaceStyle
 {
-    VANILLA, SHUFFLED, RECONSTRUCTED, RANDOM, NORMALIZED, RECONSTRUCTED_SHORTENED, RECONSTRUCTED_RANDOM_LENGTH
+    VANILLA, SHUFFLED, RECONSTRUCTED, CARTESIAN, CHAOS, RANDOM_ALL, RANDOM_PER_PALACE
 }
 
 public static class PalaceStyleExtensions
 {
-    public static bool IsReconstructed(this PalaceStyle style)
-    {
-        return style == PalaceStyle.RECONSTRUCTED || style == PalaceStyle.RECONSTRUCTED_SHORTENED || style == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH;
-    }
+
 }

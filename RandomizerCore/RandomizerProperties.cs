@@ -88,8 +88,9 @@ public class RandomizerProperties
 
     //Palaces
     //public bool shufflePalaceRooms { get; set; }
-    public PalaceStyle NormalPalaceStyle { get; set; }
-    public PalaceStyle GPStyle { get; set; }
+    public PalaceStyle[] PalaceStyles { get; set; } = new PalaceStyle[7];
+    public bool ShortenNormalPalaces { get; set; }
+    public bool ShortenGP { get; set; }
     public int StartGems { get; set; }
     public bool RequireTbird { get; set; }
     public bool ShufflePalacePalettes { get; set; }

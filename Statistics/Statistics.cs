@@ -36,7 +36,7 @@ class Statistics
         var engine = new DesktopJsEngine();
         var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
-        var palaceRooms = new PalaceRooms(roomsJson, customJson);
+        var palaceRooms = new PalaceRooms(roomsJson, false);
         var randomizer = new Hyrule(engine, palaceRooms);
         logger.Info("Started statistics generation with limit: " + LIMIT);
         try

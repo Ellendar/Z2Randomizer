@@ -88,7 +88,9 @@ public class RandomizerConfiguration
 
     //Palaces
     public PalaceStyle NormalPalaceStyle { get; set; }
+    public bool? ShortenNormalPalaces { get; set; }
     public PalaceStyle GPStyle { get; set; }
+    public bool? ShortenGP { get; set; }
     //public bool? IncludeCommunityRooms { get; set; }
     public bool? IncludeVanillaRooms { get; set; }
     public bool? Includev4_0Rooms { get; set; }
@@ -552,7 +554,7 @@ public class RandomizerConfiguration
         config.ShuffleLifeExperience = bits[1];
         config.ShuffleMagicExperience = bits[2];
         config.RestartAtPalacesOnGameOver = bits[3];
-        bool ShortGP = bits[4];
+        config.ShortenGP = bits[4];
         config.TBirdRequired = bits[5];
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
@@ -891,7 +893,7 @@ public class RandomizerConfiguration
                 break;
             case 2:
                 config.NormalPalaceStyle = PalaceStyle.RECONSTRUCTED;
-                config.GPStyle = ShortGP ? PalaceStyle.RECONSTRUCTED_SHORTENED : PalaceStyle.RECONSTRUCTED;
+                config.GPStyle = PalaceStyle.RECONSTRUCTED;
                 break;
         }
         config.IncludeVanillaRooms = true;
@@ -1299,40 +1301,64 @@ public class RandomizerConfiguration
         properties.BagusWoods = GenerateBaguWoods ?? random.Next(2) == 1;
 
         //Palaces
-        if (GPStyle == PalaceStyle.RANDOM)
+
+        //GP doesn't support separate random styles (for obvious reasons) but there is no obvious indication
+        //of what the "right" one is, so they both work
+        if (GPStyle == PalaceStyle.RANDOM_ALL || GPStyle == PalaceStyle.RANDOM_PER_PALACE)
         {
-            properties.GPStyle = random.Next(4) switch
+            properties.PalaceStyles[6] = random.Next(4) switch
             {
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
-                3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
+                3 => PalaceStyle.CARTESIAN,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
-        }
-        else if (GPStyle == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH)
-        {
-            properties.GPStyle = random.Next(2) == 0 ? PalaceStyle.RECONSTRUCTED : PalaceStyle.RECONSTRUCTED_SHORTENED;
         }
         else 
         {
-            properties.GPStyle = GPStyle;
+            properties.PalaceStyles[6] = GPStyle;
         }
 
-        if (NormalPalaceStyle == PalaceStyle.RANDOM)
+        if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
         {
-            properties.NormalPalaceStyle = random.Next(3) switch
+            PalaceStyle style = random.Next(4) switch
             {
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
+                3 => PalaceStyle.CARTESIAN,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
+            for (int i = 0; i < 6; i++)
+            {
+                properties.PalaceStyles[i] = style;
+            }
+        }
+        else if(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                PalaceStyle style = random.Next(4) switch
+                {
+                    0 => PalaceStyle.VANILLA,
+                    1 => PalaceStyle.SHUFFLED,
+                    2 => PalaceStyle.RECONSTRUCTED,
+                    3 => PalaceStyle.CARTESIAN,
+                    _ => throw new Exception("Invalid PalaceStyle")
+                };
+                properties.PalaceStyles[i] = style;
+            }
         }
         else
         {
-            properties.NormalPalaceStyle = NormalPalaceStyle;
+            for (int i = 0; i < 6; i++)
+            {
+                properties.PalaceStyles[i] = NormalPalaceStyle;
+            }
         }
+
+        properties.ShortenGP = ShortenGP ?? random.Next(2) == 1;
 
         properties.StartGems = random.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired ?? random.Next(2) == 1;
@@ -1539,7 +1565,7 @@ public class RandomizerConfiguration
         }
 
         //#180 Remove tbird doesn't currently work with vanilla, so make sure even if it comes up on random it works properly.
-        if(properties.GPStyle == PalaceStyle.VANILLA)
+        if (properties.PalaceStyles[6] == PalaceStyle.VANILLA)
         {
             properties.RemoveTbird = false;
         }
@@ -1565,19 +1591,6 @@ public class RandomizerConfiguration
             properties.BagusWoods = false;
         }
 
-        if (properties.NormalPalaceStyle is PalaceStyle.VANILLA or PalaceStyle.SHUFFLED)
-        {
-            properties.AllowV4Rooms = false;
-            properties.AllowV4_4Rooms = false;
-            properties.BlockersAnywhere = false;
-            properties.BossRoomConnect = false;
-        }
-
-        if (properties.GPStyle == PalaceStyle.VANILLA)
-        {
-            properties.RequireTbird = true;
-        }
-
         if (properties.ReplaceFireWithDash)
         {
             properties.CombineFire = false;
@@ -1598,11 +1611,14 @@ public class RandomizerConfiguration
         //Non-reconstructed is incompatable with no duplicate rooms.
         //Also, if community rooms is off, vanilla doesn't contain enough non-duplciate rooms to properly cover the number
         //of required rooms, often even in short GP.
+        //XXX: This check is way more complicated now and I need to think through how it should work
+        /*
         if (!properties.NormalPalaceStyle.IsReconstructed() || properties is { AllowV4Rooms: false, AllowV4_4Rooms: false })
         {
             properties.NoDuplicateRooms = false;
             properties.NoDuplicateRoomsBySideview = false;
         }
+        */
 
         // string debug = JsonSerializer.Serialize(properties);
         return properties;

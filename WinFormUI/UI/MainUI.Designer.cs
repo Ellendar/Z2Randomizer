@@ -109,6 +109,10 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
+        shortenGPCheckbox = new CheckBox();
+        shortenNormalPalaceCheckbox = new CheckBox();
+        ShortenPalaceLabel = new Label();
+        useCustomRoomsBox = new CheckBox();
         HardBossesCheckbox = new CheckBox();
         noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         gpStyleLabel = new Label();
@@ -264,7 +268,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        useCustomRoomsBox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1241,6 +1244,9 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(shortenGPCheckbox);
+        tabPage2.Controls.Add(shortenNormalPalaceCheckbox);
+        tabPage2.Controls.Add(ShortenPalaceLabel);
         tabPage2.Controls.Add(useCustomRoomsBox);
         tabPage2.Controls.Add(HardBossesCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsByEnemiesCheckbox);
@@ -1273,10 +1279,56 @@ partial class MainUI
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
         // 
+        // shortenGPCheckbox
+        // 
+        shortenGPCheckbox.AutoSize = true;
+        shortenGPCheckbox.Location = new Point(197, 86);
+        shortenGPCheckbox.Margin = new Padding(4, 3, 4, 3);
+        shortenGPCheckbox.Name = "shortenGPCheckbox";
+        shortenGPCheckbox.Size = new Size(15, 14);
+        shortenGPCheckbox.TabIndex = 39;
+        shortenGPCheckbox.ThreeState = true;
+        shortenGPCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // shortenNormalPalaceCheckbox
+        // 
+        shortenNormalPalaceCheckbox.AutoSize = true;
+        shortenNormalPalaceCheckbox.Location = new Point(197, 34);
+        shortenNormalPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
+        shortenNormalPalaceCheckbox.Name = "shortenNormalPalaceCheckbox";
+        shortenNormalPalaceCheckbox.Size = new Size(15, 14);
+        shortenNormalPalaceCheckbox.TabIndex = 38;
+        shortenNormalPalaceCheckbox.ThreeState = true;
+        shortenNormalPalaceCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // ShortenPalaceLabel
+        // 
+        ShortenPalaceLabel.AutoSize = true;
+        ShortenPalaceLabel.Location = new Point(186, 12);
+        ShortenPalaceLabel.Margin = new Padding(4, 0, 4, 0);
+        ShortenPalaceLabel.Name = "ShortenPalaceLabel";
+        ShortenPalaceLabel.Size = new Size(51, 15);
+        ShortenPalaceLabel.TabIndex = 37;
+        ShortenPalaceLabel.Text = "Shorten:";
+        toolTip1.SetToolTip(ShortenPalaceLabel, "Reduces the number of rooms in the palace.");
+        ShortenPalaceLabel.Click += label11_Click;
+        // 
+        // useCustomRoomsBox
+        // 
+        useCustomRoomsBox.AutoSize = true;
+        useCustomRoomsBox.Location = new Point(328, 211);
+        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
+        useCustomRoomsBox.Name = "useCustomRoomsBox";
+        useCustomRoomsBox.Size = new Size(130, 19);
+        useCustomRoomsBox.TabIndex = 36;
+        useCustomRoomsBox.Text = "Use Custom Rooms";
+        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
+        useCustomRoomsBox.UseVisualStyleBackColor = true;
+        // 
         // HardBossesCheckbox
         // 
         HardBossesCheckbox.AutoSize = true;
-        HardBossesCheckbox.Location = new Point(281, 187);
+        HardBossesCheckbox.Location = new Point(328, 186);
         HardBossesCheckbox.Margin = new Padding(4, 3, 4, 3);
         HardBossesCheckbox.Name = "HardBossesCheckbox";
         HardBossesCheckbox.Size = new Size(102, 19);
@@ -1289,7 +1341,7 @@ partial class MainUI
         // noDuplicateRoomsByEnemiesCheckbox
         // 
         noDuplicateRoomsByEnemiesCheckbox.AutoSize = true;
-        noDuplicateRoomsByEnemiesCheckbox.Location = new Point(281, 112);
+        noDuplicateRoomsByEnemiesCheckbox.Location = new Point(328, 111);
         noDuplicateRoomsByEnemiesCheckbox.Margin = new Padding(4, 3, 4, 3);
         noDuplicateRoomsByEnemiesCheckbox.Name = "noDuplicateRoomsByEnemiesCheckbox";
         noDuplicateRoomsByEnemiesCheckbox.RightToLeft = RightToLeft.No;
@@ -1315,7 +1367,7 @@ partial class MainUI
         // 
         gpStyleList.DropDownStyle = ComboBoxStyle.DropDownList;
         gpStyleList.FormattingEnabled = true;
-        gpStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed (Full)", "Reconstructed (Short)", "Reconstructed (Random Length)", "Random" });
+        gpStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed", "Sane", "Chaos", "Random" });
         gpStyleList.Location = new Point(7, 82);
         gpStyleList.Margin = new Padding(4, 3, 4, 3);
         gpStyleList.Name = "gpStyleList";
@@ -1355,7 +1407,7 @@ partial class MainUI
         // noDuplicateRoomsByLayoutCheckbox
         // 
         noDuplicateRoomsByLayoutCheckbox.AutoSize = true;
-        noDuplicateRoomsByLayoutCheckbox.Location = new Point(281, 87);
+        noDuplicateRoomsByLayoutCheckbox.Location = new Point(328, 86);
         noDuplicateRoomsByLayoutCheckbox.Margin = new Padding(4, 3, 4, 3);
         noDuplicateRoomsByLayoutCheckbox.Name = "noDuplicateRoomsByLayoutCheckbox";
         noDuplicateRoomsByLayoutCheckbox.RightToLeft = RightToLeft.No;
@@ -1415,7 +1467,7 @@ partial class MainUI
         // 
         palaceStyleList.DropDownStyle = ComboBoxStyle.DropDownList;
         palaceStyleList.FormattingEnabled = true;
-        palaceStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed", "Random" });
+        palaceStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed", "Sane", "Chaos", "Random Per Palace", "Random (All Same)" });
         palaceStyleList.Location = new Point(7, 29);
         palaceStyleList.Margin = new Padding(4, 3, 4, 3);
         palaceStyleList.Name = "palaceStyleList";
@@ -1427,7 +1479,7 @@ partial class MainUI
         // bossRoomsExitToPalaceCheckbox
         // 
         bossRoomsExitToPalaceCheckbox.AutoSize = true;
-        bossRoomsExitToPalaceCheckbox.Location = new Point(281, 162);
+        bossRoomsExitToPalaceCheckbox.Location = new Point(328, 161);
         bossRoomsExitToPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
         bossRoomsExitToPalaceCheckbox.Name = "bossRoomsExitToPalaceCheckbox";
         bossRoomsExitToPalaceCheckbox.Size = new Size(163, 19);
@@ -1440,7 +1492,7 @@ partial class MainUI
         // blockingRoomsInAnyPalaceCheckbox
         // 
         blockingRoomsInAnyPalaceCheckbox.AutoSize = true;
-        blockingRoomsInAnyPalaceCheckbox.Location = new Point(281, 137);
+        blockingRoomsInAnyPalaceCheckbox.Location = new Point(328, 136);
         blockingRoomsInAnyPalaceCheckbox.Margin = new Padding(4, 3, 4, 3);
         blockingRoomsInAnyPalaceCheckbox.Name = "blockingRoomsInAnyPalaceCheckbox";
         blockingRoomsInAnyPalaceCheckbox.Size = new Size(251, 19);
@@ -1465,7 +1517,7 @@ partial class MainUI
         // randomizeBossItemCheckbox
         // 
         randomizeBossItemCheckbox.AutoSize = true;
-        randomizeBossItemCheckbox.Location = new Point(281, 60);
+        randomizeBossItemCheckbox.Location = new Point(328, 59);
         randomizeBossItemCheckbox.Margin = new Padding(4, 3, 4, 3);
         randomizeBossItemCheckbox.Name = "randomizeBossItemCheckbox";
         randomizeBossItemCheckbox.Size = new Size(168, 19);
@@ -1490,7 +1542,7 @@ partial class MainUI
         // restartAtPalacesCheckbox
         // 
         restartAtPalacesCheckbox.AutoSize = true;
-        restartAtPalacesCheckbox.Location = new Point(281, 7);
+        restartAtPalacesCheckbox.Location = new Point(328, 6);
         restartAtPalacesCheckbox.Margin = new Padding(4, 3, 4, 3);
         restartAtPalacesCheckbox.Name = "restartAtPalacesCheckbox";
         restartAtPalacesCheckbox.Size = new Size(193, 19);
@@ -1502,7 +1554,7 @@ partial class MainUI
         // palacePaletteCheckbox
         // 
         palacePaletteCheckbox.AutoSize = true;
-        palacePaletteCheckbox.Location = new Point(281, 33);
+        palacePaletteCheckbox.Location = new Point(328, 32);
         palacePaletteCheckbox.Margin = new Padding(4, 3, 4, 3);
         palacePaletteCheckbox.Name = "palacePaletteCheckbox";
         palacePaletteCheckbox.Size = new Size(148, 19);
@@ -3187,18 +3239,6 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
-        // useCustomRoomsBox
-        // 
-        useCustomRoomsBox.AutoSize = true;
-        useCustomRoomsBox.Location = new Point(281, 212);
-        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
-        useCustomRoomsBox.Name = "useCustomRoomsBox";
-        useCustomRoomsBox.Size = new Size(130, 19);
-        useCustomRoomsBox.TabIndex = 36;
-        useCustomRoomsBox.Text = "Use Custom Rooms";
-        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
-        useCustomRoomsBox.UseVisualStyleBackColor = true;
-        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3496,5 +3536,8 @@ partial class MainUI
     private CheckBox includeQuestItemsInShuffleCheckbox;
     private CheckBox includeSwordTechsInShuffleCheckbox;
     private CheckBox includeSpellsInShuffleCheckbox;
+    private Label ShortenPalaceLabel;
+    private CheckBox shortenGPCheckbox;
+    private CheckBox shortenNormalPalaceCheckbox;
 }
 
