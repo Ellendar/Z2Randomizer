@@ -7,7 +7,7 @@
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:views="clr-namespace:CrossPlatformUI.Views"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.MainView"
              x:DataType="vm:MainViewModel">
     <dialogHost:DialogHost Identifier="GenerateRomDialog" CloseOnClickAway="False">
@@ -16,15 +16,17 @@
         </dialogHost:DialogHost.DialogContent>
         <Grid RowDefinitions="*, Auto">
             <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
+                <rxui:RoutedViewHost.DefaultContent>
+                    <views:RandomizerView />
+                </rxui:RoutedViewHost.DefaultContent>
                 <rxui:RoutedViewHost.ViewLocator>
                     <app:AppViewLocator />
+                    
                 </rxui:RoutedViewHost.ViewLocator>
             </rxui:RoutedViewHost>
             <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Content="Reload ROM" IsEnabled="{Binding CanLoadRom}" 
                         Command="{Binding LoadRom}" />
-                <Button HorizontalAlignment="Right" IsEnabled="{Binding RomFileViewModel.HasRomData}" Content="Generate" 
-                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHost:DialogHost}, Path=OpenDialogCommand}" />
             </StackPanel>
         </Grid>
     </dialogHost:DialogHost>

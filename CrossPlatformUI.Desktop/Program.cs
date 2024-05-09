@@ -1,8 +1,11 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using CommandLine;
 using CrossPlatformUI.Services;
+using Material.Styles.Themes;
+using Material.Styles.Themes.Base;
 using Microsoft.Extensions.DependencyInjection;
 using RandomizerCore.Asm;
 
@@ -34,5 +37,13 @@ public static class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
+            .AfterSetup(_ =>
+            {
+                if (Design.IsDesignMode)
+                {
+                    // This can be before or after InitializeComponent.
+                    App.Current!.LocateMaterialTheme<MaterialTheme>().BaseTheme = BaseThemeMode.Dark;
+                }
+            })
             .UseReactiveUI();
 }

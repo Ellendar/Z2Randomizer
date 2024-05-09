@@ -184,15 +184,15 @@ public class Hyrule
         return await Task.Run(() =>
         {
             World.ResetStats();
-            RNG = new Random(config.Seed);
+            Seed = BitConverter.ToInt32(MD5.HashData(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
+            RNG = new Random(Seed);
             props = config.Export(RNG);
             if(UNSAFE_DEBUG) 
             {
                 string export = JsonSerializer.Serialize(props);
                 Debug.WriteLine(export);
             }
-            Flags = config.Serialize();
-            Seed = config.Seed;
+            Flags = config.Flags;
             
             Assembler assembler = new();
             logger.Info("Started generation for " + Flags + " / " + Seed);

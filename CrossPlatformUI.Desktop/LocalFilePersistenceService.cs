@@ -21,10 +21,10 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         TypeNameHandling = TypeNameHandling.All
     };
     
-    public object LoadState()
+    public object? LoadState()
     {
         var data = File.ReadAllText(SettingsFilename);
-        return JsonConvert.DeserializeObject<object>(data, serializerSettings)!;
+        return JsonConvert.DeserializeObject<object>(data, serializerSettings);
     }
 
     public void SaveState(object state)

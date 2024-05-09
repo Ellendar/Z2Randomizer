@@ -1,6 +1,7 @@
 using System;
 using System.Reactive;
 using System.Runtime.Serialization;
+using Avalonia.Data;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.Core;
@@ -12,34 +13,67 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
 {
     public RandomizerViewModel(MainViewModel mainViewModel)
     {
-        config = mainViewModel.Config;
         HostScreen = mainViewModel;
+        Main = mainViewModel;
         
         RerollSeed = ReactiveCommand.Create(() =>
         {
-            Seed = new Random().Next(0, 999999999).ToString();
+            mainViewModel.Config.Seed = new Random().Next(0, 999999999).ToString();
         });
+        
+        mainViewModel.Config.PropertyChanged += (sender, args) =>
+        {
+            switch (args.PropertyName)
+            {
+                case "Flags":
+                    this.RaisePropertyChanged(nameof(Flags));
+                    break;
+                case "Seed":
+                    this.RaisePropertyChanged(nameof(Seed));
+                    break;
+            }
+        };
     }
 
+    public MainViewModel Main { get; }
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
 
+    private bool isFlagsValid;
+    public bool IsFlagsValid { get => isFlagsValid; set => this.RaiseAndSetIfChanged(ref isFlagsValid, value); }
+    
     [DataMember]
-    public string? Flags
+    public string Flags
     {
-        get => config.Serialize();
-        set => this.ValueOrException(ref config, () => new RandomizerConfiguration(value), "Invalid Flags");
+        get => Main.Config.Flags;
+        set
+        {
+            try
+            {
+                // Setting this flags like this will both validate the flag string
+                // and also notify all observers for the individual options and the flag string itself
+                Main.Config.Flags = new RandomizerConfiguration(value).Flags;
+                this.RaisePropertyChanged();
+                IsFlagsValid = true;
+            }
+            catch
+            {
+                throw new DataValidationException("Invalid Flags");
+                IsFlagsValid = false;
+            }
+        }
     }
     
     [DataMember]
     public string Seed
     {
-        get => seed;
-        set => this.ValueOrException(ref seed, () => value, "Invalid Seed");
+        get => Main.Config.Seed;
+        set
+        {
+            Main.Config.Seed = value;
+            this.RaisePropertyChanged();
+        }
     }
 
-    private RandomizerConfiguration config;
-    private string seed = "";
-    
     [IgnoreDataMember]
     // Unique identifier for the routable view model.
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];

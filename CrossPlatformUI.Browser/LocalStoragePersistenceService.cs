@@ -32,11 +32,11 @@ public partial class LocalStoragePersistenceService : ISuspendSyncService //: IS
         TypeNameHandling = TypeNameHandling.All,
     };
     
-    public object LoadState()
+    public object? LoadState()
     {
         var data = GetItem("appstate");
-        var ret = JsonConvert.DeserializeObject<object>(data ?? "{}", serializerSettings);
-        return ret!;
+        var ret = JsonConvert.DeserializeObject<object>(data ?? "", serializerSettings);
+        return ret;
     }
 
     public void SaveState(object state)

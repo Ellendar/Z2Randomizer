@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Z2Randomizer.Core.Flags;
@@ -11,11 +12,12 @@ using RandomizerCore.Flags;
 
 namespace Z2Randomizer.Core;
 
-public class RandomizerConfiguration : INotifyPropertyChanged
+public sealed class RandomizerConfiguration : INotifyPropertyChanged
 {
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private int seed;
+    private string seed;
+    
     private bool shuffleStartingItems;
     private bool startWithCandle;
     private bool startWithGlove;
@@ -162,7 +164,13 @@ public class RandomizerConfiguration : INotifyPropertyChanged
     
     //Meta
     [IgnoreInFlags]
-    public int Seed { get => seed; set => SetField(ref seed, value); }
+    public string Seed { get => seed; set => SetField(ref seed, value); }
+    [IgnoreInFlags]
+    public string Flags
+    {
+        get => Serialize();
+        set => ConvertFlags(value, this);
+    }
 
     //Start Configuration
     public bool ShuffleStartingItems { get => shuffleStartingItems; set => SetField(ref shuffleStartingItems, value); }
@@ -1033,10 +1041,17 @@ public class RandomizerConfiguration : INotifyPropertyChanged
         DisableHUDLag = false;
     }
 
-    public RandomizerConfiguration(string flags) : this()
+    public RandomizerConfiguration(string flagstring)
     {
-        FlagReader flagReader = new FlagReader(flags);
-        PropertyInfo[] properties = this.GetType().GetProperties();
+        ConvertFlags(flagstring, this);
+    }
+    
+    [method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(RandomizerConfiguration))]
+    private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
+    {
+        var config = newThis ?? new RandomizerConfiguration();
+        FlagReader flagReader = new FlagReader(flagstring);
+        PropertyInfo[] properties = GetType().GetProperties();
         Type thisType = typeof(RandomizerConfiguration);
         foreach (PropertyInfo property in properties)
         {
@@ -1062,38 +1077,21 @@ public class RandomizerConfiguration : INotifyPropertyChanged
             {
                 CustomFlagSerializerAttribute attribute = (CustomFlagSerializerAttribute)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
                 IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type);
-                property.SetValue(this, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
+                property.SetValue(config, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
             }
             else if (propertyType == typeof(bool))
             {
-                if (isNullable)
-                {
-                    property.SetValue(this, flagReader.ReadNullableBool());
-                }
-                else
-                {
-                    property.SetValue(this, flagReader.ReadBool());
-                }
-                flags.ToString();
+                property.SetValue(config, isNullable ? flagReader.ReadNullableBool() : flagReader.ReadBool());
             }
             else if (propertyType.IsEnum)
             {
                 limit = System.Enum.GetValues(propertyType).Length;
                 //int? index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
-                if (isNullable)
-                {
-                    MethodInfo method = typeof(FlagReader).GetMethod("ReadNullableEnum")
-                        .MakeGenericMethod(new Type[] { propertyType });
-                    var methodResult = method.Invoke(flagReader, new object[] { });
-                    property.SetValue(this, methodResult);
-                }
-                else
-                {
-                    MethodInfo method = typeof(FlagReader).GetMethod("ReadEnum")
-                        .MakeGenericMethod(new Type[] { propertyType });
-                    var methodResult = method.Invoke(flagReader, new object[] { });
-                    property.SetValue(this, methodResult);
-                }
+                var methodType = isNullable ? "ReadNullableEnum" : "ReadEnum";
+                MethodInfo method = typeof(FlagReader).GetMethod(methodType)!
+                    .MakeGenericMethod([propertyType]);
+                var methodResult = method.Invoke(flagReader, []);
+                property.SetValue(config, methodResult);
             }
             else if (IsIntegerType(propertyType))
             {
@@ -1108,15 +1106,12 @@ public class RandomizerConfiguration : INotifyPropertyChanged
                     if (isNullable)
                     {
                         int? value = flagReader.ReadNullableInt(limit);
-                        if (value != null)
-                        {
-                            value = (int)value + minimum;
-                        }
-                        property.SetValue(this, value);
+                        value += minimum;
+                        property.SetValue(config, value);
                     }
                     else
                     {
-                        property.SetValue(this, flagReader.ReadInt(limit) + minimum);
+                        property.SetValue(config, flagReader.ReadInt(limit) + minimum);
                     }
                 }
                 else
@@ -1658,7 +1653,7 @@ public class RandomizerConfiguration : INotifyPropertyChanged
         return config;
     }
 
-    public string Serialize()
+    private string Serialize()
     {
         FlagBuilder flags = new FlagBuilder();
         PropertyInfo[] properties = this.GetType().GetProperties();
@@ -2344,7 +2339,7 @@ public class RandomizerConfiguration : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -2354,6 +2349,8 @@ public class RandomizerConfiguration : INotifyPropertyChanged
         if (EqualityComparer<T>.Default.Equals(field, value)) return false;
         field = value;
         OnPropertyChanged(propertyName);
+        // ReSharper disable once ExplicitCallerInfoArgument
+        OnPropertyChanged(nameof(Flags));
         return true;
     }
 }

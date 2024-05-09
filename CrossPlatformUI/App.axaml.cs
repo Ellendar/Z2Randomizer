@@ -66,7 +66,7 @@ public sealed partial class App : Application // , IDisposable
         // var state = RxApp.SuspensionHost.GetAppState<MainViewModel>();
         try
         {
-            state = SyncSuspensionDriver!.LoadState();
+            state = SyncSuspensionDriver!.LoadState() ?? new MainViewModel();
         }
         catch (Exception)
         {

@@ -13,9 +13,8 @@ namespace CrossPlatformUI.ViewModels;
 [DataContract]
 public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
 {
+    public RandomizerConfiguration Config { get; } = new();
 
-    private RandomizerConfiguration config;
-    public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
     private bool canLoadRom;
     public bool CanLoadRom { get => canLoadRom; set => this.RaiseAndSetIfChanged(ref canLoadRom, value); }
 
@@ -43,15 +42,10 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
         {
             CanLoadRom = view != RomFileViewModel;
         });
-        Config = new();
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);
         RandomizerViewModel = new(this);
         Router.Navigate.Execute(RandomizerViewModel);
-        
-        // GoNext = ReactiveCommand.CreateFromObservable(
-        //     () => Router.Navigate.Execute(new MainViewModel(this))
-        // );
 
         LoadRom = ReactiveCommand.CreateFromObservable(
             () => Router.Navigate.Execute(RomFileViewModel)
@@ -59,11 +53,6 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
         GenerateRom = ReactiveCommand.CreateFromObservable(
             () => Router.Navigate.Execute()
         );
-        
-        this.ValidationRule(
-            viewModel => viewModel.config, 
-            cfg => !string.IsNullOrWhiteSpace(cfg?.Serialize()),
-            "Flags Invalid.");
         
         this.WhenActivated(ShowRomFileViewIfNoRom);
         return;

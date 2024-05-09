@@ -46,7 +46,7 @@ public class Program
             var r = new Random();
             this.Seed = r.Next(1000000000);
         } 
-        this.configuration.Seed = Seed.Value;
+        this.configuration.Seed = Seed.Value.ToString();
 
         if (string.IsNullOrEmpty(Rom))
         {

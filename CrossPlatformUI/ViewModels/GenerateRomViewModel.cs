@@ -58,7 +58,7 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             var customJson = config.UseCustomRooms ? await files!.OpenLocalFile("CustomRooms.json") : null;
             var palaceRooms = new PalaceRooms(roomsJson, customJson);
             var randomizer = new Hyrule(engine!, palaceRooms);
-            var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, host.Config, str => Progress = str, tokenSource.Token);
+            var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, config, str => Progress = str, tokenSource.Token);
             
         }
     }
