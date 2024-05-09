@@ -16229,7 +16229,7 @@
     "hasItem": false,
     "isBossRoom": false,
     "isDropZone": false,
-    "isEntrance": true,
+    "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
     "linkedRoomName": null,
