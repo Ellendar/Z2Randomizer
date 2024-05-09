@@ -6,9 +6,14 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.RomFileView"
              x:DataType="vm:RomFileViewModel">
-    <StackPanel HorizontalAlignment="Center"
-                VerticalAlignment="Center">
-        <TextBlock Text="Select your Zelda 2 ROM to get started!" />
-        <Button Command="{Binding OpenFileCommand}">Choose ROM</Button>
-    </StackPanel>
+    <Grid RowDefinitions="*, Auto">
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <TextBlock Text="Select your Zelda 2 ROM to get started!" />
+            <Button Command="{Binding OpenFileCommand}">Choose ROM</Button>
+        </StackPanel>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right">
+            <Button Theme="{StaticResource MaterialOutlineButton}" Command="{Binding HostScreen.Router.NavigateBack}">Just View For Now</Button>
+        </StackPanel>
+    </Grid>
 </UserControl>
