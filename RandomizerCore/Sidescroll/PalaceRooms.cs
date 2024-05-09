@@ -12,10 +12,8 @@ namespace Z2Randomizer.Core.Sidescroll;
 public partial class PalaceRooms
 {
     private readonly Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
-    //private readonly Dictionary<RoomGroup, List<Room>> customRoomsByGroup = new();
 
     private readonly Dictionary<string, Room> roomsByName = new();
-    //private readonly Dictionary<string, Room> customRoomsByName = new();
 
 
     private const string RoomsMd5 = "dKNxFT6dZjJevgj9khD11Q==";

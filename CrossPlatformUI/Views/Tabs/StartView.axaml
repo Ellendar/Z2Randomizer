@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.StartView">
+    <Grid ColumnDefinitions="*, *, *">
+        <StackPanel>
+            <CheckBox IsChecked="{Binding Config.ShuffleStartingItems}" Content="Shuffle Starting Items" />
+            <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
+            <StackPanel>
+                <ToggleSwitch IsChecked="{Binding Config.StartWithCandle}" Content="Candle" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithGlove}" Content="Glove" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithRaft}" Content="Raft" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithBoots}" Content="Boots" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithFlute}" Content="Flute" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithCross}" Content="Cross" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithHammer}" Content="Hammer" />
+                <ToggleSwitch IsChecked="{Binding Config.StartWithMagicKey}" Content="Magic Key" />
+            </StackPanel>
+            </Border>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <CheckBox IsChecked="{Binding Config.ShuffleStartingSpells}" Content="Shuffle Starting Spells" />
+            <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
+                <StackPanel>
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithShield}" Content="Shield" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithJump}" Content="Jump" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithLife}" Content="Life" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithFairy}" Content="Fairy" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithFire}" Content="Fire" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithReflect}" Content="Reflect" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithSpell}" Content="Spell" />
+                    <ToggleSwitch IsChecked="{Binding Config.StartWithThunder}" Content="Thunder" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Center" Grid.Column="2">
+
+            <TextBlock HorizontalAlignment="Center">Starting Heart Containers</TextBlock>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <NumericUpDown Value="{Binding Config.StartingHeartContainersMin}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Min"/>
+                <NumericUpDown Value="{Binding Config.StartingHeartContainersMax}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Max"/>
+                <NumericUpDown Value="{Binding Config.MaxHeartContainers}"
+                               FormatString="+0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Available"/>
+            </StackPanel>
+            <Separator/>
+            <TextBlock HorizontalAlignment="Center">Starting Level</TextBlock>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <NumericUpDown Value="{Binding Config.StartingAttackLevel}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
+                <NumericUpDown Value="{Binding Config.StartingMagicLevel}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
+                <NumericUpDown Value="{Binding Config.StartingLifeLevel}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
+            </StackPanel>
+            <Separator/>
+            <ComboBox assists:ComboBoxAssist.Label="Starting Techs" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0">
+                <TextBlock>None</TextBlock>
+            </ComboBox>
+            <ComboBox assists:ComboBoxAssist.Label="Starting Lives" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0">
+                <TextBlock>None</TextBlock>
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

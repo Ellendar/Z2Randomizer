@@ -1,36 +1,59 @@
+using System;
 using System.IO;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CrossPlatformUI.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReactiveUI;
 
 namespace CrossPlatformUI.Desktop;
 
-public class LocalFilePersistenceService : IPersistenceService
+public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionDriver
 {
     // TODO put this in appdata
     public const string SettingsFilename = "Settings.json";
-    public async Task<string> Load()
+    
+    private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
     {
-        var settings = await File.ReadAllTextAsync(SettingsFilename);
-        return settings;
+        TypeNameHandling = TypeNameHandling.All
+    };
+    
+    public object? LoadState()
+    {
+        var data = File.ReadAllText(SettingsFilename);
+        return JsonConvert.DeserializeObject<object>(data, serializerSettings);
     }
 
-    public async Task Update(string state)
+    public void SaveState(object state)
     {
-        var settings = await File.ReadAllTextAsync(SettingsFilename);
-        var orig = JObject.Parse(settings);
-        var next = JObject.Parse(state);
-        orig.Merge(next, new JsonMergeSettings
+        var json = JsonConvert.SerializeObject(state, serializerSettings);
+        var next = JObject.Parse(json);
+        try
         {
-            // union array values together to avoid duplicates
-            MergeArrayHandling = MergeArrayHandling.Union
-        });
+            var settings = File.ReadAllText(SettingsFilename);
+            var orig = JObject.Parse(settings);
+            orig.Merge(next, new JsonMergeSettings
+            {
+                // union array values together to avoid duplicates
+                MergeArrayHandling = MergeArrayHandling.Union,
+            });
+            next = orig;
+        }
+        catch (Exception e) when (e is JsonException or IOException) { }
 
-        await using var file = File.OpenWrite(SettingsFilename);
-        await using var stream = new StreamWriter(file);
-        await using var writer = new JsonTextWriter(stream);
-        orig.WriteTo(writer);
+        using var file = File.CreateText(SettingsFilename);
+        using var writer = new JsonTextWriter(file);
+        next.WriteTo(writer);
+    }
+
+    public void InvalidateState()
+    {
+        try
+        {
+            File.Delete(SettingsFilename);
+        } catch (IOException e) {}
     }
 }

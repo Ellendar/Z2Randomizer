@@ -11,15 +11,16 @@ using RandomizerCore.Asm;
 
 namespace CrossPlatformUI.Browser;
 
-internal sealed class Program
+internal sealed partial class Program
 {
     private static Task Main(string[] args) => BuildAvaloniaApp()
         .WithInterFont()
         .UseReactiveUI()
-        .AfterSetup(async _ =>
+        .AfterSetup(_ =>
         {
             App.ServiceContainer ??= new ();
             App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
+            App.SyncSuspensionDriver = new LocalStoragePersistenceService();
         })
         .StartBrowserAppAsync("out");
 

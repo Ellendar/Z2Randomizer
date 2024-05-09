@@ -1,3 +1,4 @@
+using System.Reactive;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -7,9 +8,9 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views;
 
-public partial class HeaderView : ReactiveUserControl<HeaderViewModel>
+public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
 {
-    public HeaderView()
+    public RandomizerView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);

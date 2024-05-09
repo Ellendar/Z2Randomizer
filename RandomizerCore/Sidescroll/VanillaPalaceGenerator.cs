@@ -14,8 +14,7 @@ public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
     {
         VanillaRoomPool roomPool = (VanillaRoomPool)rooms;
         if(roomPool.BossRooms.Count != 1
-            || roomPool.ItemRoom == null
-            || roomPool.TbirdRooms.Count != 1)
+            || (palaceNumber == 7 && roomPool.TbirdRooms.Count != 1))
         {
             throw new Exception("Invalid vanilla palace room pool");
         }

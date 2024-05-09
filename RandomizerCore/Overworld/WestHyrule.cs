@@ -1453,7 +1453,7 @@ public class WestHyrule : World
         if(actualSariaNorth.Reachable && 
             (itemGet[Collectable.FAIRY_SPELL] ||
             itemGet[Collectable.BAGUS_NOTE] ||
-            (itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
+            (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
         )    
         {
             actualSariaSouth.Reachable = true;
@@ -1461,7 +1461,7 @@ public class WestHyrule : World
         if (actualSariaSouth.Reachable &&
             (itemGet[Collectable.FAIRY_SPELL] ||
             itemGet[Collectable.BAGUS_NOTE] ||
-            (itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
+            (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
 )
         {
             actualSariaNorth.Reachable = true;

@@ -7,14 +7,9 @@
              x:Class="CrossPlatformUI.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
-
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
     <Application.Styles>
         <themes:MaterialTheme PrimaryColor="DeepPurple" SecondaryColor="LightBlue" />
         <avalonia:MaterialIconStyles />
-        
         <dialogHostAvalonia:DialogHostStyles />
         
         <Style Selector="StackPanel">
@@ -23,8 +18,18 @@
         <Style Selector="StackPanel > :is(Control)">
             <Setter Property="Margin" Value="2" />
         </Style>
+        <Style Selector="StackPanel > :is(ToggleButton)">
+            <Setter Property="Margin" Value="5" />
+        </Style>
+        <Style Selector=":is(ToggleButton) > TextBlock">
+            <Setter Property="Margin" Value="10, 0" />
+        </Style>
         <Style Selector="StackPanel > TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style Selector="Separator">
+            <Setter Property="Margin" Value="0 10" />
         </Style>
     </Application.Styles>
 </Application>

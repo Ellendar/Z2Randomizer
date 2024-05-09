@@ -45,7 +45,7 @@ class Statistics
             {
                 int seed = random.Next(1000000000);
                 //int seed = 38955385;
-                config.Seed = seed;
+                config.Seed = seed.ToString();
                 var vanillaRomData = File.ReadAllBytes(VANILLA_ROM_PATH);
                 DateTime startTime = DateTime.Now;
                 logger.Info("Starting seed# " + i + " at: " + startTime);

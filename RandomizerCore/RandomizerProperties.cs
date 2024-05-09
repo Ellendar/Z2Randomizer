@@ -20,7 +20,7 @@ public class RandomizerProperties
     }
 
     //ROM Info
-    public int Seed { get; set; }
+    public string Seed { get; set; }
     public string Flags { get; set; }
 
     //Items

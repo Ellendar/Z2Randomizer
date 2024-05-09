@@ -1,7 +1,5 @@
 ﻿using NLog;
 using System.Collections.Generic;
-using System.Numerics;
-using System.Speech.Synthesis;
 using System;
 using System.Threading;
 using System.Linq;

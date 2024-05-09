@@ -1,36 +1,71 @@
+using System;
 using System.IO;
+using System.Reactive;
+using System.Reactive.Threading.Tasks;
+using System.Runtime.InteropServices.JavaScript;
+using System.Text;
 using System.Threading.Tasks;
 using CrossPlatformUI.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReactiveUI;
 
-namespace CrossPlatformUI.Desktop;
+namespace CrossPlatformUI.Browser;
 
-public class LocalStoragePersistenceService : IPersistenceService
+public partial class LocalStoragePersistenceService : ISuspendSyncService //: ISuspensionDriver
 {
-    // TODO put this in appdata
-    public const string SettingsFilename = "Settings.json";
-    public async Task<string> Load()
+    [JSImport("globalThis.window.localStorage.setItem")]
+    private static partial void SetItem(string key, string value);
+    [JSImport("globalThis.window.localStorage.getItem")]
+    private static partial string? GetItem(string key);
+    [JSImport("globalThis.window.localStorage.clear")]
+    private static partial void Clear();
+    
+    // internal static partial void Log([JSMarshalAs<JSType.String>] string message);
+    // [JSImport("compile", "js65/js65.js")]
+    // [return: JSMarshalAs<JSType.MemoryView>]
+    // internal static partial Span<byte> Compile(string asm,
+    //     [JSMarshalAs<JSType.MemoryView>] Span<byte> rom);
+    
+    private readonly JsonSerializerSettings serializerSettings = new()
     {
-        var settings = await File.ReadAllTextAsync(SettingsFilename);
-        return settings;
+        TypeNameHandling = TypeNameHandling.All,
+    };
+    
+    public object? LoadState()
+    {
+        var data = GetItem("appstate");
+        var ret = JsonConvert.DeserializeObject<object>(data ?? "", serializerSettings);
+        return ret;
     }
 
-    public async Task Update(string state)
+    public void SaveState(object state)
     {
-        var settings = await File.ReadAllTextAsync(SettingsFilename);
-        var orig = JObject.Parse(settings);
-        var next = JObject.Parse(state);
-        orig.Merge(next, new JsonMergeSettings
+        var json = JsonConvert.SerializeObject(state, serializerSettings);
+        var next = JObject.Parse(json);
+        try
         {
-            // union array values together to avoid duplicates
-            MergeArrayHandling = MergeArrayHandling.Union
-        });
+            var settings = GetItem("appstate");
+            var orig = JObject.Parse(settings ?? "{}");
+            orig.Merge(next, new JsonMergeSettings
+            {
+                // union array values together to avoid duplicates
+                MergeArrayHandling = MergeArrayHandling.Union,
+            });
+            next = orig;
+        }
+        catch (Exception e) when (e is JsonException or IOException) { }
 
-        await using var file = File.OpenWrite(SettingsFilename);
-        await using var stream = new StreamWriter(file);
-        await using var writer = new JsonTextWriter(stream);
-        orig.WriteTo(writer);
+        var stringbuild = new StringBuilder();
+        using var sw = new StringWriter(stringbuild);
+        using var writer = new JsonTextWriter(sw);
+        writer.Formatting = Formatting.None;
+        next.WriteTo(writer);
+        SetItem("appstate", stringbuild.ToString());
+    }
+
+    public void InvalidateState()
+    {
+        Clear();
     }
 }

@@ -630,7 +630,7 @@ public partial class MainUI : Form
         config = ExportConfig();
 
         var palaceRooms = new PalaceRooms(
-            config.UseCustomRooms ? Util.ReadAllTextFromFile("PalaceRooms.json") : Util.ReadAllTextFromFile("CustomRooms.json"),
+            Util.ReadAllTextFromFile(config.UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json" ),
             config.UseCustomRooms);
         var engine = new DesktopJsEngine();
         randomizer = new Hyrule(engine, palaceRooms);
@@ -738,12 +738,12 @@ public partial class MainUI : Form
         RandomizerConfiguration configuration = new RandomizerConfiguration();
         try
         {
-            configuration.Seed = int.Parse(seedTextBox.Text.Trim());
+            configuration.Seed = seedTextBox.Text.Trim();
         }
         catch (FormatException)
         {
             seedTextBox.Text = r.Next(1000000000).ToString();
-            configuration.Seed = int.Parse(seedTextBox.Text.Trim());
+            configuration.Seed = seedTextBox.Text.Trim();
         }
 
         //Start Configuration
@@ -1764,7 +1764,7 @@ public partial class MainUI : Form
             {
                 f3.Text = "Generating seed " + (i + 1) + " of " + numSeeds + "...";
 
-                config.Seed = r.Next(1000000000);
+                config.Seed = r.Next(1000000000).ToString();
                 if (spawnNextSeed)
                 {
                     backgroundWorker1 = new BackgroundWorker();

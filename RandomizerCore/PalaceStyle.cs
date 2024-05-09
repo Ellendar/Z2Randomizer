@@ -7,5 +7,13 @@ public enum PalaceStyle
 
 public static class PalaceStyleExtensions
 {
-
+    public static bool UsesVanillaRoomPool(this PalaceStyle style)
+    {
+        return style switch
+        {
+            PalaceStyle.VANILLA => true,
+            PalaceStyle.SHUFFLED => true,
+            _ => false
+        };
+    }
 }

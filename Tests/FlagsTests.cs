@@ -29,7 +29,7 @@ public class FlagsTests
     public void TestBlankEncodeCycle()
     {
         RandomizerConfiguration config = new();
-        String flags = config.Serialize();
+        String flags = config.Flags;
         RandomizerConfiguration config2 = new(flags);
         foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
         {
@@ -40,7 +40,7 @@ public class FlagsTests
             Assert.AreEqual(property.GetValue(config), property.GetValue(config2), 
                 property.Name + " did not match. Config: " + property.GetValue(config) + " Config2: " + property.GetValue(config2));
         }
-        String flags2 = config2.Serialize();
+        String flags2 = config2.Flags;
         Assert.AreEqual(flags, flags2);
     }
 
@@ -48,9 +48,9 @@ public class FlagsTests
     public void TestStandardFlagsEncodeCycle()
     {
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA");
-        String flags = config.Serialize();
+        String flags = config.Flags;
         RandomizerConfiguration config2 = new(flags);
-        String flags2 = config2.Serialize();
+        String flags2 = config2.Flags;
         Assert.AreEqual(flags, flags2);
     }
 
@@ -58,9 +58,9 @@ public class FlagsTests
     public void TestMaxRandoEncodeCycle()
     {
         RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7z$ZqTBT!BhOA!0P@@A");
-        String flags = config.Serialize();
+        String flags = config.Flags;
         RandomizerConfiguration config2 = new(flags);
-        String flags2 = config2.Serialize();
+        String flags2 = config2.Flags;
         Assert.AreEqual(flags, flags2);
     }
 }

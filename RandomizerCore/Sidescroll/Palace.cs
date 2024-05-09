@@ -16,7 +16,7 @@ public class Palace
     private Room entrance;
     private Room itemRoom;
     private Room bossRoom;
-    private Room tbird;
+    private Room tbirdRoom;
     private readonly SortedDictionary<int, List<Room>> rooms;
     internal bool IsValid { get; set; } = false;
 
@@ -44,7 +44,7 @@ public class Palace
     public int NumRooms { get => numRooms; set => numRooms = value; }
     public int MaxRooms { get => maxRooms; set => maxRooms = value; }
     public int Number { get; set; }
-    internal Room Tbird { get => tbird; set => tbird = value; }
+    internal Room Tbird { get => tbirdRoom; set => tbirdRoom = value; }
     
     //DEBUG
     public int Generations { get; set; }
@@ -161,7 +161,7 @@ public class Palace
         {
             foreach (Room open2 in openRooms)
             {
-                bool boss = AttachToOpen(open2, tbird);
+                bool boss = AttachToOpen(open2, tbirdRoom);
                 if (boss)
                 {
                     break;
@@ -1310,12 +1310,19 @@ public class Palace
         }
     }
 
-    public int AssignMapNumbers(int currentMap)
+    public int AssignMapNumbers(int currentMap, bool isGP)
     {
         entrance.Map = currentMap;
         bossRoom.Map = ++currentMap;
-        itemRoom.Map = ++currentMap;
-        IEnumerable<Room> normalRooms = AllRooms.Where(i => i != entrance && i != bossRoom && i != itemRoom);
+        if (isGP)
+        {
+            tbirdRoom.Map = ++currentMap;
+        }
+        else
+        {
+            itemRoom.Map = ++currentMap;
+        }
+        IEnumerable<Room> normalRooms = AllRooms.Where(i => i != entrance && i != bossRoom && i != itemRoom && i != tbirdRoom);
         foreach(Room room in normalRooms)
         {
             room.Map = ++currentMap;

@@ -21,7 +21,11 @@ internal class VanillaRoomPool : RoomPool
         {
             LinkedRooms.Add(room.Key, room.Value);
         }
-        ItemRoom = palaceRooms.VanillaItemRoom(palaceNumber);
+        if (palaceNumber < 7)
+        {
+            ItemRoom = palaceRooms.VanillaItemRoom(palaceNumber);
+        }
+        NormalRooms.AddRange(palaceRooms.VanillaPalaceRoomsByPalaceNumber(palaceNumber));
     }
 }
 

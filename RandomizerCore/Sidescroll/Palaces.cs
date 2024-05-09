@@ -90,7 +90,15 @@ public class Palaces
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
             };
 
-            RoomPool roomPool = new(palaceRooms, currentPalace, props);
+            RoomPool roomPool;
+            if(props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool())
+            {
+                roomPool = new VanillaRoomPool(palaceRooms, currentPalace, props);
+            }
+            else
+            {
+                roomPool = new(palaceRooms, currentPalace, props);
+            }
             Palace palace;
             do
             {
@@ -99,18 +107,19 @@ public class Palaces
 
             if(palace.GetPalaceGroup() == 1)
             {
-                group1MapIndex = palace.AssignMapNumbers(group1MapIndex);
+                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7);
             }
 
             if (palace.GetPalaceGroup() == 2)
             {
-                group2MapIndex = palace.AssignMapNumbers(group2MapIndex);
+                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7);
             }
 
             if (palace.GetPalaceGroup() == 3)
             {
-                group3MapIndex = palace.AssignMapNumbers(group3MapIndex);
+                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7);
             }
+            palaces.Add(palace);
         }
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
