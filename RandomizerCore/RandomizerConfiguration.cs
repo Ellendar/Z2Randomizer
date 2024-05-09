@@ -2,224 +2,935 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using RandomizerCore.Flags;
 
 namespace Z2Randomizer.Core;
 
-public class RandomizerConfiguration
+public class RandomizerConfiguration : INotifyPropertyChanged
 {
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
+
+    private int seed;
+    private bool shuffleStartingItems;
+    private bool startWithCandle;
+    private bool startWithGlove;
+    private bool startWithRaft;
+    private bool startWithBoots;
+    private bool startWithFlute;
+    private bool startWithCross;
+    private bool startWithHammer;
+    private bool startWithMagicKey;
+    private bool shuffleStartingSpells;
+    private bool startWithShield;
+    private bool startWithJump;
+    private bool startWithLife;
+    private bool startWithFairy;
+    private bool startWithFire;
+    private bool startWithReflect;
+    private bool startWithSpell;
+    private bool startWithThunder;
+    private int? startingHeartContainersMin;
+    private int? startingHeartContainersMax;
+    private int? maxHeartContainers;
+    private bool? startWithUpstab;
+    private bool? startWithDownstab;
+    private int? startingLives;
+    private int startingAttackLevel;
+    private int startingMagicLevel;
+    private int startingLifeLevel;
+    private bool? palacesCanSwapContinents;
+    private bool? shuffleGP;
+    private bool? shuffleEncounters;
+    private bool allowUnsafePathEncounters;
+    private bool includeLavaInEncounterShuffle;
+    private EncounterRate encounterRate;
+    private bool? hidePalace;
+    private bool? hideKasuto;
+    private bool? shuffleWhichLocationIsHidden;
+    private bool? hideLessImportantLocations;
+    private bool? restrictConnectionCaveShuffle;
+    private bool allowConnectionCavesToBeBoulderBlocked;
+    private bool? goodBoots;
+    private bool? generateBaguWoods;
+    private ContinentConnectionType continentConnectionType;
+    private Biome westBiome;
+    private Biome eastBiome;
+    private Biome dmBiome1;
+    private Biome mazeBiome;
+    private Climate climate;
+    private bool vanillaShuffleUsesActualTerrain;
+    private PalaceStyle normalPalaceStyle;
+    private PalaceStyle gpStyle;
+    private bool? includeVanillaRooms;
+    private bool? includev40Rooms;
+    private bool? includev44Rooms;
+    private bool blockingRoomsInAnyPalace;
+    private bool? bossRoomsExitToPalace;
+    private bool? birdRequired;
+    private bool removeTBird;
+    private bool restartAtPalacesOnGameOver;
+    private bool changePalacePallettes;
+    private bool randomizeBossItemDrop;
+    private int palacesToCompleteMin;
+    private int palacesToCompleteMax;
+    private bool noDuplicateRoomsByLayout;
+    private bool noDuplicateRoomsByEnemies;
+    private bool generatorsAlwaysMatch;
+    private bool hardBosses;
+    private bool shuffleAttackExperience;
+    private bool shuffleMagicExperience;
+    private bool shuffleLifeExperience;
+    private int attackLevelCap;
+    private int magicLevelCap;
+    private int lifeLevelCap;
+    private bool scaleLevelRequirementsToCap;
+    private StatEffectiveness attackEffectiveness;
+    private StatEffectiveness magicEffectiveness;
+    private StatEffectiveness lifeEffectiveness;
+    private bool shuffleLifeRefillAmount;
+    private bool? shuffleSpellLocations;
+    private bool? disableMagicContainerRequirements;
+    private bool? randomizeSpellSpellEnemy;
+    private bool? swapUpAndDownStab;
+    private FireOption fireOption;
+    private bool? shuffleOverworldEnemies;
+    private bool? shufflePalaceEnemies;
+    private bool shuffleDripperEnemy;
+    private bool? mixLargeAndSmallEnemies;
+    private bool shuffleEnemyHp;
+    private bool shuffleXpStealers;
+    private bool shuffleXpStolenAmount;
+    private bool shuffleSwordImmunity;
+    private StatEffectiveness enemyXpDrops;
+    private bool? shufflePalaceItems;
+    private bool? shuffleOverworldItems;
+    private bool? mixOverworldAndPalaceItems;
+    private bool? includePBagCavesInItemShuffle;
+    private bool shuffleSmallItems;
+    private bool? palacesContainExtraKeys;
+    private bool randomizeNewKasutoJarRequirements;
+    private bool? removeSpellItems;
+    private bool? shufflePBagAmounts;
+    private bool? includeSpellsInShuffle;
+    private bool? includeSwordTechsInShuffle;
+    private bool? includeQuestItemsInShuffle;
+    private bool shuffleItemDropFrequency;
+    private bool randomizeDrops;
+    private bool standardizeDrops;
+    private bool smallEnemiesCanDropBlueJar;
+    private bool smallEnemiesCanDropRedJar;
+    private bool smallEnemiesCanDropSmallBag;
+    private bool smallEnemiesCanDropMediumBag;
+    private bool smallEnemiesCanDropLargeBag;
+    private bool smallEnemiesCanDropXlBag;
+    private bool smallEnemiesCanDrop1Up;
+    private bool smallEnemiesCanDropKey;
+    private bool largeEnemiesCanDropBlueJar;
+    private bool largeEnemiesCanDropRedJar;
+    private bool largeEnemiesCanDropSmallBag;
+    private bool largeEnemiesCanDropMediumBag;
+    private bool largeEnemiesCanDropLargeBag;
+    private bool largeEnemiesCanDropXlBag;
+    private bool largeEnemiesCanDrop1Up;
+    private bool largeEnemiesCanDropKey;
+    private bool? enableHelpfulHints;
+    private bool? enableSpellItemHints;
+    private bool? enableTownNameHints;
+    private bool jumpAlwaysOn;
+    private bool dashAlwaysOn;
+    private bool shuffleSpritePalettes;
+    private bool permanmentBeamSword;
+    private bool useCommunityText;
+    private byte beepFrequency;
+    private byte beepThreshold;
+    private bool disableMusic;
+    private bool fastSpellCasting;
+    private bool upAOnController1;
+    private bool removeFlashing;
+    private int sprite;
+    private string tunic;
+    private string shieldTunic;
+    private string beamSprite;
+    private bool useCustomRooms;
+    private bool disableHudLag;
+    private bool randomizeKnockback;
+    
     //Meta
     [IgnoreInFlags]
-    public int Seed { get; set; }
+    public int Seed { get => seed; set => SetField(ref seed, value); }
 
     //Start Configuration
-    public bool ShuffleStartingItems { get; set; }
-    public bool StartWithCandle { get; set; }
-    public bool StartWithGlove { get; set; }
-    public bool StartWithRaft { get; set; }
-    public bool StartWithBoots { get; set; }
-    public bool StartWithFlute { get; set; }
-    public bool StartWithCross { get; set; }
-    public bool StartWithHammer { get; set; }
-    public bool StartWithMagicKey { get; set; }
-
-    public bool ShuffleStartingSpells { get; set; }
-    public bool StartWithShield { get; set; }
-    public bool StartWithJump { get; set; }
-    public bool StartWithLife { get; set; }
-    public bool StartWithFairy { get; set; }
-    public bool StartWithFire { get; set; }
-    public bool StartWithReflect { get; set; }
-    public bool StartWithSpell { get; set; }
-    public bool StartWithThunder { get; set; }
+    public bool ShuffleStartingItems { get => shuffleStartingItems; set => SetField(ref shuffleStartingItems, value); }
+    public bool StartWithCandle { get => startWithCandle; set => SetField(ref startWithCandle, value); }
+    public bool StartWithGlove { get => startWithGlove; set => SetField(ref startWithGlove, value); }
+    public bool StartWithRaft { get => startWithRaft; set => SetField(ref startWithRaft, value); }
+    public bool StartWithBoots { get => startWithBoots; set => SetField(ref startWithBoots, value); }
+    public bool StartWithFlute { get => startWithFlute; set => SetField(ref startWithFlute, value); }
+    public bool StartWithCross { get => startWithCross; set => SetField(ref startWithCross, value); }
+    public bool StartWithHammer { get => startWithHammer; set => SetField(ref startWithHammer, value); }
+    public bool StartWithMagicKey { get => startWithMagicKey; set => SetField(ref startWithMagicKey, value); }
+    
+    public bool ShuffleStartingSpells { get => shuffleStartingSpells; set => SetField(ref shuffleStartingSpells, value); }
+    public bool StartWithShield { get => startWithShield; set => SetField(ref startWithShield, value); }
+    public bool StartWithJump { get => startWithJump; set => SetField(ref startWithJump, value); }
+    public bool StartWithLife { get => startWithLife; set => SetField(ref startWithLife, value); }
+    public bool StartWithFairy { get => startWithFairy; set => SetField(ref startWithFairy, value); }
+    public bool StartWithFire { get => startWithFire; set => SetField(ref startWithFire, value); }
+    public bool StartWithReflect { get => startWithReflect; set => SetField(ref startWithReflect, value); }
+    public bool StartWithSpell { get => startWithSpell; set => SetField(ref startWithSpell, value); }
+    public bool StartWithThunder { get => startWithThunder; set => SetField(ref startWithThunder, value); }
 
     [Limit(8)]
     [Minimum(1)]
-    public int? StartingHeartContainersMin { get; set; }
+    public int? StartingHeartContainersMin { get => startingHeartContainersMin; set => SetField(ref startingHeartContainersMin, value); }
+    
     [Limit(8)]
     [Minimum(1)]
-    public int? StartingHeartContainersMax { get; set; }
+    public int? StartingHeartContainersMax { get => startingHeartContainersMax; set => SetField(ref startingHeartContainersMax, value); }
+
     [Limit(11)]
     [Minimum(1)]
-    public int? MaxHeartContainers { get; set; }
-    public bool? StartWithUpstab { get; set; }
-    public bool? StartWithDownstab { get; set; }
+    public int? MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
+
+    public bool? StartWithUpstab { get => startWithUpstab; set => SetField(ref startWithUpstab, value); }
+    public bool? StartWithDownstab { get => startWithDownstab; set => SetField(ref startWithDownstab, value); }
+
     [CustomFlagSerializer(typeof(StartingLivesSerializer))]
-    public int? StartingLives { get; set; }
+    public int? StartingLives { get => startingLives; set => SetField(ref startingLives, value); }
+
     [Limit(8)]
     [Minimum(1)]
-    public int StartingAttackLevel { get; set; }
+    public int StartingAttackLevel { get => startingAttackLevel; set => SetField(ref startingAttackLevel, value); }
+
     [Limit(8)]
     [Minimum(1)]
-    public int StartingMagicLevel { get; set; }
+    public int StartingMagicLevel { get => startingMagicLevel; set => SetField(ref startingMagicLevel, value); }
+
     [Limit(8)]
     [Minimum(1)]
-    public int StartingLifeLevel { get; set; }
+    public int StartingLifeLevel { get => startingLifeLevel; set => SetField(ref startingLifeLevel, value); }
 
 
     //Overworld
-    public bool? PalacesCanSwapContinents { get; set; }
-    public bool? ShuffleGP { get; set; }
-    public bool? ShuffleEncounters { get; set; }
-    public bool AllowUnsafePathEncounters { get; set; }
-    public bool IncludeLavaInEncounterShuffle { get; set; }
-    public EncounterRate EncounterRate { get; set; }
-    public bool? HidePalace { get; set; }
-    public bool? HideKasuto { get; set; }
-    public bool? ShuffleWhichLocationIsHidden { get; set; }
-    public bool? HideLessImportantLocations { get; set; }
+    public bool? PalacesCanSwapContinents { get => palacesCanSwapContinents; set => SetField(ref palacesCanSwapContinents, value); }
+    public bool? ShuffleGP { get => shuffleGP; set => SetField(ref shuffleGP, value); }
+    public bool? ShuffleEncounters { get => shuffleEncounters; set => SetField(ref shuffleEncounters, value); }
+
+    public bool AllowUnsafePathEncounters
+    {
+        get => allowUnsafePathEncounters;
+        set => SetField(ref allowUnsafePathEncounters, value);
+    }
+
+    public bool IncludeLavaInEncounterShuffle
+    {
+        get => includeLavaInEncounterShuffle;
+        set => SetField(ref includeLavaInEncounterShuffle, value);
+    }
+
+    public EncounterRate EncounterRate
+    {
+        get => encounterRate;
+        set => SetField(ref encounterRate, value);
+    }
+
+    public bool? HidePalace
+    {
+        get => hidePalace;
+        set => SetField(ref hidePalace, value);
+    }
+
+    public bool? HideKasuto
+    {
+        get => hideKasuto;
+        set => SetField(ref hideKasuto, value);
+    }
+
+    public bool? ShuffleWhichLocationIsHidden
+    {
+        get => shuffleWhichLocationIsHidden;
+        set => SetField(ref shuffleWhichLocationIsHidden, value);
+    }
+
+    public bool? HideLessImportantLocations
+    {
+        get => hideLessImportantLocations;
+        set => SetField(ref hideLessImportantLocations, value);
+    }
+
     //Sane caves
-    public bool? RestrictConnectionCaveShuffle { get; set; }
-    public bool AllowConnectionCavesToBeBoulderBlocked { get; set; }
-    public bool? GoodBoots { get; set; }
-    public bool? GenerateBaguWoods { get; set; }
-    public ContinentConnectionType ContinentConnectionType { get; set; }
-    public Biome WestBiome { get; set; }
-    public Biome EastBiome { get; set; }
-    public Biome DMBiome { get; set; }
-    public Biome MazeBiome { get; set; }
+    public bool? RestrictConnectionCaveShuffle
+    {
+        get => restrictConnectionCaveShuffle;
+        set => SetField(ref restrictConnectionCaveShuffle, value);
+    }
+
+    public bool AllowConnectionCavesToBeBoulderBlocked
+    {
+        get => allowConnectionCavesToBeBoulderBlocked;
+        set => SetField(ref allowConnectionCavesToBeBoulderBlocked, value);
+    }
+
+    public bool? GoodBoots
+    {
+        get => goodBoots;
+        set => SetField(ref goodBoots, value);
+    }
+
+    public bool? GenerateBaguWoods
+    {
+        get => generateBaguWoods;
+        set => SetField(ref generateBaguWoods, value);
+    }
+
+    public ContinentConnectionType ContinentConnectionType
+    {
+        get => continentConnectionType;
+        set => SetField(ref continentConnectionType, value);
+    }
+
+    public Biome WestBiome
+    {
+        get => westBiome;
+        set => SetField(ref westBiome, value);
+    }
+
+    public Biome EastBiome
+    {
+        get => eastBiome;
+        set => SetField(ref eastBiome, value);
+    }
+
+    public Biome DMBiome
+    {
+        get => dmBiome1;
+        set => SetField(ref dmBiome1, value);
+    }
+
+    public Biome MazeBiome
+    {
+        get => mazeBiome;
+        set => SetField(ref mazeBiome, value);
+    }
+
     [CustomFlagSerializer(typeof(ClimateFlagSerializer))]
-    public Climate Climate { get; set; }
-    public bool VanillaShuffleUsesActualTerrain { get; set; }
+    public Climate Climate
+    {
+        get => climate;
+        set => SetField(ref climate, value);
+    }
+
+    public bool VanillaShuffleUsesActualTerrain
+    {
+        get => vanillaShuffleUsesActualTerrain;
+        set => SetField(ref vanillaShuffleUsesActualTerrain, value);
+    }
 
     //Palaces
-    public PalaceStyle NormalPalaceStyle { get; set; }
-    public PalaceStyle GPStyle { get; set; }
-    //public bool? IncludeCommunityRooms { get; set; }
-    public bool? IncludeVanillaRooms { get; set; }
-    public bool? Includev4_0Rooms { get; set; }
-    public bool? Includev4_4Rooms { get; set; }
+    public PalaceStyle NormalPalaceStyle
+    {
+        get => normalPalaceStyle;
+        set => SetField(ref normalPalaceStyle, value);
+    }
 
-    public bool BlockingRoomsInAnyPalace { get; set; }
-    public bool? BossRoomsExitToPalace { get; set; }
-    public bool? TBirdRequired { get; set; }
-    public bool RemoveTBird { get; set; }
-    public bool RestartAtPalacesOnGameOver { get; set; }
-    public bool ChangePalacePallettes { get; set; }
-    public bool RandomizeBossItemDrop { get; set; }
+    public PalaceStyle GPStyle
+    {
+        get => gpStyle;
+        set => SetField(ref gpStyle, value);
+    }
+
+    //public bool? IncludeCommunityRooms { get; set; }
+    public bool? IncludeVanillaRooms
+    {
+        get => includeVanillaRooms;
+        set => SetField(ref includeVanillaRooms, value);
+    }
+
+    public bool? Includev4_0Rooms
+    {
+        get => includev40Rooms;
+        set => SetField(ref includev40Rooms, value);
+    }
+
+    public bool? Includev4_4Rooms
+    {
+        get => includev44Rooms;
+        set => SetField(ref includev44Rooms, value);
+    }
+
+    public bool BlockingRoomsInAnyPalace
+    {
+        get => blockingRoomsInAnyPalace;
+        set => SetField(ref blockingRoomsInAnyPalace, value);
+    }
+
+    public bool? BossRoomsExitToPalace
+    {
+        get => bossRoomsExitToPalace;
+        set => SetField(ref bossRoomsExitToPalace, value);
+    }
+
+    public bool? TBirdRequired
+    {
+        get => birdRequired;
+        set => SetField(ref birdRequired, value);
+    }
+
+    public bool RemoveTBird
+    {
+        get => removeTBird;
+        set => SetField(ref removeTBird, value);
+    }
+
+    public bool RestartAtPalacesOnGameOver
+    {
+        get => restartAtPalacesOnGameOver;
+        set => SetField(ref restartAtPalacesOnGameOver, value);
+    }
+
+    public bool ChangePalacePallettes
+    {
+        get => changePalacePallettes;
+        set => SetField(ref changePalacePallettes, value);
+    }
+
+    public bool RandomizeBossItemDrop
+    {
+        get => randomizeBossItemDrop;
+        set => SetField(ref randomizeBossItemDrop, value);
+    }
+
     [Limit(7)]
-    public int PalacesToCompleteMin { get; set; }
+    public int PalacesToCompleteMin
+    {
+        get => palacesToCompleteMin;
+        set => SetField(ref palacesToCompleteMin, value);
+    }
+
     [Limit(7)]
-    public int PalacesToCompleteMax { get; set; }
-    public bool NoDuplicateRoomsByLayout { get; set; }
-    public bool NoDuplicateRoomsByEnemies { get; set; }
-    public bool GeneratorsAlwaysMatch { get; set; }
-    public bool HardBosses { get; set; }
+    public int PalacesToCompleteMax
+    {
+        get => palacesToCompleteMax;
+        set => SetField(ref palacesToCompleteMax, value);
+    }
+
+    public bool NoDuplicateRoomsByLayout
+    {
+        get => noDuplicateRoomsByLayout;
+        set => SetField(ref noDuplicateRoomsByLayout, value);
+    }
+
+    public bool NoDuplicateRoomsByEnemies
+    {
+        get => noDuplicateRoomsByEnemies;
+        set => SetField(ref noDuplicateRoomsByEnemies, value);
+    }
+
+    public bool GeneratorsAlwaysMatch
+    {
+        get => generatorsAlwaysMatch;
+        set => SetField(ref generatorsAlwaysMatch, value);
+    }
+
+    public bool HardBosses
+    {
+        get => hardBosses;
+        set => SetField(ref hardBosses, value);
+    }
 
     //Levels
-    public bool ShuffleAttackExperience { get; set; }
-    public bool ShuffleMagicExperience { get; set; }
-    public bool ShuffleLifeExperience { get; set; }
+    public bool ShuffleAttackExperience
+    {
+        get => shuffleAttackExperience;
+        set => SetField(ref shuffleAttackExperience, value);
+    }
+
+    public bool ShuffleMagicExperience
+    {
+        get => shuffleMagicExperience;
+        set => SetField(ref shuffleMagicExperience, value);
+    }
+
+    public bool ShuffleLifeExperience
+    {
+        get => shuffleLifeExperience;
+        set => SetField(ref shuffleLifeExperience, value);
+    }
+
     [Limit(8)]
     [Minimum(1)]
-    public int AttackLevelCap { get; set; }
+    public int AttackLevelCap
+    {
+        get => attackLevelCap;
+        set => SetField(ref attackLevelCap, value);
+    }
+
     [Limit(8)]
     [Minimum(1)]
-    public int MagicLevelCap { get; set; }
+    public int MagicLevelCap
+    {
+        get => magicLevelCap;
+        set => SetField(ref magicLevelCap, value);
+    }
+
     [Limit(8)]
     [Minimum(1)]
-    public int LifeLevelCap { get; set; }
-    public bool ScaleLevelRequirementsToCap { get; set; }
-    public StatEffectiveness AttackEffectiveness { get; set; }
-    public StatEffectiveness MagicEffectiveness { get; set; }
-    public StatEffectiveness LifeEffectiveness { get; set; }
+    public int LifeLevelCap
+    {
+        get => lifeLevelCap;
+        set => SetField(ref lifeLevelCap, value);
+    }
+
+    public bool ScaleLevelRequirementsToCap
+    {
+        get => scaleLevelRequirementsToCap;
+        set => SetField(ref scaleLevelRequirementsToCap, value);
+    }
+
+    public StatEffectiveness AttackEffectiveness
+    {
+        get => attackEffectiveness;
+        set => SetField(ref attackEffectiveness, value);
+    }
+
+    public StatEffectiveness MagicEffectiveness
+    {
+        get => magicEffectiveness;
+        set => SetField(ref magicEffectiveness, value);
+    }
+
+    public StatEffectiveness LifeEffectiveness
+    {
+        get => lifeEffectiveness;
+        set => SetField(ref lifeEffectiveness, value);
+    }
 
     //Spells
-    public bool ShuffleLifeRefillAmount { get; set; }
-    public bool? ShuffleSpellLocations { get; set; }
-    public bool? DisableMagicContainerRequirements { get; set; }
-    public bool? RandomizeSpellSpellEnemy { get; set; }
-    public bool? SwapUpAndDownStab { get; set; }
-    public FireOption FireOption { get; set; }
+    public bool ShuffleLifeRefillAmount
+    {
+        get => shuffleLifeRefillAmount;
+        set => SetField(ref shuffleLifeRefillAmount, value);
+    }
+
+    public bool? ShuffleSpellLocations
+    {
+        get => shuffleSpellLocations;
+        set => SetField(ref shuffleSpellLocations, value);
+    }
+
+    public bool? DisableMagicContainerRequirements
+    {
+        get => disableMagicContainerRequirements;
+        set => SetField(ref disableMagicContainerRequirements, value);
+    }
+
+    public bool? RandomizeSpellSpellEnemy
+    {
+        get => randomizeSpellSpellEnemy;
+        set => SetField(ref randomizeSpellSpellEnemy, value);
+    }
+
+    public bool? SwapUpAndDownStab
+    {
+        get => swapUpAndDownStab;
+        set => SetField(ref swapUpAndDownStab, value);
+    }
+
+    public FireOption FireOption
+    {
+        get => fireOption;
+        set => SetField(ref fireOption, value);
+    }
 
     //Enemies
-    public bool? ShuffleOverworldEnemies { get; set; }
-    public bool? ShufflePalaceEnemies { get; set; }
-    public bool ShuffleDripperEnemy { get; set; }
-    public bool? MixLargeAndSmallEnemies { get; set; }
-    public bool ShuffleEnemyHP { get; set; }
-    public bool ShuffleXPStealers { get; set; }
-    public bool ShuffleXPStolenAmount { get; set; }
-    public bool ShuffleSwordImmunity { get; set; }
-    public StatEffectiveness EnemyXPDrops { get; set; }
+    public bool? ShuffleOverworldEnemies
+    {
+        get => shuffleOverworldEnemies;
+        set => SetField(ref shuffleOverworldEnemies, value);
+    }
+
+    public bool? ShufflePalaceEnemies
+    {
+        get => shufflePalaceEnemies;
+        set => SetField(ref shufflePalaceEnemies, value);
+    }
+
+    public bool ShuffleDripperEnemy
+    {
+        get => shuffleDripperEnemy;
+        set => SetField(ref shuffleDripperEnemy, value);
+    }
+
+    public bool? MixLargeAndSmallEnemies
+    {
+        get => mixLargeAndSmallEnemies;
+        set => SetField(ref mixLargeAndSmallEnemies, value);
+    }
+
+    public bool ShuffleEnemyHP
+    {
+        get => shuffleEnemyHp;
+        set => SetField(ref shuffleEnemyHp, value);
+    }
+
+    public bool ShuffleXPStealers
+    {
+        get => shuffleXpStealers;
+        set => SetField(ref shuffleXpStealers, value);
+    }
+
+    public bool ShuffleXPStolenAmount
+    {
+        get => shuffleXpStolenAmount;
+        set => SetField(ref shuffleXpStolenAmount, value);
+    }
+
+    public bool ShuffleSwordImmunity
+    {
+        get => shuffleSwordImmunity;
+        set => SetField(ref shuffleSwordImmunity, value);
+    }
+
+    public StatEffectiveness EnemyXPDrops
+    {
+        get => enemyXpDrops;
+        set => SetField(ref enemyXpDrops, value);
+    }
 
     //Items
-    public bool? ShufflePalaceItems { get; set; }
-    public bool? ShuffleOverworldItems { get; set; }
-    public bool? MixOverworldAndPalaceItems { get; set; }
-    public bool? IncludePBagCavesInItemShuffle { get; set; }
-    public bool ShuffleSmallItems { get; set; }
-    public bool? PalacesContainExtraKeys { get; set; }
-    public bool RandomizeNewKasutoJarRequirements { get; set; }
-    public bool? RemoveSpellItems { get; set; }
-    public bool? ShufflePBagAmounts { get; set; }
-    public bool? IncludeSpellsInShuffle { get; set; }
-    public bool? IncludeSwordTechsInShuffle { get; set; }
+    public bool? ShufflePalaceItems
+    {
+        get => shufflePalaceItems;
+        set => SetField(ref shufflePalaceItems, value);
+    }
+
+    public bool? ShuffleOverworldItems
+    {
+        get => shuffleOverworldItems;
+        set => SetField(ref shuffleOverworldItems, value);
+    }
+
+    public bool? MixOverworldAndPalaceItems
+    {
+        get => mixOverworldAndPalaceItems;
+        set => SetField(ref mixOverworldAndPalaceItems, value);
+    }
+
+    public bool? IncludePBagCavesInItemShuffle
+    {
+        get => includePBagCavesInItemShuffle;
+        set => SetField(ref includePBagCavesInItemShuffle, value);
+    }
+
+    public bool ShuffleSmallItems
+    {
+        get => shuffleSmallItems;
+        set => SetField(ref shuffleSmallItems, value);
+    }
+
+    public bool? PalacesContainExtraKeys
+    {
+        get => palacesContainExtraKeys;
+        set => SetField(ref palacesContainExtraKeys, value);
+    }
+
+    public bool RandomizeNewKasutoJarRequirements
+    {
+        get => randomizeNewKasutoJarRequirements;
+        set => SetField(ref randomizeNewKasutoJarRequirements, value);
+    }
+
+    public bool? RemoveSpellItems
+    {
+        get => removeSpellItems;
+        set => SetField(ref removeSpellItems, value);
+    }
+
+    public bool? ShufflePBagAmounts
+    {
+        get => shufflePBagAmounts;
+        set => SetField(ref shufflePBagAmounts, value);
+    }
+
+    public bool? IncludeSpellsInShuffle
+    {
+        get => includeSpellsInShuffle;
+        set => SetField(ref includeSpellsInShuffle, value);
+    }
+
+    public bool? IncludeSwordTechsInShuffle
+    {
+        get => includeSwordTechsInShuffle;
+        set => SetField(ref includeSwordTechsInShuffle, value);
+    }
+
     //Bagu's note / fountain water / saria mirror
-    public bool? IncludeQuestItemsInShuffle { get; set; }
+    public bool? IncludeQuestItemsInShuffle
+    {
+        get => includeQuestItemsInShuffle;
+        set => SetField(ref includeQuestItemsInShuffle, value);
+    }
 
     //Drops
-    public bool ShuffleItemDropFrequency { get; set; }
-    public bool RandomizeDrops { get; set; }
-    public bool StandardizeDrops { get; set; }
-    public bool SmallEnemiesCanDropBlueJar { get; set; }
-    public bool SmallEnemiesCanDropRedJar { get; set; }
-    public bool SmallEnemiesCanDropSmallBag { get; set; }
-    public bool SmallEnemiesCanDropMediumBag { get; set; }
-    public bool SmallEnemiesCanDropLargeBag { get; set; }
-    public bool SmallEnemiesCanDropXLBag { get; set; }
-    public bool SmallEnemiesCanDrop1up { get; set; }
-    public bool SmallEnemiesCanDropKey { get; set; }
-    public bool LargeEnemiesCanDropBlueJar { get; set; }
-    public bool LargeEnemiesCanDropRedJar { get; set; }
-    public bool LargeEnemiesCanDropSmallBag { get; set; }
-    public bool LargeEnemiesCanDropMediumBag { get; set; }
-    public bool LargeEnemiesCanDropLargeBag { get; set; }
-    public bool LargeEnemiesCanDropXLBag { get; set; }
-    public bool LargeEnemiesCanDrop1up { get; set; }
-    public bool LargeEnemiesCanDropKey { get; set; }
+    public bool ShuffleItemDropFrequency
+    {
+        get => shuffleItemDropFrequency;
+        set => SetField(ref shuffleItemDropFrequency, value);
+    }
+
+    public bool RandomizeDrops
+    {
+        get => randomizeDrops;
+        set => SetField(ref randomizeDrops, value);
+    }
+
+    public bool StandardizeDrops
+    {
+        get => standardizeDrops;
+        set => SetField(ref standardizeDrops, value);
+    }
+
+    public bool SmallEnemiesCanDropBlueJar
+    {
+        get => smallEnemiesCanDropBlueJar;
+        set => SetField(ref smallEnemiesCanDropBlueJar, value);
+    }
+
+    public bool SmallEnemiesCanDropRedJar
+    {
+        get => smallEnemiesCanDropRedJar;
+        set => SetField(ref smallEnemiesCanDropRedJar, value);
+    }
+
+    public bool SmallEnemiesCanDropSmallBag
+    {
+        get => smallEnemiesCanDropSmallBag;
+        set => SetField(ref smallEnemiesCanDropSmallBag, value);
+    }
+
+    public bool SmallEnemiesCanDropMediumBag
+    {
+        get => smallEnemiesCanDropMediumBag;
+        set => SetField(ref smallEnemiesCanDropMediumBag, value);
+    }
+
+    public bool SmallEnemiesCanDropLargeBag
+    {
+        get => smallEnemiesCanDropLargeBag;
+        set => SetField(ref smallEnemiesCanDropLargeBag, value);
+    }
+
+    public bool SmallEnemiesCanDropXLBag
+    {
+        get => smallEnemiesCanDropXlBag;
+        set => SetField(ref smallEnemiesCanDropXlBag, value);
+    }
+
+    public bool SmallEnemiesCanDrop1up
+    {
+        get => smallEnemiesCanDrop1Up;
+        set => SetField(ref smallEnemiesCanDrop1Up, value);
+    }
+
+    public bool SmallEnemiesCanDropKey
+    {
+        get => smallEnemiesCanDropKey;
+        set => SetField(ref smallEnemiesCanDropKey, value);
+    }
+
+    public bool LargeEnemiesCanDropBlueJar
+    {
+        get => largeEnemiesCanDropBlueJar;
+        set => SetField(ref largeEnemiesCanDropBlueJar, value);
+    }
+
+    public bool LargeEnemiesCanDropRedJar
+    {
+        get => largeEnemiesCanDropRedJar;
+        set => SetField(ref largeEnemiesCanDropRedJar, value);
+    }
+
+    public bool LargeEnemiesCanDropSmallBag
+    {
+        get => largeEnemiesCanDropSmallBag;
+        set => SetField(ref largeEnemiesCanDropSmallBag, value);
+    }
+
+    public bool LargeEnemiesCanDropMediumBag
+    {
+        get => largeEnemiesCanDropMediumBag;
+        set => SetField(ref largeEnemiesCanDropMediumBag, value);
+    }
+
+    public bool LargeEnemiesCanDropLargeBag
+    {
+        get => largeEnemiesCanDropLargeBag;
+        set => SetField(ref largeEnemiesCanDropLargeBag, value);
+    }
+
+    public bool LargeEnemiesCanDropXLBag
+    {
+        get => largeEnemiesCanDropXlBag;
+        set => SetField(ref largeEnemiesCanDropXlBag, value);
+    }
+
+    public bool LargeEnemiesCanDrop1up
+    {
+        get => largeEnemiesCanDrop1Up;
+        set => SetField(ref largeEnemiesCanDrop1Up, value);
+    }
+
+    public bool LargeEnemiesCanDropKey
+    {
+        get => largeEnemiesCanDropKey;
+        set => SetField(ref largeEnemiesCanDropKey, value);
+    }
 
     //Misc
-    public bool? EnableHelpfulHints { get; set; }
-    public bool? EnableSpellItemHints { get; set; }
-    public bool? EnableTownNameHints { get; set; }
-    public bool JumpAlwaysOn { get; set; }
-    public bool DashAlwaysOn { get; set; }
-    public bool ShuffleSpritePalettes { get; set; }
-    public bool PermanmentBeamSword { get; set; }
+    public bool? EnableHelpfulHints
+    {
+        get => enableHelpfulHints;
+        set => SetField(ref enableHelpfulHints, value);
+    }
+
+    public bool? EnableSpellItemHints
+    {
+        get => enableSpellItemHints;
+        set => SetField(ref enableSpellItemHints, value);
+    }
+
+    public bool? EnableTownNameHints
+    {
+        get => enableTownNameHints;
+        set => SetField(ref enableTownNameHints, value);
+    }
+
+    public bool JumpAlwaysOn
+    {
+        get => jumpAlwaysOn;
+        set => SetField(ref jumpAlwaysOn, value);
+    }
+
+    public bool DashAlwaysOn
+    {
+        get => dashAlwaysOn;
+        set => SetField(ref dashAlwaysOn, value);
+    }
+
+    public bool ShuffleSpritePalettes
+    {
+        get => shuffleSpritePalettes;
+        set => SetField(ref shuffleSpritePalettes, value);
+    }
+
+    public bool PermanmentBeamSword
+    {
+        get => permanmentBeamSword;
+        set => SetField(ref permanmentBeamSword, value);
+    }
 
     //Custom
     [IgnoreInFlags]
-    public bool UseCommunityText { get; set; }
+    public bool UseCommunityText
+    {
+        get => useCommunityText;
+        set => SetField(ref useCommunityText, value);
+    }
+
     [IgnoreInFlags]
-    public byte BeepFrequency { get; set; }
+    public byte BeepFrequency
+    {
+        get => beepFrequency;
+        set => SetField(ref beepFrequency, value);
+    }
+
     [IgnoreInFlags]
-    public byte BeepThreshold { get; set; }
+    public byte BeepThreshold
+    {
+        get => beepThreshold;
+        set => SetField(ref beepThreshold, value);
+    }
+
     [IgnoreInFlags]
-    public bool DisableMusic { get; set; }
+    public bool DisableMusic
+    {
+        get => disableMusic;
+        set => SetField(ref disableMusic, value);
+    }
+
     [IgnoreInFlags]
-    public bool FastSpellCasting { get; set; }
+    public bool FastSpellCasting
+    {
+        get => fastSpellCasting;
+        set => SetField(ref fastSpellCasting, value);
+    }
+
     [IgnoreInFlags]
-    public bool UpAOnController1 { get; set; }
+    public bool UpAOnController1
+    {
+        get => upAOnController1;
+        set => SetField(ref upAOnController1, value);
+    }
+
     [IgnoreInFlags]
-    public bool RemoveFlashing { get; set; }
+    public bool RemoveFlashing
+    {
+        get => removeFlashing;
+        set => SetField(ref removeFlashing, value);
+    }
+
     [IgnoreInFlags]
-    public int Sprite { get; set; }
+    public int Sprite
+    {
+        get => sprite;
+        set => SetField(ref sprite, value);
+    }
+
     [IgnoreInFlags]
-    public string Tunic { get; set; }
+    public string Tunic
+    {
+        get => tunic;
+        set => SetField(ref tunic, value);
+    }
+
     [IgnoreInFlags]
-    public string ShieldTunic { get; set; }
+    public string ShieldTunic
+    {
+        get => shieldTunic;
+        set => SetField(ref shieldTunic, value);
+    }
+
     [IgnoreInFlags]
-    public string BeamSprite { get; set; }
+    public string BeamSprite
+    {
+        get => beamSprite;
+        set => SetField(ref beamSprite, value);
+    }
+
     [IgnoreInFlags]
-    public bool UseCustomRooms { get; set; }
+    public bool UseCustomRooms
+    {
+        get => useCustomRooms;
+        set => SetField(ref useCustomRooms, value);
+    }
+
     [IgnoreInFlags]
-    public bool DisableHUDLag { get; set; }
-    public bool RandomizeKnockback { get; set; }
+    public bool DisableHUDLag
+    {
+        get => disableHudLag;
+        set => SetField(ref disableHudLag, value);
+    }
+
+    public bool RandomizeKnockback
+    {
+        get => randomizeKnockback;
+        set => SetField(ref randomizeKnockback, value);
+    }
 
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.
@@ -1631,4 +2342,18 @@ public class RandomizerConfiguration
         return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
     }
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }
