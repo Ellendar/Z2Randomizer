@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:RandomizerViewModel"
+             x:Class="CrossPlatformUI.Views.RandomizerView">
+    <StackPanel Orientation="Vertical">
+        
+        <Grid ColumnDefinitions="2*, *" RowDefinitions="Auto" Margin="4">
+            <StackPanel Grid.Column="0">
+                <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
+                    <TextBox.InnerRightContent>
+                        <Button ToolTip.Tip="Generate a random number as your Seed" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}"
+                                Content="{avalonia:MaterialIconExt DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
+                    </TextBox.InnerRightContent>
+                </TextBox>
+            </StackPanel>
+        </Grid>
+        
+        <TabControl Margin="5" SelectedIndex="9">
+            <TabItem Header="Start">
+            </TabItem>
+            <TabItem Header="Overworld">
+            </TabItem>
+            <TabItem Header="Palaces">
+            </TabItem>
+            <TabItem Header="Levels">
+            </TabItem>
+            <TabItem Header="Enemies">
+            </TabItem>
+            <TabItem Header="Spells">
+            </TabItem>
+            <TabItem Header="Items">
+            </TabItem>
+            <TabItem Header="Drops">
+            </TabItem>
+            <TabItem Header="Hints">
+            </TabItem>
+            <TabItem Header="Customize">
+                <tabs:CustomizeView />
+            </TabItem>
+        </TabControl>
+    </StackPanel>
+</UserControl>

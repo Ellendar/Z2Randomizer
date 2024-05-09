@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
+             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
+             x:DataType="vmt:CustomizeViewModel">
+    <Grid ColumnDefinitions="2*, *, *" RowDefinitions="Auto" Margin="4">
+        <StackPanel Orientation="Vertical">
+            
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            
+        </StackPanel>
+        <StackPanel Grid.Column="2" Orientation="Vertical">
+            <tabs:SpritePreviewView />
+        </StackPanel>
+    </Grid>
+</UserControl>

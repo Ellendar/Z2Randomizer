@@ -13,7 +13,7 @@ public class AppViewLocator : IViewLocator
         MainWindowViewModel context => new MainWindow { DataContext = context },
         RomFileViewModel context => new RomFileView { DataContext = context },
         GenerateRomViewModel context => new GenerateRomView { DataContext = context },
-        HeaderViewModel context => new HeaderView { DataContext = context },
+        RandomizerViewModel context => new RandomizerView { DataContext = context },
         _ => throw new ArgumentOutOfRangeException(nameof(viewModel))
     };
 }

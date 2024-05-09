@@ -33,7 +33,7 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     [DataMember]
     public RomFileViewModel RomFileViewModel { get; }
     [DataMember]
-    public HeaderViewModel HeaderViewModel { get; }
+    public RandomizerViewModel RandomizerViewModel { get; }
     public GenerateRomViewModel GenerateRomViewModel { get; }
 
     
@@ -46,8 +46,8 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
         Config = new();
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);
-        HeaderViewModel = new(this);
-        Router.Navigate.Execute(HeaderViewModel);
+        RandomizerViewModel = new(this);
+        Router.Navigate.Execute(RandomizerViewModel);
         
         // GoNext = ReactiveCommand.CreateFromObservable(
         //     () => Router.Navigate.Execute(new MainViewModel(this))

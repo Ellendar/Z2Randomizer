@@ -14,7 +14,7 @@
         <dialogHost:DialogHost.DialogContent>
             <views:GenerateRomView MinHeight="200" MinWidth="400" DataContext="{Binding GenerateRomViewModel}"/>
         </dialogHost:DialogHost.DialogContent>
-        <Grid RowDefinitions="*,Auto">
+        <Grid RowDefinitions="*, Auto">
             <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
                 <rxui:RoutedViewHost.ViewLocator>
                     <app:AppViewLocator />
