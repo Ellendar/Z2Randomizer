@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using RandomizerCore;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using RandomizerCore.Flags;
@@ -39,8 +40,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
     private int? maxHeartContainers;
-    private bool? startWithUpstab;
-    private bool? startWithDownstab;
+
+    private StartingTechs startingTechs;
+    // private bool? startWithUpstab;
+    // private bool? startWithDownstab;
     private int? startingLives;
     private int startingAttackLevel;
     private int startingMagicLevel;
@@ -207,8 +210,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [Minimum(1)]
     public int? MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
 
-    public bool? StartWithUpstab { get => startWithUpstab; set => SetField(ref startWithUpstab, value); }
-    public bool? StartWithDownstab { get => startWithDownstab; set => SetField(ref startWithDownstab, value); }
+    // public bool? StartWithUpstab { get => startWithUpstab; set => SetField(ref startWithUpstab, value); }
+    // public bool? StartWithDownstab { get => startWithDownstab; set => SetField(ref startWithDownstab, value); }
+    public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }
 
     [CustomFlagSerializer(typeof(StartingLivesSerializer))]
     public int? StartingLives { get => startingLives; set => SetField(ref startingLives, value); }
@@ -1201,24 +1205,19 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[3] ? 1 : 0) + (bits[4] ? 2 : 0) + (bits[5] ? 4 : 0))
         {
             case 0:
-                config.StartWithDownstab = false;
-                config.StartWithUpstab = false;
+                config.StartingTechniques = StartingTechs.NONE;
                 break;
             case 1:
-                config.StartWithDownstab = true;
-                config.StartWithUpstab = false;
+                config.StartingTechniques = StartingTechs.DOWNSTAB;
                 break;
             case 2:
-                config.StartWithDownstab = false;
-                config.StartWithUpstab = true;
+                config.StartingTechniques = StartingTechs.UPSTAB;
                 break;
             case 3:
-                config.StartWithDownstab = true;
-                config.StartWithUpstab = true;
+                config.StartingTechniques = StartingTechs.BOTH;
                 break;
             case 4:
-                config.StartWithDownstab = null;
-                config.StartWithUpstab = null;
+                config.StartingTechniques = StartingTechs.RANDOM;
                 break;
         }
 
@@ -1869,7 +1868,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
 
         //If both stabs are random, use the classic weightings
-        if (StartWithDownstab == null && StartWithUpstab == null)
+        if (StartingTechniques == StartingTechs.RANDOM)
         {
             switch (random.Next(7))
             {
@@ -1897,8 +1896,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         //Otherwise I guess we'll use an independent 2/7ths as a rough approximation
         else
         {
-            properties.StartWithDownstab = StartWithDownstab ?? random.Next(7) >= 5;
-            properties.StartWithUpstab = StartWithUpstab ?? random.Next(7) >= 5;
+            properties.StartWithDownstab = StartingTechniques == StartingTechs.DOWNSTAB && random.Next(7) >= 5;
+            properties.StartWithUpstab = StartingTechniques == StartingTechs.UPSTAB && random.Next(7) >= 5;
         }
         properties.SwapUpAndDownStab = SwapUpAndDownStab ?? random.Next(2) == 1;
 

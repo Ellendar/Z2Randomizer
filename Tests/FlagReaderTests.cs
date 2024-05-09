@@ -1,3 +1,4 @@
+using RandomizerCore;
 using Z2Randomizer.Core;
 using Z2Randomizer.Core.Flags;
 
