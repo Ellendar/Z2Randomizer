@@ -44,9 +44,8 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         }
         catch (Exception e) when (e is JsonException or IOException) { }
 
-        using var file = File.OpenWrite(SettingsFilename);
-        using var stream = new StreamWriter(file);
-        using var writer = new JsonTextWriter(stream);
+        using var file = File.CreateText(SettingsFilename);
+        using var writer = new JsonTextWriter(file);
         next.WriteTo(writer);
     }
 

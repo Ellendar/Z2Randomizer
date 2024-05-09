@@ -14,20 +14,15 @@
         <dialogHost:DialogHost.DialogContent>
             <views:GenerateRomView MinHeight="200" MinWidth="400" DataContext="{Binding GenerateRomViewModel}"/>
         </dialogHost:DialogHost.DialogContent>
-        <Grid RowDefinitions="*, Auto">
+        <Grid>
             <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
                 <rxui:RoutedViewHost.DefaultContent>
                     <views:RandomizerView />
                 </rxui:RoutedViewHost.DefaultContent>
                 <rxui:RoutedViewHost.ViewLocator>
                     <app:AppViewLocator />
-                    
                 </rxui:RoutedViewHost.ViewLocator>
             </rxui:RoutedViewHost>
-            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Reload ROM" IsEnabled="{Binding CanLoadRom}" 
-                        Command="{Binding LoadRom}" />
-            </StackPanel>
         </Grid>
     </dialogHost:DialogHost>
 </UserControl>

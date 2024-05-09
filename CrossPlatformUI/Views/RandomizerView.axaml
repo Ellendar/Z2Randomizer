@@ -26,20 +26,34 @@
                 </TextBox>
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button HorizontalAlignment="Right" IsEnabled="{Binding IsFlagsValid}" Content="Generate" 
+                <Button HorizontalAlignment="Right" IsEnabled="{Binding CanGenerate^}" Content="Generate" 
                         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=OpenDialogCommand}" />
                 <Menu Padding="0" Margin="0">
                     <MenuItem Height="32" Width="32" Header="{avalonia:MaterialIconExt Cog, Size=32}">
-                        <MenuItem Header="Reload ROM">
+                        <MenuItem Header="Reload ROM" Command="{Binding LoadRom}" >
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="ReloadAlert" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
+                        <MenuItem Header="Save As New Preset">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Clear Saved Presets">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="TrashCanOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <Separator />
-                        <MenuItem Header="Beginner Preset" />
-                        <MenuItem Header="Standard Preset" />
-                        <MenuItem Header="Max Rando Preset" />
-                        <MenuItem Header="Random% Preset" />
+                        <MenuItem Header="Beginner Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.BeginnerPreset}}"/>
+                        <MenuItem Header="Standard Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.StandardPreset}}"/>
+                        <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.MaxRandoPreset}}"/>
+                        <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.RandoPercentPreset}}"/>
                         <Separator />
                     </MenuItem>
                 </Menu>

@@ -13,17 +13,18 @@ namespace CrossPlatformUI.ViewModels;
 [DataContract]
 public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
 {
+    public static readonly string BeginnerPreset = "bo!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
+    public static readonly string StandardPreset = "Ao!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
+    public static readonly string MaxRandoPreset = "Go!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
+    public static readonly string RandoPercentPreset = "Zo!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
+    
     public RandomizerConfiguration Config { get; } = new();
-
-    private bool canLoadRom;
-    public bool CanLoadRom { get => canLoadRom; set => this.RaiseAndSetIfChanged(ref canLoadRom, value); }
 
     // The Router associated with this Screen.
     // Required by the IScreen interface.
     public RoutingState Router { get; } = new ();
 
     // The command that navigates a user to first view model.
-    public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
     public ReactiveCommand<Unit, IRoutableViewModel> GenerateRom { get; }
 
     // The command that navigates a user back.
@@ -38,18 +39,11 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     
     public MainViewModel()
     {
-        Router.CurrentViewModel.Subscribe(view =>
-        {
-            CanLoadRom = view != RomFileViewModel;
-        });
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);
         RandomizerViewModel = new(this);
         Router.Navigate.Execute(RandomizerViewModel);
 
-        LoadRom = ReactiveCommand.CreateFromObservable(
-            () => Router.Navigate.Execute(RomFileViewModel)
-        );
         GenerateRom = ReactiveCommand.CreateFromObservable(
             () => Router.Navigate.Execute()
         );

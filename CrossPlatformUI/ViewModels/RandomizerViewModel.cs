@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Runtime.Serialization;
 using Avalonia.Data;
 using ReactiveUI;
+using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.Core;
 
@@ -21,45 +22,98 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
             mainViewModel.Config.Seed = new Random().Next(0, 999999999).ToString();
         });
         
+        LoadPreset = ReactiveCommand.Create<string>((flags) =>
+        {
+            mainViewModel.Config.Flags = flags;
+        });
+        
+        LoadRom = ReactiveCommand.CreateFromObservable(
+            () => mainViewModel.Router.Navigate.Execute(mainViewModel.RomFileViewModel)
+        );
         mainViewModel.Config.PropertyChanged += (sender, args) =>
         {
             switch (args.PropertyName)
             {
                 case "Flags":
-                    this.RaisePropertyChanged(nameof(Flags));
+                    Flags = ((RandomizerConfiguration)sender!).Flags;
                     break;
                 case "Seed":
                     this.RaisePropertyChanged(nameof(Seed));
                     break;
             }
         };
+        mainViewModel.RomFileViewModel.PropertyChanged += (sender, args) =>
+        {
+            switch (args.PropertyName)
+            {
+                case "HasRomData":
+                    this.RaisePropertyChanged(nameof(CanGenerate));
+                    break;
+            }
+        };
+        var flagsValidation = this.WhenAnyValue(
+            x => x.Flags,
+            IsFlagStringValid
+            );
+        this.ValidationRule(
+            x => x.Flags,
+            flagsValidation,
+            "Invalid Flags");
+        CanGenerate = this.WhenAnyValue(
+            x => x.Flags,
+            x => x.Seed,
+            x => x.Main.RomFileViewModel.HasRomData, 
+            (flags, seed, hasRomData) => IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData);
     }
 
     public MainViewModel Main { get; }
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
-
-    private bool isFlagsValid;
-    public bool IsFlagsValid { get => isFlagsValid; set => this.RaiseAndSetIfChanged(ref isFlagsValid, value); }
     
+    public ReactiveCommand<string, Unit> LoadPreset { get; }
+    public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
+
+    public IObservable<bool> CanGenerate { get; }
+
+    private bool IsFlagStringValid(string flags)
+    {
+        try
+        {
+            _ = new RandomizerConfiguration(flags);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    private string validatedFlags;
     [DataMember]
     public string Flags
     {
-        get => Main.Config.Flags;
+        get => validatedFlags;
         set
         {
-            try
+            if (IsFlagStringValid(value) && value != Main.Config.Flags)
             {
-                // Setting this flags like this will both validate the flag string
-                // and also notify all observers for the individual options and the flag string itself
-                Main.Config.Flags = new RandomizerConfiguration(value).Flags;
-                this.RaisePropertyChanged();
-                IsFlagsValid = true;
+                Main.Config.Flags = value;
             }
-            catch
-            {
-                throw new DataValidationException("Invalid Flags");
-                IsFlagsValid = false;
-            }
+            this.RaiseAndSetIfChanged(ref validatedFlags, value);
+            // try
+            // {
+            //     // Setting this flags like this will both validate the flag string
+            //     // and also notify all observers for the individual options and the flag string itself
+            //     Main.Config.Flags = new RandomizerConfiguration(value).Flags;
+            //     this.RaiseAndSetIfChanged(ref validationFlags, )
+            // }
+            // catch
+            // {
+            //     
+            // } 
+            // finally
+            // { 
+            //     this.RaisePropertyChanged();
+            //     this.RaisePropertyChanged(nameof(CanGenerate));
+            // }
         }
     }
     
