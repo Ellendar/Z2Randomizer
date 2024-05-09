@@ -13,7 +13,7 @@
             <Button Command="{Binding OpenFileCommand}">Choose ROM</Button>
         </StackPanel>
         <StackPanel Grid.Row="1" HorizontalAlignment="Right">
-            <Button Theme="{StaticResource MaterialOutlineButton}" Command="{Binding HostScreen.Router.NavigateBack}">Just View For Now</Button>
+            <Button Theme="{StaticResource MaterialOutlineButton}" Classes="accent" Command="{Binding HostScreen.Router.NavigateBack}">Just View For Now</Button>
         </StackPanel>
     </Grid>
 </UserControl>

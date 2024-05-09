@@ -16,6 +16,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
     {
         HostScreen = mainViewModel;
         Main = mainViewModel;
+        Flags = MainViewModel.BeginnerPreset;
         
         RerollSeed = ReactiveCommand.Create(() =>
         {
@@ -86,7 +87,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
             return false;
         }
     }
-    private string validatedFlags;
+    private string validatedFlags = "";
     [DataMember]
     public string Flags
     {
