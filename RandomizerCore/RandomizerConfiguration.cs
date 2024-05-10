@@ -156,7 +156,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool fastSpellCasting;
     private bool upAOnController1;
     private bool removeFlashing;
-    private int sprite;
+    private CharacterSprite sprite;
     private string tunic;
     private string shieldTunic;
     private string beamSprite;
@@ -916,7 +916,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
-    public int Sprite
+    public CharacterSprite Sprite
     {
         get => sprite;
         set => SetField(ref sprite, value);
@@ -1056,7 +1056,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         PermanmentBeamSword = false;
         UpAOnController1 = false;
         RemoveFlashing = false;
-        Sprite = 0;
+        Sprite = CharacterSprite.LINK;
         Tunic = "Default";
         ShieldTunic = "Orange";
         BeamSprite = "Default";
@@ -1625,7 +1625,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         //These properties aren't stored in the flags, but aren't defaulted out in properties and will break if they are null.
         //Probably properties at some point should stop being a struct and default these in the right place
-        config.Sprite = 0;
+        config.Sprite = CharacterSprite.LINK;
         config.Tunic = "Default";
         config.ShieldTunic = "Orange";
         config.BeamSprite = "Default";
@@ -2258,7 +2258,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
-        properties.CharSprite = CharacterSprite.ByIndex(Sprite);
+        properties.CharSprite = Sprite;
         properties.TunicColor = Tunic;
         properties.ShieldColor = ShieldTunic;
         properties.UpAC1 = UpAOnController1;

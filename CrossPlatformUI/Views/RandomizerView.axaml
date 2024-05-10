@@ -82,7 +82,7 @@
             <TabItem Header="Hints">
             </TabItem>
             <TabItem Header="Customize">
-                <tabs:CustomizeView DataContext="{Binding Main}" />
+                <tabs:CustomizeView DataContext="{Binding CustomizeViewModel}" />
             </TabItem>
         </TabControl>
     </StackPanel>

@@ -7,15 +7,10 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
              x:DataType="vmt:CustomizeViewModel">
-    <Grid ColumnDefinitions="2*, *, *" RowDefinitions="Auto" Margin="4">
+    <Grid ColumnDefinitions="*,*" Margin="4">
         <StackPanel Orientation="Vertical">
             
         </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Vertical">
-            
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Vertical">
-            <tabs:SpritePreviewView />
-        </StackPanel>
+        <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
     </Grid>
 </UserControl>

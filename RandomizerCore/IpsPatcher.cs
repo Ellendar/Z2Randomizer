@@ -15,24 +15,25 @@ namespace Z2Randomizer.Core;
 /// </summary>
 internal class IpsPatcher
 {
-    public void Patch(byte[] romData, string patchName)
+    public void Patch(byte[] romData, byte[] patch)
     {
         //FileStream romstream = new FileStream(romname, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
         MemoryStream romstream = new(romData);
-        FileStream ipsstream = new(patchName, FileMode.Open, FileAccess.Read);
-        int lint = (int)ipsstream.Length;
-        byte[] ipsbyte = new byte[ipsstream.Length];
+        // FileStream ipsstream = new(patchName, FileMode.Open, FileAccess.Read);
+        // int lint = (int)ipsstream.Length;
+        // byte[] ipsbyte = new byte[ipsstream.Length];
         //byte[] romData = new byte[romstream.Length];
         IAsyncResult romresult;
-        IAsyncResult ipsresult = ipsstream.BeginRead(ipsbyte, 0, lint, null, null);
-        ipsstream.EndRead(ipsresult);
+        // IAsyncResult ipsresult = ipsstream.BeginRead(ipsbyte, 0, lint, null, null);
+        // ipsstream.EndRead(ipsresult);
+        var ipsbyte = patch;
         int ipson = 5;
         int totalrepeats = 0;
         int offset = 0;
         bool keepgoing = true;
         //////////////////End Init code
         //////////////////Start main code
-        while (keepgoing == true)
+        while (keepgoing)
         {
             offset = ipsbyte[ipson] * 0x10000 + ipsbyte[ipson + 1] * 0x100 + ipsbyte[ipson + 2];
             ipson++;
@@ -71,6 +72,6 @@ internal class IpsPatcher
                 keepgoing = false;
         }
         romstream.Close();
-        ipsstream.Close();
+        // ipsstream.Close();
     }
 }

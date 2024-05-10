@@ -2,6 +2,7 @@ using System;
 using System.Reactive;
 using System.Runtime.Serialization;
 using Avalonia.Data;
+using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
@@ -16,6 +17,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
     {
         HostScreen = mainViewModel;
         Main = mainViewModel;
+        CustomizeViewModel = new(mainViewModel);
         Flags = MainViewModel.BeginnerPreset;
         
         RerollSeed = ReactiveCommand.Create(() =>
@@ -68,6 +70,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
     }
 
     public MainViewModel Main { get; }
+    public CustomizeViewModel CustomizeViewModel { get; }
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
     
     public ReactiveCommand<string, Unit> LoadPreset { get; }

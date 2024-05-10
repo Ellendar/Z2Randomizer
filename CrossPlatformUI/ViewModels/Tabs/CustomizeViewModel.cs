@@ -1,6 +1,9 @@
+using System.Runtime.Serialization;
+
 namespace CrossPlatformUI.ViewModels.Tabs;
 
-public class CustomizeViewModel : ViewModelBase
+[DataContract]
+public class CustomizeViewModel(MainViewModel main) : ViewModelBase
 {
-    
+    public SpritePreviewViewModel SpritePreviewViewModel { get; } = new (main);
 }

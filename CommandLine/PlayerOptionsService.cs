@@ -28,7 +28,7 @@ namespace CommandLine
 
         public PlayerOptionsService()
         {
-            this.spriteOptions = CharacterSprite.Options();
+            // this.spriteOptions = CharacterSprite.Options();
         }
 
         public PlayerOptions? LoadFromFile(string? path)
@@ -84,7 +84,8 @@ namespace CommandLine
 
             var sprite = GetSprite(playerOptions.Sprite);
             // If somehow sprite is null, default to Link
-            configuration.Sprite = sprite?.SelectionIndex ?? 0;
+            // configuration.Sprite = sprite?.SelectionIndex ?? 0;
+            configuration.Sprite = CharacterSprite.LINK;
         }
 
         private void ValidateTunicColor(string? color)

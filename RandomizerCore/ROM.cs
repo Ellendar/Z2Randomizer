@@ -315,7 +315,7 @@ public class ROM
         else
         {
             IpsPatcher patcher = new();
-            patcher.Patch(rawdata, charSprite.Path);
+            patcher.Patch(rawdata, charSprite.Patch);
         }
 
         Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
@@ -379,24 +379,24 @@ public class ROM
             if (c2 != null)
             {
                 Put(0x10ea, (byte)c2);
-                if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
-                {
+                // if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
+                // {
                     if (tunicColor != "Default")
                     {
                         Put(0x10ea, (byte)c2);
                         Put(l, (byte)c2);
                     }
                     //Don't overwrite for null 
-                }
-                else
-                {
-                    Put(0x10ea, (byte)c2);
-                    Put(l, (byte)c2);
-                }
+                // }
+                // else
+                // {
+                //     Put(0x10ea, (byte)c2);
+                //     Put(l, (byte)c2);
+                // }
             }
         }
 
-        if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy) && shieldColor == "Default")
+        if (shieldColor == "Default")
         {
             //Don't overwrite default shield. For custom sprite IPS base
         }
