@@ -1,7 +1,10 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
+using System.Xml.Serialization;
 using Avalonia.Data.Converters;
 using RandomizerCore;
+using RandomizerCore.Flags;
 
 namespace CrossPlatformUI;
 

@@ -159,6 +159,27 @@ public enum EncounterRate
     RANDOM
 }
 
+[DefaultValue(Lives3)]
+public enum StartingLives
+{
+    [Description("1")]
+    Lives1,
+    [Description("2")]
+    Lives2,
+    [Description("3")]
+    Lives3,
+    [Description("4")]
+    Lives4,
+    [Description("5")]
+    Lives5,
+    [Description("8")]
+    Lives8,
+    [Description("16")]
+    Lives16,
+    [Description("Random (2-5)")]
+    LivesRandom,
+}
+
 public class StringValueAttribute(string v) : Attribute
 {
     public string Value => v;
@@ -188,6 +209,7 @@ public record EnumDescription
 public static class Enums
 {
     public static IEnumerable<EnumDescription> StartingTechList { get; } = ToDescriptions(typeof(StartingTechs));
+    public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions(typeof(StartingLives));
     public static IEnumerable<EnumDescription> StatEffectivenessList { get; } = ToDescriptions(typeof(StatEffectiveness));
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions(typeof(FireOption));
     public static IEnumerable<EnumDescription> PalaceStyleList { get; } = ToDescriptions(typeof(PalaceStyle));

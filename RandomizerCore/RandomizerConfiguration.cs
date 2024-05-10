@@ -40,11 +40,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
     private int? maxHeartContainers;
-
     private StartingTechs startingTechs;
     // private bool? startWithUpstab;
     // private bool? startWithDownstab;
-    private int? startingLives;
+    private StartingLives startingLives;
     private int startingAttackLevel;
     private int startingMagicLevel;
     private int startingLifeLevel;
@@ -214,8 +213,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     // public bool? StartWithDownstab { get => startWithDownstab; set => SetField(ref startWithDownstab, value); }
     public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }
 
-    [CustomFlagSerializer(typeof(StartingLivesSerializer))]
-    public int? StartingLives { get => startingLives; set => SetField(ref startingLives, value); }
+    public StartingLives StartingLives { get => startingLives; set => SetField(ref startingLives, value); }
 
     [Limit(8)]
     [Minimum(1)]
@@ -1189,7 +1187,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         config.StartWithReflect = bits[0];
         config.StartWithSpell = bits[1];
         config.StartWithThunder = bits[2];
-        config.StartingLives = bits[3] ? 7 : 3;
+        config.StartingLives = bits[3] ? StartingLives.LivesRandom : StartingLives.Lives4;
         config.RemoveTBird = bits[4];
         config.RestrictConnectionCaveShuffle = bits[5];
 
@@ -1902,7 +1900,17 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.SwapUpAndDownStab = SwapUpAndDownStab ?? random.Next(2) == 1;
 
 
-        properties.StartLives = StartingLives ?? random.Next(2, 6);
+        properties.StartLives = StartingLives switch
+        {
+            StartingLives.Lives1 => 1,
+            StartingLives.Lives2 => 2,
+            StartingLives.Lives3 => 3,
+            StartingLives.Lives4 => 4,
+            StartingLives.Lives5 => 5,
+            StartingLives.Lives8 => 8,
+            StartingLives.Lives16 => 16,
+            _ => random.Next(2, 6)
+        };
         properties.PermanentBeam = PermanmentBeamSword;
         properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
