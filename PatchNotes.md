@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.11 - May 10, 2024
+
+- Fixed a bug where the basement guard in New Kasuto could tell you an incorrect number of required containers.
+
 ## Version 4.3.10 - May 5, 2024
 
 - Fixed a bug where wizards would display text based on their town and not the spell they had when community text was off.
