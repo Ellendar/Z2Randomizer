@@ -1,5 +1,6 @@
 ﻿using CommandLine.Models;
 using Newtonsoft.Json;
+using RandomizerCore;
 
 namespace Tests
 {

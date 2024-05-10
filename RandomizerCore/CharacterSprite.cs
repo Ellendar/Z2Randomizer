@@ -28,7 +28,8 @@ public class CharacterSprite
         Patch = patch;
     }
 
-    public static readonly CharacterSprite LINK = new CharacterSprite("Link");
+    public static readonly CharacterSprite LINK = new ("Link");
+    public static readonly CharacterSprite RANDOM = new ("Random");
 
     // public static CharacterSprite[] Options()
     // {

@@ -70,6 +70,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
     }
 
     public MainViewModel Main { get; }
+    
+    [DataMember]
     public CustomizeViewModel CustomizeViewModel { get; }
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
     
@@ -102,22 +104,6 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
                 Main.Config.Flags = value;
             }
             this.RaiseAndSetIfChanged(ref validatedFlags, value);
-            // try
-            // {
-            //     // Setting this flags like this will both validate the flag string
-            //     // and also notify all observers for the individual options and the flag string itself
-            //     Main.Config.Flags = new RandomizerConfiguration(value).Flags;
-            //     this.RaiseAndSetIfChanged(ref validationFlags, )
-            // }
-            // catch
-            // {
-            //     
-            // } 
-            // finally
-            // { 
-            //     this.RaisePropertyChanged();
-            //     this.RaisePropertyChanged(nameof(CanGenerate));
-            // }
         }
     }
     
@@ -131,6 +117,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
             this.RaisePropertyChanged();
         }
     }
+
+    private int currentTabIndex;
+    [DataMember]
+    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
 
     [IgnoreDataMember]
     // Unique identifier for the routable view model.

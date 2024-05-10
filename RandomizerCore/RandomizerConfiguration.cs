@@ -150,16 +150,16 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleSpritePalettes;
     private bool permanmentBeamSword;
     private bool useCommunityText;
-    private byte beepFrequency;
-    private byte beepThreshold;
+    private BeepFrequency beepFrequency;
+    private BeepThreshold beepThreshold;
     private bool disableMusic;
     private bool fastSpellCasting;
     private bool upAOnController1;
     private bool removeFlashing;
     private CharacterSprite sprite;
-    private string tunic;
-    private string shieldTunic;
-    private string beamSprite;
+    private CharacterColor tunic;
+    private CharacterColor shieldTunic;
+    private BeamSprites beamSprite;
     private bool useCustomRooms;
     private bool disableHudLag;
     private bool randomizeKnockback;
@@ -874,14 +874,14 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
-    public byte BeepFrequency
+    public BeepFrequency BeepFrequency
     {
         get => beepFrequency;
         set => SetField(ref beepFrequency, value);
     }
 
     [IgnoreInFlags]
-    public byte BeepThreshold
+    public BeepThreshold BeepThreshold
     {
         get => beepThreshold;
         set => SetField(ref beepThreshold, value);
@@ -923,21 +923,21 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
-    public string Tunic
+    public CharacterColor Tunic
     {
         get => tunic;
         set => SetField(ref tunic, value);
     }
 
     [IgnoreInFlags]
-    public string ShieldTunic
+    public CharacterColor ShieldTunic
     {
         get => shieldTunic;
         set => SetField(ref shieldTunic, value);
     }
 
     [IgnoreInFlags]
-    public string BeamSprite
+    public BeamSprites BeamSprite
     {
         get => beamSprite;
         set => SetField(ref beamSprite, value);
@@ -1057,9 +1057,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         UpAOnController1 = false;
         RemoveFlashing = false;
         Sprite = CharacterSprite.LINK;
-        Tunic = "Default";
-        ShieldTunic = "Orange";
-        BeamSprite = "Default";
+        Tunic = CharacterColor.Default;
+        ShieldTunic = CharacterColor.Default;
+        BeamSprite = BeamSprites.Default;
         UseCustomRooms = false;
         DisableHUDLag = false;
     }
@@ -1626,13 +1626,13 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         //These properties aren't stored in the flags, but aren't defaulted out in properties and will break if they are null.
         //Probably properties at some point should stop being a struct and default these in the right place
         config.Sprite = CharacterSprite.LINK;
-        config.Tunic = "Default";
-        config.ShieldTunic = "Orange";
-        config.BeamSprite = "Default";
+        config.Tunic = CharacterColor.Default;
+        config.ShieldTunic = CharacterColor.Default;
+        config.BeamSprite = BeamSprites.Default;
         config.UseCustomRooms = false;
 
-        config.BeepFrequency = 0x30;
-        config.BeepThreshold = 0x20;
+        config.BeepFrequency = BeepFrequency.Normal; // 0x30;
+        config.BeepThreshold = BeepThreshold.Normal; // 0x20;
         config.DisableMusic = false;
         config.FastSpellCasting = true;
         //ShuffleEn = false;
@@ -2251,8 +2251,30 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.TownNameHints = EnableTownNameHints ?? random.Next(2) == 1;
 
         //Misc.
-        properties.BeepThreshold = BeepThreshold;
-        properties.BeepFrequency = BeepFrequency;
+        properties.BeepThreshold = BeepThreshold switch
+        {
+            //Normal
+            BeepThreshold.Normal => 0x20,
+            //Half Speed
+            BeepThreshold.HalfBar => 0x10,
+            //Quarter Speed
+            BeepThreshold.QuarterBar => 0x08,
+            //Off
+            BeepThreshold.TwoBars => 0x40,
+            _ => 0x20
+        };
+        properties.BeepFrequency = BeepFrequency switch
+        {
+            //Normal
+            BeepFrequency.Normal => 0x30,
+            //Half Speed
+            BeepFrequency.HalfSpeed => 0x60,
+            //Quarter Speed
+            BeepFrequency.QuarterSpeed => 0xC0,
+            //Off
+            BeepFrequency.Off => 0,
+            _ => 0x30
+        };
         properties.JumpAlwaysOn = JumpAlwaysOn;
         properties.DashAlwaysOn = DashAlwaysOn;
         properties.FastCast = FastSpellCasting;

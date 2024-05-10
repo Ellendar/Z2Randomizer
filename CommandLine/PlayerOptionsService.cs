@@ -56,23 +56,8 @@ namespace CommandLine
 
         public void ApplyOptionsToConfiguration(PlayerOptions playerOptions, RandomizerConfiguration configuration)
         {
-            configuration.BeepFrequency = playerOptions.BeepFrequency switch
-            {
-                BeepFrequency.Normal => 0x30,
-                BeepFrequency.HalfSpeed => 0x60,
-                BeepFrequency.QuarterSpeed => 0xC0,
-                BeepFrequency.Off => 0,
-                _ => 0x30
-            };
-
-            configuration.BeepThreshold = playerOptions.BeepThreshold switch
-            {
-                BeepThreshold.Normal => 0x20,
-                BeepThreshold.HalfBar => 0x10,
-                BeepThreshold.QuarterBar => 0x08,
-                BeepThreshold.TwoBars => 0x40,
-                _ => 0x20
-            };
+            configuration.BeepFrequency = playerOptions.BeepFrequency;
+            configuration.BeepThreshold = playerOptions.BeepThreshold;
 
             configuration.RemoveFlashing = playerOptions.RemoveFlashingUponDeath;
             configuration.UpAOnController1 = playerOptions.RemapUpAToUpSelect;
@@ -102,8 +87,8 @@ namespace CommandLine
             CharacterSprite? selectedSprite = null;
             if (playerOptions != null)
             {
-                ValidateTunicColor(playerOptions.TunicColor);
-                ValidateTunicColor(playerOptions.ShieldTunicColor);
+                // ValidateTunicColor(playerOptions.TunicColor);
+                // ValidateTunicColor(playerOptions.ShieldTunicColor);
 
                 selectedSprite = GetSprite(playerOptions.Sprite);
             }

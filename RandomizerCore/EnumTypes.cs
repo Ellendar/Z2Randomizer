@@ -180,6 +180,80 @@ public enum StartingLives
     LivesRandom,
 }
 
+[DefaultValue(Default)]
+public enum CharacterColor
+{
+    [Description("Default")]
+    Default,
+    [Description("Green")]
+    Green,
+    [Description("Dark Green")]
+    DarkGreen,
+    [Description("Aqua")]
+    Aqua,
+    [Description("Dark Blue")]
+    DarkBlue,
+    [Description("Purple")]
+    Purple,
+    [Description("Pink")]
+    Pink,
+    [Description("Orange")]
+    Orange,
+    [Description("Red")]
+    Red,
+    [Description("Turd")]
+    Turd,
+    [Description("Random")]
+    Random,
+}
+
+[DefaultValue(Default)]
+public enum BeamSprites
+{
+    [Description("Default")]
+    Default,
+    [Description("Fire")]
+    Fire,
+    [Description("Bubble")]
+    Bubble,
+    [Description("Rock")]
+    Rock,
+    [Description("Axe")]
+    Axe,
+    [Description("Hammer")]
+    Hammer,
+    [Description("Wizzrobe Beam")]
+    WizzrobeBeam,
+    [Description("Random")]
+    Random,
+}
+
+[DefaultValue(Normal)]
+public enum BeepThreshold
+{
+    [Description("Normal")]
+    Normal,
+    [Description("Half Bar")]
+    HalfBar,
+    [Description("Quarter Bar")]
+    QuarterBar,
+    [Description("Two Bars")]
+    TwoBars
+}
+
+[DefaultValue(Normal)]
+public enum BeepFrequency
+{
+    [Description("Normal")]
+    Normal,
+    [Description("Half Speed")]
+    HalfSpeed,
+    [Description("Quarter Speed")]
+    QuarterSpeed,
+    [Description("Off")]
+    Off
+}
+    
 public class StringValueAttribute(string v) : Attribute
 {
     public string Value => v;
@@ -216,6 +290,10 @@ public static class Enums
     public static IEnumerable<EnumDescription> BiomeList { get; } = ToDescriptions(typeof(Biome));
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions(typeof(ContinentConnectionType));
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions(typeof(EncounterRate));
+    public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions(typeof(CharacterColor));
+    public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions(typeof(BeamSprites));
+    public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions(typeof(BeepThreshold));
+    public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions(typeof(BeepFrequency));
         
     public static IEnumerable<EnumDescription> ToDescriptions(Type t)
     {

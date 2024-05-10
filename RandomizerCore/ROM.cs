@@ -283,7 +283,7 @@ public class ROM
 
     private readonly int[] fireLocs = { 0x20850, 0x22850, 0x24850, 0x26850, 0x28850, 0x2a850, 0x2c850, 0x2e850, 0x36850, 0x32850, 0x34850, 0x38850 };
 
-    public void UpdateSprites(CharacterSprite charSprite, string tunicColor, string shieldColor, string beamSprite)
+    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
     {
         /*
          * Dear future digshake,
@@ -308,17 +308,22 @@ public class ROM
          * the cosmetics.
          */
 
-        if (charSprite.Equals(CharacterSprite.LINK))
-        {
-            //Do nothing now.
-        }
-        else
-        {
-            IpsPatcher patcher = new();
-            patcher.Patch(rawdata, charSprite.Patch);
+        if (charSprite.Patch != null) {
+            IpsPatcher.Patch(rawdata, charSprite.Patch);
         }
 
-        Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
+        var colorMap = new Dictionary<CharacterColor, int>()
+        {
+            { CharacterColor.Green, 0x2A },
+            { CharacterColor.DarkGreen, 0x0A },
+            { CharacterColor.Aqua, 0x3C },
+            { CharacterColor.DarkBlue, 0x02 },
+            { CharacterColor.Purple, 0x04 },
+            { CharacterColor.Pink, 0x24 },
+            { CharacterColor.Red, 0x16 },
+            { CharacterColor.Orange, 0x27 },
+            { CharacterColor.Turd, 0x18 }
+        };
 
         /*colors to include
             Green (2A)
@@ -333,7 +338,7 @@ public class ROM
         */
         int? c2 = null;
         int? c1 = null;
-        if (tunicColor == "Random")
+        if (tunicColor == CharacterColor.Random)
         {
             Random r2 = new Random();
 
@@ -347,12 +352,12 @@ public class ROM
                 c2p2 = r2.Next(1, 13);
                 c2 = c2p1 * 16 + c2p2;
             }
-        } else if (tunicColor != "Default")
+        } else if (tunicColor != CharacterColor.Default)
         {
             c2 = colorMap[tunicColor];
         }
 
-        if (shieldColor == "Random")
+        if (shieldColor == CharacterColor.Random)
         {
             Random r2 = new Random();
 
@@ -367,7 +372,7 @@ public class ROM
                 c1p2 = r2.Next(1, 13);
                 c1 = c1p1 * 16 + c1p2;
             }
-        } else if (shieldColor != "Default")
+        } else if (shieldColor != CharacterColor.Default)
         {
             c1 = colorMap[shieldColor];
         }
@@ -381,7 +386,7 @@ public class ROM
                 Put(0x10ea, (byte)c2);
                 // if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
                 // {
-                    if (tunicColor != "Default")
+                    if (tunicColor != CharacterColor.Default)
                     {
                         Put(0x10ea, (byte)c2);
                         Put(l, (byte)c2);
@@ -396,7 +401,7 @@ public class ROM
             }
         }
 
-        if (shieldColor == "Default")
+        if (shieldColor == CharacterColor.Default)
         {
             //Don't overwrite default shield. For custom sprite IPS base
         }
@@ -409,35 +414,34 @@ public class ROM
         }
 
         int beamType = -1;
-        if (beamSprite.Equals("Random"))
+        switch (beamSprite)
         {
-
-            Random r2 = new Random();
-            beamType = r2.Next(6);
-        }
-        else if (beamSprite.Equals("Fire"))
-        {
-            beamType = 0;
-        }
-        else if (beamSprite.Equals("Bubble"))
-        {
-            beamType = 1;
-        }
-        else if (beamSprite.Equals("Rock"))
-        {
-            beamType = 2;
-        }
-        else if (beamSprite.Equals("Axe"))
-        {
-            beamType = 3;
-        }
-        else if (beamSprite.Equals("Hammer"))
-        {
-            beamType = 4;
-        }
-        else if (beamSprite.Equals("Wizzrobe Beam"))
-        {
-            beamType = 5;
+            case BeamSprites.Random:
+            {
+                Random r2 = new Random();
+                beamType = r2.Next(6);
+                break;
+            }
+            case BeamSprites.Fire:
+                beamType = 0;
+                break;
+            case BeamSprites.Bubble:
+                beamType = 1;
+                break;
+            case BeamSprites.Rock:
+                beamType = 2;
+                break;
+            case BeamSprites.Axe:
+                beamType = 3;
+                break;
+            case BeamSprites.Hammer:
+                beamType = 4;
+                break;
+            case BeamSprites.WizzrobeBeam:
+                beamType = 5;
+                break;
+            case BeamSprites.Default:
+                break;
         }
         byte[] newSprite = new byte[32];
 
