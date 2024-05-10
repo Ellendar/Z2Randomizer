@@ -7,7 +7,7 @@ using Z2Randomizer.Core.Overworld;
 
 namespace Z2Randomizer.Core;
 
-public class CustomTexts
+public static class CustomTexts
 {
     private static readonly int[] rauruHints = new int[] { 32, 12, 30 }; //Three houses, first screen
     private static readonly int[] rutoHints = new int[] { 18, 33, 25, 26 }; //error is 25 and 26, two houses, outside left

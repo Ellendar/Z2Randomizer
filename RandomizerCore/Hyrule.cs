@@ -408,7 +408,10 @@ public class Hyrule
             ROMData.Put(0x17b18, 0x20); //Child
         }
 
-
+        // For now, reread the game text to pick up any previous writes (in particular the magic container 
+        // jar text for new kasuto). A full fix would be to rewrite the custom text stuff to work better
+        // with the assembler.
+        _hints = ROMData.GetGameText();
         _hints = CustomTexts.GenerateTexts(itemLocs, startTrophy, startMed, startKid, SpellMap, westHyrule.bagu, _hints, props, RNG);
         f = UpdateProgress(9);
         if (!f)
