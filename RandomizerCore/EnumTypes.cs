@@ -7,6 +7,7 @@ using System.Reflection;
 
 namespace RandomizerCore;
 
+[DefaultValue(NONE)]
 public enum StartingTechs
 {
     [Description("None")]
@@ -21,19 +22,53 @@ public enum StartingTechs
     RANDOM
 }
 
+[DefaultValue(NONE)]
 public enum StatEffectiveness
 {
-    NONE, LOW, VANILLA, AVERAGE, HIGH, MAX
+    [Description("None")]
+    NONE,
+    [Description("Low")]
+    LOW,
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Average")]
+    AVERAGE,
+    [Description("High")]
+    HIGH,
+    [Description("Max")]
+    MAX
 }
 
+[DefaultValue(NORMAL)]
 public enum FireOption
 {
-    NORMAL, PAIR_WITH_RANDOM, REPLACE_WITH_DASH, RANDOM
+    [Description("Normal")]
+    NORMAL,
+    [Description("Pair With Random")]
+    PAIR_WITH_RANDOM,
+    [Description("Replace With Dash")]
+    REPLACE_WITH_DASH,
+    [Description("Random")]
+    RANDOM
 }
 
+[DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
-    VANILLA, SHUFFLED, RECONSTRUCTED, CARTESIAN, CHAOS, RANDOM_ALL, RANDOM_PER_PALACE
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Shuffled")]
+    SHUFFLED,
+    [Description("Reconstructed")]
+    RECONSTRUCTED,
+    [Description("Cartesian")]
+    CARTESIAN,
+    [Description("Chaos")]
+    CHAOS,
+    [Description("Random All")]
+    RANDOM_ALL,
+    [Description("Random Per Palace")]
+    RANDOM_PER_PALACE
 }
 
 public static class PalaceStyleExtensions
@@ -49,8 +84,34 @@ public static class PalaceStyleExtensions
     }
 }
 
+[DefaultValue(VANILLA)]
 public enum Biome
-{ VANILLA, VANILLA_SHUFFLE, VANILLALIKE, ISLANDS, CANYON, DRY_CANYON, MOUNTAINOUS, VOLCANO, CALDERA, RANDOM_NO_VANILLA_OR_SHUFFLE, RANDOM_NO_VANILLA, RANDOM }
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Vanilla Shuffle")]
+    VANILLA_SHUFFLE,
+    [Description("Vanilla Like")]
+    VANILLALIKE,
+    [Description("Islands")]
+    ISLANDS,
+    [Description("Canyon")]
+    CANYON,
+    [Description("Dry Canyon")]
+    DRY_CANYON,
+    [Description("Mountainous")]
+    MOUNTAINOUS,
+    [Description("Volcano")]
+    VOLCANO,
+    [Description("Caldera")]
+    CALDERA,
+    [Description("Random (No Vanilla or Shuffle)")]
+    RANDOM_NO_VANILLA_OR_SHUFFLE,
+    [Description("Random (No Vanilla)")]
+    RANDOM_NO_VANILLA,
+    [Description("Random")]
+    RANDOM
+}
 
 static class BiomeExtensions
 {
@@ -72,14 +133,30 @@ static class BiomeExtensions
     }
 }
 
+[DefaultValue(NORMAL)]
 public enum ContinentConnectionType
 {
-    NORMAL, ANYTHING_GOES, RB_BORDER_SHUFFLE, TRANSPORTATION_SHUFFLE
+    [Description("Normal")]
+    NORMAL,
+    [Description("Anything Goes")]
+    ANYTHING_GOES,
+    [Description("RB Border Shuffle")]
+    RB_BORDER_SHUFFLE,
+    [Description("Transportation Shuffle")]
+    TRANSPORTATION_SHUFFLE
 }
 
+[DefaultValue(NONE)]
 public enum EncounterRate
 {
-    NONE, HALF, NORMAL, RANDOM
+    [Description("None")]
+    NONE,
+    [Description("Half")]
+    HALF,
+    [Description("Normal")]
+    NORMAL,
+    [Description("Random")]
+    RANDOM
 }
 
 public class StringValueAttribute(string v) : Attribute
@@ -111,6 +188,12 @@ public record EnumDescription
 public static class Enums
 {
     public static IEnumerable<EnumDescription> StartingTechList { get; } = ToDescriptions(typeof(StartingTechs));
+    public static IEnumerable<EnumDescription> StatEffectivenessList { get; } = ToDescriptions(typeof(StatEffectiveness));
+    public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions(typeof(FireOption));
+    public static IEnumerable<EnumDescription> PalaceStyleList { get; } = ToDescriptions(typeof(PalaceStyle));
+    public static IEnumerable<EnumDescription> BiomeList { get; } = ToDescriptions(typeof(Biome));
+    public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions(typeof(ContinentConnectionType));
+    public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions(typeof(EncounterRate));
         
     public static IEnumerable<EnumDescription> ToDescriptions(Type t)
     {
@@ -118,6 +201,16 @@ public static class Enums
             throw new ArgumentException($"{nameof(t)} must be an enum type");
     
         return Enum.GetValues(t).Cast<Enum>().Select(ToDescription).ToList();
+    }
+
+    public static object ToDefault(this Type enumType)
+    {
+        var attributes = enumType.GetCustomAttributes(typeof(DefaultValueAttribute), false);
+        if (attributes.Length == 0)
+        {
+            throw new ArgumentException("Generic Type 'T' must have DefaultValueAttribute.");
+        }
+        return Enum.ToObject(enumType, (attributes[0] as DefaultValueAttribute)?.Value!);
     }
     
     public static EnumDescription ToDescription(this Enum value)
