@@ -19,15 +19,16 @@
             <ComboBox assists:ComboBoxAssist.Label="Beep Frequency" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.BeepFrequencyList}}"
                       SelectedItem="{Binding BeepFrequency, Converter={x:Static ui:Util.EnumConvert}}" />
-            <ToggleSwitch IsChecked="{Binding DisableMusic}" Content="Disable Music" />
-            <ToggleSwitch IsChecked="{Binding FastSpellCasting}" Content="Fast Spell Casting"  />
-            <ToggleSwitch IsChecked="{Binding UpAOnController1}">
+            <CheckBox IsChecked="{Binding DisableMusic}" Content="Disable Music" />
+            <CheckBox IsChecked="{Binding FastSpellCasting}" Content="Fast Spell Casting"  />
+            <CheckBox IsChecked="{Binding UpAOnController1}">
                 <TextBlock>
                     Remap UP+A to UP+Select<LineBreak/>on Controller 1
                 </TextBlock>
-            </ToggleSwitch>
-            <ToggleSwitch IsChecked="{Binding RemoveFlashing}" Content="Remove Flashing" />
-            <ToggleSwitch IsChecked="{Binding ShuffleSpritePalettes}" Content="Shuffle Sprite Palettes" />
+            </CheckBox>
+            <CheckBox IsChecked="{Binding RemoveFlashing}" Content="Remove Flashing" />
+            <CheckBox IsChecked="{Binding ShuffleSpritePalettes}" Content="Shuffle Sprite Palettes" />
+            <CheckBox IsChecked="{Binding UseCommunityText}" Content="Use Community Text" />
         </StackPanel>
         <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
     </Grid>

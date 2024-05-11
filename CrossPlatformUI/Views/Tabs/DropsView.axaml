@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.DropsView">
+    <Grid ColumnDefinitions="*, *, *">
+        <StackPanel>
+            <CheckBox IsChecked="{Binding Config.RandomizeDrops}" Content="Randomize Drops" />
+            <CheckBox IsChecked="{Binding Config.StandardizeDrops}" Content="Standardize Drops" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceItems}" Content="Shuffle Palace Items" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <TextBlock>Small Enemy Pool</TextBlock>
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropBlueJar}" Content="Blue Jar" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropRedJar}" Content="Red Jar" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropSmallBag}" Content="50 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropMediumBag}" Content="100 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropLargeBag}" Content="200 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropXLBag}" Content="500 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDrop1up}" Content="1 UP" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropKey}" Content="Key" />
+        </StackPanel>
+        <StackPanel Grid.Column="2">
+            <TextBlock>Large Enemy Pool</TextBlock>
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropBlueJar}" Content="Blue Jar" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropRedJar}" Content="Red Jar" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropSmallBag}" Content="50 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropMediumBag}" Content="100 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropLargeBag}" Content="200 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropXLBag}" Content="500 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDrop1up}" Content="1 UP" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropKey}" Content="Key" />
+        </StackPanel>
+    </Grid>
+</UserControl>

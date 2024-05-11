@@ -4,7 +4,7 @@ using System.Linq;
 using Z2Randomizer.Core;
 
 namespace Z2Randomizer.Core.Overworld;
-public class Climates
+public static class Climates
 {
     public static readonly Climate Classic = new(
         "Classic",
@@ -182,6 +182,15 @@ public class Climates
             _ => throw new Exception("Unable to map Climate: " + name + " by name.")
         };
     }
+    
+    public static IEnumerable<string> ClimateList =
+    [
+        Classic.Name,
+        Chaos.Name,
+        Wetlands.Name,
+        GreatLakes.Name,
+        Scrubland.Name,
+    ];
 }
 
 

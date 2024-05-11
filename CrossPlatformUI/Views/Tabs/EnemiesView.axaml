@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.EnemiesView">
+    <Grid ColumnDefinitions="*, *">
+        <StackPanel>
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleOverworldEnemies}" Content="Shuffle Overworld Enemies" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceEnemies}" Content="Shuffle Palace Enemies" />
+            <CheckBox IsChecked="{Binding Config.ShuffleDripperEnemy}" Content="Shuffle Dripper Enemy" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixLargeAndSmallEnemies}" Content="MixLargeAndSmallEnemies" />
+            <CheckBox IsChecked="{Binding Config.GeneratorsAlwaysMatch}" Content="Generators Always Match" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <CheckBox IsChecked="{Binding Config.ShuffleEnemyHP}" Content="Shuffle Enemy HP" />
+            <CheckBox IsChecked="{Binding Config.ShuffleXPStealers}" Content="Shuffle Which Enemies Steal EXP" />
+            <CheckBox IsChecked="{Binding Config.ShuffleXPStolenAmount}" Content="Shuffle Amount Of EXP Stolen" />
+            <CheckBox IsChecked="{Binding Config.ShuffleSwordImmunity}" Content="Shuffle Sword Immunity" />
+            <ComboBox assists:ComboBoxAssist.Label="Enemy Experience Drops" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      SelectedItem="{Binding Config.EnemyXPDrops, Converter={x:Static ui:Util.EnumConvert}}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -7,9 +7,9 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class CustomizeView : ReactiveUserControl<MainViewModel>
+public partial class DropsView : ReactiveUserControl<MainViewModel>
 {
-    public CustomizeView()
+    public DropsView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);

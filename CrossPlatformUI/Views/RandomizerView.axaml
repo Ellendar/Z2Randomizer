@@ -70,20 +70,28 @@
                 <tabs:StartView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Overworld">
+                <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-            </TabItem>
-            <TabItem Header="Levels">
+                <tabs:PalacesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Enemies">
+                <tabs:EnemiesView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Levels">
+                <tabs:LevelsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Spells">
+                <tabs:SpellsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Items">
+                <tabs:ItemsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Drops">
+                <tabs:DropsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Hints">
+                <tabs:HintsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Customize">
                 <tabs:CustomizeView DataContext="{Binding CustomizeViewModel}" />

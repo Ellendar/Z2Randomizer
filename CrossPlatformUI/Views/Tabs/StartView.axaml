@@ -16,14 +16,14 @@
             <CheckBox IsChecked="{Binding Config.ShuffleStartingItems}" Content="Shuffle Starting Items" />
             <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
             <StackPanel>
-                <ToggleSwitch IsChecked="{Binding Config.StartWithCandle}" Content="Candle" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithGlove}" Content="Glove" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithRaft}" Content="Raft" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithBoots}" Content="Boots" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithFlute}" Content="Flute" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithCross}" Content="Cross" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithHammer}" Content="Hammer" />
-                <ToggleSwitch IsChecked="{Binding Config.StartWithMagicKey}" Content="Magic Key" />
+                <CheckBox IsChecked="{Binding Config.StartWithCandle}" Content="Candle" />
+                <CheckBox IsChecked="{Binding Config.StartWithGlove}" Content="Glove" />
+                <CheckBox IsChecked="{Binding Config.StartWithRaft}" Content="Raft" />
+                <CheckBox IsChecked="{Binding Config.StartWithBoots}" Content="Boots" />
+                <CheckBox IsChecked="{Binding Config.StartWithFlute}" Content="Flute" />
+                <CheckBox IsChecked="{Binding Config.StartWithCross}" Content="Cross" />
+                <CheckBox IsChecked="{Binding Config.StartWithHammer}" Content="Hammer" />
+                <CheckBox IsChecked="{Binding Config.StartWithMagicKey}" Content="Magic Key" />
             </StackPanel>
             </Border>
         </StackPanel>
@@ -31,14 +31,14 @@
             <CheckBox IsChecked="{Binding Config.ShuffleStartingSpells}" Content="Shuffle Starting Spells" />
             <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
                 <StackPanel>
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithShield}" Content="Shield" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithJump}" Content="Jump" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithLife}" Content="Life" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithFairy}" Content="Fairy" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithFire}" Content="Fire" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithReflect}" Content="Reflect" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithSpell}" Content="Spell" />
-                    <ToggleSwitch IsChecked="{Binding Config.StartWithThunder}" Content="Thunder" />
+                    <CheckBox IsChecked="{Binding Config.StartWithShield}" Content="Shield" />
+                    <CheckBox IsChecked="{Binding Config.StartWithJump}" Content="Jump" />
+                    <CheckBox IsChecked="{Binding Config.StartWithLife}" Content="Life" />
+                    <CheckBox IsChecked="{Binding Config.StartWithFairy}" Content="Fairy" />
+                    <CheckBox IsChecked="{Binding Config.StartWithFire}" Content="Fire" />
+                    <CheckBox IsChecked="{Binding Config.StartWithReflect}" Content="Reflect" />
+                    <CheckBox IsChecked="{Binding Config.StartWithSpell}" Content="Spell" />
+                    <CheckBox IsChecked="{Binding Config.StartWithThunder}" Content="Thunder" />
                 </StackPanel>
             </Border>
         </StackPanel>

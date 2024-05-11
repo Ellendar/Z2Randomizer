@@ -41,8 +41,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private int? startingHeartContainersMax;
     private int? maxHeartContainers;
     private StartingTechs startingTechs;
-    // private bool? startWithUpstab;
-    // private bool? startWithDownstab;
     private StartingLives startingLives;
     private int startingAttackLevel;
     private int startingMagicLevel;
@@ -209,8 +207,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [Minimum(1)]
     public int? MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
 
-    // public bool? StartWithUpstab { get => startWithUpstab; set => SetField(ref startWithUpstab, value); }
-    // public bool? StartWithDownstab { get => startWithDownstab; set => SetField(ref startWithDownstab, value); }
     public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }
 
     public StartingLives StartingLives { get => startingLives; set => SetField(ref startingLives, value); }

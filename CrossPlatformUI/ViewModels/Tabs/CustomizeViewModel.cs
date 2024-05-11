@@ -68,6 +68,17 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
     }
     
     [DataMember]
+    public bool UseCommunityText
+    {
+        get => Main.Config.UseCommunityText;
+        set
+        {
+            Main.Config.UseCommunityText = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    
+    [DataMember]
     public BeepThreshold BeepThreshold
     {
         get => Main.Config.BeepThreshold;
