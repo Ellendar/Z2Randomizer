@@ -6,9 +6,10 @@
              xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
-             x:DataType="vm:MainViewModel">
+             x:DataType="tabs:PalacesViewModel">
     <Grid ColumnDefinitions="*,*">
         <StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0">
@@ -34,10 +35,10 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <NumericUpDown Value="{Binding Config.PalacesToCompleteMin}"
                                FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="0" Maximum="7" assists:TextFieldAssist.Hints="Min"/>
+                               ClipValueToMinMax="True" Minimum="0" Maximum="{Binding Config.PalacesToCompleteMax}" assists:TextFieldAssist.Hints="Min"/>
                 <NumericUpDown Value="{Binding Config.PalacesToCompleteMax}"
                                FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="0" Maximum="7" assists:TextFieldAssist.Hints="Max"/>
+                               ClipValueToMinMax="True" Minimum="{Binding Config.PalacesToCompleteMin}" Maximum="6" assists:TextFieldAssist.Hints="Max"/>
             </StackPanel>
             <CheckBox IsChecked="{Binding Config.BlockingRoomsInAnyPalace}" Content="Blocking Rooms In Any Palace" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.BossRoomsExitToPalace}" Content="Boss Rooms Exit To Palace" />

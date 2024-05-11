@@ -48,10 +48,10 @@
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <NumericUpDown Value="{Binding Config.StartingHeartContainersMin}"
                                FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Min"/>
+                               ClipValueToMinMax="True" Minimum="1" Maximum="{Binding Config.StartingHeartContainersMax}" assists:TextFieldAssist.Hints="Min"/>
                 <NumericUpDown Value="{Binding Config.StartingHeartContainersMax}"
                                FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Max"/>
+                               ClipValueToMinMax="True" Minimum="{Binding Config.StartingHeartContainersMin}" Maximum="8" assists:TextFieldAssist.Hints="Max"/>
                 <NumericUpDown Value="{Binding Config.MaxHeartContainers}"
                                FormatString="+0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Available"/>

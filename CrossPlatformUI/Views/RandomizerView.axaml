@@ -8,6 +8,7 @@
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:RandomizerViewModel"
              x:Class="CrossPlatformUI.Views.RandomizerView">
@@ -34,17 +35,17 @@
                                 <avalonia:MaterialIcon Kind="ReloadAlert" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Choose ROM Save Folder" Command="{Binding LoadRom}" >
-                            <MenuItem.Icon>
-                                <avalonia:MaterialIcon Kind="ReloadAlert" Width="24" Height="24" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Save As New Preset">
+                        <MenuItem Header="Choose ROM Save Folder" IsVisible="{Binding  IsDesktop}" Command="{Binding SaveFolder}" >
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Clear Saved Presets">
+                        <MenuItem Header="Save Flags As New Preset" IsEnabled="False">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="ContentSaveAddOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Clear Saved Presets" IsEnabled="False">
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="TrashCanOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
@@ -61,10 +62,8 @@
                         <Separator />
                     </MenuItem>
                 </Menu>
-
             </StackPanel>
         </Grid>
-        
         <TabControl Margin="5" SelectedIndex="{Binding CurrentTabIndex}">
             <TabItem Header="Start">
                 <tabs:StartView DataContext="{Binding Main}"/>
@@ -73,7 +72,7 @@
                 <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-                <tabs:PalacesView DataContext="{Binding Main}"/>
+                <tabs:PalacesView DataContext="{Binding PalacesViewModel}"/>
             </TabItem>
             <TabItem Header="Enemies">
                 <tabs:EnemiesView DataContext="{Binding Main}"/>

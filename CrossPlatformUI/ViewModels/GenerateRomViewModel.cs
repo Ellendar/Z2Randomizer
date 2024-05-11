@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Threading;
@@ -22,22 +23,20 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
         set => this.RaiseAndSetIfChanged(ref progress, value);
     }
     
-    public GenerateRomViewModel()
-    {
-        HostScreen = null;
-        Activator = new();
-    }
-    
     public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
+    
+    private MainViewModel Main { get; }
+
+    private CancellationTokenSource? tokenSource;
     
     public GenerateRomViewModel(MainViewModel screen)
     {
         HostScreen = screen;
+        Main = screen;
         Activator = new();
-        var tokenSource = new CancellationTokenSource();
         CancelGeneration = ReactiveCommand.Create(() =>
         {
-            tokenSource.Cancel();
+            tokenSource?.Cancel();
             DialogHost.Close("GenerateRomDialog");
         });
 
@@ -46,19 +45,26 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
 
         async void Randomize(CompositeDisposable disposables)
         {
-            Disposable.Create(tokenSource.Cancel)
+            Disposable.Create(() => tokenSource?.Cancel())
                 .DisposeWith(disposables);
+            tokenSource = new CancellationTokenSource();
+            Progress = "";
             await App.PersistState();
             var engine = App.Current?.Services?.GetService<IAsmEngine>();
             var files = App.Current?.Services?.GetService<IFileService>();
             var host = (HostScreen as MainViewModel)!;
             var config = host.Config;
             var roomsJson = await files!.OpenLocalFile("PalaceRooms.json");
-            var customJson = config.UseCustomRooms ? await files!.OpenLocalFile("CustomRooms.json") : null;
-            var palaceRooms = new PalaceRooms(config.UseCustomRooms ? customJson : roomsJson, config.UseCustomRooms);
+            var customJson = config.UseCustomRooms ? await files.OpenLocalFile("CustomRooms.json") : null;
+            var rooms = config.UseCustomRooms ? customJson : roomsJson;
+            var palaceRooms = new PalaceRooms(rooms!, config.UseCustomRooms);
             var randomizer = new Hyrule(engine!, palaceRooms);
-            var output = await randomizer.Randomize(host.RomFileViewModel.RomData!, config, str => Progress = str, tokenSource.Token);
-            
+            // Make a copy of the rom data to prevent seed bleed!
+            var romdata = host.RomFileViewModel.RomData!.ToArray();
+            var output = await randomizer.Randomize(romdata, config, str => Progress = str, tokenSource.Token);
+            var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
+            await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
+            Progress = $"Generation Complete!\n\nFile {filename} created";
         }
     }
 

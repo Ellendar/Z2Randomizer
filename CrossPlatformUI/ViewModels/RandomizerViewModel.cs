@@ -1,11 +1,14 @@
 using System;
 using System.Reactive;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Avalonia.Data;
+using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using Z2Randomizer.Core;
 
 namespace CrossPlatformUI.ViewModels;
@@ -18,6 +21,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
         HostScreen = mainViewModel;
         Main = mainViewModel;
         CustomizeViewModel = new(mainViewModel);
+        PalacesViewModel = new(mainViewModel);
         Flags = MainViewModel.BeginnerPreset;
         
         RerollSeed = ReactiveCommand.Create(() =>
@@ -33,6 +37,13 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
         LoadRom = ReactiveCommand.CreateFromObservable(
             () => mainViewModel.Router.Navigate.Execute(mainViewModel.RomFileViewModel)
         );
+
+        SaveFolder = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
+            var folder = await fileDialog.OpenFolderAsync();
+            Main.OutputFilePath = folder?.Path.AbsolutePath ?? "";
+        });
         mainViewModel.Config.PropertyChanged += (sender, args) =>
         {
             switch (args.PropertyName)
@@ -70,10 +81,16 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
     }
 
     public MainViewModel Main { get; }
+
+    [DataMember]
+    public PalacesViewModel PalacesViewModel { get; }
+
+    public bool IsDesktop { get; } = !OperatingSystem.IsBrowser();
     
     [DataMember]
     public CustomizeViewModel CustomizeViewModel { get; }
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
+    public ReactiveCommand<Unit, Unit> SaveFolder { get; }
     
     public ReactiveCommand<string, Unit> LoadPreset { get; }
     public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
