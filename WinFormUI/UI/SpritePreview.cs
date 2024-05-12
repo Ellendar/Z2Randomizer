@@ -3,6 +3,8 @@ using Z2Randomizer.Core;
 using System.Drawing.Imaging;
 using System.Security.Policy;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using CommandLine.Models;
+using RandomizerCore;
 
 namespace WinFormUI.UI
 {
@@ -30,7 +32,7 @@ namespace WinFormUI.UI
             Credit = rom.Z2BytesToString(rom.GetBytes(0x10 + 0x16AAB, 0x10 + 0x16AC7)).Trim();
         }
 
-        public void ReloadSpriteFromROM(CharacterSprite sprite, string? tunicColor, string? shieldColor, string? beamSprite)
+        public void ReloadSpriteFromROM(CharacterSprite sprite, CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
         {
             // make a temporary copy of the original ROM file and apply the sprite to it
             var rom = new ROM(_rom.ToArray());
@@ -40,7 +42,6 @@ namespace WinFormUI.UI
             // so load the specific CHR tiles and palette data that we want
             LoadPreviewFromRom(rom);
             LoadSpriteCredit(rom);
-            //rom.Dump("C:/dev/temp/" + sprite.DisplayName + ".nes");
         }
 
         private void LoadPreviewFromRom(ROM rom)

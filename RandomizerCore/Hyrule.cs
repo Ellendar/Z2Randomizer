@@ -926,7 +926,7 @@ public class Hyrule
 
         foreach(Collectable item in ItemGet.Keys)
         {
-            if (ItemGet[item] == false)
+            if (ItemGet[item] == false && item.IsMajorItem())
             {
                 itemGetReachableFailures++;
                 if (UNSAFE_DEBUG && count >= DEBUG_THRESHOLD)
@@ -950,6 +950,7 @@ public class Hyrule
             //PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
+        /*
         if (ItemGet.Keys.Any(i => i.IsSpell() && !ItemGet[i]))
         {
             spellGetReachableFailures++;
@@ -961,7 +962,7 @@ public class Hyrule
                 return false;
             }
             return false;
-        }
+        }*/
 
         bool retval =
             CanGet(westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
@@ -3301,7 +3302,8 @@ public class Hyrule
         {
             if (item.IsMajorItem() && ItemGet.ContainsKey(item))
             {
-                logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + itemLocs.Where(i => i.Collectable == item).FirstOrDefault()?.Name);
+                Location? location = AllLocationsForReal().Where(i => i.Collectable == item).FirstOrDefault();
+                logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + location?.Name);
             }
         }
     }

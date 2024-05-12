@@ -11,6 +11,8 @@ using System.Reflection;
 using CommandLine;
 using Z2Randomizer.Core.Sidescroll;
 using System;
+using RandomizerCore;
+using System.Configuration;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -49,10 +51,13 @@ public partial class MainUI : Form
 
         InitializeComponent();
         characterSpriteList.Items.Clear();
+        //XXX: I broke the sprite list
+        /*
         foreach (CharacterSprite sprite in CharacterSprite.Options())
         {
             characterSpriteList.Items.Add(sprite.DisplayName);
         }
+        */
         r = new Random();
         startHeartsMinList.SelectedIndex = 3;
         startHeartsMinList.SelectedIndex = 3;
@@ -89,7 +94,9 @@ public partial class MainUI : Form
         hiddenPalaceList.SelectedIndex = 0;
         hideKasutoList.SelectedIndex = 0;
         var selectedSprite = Settings.Default.sprite;
-        characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
+        //XXX: Fix this
+        //characterSpriteList.SelectedIndex = (selectedSprite > (characterSpriteList.Items.Count - 1)) ? 0 : selectedSprite;
+        //characterSpriteList.SelectedIndex = 0;
 
         var version = Assembly.GetEntryAssembly().GetName().Version;
         var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
@@ -813,38 +820,33 @@ public partial class MainUI : Form
         switch (startingTechsList.SelectedIndex)
         {
             case 0:
-                configuration.StartWithDownstab = false;
-                configuration.StartWithUpstab = false;
+                configuration.StartingTechniques = StartingTechs.NONE;
                 break;
             case 1:
-                configuration.StartWithDownstab = true;
-                configuration.StartWithUpstab = false;
+                configuration.StartingTechniques = StartingTechs.DOWNSTAB;
                 break;
             case 2:
-                configuration.StartWithDownstab = false;
-                configuration.StartWithUpstab = true;
+                configuration.StartingTechniques = StartingTechs.UPSTAB;
                 break;
             case 3:
-                configuration.StartWithDownstab = true;
-                configuration.StartWithUpstab = true;
+                configuration.StartingTechniques = StartingTechs.BOTH;
                 break;
             case 4:
-                configuration.StartWithDownstab = null;
-                configuration.StartWithUpstab = null;
+                configuration.StartingTechniques = StartingTechs.RANDOM;
                 break;
             default:
                 throw new Exception("Invalid Techs setting");
         }
         configuration.StartingLives = startingLivesBox.SelectedIndex switch
         {
-            0 => 1,
-            1 => 2,
-            2 => 3,
-            3 => 4,
-            4 => 5,
-            5 => 8,
-            6 => 16,
-            7 => null,
+            0 => StartingLives.Lives1,
+            1 => StartingLives.Lives2,
+            2 => StartingLives.Lives3,
+            3 => StartingLives.Lives4,
+            4 => StartingLives.Lives5,
+            5 => StartingLives.Lives8,
+            6 => StartingLives.Lives16,
+            7 => StartingLives.LivesRandom,
             _ => throw new Exception("Invalid starting lives index")
         };
         configuration.StartingAttackLevel = startingAttackLevelList.SelectedIndex + 1;
@@ -1125,36 +1127,77 @@ public partial class MainUI : Form
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
         configuration.UseCustomRooms = useCustomRoomsBox.Checked;
         configuration.DisableHUDLag = disableHUDLag.Checked;
-        configuration.Sprite = characterSpriteList.SelectedIndex;
+        //XXX: Fix this
+        //configuration.Sprite = characterSpriteList.SelectedIndex;
+        configuration.Sprite = CharacterSprite.LINK;
         configuration.BeepFrequency = beepFrequencyDropdown.SelectedIndex switch
         {
             //Normal
-            0 => 0x30,
+            0 => BeepFrequency.Normal,
             //Half Speed
-            1 => 0x60,
+            1 => BeepFrequency.HalfSpeed,
             //Quarter Speed
-            2 => 0xC0,
+            2 => BeepFrequency.QuarterSpeed,
             //Off
-            3 => 0,
-            _ => 0x30
+            3 => BeepFrequency.Off,
+            _ => BeepFrequency.Normal
         };
 
         configuration.BeepThreshold = beepThresholdDropdown.SelectedIndex switch
         {
             //Normal
-            0 => 0x20,
+            0 => BeepThreshold.Normal,
             //Half Bar
-            1 => 0x10,
+            1 => BeepThreshold.HalfBar,
             //Quarter Bar
-            2 => 0x08,
+            2 => BeepThreshold.QuarterBar,
             //Two Bars
-            3 => 0x40,
-            _ => 0x20
+            3 => BeepThreshold.TwoBars,
+            _ => BeepThreshold.Normal
         };
 
-        configuration.Tunic = tunicColorList.GetItemText(tunicColorList.SelectedItem);
-        configuration.ShieldTunic = shieldColorList.GetItemText(shieldColorList.SelectedItem);
-        configuration.BeamSprite = beamSpriteList.GetItemText(beamSpriteList.SelectedItem);
+        configuration.Tunic = tunicColorList.SelectedIndex switch
+        {
+            0 => CharacterColor.Default,
+            1 => CharacterColor.Green,
+            2 => CharacterColor.DarkGreen,
+            3 => CharacterColor.Aqua,
+            4 => CharacterColor.DarkBlue,
+            5 => CharacterColor.Purple,
+            6 => CharacterColor.Pink,
+            7 => CharacterColor.Orange,
+            8 => CharacterColor.Red,
+            9 => CharacterColor.Turd,
+            10 => CharacterColor.Random,
+            _ => CharacterColor.Default
+        };
+        configuration.ShieldTunic = shieldColorList.SelectedIndex switch
+        {
+            0 => CharacterColor.Default,
+            1 => CharacterColor.Green,
+            2 => CharacterColor.DarkGreen,
+            3 => CharacterColor.Aqua,
+            4 => CharacterColor.DarkBlue,
+            5 => CharacterColor.Purple,
+            6 => CharacterColor.Pink,
+            7 => CharacterColor.Orange,
+            8 => CharacterColor.Red,
+            9 => CharacterColor.Turd,
+            10 => CharacterColor.Random,
+            _ => CharacterColor.Default
+        };
+        configuration.BeamSprite = beamSpriteList.SelectedIndex switch
+        {
+            0 => BeamSprites.Default,
+            1 => BeamSprites.Fire,
+            2 => BeamSprites.Bubble,
+            3 => BeamSprites.Rock,
+            4 => BeamSprites.Axe,
+            5 => BeamSprites.Hammer,
+            6 => BeamSprites.WizzrobeBeam,
+            7 => BeamSprites.Random,
+            _ => BeamSprites.Default
+        };
 
         return configuration;
     }
@@ -1283,24 +1326,24 @@ public partial class MainUI : Form
                 11 => 11,
                 _ => throw new Exception("Invalid MaxHearts setting")
             };
-            startingTechsList.SelectedIndex = (configuration.StartWithDownstab, configuration.StartWithUpstab) switch
+            startingTechsList.SelectedIndex = (configuration.StartingTechniques) switch
             {
-                (false, false) => 0,
-                (true, false) => 1,
-                (false, true) => 2,
-                (true, true) => 3,
-                (_, _) => 4
+                StartingTechs.NONE => 0,
+                StartingTechs.DOWNSTAB => 1,
+                StartingTechs.UPSTAB => 2,
+                StartingTechs.BOTH => 3,
+                StartingTechs.RANDOM => 4
             };
             startingLivesBox.SelectedIndex = configuration.StartingLives switch
             {
-                1 => 0,
-                2 => 1,
-                3 => 2,
-                4 => 3,
-                5 => 4,
-                8 => 5,
-                16 => 6,
-                null => 7
+                StartingLives.Lives1 => 0,
+                StartingLives.Lives2 => 1,
+                StartingLives.Lives3 => 2,
+                StartingLives.Lives4 => 3,
+                StartingLives.Lives5 => 4,
+                StartingLives.Lives8 => 5,
+                StartingLives.Lives16 => 6,
+                StartingLives.LivesRandom => 7
             };
             startingAttackLevelList.SelectedIndex = configuration.StartingAttackLevel - 1;
             startingMagicLevelList.SelectedIndex = configuration.StartingMagicLevel - 1;
@@ -2102,6 +2145,8 @@ public partial class MainUI : Form
 
     private void GenerateSpriteImage()
     {
+        //XXX: fix this
+        /*
         _spritePreview?.ReloadSpriteFromROM(
                CharacterSprite.ByIndex(characterSpriteList.SelectedIndex),
                tunicColorList.GetItemText(tunicColorList.SelectedItem),
@@ -2110,6 +2155,7 @@ public partial class MainUI : Form
            );
         spritePreviewBox.Image = _spritePreview?.Preview;
         spriteCreditLabel.Text = _spritePreview?.Credit;
+        */
     }
 
     private void CharacterSpriteList_SelectedIndexChanged(object sender, EventArgs e)
