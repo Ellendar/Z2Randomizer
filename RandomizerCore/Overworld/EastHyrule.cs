@@ -412,7 +412,7 @@ public class EastHyrule : World
                         map[i, 0] = fillerWater;
                         map[i, MAP_COLS - 1] = fillerWater;
                     }
-                    MakeVolcano();
+                    MakeValleyOfDeath();
                     int cols = RNG.Next(2, 4);
                     int rows = RNG.Next(2, 4);
                     List<int> pickedC = new List<int>();
@@ -481,8 +481,6 @@ public class EastHyrule : World
                 {
                     DrawCenterMountain();
 
-
-
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
                     randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
@@ -502,7 +500,7 @@ public class EastHyrule : World
                         map[i, 0] = Terrain.MOUNTAIN;
                         map[i, MAP_COLS - 1] = Terrain.MOUNTAIN;
                     }
-                    MakeVolcano();
+                    MakeValleyOfDeath();
 
                     int cols = RNG.Next(2, 4);
                     int rows = RNG.Next(2, 4);
@@ -549,14 +547,21 @@ public class EastHyrule : World
                 {
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
                     randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
-                    MakeVolcano();
+                    MakeValleyOfDeath();
 
 
                     DrawMountains();
                     DrawRiver(props.CanWalkOnWaterWithBoots);
                 }
 
-
+                if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
+                {
+                    bool f = MakeValleyOfDeath();
+                    if (!f)
+                    {
+                        return false;
+                    }
+                }
                 if (props.HiddenKasuto)
                 {
                     RandomizeHiddenKasuto(props.ShuffleHidden);
@@ -605,15 +610,6 @@ public class EastHyrule : World
                 if (bridge != null)
                 {
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
-                }
-
-                if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
-                {
-                    bool f = MakeVolcano();
-                    if (!f)
-                    {
-                        return false;
-                    }
                 }
 
                 bool b = PlaceLocations(riverTerrain, props.SaneCaves);
@@ -730,7 +726,7 @@ public class EastHyrule : World
         return true;
     }
 
-    public bool MakeVolcano()
+    public bool MakeValleyOfDeath()
     {
         int xmin = 21;
         int xmax = 41;
@@ -1373,8 +1369,10 @@ public class EastHyrule : World
     {
         if (shuffleHidden)
         {
-            hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            while (hiddenKasutoLocation == null
+            do
+            {
+                hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
+            } while ((hiddenKasutoLocation == null
                 || hiddenKasutoLocation == raft
                 || hiddenKasutoLocation == bridge
                 || hiddenKasutoLocation == cave1
@@ -1382,9 +1380,7 @@ public class EastHyrule : World
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
                 || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
-            {
-                hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            }
+            );
         }
         else
         {
@@ -1404,11 +1400,18 @@ public class EastHyrule : World
         int ypos = RNG.Next(6, MAP_ROWS - 6);
         if (shuffleHidden)
         {
-            hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            while (hiddenPalaceLocation == null || hiddenPalaceLocation == raft || hiddenPalaceLocation == bridge || hiddenPalaceLocation == cave1 || hiddenPalaceLocation == cave2 || connections.ContainsKey(hiddenPalaceLocation) || !hiddenPalaceLocation.CanShuffle || hiddenPalaceLocation == hiddenKasutoLocation || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenPalaceLocation.TerrainType == Terrain.LAVA && hiddenPalaceLocation.PassThrough != 0))
+            do
             {
                 hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            }
+            } while (hiddenPalaceLocation == null
+            || hiddenPalaceLocation == raft
+            || hiddenPalaceLocation == bridge
+            || hiddenPalaceLocation == cave1
+            || hiddenPalaceLocation == cave2
+            || connections.ContainsKey(hiddenPalaceLocation)
+            || !hiddenPalaceLocation.CanShuffle
+            || hiddenPalaceLocation == hiddenKasutoLocation
+            || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenPalaceLocation.TerrainType == Terrain.LAVA && hiddenPalaceLocation.PassThrough != 0));
         }
         else
         {
