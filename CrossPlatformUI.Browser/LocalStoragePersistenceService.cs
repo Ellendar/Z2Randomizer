@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Threading.Tasks;
@@ -8,7 +9,6 @@ using System.Threading.Tasks;
 using CrossPlatformUI.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ReactiveUI;
 
 namespace CrossPlatformUI.Browser;
 
@@ -67,5 +67,10 @@ public partial class LocalStoragePersistenceService : ISuspendSyncService //: IS
     public void InvalidateState()
     {
         Clear();
+    }
+
+    public Task<IEnumerable<string>> ListLocalFiles(string path)
+    {
+        throw new System.NotImplementedException();
     }
 }

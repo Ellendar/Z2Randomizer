@@ -10,4 +10,23 @@ const dotnetRuntime = await dotnet
 
 const config = dotnetRuntime.getConfig();
 
+this.customFetchString = function(url) {
+    return fetch(url).then(
+        async (res) => res.text()
+    );
+}
+
+this.customFetchBinary = function(url) {
+    return fetch(url).then(
+        async (res) => {
+            let string = "";
+            let buffer = await res.arrayBuffer();
+            (new Uint8Array(buffer)).forEach(
+                (byte) => { string += String.fromCharCode(byte) }
+            )
+            return btoa(string);
+        }
+    );
+}
+
 await dotnetRuntime.runMain(config.mainAssemblyName, [window.location.search]);

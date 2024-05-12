@@ -17,11 +17,6 @@ public class DesktopFileService : IFileService
         return await File.ReadAllBytesAsync(filename);
     }
 
-    public Task<IEnumerable<string>> ListLocalFiles(string path)
-    {
-        return Task.FromResult(Directory.GetFiles(path).AsEnumerable());
-    }
-
     public Task SaveGeneratedBinaryFile(string filename, byte[] filedata, string? path = null)
     {
         var file = Path.Join(path ?? "", filename);
