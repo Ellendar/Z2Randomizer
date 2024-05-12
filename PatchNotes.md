@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.12 - May 12, 2024
+
+- Fixed a bug where hidden kasuto / 3-eyed rock could incorrectly select locations that were already placed under some circumstances in volcano biomes.
+
 ## Version 4.3.11 - May 10, 2024
 
 - Fixed a bug where the basement guard in New Kasuto could tell you an incorrect number of required containers.
