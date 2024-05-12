@@ -2,7 +2,45 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:core="clr-namespace:Z2Randomizer.Core;assembly=RandomizerCore"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="tabs:SpritePreviewViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.SpritePreviewView">
-    Welcome to Avalonia!
+    <Grid ColumnDefinitions="*, *">
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <ComboBox Name="SelectedSprite" assists:ComboBoxAssist.Label="Character Sprite" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Options}"
+                      SelectedItem="{Binding Sprite}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding SmallPreview}" />
+                            <StackPanel>
+                                <TextBlock MaxHeight="12" Text="{Binding Name}" />
+                                <TextBlock MaxHeight="12" Text="{Binding AuthorName}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox assists:ComboBoxAssist.Label="Tunic Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
+                      SelectedItem="{Binding TunicColor, Converter={x:Static ui:Util.EnumConvert}}" />
+            <ComboBox assists:ComboBoxAssist.Label="Shield Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
+                      SelectedItem="{Binding ShieldColor, Converter={x:Static ui:Util.EnumConvert}}" />
+            <ComboBox assists:ComboBoxAssist.Label="Beam Sprite" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.BeamSpritesList}}"
+                      SelectedItem="{Binding BeamSprite, Converter={x:Static ui:Util.EnumConvert}}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <TextBlock>Sprite Preview</TextBlock>
+            <Image Source="{Binding Path=Sprite.LargePreview}" MaxHeight="200"/>
+            <TextBlock Text="{Binding Sprite.Credit}" />
+        </StackPanel>
+    </Grid>
 </UserControl>

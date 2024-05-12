@@ -3,14 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using CrossPlatformUI.ViewModels;
-using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class SpritePreviewView : ReactiveUserControl<SpritePreviewViewModel>
+public partial class HintsView : ReactiveUserControl<MainViewModel>
 {
-    public SpritePreviewView()
+    public HintsView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);

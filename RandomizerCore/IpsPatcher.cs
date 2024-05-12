@@ -15,24 +15,16 @@ namespace Z2Randomizer.Core;
 /// </summary>
 internal class IpsPatcher
 {
-    public void Patch(byte[] romData, string patchName)
+    public static void Patch(byte[] romData, byte[] patch)
     {
-        //FileStream romstream = new FileStream(romname, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
-        MemoryStream romstream = new(romData);
-        FileStream ipsstream = new(patchName, FileMode.Open, FileAccess.Read);
-        int lint = (int)ipsstream.Length;
-        byte[] ipsbyte = new byte[ipsstream.Length];
-        //byte[] romData = new byte[romstream.Length];
-        IAsyncResult romresult;
-        IAsyncResult ipsresult = ipsstream.BeginRead(ipsbyte, 0, lint, null, null);
-        ipsstream.EndRead(ipsresult);
+        var ipsbyte = patch;
         int ipson = 5;
         int totalrepeats = 0;
         int offset = 0;
         bool keepgoing = true;
         //////////////////End Init code
         //////////////////Start main code
-        while (keepgoing == true)
+        while (keepgoing)
         {
             offset = ipsbyte[ipson] * 0x10000 + ipsbyte[ipson + 1] * 0x100 + ipsbyte[ipson + 2];
             ipson++;
@@ -50,9 +42,7 @@ internal class IpsPatcher
                 byte[] repeatbyte = new byte[totalrepeats];
                 for (int ontime = 0; ontime < totalrepeats; ontime++)
                     repeatbyte[ontime] = ipsbyte[ipson];
-                romstream.Seek(offset, SeekOrigin.Begin);
-                romresult = romstream.BeginWrite(repeatbyte, 0, totalrepeats, null, null);
-                romstream.EndWrite(romresult);
+                repeatbyte.CopyTo(romData, offset);
                 ipson++;
             }
             else
@@ -61,16 +51,13 @@ internal class IpsPatcher
                 totalrepeats = ipsbyte[ipson] * 256 + ipsbyte[ipson + 1];
                 ipson++;
                 ipson++;
-                romstream.Seek(offset, SeekOrigin.Begin);
-                romresult = romstream.BeginWrite(ipsbyte, ipson, totalrepeats, null, null);
-                romstream.EndWrite(romresult);
-                ipson = ipson + totalrepeats;
+                var end = ipson + totalrepeats;
+                ipsbyte[ipson..end].CopyTo(romData, offset);
+                ipson = end;
             }
             /////////////Test For "EOF"
             if (ipsbyte[ipson] == 69 && ipsbyte[ipson + 1] == 79 && ipsbyte[ipson + 2] == 70)
                 keepgoing = false;
         }
-        romstream.Close();
-        ipsstream.Close();
     }
 }

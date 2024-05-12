@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.SpellsView">
+    <Grid ColumnDefinitions="*, *">
+        <StackPanel>
+            <CheckBox IsChecked="{Binding Config.ShuffleLifeRefillAmount}" Content="Shuffle Life Refill Amount" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleSpellLocations}" Content="Shuffle Spell Locations" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.DisableMagicContainerRequirements}" Content="Disable Magic Container Requirements" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.RandomizeSpellSpellEnemy}" Content="Randomize Spell Spell Enemy" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.SwapUpAndDownStab}" Content="Swap Upstab And Downstab" />
+            <ComboBox  assists:ComboBoxAssist.Label="Fire Spells" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.FireOptionList}}"
+                      SelectedItem="{Binding Config.FireOption, Converter={x:Static ui:Util.EnumConvert}}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <CheckBox IsChecked="{Binding Config.JumpAlwaysOn}" Content="Jump Always On" />
+            <CheckBox IsChecked="{Binding Config.DashAlwaysOn}" Content="Dash Always On" />
+            <CheckBox IsChecked="{Binding Config.PermanmentBeamSword}" Content="Permanment Beam Sword" />
+        </StackPanel>
+    </Grid>
+</UserControl>

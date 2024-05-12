@@ -4,18 +4,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
              x:DataType="vmt:CustomizeViewModel">
-    <Grid ColumnDefinitions="2*, *, *" RowDefinitions="Auto" Margin="4">
+    <Grid ColumnDefinitions="*,2*" Margin="4">
         <StackPanel Orientation="Vertical">
             
+            <ComboBox assists:ComboBoxAssist.Label="Beep Threshold" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.BeepThresholdList}}"
+                      SelectedItem="{Binding BeepThreshold, Converter={x:Static ui:Util.EnumConvert}}" />
+            <ComboBox assists:ComboBoxAssist.Label="Beep Frequency" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.BeepFrequencyList}}"
+                      SelectedItem="{Binding BeepFrequency, Converter={x:Static ui:Util.EnumConvert}}" />
+            <CheckBox IsChecked="{Binding DisableMusic}" Content="Disable Music" />
+            <CheckBox IsChecked="{Binding FastSpellCasting}" Content="Fast Spell Casting"  />
+            <CheckBox IsChecked="{Binding UpAOnController1}">
+                <TextBlock>
+                    Remap UP+A to UP+Select<LineBreak/>on Controller 1
+                </TextBlock>
+            </CheckBox>
+            <CheckBox IsChecked="{Binding RemoveFlashing}" Content="Remove Flashing" />
+            <CheckBox IsChecked="{Binding ShuffleSpritePalettes}" Content="Shuffle Sprite Palettes" />
+            <CheckBox IsChecked="{Binding UseCommunityText}" Content="Use Community Text" />
         </StackPanel>
-        <StackPanel Grid.Column="1" Orientation="Vertical">
-            
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Vertical">
-            <tabs:SpritePreviewView />
-        </StackPanel>
+        <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
     </Grid>
 </UserControl>

@@ -202,12 +202,12 @@ public class RandomizerProperties
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
-    public string BeamSprite { get; set; }
+    public BeamSprites BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
     [NotMapped]
     public CharacterSprite CharSprite { get; set; }
-    public string TunicColor { get; set; }
-    public string ShieldColor { get; set; }
+    public CharacterColor TunicColor { get; set; }
+    public CharacterColor ShieldColor { get; set; }
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }

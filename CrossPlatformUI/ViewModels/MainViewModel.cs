@@ -26,9 +26,9 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
 
     // The command that navigates a user to first view model.
     public ReactiveCommand<Unit, IRoutableViewModel> GenerateRom { get; }
-
-    // The command that navigates a user back.
-    public ReactiveCommand<Unit, IRoutableViewModel> GoBack => Router.NavigateBack!;
+    
+    [DataMember]
+    public string OutputFilePath { get; set; }
 
     [DataMember]
     public RomFileViewModel RomFileViewModel { get; }

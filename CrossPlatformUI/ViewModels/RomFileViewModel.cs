@@ -16,10 +16,19 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
     public string? UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
     public IScreen HostScreen { get; }
 
+    private byte[]? romData;
     [DataMember]
-    public byte[]? RomData { get; private set; }
+    public byte[]? RomData
+    {
+        get => romData;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref romData, value);
+            this.RaisePropertyChanged(nameof(HasRomData));
+        }
+    }
 
-    public bool HasRomData { get => RomData != null; set => this.RaisePropertyChanged(); }
+    public bool HasRomData => RomData != null;
 
     public RomFileViewModel(IScreen hostScreen)
     {
@@ -41,12 +50,12 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
         if (fileprops.Size <= 1024 * 1024 * 1)
         {
             await using var readStream = await file.OpenReadAsync();
-            RomData = new byte[(uint)fileprops.Size];
-            var read = await readStream.ReadAsync(RomData, token);
+            var tmp = new byte[(uint)fileprops.Size];
+            var read = await readStream.ReadAsync(tmp, token);
             // TODO: Better validation
             if (read == 1024 * 256 + 0x10)
             {
-                HasRomData = true;
+                RomData = tmp;
                 HostScreen.Router.NavigateBack.Execute();
                 // Manually save the state 
                 if (OperatingSystem.IsBrowser())

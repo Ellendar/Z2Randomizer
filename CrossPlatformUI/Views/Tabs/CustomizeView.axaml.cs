@@ -1,13 +1,17 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using CrossPlatformUI.ViewModels;
+using ReactiveUI;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class CustomizeView : UserControl
+public partial class CustomizeView : ReactiveUserControl<MainViewModel>
 {
     public CustomizeView()
     {
-        InitializeComponent();
+        this.WhenActivated(disposables => { });
+        AvaloniaXamlLoader.Load(this);
     }
 }

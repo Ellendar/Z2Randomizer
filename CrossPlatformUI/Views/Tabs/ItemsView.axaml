@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.ItemsView">
+    <Grid ColumnDefinitions="*, *">
+        <StackPanel>
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceItems}" Content="Shuffle Palace Items" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleOverworldItems}" Content="Shuffle Overworld Items" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixOverworldAndPalaceItems}" Content="Mix Overworld And Palace Items" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}" Content="Include PBag Caves In Item Shuffle" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceItems}" Content="Shuffle Palace Items" />
+            <CheckBox IsChecked="{Binding Config.ShuffleSmallItems}" Content="Shuffle Small Items" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.PalacesContainExtraKeys}" Content="Palaces Contain Extra Keys" />
+            <CheckBox IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}" Content="Randomizer New Kasuto Jar Requirements" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.RemoveSpellItems}" Content="Remove Spell Items" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePBagAmounts}" Content="Shuffle PBag Amounts" />
+
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSpellsInShuffle}" Content="Include Spells In Shuffle" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSwordTechsInShuffle}" Content="Include Sword Techs In Shuffle" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeQuestItemsInShuffle}" Content="Include Quest Items In Shuffle" />
+        </StackPanel>
+    </Grid>
+</UserControl>

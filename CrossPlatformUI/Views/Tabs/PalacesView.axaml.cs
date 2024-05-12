@@ -8,9 +8,9 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class SpritePreviewView : ReactiveUserControl<SpritePreviewViewModel>
+public partial class PalacesView : ReactiveUserControl<PalacesViewModel>
 {
-    public SpritePreviewView()
+    public PalacesView()
     {
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);

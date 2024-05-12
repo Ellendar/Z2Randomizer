@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using RandomizerCore;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using RandomizerCore.Flags;
@@ -39,9 +40,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
     private int? maxHeartContainers;
-    private bool? startWithUpstab;
-    private bool? startWithDownstab;
-    private int? startingLives;
+    private StartingTechs startingTechs;
+    private StartingLives startingLives;
     private int startingAttackLevel;
     private int startingMagicLevel;
     private int startingLifeLevel;
@@ -148,16 +148,16 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleSpritePalettes;
     private bool permanmentBeamSword;
     private bool useCommunityText;
-    private byte beepFrequency;
-    private byte beepThreshold;
+    private BeepFrequency beepFrequency;
+    private BeepThreshold beepThreshold;
     private bool disableMusic;
     private bool fastSpellCasting;
     private bool upAOnController1;
     private bool removeFlashing;
-    private int sprite;
-    private string tunic;
-    private string shieldTunic;
-    private string beamSprite;
+    private CharacterSprite sprite;
+    private CharacterColor tunic;
+    private CharacterColor shieldTunic;
+    private BeamSprites beamSprite;
     private bool useCustomRooms;
     private bool disableHudLag;
     private bool randomizeKnockback;
@@ -207,11 +207,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [Minimum(1)]
     public int? MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
 
-    public bool? StartWithUpstab { get => startWithUpstab; set => SetField(ref startWithUpstab, value); }
-    public bool? StartWithDownstab { get => startWithDownstab; set => SetField(ref startWithDownstab, value); }
+    public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }
 
-    [CustomFlagSerializer(typeof(StartingLivesSerializer))]
-    public int? StartingLives { get => startingLives; set => SetField(ref startingLives, value); }
+    public StartingLives StartingLives { get => startingLives; set => SetField(ref startingLives, value); }
 
     [Limit(8)]
     [Minimum(1)]
@@ -872,14 +870,14 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
-    public byte BeepFrequency
+    public BeepFrequency BeepFrequency
     {
         get => beepFrequency;
         set => SetField(ref beepFrequency, value);
     }
 
     [IgnoreInFlags]
-    public byte BeepThreshold
+    public BeepThreshold BeepThreshold
     {
         get => beepThreshold;
         set => SetField(ref beepThreshold, value);
@@ -914,28 +912,28 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
-    public int Sprite
+    public CharacterSprite Sprite
     {
         get => sprite;
         set => SetField(ref sprite, value);
     }
 
     [IgnoreInFlags]
-    public string Tunic
+    public CharacterColor Tunic
     {
         get => tunic;
         set => SetField(ref tunic, value);
     }
 
     [IgnoreInFlags]
-    public string ShieldTunic
+    public CharacterColor ShieldTunic
     {
         get => shieldTunic;
         set => SetField(ref shieldTunic, value);
     }
 
     [IgnoreInFlags]
-    public string BeamSprite
+    public BeamSprites BeamSprite
     {
         get => beamSprite;
         set => SetField(ref beamSprite, value);
@@ -1054,10 +1052,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         PermanmentBeamSword = false;
         UpAOnController1 = false;
         RemoveFlashing = false;
-        Sprite = 0;
-        Tunic = "Default";
-        ShieldTunic = "Orange";
-        BeamSprite = "Default";
+        Sprite = CharacterSprite.LINK;
+        Tunic = CharacterColor.Default;
+        ShieldTunic = CharacterColor.Default;
+        BeamSprite = BeamSprites.Default;
         UseCustomRooms = false;
         DisableHUDLag = false;
     }
@@ -1185,7 +1183,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         config.StartWithReflect = bits[0];
         config.StartWithSpell = bits[1];
         config.StartWithThunder = bits[2];
-        config.StartingLives = bits[3] ? 7 : 3;
+        config.StartingLives = bits[3] ? StartingLives.LivesRandom : StartingLives.Lives4;
         config.RemoveTBird = bits[4];
         config.RestrictConnectionCaveShuffle = bits[5];
 
@@ -1201,24 +1199,19 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[3] ? 1 : 0) + (bits[4] ? 2 : 0) + (bits[5] ? 4 : 0))
         {
             case 0:
-                config.StartWithDownstab = false;
-                config.StartWithUpstab = false;
+                config.StartingTechniques = StartingTechs.NONE;
                 break;
             case 1:
-                config.StartWithDownstab = true;
-                config.StartWithUpstab = false;
+                config.StartingTechniques = StartingTechs.DOWNSTAB;
                 break;
             case 2:
-                config.StartWithDownstab = false;
-                config.StartWithUpstab = true;
+                config.StartingTechniques = StartingTechs.UPSTAB;
                 break;
             case 3:
-                config.StartWithDownstab = true;
-                config.StartWithUpstab = true;
+                config.StartingTechniques = StartingTechs.BOTH;
                 break;
             case 4:
-                config.StartWithDownstab = null;
-                config.StartWithUpstab = null;
+                config.StartingTechniques = StartingTechs.RANDOM;
                 break;
         }
 
@@ -1628,14 +1621,14 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         //These properties aren't stored in the flags, but aren't defaulted out in properties and will break if they are null.
         //Probably properties at some point should stop being a struct and default these in the right place
-        config.Sprite = 0;
-        config.Tunic = "Default";
-        config.ShieldTunic = "Orange";
-        config.BeamSprite = "Default";
+        config.Sprite = CharacterSprite.LINK;
+        config.Tunic = CharacterColor.Default;
+        config.ShieldTunic = CharacterColor.Default;
+        config.BeamSprite = BeamSprites.Default;
         config.UseCustomRooms = false;
 
-        config.BeepFrequency = 0x30;
-        config.BeepThreshold = 0x20;
+        config.BeepFrequency = BeepFrequency.Normal; // 0x30;
+        config.BeepThreshold = BeepThreshold.Normal; // 0x20;
         config.DisableMusic = false;
         config.FastSpellCasting = true;
         //ShuffleEn = false;
@@ -1872,7 +1865,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
 
         //If both stabs are random, use the classic weightings
-        if (StartWithDownstab == null && StartWithUpstab == null)
+        if (StartingTechniques == StartingTechs.RANDOM)
         {
             switch (random.Next(7))
             {
@@ -1900,13 +1893,23 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         //Otherwise I guess we'll use an independent 2/7ths as a rough approximation
         else
         {
-            properties.StartWithDownstab = StartWithDownstab ?? random.Next(7) >= 5;
-            properties.StartWithUpstab = StartWithUpstab ?? random.Next(7) >= 5;
+            properties.StartWithDownstab = StartingTechniques == StartingTechs.DOWNSTAB && random.Next(7) >= 5;
+            properties.StartWithUpstab = StartingTechniques == StartingTechs.UPSTAB && random.Next(7) >= 5;
         }
         properties.SwapUpAndDownStab = SwapUpAndDownStab ?? random.Next(2) == 1;
 
 
-        properties.StartLives = StartingLives ?? random.Next(2, 6);
+        properties.StartLives = StartingLives switch
+        {
+            StartingLives.Lives1 => 1,
+            StartingLives.Lives2 => 2,
+            StartingLives.Lives3 => 3,
+            StartingLives.Lives4 => 4,
+            StartingLives.Lives5 => 5,
+            StartingLives.Lives8 => 8,
+            StartingLives.Lives16 => 16,
+            _ => random.Next(2, 6)
+        };
         properties.PermanentBeam = PermanmentBeamSword;
         properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
@@ -2247,14 +2250,36 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.TownNameHints = EnableTownNameHints ?? random.Next(2) == 1;
 
         //Misc.
-        properties.BeepThreshold = BeepThreshold;
-        properties.BeepFrequency = BeepFrequency;
+        properties.BeepThreshold = BeepThreshold switch
+        {
+            //Normal
+            BeepThreshold.Normal => 0x20,
+            //Half Speed
+            BeepThreshold.HalfBar => 0x10,
+            //Quarter Speed
+            BeepThreshold.QuarterBar => 0x08,
+            //Off
+            BeepThreshold.TwoBars => 0x40,
+            _ => 0x20
+        };
+        properties.BeepFrequency = BeepFrequency switch
+        {
+            //Normal
+            BeepFrequency.Normal => 0x30,
+            //Half Speed
+            BeepFrequency.HalfSpeed => 0x60,
+            //Quarter Speed
+            BeepFrequency.QuarterSpeed => 0xC0,
+            //Off
+            BeepFrequency.Off => 0,
+            _ => 0x30
+        };
         properties.JumpAlwaysOn = JumpAlwaysOn;
         properties.DashAlwaysOn = DashAlwaysOn;
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
-        properties.CharSprite = CharacterSprite.ByIndex(Sprite);
+        properties.CharSprite = Sprite;
         properties.TunicColor = Tunic;
         properties.ShieldColor = ShieldTunic;
         properties.UpAC1 = UpAOnController1;

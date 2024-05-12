@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.LevelsView">
+    <Grid ColumnDefinitions="*,*">
+        <StackPanel>
+            <CheckBox Click="ShuffleAllExpClicked" Content="Shuffle All Experience">
+                <CheckBox.IsChecked>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="#AtkExp.IsChecked" />
+                        <Binding Path="#MagExp.IsChecked" />
+                        <Binding Path="#LifExp.IsChecked" />
+                    </MultiBinding>
+                </CheckBox.IsChecked>
+            </CheckBox>
+            <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
+                <StackPanel>
+                    <CheckBox Name="AtkExp" IsChecked="{Binding Config.ShuffleAttackExperience}" Content="Shuffle Attack Experience" />
+                    <CheckBox Name="MagExp" IsChecked="{Binding Config.ShuffleMagicExperience}" Content="Shuffle Magic Experience" />
+                    <CheckBox Name="LifExp" IsChecked="{Binding Config.ShuffleLifeExperience}" Content="Shuffle Life Experience" />
+                </StackPanel>
+            </Border>
+            
+            <TextBlock HorizontalAlignment="Center">Level Cap</TextBlock>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <NumericUpDown Value="{Binding Config.AttackLevelCap}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
+                <NumericUpDown Value="{Binding Config.MagicLevelCap}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
+                <NumericUpDown Value="{Binding Config.LifeLevelCap}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
+            </StackPanel>
+            <CheckBox IsChecked="{Binding Config.ScaleLevelRequirementsToCap}" Content="Scale Level Requirements To Cap" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <ComboBox assists:ComboBoxAssist.Label="Attack Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      SelectedItem="{Binding Config.AttackEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
+            <ComboBox assists:ComboBoxAssist.Label="Magic Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      SelectedItem="{Binding Config.MagicEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
+            <ComboBox assists:ComboBoxAssist.Label="Life Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      SelectedItem="{Binding Config.LifeEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
+        </StackPanel>
+    </Grid>
+</UserControl>
