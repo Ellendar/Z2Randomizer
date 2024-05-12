@@ -786,8 +786,8 @@ public class Room
     public string GetDebuggerDisplay()
     {
         StringBuilder sb = new();
-        sb.Append(Map);
-        sb.Append(Name);
+        sb.Append(Map + ' ');
+        sb.Append(Name + ' ');
         sb.Append(" [" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
         sb.Append(" [" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
         return sb.ToString();

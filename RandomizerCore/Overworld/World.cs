@@ -515,7 +515,7 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || location.ActualTown.AppearsOnMap())
+                else if (location.TerrainType != Terrain.TOWN || (location.ActualTown > 0 && location.ActualTown.AppearsOnMap()))
                 {
                     Terrain t;
                     do

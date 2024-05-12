@@ -102,7 +102,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 143;
+    private static int DEBUG_THRESHOLD = 130;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -923,24 +923,6 @@ public class Hyrule
             //logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
             //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
         }
-
-        /*
-        foreach (Collectable item in SHUFFLABLE_STARTING_ITEMS)
-        {
-            if (ItemGet[item] == false)
-            {
-                if (UNSAFE_DEBUG && count >= DEBUG_THRESHOLD)
-                {
-                    Debug.WriteLine("Failed on critical item");
-                    PrintRoutingDebug(count, wh, eh, dm, mi);
-
-                    return false;
-                }
-                itemGetReachableFailures++;
-                return false;
-            }
-        }
-        */
 
         foreach(Collectable item in ItemGet.Keys)
         {
@@ -3320,7 +3302,6 @@ public class Hyrule
             if (item.IsMajorItem() && ItemGet.ContainsKey(item))
             {
                 logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + itemLocs.Where(i => i.Collectable == item).FirstOrDefault()?.Name);
-
             }
         }
     }

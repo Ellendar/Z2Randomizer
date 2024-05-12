@@ -2,6 +2,7 @@
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Z2Randomizer.Core.Overworld;

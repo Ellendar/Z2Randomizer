@@ -1669,6 +1669,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         config.HardBosses = false;
         config.RandomizeKnockback = false;
         config.DisableHUDLag = false;
+        config.includeSpellsInShuffle = false;
+        config.includeSwordTechsInShuffle = false;
+        config.includeQuestItemsInShuffle = false;
 
 
         return config;

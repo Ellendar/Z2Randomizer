@@ -65,6 +65,10 @@ internal class RoomPool
                 .Where(i => (i.PalaceNumber == null && palaceNumber < 6) || i.PalaceNumber == palaceNumber).ToList());
             TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V4_0)
                 .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
+            foreach (KeyValuePair<string, Room> room in palaceRooms.LinkedRooms(RoomGroup.V4_0))
+            {
+                LinkedRooms.Add(room.Key, room.Value);
+            }
             foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_0, direction).ToList());
@@ -79,6 +83,10 @@ internal class RoomPool
                 .Where(i => (i.PalaceNumber == null && palaceNumber < 6) || i.PalaceNumber == palaceNumber).ToList());
             TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V4_4)
                 .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
+            foreach (KeyValuePair<string, Room> room in palaceRooms.LinkedRooms(RoomGroup.V4_4))
+            {
+                LinkedRooms.Add(room.Key, room.Value);
+            }
             foreach (Direction direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_4, direction).ToList());

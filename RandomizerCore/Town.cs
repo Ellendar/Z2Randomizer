@@ -55,7 +55,7 @@ public static class TownExtensions
             Town.NEW_KASUTO => true,
             Town.OLD_KASUTO => true,
             Town.SARIA_TABLE => false,
-            Town.BAGU => true, //Maybe this should be false because bagu has special handling
+            Town.BAGU => true,
             Town.NABOORU_FOUNTAIN => false,
             _ => throw new Exception("Unrecognized town: " + town.ToString())
         };
