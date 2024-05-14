@@ -1,20 +1,73 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.Desktop;
 
-public class DesktopFileService : IFileService
+public class DesktopFileService : IFileSystemService
 {
-    public async Task<string> OpenLocalFile(string filename)
+    private string SpriteBasePath { get; init; }
+    private string SettingsBasePath { get; init; }
+    private string PalacesBasePath { get; init; }
+
+    public DesktopFileService()
     {
-        return await File.ReadAllTextAsync(filename);
+        if (OperatingSystem.IsWindows())
+        {
+            SpriteBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/Z2Randomizer/Sprites/";
+            SettingsBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
+                               "/Z2Randomizer/";
+            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+        } else // (OperatingSystem.IsMacOS())
+        {
+            // TODO
+            SpriteBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) + "/Sprites";
+            SettingsBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+        } 
+        // else if (OperatingSystem.IsLinux())
+        // {
+        //     // TODO
+        //     SpriteBasePath = "./";
+        //     SettingsBasePath = "./";
+        //     PalacesBasePath = "./";
+        // }
+        Directory.CreateDirectory(SpriteBasePath);
+        Directory.CreateDirectory(SettingsBasePath);
+        Directory.CreateDirectory(PalacesBasePath);
     }
-    public async Task<byte[]> OpenLocalBinaryFile(string filename)
+
+    private string FullPath(IFileSystemService.RandomizerPath path, string filename) =>
+        path switch
+        {
+            IFileSystemService.RandomizerPath.Sprites => SpriteBasePath + filename,
+            IFileSystemService.RandomizerPath.Settings => SettingsBasePath + filename,
+            IFileSystemService.RandomizerPath.Palaces => PalacesBasePath + filename,
+            _ => throw new ArgumentOutOfRangeException(nameof(path), path, null)
+        };
+    
+    public async Task<string> OpenFile(IFileSystemService.RandomizerPath path, string filename)
     {
-        return await File.ReadAllBytesAsync(filename);
+        return await File.ReadAllTextAsync(FullPath(path, filename));
+    }
+
+    public async Task<byte[]> OpenBinaryFile(IFileSystemService.RandomizerPath path, string filename)
+    {
+        return await File.ReadAllBytesAsync(FullPath(path, filename));
+    }
+
+    public Task SaveFile(IFileSystemService.RandomizerPath path, string filename, string data)
+    {
+        return File.WriteAllTextAsync(FullPath(path, filename), data);
+    }
+
+    public Task<IEnumerable<string>> ListLocalFiles(IFileSystemService.RandomizerPath path)
+    {
+        return Task.FromResult(Directory.GetFiles(FullPath(path, "")).AsEnumerable());
     }
 
     public Task SaveGeneratedBinaryFile(string filename, byte[] filedata, string? path = null)

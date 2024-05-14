@@ -51,11 +51,11 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             Progress = "";
             await App.PersistState();
             var engine = App.Current?.Services?.GetService<IAsmEngine>();
-            var files = App.Current?.Services?.GetService<IFileService>();
+            var files = App.Current?.Services?.GetService<IFileSystemService>();
             var host = (HostScreen as MainViewModel)!;
             var config = host.Config;
-            var roomsJson = await files!.OpenLocalFile("PalaceRooms.json");
-            var customJson = config.UseCustomRooms ? await files.OpenLocalFile("CustomRooms.json") : null;
+            var roomsJson = await files!.OpenFile(IFileSystemService.RandomizerPath.Palaces, "PalaceRooms.json");
+            var customJson = config.UseCustomRooms ? await files.OpenFile(IFileSystemService.RandomizerPath.Palaces, "CustomRooms.json") : null;
             var rooms = config.UseCustomRooms ? customJson : roomsJson;
             var palaceRooms = new PalaceRooms(rooms!, config.UseCustomRooms);
             var randomizer = new Hyrule(engine!, palaceRooms);

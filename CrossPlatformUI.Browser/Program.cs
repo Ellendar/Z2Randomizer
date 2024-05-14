@@ -21,8 +21,9 @@ internal sealed partial class Program
         {
             App.ServiceContainer ??= new ();
             App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
-            App.ServiceContainer.AddSingleton<IFileService>(x => new BrowserFileService());
-            App.SyncSuspensionDriver = new LocalStoragePersistenceService();
+            App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
+            App.FileSystemService = new BrowserFileService();
+            // App.SyncSuspensionDriver = new LocalStoragePersistenceService();
         })
         .StartBrowserAppAsync("out");
 

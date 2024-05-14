@@ -1925,7 +1925,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.HiddenPalace = HidePalace ?? random.Next(2) == 1;
         properties.HiddenKasuto = HideKasuto ?? random.Next(2) == 1;
 
-        properties.EncounterRate = EncounterRate;
+        properties.EncounterRates = EncounterRate;
         properties.ContinentConnections = ContinentConnectionType;
         properties.BoulderBlockConnections = AllowConnectionCavesToBeBoulderBlocked;
         if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA || WestBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
@@ -2012,7 +2012,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (Climate == null)
         {
-            properties.Climate = random.Next(5) switch
+            properties.Climates = random.Next(5) switch
             {
                 0 => Climates.Classic,
                 1 => Climates.Chaos,
@@ -2024,7 +2024,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         else
         {
-            properties.Climate = Climate;
+            properties.Climates = Climate;
         }
         properties.VanillaShuffleUsesActualTerrain = VanillaShuffleUsesActualTerrain;
         properties.ShuffleHidden = ShuffleWhichLocationIsHidden ?? random.Next(2) == 1;

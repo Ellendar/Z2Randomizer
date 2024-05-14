@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Dynamic;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
@@ -35,18 +36,8 @@ public class DesktopJsEngine : IAsmEngine
             var assembly = Assembly.Load("RandomizerCore");
             initmodule.Code(assembly.ReadResource("RandomizerCore.Asm.Init.s"), "__init.s");
             asm.Modules.Insert(0, initmodule);
-            var modules = new List<List<PropertyBag>>();
-            foreach (var module in asm.Modules)
-            {
-                var outmodule = new List<PropertyBag>();
-                foreach (var dict in module.Actions)
-                {
-                    outmodule.Add(dict.ToPropertyBag());
-                }
-                modules.Add(outmodule);
-            }
             scriptEngine.Script.romdata = data;
-            scriptEngine.Script.modules = modules;
+            scriptEngine.Script.modules = asm.AsExpando();
 
             scriptEngine.Execute(new DocumentInfo { Category = ModuleCategory.Standard },  /* language=javascript */ """
 import { compile } from "js65/js65.js"
@@ -81,49 +72,5 @@ internal static class AssemblyExtensions
         using var stream = assembly.GetManifestResourceStream(name)!;
         using var reader = new BinaryReader(stream);
         return reader.ReadBytes((int)stream.Length);
-    }
-}
-
-internal static class DictionaryExtensions
-{
-    public static PropertyBag ToPropertyBag(this IDictionary<string, object> dictionary)
-    {
-        var bag = new PropertyBag();
-        foreach (var kvp in dictionary)
-        {
-            switch (kvp.Value)
-            {
-                case IDictionary<string, object> objects:
-                {
-                    var inner = objects.ToPropertyBag();
-                    bag.Add(kvp.Key, inner);
-                    break;
-                }
-                case ICollection list:
-                {
-                    var itemList = new List<object>();
-                    foreach (var item in list)
-                    {
-                        if (item is IDictionary<string, object> objs)
-                        {
-                            var bagitem = objs.ToPropertyBag();
-                            itemList.Add(bagitem);
-                        }
-                        else
-                        {
-                            itemList.Add(item);
-                        }
-                    }
-
-                    bag.Add(kvp.Key, itemList);
-                    break;
-                }
-                default:
-                    bag.Add(kvp.Key, kvp.Value);
-                    break;
-            }
-        }
-
-        return bag;
     }
 }

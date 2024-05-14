@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using RandomizerCore;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
@@ -20,7 +21,7 @@ public partial class PalaceRooms
 
     public PalaceRooms(string palaceJson, bool doValidation)
     {
-        var hash = MD5.HashData(Encoding.UTF8.GetBytes(RemoveNewLines().Replace(palaceJson, "")));
+        var hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(RemoveNewLines().Replace(palaceJson, "")));
         if (doValidation && RoomsMd5 != Convert.ToBase64String(hash))
         {
             throw new Exception("Invalid PalaceRooms.json");

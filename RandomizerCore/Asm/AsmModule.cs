@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace RandomizerCore.Asm;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
+[DataContract]
 public class AsmModule
 {
-    public readonly List<Dictionary<string, object>> Actions = [];
+    [DataMember]
+    public List<Dictionary<string, object>> Actions { get; } = [];
     
     public void Code(string asm, string name = "")
     {

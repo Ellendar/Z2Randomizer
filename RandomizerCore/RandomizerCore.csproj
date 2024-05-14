@@ -25,7 +25,9 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>22CC5DF6B2071FFA83917B5AAC93AE355BED01D9</ManifestCertificateThumbprint>
   </PropertyGroup>

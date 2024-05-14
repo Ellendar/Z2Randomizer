@@ -3,10 +3,17 @@ using System.Threading.Tasks;
 
 namespace CrossPlatformUI.Services;
 
-public interface IFileService
+public interface IFileSystemService
 {
-    Task<string> OpenLocalFile(string filename);
-    Task<byte[]> OpenLocalBinaryFile(string filename);
-    Task<IEnumerable<string>> ListLocalFiles(string path);
+    public enum RandomizerPath
+    {
+        Sprites,
+        Settings,
+        Palaces,
+    }
+    Task<string> OpenFile(RandomizerPath path, string filename);
+    Task<byte[]> OpenBinaryFile(RandomizerPath path, string filename);
+    Task SaveFile(RandomizerPath path, string filename, string data);
+    Task<IEnumerable<string>> ListLocalFiles(RandomizerPath path);
     Task SaveGeneratedBinaryFile(string filename, byte[] filedata, string? path = null);
 }
