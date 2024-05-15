@@ -136,5 +136,11 @@ internal class RoomPool
             }
         }
     }
+
+    public Dictionary<RoomEditType, List<Room>> CategorizeNormalRoomExits()
+    {
+
+    }
+
 }
 

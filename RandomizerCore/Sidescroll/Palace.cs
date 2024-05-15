@@ -38,7 +38,7 @@ public class Palace
 
     internal List<Room> AllRooms { get; private set; }
 
-    public Room Root { get => entrance; set => entrance = value; }
+    public Room Entrance { get => entrance; set => entrance = value; }
     public Room ItemRoom { get => itemRoom; set => itemRoom = value; }
     public Room BossRoom { get => bossRoom; set => bossRoom = value; }
     public int NumRooms { get => numRooms; set => numRooms = value; }

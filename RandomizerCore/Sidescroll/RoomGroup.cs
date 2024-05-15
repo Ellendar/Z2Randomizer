@@ -2,5 +2,5 @@
 
 public enum RoomGroup
 {
-    VANILLA, V4_0, V4_4
+    VANILLA, V4_0, V4_4, STUBS
 }

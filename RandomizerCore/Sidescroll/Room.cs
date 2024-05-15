@@ -21,6 +21,7 @@ public class Room
     private Room up;
     private Room down;
     public bool isUpDownReversed;
+    internal (int, int) coords;
 
     private const int sideview1 = 0x10533;
     private const int sideview2 = 0x12010;
@@ -86,20 +87,21 @@ public class Room
     public bool IsReachable { get; set; }
     public int ConnectionStartAddress { get; set; }
     public byte[] Connections { get; set; }
-    public bool IsDeadEnd {
+    public bool IsDeadEnd
+    {
         get
         {
             return (HasLeftExit() ? 1 : 0) + (HasRightExit() ? 1 : 0) + (HasUpExit() ? 1 : 0) + (HasDownExit() ? 1 : 0) == 1;
-        } 
+        }
     }
-    public bool IsPlaced { get; set; }  
+    public bool IsPlaced { get; set; }
     public byte LeftByte { get; set; }
     public byte RightByte { get; set; }
     public byte UpByte
     {
         get
         {
-            if(isUpDownReversed)
+            if (isUpDownReversed)
             {
                 return downByte;
             }
@@ -108,7 +110,7 @@ public class Room
 
         set
         {
-            if(isUpDownReversed)
+            if (isUpDownReversed)
             {
                 downByte = value;
                 return;
@@ -121,7 +123,7 @@ public class Room
     {
         get
         {
-            if(isUpDownReversed)
+            if (isUpDownReversed)
             {
                 return upByte;
             }
@@ -130,7 +132,7 @@ public class Room
 
         set
         {
-            if(isUpDownReversed)
+            if (isUpDownReversed)
             {
                 upByte = value;
                 return;
@@ -253,7 +255,7 @@ public class Room
         }
 
         byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
-        if(SideView.Length != length)
+        if (SideView.Length != length)
         {
             throw new Exception("Room length header does not match actual length for sideview: " + roomData.sideviewData.ToString());
         }
@@ -266,17 +268,17 @@ public class Room
 
     public void WriteSideViewPtr(AsmModule a, string label)
     {
-        if(PalaceGroup <= 0 || PalaceGroup > 3)
+        if (PalaceGroup <= 0 || PalaceGroup > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
         int addr;
-        if(PalaceGroup == 1)
+        if (PalaceGroup == 1)
         {
             a.Segment("PRG4");
             addr = sideview1;
         }
-        else if(PalaceGroup == 2)
+        else if (PalaceGroup == 2)
         {
             a.Segment("PRG4");
             addr = sideview2;
@@ -293,10 +295,10 @@ public class Room
     public void UpdateEnemies(int enemyAddr, ROM ROMData)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
-        if(NewEnemies[0] == 0)
+        if (NewEnemies[0] == 0)
         {
             NewEnemies = Enemies;
-        }        
+        }
         //#76: If the item room is a boss item room, and it's in palace group 1, move the boss up 1 tile.
         //For some reason a bunch of the boss item rooms are fucked up in a bunch of different ways, so i'm keeping digshake's catch-all
         //though repositioned into the place it belongs.
@@ -369,11 +371,11 @@ public class Room
         {
             ptr = Group2ItemGetStartAddress;
         }
-        else if(PalaceGroup == 3)
+        else if (PalaceGroup == 3)
         {
             ptr = Group3ItemGetStartAddress;
         }
-        if(Map % 2 == 0)
+        if (Map % 2 == 0)
         {
             byte old = ROMData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0x0F);
@@ -429,10 +431,10 @@ public class Room
         byte data = ROMData.GetByte(ptr);
         data = (byte)(data & 0xF0);
         data = (byte)(data >> 4);
-        byte data2 = ROMData.GetByte(ptr+1);
+        byte data2 = ROMData.GetByte(ptr + 1);
         while (data >= 13 || data2 != 0x0F)
         {
-            ptr+=2;
+            ptr += 2;
             data = ROMData.GetByte(ptr);
             data = (byte)(data & 0xF0);
             data = (byte)(data >> 4);
@@ -503,7 +505,7 @@ public class Room
     public int CountOpenExits()
     {
         int exits = 0;
-        if(HasRightExit() && Right == null)
+        if (HasRightExit() && Right == null)
         {
             exits++;
         }
@@ -584,7 +586,7 @@ public class Room
         int? firstGenerator = null;
         int enemiesLength = (int)Enemies[0] - 1;
         NewEnemies[0] = Enemies[0];
-        for (int i = 1; i <= enemiesLength; i+=2)
+        for (int i = 1; i <= enemiesLength; i += 2)
         {
             NewEnemies[i] = Enemies[i];
             int enemyNumber = Enemies[i + 1] & 0x3F;
@@ -633,9 +635,9 @@ public class Room
                     continue;
                 }
                 else if (shufflableSmallEnemies.Contains(enemyNumber))
-                { 
+                {
                     int swap = RNG.Next(0, smallEnemies.Length);
-                    NewEnemies[i+1] = (byte)(smallEnemies[swap] + enemyPage);
+                    NewEnemies[i + 1] = (byte)(smallEnemies[swap] + enemyPage);
                     continue;
                 }
             }
@@ -687,7 +689,7 @@ public class Room
     public string PrintUnsatisfiedExits()
     {
         StringBuilder sb = new();
-        if(HasLeftExit() && Left == null)
+        if (HasLeftExit() && Left == null)
         {
             sb.Append("(Left) ");
         }
@@ -786,11 +788,115 @@ public class Room
     public string GetDebuggerDisplay()
     {
         StringBuilder sb = new();
-        sb.Append(Map + ' ');
-        sb.Append(Name + ' ');
-        sb.Append(" [" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
-        sb.Append(" [" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
+        sb.Append(Map + " ");
+        sb.Append(Name + " ");
+        sb.Append("[" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
+        sb.Append("[" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
         return sb.ToString();
+    }
+
+
+    private const int CONFLICT = -99;
+    public int FitsWithDown(Room? down)
+    {
+        if (down == null)
+        {
+            return 0;
+        }
+        //No down
+        if (!HasDownExit() && !HasDrop)
+        {
+            return CONFLICT;
+        }
+        //Elevator down
+        if (HasDownExit() && ElevatorScreen >= 0)
+        {
+            return down.HasUpExit() ? 1 : CONFLICT;
+        }
+        //Drop down
+        if (HasDrop)
+        {
+            return down.IsDropZone ? 1 : CONFLICT;
+        }
+        throw new ImpossibleException("Room " + Name + " is marked as a down exit with no elevator or drop.");
+    }
+
+    public int FitsWithUp(Room? up)
+    {
+        if (up == null)
+        {
+            return 0;
+        }
+        //No up
+        if (!HasUpExit() && !IsDropZone)
+        {
+            return CONFLICT;
+        }
+        //Elevator up
+        if (HasUpExit() && ElevatorScreen >= 0)
+        {
+            return up.HasDownExit() ? 1 : CONFLICT;
+        }
+        //Drop into
+        if (IsDropZone)
+        {
+            return up.HasDrop ? 1 : CONFLICT;
+        }
+        throw new ImpossibleException("Room " + Name + " is marked as a up exit with no elevator or drop.");
+    }
+
+    public int FitsWithLeft(Room? left)
+    {
+        if (left == null)
+        {
+            return 0;
+        }
+        //No left
+        if (!HasLeftExit())
+        {
+            return CONFLICT;
+        }
+        return left.HasRightExit() ? 1 : CONFLICT;
+    }
+    public int FitsWithRight(Room? right)
+    {
+        if (right == null)
+        {
+            return 0;
+        }
+        //No left
+        if (!HasRightExit())
+        {
+            return CONFLICT;
+        }
+        return right.HasLeftExit() ? 1 : CONFLICT;
+    }
+
+    public List<(int, int)> GetOpenExitCoords()
+    {
+        List<(int, int)> exitCoords = [];
+        if (coords == (0, 0) && !IsRoot)
+        {
+            throw new Exception("Uninitialized coordinates referenced in coordinate palace generation");
+        }
+        if (HasLeftExit() && Left == null)
+        {
+            exitCoords.Add((coords.Item1 - 1, coords.Item2));
+        }
+        if (HasRightExit() && Right == null)
+        {
+            exitCoords.Add((coords.Item1 + 1, coords.Item2));
+        }
+        if (HasUpExit() && Up == null)
+        {
+            exitCoords.Add((coords.Item1, coords.Item2 + 1));
+        }
+        if (HasDownExit() && Down == null)
+        {
+            exitCoords.Add((coords.Item1, coords.Item2 - 1));
+        }
+
+        return exitCoords;
     }
 }
 
@@ -828,7 +934,7 @@ public class RoomJsonConverter : JsonConverter<Room>
         writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
 
         writer.WritePropertyName("bitmask");
-        writer.WriteValue(BitConverter.ToString(new Byte[] { value.itemGetBits }).Replace("-", ""));
+        writer.WriteValue(BitConverter.ToString([value.itemGetBits]).Replace("-", ""));
 
         writer.WritePropertyName("requirements");
         writer.WriteRawValue(value.Requirements.Serialize());

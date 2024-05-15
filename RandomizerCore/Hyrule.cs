@@ -3062,19 +3062,19 @@ public class Hyrule
             palaces[eastHyrule.locationAtGP.PalaceNumber - 1].UpdateItem(eastHyrule.locationAtGP.Collectable, ROMData);
         }
 
-        Room root = palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Root;
+        Room root = palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance;
         ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, (byte)root.Map);
-        root = palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Root;
+        root = palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance;
         ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, (byte)root.Map);
-        root = palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Root;
+        root = palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance;
         ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, (byte)root.Map);
-        root = palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Root;
+        root = palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance;
         ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, (byte)root.Map);
-        root = palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Root;
+        root = palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance;
         ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, (byte)root.Map);
-        root = palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Root;
+        root = palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Entrance;
         ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, (byte)root.Map);
-        root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Root;
+        root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance;
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, (byte)root.Map);
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47

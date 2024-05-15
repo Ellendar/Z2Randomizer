@@ -32,11 +32,11 @@ public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
             _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
         };
 
-        palace.Root = new(roomPool.Entrances.First());
-        palace.Root.PalaceGroup = palaceGroup;
+        palace.Entrance = new(roomPool.Entrances.First());
+        palace.Entrance.PalaceGroup = palaceGroup;
         palace.BossRoom = new(roomPool.BossRooms.First());
         palace.BossRoom.PalaceGroup = palaceGroup;
-        palace.AllRooms.Add(palace.Root);
+        palace.AllRooms.Add(palace.Entrance);
         if (palaceNumber != 7)
         {
             Room itemRoom = new(roomPool.ItemRoom);

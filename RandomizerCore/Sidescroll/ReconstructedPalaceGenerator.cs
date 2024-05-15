@@ -43,12 +43,12 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
             {
                 palace = new(palaceNumber);
-                palace.Root = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
+                palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
                 {
                     IsRoot = true,
                     PalaceGroup = palaceGroup
                 };
-                palace.AllRooms.Add(palace.Root);
+                palace.AllRooms.Add(palace.Entrance);
 
                 palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
                 palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
@@ -90,7 +90,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         palace.AllRooms.Add(segmentedItemRoom2);
                         palace.SetOpenRoom(segmentedItemRoom2);
                     }
-                    palace.SetOpenRoom(palace.Root);
+                    palace.SetOpenRoom(palace.Entrance);
                 }
                 else //GP
                 {
@@ -101,7 +101,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         palace.Tbird.PalaceGroup = 3;
                         palace.AllRooms.Add(palace.Tbird);
                     }
-                    palace.SetOpenRoom(palace.Root);
+                    palace.SetOpenRoom(palace.Entrance);
 
                 }
 
