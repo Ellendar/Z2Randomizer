@@ -2,7 +2,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
-using CommandLine;
 using CrossPlatformUI.Services;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;

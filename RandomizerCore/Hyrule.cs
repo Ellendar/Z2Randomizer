@@ -489,12 +489,10 @@ public class Hyrule
         return ROMData.rawdata;
     }
 
-    private byte[] ConvertHash(byte[] hash)
+    private static byte[] ConvertHash(byte[] hash)
     {
         var inthash = BitConverter.ToInt64(hash, 0);
-
-        return new byte[]
-        {
+        return [
             (byte)(((inthash >> 0)  & 0x1F) + 0xD0),
             0xf4,
             (byte)(((inthash >> 5)  & 0x1F) + 0xD0),
@@ -505,21 +503,8 @@ public class Hyrule
             0xf4,
             (byte)(((inthash >> 20)  & 0x1F) + 0xD0),
             0xf4,
-            (byte)(((inthash >> 25)  & 0x1F) + 0xD0),
-        };
-        // str[0] = (byte)(((inthash >> 0)  & 0x1F) + 0xD0);
-        // str += (char)(((inthash >> 5)  & 0x1F)) + " ";
-        // str += (char)(((inthash >> 10) & 0x1F) + 'A') + " ";
-        // str += (char)(((inthash >> 15) & 0x1F) + 'A') + " ";
-        // str += (char)(((inthash >> 20) & 0x1F) + 'A') + " ";
-        // str += (char)(((inthash >> 25) & 0x1F) + 'A') + " ";
-        // return str;
-        // ROMData.Put(0x17C2C,  + 0xD0));
-        // ROMData.Put(0x17C2E, (byte)(((inthash >> 5) & 0x1F) + 0xD0));
-        // ROMData.Put(0x17C30, (byte)(((inthash >> 10) & 0x1F) + 0xD0));
-        // ROMData.Put(0x17C32, (byte)(((inthash >> 15) & 0x1F) + 0xD0));
-        // ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
-        // ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
+            (byte)(((inthash >> 25)  & 0x1F) + 0xD0)
+        ];
     }
 
     /*
