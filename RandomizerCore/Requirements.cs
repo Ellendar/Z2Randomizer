@@ -15,8 +15,8 @@ public class Requirements
 
     public Requirements(bool individualRequirementsAreAnds = false)
     {
-        IndividualRequirements = new RequirementType[] { };
-        CompositeRequirements = new RequirementType[][] { };
+        IndividualRequirements = [];
+        CompositeRequirements = [];
         IndividualRequirementsAreAnds = individualRequirementsAreAnds;
     }
 
@@ -32,67 +32,47 @@ public class Requirements
         CompositeRequirements = compositeRequirements;
     }
 
-    public Requirements(string json)
+    public Requirements(string? json)
     {
-        if(json == null)
-        {
-            IndividualRequirements = new RequirementType[] { };
-            CompositeRequirements = new RequirementType[][] { };
-            return;
-        }
-        dynamic requirementsDynamic = JsonConvert.DeserializeObject(json);
-        List<List<RequirementType>> compositeReqirements = new();
-        List<RequirementType> individualRequirements = new();
-        foreach(dynamic requirement in requirementsDynamic)
-        {
-            if (requirement is JArray)
-            {
-                List<RequirementType> compositeRequirementComponents = new();
-                foreach (dynamic subRequirement in requirement)
-                {
-                    compositeRequirementComponents.Add((RequirementType)Enum.Parse(typeof(RequirementType), (string)subRequirement));
-                }
-                compositeReqirements.Add(compositeRequirementComponents);
-            }
-            else
-            {
-                individualRequirements.Add((RequirementType)Enum.Parse(typeof(RequirementType), (string)requirement));
-            }
-        }
-
-        IndividualRequirements = individualRequirements.ToArray();
-        CompositeRequirements = compositeReqirements.Select(i => i.ToArray()).ToArray();
+        var n = Deserialize(json);
+        IndividualRequirements = n?.IndividualRequirements ?? [];
+        CompositeRequirements = n?.CompositeRequirements ?? [];
     }
 
+    public Requirements? Deserialize(string? json)
+    {
+        return JsonConvert.DeserializeObject<Requirements>(json ?? "[]");
+    }
+    
     public string Serialize()
     {
         StringBuilder sb = new();
-        sb.Append("[");
-        for (int i = 0; i < IndividualRequirements.Length; i++)
+        sb.Append('[');
+        foreach (var t in IndividualRequirements)
         {
             sb.Append('"');
-            sb.Append(IndividualRequirements[i].ToString());
+            sb.Append(t.ToString());
             sb.Append('"');
-            sb.Append(",");
+            sb.Append(',');
         }
-        for (int i = 0; i < CompositeRequirements.Length; i++)
+        foreach (var t in CompositeRequirements)
         {
-            sb.Append("[");
-            for (int j = 0; j < CompositeRequirements[i].Length; j++)
+            sb.Append('[');
+            foreach (var t1 in t)
             {
                 sb.Append('"');
-                sb.Append(CompositeRequirements[i][j].ToString());
+                sb.Append(t1.ToString());
                 sb.Append('"');
-                sb.Append(",");
+                sb.Append(',');
             }
             sb.Remove(sb.Length - 1, 1);
-            sb.Append("]");
+            sb.Append(']');
         }
-        if (sb.Length > 1 && sb[sb.Length - 1] != ']')
+        if (sb.Length > 1 && sb[^1] != ']')
         {
             sb.Remove(sb.Length - 1, 1);
         }
-        sb.Append("]");
+        sb.Append(']');
 
         return sb.ToString();
     }
@@ -105,15 +85,17 @@ public class Requirements
     public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables)
     {
 
-        bool individualRequirementsSatisfied = false;
-        foreach (RequirementType requirement in IndividualRequirements)
+        var individualRequirementsSatisfied = false;
+        var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
+        foreach (var requirement in IndividualRequirements)
         {
-            if (requireables.Contains(requirement) && !IndividualRequirementsAreAnds)
+            if (requirementTypes.Contains(requirement) && !IndividualRequirementsAreAnds)
             {
                 individualRequirementsSatisfied = true;
                 break;
             }
-            else if(IndividualRequirementsAreAnds)
+
+            if(IndividualRequirementsAreAnds)
             {
                 return false;
             }
@@ -123,31 +105,22 @@ public class Requirements
             return false;
         }
 
-        bool compositeRequirementSatisfied = CompositeRequirements.Length == 0;
-        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
-        {
-            if(compositeRequirement.All(i => requireables.Contains(i)))
-            {
-                compositeRequirementSatisfied = true;
-                break;
-            }
-        }
+        var compositeRequirementSatisfied = 
+            CompositeRequirements.Length == 0 || CompositeRequirements.Any(compositeRequirement =>
+            compositeRequirement.All(i => requirementTypes.Contains(i)));
         return compositeRequirementSatisfied;
     }
 
     public bool HasHardRequirement(RequirementType requireable)
     {
-        foreach (RequirementType requirement in IndividualRequirements)
+        if (IndividualRequirements.Any(requirement => requirement != requireable))
         {
-            if (requirement != requireable)
-            {
-                return false;
-            }
+            return false;
         }
-        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
+        foreach (var compositeRequirement in CompositeRequirements)
         {
-            bool containsRequireable = false;
-            foreach (RequirementType requirement in compositeRequirement)
+            var containsRequireable = false;
+            foreach (var requirement in compositeRequirement)
             {
                 if (requirement != requireable)
                 {
@@ -165,13 +138,35 @@ public class Requirements
 
 public class RequirementsJsonConverter : JsonConverter<Requirements>
 {
-    public override Requirements ReadJson(JsonReader reader, Type objectType, Requirements existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override Requirements ReadJson(JsonReader reader, Type objectType, Requirements? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
-        return new Requirements(reader.ReadAsString());
+        var jToken = JToken.Load(reader);
+        if (jToken.Type != JTokenType.Array)
+            return new Requirements();
+        List<RequirementType> individualReqs = [];
+        List<List<RequirementType>> compositeReqs = []; 
+        foreach (var req in jToken.ToObject<List<JToken>>()!)
+        {
+            switch (req.Type)
+            {
+                case JTokenType.String:
+                    individualReqs.Add((RequirementType)Enum.Parse(typeof(RequirementType), req.ToString()));
+                    break;
+                case JTokenType.Array:
+                    List<RequirementType> newComp = [];
+                    compositeReqs.Add(newComp);
+                    var comps = req.ToObject<List<JToken>>()!.Select(comp =>
+                        (RequirementType)Enum.Parse(typeof(RequirementType), comp.ToString()));
+                    newComp.AddRange(comps);
+                    break;
+            }
+        }
+        return new Requirements(individualReqs.ToArray(),
+            compositeReqs.Select(i => i.ToArray()).ToArray());
     }
 
-    public override void WriteJson(JsonWriter writer, Requirements value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, Requirements? value, JsonSerializer serializer)
     {
-        writer.WriteRaw(value.Serialize());
+        writer.WriteRaw(value?.Serialize() ?? "[]");
     }
 }

@@ -22,13 +22,13 @@ public class DesktopFileService : IFileSystemService
                              "/Z2Randomizer/Sprites/";
             SettingsBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
                                "/Z2Randomizer/";
-            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)! + "/";
+            PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
         } else // (OperatingSystem.IsMacOS())
         {
             // TODO
-            SpriteBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) + "/Sprites/";
-            SettingsBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)! + "/";
-            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)! + "/";
+            SpriteBasePath = Path.GetDirectoryName(AppContext.BaseDirectory) + "/Sprites/";
+            SettingsBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
+            PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
         } 
         // else if (OperatingSystem.IsLinux())
         // {

@@ -12,17 +12,17 @@ public class RequirementsTests
     [TestMethod]
     public void TestJsonConstructor()
     {
-        string json = @"[""JUMP"",""FAIRY"",""KEY"",[""DASH"",""JUMP""]]";
+        string? json = @"[""JUMP"",""FAIRY"",""KEY"",[""DASH"",""JUMP""]]";
         Requirements requirements = new Requirements(json);
-        string serialized = requirements.Serialize();
+        string? serialized = requirements.Serialize();
         Assert.AreEqual(json, serialized);
     }
 
     public void TestEmptyJsonConstructor()
     {
-        string json = @"[]";
+        string? json = @"[]";
         Requirements requirements = new Requirements(json);
-        string serialized = requirements.Serialize();
+        string? serialized = requirements.Serialize();
         Assert.AreEqual(json, serialized);
     }
 

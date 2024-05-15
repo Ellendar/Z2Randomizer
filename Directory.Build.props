@@ -3,9 +3,9 @@
     <Nullable>enable</Nullable>
     <AvaloniaVersion>11.1.0-beta2</AvaloniaVersion>
 <!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
-<!--    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>-->
-<!--    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>-->
-<!--    <TrimmerSingleWarn>false</TrimmerSingleWarn>-->
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <TrimmerSingleWarn>true</TrimmerSingleWarn>
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
   </PropertyGroup>
 </Project>

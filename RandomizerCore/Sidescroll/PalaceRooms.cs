@@ -26,10 +26,10 @@ public partial class PalaceRooms
         {
             throw new Exception("Invalid PalaceRooms.json");
         }
-        dynamic rooms = JsonConvert.DeserializeObject(palaceJson)!;
-        foreach (var obj in rooms)
+
+        var rooms = JsonConvert.DeserializeObject<List<Room>>(palaceJson)!;
+        foreach (var room in rooms)
         {
-            Room room = new(obj.ToString());
             if (room.Enabled)
             {
                 if (!roomsByGroup.TryGetValue(room.Group, out var value))
@@ -37,7 +37,7 @@ public partial class PalaceRooms
                     value = [];
                     roomsByGroup.Add(room.Group, value);
                 }
-
+            
                 value.Add(room);
             }
             roomsByName[room.Name] = room;
