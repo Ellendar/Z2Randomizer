@@ -2,7 +2,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
-using CommandLine;
 using CrossPlatformUI.Services;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
@@ -24,8 +23,8 @@ public static class Program
             {
                 App.ServiceContainer ??= new ();
                 App.ServiceContainer.AddSingleton<IAsmEngine>(x => new DesktopJsEngine());
-                App.ServiceContainer.AddSingleton<IFileService>(x => new DesktopFileService());
-                App.SyncSuspensionDriver = new LocalFilePersistenceService();
+                App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
+                App.FileSystemService = new DesktopFileService();
                 // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
             })
             .StartWithClassicDesktopLifetime(args);

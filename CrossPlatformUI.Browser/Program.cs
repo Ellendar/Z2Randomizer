@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
 using Avalonia.ReactiveUI;
+using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using RandomizerCore.Asm;
 
@@ -20,7 +21,9 @@ internal sealed partial class Program
         {
             App.ServiceContainer ??= new ();
             App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
-            App.SyncSuspensionDriver = new LocalStoragePersistenceService();
+            App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
+            App.FileSystemService = new BrowserFileService();
+            // App.SyncSuspensionDriver = new LocalStoragePersistenceService();
         })
         .StartBrowserAppAsync("out");
 

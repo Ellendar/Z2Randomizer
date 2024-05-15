@@ -84,13 +84,13 @@ public class SpritePreviewViewModel : ReactiveObject
             if (token.IsCancellationRequested)
                 return;
             Options.Add(link);
-            var fileservice = App.Current?.Services?.GetService<IFileService>()!;
-            var files = await fileservice.ListLocalFiles("Sprites");
+            var fileservice = App.Current?.Services?.GetService<IFileSystemService>()!;
+            var files = await fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites);
             var spriteFiles = files.Where(x => x.EndsWith(".ips")).ToList();
             foreach (var spriteFile in spriteFiles)
             {
-                var patch = await fileservice.OpenLocalBinaryFile(spriteFile);
-                string parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
+                var patch = await fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile);
+                var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
                 var ch = new CharacterSprite(parsedName, patch);
                 var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, patch, ch);
                 await loaded.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);

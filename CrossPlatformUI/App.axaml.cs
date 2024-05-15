@@ -1,10 +1,12 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -17,6 +19,8 @@ using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ReactiveUI;
 
 namespace CrossPlatformUI;
@@ -30,7 +34,11 @@ public sealed partial class App : Application // , IDisposable
 
     public static ServiceCollection? ServiceContainer;
 
-    public static ISuspendSyncService? SyncSuspensionDriver;
+    public static IFileSystemService? FileSystemService;
+    
+    public static TopLevel TopLevel { get; private set; }
+
+    public MainView MainView;
 
     private object? state;
     
@@ -64,16 +72,33 @@ public sealed partial class App : Application // , IDisposable
         
         // ReactiveUI's suspension stuff doesn't work on browser either. So hack that together too.
         // var state = RxApp.SuspensionHost.GetAppState<MainViewModel>();
+        
+        ServiceContainer ??= new ();
+        
         try
         {
-            state = SyncSuspensionDriver!.LoadState() ?? new MainViewModel();
+            // var files = Current?.Services?.GetService<IFileSystemService>()!;
+            // var files = ServiceContainer.First(service => service.ServiceType == typeof(IFileSystemService)).;
+            var files = FileSystemService!;
+            var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
+            state = JsonConvert.DeserializeObject<object>(json, serializerSettings);
         }
         catch (Exception)
         {
-            state = new MainViewModel();
+            state = null;
         }
-        
-        ServiceContainer ??= new ();
+
+        if (state == null)
+        {
+            if (OperatingSystem.IsBrowser())
+            {
+                state = new MainViewModel();
+            }
+            else
+            {
+                state = new MainWindowViewModel();
+            }   
+        }
         
         switch (ApplicationLifetime)
         {
@@ -83,13 +108,16 @@ public sealed partial class App : Application // , IDisposable
                     PersistStateInternal().Wait();
                 };
                 // isLaunchingNew.OnNext(Unit.Default);
-
+                var context = state as MainWindowViewModel;
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = state
+                    DataContext = state,
+                    Position = context!.WindowPosition,
+                    Width = context.WindowSize.Width,
+                    Height = context.WindowSize.Height,
                 };
 
-                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(desktop.MainWindow));
+                TopLevel = TopLevel.GetTopLevel(desktop.MainWindow)!;
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:
                 singleViewPlatform.MainView = new MainView
@@ -97,10 +125,11 @@ public sealed partial class App : Application // , IDisposable
                     DataContext = state
                 };
 
-                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
+                TopLevel = TopLevel.GetTopLevel(singleViewPlatform.MainView)!;
                 break;
         }
 
+        ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
         Services = ServiceContainer.BuildServiceProvider();
         
         base.OnFrameworkInitializationCompleted();
@@ -111,14 +140,42 @@ public sealed partial class App : Application // , IDisposable
         return Current!.PersistStateInternal();
     }
     
+    private readonly JsonSerializerSettings serializerSettings = new()
+    {
+        TypeNameHandling = TypeNameHandling.All,
+    };
+    
     private Task PersistStateInternal()
     {
         // var tcs = new TaskCompletionSource();
         // shouldPersistState.OnNext(Disposable.Create(() => tcs.SetResult()));
         // return tcs.Task;
-        return Task.Run(() =>
+        return Task.Run(async () =>
         {
-            SyncSuspensionDriver!.SaveState(state!);
+            var files = Current?.Services?.GetService<IFileSystemService>()!;
+            var json = JsonConvert.SerializeObject(state, serializerSettings);
+            var next = JObject.Parse(json);
+            try
+            {
+                var settings = await files.OpenFile(IFileSystemService.RandomizerPath.Settings, "Settings.json");
+                var orig = JObject.Parse(settings ?? "{}");
+                orig.Merge(next, new JsonMergeSettings
+                {
+                    // union array values together to avoid duplicates
+                    MergeArrayHandling = MergeArrayHandling.Union,
+                });
+                next = orig;
+            }
+            catch (Exception e) when (e is JsonException or IOException) { }
+
+            var stringbuild = new StringBuilder();
+            await using var sw = new StringWriter(stringbuild);
+            await using var writer = new JsonTextWriter(sw);
+            writer.Formatting = Formatting.None;
+            next.WriteTo(writer);
+            await files.SaveFile(IFileSystemService.RandomizerPath.Settings, "Settings.json", stringbuild.ToString());
+            // SetItem("appstate", stringbuild.ToString());
+            // SyncSuspensionDriver!.SaveState(state!);
         });
     }
 

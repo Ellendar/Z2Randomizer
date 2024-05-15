@@ -2030,7 +2030,7 @@ public partial class MainUI : Form
         var cts = new CancellationTokenSource();
         var ct = cts.Token;
         byte[] vanillaRomData = File.ReadAllBytes(romFileTextBox.Text.Trim());
-        var task = randomizer.Randomize(vanillaRomData, config, str => f3.BeginInvoke(delegate { f3.setText(str); }), ct);
+        var task = randomizer.Randomize(vanillaRomData, config, UpdateProgress, ct);
         while (!task.IsCompleted)
         {
             if (worker.CancellationPending)
@@ -2040,6 +2040,11 @@ public partial class MainUI : Form
             }
             Thread.Sleep(50);
         }
+    }
+
+    private async Task UpdateProgress(string str)
+    {
+        await Task.Run(() => f3.BeginInvoke(delegate { f3.setText(str); }));
     }
 
     private void PalaceBox_SelectedIndexChanged(object sender, EventArgs e)

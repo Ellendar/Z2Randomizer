@@ -7,6 +7,7 @@ using System.Linq;
 using Z2Randomizer.Core;
 
 namespace Z2Randomizer.Core.Overworld;
+
 public class Climate
 {
     public float[] DistanceCoefficients { get; }

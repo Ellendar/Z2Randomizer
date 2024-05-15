@@ -1,9 +1,9 @@
-import { Assembler } from "js65/assembler.js"
-import { Cpu } from "js65/cpu.js"
-import { Linker } from "js65/linker.js"
-import { Preprocessor } from "js65/preprocessor.js"
-import { Tokenizer } from "js65/tokenizer.js"
-import { TokenStream } from "js65/tokenstream.js"
+import { Assembler } from "./assembler.js"
+import { Cpu } from "./cpu.js"
+import { Linker } from "./linker.js"
+import { Preprocessor } from "./preprocessor.js"
+import { Tokenizer } from "./tokenizer.js"
+import { TokenStream } from "./tokenstream.js"
 
 async function processAction(a, action) {
     switch (action["action"]) {
@@ -59,23 +59,35 @@ async function processAction(a, action) {
     }
 }
 export async function compile(modules,romdata) {
+    // debugger;
+    let mods = modules;
+    if (typeof romdata === 'string') {
+        mods = JSON.parse(modules);
+    }
     // Assemble all of the modules
     const assembled = [];
-    for (const module of modules) {
+    for (const module of mods) {
         let a = new Assembler(Cpu.P02);
         for (const action of module) {
             await processAction(a, action);
         }
         assembled.push(a);
     }
-
+    
+    let rombytes = romdata;
+    if (typeof romdata === 'string') {
+        rombytes = new Uint8Array(window.base64ToArrayBuffer(romdata));
+    }
     // And now link them together
     const linker = new Linker();
-    linker.base(romdata, 0);
+    linker.base(rombytes, 0);
     for (const m of assembled) {
         linker.read(m.module());
     }
     const out = linker.link();
-    out.apply(romdata);
-    return out;
+    out.apply(rombytes);
+    if (typeof romdata === 'string') {
+        rombytes = window.arrayBufferToBase64(rombytes);
+    }
+    return rombytes;
 }

@@ -30,7 +30,7 @@ internal class StatisticsDbContext : DbContext
     {
         modelBuilder
         .Entity<RandomizerProperties>()
-        .Property(e => e.Climate)
+        .Property(e => e.Climates)
         .HasConversion(
             v => v.Name,
             v => Climates.ByName(v));

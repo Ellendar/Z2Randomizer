@@ -252,7 +252,7 @@ public class WestHyrule : World
         biome = props.WestBiome;
 
         //Climate filtering
-        climate = props.Climate.Clone();
+        climate = props.Climates.Clone();
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -15,6 +17,19 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
 {
     // TODO put this in appdata
     public const string SettingsFilename = "Settings.json";
+    public string SettingsPath;
+
+    public LocalFilePersistenceService()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            
+        }
+        else if (OperatingSystem.IsMacOS())
+        {
+            
+        }
+    }
     
     private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
     {
@@ -55,5 +70,10 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         {
             File.Delete(SettingsFilename);
         } catch (IOException e) {}
+    }
+    
+    public Task<IEnumerable<string>> ListLocalFiles(string path)
+    {
+        return Task.FromResult(Directory.GetFiles(path).AsEnumerable());
     }
 }

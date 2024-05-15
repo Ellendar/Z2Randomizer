@@ -9,6 +9,8 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <InvariantGlobalization>true</InvariantGlobalization>
         <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <PublishSingleFile>true</PublishSingleFile>
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -22,7 +24,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
     </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.5" />
+		<PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Linux'))" />
+		<PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('OSX'))" />
+		<PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
+	</ItemGroup>
 </Project>

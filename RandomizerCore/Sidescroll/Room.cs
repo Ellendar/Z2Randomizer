@@ -5,12 +5,22 @@ using Z2Randomizer.Core.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using RandomizerCore.Asm;
+using JsonConverter = Newtonsoft.Json.JsonConverter;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
+[DataContract]
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Room
 {
@@ -18,8 +28,8 @@ public class Room
 
     private byte upByte;
     private byte downByte;
-    private Room up;
-    private Room down;
+    private Room? up;
+    private Room? down;
     public bool isUpDownReversed;
     internal (int, int) coords;
 
@@ -33,25 +43,22 @@ public class Room
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
-    public byte itemGetBits;
+    [DataMember(Name = "bitmask")]
+    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
+    public byte[] ItemGetBits { get; set; }
 
+    [DataMember]
     public int Map { get; set; }
+    [DataMember]
     public int? PalaceGroup { get; set; }
-
+    [DataMember]
     public bool IsRoot { get; set; }
     public Room LinkedRoom { get; set; }
-    public Room Left { get; set; }
-    public Room Right { get; set; }
-    public Room Up
+    public Room? Left { get; set; }
+    public Room? Right { get; set; }
+    public Room? Up
     {
-        get
-        {
-            if (isUpDownReversed)
-            {
-                return down;
-            }
-            return up;
-        }
+        get => isUpDownReversed ? down : up;
 
         set
         {
@@ -63,16 +70,9 @@ public class Room
             up = value;
         }
     }
-    public Room Down
+    public Room? Down
     {
-        get
-        {
-            if (isUpDownReversed)
-            {
-                return up;
-            }
-            return down;
-        }
+        get => isUpDownReversed ? up : down;
 
         set
         {
@@ -84,30 +84,24 @@ public class Room
             down = value;
         }
     }
+    [DataMember]
     public bool IsReachable { get; set; }
+    [DataMember]
     public int ConnectionStartAddress { get; set; }
+    [DataMember]
+    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
     public byte[] Connections { get; set; }
-    public bool IsDeadEnd
-    {
-        get
-        {
-            return (HasLeftExit() ? 1 : 0) + (HasRightExit() ? 1 : 0) + (HasUpExit() ? 1 : 0) + (HasDownExit() ? 1 : 0) == 1;
-        }
-    }
+
+    public bool IsDeadEnd => (HasLeftExit() ? 1 : 0) + (HasRightExit() ? 1 : 0) + (HasUpExit() ? 1 : 0) + (HasDownExit() ? 1 : 0) == 1;
+    [DataMember]
+>>>>>>> 71e219295cccd646719a977df6c28b66103caded
     public bool IsPlaced { get; set; }
     public byte LeftByte { get; set; }
     public byte RightByte { get; set; }
     public byte UpByte
     {
-        get
-        {
-            if (isUpDownReversed)
-            {
-                return downByte;
-            }
-            return upByte;
-        }
-
+        get => isUpDownReversed ? downByte : upByte;
+		
         set
         {
             if (isUpDownReversed)
@@ -118,17 +112,9 @@ public class Room
             upByte = value;
         }
     }
-
     public byte DownByte
     {
-        get
-        {
-            if (isUpDownReversed)
-            {
-                return upByte;
-            }
-            return downByte;
-        }
+        get => isUpDownReversed ? upByte : downByte;
 
         set
         {
@@ -140,51 +126,95 @@ public class Room
             downByte = value;
         }
     }
-
     public bool IsBeforeTbird { get; set; }
 
+    [DataMember]
     public bool HasDrop { get; set; }
+    [DataMember]
     public int ElevatorScreen { get; set; }
     //public bool IsFairyBlocked { get; set; }
     //public bool IsUpstabBlocked { get; set; }
     //public bool IsDownstabBlocked { get; set; }
     //public bool IsGloveBlocked { get; set; }
     //public bool IsJumpBlocked { get; set; }
-    [JsonConverter(typeof(RequirementsJsonConverter))]
+    [DataMember]
+    [Newtonsoft.Json.JsonConverter(typeof(RequirementsJsonConverter))]
     public Requirements Requirements { get; set; }
+    [DataMember]
     public bool IsDropZone { get; set; }
+    [DataMember]
     public bool HasItem { get; set; }
+    [DataMember]
+    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
     public byte[] Enemies { get; set; }
     public byte[] NewEnemies { get; set; }
+    [DataMember(Name = "sideviewData")]
+    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
     public byte[] SideView { get; set; }
     //public int? NewMap { get; set; }
     //Whether the room contains a boss, which is true of boss rooms, but also boss-containing passthrough/item rooms.
+    [DataMember]
     public bool HasBoss { get; set; }
     //Specifically indicates this is a "boss room" i.e. boss then a gem statue, then an exit.
+    [DataMember]
     public bool IsBossRoom { get; set; }
+    [DataMember]
     public string Name { get; set; }
     //public string Group { get; set; }
+    [DataMember]
     public string Author { get; set; }
+    [DataMember]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     public RoomGroup Group { get; set; }
+    [DataMember]
     public bool IsThunderBirdRoom { get; set; }
+    [DataMember]
     public bool Enabled { get; set; }
+    [DataMember]
     public bool IsEntrance { get; set; }
+    [DataMember]
     public int? PalaceNumber { get; set; }
+    [DataMember]
     public string LinkedRoomName { get; set; }
+    [DataMember]
     public int PageCount { get; private set; }
 
-    public Room()
-    {
-
-    }
+    public Room() {}
+    
     public Room(Room room)
     {
+        CopyFrom(room);
+    }
+
+    public Room(string json)
+    {
+        var contractResolver = new DefaultContractResolver
+        {
+            NamingStrategy = new CamelCaseNamingStrategy()
+        };
+        var options = new JsonSerializerSettings
+        {
+            ContractResolver = contractResolver,
+            Formatting = Formatting.None
+        };
+        var room = JsonConvert.DeserializeObject<Room>(json, options);
+        CopyFrom(room!);
+        
+        var length = SideView?[0] ?? 0;
+        if(SideView?.Length != length)
+        {
+            throw new Exception($"Room length header {length} does not match actual length for sideview: {SideView.Length}");
+        }
+    }
+
+    private void CopyFrom(Room room)
+    {
         Map = room.Map;
-        Connections = (byte[])room.Connections.Clone();
-        Enemies = (byte[])room.Enemies.Clone();
+        Connections = room.Connections.ToArray();
+        Enemies = room.Enemies.ToArray();
         NewEnemies = new byte[Enemies.Length];
-        SideView = (byte[])room.SideView.Clone();
-        itemGetBits = room.itemGetBits;
+        SideView = room.SideView.ToArray();
+        ItemGetBits = room.ItemGetBits.ToArray();
         HasItem = room.HasItem;
         HasBoss = room.HasBoss;
         IsBossRoom = room.IsBossRoom;
@@ -202,6 +232,7 @@ public class Room
         Enabled = room.Enabled;
         Group = room.Group;
         PalaceGroup = room.PalaceGroup;
+        PalaceNumber = room.PalaceNumber;
 
         LeftByte = room.Connections[0];
         downByte = room.Connections[1];
@@ -209,90 +240,38 @@ public class Room
         RightByte = room.Connections[3];
     }
 
-    public Room(string json)
-    {
-        dynamic roomData = JsonConvert.DeserializeObject(json);
-        try
-        {
-            Name = roomData.name;
-            Group = Enum.Parse(typeof(RoomGroup), roomData.group.ToString().ToUpper());
-            Author = roomData.author;
-            Map = roomData.map;
-            Enabled = (bool)roomData.enabled;
-            Connections = Convert.FromHexString(roomData.connections.ToString());
-            LeftByte = Connections[0];
-            downByte = Connections[1];
-            upByte = Connections[2];
-            RightByte = Connections[3];
-            Enemies = Convert.FromHexString(roomData.enemies.ToString());
-            NewEnemies = Enemies;
-            SideView = Convert.FromHexString(roomData.sideviewData.ToString());
-            itemGetBits = Convert.FromHexString(roomData.bitmask.ToString())[0];
-            HasItem = roomData.hasItem;
-            HasBoss = roomData.hasBoss;
-            IsBossRoom = roomData.isBossRoom;
-            HasDrop = roomData.hasDrop;
-            ElevatorScreen = roomData.elevatorScreen;
-            //ConnectionStartAddress = Convert.ToInt32("0x" + roomData.memoryAddress, 16);
-            ConnectionStartAddress = roomData.memoryAddress;
-            isUpDownReversed = roomData.isUpDownReversed;
-            IsDropZone = roomData.isDropZone;
-            IsEntrance = roomData.isEntrance;
-            IsThunderBirdRoom = roomData.isThunderBirdRoom;
-            PalaceNumber = roomData.palaceNumber;
-            PalaceGroup = (int?)roomData.palaceGroup.Value ?? 0;
-            Requirements = new Requirements(roomData.requirements.ToString());
-            LinkedRoomName = roomData.linkedRoomName;
-
-            IsPlaced = false;
-            IsRoot = false;
-            IsReachable = false;
-            IsBeforeTbird = false;
-        }
-        catch
-        {
-            throw;
-        }
-
-        byte length = Convert.FromHexString(roomData.sideviewData.ToString())[0];
-        if (SideView.Length != length)
-        {
-            throw new Exception("Room length header does not match actual length for sideview: " + roomData.sideviewData.ToString());
-        }
-    }
-
     public string Serialize()
     {
-        return JsonConvert.SerializeObject(this, Formatting.None, new RoomJsonConverter());
+        return JsonConvert.SerializeObject(this, Formatting.None);
     }
 
     public void WriteSideViewPtr(AsmModule a, string label)
     {
-        if (PalaceGroup <= 0 || PalaceGroup > 3)
+        if(PalaceGroup is <= 0 or > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
         int addr;
-        if (PalaceGroup == 1)
+        switch (PalaceGroup)
         {
-            a.Segment("PRG4");
-            addr = sideview1;
-        }
-        else if (PalaceGroup == 2)
-        {
-            a.Segment("PRG4");
-            addr = sideview2;
-        }
-        else
-        {
-            a.Segment("PRG5", "PRG7");
-            addr = sideview3;
+            case 1:
+                a.Segment("PRG4");
+                addr = sideview1;
+                break;
+            case 2:
+                a.Segment("PRG4");
+                addr = sideview2;
+                break;
+            default:
+                a.Segment("PRG5", "PRG7");
+                addr = sideview3;
+                break;
         }
         a.RomOrg(addr + Map * 2);
         a.Word(a.Symbol(label));
     }
 
-    public void UpdateEnemies(int enemyAddr, ROM ROMData)
+    public void UpdateEnemies(int enemyAddr, ROM romData)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if (NewEnemies[0] == 0)
@@ -306,7 +285,7 @@ public class Room
         {
             NewEnemies[1] = 0x6C;
         }
-        int enemyPtr = PalaceGroup switch
+        var enemyPtr = PalaceGroup switch
         {
             1 => Core.Enemies.Palace125EnemyPtr,
             2 => Core.Enemies.Palace346EnemyPtr,
@@ -314,7 +293,7 @@ public class Room
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
 
-        int baseEnemyAddr = PalaceGroup switch
+        var baseEnemyAddr = PalaceGroup switch
         {
             1 => Core.Enemies.NormalPalaceEnemyAddr,
             2 => Core.Enemies.NormalPalaceEnemyAddr,
@@ -324,7 +303,7 @@ public class Room
 
         if (NewEnemies.Length > 1 && PalaceGroup == 2)
         {
-            for (int i = 2; i < NewEnemies.Length; i += 2)
+            for (var i = 2; i < NewEnemies.Length; i += 2)
             {
                 if ((NewEnemies[i] & 0x3F) == 0x0A && !HasBoss && !HasItem)
                 {
@@ -334,113 +313,91 @@ public class Room
         }
 
         //Reconstructed palaces require us to rewrite the enemy pointers table.
-        int memAddr = enemyAddr;
-        //Write the updated pointers
-        if (PalaceGroup == 1)
+        var memAddr = enemyAddr;
+        switch (PalaceGroup)
         {
-            memAddr -= 0x98b0;
-            ROMData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-        }
-        else if (PalaceGroup == 2)
-        {
-            memAddr -= 0x98b0;
-            ROMData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-        }
-        else
-        {
-            memAddr -= 0xd8b0;
-            ROMData.Put(Core.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-            ROMData.Put(Core.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            //Write the updated pointers
+            case 1:
+                memAddr -= 0x98b0;
+                romData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+                romData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                break;
+            case 2:
+                memAddr -= 0x98b0;
+                romData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+                romData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                break;
+            default:
+                memAddr -= 0xd8b0;
+                romData.Put(Core.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+                romData.Put(Core.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                break;
         }
 
 
-        ROMData.Put(enemyAddr, NewEnemies);
+        romData.Put(enemyAddr, NewEnemies);
     }
 
-    public void UpdateItemGetBits(ROM ROMData)
+    public void UpdateItemGetBits(ROM romData)
     {
-        if (PalaceGroup <= 0 || PalaceGroup > 3)
+        if (PalaceGroup is <= 0 or > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int ptr = Group1ItemGetStartAddress;
 
-        if (PalaceGroup == 2)
+        var ptr = PalaceGroup switch
         {
-            ptr = Group2ItemGetStartAddress;
-        }
-        else if (PalaceGroup == 3)
+            2 => Group2ItemGetStartAddress,
+            3 => Group3ItemGetStartAddress,
+            _ => Group1ItemGetStartAddress
+        };
+        if(Map % 2 == 0)
         {
-            ptr = Group3ItemGetStartAddress;
-        }
-        if (Map % 2 == 0)
-        {
-            byte old = ROMData.GetByte(ptr + Map / 2);
+            var old = romData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0x0F);
-            old = (byte)((itemGetBits << 4) | old);
-            ROMData.Put(ptr + Map / 2, old);
+            old = (byte)((ItemGetBits[0] << 4) | old);
+            romData.Put(ptr + Map / 2, old);
         }
         else
         {
-            byte old = ROMData.GetByte(ptr + Map / 2);
+            var old = romData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0xF0);
-            old = (byte)((itemGetBits) | old);
-            ROMData.Put(ptr + Map / 2, old);
+            old = (byte)((ItemGetBits[0]) | old);
+            romData.Put(ptr + Map / 2, old);
         }
     }
 
-    //A: this method is broken and always assumes the item to be set is the first collectable instruction in the room, \
-    //which is not always true
-    //B: This was only called in a place that was completely pointless anyway. So for now we're killing it.
-    /*
-    public void SetItem(Collectable item)
+    public void UpdateItem(Collectable i, ROM romData)
     {
-        for(int i = 4; i < SideView.Length; i+=2)
-        {
-            int yPos = SideView[i] & 0xF0;
-            yPos >>= 4;
-            if(yPos < 13 && SideView[i+1] == 0x0F)
-            {
-                SideView[i + 2] = (byte)item;
-                return;
-            }
-        }
-    }
-    */
-
-    public void UpdateItem(Collectable i, ROM ROMData)
-    {
-        if (PalaceGroup <= 0 || PalaceGroup > 3)
+        if (PalaceGroup is <= 0 or > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        int sideViewPtr = (ROMData.GetByte(sideview1 + Map * 2) + (ROMData.GetByte(sideview1 + 1 + Map * 2) << 8));
+        var sideViewPtr = (romData.GetByte(sideview1 + Map * 2) + (romData.GetByte(sideview1 + 1 + Map * 2) << 8));
 
         if (PalaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(sideview2 + Map * 2) + (ROMData.GetByte(sideview2 + 1 + Map * 2) << 8));
+            sideViewPtr = (romData.GetByte(sideview2 + Map * 2) + (romData.GetByte(sideview2 + 1 + Map * 2) << 8));
         }
         // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
         // otherwise we want to use the bank offset for PRG4 (0x10000)
         sideViewPtr -= 0x8000;
         sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
         sideViewPtr += 0x10; // Add the offset for the iNES header
-        int ptr = sideViewPtr + 4;
-        byte data = ROMData.GetByte(ptr);
+        var ptr = sideViewPtr + 4;
+        var data = romData.GetByte(ptr);
         data = (byte)(data & 0xF0);
         data = (byte)(data >> 4);
-        byte data2 = ROMData.GetByte(ptr + 1);
+        var data2 = romData.GetByte(ptr+1);
         while (data >= 13 || data2 != 0x0F)
         {
-            ptr += 2;
-            data = ROMData.GetByte(ptr);
+            ptr+=2;
+            data = romData.GetByte(ptr);
             data = (byte)(data & 0xF0);
             data = (byte)(data >> 4);
-            data2 = ROMData.GetByte(ptr + 1);
+            data2 = romData.GetByte(ptr + 1);
         }
-        ROMData.Put(ptr + 2, (byte)i);
+        romData.Put(ptr + 2, (byte)i);
 
     }
 
@@ -504,8 +461,8 @@ public class Room
 
     public int CountOpenExits()
     {
-        int exits = 0;
-        if (HasRightExit() && Right == null)
+        var exits = 0;
+        if(HasRightExit() && Right == null)
         {
             exits++;
         }
@@ -584,21 +541,21 @@ public class Room
         }
 
         int? firstGenerator = null;
-        int enemiesLength = (int)Enemies[0] - 1;
+        var enemiesLength = (int)Enemies[0] - 1;
         NewEnemies[0] = Enemies[0];
         for (int i = 1; i <= enemiesLength; i += 2)
         {
             NewEnemies[i] = Enemies[i];
-            int enemyNumber = Enemies[i + 1] & 0x3F;
-            int enemyPage = Enemies[i + 1] & 0xC0;
+            var enemyNumber = Enemies[i + 1] & 0x3F;
+            var enemyPage = Enemies[i + 1] & 0xC0;
             if (mixEnemies)
             {
                 //If this is a shufflable enemy (As opposed to something like a crystal marker)
                 if (shufflableEnemies.Contains(enemyNumber))
                 {
-                    int swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
-                    int ypos = Enemies[i] & 0xF0;
-                    int xpos = Enemies[i] & 0x0F;
+                    var swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
+                    var ypos = Enemies[i] & 0xF0;
+                    var xpos = Enemies[i] & 0x0F;
                     if (shufflableSmallEnemies.Contains(enemyNumber) && shufflableLargeEnemies.Contains(swapEnemy))
                     {
                         ypos -= 16;
@@ -624,9 +581,9 @@ public class Room
             {
                 if (shufflableLargeEnemies.Contains(enemyNumber))
                 {
-                    int swap = RNG.Next(0, largeEnemies.Length);
-                    int ypos = Enemies[i] & 0xF0;
-                    int xpos = Enemies[i] & 0x0F;
+                    var swap = RNG.Next(0, largeEnemies.Length);
+                    var ypos = Enemies[i] & 0xF0;
+                    var xpos = Enemies[i] & 0x0F;
                     while (largeEnemies[swap] == 0x1D && ypos != 0x70 && PalaceGroup != 3)
                     {
                         swap = RNG.Next(0, largeEnemies.Length);
@@ -645,7 +602,7 @@ public class Room
 
             if (shufflableFlyingEnemies.Contains(enemyNumber))
             {
-                int swap = RNG.Next(0, flyingEnemies.Length);
+                var swap = RNG.Next(0, flyingEnemies.Length);
                 while (enemyNumber == 0x07 && (flyingEnemies[swap] == 0x06 || flyingEnemies[swap] == 0x0E))
                 {
                     swap = RNG.Next(0, flyingEnemies.Length);
@@ -656,7 +613,7 @@ public class Room
 
             if (shufflableGenerators.Contains(enemyNumber))
             {
-                int swap = RNG.Next(0, generators.Length);
+                var swap = RNG.Next(0, generators.Length);
                 firstGenerator ??= swap;
                 if (generatorsAlwaysMatch)
                 {
@@ -900,87 +857,17 @@ public class Room
     }
 }
 
-public class RoomJsonConverter : JsonConverter<Room>
+public class HexStringConverter : Newtonsoft.Json.JsonConverter<byte[]>
 {
-    public override Room ReadJson(JsonReader reader, Type objectType, Room existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, byte[]? value, JsonSerializer serializer)
     {
-        //Eventually i'll replace the hacky custom serialization in the Room(string json) constructor. That day is not now.
-        throw new NotImplementedException();
+        writer.WriteValue(Convert.ToHexString(value?.ToArray() ?? []));
     }
 
-    public override void WriteJson(JsonWriter writer, Room value, JsonSerializer serializer)
+    public override byte[] ReadJson(JsonReader reader, Type objectType, byte[]? existingValue, bool hasExistingValue,
+        JsonSerializer serializer)
     {
-        writer.WriteStartObject();
-
-        writer.WritePropertyName("name");
-        writer.WriteValue(value.Name);
-
-        writer.WritePropertyName("group");
-        writer.WriteValue(value.Group.ToString());
-
-        writer.WritePropertyName("map");
-        writer.WriteValue(value.Map);
-
-        writer.WritePropertyName("enabled");
-        writer.WriteValue(value.Enabled);
-
-        writer.WritePropertyName("connections");
-        writer.WriteValue(BitConverter.ToString(value.Connections).Replace("-", ""));
-
-        writer.WritePropertyName("enemies");
-        writer.WriteValue(BitConverter.ToString((value.NewEnemies == null || value.NewEnemies.Length == 0 || value.NewEnemies[0] == 0) ? value.Enemies : value.NewEnemies).Replace("-", ""));
-
-        writer.WritePropertyName("sideviewData");
-        writer.WriteValue(BitConverter.ToString(value.SideView).Replace("-", ""));
-
-        writer.WritePropertyName("bitmask");
-        writer.WriteValue(BitConverter.ToString([value.itemGetBits]).Replace("-", ""));
-
-        writer.WritePropertyName("requirements");
-        writer.WriteRawValue(value.Requirements.Serialize());
-
-        writer.WritePropertyName("hasItem");
-        writer.WriteValue(value.HasItem);
-
-        writer.WritePropertyName("hasBoss");
-        writer.WriteValue(value.HasBoss);
-
-        writer.WritePropertyName("isBossRoom");
-        writer.WriteValue(value.IsBossRoom);
-
-        writer.WritePropertyName("hasDrop");
-        writer.WriteValue(value.HasDrop);
-
-        writer.WritePropertyName("elevatorScreen");
-        writer.WriteValue(value.ElevatorScreen); ;
-
-        writer.WritePropertyName("memoryAddress");
-        writer.WriteValue(value.ConnectionStartAddress);
-
-        writer.WritePropertyName("isUpDownReversed");
-        writer.WriteValue(value.isUpDownReversed);
-
-        writer.WritePropertyName("isDropZone");
-        writer.WriteValue(value.IsDropZone);
-
-        writer.WritePropertyName("isThunderBirdRoom");
-        writer.WriteValue(value.IsThunderBirdRoom);
-
-        writer.WritePropertyName("isEntrance");
-        writer.WriteValue(value.IsEntrance);
-
-        writer.WritePropertyName("palaceNumber");
-        writer.WriteValue(value.PalaceNumber);
-
-        writer.WritePropertyName("linkedRoomName");
-        writer.WriteValue(value.PalaceNumber);
-
-        writer.WritePropertyName("author");
-        writer.WriteValue(value.Author);
-
-        writer.WritePropertyName("palaceGroup");
-        writer.WriteValue(value.PalaceGroup);
-
-        writer.WriteEndObject();
+        var val = reader.Value as string ?? "";
+        return Convert.FromHexString(val);
     }
 }

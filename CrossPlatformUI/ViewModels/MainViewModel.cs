@@ -13,7 +13,7 @@ namespace CrossPlatformUI.ViewModels;
 [DataContract]
 public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
 {
-    public static readonly string BeginnerPreset = "bo!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
+    public static readonly string BeginnerPreset = "RAhN6FAABRFJAAAJAJBcZB+3mCAqBAFjALBJWA";
     public static readonly string StandardPreset = "Ao!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
     public static readonly string MaxRandoPreset = "Go!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
     public static readonly string RandoPercentPreset = "Zo!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";

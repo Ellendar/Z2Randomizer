@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Z2Randomizer.Core.Overworld;
 using static System.Reflection.Metadata.BlobBuilder;
 
@@ -13,11 +14,15 @@ namespace Z2Randomizer.Core;
 /// was, and RandomizerConfiguration should represent the flags/interface, with the configuration randomization done entirly
 /// in the interface between them.
 /// </summary>
+
+[JsonSourceGenerationOptions(WriteIndented = false)]
+[JsonSerializable(typeof(RandomizerProperties))]
+[JsonSerializable(typeof(Climate))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
+}
 public class RandomizerProperties
 {
-    public RandomizerProperties()
-    {
-    }
 
     //ROM Info
     public string Seed { get; set; }
@@ -69,7 +74,7 @@ public class RandomizerProperties
     public bool HiddenPalace { get; set; }
     public bool HiddenKasuto { get; set; }
     public bool TownSwap { get; set; }
-    public EncounterRate EncounterRate { get; set; }
+    public EncounterRate EncounterRates { get; set; }
     public ContinentConnectionType ContinentConnections { get; set; }
     public bool BoulderBlockConnections { get; set; }
     public Biome WestBiome { get; set; }
@@ -80,7 +85,7 @@ public class RandomizerProperties
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
 
-    public Climate Climate { get; set; }
+    public Climate Climates { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }

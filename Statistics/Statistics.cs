@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using CommandLine;
 using System.Threading;
+using System.Threading.Tasks;
 using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.Statistics;
@@ -50,7 +51,7 @@ class Statistics
                 DateTime startTime = DateTime.Now;
                 logger.Info("Starting seed# " + i + " at: " + startTime);
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
-                randomizer.Randomize(vanillaRomData, config, (str) => logger.Trace(str), tokenSource.Token).Wait(tokenSource.Token);
+                randomizer.Randomize(vanillaRomData, config, UpdateProgress, tokenSource.Token).Wait(tokenSource.Token);
                 DateTime endTime = DateTime.Now;
                 Result result = new Result(randomizer);
                 result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
@@ -62,5 +63,10 @@ class Statistics
             dbContext.SaveChanges();
         }
         catch(Exception e) { logger.Error(e); }
+    }
+    
+    private static async Task UpdateProgress(string str)
+    {
+        await Task.Run(() => logger.Trace(str));
     }
 }

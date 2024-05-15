@@ -15,6 +15,11 @@
     <ItemGroup>
         <WasmExtraFilesToDeploy Include="wwwroot\**" />
     </ItemGroup>
+    <ItemGroup>
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Sprites\**" />
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\PalaceRooms.json" />
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\js65\**" TargetPath="js65\%(RecursiveDir)\%(Filename)%(Extension)" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
