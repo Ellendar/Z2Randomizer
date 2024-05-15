@@ -18,16 +18,17 @@ public class DesktopFileService : IFileSystemService
     {
         if (OperatingSystem.IsWindows())
         {
-            SpriteBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/Z2Randomizer/Sprites/";
+            SpriteBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
+                             "/Z2Randomizer/Sprites/";
             SettingsBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
                                "/Z2Randomizer/";
-            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)! + "/";
         } else // (OperatingSystem.IsMacOS())
         {
             // TODO
-            SpriteBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) + "/Sprites";
-            SettingsBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
-            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!;
+            SpriteBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location) + "/Sprites/";
+            SettingsBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)! + "/";
+            PalacesBasePath = Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)! + "/";
         } 
         // else if (OperatingSystem.IsLinux())
         // {
@@ -49,15 +50,22 @@ public class DesktopFileService : IFileSystemService
             IFileSystemService.RandomizerPath.Palaces => PalacesBasePath + filename,
             _ => throw new ArgumentOutOfRangeException(nameof(path), path, null)
         };
-    
-    public async Task<string> OpenFile(IFileSystemService.RandomizerPath path, string filename)
+    public Task<string> OpenFile(IFileSystemService.RandomizerPath path, string filename)
     {
-        return await File.ReadAllTextAsync(FullPath(path, filename));
+        return File.ReadAllTextAsync(FullPath(path, filename));
+    }
+    public string OpenFileSync(IFileSystemService.RandomizerPath path, string filename)
+    {
+        if (path == IFileSystemService.RandomizerPath.Settings)
+        {
+            return File.ReadAllText(FullPath(path, filename));
+        }
+        throw new NotImplementedException();
     }
 
-    public async Task<byte[]> OpenBinaryFile(IFileSystemService.RandomizerPath path, string filename)
+    public Task<byte[]> OpenBinaryFile(IFileSystemService.RandomizerPath path, string filename)
     {
-        return await File.ReadAllBytesAsync(FullPath(path, filename));
+        return File.ReadAllBytesAsync(FullPath(path, filename));
     }
 
     public Task SaveFile(IFileSystemService.RandomizerPath path, string filename, string data)

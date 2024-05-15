@@ -84,6 +84,15 @@ public partial class BrowserFileService : IFileSystemService
         return await OpenFileInternal(path, filename);
     }
 
+    public string OpenFileSync(IFileSystemService.RandomizerPath path, string filename)
+    {
+        if (path == IFileSystemService.RandomizerPath.Settings)
+        {
+            return GetItem(filename) ?? "";
+        }
+        throw new NotImplementedException();
+    }
+
     public async Task<byte[]> OpenBinaryFile(IFileSystemService.RandomizerPath path, string filename)
     {
         var res = await OpenFileInternal(path, filename);

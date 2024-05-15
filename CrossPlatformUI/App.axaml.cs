@@ -76,12 +76,24 @@ public sealed partial class App : Application // , IDisposable
             // var files = Current?.Services?.GetService<IFileSystemService>()!;
             // var files = ServiceContainer.First(service => service.ServiceType == typeof(IFileSystemService)).;
             var files = FileSystemService!;
-            var json = files.OpenFile(IFileSystemService.RandomizerPath.Settings, "Settings.json").Result;
-            state = JsonConvert.DeserializeObject<object>(json, serializerSettings) ?? new MainViewModel();
+            var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
+            state = JsonConvert.DeserializeObject<object>(json, serializerSettings);
         }
         catch (Exception)
         {
-            state = new MainViewModel();
+            state = null;
+        }
+
+        if (state == null)
+        {
+            if (OperatingSystem.IsBrowser())
+            {
+                state = new MainViewModel();
+            }
+            else
+            {
+                state = new MainWindowViewModel();
+            }   
         }
         
         switch (ApplicationLifetime)
@@ -92,10 +104,13 @@ public sealed partial class App : Application // , IDisposable
                     PersistStateInternal().Wait();
                 };
                 // isLaunchingNew.OnNext(Unit.Default);
-
+                var context = state as MainWindowViewModel;
                 desktop.MainWindow = new MainWindow
                 {
-                    DataContext = state
+                    DataContext = state,
+                    Position = context!.WindowPosition,
+                    Width = context.WindowSize.Width,
+                    Height = context.WindowSize.Height,
                 };
 
                 ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(desktop.MainWindow));

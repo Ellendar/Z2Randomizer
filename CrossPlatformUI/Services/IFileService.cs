@@ -12,6 +12,7 @@ public interface IFileSystemService
         Palaces,
     }
     Task<string> OpenFile(RandomizerPath path, string filename);
+    string OpenFileSync(RandomizerPath path, string filename);
     Task<byte[]> OpenBinaryFile(RandomizerPath path, string filename);
     Task SaveFile(RandomizerPath path, string filename, string data);
     Task<IEnumerable<string>> ListLocalFiles(RandomizerPath path);
