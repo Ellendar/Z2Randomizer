@@ -173,6 +173,8 @@ public class Hyrule
     private List<Text> hints;
     private readonly IAsmEngine engine;
     private readonly PalaceRooms palaceRooms;
+    
+    public string Hash { get; private set; }
 
     public Hyrule(IAsmEngine engine, PalaceRooms rooms)
     {
@@ -181,6 +183,7 @@ public class Hyrule
     }
     public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
     {
+        Hash = "";
         World.ResetStats();
         Seed = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
         RNG = new Random(Seed);
@@ -394,7 +397,7 @@ public class Hyrule
         RandomizeEnemyStats();
 
         firstProcessOverworldTimestamp = DateTime.Now;
-        ProcessOverworld(progress, ct);
+        await ProcessOverworld(progress, ct);
         bool f = await UpdateProgress(progress, ct, 8);
         if (!f)
         {
@@ -463,7 +466,10 @@ public class Hyrule
             // Util.ReadAllTextFromFile(config.GetRoomsFile()) +
             Util.ByteArrayToHexString(finalRNGState)
         ));
-        UpdateRom(hash);
+        UpdateRom();
+        var z2Hash = ConvertHash(hash);
+        ROMData.Put(0x17C2C, z2Hash);
+        Hash = Util.FromGameText(z2Hash.Select( x => (char) x ));
 
         if (UNSAFE_DEBUG)
         {
@@ -483,6 +489,38 @@ public class Hyrule
         return ROMData.rawdata;
     }
 
+    private byte[] ConvertHash(byte[] hash)
+    {
+        var inthash = BitConverter.ToInt64(hash, 0);
+
+        return new byte[]
+        {
+            (byte)(((inthash >> 0)  & 0x1F) + 0xD0),
+            0xf4,
+            (byte)(((inthash >> 5)  & 0x1F) + 0xD0),
+            0xf4,
+            (byte)(((inthash >> 10)  & 0x1F) + 0xD0),
+            0xf4,
+            (byte)(((inthash >> 15)  & 0x1F) + 0xD0),
+            0xf4,
+            (byte)(((inthash >> 20)  & 0x1F) + 0xD0),
+            0xf4,
+            (byte)(((inthash >> 25)  & 0x1F) + 0xD0),
+        };
+        // str[0] = (byte)(((inthash >> 0)  & 0x1F) + 0xD0);
+        // str += (char)(((inthash >> 5)  & 0x1F)) + " ";
+        // str += (char)(((inthash >> 10) & 0x1F) + 'A') + " ";
+        // str += (char)(((inthash >> 15) & 0x1F) + 'A') + " ";
+        // str += (char)(((inthash >> 20) & 0x1F) + 'A') + " ";
+        // str += (char)(((inthash >> 25) & 0x1F) + 'A') + " ";
+        // return str;
+        // ROMData.Put(0x17C2C,  + 0xD0));
+        // ROMData.Put(0x17C2E, (byte)(((inthash >> 5) & 0x1F) + 0xD0));
+        // ROMData.Put(0x17C30, (byte)(((inthash >> 10) & 0x1F) + 0xD0));
+        // ROMData.Put(0x17C32, (byte)(((inthash >> 15) & 0x1F) + 0xD0));
+        // ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
+        // ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
+    }
 
     /*
         Text Notes:
@@ -1301,7 +1339,7 @@ public class Hyrule
         return requireables;
     }
 
-    private async void ProcessOverworld(Func<string, Task> progress, CancellationToken ct)
+    private async Task ProcessOverworld(Func<string, Task> progress, CancellationToken ct)
     {
         if (props.ShuffleSmallItems)
         {
@@ -2563,7 +2601,7 @@ public class Hyrule
         }
     }
 
-    private void UpdateRom(byte[] hash)
+    private void UpdateRom()
     {
         foreach (World world in worlds)
         {
@@ -3220,15 +3258,6 @@ public class Hyrule
         {
             ROMData.Put(0x32CD0 + i, ROMData.GetByte(0x34CD0 + i));
         }
-
-        long inthash = BitConverter.ToInt64(hash, 0);
-
-        ROMData.Put(0x17C2C, (byte)(((inthash) & 0x1F) + 0xD0));
-        ROMData.Put(0x17C2E, (byte)(((inthash >> 5) & 0x1F) + 0xD0));
-        ROMData.Put(0x17C30, (byte)(((inthash >> 10) & 0x1F) + 0xD0));
-        ROMData.Put(0x17C32, (byte)(((inthash >> 15) & 0x1F) + 0xD0));
-        ROMData.Put(0x17C34, (byte)(((inthash >> 20) & 0x1F) + 0xD0));
-        ROMData.Put(0x17C36, (byte)(((inthash >> 25) & 0x1F) + 0xD0));
     }
 
     public void RandomizeSmallItems(int world, bool first)
