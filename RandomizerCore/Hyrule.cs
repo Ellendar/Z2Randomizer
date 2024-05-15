@@ -179,7 +179,7 @@ public class Hyrule
         this.engine = engine;
         palaceRooms = rooms;
     }
-    public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Action<string> progress, CancellationToken ct)
+    public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
     {
         World.ResetStats();
         Seed = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
@@ -210,8 +210,8 @@ public class Hyrule
         accessibleMagicContainers = 4;
         reachableAreas = new HashSet<string>();
         //areasByLocation = new SortedDictionary<string, List<Location>>();
-
-        ROMData = new ROM(vanillaRomData);
+        // Make a copy of the vanilla data to prevent seed bleed
+        ROMData = new ROM(vanillaRomData.ToArray());
         hints = ROMData.GetGameText();
 
         if(props.DisableMagicRecs)
@@ -395,7 +395,7 @@ public class Hyrule
 
         firstProcessOverworldTimestamp = DateTime.Now;
         ProcessOverworld(progress, ct);
-        bool f = UpdateProgress(progress, ct, 8);
+        bool f = await UpdateProgress(progress, ct, 8);
         if (!f)
         {
             return null;
@@ -438,7 +438,7 @@ public class Hyrule
             { eastHyrule.townAtOldKasuto.ActualTown, eastHyrule.townAtOldKasuto.Collectable },
         };
         hints = CustomTexts.GenerateTexts(itemLocs, spellMap, westHyrule.bagu, hints, props, RNG);
-        f = UpdateProgress(progress, ct, 9);
+        f = await UpdateProgress(progress, ct, 9);
         if (!f)
         {
             return null;
@@ -1301,7 +1301,7 @@ public class Hyrule
         return requireables;
     }
 
-    private void ProcessOverworld(Action<string> progress, CancellationToken ct)
+    private async void ProcessOverworld(Func<string, Task> progress, CancellationToken ct)
     {
         if (props.ShuffleSmallItems)
         {
@@ -1556,7 +1556,7 @@ public class Hyrule
             do //while (wtries < 10 && !EverythingReachable());
             {
                 //GENERATE WEST
-                bool shouldContinue = UpdateProgress(progress, ct, 2);
+                bool shouldContinue = await UpdateProgress(progress, ct, 2);
                 if (!shouldContinue)
                 {
                     return;
@@ -1572,7 +1572,7 @@ public class Hyrule
                 timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
-                shouldContinue = UpdateProgress(progress, ct, 3);
+                shouldContinue = await UpdateProgress(progress, ct, 3);
                 if (!shouldContinue)
                 {
                     return;
@@ -1587,7 +1587,7 @@ public class Hyrule
                 timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
-                shouldContinue = UpdateProgress(progress, ct, 4);
+                shouldContinue = await UpdateProgress(progress, ct, 4);
                 if (!shouldContinue)
                 {
                     return;
@@ -1602,7 +1602,7 @@ public class Hyrule
                 timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
-                shouldContinue = UpdateProgress(progress, ct, 5);
+                shouldContinue = await UpdateProgress(progress, ct, 5);
                 if (!shouldContinue)
                 {
                     return;
@@ -1616,7 +1616,7 @@ public class Hyrule
                 mazeIsland.ResetVisitabilityState();
                 timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
-                shouldContinue = UpdateProgress(progress, ct, 6);
+                shouldContinue = await UpdateProgress(progress, ct, 6);
                 if (!shouldContinue)
                 {
                     return;
@@ -1684,7 +1684,7 @@ public class Hyrule
         }
     }
 
-    private bool UpdateProgress(Action<string> progress, CancellationToken ct, int v)
+    private async Task<bool> UpdateProgress(Func<string, Task> progress, CancellationToken ct, int v)
     {
         if (ct.IsCancellationRequested)
         {
@@ -1693,28 +1693,28 @@ public class Hyrule
         switch (v)
         {
             case 2:
-                progress.Invoke("Generating Western Hyrule");
+                await progress.Invoke("Generating Western Hyrule");
                 break;
             case 3:
-                progress.Invoke("Generating Death Mountain");
+                await progress.Invoke("Generating Death Mountain");
                 break;
             case 4:
-                progress.Invoke("Generating East Hyrule");
+                await progress.Invoke("Generating East Hyrule");
                 break;
             case 5:
-                progress.Invoke("Generating Maze Island");
+                await progress.Invoke("Generating Maze Island");
                 break;
             case 6:
-                progress.Invoke("Shuffling Items and Spells");
+                await progress.Invoke("Shuffling Items and Spells");
                 break;
             case 7:
-                progress.Invoke("Running Seed Completability Checks");
+                await progress.Invoke("Running Seed Completability Checks");
                 break;
             case 8:
-                progress.Invoke("Generating Hints");
+                await progress.Invoke("Generating Hints");
                 break;
             case 9:
-                progress.Invoke("Finishing up");
+                await progress.Invoke("Finishing up");
                 break;
         }
         return true;

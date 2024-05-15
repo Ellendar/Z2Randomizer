@@ -11,6 +11,9 @@ namespace CrossPlatformUI.ViewModels;
 [DataContract]
 public class MainWindowViewModel : ViewModelBase
 {
+    private const int DefaultWidth = 650;
+    private const int DefaultHeight = 900;
+    
     private PixelPoint windowPosition;
     private Size windowSize;
     
@@ -22,4 +25,9 @@ public class MainWindowViewModel : ViewModelBase
     
     [DataMember]
     public MainViewModel Main { get; set; } = new();
+
+    public MainWindowViewModel()
+    {
+        WindowSize = new Size(DefaultWidth, DefaultHeight);
+    }
 }

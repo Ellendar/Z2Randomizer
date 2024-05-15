@@ -109,7 +109,7 @@ public class Program
         var customJson = configuration!.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
         var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson : roomsJson, configuration!.UseCustomRooms);
         var randomizer = new Hyrule(engine, palaceRooms);
-        var rom = await randomizer.Randomize(vanillaRomData!, configuration, (str) => { logger.Info(str); }, cts.Token);
+        var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 
         if (rom != null)
         {
@@ -123,6 +123,11 @@ public class Program
         {
             logger.Error("An exception occurred generating the rom");
         }
+    }
+    
+    private async Task UpdateProgress(string str)
+    {
+        await Task.Run(() => logger.Info(str));
     }
 
     private static void SetNlogLogLevel(LogLevel level)

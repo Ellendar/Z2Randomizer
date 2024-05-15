@@ -35,6 +35,10 @@ public sealed partial class App : Application // , IDisposable
     public static ServiceCollection? ServiceContainer;
 
     public static IFileSystemService? FileSystemService;
+    
+    public static TopLevel TopLevel { get; private set; }
+
+    public MainView MainView;
 
     private object? state;
     
@@ -113,7 +117,7 @@ public sealed partial class App : Application // , IDisposable
                     Height = context.WindowSize.Height,
                 };
 
-                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(desktop.MainWindow));
+                TopLevel = TopLevel.GetTopLevel(desktop.MainWindow)!;
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:
                 singleViewPlatform.MainView = new MainView
@@ -121,10 +125,11 @@ public sealed partial class App : Application // , IDisposable
                     DataContext = state
                 };
 
-                ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel.GetTopLevel(singleViewPlatform.MainView)));
+                TopLevel = TopLevel.GetTopLevel(singleViewPlatform.MainView)!;
                 break;
         }
 
+        ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
         Services = ServiceContainer.BuildServiceProvider();
         
         base.OnFrameworkInitializationCompleted();
