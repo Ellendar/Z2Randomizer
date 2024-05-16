@@ -94,7 +94,6 @@ public class Room
 
     public bool IsDeadEnd => (HasLeftExit() ? 1 : 0) + (HasRightExit() ? 1 : 0) + (HasUpExit() ? 1 : 0) + (HasDownExit() ? 1 : 0) == 1;
     [DataMember]
->>>>>>> 71e219295cccd646719a977df6c28b66103caded
     public bool IsPlaced { get; set; }
     public byte LeftByte { get; set; }
     public byte RightByte { get; set; }
@@ -132,11 +131,7 @@ public class Room
     public bool HasDrop { get; set; }
     [DataMember]
     public int ElevatorScreen { get; set; }
-    //public bool IsFairyBlocked { get; set; }
-    //public bool IsUpstabBlocked { get; set; }
-    //public bool IsDownstabBlocked { get; set; }
-    //public bool IsGloveBlocked { get; set; }
-    //public bool IsJumpBlocked { get; set; }
+
     [DataMember]
     [Newtonsoft.Json.JsonConverter(typeof(RequirementsJsonConverter))]
     public Requirements Requirements { get; set; }
@@ -429,7 +424,7 @@ public class Room
         }
         else
         {
-            return (upByte < 0xFC);// || (Map == 4 && upByte == 0x02) || (Map == 1 && upByte == 0x02) || (Map == 2 && upByte == 0x03);
+            return (upByte < 0xFC);
         }
     }
 
@@ -854,6 +849,70 @@ public class Room
         }
 
         return exitCoords;
+    }
+
+    internal RoomExitType CategorizeExits()
+    {
+        if(HasLeftExit())
+        {
+            if (HasRightExit())
+            {
+                if (HasUpExit())
+                {
+                    if (HasDownExit())
+                    {
+                        return RoomExitType.FOUR_WAY;
+                    }
+                    return RoomExitType.INVERSE_T;
+                }
+                else if (HasDownExit())
+                {
+                    return RoomExitType.T;
+                }
+                else
+                {
+                    return RoomExitType.HORIZONTAL_PASSTHROUGH;
+                }
+            }
+            else if (HasUpExit())
+            {
+                if (HasDownExit())
+                {
+                    return RoomExitType.LEFT_T;
+                }
+                return RoomExitType.NW_L;
+            }
+            else if (HasDownExit())
+            {
+                return RoomExitType.SW_L;
+            }
+            else return RoomExitType.DEADEND_LEFT;
+        }
+        //Not Left
+        if(HasRightExit()) {
+            if(HasUpExit())
+            {
+                if(HasDownExit())
+                {
+                    return RoomExitType.RIGHT_T;
+                }
+                return RoomExitType.NE_L;
+            }
+            return RoomExitType.DEADEND_RIGHT;
+        }
+        if (HasUpExit())
+        {
+            if (HasDownExit())
+            {
+                return RoomExitType.VERTICAL_PASSTHROUGH;
+            }
+            return RoomExitType.DEADEND_UP;
+        }
+        else if (HasDownExit())
+        {
+            return RoomExitType.DEADEND_DOWN;
+        }
+        throw new ImpossibleException("Room has no exits");
     }
 }
 

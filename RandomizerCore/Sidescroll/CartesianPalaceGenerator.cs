@@ -12,6 +12,7 @@ namespace Z2Randomizer.Core.Sidescroll;
 public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
 {
     private static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
+    private const int STALL_LIMIT = 1000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         Palace palace = new(palaceNumber);
@@ -36,15 +37,26 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
         openCoords.AddRange(entrance.GetOpenExitCoords());
         palace.AllRooms.Add(entrance);
 
-        while (palace.AllRooms.Count + openCoords.Count < roomCount)
+        int stallCount = 0;
+        int openJunctionsCount = 0;
+        while (palace.AllRooms.Count + openCoords.Count < roomCount || openJunctionsCount > 0)
         {
             //Stalled out, try again from the start
-            if(openCoords.Count == 0)
+            if(openCoords.Count == 0 || stallCount++ > STALL_LIMIT)
             {
                 palace.IsValid = false;
                 return palace;
             }
-            Room newRoom = new(roomPool.NormalRooms.Sample(r));
+            Room? newRoom = roomPool.NormalRooms.Sample(r);
+            if (newRoom == null)
+            {
+                palace.IsValid = false;
+                return palace;
+            }
+            else
+            {
+                newRoom = new(newRoom);
+            }
 
             openCoords.FisherYatesShuffle(r);
             (int, int) bestFit = (0,0);
@@ -119,20 +131,139 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                 openCoords.AddRange(newOpenCoords);
                 openCoords.Remove(bestFit);
                 palace.AllRooms.Add(newRoom);
+                stallCount = 0;
+
+                //Count the number of open coordinates that are junction coordinates, i.e. they have
+                //more than 1 room they need to connect to. We want to fill all of these in before capping paths
+                //to prevent the capping logic from getting dumb.
+                //I considered just categorizing all the rooms by type and doing logic to determine the appropriate cap,
+                //but that logic tree to find what shape the hole is to fill with the appropriate peg got messy.
+                openJunctionsCount = 0;
+                foreach((int, int) coord in openCoords)
+                {
+                    Room? coordLeft = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1 - 1, coord.Item2));
+                    Room? coordRight = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1 + 1, coord.Item2));
+                    Room? coordUp = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1, coord.Item2 + 1));
+                    Room? coordDown = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1, coord.Item2 - 1));
+
+                    if((coordLeft != null && coordLeft.HasRightExit() ? 1 : 0)
+                        + (coordRight != null && coordRight.HasLeftExit() ? 1 : 0)
+                        + (coordUp != null && (coordUp.HasDownExit() || coordUp.HasDrop) ? 1 : 0)
+                        + (coordDown != null && coordDown.HasUpExit() ? 1 : 0) >= 2)
+                    {
+                        openJunctionsCount++;
+                    }
+                }
 
                 Debug.WriteLine("Added Room at (" + newRoom.coords.Item1 + ", " + newRoom.coords.Item2 + ")");
             }
         }
-        
+        if(openCoords.Count > 0)
+        {
+            Dictionary<RoomExitType, List<Room>> roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
 
+            foreach ((int, int) openCoord in openCoords)
+            {
+                Room? left = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1 - 1, openCoord.Item2));
+                Room? right = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1 + 1, openCoord.Item2));
+                Room? up = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1, openCoord.Item2 + 1));
+                Room? down = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1, openCoord.Item2 - 1));
+                if ((left != null && left.HasRightExit() ? 1 : 0)
+                    + (right != null && right.HasLeftExit() ? 1 : 0)
+                    + (up != null && (up.HasDownExit() || up.HasDrop) ? 1 : 0)
+                    + (down != null && down.HasUpExit() ? 1 : 0) >= 2)
+                {
+                    throw new Exception("Junction remains in stub closing that should have been cleaned up");
+                }
 
-        if (palace.AllRooms.Count + openCoords.Count > roomCount)
+                bool placed;
+                do
+                {
+                    placed = true;
+                    RoomExitType exitType;
+                    if (left != null)
+                    {
+                        exitType = RoomExitType.DEADEND_LEFT;
+                    }
+                    else if (right != null)
+                    {
+                        exitType = RoomExitType.DEADEND_RIGHT;
+                    }
+                    else if (up != null)
+                    {
+                        exitType = RoomExitType.DEADEND_DOWN;
+                    }
+                    else if (down != null)
+                    {
+                        exitType = RoomExitType.DEADEND_UP;
+                    }
+                    else
+                    {
+                        throw new ImpossibleException("Open coordinate has no adjacent exits");
+                    }
+                    Room? newRoom = roomsByExitType[exitType].Sample(r);
+                    //The most likely cause of this is roomPool exhaustion in no duplicate rooms seeds.
+                    //There could be some compromise to try and save it, but might as well regen
+                    if (newRoom == null)
+                    {
+                        palace.IsValid = false;
+                        return palace;
+                    }
+                    else
+                    {
+                        newRoom = new(newRoom);
+                    }
+                    newRoom.coords = openCoord;
+                    palace.AllRooms.Add(newRoom);
+
+                    if (left != null)
+                    {
+                        newRoom.Left = left;
+                        left.Right = newRoom;
+                    }
+                    if (down != null)
+                    {
+                        newRoom.Down = down;
+                        down.Up = newRoom;
+                    }
+                    if (up != null)
+                    {
+                        newRoom.Up = up;
+                        up.Down = newRoom;
+                    }
+                    if (right != null)
+                    {
+                        newRoom.Right = right;
+                        right.Left = newRoom;
+                    }
+
+                    if (props.NoDuplicateRooms && newRoom.Group != RoomGroup.STUBS)
+                    {
+                        roomsByExitType[exitType].Remove(newRoom);
+                    }
+                    if (props.NoDuplicateRoomsBySideview)
+                    {
+                        if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView))
+                            && newRoom.Group != RoomGroup.STUBS)
+                        {
+                            roomsByExitType[exitType].Remove(newRoom);
+                            placed = false;
+                        }
+                    }
+                } while (placed == false);
+            }
+        }
+
+        if (palace.AllRooms.Count > roomCount)
         {
             throw new ImpossibleException("Room count exceeds maximum room count.");
         }
+        if(openCoords.Count != 0)
+        {
+            throw new ImpossibleException("Stray open coordinate after palace is generated");
+        }
 
-
-
-        throw new NotImplementedException();
+        palace.IsValid = true;
+        return palace;
     }
 }

@@ -13,11 +13,13 @@ internal class RoomPool
     public Room VanillaBossRoom { get; set; }
     public Dictionary<string, Room> LinkedRooms { get; } = [];
     public MultiValueDictionary<Direction, Room> ItemRoomsByDirection { get; set; } = [];
+    private PalaceRooms palaceRooms;
 
     protected RoomPool() { }
     
     public RoomPool(RoomPool target)
     {
+        palaceRooms = target.palaceRooms;
         NormalRooms.AddRange(target.NormalRooms);
         Entrances.AddRange(target.Entrances);
         BossRooms.AddRange(target.BossRooms);
@@ -35,6 +37,7 @@ internal class RoomPool
 
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
+        this.palaceRooms = palaceRooms;
         if (props.AllowVanillaRooms)
         {
             Entrances.AddRange(palaceRooms.Entrances(RoomGroup.VANILLA)
@@ -133,9 +136,34 @@ internal class RoomPool
         }
     }
 
-    public Dictionary<RoomEditType, List<Room>> CategorizeNormalRoomExits()
+    public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits(bool includeStubs)
     {
+        Dictionary<RoomExitType, List<Room>> categorizedRooms = [];
+        foreach(Room room in NormalRooms)
+        {
+            RoomExitType type = room.CategorizeExits();
+            if(!categorizedRooms.ContainsKey(type))
+            {
+                categorizedRooms[type] = [];
+            }
+            categorizedRooms[type].Add(room);
+        }
 
+        //If we are using these categorized exits to cap paths, there needs to always be a path of each type
+        //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
+        if(includeStubs)
+        {
+            if (!categorizedRooms.ContainsKey(RoomExitType.DEADEND_UP))
+            {
+                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit()));
+            }
+            if (!categorizedRooms.ContainsKey(RoomExitType.DEADEND_DOWN))
+            {
+                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit()));
+            }
+        }
+        
+        return categorizedRooms;
     }
 
 }
