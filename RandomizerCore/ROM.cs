@@ -799,7 +799,115 @@ CheckController1ForUpAMagic:
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
+    public void DontCountExpDuringTalking(Assembler a)
+    {
+        a.Module().Code("""
+.segment "PRG7"
+; Patch the count up code and check to see if we are in a dialog
+.org $d433
+    jsr CheckForDialog
+.reloc
+CheckForDialog:
+    lda $74c ; current dialog type
+    beq OriginalPatchedCode
+        ; We are in a dialog or something, so don't tick down
+        ; by skipping ahead to after the counting code
+        pla
+        pla
+        jmp $d477
+OriginalPatchedCode: 
+    lda $756 ; Low byte of EXP to add
+    rts
+""", "dont_count_during_talking.s");
+    }
 
+    public void InstantText(Assembler a)
+    {
+        a.Module().Code("""
+.segment "PRG3"
+
+DialogActionLoadTextPtr = $b480
+DialogActionDrawBox = $b0d2
+DrawTwoRowsOfTiles = $b2f2
+
+DialogPtr = $569
+
+; Swap the dialog action pointers for loading the text pointer and the dialog draw box
+.org $b0b9 ; actions 4 and 5
+    .word DialogActionLoadTextPtr
+    .word DialogActionDrawBox
+
+; Patch the count up code and check to see if we are in a dialog
+.org $b10b
+    jsr InstantDialog
+.reloc
+InstantDialog:
+    ; Run the original code to draw two rows of tiles
+    jsr DrawTwoRowsOfTiles
+    ; save the Draw Macro current write offset since the later code uses y
+    sty $362
+
+    ; Check the current line, no text on lines 0-1 so skip it
+    lda $525
+    beq Exit
+
+    lda #$60 ; 60 = typewriter sound
+    sta $ec  ; Sound Effects Type 1
+    ; If the current offset isn't on a $f4 tile, then move ahead until we get to it
+    ; This will happen if the text box is split across multiple nametables
+    ldx #0
+FindNextF4:
+    lda $368,x
+    cmp #$f4
+    beq StartReadingLetters
+        inx
+        bne FindNextF4
+StartReadingLetters:
+    ldy #0
+    ; Load the current pointer for the text and see if we reached the end.
+    lda DialogPtr+0
+    sta $09
+    lda DialogPtr+1
+    sta $0a
+    lda ($09),y
+ReadLetterLoop:
+    ; if its FF then its end of string so just exit
+    cmp #$ff
+    beq ExitUpdatePtr
+    ; Read each letter until the end of the line
+    cmp #$fc
+    bcs NextLine
+    ; Draw the current letter over the blank space that we are rendering
+    sta $368,x
+    ; Move to the next spot in ram and check that its a blank space before writing.
+    inx
+FindNextF4Again:
+    lda $368,x
+    cmp #$f4
+    beq F4Found
+        inx
+        bne FindNextF4Again
+F4Found:
+    iny
+    lda ($09),y
+    jmp ReadLetterLoop
+NextLine:
+    ; Letters $fc-$fe indicate go to next line
+    iny
+ExitUpdatePtr:
+    ; Store current dialog pointer back into the text pointer
+    tya
+    clc
+    adc DialogPtr+0
+    sta DialogPtr+0
+    bcc Exit
+        inc DialogPtr+1
+Exit:
+    ldy $362
+    rts
+""", "instant_text.s");
+    }
+    
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");

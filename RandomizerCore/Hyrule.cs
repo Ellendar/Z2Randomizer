@@ -3815,6 +3815,8 @@ FREE_UNTIL $c2ca
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
+        rom.DontCountExpDuringTalking(engine);
+        rom.InstantText(engine);
 
         if (props.RandomizeKnockback)
         {
