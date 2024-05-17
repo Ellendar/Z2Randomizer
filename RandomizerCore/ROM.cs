@@ -847,6 +847,14 @@ InstantDialog:
     ; save the Draw Macro current write offset since the later code uses y
     sty $362
 
+    ; Save the values in $00 which is used later for calculating the attribute offset
+    ; We could use any other unused zp temp (i originally used $09-0a) but this is just
+    ; extremely safe and it doesn't add lag to save/restore here since its in a menu load
+    lda $00
+    pha
+    lda $01
+    pha
+
     ; Check the current line, no text on lines 0-1 so skip it
     lda $525
     beq Exit
@@ -866,10 +874,10 @@ StartReadingLetters:
     ldy #0
     ; Load the current pointer for the text and see if we reached the end.
     lda DialogPtr+0
-    sta $09
+    sta $00
     lda DialogPtr+1
-    sta $0a
-    lda ($09),y
+    sta $01
+    lda ($00),y
 ReadLetterLoop:
     ; if its FF then its end of string so just exit
     cmp #$ff
@@ -889,7 +897,7 @@ FindNextF4Again:
         bne FindNextF4Again
 F4Found:
     iny
-    lda ($09),y
+    lda ($00),y
     jmp ReadLetterLoop
 NextLine:
     ; Letters $fc-$fe indicate go to next line
@@ -903,11 +911,16 @@ ExitUpdatePtr:
     bcc Exit
         inc DialogPtr+1
 Exit:
+    ; restore the saved values in $00 and $01
+    pla
+    sta $01
+    pla
+    sta $00
     ldy $362
     rts
 """, "instant_text.s");
     }
-    
+
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
