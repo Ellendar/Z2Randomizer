@@ -37,8 +37,16 @@ public sealed partial class App : Application // , IDisposable
     {
         ServiceContainer ??= new ();
         var files = FileSystemService!;
-        var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
-        main = JsonSerializer.Deserialize(json, SerializationContext.Default.MainViewModel);
+        try
+        {
+            var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
+            main = JsonSerializer.Deserialize(json, SerializationContext.Default.MainViewModel);
+        }
+        catch (Exception e)
+        {
+            // Could not load settings, so just use the default instead
+        }
+
         main ??= new MainViewModel();
         
         switch (ApplicationLifetime)
