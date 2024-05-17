@@ -72,7 +72,7 @@
                 <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-                <tabs:PalacesView DataContext="{Binding PalacesViewModel}"/>
+                <tabs:PalacesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Enemies">
                 <tabs:EnemiesView DataContext="{Binding Main}"/>

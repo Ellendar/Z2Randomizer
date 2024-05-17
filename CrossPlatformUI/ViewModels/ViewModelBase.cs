@@ -6,10 +6,7 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.ViewModels;
 
-public class ViewModelBase : ReactiveObject
-{
-    
-}
+public class ViewModelBase : ReactiveObject { }
 
 public static class Extension {
     public static void ValueOrException<TParent, TBacking>(this TParent parent, ref TBacking backing,

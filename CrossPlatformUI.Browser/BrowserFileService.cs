@@ -2,12 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CrossPlatformUI.Services;
-using Newtonsoft.Json;
 
 namespace CrossPlatformUI.Browser;
+
+public struct SpriteFile
+{
+    public string Filename;
+    public string Patch;
+}
+
+[JsonSourceGenerationOptions(WriteIndented = false)]
+[JsonSerializable(typeof(SpriteFile[]))]
+public partial class SpriteSerializer : JsonSerializerContext {}
 
 public partial class BrowserFileService : IFileSystemService
 {
@@ -37,19 +47,13 @@ public partial class BrowserFileService : IFileSystemService
 
     private readonly Task<SpriteFile[]> preloadedSprites;
     private readonly Task<string> preloadedPalaces;
-
-    private struct SpriteFile
-    {
-        public string Filename;
-        public string Patch;
-    }
     public BrowserFileService()
     {
         var tsk  = FetchPreloadedSprites();
         preloadedSprites = tsk.ContinueWith(task =>
         {
             var res = task.Result;
-            return JsonConvert.DeserializeObject<SpriteFile[]>(res)!;
+            return JsonSerializer.Deserialize(res, SpriteSerializer.Default.SpriteFileArray)!;
         });
 
         preloadedPalaces = FetchPalaces();

@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Threading.Tasks;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -15,22 +14,46 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Converters;
 using RandomizerCore;
 using ReactiveUI;
 using Z2Randomizer.Core;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
-[DataContract]
-public class SpritePreviewViewModel : ReactiveObject
+public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 {
     private CancellationTokenSource backgroundUpdateTask = new ();
     private CancellationTokenSource backgroundLoadTask = new ();
-    public MainViewModel Main { get; init; }
-    public SpritePreviewViewModel(MainViewModel mainViewModel)
+
+    public string? SpriteName { get; set; } = "";
+
+    public CharacterColor TunicColor
     {
-        Main = mainViewModel;
+        get => Main.Config.Tunic;
+        set { Main.Config.Tunic = value; this.RaisePropertyChanged(); }
+    }
+    public CharacterColor ShieldColor
+    {
+        get => Main.Config.ShieldTunic;
+        set { Main.Config.ShieldTunic = value; this.RaisePropertyChanged(); }
+    }
+    public BeamSprites BeamSprite
+    {
+        get => Main.Config.BeamSprite;
+        set { Main.Config.BeamSprite = value; this.RaisePropertyChanged(); }
+    }
+    
+    [JsonConstructor]
+    public SpritePreviewViewModel() {}
+    public SpritePreviewViewModel(MainViewModel main)
+    {
+        Main = main;
+        Activator = new();
+        this.WhenActivated(OnActivate);
+    }
+
+    private void OnActivate(CompositeDisposable disposable)
+    {
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,
             x => x.Main.Config.Tunic,
@@ -38,7 +61,7 @@ public class SpritePreviewViewModel : ReactiveObject
             // x => x.Main.Config.BeamSprite,
             x => x.Main.RomFileViewModel.HasRomData
         ).Subscribe(tuple => {
-            var (characterSprite, tunic, hasRom) = tuple;
+            var (_, _, hasRom) = tuple;
             if (hasRom)
             {
                 backgroundUpdateTask.CancelAsync().ToObservable().Subscribe(_ =>
@@ -79,7 +102,7 @@ public class SpritePreviewViewModel : ReactiveObject
         async void LoadCharacterSprites(CancellationToken token)
         {
             Options.Clear();
-            var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, null, CharacterSprite.LINK);
+            var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.LINK);
             await link.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             if (token.IsCancellationRequested)
                 return;
@@ -92,7 +115,7 @@ public class SpritePreviewViewModel : ReactiveObject
                 var patch = await fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile);
                 var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
                 var ch = new CharacterSprite(parsedName, patch);
-                var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, patch, ch);
+                var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, ch);
                 await loaded.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);
                 if (token.IsCancellationRequested)
                     return;
@@ -100,64 +123,44 @@ public class SpritePreviewViewModel : ReactiveObject
             }
             if (token.IsCancellationRequested)
                 return;
-            Options.Add(new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, null, CharacterSprite.RANDOM));
+            Options.Add(new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.RANDOM));
             
             // Select the sprite on load based on the name
             Sprite = Options.FirstOrDefault(loaded => loaded.Name == SpriteName, link);
         }
     }
 
-    private LoadedCharacterSprite sprite;
+    [JsonIgnore]
+    public MainViewModel Main { get; }
 
-    public LoadedCharacterSprite Sprite
+    private LoadedCharacterSprite? sprite;
+    [JsonIgnore]
+    public LoadedCharacterSprite? Sprite
     {
         get => sprite;
         set
         {
             this.RaiseAndSetIfChanged(ref sprite, value);
+            if (sprite == null) return;
             Main.Config.Sprite = sprite.Sprite;
             SpriteName = sprite.Name;
         }
     }
 
-    [DataMember]
-    public string SpriteName { get; set; }
-
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-    [DataMember]
-    public CharacterColor TunicColor
-    {
-        get => Main.Config.Tunic;
-        set { Main.Config.Tunic = value; this.RaisePropertyChanged(); }
-    }
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-    [DataMember]
-    public CharacterColor ShieldColor
-    {
-        get => Main.Config.ShieldTunic;
-        set { Main.Config.ShieldTunic = value; this.RaisePropertyChanged(); }
-    }
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-    [DataMember]
-    public BeamSprites BeamSprite
-    {
-        get => Main.Config.BeamSprite;
-        set { Main.Config.BeamSprite = value; this.RaisePropertyChanged(); }
-    }
-
-    private ObservableCollection<LoadedCharacterSprite> options = new ();
-    public ObservableCollection<LoadedCharacterSprite> Options { get => options; }
+    private readonly ObservableCollection<LoadedCharacterSprite> options = [];
+    [JsonIgnore]
+    public ObservableCollection<LoadedCharacterSprite> Options => options;
+    [JsonIgnore]
+    public ViewModelActivator Activator { get; }
 }
 
 public class LoadedCharacterSprite : ReactiveObject
 {
     private readonly byte[] rom;
-    private readonly byte[]? ips;
     public CharacterSprite Sprite { get; }
-    public LoadedCharacterSprite(byte[] raw, byte[]? patch, CharacterSprite spr)
+    public LoadedCharacterSprite(byte[] raw, CharacterSprite spr)
     {
         rom = raw.ToArray();
-        ips = patch;
         Sprite = spr;
         Name = spr.DisplayName;
     }
@@ -186,19 +189,19 @@ public class LoadedCharacterSprite : ReactiveObject
         AuthorName = creditRaw;
     }
 
-    private Bitmap largePreview;
-    public Bitmap LargePreview { get => largePreview; set => this.RaiseAndSetIfChanged(ref largePreview, value); }
+    private Bitmap? largePreview;
+    public Bitmap? LargePreview { get => largePreview; set => this.RaiseAndSetIfChanged(ref largePreview, value); }
     
-    private Bitmap smallPreview;
-    public Bitmap SmallPreview { get => smallPreview; set => this.RaiseAndSetIfChanged(ref smallPreview, value); }
+    private Bitmap? smallPreview;
+    public Bitmap? SmallPreview { get => smallPreview; set => this.RaiseAndSetIfChanged(ref smallPreview, value); }
     
-    private string authorName;
-    public string AuthorName { get => authorName; set => this.RaiseAndSetIfChanged(ref authorName, value); }
-    private string credit;
-    public string Credit { get => credit; set => this.RaiseAndSetIfChanged(ref credit, value); }
+    private string? authorName;
+    public string? AuthorName { get => authorName; set => this.RaiseAndSetIfChanged(ref authorName, value); }
+    private string? credit;
+    public string? Credit { get => credit; set => this.RaiseAndSetIfChanged(ref credit, value); }
     
-    private string name;
-    public string Name { get => name; set => this.RaiseAndSetIfChanged(ref name, value); }
+    private string? name;
+    public string? Name { get => name; set => this.RaiseAndSetIfChanged(ref name, value); }
 
     private static Task<byte[]> LoadPreviewFromRom(ROM tmp)
     {

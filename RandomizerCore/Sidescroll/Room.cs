@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using NLog;
+﻿using NLog;
 using RandomizerCore;
 using System;
 using System.Collections.Generic;
@@ -7,14 +6,23 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using RandomizerCore.Asm;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Z2Randomizer.Core.Sidescroll;
 
-[DataContract]
+[JsonSourceGenerationOptions(
+    UseStringEnumConverter = true,
+    WriteIndented = false,
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    Converters = [typeof(RequirementsJsonConverter)]
+)]
+[JsonSerializable(typeof(List<Room>))]
+[JsonSerializable(typeof(Room))]
+[JsonSerializable(typeof(Requirements))]
+public partial class RoomSerializationContext : JsonSerializerContext { }
+
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Room
 {
@@ -35,84 +43,65 @@ public class Room
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
 
-    [DataMember(Name = "bitmask")]
-    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
+    [JsonPropertyName("bitmask")]
+    [JsonConverter(typeof(HexStringConverter))]
     public byte[] ItemGetBits { get; set; }
 
-    [DataMember]
     public int Map { get; set; }
-    [DataMember]
     public int? PalaceGroup { get; set; }
-    [DataMember]
     public bool IsRoot { get; set; }
+    
+    [JsonIgnore]
     public Room LinkedRoom { get; set; }
+    [JsonIgnore]
     public Room? Left { get; set; }
+    [JsonIgnore]
     public Room? Right { get; set; }
     public Room Up { get; set; }
     public Room Down { get; set; }
-    [DataMember]
+    
     public bool IsReachable { get; set; }
-    [DataMember]
     public int ConnectionStartAddress { get; set; }
 
-    //This still exists just to facilitate serialization because I didn't want to mess with it.
-    //It's also used for the vanilla rooms to build the vanilla room tree, which should probably just be
-    //handled elsewhere.
-    //Please do not reference it outside of that
-    [DataMember]
-    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
-    public byte[] Connections { get; set; }
 
     public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
     [DataMember]
     public bool IsPlaced { get; set; }
+	
+	//This still exists just to facilitate serialization because I didn't want to mess with it.
+    //It's also used for the vanilla rooms to build the vanilla room tree, which should probably just be
+    //handled elsewhere.
+    //Please do not reference it outside of that
+    [JsonConverter(typeof(HexStringConverter))]
+    public byte[] Connections { get; set; }
+
     public bool IsBeforeTbird { get; set; }
 
-    [DataMember]
     public bool HasDrop { get; set; }
-    [DataMember]
     public int ElevatorScreen { get; set; }
-
-    [DataMember]
-    [Newtonsoft.Json.JsonConverter(typeof(RequirementsJsonConverter))]
+    [JsonConverter(typeof(RequirementsJsonConverter))]
     public Requirements Requirements { get; set; }
-    [DataMember]
     public bool IsDropZone { get; set; }
-    [DataMember]
     public bool HasItem { get; set; }
-    [DataMember]
-    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
+    [JsonConverter(typeof(HexStringConverter))]
     public byte[] Enemies { get; set; }
     public byte[] NewEnemies { get; set; }
-    [DataMember(Name = "sideviewData")]
-    [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
+    [JsonPropertyName("sideviewData")]
+    [JsonConverter(typeof(HexStringConverter))]
     public byte[] SideView { get; set; }
     //public int? NewMap { get; set; }
     //Whether the room contains a boss, which is true of boss rooms, but also boss-containing passthrough/item rooms.
-    [DataMember]
     public bool HasBoss { get; set; }
     //Specifically indicates this is a "boss room" i.e. boss then a gem statue, then an exit.
-    [DataMember]
     public bool IsBossRoom { get; set; }
-    [DataMember]
     public string Name { get; set; }
-    //public string Group { get; set; }
-    [DataMember]
     public string Author { get; set; }
-    [DataMember]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     public RoomGroup Group { get; set; }
-    [DataMember]
     public bool IsThunderBirdRoom { get; set; }
-    [DataMember]
     public bool Enabled { get; set; }
-    [DataMember]
     public bool IsEntrance { get; set; }
-    [DataMember]
     public int? PalaceNumber { get; set; }
-    [DataMember]
     public string LinkedRoomName { get; set; }
-    [DataMember]
     public int PageCount { get; private set; }
     public bool HasLeftExit { get; private set; }
     public bool HasRightExit { get; set; }
@@ -129,16 +118,7 @@ public class Room
 
     public Room(string json)
     {
-        var contractResolver = new DefaultContractResolver
-        {
-            NamingStrategy = new CamelCaseNamingStrategy()
-        };
-        var options = new JsonSerializerSettings
-        {
-            ContractResolver = contractResolver,
-            Formatting = Formatting.None
-        };
-        var room = JsonConvert.DeserializeObject<Room>(json, options);
+        var room = JsonSerializer.Deserialize(json, RoomSerializationContext.Default.Room);
         CopyFrom(room!);
         
         var length = SideView?[0] ?? 0;
@@ -184,7 +164,7 @@ public class Room
 
     public string Serialize()
     {
-        return JsonConvert.SerializeObject(this, Formatting.None);
+        return JsonSerializer.Serialize(this, RoomSerializationContext.Default.Room);
     }
 
     public void WriteSideViewPtr(AsmModule a, string label)
@@ -354,46 +334,6 @@ public class Room
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
     }
-
-    /*
-    public bool HasUpExit()
-    {
-        if (isUpDownReversed)
-        {
-            return (downByte < 0xFC && downByte > 0x03);
-        }
-        else
-        {
-            return (upByte < 0xFC);
-        }
-    }
-
-    public bool HasDownExit()
-    {
-        if (isUpDownReversed)
-        {
-            return (upByte < 0xFC);
-        }
-        else
-        {
-            return (downByte < 0xFC);
-        }
-    }
-
-    public bool HasLeftExit()
-    {
-
-        return (LeftByte < 0xFC);
-
-    }
-
-    public bool HasRightExit()
-    {
-
-        return (RightByte < 0xFC);
-
-    }
-    */
 
     public int CountOpenExits()
     {
@@ -784,17 +724,17 @@ public class Room
     }
 }
 
-public class HexStringConverter : Newtonsoft.Json.JsonConverter<byte[]>
+public class HexStringConverter : JsonConverter<byte[]?>
 {
-    public override void WriteJson(JsonWriter writer, byte[]? value, JsonSerializer serializer)
+
+    public override byte[]? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        writer.WriteValue(Convert.ToHexString(value?.ToArray() ?? []));
+        var val = reader.GetString();
+        return val == null ? null : Convert.FromHexString(val);
     }
 
-    public override byte[] ReadJson(JsonReader reader, Type objectType, byte[]? existingValue, bool hasExistingValue,
-        JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, byte[]? value, JsonSerializerOptions options)
     {
-        var val = reader.Value as string ?? "";
-        return Convert.FromHexString(val);
+        writer.WriteStringValue(Convert.ToHexString(value?.ToArray() ?? []));
     }
 }

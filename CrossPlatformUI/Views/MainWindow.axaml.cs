@@ -7,13 +7,31 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views;
 
-public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+public partial class MainWindow : ReactiveWindow<MainViewModel>
 {
-    
     public MainWindow()
     {
         // Prevent the previewer's DataContext from being set when the application is run.
-        this.WhenActivated(disposables => { });
+        this.WhenActivated(disposables => {
+            PositionChanged += (sender, args) =>
+            {
+                var context = DataContext as MainViewModel;
+                context!.WindowPosition = new CustomPixelPoint
+                {
+                    X = args.Point.X,
+                    Y = args.Point.Y,
+                };
+            };
+            Resized += (sender, args) =>
+            {
+                var context = DataContext as MainViewModel;
+                context!.WindowSize = new CustomSize
+                {
+                    Width = args.ClientSize.Width,
+                    Height = args.ClientSize.Height,
+                };
+            };
+        });
         AvaloniaXamlLoader.Load(this);
         // var prevSize = ClientSize;
         
@@ -25,15 +43,11 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         //     prevSize = args.ClientSize;
         //     Position = new PixelPoint(Position.X + (int)x, Position.Y + (int)y);
         // };
-        PositionChanged += (sender, args) =>
-        {
-            var context = DataContext as MainWindowViewModel;
-            context.WindowPosition = args.Point;
-        };
-        Resized += (sender, args) =>
-        {
-            var context = DataContext as MainWindowViewModel;
-            context.WindowSize = args.ClientSize;
-        };
+    }
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        var context = DataContext as MainViewModel;
+        ClientSize = new Size(context!.WindowSize.Width,context.WindowSize.Height);
     }
 }

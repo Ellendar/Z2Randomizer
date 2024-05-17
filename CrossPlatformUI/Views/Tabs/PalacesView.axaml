@@ -9,7 +9,7 @@
              xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
-             x:DataType="tabs:PalacesViewModel">
+             x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*,*">
         <StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0">

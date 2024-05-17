@@ -6,10 +6,8 @@ using System.Runtime.Serialization;
 
 namespace RandomizerCore.Asm;
 
-[DataContract]
 public class Assembler
 {
-    [DataMember]
     public List<AsmModule> Modules { get; } = new();
 
     public void Add(AsmModule asmModule)

@@ -7,6 +7,9 @@
         <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <InvariantGlobalization>true</InvariantGlobalization>
+
+        <PublishTrimmed>false</PublishTrimmed>
+<!--        <TrimMode>partial</TrimMode>-->
 <!--        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>-->
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
 <!--        <RunAOTCompilation>true</RunAOTCompilation>-->

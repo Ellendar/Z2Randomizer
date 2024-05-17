@@ -17,10 +17,10 @@ namespace Z2Randomizer.Core;
 public class CharacterSprite
 {
     // public int SelectionIndex { get; private set; }
-    public string DisplayName { get; private set; }
+    public string? DisplayName { get; private set; }
     public byte[]? Patch { get; private set; }
     // public bool IsLegacy { get; private set; }
-    public CharacterSprite(string displayName, byte[]? patch = null)
+    public CharacterSprite(string? displayName, byte[]? patch = null)
     {
         // SelectionIndex = selectionIndex;
         DisplayName = displayName;

@@ -7,10 +7,8 @@ using System.Text;
 namespace RandomizerCore.Asm;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-[DataContract]
 public class AsmModule
 {
-    [DataMember]
     public List<Dictionary<string, object>> Actions { get; } = [];
     
     public void Code(string asm, string name = "")

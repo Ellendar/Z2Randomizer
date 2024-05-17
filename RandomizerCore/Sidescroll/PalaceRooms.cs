@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
-using Z2Randomizer.Core.Sidescroll;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using RandomizerCore;
 
@@ -27,7 +26,7 @@ public partial class PalaceRooms
             throw new Exception("Invalid PalaceRooms.json");
         }
 
-        var rooms = JsonConvert.DeserializeObject<List<Room>>(palaceJson)!;
+        var rooms = JsonSerializer.Deserialize(palaceJson, RoomSerializationContext.Default.ListRoom)!;
         foreach (var room in rooms)
         {
             if (room.Enabled)

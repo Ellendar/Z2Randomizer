@@ -1,18 +1,23 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using RandomizerCore;
 using ReactiveUI;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
-[DataContract]
-public class CustomizeViewModel(MainViewModel main) : ReactiveObject
+public class CustomizeViewModel : ReactiveObject
 {
-    public MainViewModel Main { get; } = main;
-    
-    [DataMember]
-    public SpritePreviewViewModel SpritePreviewViewModel { get; } = new (main);
-    
-    [DataMember]
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    public SpritePreviewViewModel SpritePreviewViewModel { get; }
+
+    [JsonConstructor]
+    public CustomizeViewModel() {}
+    public CustomizeViewModel(MainViewModel main)
+    {
+        Main = main;
+        SpritePreviewViewModel = new(main);
+    }
+
     public bool DisableMusic
     {
         get => Main.Config.DisableMusic;
@@ -22,8 +27,6 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
     public bool FastSpellCasting
     {
         get => Main.Config.FastSpellCasting;
@@ -33,8 +36,6 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
     public bool UpAOnController1
     {
         get => Main.Config.UpAOnController1;
@@ -44,8 +45,7 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
+
     public bool RemoveFlashing
     {
         get => Main.Config.RemoveFlashing;
@@ -55,8 +55,7 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
+
     public bool ShuffleSpritePalettes
     {
         get => Main.Config.ShuffleSpritePalettes;
@@ -66,8 +65,6 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
     public bool UseCommunityText
     {
         get => Main.Config.UseCommunityText;
@@ -77,8 +74,7 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
+
     public BeepThreshold BeepThreshold
     {
         get => Main.Config.BeepThreshold;
@@ -88,8 +84,7 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
-    [DataMember]
+
     public BeepFrequency BeepFrequency
     {
         get => Main.Config.BeepFrequency;
@@ -99,4 +94,7 @@ public class CustomizeViewModel(MainViewModel main) : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
+    
+    [JsonIgnore]
+    public MainViewModel Main { get; }
 }

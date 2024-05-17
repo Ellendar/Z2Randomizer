@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Z2Randomizer.Core.Sidescroll;
 
 namespace Z2Randomizer.Core;
 
@@ -41,7 +42,7 @@ public class Requirements
 
     public Requirements? Deserialize(string? json)
     {
-        return JsonConvert.DeserializeObject<Requirements>(json ?? "[]");
+        return JsonSerializer.Deserialize(json ?? "[]", RoomSerializationContext.Default.Requirements);
     }
     
     public string Serialize()
@@ -138,24 +139,25 @@ public class Requirements
 
 public class RequirementsJsonConverter : JsonConverter<Requirements>
 {
-    public override Requirements ReadJson(JsonReader reader, Type objectType, Requirements? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override Requirements Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        var jToken = JToken.Load(reader);
-        if (jToken.Type != JTokenType.Array)
+        if (reader.TokenType != JsonTokenType.StartArray)
             return new Requirements();
         List<RequirementType> individualReqs = [];
-        List<List<RequirementType>> compositeReqs = []; 
-        foreach (var req in jToken.ToObject<List<JToken>>()!)
+        List<List<RequirementType>> compositeReqs = [];
+        var doc = JsonDocument.ParseValue(ref reader);
+        foreach (var req in doc.RootElement.EnumerateArray())
         {
-            switch (req.Type)
+            switch (req.ValueKind)
             {
-                case JTokenType.String:
+                case JsonValueKind.String:
                     individualReqs.Add((RequirementType)Enum.Parse(typeof(RequirementType), req.ToString()));
                     break;
-                case JTokenType.Array:
+                case JsonValueKind.Array:
                     List<RequirementType> newComp = [];
                     compositeReqs.Add(newComp);
-                    var comps = req.ToObject<List<JToken>>()!.Select(comp =>
+                    var subArray = req.EnumerateArray();
+                    var comps = subArray.Select(comp =>
                         (RequirementType)Enum.Parse(typeof(RequirementType), comp.ToString()));
                     newComp.AddRange(comps);
                     break;
@@ -165,8 +167,8 @@ public class RequirementsJsonConverter : JsonConverter<Requirements>
             compositeReqs.Select(i => i.ToArray()).ToArray());
     }
 
-    public override void WriteJson(JsonWriter writer, Requirements? value, JsonSerializer serializer)
+    public override void Write(Utf8JsonWriter writer, Requirements value, JsonSerializerOptions options)
     {
-        writer.WriteRaw(value?.Serialize() ?? "[]");
+        writer.WriteRawValue(value?.Serialize() ?? "[]");
     }
 }

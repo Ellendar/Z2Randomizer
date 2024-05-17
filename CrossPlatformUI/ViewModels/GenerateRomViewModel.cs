@@ -3,9 +3,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Controls;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
 using DialogHostAvalonia;
@@ -20,28 +20,13 @@ namespace CrossPlatformUI.ViewModels;
 
 public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
-
-    private string progress = "";
-    public string Progress {
-        get => string.IsNullOrEmpty(progress) ? "Starting Seed Generation" : progress;
-        set => this.RaiseAndSetIfChanged(ref progress, value);
-    }
     
-    public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
-    public ReactiveCommand<Unit, Unit> CopyError { get; }
-    
-    private MainViewModel Main { get; }
-
-    private CancellationTokenSource? tokenSource;
-
-    private bool hasError;
-    public bool HasError { get => hasError; set => this.RaiseAndSetIfChanged(ref hasError, value); }
-    private Exception? lastError = null;
-    
-    public GenerateRomViewModel(MainViewModel screen)
+    [JsonConstructor]
+    public GenerateRomViewModel() {}
+    public GenerateRomViewModel(MainViewModel main)
     {
-        HostScreen = screen;
-        Main = screen;
+        Main = main;
+        HostScreen = Main;
         HasError = false;
         Activator = new();
         CancelGeneration = ReactiveCommand.Create(() =>
@@ -117,10 +102,34 @@ Seed: {config.Seed}
         return Dispatcher.UIThread.InvokeAsync(() => Progress = str).GetTask();
     }
 
+    private string progress = "";
+    [JsonIgnore]
+    public string Progress {
+        get => string.IsNullOrEmpty(progress) ? "Starting Seed Generation" : progress;
+        set => this.RaiseAndSetIfChanged(ref progress, value);
+    }
+    
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> CopyError { get; }
+
+    private CancellationTokenSource? tokenSource;
+
+    private bool hasError;
+    [JsonIgnore]
+    public bool HasError { get => hasError; set => this.RaiseAndSetIfChanged(ref hasError, value); }
+    private Exception? lastError;
+
+    [JsonIgnore]
+    public MainViewModel Main { get; }
     // Reference to IScreen that owns the routable view model.
+    [JsonIgnore]
     public IScreen HostScreen { get; }
     // Unique identifier for the routable view model.
+    [JsonIgnore]
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
+    [JsonIgnore]
     public ViewModelActivator Activator { get; }
     
 }
