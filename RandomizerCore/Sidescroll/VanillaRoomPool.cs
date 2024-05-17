@@ -1,7 +1,4 @@
-﻿using SD.Tools.Algorithmia.GeneralDataStructures;
-using SD.Tools.BCLExtensions.CollectionsRelated;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Z2Randomizer.Core.Sidescroll;

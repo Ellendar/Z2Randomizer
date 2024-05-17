@@ -146,10 +146,10 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     Room? coordUp = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1, coord.Item2 + 1));
                     Room? coordDown = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1, coord.Item2 - 1));
 
-                    if((coordLeft != null && coordLeft.HasRightExit() ? 1 : 0)
-                        + (coordRight != null && coordRight.HasLeftExit() ? 1 : 0)
-                        + (coordUp != null && (coordUp.HasDownExit() || coordUp.HasDrop) ? 1 : 0)
-                        + (coordDown != null && coordDown.HasUpExit() ? 1 : 0) >= 2)
+                    if((coordLeft != null && coordLeft.HasRightExit ? 1 : 0)
+                        + (coordRight != null && coordRight.HasLeftExit ? 1 : 0)
+                        + (coordUp != null && (coordUp.HasDownExit || coordUp.HasDrop) ? 1 : 0)
+                        + (coordDown != null && coordDown.HasUpExit ? 1 : 0) >= 2)
                     {
                         openJunctionsCount++;
                     }
@@ -168,10 +168,10 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                 Room? right = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1 + 1, openCoord.Item2));
                 Room? up = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1, openCoord.Item2 + 1));
                 Room? down = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1, openCoord.Item2 - 1));
-                if ((left != null && left.HasRightExit() ? 1 : 0)
-                    + (right != null && right.HasLeftExit() ? 1 : 0)
-                    + (up != null && (up.HasDownExit() || up.HasDrop) ? 1 : 0)
-                    + (down != null && down.HasUpExit() ? 1 : 0) >= 2)
+                if ((left != null && left.HasRightExit ? 1 : 0)
+                    + (right != null && right.HasLeftExit ? 1 : 0)
+                    + (up != null && (up.HasDownExit || up.HasDrop) ? 1 : 0)
+                    + (down != null && down.HasUpExit ? 1 : 0) >= 2)
                 {
                     throw new Exception("Junction remains in stub closing that should have been cleaned up");
                 }

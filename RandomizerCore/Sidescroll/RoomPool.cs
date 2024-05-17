@@ -155,11 +155,11 @@ internal class RoomPool
         {
             if (!categorizedRooms.ContainsKey(RoomExitType.DEADEND_UP))
             {
-                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit()));
+                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit));
             }
             if (!categorizedRooms.ContainsKey(RoomExitType.DEADEND_DOWN))
             {
-                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit()));
+                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit));
             }
         }
         

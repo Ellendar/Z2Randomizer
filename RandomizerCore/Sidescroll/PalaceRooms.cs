@@ -150,10 +150,10 @@ public partial class PalaceRooms
             //    return rooms[group].Where(i => i.HasItem && i.HasLeftExit() && i.HasRightExit());
             //case Direction.VERTICAL_PASSTHROUGH:
             //    return rooms[group].Where(i => i.HasItem && i.HasUpExit() && i.HasDownExit());
-            Direction.NORTH => rooms[group].Where(i => i.HasItem && i.HasUpExit()),
-            Direction.SOUTH => rooms[group].Where(i => i.HasItem && i.HasDownExit()),
-            Direction.WEST => rooms[group].Where(i => i.HasItem && i.HasLeftExit()),
-            Direction.EAST => rooms[group].Where(i => i.HasItem && i.HasRightExit()),
+            Direction.NORTH => rooms[group].Where(i => i.HasItem && i.HasUpExit),
+            Direction.SOUTH => rooms[group].Where(i => i.HasItem && i.HasDownExit),
+            Direction.WEST => rooms[group].Where(i => i.HasItem && i.HasLeftExit),
+            Direction.EAST => rooms[group].Where(i => i.HasItem && i.HasRightExit),
             _ => throw new ImpossibleException("Invalid direction in ItemRoomsByDirection")
         };
     }

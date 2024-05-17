@@ -76,6 +76,12 @@ public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
         {
             throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
         }
+
+        if(props.ShortenNormalPalaces && palaceGroup < 7 || props.ShortenGP && palaceGroup == 7)
+        {
+            palace.Shorten(r);
+        }
+
         palace.IsValid = true;
         return palace;
     }

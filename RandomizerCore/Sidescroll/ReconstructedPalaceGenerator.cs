@@ -75,7 +75,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                     if (props.BossRoomConnect)
                     {
-                        palace.BossRoom.RightByte = 0x69;
+                        palace.BossRoom.HasRightExit = true;
                     }
 
                     if (palace.ItemRoom.LinkedRoomName != null)

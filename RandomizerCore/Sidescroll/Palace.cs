@@ -202,65 +202,52 @@ public class Palace
     {
         bool placed = false;
         //Right from open into r
-        if (!placed && open.HasRightExit() && open.Right == null && r.HasLeftExit() && r.Left == null)
+        if (!placed && open.HasRightExit && open.Right == null && r.HasLeftExit && r.Left == null)
         {
             open.Right = r;
-            open.RightByte = (byte)(r.Map * 4);
-
             r.Left = open;
-            r.LeftByte = (byte)(open.Map * 4 + 3);
 
             placed = true;
         }
         //Left open into r
-        if (!placed && open.HasLeftExit() && open.Left == null && r.HasRightExit() && r.Right == null)
+        if (!placed && open.HasLeftExit && open.Left == null && r.HasRightExit && r.Right == null)
         {
             open.Left = r;
-            open.LeftByte = (byte)(r.Map * 4 + 3);
 
             r.Right = open;
-            r.RightByte = (byte)(open.Map * 4);
 
             placed = true;
         }
         //Elevator Up from open
-        if (!placed && open.HasUpExit() && open.Up == null && r.HasDownExit() && r.Down == null && !r.HasDrop)
+        if (!placed && open.HasUpExit && open.Up == null && r.HasDownExit && r.Down == null && !r.HasDrop)
         {
             open.Up = r;
-            open.UpByte = (byte)(r.Map * 4 + r.ElevatorScreen);
-
             r.Down = open;
-            r.DownByte = (byte)(open.Map * 4 + open.ElevatorScreen);
 
             placed = true;
         }
         //Down Elevator from open
-        if (!placed && open.HasDownExit() && !open.HasDrop && open.Down == null && r.HasUpExit() && r.Up == null)
+        if (!placed && open.HasDownExit && !open.HasDrop && open.Down == null && r.HasUpExit && r.Up == null)
         {
-
             open.Down = r;
-            open.DownByte = (byte)(r.Map * 4 + r.ElevatorScreen);
-
             r.Up = open;
-            r.UpByte = (byte)(open.Map * 4 + open.ElevatorScreen);
 
             placed = true;
         }
         //Drop from open into r
-        if (!placed && open.HasDownExit() && open.HasDrop && open.Down == null && r.IsDropZone)
+        if (!placed && open.HasDownExit && open.HasDrop && open.Down == null && r.IsDropZone)
         {
 
             open.Down = r;
-            open.DownByte = (byte)(r.Map * 4);
             r.IsDropZone = false;
             placed = true;
         }
         //Drop from r into open 
-        if (!placed && open.IsDropZone && r.HasDrop && r.Down == null && r.HasDownExit())
+        if (!placed && open.IsDropZone && r.HasDrop && r.Down == null && r.HasDownExit)
         {
 
             r.Down = open;
-            r.DownByte = (byte)(open.Map * 4);
+
             open.IsDropZone = false;
             placed = true;
         }
@@ -294,13 +281,13 @@ public class Palace
 
     public bool RequiresThunderbird()
     {
-        CheckSpecialPaths(entrance, 2);
+        CheckSpecialPaths(entrance);
         return !bossRoom.IsBeforeTbird;
     }
 
     public bool HasDeadEnd()
     {
-        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit && i.HasDrop).ToList();
         if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
         {
             return false;
@@ -348,7 +335,7 @@ public class Palace
 
 
 
-    private void CheckSpecialPaths(Room r, int dir)
+    private void CheckSpecialPaths(Room r)
     {
         if (!r.IsBeforeTbird)
         {
@@ -361,22 +348,22 @@ public class Palace
             r.IsBeforeTbird = true;
             if (r.Left != null)
             {
-                CheckSpecialPaths(r.Left, 3);
+                CheckSpecialPaths(r.Left);
             }
 
             if (r.Right != null)
             {
-                CheckSpecialPaths(r.Right, 2);
+                CheckSpecialPaths(r.Right);
             }
 
             if (r.Up != null)
             {
-                CheckSpecialPaths(r.Up, 1);
+                CheckSpecialPaths(r.Up);
             }
 
             if (r.Down != null)
             {
-                CheckSpecialPaths(r.Down, 0);
+                CheckSpecialPaths(r.Down);
             }
         }
     }
@@ -496,10 +483,10 @@ public class Palace
     }
     public void ShuffleRooms(Random r)
     {
-        List<Room> roomsWithUpExits = AllRooms.Where(i => i.HasUpExit()).ToList();
-        List<Room> roomsWithDownExits = AllRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
-        List<Room> roomsWithLeftExits = AllRooms.Where(i => i.HasLeftExit()).ToList();
-        List<Room> roomsWithRightExits = AllRooms.Where(i => i.HasRightExit()).ToList();
+        List<Room> roomsWithUpExits = AllRooms.Where(i => i.HasUpExit).ToList();
+        List<Room> roomsWithDownExits = AllRooms.Where(i => i.HasDownExit && !i.HasDrop).ToList();
+        List<Room> roomsWithLeftExits = AllRooms.Where(i => i.HasLeftExit).ToList();
+        List<Room> roomsWithRightExits = AllRooms.Where(i => i.HasRightExit).ToList();
         List<Room> roomsWithDropExits = AllRooms.Where(i => i.HasDrop).ToList();
 
         for (int i = 0; i < roomsWithUpExits.Count; i++)
@@ -508,10 +495,6 @@ public class Palace
             Room swapRoom = roomsWithUpExits.Sample(r);
             selectedRoom.Up.Down = swapRoom;
             swapRoom.Up.Down = selectedRoom;
-
-            (selectedRoom.Up, swapRoom.Up) = (swapRoom.Up, selectedRoom.Up);
-            (selectedRoom.UpByte, swapRoom.UpByte) = (swapRoom.UpByte, selectedRoom.UpByte);
-            (swapRoom.Up.DownByte, selectedRoom.Up.DownByte) = (selectedRoom.Up.DownByte, swapRoom.Up.DownByte);
 
             if (roomsWithUpExits.Any(i => i.Up == null))
             {
@@ -523,24 +506,20 @@ public class Palace
             int swap = r.Next(i, roomsWithDropExits.Count);
 
             Room temp = roomsWithDropExits[i].Down;
-            byte tempByte = roomsWithDropExits[i].DownByte;
 
             roomsWithDropExits[i].Down = roomsWithDropExits[swap].Down;
-            roomsWithDropExits[i].DownByte = roomsWithDropExits[swap].DownByte;
             roomsWithDropExits[swap].Down = temp;
-            roomsWithDropExits[swap].DownByte = tempByte;
         }
 
         for (int i = 0; i < roomsWithDownExits.Count; i++)
         {
             Room selectedRoom = roomsWithDownExits[i];
             Room swapRoom = roomsWithDownExits.Sample(r);
+
             selectedRoom.Down.Up = swapRoom;
             swapRoom.Down.Up = selectedRoom;
 
             (selectedRoom.Down, swapRoom.Down) = (swapRoom.Down, selectedRoom.Down);
-            (selectedRoom.DownByte, swapRoom.DownByte) = (swapRoom.DownByte, selectedRoom.DownByte);
-            (swapRoom.Down.UpByte, selectedRoom.Down.UpByte) = (selectedRoom.Down.UpByte, swapRoom.Down.UpByte);
 
             if (roomsWithDownExits.Any(i => i.Down == null))
             {
@@ -557,8 +536,6 @@ public class Palace
             swapRoom.Left.Right = selectedRoom;
 
             (selectedRoom.Left, swapRoom.Left) = (swapRoom.Left, selectedRoom.Left);
-            (selectedRoom.LeftByte, swapRoom.LeftByte) = (swapRoom.LeftByte, selectedRoom.LeftByte);
-            (swapRoom.Left.RightByte, selectedRoom.Left.RightByte) = (selectedRoom.Left.RightByte, swapRoom.Left.RightByte);
 
             if (roomsWithLeftExits.Any(i => i.Left == null))
             {
@@ -574,28 +551,10 @@ public class Palace
             swapRoom.Right.Left = selectedRoom;
 
             (selectedRoom.Right, swapRoom.Right) = (swapRoom.Right, selectedRoom.Right);
-            (selectedRoom.RightByte, swapRoom.RightByte) = (swapRoom.RightByte, selectedRoom.RightByte);
-            (swapRoom.Right.LeftByte, selectedRoom.Right.LeftByte) = (selectedRoom.Right.LeftByte, swapRoom.Right.LeftByte);
 
             if (roomsWithRightExits.Any(i => i.Right == null))
             {
                 logger.Error("Right Exits desynched!");
-            }
-        }
-        if (Number == 6)
-        {
-            foreach (Room room in roomsWithDropExits)
-            {
-                if (room.Down.Map == 0xBC)
-                {
-                    int db = room.DownByte;
-                    room.DownByte = (byte)((db & 0xFC) + 2);
-                }
-                else
-                {
-                    int db = room.DownByte;
-                    room.DownByte = (byte)((db & 0xFC) + 1);
-                }
             }
         }
     }
@@ -620,25 +579,21 @@ public class Palace
                     throw new Exception("Inconsistent isUpDownReversed in linked rooms");
                 }
                 //set each blank exit on the master room that has a counterpart in the linked room
-                if (linkedRoom.HasLeftExit() && room.Left == null && linkedRoom.Left != null)
+                if (linkedRoom.HasLeftExit && room.Left == null && linkedRoom.Left != null)
                 {
                     room.Left = linkedRoom.Left;
-                    room.LeftByte = linkedRoom.LeftByte;
                 }
-                if (linkedRoom.HasRightExit() && room.Right == null && linkedRoom.Right != null)
+                if (linkedRoom.HasRightExit && room.Right == null && linkedRoom.Right != null)
                 {
                     room.Right = linkedRoom.Right;
-                    room.RightByte = linkedRoom.RightByte;
                 }
-                if (linkedRoom.HasUpExit() && room.Up == null && linkedRoom.Up != null)
+                if (linkedRoom.HasUpExit && room.Up == null && linkedRoom.Up != null)
                 {
                     room.Up = linkedRoom.Up;
-                    room.UpByte = linkedRoom.UpByte;
                 }
-                if (linkedRoom.HasDownExit() && room.Down == null && linkedRoom.Down != null)
+                if (linkedRoom.HasDownExit && room.Down == null && linkedRoom.Down != null)
                 {
                     room.Down = linkedRoom.Down;
-                    room.DownByte = linkedRoom.DownByte;
                 }
 
                 //set each room that links to the secondary room to point to the master room instead
@@ -652,10 +607,8 @@ public class Palace
             }
         }
         AllRooms = AllRooms.Except(roomsToRemove).ToList();
-        AllRooms.ForEach(r => r.UpdateConnectionBytes());
 
-        //Update connections
-        foreach(Room room in AllRooms.Where(r => r.PageCount != 4))
+        foreach (Room room in AllRooms)
         {
             if (room.PageCount <= 1)
             {
@@ -667,7 +620,7 @@ public class Palace
             }
             if (room.PageCount == 2)
             {
-                if(room.Right != null)
+                if (room.Right != null)
                 {
                     room.Right.Connections[0] = (byte)(room.Map * 4 + 1);
                 }
@@ -687,10 +640,6 @@ public class Palace
                     logger.Debug("Up/Down in 3 screen rooms is weird");
                 }
             }
-        }
-
-        foreach (Room r in AllRooms)
-        {
 
             //If a room is fewer than 4 pages, "right" doesn't actually work.
             //Exits in Z2 point you not based on how you exit, but what page you exit from.
@@ -698,23 +647,23 @@ public class Palace
             //this standardizes the exits so 2 page rooms are always left / right
             //3 page rooms are always left / down / right
             //and then 4 page rooms are always left / down / up / right
-            ROMData.Put(r.ConnectionStartAddress + 0, r.Connections[0]);
-            if(r.PageCount == 2)
+            ROMData.Put(room.ConnectionStartAddress + 0, room.Connections[0]);
+            if(room.PageCount == 2)
             {
-                ROMData.Put(r.ConnectionStartAddress + 1, r.Connections[3]);
-                ROMData.Put(r.ConnectionStartAddress + 2, 0xFF);
-                ROMData.Put(r.ConnectionStartAddress + 3, 0xFF);
+                ROMData.Put(room.ConnectionStartAddress + 1, room.Connections[3]);
+                ROMData.Put(room.ConnectionStartAddress + 2, 0xFF);
+                ROMData.Put(room.ConnectionStartAddress + 3, 0xFF);
                 continue;
             }
-            ROMData.Put(r.ConnectionStartAddress + 1, r.Connections[1]);
-            if (r.PageCount == 3)
+            ROMData.Put(room.ConnectionStartAddress + 1, room.Connections[1]);
+            if (room.PageCount == 3)
             {
-                ROMData.Put(r.ConnectionStartAddress + 2, r.Connections[3]);
-                ROMData.Put(r.ConnectionStartAddress + 3, 0xFF);
+                ROMData.Put(room.ConnectionStartAddress + 2, room.Connections[3]);
+                ROMData.Put(room.ConnectionStartAddress + 3, 0xFF);
                 continue;
             }
-            ROMData.Put(r.ConnectionStartAddress + 2, r.Connections[2]);
-            ROMData.Put(r.ConnectionStartAddress + 3, r.Connections[3]);
+            ROMData.Put(room.ConnectionStartAddress + 2, room.Connections[2]);
+            ROMData.Put(room.ConnectionStartAddress + 3, room.Connections[3]);
         }
     }
 
@@ -725,12 +674,6 @@ public class Palace
         {
             if (rooms.ContainsKey(r.Map * 4))
             {
-                /*
-                List<Room> l = rooms[r.Map * 4];
-                l.Add(r);
-                rooms.Remove(r.Map * 4);
-                rooms.Add(r.Map * 4, l);
-                */
                 rooms[r.Map * 4].Add(r);
             }
             else
@@ -738,73 +681,73 @@ public class Palace
                 List<Room> l = new List<Room> { r };
                 rooms.Add(r.Map * 4, l);
             }
-            //SortRoom(r);
         }
         foreach (Room r in AllRooms)
         {
-            if (r.Left == null && r.HasLeftExit())
+            if (r.Left == null && r.HasLeftExit)
             {
-                List<Room> l = rooms[r.LeftByte & 0xFC];
+                List<Room> l = rooms[r.Connections[0] & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if ((r2.RightByte & 0xFC) / 4 == r.Map)
+                    if ((r2.Connections[3] & 0xFC) / 4 == r.Map)
                     {
                         r.Left = r2;
                     }
                 }
             }
 
-            if (r.Right == null && r.HasRightExit())
+            if (r.Right == null && r.HasRightExit)
             {
-                List<Room> l = rooms[r.RightByte & 0xFC];
+                List<Room> l = rooms[r.Connections[3] & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if ((r2.LeftByte & 0xFC) / 4 == r.Map)
+                    if ((r2.Connections[0] & 0xFC) / 4 == r.Map)
                     {
                         r.Right = r2;
                     }
                 }
             }
 
-            if (r.Up == null && r.HasUpExit())
+            if (r.Up == null && r.HasUpExit)
             {
-                List<Room> l = rooms[r.UpByte & 0xFC];
+                List<Room> l = rooms[(r.isUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if ((r2.DownByte & 0xFC) / 4 == r.Map)
+                    if (((r2.isUpDownReversed ? r2.Connections[2] : r2.Connections[1]) & 0xFC) / 4 == r.Map)
                     {
                         r.Up = r2;
                     }
-                    else if (r2.Map == (r.UpByte & 0xFC) / 4 && r2.IsDropZone) {
+                    else if (r2.Map == ((r.isUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) / 4 && r2.IsDropZone) {
                         r.Up = r2;
                     }
                 }
             }
 
-            if (r.Down == null && r.HasDownExit())
+            if (r.Down == null && r.HasDownExit)
             {
-                List<Room> l = rooms[r.DownByte & 0xFC];
+                List<Room> l = rooms[(r.isUpDownReversed ? r.Connections[2] : r.Connections[1]) & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if ((r2.UpByte & 0xFC) / 4 == r.Map)
+                    if (((r2.isUpDownReversed ? r2.Connections[1] : r2.Connections[2]) & 0xFC) / 4 == r.Map)
                     {
                         r.Down = r2;
                     }
-                    else if (r2.Map == (r.DownByte & 0xFC) / 4 && r2.IsDropZone)
+                    else if (r2.Map == ((r.isUpDownReversed ? r.Connections[2] : r.Connections[1]) & 0xFC) / 4 && r2.IsDropZone)
                     {
                         r.Down = r2;
                     }
                 }
             }
-            if ((r.UpByte & 0xFC) == 0 && (entrance.DownByte & 0xFC) / 4 == r.Map)
+            if (((r.isUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) == 0 
+                && ((entrance.isUpDownReversed ? entrance.Connections[2] : entrance.Connections[1]) & 0xFC) / 4 == r.Map)
             {
                 r.Up = entrance;
             }
         }
         if (removeTbird)
         {
-            Tbird.Left.RightByte = Tbird.RightByte;
-            Tbird.Right.LeftByte = Tbird.LeftByte;
+            Tbird.Left.Connections[3] = Tbird.Connections[3];
+            Tbird.Right.Connections[0] = Tbird.Connections[0];
             Tbird.Left.Right = Tbird.Right;
             Tbird.Right.Left = Tbird.Left;
             //leftExits.Remove(Tbird);
@@ -815,11 +758,11 @@ public class Palace
 
     public void Shorten(Random random)
     {
-        List<Room> upExits = AllRooms.Where(i => i.HasUpExit()).ToList();
-        List<Room> downExits = AllRooms.Where(i => i.HasDownExit() && !i.HasDrop).ToList();
-        List<Room> leftExits = AllRooms.Where(i => i.HasLeftExit()).ToList();
-        List<Room> rightExits = AllRooms.Where(i => i.HasRightExit()).ToList();
-        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit() && i.HasDrop).ToList();
+        List<Room> upExits = AllRooms.Where(i => i.HasUpExit).ToList();
+        List<Room> downExits = AllRooms.Where(i => i.HasDownExit && !i.HasDrop).ToList();
+        List<Room> leftExits = AllRooms.Where(i => i.HasLeftExit).ToList();
+        List<Room> rightExits = AllRooms.Where(i => i.HasRightExit).ToList();
+        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit && i.HasDrop).ToList();
 
         int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
@@ -885,8 +828,6 @@ public class Palace
                 {
                     remove.Left.Right = remove.Right;
                     remove.Right.Left = remove.Left;
-                    remove.Left.RightByte = remove.RightByte;
-                    remove.Right.LeftByte = remove.LeftByte;
                     rooms--;
                     //logger.WriteLine("removed 1 room");
                     leftExits.Remove(remove);
@@ -900,8 +841,6 @@ public class Palace
                 {
                     remove.Up.Down = remove.Down;
                     remove.Down.Up = remove.Up;
-                    remove.Up.DownByte = remove.DownByte;
-                    remove.Down.UpByte = remove.UpByte;
                     //logger.WriteLine("removed 1 room");
                     rooms--;
                     upExits.Remove(remove);
@@ -932,9 +871,7 @@ public class Palace
                         }
 
                         remove.Left.Up.Down = remove.Down;
-                        remove.Left.Up.DownByte = remove.DownByte;
                         remove.Down.Up = remove.Left.Up;
-                        remove.Down.UpByte = remove.Left.UpByte;
 
                         downExits.Remove(remove);
                         leftExits.Remove(remove);
@@ -966,9 +903,7 @@ public class Palace
                         }
 
                         remove.Right.Up.Down = remove.Down;
-                        remove.Right.Up.DownByte = remove.DownByte;
                         remove.Down.Up = remove.Right.Up;
-                        remove.Down.UpByte = remove.Right.UpByte;
 
                         downExits.Remove(remove);
                         rightExits.Remove(remove);
@@ -1004,9 +939,7 @@ public class Palace
                         }
 
                         remove.Left.Down.Up = remove.Up;
-                        remove.Left.Down.UpByte = remove.UpByte;
                         remove.Up.Down = remove.Left.Down;
-                        remove.Up.DownByte = remove.Left.DownByte;
 
                         upExits.Remove(remove);
                         leftExits.Remove(remove);
@@ -1039,9 +972,7 @@ public class Palace
                         }
 
                         remove.Right.Down.Up = remove.Up;
-                        remove.Right.Down.UpByte = remove.UpByte;
                         remove.Up.Down = remove.Right.Down;
-                        remove.Up.DownByte = remove.Right.DownByte;
 
                         upExits.Remove(remove);
                         rightExits.Remove(remove);
@@ -1056,10 +987,6 @@ public class Palace
                         continue;
                     }
                 }
-
-
-
-
             }
         }
         logger.Debug("Target: " + target + " Rooms: " + rooms);
@@ -1284,6 +1211,7 @@ public class Palace
         };
     }
 
+    /*
     public void ValidateRoomConnections()
     {
         foreach(Room r in AllRooms)
@@ -1309,6 +1237,7 @@ public class Palace
             }
         }
     }
+    */
 
     public int AssignMapNumbers(int currentMap, bool isGP)
     {

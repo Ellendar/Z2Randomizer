@@ -314,7 +314,6 @@ public class Hyrule
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData);
                     enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectionBytes();
                     room.UpdateConnectionStartAddress();
                 }
             }
@@ -337,7 +336,6 @@ public class Hyrule
                     room.UpdateItemGetBits(ROMData);
                     room.UpdateEnemies(enemyAddr, ROMData);
                     enemyAddr += room.NewEnemies.Length;
-                    room.UpdateConnectionBytes();
                     room.UpdateConnectionStartAddress();
                 }
             }
@@ -2912,7 +2910,7 @@ public class Hyrule
 
         foreach (Palace palace in palaces)
         {
-            palace.ValidateRoomConnections();
+            //palace.ValidateRoomConnections();
             palace.UpdateRom(ROMData);
         }
 

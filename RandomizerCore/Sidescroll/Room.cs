@@ -1,21 +1,15 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using RandomizerCore;
-using Z2Randomizer.Core.Sidescroll;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Dynamic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using RandomizerCore.Asm;
-using JsonConverter = Newtonsoft.Json.JsonConverter;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace Z2Randomizer.Core.Sidescroll;
@@ -26,8 +20,6 @@ public class Room
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private byte upByte;
-    private byte downByte;
     private Room? up;
     private Room? down;
     public bool isUpDownReversed;
@@ -56,75 +48,24 @@ public class Room
     public Room LinkedRoom { get; set; }
     public Room? Left { get; set; }
     public Room? Right { get; set; }
-    public Room? Up
-    {
-        get => isUpDownReversed ? down : up;
-
-        set
-        {
-            if (isUpDownReversed)
-            {
-                down = value;
-                return;
-            }
-            up = value;
-        }
-    }
-    public Room? Down
-    {
-        get => isUpDownReversed ? up : down;
-
-        set
-        {
-            if (isUpDownReversed)
-            {
-                up = value;
-                return;
-            }
-            down = value;
-        }
-    }
+    public Room Up { get; set; }
+    public Room Down { get; set; }
     [DataMember]
     public bool IsReachable { get; set; }
     [DataMember]
     public int ConnectionStartAddress { get; set; }
+
+    //This still exists just to facilitate serialization because I didn't want to mess with it.
+    //It's also used for the vanilla rooms to build the vanilla room tree, which should probably just be
+    //handled elsewhere.
+    //Please do not reference it outside of that
     [DataMember]
     [Newtonsoft.Json.JsonConverter(typeof(HexStringConverter))]
     public byte[] Connections { get; set; }
 
-    public bool IsDeadEnd => (HasLeftExit() ? 1 : 0) + (HasRightExit() ? 1 : 0) + (HasUpExit() ? 1 : 0) + (HasDownExit() ? 1 : 0) == 1;
+    public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
     [DataMember]
     public bool IsPlaced { get; set; }
-    public byte LeftByte { get; set; }
-    public byte RightByte { get; set; }
-    public byte UpByte
-    {
-        get => isUpDownReversed ? downByte : upByte;
-		
-        set
-        {
-            if (isUpDownReversed)
-            {
-                downByte = value;
-                return;
-            }
-            upByte = value;
-        }
-    }
-    public byte DownByte
-    {
-        get => isUpDownReversed ? upByte : downByte;
-
-        set
-        {
-            if (isUpDownReversed)
-            {
-                upByte = value;
-                return;
-            }
-            downByte = value;
-        }
-    }
     public bool IsBeforeTbird { get; set; }
 
     [DataMember]
@@ -173,6 +114,11 @@ public class Room
     public string LinkedRoomName { get; set; }
     [DataMember]
     public int PageCount { get; private set; }
+    public bool HasLeftExit { get; private set; }
+    public bool HasRightExit { get; set; }
+    public bool HasUpExit { get; private set; }
+    public bool HasDownExit { get; private set; }
+
 
     public Room() {}
     
@@ -205,7 +151,7 @@ public class Room
     private void CopyFrom(Room room)
     {
         Map = room.Map;
-        Connections = room.Connections.ToArray();
+        HasLeftExit = room.HasLeftExit;
         Enemies = room.Enemies.ToArray();
         NewEnemies = new byte[Enemies.Length];
         SideView = room.SideView.ToArray();
@@ -229,10 +175,11 @@ public class Room
         PalaceGroup = room.PalaceGroup;
         PalaceNumber = room.PalaceNumber;
 
-        LeftByte = room.Connections[0];
-        downByte = room.Connections[1];
-        upByte = room.Connections[2];
-        RightByte = room.Connections[3];
+        Connections = room.Connections;
+        HasLeftExit = room.Connections[0] < 0xFC;
+        HasDownExit = isUpDownReversed ? room.Connections[2] < 0xFC : room.Connections[1] < 0xFC;
+        HasUpExit = isUpDownReversed ? room.Connections[1] < 0xFC : room.Connections[2] < 0xFC;
+        HasRightExit = room.Connections[3] < 0xFC;
     }
 
     public string Serialize()
@@ -396,14 +343,6 @@ public class Room
 
     }
 
-    public void UpdateConnectionBytes()
-    {
-        PageCount = ((SideView[1] & 0b01100000) >> 5) + 1;
-        Connections[0] = LeftByte;
-        Connections[1] = downByte;
-        Connections[2] = upByte;
-        Connections[3] = RightByte;
-    }
 
     public void UpdateConnectionStartAddress()
     {
@@ -416,6 +355,7 @@ public class Room
         };
     }
 
+    /*
     public bool HasUpExit()
     {
         if (isUpDownReversed)
@@ -453,26 +393,27 @@ public class Room
         return (RightByte < 0xFC);
 
     }
+    */
 
     public int CountOpenExits()
     {
         var exits = 0;
-        if(HasRightExit() && Right == null)
+        if(HasRightExit && Right == null)
         {
             exits++;
         }
 
-        if (HasLeftExit() && Left == null)
+        if (HasLeftExit && Left == null)
         {
             exits++;
         }
 
-        if (HasUpExit() && Up == null)
+        if (HasUpExit && Up == null)
         {
             exits++;
         }
 
-        if (HasDownExit() && Down == null)
+        if (HasDownExit && Down == null)
         {
             exits++;
         }
@@ -641,97 +582,24 @@ public class Room
     public string PrintUnsatisfiedExits()
     {
         StringBuilder sb = new();
-        if (HasLeftExit() && Left == null)
+        if (HasLeftExit && Left == null)
         {
             sb.Append("(Left) ");
         }
-        if (HasRightExit() && Right == null)
+        if (HasRightExit && Right == null)
         {
             sb.Append("(Right) ");
         }
-        if (HasUpExit() && Up == null)
+        if (HasUpExit && Up == null)
         {
             sb.Append("(Up) ");
         }
-        if (HasDownExit() && Down == null)
+        if (HasDownExit && Down == null)
         {
             sb.Append("(Down) ");
         }
         return sb.ToString();
     }
-
-    /*
-    private bool IsAppropriateBlocker(int palaceNumber)
-    {
-        if (Number == 1)
-        {
-            if (r.IsFairyBlocked
-                || r.IsDownstabBlocked
-                || r.IsUpstabBlocked
-                || r.IsJumpBlocked
-                || r.IsGloveBlocked
-                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
-                || r.HasBoss)
-            {
-                return false;
-            }
-        }
-
-        if (Number == 2)
-        {
-            if (r.IsFairyBlocked
-                || r.IsDownstabBlocked
-                || r.IsUpstabBlocked
-                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
-                || r.HasBoss)
-            {
-                return false;
-            }
-        }
-
-        if (Number == 3)
-        {
-            if (r.IsJumpBlocked
-                || r.IsFairyBlocked
-                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone)))
-            {
-                return false;
-            }
-        }
-
-        if (Number == 4)
-        {
-            if (r.IsGloveBlocked
-                || r.IsUpstabBlocked
-                || r.IsDownstabBlocked)
-            {
-                return false;
-            }
-        }
-
-        if (Number == 5)
-        {
-            if (r.IsGloveBlocked
-                || r.IsUpstabBlocked
-                || r.IsDownstabBlocked
-                || (DROPS_ARE_BLOCKERS && (r.HasDrop || r.IsDropZone))
-                || r.HasBoss)
-            {
-                return false;
-            }
-        }
-
-        if (Number == 6)
-        {
-            if (r.IsUpstabBlocked || r.IsDownstabBlocked)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    */
-
     public bool IsTraversable(IEnumerable<RequirementType> requireables)
     {
         return Requirements.AreSatisfiedBy(requireables);
@@ -756,14 +624,14 @@ public class Room
             return 0;
         }
         //No down
-        if (!HasDownExit() && !HasDrop)
+        if (!HasDownExit && !HasDrop)
         {
             return CONFLICT;
         }
         //Elevator down
-        if (HasDownExit() && ElevatorScreen >= 0)
+        if (HasDownExit && ElevatorScreen >= 0)
         {
-            return down.HasUpExit() ? 1 : CONFLICT;
+            return down.HasUpExit ? 1 : CONFLICT;
         }
         //Drop down
         if (HasDrop)
@@ -780,14 +648,14 @@ public class Room
             return 0;
         }
         //No up
-        if (!HasUpExit() && !IsDropZone)
+        if (!HasUpExit && !IsDropZone)
         {
             return CONFLICT;
         }
         //Elevator up
-        if (HasUpExit() && ElevatorScreen >= 0)
+        if (HasUpExit && ElevatorScreen >= 0)
         {
-            return up.HasDownExit() ? 1 : CONFLICT;
+            return up.HasDownExit ? 1 : CONFLICT;
         }
         //Drop into
         if (IsDropZone)
@@ -804,11 +672,11 @@ public class Room
             return 0;
         }
         //No left
-        if (!HasLeftExit())
+        if (!HasLeftExit)
         {
             return CONFLICT;
         }
-        return left.HasRightExit() ? 1 : CONFLICT;
+        return left.HasRightExit ? 1 : CONFLICT;
     }
     public int FitsWithRight(Room? right)
     {
@@ -817,11 +685,11 @@ public class Room
             return 0;
         }
         //No left
-        if (!HasRightExit())
+        if (!HasRightExit)
         {
             return CONFLICT;
         }
-        return right.HasLeftExit() ? 1 : CONFLICT;
+        return right.HasLeftExit ? 1 : CONFLICT;
     }
 
     public List<(int, int)> GetOpenExitCoords()
@@ -831,19 +699,19 @@ public class Room
         {
             throw new Exception("Uninitialized coordinates referenced in coordinate palace generation");
         }
-        if (HasLeftExit() && Left == null)
+        if (HasLeftExit && Left == null)
         {
             exitCoords.Add((coords.Item1 - 1, coords.Item2));
         }
-        if (HasRightExit() && Right == null)
+        if (HasRightExit && Right == null)
         {
             exitCoords.Add((coords.Item1 + 1, coords.Item2));
         }
-        if (HasUpExit() && Up == null)
+        if (HasUpExit && Up == null)
         {
             exitCoords.Add((coords.Item1, coords.Item2 + 1));
         }
-        if (HasDownExit() && Down == null)
+        if (HasDownExit && Down == null)
         {
             exitCoords.Add((coords.Item1, coords.Item2 - 1));
         }
@@ -853,19 +721,19 @@ public class Room
 
     internal RoomExitType CategorizeExits()
     {
-        if(HasLeftExit())
+        if(HasLeftExit)
         {
-            if (HasRightExit())
+            if (HasRightExit)
             {
-                if (HasUpExit())
+                if (HasUpExit)
                 {
-                    if (HasDownExit())
+                    if (HasDownExit)
                     {
                         return RoomExitType.FOUR_WAY;
                     }
                     return RoomExitType.INVERSE_T;
                 }
-                else if (HasDownExit())
+                else if (HasDownExit)
                 {
                     return RoomExitType.T;
                 }
@@ -874,25 +742,25 @@ public class Room
                     return RoomExitType.HORIZONTAL_PASSTHROUGH;
                 }
             }
-            else if (HasUpExit())
+            else if (HasUpExit)
             {
-                if (HasDownExit())
+                if (HasDownExit)
                 {
                     return RoomExitType.LEFT_T;
                 }
                 return RoomExitType.NW_L;
             }
-            else if (HasDownExit())
+            else if (HasDownExit)
             {
                 return RoomExitType.SW_L;
             }
             else return RoomExitType.DEADEND_LEFT;
         }
         //Not Left
-        if(HasRightExit()) {
-            if(HasUpExit())
+        if(HasRightExit) {
+            if(HasUpExit)
             {
-                if(HasDownExit())
+                if(HasDownExit)
                 {
                     return RoomExitType.RIGHT_T;
                 }
@@ -900,15 +768,15 @@ public class Room
             }
             return RoomExitType.DEADEND_RIGHT;
         }
-        if (HasUpExit())
+        if (HasUpExit)
         {
-            if (HasDownExit())
+            if (HasDownExit)
             {
                 return RoomExitType.VERTICAL_PASSTHROUGH;
             }
             return RoomExitType.DEADEND_UP;
         }
-        else if (HasDownExit())
+        else if (HasDownExit)
         {
             return RoomExitType.DEADEND_DOWN;
         }
