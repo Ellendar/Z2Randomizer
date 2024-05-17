@@ -8,7 +8,7 @@ using ReactiveUI;
 
 namespace CrossPlatformUI.Views.Tabs;
 
-public partial class PalacesView : ReactiveUserControl<PalacesViewModel>
+public partial class PalacesView : ReactiveUserControl<MainViewModel>
 {
     public PalacesView()
     {

@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:CrossPlatformUI.Views"
         xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-        x:DataType="vm:MainWindowViewModel"
+        x:DataType="vm:MainViewModel"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="CrossPlatformUI.Views.MainWindow"
         WindowStartupLocation="Manual"
@@ -12,5 +12,5 @@
         MinHeight="650"
         MinWidth="900"
         Title="Z2Randomizer">
-    <views:MainView DataContext="{Binding Main}"/>
+    <views:MainView />
 </Window>

@@ -2,23 +2,20 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using CrossPlatformUI.Services;
 using ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 
 namespace CrossPlatformUI.ViewModels;
 
-[DataContract]
 public class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
-    public string? UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
-    public IScreen HostScreen { get; }
-
-    private byte[]? romData;
-    [DataMember]
-    public byte[]? RomData
+    private byte[] romData = [];
+    public byte[] RomData
     {
         get => romData;
         set
@@ -28,15 +25,19 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
         }
     }
 
-    public bool HasRomData => RomData != null;
+    [JsonIgnore]
+    public bool HasRomData => !RomData.IsNullOrEmpty();
 
-    public RomFileViewModel(IScreen hostScreen)
+    [JsonConstructor]
+    public RomFileViewModel() {}
+
+    public RomFileViewModel(MainViewModel main)
     {
+        Main = main;
         OpenFileCommand = ReactiveCommand.CreateFromTask(OpenFileInternal);
-        HostScreen = hostScreen;
+        HostScreen = Main;
     }
     
-    public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
 
     private async Task OpenFileInternal(CancellationToken token)
     {
@@ -69,4 +70,14 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
             throw new Exception("File exceeded 1MB limit.");
         }
     }
+    
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> OpenFileCommand { get; }
+    [JsonIgnore]
+    public MainViewModel Main { get; }
+    [JsonIgnore]
+    public string? UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
+    [JsonIgnore]
+    public IScreen HostScreen { get; }
+
 }

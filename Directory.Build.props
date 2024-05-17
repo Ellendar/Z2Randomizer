@@ -3,9 +3,13 @@
     <Nullable>enable</Nullable>
     <AvaloniaVersion>11.1.0-beta2</AvaloniaVersion>
 <!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
-    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <TrimmerSingleWarn>true</TrimmerSingleWarn>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+
+    <PublishTrimmed>false</PublishTrimmed>
+<!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
   </PropertyGroup>
 </Project>

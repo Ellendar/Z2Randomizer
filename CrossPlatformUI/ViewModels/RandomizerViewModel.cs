@@ -1,8 +1,7 @@
 using System;
 using System.Reactive;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using Avalonia.Data;
+using System.Reactive.Disposables;
+using System.Text.Json.Serialization;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
@@ -13,29 +12,68 @@ using Z2Randomizer.Core;
 
 namespace CrossPlatformUI.ViewModels;
 
-[DataContract]
-public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
+public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
-    public RandomizerViewModel(MainViewModel mainViewModel)
+    private bool IsFlagStringValid(string flags)
     {
-        HostScreen = mainViewModel;
-        Main = mainViewModel;
-        CustomizeViewModel = new(mainViewModel);
-        PalacesViewModel = new(mainViewModel);
-        Flags = MainViewModel.BeginnerPreset;
-        
+        try
+        {
+            _ = new RandomizerConfiguration(flags);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    private string validatedFlags = "";
+
+    public string Flags
+    {
+        get => validatedFlags;
+        set
+        {
+            if (IsFlagStringValid(value) && value != Main.Config.Flags)
+            {
+                Main.Config.Flags = value;
+            }
+            this.RaiseAndSetIfChanged(ref validatedFlags, value);
+        }
+    }
+
+    public string Seed
+    {
+        get => Main.Config.Seed;
+        set
+        {
+            Main.Config.Seed = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    private int currentTabIndex;
+    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
+    
+    [JsonConstructor]
+    public RandomizerViewModel() {}
+    public RandomizerViewModel(MainViewModel main)
+    {
+        Main = main;
+        HostScreen = Main;
+        CustomizeViewModel = new(Main);
+        Activator = new ViewModelActivator();
         RerollSeed = ReactiveCommand.Create(() =>
         {
-            mainViewModel.Config.Seed = new Random().Next(0, 999999999).ToString();
+            Main.Config.Seed = new Random().Next(0, 999999999).ToString();
         });
         
         LoadPreset = ReactiveCommand.Create<string>((flags) =>
         {
-            mainViewModel.Config.Flags = flags;
+            Main.Config.Flags = flags;
         });
         
         LoadRom = ReactiveCommand.CreateFromObservable(
-            () => mainViewModel.Router.Navigate.Execute(mainViewModel.RomFileViewModel)
+            () => Main.Router.Navigate.Execute(Main.RomFileViewModel)
         );
 
         SaveFolder = ReactiveCommand.CreateFromTask(async () =>
@@ -44,7 +82,16 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
             var folder = await fileDialog.OpenFolderAsync();
             Main.OutputFilePath = folder?.Path.AbsolutePath ?? "";
         });
-        mainViewModel.Config.PropertyChanged += (sender, args) =>
+        this.WhenActivated(OnActivate);
+    }
+
+    private void OnActivate(CompositeDisposable disposable)
+    {
+        if (string.IsNullOrEmpty(Main.Config.Flags))
+        {
+            Flags = MainViewModel.BeginnerPreset;            
+        }
+        Main.Config.PropertyChanged += (sender, args) =>
         {
             switch (args.PropertyName)
             {
@@ -56,7 +103,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
                     break;
             }
         };
-        mainViewModel.RomFileViewModel.PropertyChanged += (sender, args) =>
+        Main.RomFileViewModel.PropertyChanged += (_, args) =>
         {
             switch (args.PropertyName)
             {
@@ -80,68 +127,31 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel
             (flags, seed, hasRomData) => IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData);
     }
 
-    public MainViewModel Main { get; }
-
-    [DataMember]
-    public PalacesViewModel PalacesViewModel { get; }
-
+    [JsonIgnore]
     public bool IsDesktop { get; } = !OperatingSystem.IsBrowser();
-    
-    [DataMember]
+
+    [JsonIgnore]
+    public MainViewModel Main { get; }
+    [JsonInclude]
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public CustomizeViewModel CustomizeViewModel { get; }
+    
+    [JsonIgnore]
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
+    [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveFolder { get; }
-    
+    [JsonIgnore]
     public ReactiveCommand<string, Unit> LoadPreset { get; }
+    [JsonIgnore]
     public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
+    [JsonIgnore]
+    public IObservable<bool> CanGenerate { get; private set; }
 
-    public IObservable<bool> CanGenerate { get; }
-
-    private bool IsFlagStringValid(string flags)
-    {
-        try
-        {
-            _ = new RandomizerConfiguration(flags);
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
-    }
-    private string validatedFlags = "";
-    [DataMember]
-    public string Flags
-    {
-        get => validatedFlags;
-        set
-        {
-            if (IsFlagStringValid(value) && value != Main.Config.Flags)
-            {
-                Main.Config.Flags = value;
-            }
-            this.RaiseAndSetIfChanged(ref validatedFlags, value);
-        }
-    }
-    
-    [DataMember]
-    public string Seed
-    {
-        get => Main.Config.Seed;
-        set
-        {
-            Main.Config.Seed = value;
-            this.RaisePropertyChanged();
-        }
-    }
-
-    private int currentTabIndex;
-    [DataMember]
-    public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
-
-    [IgnoreDataMember]
     // Unique identifier for the routable view model.
+    [JsonIgnore]
     public string UrlPathSegment { get; } = Guid.NewGuid().ToString()[..5];
-    [IgnoreDataMember]
+    [JsonIgnore]
     public IScreen HostScreen { get; }
+    [JsonIgnore]
+    public ViewModelActivator Activator { get; }
 }
