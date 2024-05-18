@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 internal class VanillaRoomPool : RoomPool
 {

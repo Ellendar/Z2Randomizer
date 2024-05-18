@@ -1,22 +1,19 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 using RandomizerCore.Asm;
-using Z2Randomizer.Core.Overworld;
-using Z2Randomizer.Core.Sidescroll;
+using RandomizerCore.Overworld;
+using RandomizerCore.Sidescroll;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 public class Hyrule
 {

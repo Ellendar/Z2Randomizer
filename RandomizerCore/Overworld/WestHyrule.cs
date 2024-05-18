@@ -1,10 +1,9 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NLog;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace RandomizerCore.Overworld;
 
 public class WestHyrule : World
 {

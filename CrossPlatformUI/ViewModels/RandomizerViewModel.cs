@@ -8,7 +8,7 @@ using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
-using Z2Randomizer.Core;
+using RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 

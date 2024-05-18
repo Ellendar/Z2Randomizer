@@ -1,4 +1,4 @@
-﻿namespace Z2Randomizer.Core.Sidescroll;
+﻿namespace RandomizerCore.Sidescroll;
 
 public enum RoomExitType
 {

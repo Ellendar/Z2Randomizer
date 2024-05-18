@@ -1,5 +1,5 @@
 ﻿using System;
-using Z2Randomizer.Core.Overworld;
+using RandomizerCore.Overworld;
 
 namespace RandomizerCore.Flags;
 

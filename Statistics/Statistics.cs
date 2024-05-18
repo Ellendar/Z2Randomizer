@@ -1,12 +1,11 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
-using System.ComponentModel;
 using System.IO;
 using CommandLine;
 using System.Threading;
 using System.Threading.Tasks;
-using Z2Randomizer.Core.Sidescroll;
+using RandomizerCore;
+using RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Statistics;
 

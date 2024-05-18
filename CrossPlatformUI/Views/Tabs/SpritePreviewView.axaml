@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:core="clr-namespace:Z2Randomizer.Core;assembly=RandomizerCore"
              xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"

@@ -1,17 +1,15 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using RandomizerCore;
-using Z2Randomizer.Core.Flags;
-using Z2Randomizer.Core.Overworld;
+using NLog;
 using RandomizerCore.Flags;
+using RandomizerCore.Overworld;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 public sealed class RandomizerConfiguration : INotifyPropertyChanged
 {

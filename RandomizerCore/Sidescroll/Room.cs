@@ -1,6 +1,4 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,9 +6,10 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NLog;
 using RandomizerCore.Asm;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 [JsonSourceGenerationOptions(
     UseStringEnumConverter = true,
@@ -209,17 +208,17 @@ public class Room
         }
         var enemyPtr = PalaceGroup switch
         {
-            1 => Core.Enemies.Palace125EnemyPtr,
-            2 => Core.Enemies.Palace346EnemyPtr,
-            3 => Core.Enemies.GPEnemyPtr,
+            1 => RandomizerCore.Enemies.Palace125EnemyPtr,
+            2 => RandomizerCore.Enemies.Palace346EnemyPtr,
+            3 => RandomizerCore.Enemies.GPEnemyPtr,
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
 
         var baseEnemyAddr = PalaceGroup switch
         {
-            1 => Core.Enemies.NormalPalaceEnemyAddr,
-            2 => Core.Enemies.NormalPalaceEnemyAddr,
-            3 => Core.Enemies.GPEnemyAddr,
+            1 => RandomizerCore.Enemies.NormalPalaceEnemyAddr,
+            2 => RandomizerCore.Enemies.NormalPalaceEnemyAddr,
+            3 => RandomizerCore.Enemies.GPEnemyAddr,
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
 
@@ -241,18 +240,18 @@ public class Room
             //Write the updated pointers
             case 1:
                 memAddr -= 0x98b0;
-                romData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-                romData.Put(Core.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                romData.Put(RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+                romData.Put(RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
                 break;
             case 2:
                 memAddr -= 0x98b0;
-                romData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-                romData.Put(Core.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                romData.Put(RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+                romData.Put(RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
                 break;
             default:
                 memAddr -= 0xd8b0;
-                romData.Put(Core.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-                romData.Put(Core.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                romData.Put(RandomizerCore.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
+                romData.Put(RandomizerCore.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
                 break;
         }
 
@@ -377,40 +376,40 @@ public class Room
         switch (PalaceGroup)
         {
             case 1:
-                allEnemies = Core.Enemies.Palace125Enemies;
-                smallEnemies = Core.Enemies.Palace125SmallEnemies;
-                largeEnemies = Core.Enemies.Palace125LargeEnemies;
-                flyingEnemies = Core.Enemies.Palace125FlyingEnemies;
-                generators = Core.Enemies.Palace125Generators;
-                shufflableEnemies = Core.Enemies.StandardPalaceEnemies;
-                shufflableSmallEnemies = Core.Enemies.StandardPalaceSmallEnemies;
-                shufflableLargeEnemies = Core.Enemies.StandardPalaceLargeEnemies;
-                shufflableFlyingEnemies = Core.Enemies.StandardPalaceFlyingEnemies;
-                shufflableGenerators = Core.Enemies.StandardPalaceGenerators;
+                allEnemies = RandomizerCore.Enemies.Palace125Enemies;
+                smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
+                largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
+                flyingEnemies = RandomizerCore.Enemies.Palace125FlyingEnemies;
+                generators = RandomizerCore.Enemies.Palace125Generators;
+                shufflableEnemies = RandomizerCore.Enemies.StandardPalaceEnemies;
+                shufflableSmallEnemies = RandomizerCore.Enemies.StandardPalaceSmallEnemies;
+                shufflableLargeEnemies = RandomizerCore.Enemies.StandardPalaceLargeEnemies;
+                shufflableFlyingEnemies = RandomizerCore.Enemies.StandardPalaceFlyingEnemies;
+                shufflableGenerators = RandomizerCore.Enemies.StandardPalaceGenerators;
                 break;
             case 2:
-                allEnemies = Core.Enemies.Palace346Enemies;
-                smallEnemies = Core.Enemies.Palace346SmallEnemies;
-                largeEnemies = Core.Enemies.Palace346LargeEnemies;
-                flyingEnemies = Core.Enemies.Palace346FlyingEnemies;
-                generators = Core.Enemies.Palace346Generators;
-                shufflableEnemies = Core.Enemies.StandardPalaceEnemies;
-                shufflableSmallEnemies = Core.Enemies.StandardPalaceSmallEnemies;
-                shufflableLargeEnemies = Core.Enemies.StandardPalaceLargeEnemies;
-                shufflableFlyingEnemies = Core.Enemies.StandardPalaceFlyingEnemies;
-                shufflableGenerators = Core.Enemies.StandardPalaceGenerators;
+                allEnemies = RandomizerCore.Enemies.Palace346Enemies;
+                smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
+                largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
+                flyingEnemies = RandomizerCore.Enemies.Palace346FlyingEnemies;
+                generators = RandomizerCore.Enemies.Palace346Generators;
+                shufflableEnemies = RandomizerCore.Enemies.StandardPalaceEnemies;
+                shufflableSmallEnemies = RandomizerCore.Enemies.StandardPalaceSmallEnemies;
+                shufflableLargeEnemies = RandomizerCore.Enemies.StandardPalaceLargeEnemies;
+                shufflableFlyingEnemies = RandomizerCore.Enemies.StandardPalaceFlyingEnemies;
+                shufflableGenerators = RandomizerCore.Enemies.StandardPalaceGenerators;
                 break;
             case 3:
-                allEnemies = Core.Enemies.GPEnemies;
-                smallEnemies = Core.Enemies.GPSmallEnemies;
-                largeEnemies = Core.Enemies.GPLargeEnemies;
-                flyingEnemies = Core.Enemies.GPFlyingEnemies;
-                generators = Core.Enemies.GPGenerators;
-                shufflableEnemies = Core.Enemies.GPEnemies;
-                shufflableSmallEnemies = Core.Enemies.GPSmallEnemies;
-                shufflableLargeEnemies = Core.Enemies.GPLargeEnemies;
-                shufflableFlyingEnemies = Core.Enemies.GPFlyingEnemies;
-                shufflableGenerators = Core.Enemies.GPGenerators;
+                allEnemies = RandomizerCore.Enemies.GPEnemies;
+                smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
+                largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
+                flyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
+                generators = RandomizerCore.Enemies.GPGenerators;
+                shufflableEnemies = RandomizerCore.Enemies.GPEnemies;
+                shufflableSmallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
+                shufflableLargeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
+                shufflableFlyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
+                shufflableGenerators = RandomizerCore.Enemies.GPGenerators;
                 break;
             default:
                 throw new ImpossibleException("Invalid Palace Group");

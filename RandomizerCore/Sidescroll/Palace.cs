@@ -1,11 +1,10 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
-using RandomizerCore;
+using System.Linq;
+using NLog;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 public class Palace
 {

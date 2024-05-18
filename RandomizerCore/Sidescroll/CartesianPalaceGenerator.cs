@@ -1,13 +1,10 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Threading;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
 {

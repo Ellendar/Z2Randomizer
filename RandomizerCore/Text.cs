@@ -1,10 +1,9 @@
-﻿using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Z2Randomizer.Core.Overworld;
+using RandomizerCore.Overworld;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Text : IEquatable<Text>

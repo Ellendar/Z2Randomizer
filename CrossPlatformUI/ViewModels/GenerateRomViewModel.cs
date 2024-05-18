@@ -12,9 +12,9 @@ using DialogHostAvalonia;
 using RandomizerCore.Asm;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
-using Z2Randomizer.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Z2Randomizer.Core.Sidescroll;
+using RandomizerCore;
+using RandomizerCore.Sidescroll;
 
 namespace CrossPlatformUI.ViewModels;
 

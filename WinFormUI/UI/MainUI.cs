@@ -1,18 +1,14 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System.ComponentModel;
-using Z2Randomizer.Core.Overworld;
 using WinFormUI.UI;
-
-using Z2Randomizer.Core.Flags;
 using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
 using System.Reflection;
 using CommandLine;
-using Z2Randomizer.Core.Sidescroll;
-using System;
 using RandomizerCore;
-using System.Configuration;
+using RandomizerCore.Flags;
+using RandomizerCore.Overworld;
+using RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.WinFormUI;
 

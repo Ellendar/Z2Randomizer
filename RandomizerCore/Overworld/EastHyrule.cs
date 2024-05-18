@@ -1,11 +1,9 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using NLog;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace RandomizerCore.Overworld;
 
 //6A31 - address in memory of kasuto y coord;
 //6A35 - address in memory of palace 6 y coord

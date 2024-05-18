@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 public class VanillaShufflePalaceGenerator(CancellationToken ct) : VanillaPalaceGenerator(ct)
 {
