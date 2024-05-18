@@ -46,4 +46,4 @@ jobs:
           compression-level: 9
           path: |
             CrossPlatformUI/bin/publish
-            !path/**/*.pdb
+            !**/*.pdb
