@@ -13,30 +13,30 @@ public class DesktopFileService : IFileSystemService
     private string SpriteBasePath { get; init; }
     private string SettingsBasePath { get; init; }
     private string PalacesBasePath { get; init; }
+    private string OSBasePath { get; init; }
 
     public DesktopFileService()
     {
         if (OperatingSystem.IsWindows())
         {
-            SpriteBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-                             "/Z2Randomizer/Sprites/";
-            SettingsBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-                               "/Z2Randomizer/";
-            PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
-        } else // (OperatingSystem.IsMacOS())
-        {
-            // TODO
-            SpriteBasePath = Path.GetDirectoryName(AppContext.BaseDirectory) + "/Sprites/";
-            SettingsBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
-            PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
+            OSBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         } 
-        // else if (OperatingSystem.IsLinux())
-        // {
-        //     // TODO
-        //     SpriteBasePath = "./";
-        //     SettingsBasePath = "./";
-        //     PalacesBasePath = "./";
-        // }
+        else if (OperatingSystem.IsMacOS() && Environment.GetEnvironmentVariable("HOME") is not null)
+        {
+            OSBasePath = Path.Combine(Environment.GetEnvironmentVariable("HOME")!,
+                                      "Library", "Application Support");
+        }
+        else if (OperatingSystem.IsLinux() && Environment.GetEnvironmentVariable("HOME") is not null)
+        {
+            OSBasePath = Path.Combine(Environment.GetEnvironmentVariable("HOME")!, ".local", "share");
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+        SettingsBasePath = Path.Combine(OSBasePath, "Z2Randomizer");
+        SpriteBasePath = Path.Combine(SettingsBasePath, "Sprites");
+        PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
         Directory.CreateDirectory(SpriteBasePath);
         Directory.CreateDirectory(SettingsBasePath);
         Directory.CreateDirectory(PalacesBasePath);
