@@ -1,12 +1,10 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Z2Randomizer.Core.Overworld;
+using NLog;
+using RandomizerCore.Overworld;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 public class CustomTexts
 {

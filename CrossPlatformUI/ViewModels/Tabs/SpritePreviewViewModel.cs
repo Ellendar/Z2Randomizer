@@ -16,7 +16,6 @@ using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using RandomizerCore;
 using ReactiveUI;
-using Z2Randomizer.Core;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 

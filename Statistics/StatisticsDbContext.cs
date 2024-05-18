@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using Z2Randomizer.Core;
-using Z2Randomizer.Core.Overworld;
+using RandomizerCore;
+using RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Statistics;
 

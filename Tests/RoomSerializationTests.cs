@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Diagnostics;
-using Z2Randomizer.Core.Sidescroll;
-using Z2Randomizer.Core.Sidescroll;
+using RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Tests;
 

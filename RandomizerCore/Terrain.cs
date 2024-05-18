@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Z2Randomizer.Core;
+﻿namespace RandomizerCore;
 
 //These indexes correspond to the 4bit representation used in the rom. Do not change them.
 public enum Terrain

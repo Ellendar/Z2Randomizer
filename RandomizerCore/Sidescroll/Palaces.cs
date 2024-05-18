@@ -1,15 +1,11 @@
-﻿using NLog;
-using Z2Randomizer.Core.Sidescroll;
-using SD.Tools.Algorithmia.GeneralDataStructures;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using RandomizerCore;
-using static Z2Randomizer.Core.Util;
+using NLog;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 public class Palaces
 {

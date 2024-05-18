@@ -1,12 +1,9 @@
-﻿using RandomizerCore;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Z2Randomizer.Core.Overworld;
-using static System.Reflection.Metadata.BlobBuilder;
+using RandomizerCore.Overworld;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 /// <summary>
 /// Originally this class corresponded to the flags and controlled the logic, with all the actual configuration randomization

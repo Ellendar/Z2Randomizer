@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 public abstract class PalaceGenerator
 {

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NLog;
-using RandomizerCore;
+
 //using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace RandomizerCore.Overworld;
 
 public abstract class World
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 public enum Town
 {

@@ -1,11 +1,9 @@
-﻿using RandomizerCore;
-using SD.Tools.BCLExtensions.CollectionsRelated;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace RandomizerCore.Overworld;
 
 class DeathMountain : World
 {

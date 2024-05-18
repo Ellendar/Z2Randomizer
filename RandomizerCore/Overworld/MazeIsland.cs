@@ -1,13 +1,8 @@
-﻿using Z2Randomizer.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data;
-using RandomizerCore;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace RandomizerCore.Overworld;
 
 class MazeIsland : World
 {

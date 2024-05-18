@@ -1,5 +1,4 @@
-﻿using Z2Randomizer.Core;
-
+﻿
 namespace RandomizerCore;
 
 public enum Collectable

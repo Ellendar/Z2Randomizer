@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using NLog;
 using System.Reflection;
-using Z2Randomizer.Core;
+using RandomizerCore;
 
 namespace CommandLine
 {

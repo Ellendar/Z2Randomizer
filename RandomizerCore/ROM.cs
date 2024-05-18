@@ -1,16 +1,15 @@
-﻿using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using NLog;
 using RandomizerCore.Asm;
-using Z2Randomizer.Core.Overworld;
+using RandomizerCore.Overworld;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 /*
 Classes Needed:

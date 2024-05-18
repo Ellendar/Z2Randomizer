@@ -2,8 +2,8 @@
 using CommandLine;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
-using Z2Randomizer.Core;
-using Z2Randomizer.Core.Sidescroll;
+using RandomizerCore;
+using RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.CommandLine;
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Z2Randomizer.Core.Sidescroll;
+using RandomizerCore.Sidescroll;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
 public class Requirements
 {

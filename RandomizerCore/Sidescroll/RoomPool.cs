@@ -1,8 +1,8 @@
-﻿using SD.Tools.Algorithmia.GeneralDataStructures;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using SD.Tools.Algorithmia.GeneralDataStructures;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 internal class RoomPool
 {

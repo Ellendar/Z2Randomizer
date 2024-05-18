@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 using Avalonia.Data.Converters;
 using RandomizerCore;
 using RandomizerCore.Flags;
-using Z2Randomizer.Core.Overworld;
+using RandomizerCore.Overworld;
 
 namespace CrossPlatformUI;
 

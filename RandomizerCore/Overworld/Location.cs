@@ -1,10 +1,7 @@
-﻿using NLog;
-using Z2Randomizer.Core;
-using System;
-using System.Diagnostics;
-using RandomizerCore;
+﻿using System.Diagnostics;
+using NLog;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace RandomizerCore.Overworld;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Location

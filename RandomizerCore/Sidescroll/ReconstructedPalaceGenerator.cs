@@ -1,10 +1,10 @@
-﻿using NLog;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using System.Threading;
 using System.Linq;
+using System.Threading;
+using NLog;
 
-namespace Z2Randomizer.Core.Sidescroll;
+namespace RandomizerCore.Sidescroll;
 
 public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerator
 {

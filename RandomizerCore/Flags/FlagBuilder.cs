@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Z2Randomizer.Core.Flags;
+namespace RandomizerCore.Flags;
 
 /// <summary>
 /// Extremely crude builder pattern implementation for flags backed by a bitarray. If I cared that much about efficency this would 
