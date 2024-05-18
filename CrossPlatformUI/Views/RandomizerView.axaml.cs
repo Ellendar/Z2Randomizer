@@ -3,7 +3,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using Avalonia.VisualTree;
 using CrossPlatformUI.ViewModels;
+using DialogHostAvalonia;
 using ReactiveUI;
 
 namespace CrossPlatformUI.Views;

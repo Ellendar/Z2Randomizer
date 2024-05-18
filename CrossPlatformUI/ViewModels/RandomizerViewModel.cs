@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels.Tabs;
+using DialogHostAvalonia;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
@@ -26,27 +27,14 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             return false;
         }
     }
-    private string validatedFlags = "";
 
-    public string Flags
-    {
-        get => validatedFlags;
-        set
-        {
-            if (IsFlagStringValid(value) && value != Main.Config.Flags)
-            {
-                Main.Config.Flags = value;
-            }
-            this.RaiseAndSetIfChanged(ref validatedFlags, value);
-        }
-    }
-
+    [JsonIgnore]
     public string Seed
     {
         get => Main.Config.Seed;
         set
         {
-            Main.Config.Seed = value;
+            Main.Config.Seed = value.Trim();
             this.RaisePropertyChanged();
         }
     }
@@ -82,6 +70,17 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             var folder = await fileDialog.OpenFolderAsync();
             Main.OutputFilePath = folder?.Path.AbsolutePath ?? "";
         });
+        CanGenerate = this.WhenAnyValue(
+            x => x.Flags,
+            x => x.Main.Config.Seed,
+            x => x.Main.RomFileViewModel.HasRomData,
+            (flags, seed, hasRomData) =>
+                IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData
+        );
+        // Generate = ReactiveCommand.CreateFromTask(async () =>
+        // {
+        //     await DialogHost.Show("GenerateRomDialog");
+        // }, CanGenerate);
         this.WhenActivated(OnActivate);
     }
 
@@ -91,6 +90,11 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         {
             Flags = MainViewModel.BeginnerPreset;            
         }
+        else
+        {
+            Flags = Main.Config.Flags;
+        }
+
         Main.Config.PropertyChanged += (sender, args) =>
         {
             switch (args.PropertyName)
@@ -120,11 +124,22 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             x => x.Flags,
             flagsValidation,
             "Invalid Flags");
-        CanGenerate = this.WhenAnyValue(
-            x => x.Flags,
-            x => x.Seed,
-            x => x.Main.RomFileViewModel.HasRomData, 
-            (flags, seed, hasRomData) => IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData);
+    }
+
+    private string validatedFlags = "";
+
+    [JsonIgnore]
+    public string Flags
+    {
+        get => validatedFlags;
+        set
+        {
+            if (IsFlagStringValid(value) && value != Main.Config.Flags)
+            {
+                Main.Config.Flags = value;
+            }
+            this.RaiseAndSetIfChanged(ref validatedFlags, value);
+        }
     }
 
     [JsonIgnore]
@@ -132,12 +147,12 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
     [JsonIgnore]
     public MainViewModel Main { get; }
-    [JsonInclude]
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public CustomizeViewModel CustomizeViewModel { get; set; }
+    public CustomizeViewModel CustomizeViewModel { get; }
     
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> Generate { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveFolder { get; }
     [JsonIgnore]

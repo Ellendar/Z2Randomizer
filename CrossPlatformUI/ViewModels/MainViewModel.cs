@@ -18,6 +18,9 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     public string? OutputFilePath { get; set; }
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    public RandomizerConfiguration Config { get; set; } = new();
+
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RomFileViewModel RomFileViewModel { get; set; }
     
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
@@ -70,9 +73,6 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     // {
     //     App.Main = this;
     // }
-
-    [JsonIgnore]
-    public RandomizerConfiguration Config { get; } = new();
 
     // The Router associated with this Screen.
     // Required by the IScreen interface.

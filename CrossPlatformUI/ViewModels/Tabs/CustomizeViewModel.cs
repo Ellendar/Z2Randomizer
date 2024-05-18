@@ -7,8 +7,7 @@ namespace CrossPlatformUI.ViewModels.Tabs;
 
 public class CustomizeViewModel : ReactiveObject
 {
-    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public SpritePreviewViewModel SpritePreviewViewModel { get; set; }
+    public SpritePreviewViewModel SpritePreviewViewModel { get; }
 
     [JsonConstructor]
     public CustomizeViewModel() {}
