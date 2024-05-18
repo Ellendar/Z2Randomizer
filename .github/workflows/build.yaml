@@ -31,22 +31,19 @@ jobs:
 
       - if: ${{ ! startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Desktop
-        run: dotnet publish -c Release /p:Platform="${{ matrix.platform.arch }}" -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
+        run: dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
 
       - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Browser
         run: |
           dotnet workload install wasm-tools
-          dotnet publish -c Release -o CrossPlatformUI/bin/Release/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
-
-      - name: Compress artifacts
-        uses: vimtor/action-zip@v1.2
-        with:
-          files: CrossPlatformUI/bin/Release/publish/
-          dest: CrossPlatformUI/bin/Release/Z2Randomizer.zip
+          dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload To Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: Z2Randomizer ${{ matrix.platform.os }}) ${{ matrix.platform.arch }})
-          path: CrossPlatformUI/bin/Release/Z2Randomizer.zip
+          name: Z2Randomizer ${{ matrix.platform.os }} - ${{ matrix.platform.arch }}
+          compression-level: 9
+          path: |
+            CrossPlatformUI/bin/publish
+            !path/**/*.pdb

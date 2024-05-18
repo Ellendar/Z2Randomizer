@@ -3,7 +3,6 @@
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>C:\Users\Doug\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -37,45 +36,26 @@
     <None Remove="Asm\FixedHud.s" />
     <None Remove="Asm\Graphics\item_sprites.chr" />
     <None Remove="Asm\Recoil.s" />
-    <None Remove="CustomRooms.json" />
-    <None Remove="nlog.config" />
-    <None Remove="PalaceRooms.json" />
     <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
+    <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="CustomRooms.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="nlog.config">
+    <Content Include="nlog.config" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-	<Content Include="PalaceRooms.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <Content Include="js65\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="NLog" Version="5.2.6" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Sprites\*.ips">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="js65\**" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>

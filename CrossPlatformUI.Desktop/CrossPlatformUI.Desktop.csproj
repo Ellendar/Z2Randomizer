@@ -12,8 +12,7 @@
         <PublishSingleFile>true</PublishSingleFile>
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>partial</TrimMode>
-<!--        <PublishAot>true</PublishAot>-->
-<!--        <IsAotCompatible>true</IsAotCompatible>-->
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     </PropertyGroup>
 
     <PropertyGroup>
