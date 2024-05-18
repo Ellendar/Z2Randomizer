@@ -10,6 +10,7 @@ using RandomizerCore;
 using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using RandomizerCore.Flags;
+using System.ComponentModel.DataAnnotations;
 
 namespace Z2Randomizer.Core;
 
@@ -163,8 +164,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool randomizeKnockback;
     private bool? shortenGP;
     private bool? shortenNormalPalaces;
-    
+
     //Meta
+    [Required]
     [IgnoreInFlags]
     public string Seed { get => seed; set => SetField(ref seed, value); }
     [IgnoreInFlags]

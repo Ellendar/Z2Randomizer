@@ -22,6 +22,7 @@
             <CheckBox IsChecked="{Binding Config.ShuffleXPStealers}" Content="Shuffle Which Enemies Steal EXP" />
             <CheckBox IsChecked="{Binding Config.ShuffleXPStolenAmount}" Content="Shuffle Amount Of EXP Stolen" />
             <CheckBox IsChecked="{Binding Config.ShuffleSwordImmunity}" Content="Shuffle Sword Immunity" />
+            <CheckBox IsChecked="{Binding Config.ShuffleSpritePalettes}" Content="Shuffle Sprite Palettes" />
             <ComboBox assists:ComboBoxAssist.Label="Enemy Experience Drops" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.XPEffectivenessList}}"
                       SelectedItem="{Binding Config.EnemyXPDrops, Converter={x:Static ui:Util.EnumConvert}}" />

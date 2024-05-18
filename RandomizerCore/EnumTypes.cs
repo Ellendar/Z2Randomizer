@@ -244,6 +244,72 @@ static class BiomeExtensions
             _ => throw new Exception("Unrecognized Biome in SeedTerrainLimit")
         };
     }
+
+    public static bool IsWestBiome(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            Biome.VANILLALIKE => true,
+            Biome.ISLANDS => true,
+            Biome.CANYON => true,
+            Biome.CALDERA => true,
+            Biome.MOUNTAINOUS => true,
+            Biome.RANDOM => true,
+            Biome.RANDOM_NO_VANILLA => true,
+            Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => true,
+            _ => false
+        };
+    }
+
+    public static bool IsEastBiome(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            Biome.VANILLALIKE => true,
+            Biome.ISLANDS => true,
+            Biome.CANYON => true,
+            Biome.VOLCANO => true,
+            Biome.MOUNTAINOUS => true,
+            Biome.RANDOM => true,
+            Biome.RANDOM_NO_VANILLA => true,
+            Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => true,
+            _ => false
+        };
+    }
+
+    public static bool IsMazeBiome(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            Biome.VANILLALIKE => true,
+            Biome.RANDOM => true,
+            _ => false
+        };
+    }
+
+    public static bool IsDMBiome(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            Biome.VANILLALIKE => true,
+            Biome.ISLANDS => true,
+            Biome.CANYON => true,
+            Biome.CALDERA => true,
+            Biome.MOUNTAINOUS => true,
+            Biome.RANDOM => true,
+            Biome.RANDOM_NO_VANILLA => true,
+            Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => true,
+            _ => false
+        };
+    }
 }
 
 [DefaultValue(NORMAL)]
@@ -395,29 +461,36 @@ public record EnumDescription
 
 public static class Enums
 {
-    public static IEnumerable<EnumDescription> StartingTechList { get; } = ToDescriptions(typeof(StartingTechs));
-    public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions(typeof(StartingLives));
-    public static IEnumerable<EnumDescription> AttackEffectivenessList { get; } = ToDescriptions(typeof(AttackEffectiveness));
-    public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions(typeof(MagicEffectiveness));
-    public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions(typeof(LifeEffectiveness));
-    public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions(typeof(XPEffectiveness));
-    public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions(typeof(FireOption));
-    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; } = ToDescriptions(typeof(NormalPalaceStyle));
-    public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } = ToDescriptions(typeof(GPStyle));
-    public static IEnumerable<EnumDescription> BiomeList { get; } = ToDescriptions(typeof(Biome));
-    public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions(typeof(ContinentConnectionType));
-    public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions(typeof(EncounterRate));
-    public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions(typeof(CharacterColor));
-    public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions(typeof(BeamSprites));
-    public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions(typeof(BeepThreshold));
-    public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions(typeof(BeepFrequency));
-        
-    public static IEnumerable<EnumDescription> ToDescriptions(Type t)
+    public static IEnumerable<EnumDescription> StartingTechList { get; } = ToDescriptions<StartingTechs>();
+    public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions<StartingLives>();
+    public static IEnumerable<EnumDescription> AttackEffectivenessList { get; } = ToDescriptions<AttackEffectiveness>();
+    public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
+    public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
+    public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
+    public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
+    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; } = ToDescriptions<NormalPalaceStyle>();
+    public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } = ToDescriptions<GPStyle>();
+    public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
+    public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
+    public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
+    public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
+    public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
+    public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();
+    public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions<CharacterColor>();
+    public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();
+    public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions<BeepThreshold>();
+    public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions<BeepFrequency>();
+
+    public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
     {
-        if (!t.IsEnum)
-            throw new ArgumentException($"{nameof(t)} must be an enum type");
-    
-        return Enum.GetValues(t).Cast<Enum>().Select(ToDescription).ToList();
+        if (!typeof(T).IsEnum)
+            throw new ArgumentException($"{nameof(T)} must be an enum type");
+
+        if(filterExpression == null)
+        {
+            return Enum.GetValues(typeof(T)).Cast<Enum>().Select(i => i.ToDescription());
+        }
+        return Enum.GetValues(typeof(T)).Cast<T>().Where(filterExpression).Select(i => i.ToDescription());
     }
 
     public static object ToDefault(this Type enumType)

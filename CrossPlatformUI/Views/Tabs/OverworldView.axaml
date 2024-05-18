@@ -33,23 +33,23 @@
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.GoodBoots}" Content="All Water Is Walkable With Boots" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.GenerateBaguWoods}" Content="Generate Bagu's Woods" />
             <Separator />
-            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *">
+            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
                 <ComboBox Grid.Row="0" Grid.Column="0" assists:ComboBoxAssist.Label="West Continent Biome" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.BiomeList}}"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.WestBiomeList}}"
                           SelectedItem="{Binding Config.WestBiome, Converter={x:Static ui:Util.EnumConvert}}" />
-                <ComboBox Grid.Row="0" Grid.Column="1" assists:ComboBoxAssist.Label="East Continent Biome" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.BiomeList}}"
+                <ComboBox Grid.Row="1" Grid.Column="0" assists:ComboBoxAssist.Label="East Continent Biome" Theme="{StaticResource MaterialOutlineComboBox}"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.EastBiomeList}}"
                           SelectedItem="{Binding Config.EastBiome, Converter={x:Static ui:Util.EnumConvert}}" />
-                <ComboBox Grid.Row="1" Grid.Column="0" assists:ComboBoxAssist.Label="Death Mountain Biome" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.BiomeList}}"
+                <ComboBox Grid.Row="3" Grid.Column="0" assists:ComboBoxAssist.Label="Death Mountain Biome" Theme="{StaticResource MaterialOutlineComboBox}"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.DMBiomeList}}"
                           SelectedItem="{Binding Config.DMBiome, Converter={x:Static ui:Util.EnumConvert}}" />
-                <ComboBox Grid.Row="1" Grid.Column="1" assists:ComboBoxAssist.Label="Maze Island Biome" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.BiomeList}}"
+                <ComboBox Grid.Row="2" Grid.Column="0" assists:ComboBoxAssist.Label="Maze Island Biome" Theme="{StaticResource MaterialOutlineComboBox}"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.MazeBiomeList}}"
                           SelectedItem="{Binding Config.MazeBiome, Converter={x:Static ui:Util.EnumConvert}}" />
-                <ComboBox Grid.Row="2" Grid.Column="0" assists:ComboBoxAssist.Label="Continent Connections" Theme="{StaticResource MaterialOutlineComboBox}"
+                <ComboBox Grid.Row="1" Grid.Column="1" assists:ComboBoxAssist.Label="Continent Connections" Theme="{StaticResource MaterialOutlineComboBox}"
                           ItemsSource="{Binding Source={x:Static rc:Enums.ContinentConnectionTypeList}}"
                           SelectedItem="{Binding Config.ContinentConnectionType, Converter={x:Static ui:Util.EnumConvert}}" />
-                <ComboBox Grid.Row="2" Grid.Column="1" assists:ComboBoxAssist.Label="Climate" Theme="{StaticResource MaterialOutlineComboBox}"
+                <ComboBox Grid.Row="0" Grid.Column="1" assists:ComboBoxAssist.Label="Climate" Theme="{StaticResource MaterialOutlineComboBox}"
                           ItemsSource="{Binding Source={x:Static overworld:Climates.ClimateList}}"
                           SelectedItem="{Binding Config.Climate, Converter={x:Static ui:Util.ClimateConvert}}" />
             </Grid>

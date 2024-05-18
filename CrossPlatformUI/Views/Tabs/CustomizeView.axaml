@@ -27,7 +27,6 @@
                 </TextBlock>
             </CheckBox>
             <CheckBox IsChecked="{Binding RemoveFlashing}" Content="Remove Flashing" />
-            <CheckBox IsChecked="{Binding ShuffleSpritePalettes}" Content="Shuffle Sprite Palettes" />
             <CheckBox IsChecked="{Binding UseCommunityText}" Content="Use Community Text" />
         </StackPanel>
         <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
