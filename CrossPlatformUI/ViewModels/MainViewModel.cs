@@ -18,10 +18,10 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     public string? OutputFilePath { get; set; }
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public RomFileViewModel RomFileViewModel { get; }
+    public RomFileViewModel RomFileViewModel { get; set; }
     
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public RandomizerViewModel RandomizerViewModel { get; }
+    public RandomizerViewModel RandomizerViewModel { get; set; }
 
     public CustomPixelPoint WindowPosition { get => windowPosition; set => this.RaiseAndSetIfChanged(ref windowPosition, value); }
 
@@ -53,8 +53,8 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     
     // Window/Desktop specific data
     
-    private const int DefaultWidth = 650;
-    private const int DefaultHeight = 900;
+    private const int DefaultWidth = 900;
+    private const int DefaultHeight = 650;
     
     private CustomPixelPoint windowPosition = new()
     {

@@ -109,6 +109,7 @@ public sealed partial class App : Application // , IDisposable
 
 [JsonSourceGenerationOptions(
     WriteIndented = false,
+    IgnoreReadOnlyProperties = true,
     PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
 )]
 [JsonSerializable(typeof(MainViewModel))]

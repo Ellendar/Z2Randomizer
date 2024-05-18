@@ -134,7 +134,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public MainViewModel Main { get; }
     [JsonInclude]
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public CustomizeViewModel CustomizeViewModel { get; }
+    public CustomizeViewModel CustomizeViewModel { get; set; }
     
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> RerollSeed { get; }

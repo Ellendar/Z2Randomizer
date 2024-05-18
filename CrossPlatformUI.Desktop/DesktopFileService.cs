@@ -45,9 +45,9 @@ public class DesktopFileService : IFileSystemService
     private string FullPath(IFileSystemService.RandomizerPath path, string filename) =>
         path switch
         {
-            IFileSystemService.RandomizerPath.Sprites => SpriteBasePath + filename,
-            IFileSystemService.RandomizerPath.Settings => SettingsBasePath + filename,
-            IFileSystemService.RandomizerPath.Palaces => PalacesBasePath + filename,
+            IFileSystemService.RandomizerPath.Sprites => Path.Combine(SpriteBasePath, filename),
+            IFileSystemService.RandomizerPath.Settings => Path.Combine(SettingsBasePath, filename),
+            IFileSystemService.RandomizerPath.Palaces => Path.Combine(PalacesBasePath, filename),
             _ => throw new ArgumentOutOfRangeException(nameof(path), path, null)
         };
     public Task<string> OpenFile(IFileSystemService.RandomizerPath path, string filename)

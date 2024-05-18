@@ -13,19 +13,19 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
     {
         // Prevent the previewer's DataContext from being set when the application is run.
         this.WhenActivated(disposables => {
-            PositionChanged += (sender, args) =>
+            var context = DataContext as MainViewModel;
+            ClientSize = new Size(context!.WindowSize.Width,context.WindowSize.Height);
+            PositionChanged += (_, args) =>
             {
-                var context = DataContext as MainViewModel;
-                context!.WindowPosition = new CustomPixelPoint
+                context.WindowPosition = new CustomPixelPoint
                 {
                     X = args.Point.X,
                     Y = args.Point.Y,
                 };
             };
-            Resized += (sender, args) =>
+            Resized += (_, args) =>
             {
-                var context = DataContext as MainViewModel;
-                context!.WindowSize = new CustomSize
+                context.WindowSize = new CustomSize
                 {
                     Width = args.ClientSize.Width,
                     Height = args.ClientSize.Height,
