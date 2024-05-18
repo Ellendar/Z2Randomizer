@@ -959,23 +959,23 @@ public partial class MainUI : Form
         //Palaces
         configuration.NormalPalaceStyle = palaceStyleList.SelectedIndex switch
         {
-            0 => PalaceStyle.VANILLA,
-            1 => PalaceStyle.SHUFFLED,
-            2 => PalaceStyle.RECONSTRUCTED,
-            3 => PalaceStyle.CARTESIAN,
-            4 => PalaceStyle.CHAOS,
-            5 => PalaceStyle.RANDOM_ALL,
-            6 => PalaceStyle.RANDOM_PER_PALACE,
+            0 => NormalPalaceStyle.VANILLA,
+            1 => NormalPalaceStyle.SHUFFLED,
+            2 => NormalPalaceStyle.RECONSTRUCTED,
+            3 => NormalPalaceStyle.CARTESIAN,
+            4 => NormalPalaceStyle.CHAOS,
+            5 => NormalPalaceStyle.RANDOM_ALL,
+            6 => NormalPalaceStyle.RANDOM_PER_PALACE,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
         configuration.GPStyle = gpStyleList.SelectedIndex switch
         {
-            0 => PalaceStyle.VANILLA,
-            1 => PalaceStyle.SHUFFLED,
-            2 => PalaceStyle.RECONSTRUCTED,
-            3 => PalaceStyle.CARTESIAN,
-            4 => PalaceStyle.CHAOS,
-            5 => PalaceStyle.RANDOM_ALL,
+            0 => GPStyle.VANILLA,
+            1 => GPStyle.SHUFFLED,
+            2 => GPStyle.RECONSTRUCTED,
+            3 => GPStyle.CARTESIAN,
+            4 => GPStyle.CHAOS,
+            5 => GPStyle.RANDOM,
             _ => throw new Exception("Invalid GP Style setting")
         };
         configuration.ShortenNormalPalaces = GetTripleCheckState(shortenNormalPalaceCheckbox);
@@ -1012,29 +1012,29 @@ public partial class MainUI : Form
         configuration.ScaleLevelRequirementsToCap = scaleLevelRequirementsToCapCheckbox.Checked;
         configuration.AttackEffectiveness = attackEffectivenessList.SelectedIndex switch
         {
-            0 => StatEffectiveness.AVERAGE,
-            1 => StatEffectiveness.LOW,
-            2 => StatEffectiveness.VANILLA,
-            3 => StatEffectiveness.HIGH,
-            4 => StatEffectiveness.MAX,
+            0 => AttackEffectiveness.AVERAGE,
+            1 => AttackEffectiveness.LOW,
+            2 => AttackEffectiveness.VANILLA,
+            3 => AttackEffectiveness.HIGH,
+            4 => AttackEffectiveness.OHKO,
             _ => throw new Exception("Invalid AttackEffectiveness setting")
         };
         configuration.MagicEffectiveness = magicEffectivenessList.SelectedIndex switch
         {
-            0 => StatEffectiveness.AVERAGE,
-            1 => StatEffectiveness.LOW,
-            2 => StatEffectiveness.VANILLA,
-            3 => StatEffectiveness.HIGH,
-            4 => StatEffectiveness.MAX,
+            0 => MagicEffectiveness.AVERAGE,
+            1 => MagicEffectiveness.HIGH_COST,
+            2 => MagicEffectiveness.VANILLA,
+            3 => MagicEffectiveness.LOW_COST,
+            4 => MagicEffectiveness.FREE,
             _ => throw new Exception("Invalid MagicEffectiveness setting")
         };
         configuration.LifeEffectiveness = lifeEffectivenessList.SelectedIndex switch
         {
-            0 => StatEffectiveness.AVERAGE,
-            1 => StatEffectiveness.NONE,
-            2 => StatEffectiveness.VANILLA,
-            3 => StatEffectiveness.HIGH,
-            4 => StatEffectiveness.MAX,
+            0 => LifeEffectiveness.AVERAGE,
+            1 => LifeEffectiveness.OHKO,
+            2 => LifeEffectiveness.VANILLA,
+            3 => LifeEffectiveness.HIGH,
+            4 => LifeEffectiveness.INVINCIBLE,
             _ => throw new Exception("Invalid LifeEffectiveness setting")
         };
 
@@ -1065,11 +1065,10 @@ public partial class MainUI : Form
         configuration.ShuffleSwordImmunity = shuffleSwordImmunityBox.Checked;
         configuration.EnemyXPDrops = experienceDropsList.SelectedIndex switch
         {
-            0 => StatEffectiveness.VANILLA,
-            1 => StatEffectiveness.NONE,
-            2 => StatEffectiveness.LOW,
-            3 => StatEffectiveness.AVERAGE,
-            4 => StatEffectiveness.HIGH,
+            0 => XPEffectiveness.VANILLA,
+            1 => XPEffectiveness.LOW,
+            2 => XPEffectiveness.AVERAGE,
+            3 => XPEffectiveness.HIGH,
             _ => throw new Exception("Invalid EnemyXPDrops setting")
         };
 
@@ -1453,23 +1452,23 @@ public partial class MainUI : Form
             //Palaces
             palaceStyleList.SelectedIndex = configuration.NormalPalaceStyle switch
             {
-                PalaceStyle.VANILLA => 0,
-                PalaceStyle.SHUFFLED => 1,
-                PalaceStyle.RECONSTRUCTED => 2,
-                PalaceStyle.CARTESIAN => 3,
-                PalaceStyle.CHAOS => 4,
-                PalaceStyle.RANDOM_ALL => 5,
-                PalaceStyle.RANDOM_PER_PALACE => 6,
+                NormalPalaceStyle.VANILLA => 0,
+                NormalPalaceStyle.SHUFFLED => 1,
+                NormalPalaceStyle.RECONSTRUCTED => 2,
+                NormalPalaceStyle.CARTESIAN => 3,
+                NormalPalaceStyle.CHAOS => 4,
+                NormalPalaceStyle.RANDOM_ALL => 5,
+                NormalPalaceStyle.RANDOM_PER_PALACE => 6,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             gpStyleList.SelectedIndex = configuration.GPStyle switch
             {
-                PalaceStyle.VANILLA => 0,
-                PalaceStyle.SHUFFLED => 1,
-                PalaceStyle.RECONSTRUCTED => 2,
-                PalaceStyle.CARTESIAN => 3,
-                PalaceStyle.CHAOS => 4,
-                PalaceStyle.RANDOM_ALL => 5,
+                GPStyle.VANILLA => 0,
+                GPStyle.SHUFFLED => 1,
+                GPStyle.RECONSTRUCTED => 2,
+                GPStyle.CARTESIAN => 3,
+                GPStyle.CHAOS => 4,
+                GPStyle.RANDOM => 5,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
@@ -1508,29 +1507,29 @@ public partial class MainUI : Form
             scaleLevelRequirementsToCapCheckbox.Checked = configuration.ScaleLevelRequirementsToCap;
             attackEffectivenessList.SelectedIndex = configuration.AttackEffectiveness switch
             {
-                StatEffectiveness.AVERAGE => 0,
-                StatEffectiveness.LOW => 1,
-                StatEffectiveness.VANILLA => 2,
-                StatEffectiveness.HIGH => 3,
-                StatEffectiveness.MAX => 4,
+                AttackEffectiveness.AVERAGE => 0,
+                AttackEffectiveness.LOW => 1,
+                AttackEffectiveness.VANILLA => 2,
+                AttackEffectiveness.HIGH => 3,
+                AttackEffectiveness.OHKO => 4,
                 _ => throw new Exception("Invalid AttackEffectiveness setting")
             };
             magicEffectivenessList.SelectedIndex = configuration.MagicEffectiveness switch
             {
-                StatEffectiveness.AVERAGE => 0,
-                StatEffectiveness.LOW => 1,
-                StatEffectiveness.VANILLA => 2,
-                StatEffectiveness.HIGH => 3,
-                StatEffectiveness.MAX => 4,
+                MagicEffectiveness.AVERAGE => 0,
+                MagicEffectiveness.HIGH_COST => 1,
+                MagicEffectiveness.VANILLA => 2,
+                MagicEffectiveness.LOW_COST => 3,
+                MagicEffectiveness.FREE => 4,
                 _ => throw new Exception("Invalid MagicEffectiveness setting")
             };
             lifeEffectivenessList.SelectedIndex = configuration.LifeEffectiveness switch
             {
-                StatEffectiveness.AVERAGE => 0,
-                StatEffectiveness.NONE => 1,
-                StatEffectiveness.VANILLA => 2,
-                StatEffectiveness.HIGH => 3,
-                StatEffectiveness.MAX => 4,
+                LifeEffectiveness.AVERAGE => 0,
+                LifeEffectiveness.OHKO => 1,
+                LifeEffectiveness.VANILLA => 2,
+                LifeEffectiveness.HIGH => 3,
+                LifeEffectiveness.INVINCIBLE => 4,
                 _ => throw new Exception("Invalid LifeEffectiveness setting")
             };
 
@@ -1561,11 +1560,10 @@ public partial class MainUI : Form
             shuffleSwordImmunityBox.Checked = configuration.ShuffleSwordImmunity;
             experienceDropsList.SelectedIndex = configuration.EnemyXPDrops switch
             {
-                StatEffectiveness.VANILLA => 0,
-                StatEffectiveness.NONE => 1,
-                StatEffectiveness.LOW => 2,
-                StatEffectiveness.AVERAGE => 3,
-                StatEffectiveness.HIGH => 4,
+                XPEffectiveness.VANILLA => 0,
+                XPEffectiveness.LOW => 1,
+                XPEffectiveness.AVERAGE => 2,
+                XPEffectiveness.HIGH => 3,
                 _ => throw new Exception("Invalid EnemyXPDrops setting")
             };
 

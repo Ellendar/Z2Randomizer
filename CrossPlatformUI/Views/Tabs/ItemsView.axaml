@@ -15,18 +15,16 @@
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleOverworldItems}" Content="Shuffle Overworld Items" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixOverworldAndPalaceItems}" Content="Mix Overworld And Palace Items" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}" Content="Include PBag Caves In Item Shuffle" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceItems}" Content="Shuffle Palace Items" />
-            <CheckBox IsChecked="{Binding Config.ShuffleSmallItems}" Content="Shuffle Small Items" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.PalacesContainExtraKeys}" Content="Palaces Contain Extra Keys" />
-            <CheckBox IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}" Content="Randomizer New Kasuto Jar Requirements" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.RemoveSpellItems}" Content="Remove Spell Items" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePBagAmounts}" Content="Shuffle PBag Amounts" />
-
-        </StackPanel>
-        <StackPanel Grid.Column="1">
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSpellsInShuffle}" Content="Include Spells In Shuffle" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSwordTechsInShuffle}" Content="Include Sword Techs In Shuffle" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeQuestItemsInShuffle}" Content="Include Quest Items In Shuffle" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <CheckBox IsChecked="{Binding Config.ShuffleSmallItems}" Content="Shuffle Small Items" />
+          <CheckBox IsThreeState="True" IsChecked="{Binding Config.RemoveSpellItems}" Content="Remove Spell Items" />
+          <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePBagAmounts}" Content="Shuffle PBag Amounts" />
+          <CheckBox IsThreeState="True" IsChecked="{Binding Config.PalacesContainExtraKeys}" Content="Palaces Contain Extra Keys" />
+          <CheckBox IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}" Content="Randomize New Kasuto Jar Requirements" />
         </StackPanel>
     </Grid>
 </UserControl>

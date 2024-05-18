@@ -66,8 +66,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private Biome mazeBiome;
     private Climate climate;
     private bool vanillaShuffleUsesActualTerrain;
-    private PalaceStyle normalPalaceStyle;
-    private PalaceStyle gpStyle;
+    private NormalPalaceStyle normalPalaceStyle;
+    private GPStyle gpStyle;
     private bool? includeVanillaRooms;
     private bool? includev40Rooms;
     private bool? includev44Rooms;
@@ -91,9 +91,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private int magicLevelCap;
     private int lifeLevelCap;
     private bool scaleLevelRequirementsToCap;
-    private StatEffectiveness attackEffectiveness;
-    private StatEffectiveness magicEffectiveness;
-    private StatEffectiveness lifeEffectiveness;
+    private AttackEffectiveness attackEffectiveness;
+    private MagicEffectiveness magicEffectiveness;
+    private LifeEffectiveness lifeEffectiveness;
     private bool shuffleLifeRefillAmount;
     private bool? shuffleSpellLocations;
     private bool? disableMagicContainerRequirements;
@@ -108,7 +108,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleXpStealers;
     private bool shuffleXpStolenAmount;
     private bool shuffleSwordImmunity;
-    private StatEffectiveness enemyXpDrops;
+    private XPEffectiveness enemyXpDrops;
     private bool? shufflePalaceItems;
     private bool? shuffleOverworldItems;
     private bool? mixOverworldAndPalaceItems;
@@ -339,16 +339,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         set => SetField(ref vanillaShuffleUsesActualTerrain, value);
     }
 
-    //Palaces
-    /*
-    public PalaceStyle NormalPalaceStyle { get; set; }
-    public bool? ShortenNormalPalaces { get; set; }
-    public bool? ShortenGP { get; set; }
-    //public bool? IncludeCommunityRooms { get; set; }
-    public bool? IncludeVanillaRooms { get; set; }
-    public bool? Includev4_0Rooms { get; set; }
-    public bool? Includev4_4Rooms { get; set; }
-    */
     public bool? ShortenGP
     {
         get => shortenGP;
@@ -359,19 +349,18 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         get => shortenNormalPalaces;
         set => SetField(ref shortenNormalPalaces, value);
     }
-    public PalaceStyle NormalPalaceStyle
+    public NormalPalaceStyle NormalPalaceStyle
     {
         get => normalPalaceStyle;
         set => SetField(ref normalPalaceStyle, value);
     }
 
-    public PalaceStyle GPStyle
+    public GPStyle GPStyle
     {
         get => gpStyle;
         set => SetField(ref gpStyle, value);
     }
 
-    //public bool? IncludeCommunityRooms { get; set; }
     public bool? IncludeVanillaRooms
     {
         get => includeVanillaRooms;
@@ -519,19 +508,19 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         set => SetField(ref scaleLevelRequirementsToCap, value);
     }
 
-    public StatEffectiveness AttackEffectiveness
+    public AttackEffectiveness AttackEffectiveness
     {
         get => attackEffectiveness;
         set => SetField(ref attackEffectiveness, value);
     }
 
-    public StatEffectiveness MagicEffectiveness
+    public MagicEffectiveness MagicEffectiveness
     {
         get => magicEffectiveness;
         set => SetField(ref magicEffectiveness, value);
     }
 
-    public StatEffectiveness LifeEffectiveness
+    public LifeEffectiveness LifeEffectiveness
     {
         get => lifeEffectiveness;
         set => SetField(ref lifeEffectiveness, value);
@@ -623,7 +612,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         set => SetField(ref shuffleSwordImmunity, value);
     }
 
-    public StatEffectiveness EnemyXPDrops
+    public XPEffectiveness EnemyXPDrops
     {
         get => enemyXpDrops;
         set => SetField(ref enemyXpDrops, value);
@@ -1227,19 +1216,19 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[2] ? 1 : 0) + (bits[3] ? 2 : 0) + (bits[4] ? 4 : 0))
         {
             case 0:
-                config.AttackEffectiveness = StatEffectiveness.AVERAGE;
+                config.AttackEffectiveness = AttackEffectiveness.AVERAGE;
                 break;
             case 1:
-                config.AttackEffectiveness = StatEffectiveness.LOW;
+                config.AttackEffectiveness = AttackEffectiveness.LOW;
                 break;
             case 2:
-                config.AttackEffectiveness = StatEffectiveness.VANILLA;
+                config.AttackEffectiveness = AttackEffectiveness.VANILLA;
                 break;
             case 3:
-                config.AttackEffectiveness = StatEffectiveness.HIGH;
+                config.AttackEffectiveness = AttackEffectiveness.HIGH;
                 break;
             case 4:
-                config.AttackEffectiveness = StatEffectiveness.MAX;
+                config.AttackEffectiveness = AttackEffectiveness.OHKO;
                 break;
             default:
                 throw new Exception("Invalid AttackEffectiveness setting");
@@ -1279,19 +1268,19 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0))
         {
             case 0:
-                config.MagicEffectiveness = StatEffectiveness.AVERAGE;
+                config.MagicEffectiveness = MagicEffectiveness.AVERAGE;
                 break;
             case 1:
-                config.MagicEffectiveness = StatEffectiveness.LOW;
+                config.MagicEffectiveness = MagicEffectiveness.HIGH_COST;
                 break;
             case 2:
-                config.MagicEffectiveness = StatEffectiveness.VANILLA;
+                config.MagicEffectiveness = MagicEffectiveness.VANILLA;
                 break;
             case 3:
-                config.MagicEffectiveness = StatEffectiveness.HIGH;
+                config.MagicEffectiveness = MagicEffectiveness.LOW_COST;
                 break;
             case 4:
-                config.MagicEffectiveness = StatEffectiveness.MAX;
+                config.MagicEffectiveness = MagicEffectiveness.FREE;
                 break;
         }
         config.ShuffleXPStealers = bits[3];
@@ -1326,19 +1315,19 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0))
         {
             case 0:
-                config.LifeEffectiveness = StatEffectiveness.AVERAGE;
+                config.LifeEffectiveness = LifeEffectiveness.AVERAGE;
                 break;
             case 1:
-                config.LifeEffectiveness = StatEffectiveness.NONE;
+                config.LifeEffectiveness = LifeEffectiveness.OHKO;
                 break;
             case 2:
-                config.LifeEffectiveness = StatEffectiveness.VANILLA;
+                config.LifeEffectiveness = LifeEffectiveness.VANILLA;
                 break;
             case 3:
-                config.LifeEffectiveness = StatEffectiveness.HIGH;
+                config.LifeEffectiveness = LifeEffectiveness.HIGH;
                 break;
             case 4:
-                config.LifeEffectiveness = StatEffectiveness.MAX;
+                config.LifeEffectiveness = LifeEffectiveness.INVINCIBLE;
                 break;
         }
         config.RandomizeNewKasutoJarRequirements = bits[3];
@@ -1436,19 +1425,16 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[2] ? 1 : 0) + (bits[3] ? 2 : 0) + (bits[4] ? 4 : 0))
         {
             case 0:
-                config.EnemyXPDrops = StatEffectiveness.VANILLA;
+                config.EnemyXPDrops = XPEffectiveness.VANILLA;
                 break;
             case 1:
-                config.EnemyXPDrops = StatEffectiveness.NONE;
+                config.EnemyXPDrops = XPEffectiveness.LOW;
                 break;
             case 2:
-                config.EnemyXPDrops = StatEffectiveness.LOW;
+                config.EnemyXPDrops = XPEffectiveness.AVERAGE;
                 break;
             case 3:
-                config.EnemyXPDrops = StatEffectiveness.AVERAGE;
-                break;
-            case 4:
-                config.EnemyXPDrops = StatEffectiveness.HIGH;
+                config.EnemyXPDrops = XPEffectiveness.HIGH;
                 break;
         }
         bool startAttackLowBit = bits[5];
@@ -1602,16 +1588,16 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[1] ? 1 : 0) + (bits[5] ? 2 : 0))
         {
             case 0:
-                config.NormalPalaceStyle = PalaceStyle.VANILLA;
-                config.GPStyle = PalaceStyle.VANILLA;
+                config.NormalPalaceStyle = NormalPalaceStyle.VANILLA;
+                config.GPStyle = GPStyle.VANILLA;
                 break;
             case 1:
-                config.NormalPalaceStyle = PalaceStyle.SHUFFLED;
-                config.GPStyle = PalaceStyle.SHUFFLED;
+                config.NormalPalaceStyle = NormalPalaceStyle.SHUFFLED;
+                config.GPStyle = GPStyle.SHUFFLED;
                 break;
             case 2:
-                config.NormalPalaceStyle = PalaceStyle.RECONSTRUCTED;
-                config.GPStyle = PalaceStyle.RECONSTRUCTED;
+                config.NormalPalaceStyle = NormalPalaceStyle.RECONSTRUCTED;
+                config.GPStyle = GPStyle.RECONSTRUCTED;
                 break;
         }
         config.IncludeVanillaRooms = true;
@@ -2033,9 +2019,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         //Palaces
 
-        //GP doesn't support separate random styles (for obvious reasons) but there is no obvious indication
-        //of what the "right" one is, so they both work
-        if (GPStyle == PalaceStyle.RANDOM_ALL || GPStyle == PalaceStyle.RANDOM_PER_PALACE)
+        if (GPStyle == GPStyle.RANDOM)
         {
             properties.PalaceStyles[6] = random.Next(4) switch
             {
@@ -2048,10 +2032,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         else 
         {
-            properties.PalaceStyles[6] = GPStyle;
+            properties.PalaceStyles[6] = GPStyle.AsPalaceStyle();
         }
 
-        if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
+        if (NormalPalaceStyle == NormalPalaceStyle.RANDOM_ALL)
         {
             PalaceStyle style = random.Next(4) switch
             {
@@ -2066,7 +2050,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 properties.PalaceStyles[i] = style;
             }
         }
-        else if(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
+        else if(NormalPalaceStyle == NormalPalaceStyle.RANDOM_PER_PALACE)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -2085,7 +2069,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         {
             for (int i = 0; i < 6; i++)
             {
-                properties.PalaceStyles[i] = NormalPalaceStyle;
+                properties.PalaceStyles[i] = NormalPalaceStyle.AsPalaceStyle();
             }
         }
 
@@ -2129,57 +2113,46 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MixLargeAndSmallEnemies = MixLargeAndSmallEnemies ?? random.Next(2) == 1;
         properties.ShuffleDripper = ShuffleDripperEnemy;
         properties.ShuffleEnemyPalettes = ShuffleSpritePalettes;
-        properties.ExpLevel = EnemyXPDrops;
+        properties.ExpLevel = EnemyXPDrops switch
+        {
+            XPEffectiveness.VANILLA => StatEffectiveness.VANILLA,
+            XPEffectiveness.LOW => StatEffectiveness.LOW,
+            XPEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
+            XPEffectiveness.HIGH => StatEffectiveness.HIGH,
+            _ => throw new ImpossibleException("Invalid XPEffectiveness in properties export")
+        };
 
         //Levels
         properties.ShuffleAtkExp = ShuffleAttackExperience;
         properties.ShuffleMagicExp = ShuffleMagicExperience;
         properties.ShuffleLifeExp = ShuffleLifeExperience;
-        if (AttackEffectiveness == StatEffectiveness.NONE)
+        properties.AttackEffectiveness = AttackEffectiveness switch
         {
-            properties.AttackEffectiveness = random.Next(4) switch
-            {
-                0 => StatEffectiveness.LOW,
-                1 => StatEffectiveness.VANILLA,
-                2 => StatEffectiveness.HIGH,
-                3 => StatEffectiveness.MAX,
-                _ => throw new Exception("Invalid attack effectiveness")
-            };
-        }
-        else
+            AttackEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
+            AttackEffectiveness.LOW => StatEffectiveness.LOW,
+            AttackEffectiveness.VANILLA => StatEffectiveness.VANILLA,
+            AttackEffectiveness.HIGH => StatEffectiveness.HIGH,
+            AttackEffectiveness.OHKO => StatEffectiveness.MAX,
+            _ => throw new ImpossibleException("Invalid AttackEffectiveness in properties export")
+        };
+        properties.MagicEffectiveness = MagicEffectiveness switch
         {
-            properties.AttackEffectiveness = AttackEffectiveness;
-        }
-        if (MagicEffectiveness == StatEffectiveness.NONE)
+            MagicEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
+            MagicEffectiveness.HIGH_COST => StatEffectiveness.LOW,
+            MagicEffectiveness.VANILLA => StatEffectiveness.VANILLA,
+            MagicEffectiveness.LOW_COST => StatEffectiveness.HIGH,
+            MagicEffectiveness.FREE => StatEffectiveness.MAX,
+            _ => throw new ImpossibleException("Invalid MagicEffectiveness in properties export")
+        };
+        properties.LifeEffectiveness = LifeEffectiveness switch
         {
-            properties.MagicEffectiveness = random.Next(4) switch
-            {
-                0 => StatEffectiveness.LOW,
-                1 => StatEffectiveness.VANILLA,
-                2 => StatEffectiveness.HIGH,
-                3 => StatEffectiveness.MAX,
-                _ => throw new Exception("Invalid magic effectiveness")
-            };
-        }
-        else
-        {
-            properties.MagicEffectiveness = MagicEffectiveness;
-        }
-        if (LifeEffectiveness == StatEffectiveness.NONE)
-        {
-            properties.LifeEffectiveness = random.Next(4) switch
-            {
-                0 => StatEffectiveness.NONE,
-                1 => StatEffectiveness.VANILLA,
-                2 => StatEffectiveness.HIGH,
-                3 => StatEffectiveness.MAX,
-                _ => throw new Exception("Invalid life effectiveness")
-            };
-        }
-        else
-        {
-            properties.LifeEffectiveness = LifeEffectiveness;
-        }
+            LifeEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
+            LifeEffectiveness.OHKO => StatEffectiveness.NONE,
+            LifeEffectiveness.VANILLA => StatEffectiveness.VANILLA,
+            LifeEffectiveness.HIGH => StatEffectiveness.HIGH,
+            LifeEffectiveness.INVINCIBLE => StatEffectiveness.MAX,
+            _ => throw new ImpossibleException("Invalid LifeEffectiveness in properties export")
+        };
         properties.ShuffleLifeRefill = ShuffleLifeRefillAmount;
         properties.ShuffleSpellLocations = ShuffleSpellLocations ?? random.Next(2) == 1;
         properties.DisableMagicRecs = DisableMagicContainerRequirements ?? random.Next(2) == 1;

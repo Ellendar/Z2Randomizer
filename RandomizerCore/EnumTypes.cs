@@ -22,22 +22,78 @@ public enum StartingTechs
     RANDOM
 }
 
-[DefaultValue(NONE)]
-public enum StatEffectiveness
+[DefaultValue(VANILLA)]
+public enum AttackEffectiveness
 {
-    [Description("None")]
-    NONE,
-    [Description("Low")]
+    [Description("Random")]
+    AVERAGE,
+    [Description("Low Attack")]
     LOW,
     [Description("Vanilla")]
     VANILLA,
+    [Description("High Attack")]
+    HIGH,
+    [Description("Instant Kill")]
+    OHKO
+}
+
+[DefaultValue(VANILLA)]
+public enum MagicEffectiveness
+{
+    [Description("Random")]
+    AVERAGE,
+    [Description("High Spell Cost")]
+    HIGH_COST,
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Low Spell Cost")]
+    LOW_COST,
+    [Description("Free Spells")]
+    FREE
+}
+
+[DefaultValue(VANILLA)]
+public enum LifeEffectiveness
+{
+    [Description("Random")]
+    AVERAGE,
+    [Description("OHKO Link")]
+    OHKO,
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("High Defense")]
+    HIGH,
+    [Description("Invincible")]
+    INVINCIBLE
+}
+
+//I removed no XP drops because literally nobody played it and it saved a bit in the flag string
+//If anyone complains I can put it back but... nobody will.
+[DefaultValue(VANILLA)]
+public enum XPEffectiveness
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Low")]
+    LOW,
     [Description("Average")]
     AVERAGE,
     [Description("High")]
-    HIGH,
-    [Description("Max")]
+    HIGH
+}
+
+//The old unified stateffectiveness is still used on the rando side, but moved
+//to separate effectivenesses for the config mapping
+public enum StatEffectiveness
+{
+    NONE, 
+    LOW, 
+    VANILLA, 
+    AVERAGE, 
+    HIGH, 
     MAX
 }
+
 
 [DefaultValue(NORMAL)]
 public enum FireOption
@@ -53,7 +109,7 @@ public enum FireOption
 }
 
 [DefaultValue(VANILLA)]
-public enum PalaceStyle
+public enum NormalPalaceStyle
 {
     [Description("Vanilla")]
     VANILLA,
@@ -71,6 +127,35 @@ public enum PalaceStyle
     RANDOM_PER_PALACE
 }
 
+[DefaultValue(VANILLA)]
+public enum GPStyle
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Shuffled")]
+    SHUFFLED,
+    [Description("Reconstructed")]
+    RECONSTRUCTED,
+    [Description("Cartesian")]
+    CARTESIAN,
+    [Description("Chaos")]
+    CHAOS,
+    [Description("Random")]
+    RANDOM
+}
+
+//The old unified PalaceStyle is still used on the rando side, but moved
+//to separate effectivenesses for the config mapping
+[DefaultValue(VANILLA)]
+public enum PalaceStyle
+{
+    VANILLA,
+    SHUFFLED,
+    RECONSTRUCTED,
+    CARTESIAN,
+    CHAOS
+}
+
 public static class PalaceStyleExtensions
 {
     public static bool UsesVanillaRoomPool(this PalaceStyle style)
@@ -80,6 +165,34 @@ public static class PalaceStyleExtensions
             PalaceStyle.VANILLA => true,
             PalaceStyle.SHUFFLED => true,
             _ => false
+        };
+    }
+
+    public static PalaceStyle AsPalaceStyle(this GPStyle style)
+    {
+        return style switch
+        {
+            GPStyle.CHAOS => PalaceStyle.CHAOS,
+            GPStyle.CARTESIAN => PalaceStyle.CARTESIAN,
+            GPStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
+            GPStyle.VANILLA => PalaceStyle.VANILLA,
+            GPStyle.SHUFFLED => PalaceStyle.SHUFFLED,
+            //Random intentionally not here, GPPalaceStyle should only be used on the config side,
+            //PalaceStyle on the rando side.
+            _ => throw new Exception("Unrecognized GPPalaceStyle conversion")
+        };
+    }
+
+    public static PalaceStyle AsPalaceStyle(this NormalPalaceStyle style)
+    {
+        return style switch
+        {
+            NormalPalaceStyle.CHAOS => PalaceStyle.CHAOS,
+            NormalPalaceStyle.CARTESIAN => PalaceStyle.CARTESIAN,
+            NormalPalaceStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
+            NormalPalaceStyle.VANILLA => PalaceStyle.VANILLA,
+            NormalPalaceStyle.SHUFFLED => PalaceStyle.SHUFFLED,
+            _ => throw new Exception("Unrecognized NormalPalaceStyle conversion")
         };
     }
 }
@@ -284,9 +397,13 @@ public static class Enums
 {
     public static IEnumerable<EnumDescription> StartingTechList { get; } = ToDescriptions(typeof(StartingTechs));
     public static IEnumerable<EnumDescription> StartingLivesList { get; } = ToDescriptions(typeof(StartingLives));
-    public static IEnumerable<EnumDescription> StatEffectivenessList { get; } = ToDescriptions(typeof(StatEffectiveness));
+    public static IEnumerable<EnumDescription> AttackEffectivenessList { get; } = ToDescriptions(typeof(AttackEffectiveness));
+    public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions(typeof(MagicEffectiveness));
+    public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions(typeof(LifeEffectiveness));
+    public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions(typeof(XPEffectiveness));
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions(typeof(FireOption));
-    public static IEnumerable<EnumDescription> PalaceStyleList { get; } = ToDescriptions(typeof(PalaceStyle));
+    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; } = ToDescriptions(typeof(NormalPalaceStyle));
+    public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } = ToDescriptions(typeof(GPStyle));
     public static IEnumerable<EnumDescription> BiomeList { get; } = ToDescriptions(typeof(Biome));
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions(typeof(ContinentConnectionType));
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions(typeof(EncounterRate));

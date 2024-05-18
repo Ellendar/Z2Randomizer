@@ -44,13 +44,13 @@
         </StackPanel>
         <StackPanel Grid.Column="1">
             <ComboBox assists:ComboBoxAssist.Label="Attack Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.AttackEffectivenessList}}"
                       SelectedItem="{Binding Config.AttackEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
             <ComboBox assists:ComboBoxAssist.Label="Magic Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.MagicEffectivenessList}}"
                       SelectedItem="{Binding Config.MagicEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
             <ComboBox assists:ComboBoxAssist.Label="Life Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.StatEffectivenessList}}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.LifeEffectivenessList}}"
                       SelectedItem="{Binding Config.LifeEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
         </StackPanel>
     </Grid>

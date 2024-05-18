@@ -14,11 +14,15 @@
         <StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0">
                 <ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="Normal Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.PalaceStyleList}}"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
                           SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}" />
-                <ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="GP Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.PalaceStyleList}}"
-                          SelectedItem="{Binding Config.GPStyle, Converter={x:Static ui:Util.EnumConvert}}" />
+                <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenNormalPalaces}" Content="Shorten:" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0">
+              <ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="GP Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
+                        ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
+                        SelectedItem="{Binding Config.GPStyle, Converter={x:Static ui:Util.EnumConvert}}" />
+              <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenGP}" Content="Shorten:" />
             </StackPanel>
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeVanillaRooms}" Content="Include Vanilla Rooms" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_0Rooms}" Content="Include 4.0 Rooms" />
