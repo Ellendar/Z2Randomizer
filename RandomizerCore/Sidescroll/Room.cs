@@ -750,7 +750,7 @@ public class Room
         {
             return false;
         }
-        if (HasDownExit && Down != null && Down.Up != this)
+        if (HasDownExit && !HasDrop && Down != null && Down.Up != this)
         {
             return false;
         }
