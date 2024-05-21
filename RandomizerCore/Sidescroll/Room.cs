@@ -15,6 +15,7 @@ namespace RandomizerCore.Sidescroll;
     UseStringEnumConverter = true,
     WriteIndented = false,
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    PropertyNameCaseInsensitive = true,
     Converters = [typeof(RequirementsJsonConverter)]
 )]
 [JsonSerializable(typeof(List<Room>))]
@@ -61,7 +62,6 @@ public class Room
 
 
     public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
-    [DataMember]
     public bool IsPlaced { get; set; }
 	
 	//This still exists just to facilitate serialization because I didn't want to mess with it.
