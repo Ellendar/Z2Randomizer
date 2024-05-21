@@ -1452,12 +1452,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 config.ContinentConnectionType = ContinentConnectionType.NORMAL;
                 break;
             case 1:
-                config.ContinentConnectionType = ContinentConnectionType.RB_BORDER_SHUFFLE;
-                break;
-            case 2:
                 config.ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE;
                 break;
-            case 3:
+            case 2:
                 config.ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES;
                 break;
         }

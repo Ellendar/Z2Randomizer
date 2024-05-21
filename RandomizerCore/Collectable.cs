@@ -44,7 +44,7 @@ public enum Collectable
 
 public static class CollectableExtensions
 {
-    public static bool IsMajorItem(this Collectable collectable)
+    public static bool IsItemGetItem(this Collectable collectable)
     {
         return collectable switch
         {
@@ -62,8 +62,8 @@ public static class CollectableExtensions
             Collectable.MEDIUM_BAG => false,
             Collectable.LARGE_BAG => false,
             Collectable.XL_BAG => false,
-            Collectable.MAGIC_CONTAINER => true,
-            Collectable.HEART_CONTAINER => true,
+            Collectable.MAGIC_CONTAINER => false,
+            Collectable.HEART_CONTAINER => false,
             Collectable.BLUE_JAR => false,
             Collectable.RED_JAR => false,
             Collectable.ONEUP => false,
