@@ -234,10 +234,10 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 }
                 while (
                 (!reachable || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
-                && (tries < PALACE_SHUFFLE_ATTEMPT_LIMIT)
+                && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
                     );
             }
-        } while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
+        } while (tries >= ROOM_SHUFFLE_ATTEMPT_LIMIT);
         palace.Generations += tries;
         palace.IsValid = true;
         return palace;

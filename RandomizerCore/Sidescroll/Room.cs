@@ -738,6 +738,22 @@ public class Room
         {
             return false;
         }
+        if(HasRightExit && Right != null && Right.Left != this)
+        {
+            return false;
+        }
+        if (HasLeftExit && Left != null && Left.Right != this)
+        {
+            return false;
+        }
+        if (HasUpExit && Up != null && Up.Down != this)
+        {
+            return false;
+        }
+        if (HasDownExit && Down != null && Down.Up != this)
+        {
+            return false;
+        }
         return true;
     }
 }

@@ -955,7 +955,7 @@ public class Hyrule
                 {
                     Debug.WriteLine("Failed on items");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
-                    return true;
+                    return false;
                 }
                 return false;
             }

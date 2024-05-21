@@ -498,6 +498,8 @@ public class Palace
             Room swapRoom = roomsWithUpExits.Sample(r)!;
             selectedRoom.Up.Down = swapRoom;
             swapRoom.Up.Down = selectedRoom;
+
+            (selectedRoom.Up, swapRoom.Up) = (swapRoom.Up, selectedRoom.Up);
             if (AllRooms.Any(i => !i.ValidateExits()))
             {
                 throw new Exception("Invalid room connections while shuffling");

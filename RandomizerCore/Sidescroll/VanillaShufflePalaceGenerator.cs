@@ -11,10 +11,20 @@ public class VanillaShufflePalaceGenerator(CancellationToken ct) : VanillaPalace
 
         palace.ShuffleRooms(r);
 
-        while (!palace.AllReachable() || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
+        int tries = 0;
+        while (
+            !palace.AllReachable() 
+            || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) 
+            || palace.HasDeadEnd()
+        )
         {
             palace.ResetRooms();
             palace.ShuffleRooms(r);
+            if(++tries > ROOM_SHUFFLE_ATTEMPT_LIMIT)
+            {
+                palace.IsValid = false;
+                return palace;
+            }
         }
         return palace;
     }
