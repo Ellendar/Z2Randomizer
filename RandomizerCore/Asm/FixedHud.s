@@ -8,7 +8,7 @@
 ; and then keep the "sprite zero" hud split check on.
 ; All of these changes are always on no matter the setting, 
 
-.define LagFrameVar $f4
+LagFrameVar = $f4
 
 .segment "PRG6"
 
@@ -19,11 +19,11 @@ RunAudioFrameOrLagFrame:
     tya
     pha
         lda LagFrameVar
-        bpl +
+        bpl @skip
             jmp HandleLagFrame
-        +
+        @skip:
         jsr $9000 ; audio handler
--
+@nolag:
     pla
     tay
     pla
@@ -36,19 +36,19 @@ RunAudioFrameOrLagFrame:
 HandleLagFrame:
     ; To allow for testing between the flag on or off, I made it a soft flag 
     lda #PREVENT_HUD_FLASH_ON_LAG
-    beq -
+    beq @nolag
     ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
     lda $fe
     and #$10
-    beq -
+    beq @nolag
     ; Check that we are in the side view mode
     lda $0736
     cmp #$0b
-    bne -
+    bne @nolag
     ; Check if we even have a sprite zero on the screen
     lda $200
     cmp #$f0
-    bcs -
+    bcs @nolag
     ; keep all flags except for the nametable select to always use nametable 0
     lda $ff
     and #$fc
