@@ -29,7 +29,6 @@ public class Room
 
     private Room? up;
     private Room? down;
-    public bool isUpDownReversed;
     internal (int, int) coords;
 
     private const int sideview1 = 0x10533;
@@ -46,7 +45,7 @@ public class Room
     [JsonConverter(typeof(HexStringConverter))]
     public byte[] ItemGetBits { get; set; }
 
-    public int Map { get; set; }
+    public byte Map { get; set; }
     public int? PalaceGroup { get; set; }
     public bool IsRoot { get; set; }
     
@@ -101,11 +100,12 @@ public class Room
     public bool IsEntrance { get; set; }
     public int? PalaceNumber { get; set; }
     public string LinkedRoomName { get; set; }
-    public int PageCount { get; private set; }
+    //public int PageCount { get; private set; }
     public bool HasLeftExit { get; private set; }
     public bool HasRightExit { get; set; }
     public bool HasUpExit { get; private set; }
     public bool HasDownExit { get; private set; }
+    public bool IsUpDownReversed { get; private set; }
 
 
     public Room() {}
@@ -141,7 +141,7 @@ public class Room
         HasDrop = room.HasDrop;
         ElevatorScreen = room.ElevatorScreen;
         ConnectionStartAddress = room.ConnectionStartAddress;
-        isUpDownReversed = room.isUpDownReversed;
+        IsUpDownReversed = room.IsUpDownReversed;
         IsDropZone = room.IsDropZone;
         IsEntrance = room.IsEntrance;
         IsThunderBirdRoom = room.IsThunderBirdRoom;
@@ -156,8 +156,8 @@ public class Room
 
         Connections = room.Connections;
         HasLeftExit = room.Connections[0] < 0xFC;
-        HasDownExit = isUpDownReversed ? room.Connections[2] < 0xFC : room.Connections[1] < 0xFC;
-        HasUpExit = isUpDownReversed ? room.Connections[1] < 0xFC : room.Connections[2] < 0xFC;
+        HasDownExit = IsUpDownReversed ? room.Connections[2] < 0xFC : room.Connections[1] < 0xFC;
+        HasUpExit = IsUpDownReversed ? room.Connections[1] < 0xFC : room.Connections[2] < 0xFC;
         HasRightExit = room.Connections[3] < 0xFC;
     }
 
@@ -720,6 +720,27 @@ public class Room
             return RoomExitType.DEADEND_DOWN;
         }
         throw new ImpossibleException("Room has no exits");
+    }
+
+    public bool ValidateExits()
+    {
+        if (!HasRightExit && Right != null) 
+        {
+            return false;
+        }
+        if (!HasLeftExit && Left != null)
+        {
+            return false;
+        }
+        if (!HasUpExit && Up != null)
+        {
+            return false;
+        }
+        if (!HasDownExit && Down != null)
+        {
+            return false;
+        }
+        return true;
     }
 }
 

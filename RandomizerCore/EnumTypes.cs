@@ -317,12 +317,10 @@ public enum ContinentConnectionType
 {
     [Description("Normal")]
     NORMAL,
-    [Description("Anything Goes")]
-    ANYTHING_GOES,
-    [Description("RB Border Shuffle")]
-    RB_BORDER_SHUFFLE,
     [Description("Transportation Shuffle")]
-    TRANSPORTATION_SHUFFLE
+    TRANSPORTATION_SHUFFLE,
+    [Description("Anything Goes")]
+    ANYTHING_GOES
 }
 
 [DefaultValue(NONE)]

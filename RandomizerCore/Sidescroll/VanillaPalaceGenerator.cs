@@ -39,7 +39,6 @@ public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
         if (palaceNumber != 7)
         {
             Room itemRoom = new(roomPool.ItemRoom);
-
             palace.ItemRoom = itemRoom;
             palace.ItemRoom.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(palace.ItemRoom);

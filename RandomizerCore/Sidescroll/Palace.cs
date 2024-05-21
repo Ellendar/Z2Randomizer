@@ -11,7 +11,7 @@ public class Palace
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private const bool DROPS_ARE_BLOCKERS = false;
-    private const int OUTSIDE_ROOM_EXIT = 0b11111100;
+    private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
     private Room entrance;
     private Room itemRoom;
     private Room bossRoom;
@@ -488,16 +488,19 @@ public class Palace
         List<Room> roomsWithRightExits = AllRooms.Where(i => i.HasRightExit).ToList();
         List<Room> roomsWithDropExits = AllRooms.Where(i => i.HasDrop).ToList();
 
+        if (AllRooms.Any(i => !i.ValidateExits()))
+        {
+            throw new Exception("Invalid room connections while shuffling");
+        }
         for (int i = 0; i < roomsWithUpExits.Count; i++)
         {
             Room selectedRoom = roomsWithUpExits[i];
-            Room swapRoom = roomsWithUpExits.Sample(r);
+            Room swapRoom = roomsWithUpExits.Sample(r)!;
             selectedRoom.Up.Down = swapRoom;
             swapRoom.Up.Down = selectedRoom;
-
-            if (roomsWithUpExits.Any(i => i.Up == null))
+            if (AllRooms.Any(i => !i.ValidateExits()))
             {
-                logger.Error("Up Exits desynched!");
+                throw new Exception("Invalid room connections while shuffling");
             }
         }
         for (int i = 0; i < roomsWithDropExits.Count; i++)
@@ -508,21 +511,24 @@ public class Palace
 
             roomsWithDropExits[i].Down = roomsWithDropExits[swap].Down;
             roomsWithDropExits[swap].Down = temp;
+            if (AllRooms.Any(i => !i.ValidateExits()))
+            {
+                throw new Exception("Invalid room connections while shuffling");
+            }
         }
 
         for (int i = 0; i < roomsWithDownExits.Count; i++)
         {
             Room selectedRoom = roomsWithDownExits[i];
-            Room swapRoom = roomsWithDownExits.Sample(r);
+            Room swapRoom = roomsWithDownExits.Sample(r)!;
 
             selectedRoom.Down.Up = swapRoom;
             swapRoom.Down.Up = selectedRoom;
 
             (selectedRoom.Down, swapRoom.Down) = (swapRoom.Down, selectedRoom.Down);
-
-            if (roomsWithDownExits.Any(i => i.Down == null))
+            if (AllRooms.Any(i => !i.ValidateExits()))
             {
-                logger.Error("Down Exits desynched!");
+                throw new Exception("Invalid room connections while shuffling");
             }
         }
 
@@ -530,30 +536,28 @@ public class Palace
         {
 
             Room selectedRoom = roomsWithLeftExits[i];
-            Room swapRoom = roomsWithLeftExits.Sample(r);
+            Room swapRoom = roomsWithLeftExits.Sample(r)!;
             selectedRoom.Left.Right = swapRoom;
             swapRoom.Left.Right = selectedRoom;
 
             (selectedRoom.Left, swapRoom.Left) = (swapRoom.Left, selectedRoom.Left);
-
-            if (roomsWithLeftExits.Any(i => i.Left == null))
+            if (AllRooms.Any(i => !i.ValidateExits()))
             {
-                logger.Error("Left Exits desynched!");
+                throw new Exception("Invalid room connections while shuffling");
             }
         }
 
         for (int i = 0; i < roomsWithRightExits.Count; i++)
         {
             Room selectedRoom = roomsWithRightExits[i];
-            Room swapRoom = roomsWithRightExits.Sample(r);
+            Room swapRoom = roomsWithRightExits.Sample(r)!;
             selectedRoom.Right.Left = swapRoom;
             swapRoom.Right.Left = selectedRoom;
 
             (selectedRoom.Right, swapRoom.Right) = (swapRoom.Right, selectedRoom.Right);
-
-            if (roomsWithRightExits.Any(i => i.Right == null))
+            if (AllRooms.Any(i => !i.ValidateExits()))
             {
-                logger.Error("Right Exits desynched!");
+                throw new Exception("Invalid room connections while shuffling");
             }
         }
     }
@@ -573,9 +577,9 @@ public class Palace
             if (room.LinkedRoomName != null && room.Enabled && room.LinkedRoom != null)
             {
                 Room linkedRoom = room.LinkedRoom;
-                if(room.isUpDownReversed != linkedRoom.isUpDownReversed)
+                if(room.IsUpDownReversed != linkedRoom.IsUpDownReversed)
                 {
-                    throw new Exception("Inconsistent isUpDownReversed in linked rooms");
+                    throw new Exception("Inconsistent IsUpDownReversed in linked rooms");
                 }
                 //set each blank exit on the master room that has a counterpart in the linked room
                 if (linkedRoom.HasLeftExit && room.Left == null && linkedRoom.Left != null)
@@ -609,35 +613,29 @@ public class Palace
 
         foreach (Room room in AllRooms)
         {
-            if (room.PageCount <= 1)
+            byte leftByte = (byte)(room.Left == null ? OUTSIDE_ROOM_EXIT : (room.Left.Map * 4 + 3));
+            byte downByte = (byte)(room.Down == null ? OUTSIDE_ROOM_EXIT : (room.Down.Map * 4 + 2));
+            byte upByte = (byte)(room.Up == null ? OUTSIDE_ROOM_EXIT : (room.Up.Map * 4 + 1));
+            byte rightByte = (byte)(room.Right == null ? OUTSIDE_ROOM_EXIT : (room.Right.Map * 4));
+            int pageCount = ((room.SideView[1] & 0b01100000) >> 5) + 1;
+
+            //if the room on the left is a 2/3 page room, make the left exit go to the rightmost page in that room
+            if(room.Left != null)
             {
-                throw new Exception("Palaces cannot have fewer than 2 pages");
-            }
-            if (room.PageCount > 4)
-            {
-                throw new Exception("Palaces cannot have more than 4 pages");
-            }
-            if (room.PageCount == 2)
-            {
-                if (room.Right != null)
+                int leftPageCount = ((room.Left.SideView[1] & 0b01100000) >> 5) + 1;
+                if (leftPageCount < 4)
                 {
-                    room.Right.Connections[0] = (byte)(room.Map * 4 + 1);
-                }
-                if (room.Up != null || room.Down != null)
-                {
-                    throw new Exception("Up/Down not supported for 2 screen rooms");
+                    leftByte -= (byte)(4 - leftPageCount);
                 }
             }
-            if (room.PageCount == 3)
+
+            if (pageCount <= 1)
             {
-                if (room.Right != null)
-                {
-                    room.Right.Connections[0] = (byte)(room.Map * 4 + 2);
-                }
-                if (room.Up != null || room.Down != null)
-                {
-                    logger.Debug("Up/Down in 3 screen rooms is weird");
-                }
+                throw new Exception("Palace rooms cannot have fewer than 2 pages");
+            }
+            if (pageCount > 4)
+            {
+                throw new Exception("Palace rooms cannot have more than 4 pages");
             }
 
             //If a room is fewer than 4 pages, "right" doesn't actually work.
@@ -646,23 +644,23 @@ public class Palace
             //this standardizes the exits so 2 page rooms are always left / right
             //3 page rooms are always left / down / right
             //and then 4 page rooms are always left / down / up / right
-            ROMData.Put(room.ConnectionStartAddress + 0, room.Connections[0]);
-            if(room.PageCount == 2)
+            ROMData.Put(room.ConnectionStartAddress + 0, leftByte);
+            if (pageCount == 2)
             {
-                ROMData.Put(room.ConnectionStartAddress + 1, room.Connections[3]);
+                ROMData.Put(room.ConnectionStartAddress + 1, rightByte);
                 ROMData.Put(room.ConnectionStartAddress + 2, 0xFF);
                 ROMData.Put(room.ConnectionStartAddress + 3, 0xFF);
                 continue;
             }
-            ROMData.Put(room.ConnectionStartAddress + 1, room.Connections[1]);
-            if (room.PageCount == 3)
+            ROMData.Put(room.ConnectionStartAddress + 1, downByte);
+            if (pageCount == 3)
             {
-                ROMData.Put(room.ConnectionStartAddress + 2, room.Connections[3]);
+                ROMData.Put(room.ConnectionStartAddress + 2, rightByte);
                 ROMData.Put(room.ConnectionStartAddress + 3, 0xFF);
                 continue;
             }
-            ROMData.Put(room.ConnectionStartAddress + 2, room.Connections[2]);
-            ROMData.Put(room.ConnectionStartAddress + 3, room.Connections[3]);
+            ROMData.Put(room.ConnectionStartAddress + 2, upByte);
+            ROMData.Put(room.ConnectionStartAddress + 3, rightByte);
         }
     }
 
@@ -709,14 +707,14 @@ public class Palace
 
             if (r.Up == null && r.HasUpExit)
             {
-                List<Room> l = rooms[(r.isUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC];
+                List<Room> l = rooms[(r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if (((r2.isUpDownReversed ? r2.Connections[2] : r2.Connections[1]) & 0xFC) / 4 == r.Map)
+                    if (((r2.IsUpDownReversed ? r2.Connections[2] : r2.Connections[1]) & 0xFC) / 4 == r.Map)
                     {
                         r.Up = r2;
                     }
-                    else if (r2.Map == ((r.isUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) / 4 && r2.IsDropZone) {
+                    else if (r2.Map == ((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) / 4 && r2.IsDropZone) {
                         r.Up = r2;
                     }
                 }
@@ -724,21 +722,21 @@ public class Palace
 
             if (r.Down == null && r.HasDownExit)
             {
-                List<Room> l = rooms[(r.isUpDownReversed ? r.Connections[2] : r.Connections[1]) & 0xFC];
+                List<Room> l = rooms[(r.IsUpDownReversed ? r.Connections[2] : r.Connections[1]) & 0xFC];
                 foreach (Room r2 in l)
                 {
-                    if (((r2.isUpDownReversed ? r2.Connections[1] : r2.Connections[2]) & 0xFC) / 4 == r.Map)
+                    if (((r2.IsUpDownReversed ? r2.Connections[1] : r2.Connections[2]) & 0xFC) / 4 == r.Map)
                     {
                         r.Down = r2;
                     }
-                    else if (r2.Map == ((r.isUpDownReversed ? r.Connections[2] : r.Connections[1]) & 0xFC) / 4 && r2.IsDropZone)
+                    else if (r2.Map == ((r.IsUpDownReversed ? r.Connections[2] : r.Connections[1]) & 0xFC) / 4 && r2.IsDropZone)
                     {
                         r.Down = r2;
                     }
                 }
             }
-            if (((r.isUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) == 0 
-                && ((entrance.isUpDownReversed ? entrance.Connections[2] : entrance.Connections[1]) & 0xFC) / 4 == r.Map)
+            if (((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) == 0 
+                && ((entrance.IsUpDownReversed ? entrance.Connections[2] : entrance.Connections[1]) & 0xFC) / 4 == r.Map)
             {
                 r.Up = entrance;
             }
@@ -1238,8 +1236,12 @@ public class Palace
     }
     */
 
-    public int AssignMapNumbers(int currentMap, bool isGP)
+    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla)
     {
+        if(isVanilla)
+        {
+            return AllRooms.Max(i => (byte)(i.Map + 1));
+        }
         entrance.Map = currentMap;
         bossRoom.Map = ++currentMap;
         if (isGP)

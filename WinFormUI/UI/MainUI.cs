@@ -9,6 +9,7 @@ using RandomizerCore;
 using RandomizerCore.Flags;
 using RandomizerCore.Overworld;
 using RandomizerCore.Sidescroll;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -886,9 +887,8 @@ public partial class MainUI : Form
         configuration.ContinentConnectionType = continentConnectionBox.SelectedIndex switch
         {
             0 => ContinentConnectionType.NORMAL,
-            1 => ContinentConnectionType.RB_BORDER_SHUFFLE,
-            2 => ContinentConnectionType.TRANSPORTATION_SHUFFLE,
-            3 => ContinentConnectionType.ANYTHING_GOES,
+            1 => ContinentConnectionType.TRANSPORTATION_SHUFFLE,
+            2 => ContinentConnectionType.ANYTHING_GOES,
             _ => throw new Exception("Invalid ContinentConnection setting")
         };
         configuration.Climate = climateSelector.SelectedIndex switch
@@ -1379,9 +1379,8 @@ public partial class MainUI : Form
             continentConnectionBox.SelectedIndex = configuration.ContinentConnectionType switch
             {
                 ContinentConnectionType.NORMAL => 0,
-                ContinentConnectionType.RB_BORDER_SHUFFLE => 1,
-                ContinentConnectionType.TRANSPORTATION_SHUFFLE => 2,
-                ContinentConnectionType.ANYTHING_GOES => 3,
+                ContinentConnectionType.TRANSPORTATION_SHUFFLE => 1,
+                ContinentConnectionType.ANYTHING_GOES => 2,
                 _ => throw new Exception("Invalid ContinentConnection setting")
             };
             climateSelector.SelectedIndex = configuration.Climate.Name switch
@@ -2018,7 +2017,7 @@ public partial class MainUI : Form
         ShuffleHiddenEnable();
     }
 
-    private void BackgroundWorker1_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+    private void BackgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
     {
         BackgroundWorker worker = sender as BackgroundWorker;
         var cts = new CancellationTokenSource();
@@ -2033,6 +2032,17 @@ public partial class MainUI : Form
                 cts.Cancel();
             }
             Thread.Sleep(50);
+        }
+        if(task.IsFaulted)
+        {
+            throw task.Exception;
+        }
+        else if(task.IsCompleted && task.Result != null)
+        {
+            char os_sep = Path.DirectorySeparatorChar;
+            string fileName = romFileTextBox.Text.Trim();
+            string newFileName = fileName.Substring(0, fileName.LastIndexOf(os_sep) + 1) + "Z2_" + config.Seed + "_" + config.Flags + ".nes";
+            File.WriteAllBytes(newFileName, task.Result);
         }
     }
 

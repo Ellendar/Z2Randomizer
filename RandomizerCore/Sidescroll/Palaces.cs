@@ -74,7 +74,7 @@ public class Palaces
             sizes[6] = r.Next(54, 60); //57
         }
 
-        int group1MapIndex = 0, group2MapIndex = 0, group3MapIndex = 0;
+        byte group1MapIndex = 0, group2MapIndex = 0, group3MapIndex = 0;
         for (int currentPalace = 1; currentPalace < 8; currentPalace++)
         {
             PalaceGenerator palaceGenerator = props.PalaceStyles[currentPalace - 1] switch
@@ -103,17 +103,17 @@ public class Palaces
 
             if(palace.GetPalaceGroup() == 1)
             {
-                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7);
+                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }
 
             if (palace.GetPalaceGroup() == 2)
             {
-                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7);
+                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }
 
             if (palace.GetPalaceGroup() == 3)
             {
-                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7);
+                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }
             palaces.Add(palace);
         }
