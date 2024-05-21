@@ -1,4 +1,4 @@
-.macpack common
+.macpack "common"
 
 .segment "PRG0"
 
@@ -12,10 +12,11 @@ CheckIfLevelingUp:
     lda $074c ; When 74c is 0 we are doing the normal pause screen
     lsr       ; so set the carry if 74c is 1
     lda $0525 ; Then reload the row draw count
-    bcc +
+    bcc @skip
     cmp #$0a
     rts
-+   cmp #$0b ; extend the menu just a little bit
+@skip:
+    cmp #$0b ; extend the menu just a little bit
     rts
 
 .org $a5e8

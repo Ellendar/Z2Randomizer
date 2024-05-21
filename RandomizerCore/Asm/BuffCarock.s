@@ -1,14 +1,14 @@
 ﻿.segment "PRG4"
 
-.define ProjectileYPosition $30
-.define ProjectileXVelocity $77
-.define ProjectileType      $87
-.define EnemyType           $a1
-.define LinkXPosition       $4d
-.define EnemyXPositionLo    $4e
-.define EnemyXPositionHi    $3c
-.define RNG                 $051b
-.define ProjectileEnemyData $07c0
+ProjectileYPosition = $30
+ProjectileXVelocity = $77
+ProjectileType      = $87
+EnemyType           = $a1
+LinkXPosition       = $4d
+EnemyXPositionLo    = $4e
+EnemyXPositionHi    = $3c
+RNG                 = $051b
+ProjectileEnemyData = $07c0
 
 EnemyYVelocity = $057e
 ; SinWaveVelocityIncrement = $ba1c
@@ -16,7 +16,7 @@ EnemyYVelocity = $057e
 ; Hook into carrock's update code to add the new position calculation
 .org $aec4
     jmp ChooseNewCarrockXPosition
-.free $aed3 - *
+FREE_UNTIL $aed3
 
 ; Force Carrock to teleport only on the side opposite of the player
 .reloc
@@ -164,7 +164,8 @@ ClearProjectilesOnCarockDeath:
     inc $b6,x
     lda #0
     ldy #5
-    -   sta ProjectileEnemyData,y
+    @loop:
+        sta ProjectileEnemyData,y
         dey
-        bpl -
+        bpl @loop
     rts

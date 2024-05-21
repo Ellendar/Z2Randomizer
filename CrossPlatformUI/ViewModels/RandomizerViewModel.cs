@@ -86,14 +86,9 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
     private void OnActivate(CompositeDisposable disposable)
     {
-        if (string.IsNullOrEmpty(Main.Config.Flags))
-        {
-            Flags = MainViewModel.BeginnerPreset;            
-        }
-        else
-        {
-            Flags = Main.Config.Flags;
-        }
+        Flags = string.IsNullOrEmpty(Main.Config.Flags)
+            ? MainViewModel.BeginnerPreset
+            : Main.Config.Flags;
 
         Main.Config.PropertyChanged += (sender, args) =>
         {
