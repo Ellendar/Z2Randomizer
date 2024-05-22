@@ -1,9 +1,9 @@
 ﻿using NLog;
 using System;
 using System.IO;
-using CommandLine;
 using System.Threading;
 using System.Threading.Tasks;
+using Desktop.Common;
 using RandomizerCore;
 using RandomizerCore.Sidescroll;
 

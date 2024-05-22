@@ -1,4 +1,4 @@
-.macpack "common"
+.macpack common
 
 .segment "PRG0"
 

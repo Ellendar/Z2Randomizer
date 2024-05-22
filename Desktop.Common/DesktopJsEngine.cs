@@ -1,14 +1,11 @@
-﻿using System.Collections;
-using System.Dynamic;
+﻿using System.Reflection;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.JavaScript;
 using Microsoft.ClearScript.V8;
 using NLog;
 using RandomizerCore.Asm;
 
-namespace CommandLine;
-
-using System.Reflection;
+namespace Desktop.Common;
 
 public class DesktopJsEngine : IAsmEngine
 {

@@ -4,12 +4,11 @@ using WinFormUI.UI;
 using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
 using System.Reflection;
-using CommandLine;
+using Desktop.Common;
 using RandomizerCore;
 using RandomizerCore.Flags;
 using RandomizerCore.Overworld;
 using RandomizerCore.Sidescroll;
-using McMaster.Extensions.CommandLineUtils;
 
 namespace Z2Randomizer.WinFormUI;
 
