@@ -143,7 +143,7 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                 openJunctionsCount = 0;
                 foreach((int, int) coord in openCoords)
                 {
-                    debug++;
+                    //debug++;
                     Room? coordLeft = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1 - 1, coord.Item2));
                     Room? coordRight = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1 + 1, coord.Item2));
                     Room? coordUp = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1, coord.Item2 + 1));
@@ -195,19 +195,19 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     {
                         if (up.HasDrop)
                         {
-                            exitType = RoomExitType.DROP_DEADEND_DOWN;
+                            exitType = RoomExitType.DROP_DEADEND_UP;
                             logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
                             palace.IsValid = false;
                             return palace;
                         }
                         else
                         {
-                            exitType = RoomExitType.DEADEND_DOWN;
+                            exitType = RoomExitType.DEADEND_UP;
                         }
                     }
                     else if (down != null && down.HasUpExit)
                     {
-                        exitType = RoomExitType.DEADEND_UP;
+                        exitType = RoomExitType.DEADEND_DOWN;
                     }
                     else
                     {
@@ -228,12 +228,13 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     }
                     else
                     {
-                        //Don't use drop zones as stubs, it can cause junctions to appear where they weren't before.
-                        if(newRoom.IsDropZone)
-                        {
-                            continue;
-                        }
                         newRoom = new(newRoom);
+                        //If the stub is a drop zone, pretend it isn't, otherwise junctions can appear
+                        //as a result of adding the stub.
+                        if (newRoom.IsDropZone)
+                        {
+                            newRoom.IsDropZone = false;
+                        }
                     }
                     newRoom.coords = openCoord;
                     palace.AllRooms.Add(newRoom);

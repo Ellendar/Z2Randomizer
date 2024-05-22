@@ -1428,13 +1428,13 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 config.EnemyXPDrops = XPEffectiveness.VANILLA;
                 break;
             case 1:
-                config.EnemyXPDrops = XPEffectiveness.LOW;
+                config.EnemyXPDrops = XPEffectiveness.RANDOM_LOW;
                 break;
             case 2:
-                config.EnemyXPDrops = XPEffectiveness.AVERAGE;
+                config.EnemyXPDrops = XPEffectiveness.RANDOM;
                 break;
             case 3:
-                config.EnemyXPDrops = XPEffectiveness.HIGH;
+                config.EnemyXPDrops = XPEffectiveness.RANDOM_HIGH;
                 break;
         }
         bool startAttackLowBit = bits[5];
@@ -2110,46 +2110,15 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MixLargeAndSmallEnemies = MixLargeAndSmallEnemies ?? random.Next(2) == 1;
         properties.ShuffleDripper = ShuffleDripperEnemy;
         properties.ShuffleEnemyPalettes = ShuffleSpritePalettes;
-        properties.ExpLevel = EnemyXPDrops switch
-        {
-            XPEffectiveness.VANILLA => StatEffectiveness.VANILLA,
-            XPEffectiveness.LOW => StatEffectiveness.LOW,
-            XPEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
-            XPEffectiveness.HIGH => StatEffectiveness.HIGH,
-            _ => throw new ImpossibleException("Invalid XPEffectiveness in properties export")
-        };
+        properties.EnemyXPDrops = EnemyXPDrops;
 
         //Levels
         properties.ShuffleAtkExp = ShuffleAttackExperience;
         properties.ShuffleMagicExp = ShuffleMagicExperience;
         properties.ShuffleLifeExp = ShuffleLifeExperience;
-        properties.AttackEffectiveness = AttackEffectiveness switch
-        {
-            AttackEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
-            AttackEffectiveness.LOW => StatEffectiveness.LOW,
-            AttackEffectiveness.VANILLA => StatEffectiveness.VANILLA,
-            AttackEffectiveness.HIGH => StatEffectiveness.HIGH,
-            AttackEffectiveness.OHKO => StatEffectiveness.MAX,
-            _ => throw new ImpossibleException("Invalid AttackEffectiveness in properties export")
-        };
-        properties.MagicEffectiveness = MagicEffectiveness switch
-        {
-            MagicEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
-            MagicEffectiveness.HIGH_COST => StatEffectiveness.LOW,
-            MagicEffectiveness.VANILLA => StatEffectiveness.VANILLA,
-            MagicEffectiveness.LOW_COST => StatEffectiveness.HIGH,
-            MagicEffectiveness.FREE => StatEffectiveness.MAX,
-            _ => throw new ImpossibleException("Invalid MagicEffectiveness in properties export")
-        };
-        properties.LifeEffectiveness = LifeEffectiveness switch
-        {
-            LifeEffectiveness.AVERAGE => StatEffectiveness.AVERAGE,
-            LifeEffectiveness.OHKO => StatEffectiveness.NONE,
-            LifeEffectiveness.VANILLA => StatEffectiveness.VANILLA,
-            LifeEffectiveness.HIGH => StatEffectiveness.HIGH,
-            LifeEffectiveness.INVINCIBLE => StatEffectiveness.MAX,
-            _ => throw new ImpossibleException("Invalid LifeEffectiveness in properties export")
-        };
+        properties.AttackEffectiveness = AttackEffectiveness;
+        properties.MagicEffectiveness = MagicEffectiveness;
+        properties.LifeEffectiveness = LifeEffectiveness;
         properties.ShuffleLifeRefill = ShuffleLifeRefillAmount;
         properties.ShuffleSpellLocations = ShuffleSpellLocations ?? random.Next(2) == 1;
         properties.DisableMagicRecs = DisableMagicContainerRequirements ?? random.Next(2) == 1;

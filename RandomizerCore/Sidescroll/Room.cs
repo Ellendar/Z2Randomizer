@@ -732,6 +732,14 @@ public class Room : IJsonOnDeserialized
                 }
                 return RoomExitType.NE_L;
             }
+            if(HasDownExit)
+            {
+                if (HasDrop)
+                {
+                    return RoomExitType.DROP_SE_L;
+                }
+                return RoomExitType.SE_L;
+            }
             return RoomExitType.DEADEND_RIGHT;
         }
         //Not left or right
@@ -745,14 +753,14 @@ public class Room : IJsonOnDeserialized
                 }
                 return RoomExitType.VERTICAL_PASSTHROUGH;
             }
+            if (IsDropZone)
+            {
+                return RoomExitType.DROP_DEADEND_UP;
+            }
             return RoomExitType.DEADEND_UP;
         }
         else if (HasDownExit)
         {
-            if (HasDrop)
-            {
-                return RoomExitType.DROP_DEADEND_DOWN;
-            }
             return RoomExitType.DEADEND_DOWN;
         }
         throw new ImpossibleException("Room has no exits");

@@ -75,15 +75,18 @@ public enum XPEffectiveness
     [Description("Vanilla")]
     VANILLA,
     [Description("Low")]
-    LOW,
+    RANDOM_LOW,
     [Description("Average")]
-    AVERAGE,
+    RANDOM,
     [Description("High")]
-    HIGH
+    RANDOM_HIGH,
+    [Description("None")]
+    NONE
 }
 
 //The old unified stateffectiveness is still used on the rando side, but moved
 //to separate effectivenesses for the config mapping
+/*
 public enum StatEffectiveness
 {
     NONE, 
@@ -93,6 +96,7 @@ public enum StatEffectiveness
     HIGH, 
     MAX
 }
+*/
 
 
 [DefaultValue(NORMAL)]

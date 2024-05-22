@@ -1061,9 +1061,9 @@ public partial class MainUI : Form
         configuration.EnemyXPDrops = experienceDropsList.SelectedIndex switch
         {
             0 => XPEffectiveness.VANILLA,
-            1 => XPEffectiveness.LOW,
-            2 => XPEffectiveness.AVERAGE,
-            3 => XPEffectiveness.HIGH,
+            1 => XPEffectiveness.RANDOM_LOW,
+            2 => XPEffectiveness.RANDOM,
+            3 => XPEffectiveness.RANDOM_HIGH,
             _ => throw new Exception("Invalid EnemyXPDrops setting")
         };
 
@@ -1555,9 +1555,9 @@ public partial class MainUI : Form
             experienceDropsList.SelectedIndex = configuration.EnemyXPDrops switch
             {
                 XPEffectiveness.VANILLA => 0,
-                XPEffectiveness.LOW => 1,
-                XPEffectiveness.AVERAGE => 2,
-                XPEffectiveness.HIGH => 3,
+                XPEffectiveness.RANDOM_LOW => 1,
+                XPEffectiveness.RANDOM => 2,
+                XPEffectiveness.RANDOM_HIGH => 3,
                 _ => throw new Exception("Invalid EnemyXPDrops setting")
             };
 

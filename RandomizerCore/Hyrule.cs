@@ -533,17 +533,19 @@ public class Hyrule
     */
 
 
-    private void RandomizeAttackEffectiveness(ROM rom, StatEffectiveness attackEffectiveness)
+    private void RandomizeAttackEffectiveness(ROM rom, AttackEffectiveness attackEffectiveness)
     {
-        if (attackEffectiveness == StatEffectiveness.MAX)
+        if (attackEffectiveness == AttackEffectiveness.OHKO)
         {
+            //This is a duplicate of a more advanced version in RandomizeEnemyStats()
+            /*
             for (int i = 0; i < 8; i++)
             {
                 ROMData.Put(0x1E67D + i, 192);
-            }
+            }*/
             return;
         }
-        if(attackEffectiveness == StatEffectiveness.VANILLA)
+        if(attackEffectiveness == AttackEffectiveness.VANILLA)
         {
             return;
         }
@@ -560,7 +562,7 @@ public class Hyrule
             double maxAtk = attackValues[i] + attackValues[i] * .5;
 
             double attack;
-            if (attackEffectiveness == StatEffectiveness.AVERAGE)
+            if (attackEffectiveness == AttackEffectiveness.AVERAGE)
             {
                 attack = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
                 if (i == 0)
@@ -581,11 +583,11 @@ public class Hyrule
                 attack = (int)Math.Min(attack, maxAtk);
                 attack = (int)Math.Max(attack, minAtk);
             }
-            else if (attackEffectiveness == StatEffectiveness.HIGH)
+            else if (attackEffectiveness == AttackEffectiveness.HIGH)
             {
                 attack = (int)(attackValues[i] + (attackValues[i] * .5));
             }
-            else if (attackEffectiveness == StatEffectiveness.LOW)
+            else if (attackEffectiveness == AttackEffectiveness.LOW)
             {
                 //Low attack does really dumb stuff with rounding regardless of what you do because the values are so low
                 //This causes at least 1 level to to literal nothing. To avoid this, we just have a linear increase from 1-6
@@ -1143,16 +1145,15 @@ public class Hyrule
         accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.ItemGet == true && i.Collectable == Collectable.MAGIC_CONTAINER).Count();
         return changed;
     }
-    private void RandomizeLifeOrMagicEffectiveness(ROM rom, bool isMag)
-    {
 
+    //This used to be one method for handling both, but it was rapidly approaching unreadable so I split it back out
+    private void RandomizeLifeEffectiveness(ROM rom)
+    {
         int numBanks = 7;
         int start = 0x1E2BF;
-        if (isMag)
-        {
-            numBanks = 8;
-            start = 0xD8B;
-        }
+        //There are 7 different damage categories for which damage taken scales with life level
+        //Each of those 7 categories has 8 values coresponding to each life level
+        //Damage values that do not scale with life levels are currently not randomized.
         int[,] life = new int[numBanks, 8];
         for (int i = 0; i < numBanks; i++)
         {
@@ -1165,21 +1166,17 @@ public class Hyrule
             }
         }
 
-        StatEffectiveness currentStatEffectiveness = isMag ? props.MagicEffectiveness : props.LifeEffectiveness;
+        LifeEffectiveness lifeEffectiveness = props.LifeEffectiveness;
 
         for (int j = 0; j < 8; j++)
         {
             for (int i = 0; i < numBanks; i++)
             {
                 int nextVal = life[i, j];
-                if (currentStatEffectiveness == StatEffectiveness.AVERAGE)
+                if (lifeEffectiveness == LifeEffectiveness.AVERAGE)
                 {
                     int max = (int)(life[i, j] + life[i, j] * .5);
-                    int min = (int)(life[i, j] - life[i, j] * .5);
-                    if (!isMag)
-                    {
-                        min = (int)(life[i, j] - life[i, j] * .25);
-                    }
+                    int min = (int)(life[i, j] - life[i, j] * .25);
                     if (j == 0)
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
@@ -1193,19 +1190,11 @@ public class Hyrule
                         }
                     }
                 }
-                else if (props.MagicEffectiveness == StatEffectiveness.LOW && isMag)
-                {
-                    nextVal = (int)(life[i, j] + (life[i, j] * .5));
-                }
-                else if (props.LifeEffectiveness == StatEffectiveness.HIGH && !isMag || props.MagicEffectiveness == StatEffectiveness.HIGH && isMag)
+                else if (props.LifeEffectiveness == LifeEffectiveness.HIGH)
                 {
                     nextVal = (int)(life[i, j] * .5);
                 }
 
-                if (isMag && nextVal > 120)
-                {
-                    nextVal = 120;
-                }
                 life[i, j] = nextVal;
             }
         }
@@ -1216,6 +1205,74 @@ public class Hyrule
             {
                 int highPart = (life[i, j] / 8) << 4;
                 int lowPart = (life[i, j] % 8);
+                rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
+            }
+        }
+
+    }
+
+    private void RandomizeMagicEffectiveness(ROM rom)
+    {
+        int numBanks = 8;
+        int start = 0xD8B;
+        //8 spells by 8 magic levels
+        int[,] magicCosts = new int[numBanks, 8];
+        for (int i = 0; i < numBanks; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                int magicCost = rom.GetByte(start + (i * 8) + j);
+                int highPart = (magicCost & 0xF0) >> 4;
+                int lowPart = magicCost & 0x0F;
+                magicCosts[i, j] = highPart * 8 + lowPart / 2;
+            }
+        }
+
+        MagicEffectiveness currentStatEffectiveness = props.MagicEffectiveness;
+
+        for (int j = 0; j < 8; j++)
+        {
+            for (int i = 0; i < numBanks; i++)
+            {
+                int nextVal = magicCosts[i, j];
+                if (currentStatEffectiveness == MagicEffectiveness.AVERAGE)
+                {
+                    int max = (int)(magicCosts[i, j] + magicCosts[i, j] * .5);
+                    int min = (int)(magicCosts[i, j] - magicCosts[i, j] * .5);
+
+                    if (j == 0)
+                    {
+                        nextVal = RNG.Next(min, Math.Min(max, 120));
+                    }
+                    else
+                    {
+                        nextVal = RNG.Next(min, Math.Min(max, 120));
+                        if (nextVal > magicCosts[i, j - 1])
+                        {
+                            nextVal = magicCosts[i, j - 1];
+                        }
+                    }
+                }
+                else if (props.MagicEffectiveness == MagicEffectiveness.HIGH_COST)
+                {
+                    nextVal = (int)(magicCosts[i, j] + (magicCosts[i, j] * .5));
+                }
+                else if (props.MagicEffectiveness == MagicEffectiveness.LOW_COST)
+                {
+                    nextVal = (int)(magicCosts[i, j] * .5);
+                }
+
+                nextVal = Math.Min(120, nextVal);
+                magicCosts[i, j] = nextVal;
+            }
+        }
+
+        for (int i = 0; i < numBanks; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                int highPart = (magicCosts[i, j] / 8) << 4;
+                int lowPart = (magicCosts[i, j] % 8);
                 rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
             }
         }
@@ -1239,7 +1296,7 @@ public class Hyrule
             RandomizeHP(0x12937, 0x12954);
         }
 
-        if (props.AttackEffectiveness == StatEffectiveness.MAX)
+        if (props.AttackEffectiveness == AttackEffectiveness.OHKO)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -2081,20 +2138,20 @@ public class Hyrule
             int high = exp & 0xF0;
             int low = exp & 0x0F;
 
-            if (props.ExpLevel == StatEffectiveness.HIGH)
+            if (props.EnemyXPDrops == XPEffectiveness.RANDOM_HIGH)
             {
                 low++;
             }
-            else if (props.ExpLevel == StatEffectiveness.LOW)
+            else if (props.EnemyXPDrops == XPEffectiveness.RANDOM_LOW)
             {
                 low--;
             }
-            else if (props.ExpLevel == StatEffectiveness.NONE)
+            else if (props.EnemyXPDrops == XPEffectiveness.NONE)
             {
                 low = 0;
             }
 
-            if (props.ExpLevel != StatEffectiveness.NONE)
+            if (props.EnemyXPDrops != XPEffectiveness.RANDOM)
             {
                 low = RNG.Next(low - 2, low + 3);
             }
@@ -2252,7 +2309,7 @@ public class Hyrule
             RandomizeBits(rom, addr, 0x20);
         }
 
-        if (props.ExpLevel != StatEffectiveness.VANILLA)
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
             RandomizeEnemyExp(rom, addr);
         }
@@ -2278,7 +2335,7 @@ public class Hyrule
         {
             RandomizeBits(rom, addr, 0x20);
         }
-        if (props.ExpLevel != StatEffectiveness.VANILLA)
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
             RandomizeEnemyExp(rom, addr);
         }
@@ -2311,7 +2368,7 @@ public class Hyrule
         {
             RandomizeBits(rom, addr, 0x20);
         }
-        if (props.ExpLevel != StatEffectiveness.VANILLA)
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
             RandomizeEnemyExp(rom, addr);
         }
@@ -2353,7 +2410,7 @@ public class Hyrule
         {
             RandomizeBits(rom, addr, 0x20);
         }
-        if (props.ExpLevel != StatEffectiveness.VANILLA)
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
             RandomizeEnemyExp(rom, addr);
         }
@@ -2388,12 +2445,12 @@ public class Hyrule
         {
             RandomizeBits(rom, addr, 0x20);
         }
-        if (props.ExpLevel != StatEffectiveness.VANILLA)
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
             RandomizeEnemyExp(rom, addr);
         }
 
-        if (props.ExpLevel != StatEffectiveness.VANILLA)
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
             addr = new List<int>();
             addr.Add(0x11505);
@@ -2482,9 +2539,9 @@ public class Hyrule
 
         RandomizeAttackEffectiveness(rom, props.AttackEffectiveness);
 
-        RandomizeLifeOrMagicEffectiveness(rom, true);
+        RandomizeLifeEffectiveness(rom);
 
-        RandomizeLifeOrMagicEffectiveness(rom, false);
+        RandomizeMagicEffectiveness(rom);
 
         rom.Put(0x17B10, (byte)props.StartGems);
 
@@ -2513,7 +2570,7 @@ public class Hyrule
             rom.Put(0xF4EB, 0x10);
         }
 
-        if (props.LifeEffectiveness == StatEffectiveness.MAX)
+        if (props.LifeEffectiveness == LifeEffectiveness.INVINCIBLE)
         {
             for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
             {
@@ -2521,7 +2578,7 @@ public class Hyrule
             }
         }
 
-        if (props.LifeEffectiveness == StatEffectiveness.NONE)
+        if (props.LifeEffectiveness == LifeEffectiveness.OHKO)
         {
             for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
             {
@@ -2529,7 +2586,7 @@ public class Hyrule
             }
         }
 
-        if (props.MagicEffectiveness == StatEffectiveness.MAX)
+        if (props.MagicEffectiveness == MagicEffectiveness.FREE)
         {
             for (int i = 0xD8B; i < 0xD8b + 64; i++)
             {

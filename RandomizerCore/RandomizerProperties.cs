@@ -120,7 +120,7 @@ public class RandomizerProperties
     public bool MixLargeAndSmallEnemies { get; set; }
     public bool ShuffleDripper { get; set; }
     public bool ShuffleEnemyPalettes { get; set; }
-    public StatEffectiveness ExpLevel { get; set; }
+    public XPEffectiveness EnemyXPDrops { get; set; }
 
     //Levels
     //public bool shuffleAllExp { get; set; }
@@ -144,9 +144,9 @@ public class RandomizerProperties
     public bool highMag { get; set; }
     public bool lowMag { get; set; }
     */
-    public StatEffectiveness AttackEffectiveness { get; set; }
-    public StatEffectiveness MagicEffectiveness { get; set; }
-    public StatEffectiveness LifeEffectiveness { get; set; }
+    public AttackEffectiveness AttackEffectiveness { get; set; }
+    public MagicEffectiveness MagicEffectiveness { get; set; }
+    public LifeEffectiveness LifeEffectiveness { get; set; }
     public int AttackCap { get; set; }
     public int MagicCap { get; set; }
     public int LifeCap { get; set; }
@@ -155,6 +155,7 @@ public class RandomizerProperties
     public bool SaneCaves { get; set; }
     public bool SpellEnemy { get; set; }
 
+    //Items
     //Items
     public bool ShuffleOverworldItems { get; set; }
     public bool ShufflePalaceItems { get; set; }
