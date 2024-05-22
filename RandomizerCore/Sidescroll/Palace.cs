@@ -30,9 +30,9 @@ public class Palace
         Collectable.ONEUP
     ];
 
-    private int numRooms;
+    //private int numRooms;
     private List<Room> openRooms;
-    private int maxRooms;
+    //private int maxRooms;
     private int netDeadEnds;
 
     internal List<Room> AllRooms { get; private set; }
@@ -40,8 +40,6 @@ public class Palace
     public Room Entrance { get => entrance; set => entrance = value; }
     public Room ItemRoom { get => itemRoom; set => itemRoom = value; }
     public Room BossRoom { get => bossRoom; set => bossRoom = value; }
-    public int NumRooms { get => numRooms; set => numRooms = value; }
-    public int MaxRooms { get => maxRooms; set => maxRooms = value; }
     public int Number { get; set; }
     internal Room Tbird { get => tbirdRoom; set => tbirdRoom = value; }
     
@@ -54,7 +52,6 @@ public class Palace
         entrance = null;
         rooms = new SortedDictionary<int, List<Room>>();
         AllRooms = new List<Room>();
-        numRooms = 0;
         openRooms = new List<Room>();
         if (Number < 7)
         {
@@ -132,7 +129,7 @@ public class Palace
         }
         AllRooms.Add(r);
         //SortRoom(r);
-        numRooms++;
+        //numRooms++;
 
         if (Number != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
         {
@@ -762,6 +759,7 @@ public class Palace
         List<Room> leftExits = AllRooms.Where(i => i.HasLeftExit).ToList();
         List<Room> rightExits = AllRooms.Where(i => i.HasRightExit).ToList();
         List<Room> dropExits = AllRooms.Where(i => i.HasDownExit && i.HasDrop).ToList();
+        int numRooms = AllRooms.Count;
 
         int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;

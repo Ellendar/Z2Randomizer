@@ -99,7 +99,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 80;
+    private static int DEBUG_THRESHOLD = 130;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -953,7 +953,7 @@ public class Hyrule
                 itemGetReachableFailures++;
                 if (UNSAFE_DEBUG && count >= DEBUG_THRESHOLD)
                 {
-                    Debug.WriteLine("Failed on items");
+                    Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
                     return false;
                 }
@@ -972,19 +972,6 @@ public class Hyrule
             //PrintRoutingDebug(count, wh, eh, dm, mi);
             return false;
         }
-        /*
-        if (ItemGet.Keys.Any(i => i.IsSpell() && !ItemGet[i]))
-        {
-            spellGetReachableFailures++;
-            if (UNSAFE_DEBUG && count > DEBUG_THRESHOLD)
-            {
-                Debug.WriteLine("Failed on spells");
-                debug++;
-                PrintRoutingDebug(count, wh, eh, dm, mi);
-                return false;
-            }
-            return false;
-        }*/
 
         bool retval =
             CanGet(westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto))
@@ -3625,7 +3612,8 @@ FixSoftlock:
     
     public void ExpandedPauseMenu(Assembler a)
     {;
-        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
+        //XXX: restore this
+        //a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
     
     public void StandardizeDrops(Assembler a)

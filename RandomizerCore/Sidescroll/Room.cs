@@ -24,7 +24,7 @@ namespace RandomizerCore.Sidescroll;
 public partial class RoomSerializationContext : JsonSerializerContext { }
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-public class Room
+public class Room : IJsonOnDeserialized
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -157,6 +157,14 @@ public class Room
         HasDownExit = IsUpDownReversed ? room.Connections[2] < 0xFC : room.Connections[1] < 0xFC;
         HasUpExit = IsUpDownReversed ? room.Connections[1] < 0xFC : room.Connections[2] < 0xFC;
         HasRightExit = room.Connections[3] < 0xFC;
+    }
+
+    public void OnDeserialized()
+    {
+        HasLeftExit = Connections[0] < 0xFC;
+        HasDownExit = IsUpDownReversed ? Connections[2] < 0xFC : Connections[1] < 0xFC;
+        HasUpExit = IsUpDownReversed ? Connections[1] < 0xFC : Connections[2] < 0xFC;
+        HasRightExit = Connections[3] < 0xFC;
     }
 
     public string Serialize()
@@ -547,6 +555,7 @@ public class Room
         StringBuilder sb = new();
         sb.Append(Map + " ");
         sb.Append(Name + " ");
+        sb.Append(coords + " ");
         sb.Append("[" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
         sb.Append("[" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
         return sb.ToString();
@@ -666,12 +675,20 @@ public class Room
                 {
                     if (HasDownExit)
                     {
+                        if(HasDrop)
+                        {
+                            return RoomExitType.DROP_FOUR_WAY;
+                        }
                         return RoomExitType.FOUR_WAY;
                     }
                     return RoomExitType.INVERSE_T;
                 }
                 else if (HasDownExit)
                 {
+                    if (HasDrop)
+                    {
+                        return RoomExitType.DROP_T;
+                    }
                     return RoomExitType.T;
                 }
                 else
@@ -683,12 +700,20 @@ public class Room
             {
                 if (HasDownExit)
                 {
+                    if (HasDrop)
+                    {
+                        return RoomExitType.DROP_LEFT_T;
+                    }
                     return RoomExitType.LEFT_T;
                 }
                 return RoomExitType.NW_L;
             }
             else if (HasDownExit)
             {
+                if (HasDrop)
+                {
+                    return RoomExitType.DROP_SW_L;
+                }
                 return RoomExitType.SW_L;
             }
             else return RoomExitType.DEADEND_LEFT;
@@ -699,22 +724,35 @@ public class Room
             {
                 if(HasDownExit)
                 {
+                    if (HasDrop)
+                    {
+                        return RoomExitType.DROP_RIGHT_T;
+                    }
                     return RoomExitType.RIGHT_T;
                 }
                 return RoomExitType.NE_L;
             }
             return RoomExitType.DEADEND_RIGHT;
         }
+        //Not left or right
         if (HasUpExit)
         {
             if (HasDownExit)
             {
+                if (HasDrop)
+                {
+                    return RoomExitType.DROP_COLUMN;
+                }
                 return RoomExitType.VERTICAL_PASSTHROUGH;
             }
             return RoomExitType.DEADEND_UP;
         }
         else if (HasDownExit)
         {
+            if (HasDrop)
+            {
+                return RoomExitType.DROP_DEADEND_DOWN;
+            }
             return RoomExitType.DEADEND_DOWN;
         }
         throw new ImpossibleException("Room has no exits");
@@ -755,6 +793,14 @@ public class Room
             return false;
         }
         return true;
+    }
+
+    public bool IsOrphaned()
+    {
+        return (HasLeftExit && Left != null)
+            || (HasUpExit && Up != null)
+            || (HasDownExit && Down != null)
+            || (HasRightExit && Right != null);
     }
 }
 

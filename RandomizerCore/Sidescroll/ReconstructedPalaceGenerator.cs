@@ -58,6 +58,10 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                 if (palaceNumber < 7) //Not GP
                 {
+                    if(roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
+                    {
+                        throw new Exception("No item rooms for generated palace");
+                    }
                     Direction itemRoomDirection;
                     Room itemRoom = null;
                     while (itemRoom == null)
@@ -105,12 +109,9 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                 }
 
-
-                palace.MaxRooms = roomCount;
-
                 //add rooms
                 roomPlacementFailures = 0;
-                while (palace.AllRooms.Count < palace.MaxRooms)
+                while (palace.AllRooms.Count < roomCount)
                 {
                     if (roomPool.NormalRooms.Count == 0)
                     {
@@ -157,7 +158,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         }
                         if (roomToAdd.HasDrop)
                         {
-                            int numDrops = r.Next(Math.Min(3, palace.MaxRooms - palace.AllRooms.Count), Math.Min(6, palace.MaxRooms - palace.AllRooms.Count));
+                            int numDrops = r.Next(Math.Min(3, roomCount - palace.AllRooms.Count), Math.Min(6, roomCount - palace.AllRooms.Count));
                             numDrops = Math.Min(numDrops, roomPool.NormalRooms.Count(i => i.IsDropZone) + 1);
                             bool continueDropping = true;
                             int j = 0;
@@ -208,7 +209,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         break;
                     }
 
-                    if (palace.GetOpenRooms() >= palace.MaxRooms - palace.AllRooms.Count) //consolidate
+                    if (palace.GetOpenRooms() >= roomCount - palace.AllRooms.Count) //consolidate
                     {
                         palace.Consolidate();
                     }

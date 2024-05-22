@@ -9,6 +9,7 @@ public class VanillaShufflePalaceGenerator(CancellationToken ct) : VanillaPalace
     {
         Palace palace = base.GeneratePalace(props, rooms, r, roomCount, palaceNumber);
 
+        palace.ResetRooms();
         palace.ShuffleRooms(r);
 
         int tries = 0;

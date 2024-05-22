@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,12 +9,15 @@ namespace RandomizerCore.Sidescroll;
 
 public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
 {
+    private static int debug = 0;
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     private static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
     private const int STALL_LIMIT = 1000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         Palace palace = new(palaceNumber);
         List<(int, int)> openCoords = new();
+        Dictionary<RoomExitType, List<Room>> roomsByExitType;
         RoomPool roomPool = new(rooms);
         int palaceGroup = palaceNumber switch
         {
@@ -33,6 +37,7 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
         };
         openCoords.AddRange(entrance.GetOpenExitCoords());
         palace.AllRooms.Add(entrance);
+        palace.Entrance = entrance;
 
         int stallCount = 0;
         int openJunctionsCount = 0;
@@ -138,6 +143,7 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                 openJunctionsCount = 0;
                 foreach((int, int) coord in openCoords)
                 {
+                    debug++;
                     Room? coordLeft = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1 - 1, coord.Item2));
                     Room? coordRight = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1 + 1, coord.Item2));
                     Room? coordUp = palace.AllRooms.FirstOrDefault(i => i.coords == (coord.Item1, coord.Item2 + 1));
@@ -152,14 +158,14 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     }
                 }
 
-                Debug.WriteLine("Added Room at (" + newRoom.coords.Item1 + ", " + newRoom.coords.Item2 + ")");
+                //Debug.WriteLine("Added Room at (" + newRoom.coords.Item1 + ", " + newRoom.coords.Item2 + ")");
             }
         }
         if(openCoords.Count > 0)
         {
-            Dictionary<RoomExitType, List<Room>> roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
+            roomsByExitType = roomPool.CategorizeNormalRoomExits();
 
-            foreach ((int, int) openCoord in openCoords)
+            foreach ((int, int) openCoord in openCoords.ToList())
             {
                 Room? left = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1 - 1, openCoord.Item2));
                 Room? right = palace.AllRooms.FirstOrDefault(i => i.coords == (openCoord.Item1 + 1, openCoord.Item2));
@@ -173,24 +179,33 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     throw new Exception("Junction remains in stub closing that should have been cleaned up");
                 }
 
-                bool placed;
+                bool placed = false;
                 do
                 {
-                    placed = true;
                     RoomExitType exitType;
-                    if (left != null)
+                    if (left != null && left.HasRightExit)
                     {
                         exitType = RoomExitType.DEADEND_LEFT;
                     }
-                    else if (right != null)
+                    else if (right != null && right.HasLeftExit)
                     {
                         exitType = RoomExitType.DEADEND_RIGHT;
                     }
-                    else if (up != null)
+                    else if (up != null && up.HasDownExit)
                     {
-                        exitType = RoomExitType.DEADEND_DOWN;
+                        if (up.HasDrop)
+                        {
+                            exitType = RoomExitType.DROP_DEADEND_DOWN;
+                            logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
+                            palace.IsValid = false;
+                            return palace;
+                        }
+                        else
+                        {
+                            exitType = RoomExitType.DEADEND_DOWN;
+                        }
                     }
-                    else if (down != null)
+                    else if (down != null && down.HasUpExit)
                     {
                         exitType = RoomExitType.DEADEND_UP;
                     }
@@ -198,7 +213,12 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     {
                         throw new ImpossibleException("Open coordinate has no adjacent exits");
                     }
-                    Room? newRoom = roomsByExitType[exitType].Sample(r);
+                    roomsByExitType.TryGetValue(exitType, out var possibleStubs);
+                    Room? newRoom = possibleStubs?.Sample(r);
+                    if (newRoom == null)
+                    {
+                        roomPool.StubsByDirection.TryGetValue(exitType, out newRoom);
+                    }
                     //The most likely cause of this is roomPool exhaustion in no duplicate rooms seeds.
                     //There could be some compromise to try and save it, but might as well regen
                     if (newRoom == null)
@@ -208,10 +228,17 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     }
                     else
                     {
+                        //Don't use drop zones as stubs, it can cause junctions to appear where they weren't before.
+                        if(newRoom.IsDropZone)
+                        {
+                            continue;
+                        }
                         newRoom = new(newRoom);
                     }
                     newRoom.coords = openCoord;
                     palace.AllRooms.Add(newRoom);
+                    openCoords.Remove(openCoord);
+                    placed = true;
 
                     if (left != null)
                     {
@@ -253,12 +280,116 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
 
         if (palace.AllRooms.Count > roomCount)
         {
-            throw new ImpossibleException("Room count exceeds maximum room count.");
+            throw new ImpossibleException("Palace Room count exceeds maximum room count.");
         }
         if(openCoords.Count != 0)
         {
             throw new ImpossibleException("Stray open coordinate after palace is generated");
         }
+
+        //Recategorize the remaining rooms after stubbing out.
+        roomsByExitType = roomPool.CategorizeNormalRoomExits();
+
+
+        //ItemRoom
+        if(palace.Number < 7)
+        {
+            if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
+            {
+                throw new Exception("No item rooms for generated palace");
+            }
+            Direction itemRoomDirection;
+            Room itemRoom = null;
+            do
+            {
+                itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
+            } while (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection));
+            List<Room> itemRoomCandidates = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList();
+            itemRoomCandidates.FisherYatesShuffle(r);
+
+            foreach (Room itemRoomCandidate in itemRoomCandidates)
+            {
+                List<Room> itemRoomReplacementCandidates =
+                    palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits()).ToList();
+                Room? itemRoomReplacementRoom = itemRoomReplacementCandidates.Sample(r);
+                if (itemRoomReplacementRoom != null)
+                {
+                    palace.AllRooms.Remove(itemRoomReplacementRoom);
+                    palace.ItemRoom = new(itemRoomCandidate);
+                    palace.AllRooms.Add(palace.ItemRoom);
+                    palace.ItemRoom.coords = itemRoomReplacementRoom.coords;
+                    palace.ItemRoom.PalaceGroup = palaceGroup;
+                    break;
+                }
+            }
+        }
+        //Tbird Room
+        else
+        {
+            if (roomPool.TbirdRooms.Count == 0)
+            {
+                throw new Exception("No tbird rooms for generated palace");
+            }
+            List<Room> tbirdRoomCandidates = roomPool.TbirdRooms.ToList();
+            tbirdRoomCandidates.FisherYatesShuffle(r);
+
+            foreach (Room tbirdRoomCandidate in tbirdRoomCandidates)
+            {
+                List<Room> tbirdRoomReplacementCandidates =
+                    palace.AllRooms.Where(i => i.CategorizeExits() == tbirdRoomCandidate.CategorizeExits()).ToList();
+                Room? tbirdRoomReplacementRoom = tbirdRoomReplacementCandidates.Sample(r);
+                if (tbirdRoomReplacementRoom != null)
+                {
+                    palace.AllRooms.Remove(tbirdRoomReplacementRoom);
+                    palace.Tbird = new(tbirdRoomCandidate);
+                    palace.AllRooms.Add(palace.Tbird);
+                    palace.Tbird.coords = tbirdRoomReplacementRoom.coords;
+                    palace.Tbird.PalaceGroup = palaceGroup;
+                    break;
+                }
+            }
+        }
+
+        //BossRoom
+        if (roomPool.BossRooms.Count == 0)
+        {
+            throw new Exception("No boss rooms for generated palace");
+        }
+        List<Room> bossRoomCandidates = roomPool.BossRooms.ToList();
+        bossRoomCandidates.FisherYatesShuffle(r);
+
+        foreach (Room bossRoomCandidate in bossRoomCandidates)
+        {
+            List<Room> bossRoomReplacementCandidates =
+                palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomCandidate.CategorizeExits()).ToList();
+            Room? bossRoomReplacementRoom = bossRoomReplacementCandidates.Sample(r);
+            if (bossRoomReplacementRoom != null)
+            {
+                palace.AllRooms.Remove(bossRoomReplacementRoom);
+                palace.BossRoom = new(bossRoomCandidate);
+                palace.AllRooms.Add(palace.BossRoom);
+                palace.BossRoom.coords = bossRoomReplacementRoom.coords;
+                palace.BossRoom.PalaceGroup = palaceGroup;
+                break;
+            }
+        }
+
+        if(palace.BossRoom == null
+            || palace.Entrance == null
+            || (palaceNumber == 7 && palace.Tbird == null)
+            || (palaceNumber < 7 && palace.ItemRoom == null))
+        {
+            logger.Debug("Failed to place critical room in palace");
+            palace.IsValid = false;
+            return palace;
+        }
+
+        if(palace.AllRooms.Count != roomCount)
+        {
+            throw new Exception("Generated palace has the incorrect number of rooms");
+        }
+        //TODO: tbird required logic
+        //TODO: passthru boss rooms (directly on the room pool)
 
         palace.IsValid = true;
         return palace;

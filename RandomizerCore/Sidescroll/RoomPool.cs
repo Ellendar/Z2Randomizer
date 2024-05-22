@@ -13,6 +13,8 @@ internal class RoomPool
     public Room VanillaBossRoom { get; set; }
     public Dictionary<string, Room> LinkedRooms { get; } = [];
     public MultiValueDictionary<Direction, Room> ItemRoomsByDirection { get; set; } = [];
+    public Dictionary<RoomExitType, Room> StubsByDirection { get; set; } = [];
+
     private PalaceRooms palaceRooms;
 
     protected RoomPool() { }
@@ -32,6 +34,10 @@ internal class RoomPool
         foreach (var key in target.ItemRoomsByDirection.Keys)
         {
             ItemRoomsByDirection.AddRange(key, target.ItemRoomsByDirection[key]);
+        }
+        foreach (var key in target.StubsByDirection.Keys)
+        {
+            StubsByDirection.Add(key, target.StubsByDirection[key]);
         }
     }
 
@@ -54,6 +60,10 @@ internal class RoomPool
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction).ToList());
             }
+            //If we are using these categorized exits to cap paths, there needs to always be a path of each type
+            //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
+            StubsByDirection.Add(RoomExitType.DEADEND_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
+            StubsByDirection.Add(RoomExitType.DEADEND_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
         }
 
         if (props.AllowV4Rooms)
@@ -136,7 +146,7 @@ internal class RoomPool
         }
     }
 
-    public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits(bool includeStubs)
+    public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits()
     {
         Dictionary<RoomExitType, List<Room>> categorizedRooms = [];
         foreach(Room room in NormalRooms)
@@ -147,20 +157,6 @@ internal class RoomPool
                 categorizedRooms[type] = [];
             }
             categorizedRooms[type].Add(room);
-        }
-
-        //If we are using these categorized exits to cap paths, there needs to always be a path of each type
-        //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
-        if(includeStubs)
-        {
-            if (!categorizedRooms.ContainsKey(RoomExitType.DEADEND_UP))
-            {
-                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit));
-            }
-            if (!categorizedRooms.ContainsKey(RoomExitType.DEADEND_DOWN))
-            {
-                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit));
-            }
         }
         
         return categorizedRooms;
