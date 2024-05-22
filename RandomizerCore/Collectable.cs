@@ -27,18 +27,18 @@ public enum Collectable
     MEDICINE = 0x15,
     UPSTAB = 0x16,
     DOWNSTAB = 0x17,
-    MIRROR = 0x19,
-    BAGUS_NOTE = 0x1A,
-    WATER = 0x1B,
-    SHIELD_SPELL = 0x1C,
-    JUMP_SPELL = 0x1D,
-    LIFE_SPELL = 0x1E,
-    FAIRY_SPELL = 0x1F,
-    FIRE_SPELL = 0x20,
-    DASH_SPELL = 0x21,
-    REFLECT_SPELL = 0x22,
-    SPELL_SPELL = 0x23,
-    THUNDER_SPELL = 0x24
+    MIRROR = 0x18,
+    BAGUS_NOTE = 0x19,
+    WATER = 0x1a,
+    SHIELD_SPELL = 0x1b,
+    JUMP_SPELL = 0x1c,
+    LIFE_SPELL = 0x1d,
+    FAIRY_SPELL = 0x1e,
+    FIRE_SPELL = 0x1f,
+    DASH_SPELL = 0x20,
+    REFLECT_SPELL = 0x21,
+    SPELL_SPELL = 0x22,
+    THUNDER_SPELL = 0x23
 }
 
 

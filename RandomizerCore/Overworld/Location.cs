@@ -118,7 +118,7 @@ public class Location
         TerrainType = t;
         MemAddress = mem;
         CanShuffle = true;
-        Collectable = Collectable.DO_NOT_USE;
+        VanillaCollectable = Collectable = Collectable.DO_NOT_USE;
         ItemGet = false;
         Reachable = false;
         PalaceNumber = 0;

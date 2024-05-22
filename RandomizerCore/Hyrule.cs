@@ -3272,7 +3272,7 @@ public class Hyrule
                         {
                             logger.Debug("Map: " + map);
                             logger.Debug("Item: " + item);
-                            logger.Debug("Address: {0:X}", addr);
+                            logger.Debug($"Address: {addr:X}");
                         }
                         addresses.Add(addr);
                         items.Add(item);
@@ -3285,9 +3285,7 @@ public class Hyrule
         for (int i = 0; i < items.Count; i++)
         {
             int swap = RNG.Next(i, items.Count);
-            int temp = items[swap];
-            items[swap] = items[i];
-            items[i] = temp;
+            (items[swap], items[i]) = (items[i], items[swap]);
         }
         for (int i = 0; i < addresses.Count; i++)
         {
@@ -3367,11 +3365,11 @@ CustomFileSelectData:
 
     public IEnumerable<Location> AllLocationsForReal()
     {
-        List<Location> locations = westHyrule.AllLocations
-            .Union(eastHyrule.AllLocations)
-            .Union(mazeIsland.AllLocations)
-            .Union(deathMountain.AllLocations).ToList();
-        return locations;
+        List<Location>? locations = westHyrule?.AllLocations
+            .Union(eastHyrule?.AllLocations ?? [])
+            .Union(mazeIsland?.AllLocations ?? [])
+            .Union(deathMountain?.AllLocations ?? []).ToList();
+        return locations ?? [];
     }
 
     public IEnumerable<Location> GetNonSideviewItemLocations()
@@ -3486,6 +3484,20 @@ CustomFileSelectData:
         return false;
     }
 
+    private void FullItemShuffle(Assembler asm, IEnumerable<Location> collectables)
+    {
+        var a = asm.Module();
+        foreach (var collect in Enum.GetValues<Collectable>())
+        {
+            a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
+        }
+        foreach (var loc in collectables)
+        {
+            a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectable);
+        }
+        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
+    }
+    
     private void FixHelmetheadBossRoom(Assembler asm)
     {
         byte helmetRoom;
@@ -3618,9 +3630,8 @@ FixSoftlock:
     }
     
     public void ExpandedPauseMenu(Assembler a)
-    {;
-        //XXX: restore this
-        //a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
+    {
+        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
     
     public void StandardizeDrops(Assembler a)
@@ -3814,6 +3825,7 @@ FREE_UNTIL $c2ca
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
+        FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
         rom.InstantText(engine);
 

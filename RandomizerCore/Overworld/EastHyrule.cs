@@ -122,13 +122,13 @@ public class EastHyrule : World
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNabooru = GetLocationByMem(0x865C);
-        townAtNabooru.Collectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
+        townAtNabooru.VanillaCollectable = townAtNabooru.Collectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
         townAtDarunia = GetLocationByMem(0x865E);
-        townAtDarunia.Collectable = Collectable.REFLECT_SPELL;
+        townAtDarunia.VanillaCollectable = townAtDarunia.Collectable = Collectable.REFLECT_SPELL;
         townAtNewKasuto = GetLocationByMem(0x8660);
-        townAtNewKasuto.Collectable = Collectable.SPELL_SPELL;
+        townAtNewKasuto.VanillaCollectable = townAtNewKasuto.Collectable = Collectable.SPELL_SPELL;
         townAtOldKasuto = GetLocationByMem(0x8662);
-        townAtOldKasuto.Collectable = Collectable.THUNDER_SPELL;
+        townAtOldKasuto.VanillaCollectable = townAtOldKasuto.Collectable = Collectable.THUNDER_SPELL;
 
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
@@ -153,27 +153,27 @@ public class EastHyrule : World
         enemyPtr = 0x85B1;
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
-        locationAtGP.Collectable = Collectable.DO_NOT_USE;
+        locationAtGP.VanillaCollectable = locationAtGP.Collectable = Collectable.DO_NOT_USE;
         pbagCave1 = GetLocationByMem(0x863C);
         pbagCave2 = GetLocationByMem(0x863D);
         VANILLA_MAP_ADDR = 0x9056;
 
         //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
         spellTower = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
-        spellTower.Collectable = Collectable.MAGIC_KEY;
+        spellTower.VanillaCollectable = spellTower.Collectable = Collectable.MAGIC_KEY;
         spellTower.Name = "Spell Tower";
         AddLocation(spellTower);
         newKasutoBasement = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
-        newKasutoBasement.Collectable = Collectable.MAGIC_CONTAINER;
+        newKasutoBasement.VanillaCollectable = newKasutoBasement.Collectable = Collectable.MAGIC_CONTAINER;
         newKasutoBasement.Name = "Granny's basement";
         AddLocation(newKasutoBasement);
         fountain = new Location(townAtNabooru.LocationBytes, townAtNabooru.TerrainType, townAtNabooru.MemAddress, Continent.EAST);
-        fountain.Collectable = Collectable.WATER;
+        fountain.VanillaCollectable = fountain.Collectable = Collectable.WATER;
         fountain.Name = "Water Fountain";
         fountain.ActualTown = Town.NABOORU_FOUNTAIN;
         AddLocation(fountain);
         daruniaRoof = new Location(townAtDarunia.LocationBytes, townAtDarunia.TerrainType, townAtDarunia.MemAddress, Continent.EAST);
-        daruniaRoof.Collectable = Collectable.UPSTAB;
+        daruniaRoof.VanillaCollectable = daruniaRoof.Collectable = Collectable.UPSTAB;
         daruniaRoof.Name = "Darunia Roof";
         daruniaRoof.ActualTown = Town.DARUNIA_ROOF;
         AddLocation(daruniaRoof);
