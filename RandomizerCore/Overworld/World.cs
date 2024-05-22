@@ -2779,4 +2779,6 @@ public abstract class World
     public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
+
+    protected abstract void SetVanillaCollectables(bool useDash);
 }

@@ -1576,4 +1576,26 @@ public class WestHyrule : World
         }
         return requiredLocations.Where(i => i != null);
     }
+
+    protected override void SetVanillaCollectables(bool useFire)
+    {
+        locationAtPalace1.VanillaCollectable = Collectable.CANDLE;
+        locationAtPalace2.VanillaCollectable = Collectable.GLOVE;
+        locationAtPalace3.VanillaCollectable = Collectable.RAFT;
+
+        locationAtRauru.VanillaCollectable = Collectable.SHIELD_SPELL;
+        locationAtRuto.VanillaCollectable = Collectable.JUMP_SPELL;
+        locationAtSariaNorth.VanillaCollectable = Collectable.LIFE_SPELL;
+        locationAtMido.VanillaCollectable = Collectable.FAIRY_SPELL;
+        midoChurch.VanillaCollectable = Collectable.DOWNSTAB;
+        bagu.VanillaCollectable = Collectable.BAGUS_NOTE;
+        mirrorTable.VanillaCollectable = Collectable.MIRROR;
+
+        grassTile.VanillaCollectable = Collectable.HEART_CONTAINER;
+        pbagCave.VanillaCollectable = Collectable.LARGE_BAG;
+        heartContainerCave.VanillaCollectable = Collectable.HEART_CONTAINER;
+        magicContainerCave.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+        trophyCave.VanillaCollectable = Collectable.TROPHY;
+        medicineCave.VanillaCollectable = Collectable.MEDICINE;
+    }
 }

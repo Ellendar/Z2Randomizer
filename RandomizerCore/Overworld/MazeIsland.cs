@@ -913,4 +913,11 @@ class MazeIsland : World
         }
         return requiredLocations.Where(i => i != null);
     }
+
+    protected override void SetVanillaCollectables(bool useDash)
+    {
+        locationAtPalace4.VanillaCollectable = Collectable.BOOTS;
+        childDrop.VanillaCollectable = Collectable.CHILD;
+        magicContainerDrop.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+    }
 }

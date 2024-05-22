@@ -191,6 +191,28 @@ public static class CollectableExtensions
         };
     }
 
+    public static bool IsQuestItem(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.WATER => true,
+            Collectable.BAGUS_NOTE => true,
+            Collectable.MIRROR => true,
+            _ => false
+        };
+    }
+
+    public static bool IsSwordTech(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.WATER => true,
+            Collectable.BAGUS_NOTE => true,
+            Collectable.MIRROR => true,
+            _ => false
+        };
+    }
+
     public static RequirementType? AsRequirement(this Collectable collectable)
     {
         return collectable switch

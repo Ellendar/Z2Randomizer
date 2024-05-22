@@ -3365,13 +3365,21 @@ CustomFileSelectData:
 """, "crop_guides.s");
     }
 
-    public List<Location> AllLocationsForReal()
+    public IEnumerable<Location> AllLocationsForReal()
     {
         List<Location> locations = westHyrule.AllLocations
             .Union(eastHyrule.AllLocations)
             .Union(mazeIsland.AllLocations)
             .Union(deathMountain.AllLocations).ToList();
         return locations;
+    }
+
+    public IEnumerable<Location> GetNonSideviewItemLocations()
+    {
+        return AllLocationsForReal().Where(
+            i => i.VanillaCollectable.IsSpell()
+        || i.VanillaCollectable.IsQuestItem()
+        || i.VanillaCollectable.IsSwordTech());
     }
 
     public string SpellDebug()
@@ -3443,8 +3451,7 @@ CustomFileSelectData:
 
         //Debug.WriteLine("-" + count + "- " + accessibleMagicContainers);
         //SHUFFLABLE_STARTING_ITEMS.Where(i => ItemGet[item] == false).ToList().ForEach(i => Debug.WriteLine(Enum.GetName(typeof(Item), i)));
-        List<Location> allLocations = AllLocationsForReal();
-        foreach(Location location in allLocations.Where(i => !i.ItemGet && i.Collectable != Collectable.DO_NOT_USE))
+        foreach(Location location in AllLocationsForReal().Where(i => !i.ItemGet && i.Collectable != Collectable.DO_NOT_USE))
         {
             sb.AppendLine(location.Name + " / " + Enum.GetName(typeof(Collectable), location.Collectable));
         }

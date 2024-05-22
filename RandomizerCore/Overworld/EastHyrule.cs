@@ -1873,4 +1873,24 @@ public class EastHyrule : World
         }
         return requiredLocations.Where(i => i != null);
     }
+
+    protected override void SetVanillaCollectables(bool useDash)
+    {
+        locationAtPalace5.VanillaCollectable = Collectable.FLUTE;
+        locationAtPalace6.VanillaCollectable = Collectable.CROSS;
+
+        townAtNabooru.VanillaCollectable = useDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
+        fountain.VanillaCollectable = Collectable.WATER;
+        townAtDarunia.VanillaCollectable = Collectable.REFLECT_SPELL;
+        daruniaRoof.VanillaCollectable = Collectable.UPSTAB;
+        newKasutoBasement.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+        townAtNewKasuto.VanillaCollectable = Collectable.SPELL_SPELL;
+        spellTower.VanillaCollectable = Collectable.MAGIC_KEY;
+        townAtOldKasuto.VanillaCollectable = Collectable.THUNDER_SPELL;
+
+        waterTile.VanillaCollectable = Collectable.HEART_CONTAINER;
+        desertTile.VanillaCollectable = Collectable.HEART_CONTAINER;
+        pbagCave1.VanillaCollectable = Collectable.XL_BAG;
+        pbagCave2.VanillaCollectable = Collectable.XL_BAG;
+    }
 }

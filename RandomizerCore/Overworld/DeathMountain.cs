@@ -1149,4 +1149,10 @@ class DeathMountain : World
 
         return requiredLocations.Where(i => i != null);
     }
+
+    protected override void SetVanillaCollectables(bool useDash)
+    {
+        hammerCave.VanillaCollectable = Collectable.HAMMER;
+        specRock.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+    }
 }

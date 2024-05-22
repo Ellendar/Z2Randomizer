@@ -10,6 +10,7 @@ public class Location
     private int appear2loweruponexit;
     private (int, int)coords;
     public Collectable Collectable { get; set; }
+    public Collectable VanillaCollectable { get; set; }
     public bool ItemGet { get; set; }
 
     public Terrain TerrainType { get; set; }
@@ -350,5 +351,10 @@ public class Location
             + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
             + (Collectable == Collectable.DO_NOT_USE ? "" : Collectable.ToString());
+    }
+
+    public bool HasVanillaItem()
+    {
+        return Collectable == VanillaCollectable;
     }
 }
