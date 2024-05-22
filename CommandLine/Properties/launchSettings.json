@@ -2,7 +2,7 @@
   "profiles": {
     "CommandLine": {
       "commandName": "Project",
-      "commandLineArgs": "-f RChN6GAABRFJUNmCsyX5t+@KChsAjtZdAAFRA -s 12345678 -r C:\\emu\\nes\\roms\\Zelda2.nes"
+      "commandLineArgs": "-f g0+e6e+@RWVqAAALAsVAAD+hAVCmAshCqAhLqA -s 605320858 -r C:\\emu\\nes\\roms\\Zelda2.nes"
     }
   }
 }

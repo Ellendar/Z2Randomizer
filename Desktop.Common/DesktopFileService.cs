@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+
 using CrossPlatformUI.Services;
 
-namespace CrossPlatformUI.Desktop;
+namespace Desktop.Common;
 
 public class DesktopFileService : IFileSystemService
 {

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CommandLine;
+using Desktop.Common;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
 using RandomizerCore;

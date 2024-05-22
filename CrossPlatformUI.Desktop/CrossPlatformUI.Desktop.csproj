@@ -27,6 +27,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
+        <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup>

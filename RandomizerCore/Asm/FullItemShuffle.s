@@ -154,11 +154,41 @@ HandlePBagTimerClear:
     sta DontKillEnemyFlag
     rts
 
+.org $f219
+    lda CommonEnemyTileTable,x
+.org $f221
+    lda CommonEnemyTileTable+1,x
+.org $f22e
+    lda CommonEnemyTileTable+1,x 
 
-; Clear out the space from the original item tile table
-.org $ee7f
+; Clear out the space from the original enemy and item tile table
+.org $ee51
 FREE_UNTIL $eeb2
 .reloc
+CommonEnemyTileTable:
+    .byte $86, $86 ; Explosion Frame 1
+    .byte $88, $88 ; Explosion Frame 2
+    .byte $DC, $DE ; 
+    .byte $AC, $AC ; Elevator
+    .byte $E4, $E6 ; Hammer / Fokkeru body frame 1
+    .byte $E8, $EA ; Hammer / Fokkeru frame 2
+    .byte $C0, $C2 ; Bago bago frame 1
+    .byte $C0, $C4 ; Bago Bago frame 2
+    .byte $BA, $BC ; Spider
+    .byte $C6, $C8 ; Octorok / Spitter Frame 1
+    .byte $CA, $CC ; Octorok / Spitter Frame 2
+    .byte $50, $50 ; Bat Frame 1
+    .byte $4E, $4E ; Bat Frame 2
+    .byte $7C, $7E ; Fire Bat Head
+    .byte $80, $82 ; Fire Bat Body
+    .byte $B6, $B8 ; Moa
+    .byte $BB, $BD ; Falling Block
+    .byte $BF, $C1 ; Crumble Block 1
+    .byte $C3, $C3 ; Crumble Block 2
+    .byte $B2, $B2 ; Bot Frame 1
+    .byte $B4, $B4 ; Bot Frame 2
+    .byte $24, $24 ; Spike top frame 1
+    .byte $B0, $B0 ; Spike top frame 2
 ItemTileTable:
     .byte $8C, $F5 ; Candle
     .byte $8E, $F5 ; Glove

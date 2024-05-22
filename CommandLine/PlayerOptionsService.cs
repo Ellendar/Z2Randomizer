@@ -2,6 +2,9 @@
 using Newtonsoft.Json;
 using NLog;
 using System.Reflection;
+using CrossPlatformUI.Services;
+using CrossPlatformUI.ViewModels.Tabs;
+using Desktop.Common;
 using RandomizerCore;
 
 namespace CommandLine
@@ -24,11 +27,20 @@ namespace CommandLine
             "Random"
         };
 
-        private CharacterSprite[] spriteOptions;
+        private IList<CharacterSprite> spriteOptions = new List<CharacterSprite>();
 
         public PlayerOptionsService()
         {
-            // this.spriteOptions = CharacterSprite.Options();
+            var fileservice = new DesktopFileService();
+            var files = fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites).Result;
+            spriteOptions.Add(CharacterSprite.LINK);
+            foreach (var spriteFile in files)
+            {
+                var patch = fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile).Result;
+                var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
+                spriteOptions.Add(new CharacterSprite(parsedName, patch));
+            }
+            spriteOptions.Add(CharacterSprite.RANDOM);
         }
 
         public PlayerOptions? LoadFromFile(string? path)
@@ -69,8 +81,8 @@ namespace CommandLine
 
             var sprite = GetSprite(playerOptions.Sprite);
             // If somehow sprite is null, default to Link
-            // configuration.Sprite = sprite?.SelectionIndex ?? 0;
-            configuration.Sprite = CharacterSprite.LINK;
+            configuration.Sprite = sprite ?? CharacterSprite.LINK;
+            // configuration.Sprite = CharacterSprite.LINK;
         }
 
         private void ValidateTunicColor(string? color)
@@ -103,7 +115,7 @@ namespace CommandLine
 
         public CharacterSprite? GetSprite(string? name)
         {
-            return this.spriteOptions.FirstOrDefault(sprite => string.Equals(
+            return spriteOptions.FirstOrDefault(sprite => string.Equals(
                 sprite.DisplayName, name, StringComparison.CurrentCultureIgnoreCase));
         }
     }
