@@ -1,9 +1,9 @@
 ﻿{
   "DisableMusic": false,
   "FastSpellCasting": true,
-  "RemapUpAToUpSelect": false,
+  "RemapUpAToUpSelect": true,
   "RemoveFlashingUponDeath": true,
-  "DisableHUDLag": false,
+  "DisableHUDLag": true,
   "Sprite": "Link",
   "TunicColor": "Default",
   "ShieldTunicColor": "Default",

@@ -49,6 +49,13 @@ ITEM_REFLECT_SPELL = $21
 ITEM_SPELL_SPELL = $22
 ITEM_THUNDER_SPELL = $23
 
+LOCATION_KNIGHT = $08
+LOCATION_MIRROR = $0a
+LOCATION_BAGU_NOTE = $0b
+LOCATION_WATER = $0c
+LocationTableMisc = $0123
+LocationTableWizard = $0123
+
 .segment "PRG3"
 
 DialogConditionsDefault = $b5c7
@@ -149,6 +156,70 @@ HandlePBagTimerClear:
     sta DontKillEnemyFlag
     rts
 
+; Patch the end of the get item routine to add handlers for the rest of the checks
+.org $e847
+    jmp ExpandedGetItem 
+    nop
+.reloc
+ExpandedGetItem:
+    cpy #ITEM_RED_MAGIC_JAR + 1
+    bcs @NotJar 
+        
+@NotJar:
+    cpy #ITEM_SHIELD_SPELL
+    bcc @NotSpell
+        ; flash screen as if you got the spell from a wizard 
+        lda #$C0
+        sta $074b
+        ; Update the cursor position to point to the new spell
+        tya
+        sec
+        sbc #ITEM_SHIELD_SPELL
+        sta $0749
+        lda #1
+        sta $077b - ITEM_SHIELD_SPELL,y
+        bne @Exit ; unconditional
+@NotSpell:
+    cpy #ITEM_UPSTAB
+    beq @ItemStab
+    cpy #ITEM_DOWNSTAB
+    beq @ItemStab
+    cpy #ITEM_MIRROR
+    beq @ItemMirror
+    cpy #ITEM_BAGU
+    beq @ItemBagu
+    cpy #ITEM_WATER
+    beq @ItemWater
+    ; Red jar or blue jar
+    lda #8
+    sta $ef
+    jmp $e84b ; Red/blue jar handler
+@ItemStab:
+    lda $0796
+    ora @StabTable - ITEM_UPSTAB,y
+    sta $0796
+    bne @Exit ; unconditional
+@ItemMirror:
+    lda $0797,y
+    ora #1
+    sta $0797,y
+    bne @Exit ; unconditional
+@ItemBagu:
+    lda $079a
+    ora #8
+    sta $079a
+    bne @Exit ; unconditional
+@ItemWater:
+    lda $079b
+    ora #1
+    sta $079b
+    ; fallthrough
+@Exit:
+    jmp GetItemReturn
+@StabTable:
+    ;     Down, Up
+    .byte $04, $10
+
 .org $f219
     lda CommonEnemyTileTable,x
 .org $f221
@@ -225,7 +296,7 @@ ItemTileTable:
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest
 .org $f120
-    lda ItemPaletteTable,x
+    lda ItemPaletteTable - $10,x
 .reloc
 ItemPaletteTable:
     .byte $03 ; Blue Jar
@@ -247,3 +318,4 @@ ItemPaletteTable:
     .byte $01 ; Reflect Spell
     .byte $01 ; Spell Spell
     .byte $01 ; Thunder Spell
+

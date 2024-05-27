@@ -3233,59 +3233,66 @@ public class Hyrule
         int[] magFunction = new int[8];
         //ROMData.UpdateWizardText(WizardCollectables);
 
-        //XXX: We discussed this in discord and the majority wanted the spell list in vanilla order,
-        //but also this should probably work the way it used to when full spell shuffle is off
-        //regardless it needs to be refactored because WizardCollectables is dead
-        /*
-        for (int i = 0; i < magFunction.Count(); i++)
+        if (props.IncludeSpellsInShuffle)
         {
-            magFunction[i] = ROMData.GetByte(functionBase + WizardCollectables[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder());
+            // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
         }
-
-        for (int i = 0; i < magEffects.Count(); i = i + 2)
+        else
         {
-            magEffects[i] = ROMData.GetByte(effectBase + WizardCollectables[Towns.STRICT_SPELL_LOCATIONS[i / 2]].VanillaSpellOrder() * 2);
-            magEffects[i + 1] = ROMData.GetByte(effectBase + WizardCollectables[Towns.STRICT_SPELL_LOCATIONS[i / 2]].VanillaSpellOrder() * 2 + 1);
-        }
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
+            // Use the old spell menu behavior where the spells are placed in the menu in the location it came from
+            var wizardCollectables = AllLocationsForReal()
+                .Where(l => Towns.STRICT_SPELL_LOCATIONS.Contains(l.ActualTown))
+                .Select(l => l.Collectable).ToList();
+            
+            for (int i = 0; i < magFunction.Length; i++)
             {
-                magLevels[i, j] = ROMData.GetByte(spellCostBase + (WizardCollectables[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 8 + j));
+                magFunction[i] = ROMData.GetByte(functionBase + wizardCollectables[i].VanillaSpellOrder());
             }
 
-            for (int j = 0; j < 7; j++)
+            for (int i = 0; i < magEffects.Length; i = i + 2)
             {
-                magNames[i, j] = ROMData.GetByte(spellNameBase + (WizardCollectables[Towns.STRICT_SPELL_LOCATIONS[i]].VanillaSpellOrder() * 0xe + j));
-            }
-        }
-        */
-
-        for (int i = 0; i < magFunction.Count(); i++)
-        {
-            ROMData.Put(functionBase + i, (byte)magFunction[i]);
-        }
-
-        for (int i = 0; i < magEffects.Count(); i = i + 2)
-        {
-            ROMData.Put(effectBase + i, (byte)magEffects[i]);
-            ROMData.Put(effectBase + i + 1, (byte)magEffects[i + 1]);
-        }
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                ROMData.Put(spellCostBase + (i * 8) + j, (byte)magLevels[i, j]);
+                magEffects[i] = ROMData.GetByte(effectBase + wizardCollectables[i / 2].VanillaSpellOrder() * 2);
+                magEffects[i + 1] = ROMData.GetByte(effectBase + wizardCollectables[i / 2].VanillaSpellOrder() * 2 + 1);
             }
 
-            for (int j = 0; j < 7; j++)
+            for (int i = 0; i < 8; i++)
             {
-                ROMData.Put(spellNameBase + (i * 0xe) + j, (byte)magNames[i, j]);
-            }
-        }
+                for (int j = 0; j < 8; j++)
+                {
+                    magLevels[i, j] = ROMData.GetByte(spellCostBase + (wizardCollectables[i].VanillaSpellOrder() * 8 + j));
+                }
 
+                for (int j = 0; j < 7; j++)
+                {
+                    magNames[i, j] = ROMData.GetByte(spellNameBase + (wizardCollectables[i].VanillaSpellOrder() * 0xe + j));
+                }
+            }
+
+            for (int i = 0; i < magFunction.Count(); i++)
+            {
+                ROMData.Put(functionBase + i, (byte)magFunction[i]);
+            }
+
+            for (int i = 0; i < magEffects.Count(); i = i + 2)
+            {
+                ROMData.Put(effectBase + i, (byte)magEffects[i]);
+                ROMData.Put(effectBase + i + 1, (byte)magEffects[i + 1]);
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    ROMData.Put(spellCostBase + (i * 8) + j, (byte)magLevels[i, j]);
+                }
+
+                for (int j = 0; j < 7; j++)
+                {
+                    ROMData.Put(spellNameBase + (i * 0xe) + j, (byte)magNames[i, j]);
+                }
+            }
+
+        }
         //fix for rope graphical glitch
         for (int i = 0; i < 16; i++)
         {
