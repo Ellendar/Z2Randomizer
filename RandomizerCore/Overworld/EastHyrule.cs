@@ -7,7 +7,7 @@ namespace RandomizerCore.Overworld;
 
 //6A31 - address in memory of kasuto y coord;
 //6A35 - address in memory of palace 6 y coord
-public class EastHyrule : World
+public sealed class EastHyrule : World
 {
     private int bridgeCount;
 
@@ -241,6 +241,7 @@ public class EastHyrule : World
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

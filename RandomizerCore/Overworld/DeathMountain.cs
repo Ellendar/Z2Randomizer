@@ -5,7 +5,7 @@ using SD.Tools.BCLExtensions.CollectionsRelated;
 
 namespace RandomizerCore.Overworld;
 
-class DeathMountain : World
+sealed class DeathMountain : World
 {
 
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
@@ -145,6 +145,7 @@ class DeathMountain : World
         };
         climate.ApplyDeathMountainSafety(walkableTerrains, dmOpennessFactor);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

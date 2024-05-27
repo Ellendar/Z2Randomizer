@@ -5,7 +5,7 @@ using NLog;
 
 namespace RandomizerCore.Overworld;
 
-public class WestHyrule : World
+public sealed class WestHyrule : World
 {
     private readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -304,6 +304,7 @@ public class WestHyrule : World
             { (0x62, 0x39), "island" }
         };
         lostWoods = new List<Location> { GetLocationByMem(0x4649), GetLocationByMem(0x464A), GetLocationByMem(0x464B), GetLocationByMem(0x464C), GetLocationByMem(0x4635) };
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

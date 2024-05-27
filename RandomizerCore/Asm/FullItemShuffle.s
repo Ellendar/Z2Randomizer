@@ -53,8 +53,8 @@ LOCATION_KNIGHT = $08
 LOCATION_MIRROR = $0a
 LOCATION_BAGU_NOTE = $0b
 LOCATION_WATER = $0c
-LocationTableMisc = $0123
-LocationTableWizard = $0123
+LocationTableMisc = $0795
+LocationTableWizard = $0797
 
 .segment "PRG3"
 
@@ -69,15 +69,30 @@ GetItem = $e781
 KillEnemy = $dd47
 EnemyDeath = $e880
 
+; This is used for item obtained for $600 table, and its good enough
+; to work for our new item obtained tables
+; $F7,$FB,$FD,$FE,$7F,$BF,$DF,$EF
+JankPowerOfTwoMask = $c28d
+; $08,$04,$02,$01,$80,$40,$20,$10
+JankPowerOfTwo = $c28d
+
 .org MirrorGetItem
     lda #MIRROR_ITEMLOC
-    jsr GetItemDontKillEnemy
-    jmp DialogConditionsDefault
+    ldy #0
+    jmp CheckGetItemCustomLocationMisc
 FREE_UNTIL $b5b9
 
 .org WizardDialogGetItem
-    lda TownToItemTable,y
-    jsr GetItemDontKillEnemy
+    lda LocationTableWizard
+    and JankPowerOfTwo,y
+    bne @AlreadyHaveItem
+        lda LocationTableWizard
+        ora JankPowerOfTwo,y
+        sta LocationTableWizard
+        lda TownToItemTable,y
+        jmp GetItemDontKillEnemy
+@AlreadyHaveItem:
+    inc $048c ; Use the 'Already have item' dialog
     jmp DialogConditionsDefault
     FREE_UNTIL $b54e
 
@@ -94,12 +109,30 @@ TownToItemTable:
 
 .segment "PRG7"
 
+.reloc
+; Check first if we've already gotten this item from a custom location before
+; we call the get item for this spot
+AlreadyHaveItemAtLocationExit:
+    pla
+    jmp DialogConditionsDefault
+CheckGetItemCustomLocationMisc:
+    ; Y contains the location id 0 - 4
+    ; A contains the new item id
+    pha
+        lda LocationTableMisc
+        and JankPowerOfTwo,y
+        bne AlreadyHaveItemAtLocationExit
+            lda LocationTableWizard
+            ora JankPowerOfTwo,y
+            sta LocationTableWizard
+             ; restore the item id
+            pla
 ; Add a new entry point to GetItem that sets a temporary flag to denote that this
 ; item should not kill the enemy at this index
-.reloc 
 GetItemDontKillEnemy:
     dec DontKillEnemyFlag
-    jmp GetItem
+    jsr GetItem
+    jmp DialogConditionsDefault
 
 ; Patch the return calls for the item get and only clear the enemy if the flag isn't set
 .org $e797

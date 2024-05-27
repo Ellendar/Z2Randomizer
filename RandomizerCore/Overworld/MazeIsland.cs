@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace RandomizerCore.Overworld;
 
-class MazeIsland : World
+sealed class MazeIsland : World
 {
     public static readonly int[] OverworldEnemies = new int[] { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
     public static readonly int[] OverworldFlyingEnemies = new int[] { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
@@ -66,6 +66,7 @@ class MazeIsland : World
         VANILLA_MAP_ADDR = 0xa65c;
 
         biome = props.MazeBiome;
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
