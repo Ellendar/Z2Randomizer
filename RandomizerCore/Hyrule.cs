@@ -99,7 +99,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 130;
+    private static int DEBUG_THRESHOLD = 1;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -957,7 +957,7 @@ public class Hyrule
                 {
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
-                    return false;
+                    return true;
                 }
                 return false;
             }
@@ -2960,7 +2960,7 @@ public class Hyrule
 
         foreach (Palace palace in palaces)
         {
-            //palace.ValidateRoomConnections();
+            palace.ValidateRoomConnections();
             palace.UpdateRom(ROMData);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -660,6 +661,10 @@ public class Palace
             }
             ROMData.Put(room.ConnectionStartAddress + 2, upByte);
             ROMData.Put(room.ConnectionStartAddress + 3, rightByte);
+
+            Debug.WriteLine("Wrote Map " + room.Map + "(" + room.PalaceGroup + ") " +
+                room.PalaceNumber + " at address " + room.ConnectionStartAddress + " : "
+                + Util.ByteArrayToHexString([leftByte, downByte, upByte, rightByte]));
         }
     }
 
@@ -1208,33 +1213,36 @@ public class Palace
         };
     }
 
-    /*
     public void ValidateRoomConnections()
     {
-        foreach(Room r in AllRooms)
+        foreach(Room room in AllRooms)
         {
-            //If this room connects to any rooms that aren't in the same palace, it's leftover stray data from the vanilla versions of the rooms.
-            //While often these connections are inaccessible, the can freak out Z2Edit's sideview graph.
-            //No reason not to remove them.
-            if (r.Left == null || !AllRooms.Contains(r.Left))
+            //If this room connects to any rooms that aren't in the same palace,
+            //or that it knows are invalid, it's probably a bug
+            //since we purged all the extraneous vanilla connection data.
+            //Remove it. (But also probably freak out)
+            if (room.Left != null && (!AllRooms.Contains(room.Left) || !room.HasLeftExit))
             {
-                r.LeftByte = OUTSIDE_ROOM_EXIT;
+                room.Left = null;
+                logger.Warn("Invalid Room connection removed");
             }
-            if (r.Right == null || !AllRooms.Contains(r.Right))
+            if (room.Right != null && (!AllRooms.Contains(room.Right) || !room.HasRightExit))
             {
-                r.RightByte = OUTSIDE_ROOM_EXIT;
+                room.Right = null;
+                logger.Warn("Invalid Room connection removed");
             }
-            if (r.Up == null || !AllRooms.Contains(r.Up))
+            if (room.Up != null && (!AllRooms.Contains(room.Up) || !room.HasUpExit))
             {
-                r.UpByte = OUTSIDE_ROOM_EXIT;
+                room.Up = null;
+                logger.Warn("Invalid Room connection removed");
             }
-            if (r.Down == null || !AllRooms.Contains(r.Down))
+            if (room.Down != null && (!AllRooms.Contains(room.Down) || !room.HasDownExit))
             {
-                r.DownByte = OUTSIDE_ROOM_EXIT;
+                room.Down = null;
+                logger.Warn("Invalid Room connection removed");
             }
         }
     }
-    */
 
     public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla)
     {
@@ -1242,25 +1250,65 @@ public class Palace
         {
             return AllRooms.Max(i => (byte)(i.Map + 1));
         }
-        entrance.Map = currentMap;
-        bossRoom.Map = ++currentMap;
+        entrance.Map = currentMap++;
+        bossRoom.Map = currentMap++;
         if (isGP)
         {
-            tbirdRoom.Map = ++currentMap;
+            tbirdRoom.Map = currentMap++;
         }
         else
         {
-            itemRoom.Map = ++currentMap;
+            itemRoom.Map = currentMap++;
         }
-        IEnumerable<Room> normalRooms = AllRooms.Where(i => i != entrance && i != bossRoom && i != itemRoom && i != tbirdRoom);
+        List<Room> normalRooms = AllRooms.Where(i => i.IsNormalRoom()).ToList();
         foreach(Room room in normalRooms)
         {
-            room.Map = ++currentMap;
+            //Only set the room number on the primary room of a linked room pair
+            if(room.LinkedRoom == null || room.Enabled)
+            {
+                room.Map = currentMap++;
+            }
         }
-        if(currentMap >= 63)
+        //Linked room secondaries share a map number with their primary
+        foreach(Room room in AllRooms.Where(i => i.LinkedRoom != null && !i.Enabled))
+        {
+            room.Map = room.LinkedRoom.Map;
+        }
+        if(currentMap > 63)
         {
             throw new Exception("Map number has exceeded maximum");
         }
         return currentMap;
+    }
+
+    public void ReplaceRoom(Room roomToReplace, Room newRoom)
+    {
+        newRoom.coords = roomToReplace.coords;
+        newRoom.PalaceGroup = roomToReplace.PalaceGroup;
+
+        foreach(Room room in AllRooms.Where(i => i.Left == roomToReplace))
+        {
+            room.Left = newRoom;
+        }
+        foreach (Room room in AllRooms.Where(i => i.Down == roomToReplace))
+        {
+            room.Down = newRoom;
+        }
+        foreach (Room room in AllRooms.Where(i => i.Up == roomToReplace))
+        {
+            room.Up = newRoom;
+        }
+        foreach (Room room in AllRooms.Where(i => i.Right == roomToReplace))
+        {
+            room.Right = newRoom;
+        }
+
+        newRoom.Left = roomToReplace.Left;
+        newRoom.Down = roomToReplace.Down;
+        newRoom.Up = roomToReplace.Up;
+        newRoom.Right = roomToReplace.Right;
+
+        AllRooms.Remove(roomToReplace);
+        AllRooms.Add(newRoom);
     }
 }

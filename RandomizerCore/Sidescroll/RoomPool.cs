@@ -62,8 +62,8 @@ internal class RoomPool
             }
             //If we are using these categorized exits to cap paths, there needs to always be a path of each type
             //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
-            StubsByDirection.Add(RoomExitType.DEADEND_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
-            StubsByDirection.Add(RoomExitType.DEADEND_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
+            StubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
+            StubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
         }
 
         if (props.AllowV4Rooms)

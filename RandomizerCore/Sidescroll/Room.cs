@@ -574,17 +574,23 @@ public class Room : IJsonOnDeserialized
         {
             return CONFLICT;
         }
-        //Elevator down
-        if (HasDownExit && ElevatorScreen >= 0)
+        //Down
+        if (HasDownExit)
         {
-            return down.HasUpExit ? 1 : CONFLICT;
+            //Drop down
+            if (HasDrop && down.IsDropZone)
+            {
+                return 1;
+            }
+            if (ElevatorScreen >= 0 && down.ElevatorScreen >= 0 && down.HasUpExit)
+            {
+                return 1;
+            }
+            //types don't match
+            return CONFLICT;
         }
-        //Drop down
-        if (HasDrop)
-        {
-            return down.IsDropZone ? 1 : CONFLICT;
-        }
-        throw new ImpossibleException("Room " + Name + " is marked as a down exit with no elevator or drop.");
+        throw new ImpossibleException("Room " + Name + Util.ByteArrayToHexString(SideView) +
+            " is marked as a down exit with no elevator or drop.");
     }
 
     public int FitsWithUp(Room? up)
@@ -598,17 +604,27 @@ public class Room : IJsonOnDeserialized
         {
             return CONFLICT;
         }
-        //Elevator up
-        if (HasUpExit && ElevatorScreen >= 0)
+        //Up
+        if (HasUpExit)
         {
-            return up.HasDownExit ? 1 : CONFLICT;
+            if(ElevatorScreen >= 0 && up.ElevatorScreen >= 0 && up.HasDownExit)
+            {
+                return 1;
+            }
+            //types don't match
+            return CONFLICT;
         }
-        //Drop into
+        //Drop down
         if (IsDropZone)
         {
-            return up.HasDrop ? 1 : CONFLICT;
+            if(up.HasDrop)
+            {
+                return 1;
+            }
+            return CONFLICT;
         }
-        throw new ImpossibleException("Room " + Name + " is marked as a up exit with no elevator or drop.");
+        throw new ImpossibleException("Room " + Name + Util.ByteArrayToHexString(SideView) +
+            " is marked as a down exit with no elevator or drop.");
     }
 
     public int FitsWithLeft(Room? left)
@@ -667,103 +683,18 @@ public class Room : IJsonOnDeserialized
 
     internal RoomExitType CategorizeExits()
     {
-        if(HasLeftExit)
+        if(ElevatorScreen >= 0 && (HasDrop || IsDropZone))
         {
-            if (HasRightExit)
-            {
-                if (HasUpExit)
-                {
-                    if (HasDownExit)
-                    {
-                        if(HasDrop)
-                        {
-                            return RoomExitType.DROP_FOUR_WAY;
-                        }
-                        return RoomExitType.FOUR_WAY;
-                    }
-                    return RoomExitType.INVERSE_T;
-                }
-                else if (HasDownExit)
-                {
-                    if (HasDrop)
-                    {
-                        return RoomExitType.DROP_T;
-                    }
-                    return RoomExitType.T;
-                }
-                else
-                {
-                    return RoomExitType.HORIZONTAL_PASSTHROUGH;
-                }
-            }
-            else if (HasUpExit)
-            {
-                if (HasDownExit)
-                {
-                    if (HasDrop)
-                    {
-                        return RoomExitType.DROP_LEFT_T;
-                    }
-                    return RoomExitType.LEFT_T;
-                }
-                return RoomExitType.NW_L;
-            }
-            else if (HasDownExit)
-            {
-                if (HasDrop)
-                {
-                    return RoomExitType.DROP_SW_L;
-                }
-                return RoomExitType.SW_L;
-            }
-            else return RoomExitType.DEADEND_LEFT;
+            throw new Exception("Room has a mixed drop type. Add categories for this.");
         }
-        //Not Left
-        if(HasRightExit) {
-            if(HasUpExit)
-            {
-                if(HasDownExit)
-                {
-                    if (HasDrop)
-                    {
-                        return RoomExitType.DROP_RIGHT_T;
-                    }
-                    return RoomExitType.RIGHT_T;
-                }
-                return RoomExitType.NE_L;
-            }
-            if(HasDownExit)
-            {
-                if (HasDrop)
-                {
-                    return RoomExitType.DROP_SE_L;
-                }
-                return RoomExitType.SE_L;
-            }
-            return RoomExitType.DEADEND_RIGHT;
-        }
-        //Not left or right
-        if (HasUpExit)
-        {
-            if (HasDownExit)
-            {
-                if (HasDrop)
-                {
-                    return RoomExitType.DROP_COLUMN;
-                }
-                return RoomExitType.VERTICAL_PASSTHROUGH;
-            }
-            if (IsDropZone)
-            {
-                return RoomExitType.DROP_DEADEND_UP;
-            }
-            return RoomExitType.DEADEND_UP;
-        }
-        else if (HasDownExit)
-        {
-            return RoomExitType.DEADEND_DOWN;
-        }
-        throw new ImpossibleException("Room has no exits");
+        int flags =
+            (HasLeftExit ? RoomExitTypeExtensions.LEFT : 0)
+            + (HasRightExit ? RoomExitTypeExtensions.RIGHT : 0)
+            + (HasUpExit ? RoomExitTypeExtensions.UP : 0)
+            + (HasDownExit && HasDrop ? RoomExitTypeExtensions.DROP : 0)
+            + (HasDownExit && !HasDrop ? RoomExitTypeExtensions.DOWN : 0);
+
+        return (RoomExitType)flags;
     }
 
     public bool ValidateExits()
@@ -809,6 +740,11 @@ public class Room : IJsonOnDeserialized
             || (HasUpExit && Up != null)
             || (HasDownExit && Down != null)
             || (HasRightExit && Right != null);
+    }
+
+    public bool IsNormalRoom()
+    {
+        return !(IsBossRoom || IsThunderBirdRoom || HasItem || IsEntrance);
     }
 }
 

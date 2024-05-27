@@ -15,6 +15,7 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
     private const int STALL_LIMIT = 1000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
+        debug++;
         Palace palace = new(palaceNumber);
         List<(int, int)> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
@@ -81,6 +82,7 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
             if(bestFitExitCount > 0 && bestFit != (0, 0))
             {
                 newRoom.coords = bestFit;
+                
                 List<(int, int)> newOpenCoords = newRoom.GetOpenExitCoords();
                 foreach ((int, int) coord in newOpenCoords.ToList())
                 {
@@ -118,11 +120,17 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                 if (newRoom.FitsWithDown(down) > 0)
                 {
                     newRoom.Down = down;
-                    down.Up = newRoom;
+                    if(!newRoom.HasDrop)
+                    {
+                        down.Up = newRoom;
+                    }
                 }
                 if (newRoom.FitsWithUp(up) > 0)
                 {
-                    newRoom.Up = up;
+                    if(!up.HasDrop)
+                    {
+                        newRoom.Up = up;
+                    }
                     up.Down = newRoom;
                 }
                 if (newRoom.FitsWithRight(right) > 0)
@@ -185,29 +193,29 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     RoomExitType exitType;
                     if (left != null && left.HasRightExit)
                     {
-                        exitType = RoomExitType.DEADEND_LEFT;
+                        exitType = RoomExitType.DEADEND_EXIT_LEFT;
                     }
                     else if (right != null && right.HasLeftExit)
                     {
-                        exitType = RoomExitType.DEADEND_RIGHT;
+                        exitType = RoomExitType.DEADEND_EXIT_RIGHT;
                     }
                     else if (up != null && up.HasDownExit)
                     {
                         if (up.HasDrop)
                         {
-                            exitType = RoomExitType.DROP_DEADEND_UP;
+                            exitType = RoomExitType.NO_ESCAPE;
                             logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
                             palace.IsValid = false;
                             return palace;
                         }
                         else
                         {
-                            exitType = RoomExitType.DEADEND_UP;
+                            exitType = RoomExitType.DEADEND_EXIT_UP;
                         }
                     }
                     else if (down != null && down.HasUpExit)
                     {
-                        exitType = RoomExitType.DEADEND_DOWN;
+                        exitType = RoomExitType.DEADEND_EXIT_DOWN;
                     }
                     else
                     {
@@ -241,22 +249,22 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
                     openCoords.Remove(openCoord);
                     placed = true;
 
-                    if (left != null)
+                    if (left != null && newRoom.HasLeftExit)
                     {
                         newRoom.Left = left;
                         left.Right = newRoom;
                     }
-                    if (down != null)
+                    if (down != null && newRoom.HasDownExit)
                     {
                         newRoom.Down = down;
                         down.Up = newRoom;
                     }
-                    if (up != null)
+                    if (up != null && newRoom.HasUpExit)
                     {
                         newRoom.Up = up;
                         up.Down = newRoom;
                     }
-                    if (right != null)
+                    if (right != null && newRoom.HasRightExit)
                     {
                         newRoom.Right = right;
                         right.Left = newRoom;
@@ -311,15 +319,12 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
             foreach (Room itemRoomCandidate in itemRoomCandidates)
             {
                 List<Room> itemRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits()).ToList();
+                    palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
                 Room? itemRoomReplacementRoom = itemRoomReplacementCandidates.Sample(r);
                 if (itemRoomReplacementRoom != null)
                 {
-                    palace.AllRooms.Remove(itemRoomReplacementRoom);
                     palace.ItemRoom = new(itemRoomCandidate);
-                    palace.AllRooms.Add(palace.ItemRoom);
-                    palace.ItemRoom.coords = itemRoomReplacementRoom.coords;
-                    palace.ItemRoom.PalaceGroup = palaceGroup;
+                    palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);
                     break;
                 }
             }
@@ -337,15 +342,12 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
             foreach (Room tbirdRoomCandidate in tbirdRoomCandidates)
             {
                 List<Room> tbirdRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == tbirdRoomCandidate.CategorizeExits()).ToList();
+                    palace.AllRooms.Where(i => i.CategorizeExits() == tbirdRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
                 Room? tbirdRoomReplacementRoom = tbirdRoomReplacementCandidates.Sample(r);
                 if (tbirdRoomReplacementRoom != null)
                 {
-                    palace.AllRooms.Remove(tbirdRoomReplacementRoom);
                     palace.Tbird = new(tbirdRoomCandidate);
-                    palace.AllRooms.Add(palace.Tbird);
-                    palace.Tbird.coords = tbirdRoomReplacementRoom.coords;
-                    palace.Tbird.PalaceGroup = palaceGroup;
+                    palace.ReplaceRoom(tbirdRoomReplacementRoom, palace.Tbird);
                     break;
                 }
             }
@@ -361,16 +363,23 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
 
         foreach (Room bossRoomCandidate in bossRoomCandidates)
         {
+            RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
+            if(props.BossRoomConnect && palaceNumber < 7)
+            {
+                bossRoomExitType = (RoomExitType)((int)bossRoomExitType | RoomExitTypeExtensions.RIGHT);
+            }
             List<Room> bossRoomReplacementCandidates =
-                palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomCandidate.CategorizeExits()).ToList();
+                palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomExitType && i.IsNormalRoom()).ToList();
+            
             Room? bossRoomReplacementRoom = bossRoomReplacementCandidates.Sample(r);
             if (bossRoomReplacementRoom != null)
             {
-                palace.AllRooms.Remove(bossRoomReplacementRoom);
                 palace.BossRoom = new(bossRoomCandidate);
-                palace.AllRooms.Add(palace.BossRoom);
-                palace.BossRoom.coords = bossRoomReplacementRoom.coords;
-                palace.BossRoom.PalaceGroup = palaceGroup;
+                if (props.BossRoomConnect && palaceNumber < 7)
+                {
+                    palace.BossRoom.HasRightExit = true;
+                }
+                palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
                 break;
             }
         }
@@ -385,13 +394,24 @@ public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
             return palace;
         }
 
-        if(palace.AllRooms.Count != roomCount)
+        //TODO: This is REALLY late to abandon ship on the whole palace, but 
+        //refactoring the boss placement to do the check properly without a million stupid room swaps
+        //was not a thing I felt like figuring out.
+        //Maybe we use ShuffleRooms()?
+        //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
+        if (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+        {
+            palace.IsValid = false;
+            return palace;
+        }
+
+        if (palace.AllRooms.Count != roomCount)
         {
             throw new Exception("Generated palace has the incorrect number of rooms");
         }
-        //TODO: tbird required logic
-        //TODO: passthru boss rooms (directly on the room pool)
 
+        
+        palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
         palace.IsValid = true;
         return palace;
     }
