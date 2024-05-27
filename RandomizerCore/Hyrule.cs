@@ -167,7 +167,6 @@ public class Hyrule
         }
     }
 
-    private List<Text> hints;
     private readonly IAsmEngine engine;
     private readonly PalaceRooms palaceRooms;
     
@@ -214,7 +213,6 @@ public class Hyrule
             //areasByLocation = new SortedDictionary<string, List<Location>>();
             // Make a copy of the vanilla data to prevent seed bleed
             ROMData = new ROM(vanillaRomData.ToArray());
-            hints = ROMData.GetGameText();
 
             if (props.DisableMagicRecs)
             {
@@ -344,7 +342,10 @@ public class Hyrule
                     validationEngine.Add(sideview_module);
                     validationEngine.Add(gp_sideview_module);
                     ROM testRom = new(ROMData);
-                    ApplyAsmPatches(props, validationEngine, RNG, testRom);
+                    //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
+                    //be tested here, but we don't actually know what they will be until later, for now i'm just
+                    //testing with the vanilla text, but this could be an issue down the line.
+                    ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
                     await testRom.ApplyAsm(engine, validationEngine); //.Wait(ct);
                 }
                 catch (Exception e)
@@ -437,14 +438,14 @@ public class Hyrule
                 { eastHyrule.townAtNewKasuto.ActualTown, eastHyrule.townAtNewKasuto.Collectable },
                 { eastHyrule.townAtOldKasuto.ActualTown, eastHyrule.townAtOldKasuto.Collectable },
             };
-            hints = CustomTexts.GenerateTexts(itemLocs, spellMap, westHyrule.bagu, hints, props, RNG);
             f = await UpdateProgress(progress, ct, 9);
             if (!f)
             {
                 return null;
             }
 
-            ApplyAsmPatches(props, assembler, RNG, ROMData);
+            List<Text> texts = CustomTexts.GenerateTexts(itemLocs, westHyrule.bagu, ROMData.GetGameText(), props, RNG);
+            ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
             var rom = await ROMData.ApplyAsm(engine, assembler);
 
             // await assemblerTask; // .Wait(ct);
@@ -3849,7 +3850,7 @@ FREE_UNTIL $c2ca
 """, "fix_continent_transitions.s");
     }
 
-    public void UpdateHints(Assembler asm, List<Text> hints)
+    public void UpdateTexts(Assembler asm, List<Text> hints)
     {
         var a = asm.Module();
         // Clear out the ROM for the existing tables
@@ -3884,7 +3885,7 @@ FREE_UNTIL $c2ca
         }
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, ROM rom)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
     {
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
@@ -3930,7 +3931,7 @@ FREE_UNTIL $c2ca
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
 
-        UpdateHints(engine, hints);
+        UpdateTexts(engine, texts);
     }
 
     //This entire town location shuffle structure is awful if this method needs to exist.
