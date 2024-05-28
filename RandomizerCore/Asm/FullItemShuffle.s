@@ -32,22 +32,23 @@ ITEM_1UP = $12
 ITEM_CHILD = $13
 ITEM_TROPHY = $14
 ITEM_MEDICINE = $15
+ITEM_DO_NOT_USE_ANTIFAIRY = $16
 
-ITEM_UPSTAB = $16
-ITEM_DOWNSTAB = $17
-ITEM_BAGU = $18
-ITEM_MIRROR = $19
-ITEM_WATER = $1a
+ITEM_UPSTAB = $17
+ITEM_DOWNSTAB = $18
+ITEM_BAGU = $19
+ITEM_MIRROR = $1a
+ITEM_WATER = $1b
 
-ITEM_SHIELD_SPELL = $1b
-ITEM_JUMP_SPELL = $1c
-ITEM_LIFE_SPELL = $1d
-ITEM_FAIRY_SPELL = $1e
-ITEM_FIRE_SPELL = $1f
-ITEM_DASH_SPELL = $20
-ITEM_REFLECT_SPELL = $21
-ITEM_SPELL_SPELL = $22
-ITEM_THUNDER_SPELL = $23
+ITEM_SHIELD_SPELL = $1c
+ITEM_JUMP_SPELL = $1d
+ITEM_LIFE_SPELL = $1e
+ITEM_FAIRY_SPELL = $1f
+ITEM_FIRE_SPELL = $20
+ITEM_DASH_SPELL = $21
+ITEM_REFLECT_SPELL = $22
+ITEM_SPELL_SPELL = $23
+ITEM_THUNDER_SPELL = $24
 
 ; These are two unused locations in the save game that we can use for custom item get flags
 LocationTableMisc = $0795
@@ -182,9 +183,9 @@ CheckGetItemCustomLocationMisc:
         lda LocationTableMisc
         and JankPowerOfTwo,y
         bne AlreadyHaveItemAtLocationExit
-            lda LocationTableWizard
+            lda LocationTableMisc
             ora JankPowerOfTwo,y
-            sta LocationTableWizard
+            sta LocationTableMisc
              ; restore the item id
             pla
 ; Add a new entry point to GetItem that sets a temporary flag to denote that this
@@ -372,9 +373,9 @@ ItemTileTable:
     .byte $2F, $2F ; Trophy
     .byte $31, $31 ; Medicine
     .byte $67, $67 ; Antifairy
-    .byte $e9, $f5 ; Bagu
     .byte $e1, $f5 ; Upstab
     .byte $e3, $f5 ; Downstab
+    .byte $e9, $f5 ; Bagu
     .byte $e7, $f5 ; Mirror
     .byte $ed, $f5 ; Water
     .byte $fb, $fd ; Shield Spell
@@ -399,9 +400,9 @@ ItemPaletteTable:
     .byte $01 ; Child
     .byte $01 ; Trophy
     .byte $01 ; Medicine
-    .byte $01 ; Bagu
     .byte $01 ; Upstab
     .byte $01 ; Downstab
+    .byte $01 ; Bagu
     .byte $01 ; Mirror
     .byte $01 ; Water
     .byte $01 ; Shield Spell
