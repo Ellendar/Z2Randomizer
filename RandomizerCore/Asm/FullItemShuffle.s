@@ -88,7 +88,7 @@ MirrorOrWaterLocation:
     cpy #4 ; Nabooru
     bne @Mirror
         lda #WATER_ITEMLOC
-        bne @Exit
+        bpl @Exit ; unconditional
 @Mirror:
     lda #MIRROR_ITEMLOC
 @Exit:
@@ -216,16 +216,19 @@ GetItemReturn:
     rts
 
 ; If the item is a PBag, and there is no enemy, then we need custom
-; pbag handling so that it puts the experience in the right spot
-; Also remove reloading the item id by saving it to the stack.
+; pbag handling so that it puts the experience in the right spot.
+; We pull this off by searching for an empty enemy slot and creating an enemy
+; thats already in the "give exp" state
+
 .org $e7f4
+    ; Remove reloading the item id ($af) by saving it to the stack.
     tya
     pha
     jsr HandlePBagDeath
     pla
     tay
     nop
-FREE_UNTIL $e7fc
+FREE_UNTIL $e7fc ; This is just an assert that we didn't go past the size
 
 .reloc
 HandlePBagDeath:
@@ -234,7 +237,36 @@ HandlePBagDeath:
         jmp EnemyDeath
     ; There's no enemy to kill, so just manually set the exp
 @DontKillEnemy:
-    ; don't reset the flag here since its needed in HandlePBagTimerClear
+    ; we create a new enemy in an empty slot that has the exp temporarily set x to be the new enemy id
+    ldy #5
+@FindEmptySlotLoop:
+        lda $b6,y
+        beq @FoundEmpty
+        dey
+        bpl @FindEmptySlotLoop
+    ; We didn't find an empty slot, so just kill the current object?
+    ; This particular case can happen if we find a PBag on the water fountain
+    ; since there a lot of NPCs walking around.
+    bmi @Exit ; unconditional
+@FoundEmpty:
+    lda $20,x ; enemy y hi
+    sta $20,y
+    lda $2a,x ; enemy y lo
+    sta $2a,y
+    lda $3c,x ; enemy x hi
+    sta $3c,y
+    lda $4e,x ; enemy x lo
+    sta $4e,y
+    ; don't reset DontKillEnemyFlag here since its needed in HandlePBagTimerClear
+    tya
+    tax
+@Exit:
+    lda #1
+    sta $a1,x ; set the proper id for a dropped item
+    lda #$20 * 2 ; double the usual amount of time so people are more likely to catch how much it is
+    sta $0504,x ; set the timer for the numbers
+    lda #3
+    sta $b6,x ; set the "give exp" state
     rts
 
 .org $e808
@@ -242,12 +274,16 @@ HandlePBagDeath:
 .reloc
 HandlePBagTimerClear:
     bit DontKillEnemyFlag
-    bmi @DontKillEnemy
-        sta $0504,x
+    bpl @Exit
+        ; restore the original enemy id and reset the flag.
+        ; The code here is mostly to prevent from clearing the timer we just set
+        ldx $10
+        lda #0
+        sta DontKillEnemyFlag
         rts
-@DontKillEnemy:
-    lda #0
-    sta DontKillEnemyFlag
+@Exit:
+    ; Vanilla behavior is to clear any existing timers. They'll be set later
+    sta $0504,x
     rts
 
 ; Patch the end of the get item routine to add handlers for the rest of the checks
@@ -299,9 +335,9 @@ ExpandedGetItem:
     sta $079a
     bne @Exit ; unconditional
 @ItemMirror:
-    lda $0797,y
+    lda $0799
     ora #1
-    sta $0797,y
+    sta $0799
     bne @Exit ; unconditional
 @ItemWater:
     lda $079b
@@ -314,6 +350,9 @@ ExpandedGetItem:
     ;     Down, Up
     .byte $04, $10
 
+; Repoint the pointers that went to the original enemy/item tile table
+.org $eef4
+    lda EnemyExplosionAnimationTable,x
 .org $f219
     lda CommonEnemyTileTable,x
 .org $f221
@@ -324,6 +363,9 @@ ExpandedGetItem:
 ; Clear out the space from the original enemy and item tile table
 .org $ee51
 FREE_UNTIL $eeb2
+.reloc
+EnemyExplosionAnimationTable:
+    .byte $00,$02,$02,$00,$00
 .reloc
 CommonEnemyTileTable:
     .byte $86, $86 ; Explosion Frame 1
@@ -413,4 +455,3 @@ ItemPaletteTable:
     .byte $01 ; Reflect Spell
     .byte $01 ; Spell Spell
     .byte $01 ; Thunder Spell
-
