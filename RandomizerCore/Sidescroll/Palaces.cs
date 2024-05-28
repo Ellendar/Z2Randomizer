@@ -81,7 +81,7 @@ public class Palaces
             {
                 PalaceStyle.VANILLA => new VanillaPalaceGenerator(ct),
                 PalaceStyle.SHUFFLED => new VanillaShufflePalaceGenerator(ct),
-                PalaceStyle.CARTESIAN => new CartesianPalaceGenerator(ct),
+                PalaceStyle.SEQUENTIAL => new SequentialPlacementCoordinatePalaceGenerator(ct),
                 PalaceStyle.RECONSTRUCTED => new ReconstructedPalaceGenerator(ct),
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
             };

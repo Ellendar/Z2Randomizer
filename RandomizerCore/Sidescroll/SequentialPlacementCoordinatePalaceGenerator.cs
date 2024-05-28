@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace RandomizerCore.Sidescroll;
 
-public class CartesianPalaceGenerator(CancellationToken ct) : PalaceGenerator
+public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) : PalaceGenerator
 {
     private static int debug = 0;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();

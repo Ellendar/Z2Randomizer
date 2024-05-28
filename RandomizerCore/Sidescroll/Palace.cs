@@ -614,13 +614,23 @@ public class Palace
         foreach (Room room in AllRooms)
         {
             byte leftByte = (byte)(room.Left == null ? OUTSIDE_ROOM_EXIT : (room.Left.Map * 4 + 3));
-            byte downByte = (byte)(room.Down == null ? OUTSIDE_ROOM_EXIT : (room.Down.Map * 4 + 2));
-            byte upByte = (byte)(room.Up == null ? OUTSIDE_ROOM_EXIT : (room.Up.Map * 4 + 1));
+            byte downByte = (byte)(room.Down == null ? OUTSIDE_ROOM_EXIT : (room.Down.Map * 4));
+            byte upByte = (byte)(room.Up == null ? OUTSIDE_ROOM_EXIT : (room.Up.Map * 4));
             byte rightByte = (byte)(room.Right == null ? OUTSIDE_ROOM_EXIT : (room.Right.Map * 4));
             int pageCount = ((room.SideView[1] & 0b01100000) >> 5) + 1;
 
+            //if the up/down exit is an elevator type, go to the page the elevator is on on that screen
+            if(room.Down != null && room.Down.ElevatorScreen >= 0)
+            {
+                downByte = (byte)(downByte + room.Down.ElevatorScreen);
+            }
+            if (room.Up != null && room.Up.ElevatorScreen >= 0)
+            {
+                upByte = (byte)(upByte + room.Up.ElevatorScreen);
+            }
+
             //if the room on the left is a 2/3 page room, make the left exit go to the rightmost page in that room
-            if(room.Left != null)
+            if (room.Left != null)
             {
                 int leftPageCount = ((room.Left.SideView[1] & 0b01100000) >> 5) + 1;
                 if (leftPageCount < 4)

@@ -2023,7 +2023,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
-                3 => PalaceStyle.CARTESIAN,
+                3 => PalaceStyle.SEQUENTIAL,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
@@ -2039,7 +2039,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
-                3 => PalaceStyle.CARTESIAN,
+                3 => PalaceStyle.SEQUENTIAL,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
             for (int i = 0; i < 6; i++)
@@ -2056,7 +2056,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                     0 => PalaceStyle.VANILLA,
                     1 => PalaceStyle.SHUFFLED,
                     2 => PalaceStyle.RECONSTRUCTED,
-                    3 => PalaceStyle.CARTESIAN,
+                    3 => PalaceStyle.SEQUENTIAL,
                     _ => throw new Exception("Invalid PalaceStyle")
                 };
                 properties.PalaceStyles[i] = style;

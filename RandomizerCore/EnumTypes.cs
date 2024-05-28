@@ -156,7 +156,8 @@ public enum PalaceStyle
     VANILLA,
     SHUFFLED,
     RECONSTRUCTED,
-    CARTESIAN,
+    SEQUENTIAL,
+    CONDENSED,
     CHAOS
 }
 
@@ -177,7 +178,7 @@ public static class PalaceStyleExtensions
         return style switch
         {
             GPStyle.CHAOS => PalaceStyle.CHAOS,
-            GPStyle.CARTESIAN => PalaceStyle.CARTESIAN,
+            GPStyle.CARTESIAN => PalaceStyle.SEQUENTIAL,
             GPStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
             GPStyle.VANILLA => PalaceStyle.VANILLA,
             GPStyle.SHUFFLED => PalaceStyle.SHUFFLED,
@@ -192,7 +193,7 @@ public static class PalaceStyleExtensions
         return style switch
         {
             NormalPalaceStyle.CHAOS => PalaceStyle.CHAOS,
-            NormalPalaceStyle.CARTESIAN => PalaceStyle.CARTESIAN,
+            NormalPalaceStyle.CARTESIAN => PalaceStyle.SEQUENTIAL,
             NormalPalaceStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
             NormalPalaceStyle.VANILLA => PalaceStyle.VANILLA,
             NormalPalaceStyle.SHUFFLED => PalaceStyle.SHUFFLED,
