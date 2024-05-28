@@ -35,8 +35,8 @@ ITEM_MEDICINE = $15
 
 ITEM_UPSTAB = $16
 ITEM_DOWNSTAB = $17
-ITEM_MIRROR = $18
-ITEM_BAGU = $19
+ITEM_BAGU = $18
+ITEM_MIRROR = $19
 ITEM_WATER = $1a
 
 ITEM_SHIELD_SPELL = $1b
@@ -49,17 +49,17 @@ ITEM_REFLECT_SPELL = $21
 ITEM_SPELL_SPELL = $22
 ITEM_THUNDER_SPELL = $23
 
-LOCATION_KNIGHT = $08
-LOCATION_MIRROR = $0a
-LOCATION_BAGU_NOTE = $0b
-LOCATION_WATER = $0c
+; These are two unused locations in the save game that we can use for custom item get flags
 LocationTableMisc = $0795
-LocationTableWizard = $0797
+LocationTableWizard = $077a
 
 .segment "PRG3"
 
 DialogConditionsDefault = $b5c7
-MirrorGetItem = $b5ae
+DownStabGetItem = $b4bf
+UpStabGetItem = $b4d7
+TalkWithStandingStillNpc = $b554
+MirrorOrWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
 DontKillEnemyFlag = $0122
 
@@ -76,16 +76,75 @@ JankPowerOfTwoMask = $c28d
 ; $08,$04,$02,$01,$80,$40,$20,$10
 JankPowerOfTwo = $c28d
 
-.org MirrorGetItem
+.org MirrorOrWaterGetItem
+    jmp MirrorOrWaterLocation
+FREE_UNTIL $b5b9
+
+.reloc
+; The game uses the same enemy id to set the flags for the
+; mirror and the water object, so check here for which town we are in.
+MirrorOrWaterLocation:
+    cpy #4 ; Nabooru
+    bne @Mirror
+        lda #WATER_ITEMLOC
+        bne @Exit
+@Mirror:
     lda #MIRROR_ITEMLOC
+@Exit:
+    jmp CheckGetItemCustomLocationMisc
+
+; This spot is used for setting flags of several different standing NPCs
+; but we can hack it just for bagu too
+.org TalkWithStandingStillNpc
+    jsr HandleBaguItem
+    
+.reloc
+HandleBaguItem:
+    ; X is the adjusted NPC id and Y is the Town id
+    ; Bagu is x=0 y=3
+    cpx #0
+    bne @Exit
+    cpy #3
+    bne @Exit
+    ; double return to skip setting the vanilla bagu flag
+    ; and then use the custom get item check for this location
+    pla
+    pla
+    lda #BAGUS_NOTE_ITEMLOC
+    jmp CheckGetItemCustomLocationMisc
+@Exit:
+    lda $0797,y
+    rts
+
+.org DownStabGetItem
+    lda #DOWNSTAB_ITEMLOC
     ldy #0
     jmp CheckGetItemCustomLocationMisc
-FREE_UNTIL $b5b9
+FREE_UNTIL $b4d3
+
+.org UpStabGetItem
+    lda #UPSTAB_ITEMLOC
+    ldy #1
+    jmp CheckGetItemCustomLocationMisc
+FREE_UNTIL $b4eb
+
+
+.if _CHECK_WIZARD_MAGIC_CONTAINER
+.reloc
+WizardMagicContainerRequirement:
+    .byte $01,$02,$03,$04,$05,$06,$07,$08
+.endif
 
 .org WizardDialogGetItem
     lda LocationTableWizard
     and JankPowerOfTwo,y
     bne @AlreadyHaveItem
+        ; check if the magic container requirement is enabled
+.if _CHECK_WIZARD_MAGIC_CONTAINER
+        lda $0783
+        cmp WizardMagicContainerRequirement,y
+        bcc @EarlyExit
+.endif
         lda LocationTableWizard
         ora JankPowerOfTwo,y
         sta LocationTableWizard
@@ -93,6 +152,7 @@ FREE_UNTIL $b5b9
         jmp GetItemDontKillEnemy
 @AlreadyHaveItem:
     inc $048c ; Use the 'Already have item' dialog
+@EarlyExit:
     jmp DialogConditionsDefault
     FREE_UNTIL $b54e
 
@@ -217,10 +277,10 @@ ExpandedGetItem:
     beq @ItemStab
     cpy #ITEM_DOWNSTAB
     beq @ItemStab
-    cpy #ITEM_MIRROR
-    beq @ItemMirror
     cpy #ITEM_BAGU
     beq @ItemBagu
+    cpy #ITEM_MIRROR
+    beq @ItemMirror
     cpy #ITEM_WATER
     beq @ItemWater
     ; Red jar or blue jar
@@ -232,15 +292,15 @@ ExpandedGetItem:
     ora @StabTable - ITEM_UPSTAB,y
     sta $0796
     bne @Exit ; unconditional
-@ItemMirror:
-    lda $0797,y
-    ora #1
-    sta $0797,y
-    bne @Exit ; unconditional
 @ItemBagu:
     lda $079a
     ora #8
     sta $079a
+    bne @Exit ; unconditional
+@ItemMirror:
+    lda $0797,y
+    ora #1
+    sta $0797,y
     bne @Exit ; unconditional
 @ItemWater:
     lda $079b
@@ -311,10 +371,11 @@ ItemTileTable:
     .byte $31, $31 ; Child
     .byte $2F, $2F ; Trophy
     .byte $31, $31 ; Medicine
+    .byte $67, $67 ; Antifairy
+    .byte $e9, $f5 ; Bagu
     .byte $e1, $f5 ; Upstab
     .byte $e3, $f5 ; Downstab
     .byte $e7, $f5 ; Mirror
-    .byte $e9, $f5 ; Bagu
     .byte $ed, $f5 ; Water
     .byte $fb, $fd ; Shield Spell
     .byte $d3, $d5 ; Jump Spell
@@ -338,10 +399,10 @@ ItemPaletteTable:
     .byte $01 ; Child
     .byte $01 ; Trophy
     .byte $01 ; Medicine
+    .byte $01 ; Bagu
     .byte $01 ; Upstab
     .byte $01 ; Downstab
     .byte $01 ; Mirror
-    .byte $01 ; Bagu
     .byte $01 ; Water
     .byte $01 ; Shield Spell
     .byte $01 ; Jump Spell
