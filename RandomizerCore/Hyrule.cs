@@ -3560,6 +3560,7 @@ CustomFileSelectData:
         {
             a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectable);
         }
+        a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
