@@ -15,6 +15,7 @@
     <AssemblyName>Z2Randomizer</AssemblyName>
     <RootNamespace>$(SolutionName.Replace(" ", "_")).$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
 
   <ItemGroup>

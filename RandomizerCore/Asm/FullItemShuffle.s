@@ -292,10 +292,10 @@ HandlePBagTimerClear:
     nop
 .reloc
 ExpandedGetItem:
-    cpy #ITEM_RED_MAGIC_JAR + 1
-    bcs @NotJar 
-        
-@NotJar:
+;    cpy #ITEM_RED_MAGIC_JAR + 1
+;    bcs @NotJar 
+;        
+;@NotJar:
     cpy #ITEM_SHIELD_SPELL
     bcc @NotSpell
         ; flash screen as if you got the spell from a wizard 
