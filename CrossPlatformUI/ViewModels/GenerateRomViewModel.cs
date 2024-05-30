@@ -61,6 +61,7 @@ Seed: {config.Seed}
                 .DisposeWith(disposables);
             lastError = null;
             HasError = false;
+            IsComplete = false;
             tokenSource = new CancellationTokenSource();
             Progress = "";
             await App.PersistState();
@@ -85,6 +86,7 @@ Seed: {config.Seed}
                     var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
                     await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
                     Progress = $"Generation Complete! Hash: {randomizer.Hash}\n\nFile {filename} created";
+                    IsComplete = true;
                 }
                 catch (Exception e)
                 {
@@ -116,10 +118,13 @@ Seed: {config.Seed}
 
     private CancellationTokenSource? tokenSource;
 
+    private Exception? lastError;
     private bool hasError;
     [JsonIgnore]
     public bool HasError { get => hasError; set => this.RaiseAndSetIfChanged(ref hasError, value); }
-    private Exception? lastError;
+    private bool isComplete;
+    [JsonIgnore]
+    public bool IsComplete { get => isComplete; set => this.RaiseAndSetIfChanged(ref isComplete, value); }
 
     [JsonIgnore]
     public MainViewModel Main { get; }

@@ -11,7 +11,8 @@
         <TextBlock TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Progress}" />
         <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
             <Button Content="Copy Error" IsVisible="{Binding HasError}" Command="{Binding CopyError}" />
-            <Button Content="Cancel" Command="{Binding CancelGeneration}" />
+            <Button Content="Cancel" Classes="accent" IsVisible="{Binding !IsComplete}" Command="{Binding CancelGeneration}" />
+            <Button Content="Close" IsVisible="{Binding IsComplete}" Command="{Binding CancelGeneration}" />
         </StackPanel>
     </Grid>
 </UserControl>
