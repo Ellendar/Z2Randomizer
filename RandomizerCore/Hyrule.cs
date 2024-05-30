@@ -2962,7 +2962,7 @@ public class Hyrule
         foreach (Palace palace in palaces)
         {
             palace.ValidateRoomConnections();
-            palace.UpdateRom(ROMData);
+            palace.WriteConnections(ROMData);
         }
 
         ROMData.AddCredits();

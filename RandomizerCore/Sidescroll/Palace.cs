@@ -567,7 +567,7 @@ public class Palace
         openRooms.Add(r);
     }
 
-    public void UpdateRom(ROM ROMData)
+    public void WriteConnections(ROM ROMData)
     {
         List<Room> roomsToRemove = new();
         //Unify the parts of segmented rooms back together
@@ -619,6 +619,10 @@ public class Palace
             byte rightByte = (byte)(room.Right == null ? OUTSIDE_ROOM_EXIT : (room.Right.Map * 4));
             int pageCount = ((room.SideView[1] & 0b01100000) >> 5) + 1;
 
+            if(room.IsUpDownReversed)
+            {
+                (downByte, upByte) = (upByte, downByte);
+            }
             //if the up/down exit is an elevator type, go to the page the elevator is on on that screen
             if(room.Down != null && room.Down.ElevatorScreen >= 0)
             {

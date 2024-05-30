@@ -121,8 +121,10 @@ public enum NormalPalaceStyle
     SHUFFLED,
     [Description("Reconstructed")]
     RECONSTRUCTED,
-    [Description("Cartesian")]
-    CARTESIAN,
+    [Description("Sequential")]
+    SEQUENTIAL,
+    [Description("Condensed")]
+    CONDENSED,
     [Description("Chaos")]
     CHAOS,
     [Description("Random All")]
@@ -140,8 +142,10 @@ public enum GPStyle
     SHUFFLED,
     [Description("Reconstructed")]
     RECONSTRUCTED,
-    [Description("Cartesian")]
-    CARTESIAN,
+    [Description("Sequential")]
+    SEQUENTIAL,
+    [Description("Condensed")]
+    CONDENSED,
     [Description("Chaos")]
     CHAOS,
     [Description("Random")]
@@ -178,7 +182,8 @@ public static class PalaceStyleExtensions
         return style switch
         {
             GPStyle.CHAOS => PalaceStyle.CHAOS,
-            GPStyle.CARTESIAN => PalaceStyle.SEQUENTIAL,
+            GPStyle.SEQUENTIAL => PalaceStyle.SEQUENTIAL,
+            GPStyle.CONDENSED => PalaceStyle.CONDENSED,
             GPStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
             GPStyle.VANILLA => PalaceStyle.VANILLA,
             GPStyle.SHUFFLED => PalaceStyle.SHUFFLED,
@@ -193,7 +198,8 @@ public static class PalaceStyleExtensions
         return style switch
         {
             NormalPalaceStyle.CHAOS => PalaceStyle.CHAOS,
-            NormalPalaceStyle.CARTESIAN => PalaceStyle.SEQUENTIAL,
+            NormalPalaceStyle.SEQUENTIAL => PalaceStyle.SEQUENTIAL,
+            NormalPalaceStyle.CONDENSED => PalaceStyle.CONDENSED,
             NormalPalaceStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
             NormalPalaceStyle.VANILLA => PalaceStyle.VANILLA,
             NormalPalaceStyle.SHUFFLED => PalaceStyle.SHUFFLED,

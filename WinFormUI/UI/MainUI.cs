@@ -957,10 +957,11 @@ public partial class MainUI : Form
             0 => NormalPalaceStyle.VANILLA,
             1 => NormalPalaceStyle.SHUFFLED,
             2 => NormalPalaceStyle.RECONSTRUCTED,
-            3 => NormalPalaceStyle.CARTESIAN,
-            4 => NormalPalaceStyle.CHAOS,
-            5 => NormalPalaceStyle.RANDOM_ALL,
-            6 => NormalPalaceStyle.RANDOM_PER_PALACE,
+            3 => NormalPalaceStyle.SEQUENTIAL,
+            4 => NormalPalaceStyle.CONDENSED,
+            5 => NormalPalaceStyle.CHAOS,
+            6 => NormalPalaceStyle.RANDOM_ALL,
+            7 => NormalPalaceStyle.RANDOM_PER_PALACE,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
         configuration.GPStyle = gpStyleList.SelectedIndex switch
@@ -968,9 +969,10 @@ public partial class MainUI : Form
             0 => GPStyle.VANILLA,
             1 => GPStyle.SHUFFLED,
             2 => GPStyle.RECONSTRUCTED,
-            3 => GPStyle.CARTESIAN,
-            4 => GPStyle.CHAOS,
-            5 => GPStyle.RANDOM,
+            3 => GPStyle.SEQUENTIAL,
+            4 => GPStyle.CONDENSED,
+            5 => GPStyle.CHAOS,
+            6 => GPStyle.RANDOM,
             _ => throw new Exception("Invalid GP Style setting")
         };
         configuration.ShortenNormalPalaces = GetTripleCheckState(shortenNormalPalaceCheckbox);
@@ -1449,10 +1451,11 @@ public partial class MainUI : Form
                 NormalPalaceStyle.VANILLA => 0,
                 NormalPalaceStyle.SHUFFLED => 1,
                 NormalPalaceStyle.RECONSTRUCTED => 2,
-                NormalPalaceStyle.CARTESIAN => 3,
-                NormalPalaceStyle.CHAOS => 4,
-                NormalPalaceStyle.RANDOM_ALL => 5,
-                NormalPalaceStyle.RANDOM_PER_PALACE => 6,
+                NormalPalaceStyle.SEQUENTIAL => 3,
+                NormalPalaceStyle.CONDENSED => 4,
+                NormalPalaceStyle.CHAOS => 5,
+                NormalPalaceStyle.RANDOM_ALL => 6,
+                NormalPalaceStyle.RANDOM_PER_PALACE => 7,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             gpStyleList.SelectedIndex = configuration.GPStyle switch
@@ -1460,9 +1463,10 @@ public partial class MainUI : Form
                 GPStyle.VANILLA => 0,
                 GPStyle.SHUFFLED => 1,
                 GPStyle.RECONSTRUCTED => 2,
-                GPStyle.CARTESIAN => 3,
-                GPStyle.CHAOS => 4,
-                GPStyle.RANDOM => 5,
+                GPStyle.SEQUENTIAL => 3,
+                GPStyle.CONDENSED => 4,
+                GPStyle.CHAOS => 5,
+                GPStyle.RANDOM => 6,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);

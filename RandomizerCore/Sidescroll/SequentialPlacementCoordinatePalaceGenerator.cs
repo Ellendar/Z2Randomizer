@@ -299,7 +299,6 @@ public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) 
         //Recategorize the remaining rooms after stubbing out.
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
 
-
         //ItemRoom
         if(palace.Number < 7)
         {

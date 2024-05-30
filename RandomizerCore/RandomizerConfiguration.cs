@@ -2018,12 +2018,13 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         if (GPStyle == GPStyle.RANDOM)
         {
-            properties.PalaceStyles[6] = random.Next(4) switch
+            properties.PalaceStyles[6] = random.Next(5) switch
             {
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
                 3 => PalaceStyle.SEQUENTIAL,
+                4 => PalaceStyle.CONDENSED,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
@@ -2040,6 +2041,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
                 3 => PalaceStyle.SEQUENTIAL,
+                4 => PalaceStyle.CONDENSED,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
             for (int i = 0; i < 6; i++)
@@ -2057,6 +2059,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                     1 => PalaceStyle.SHUFFLED,
                     2 => PalaceStyle.RECONSTRUCTED,
                     3 => PalaceStyle.SEQUENTIAL,
+                    4 => PalaceStyle.CONDENSED,
                     _ => throw new Exception("Invalid PalaceStyle")
                 };
                 properties.PalaceStyles[i] = style;

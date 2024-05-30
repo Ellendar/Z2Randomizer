@@ -1,4 +1,6 @@
-﻿namespace RandomizerCore.Sidescroll;
+﻿using System;
+
+namespace RandomizerCore.Sidescroll;
 
 public enum RoomExitType
 {
@@ -24,7 +26,6 @@ public enum RoomExitType
     LEFT_T = 0b11010,
     FOUR_WAY = 0b11011,
 
-    //Left, down, drop down, up, right
     //Drop down
     DROP_STUB = 0b00100,
     DROP_SE_L = 0b00101,
@@ -62,5 +63,47 @@ public static class RoomExitTypeExtensions
     public static bool ContainsLeft(this RoomExitType exitType)
     {
         return ((int)exitType & LEFT) == LEFT;
+    }
+
+    public static RoomExitType AddUp(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType | UP);
+    }
+
+    public static RoomExitType AddDown(this RoomExitType exitType)
+    {
+        if(exitType.ContainsDrop())
+        {
+            throw new Exception("Can't add down to a room that drops");
+        }
+        return (RoomExitType)((int)exitType | DOWN);
+    }
+    public static RoomExitType AddDrop(this RoomExitType exitType)
+    {
+        if (exitType.ContainsDrop())
+        {
+            throw new Exception("Can't add drop to a room that downs");
+        }
+        return (RoomExitType)((int)exitType | DROP);
+    }
+
+    public static RoomExitType AddLeft(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType | LEFT);
+    }
+
+    public static RoomExitType AddRight(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType | RIGHT);
+    }
+
+    public static RoomExitType ConvertToDrop(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType & 0b10111 | DROP);
+    }
+
+    public static RoomExitType RemoveUp(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType & 0b11101);
     }
 }
