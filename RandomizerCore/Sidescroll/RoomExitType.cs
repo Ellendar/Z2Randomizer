@@ -99,6 +99,10 @@ public static class RoomExitTypeExtensions
 
     public static RoomExitType ConvertToDrop(this RoomExitType exitType)
     {
+        if(!exitType.ContainsDown())
+        {
+            throw new Exception("Cannot convert non-down room to drop");
+        }
         return (RoomExitType)((int)exitType & 0b10111 | DROP);
     }
 

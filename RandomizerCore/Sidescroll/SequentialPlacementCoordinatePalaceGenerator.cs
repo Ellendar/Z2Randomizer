@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace RandomizerCore.Sidescroll;
 
-public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) : PalaceGenerator
+public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) : CoordinatePalaceGenerator(ct)
 {
     private static int debug = 0;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -299,106 +299,7 @@ public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) 
         //Recategorize the remaining rooms after stubbing out.
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
 
-        //ItemRoom
-        if(palace.Number < 7)
-        {
-            if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
-            {
-                throw new Exception("No item rooms for generated palace");
-            }
-            Direction itemRoomDirection;
-            Room itemRoom = null;
-            do
-            {
-                itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-            } while (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection));
-            List<Room> itemRoomCandidates = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList();
-            itemRoomCandidates.FisherYatesShuffle(r);
-
-            foreach (Room itemRoomCandidate in itemRoomCandidates)
-            {
-                List<Room> itemRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
-                Room? itemRoomReplacementRoom = itemRoomReplacementCandidates.Sample(r);
-                if (itemRoomReplacementRoom != null)
-                {
-                    palace.ItemRoom = new(itemRoomCandidate);
-                    palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);
-                    break;
-                }
-            }
-        }
-        //Tbird Room
-        else
-        {
-            if (roomPool.TbirdRooms.Count == 0)
-            {
-                throw new Exception("No tbird rooms for generated palace");
-            }
-            List<Room> tbirdRoomCandidates = roomPool.TbirdRooms.ToList();
-            tbirdRoomCandidates.FisherYatesShuffle(r);
-
-            foreach (Room tbirdRoomCandidate in tbirdRoomCandidates)
-            {
-                List<Room> tbirdRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == tbirdRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
-                Room? tbirdRoomReplacementRoom = tbirdRoomReplacementCandidates.Sample(r);
-                if (tbirdRoomReplacementRoom != null)
-                {
-                    palace.Tbird = new(tbirdRoomCandidate);
-                    palace.ReplaceRoom(tbirdRoomReplacementRoom, palace.Tbird);
-                    break;
-                }
-            }
-        }
-
-        //BossRoom
-        if (roomPool.BossRooms.Count == 0)
-        {
-            throw new Exception("No boss rooms for generated palace");
-        }
-        List<Room> bossRoomCandidates = roomPool.BossRooms.ToList();
-        bossRoomCandidates.FisherYatesShuffle(r);
-
-        foreach (Room bossRoomCandidate in bossRoomCandidates)
-        {
-            RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
-            if(props.BossRoomConnect && palaceNumber < 7)
-            {
-                bossRoomExitType = (RoomExitType)((int)bossRoomExitType | RoomExitTypeExtensions.RIGHT);
-            }
-            List<Room> bossRoomReplacementCandidates =
-                palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomExitType && i.IsNormalRoom()).ToList();
-            
-            Room? bossRoomReplacementRoom = bossRoomReplacementCandidates.Sample(r);
-            if (bossRoomReplacementRoom != null)
-            {
-                palace.BossRoom = new(bossRoomCandidate);
-                if (props.BossRoomConnect && palaceNumber < 7)
-                {
-                    palace.BossRoom.HasRightExit = true;
-                }
-                palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
-                break;
-            }
-        }
-
-        if(palace.BossRoom == null
-            || palace.Entrance == null
-            || (palaceNumber == 7 && palace.Tbird == null)
-            || (palaceNumber < 7 && palace.ItemRoom == null))
-        {
-            logger.Debug("Failed to place critical room in palace");
-            palace.IsValid = false;
-            return palace;
-        }
-
-        //TODO: This is REALLY late to abandon ship on the whole palace, but 
-        //refactoring the boss placement to do the check properly without a million stupid room swaps
-        //was not a thing I felt like figuring out.
-        //Maybe we use ShuffleRooms()?
-        //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
-        if (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
         {
             palace.IsValid = false;
             return palace;

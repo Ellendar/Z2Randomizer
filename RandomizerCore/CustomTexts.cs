@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NLog;
 using RandomizerCore.Overworld;
 using static System.Net.Mime.MediaTypeNames;
@@ -27,7 +28,7 @@ public class CustomTexts
     private static readonly int[] sariaMoving = [27];
     private static readonly int[] movingMido = [40, 39];
     private static readonly int[] movingNabooru = [61, 60];
-    private static readonly int[] daruniaMoving = [72, 75,];
+    private static readonly int[] daruniaMoving = [72, 75];
     private static readonly int[] newkasutoMoving = [88, 89];
 
     //Indexes in the hints list
@@ -297,8 +298,7 @@ public class CustomTexts
     ];
 
     public static List<Text> GenerateTexts(
-        List<Location> itemLocs,
-        Location baguLocation,
+        IEnumerable<Location> locations,
         List<Text> texts,
         RandomizerProperties props,
         Random hashRNG)
@@ -317,19 +317,29 @@ public class CustomTexts
                 (texts[townWizardTextIndexes[Town.DARUNIA_ROOF]], texts[townWizardTextIndexes[Town.MIDO_CHURCH]]) =
                     (texts[townWizardTextIndexes[Town.MIDO_CHURCH]], texts[townWizardTextIndexes[Town.DARUNIA_ROOF]]);
             }
-            GenerateWizardTexts(texts, itemLocs, nonhashRNG, props.UseCommunityText);
+            GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
 
             if (props.SpellItemHints)
             {
-                GenerateSpellHints(itemLocs, texts, props);
+                GenerateSpellHints(locations, texts, props);
             }
 
+            Location baguLocation = locations.FirstOrDefault(i => i.ActualTown == Town.BAGU)!;
+            if(baguLocation == null)
+            {
+                throw new Exception("Bagu location not found while generating text");
+            }
             Text? baguText = GenerateBaguText(baguLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if(baguText != null)
             {
                 texts[baguTextIndex] = baguText;
             }
-            
+
+            Text? mirrorText = GenerateMirrorTableText(baguLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            if (mirrorText != null)
+            {
+                texts[mirrorIndex] = mirrorText;
+            }
 
             if (props.BagusWoods)
             {
@@ -341,7 +351,7 @@ public class CustomTexts
             }
             if (props.HelpfulHints)
             {
-                List<int> placedIndexes = GenerateHelpfulHints(texts, itemLocs, hashRNG, props.SpellItemHints);
+                List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props.SpellItemHints);
                 GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText);
             }
 
@@ -356,7 +366,7 @@ public class CustomTexts
 
             if (props.TownNameHints)
             {
-                GenerateTownNameHints(texts, itemLocs, props.CombineFire);
+                GenerateTownNameHints(texts, locations, props.CombineFire);
             }
         } while (TextLength(texts) > MAX_TEXT_LENGTH);
 
@@ -417,7 +427,7 @@ public class CustomTexts
         return baguHint;
     }
 
-    private static void GenerateTownNameHints(List<Text> texts, List<Location> itemLocs, bool linkedFire)
+    private static void GenerateTownNameHints(List<Text> texts, IEnumerable<Location> itemLocs, bool linkedFire)
     {
         foreach (Location location in itemLocs.Where(i => i.ActualTown != 0 && i.ActualTown.VanillaTownOrder() != 0))
         {
@@ -468,7 +478,23 @@ public class CustomTexts
         }
         else if(useCommunityText)
         {
-            return new Text(BAGU_TEXTS[r.Next(BAGU_TEXTS.Length)]);
+            return new Text(BAGU_TEXTS.Sample(r)!);
+        }
+        return null;
+    }
+    private static Text? GenerateMirrorTableText(Collectable mirrorItem, Random r, bool useCommunityText, bool includeQuestItemsInShuffle)
+    {
+        if (includeQuestItemsInShuffle)
+        {
+            if (useCommunityText)
+            {
+                return GenerateNonSpellWizardText(mirrorItem, r, true);
+            }
+            else {
+                string rawText;
+                rawText = "I FOUND A$%$UNDER THE$TABLE.";
+                    return new Text(rawText.Replace("%", mirrorItem.SingleLineText()));
+            }
         }
         return null;
     }
@@ -508,17 +534,17 @@ public class CustomTexts
         {
             if (!placedIndex.Contains(stationary[i]))
             {
-                hints[stationary[i]] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS[r.Next(KNOW_NOTHING_TEXTS.Length)]) : defaultKnowNothing;
+                hints[stationary[i]] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
             }
         }
 
         for (int i = 0; i < moving.Count; i++)
         {
-            hints[moving[i]] =  useCommunityText ? new Text(KNOW_NOTHING_TEXTS[r.Next(KNOW_NOTHING_TEXTS.Length)]) : defaultKnowNothing;
+            hints[moving[i]] =  useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
         }
     }
 
-    private static List<int> GenerateHelpfulHints(List<Text> hints, List<Location> itemLocs, Random r, bool useSpellItemHints)
+    private static List<int> GenerateHelpfulHints(List<Text> hints, IEnumerable<Location> locations, Random r, bool useSpellItemHints)
     {
         List<int> placedIndex = new List<int>();
 
@@ -527,7 +553,8 @@ public class CustomTexts
         List<Collectable> smallItems = [Collectable.BLUE_JAR, Collectable.XL_BAG, Collectable.KEY, Collectable.MEDIUM_BAG, Collectable.MAGIC_CONTAINER, Collectable.HEART_CONTAINER, Collectable.ONEUP, Collectable.RED_JAR, Collectable.SMALL_BAG, Collectable.LARGE_BAG];
         List<int> placedTowns = [];
 
-        List<Collectable> items = itemLocs.Select(i => i.Collectable).ToList();
+        List<Collectable> items = locations.Select(i => i.Collectable).ToList();
+        items = items.Where(i => i != Collectable.DO_NOT_USE).ToList();
 
         if (useSpellItemHints)
         {
@@ -538,20 +565,22 @@ public class CustomTexts
 
         for (int i = 0; i < HELPFUL_HINTS_COUNT; i++)
         {
-            Collectable doThis = items[r.Next(items.Count)];
+            Collectable hintCollectable = items[r.Next(items.Count)];
             int tries = 0;
-            while (((placedSmall && smallItems.Contains(doThis)) || placedItems.Contains(doThis)) && tries < 1000)
+            while (((placedSmall && smallItems.Contains(hintCollectable)) || placedItems.Contains(hintCollectable)) && tries < 1000)
             {
-                doThis = items[r.Next(items.Count)];
+                hintCollectable = items[r.Next(items.Count)];
                 tries++;
             }
             int j = 0;
-            while (itemLocs[j].Collectable != doThis)
+            List<Location> possibleHintLocations = locations.Where(i => i.Collectable == hintCollectable).ToList();
+            Location hintLocation = possibleHintLocations.Sample(r);
+            if(hintLocation == null)
             {
-                j++;
+                throw new ImpossibleException("Error generating hint for unplaced item");
             }
             Text hint = new();
-            hint.GenerateHelpfulHint(itemLocs[j]);
+            hint.GenerateHelpfulHint(hintLocation);
             int town = r.Next(9);
             while (placedTowns.Contains(town))
             {
@@ -572,8 +601,8 @@ public class CustomTexts
             }
 
             placedTowns.Add(town);
-            placedItems.Add(doThis);
-            if (smallItems.Contains(doThis))
+            placedItems.Add(hintCollectable);
+            if (smallItems.Contains(hintCollectable))
             {
                 placedSmall = true;
             }
@@ -582,7 +611,7 @@ public class CustomTexts
         return placedIndex;
     }
 
-    private static void GenerateSpellHints(List<Location> itemLocs, List<Text> hints, RandomizerProperties props)
+    private static void GenerateSpellHints(IEnumerable<Location> itemLocs, List<Text> hints, RandomizerProperties props)
     {
 
         foreach (Location itemLocation in itemLocs)
@@ -620,7 +649,7 @@ public class CustomTexts
         }
     }
 
-    private static void GenerateWizardTexts(List<Text> texts, List<Location> itemLocs, Random r, bool useCommunityText)
+    private static void GenerateWizardTexts(List<Text> texts, IEnumerable<Location> itemLocs, Random r, bool useCommunityText)
     {
         List<Text> vanillaText = new(texts);
         List<Text> usedWizardTexts = [];

@@ -65,8 +65,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private Biome mazeBiome;
     private Climate climate;
     private bool vanillaShuffleUsesActualTerrain;
-    private NormalPalaceStyle normalPalaceStyle;
-    private GPStyle gpStyle;
+    private PalaceStyle normalPalaceStyle;
+    private PalaceStyle gpStyle;
     private bool? includeVanillaRooms;
     private bool? includev40Rooms;
     private bool? includev44Rooms;
@@ -349,13 +349,13 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         get => shortenNormalPalaces;
         set => SetField(ref shortenNormalPalaces, value);
     }
-    public NormalPalaceStyle NormalPalaceStyle
+    public PalaceStyle NormalPalaceStyle
     {
         get => normalPalaceStyle;
         set => SetField(ref normalPalaceStyle, value);
     }
 
-    public GPStyle GPStyle
+    public PalaceStyle GPStyle
     {
         get => gpStyle;
         set => SetField(ref gpStyle, value);
@@ -1585,16 +1585,16 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         switch ((bits[1] ? 1 : 0) + (bits[5] ? 2 : 0))
         {
             case 0:
-                config.NormalPalaceStyle = NormalPalaceStyle.VANILLA;
-                config.GPStyle = GPStyle.VANILLA;
+                config.NormalPalaceStyle = PalaceStyle.VANILLA;
+                config.GPStyle = PalaceStyle.VANILLA;
                 break;
             case 1:
-                config.NormalPalaceStyle = NormalPalaceStyle.SHUFFLED;
-                config.GPStyle = GPStyle.SHUFFLED;
+                config.NormalPalaceStyle = PalaceStyle.SHUFFLED;
+                config.GPStyle = PalaceStyle.SHUFFLED;
                 break;
             case 2:
-                config.NormalPalaceStyle = NormalPalaceStyle.RECONSTRUCTED;
-                config.GPStyle = GPStyle.RECONSTRUCTED;
+                config.NormalPalaceStyle = PalaceStyle.RECONSTRUCTED;
+                config.GPStyle = PalaceStyle.RECONSTRUCTED;
                 break;
         }
         config.IncludeVanillaRooms = true;
@@ -2016,7 +2016,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         //Palaces
 
-        if (GPStyle == GPStyle.RANDOM)
+        if (GPStyle == PalaceStyle.RANDOM)
         {
             properties.PalaceStyles[6] = random.Next(5) switch
             {
@@ -2024,16 +2024,16 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
                 3 => PalaceStyle.SEQUENTIAL,
-                4 => PalaceStyle.CONDENSED,
+                4 => PalaceStyle.RANDOM_WALK,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
         else 
         {
-            properties.PalaceStyles[6] = GPStyle.AsPalaceStyle();
+            properties.PalaceStyles[6] = GPStyle;
         }
 
-        if (NormalPalaceStyle == NormalPalaceStyle.RANDOM_ALL)
+        if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
         {
             PalaceStyle style = random.Next(4) switch
             {
@@ -2041,7 +2041,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 1 => PalaceStyle.SHUFFLED,
                 2 => PalaceStyle.RECONSTRUCTED,
                 3 => PalaceStyle.SEQUENTIAL,
-                4 => PalaceStyle.CONDENSED,
+                4 => PalaceStyle.RANDOM_WALK,
                 _ => throw new Exception("Invalid PalaceStyle")
             };
             for (int i = 0; i < 6; i++)
@@ -2049,7 +2049,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 properties.PalaceStyles[i] = style;
             }
         }
-        else if(NormalPalaceStyle == NormalPalaceStyle.RANDOM_PER_PALACE)
+        else if(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -2059,7 +2059,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                     1 => PalaceStyle.SHUFFLED,
                     2 => PalaceStyle.RECONSTRUCTED,
                     3 => PalaceStyle.SEQUENTIAL,
-                    4 => PalaceStyle.CONDENSED,
+                    4 => PalaceStyle.RANDOM_WALK,
                     _ => throw new Exception("Invalid PalaceStyle")
                 };
                 properties.PalaceStyles[i] = style;
@@ -2069,7 +2069,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         {
             for (int i = 0; i < 6; i++)
             {
-                properties.PalaceStyles[i] = NormalPalaceStyle.AsPalaceStyle();
+                properties.PalaceStyles[i] = NormalPalaceStyle;
             }
         }
 

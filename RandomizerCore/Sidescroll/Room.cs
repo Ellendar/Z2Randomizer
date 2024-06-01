@@ -683,10 +683,12 @@ public class Room : IJsonOnDeserialized
 
     internal RoomExitType CategorizeExits()
     {
+        /*
         if(ElevatorScreen >= 0 && (HasDrop || IsDropZone))
         {
             throw new Exception("Room has a mixed drop type. Add categories for this.");
         }
+        */
         int flags =
             (HasLeftExit ? RoomExitTypeExtensions.LEFT : 0)
             + (HasRightExit ? RoomExitTypeExtensions.RIGHT : 0)

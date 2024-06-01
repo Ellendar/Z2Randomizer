@@ -6,10 +6,10 @@ using System.Threading;
 
 namespace RandomizerCore.Sidescroll;
 
-public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : PalaceGenerator
+public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : CoordinatePalaceGenerator(ct)
 {
     private static int debug = 0;
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     private static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
     private const int STALL_LIMIT = 1000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
@@ -91,12 +91,6 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : PalaceG
 
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
 
-        //for each node
-        //if the node contains down
-        //if the node below is a deadend, drop chance 0%
-        //if the node above drops in, drop chance 100% (we don't have drop -> elevator conversion rooms)
-        //otherwise drop chance is 30%
-
         foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.Item2).ThenBy(i => i.Key.Item1))
         {
             int x = item.Key.Item1;
@@ -116,13 +110,19 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : PalaceG
             {
                 continue;
             }
-            double dropChance = .3d;
+            double dropChance = .5d;
             Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
+            //if we dropped into this room
             if (upRoom != null && upRoom.HasDrop)
             {
-                dropChance = 1f;
+                //There are no drop -> elevator conversion rooms, so if we have to keep going down, it needs to be a drop.
+                if(exitType.ContainsDown())
+                {
+                    dropChance = 1f;
+                } 
             }
-            if (downExitType == null || downExitType == RoomExitType.DEADEND_EXIT_UP)
+            //if the path doesn't go down, or the room below doesn't exist, or the room below only goes up
+            if (!exitType.ContainsDown() || downExitType == null || downExitType == RoomExitType.DEADEND_EXIT_UP)
             {
                 dropChance = 0f;
             }
@@ -135,7 +135,7 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : PalaceG
         }
 
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
-        foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph)
+        foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.Item2).ThenBy(i => i.Key.Item1))
         {
             if (item.Key == (0, 0))
             {
@@ -150,7 +150,8 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : PalaceG
             Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
             foreach (Room roomCandidate in roomCandidates)
             {
-                if(upRoom == null || (upRoom.HasDrop == roomCandidate.IsDropZone))
+                if((upRoom == null || (upRoom.HasDrop == roomCandidate.IsDropZone))
+                    && roomCandidate.IsNormalRoom())
                 {
                     newRoom = roomCandidate;
                     break;
@@ -170,152 +171,65 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : PalaceG
                 newRoom = new(newRoom);
             }
 
-            //Connect adjacent rooms if they exist
-            Room? left = palace.AllRooms.FirstOrDefault(i => i.coords == (item.Key.Item1 - 1, item.Key.Item2));
-            Room? down = palace.AllRooms.FirstOrDefault(i => i.coords == (item.Key.Item1, item.Key.Item2 - 1));
-            Room? up = palace.AllRooms.FirstOrDefault(i => i.coords == (item.Key.Item1, item.Key.Item2 + 1));
-            Room? right = palace.AllRooms.FirstOrDefault(i => i.coords == (item.Key.Item1 - 1, item.Key.Item2));
-            if (left != null && newRoom.FitsWithLeft(left) > 0)
-            {
-                newRoom.Left = left;
-                left.Right = newRoom;
-            }
-            if (down != null && newRoom.FitsWithDown(down) > 0)
-            {
-                newRoom.Down = down;
-                if (!newRoom.HasDrop)
-                {
-                    down.Up = newRoom;
-                }
-            }
-            if (up != null && newRoom.FitsWithUp(up) > 0)
-            {
-                if (!up.HasDrop)
-                {
-                    newRoom.Up = up;
-                }
-                up.Down = newRoom;
-            }
-            if (right != null && newRoom.FitsWithRight(right) > 0)
-            {
-                newRoom.Right = right;
-                right.Left = newRoom;
-            }
-
             palace.AllRooms.Add(newRoom);
             newRoom.coords = item.Key;
         }
 
-        //ItemRoom
-        if (palace.Number < 7)
+        //Connect adjacent rooms if they exist
+        foreach (Room room in palace.AllRooms)
         {
-            if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
-            {
-                throw new Exception("No item rooms for generated palace");
-            }
-            Direction itemRoomDirection;
-            Room itemRoom = null;
-            do
-            {
-                itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-            } while (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection));
-            List<Room> itemRoomCandidates = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList();
-            itemRoomCandidates.FisherYatesShuffle(r);
+            Room? left = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1 - 1, room.coords.Item2));
+            Room? down = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1, room.coords.Item2 - 1));
+            Room? up = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1, room.coords.Item2 + 1));
+            Room? right = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1 + 1, room.coords.Item2));
 
-            foreach (Room itemRoomCandidate in itemRoomCandidates)
+            if (left != null && room.FitsWithLeft(left) > 0)
             {
-                List<Room> itemRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
-                Room? itemRoomReplacementRoom = itemRoomReplacementCandidates.Sample(r);
-                if (itemRoomReplacementRoom != null)
+                room.Left = left;
+                left.Right = room;
+            }
+            if (down != null && room.FitsWithDown(down) > 0)
+            {
+                room.Down = down;
+                if (!room.HasDrop)
                 {
-                    palace.ItemRoom = new(itemRoomCandidate);
-                    palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);
-                    break;
+                    down.Up = room;
                 }
             }
-        }
-        //Tbird Room
-        else
-        {
-            if (roomPool.TbirdRooms.Count == 0)
+            if (up != null && room.FitsWithUp(up) > 0)
             {
-                throw new Exception("No tbird rooms for generated palace");
-            }
-            List<Room> tbirdRoomCandidates = roomPool.TbirdRooms.ToList();
-            tbirdRoomCandidates.FisherYatesShuffle(r);
-
-            foreach (Room tbirdRoomCandidate in tbirdRoomCandidates)
-            {
-                List<Room> tbirdRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == tbirdRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
-                Room? tbirdRoomReplacementRoom = tbirdRoomReplacementCandidates.Sample(r);
-                if (tbirdRoomReplacementRoom != null)
+                if (!up.HasDrop)
                 {
-                    palace.Tbird = new(tbirdRoomCandidate);
-                    palace.ReplaceRoom(tbirdRoomReplacementRoom, palace.Tbird);
-                    break;
+                    room.Up = up;
                 }
+                up.Down = room;
             }
-        }
-
-        //BossRoom
-        if (roomPool.BossRooms.Count == 0)
-        {
-            throw new Exception("No boss rooms for generated palace");
-        }
-        List<Room> bossRoomCandidates = roomPool.BossRooms.ToList();
-        bossRoomCandidates.FisherYatesShuffle(r);
-
-        foreach (Room bossRoomCandidate in bossRoomCandidates)
-        {
-            RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
-            if (props.BossRoomConnect && palaceNumber < 7)
+            if (right != null && room.FitsWithRight(right) > 0)
             {
-                bossRoomExitType = (RoomExitType)((int)bossRoomExitType | RoomExitTypeExtensions.RIGHT);
-            }
-            List<Room> bossRoomReplacementCandidates =
-                palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomExitType && i.IsNormalRoom()).ToList();
-
-            Room? bossRoomReplacementRoom = bossRoomReplacementCandidates.Sample(r);
-            if (bossRoomReplacementRoom != null)
-            {
-                palace.BossRoom = new(bossRoomCandidate);
-                if (props.BossRoomConnect && palaceNumber < 7)
-                {
-                    palace.BossRoom.HasRightExit = true;
-                }
-                palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
-                break;
+                room.Right = right;
+                right.Left = room;
             }
         }
 
-        if (palace.BossRoom == null
-            || palace.Entrance == null
-            || (palaceNumber == 7 && palace.Tbird == null)
-            || (palaceNumber < 7 && palace.ItemRoom == null))
+        //Some percentage of the time, dropifying some rooms causes part of the palace to become
+        //unreachable because up was the only way to get there.
+        if (!palace.AllReachable())
         {
-            logger.Debug("Failed to place critical room in palace");
             palace.IsValid = false;
             return palace;
         }
 
-        //TODO: This is REALLY late to abandon ship on the whole palace, but 
-        //refactoring the boss placement to do the check properly without a million stupid room swaps
-        //was not a thing I felt like figuring out.
-        //Maybe we use ShuffleRooms()?
-        //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
-        if (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+        if(!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
         {
             palace.IsValid = false;
             return palace;
         }
+
 
         if (palace.AllRooms.Count != roomCount)
         {
             throw new Exception("Generated palace has the incorrect number of rooms");
         }
-
 
         palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
 

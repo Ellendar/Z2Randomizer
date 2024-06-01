@@ -4,7 +4,7 @@ using SD.Tools.Algorithmia.GeneralDataStructures;
 
 namespace RandomizerCore.Sidescroll;
 
-internal class RoomPool
+public class RoomPool
 {
     public List<Room> NormalRooms { get; set; } = [];
     public List<Room> Entrances { get; set; } = [];

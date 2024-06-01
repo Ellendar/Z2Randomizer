@@ -112,6 +112,7 @@ public enum FireOption
     RANDOM
 }
 
+/*
 [DefaultValue(VANILLA)]
 public enum NormalPalaceStyle
 {
@@ -151,18 +152,29 @@ public enum GPStyle
     [Description("Random")]
     RANDOM
 }
+*/
 
-//The old unified PalaceStyle is still used on the rando side, but moved
-//to separate effectivenesses for the config mapping
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
+    [Description("Vanilla")]
     VANILLA,
+    [Description("Shuffled")]
     SHUFFLED,
+    [Description("Reconstructed")]
     RECONSTRUCTED,
+    [Description("Sequential")]
     SEQUENTIAL,
-    CONDENSED,
-    CHAOS
+    [Description("Random Walk")]
+    RANDOM_WALK,
+    [Description("Chaos")]
+    CHAOS,
+    [Description("Random")]
+    RANDOM,
+    [Description("Random(All Same)")]
+    RANDOM_ALL,
+    [Description("Random(Per Palace)")]
+    RANDOM_PER_PALACE
 }
 
 public static class PalaceStyleExtensions
@@ -174,36 +186,6 @@ public static class PalaceStyleExtensions
             PalaceStyle.VANILLA => true,
             PalaceStyle.SHUFFLED => true,
             _ => false
-        };
-    }
-
-    public static PalaceStyle AsPalaceStyle(this GPStyle style)
-    {
-        return style switch
-        {
-            GPStyle.CHAOS => PalaceStyle.CHAOS,
-            GPStyle.SEQUENTIAL => PalaceStyle.SEQUENTIAL,
-            GPStyle.CONDENSED => PalaceStyle.CONDENSED,
-            GPStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
-            GPStyle.VANILLA => PalaceStyle.VANILLA,
-            GPStyle.SHUFFLED => PalaceStyle.SHUFFLED,
-            //Random intentionally not here, GPPalaceStyle should only be used on the config side,
-            //PalaceStyle on the rando side.
-            _ => throw new Exception("Unrecognized GPPalaceStyle conversion")
-        };
-    }
-
-    public static PalaceStyle AsPalaceStyle(this NormalPalaceStyle style)
-    {
-        return style switch
-        {
-            NormalPalaceStyle.CHAOS => PalaceStyle.CHAOS,
-            NormalPalaceStyle.SEQUENTIAL => PalaceStyle.SEQUENTIAL,
-            NormalPalaceStyle.CONDENSED => PalaceStyle.CONDENSED,
-            NormalPalaceStyle.RECONSTRUCTED => PalaceStyle.RECONSTRUCTED,
-            NormalPalaceStyle.VANILLA => PalaceStyle.VANILLA,
-            NormalPalaceStyle.SHUFFLED => PalaceStyle.SHUFFLED,
-            _ => throw new Exception("Unrecognized NormalPalaceStyle conversion")
         };
     }
 }
@@ -477,8 +459,9 @@ public static class Enums
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
-    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; } = ToDescriptions<NormalPalaceStyle>();
-    public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } = ToDescriptions<GPStyle>();
+    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }  = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
+    public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
+        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
     public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
