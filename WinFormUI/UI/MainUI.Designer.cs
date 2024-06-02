@@ -1311,7 +1311,6 @@ partial class MainUI
         ShortenPalaceLabel.TabIndex = 37;
         ShortenPalaceLabel.Text = "Shorten:";
         toolTip1.SetToolTip(ShortenPalaceLabel, "Reduces the number of rooms in the palace.");
-        ShortenPalaceLabel.Click += label11_Click;
         // 
         // useCustomRoomsBox
         // 

@@ -798,18 +798,19 @@ public partial class MainUI : Form
         };
         configuration.MaxHeartContainers = maxHeartsList.SelectedIndex switch
         {
-            0 => 1,
-            1 => 2,
-            2 => 3,
-            3 => 4,
-            4 => 5,
-            5 => 6,
-            6 => 7,
-            7 => 8,
-            8 => null,
-            9 => 9,
-            10 => 10,
-            11 => 11,
+            0 => StartingHeartsMaxOption.ONE,
+            1 => StartingHeartsMaxOption.TWO,
+            2 => StartingHeartsMaxOption.THREE,
+            3 => StartingHeartsMaxOption.FOUR,
+            4 => StartingHeartsMaxOption.FIVE,
+            5 => StartingHeartsMaxOption.SIX,
+            6 => StartingHeartsMaxOption.SEVEN,
+            7 => StartingHeartsMaxOption.EIGHT,
+            8 => StartingHeartsMaxOption.RANDOM,
+            9 => StartingHeartsMaxOption.PLUS_ONE,
+            10 => StartingHeartsMaxOption.PLUS_TWO,
+            11 => StartingHeartsMaxOption.PLUS_THREE,
+            12 => StartingHeartsMaxOption.PLUS_FOUR,
             _ => throw new Exception("Invalid StartHeartsMax setting")
         };
 
@@ -954,25 +955,25 @@ public partial class MainUI : Form
         //Palaces
         configuration.NormalPalaceStyle = palaceStyleList.SelectedIndex switch
         {
-            0 => NormalPalaceStyle.VANILLA,
-            1 => NormalPalaceStyle.SHUFFLED,
-            2 => NormalPalaceStyle.RECONSTRUCTED,
-            3 => NormalPalaceStyle.SEQUENTIAL,
-            4 => NormalPalaceStyle.CONDENSED,
-            5 => NormalPalaceStyle.CHAOS,
-            6 => NormalPalaceStyle.RANDOM_ALL,
-            7 => NormalPalaceStyle.RANDOM_PER_PALACE,
+            0 => PalaceStyle.VANILLA,
+            1 => PalaceStyle.SHUFFLED,
+            2 => PalaceStyle.RECONSTRUCTED,
+            3 => PalaceStyle.SEQUENTIAL,
+            4 => PalaceStyle.RANDOM_WALK,
+            5 => PalaceStyle.CHAOS,
+            6 => PalaceStyle.RANDOM_ALL,
+            7 => PalaceStyle.RANDOM_PER_PALACE,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
         configuration.GPStyle = gpStyleList.SelectedIndex switch
         {
-            0 => GPStyle.VANILLA,
-            1 => GPStyle.SHUFFLED,
-            2 => GPStyle.RECONSTRUCTED,
-            3 => GPStyle.SEQUENTIAL,
-            4 => GPStyle.CONDENSED,
-            5 => GPStyle.CHAOS,
-            6 => GPStyle.RANDOM,
+            0 => PalaceStyle.VANILLA,
+            1 => PalaceStyle.SHUFFLED,
+            2 => PalaceStyle.RECONSTRUCTED,
+            3 => PalaceStyle.SEQUENTIAL,
+            4 => PalaceStyle.RANDOM_WALK,
+            5 => PalaceStyle.CHAOS,
+            6 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid GP Style setting")
         };
         configuration.ShortenNormalPalaces = GetTripleCheckState(shortenNormalPalaceCheckbox);
@@ -1308,18 +1309,19 @@ public partial class MainUI : Form
             };
             maxHeartsList.SelectedIndex = configuration.MaxHeartContainers switch
             {
-                1 => 0,
-                2 => 1,
-                3 => 2,
-                4 => 3,
-                5 => 4,
-                6 => 5,
-                7 => 6,
-                8 => 7,
-                null => 8,
-                9 => 9,
-                10 => 10,
-                11 => 11,
+                StartingHeartsMaxOption.ONE => 0,
+                StartingHeartsMaxOption.TWO => 1,
+                StartingHeartsMaxOption.THREE => 2,
+                StartingHeartsMaxOption.FOUR => 3,
+                StartingHeartsMaxOption.FIVE => 4,
+                StartingHeartsMaxOption.SIX => 5,
+                StartingHeartsMaxOption.SEVEN => 6,
+                StartingHeartsMaxOption.EIGHT => 7,
+                StartingHeartsMaxOption.RANDOM => 8,
+                StartingHeartsMaxOption.PLUS_ONE => 9,
+                StartingHeartsMaxOption.PLUS_TWO => 10,
+                StartingHeartsMaxOption.PLUS_THREE => 11,
+                StartingHeartsMaxOption.PLUS_FOUR => 12,
                 _ => throw new Exception("Invalid MaxHearts setting")
             };
             startingTechsList.SelectedIndex = (configuration.StartingTechniques) switch
@@ -1448,25 +1450,25 @@ public partial class MainUI : Form
             //Palaces
             palaceStyleList.SelectedIndex = configuration.NormalPalaceStyle switch
             {
-                NormalPalaceStyle.VANILLA => 0,
-                NormalPalaceStyle.SHUFFLED => 1,
-                NormalPalaceStyle.RECONSTRUCTED => 2,
-                NormalPalaceStyle.SEQUENTIAL => 3,
-                NormalPalaceStyle.CONDENSED => 4,
-                NormalPalaceStyle.CHAOS => 5,
-                NormalPalaceStyle.RANDOM_ALL => 6,
-                NormalPalaceStyle.RANDOM_PER_PALACE => 7,
+                PalaceStyle.VANILLA => 0,
+                PalaceStyle.SHUFFLED => 1,
+                PalaceStyle.RECONSTRUCTED => 2,
+                PalaceStyle.SEQUENTIAL => 3,
+                PalaceStyle.RANDOM_WALK => 4,
+                PalaceStyle.CHAOS => 5,
+                PalaceStyle.RANDOM_ALL => 6,
+                PalaceStyle.RANDOM_PER_PALACE => 7,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             gpStyleList.SelectedIndex = configuration.GPStyle switch
             {
-                GPStyle.VANILLA => 0,
-                GPStyle.SHUFFLED => 1,
-                GPStyle.RECONSTRUCTED => 2,
-                GPStyle.SEQUENTIAL => 3,
-                GPStyle.CONDENSED => 4,
-                GPStyle.CHAOS => 5,
-                GPStyle.RANDOM => 6,
+                PalaceStyle.VANILLA => 0,
+                PalaceStyle.SHUFFLED => 1,
+                PalaceStyle.RECONSTRUCTED => 2,
+                PalaceStyle.SEQUENTIAL => 3,
+                PalaceStyle.RANDOM_WALK => 4,
+                PalaceStyle.CHAOS => 5,
+                PalaceStyle.RANDOM => 6,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
@@ -2234,10 +2236,5 @@ public partial class MainUI : Form
         {
             swapUpAndDownstabCheckbox.Enabled = true;
         }
-    }
-
-    private void label11_Click(object sender, EventArgs e)
-    {
-
     }
 }

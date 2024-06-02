@@ -14,7 +14,7 @@
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleOverworldEnemies}" Content="Shuffle Overworld Enemies" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceEnemies}" Content="Shuffle Palace Enemies" />
             <CheckBox IsChecked="{Binding Config.ShuffleDripperEnemy}" Content="Shuffle Dripper Enemy" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixLargeAndSmallEnemies}" Content="MixLargeAndSmallEnemies" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixLargeAndSmallEnemies}" Content="Mix Large And Small Enemies" />
             <CheckBox IsChecked="{Binding Config.GeneratorsAlwaysMatch}" Content="Generators Always Match" />
         </StackPanel>
         <StackPanel Grid.Column="1">

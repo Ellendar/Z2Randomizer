@@ -38,7 +38,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool startWithThunder;
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
-    private int? maxHeartContainers;
+    private StartingHeartsMaxOption maxHeartContainers;
     private StartingTechs startingTechs;
     private StartingLives startingLives;
     private int startingAttackLevel;
@@ -205,7 +205,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
     [Limit(11)]
     [Minimum(1)]
-    public int? MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
+    public StartingHeartsMaxOption MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
 
     public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }
 
@@ -1028,7 +1028,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         StartingMagicLevel = 1;
         StartingLifeLevel = 1;
 
-        MaxHeartContainers = 8;
+        MaxHeartContainers = StartingHeartsMaxOption.EIGHT;
         StartingHeartContainersMin = 8;
         StartingHeartContainersMax = 8;
 
@@ -1298,8 +1298,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         else
         {
-            config.PalacesToCompleteMin = Int32.Parse(startGemsString);
-            config.PalacesToCompleteMax = Int32.Parse(startGemsString);
+            config.PalacesToCompleteMin = int.Parse(startGemsString);
+            config.PalacesToCompleteMax = int.Parse(startGemsString);
         }
         config.MixLargeAndSmallEnemies = bits[5];
 
@@ -1338,11 +1338,11 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         string maxHeartsString = ((bits[0] ? 1 : 0) + (bits[1] ? 2 : 0) + (bits[2] ? 4 : 0) + (bits[3] ? 8 : 0) + 1).ToString();
         if (maxHeartsString == "9")
         {
-            config.MaxHeartContainers = null;
+            config.MaxHeartContainers = StartingHeartsMaxOption.RANDOM;
         }
         else
         {
-            config.MaxHeartContainers = Int32.Parse(maxHeartsString);
+            config.MaxHeartContainers = (StartingHeartsMaxOption)int.Parse(maxHeartsString);
         }
         switch ((bits[4] ? 1 : 0) + (bits[5] ? 2 : 0))
         {
@@ -1833,17 +1833,25 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.StartHearts = random.Next(startHeartsMin, startHeartsMax + 1);
 
         //+1/+2/+3
-        if (MaxHeartContainers == null)
+        if (MaxHeartContainers == StartingHeartsMaxOption.RANDOM)
         {
             properties.MaxHearts = random.Next(properties.StartHearts, 9);
         }
-        else if (MaxHeartContainers > 8)
+        else if ((int)MaxHeartContainers <= 8)
         {
-            properties.MaxHearts = Math.Min(properties.StartHearts + (int)MaxHeartContainers - 8, 8);
+            properties.MaxHearts = (int)MaxHeartContainers;
         }
         else
         {
-            properties.MaxHearts = (int)MaxHeartContainers;
+            int additionalHearts = MaxHeartContainers switch
+            {
+                StartingHeartsMaxOption.PLUS_ONE => 1,
+                StartingHeartsMaxOption.PLUS_TWO => 2,
+                StartingHeartsMaxOption.PLUS_THREE => 3,
+                StartingHeartsMaxOption.PLUS_FOUR => 4,
+                _ => throw new ImpossibleException("Invalid heart container max configuration")
+            };
+            properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
         }
         properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
 
@@ -2091,9 +2099,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV4_4Rooms)) {
             properties.AllowVanillaRooms = IncludeVanillaRooms ?? random.Next(2) == 1;
             properties.AllowV4Rooms = Includev4_0Rooms ?? random.Next(2) == 1;
-            //temporarily, so we can test rooms, UseCustomRooms automatically turn on v4_4 since there's no toggle
-            properties.AllowV4_4Rooms = UseCustomRooms;
-            //properties.AllowV4_4Rooms = Includev4_4Rooms == null ? random.Next(2) == 1 : (bool)IncludeVanillaRooms;
+            properties.AllowV4_4Rooms = Includev4_4Rooms ?? random.Next(2) == 1;
         }
 
         properties.BlockersAnywhere = BlockingRoomsInAnyPalace;
