@@ -10,31 +10,31 @@ namespace RandomizerCore;
 [DefaultValue(EIGHT)]
 public enum StartingHeartsMaxOption
 {
-    [Description("None")]
+    [Description("1")]
     ONE = 1,
-    [Description("None")]
+    [Description("2")]
     TWO = 2,
-    [Description("None")]
+    [Description("3")]
     THREE = 3,
-    [Description("None")]
+    [Description("4")]
     FOUR = 4,
-    [Description("None")]
+    [Description("5")]
     FIVE = 5,
-    [Description("None")]
+    [Description("6")]
     SIX = 6,
-    [Description("None")]
+    [Description("7")]
     SEVEN = 7,
-    [Description("None")]
+    [Description("8")]
     EIGHT = 8,
-    [Description("None")]
+    [Description("+1")]
     PLUS_ONE = 9,
-    [Description("None")]
+    [Description("+2")]
     PLUS_TWO = 10,
-    [Description("None")]
+    [Description("+3")]
     PLUS_THREE = 11,
-    [Description("None")]
+    [Description("+4")]
     PLUS_FOUR = 12,
-    [Description("None")]
+    [Description("Random")]
     RANDOM = 13,
 }
 
@@ -503,6 +503,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();
     public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions<BeepThreshold>();
     public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions<BeepFrequency>();
+    public static IEnumerable<EnumDescription> StartingHeartsMaxOptionList { get; } = ToDescriptions<StartingHeartsMaxOption>();
 
     public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
     {

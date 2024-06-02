@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace RandomizerCore;
 
 public enum Collectable
@@ -85,7 +87,8 @@ public static class CollectableExtensions
             Collectable.REFLECT_SPELL => true,
             Collectable.SPELL_SPELL => true,
             Collectable.THUNDER_SPELL => true,
-            _ => true
+            Collectable.DO_NOT_USE_ANTIFAIRY => false,
+            _ => throw new Exception("Invalid item type determining itemgets")
         };
     }
     public static string EnglishText(this Collectable collectable)
@@ -249,6 +252,16 @@ public static class CollectableExtensions
             Collectable.SPELL_SPELL => 6,
             Collectable.THUNDER_SPELL => 7,
             _ => throw new ImpossibleException("Invalid vanilla spell index")
+        };
+    }
+
+    public static bool IsInternalUse(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.DO_NOT_USE => true,
+            Collectable.DO_NOT_USE_ANTIFAIRY => true,
+            _ => false
         };
     }
 }

@@ -99,7 +99,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 140;
+    private static int DEBUG_THRESHOLD = 143;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -1078,7 +1078,7 @@ public class Hyrule
         bool changed = false;
         List<RequirementType> requireables = GetRequireables();
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
-        foreach (Location location in AllLocationsForReal().Where(i => i.Collectable != Collectable.DO_NOT_USE))
+        foreach (Location location in AllLocationsForReal().Where(i => !i.Collectable.IsInternalUse()))
         {
             bool hadItemPreviously = location.ItemGet;
             bool hasItemNow;
@@ -3514,7 +3514,7 @@ CustomFileSelectData:
 
         //Debug.WriteLine("-" + count + "- " + accessibleMagicContainers);
         //SHUFFLABLE_STARTING_ITEMS.Where(i => ItemGet[item] == false).ToList().ForEach(i => Debug.WriteLine(Enum.GetName(typeof(Item), i)));
-        foreach(Location location in AllLocationsForReal().Where(i => !i.ItemGet && i.Collectable != Collectable.DO_NOT_USE))
+        foreach(Location location in AllLocationsForReal().Where(i => !i.ItemGet && !i.Collectable.IsInternalUse()))
         {
             sb.AppendLine(location.Name + " / " + Enum.GetName(typeof(Collectable), location.Collectable));
         }

@@ -52,9 +52,9 @@
                 <NumericUpDown Value="{Binding Config.StartingHeartContainersMax}"
                                FormatString="N0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="{Binding Config.StartingHeartContainersMin}" Maximum="8" assists:TextFieldAssist.Hints="Max"/>
-                <NumericUpDown Value="{Binding Config.MaxHeartContainers}"
-                               FormatString="+0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Available"/>
+              <ComboBox assists:ComboBoxAssist.Label="Max" Theme="{StaticResource MaterialOutlineComboBox}"
+                        ItemsSource="{Binding Source={x:Static rc:Enums.StartingHeartsMaxOptionList}}"
+                        SelectedItem="{Binding Config.MaxHeartContainers, Converter={x:Static ui:Util.EnumConvert}}"/>
             </StackPanel>
             <Separator/>
             <TextBlock HorizontalAlignment="Center">Starting Level</TextBlock>

@@ -117,6 +117,10 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
                 {
                     palace.BossRoom = new(bossRoomCandidate);
                     palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
+                    if (props.BossRoomConnect && palace.Number < 7)
+                    {
+                        palace.BossRoom.HasRightExit = true;
+                    }
                     palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
                     break;
                 }

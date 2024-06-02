@@ -86,6 +86,7 @@ public class CustomTexts
         { Collectable.FAIRY_SPELL, 46 },
         { Collectable.DOWNSTAB, 47 },
         { Collectable.FIRE_SPELL, 70 },
+        { Collectable.DASH_SPELL, 70 },
         { Collectable.UPSTAB, 82 },
         { Collectable.REFLECT_SPELL, 81 },
         { Collectable.SPELL_SPELL, 93 },
@@ -554,7 +555,7 @@ public class CustomTexts
         List<int> placedTowns = [];
 
         List<Collectable> items = locations.Select(i => i.Collectable).ToList();
-        items = items.Where(i => i != Collectable.DO_NOT_USE).ToList();
+        items = items.Where(i => !i.IsInternalUse()).ToList();
 
         if (useSpellItemHints)
         {
