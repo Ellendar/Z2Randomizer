@@ -1,4 +1,5 @@
-﻿.segment "PRG4"
+﻿.macpack common
+.segment "PRG4"
 
 ProjectileYPosition = $30
 ProjectileXVelocity = $77

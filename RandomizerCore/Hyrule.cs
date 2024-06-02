@@ -99,7 +99,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 1;
+    private static int DEBUG_THRESHOLD = 140;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -958,7 +958,7 @@ public class Hyrule
                 {
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
-                    return true;
+                    return false;
                 }
                 return false;
             }
