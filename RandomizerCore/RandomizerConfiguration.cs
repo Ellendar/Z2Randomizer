@@ -203,8 +203,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [Minimum(1)]
     public int? StartingHeartContainersMax { get => startingHeartContainersMax; set => SetField(ref startingHeartContainersMax, value); }
 
-    [Limit(11)]
-    [Minimum(1)]
     public StartingHeartsMaxOption MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
 
     public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }

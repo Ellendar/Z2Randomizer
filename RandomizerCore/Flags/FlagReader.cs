@@ -175,7 +175,9 @@ public class FlagReader
         int limit = Enum.GetValues(typeof(T)).Length - 1;
 
         int take = (byte)Take((int)Math.Log(limit, 2) + 1);
-        return (T)Enum.ToObject(typeof(T), take);
+
+        return (T)Enum.GetValues(typeof(T)).GetValue(take);
+        //return (T)Enum.ToObject(typeof(T), take);
     }
 
     public T? ReadNullableEnum<T>() where T : struct, IConvertible

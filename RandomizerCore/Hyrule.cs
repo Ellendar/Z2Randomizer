@@ -3361,14 +3361,39 @@ public class Hyrule
     public void PrintSpoiler(LogLevel logLevel)
     {
         logger.Log(logLevel, "ITEMS:");
+        List<Location> MC_Locations = [];
+        List<Location> HC_Locations = [];
+
+        StringBuilder sb = new();
+
         foreach (Collectable item in Enum.GetValues(typeof(Collectable)))
         {
             if (item.IsItemGetItem() && ItemGet.ContainsKey(item))
             {
                 Location? location = AllLocationsForReal().Where(i => i.Collectable == item).FirstOrDefault();
-                logger.Log(logLevel, item.ToString() + "(" + ItemGet[item] + ") : " + location?.Name);
+                sb.AppendLine(item.ToString() + "(" + ItemGet[item] + ") : " + location?.Name);
             }
         }
+        foreach(Location location in AllLocationsForReal())
+        {
+            if(location.Collectable == Collectable.HEART_CONTAINER)
+            {
+                HC_Locations.Add(location);
+            }
+            if (location.Collectable == Collectable.MAGIC_CONTAINER)
+            {
+                MC_Locations.Add(location);
+            }
+        }
+        foreach (Location location in HC_Locations)
+        {
+            sb.AppendLine("HeartContainer: " + location.Name);
+        }
+        foreach (Location location in MC_Locations)
+        {
+            sb.AppendLine("MagicContainer: " + location.Name);
+        }
+        logger.Log(logLevel, sb.ToString());
     }
 
     /// <summary>
