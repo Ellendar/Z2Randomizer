@@ -38,10 +38,10 @@ public enum Collectable
     LIFE_SPELL = 0x1e,
     FAIRY_SPELL = 0x1f,
     FIRE_SPELL = 0x20,
-    DASH_SPELL = 0x21,
-    REFLECT_SPELL = 0x22,
-    SPELL_SPELL = 0x23,
-    THUNDER_SPELL = 0x24
+    REFLECT_SPELL = 0x21,
+    SPELL_SPELL = 0x22,
+    THUNDER_SPELL = 0x23,
+    DASH_SPELL = 0x24,
 }
 
 

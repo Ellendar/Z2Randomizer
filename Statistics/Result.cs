@@ -64,7 +64,7 @@ class Result
     public Result(Hyrule hyrule)
     {
         Flags = hyrule.Flags;
-        Seed = hyrule.Seed;
+        Seed = hyrule.SeedHash;
 
         //Palace Generation Attempts
         P1GenerationAttempts = hyrule.palaces[0].Generations;

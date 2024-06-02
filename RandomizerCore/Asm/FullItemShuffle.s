@@ -45,10 +45,10 @@ ITEM_JUMP_SPELL = $1d
 ITEM_LIFE_SPELL = $1e
 ITEM_FAIRY_SPELL = $1f
 ITEM_FIRE_SPELL = $20
-ITEM_DASH_SPELL = $21
-ITEM_REFLECT_SPELL = $22
-ITEM_SPELL_SPELL = $23
-ITEM_THUNDER_SPELL = $24
+ITEM_REFLECT_SPELL = $21
+ITEM_SPELL_SPELL = $22
+ITEM_THUNDER_SPELL = $23
+ITEM_DASH_SPELL = $24
 
 ; These are two unused locations in the save game that we can use for custom item get flags
 LocationTableMisc = $0795
@@ -298,8 +298,13 @@ ExpandedGetItem:
 ;@NotJar:
     cpy #ITEM_SHIELD_SPELL
     bcc @NotSpell
+        cpy #ITEM_DASH_SPELL
+        bcc @NotDashSpell
+            ; Dash always replaces fire, so if we get the dash spell load fire instead
+            ldy #ITEM_FIRE_SPELL
+    @NotDashSpell:
         ; flash screen as if you got the spell from a wizard 
-        lda #$C0
+        lda #$c0
         sta $074b
         ; Update the cursor position to point to the new spell
         tya
@@ -425,10 +430,10 @@ ItemTileTable:
     .byte $d7, $d9 ; Life Spell
     .byte $cb, $cd ; Fairy Spell
     .byte $cf, $d1 ; Fire Spell
-    .byte $c7, $c9 ; Dash Spell
     .byte $db, $dd ; Reflect Spell
     .byte $f1, $f3 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
+    .byte $c7, $c9 ; Dash Spell
 
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest
@@ -455,3 +460,4 @@ ItemPaletteTable:
     .byte $01 ; Reflect Spell
     .byte $01 ; Spell Spell
     .byte $01 ; Thunder Spell
+    .byte $01 ; Dash Spell

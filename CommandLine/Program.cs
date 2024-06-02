@@ -20,6 +20,9 @@ public class Program
     [Option(ShortName = "r", Description = "Path to the base ROM file")]
     public string? Rom { get; }
 
+    [Option(ShortName = "o", Description = "Path to the folder to save the ROM")]
+    public string? OutputPath { get; }
+
     [Option(ShortName = "s", Description = "[Optional] Seed used to generate the shuffled ROM")]
     public int? Seed { get; set; }
 
@@ -114,9 +117,11 @@ public class Program
 
         if (rom != null)
         {
+            
             char os_sep = Path.DirectorySeparatorChar;
             var filename = Rom!;
-            string newFileName = filename[..(filename.LastIndexOf(os_sep) + 1)] + $"Z2_{Seed}_{Flags}.nes";
+            var outpath = OutputPath ?? filename[..filename.LastIndexOf(os_sep)];
+            string newFileName =  $"{outpath}/Z2_{Seed}_{Flags}.nes";
             File.WriteAllBytes(newFileName, rom);
             logger.Info("File " + "Z2_" + this.Seed + "_" + this.Flags + ".nes" + " has been created!");
         }
