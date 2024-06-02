@@ -116,6 +116,7 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
                     (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == bossRoomCandidate.IsDropZone))
                 {
                     palace.BossRoom = new(bossRoomCandidate);
+                    palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
                     palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
                     break;
                 }
@@ -125,7 +126,8 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
         if (palace.BossRoom == null
             || palace.Entrance == null
             || (palace.Number == 7 && palace.Tbird == null)
-            || (palace.Number < 7 && palace.ItemRoom == null))
+            || (palace.Number < 7 && palace.ItemRoom == null)
+            || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird()))
         {
             logger.Debug("Failed to place critical room in palace");
             return false;

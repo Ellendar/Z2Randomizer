@@ -1,81 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using NLog;
 using RandomizerCore.Overworld;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RandomizerCore;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Text : IEquatable<Text>
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     public string RawText { get; private set; }
-    public List<char> TextChars { get; private set; }
+    public List<char> EncodedText { get; private set; }
 
     public Text()
     {
-        TextChars = Util.ToGameText("I know$nothing", true);
+        EncodedText = Util.ToGameText("I know$nothing", true);
     }
 
     public Text(List<char> text)
     {
         RawText = Util.FromGameText(text);
-        TextChars = text;
+        EncodedText = text;
     }
     public Text(string text)
     {
         RawText = text;
-        TextChars = Util.ToGameText(text, true);
+        EncodedText = Util.ToGameText(text, true);
     }
 
-    public void GenerateHelpfulHint(Location location)
+    public Text(string text, Collectable collectable)
     {
-        Collectable hintItem = location.Collectable;
-        string hint = "";
-        if (location.PalaceNumber == 1)
+        RawText = text;
+        ApplyCollectableName(collectable);
+    }
+
+    public void ApplyCollectableName(Collectable collectable)
+    {
+        if (RawText.Contains("%%"))
         {
-            hint += "horsehead$neighs$with the$";
+            RawText = RawText.Replace("%%", collectable.EnglishText());
         }
-        else if (location.PalaceNumber == 2)
+        else if (RawText.Contains('%'))
         {
-            hint += "helmethead$guards the$";
-        }
-        else if (location.PalaceNumber == 3)
-        {
-            hint += "rebonack$rides$with the$";
-        }
-        else if (location.PalaceNumber == 4)
-        {
-            hint += "carock$disappears$with the$";
-        }
-        else if (location.PalaceNumber == 5)
-        {
-            hint += "gooma sits$on the$";
-        }
-        else if (location.PalaceNumber == 6)
-        {
-            hint += "barba$slithers$with the$";
-        }
-        else if (location.Continent == Continent.EAST)
-        {
-            hint += "go east to$find the$";
-        }
-        else if (location.Continent == Continent.WEST)
-        {
-            hint += "go west to$find the$";
-        }
-        else if (location.Continent == Continent.DM)
-        {
-            hint += "death$mountain$holds the$";
+            RawText = RawText.Replace("%", collectable.SingleLineText());
         }
         else
         {
-            hint += "in a maze$lies the$";
+            logger.Warn("Invalid collectable in hint generation");
+            RawText = "THIS TEXT$IS BROKEN$TELL$ELLENDAR";
+        }
+        EncodedText = Util.ToGameText(RawText, true);
+    }
+
+    public static Text GenerateHelpfulHint(Location location)
+    {
+        string hint = "";
+        if (location.PalaceNumber == 1)
+        {
+            hint += "horsehead$neighs$with the$%";
+        }
+        else if (location.PalaceNumber == 2)
+        {
+            hint += "helmethead$guards the$%%";
+        }
+        else if (location.PalaceNumber == 3)
+        {
+            hint += "rebonack$rides$with the$%";
+        }
+        else if (location.PalaceNumber == 4)
+        {
+            hint += "carock$disappears$with the$%";
+        }
+        else if (location.PalaceNumber == 5)
+        {
+            hint += "gooma sits$on the$%%";
+        }
+        else if (location.PalaceNumber == 6)
+        {
+            hint += "barba$slithers$with the$%";
+        }
+        else if (location.Continent == Continent.EAST)
+        {
+            hint += "go east to$find the$%%";
+        }
+        else if (location.Continent == Continent.WEST)
+        {
+            hint += "go west to$find the$%%";
+        }
+        else if (location.Continent == Continent.DM)
+        {
+            hint += "death$mountain$holds the$%";
+        }
+        else
+        {
+            hint += "in a maze$lies the$%%";
         }
 
-        hint += hintItem.SingleLineText();
-
-        RawText = hint;
-        TextChars = Util.ToGameText(hint, true);
+        return new Text(hint, location.Collectable);
     }
 
     public string GetDebuggerDisplay()
@@ -91,11 +116,11 @@ public class Text : IEquatable<Text>
     public bool Equals(Text other)
     {
         return other is not null &&
-               EqualityComparer<List<char>>.Default.Equals(TextChars, other.TextChars);
+               EqualityComparer<List<char>>.Default.Equals(EncodedText, other.EncodedText);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TextChars);
+        return HashCode.Combine(EncodedText);
     }
 }

@@ -207,9 +207,8 @@ public static class CollectableExtensions
     {
         return collectable switch
         {
-            Collectable.WATER => true,
-            Collectable.BAGUS_NOTE => true,
-            Collectable.MIRROR => true,
+            Collectable.DOWNSTAB => true,
+            Collectable.UPSTAB => true,
             _ => false
         };
     }
@@ -230,6 +229,8 @@ public static class CollectableExtensions
             Collectable.TROPHY => RequirementType.TROPHY,
             Collectable.MEDICINE => RequirementType.MEDICINE,
             Collectable.CHILD => RequirementType.CHILD,
+            Collectable.MIRROR => RequirementType.MIRROR,
+            Collectable.WATER => RequirementType.WATER,
             _ => null
         };
     }

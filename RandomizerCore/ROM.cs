@@ -223,9 +223,9 @@ public class ROM
             Put(ptrptr, (byte)low);
             Put(ptrptr + 1, (byte)high);
             ptrptr = ptrptr + 2;
-            for (int j = 0; j < texts[i].TextChars.Count; j++)
+            for (int j = 0; j < texts[i].EncodedText.Count; j++)
             {
-                Put(textptr, (byte)texts[i].TextChars[j]);
+                Put(textptr, (byte)texts[i].EncodedText[j]);
                 textptr++;
                 ptr++;
             }

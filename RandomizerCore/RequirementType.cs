@@ -18,5 +18,7 @@ public enum RequirementType
     EIGHT_CONTAINERS, 
     TROPHY, 
     MEDICINE, 
-    CHILD
+    CHILD,
+    MIRROR,
+    WATER
 }

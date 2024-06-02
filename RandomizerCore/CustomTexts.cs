@@ -579,8 +579,7 @@ public class CustomTexts
             {
                 throw new ImpossibleException("Error generating hint for unplaced item");
             }
-            Text hint = new();
-            hint.GenerateHelpfulHint(hintLocation);
+            Text hint = Text.GenerateHelpfulHint(hintLocation);
             int town = r.Next(9);
             while (placedTowns.Contains(town))
             {
@@ -611,40 +610,33 @@ public class CustomTexts
         return placedIndex;
     }
 
-    private static void GenerateSpellHints(IEnumerable<Location> itemLocs, List<Text> hints, RandomizerProperties props)
+    private static void GenerateSpellHints(IEnumerable<Location> locations, List<Text> hints, RandomizerProperties props)
     {
-
-        foreach (Location itemLocation in itemLocs)
+        if(props.SpellItemHints && !props.StartWithSpellItems)
         {
-            if (itemLocation.Collectable == Collectable.TROPHY && !props.StartWithSpellItems)
+            Location itemLocation;
+
+            itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.TROPHY)!;
+            Text trophyHint = Text.GenerateHelpfulHint(itemLocation);
+            hints[trophyIndex] = trophyHint;
+
+            itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MEDICINE)!;
+            Text medHint = Text.GenerateHelpfulHint(itemLocation);
+            hints[medIndex] = medHint;
+
+            itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.CHILD)!;
+            Text kidHint = Text.GenerateHelpfulHint(itemLocation);
+            hints[kidIndex] = kidHint;
+
+            if(props.IncludeQuestItemsInShuffle)
             {
-                Text trophyHint = new Text();
-                trophyHint.GenerateHelpfulHint(itemLocation);
-                hints[trophyIndex] = trophyHint;
-            }
-            else if (itemLocation.Collectable == Collectable.MEDICINE && !props.StartWithSpellItems)
-            {
-                Text medHint = new Text();
-                medHint.GenerateHelpfulHint(itemLocation);
-                hints[medIndex] = medHint;
-            }
-            else if (itemLocation.Collectable == Collectable.CHILD && !props.StartWithSpellItems)
-            {
-                Text kidHint = new Text();
-                kidHint.GenerateHelpfulHint(itemLocation);
-                hints[kidIndex] = kidHint;
-            }
-            else if (itemLocation.Collectable == Collectable.MIRROR && !props.StartWithSpellItems)
-            {
-                Text waterHint = new Text();
-                waterHint.GenerateHelpfulHint(itemLocation);
-                hints[kidIndex] = waterHint;
-            }
-            else if (itemLocation.Collectable == Collectable.WATER && !props.StartWithSpellItems)
-            {
-                Text kidHint = new Text();
-                kidHint.GenerateHelpfulHint(itemLocation);
-                hints[kidIndex] = kidHint;
+                itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MIRROR)!;
+                Text mirrorHint = Text.GenerateHelpfulHint(itemLocation);
+                hints[mirrorIndex] = mirrorHint;
+
+                itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.WATER)!;
+                Text waterHint = Text.GenerateHelpfulHint(itemLocation);
+                hints[waterIndex] = waterHint;
             }
         }
     }
@@ -677,20 +669,8 @@ public class CustomTexts
         {
             collectableWizardText = DEFAULT_WIZARD_COLLECTABLE;
         }
-        
-        if (collectableWizardText.Contains("%%"))
-        {
-            return new Text(collectableWizardText.Replace("%%", collectable.EnglishText()));
-        }
-        else if (collectableWizardText.Contains("%"))
-        {
-            return new Text(collectableWizardText.Replace("%", collectable.SingleLineText()));
-        }
-        else
-        {
-            logger.Error("Invalid collectable in hint generation");
-            return new Text("THIS TEXT$IS BROKEN$TELL$ELLENDAR");
-        }
+
+        return new Text(collectableWizardText, collectable);
     }
 
     private static int TextLength(List<Text> texts)
@@ -698,7 +678,7 @@ public class CustomTexts
         int sum = 0;
         for (int i = 0; i < texts.Count(); i++)
         {
-            sum += texts[i].TextChars.Count;
+            sum += texts[i].EncodedText.Count;
         }
         return sum;
     }

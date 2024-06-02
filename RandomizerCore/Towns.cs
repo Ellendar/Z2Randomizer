@@ -8,10 +8,10 @@ internal class Towns
     {
         { Town.RAURU, new Requirements() },
         { Town.RUTO, new Requirements(new RequirementType[] {RequirementType.TROPHY }) },
-        { Town.SARIA_NORTH, new Requirements() },
+        { Town.SARIA_NORTH, new Requirements(new RequirementType[] {RequirementType.MIRROR }) },
         { Town.MIDO_WEST, new Requirements(new RequirementType[] {RequirementType.MEDICINE }) },
         { Town.MIDO_CHURCH, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
-        { Town.NABOORU, new Requirements(new RequirementType[] {RequirementType.FIVE_CONTAINERS }) },
+        { Town.NABOORU, new Requirements([], [[RequirementType.WATER, RequirementType.FIVE_CONTAINERS]]) },
         { Town.DARUNIA_WEST, new Requirements([], [[RequirementType.CHILD, RequirementType.SIX_CONTAINERS]]) },
         { Town.DARUNIA_ROOF, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
         { Town.NEW_KASUTO, new Requirements(new RequirementType[] {RequirementType.SEVEN_CONTAINERS })  },

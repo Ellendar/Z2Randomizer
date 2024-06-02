@@ -3867,7 +3867,7 @@ FREE_UNTIL $c2ca
             var hint = hints[i];
             a.Reloc();
             a.Label($"HintText{i}");
-            a.Byt(hint.TextChars.Select(c => (byte)c).ToArray());
+            a.Byt(hint.EncodedText.Select(c => (byte)c).ToArray());
         }
 
         a.Reloc();
