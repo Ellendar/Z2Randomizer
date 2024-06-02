@@ -7,6 +7,37 @@ using System.Reflection;
 
 namespace RandomizerCore;
 
+[DefaultValue(EIGHT)]
+public enum StartingHeartsMaxOption
+{
+    [Description("None")]
+    ONE = 1,
+    [Description("None")]
+    TWO = 2,
+    [Description("None")]
+    THREE = 3,
+    [Description("None")]
+    FOUR = 4,
+    [Description("None")]
+    FIVE = 5,
+    [Description("None")]
+    SIX = 6,
+    [Description("None")]
+    SEVEN = 7,
+    [Description("None")]
+    EIGHT = 8,
+    [Description("None")]
+    PLUS_ONE = 9,
+    [Description("None")]
+    PLUS_TWO = 10,
+    [Description("None")]
+    PLUS_THREE = 11,
+    [Description("None")]
+    PLUS_FOUR = 12,
+    [Description("None")]
+    RANDOM = 13,
+}
+
 [DefaultValue(NONE)]
 public enum StartingTechs
 {

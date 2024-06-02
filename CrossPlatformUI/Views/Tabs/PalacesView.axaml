@@ -28,10 +28,10 @@
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_0Rooms}" Content="Include 4.0 Rooms" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_4Rooms}" Content="Include 4.4 Rooms" />
             <Separator/>
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenGP}" Content="Shorten GP" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenNormalPalaces}" Content="Shorten Normal Palaces" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.TBirdRequired}" Content="Thunder Bird Required" />
             <CheckBox IsEnabled="{Binding !Config.TBirdRequired}" IsChecked="{Binding Config.RemoveTBird}" Content="Remove Thunder Bird" />
+            <Separator/>
+            <CheckBox IsThreeState="False" IsChecked="{Binding Config.UseCustomRooms}" Content="Use Custom Rooms File" />
 
         </StackPanel>
         <StackPanel Grid.Column="1">

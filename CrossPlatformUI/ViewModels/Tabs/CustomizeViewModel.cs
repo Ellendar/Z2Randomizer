@@ -93,7 +93,17 @@ public class CustomizeViewModel : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
-    
+
+    public bool DisableHUDLag
+    {
+        get => Main.Config.DisableHUDLag;
+        set
+        {
+            Main.Config.DisableHUDLag = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
     [JsonIgnore]
     public MainViewModel Main { get; }
 }
