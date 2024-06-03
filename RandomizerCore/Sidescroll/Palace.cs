@@ -374,52 +374,48 @@ public class Palace
                 return false;
             }
         }
-        CheckPaths(entrance, Direction.WEST);
-        foreach (Room r in AllRooms)
+        List<Room> reachedRooms = [];
+        List<(Room, Direction)> roomsToCheck = [(entrance, Direction.WEST)];
+        while (roomsToCheck.Count > 0)
         {
-            if (!r.IsPlaced)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void CheckPaths(Room r, Direction originDirection)
-    {
-        if (!r.IsPlaced)
-        {
-            //Debug.WriteLine(r.PalaceGroup + " " + r.Map);
+            Room room = roomsToCheck.Last().Item1;
+            Direction originDirection = roomsToCheck.Last().Item2;
             //For required thunderbird, you can't path backwards into tbird room
-            if ((Number == 7) && r.IsThunderBirdRoom)
+            if ((Number == 7 && room.IsThunderBirdRoom) 
+                || (Number < 7 && room.IsBossRoom))
             {
                 if (originDirection == Direction.EAST)
                 {
-                    r.IsPlaced = false;
-                    return;
+                    return false;
                 }
             }
-            r.IsPlaced = true;
-            if (r.Left != null)
+            roomsToCheck.Remove(roomsToCheck.Last());
+            if (reachedRooms.Contains(room))
             {
-                CheckPaths(r.Left, Direction.EAST);
+                continue;
+            }
+            reachedRooms.Add(room);
+            if (room.Left != null && originDirection != Direction.WEST)
+            {
+                roomsToCheck.Add((room.Left, Direction.EAST));
             }
 
-            if (r.Right != null)
+            if (room.Right != null && originDirection != Direction.EAST)
             {
-                CheckPaths(r.Right, Direction.WEST);
+                roomsToCheck.Add((room.Right, Direction.WEST));
             }
 
-            if (r.Up != null)
+            if (room.Up != null && originDirection != Direction.NORTH)
             {
-                CheckPaths(r.Up, Direction.SOUTH);
+                roomsToCheck.Add((room.Up, Direction.SOUTH));
             }
 
-            if (r.Down != null)
+            if (room.Down != null && originDirection != Direction.SOUTH)
             {
-                CheckPaths(r.Down, Direction.NORTH);
+                roomsToCheck.Add((room.Down, Direction.NORTH));
             }
         }
+        return !AllRooms.Any(i => !reachedRooms.Contains(i));
     }
 
     private bool CanEnterBossFromLeft(Room b)
@@ -1126,7 +1122,6 @@ public class Palace
     {
         foreach (Room r in AllRooms)
         {
-            r.IsPlaced = false;
             r.IsReachable = false;
             r.IsBeforeTbird = false;
         }

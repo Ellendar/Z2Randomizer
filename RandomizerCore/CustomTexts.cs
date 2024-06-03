@@ -51,12 +51,15 @@ public class CustomTexts
     private const int riverManTextIndex = 36;
     //private const int downstabTextIndex = 47;
     //private const int upstabTextIndex = 82;
-    private const int trophyIndex = 13;
-    private const int medIndex = 43;
-    private const int kidIndex = 79;
+    private const int trophySpellHintIndex = 13;
+    private const int medicineSpellHintIndex = 43;
+    private const int childSpellHintIndex = 79;
+    private const int waterSpellHintIndex = 79;
+    private const int mirrorSpellHintIndex = 65;
+
     private const int baguTextIndex = 48;
-    private const int waterIndex = 63;
-    private const int mirrorIndex = 21;
+    private const int gotWaterTextIndex = 63;
+    private const int gotMirrorTextIndex = 21;
 
     private const int HELPFUL_HINTS_COUNT = 4;
 
@@ -339,7 +342,7 @@ public class CustomTexts
             Text? mirrorText = GenerateMirrorTableText(baguLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (mirrorText != null)
             {
-                texts[mirrorIndex] = mirrorText;
+                texts[gotMirrorTextIndex] = mirrorText;
             }
 
             if (props.BagusWoods)
@@ -428,9 +431,9 @@ public class CustomTexts
         return baguHint;
     }
 
-    private static void GenerateTownNameHints(List<Text> texts, IEnumerable<Location> itemLocs, bool linkedFire)
+    private static void GenerateTownNameHints(List<Text> texts, IEnumerable<Location> locations, bool linkedFire)
     {
-        foreach (Location location in itemLocs.Where(i => i.ActualTown != 0 && i.ActualTown.VanillaTownOrder() != 0))
+        foreach (Location location in locations.Where(i => i.VanillaCollectable.IsSpell()))
         {
             texts[TOWN_SIGN_INDEXES[location.ActualTown]] = GenerateTownSignHint(location.Collectable, linkedFire);
         }
@@ -619,25 +622,25 @@ public class CustomTexts
 
             itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.TROPHY)!;
             Text trophyHint = Text.GenerateHelpfulHint(itemLocation);
-            hints[trophyIndex] = trophyHint;
+            hints[trophySpellHintIndex] = trophyHint;
 
             itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MEDICINE)!;
             Text medHint = Text.GenerateHelpfulHint(itemLocation);
-            hints[medIndex] = medHint;
+            hints[medicineSpellHintIndex] = medHint;
 
             itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.CHILD)!;
             Text kidHint = Text.GenerateHelpfulHint(itemLocation);
-            hints[kidIndex] = kidHint;
+            hints[childSpellHintIndex] = kidHint;
 
             if(props.IncludeQuestItemsInShuffle)
             {
                 itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MIRROR)!;
                 Text mirrorHint = Text.GenerateHelpfulHint(itemLocation);
-                hints[mirrorIndex] = mirrorHint;
+                hints[mirrorSpellHintIndex] = mirrorHint;
 
                 itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.WATER)!;
                 Text waterHint = Text.GenerateHelpfulHint(itemLocation);
-                hints[waterIndex] = waterHint;
+                hints[waterSpellHintIndex] = waterHint;
             }
         }
     }
@@ -646,7 +649,8 @@ public class CustomTexts
     {
         List<Text> vanillaText = new(texts);
         List<Text> usedWizardTexts = [];
-        foreach(Location location in itemLocs.Where(i => i.ActualTown != 0 && i.ActualTown.VanillaTownOrder() != 0))
+        List<Location> wizardLocations = itemLocs.Where(i => i.ActualTown != 0 && i.ActualTown.IsWizardTown()).ToList();
+        foreach (Location location in wizardLocations)
         {
             Text wizardHint;
             do

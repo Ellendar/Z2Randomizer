@@ -2243,6 +2243,11 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             properties.IncludeLavaInEncounterShuffle = false;
         }
 
+        if(properties.IncludeSwordTechsInShuffle)
+        {
+            properties.SwapUpAndDownStab = false;
+        }
+
         if (properties is { ShuffleOverworldEnemies: false, ShufflePalaceEnemies: false })
         {
             properties.MixLargeAndSmallEnemies = false;

@@ -62,7 +62,7 @@ public class Room : IJsonOnDeserialized
 
 
     public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
-    public bool IsPlaced { get; set; }
+    //public bool IsPlaced { get; set; }
 	
 	//This still exists just to facilitate serialization because I didn't want to mess with it.
     //It's also used for the vanilla rooms to build the vanilla room tree, which should probably just be

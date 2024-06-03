@@ -39,6 +39,24 @@ public static class TownExtensions
         };
     }
 
+    public static bool IsWizardTown(this Town town)
+    {
+        return town switch
+        {
+            Town.RAURU => true,
+            Town.RUTO => true,
+            Town.SARIA_NORTH => true,
+            Town.MIDO_WEST => true,
+            Town.NABOORU => true,
+            Town.DARUNIA_WEST => true,
+            Town.NEW_KASUTO => true,
+            Town.OLD_KASUTO => true,
+            Town.MIDO_CHURCH => true,
+            Town.DARUNIA_ROOF => true,
+            _ => false
+        };
+    }
+
     public static bool AppearsOnMap(this Town town)
     {
         return town switch

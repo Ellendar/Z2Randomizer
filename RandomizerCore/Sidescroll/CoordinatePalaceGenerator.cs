@@ -130,8 +130,7 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
         if (palace.BossRoom == null
             || palace.Entrance == null
             || (palace.Number == 7 && palace.Tbird == null)
-            || (palace.Number < 7 && palace.ItemRoom == null)
-            || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird()))
+            || (palace.Number < 7 && palace.ItemRoom == null))
         {
             logger.Debug("Failed to place critical room in palace");
             return false;
@@ -142,7 +141,7 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
         //was not a thing I felt like figuring out.
         //Maybe we use ShuffleRooms()?
         //So for now we suffer lesser performance (but still way better than Reconstructed so do we care?)
-        if (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+        if (!palace.AllReachable() || (palace.Number == 7 && props.RequireTbird && !palace.RequiresThunderbird()))
         {
             return false;
         }

@@ -110,7 +110,7 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             {
                 continue;
             }
-            double dropChance = .5d;
+            double dropChance = .15d;
             Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
             //if we dropped into this room
             if (upRoom != null && upRoom.HasDrop)
