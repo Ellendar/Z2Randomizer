@@ -60,7 +60,7 @@ DialogConditionsDefault = $b5c7
 DownStabGetItem = $b4bf
 UpStabGetItem = $b4d7
 TalkWithStandingStillNpc = $b554
-MirrorOrWaterGetItem = $b5ae
+MirrorWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
 DontKillEnemyFlag = $0122
 
@@ -77,7 +77,7 @@ JankPowerOfTwoMask = $c28d
 ; $08,$04,$02,$01,$80,$40,$20,$10
 JankPowerOfTwo = $c28d
 
-.org MirrorOrWaterGetItem
+.org MirrorWaterGetItem
     jmp MirrorOrWaterLocation
 FREE_UNTIL $b5b9
 
@@ -167,6 +167,25 @@ TownToItemTable:
     .byte FIRE_SPELL_ITEMLOC
     .byte SPELL_SPELL_ITEMLOC
     .byte THUNDER_SPELL_ITEMLOC
+
+; Update a few hardcoded positions in the rom to change "mirror" objects in Darunia and Mido into sign objects
+; Change the mirror object $21 to sign object $22. the high two bits are for X position
+.org $88ee ; Mido Left
+    .byte $22
+.org $890c ; Mido Right
+    .byte $c0 | $22
+.org $8954 ; Darunia Left
+    .byte $22
+.org $8974 ; Darunia Right
+    .byte $c0 | $22
+
+; Text uses the object id as an offset into a lookup table for text, so since the object id changed, we need
+; to update the offset table as well to point to the original text. Subtract 1 from each of the vanilla data
+.org $a29b
+    .byte $2a - 1 ; Mido
+.org $a33d
+    .byte $19 - 1 ; Darunia
+
 
 .segment "PRG7"
 
@@ -364,6 +383,7 @@ ExpandedGetItem:
     lda CommonEnemyTileTable+1,x
 .org $f22e
     lda CommonEnemyTileTable+1,x 
+
 
 ; Clear out the space from the original enemy and item tile table
 .org $ee51
