@@ -153,7 +153,7 @@ public class Hyrule
     public ROM ROMData { get; set; }
     public Random RNG { get; set; }
     public string Flags { get; private set; }
-    public int Seed { get; private set; }
+    public int SeedHash { get; private set; }
     public RandomizerProperties Props
     {
         get
@@ -183,8 +183,8 @@ public class Hyrule
         {
             Hash = "";
             World.ResetStats();
-            Seed = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
-            RNG = new Random(Seed);
+            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
+            RNG = new Random(SeedHash);
             props = config.Export(RNG);
             if (UNSAFE_DEBUG)
             {
@@ -194,7 +194,7 @@ public class Hyrule
             Flags = config.Flags;
 
             Assembler assembler = new();
-            logger.Info("Started generation for " + Flags + " / " + Seed);
+            logger.Info($"Started generation for flags: {Flags} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
 
@@ -458,7 +458,7 @@ public class Hyrule
             var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
             byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
                 Flags +
-                Seed +
+                SeedHash +
                 versionstr +
                 // TODO get room file hash
                 // Util.ReadAllTextFromFile(config.GetRoomsFile()) +

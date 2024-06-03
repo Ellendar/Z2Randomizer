@@ -45,10 +45,10 @@ ITEM_JUMP_SPELL = $1d
 ITEM_LIFE_SPELL = $1e
 ITEM_FAIRY_SPELL = $1f
 ITEM_FIRE_SPELL = $20
-ITEM_DASH_SPELL = $21
-ITEM_REFLECT_SPELL = $22
-ITEM_SPELL_SPELL = $23
-ITEM_THUNDER_SPELL = $24
+ITEM_REFLECT_SPELL = $21
+ITEM_SPELL_SPELL = $22
+ITEM_THUNDER_SPELL = $23
+ITEM_DASH_SPELL = $24
 
 ; These are two unused locations in the save game that we can use for custom item get flags
 LocationTableMisc = $0795
@@ -60,7 +60,7 @@ DialogConditionsDefault = $b5c7
 DownStabGetItem = $b4bf
 UpStabGetItem = $b4d7
 TalkWithStandingStillNpc = $b554
-MirrorOrWaterGetItem = $b5ae
+MirrorWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
 DontKillEnemyFlag = $0122
 
@@ -77,7 +77,7 @@ JankPowerOfTwoMask = $c28d
 ; $08,$04,$02,$01,$80,$40,$20,$10
 JankPowerOfTwo = $c28d
 
-.org MirrorOrWaterGetItem
+.org MirrorWaterGetItem
     jmp MirrorOrWaterLocation
 FREE_UNTIL $b5b9
 
@@ -167,6 +167,25 @@ TownToItemTable:
     .byte FIRE_SPELL_ITEMLOC
     .byte SPELL_SPELL_ITEMLOC
     .byte THUNDER_SPELL_ITEMLOC
+
+; Update a few hardcoded positions in the rom to change "mirror" objects in Darunia and Mido into sign objects
+; Change the mirror object $21 to sign object $22. the high two bits are for X position
+.org $88ee ; Mido Left
+    .byte $22
+.org $890c ; Mido Right
+    .byte $c0 | $22
+.org $8954 ; Darunia Left
+    .byte $22
+.org $8974 ; Darunia Right
+    .byte $c0 | $22
+
+; Text uses the object id as an offset into a lookup table for text, so since the object id changed, we need
+; to update the offset table as well to point to the original text. Subtract 1 from each of the vanilla data
+.org $a29b
+    .byte $2a - 1 ; Mido
+.org $a33d
+    .byte $19 - 1 ; Darunia
+
 
 .segment "PRG7"
 
@@ -298,8 +317,13 @@ ExpandedGetItem:
 ;@NotJar:
     cpy #ITEM_SHIELD_SPELL
     bcc @NotSpell
+        cpy #ITEM_DASH_SPELL
+        bcc @NotDashSpell
+            ; Dash always replaces fire, so if we get the dash spell load fire instead
+            ldy #ITEM_FIRE_SPELL
+    @NotDashSpell:
         ; flash screen as if you got the spell from a wizard 
-        lda #$C0
+        lda #$c0
         sta $074b
         ; Update the cursor position to point to the new spell
         tya
@@ -359,6 +383,7 @@ ExpandedGetItem:
     lda CommonEnemyTileTable+1,x
 .org $f22e
     lda CommonEnemyTileTable+1,x 
+
 
 ; Clear out the space from the original enemy and item tile table
 .org $ee51
@@ -425,10 +450,10 @@ ItemTileTable:
     .byte $d7, $d9 ; Life Spell
     .byte $cb, $cd ; Fairy Spell
     .byte $cf, $d1 ; Fire Spell
-    .byte $c7, $c9 ; Dash Spell
     .byte $db, $dd ; Reflect Spell
     .byte $f1, $f3 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
+    .byte $c7, $c9 ; Dash Spell
 
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest
@@ -455,3 +480,4 @@ ItemPaletteTable:
     .byte $01 ; Reflect Spell
     .byte $01 ; Spell Spell
     .byte $01 ; Thunder Spell
+    .byte $01 ; Dash Spell
