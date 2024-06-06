@@ -2992,6 +2992,10 @@ public class Hyrule
                 }
             }
 
+            for (int i = 0; i < 8; i++)
+            {
+                ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartWithCollectable(wizardCollectables[i]) ? (byte)1 : (byte)0);
+            }
         }
         //fix for rope graphical glitch
         for (int i = 0; i < 16; i++)
@@ -3615,6 +3619,7 @@ FREE_UNTIL $c2ca
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
+        //XXX: restore
         FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
         rom.InstantText(engine);
