@@ -37,7 +37,7 @@
                     <CheckBox IsChecked="{Binding Config.StartWithFairy}" Content="Fairy" />
                     <CheckBox IsChecked="{Binding Config.StartWithFire}" Content="Fire" />
                     <CheckBox IsChecked="{Binding Config.StartWithReflect}" Content="Reflect" />
-                    <CheckBox IsChecked="{Binding Config.StartWithSpell}" Content="Spell" />
+                    <CheckBox IsChecked="{Binding Config.StartWithSpellSpell}" Content="Spell" />
                     <CheckBox IsChecked="{Binding Config.StartWithThunder}" Content="Thunder" />
                 </StackPanel>
             </Border>

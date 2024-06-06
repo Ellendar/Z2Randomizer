@@ -401,31 +401,11 @@ public class Hyrule
             {
                 return null;
             }
-            //XXX: Is this being handled elsewhere?
-            /*
+
             if (props.CombineFire)
             {
                 LinkFire();
             }
-            */
-
-            //If you start with a spell, also start with its corresponding spell item if applicable.
-            //This is specifically only true if the collectable behind the wizard is a spell and spells are not in the general pool
-            //if that's the case, you already know the check is clear just from looking at the menu.
-            //If it's not the case, you have no idea what that wizard has, so it's a live check.
-            /*
-            if (!props.IncludeSpellsInShuffle)
-            {
-                if (props.StartWithCollectable(eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectable))
-                {
-                    ROMData.Put(0x17b17, 0x01); //Water
-                }
-                if (props.StartWithCollectable(eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable))
-                {
-                    ROMData.Put(0x17b18, 0x20); //Child
-                }
-            }
-            */
 
             Dictionary<Town, Collectable> spellMap = new()
             {
@@ -668,7 +648,7 @@ public class Hyrule
         }
         else if(props.SwapUpAndDownStab)
         {
-            HandleSwapUpAndDownstab();
+            SwapUpAndDownstab();
         }
 
         heartContainersInItemPool = maxHearts - startHearts;
@@ -703,6 +683,22 @@ public class Hyrule
         ItemGet[Collectable.CROSS] = props.StartCross;
         ItemGet[Collectable.HAMMER] = props.StartHammer;
         ItemGet[Collectable.MAGIC_KEY] = props.StartKey;
+
+        ItemGet[Collectable.SHIELD_SPELL] = props.StartShield;
+        ItemGet[Collectable.JUMP_SPELL] = props.StartJump;
+        ItemGet[Collectable.LIFE_SPELL] = props.StartLife;
+        ItemGet[Collectable.FAIRY_SPELL] = props.StartFairy;
+        if (props.ReplaceFireWithDash)
+        {
+            ItemGet[Collectable.DASH_SPELL] = props.StartFire;
+        }
+        else
+        {
+            ItemGet[Collectable.FIRE_SPELL] = props.StartFire;
+        }
+        ItemGet[Collectable.REFLECT_SPELL] = props.StartReflect;
+        ItemGet[Collectable.SPELL_SPELL] = props.StartSpell;
+        ItemGet[Collectable.THUNDER_SPELL] = props.StartThunder;
 
         pbagHearts = new List<Location>();
         //Replace any unused heart containers with small items
@@ -1969,12 +1965,10 @@ public class Hyrule
         List<Town> unallocatedTowns = new List<Town> { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
             Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
 
-        var filteredToJustSpells = Enum.GetValues(typeof(Collectable)).Cast<Collectable>().ToList()
-            .Where(x => x.ToString().EndsWith("_SPELL"));
+        var filteredToJustSpells = Enum.GetValues(typeof(Collectable)).Cast<Collectable>().Where(i => i.IsSpell());
         foreach (Collectable spell in filteredToJustSpells)
         {
-            if (!spell.IsSpell()
-                || props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
+            if (props.ReplaceFireWithDash && spell == Collectable.FIRE_SPELL
                 || !props.ReplaceFireWithDash && spell == Collectable.DASH_SPELL
                 || spell == Collectable.UPSTAB
                 || spell == Collectable.DOWNSTAB)
@@ -1985,7 +1979,6 @@ public class Hyrule
             Location townLocation = GetTownLocation(town);
             townLocation.Collectable = spell;
             unallocatedTowns.Remove(town);
-
         }
 
         if (props.CombineFire)
@@ -2000,7 +1993,7 @@ public class Hyrule
         }
     }
 
-    private void HandleSwapUpAndDownstab()
+    private void SwapUpAndDownstab()
     {
         eastHyrule.daruniaRoof.Collectable = Collectable.DOWNSTAB;
         westHyrule.midoChurch.Collectable = Collectable.UPSTAB;
@@ -2664,301 +2657,6 @@ public class Hyrule
             ROMData.Put(0x39810 + i, heartByte);
         }
 
-
-        /*
-        Location medicineLoc = null;
-        Location trophyLoc = null;
-        Location kidLoc = null;
-        foreach (Location location in itemLocs)
-        {
-            if (location.Collectable == Collectable.MEDICINE)
-            {
-                medicineLoc = location;
-            }
-            if (location.Collectable == Collectable.TROPHY)
-            {
-                trophyLoc = location;
-            }
-            if (location.Collectable == Collectable.CHILD)
-            {
-                kidLoc = location;
-            }
-        }
-
-        byte[] medSprite = new byte[32];
-        byte[] trophySprite = new byte[32];
-        byte[] kidSprite = new byte[32];
-
-        for (int i = 0; i < 32; i++)
-        {
-            medSprite[i] = ROMData.GetByte(0x23310 + i);
-            trophySprite[i] = ROMData.GetByte(0x232f0 + i);
-            kidSprite[i] = ROMData.GetByte(0x25310 + i);
-        }
-        bool medEast = (eastHyrule.AllLocations.Contains(medicineLoc) || mazeIsland.AllLocations.Contains(medicineLoc));
-        bool trophyEast = (eastHyrule.AllLocations.Contains(trophyLoc) || mazeIsland.AllLocations.Contains(trophyLoc));
-        bool kidWest = (westHyrule.AllLocations.Contains(kidLoc) || deathMountain.AllLocations.Contains(kidLoc));
-        Dictionary<int, int> palaceMems = new Dictionary<int, int>();
-        palaceMems.Add(1, 0x29AD0);
-        palaceMems.Add(2, 0x2BAD0);
-        palaceMems.Add(3, 0x33AD0);
-        palaceMems.Add(4, 0x35AD0);
-        palaceMems.Add(5, 0x37AD0);
-        palaceMems.Add(6, 0x39AD0);
-
-        if (medEast && eastHyrule.locationAtPalace5.Collectable != Item.MEDICINE && eastHyrule.locationAtPalace6.Collectable != Item.MEDICINE && mazeIsland.locationAtPalace4.Collectable != Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(0x25430 + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0x43);
-            ROMData.Put(0x1eeba, 0x43);
-        }
-
-        if (trophyEast)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(0x25410 + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0x41);
-            ROMData.Put(0x1eeb8, 0x41);
-        }
-
-        if (kidWest && westHyrule.locationAtPalace1.Collectable != Item.CHILD && westHyrule.locationAtPalace2.Collectable != Item.CHILD && westHyrule.locationAtPalace3.Collectable != Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(0x23570 + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0x57);
-            ROMData.Put(0x1eeb6, 0x57);
-        }
-
-        if (eastHyrule.townAtNewKasuto.Collectable == Item.TROPHY || eastHyrule.spellTower.Collectable == Item.TROPHY || westHyrule.locationAtSariaNorth.Collectable == Item.TROPHY || westHyrule.locationAtSariaSouth.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(0x27210 + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0x21);
-            ROMData.Put(0x1eeb8, 0x21);
-        }
-
-        if (eastHyrule.townAtNewKasuto.Collectable == Item.MEDICINE || eastHyrule.spellTower.Collectable == Item.MEDICINE || westHyrule.locationAtSariaNorth.Collectable == Item.TROPHY || westHyrule.locationAtSariaSouth.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(0x27230 + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0x23);
-            ROMData.Put(0x1eeba, 0x23);
-        }
-
-        if (eastHyrule.townAtNewKasuto.Collectable == Item.CHILD || eastHyrule.spellTower.Collectable == Item.CHILD || westHyrule.locationAtSariaNorth.Collectable == Item.TROPHY || westHyrule.locationAtSariaSouth.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(0x27250 + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0x25);
-            ROMData.Put(0x1eeb6, 0x25);
-        }
-
-        if (westHyrule.locationAtPalace1.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-        if (westHyrule.locationAtPalace2.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-        if (westHyrule.locationAtPalace3.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-        if (mazeIsland.locationAtPalace4.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-        if (eastHyrule.locationAtPalace5.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-        if (eastHyrule.locationAtPalace6.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-        if (eastHyrule.locationAtGP.Collectable == Item.TROPHY)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalaceNumber] + i, trophySprite[i]);
-            }
-            ROMData.Put(0x1eeb7, 0xAD);
-            ROMData.Put(0x1eeb8, 0xAD);
-        }
-
-        if (westHyrule.locationAtPalace1.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-        if (westHyrule.locationAtPalace2.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-        if (westHyrule.locationAtPalace3.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-        if (mazeIsland.locationAtPalace4.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-        if (eastHyrule.locationAtPalace5.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-        if (eastHyrule.locationAtPalace6.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-        if (eastHyrule.locationAtGP.Collectable == Item.MEDICINE)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalaceNumber] + i, medSprite[i]);
-            }
-            ROMData.Put(0x1eeb9, 0xAD);
-            ROMData.Put(0x1eeba, 0xAD);
-        }
-
-        if (westHyrule.locationAtPalace1.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace1.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        if (westHyrule.locationAtPalace2.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace2.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        if (westHyrule.locationAtPalace3.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[westHyrule.locationAtPalace3.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        if (mazeIsland.locationAtPalace4.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[mazeIsland.locationAtPalace4.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        if (eastHyrule.locationAtPalace5.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace5.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        if (eastHyrule.locationAtPalace6.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtPalace6.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        if (eastHyrule.locationAtGP.Collectable == Item.CHILD)
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                ROMData.Put(palaceMems[eastHyrule.locationAtGP.PalaceNumber] + i, kidSprite[i]);
-            }
-            ROMData.Put(0x1eeb5, 0xAD);
-            ROMData.Put(0x1eeb6, 0xAD);
-        }
-        */
-
         foreach (Palace palace in palaces)
         {
             palace.ValidateRoomConnections();
@@ -2966,15 +2664,6 @@ public class Hyrule
         }
 
         ROMData.AddCredits();
-        //fixes improper exit from p6/new kasuto
-        //if (eastHyrule.palace6.PalNum != 7)
-        //{
-        //    ROMData.put(0x1ccd3, 0xea);
-        //    ROMData.put(0x1ccd4, 0xea);
-        //    ROMData.put(0x1ccd5, 0xea);
-        //    ROMData.put(0x1ccd6, 0xc0);
-        //    ROMData.put(0x1ccd7, 0x31);
-        //}
 
 
         ROMData.Put(0x1CD3A, (byte)palGraphics[westHyrule.locationAtPalace1.PalaceNumber]);
@@ -3234,9 +2923,19 @@ public class Hyrule
         int[] magFunction = new int[8];
         //ROMData.UpdateWizardText(WizardCollectables);
 
+        // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
+        // This was overwhelmingly the favorite in the community vote;
         if (props.IncludeSpellsInShuffle)
         {
-            // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
+            //but we still need to give out starting spells
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS, props.StartShield ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 1, props.StartJump ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 2, props.StartLife ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 3, props.StartFairy ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 4, props.StartFire ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 5, props.StartReflect ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 6, props.StartSpell ? (byte)1 : (byte)0);
+            ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + 7, props.StartThunder ? (byte)1 : (byte)0);
         }
         else
         {

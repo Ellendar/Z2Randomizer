@@ -34,7 +34,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool startWithFairy;
     private bool startWithFire;
     private bool startWithReflect;
-    private bool startWithSpell;
+    private bool startWithSpellSpell;
     private bool startWithThunder;
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
@@ -192,7 +192,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     public bool StartWithFairy { get => startWithFairy; set => SetField(ref startWithFairy, value); }
     public bool StartWithFire { get => startWithFire; set => SetField(ref startWithFire, value); }
     public bool StartWithReflect { get => startWithReflect; set => SetField(ref startWithReflect, value); }
-    public bool StartWithSpell { get => startWithSpell; set => SetField(ref startWithSpell, value); }
+    public bool StartWithSpellSpell { get => startWithSpellSpell; set => SetField(ref startWithSpellSpell, value); }
     public bool StartWithThunder { get => startWithThunder; set => SetField(ref startWithThunder, value); }
 
     [Limit(8)]
@@ -1168,7 +1168,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         bits = new BitArray(BitConverter.GetBytes(BASE64_DECODE[flags[i++]]));
         config.StartWithReflect = bits[0];
-        config.StartWithSpell = bits[1];
+        config.StartWithSpellSpell = bits[1];
         config.StartWithThunder = bits[2];
         config.StartingLives = bits[3] ? StartingLives.LivesRandom : StartingLives.Lives4;
         config.RemoveTBird = bits[4];
@@ -1774,7 +1774,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.StartFairy = !StartWithFairy && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFairy;
         properties.StartFire = !StartWithFire && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithFire;
         properties.StartReflect = !StartWithReflect && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithReflect;
-        properties.StartSpell = !StartWithSpell && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithSpell;
+        properties.StartSpell = !StartWithSpellSpell && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithSpellSpell;
         properties.StartThunder = !StartWithThunder && ShuffleStartingSpells ? random.NextDouble() > .75 : StartWithThunder;
         switch (FireOption)
         {

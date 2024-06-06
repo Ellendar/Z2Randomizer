@@ -767,7 +767,7 @@ public partial class MainUI : Form
         configuration.StartWithFairy = startWithFairyCheckbox.Checked;
         configuration.StartWithFire = startWithFireCheckbox.Checked;
         configuration.StartWithReflect = startWithReflectCheckbox.Checked;
-        configuration.StartWithSpell = startWithSpellCheckbox.Checked;
+        configuration.StartWithSpellSpell = startWithSpellCheckbox.Checked;
         configuration.StartWithThunder = startWIthThunderCheckbox.Checked;
 
         configuration.StartingHeartContainersMin = startHeartsMinList.SelectedIndex switch
@@ -1278,7 +1278,7 @@ public partial class MainUI : Form
             startWithFairyCheckbox.Checked = configuration.StartWithFairy;
             startWithFireCheckbox.Checked = configuration.StartWithFire;
             startWithReflectCheckbox.Checked = configuration.StartWithReflect;
-            startWithSpellCheckbox.Checked = configuration.StartWithSpell;
+            startWithSpellCheckbox.Checked = configuration.StartWithSpellSpell;
             startWIthThunderCheckbox.Checked = configuration.StartWithThunder;
 
             startHeartsMinList.SelectedIndex = configuration.StartingHeartContainersMin switch

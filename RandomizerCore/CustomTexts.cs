@@ -54,8 +54,8 @@ public class CustomTexts
     private const int trophySpellHintIndex = 13;
     private const int medicineSpellHintIndex = 43;
     private const int childSpellHintIndex = 79;
-    private const int waterSpellHintIndex = 79;
-    private const int mirrorSpellHintIndex = 65;
+    private const int waterSpellHintIndex = 65;
+    private const int mirrorSpellHintIndex = 22;
 
     private const int baguTextIndex = 48;
     private const int gotWaterTextIndex = 63;
@@ -339,10 +339,18 @@ public class CustomTexts
                 texts[baguTextIndex] = baguText;
             }
 
-            Text? mirrorText = GenerateMirrorTableText(baguLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Location tableLocation = locations.FirstOrDefault(i => i.ActualTown == Town.SARIA_TABLE)!;
+            Text? mirrorText = GenerateMirrorTableText(tableLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (mirrorText != null)
             {
                 texts[gotMirrorTextIndex] = mirrorText;
+            }
+
+            Location fountainLocation = locations.FirstOrDefault(i => i.ActualTown == Town.SARIA_TABLE)!;
+            Text? fountainText = GenerateMirrorTableText(fountainLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            if (fountainText != null)
+            {
+                texts[gotWaterTextIndex] = fountainText;
             }
 
             if (props.BagusWoods)
