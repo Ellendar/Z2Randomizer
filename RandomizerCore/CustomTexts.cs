@@ -629,16 +629,25 @@ public class CustomTexts
             Location itemLocation;
 
             itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.TROPHY)!;
-            Text trophyHint = Text.GenerateHelpfulHint(itemLocation);
-            hints[trophySpellHintIndex] = trophyHint;
+            if(itemLocation != null)
+            {
+                Text trophyHint = Text.GenerateHelpfulHint(itemLocation);
+                hints[trophySpellHintIndex] = trophyHint;
+            }
 
             itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MEDICINE)!;
-            Text medHint = Text.GenerateHelpfulHint(itemLocation);
-            hints[medicineSpellHintIndex] = medHint;
+            if (itemLocation != null)
+            {
+                Text medHint = Text.GenerateHelpfulHint(itemLocation);
+                hints[medicineSpellHintIndex] = medHint;
+            }   
 
             itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.CHILD)!;
-            Text kidHint = Text.GenerateHelpfulHint(itemLocation);
-            hints[childSpellHintIndex] = kidHint;
+            if (itemLocation != null)
+            {
+                Text kidHint = Text.GenerateHelpfulHint(itemLocation);
+                hints[childSpellHintIndex] = kidHint;
+            }
 
             if(props.IncludeQuestItemsInShuffle)
             {

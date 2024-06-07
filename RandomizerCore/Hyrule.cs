@@ -425,7 +425,7 @@ public class Hyrule
             }
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), ROMData.GetGameText(), props, RNG);
-            ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
+            //ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
             var rom = await ROMData.ApplyAsm(engine, assembler);
 
             // await assemblerTask; // .Wait(ct);
@@ -3619,7 +3619,6 @@ FREE_UNTIL $c2ca
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
-        //XXX: restore
         FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
         rom.InstantText(engine);
