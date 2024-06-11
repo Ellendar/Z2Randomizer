@@ -168,10 +168,15 @@ public sealed class WestHyrule : World
         mirrorTable = new Location(locationAtSariaNorth.LocationBytes, locationAtSariaNorth.TerrainType, locationAtSariaNorth.MemAddress, Continent.WEST);
         mirrorTable.Collectable = Collectable.MIRROR;
         mirrorTable.ActualTown = Town.SARIA_TABLE;
+        mirrorTable.Name = "Saria Mirror Table";
+        mirrorTable.CanShuffle = false;
         AddLocation(mirrorTable);
+
         midoChurch = new Location(locationAtMido.LocationBytes, locationAtMido.TerrainType, locationAtMido.MemAddress, Continent.WEST);
         midoChurch.Collectable = Collectable.DOWNSTAB;
         midoChurch.ActualTown = Town.MIDO_CHURCH;
+        midoChurch.Name = "Mido Church";
+        midoChurch.CanShuffle = false;
         AddLocation(midoChurch);
 
 
@@ -651,7 +656,7 @@ public sealed class WestHyrule : World
                 {
                     //debug++;
                     //Debug.WriteLine(debug);
-                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots, biome,
+                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, false, props.CanWalkOnWaterWithBoots, biome,
                         calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
                         calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
                     if (!f)
@@ -661,14 +666,14 @@ public sealed class WestHyrule : World
                     }
                 }
 
-                PlaceRocks(props.BoulderBlockConnections);
+                BlockCaves(props.BoulderBlockConnections);
                 PlaceHiddenLocations();
 
 
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     //Debug.WriteLine(GetMapDebug());
-                    bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool f = ConnectIslands(100, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         //Debug.WriteLine(GetMapDebug());
@@ -678,7 +683,7 @@ public sealed class WestHyrule : World
                 }
                 if (biome == Biome.ISLANDS)
                 {
-                    bool f = ConnectIslands(25, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool f = ConnectIslands(25, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -689,7 +694,7 @@ public sealed class WestHyrule : World
                 {
                     walkableTerrains.Add(Terrain.ROAD);
 
-                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!h)
                     {
                         failedOnConnectIslands++;
@@ -700,9 +705,9 @@ public sealed class WestHyrule : World
                 {
                     riverTerrain = fillerWater;
                     //2 bridges over the mountains
-                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     //4 bridges including saria and the double bridge across arbitrary water
-                    bool f = ConnectIslands(4, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool f = ConnectIslands(4, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -1223,7 +1228,7 @@ public sealed class WestHyrule : World
         }
         return true;
     }
-    private void PlaceRocks(bool boulderBlockConnections)
+    private void BlockCaves(bool boulderBlockConnections)
     {
         int rockNum = RNG.Next(3);
         int cavePicked = 0;
@@ -1236,6 +1241,7 @@ public sealed class WestHyrule : World
             {
                 caveConn = connections[GetLocationByMem(cavePicked)].MemAddress;
             }
+            //Item caves
             if (boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
                 if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null)
@@ -1288,6 +1294,7 @@ public sealed class WestHyrule : World
                 }
                 cavePicked = cave.MemAddress;
             }
+            //Connector caves
             else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
             {
                 if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN)

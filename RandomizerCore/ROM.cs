@@ -1103,24 +1103,28 @@ Exit:
         List<Location> locations = new List<Location>();
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = new byte[4] { 
+            byte[] bytes = [ 
                 GetByte(startAddr + i), 
                 GetByte(startAddr + RomMap.overworldXOffset + i), 
                 GetByte(startAddr + RomMap.overworldMapOffset + i), 
-                GetByte(startAddr + RomMap.overworldWorldOffset + i) };
-            locations.Add(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
+                GetByte(startAddr + RomMap.overworldWorldOffset + i) ];
+            Location location = new(bytes, Terrains[startAddr + i], startAddr + i, continent);
+            location.AppearsOnMap = true;
+            locations.Add(location);
         }
         return locations;
     }
 
     public Location LoadLocation(int addr, Terrain t, Continent c)
     {
-        byte[] bytes = new byte[4] { 
+        byte[] bytes = [ 
             GetByte(addr), 
             GetByte(addr + RomMap.overworldXOffset), 
             GetByte(addr + RomMap.overworldMapOffset), 
-            GetByte(addr + RomMap.overworldWorldOffset) };
-        return new Location(bytes, t, addr, c);
+            GetByte(addr + RomMap.overworldWorldOffset) ];
+        Location location = new(bytes, t, addr, c);
+        location.AppearsOnMap = true;
+        return location;
     }
 
     public void RemoveUnusedConnectors(World world)

@@ -99,7 +99,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 143;
+    private static int DEBUG_THRESHOLD = 130;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -425,7 +425,7 @@ public class Hyrule
             }
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), ROMData.GetGameText(), props, RNG);
-            //ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
+            ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
             var rom = await ROMData.ApplyAsm(engine, assembler);
 
             // await assemblerTask; // .Wait(ct);
@@ -954,6 +954,7 @@ public class Hyrule
                 {
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
+                    //Debug.WriteLine(eastHyrule.GetMapDebug());
                     return false;
                 }
                 return false;
@@ -2633,7 +2634,7 @@ public class Hyrule
         foreach (World world in worlds)
         {
             List<Location> locs = world.AllLocations;
-            foreach (Location location in locs)
+            foreach (Location location in locs.Where(i => i.AppearsOnMap))
             {
                 location.UpdateBytes();
                 ROMData.Put(location.MemAddress, location.LocationBytes[0]);

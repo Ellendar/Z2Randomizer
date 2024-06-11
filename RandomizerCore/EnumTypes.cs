@@ -454,7 +454,33 @@ public enum BeepFrequency
     [Description("Off")]
     Off
 }
-    
+
+[DefaultValue(HALF)]
+public enum IndeterminateOptionRate
+{
+    [Description("25%")]
+    QUARTER,
+    [Description("50%")]
+    HALF,
+    [Description("75%")]
+    THREE_QUARTERS,
+    [Description("90%")]
+    NINETY_PERCENT
+}
+
+[DefaultValue(PATH)]
+public enum RiverDevilBlockerOption
+{
+    [Description("Blocks Path")]
+    PATH,
+    [Description("Blocks Cave")]
+    CAVE,
+    [Description("Blocks Town")]
+    SIEGE,
+    [Description("Random")]
+    RANDOM
+}
+
 public class StringValueAttribute(string v) : Attribute
 {
     public string Value => v;
@@ -504,6 +530,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions<BeepThreshold>();
     public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions<BeepFrequency>();
     public static IEnumerable<EnumDescription> StartingHeartsMaxOptionList { get; } = ToDescriptions<StartingHeartsMaxOption>();
+    public static IEnumerable<EnumDescription> IndeterminateOptionRateList { get; } = ToDescriptions<IndeterminateOptionRate>();
+    public static IEnumerable<EnumDescription> RiverDevilBlockerOptionList { get; } = ToDescriptions<RiverDevilBlockerOption>();
 
     public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
     {

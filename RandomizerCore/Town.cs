@@ -79,6 +79,18 @@ public static class TownExtensions
         };
     }
 
+    public static Town GetMasterTown(this Town town)
+    {
+        return town switch
+        {
+            Town.SARIA_TABLE => Town.SARIA_NORTH,
+            Town.DARUNIA_ROOF => Town.DARUNIA_WEST,
+            Town.NABOORU_FOUNTAIN => Town.NABOORU,
+            Town.MIDO_CHURCH => Town.MIDO_WEST,
+            _ => town
+        };
+    }
+
     public static bool IsUnderConsiderationForReachable(this Town town)
     {
         return town switch

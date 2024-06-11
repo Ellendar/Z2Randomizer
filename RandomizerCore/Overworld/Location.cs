@@ -8,7 +8,6 @@ public class Location
 {
     Logger logger = LogManager.GetCurrentClassLogger();
     private int appear2loweruponexit;
-    private (int, int)coords;
     public Collectable Collectable { get; set; }
     public Collectable VanillaCollectable { get; set; }
     public bool ItemGet { get; set; }
@@ -35,7 +34,8 @@ public class Location
 
         set
         {
-            coords = value;
+            Ypos = value.Item1;
+            Xpos = value.Item2;
         }
     }
 
@@ -72,6 +72,8 @@ public class Location
     public int Secondpartofcave { get; set; }
 
     public string Name { get; set; }
+
+    public bool AppearsOnMap { get; set; }
 
     /*
     Byte 0

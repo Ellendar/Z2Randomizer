@@ -441,7 +441,7 @@ public abstract class World
     {
         //return true;
         int i = 0;
-        foreach (Location location in AllLocations)
+        foreach (Location location in AllLocations.Where(i => i.AppearsOnMap))
         {
             i++;
             if ((location.TerrainType != Terrain.BRIDGE 
@@ -533,6 +533,15 @@ public abstract class World
                     location.Xpos = x;
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
+                }
+            }
+
+            if(location.TerrainType == Terrain.TOWN)
+            {
+                foreach (Location linkedLocation in AllLocations.Where(
+                    i => !i.AppearsOnMap && i.ActualTown.GetMasterTown() == location.ActualTown))
+                {
+                    linkedLocation.Coords = location.Coords;
                 }
             }
         }
@@ -784,7 +793,8 @@ public abstract class World
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, 
+    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, 
+        bool rockBlock, bool placeLongBridge, bool placeDarunia, 
         bool canWalkOnWater, Biome biome, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
     {
         int maxBridgeLength = MAXIMUM_BRIDGE_LENGTH[biome];
@@ -1172,6 +1182,12 @@ public abstract class World
                                         riverDevil = false;
                                         placed = true;
                                     }
+                                    else if (rockBlock)
+                                    {
+                                        map[y, x] = Terrain.ROCK;
+                                        rockBlock = false;
+                                        placed = true;
+                                    }
                                     foreach (Location location in locs)
                                     {
                                         if (location.CanShuffle && !placed)
@@ -1200,6 +1216,12 @@ public abstract class World
                                             riverDevil = false;
                                             placed = true;
                                         }
+                                        else if (rockBlock)
+                                        {
+                                            map[y, x] = Terrain.ROCK;
+                                            rockBlock = false;
+                                            placed = true;
+                                        }
                                         foreach (Location location in Locations[Terrain.ROAD])
                                         {
                                             if (location.CanShuffle && !placed)
@@ -1226,6 +1248,12 @@ public abstract class World
                                         {
                                             map[y, x] = Terrain.RIVER_DEVIL;
                                             riverDevil = false;
+                                            placed = true;
+                                        }
+                                        else if (rockBlock)
+                                        {
+                                            map[y, x] = Terrain.ROCK;
+                                            rockBlock = false;
                                             placed = true;
                                         }
                                         foreach (Location location in Locations[Terrain.BRIDGE])

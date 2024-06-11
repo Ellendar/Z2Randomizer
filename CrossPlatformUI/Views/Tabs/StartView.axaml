@@ -76,6 +76,9 @@
             <ComboBox assists:ComboBoxAssist.Label="Starting Lives" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.StartingLivesList}}"
                       SelectedItem="{Binding Config.StartingLives, Converter={x:Static ui:Util.EnumConvert}}"/>
+            <ComboBox assists:ComboBoxAssist.Label="Random Flag Rate" Theme="{StaticResource MaterialOutlineComboBox}"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.IndeterminateOptionRateList}}"
+                      SelectedItem="{Binding Config.IndeterminateOptionRate, Converter={x:Static ui:Util.EnumConvert}}"/>
         </StackPanel>
     </Grid>
 </UserControl>

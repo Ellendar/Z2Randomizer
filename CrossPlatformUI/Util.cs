@@ -44,6 +44,11 @@ public class ClimateConverter : IValueConverter
     
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        return value is string climate ? Climates.ClimateList.FirstOrDefault(c => c == climate, null) : null;
+        if (value is string climate) 
+        {
+            return Climates.ClimateList.FirstOrDefault(c => c.Name == climate);
+        }
+        return null;
+            
     }
 }

@@ -672,9 +672,9 @@ public class Palace
             ROMData.Put(room.ConnectionStartAddress + 2, upByte);
             ROMData.Put(room.ConnectionStartAddress + 3, rightByte);
 
-            Debug.WriteLine("Wrote Map " + room.Map + "(" + room.PalaceGroup + ") " +
-                room.PalaceNumber + " at address " + room.ConnectionStartAddress + " : "
-                + Util.ByteArrayToHexString([leftByte, downByte, upByte, rightByte]));
+            //Debug.WriteLine("Wrote Map " + room.Map + "(" + room.PalaceGroup + ") " +
+            //   room.PalaceNumber + " at address " + room.ConnectionStartAddress + " : "
+            //    + Util.ByteArrayToHexString([leftByte, downByte, upByte, rightByte]));
         }
     }
 

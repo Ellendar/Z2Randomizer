@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NLog;
 
@@ -162,20 +163,27 @@ public sealed class EastHyrule : World
         spellTower = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
         spellTower.VanillaCollectable = spellTower.Collectable = Collectable.MAGIC_KEY;
         spellTower.Name = "Spell Tower";
+        spellTower.CanShuffle = false;
         AddLocation(spellTower);
+
         newKasutoBasement = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
         newKasutoBasement.VanillaCollectable = newKasutoBasement.Collectable = Collectable.MAGIC_CONTAINER;
         newKasutoBasement.Name = "Granny's basement";
+        newKasutoBasement.CanShuffle = false;
         AddLocation(newKasutoBasement);
+
         fountain = new Location(townAtNabooru.LocationBytes, townAtNabooru.TerrainType, townAtNabooru.MemAddress, Continent.EAST);
         fountain.VanillaCollectable = fountain.Collectable = Collectable.WATER;
         fountain.Name = "Water Fountain";
         fountain.ActualTown = Town.NABOORU_FOUNTAIN;
+        fountain.CanShuffle = false;
         AddLocation(fountain);
+
         daruniaRoof = new Location(townAtDarunia.LocationBytes, townAtDarunia.TerrainType, townAtDarunia.MemAddress, Continent.EAST);
         daruniaRoof.VanillaCollectable = daruniaRoof.Collectable = Collectable.UPSTAB;
         daruniaRoof.Name = "Darunia Roof";
         daruniaRoof.ActualTown = Town.DARUNIA_ROOF;
+        daruniaRoof.CanShuffle = false;
         AddLocation(daruniaRoof);
 
         overworldMaps = new List<int> { 0x22, 0x1D, 0x27, 0x35, 0x30, 0x1E, 0x28, 0x3C };
@@ -578,10 +586,9 @@ public sealed class EastHyrule : World
                     MakeVolcano();
 
 
-                    DrawMountains();
+                    DrawMountains(props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH);
                     DrawRiver(props.CanWalkOnWaterWithBoots);
                 }
-
 
                 if (props.HiddenKasuto)
                 {
@@ -643,6 +650,7 @@ public sealed class EastHyrule : World
                 }
 
                 bool b = PlaceLocations(riverTerrain, props.SaneCaves);
+
                 if (!b)
                 {
                     return false;
@@ -684,31 +692,65 @@ public sealed class EastHyrule : World
                     }
                 }
                 */
+                bool riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.CAVE;
+                bool rockBlock = props.EastRocks && !props.EastRockIsPath;
+                BlockCaves(props.BoulderBlockConnections, rockBlock, rockBlock);
                 PlaceHiddenLocations();
+                riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH;
+                rockBlock = props.EastRocks && props.EastRockIsPath;
                 if (biome == Biome.VANILLALIKE)
                 {
-                    ConnectIslands(4, false, Terrain.MOUNTAIN, false, false, true, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(4, false, Terrain.MOUNTAIN, false, false, false, true, props.CanWalkOnWaterWithBoots, biome);
 
-                    ConnectIslands(3, false, fillerWater, true, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(3, false, fillerWater, riverDevil, rockBlock, false, false, props.CanWalkOnWaterWithBoots, biome);
 
                 }
                 if (biome == Biome.ISLANDS)
                 {
-                    ConnectIslands(100, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(100, false, riverTerrain, riverDevil, rockBlock, false, true, props.CanWalkOnWaterWithBoots, biome);
                 }
                 if (biome == Biome.MOUNTAINOUS)
                 {
-                    ConnectIslands(20, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(20, false, riverTerrain, riverDevil, rockBlock, false, true, props.CanWalkOnWaterWithBoots, biome);
                 }
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
-                    ConnectIslands(15, false, riverTerrain, true, false, true, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(15, false, riverTerrain, riverDevil, rockBlock, false, true, props.CanWalkOnWaterWithBoots, biome);
 
+                }
+
+                if(props.RiverDevilBlockerOption == RiverDevilBlockerOption.SIEGE)
+                {
+                    //Iterate the towns in a random order
+                    Location[] towns = [townAtNabooru, townAtDarunia, townAtNewKasuto, townAtOldKasuto];
+                    RNG.Shuffle(towns);
+                    bool placed = false;
+                    foreach (Location location in towns)
+                    {
+                        //if the town has walkable space in all 4 cardinal directions
+                        //TODO: a little bit of bounds safety.
+                        //It is currently impossible to put towns on the edge of the map but don't trust that
+                        if (map[location.Ypos - 29, location.Xpos].IsWalkable() && map[location.Ypos - 30, location.Xpos - 1].IsWalkable() &&
+                            map[location.Ypos - 31, location.Xpos].IsWalkable() && map[location.Ypos - 30, location.Xpos + 1].IsWalkable())
+                        {
+                            //replace each cardinal adjacency with a river devil
+                            map[location.Ypos - 29, location.Xpos] = Terrain.RIVER_DEVIL;
+                            map[location.Ypos - 31, location.Xpos] = Terrain.RIVER_DEVIL;
+                            map[location.Ypos - 30, location.Xpos - 1] = Terrain.RIVER_DEVIL;
+                            map[location.Ypos - 30, location.Xpos + 1] = Terrain.RIVER_DEVIL;
+                            placed = true;
+                            break;
+                        }
+                    }
+                    if(!placed)
+                    {
+                        return false;
+                    }
                 }
 
                 foreach (Location location in AllLocations)
                 {
-                    if (location.CanShuffle)
+                    if (location.CanShuffle && location.AppearsOnMap)
                     {
                         location.Ypos = 0;
                         location.CanShuffle = false;
@@ -1555,14 +1597,123 @@ public sealed class EastHyrule : World
         return Math.Sqrt(Math.Pow(l.Xpos - l2.Xpos, 2) + Math.Pow(l.Ypos - l2.Ypos, 2));
     }
 
+    private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock)
+    {
+        //Blockers are on, but there are no block types 
+        if(!riverDevilBlocks && !rockBlock)
+        {
+            return;
+        }
+        int cavePicked = 0;
+        bool riverDevilPlaced = !riverDevilBlocks;
+        bool rockPlaced = !rockBlock;
+        while (!riverDevilPlaced || !rockPlaced)
+        {
+            bool placed = false;
+            Terrain blockerTerrain = riverDevilPlaced ? Terrain.ROCK : Terrain.RIVER_DEVIL;
+            List<Location> Caves = Locations[Terrain.CAVE];
+            Location cave = Caves[RNG.Next(Caves.Count)];
+            int caveConn = 0;
+            if (caveConn != 0 && connections.ContainsKey(GetLocationByMem(cavePicked)))
+            {
+                caveConn = connections[GetLocationByMem(cavePicked)].MemAddress;
+            }
+            if (connectionsCanBeBlocked && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
+            {
+                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null)
+                {
+                    map[cave.Ypos - 30, cave.Xpos - 1] = blockerTerrain;
+                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.CAVE;
+                    if (cave.Xpos + 2 < MAP_COLS)
+                    {
+                        map[cave.Ypos - 30, cave.Xpos + 2] = Terrain.MOUNTAIN;
+                    }
+                    cave.Xpos++;
+                    placed = true;
+                }
+                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null)
+                {
+                    map[cave.Ypos - 30, cave.Xpos + 1] = blockerTerrain;
+                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.CAVE;
+                    if (cave.Xpos - 2 >= 0)
+                    {
+                        map[cave.Ypos - 30, cave.Xpos - 2] = Terrain.MOUNTAIN;
+                    }
+                    cave.Xpos--;
+                    placed = true;
+                }
+                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null)
+                {
+                    map[cave.Ypos - 29, cave.Xpos] = blockerTerrain;
+                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Ypos - 31, cave.Xpos] = Terrain.CAVE;
+                    if (cave.Ypos - 32 >= 0)
+                    {
+                        map[cave.Ypos - 32, cave.Xpos] = Terrain.MOUNTAIN;
+                    }
+                    cave.Ypos--;
+                    placed = true;
+                }
+                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null)
+                {
+                    map[cave.Ypos - 31, cave.Xpos] = blockerTerrain;
+                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Ypos - 29, cave.Xpos] = Terrain.CAVE;
+                    if (cave.Ypos - 28 < MAP_ROWS)
+                    {
+                        map[cave.Ypos - 28, cave.Xpos] = Terrain.MOUNTAIN;
+                    }
+                    cave.Ypos++;
+                    placed = true;
+                }
+                cavePicked = cave.MemAddress;
+            }
+            else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
+            {
+                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN)
+                {
+                    map[cave.Ypos - 30, cave.Xpos - 1] = blockerTerrain;
+                    placed = true;
+                }
+                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN)
+                {
+                    map[cave.Ypos - 30, cave.Xpos + 1] = blockerTerrain;
+                    placed = true;
+                }
+                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN)
+                {
+                    map[cave.Ypos - 29, cave.Xpos] = blockerTerrain;
+                    placed = true;
+                }
+                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN)
+                {
+                    map[cave.Ypos - 31, cave.Xpos] = blockerTerrain;
+                    placed = true;
+                }
+                cavePicked = cave.MemAddress;
+            }
+            if(placed)
+            {
+                if(blockerTerrain == Terrain.RIVER_DEVIL)
+                {
+                    riverDevilPlaced = true;
+                }
+                else if (blockerTerrain == Terrain.ROCK)
+                {
+                    rockPlaced = true;
+                }
+            }
+        }
+    }
 
-
-    private void DrawMountains()
+    private void DrawMountains(bool useRiverDevil)
     {
         //create some mountains
         int mounty = RNG.Next(MAP_COLS / 3 - 10, MAP_COLS / 3 + 10);
         map[mounty, 0] = Terrain.MOUNTAIN;
-        bool placedSpider = false;
+        bool placedSpider = !useRiverDevil;
 
 
         int endmounty = RNG.Next(MAP_COLS / 3 - 10, MAP_COLS / 3 + 10);
@@ -1893,5 +2044,21 @@ public sealed class EastHyrule : World
         desertTile.VanillaCollectable = Collectable.HEART_CONTAINER;
         pbagCave1.VanillaCollectable = Collectable.XL_BAG;
         pbagCave2.VanillaCollectable = Collectable.XL_BAG;
+    }
+
+    //XXX: delete this
+    public void DebugTowns()
+    {
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                if (map[y, x] == Terrain.TOWN)
+                {
+                    Debug.WriteLine("(" + y + "," + x + ")");
+                }
+            }
+        }
+        Debug.WriteLine("");
     }
 }

@@ -21,16 +21,19 @@
             <ComboBox assists:ComboBoxAssist.Label="Encounter Rate" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.EncounterRateList}}"
                       SelectedItem="{Binding Config.EncounterRate, Converter={x:Static ui:Util.EnumConvert}}" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.GoodBoots}" Content="All Water Is Walkable With Boots" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.HidePalace}" Content="Hide Palace" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.HideKasuto}" Content="Hide Kasuto" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.HideLessImportantLocations}" Content="Hide Less Important Locations" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleWhichLocationIsHidden}" Content="Shuffle Which Location Is Hidden" />
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.HideLessImportantLocations}" Content="Hide Less Important Locations" />
+            <ComboBox Grid.Row="0" Grid.Column="0" assists:ComboBoxAssist.Label="River Devil Blocks" Theme="{StaticResource MaterialOutlineComboBox}"
+              ItemsSource="{Binding Source={x:Static rc:Enums.RiverDevilBlockerOptionList}}"
+              SelectedItem="{Binding Config.RiverDevilBlockerOption, Converter={x:Static ui:Util.EnumConvert}}" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.EastRocks}" Content="Allow Rock Blocks on the East" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.RestrictConnectionCaveShuffle}" Content="Restrict Connection Cave Shuffle" />
-            <CheckBox IsChecked="{Binding Config.AllowConnectionCavesToBeBoulderBlocked}" Content="Allow Connection Caves To Be Boulder Blocked" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.HideLessImportantLocations}" Content="Hide Less Important Locations" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.GoodBoots}" Content="All Water Is Walkable With Boots" />
+            <CheckBox IsChecked="{Binding Config.AllowConnectionCavesToBeBlocked}" Content="Allow Connection Caves To Be Blocked" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.GenerateBaguWoods}" Content="Generate Bagu's Woods" />
             <Separator />
             <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
@@ -50,7 +53,7 @@
                           ItemsSource="{Binding Source={x:Static rc:Enums.ContinentConnectionTypeList}}"
                           SelectedItem="{Binding Config.ContinentConnectionType, Converter={x:Static ui:Util.EnumConvert}}" />
                 <ComboBox Grid.Row="0" Grid.Column="1" assists:ComboBoxAssist.Label="Climate" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static overworld:Climates.ClimateList}}"
+                          ItemsSource="{Binding Source={x:Static overworld:Climates.ClimateNameList}}"
                           SelectedItem="{Binding Config.Climate, Converter={x:Static ui:Util.ClimateConvert}}" />
             </Grid>
 

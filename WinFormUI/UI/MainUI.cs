@@ -881,7 +881,7 @@ public partial class MainUI : Form
         configuration.ShuffleWhichLocationIsHidden = GetTripleCheckState(shuffleWhichLocationsAreHiddenCheckbox);
         configuration.HideLessImportantLocations = GetTripleCheckState(hideLessImportantLocationsCheckbox);
         configuration.RestrictConnectionCaveShuffle = GetTripleCheckState(saneCaveShuffleBox);
-        configuration.AllowConnectionCavesToBeBoulderBlocked = allowBoulderBlockedConnectionsCheckbox.Checked;
+        configuration.AllowConnectionCavesToBeBlocked = allowBoulderBlockedConnectionsCheckbox.Checked;
         configuration.GoodBoots = GetTripleCheckState(useGoodBootsCheckbox);
         configuration.GenerateBaguWoods = GetTripleCheckState(generateBaguWoodsCheckbox);
         configuration.ContinentConnectionType = continentConnectionBox.SelectedIndex switch
@@ -1376,7 +1376,7 @@ public partial class MainUI : Form
             shuffleWhichLocationsAreHiddenCheckbox.CheckState = ToCheckState(configuration.ShuffleWhichLocationIsHidden);
             hideLessImportantLocationsCheckbox.CheckState = ToCheckState(configuration.HideLessImportantLocations);
             saneCaveShuffleBox.CheckState = ToCheckState(configuration.RestrictConnectionCaveShuffle);
-            allowBoulderBlockedConnectionsCheckbox.Checked = configuration.AllowConnectionCavesToBeBoulderBlocked;
+            allowBoulderBlockedConnectionsCheckbox.Checked = configuration.AllowConnectionCavesToBeBlocked;
             useGoodBootsCheckbox.CheckState = ToCheckState(configuration.GoodBoots);
             generateBaguWoodsCheckbox.CheckState = ToCheckState(configuration.GenerateBaguWoods);
             continentConnectionBox.SelectedIndex = configuration.ContinentConnectionType switch

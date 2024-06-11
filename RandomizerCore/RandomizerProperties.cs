@@ -81,15 +81,16 @@ public class RandomizerProperties
     public bool DmIsHorizontal { get; set; }
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
-
+    public bool EastRockIsPath { get; set; }
     public Climate Climates { get; set; }
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
     public bool BagusWoods { get; set; }
+    public RiverDevilBlockerOption RiverDevilBlockerOption { get; set; }
+    public bool EastRocks { get; set; }
 
     //Palaces
-    //public bool shufflePalaceRooms { get; set; }
     public PalaceStyle[] PalaceStyles { get; set; } = new PalaceStyle[7];
     public bool ShortenNormalPalaces { get; set; }
     public bool ShortenGP { get; set; }
@@ -99,7 +100,6 @@ public class RandomizerProperties
     public bool UpARestartsAtPalaces { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
-    //public bool createPalaces { get; set; }
     public bool BlockersAnywhere { get; set; }
     public bool BossRoomConnect { get; set; }
     public bool NoDuplicateRooms { get; set; }
@@ -123,27 +123,12 @@ public class RandomizerProperties
     public XPEffectiveness EnemyXPDrops { get; set; }
 
     //Levels
-    //public bool shuffleAllExp { get; set; }
     public bool ShuffleAtkExp { get; set; }
     public bool ShuffleMagicExp { get; set; }
     public bool ShuffleLifeExp { get; set; }
-    //public bool shuffleAtkEff { get; set; }
-    //public bool shuffleMagEff { get; set; }
-    //public bool shuffleLifeEff { get; set; }
     public bool ShuffleLifeRefill { get; set; }
     public bool ShuffleSpellLocations { get; set; }
     public bool DisableMagicRecs { get; set; }
-    /*
-    public bool ohkoEnemies { get; set; }
-    public bool tankMode { get; set; }
-    public bool ohkoLink { get; set; }
-    public bool wizardMode { get; set; }
-    public bool highAtk { get; set; }
-    public bool lowAtk { get; set; }
-    public bool highDef { get; set; }
-    public bool highMag { get; set; }
-    public bool lowMag { get; set; }
-    */
     public AttackEffectiveness AttackEffectiveness { get; set; }
     public MagicEffectiveness MagicEffectiveness { get; set; }
     public LifeEffectiveness LifeEffectiveness { get; set; }

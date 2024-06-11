@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RandomizerCore.Overworld;
 public static class Climates
@@ -181,14 +182,16 @@ public static class Climates
         };
     }
     
-    public static IEnumerable<string> ClimateList =
+    public static IEnumerable<Climate> ClimateList =
     [
-        Classic.Name,
-        Chaos.Name,
-        Wetlands.Name,
-        GreatLakes.Name,
-        Scrubland.Name,
+        Classic,
+        Chaos,
+        Wetlands,
+        GreatLakes,
+        Scrubland,
     ];
+
+    public static IEnumerable<string> ClimateNameList = ClimateList.Select(i => i.Name);
 }
 
 
