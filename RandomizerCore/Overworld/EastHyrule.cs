@@ -694,7 +694,7 @@ public sealed class EastHyrule : World
                 */
                 bool riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.CAVE;
                 bool rockBlock = props.EastRocks && !props.EastRockIsPath;
-                BlockCaves(props.BoulderBlockConnections, rockBlock, rockBlock);
+                BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock);
                 PlaceHiddenLocations();
                 riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH;
                 rockBlock = props.EastRocks && props.EastRockIsPath;

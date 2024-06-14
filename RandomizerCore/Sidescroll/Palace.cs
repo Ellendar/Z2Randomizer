@@ -365,13 +365,13 @@ public class Palace
         }
     }
 
-    public bool AllReachable()
+    public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false)
     {
         foreach (Room r in AllRooms)
         {
             if (r.HasBoss && CanEnterBossFromLeft(r))
             {
-                return false;
+                return new Room[] { entrance };
             }
         }
         List<Room> reachedRooms = [];
@@ -386,7 +386,7 @@ public class Palace
             {
                 if (originDirection == Direction.EAST)
                 {
-                    return false;
+                    return new Room[] { entrance };
                 }
             }
             roomsToCheck.Remove(roomsToCheck.Last());
@@ -395,27 +395,32 @@ public class Palace
                 continue;
             }
             reachedRooms.Add(room);
-            if (room.Left != null && originDirection != Direction.WEST)
+            if (room.Left != null && (originDirection != Direction.WEST || allowBacktracking))
             {
                 roomsToCheck.Add((room.Left, Direction.EAST));
             }
 
-            if (room.Right != null && originDirection != Direction.EAST)
+            if (room.Right != null && (originDirection != Direction.EAST || allowBacktracking))
             {
                 roomsToCheck.Add((room.Right, Direction.WEST));
             }
 
-            if (room.Up != null && originDirection != Direction.NORTH)
+            if (room.Up != null && (originDirection != Direction.NORTH || allowBacktracking))
             {
                 roomsToCheck.Add((room.Up, Direction.SOUTH));
             }
 
-            if (room.Down != null && originDirection != Direction.SOUTH)
+            if (room.Down != null && (originDirection != Direction.SOUTH || allowBacktracking))
             {
                 roomsToCheck.Add((room.Down, Direction.NORTH));
             }
         }
-        return !AllRooms.Any(i => !reachedRooms.Contains(i));
+        return reachedRooms;
+    }
+
+    public bool AllReachable(bool allowBacktracking = false)
+    {
+        return !AllRooms.Any(i => !GetReachableRooms(allowBacktracking).Contains(i));
     }
 
     private bool CanEnterBossFromLeft(Room b)
@@ -1190,21 +1195,26 @@ public class Palace
             {
                 return true;
             }
+            if (coveredRooms.Contains(room))
+            {
+                pendingRooms.Remove(room);
+                continue;
+            }
             coveredRooms.Add(room);
             pendingRooms.Remove(room);
-            if (room.Left != null && room.Left.IsTraversable(requireables) && !coveredRooms.Contains(room.Left))
+            if (room.Left != null && room.Left.IsTraversable(requireables))
             {
                 pendingRooms.Add(room.Left);
             }
-            if (room.Right != null && room.Right.IsTraversable(requireables) && !coveredRooms.Contains(room.Right))
+            if (room.Right != null && room.Right.IsTraversable(requireables))
             {
                 pendingRooms.Add(room.Right);
             }
-            if (room.Up != null && room.Up.IsTraversable(requireables) && !coveredRooms.Contains(room.Up))
+            if (room.Up != null && room.Up.IsTraversable(requireables))
             {
                 pendingRooms.Add(room.Up);
             }
-            if (room.Down != null && room.Down.IsTraversable(requireables) && !coveredRooms.Contains(room.Down))
+            if (room.Down != null && room.Down.IsTraversable(requireables))
             {
                 pendingRooms.Add(room.Down);
             }

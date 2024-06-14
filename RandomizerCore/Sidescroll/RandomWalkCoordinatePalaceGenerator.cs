@@ -44,6 +44,7 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
 
         (int, int) currentCoord = (0, 0);
 
+        //Create graph
         while (walkGraph.Count < roomCount)
         {
             int direction = r.Next(4);
@@ -89,8 +90,8 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             currentCoord = nextCoord;
         }
 
+        //Dropify graph
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
-
         foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.Item2).ThenBy(i => i.Key.Item1))
         {
             int x = item.Key.Item1;
@@ -134,7 +135,8 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             }
         }
 
-        roomsByExitType = roomPool.CategorizeNormalRoomExits();
+        //Add rooms
+        roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
         foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.Item2).ThenBy(i => i.Key.Item1))
         {
             if (item.Key == (0, 0))
@@ -143,7 +145,8 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             }
             int x = item.Key.Item1;
             int y = item.Key.Item2;
-            roomsByExitType.TryGetValue(item.Value, out var roomCandidates);
+            RoomExitType roomExitType = item.Value;
+            roomsByExitType.TryGetValue(roomExitType, out var roomCandidates);
             roomCandidates ??= [];
             roomCandidates.FisherYatesShuffle(r);
             Room newRoom = null;
@@ -159,10 +162,18 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             }
             if (newRoom == null)
             {
-                roomPool.StubsByDirection.TryGetValue(item.Value, out newRoom);
+                roomPool.StubsByDirection.TryGetValue(roomExitType, out newRoom);
             }
             if (newRoom == null)
             {
+                if(roomExitType == RoomExitType.DROP_STUB)
+                {
+                    if(upRoom?.IsDropZone ?? false)
+                    {
+                        upRoom.Down = upRoom;
+                        continue;
+                    }
+                }
                 palace.IsValid = false;
                 return palace;
             }
@@ -172,42 +183,60 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             }
 
             palace.AllRooms.Add(newRoom);
+            if(newRoom.LinkedRoomName != null)
+            {
+                palace.AllRooms.Add(new(roomPool.LinkedRooms[newRoom.LinkedRoomName]));
+                roomCount++;
+            }
             newRoom.coords = item.Key;
         }
 
         //Connect adjacent rooms if they exist
         foreach (Room room in palace.AllRooms)
         {
-            Room? left = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1 - 1, room.coords.Item2));
-            Room? down = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1, room.coords.Item2 - 1));
-            Room? up = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1, room.coords.Item2 + 1));
-            Room? right = palace.AllRooms.FirstOrDefault(i => i.coords == (room.coords.Item1 + 1, room.coords.Item2));
+            Room[] leftRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1 - 1, room.coords.Item2)).ToArray();
+            Room[] downRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1, room.coords.Item2 - 1)).ToArray();
+            Room[] upRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1, room.coords.Item2 + 1)).ToArray();
+            Room[] rightRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1 + 1, room.coords.Item2)).ToArray();
 
-            if (left != null && room.FitsWithLeft(left) > 0)
+            foreach(Room left in leftRooms)
             {
-                room.Left = left;
-                left.Right = room;
-            }
-            if (down != null && room.FitsWithDown(down) > 0)
-            {
-                room.Down = down;
-                if (!room.HasDrop)
+                if (left != null && room.FitsWithLeft(left) > 0)
                 {
-                    down.Up = room;
+                    room.Left = left;
+                    left.Right = room;
                 }
             }
-            if (up != null && room.FitsWithUp(up) > 0)
+
+            foreach (Room down in downRooms)
             {
-                if (!up.HasDrop)
+                if (down != null && room.FitsWithDown(down) > 0)
                 {
-                    room.Up = up;
+                    room.Down = down;
+                    if (!room.HasDrop)
+                    {
+                        down.Up = room;
+                    }
                 }
-                up.Down = room;
             }
-            if (right != null && room.FitsWithRight(right) > 0)
+            foreach (Room up in upRooms)
             {
-                room.Right = right;
-                right.Left = room;
+                if (up != null && room.FitsWithUp(up) > 0)
+                {
+                    if (!up.HasDrop)
+                    {
+                        room.Up = up;
+                    }
+                    up.Down = room;
+                }
+            }
+            foreach (Room right in rightRooms)
+            {
+                if (right != null && room.FitsWithRight(right) > 0)
+                {
+                    room.Right = right;
+                    right.Left = room;
+                }
             }
         }
 

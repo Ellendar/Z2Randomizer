@@ -165,6 +165,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private IndeterminateOptionRate indeterminateOptionRate;
     private RiverDevilBlockerOption riverDevilBlockerOption;
     private bool? eastRocks;
+    private bool generateSpoiler;
 
     //Meta
     [Required]

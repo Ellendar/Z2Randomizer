@@ -736,6 +736,48 @@ public class Room : IJsonOnDeserialized
         return true;
     }
 
+    public bool ConnectRandomly(Room otherRoom, Random r)
+    {
+        Direction[] directons = [Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST];
+        r.Shuffle(directons);
+
+        foreach (Direction direction in directons)
+        {
+            switch(direction)
+            {
+                case Direction.NORTH:
+                    if(FitsWithUp(otherRoom) == 1 && ElevatorScreen > -1 && otherRoom.ElevatorScreen > -1)
+                    {
+                        Up = otherRoom;
+                        return true;
+                    }
+                    break;
+                case Direction.SOUTH:
+                    if (FitsWithDown(otherRoom) == 1)
+                    {
+                        Down = otherRoom;
+                        return true;
+                    }
+                    break;
+                case Direction.WEST:
+                    if (FitsWithLeft(otherRoom) == 1)
+                    {
+                        Left = otherRoom;
+                        return true;
+                    }
+                    break;
+                case Direction.EAST:
+                    if (FitsWithRight(otherRoom) == 1)
+                    {
+                        Right = otherRoom;
+                        return true;
+                    }
+                    break;
+            }
+        }
+        return false;
+    }
+
     public bool IsOrphaned()
     {
         return (HasLeftExit && Left != null)

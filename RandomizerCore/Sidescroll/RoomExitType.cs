@@ -110,4 +110,9 @@ public static class RoomExitTypeExtensions
     {
         return (RoomExitType)((int)exitType & 0b11101);
     }
+
+    public static RoomExitType Merge(this RoomExitType exitType, RoomExitType toMerge)
+    {
+        return exitType | toMerge;
+    }
 }

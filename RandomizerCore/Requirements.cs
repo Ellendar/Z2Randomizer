@@ -109,7 +109,7 @@ public class Requirements
         var compositeRequirementSatisfied = 
             CompositeRequirements.Length == 0 || CompositeRequirements.Any(compositeRequirement =>
             compositeRequirement.All(i => requirementTypes.Contains(i)));
-        return compositeRequirementSatisfied;
+        return (IndividualRequirements.Length > 0 && individualRequirementsSatisfied) || compositeRequirementSatisfied;
     }
 
     public bool HasHardRequirement(RequirementType requireable)

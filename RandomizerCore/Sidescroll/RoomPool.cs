@@ -146,12 +146,16 @@ public class RoomPool
         }
     }
 
-    public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits()
+    public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits(bool linkRooms = false)
     {
         Dictionary<RoomExitType, List<Room>> categorizedRooms = [];
         foreach(Room room in NormalRooms)
         {
             RoomExitType type = room.CategorizeExits();
+            if(room.LinkedRoomName != null)
+            {
+                type = type.Merge(LinkedRooms[room.LinkedRoomName].CategorizeExits());
+            }
             if(!categorizedRooms.ContainsKey(type))
             {
                 categorizedRooms[type] = [];
