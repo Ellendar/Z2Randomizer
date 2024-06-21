@@ -2809,4 +2809,6 @@ public abstract class World
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 
     protected abstract void SetVanillaCollectables(bool useDash);
+
+    protected abstract void GenerateSpoiler();
 }

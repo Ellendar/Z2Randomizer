@@ -968,6 +968,11 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         get => randomizeKnockback;
         set => SetField(ref randomizeKnockback, value);
     }
+    public bool GenerateSpoiler
+    {
+        get => generateSpoiler;
+        set => SetField(ref generateSpoiler, value);
+    }
 
 
     //This is a lazy backwards implementation Digshake's base64 encoding system.

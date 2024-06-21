@@ -9,11 +9,14 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.HintsView">
-    <Grid ColumnDefinitions="*">
+    <Grid ColumnDefinitions="*, *">
         <StackPanel>
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.EnableHelpfulHints}" Content="Enable Helpful Hints" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.EnableSpellItemHints}" Content="Enable Spell Item Hints" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.EnableTownNameHints}" Content="Enable Town Name Hints" />
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+          <CheckBox IsThreeState="False" IsChecked="{Binding Config.GenerateSpoiler}" Content="Generate Spoiler" />
         </StackPanel>
     </Grid>
 </UserControl>

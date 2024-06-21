@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using NLog;
 
 namespace RandomizerCore.Overworld;
@@ -1605,5 +1606,13 @@ public sealed class WestHyrule : World
         magicContainerCave.VanillaCollectable = Collectable.MAGIC_CONTAINER;
         trophyCave.VanillaCollectable = Collectable.TROPHY;
         medicineCave.VanillaCollectable = Collectable.MEDICINE;
+    }
+
+    protected abstract string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+        sb.
+
+        return sb.ToString();
     }
 }
