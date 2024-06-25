@@ -2810,5 +2810,5 @@ public abstract class World
 
     protected abstract void SetVanillaCollectables(bool useDash);
 
-    protected abstract void GenerateSpoiler();
+    public abstract string GenerateSpoiler();
 }

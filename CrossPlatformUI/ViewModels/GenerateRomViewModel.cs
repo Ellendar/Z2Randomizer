@@ -85,6 +85,11 @@ Seed: {config.Seed}
                     var output = await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token);
                     var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
                     await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
+                    if(config.GenerateSpoiler)
+                    {
+                        filename = $"Z2_{config.Seed}_{config.Flags}.spoiler";
+                        await files.SaveSpoilerFile(filename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
+                    }
                     Progress = $"Generation Complete! Hash: {randomizer.Hash}\n\nFile {filename} created";
                     IsComplete = true;
                 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace RandomizerCore.Overworld;
 
@@ -920,5 +921,17 @@ sealed class MazeIsland : World
         locationAtPalace4.VanillaCollectable = Collectable.BOOTS;
         childDrop.VanillaCollectable = Collectable.CHILD;
         magicContainerDrop.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+    }
+
+    public override string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("MAZE ISLAND: ");
+        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.Collectable.EnglishText());
+        sb.AppendLine("\tChild Drop: " + childDrop.Collectable.EnglishText());
+
+        sb.AppendLine("\tPalace 4 (" + locationAtPalace4.PalaceNumber + "): " + locationAtPalace4.Collectable.EnglishText());
+        sb.AppendLine();
+        return sb.ToString();
     }
 }

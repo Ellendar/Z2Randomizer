@@ -2187,7 +2187,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShuffleOverworldItems = ShuffleOverworldItems ?? GetIndeterminateFlagValue(r);
         properties.ShufflePalaceItems = ShufflePalaceItems ?? GetIndeterminateFlagValue(r);
         properties.MixOverworldPalaceItems = MixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r); 
-        properties.ShuffleSmallItems = ShuffleSmallItems;
+        properties.RandomizeSmallItems = ShuffleSmallItems;
         properties.ExtraKeys = PalacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.KasutoJars = RandomizeNewKasutoJarRequirements;
         properties.PbagItemShuffle = IncludePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);

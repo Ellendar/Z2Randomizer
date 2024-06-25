@@ -17,4 +17,5 @@ public interface IFileSystemService
     Task SaveFile(RandomizerPath path, string filename, string data);
     Task<IEnumerable<string>> ListLocalFiles(RandomizerPath path);
     Task SaveGeneratedBinaryFile(string filename, byte[] filedata, string? path = null);
+    Task SaveSpoilerFile(string filename, string data, string? path = null);
 }

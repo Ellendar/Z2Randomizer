@@ -78,4 +78,9 @@ public class DesktopFileService : IFileSystemService
         var file = Path.Join(path ?? "", filename);
         return File.WriteAllBytesAsync(file, filedata);
     }
+
+    public Task SaveSpoilerFile(string filename, string data, string? path = null)
+    {
+        return File.WriteAllTextAsync(Path.Combine(path ?? "", filename), data);
+    }
 }

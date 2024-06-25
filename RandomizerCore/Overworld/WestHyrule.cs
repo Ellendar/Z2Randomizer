@@ -1608,11 +1608,29 @@ public sealed class WestHyrule : World
         medicineCave.VanillaCollectable = Collectable.MEDICINE;
     }
 
-    protected abstract string GenerateSpoiler()
+    public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
-        sb.
+        sb.AppendLine("WEST: ");
+        sb.AppendLine("\tRauru: " + AllLocations.First(i => i.ActualTown == Town.RAURU).Collectable.EnglishText());
+        sb.AppendLine("\tRuto: " + AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable.EnglishText());
+        sb.AppendLine("\tMirror Table: " + mirrorTable.Collectable.EnglishText());
+        sb.AppendLine("\tSaria: " + AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectable.EnglishText());
+        sb.AppendLine("\tDownstab Guy: " + midoChurch.Collectable.EnglishText());
+        sb.AppendLine("\tMido: " + AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable.EnglishText());
+        sb.AppendLine("\tBagu: " + bagu.Collectable.EnglishText());
 
+        sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.Collectable.EnglishText());
+        sb.AppendLine("\tTrophy Cave: " + trophyCave.Collectable.EnglishText());
+        sb.AppendLine("\tGrass Tile: " + grassTile.Collectable.EnglishText());
+        sb.AppendLine("\tHeart Container Cave: " + heartContainerCave.Collectable.EnglishText());
+        sb.AppendLine("\tPillar Pbag Cave: " + pbagCave.Collectable.EnglishText());
+        sb.AppendLine("\tMedicine Cave: " + medicineCave.Collectable.EnglishText());
+
+        sb.AppendLine("\tPalace 1 (" + locationAtPalace1.PalaceNumber + "): " + locationAtPalace1.Collectable.EnglishText());
+        sb.AppendLine("\tPalace 2 (" + locationAtPalace2.PalaceNumber + "): " + locationAtPalace2.Collectable.EnglishText());
+        sb.AppendLine("\tPalace 3 (" + locationAtPalace3.PalaceNumber + "): " + locationAtPalace3.Collectable.EnglishText());
+        sb.AppendLine();
         return sb.ToString();
     }
 }

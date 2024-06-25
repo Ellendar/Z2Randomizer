@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using NLog;
 
 namespace RandomizerCore.Overworld;
@@ -2060,5 +2061,29 @@ public sealed class EastHyrule : World
             }
         }
         Debug.WriteLine("");
+    }
+
+    public override string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("EAST: ");
+        sb.AppendLine("\tNabooru: " + AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectable.EnglishText());
+        sb.AppendLine("\tFountain: " + fountain.Collectable.EnglishText());
+        sb.AppendLine("\tDarunia: " + AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable.EnglishText());
+        sb.AppendLine("\tUpstab Guy: " + daruniaRoof.Collectable.EnglishText());
+        sb.AppendLine("\tNew Kasuto: " + AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Collectable.EnglishText());
+        sb.AppendLine("\tGranny's Basement: " + newKasutoBasement.Collectable.EnglishText());
+        sb.AppendLine("\tSpell Tower: " + spellTower.Collectable.EnglishText());
+        sb.AppendLine("\tOld Kasuto: " + AllLocations.First(i => i.ActualTown == Town.OLD_KASUTO).Collectable.EnglishText());
+
+        sb.AppendLine("\tRisen Pbag Cave: " + pbagCave2.Collectable.EnglishText());
+        sb.AppendLine("\tSunken Pbag Cave: " + pbagCave1.Collectable.EnglishText());
+        sb.AppendLine("\tWater Tile: " + waterTile.Collectable.EnglishText());
+        sb.AppendLine("\tDesert tile: " + desertTile.Collectable.EnglishText());
+
+        sb.AppendLine("\tPalace 5 (" + locationAtPalace5.PalaceNumber + "): " + locationAtPalace5.Collectable.EnglishText());
+        sb.AppendLine("\tPalace 6 (" + locationAtPalace6.PalaceNumber + "): " + locationAtPalace6.Collectable.EnglishText());
+        sb.AppendLine();
+        return sb.ToString();
     }
 }

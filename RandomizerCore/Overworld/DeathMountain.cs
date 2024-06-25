@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using SD.Tools.BCLExtensions.CollectionsRelated;
 
 namespace RandomizerCore.Overworld;
@@ -1155,5 +1156,16 @@ sealed class DeathMountain : World
     {
         hammerCave.VanillaCollectable = Collectable.HAMMER;
         specRock.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+    }
+
+    public override string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("DEATH MOUNTAIN: ");
+        sb.AppendLine("\tHammer Cave: " + hammerCave.Collectable.EnglishText());
+        sb.AppendLine("\tSpec Rock: " + specRock.Collectable.EnglishText());
+
+        sb.AppendLine();
+        return sb.ToString();
     }
 }

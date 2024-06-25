@@ -186,6 +186,11 @@ public class Hyrule
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
             RNG = new Random(SeedHash);
             props = config.Export(RNG);
+            //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
+            if(props.GenerateSpoiler)
+            {
+                RNG.NextBytes(new byte[64]);
+            }
             if (UNSAFE_DEBUG)
             {
                 string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
@@ -243,7 +248,7 @@ public class Hyrule
                     palaces.ForEach(i => i.RandomizeEnemies(props, RNG));
                 }
 
-                if (props.ShuffleSmallItems || props.ExtraKeys)
+                if (props.RandomizeSmallItems || props.ExtraKeys)
                 {
                     palaces[0].RandomizeSmallItems(RNG, props.ExtraKeys);
                     palaces[1].RandomizeSmallItems(RNG, props.ExtraKeys);
@@ -451,7 +456,7 @@ public class Hyrule
 
             if (UNSAFE_DEBUG)
             {
-                PrintSpoiler(LogLevel.Error);
+                PrintDebugSpoiler(LogLevel.Error);
                 //DEBUG
                 StringBuilder sb = new();
                 foreach (Palace palace in palaces)
@@ -616,6 +621,12 @@ public class Hyrule
             shufflableItems.Add(westHyrule.pbagCave.Collectable);
             shufflableItems.Add(eastHyrule.pbagCave1.Collectable);
             shufflableItems.Add(eastHyrule.pbagCave2.Collectable);
+        }
+        else
+        {
+            westHyrule.pbagCave.Collectable = Collectable.LARGE_BAG;
+            eastHyrule.pbagCave1.Collectable = Collectable.LARGE_BAG;
+            eastHyrule.pbagCave2.Collectable = Collectable.XL_BAG;
         }
 
         if(UNSAFE_DEBUG && props.IncludeSpellsInShuffle)
@@ -1372,7 +1383,7 @@ public class Hyrule
 
     private async Task ProcessOverworld(Func<string, Task> progress, CancellationToken ct)
     {
-        if (props.ShuffleSmallItems)
+        if (props.RandomizeSmallItems)
         {
             RandomizeSmallItems(1, true);
             RandomizeSmallItems(1, false);
@@ -3062,7 +3073,7 @@ public class Hyrule
         }
     }
 
-    public void PrintSpoiler(LogLevel logLevel)
+    public void PrintDebugSpoiler(LogLevel logLevel)
     {
         logger.Log(logLevel, "ITEMS:");
         List<Location> MC_Locations = [];
@@ -3098,6 +3109,22 @@ public class Hyrule
             sb.AppendLine("MagicContainer: " + location.Name);
         }
         logger.Log(logLevel, sb.ToString());
+    }
+
+    public string GenerateSpoiler()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("Flags: " + props.Flags);
+        sb.AppendLine("Seed: " + props.Seed);
+
+        sb.AppendLine(westHyrule.GenerateSpoiler());
+        sb.AppendLine(deathMountain.GenerateSpoiler());
+        sb.AppendLine(eastHyrule.GenerateSpoiler());
+        sb.AppendLine(mazeIsland.GenerateSpoiler());
+
+        sb.AppendLine("DETAILS: ");
+        sb.Append(JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties));
+        return sb.ToString().Replace('$', ' ');
     }
 
     /// <summary>

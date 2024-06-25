@@ -130,4 +130,9 @@ public partial class BrowserFileService : IFileSystemService
             DownloadFile(data, filename);
         });
     }
+
+    public Task SaveSpoilerFile(string filename, string data, string? path = null)
+    {
+        throw new NotImplementedException();
+    }
 }
