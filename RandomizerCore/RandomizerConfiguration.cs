@@ -16,6 +16,28 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 {
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    private readonly static Collectable[] POSSIBLE_STARTING_ITEMS = [
+        Collectable.CANDLE,
+        Collectable.GLOVE,
+        Collectable.RAFT,
+        Collectable.BOOTS,
+        Collectable.FLUTE,
+        Collectable.CROSS,
+        Collectable.HAMMER,
+        Collectable.MAGIC_KEY
+    ];
+
+    private readonly static Collectable[] POSSIBLE_STARTING_SPELLS = [
+        Collectable.SHIELD_SPELL,
+        Collectable.JUMP_SPELL,
+        Collectable.LIFE_SPELL,
+        Collectable.FAIRY_SPELL,
+        Collectable.FIRE_SPELL,
+        Collectable.REFLECT_SPELL,
+        Collectable.SPELL_SPELL,
+        Collectable.THUNDER_SPELL
+    ];
+
     private string seed;
     
     private bool shuffleStartingItems;
@@ -28,6 +50,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool startWithHammer;
     private bool startWithMagicKey;
     private bool shuffleStartingSpells;
+    private StartingResourceLimit startItemsLimit;
     private bool startWithShield;
     private bool startWithJump;
     private bool startWithLife;
@@ -36,6 +59,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool startWithReflect;
     private bool startWithSpellSpell;
     private bool startWithThunder;
+    private StartingResourceLimit startSpellsLimit;
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
     private StartingHeartsMaxOption maxHeartContainers;
@@ -190,6 +214,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     public bool StartWithMagicKey { get => startWithMagicKey; set => SetField(ref startWithMagicKey, value); }
     
     public bool ShuffleStartingSpells { get => shuffleStartingSpells; set => SetField(ref shuffleStartingSpells, value); }
+    public StartingResourceLimit StartItemsLimit { get => startItemsLimit; set => SetField(ref startItemsLimit, value); }
     public bool StartWithShield { get => startWithShield; set => SetField(ref startWithShield, value); }
     public bool StartWithJump { get => startWithJump; set => SetField(ref startWithJump, value); }
     public bool StartWithLife { get => startWithLife; set => SetField(ref startWithLife, value); }
@@ -198,6 +223,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     public bool StartWithReflect { get => startWithReflect; set => SetField(ref startWithReflect, value); }
     public bool StartWithSpellSpell { get => startWithSpellSpell; set => SetField(ref startWithSpellSpell, value); }
     public bool StartWithThunder { get => startWithThunder; set => SetField(ref startWithThunder, value); }
+    public StartingResourceLimit StartSpellsLimit { get => startSpellsLimit; set => SetField(ref startSpellsLimit, value); }
 
     [Limit(8)]
     [Minimum(1)]
@@ -1779,7 +1805,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
     public RandomizerProperties Export(Random r)
     {
-        RandomizerProperties properties = new RandomizerProperties();
+        RandomizerProperties properties = new();
+
+        properties.Flags = Flags;
 
         properties.WestIsHorizontal = r.Next(2) == 1;
         properties.EastIsHorizontal = r.Next(2) == 1;
@@ -1790,23 +1818,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.Seed = Seed;
 
         //Start Configuration
-        properties.StartCandle = !StartWithCandle && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithCandle;
-        properties.StartGlove = !StartWithGlove && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithGlove;
-        properties.StartRaft = !StartWithRaft && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithRaft;
-        properties.StartBoots = !StartWithBoots && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithBoots;
-        properties.StartFlute = !StartWithFlute && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithFlute;
-        properties.StartCross = !StartWithCross && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithCross;
-        properties.StartHammer = !StartWithHammer && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithHammer;
-        properties.StartKey = !StartWithMagicKey && ShuffleStartingItems ? r.NextDouble() > .75 : StartWithMagicKey;
+        ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
+        ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, StartSpellsLimit, ShuffleStartingSpells, properties, r);
 
-        properties.StartShield = !StartWithShield && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithShield;
-        properties.StartJump = !StartWithJump && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithJump;
-        properties.StartLife = !StartWithLife && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithLife;
-        properties.StartFairy = !StartWithFairy && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithFairy;
-        properties.StartFire = !StartWithFire && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithFire;
-        properties.StartReflect = !StartWithReflect && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithReflect;
-        properties.StartSpell = !StartWithSpellSpell && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithSpellSpell;
-        properties.StartThunder = !StartWithThunder && ShuffleStartingSpells ? r.NextDouble() > .75 : StartWithThunder;
         switch (FireOption)
         {
             case FireOption.NORMAL:
@@ -2423,5 +2437,82 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             IndeterminateOptionRate.THREE_QUARTERS => .75,
             IndeterminateOptionRate.NINETY_PERCENT => .90,
         };
+    }
+
+    public bool StartsWithCollectable(Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.SHIELD_SPELL => StartWithShield,
+            Collectable.JUMP_SPELL => StartWithJump,
+            Collectable.LIFE_SPELL => StartWithLife,
+            Collectable.FAIRY_SPELL => StartWithFairy,
+            Collectable.FIRE_SPELL => StartWithFire,
+            Collectable.DASH_SPELL => StartWithFire,
+            Collectable.REFLECT_SPELL => StartWithReflect,
+            Collectable.SPELL_SPELL => StartWithSpellSpell,
+            Collectable.THUNDER_SPELL => StartWithThunder,
+            Collectable.CANDLE => StartWithCandle,
+            Collectable.GLOVE => StartWithGlove,
+            Collectable.RAFT => StartWithRaft,
+            Collectable.BOOTS => StartWithBoots,
+            Collectable.FLUTE => StartWithFlute,
+            Collectable.CROSS => StartWithCross,
+            Collectable.HAMMER => StartWithHammer,
+            Collectable.MAGIC_KEY => StartWithMagicKey,
+            _ => throw new ImpossibleException("Unrecognized collectable")
+        };
+    }
+
+    private void ShuffleStartingCollectables(Collectable[] possibleCollectables, StartingResourceLimit limit, bool shuffleRandom, 
+        RandomizerProperties properties, Random r)
+    {
+        int itemLimit = limit switch
+        {
+            StartingResourceLimit.ONE => 1,
+            StartingResourceLimit.TWO => 2,
+            StartingResourceLimit.FOUR => 4,
+            StartingResourceLimit.NO_LIMIT => 8,
+            _ => throw new Exception("Unrecognized StartingResourceLimit in Export")
+        };
+        List<Collectable> startingItems = [];
+
+        Collectable[] randomPossibleCollectables = new Collectable[possibleCollectables.Length];
+        Array.Copy(possibleCollectables, randomPossibleCollectables, possibleCollectables.Length);
+        r.Shuffle(randomPossibleCollectables);
+        foreach (Collectable collectable in randomPossibleCollectables)
+        {
+            if (startingItems.Count >= itemLimit)
+            {
+                break;
+            }
+            if (StartsWithCollectable(collectable))
+            {
+                startingItems.Add(collectable);
+            }
+        }
+
+        if (shuffleRandom)
+        {
+            foreach (Collectable collectable in randomPossibleCollectables)
+            {
+                if (startingItems.Count >= itemLimit)
+                {
+                    break;
+                }
+                if (!StartsWithCollectable(collectable))
+                {
+                    if (r.Next(4) == 0)
+                    {
+                        startingItems.Add(collectable);
+                    }
+                }
+            }
+        }
+
+        foreach (Collectable collectable in startingItems)
+        {
+            properties.SetStartingCollectable(collectable);
+        }
     }
 }

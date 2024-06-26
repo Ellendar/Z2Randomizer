@@ -347,6 +347,19 @@ public enum ContinentConnectionType
     ANYTHING_GOES
 }
 
+[DefaultValue(NO_LIMIT)]
+public enum StartingResourceLimit
+{
+    [Description("No Limit")]
+    NO_LIMIT,
+    [Description("1")]
+    ONE,
+    [Description("2")]
+    TWO,
+    [Description("4")]
+    FOUR,
+}
+
 [DefaultValue(NONE)]
 public enum EncounterRate
 {
@@ -532,6 +545,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> StartingHeartsMaxOptionList { get; } = ToDescriptions<StartingHeartsMaxOption>();
     public static IEnumerable<EnumDescription> IndeterminateOptionRateList { get; } = ToDescriptions<IndeterminateOptionRate>();
     public static IEnumerable<EnumDescription> RiverDevilBlockerOptionList { get; } = ToDescriptions<RiverDevilBlockerOption>();
+    public static IEnumerable<EnumDescription> StartingResourceLimitList { get; } = ToDescriptions<StartingResourceLimit>();
+    
 
     public static IEnumerable<EnumDescription> ToDescriptions<T>(Func<T, bool>? filterExpression = null) where T : Enum
     {

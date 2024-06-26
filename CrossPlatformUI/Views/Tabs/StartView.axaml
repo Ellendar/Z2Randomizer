@@ -26,6 +26,9 @@
                 <CheckBox IsChecked="{Binding Config.StartWithMagicKey}" Content="Magic Key" />
             </StackPanel>
             </Border>
+            <ComboBox assists:ComboBoxAssist.Label="Starting Item Limit" Theme="{StaticResource MaterialOutlineComboBox}"
+              ItemsSource="{Binding Source={x:Static rc:Enums.StartingResourceLimitList}}"
+              SelectedItem="{Binding Config.StartItemsLimit, Converter={x:Static ui:Util.EnumConvert}}"/>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox IsChecked="{Binding Config.ShuffleStartingSpells}" Content="Shuffle Starting Spells" />
@@ -41,6 +44,9 @@
                     <CheckBox IsChecked="{Binding Config.StartWithThunder}" Content="Thunder" />
                 </StackPanel>
             </Border>
+          <ComboBox assists:ComboBoxAssist.Label="Starting Spell Limit" Theme="{StaticResource MaterialOutlineComboBox}"
+            ItemsSource="{Binding Source={x:Static rc:Enums.StartingResourceLimitList}}"
+            SelectedItem="{Binding Config.StartSpellsLimit, Converter={x:Static ui:Util.EnumConvert}}"/>
         </StackPanel>
         <StackPanel HorizontalAlignment="Center" Grid.Column="2">
 

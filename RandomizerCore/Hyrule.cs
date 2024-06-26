@@ -3006,7 +3006,7 @@ public class Hyrule
 
             for (int i = 0; i < 8; i++)
             {
-                ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartWithCollectable(wizardCollectables[i]) ? (byte)1 : (byte)0);
+                ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS + i, props.StartsWithCollectable(wizardCollectables[i]) ? (byte)1 : (byte)0);
             }
         }
         //fix for rope graphical glitch

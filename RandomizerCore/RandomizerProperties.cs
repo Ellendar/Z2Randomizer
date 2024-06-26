@@ -36,6 +36,7 @@ public class RandomizerProperties
     public bool StartCross { get; set; }
     public bool StartHammer { get; set; }
     public bool StartKey { get; set; }
+    public StartingResourceLimit StartItemsLimit { get; set; }
 
     //Spells
     //public bool shuffleSpells;
@@ -49,6 +50,7 @@ public class RandomizerProperties
     public bool StartThunder { get; set; }
     public bool CombineFire { get; set; }
     public bool ReplaceFireWithDash { get; set; }
+    public StartingResourceLimit StartSpellsLimit { get; set; }
 
     //Other starting attributes
     public int StartHearts { get; set; }
@@ -207,7 +209,7 @@ public class RandomizerProperties
     [Key]
     public int Id { get; set; }
 
-    public bool StartWithCollectable(Collectable collectable)
+    public bool StartsWithCollectable(Collectable collectable)
     {
         return collectable switch
         {
@@ -230,7 +232,75 @@ public class RandomizerProperties
             Collectable.CROSS => StartCross,
             Collectable.HAMMER => StartHammer,
             Collectable.MAGIC_KEY => StartKey,
-            _ => throw new ImpossibleException("Unrecognized spell")
+            _ => throw new ImpossibleException("Unrecognized collectable")
         };
+    }
+
+    public void SetStartingCollectable(Collectable collectable, bool starts = true)
+    {
+        if(collectable == Collectable.SHIELD_SPELL)
+        {
+            StartShield = starts;
+        }
+        else if (collectable == Collectable.JUMP_SPELL)
+        {
+            StartJump = starts;
+        }
+        else if (collectable == Collectable.LIFE_SPELL)
+        {
+            StartLife = starts;
+        }
+        else if (collectable == Collectable.FAIRY_SPELL)
+        {
+            StartFairy = starts;
+        }
+        else if (collectable == Collectable.FIRE_SPELL)
+        {
+            StartFire = starts;
+        }
+        else if (collectable == Collectable.REFLECT_SPELL)
+        {
+            StartReflect = starts;
+        }
+        else if (collectable == Collectable.SPELL_SPELL)
+        {
+            StartSpell = starts;
+        }
+        else if (collectable == Collectable.THUNDER_SPELL)
+        {
+            StartThunder = starts;
+        }
+        else if (collectable == Collectable.CANDLE)
+        {
+            StartCandle = starts;
+        }
+        else if (collectable == Collectable.GLOVE)
+        {
+            StartGlove = starts;
+        }
+        else if (collectable == Collectable.RAFT)
+        {
+            StartRaft = starts;
+        }
+        else if (collectable == Collectable.BOOTS)
+        {
+            StartBoots = starts;
+        }
+        else if (collectable == Collectable.FLUTE)
+        {
+            StartFlute = starts;
+        }
+        else if (collectable == Collectable.CROSS)
+        {
+            StartCross = starts;
+        }
+        else if (collectable == Collectable.HAMMER)
+        {
+            StartHammer = starts;
+        }
+        else if (collectable == Collectable.MAGIC_KEY)
+        {
+            StartKey = starts;
+        }
     }
 }
