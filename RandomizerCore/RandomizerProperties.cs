@@ -144,7 +144,6 @@ public class RandomizerProperties
     public bool SpellEnemy { get; set; }
 
     //Items
-    //Items
     public bool ShuffleOverworldItems { get; set; }
     public bool ShufflePalaceItems { get; set; }
     public bool MixOverworldPalaceItems { get; set; }
@@ -154,7 +153,7 @@ public class RandomizerProperties
     public bool IncludeQuestItemsInShuffle { get; set; }
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
-    public bool KasutoJars { get; set; }
+    public bool RandomizeNewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }
     public bool StartWithSpellItems { get; set; }

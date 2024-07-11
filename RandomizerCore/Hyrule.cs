@@ -219,11 +219,7 @@ public class Hyrule
             // Make a copy of the vanilla data to prevent seed bleed
             ROMData = new ROM(vanillaRomData.ToArray());
 
-            if (props.DisableMagicRecs)
-            {
-                kasutoJars = 1;
-            }
-            else if (props.KasutoJars)
+            if (props.RandomizeNewKasutoBasementRequirement)
             {
                 kasutoJars = RNG.Next(5, 8);
             }

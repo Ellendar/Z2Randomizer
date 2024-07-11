@@ -1924,11 +1924,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                     break;
             }
         }
-        //Otherwise I guess we'll use an independent 2/7ths as a rough approximation
         else
         {
-            properties.StartWithDownstab = StartingTechniques == StartingTechs.DOWNSTAB && r.Next(7) >= 5;
-            properties.StartWithUpstab = StartingTechniques == StartingTechs.UPSTAB && r.Next(7) >= 5;
+            properties.StartWithDownstab = StartingTechniques.StartWithDownstab();
+            properties.StartWithUpstab = StartingTechniques.StartWithUpstab();
         }
         properties.SwapUpAndDownStab = SwapUpAndDownStab ?? GetIndeterminateFlagValue(r);
 
@@ -2203,7 +2202,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MixOverworldPalaceItems = MixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r); 
         properties.RandomizeSmallItems = ShuffleSmallItems;
         properties.ExtraKeys = PalacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
-        properties.KasutoJars = RandomizeNewKasutoJarRequirements;
+        properties.RandomizeNewKasutoBasementRequirement = RandomizeNewKasutoJarRequirements;
         properties.PbagItemShuffle = IncludePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
         properties.StartWithSpellItems = RemoveSpellItems ?? GetIndeterminateFlagValue(r);
         properties.ShufflePbagXp = ShufflePBagAmounts ?? GetIndeterminateFlagValue(r);

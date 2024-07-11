@@ -105,6 +105,9 @@ public class Room : IJsonOnDeserialized
     public bool HasDownExit { get; private set; }
     public bool IsUpDownReversed { get; set; }
 
+    public Room MergedPrimary { get; set; }
+    public Room MergedSecondary { get; set; }
+
 
     public Room() {}
     
@@ -776,6 +779,21 @@ public class Room : IJsonOnDeserialized
             }
         }
         return false;
+    }
+
+    public Room Merge(Room otherRoom)
+    {
+        Room mergedRoom = new Room(this);
+        mergedRoom.HasLeftExit = HasLeftExit | otherRoom.HasLeftExit;
+        mergedRoom.HasRightExit = HasRightExit | otherRoom.HasRightExit;
+        mergedRoom.HasUpExit = HasUpExit | otherRoom.HasUpExit;
+        mergedRoom.HasDownExit = HasDownExit | otherRoom.HasDownExit;
+        mergedRoom.IsDropZone = IsDropZone | otherRoom.IsDropZone;
+        mergedRoom.HasDrop = HasDrop | otherRoom.HasDrop;
+        mergedRoom.MergedPrimary = this;
+        mergedRoom.MergedSecondary = otherRoom;
+
+        return mergedRoom;
     }
 
     public bool IsOrphaned()

@@ -53,6 +53,28 @@ public enum StartingTechs
     RANDOM
 }
 
+public static class StartingTechsExtensions
+{
+    public static bool StartWithDownstab(this StartingTechs techs)
+    {
+        return techs switch
+        {
+            StartingTechs.BOTH => true,
+            StartingTechs.DOWNSTAB => true,
+            _ => false
+        };
+    }
+    public static bool StartWithUpstab(this StartingTechs techs)
+    {
+        return techs switch
+        {
+            StartingTechs.BOTH => true,
+            StartingTechs.UPSTAB => true,
+            _ => false
+        };
+    }
+}
+
 [DefaultValue(VANILLA)]
 public enum AttackEffectiveness
 {

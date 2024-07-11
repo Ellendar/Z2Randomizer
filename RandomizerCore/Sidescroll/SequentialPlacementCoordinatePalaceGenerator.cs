@@ -59,6 +59,11 @@ public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) 
             else
             {
                 newRoom = new(newRoom);
+                if (newRoom.LinkedRoomName != null)
+                {
+                    Room linkedRoom = rooms.LinkedRooms[newRoom.LinkedRoomName];
+                    newRoom = newRoom.Merge(new(linkedRoom));
+                }
             }
 
             openCoords.FisherYatesShuffle(r);

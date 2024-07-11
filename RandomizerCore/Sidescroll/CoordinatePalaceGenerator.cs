@@ -45,6 +45,11 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
                         (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == itemRoomCandidate.IsDropZone))
                     {
                         palace.ItemRoom = new(itemRoomCandidate);
+                        if (itemRoomCandidate.LinkedRoomName != null)
+                        {
+                            Room linkedRoom = roomPool.LinkedRooms[palace.ItemRoom.LinkedRoomName];
+                            palace.ItemRoom = palace.ItemRoom.Merge(linkedRoom);
+                        }
                         palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);
                         break;
                     }
@@ -134,6 +139,58 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
         {
             logger.Debug("Failed to place critical room in palace");
             return false;
+        }
+
+        foreach(Room room in palace.AllRooms.ToList())
+        {
+            if(room.MergedPrimary != null)
+            {
+                palace.AllRooms.Remove(room);
+                Room primary = room.MergedPrimary;
+                Room secondary = room.MergedSecondary;
+                palace.AllRooms.Add(primary);
+                palace.AllRooms.Add(secondary);
+                if(room == palace.ItemRoom)
+                {
+                    palace.ItemRoom = room.MergedPrimary;
+                }
+                primary.coords = room.coords;
+                secondary.coords = room.coords;
+
+                if (primary.HasLeftExit && room.Left != null)
+                {
+                    primary.Left = room.Left;
+                }
+                if (primary.HasRightExit && room.Right != null)
+                {
+                    primary.Right = room.Right;
+                }
+                if (primary.HasUpExit && room.Up != null)
+                {
+                    primary.Up = room.Up;
+                }
+                if (primary.HasDownExit && room.Down != null)
+                {
+                    primary.Down = room.Down;
+                }
+
+                if (secondary.HasLeftExit && room.Left != null)
+                {
+                    secondary.Left = room.Left;
+                }
+                if (secondary.HasRightExit && room.Right != null)
+                {
+                    secondary.Right = room.Right;
+                }
+                if (secondary.HasUpExit && room.Up != null)
+                {
+                    secondary.Up = room.Up;
+                }
+                if (secondary.HasDownExit && room.Down != null)
+                {
+                    secondary.Down = room.Down;
+                }
+            }
         }
 
         //TODO: This is REALLY late to abandon ship on the whole palace, but 
