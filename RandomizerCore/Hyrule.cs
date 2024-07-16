@@ -425,7 +425,7 @@ public class Hyrule
                 return null;
             }
 
-            List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), ROMData.GetGameText(), props, RNG);
+            List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, RNG);
             ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
             var rom = await ROMData.ApplyAsm(engine, assembler);
 

@@ -31,6 +31,19 @@ public class CustomTexts
     private static readonly int[] daruniaMoving = [72, 75];
     private static readonly int[] newkasutoMoving = [88, 89];
 
+    private static readonly Collectable[] smallItems = [
+        Collectable.BLUE_JAR,
+        Collectable.XL_BAG,
+        Collectable.KEY,
+        Collectable.MEDIUM_BAG,
+        Collectable.MAGIC_CONTAINER,
+        Collectable.HEART_CONTAINER,
+        Collectable.ONEUP,
+        Collectable.RED_JAR,
+        Collectable.SMALL_BAG,
+        Collectable.LARGE_BAG
+    ];
+
     //Indexes in the hints list
     private static readonly Dictionary<Town, int> TOWN_SIGN_INDEXES = new()
     {
@@ -289,7 +302,7 @@ public class CustomTexts
         { Collectable.DASH_SPELL, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through!"  } },
         { Collectable.REFLECT_SPELL, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
         { Collectable.SPELL_SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
-        { Collectable.THUNDER_SPELL, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage" } },
+        { Collectable.THUNDER_SPELL, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage", "he's dead$jim" } },
         { Collectable.UPSTAB, UPSTAB_TEXTS },
         { Collectable.DOWNSTAB, DOWNSTAB_TEXTS }
     };
@@ -298,11 +311,55 @@ public class CustomTexts
 
     public static string[] COMMUNITY_NONSPELL_GET_TEXT =
     [
-        "GET$EQUIPPED$WITH THE$%"
+        "GET$EQUIPPED$WITH THE$%",
+        "Tis a good$Day for$%%",
+        "I can't$believe$it's$%",
+        "All Hail$%$heroes$rise again",
+        "Congrats!$it's a$%%",
+        "One Fish$Two Fish$Red Fish$%",
+        "Master it$and you$can have$%",
+        "%$it's what$plants$crave",
+        "%$bagu$gives it$5 stars",
+        "The$power of$%$is yours",
+        "ganon is$jealous$of your$%",
+        "the secret$to life is$%%",
+        "Your love$is like$bad$%",
+        "Screw the$rules I$have this$%",
+        "excuse me$you forgot$this$%",
+        "takes this!$%$now I can$retire",
+        "you$gotta$have$%",
+        "I love the$%%$its so bad",
+        "don't feed$%$after$midnight",
+        "take the$%$leave the$cannoli",
+        "%$%$%$Yay!",
+        "I will$give you$%$to go away",
+        "%%$does not$spark joy",
+        "lets talk$about$%$baby!",
+        "When all$else fails$try$%",
+        "%%$it's what's$for dinner",
+        "%%$needs food$badly",
+        "%%$detected",
+        "Badger$Badger$Badger$%",
+        "The$World$is a$%",
+        "link$meets$%",
+        "a brand$new$%$!!!",
+        "Earth Fire$wind water$%",
+        "happy$%$day!!",
+        "%$%$never$changes",
+        "%%$is$cheating",
+        "This seed$sponsored$by$%",
+        "we all$live in$a yellow$%",
+        "its$%$time!",
+        "fresh$%$50 rupees$obo",
+        "no whammy$no whammy$and stop!$%",
+        "all you$need is$%%",
+        "the secret$word is$%",
+        "have a$%$on the$house"
     ];
 
     public static List<Text> GenerateTexts(
         IEnumerable<Location> locations,
+        IEnumerable<Location> itemLocations,
         List<Text> texts,
         RandomizerProperties props,
         Random hashRNG)
@@ -363,7 +420,7 @@ public class CustomTexts
             }
             if (props.HelpfulHints)
             {
-                List<int> placedIndexes = GenerateHelpfulHints(texts, locations, hashRNG, props.SpellItemHints);
+                List<int> placedIndexes = GenerateHelpfulHints(texts, itemLocations, hashRNG, props);
                 GenerateKnowNothings(texts, placedIndexes, nonhashRNG, props.BagusWoods, props.UseCommunityText);
             }
 
@@ -556,48 +613,53 @@ public class CustomTexts
         }
     }
 
-    private static List<int> GenerateHelpfulHints(List<Text> hints, IEnumerable<Location> locations, Random r, bool useSpellItemHints)
+    private static List<int> GenerateHelpfulHints(List<Text> hints, IEnumerable<Location> locations, Random r, 
+        RandomizerProperties props)
     {
         List<int> placedIndex = new List<int>();
 
         List<Collectable> placedItems = [];
         bool placedSmall = false;
-        List<Collectable> smallItems = [Collectable.BLUE_JAR, Collectable.XL_BAG, Collectable.KEY, Collectable.MEDIUM_BAG, Collectable.MAGIC_CONTAINER, Collectable.HEART_CONTAINER, Collectable.ONEUP, Collectable.RED_JAR, Collectable.SMALL_BAG, Collectable.LARGE_BAG];
         List<int> placedTowns = [];
 
         List<Collectable> items = locations.Select(i => i.Collectable).ToList();
         items = items.Where(i => !i.IsInternalUse()).ToList();
 
-        if (useSpellItemHints)
+        if (props.StartWithSpellItems)
         {
             items.Remove(Collectable.TROPHY);
             items.Remove(Collectable.CHILD);
             items.Remove(Collectable.MEDICINE);
         }
 
-        for (int i = 0; i < HELPFUL_HINTS_COUNT; i++)
+        int hintsCount = HELPFUL_HINTS_COUNT;
+        if(props.IncludeSwordTechsInShuffle && props.IncludeQuestItemsInShuffle)
         {
-            Collectable hintCollectable = items[r.Next(items.Count)];
-            int tries = 0;
-            while (((placedSmall && smallItems.Contains(hintCollectable)) || placedItems.Contains(hintCollectable)) && tries < 1000)
-            {
-                hintCollectable = items[r.Next(items.Count)];
-                tries++;
-            }
-            int j = 0;
+            hintsCount++;
+        }
+        List<Collectable> hintCollectables = items.Where(i => !smallItems.Contains(i)).ToList();
+        hintCollectables.FisherYatesShuffle(r);
+        hintCollectables = hintCollectables.Take(hintsCount - 1).ToList();
+        hintCollectables.Add(items.Where(smallItems.Contains).ToList().Sample(r));
+
+        if(props.IncludeSpellsInShuffle)
+        {
+            Collectable[] criticalSpells = [Collectable.THUNDER_SPELL, Collectable.FAIRY_SPELL, Collectable.REFLECT_SPELL];
+            hintCollectables.Add(criticalSpells.Sample(r));
+        }
+
+
+        foreach(Collectable hintCollectable in hintCollectables)
+        {
             List<Location> possibleHintLocations = locations.Where(i => i.Collectable == hintCollectable).ToList();
-            Location hintLocation = possibleHintLocations.Sample(r);
-            if(hintLocation == null)
-            {
-                throw new ImpossibleException("Error generating hint for unplaced item");
-            }
+            Location hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
             Text hint = Text.GenerateHelpfulHint(hintLocation);
             int town = r.Next(9);
             while (placedTowns.Contains(town))
             {
                 town = r.Next(9);
             }
-            int index = hintIndexes[town][r.Next(hintIndexes[town].Count())];
+            int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];
             if (index == errorTextIndex1 || index == errorTextIndex2)
             {
                 hints[errorTextIndex1] = hint;

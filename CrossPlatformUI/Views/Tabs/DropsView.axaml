@@ -11,9 +11,9 @@
              x:Class="CrossPlatformUI.Views.Tabs.DropsView">
     <Grid ColumnDefinitions="*, *, *">
         <StackPanel>
-            <CheckBox IsChecked="{Binding Config.RandomizeDrops}" Content="Randomize Drops" />
-            <CheckBox IsChecked="{Binding Config.StandardizeDrops}" Content="Standardize Drops" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceItems}" Content="Shuffle Palace Items" />
+          <CheckBox IsChecked="{Binding Config.ShuffleItemDropFrequency}" Content="Shuffle Item Drop Frequency" />
+          <CheckBox IsChecked="{Binding Config.RandomizeDrops}" Content="Randomize Drops" />
+          <CheckBox IsChecked="{Binding Config.StandardizeDrops}" Content="Standardize Drops" />
         </StackPanel>
         <StackPanel Grid.Column="1">
             <TextBlock>Small Enemy Pool</TextBlock>

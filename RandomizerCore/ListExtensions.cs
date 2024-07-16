@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RandomizerCore;
 
@@ -18,15 +19,18 @@ internal static class ListExtensions
     {
         return list.Length == 0 ? default : list[RNG.Next(list.Length)];
     }
+    public static T[] Sample<T>(this T[] list, Random RNG, int count)
+    {
+        return RNG.GetItems(list, count);
+    }
 
     public static T? Sample<T>(this List<T> list, Random RNG)
     {
         return list.Count == 0 ? default : list[RNG.Next(list.Count)];
     }
 
-    public static T? Sample<T>(this List<T> list, Random RNG, int count)
+    public static List<T> Sample<T>(this List<T> list, Random RNG, int count)
     {
-        //TODO: Implement this with Random.Shared.GetItems(array, count);
-        throw new NotImplementedException();
+        return RNG.GetItems(list.ToArray(), count).ToList();
     }
 }
