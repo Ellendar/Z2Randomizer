@@ -47,6 +47,23 @@ public enum Collectable
 
 public static class CollectableExtensions
 {
+    public static bool IsMinorItem(this Collectable collectable)
+    {
+        return collectable switch
+        {
+            Collectable.SMALL_BAG => true,
+            Collectable.MEDIUM_BAG => true,
+            Collectable.LARGE_BAG => true,
+            Collectable.XL_BAG => true,
+            Collectable.RED_JAR => true,
+            Collectable.BLUE_JAR => true,
+            Collectable.KEY => true,
+            Collectable.ONEUP => true,
+            _ => false
+        };
+    }
+
+
     public static bool IsItemGetItem(this Collectable collectable)
     {
         return collectable switch

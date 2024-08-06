@@ -47,7 +47,7 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
                         palace.ItemRoom = new(itemRoomCandidate);
                         if (itemRoomCandidate.LinkedRoomName != null)
                         {
-                            Room linkedRoom = roomPool.LinkedRooms[palace.ItemRoom.LinkedRoomName];
+                            Room linkedRoom = new(roomPool.LinkedRooms[palace.ItemRoom.LinkedRoomName]);
                             palace.ItemRoom = palace.ItemRoom.Merge(linkedRoom);
                         }
                         palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);

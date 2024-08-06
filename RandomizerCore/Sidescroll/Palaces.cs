@@ -128,7 +128,7 @@ public class Palaces
         {
             return [];
         }
-
+        
         return palaces;
     }
 
@@ -139,6 +139,14 @@ public class Palaces
             || palaces.Where(i => i.Number == 7).Sum(i => i.AllRooms.Sum(j => j.Enemies.Length)) > 0x2A9)
         {
             return false;
+        }
+
+        foreach(Palace palace in palaces)
+        {
+            if(palace.Number < 7 && palace.ItemRoom == null || palace.BossRoom == null)
+            {
+                return false;
+            }
         }
         return CanGetGlove(props, palaces[1])
             && CanGetRaft(props, raftIsRequired, palaces[1], palaces[2])

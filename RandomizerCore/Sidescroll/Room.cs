@@ -297,28 +297,28 @@ public class Room : IJsonOnDeserialized
         }
     }
 
-    public void UpdateItem(Collectable i, ROM romData)
+    public void UpdateRomItem(Collectable i, ROM romData)
     {
         if (PalaceGroup is <= 0 or > 3)
         {
             throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
         }
-        var sideViewPtr = (romData.GetByte(sideview1 + Map * 2) + (romData.GetByte(sideview1 + 1 + Map * 2) << 8));
-
+        int sideViewPtr = (romData.GetByte(sideview1 + Map * 2) + (romData.GetByte(sideview1 + 1 + Map * 2) << 8));
         if (PalaceGroup == 2)
         {
             sideViewPtr = (romData.GetByte(sideview2 + Map * 2) + (romData.GetByte(sideview2 + 1 + Map * 2) << 8));
         }
+
         // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
         // otherwise we want to use the bank offset for PRG4 (0x10000)
         sideViewPtr -= 0x8000;
         sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
         sideViewPtr += 0x10; // Add the offset for the iNES header
-        var ptr = sideViewPtr + 4;
-        var data = romData.GetByte(ptr);
+        int ptr = sideViewPtr + 4;
+        int data = romData.GetByte(ptr);
         data = (byte)(data & 0xF0);
         data = (byte)(data >> 4);
-        var data2 = romData.GetByte(ptr+1);
+        int data2 = romData.GetByte(ptr+1);
         while (data >= 13 || data2 != 0x0F)
         {
             ptr+=2;
@@ -328,7 +328,7 @@ public class Room : IJsonOnDeserialized
             data2 = romData.GetByte(ptr + 1);
         }
         romData.Put(ptr + 2, (byte)i);
-
+        //System.Diagnostics.Debug.WriteLine($"Writing palace number {PalaceNumber} group {PalaceGroup} map {Map} item 0x{i:X} at address 0x{ptr+2:X}");
     }
 
 

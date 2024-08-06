@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -166,10 +167,34 @@ public class Palace
             }
         }
     }
-
-    public void UpdateItem(Collectable i, ROM ROMData)
+    public void UpdateSideviewItem(Collectable collectable)
     {
-        itemRoom.UpdateItem(i, ROMData);
+        if(Number == 7)
+        {
+            return;
+        }
+        byte[] sideView = ItemRoom.SideView;
+        for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
+        {
+            int yPos = sideView[sideviewIndex] & 0xF0;
+            yPos >>= 4;
+            //item
+            if (yPos < 13 && sideView[sideviewIndex + 1] == 0x0F)
+            {
+                int collectableId = sideView[sideviewIndex + 2];
+                if (!((Collectable)collectableId).IsMinorItem())
+                {
+                    sideView[sideviewIndex + 2] = (byte)collectable;
+                }
+                sideviewIndex++;
+            }
+        }
+    }
+
+    public void UpdateRomItem(Collectable collectable, ROM ROMData)
+    {
+        //XXX: HERE
+        itemRoom.UpdateRomItem(collectable, ROMData);
     }
 
     public void Consolidate()
