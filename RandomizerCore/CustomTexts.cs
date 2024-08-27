@@ -15,7 +15,6 @@ public class CustomTexts
     private static readonly int[] rauruHints = [32, 12, 30]; //Three houses, first screen
     private static readonly int[] rutoHints = [18, 33, 25, 26]; //error is 25 and 26, two houses, outside left
     private static readonly int[] sariaHints = [50, 28];//moving middle screen, sleeping thing, stationary right
-    private static readonly int[] sariaHintsWithBaguWoods = [28];
     private static readonly int[] kingsTomb = [51];
     private static readonly int[] midoHints = [45];//moving old lady left, moving kid middle, inside house right
     private static readonly int[] nabooruHints = [67, 64, 97];//inside house right, moving bagu middle, stationary left, moving left, persistent left
@@ -404,7 +403,7 @@ public class CustomTexts
             }
 
             Location fountainLocation = locations.FirstOrDefault(i => i.ActualTown == Town.SARIA_TABLE)!;
-            Text? fountainText = GenerateMirrorTableText(fountainLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Text? fountainText = GenerateFountainText(fountainLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (fountainText != null)
             {
                 texts[gotWaterTextIndex] = fountainText;
@@ -567,6 +566,15 @@ public class CustomTexts
         }
         return null;
     }
+
+    private static Text? GenerateFountainText(Collectable fountainItem, Random r, bool useCommunityText, bool includeQuestItemsInShuffle)
+    {
+        if (includeQuestItemsInShuffle)
+        {
+            return GenerateNonSpellWizardText(fountainItem, r, useCommunityText);
+        }
+        return null;
+    }
     private static Text GenerateRiverManText(Random r)
     {
         return new Text(RIVER_MAN_TEXTS[r.Next(RIVER_MAN_TEXTS.Length)]);
@@ -578,7 +586,7 @@ public class CustomTexts
         [
             .. rauruHints,
             .. rutoHints,
-            .. useBaguWoods ? sariaHintsWithBaguWoods : sariaHints,
+            .. sariaHints,
             .. midoHints,
             .. nabooruHints,
             .. daruniaHints,

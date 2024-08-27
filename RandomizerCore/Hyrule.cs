@@ -271,7 +271,6 @@ public class Hyrule
                 //If multiple palaces use the same item room, they'll get consolidated under a single sideview
                 //with multiple pointers, but then when the item update happens later, it will affect all the rooms,
                 //so do a first pass with distinct items so all item rooms are always separate sideviews
-                //XXX: HERE
                 palaces.ForEach(i => i.UpdateSideviewItem((Collectable)i.Number));
                 //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
                 //so we just start at the 125 pointer address
@@ -3112,6 +3111,7 @@ public class Hyrule
         StringBuilder sb = new StringBuilder();
         sb.AppendLine("Flags: " + props.Flags);
         sb.AppendLine("Seed: " + props.Seed);
+        sb.AppendLine("Hash: " + Hash.Replace(" ", ""));
 
         sb.AppendLine(westHyrule.GenerateSpoiler());
         sb.AppendLine(deathMountain.GenerateSpoiler());

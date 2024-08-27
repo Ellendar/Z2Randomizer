@@ -1621,7 +1621,12 @@ public sealed class EastHyrule : World
             }
             if (connectionsCanBeBlocked && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
-                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null)
+                //Von's bug from discord: When moving back the mountain, check both the space the mountain will be placed
+                //and the space 1 past it so the possible border on isolated tiles is retained.
+                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS 
+                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null
+                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 3)) == null
+                )
                 {
                     map[cave.Ypos - 30, cave.Xpos - 1] = blockerTerrain;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1633,7 +1638,10 @@ public sealed class EastHyrule : World
                     cave.Xpos++;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null)
+                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 
+                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null
+                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 3)) == null
+                )
                 {
                     map[cave.Ypos - 30, cave.Xpos + 1] = blockerTerrain;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1645,7 +1653,10 @@ public sealed class EastHyrule : World
                     cave.Xpos--;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null)
+                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS 
+                    && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null
+                    && GetLocationByCoords((cave.Ypos - 33, cave.Xpos)) == null
+                )
                 {
                     map[cave.Ypos - 29, cave.Xpos] = blockerTerrain;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
@@ -1657,7 +1668,10 @@ public sealed class EastHyrule : World
                     cave.Ypos--;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null)
+                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS 
+                    && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null
+                    && GetLocationByCoords((cave.Ypos - 27, cave.Xpos)) == null
+                )
                 {
                     map[cave.Ypos - 31, cave.Xpos] = blockerTerrain;
                     map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
