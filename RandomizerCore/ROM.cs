@@ -154,12 +154,15 @@ public class ROM
         return rawdata[index];
     }
 
-    public byte[] GetBytes(int start, int end)
+    
+    //This used to be [start, end), but that's both awkward and not idiomatic, so I replaced it
+    //with a more conventional start + lengh implementation
+    public byte[] GetBytes(int start, int length)
     {
-        byte[] bytes = new byte[end - start];
-        for(int i = start; i < end; i++)
+        byte[] bytes = new byte[length];
+        for (int i = 0; i < length; i++)
         {
-            bytes[i - start] = GetByte(i);
+            bytes[i] = GetByte(i + start);
         }
         return bytes;
     }

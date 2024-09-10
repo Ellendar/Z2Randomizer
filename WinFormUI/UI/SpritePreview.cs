@@ -25,7 +25,7 @@ namespace WinFormUI.UI
         private void LoadSpriteCredit(ROM rom)
         {
             // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
-            Credit = rom.Z2BytesToString(rom.GetBytes(0x10 + 0x16AAB, 0x10 + 0x16AC7)).Trim();
+            Credit = rom.Z2BytesToString(rom.GetBytes(0x10 + 0x16AAB, 0x1C)).Trim();
         }
 
         public void ReloadSpriteFromROM(CharacterSprite sprite, CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
@@ -46,7 +46,7 @@ namespace WinFormUI.UI
             
             // Load the new palette for the sprite from the ROM
             var CHAR_PALETTE_ADDR = 0x10 + 0x1c46b;
-            var palette = rom.GetBytes(CHAR_PALETTE_ADDR, CHAR_PALETTE_ADDR + 4);
+            var palette = rom.GetBytes(CHAR_PALETTE_ADDR, 4);
 
             // 8 pixels in each 8x8 sprite :P
             var pixelsPerTileRow = 8;

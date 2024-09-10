@@ -62,7 +62,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             palace.AllRooms.Add(palace.ItemRoom);
         }
 
-        if (palace.ItemRoom.LinkedRoomName != null)
+        if (palaceNumber < 7 && palace.ItemRoom.LinkedRoomName != null)
         {
             Room segmentedItemRoom1, segmentedItemRoom2;
             segmentedItemRoom1 = palace.ItemRoom;
@@ -155,7 +155,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             unreachableRooms = palace.AllRooms.Except(reachableRooms).ToList();
         };
 
-        palace.IsValid = palace.AllReachable();
+        palace.IsValid = palace.AllReachable(true);
         return palace;
     }
 }

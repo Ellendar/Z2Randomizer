@@ -179,7 +179,7 @@ public class LoadedCharacterSprite : ReactiveObject
             }
         }
         // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
-        var creditRaw = tmp.Z2BytesToString(tmp.GetBytes(0x10 + 0x16AAB, 0x10 + 0x16AC7)).Trim();
+        var creditRaw = tmp.Z2BytesToString(tmp.GetBytes(0x10 + 0x16AAB, 0x1C)).Trim();
         Credit = creditRaw;
         if (creditRaw.StartsWith("SPRITE BY"))
         {
@@ -211,7 +211,7 @@ public class LoadedCharacterSprite : ReactiveObject
         
             // Load the new palette for the sprite from the ROM
             const int charPaletteAddr = 0x10 + 0x1c46b;
-            var palette = tmp.GetBytes(charPaletteAddr, charPaletteAddr + 4);
+            var palette = tmp.GetBytes(charPaletteAddr, 4);
 
             // 8 pixels in each 8x8 sprite :P
             var pixelsPerTileRow = 8;

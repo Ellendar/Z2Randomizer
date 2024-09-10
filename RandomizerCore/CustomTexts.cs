@@ -402,7 +402,7 @@ public class CustomTexts
                 texts[gotMirrorTextIndex] = mirrorText;
             }
 
-            Location fountainLocation = locations.FirstOrDefault(i => i.ActualTown == Town.SARIA_TABLE)!;
+            Location fountainLocation = locations.FirstOrDefault(i => i.ActualTown == Town.NABOORU_FOUNTAIN)!;
             Text? fountainText = GenerateFountainText(fountainLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (fountainText != null)
             {
@@ -647,7 +647,11 @@ public class CustomTexts
         }
         List<Collectable> hintCollectables = items.Where(i => !smallItems.Contains(i)).ToList();
         hintCollectables.FisherYatesShuffle(r);
-        hintCollectables = hintCollectables.Take(hintsCount - 1).ToList();
+        hintsCount = Math.Min(hintsCount, hintCollectables.Count);
+        if(hintsCount > 0)
+        {
+            hintCollectables = hintCollectables.Take(hintsCount - 1).ToList();
+        }
         hintCollectables.Add(items.Where(smallItems.Contains).ToList().Sample(r));
 
         if(props.IncludeSpellsInShuffle)
