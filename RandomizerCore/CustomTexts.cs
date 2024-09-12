@@ -648,17 +648,22 @@ public class CustomTexts
         List<Collectable> hintCollectables = items.Where(i => !smallItems.Contains(i)).ToList();
         hintCollectables.FisherYatesShuffle(r);
         hintsCount = Math.Min(hintsCount, hintCollectables.Count);
-        if(hintsCount > 0)
+
+        if (props.IncludeSpellsInShuffle)
+        {
+            Collectable[] criticalSpells = [Collectable.THUNDER_SPELL, Collectable.FAIRY_SPELL, Collectable.REFLECT_SPELL];
+            criticalSpells = criticalSpells.Where(i => hintCollectables.Contains(i)).ToArray();
+            if(criticalSpells.Length > 0)
+            {
+                hintCollectables.Add(criticalSpells.Sample(r));
+            }
+        }
+
+        if (hintsCount > 0)
         {
             hintCollectables = hintCollectables.Take(hintsCount - 1).ToList();
         }
         hintCollectables.Add(items.Where(smallItems.Contains).ToList().Sample(r));
-
-        if(props.IncludeSpellsInShuffle)
-        {
-            Collectable[] criticalSpells = [Collectable.THUNDER_SPELL, Collectable.FAIRY_SPELL, Collectable.REFLECT_SPELL];
-            hintCollectables.Add(criticalSpells.Sample(r));
-        }
 
 
         foreach(Collectable hintCollectable in hintCollectables)

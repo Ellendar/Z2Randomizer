@@ -231,7 +231,7 @@ public class RandomizerProperties
             Collectable.CROSS => StartCross,
             Collectable.HAMMER => StartHammer,
             Collectable.MAGIC_KEY => StartKey,
-            _ => throw new ImpossibleException("Unrecognized collectable")
+            _ => false
         };
     }
 

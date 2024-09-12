@@ -436,22 +436,22 @@ ItemTileTable:
     .byte $8A, $F5 ; Blue Jar
     .byte $8A, $F5 ; Red Jar
     .byte $A8, $F5 ; Link Doll
-    .byte $31, $31 ; Child
-    .byte $2F, $2F ; Trophy
-    .byte $31, $31 ; Medicine
+    .byte $f5, $f5 ; Child
+    .byte $f3, $f3 ; Trophy
+    .byte $fd, $fd ; Medicine
     .byte $67, $67 ; Antifairy
     .byte $e1, $f5 ; Upstab
     .byte $e3, $f5 ; Downstab
     .byte $e9, $f5 ; Bagu
     .byte $e7, $f5 ; Mirror
     .byte $ed, $f5 ; Water
-    .byte $fb, $fd ; Shield Spell
+    .byte $fb, $fb ; Shield Spell
     .byte $d3, $d5 ; Jump Spell
     .byte $d7, $d9 ; Life Spell
     .byte $cb, $cd ; Fairy Spell
     .byte $cf, $d1 ; Fire Spell
     .byte $db, $dd ; Reflect Spell
-    .byte $f1, $f3 ; Spell Spell
+    .byte $f1, $f1 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
     .byte $c7, $c9 ; Dash Spell
 

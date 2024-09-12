@@ -10,10 +10,10 @@ namespace CrossPlatformUI.ViewModels;
 
 public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
 {
-    public const string BeginnerPreset = "RAhN6FAABRFJAAAJAJBcZB+3mCAqBAFjALBJWA";
-    public const string StandardPreset = "Ao!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
-    public const string MaxRandoPreset = "Go!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
-    public const string RandoPercentPreset = "Zo!V2thCqLsVAAAAFThAAg!AFVVhFVnAAAALhA";
+    public const string BeginnerPreset = "RAAA2dqAJAhJiLamhRjVC54g+o5VFRDWcBYhAAsA";
+    public const string StandardPreset = "AAAA2dJALw3qnbamhRjVs#2g+hBWFc9WaBYhAAsA";
+    public const string MaxRandoPreset = "hEAAH1dALw3qnbsqhRjVs7yg+hBWKc9WaFYhAAsA";
+    public const string RandoPercentPreset = "hEAAp1dAOR4YXs0uhjGs371g+hBswv9svsthABVA";
     
     public string? OutputFilePath { get; set; }
 
