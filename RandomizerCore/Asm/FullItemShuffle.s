@@ -436,7 +436,7 @@ ItemTileTable:
     .byte $8A, $F5 ; Blue Jar
     .byte $8A, $F5 ; Red Jar
     .byte $A8, $F5 ; Link Doll
-    .byte $f5, $f5 ; Child
+    .byte $df, $df ; Child
     .byte $f3, $f3 ; Trophy
     .byte $fd, $fd ; Medicine
     .byte $67, $67 ; Antifairy
