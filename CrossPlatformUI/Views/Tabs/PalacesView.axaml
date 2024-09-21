@@ -28,8 +28,15 @@
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_0Rooms}" Content="Include 4.0 Rooms" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_4Rooms}" Content="Include 4.4 Rooms" />
             <Separator/>
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.TBirdRequired}" Content="Thunder Bird Required" />
-            <CheckBox IsEnabled="{Binding !Config.TBirdRequired}" IsChecked="{Binding Config.RemoveTBird}" Content="Remove Thunder Bird" />
+            <CheckBox IsThreeState="True" 
+                      IsChecked="{Binding Config.TBirdRequired}"
+                      Checked="TBirdRequiredChecked"
+                      Content="Thunderbird Required" />
+            <CheckBox 
+                      Name="RemoveThunderbirdCheckbox"
+                      IsEnabled="{Binding !Config.TBirdRequired}" 
+                      IsChecked="{Binding Config.RemoveTBird}" 
+                      Content="Remove Thunderbird" />
             <Separator/>
             <CheckBox IsThreeState="False" IsChecked="{Binding Config.UseCustomRooms}" Content="Use Custom Rooms File" />
 
@@ -44,13 +51,19 @@
                                FormatString="N0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="{Binding Config.PalacesToCompleteMin}" Maximum="6" assists:TextFieldAssist.Hints="Max"/>
             </StackPanel>
-            <CheckBox IsChecked="{Binding Config.BlockingRoomsInAnyPalace}" Content="Blocking Rooms In Any Palace" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.BossRoomsExitToPalace}" Content="Boss Rooms Exit To Palace" />
             <CheckBox IsChecked="{Binding Config.RestartAtPalacesOnGameOver}" Content="Restart At Palaces On Game Over" />
             <CheckBox IsChecked="{Binding Config.ChangePalacePallettes}" Content="Change Palace Palettes" />
             <CheckBox IsChecked="{Binding Config.RandomizeBossItemDrop}" Content="Randomize Boss Item Drop" />
-            <CheckBox IsChecked="{Binding Config.NoDuplicateRoomsByLayout}" Content="No Duplicate Rooms By Layout" />
-            <CheckBox IsChecked="{Binding Config.NoDuplicateRoomsByEnemies}" Content="No Duplicate Rooms By Enemies" />
+            <CheckBox Name="NoDuplicateRoomsByLayoutCheckbox"
+                      IsChecked="{Binding Config.NoDuplicateRoomsByLayout}" 
+                      Checked="NoDuplicateRoomsByLayoutChecked" 
+                      Content="No Duplicate Rooms (By Layout)" />
+            <CheckBox Name="NoDuplicateRoomsByEnemiesCheckbox"
+                      IsChecked="{Binding Config.NoDuplicateRoomsByEnemies}" 
+                      Checked="NoDuplicateRoomsByEnemiesChecked" 
+                      Content="No Duplicate Rooms (By Layout/Enemies)" />
+            <CheckBox IsChecked="{Binding Config.BlockingRoomsInAnyPalace}" Content="Blocking Rooms In Any Palace" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.BossRoomsExitToPalace}" Content="Boss Rooms Exit To Palace" />
             <CheckBox IsChecked="{Binding Config.HardBosses}" Content="Harder Carock" />
         </StackPanel>
     </Grid>

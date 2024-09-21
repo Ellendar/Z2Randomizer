@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:converters="using:CrossPlatformUI.Converters"
              xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
@@ -11,15 +12,9 @@
              x:Class="CrossPlatformUI.Views.Tabs.LevelsView">
     <Grid ColumnDefinitions="*,*">
         <StackPanel>
-            <CheckBox Click="ShuffleAllExpClicked" Content="Shuffle All Experience">
-                <CheckBox.IsChecked>
-                    <MultiBinding Converter="{x:Static BoolConverters.And}">
-                        <Binding Path="#AtkExp.IsChecked" />
-                        <Binding Path="#MagExp.IsChecked" />
-                        <Binding Path="#LifExp.IsChecked" />
-                    </MultiBinding>
-                </CheckBox.IsChecked>
-            </CheckBox>
+            <CheckBox Checked="ShuffleAllExpChecked" 
+                      Unchecked="ShuffleAllExpUnchecked"
+                      Content="Shuffle All Experience"/>
             <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
                 <StackPanel>
                     <CheckBox Name="AtkExp" IsChecked="{Binding Config.ShuffleAttackExperience}" Content="Shuffle Attack Experience" />
@@ -30,17 +25,27 @@
             
             <TextBlock HorizontalAlignment="Center">Level Cap</TextBlock>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <NumericUpDown Value="{Binding Config.AttackLevelCap}"
+                <NumericUpDown Name="AttackLevelCapSelector" Value="{Binding Config.AttackLevelCap}"
                                FormatString="N0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
-                <NumericUpDown Value="{Binding Config.MagicLevelCap}"
+                <NumericUpDown Name="MagicLevelCapSelector" Value="{Binding Config.MagicLevelCap}"
                                FormatString="N0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
-                <NumericUpDown Value="{Binding Config.LifeLevelCap}"
+                <NumericUpDown Name="LifeLevelCapSelector" Value="{Binding Config.LifeLevelCap}"
                                FormatString="N0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
             </StackPanel>
-            <CheckBox IsChecked="{Binding Config.ScaleLevelRequirementsToCap}" Content="Scale Level Requirements To Cap" />
+
+            <CheckBox Content="Scale Level Requirements To Cap">
+              <CheckBox.IsEnabled>
+                <MultiBinding Converter="{StaticResource SumOfValuesLessThanConverter}" ConverterParameter="24">
+                  <Binding Path="#AttackLevelCapSelector.Value" />
+                  <Binding Path="#MagicLevelCapSelector.Value" />
+                  <Binding Path="#LifeLevelCapSelector.Value" />
+                </MultiBinding>
+              </CheckBox.IsEnabled>
+            </CheckBox>
+            
         </StackPanel>
         <StackPanel Grid.Column="1">
             <ComboBox assists:ComboBoxAssist.Label="Attack Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"

@@ -11,11 +11,36 @@
              x:Class="CrossPlatformUI.Views.Tabs.EnemiesView">
     <Grid ColumnDefinitions="*, *">
         <StackPanel>
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleOverworldEnemies}" Content="Shuffle Overworld Enemies" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceEnemies}" Content="Shuffle Palace Enemies" />
-            <CheckBox IsChecked="{Binding Config.ShuffleDripperEnemy}" Content="Shuffle Dripper Enemy" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixLargeAndSmallEnemies}" Content="Mix Large And Small Enemies" />
-            <CheckBox IsChecked="{Binding Config.GeneratorsAlwaysMatch}" Content="Generators Always Match" />
+            <CheckBox Name="ShuffleOverworldEnemiesCheckbox" 
+                      Unchecked="EnemyShuffleChecked"
+                      IsThreeState="True"
+                      IsChecked="{Binding Config.ShuffleOverworldEnemies}" 
+                      Content="Shuffle Overworld Enemies" />
+            <CheckBox Name="ShufflePalaceEnemiesCheckbox"
+                      Unchecked="EnemyShuffleChecked"
+                      IsThreeState="True" 
+                      IsChecked="{Binding Config.ShufflePalaceEnemies}" 
+                      Content="Shuffle Palace Enemies" />
+            <CheckBox Name="ShuffleDripperCheckbox" 
+                      IsEnabled="{Binding Config.ShufflePalaceEnemies}"
+                      IsChecked="{Binding Config.ShuffleDripperEnemy}" 
+                      Content="Shuffle Dripper Enemy" />
+            <CheckBox Name="MixLargeAndSmallEnemiesCheckbox" IsThreeState="True" IsChecked="{Binding Config.MixLargeAndSmallEnemies}" Content="Mix Large And Small Enemies">
+              <CheckBox.IsEnabled>
+                <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                  <MultiBinding.Bindings>
+                    <Binding Path="#ShuffleOverworldEnemiesCheckbox.IsChecked"/>
+                    <Binding Path="#ShufflePalaceEnemiesCheckbox.IsChecked"/>
+                  </MultiBinding.Bindings>
+                </MultiBinding>
+              </CheckBox.IsEnabled>
+            </CheckBox>
+            <CheckBox Name="GeneratorsMatchCheckbox"
+                    IsEnabled="{Binding Config.ShufflePalaceEnemies}"
+                    IsChecked="{Binding Config.GeneratorsAlwaysMatch}" 
+                    Content="Generators Always Match" />
+            <Separator></Separator>
+            <CheckBox IsChecked="{Binding Config.RandomizeKnockback}" Content="Randomize Knockback" />
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox IsChecked="{Binding Config.ShuffleEnemyHP}" Content="Shuffle Enemy HP" />

@@ -11,12 +11,36 @@
              x:Class="CrossPlatformUI.Views.Tabs.ItemsView">
     <Grid ColumnDefinitions="*, *">
         <StackPanel>
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePalaceItems}" Content="Shuffle Palace Items" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleOverworldItems}" Content="Shuffle Overworld Items" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.MixOverworldAndPalaceItems}" Content="Mix Overworld And Palace Items" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}" Content="Include PBag Caves In Item Shuffle" />
+            <CheckBox Name="ShufflePalaceItemsCheckbox" 
+                      Unchecked="ShuffleItemChecked"
+                      IsThreeState="True" 
+                      IsChecked="{Binding Config.ShufflePalaceItems}" 
+                      Content="Shuffle Palace Items" />
+            <CheckBox Name="ShuffleOverworldItemsCheckbox" 
+                      Unchecked="ShuffleItemChecked"
+                      IsThreeState="True" 
+                      IsChecked="{Binding Config.ShuffleOverworldItems}" 
+                      Content="Shuffle Overworld Items" />
+            <CheckBox Name="MixOverworldAndPalaceItemsCheckbox"
+              IsThreeState="True"
+              IsChecked="{Binding Config.MixOverworldAndPalaceItems}"
+              Content="Mix Overworld And Palace Items">
+              <CheckBox.IsEnabled>
+                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                  <MultiBinding.Bindings>
+                    <Binding Path="#ShufflePalaceItemsCheckbox.IsChecked"/>
+                    <Binding Path="#ShuffleOverworldItemsCheckbox.IsChecked"/>
+                  </MultiBinding.Bindings>
+                </MultiBinding>
+              </CheckBox.IsEnabled>
+            </CheckBox>
+            <CheckBox Name="PBagsInShuffleCheckbox"
+              IsEnabled="{Binding Config.ShuffleOverworldItems}"
+              IsThreeState="True" 
+              IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}" 
+              Content="Include PBag Caves In Item Shuffle" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSpellsInShuffle}" Content="Include Spells In Shuffle" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSwordTechsInShuffle}" Content="Include Sword Techs In Shuffle" />
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSwordTechsInShuffle}" Content="Include Sword Techniques In Shuffle" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeQuestItemsInShuffle}" Content="Include Quest Items In Shuffle" />
         </StackPanel>
         <StackPanel Grid.Column="1">

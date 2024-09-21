@@ -28,7 +28,7 @@
             </CheckBox>
             <CheckBox IsChecked="{Binding RemoveFlashing}" Content="Remove Flashing" />
             <CheckBox IsChecked="{Binding UseCommunityText}" Content="Use Community Text" />
-            <CheckBox IsChecked="{Binding DisableHUDLag}" Content="Disable HUD Lag" />
+            <CheckBox IsChecked="{Binding DisableHUDLag}" Content="Disable HUD Flash on Lag" />
         </StackPanel>
         <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
     </Grid>

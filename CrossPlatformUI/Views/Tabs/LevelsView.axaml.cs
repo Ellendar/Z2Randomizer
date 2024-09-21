@@ -16,10 +16,28 @@ public partial class LevelsView : ReactiveUserControl<MainViewModel>
         AvaloniaXamlLoader.Load(this);
     }
 
-    private void ShuffleAllExpClicked(object? sender, RoutedEventArgs e)
+    private void ShuffleAllExpChecked(object? sender, RoutedEventArgs e)
     {
-        this.FindControl<CheckBox>("AtkExp")!.IsChecked = true;
-        this.FindControl<CheckBox>("MagExp")!.IsChecked = true;
-        this.FindControl<CheckBox>("LifExp")!.IsChecked = true;
+        CheckBox AtkExpCheckbox = this.FindControl<CheckBox>("AtkExp") ?? throw new System.Exception("Missing Required Validation Element");
+        CheckBox MagExpCheckbox = this.FindControl<CheckBox>("MagExp") ?? throw new System.Exception("Missing Required Validation Element");
+        CheckBox LifExpCheckbox = this.FindControl<CheckBox>("LifExp") ?? throw new System.Exception("Missing Required Validation Element");
+
+        AtkExpCheckbox.IsChecked = true;
+        AtkExpCheckbox.IsEnabled = false;
+        MagExpCheckbox.IsChecked = true;
+        MagExpCheckbox.IsEnabled = false;
+        LifExpCheckbox.IsChecked = true;
+        LifExpCheckbox.IsEnabled = false;
+    }
+
+    private void ShuffleAllExpUnchecked(object? sender, RoutedEventArgs e)
+    {
+        CheckBox AtkExpCheckbox = this.FindControl<CheckBox>("AtkExp") ?? throw new System.Exception("Missing Required Validation Element");
+        CheckBox MagExpCheckbox = this.FindControl<CheckBox>("MagExp") ?? throw new System.Exception("Missing Required Validation Element");
+        CheckBox LifExpCheckbox = this.FindControl<CheckBox>("LifExp") ?? throw new System.Exception("Missing Required Validation Element");
+
+        AtkExpCheckbox.IsEnabled = true;
+        MagExpCheckbox.IsEnabled = true;
+        LifExpCheckbox.IsEnabled = true;
     }
 }

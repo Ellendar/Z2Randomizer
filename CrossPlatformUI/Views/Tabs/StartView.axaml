@@ -54,11 +54,11 @@
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <NumericUpDown Value="{Binding Config.StartingHeartContainersMin}"
                                FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="{Binding Config.StartingHeartContainersMax}" assists:TextFieldAssist.Hints="Min"/>
+                               ClipValueToMinMax="True" Minimum="1" Maximum="{Binding Config.StartingHeartContainersMax}" assists:TextFieldAssist.Hints="Start Min"/>
                 <NumericUpDown Value="{Binding Config.StartingHeartContainersMax}"
                                FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="{Binding Config.StartingHeartContainersMin}" Maximum="8" assists:TextFieldAssist.Hints="Max"/>
-              <ComboBox assists:ComboBoxAssist.Label="Max" Theme="{StaticResource MaterialOutlineComboBox}"
+                               ClipValueToMinMax="True" Minimum="{Binding Config.StartingHeartContainersMin}" Maximum="8" assists:TextFieldAssist.Hints="Start Max"/>
+              <ComboBox assists:ComboBoxAssist.Label="Seed Max" Theme="{StaticResource MaterialOutlineComboBox}"
                         ItemsSource="{Binding Source={x:Static rc:Enums.StartingHeartsMaxOptionList}}"
                         SelectedItem="{Binding Config.MaxHeartContainers, Converter={x:Static ui:Util.EnumConvert}}"/>
             </StackPanel>
@@ -76,7 +76,7 @@
                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
             </StackPanel>
             <Separator/>
-            <ComboBox assists:ComboBoxAssist.Label="Starting Techs" Theme="{StaticResource MaterialOutlineComboBox}"
+            <ComboBox assists:ComboBoxAssist.Label="Starting Sword Techniques" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.StartingTechList}}"
                       SelectedItem="{Binding Config.StartingTechniques, Converter={x:Static ui:Util.EnumConvert}}"/>
             <ComboBox assists:ComboBoxAssist.Label="Starting Lives" Theme="{StaticResource MaterialOutlineComboBox}"

@@ -30,8 +30,8 @@ public class DesktopFileService : IFileSystemService
             throw new NotImplementedException();
         }
         SettingsBasePath = Path.Combine(OSBasePath, "Z2Randomizer");
-        SpriteBasePath = Path.Combine(SettingsBasePath, "Sprites");
-        PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + "/";
+        SpriteBasePath = Path.Combine(AppContext.BaseDirectory, "Sprites");
+        PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + Path.DirectorySeparatorChar;
         Directory.CreateDirectory(SpriteBasePath);
         Directory.CreateDirectory(SettingsBasePath);
         Directory.CreateDirectory(PalacesBasePath);

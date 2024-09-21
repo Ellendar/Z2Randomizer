@@ -15,8 +15,8 @@
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShuffleSpellLocations}" Content="Shuffle Spell Locations" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.DisableMagicContainerRequirements}" Content="Disable Magic Container Requirements" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.RandomizeSpellSpellEnemy}" Content="Randomize Spell Spell Enemy" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.SwapUpAndDownStab}" Content="Swap Upstab And Downstab" />
-            <ComboBox  assists:ComboBoxAssist.Label="Fire Spells" Theme="{StaticResource MaterialOutlineComboBox}"
+            <CheckBox IsThreeState="True" IsChecked="{Binding Config.SwapUpAndDownStab}" Content="Swap Upstab And Downstab Location" />
+            <ComboBox  assists:ComboBoxAssist.Label="Fire Spell" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.FireOptionList}}"
                       SelectedItem="{Binding Config.FireOption, Converter={x:Static ui:Util.EnumConvert}}" />
         </StackPanel>
