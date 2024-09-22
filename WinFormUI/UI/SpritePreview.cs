@@ -31,7 +31,7 @@ namespace WinFormUI.UI
         public void ReloadSpriteFromROM(CharacterSprite sprite, CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
         {
             // make a temporary copy of the original ROM file and apply the sprite to it
-            var rom = new ROM(_rom.ToArray());
+            var rom = new ROM(_rom.ToArray(), true);
             rom.UpdateSprites(sprite, tunicColor, shieldColor, beamSprite);
 
             // now the original rom has the sprite and palette data applied,
@@ -57,7 +57,7 @@ namespace WinFormUI.UI
             // Location in the ROM where the sprite starts
             // 0x22000 = CHR page (bank $02) base, 0x10 = ines header, 0x80 for the tile offset
             // we are reading 8 sprites from [0x80, 0x100)
-            var spriteBase = 0x22000 + 0x10 + 0x80;
+            var spriteBase = ROM.ChrRomOffs + 0x2000 + 0x80;
 
             // We only have one palette to read from, but should there be multipalette sprites someday
             // this could come in handy

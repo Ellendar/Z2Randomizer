@@ -61,14 +61,30 @@ UPDATE_REFS target @ refs
 .segment "PRG5"   :bank $05 :size $4000 :mem $8000 :off $14010
 .segment "PRG6"   :bank $06 :size $4000 :mem $8000 :off $18010
 .segment "PRG7"   :bank $07 :size $4000 :mem $c000 :off $1c010
-.segment "CHR"    :size $20000 :off $20010 :out
+.segment "PRG10"   :bank $10 :size $2000 :mem $8000 :off $20010
+.segment "PRG11"   :bank $11 :size $2000 :mem $8000 :off $22010
+.segment "PRG12"   :bank $12 :size $2000 :mem $8000 :off $24010
+.segment "PRG13"   :bank $13 :size $2000 :mem $8000 :off $26010
+.segment "PRG14"   :bank $14 :size $2000 :mem $8000 :off $28010
+.segment "PRG15"   :bank $15 :size $2000 :mem $8000 :off $2a010
+.segment "PRG16"   :bank $16 :size $2000 :mem $8000 :off $2c010
+.segment "PRG17"   :bank $17 :size $2000 :mem $8000 :off $2e010
+.segment "PRG18"   :bank $18 :size $2000 :mem $8000 :off $30010
+.segment "PRG19"   :bank $19 :size $2000 :mem $8000 :off $32010
+.segment "PRG1A"   :bank $1A :size $2000 :mem $8000 :off $34010
+.segment "PRG1B"   :bank $1B :size $2000 :mem $8000 :off $36010
+.segment "PRG1C"   :bank $1C :size $2000 :mem $8000 :off $38010
+.segment "PRG1D"   :bank $1D :size $2000 :mem $8000 :off $3a010
+.segment "PRG1E"   :bank $1E :size $2000 :mem $c000 :off $3c010
+.segment "PRG1F"   :bank $1F :size $2000 :mem $e000 :off $3e010
+.segment "CHR"    :size $20000 :off $40010 :out
 
 ; Mark unused areas in the ROM so the linker can place stuff here
 
 ; FREE "PRG0" [$AA40, $c000)
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
-FREE "PRG3" [$B803, $bfff)
+FREE "PRG3" [$B803, $c000)
 
 FREE "PRG4" [$83DC, $8470)
 FREE "PRG4" [$84f0, $8500)
@@ -91,12 +107,37 @@ FREE "PRG5" [$93ae, $9400)
 FREE "PRG5" [$a54f, $a600)
 FREE "PRG5" [$bda1, $c000)
 
-FREE "PRG6" [$878c, $9000)
-FREE "PRG6" [$9da8, $9fff)
-FREE "PRG6" [$ac09, $bfff)
+; Most of bank 6 is reserved for z2ft
+;FREE "PRG6" [$878c, $9000)
+;FREE "PRG6" [$9da8, $a000)
+;FREE "PRG6" [$ac09, $c000) TEMP
+FREE "PRG6" [$ac21, $c000)
 
 ; DPCM data, will affect dpcm sfx but not gameplay so its fine to use this as a last ditch
 ; free space for patches. Keep it disabled as much as possible
 ; FREE "PRG7" [$f369, $fcfb)
 FREE "PRG7" [$f3d0, $fcfb) ; allow code in the ganon laugh sfx but not the hurt sfx
 
+; Currently these are only used as space for music tracks
+;FREE "PRG10" [$a000, $c000)
+;FREE "PRG11" [$a000, $c000)
+;FREE "PRG12" [$a000, $c000)
+;FREE "PRG13" [$a000, $c000)
+;FREE "PRG14" [$a000, $c000)
+;FREE "PRG15" [$a000, $c000)
+;FREE "PRG16" [$a000, $c000)
+;FREE "PRG17" [$a000, $c000)
+;FREE "PRG18" [$a000, $c000)
+;FREE "PRG19" [$a000, $c000)
+;FREE "PRG1A" [$a000, $c000)
+;FREE "PRG1B" [$a000, $c000)
+;FREE "PRG1C" [$a000, $c000)
+;FREE "PRG1D" [$a000, $c000)
+;FREE "PRG1E" [$a000, $c000)
+
+; Most of bank 1f is reserved for z2ft
+FREE "PRG1F" [$ff80, $ffe8)
+
+nmi = $c07b
+
+.export nmi

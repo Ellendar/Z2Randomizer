@@ -20,6 +20,24 @@
                       ItemsSource="{Binding Source={x:Static rc:Enums.BeepFrequencyList}}"
                       SelectedItem="{Binding BeepFrequency, Converter={x:Static ui:Util.EnumConvert}}" />
             <CheckBox IsChecked="{Binding DisableMusic}" Content="Disable Music" />
+            <CheckBox 
+              IsEnabled="{Binding !DisableMusic}"
+              IsChecked="{Binding RandomizeMusic}"
+              Content="Use Custom Music If Any" 
+              ToolTip.Tip="Randomize music using any music libraries found in the Music directory"
+            />
+            <CheckBox
+              IsEnabled="{Binding RandomizeMusicEnabled}"
+              IsChecked="{Binding MixCustomAndOriginalMusic}" 
+              Content="Mix Custom and Original Music"
+              ToolTip.Tip="When using custom music also include original tracks in the selection. If disabled, original tracks will only be selected when no custom tracks exist for a given usage."
+            />
+            <CheckBox
+              IsEnabled="{Binding RandomizeMusicEnabled}"
+              IsChecked="{Binding DisableUnsafeMusic}" 
+              Content="Disable Unsafe Music"
+              ToolTip.Tip="Do not use custom tracks that are likely to interfere with streaming"
+            />
             <CheckBox IsChecked="{Binding FastSpellCasting}" Content="Fast Spell Casting"  />
             <CheckBox IsChecked="{Binding UpAOnController1}">
                 <TextBlock>

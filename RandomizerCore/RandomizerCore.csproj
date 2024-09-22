@@ -36,10 +36,12 @@
     <None Remove="Asm\FixedHud.s" />
     <None Remove="Asm\Graphics\item_sprites.chr" />
     <None Remove="Asm\Recoil.s" />
+    <None Remove="Asm\z2ft.s" />
     <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
-    <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest"/>
+    <None Remove="Asm\z2rndft.ips" />
+    <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="PreserveNewest" />
@@ -57,5 +59,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
+    <EmbeddedResource Include="Asm\z2rndft.ips" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
   </ItemGroup>
 </Project>
