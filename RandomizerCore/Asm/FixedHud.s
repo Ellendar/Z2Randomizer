@@ -10,6 +10,12 @@
 
 .define LagFrameVar $f4
 
+.if ENABLE_Z2FT
+    .import UpdateSound
+.else
+    UpdateSound = $9000
+.endif
+
 .segment "PRG6"
 
 .reloc
@@ -19,11 +25,11 @@ RunAudioFrameOrLagFrame:
     tya
     pha
         lda LagFrameVar
-        bpl +
+        bpl @skip
             jmp HandleLagFrame
-        +
-        jsr $9000 ; audio handler
--
+        @skip:
+        jsr UpdateSound
+EarlyExitIrq:
     pla
     tay
     pla
@@ -36,19 +42,19 @@ RunAudioFrameOrLagFrame:
 HandleLagFrame:
     ; To allow for testing between the flag on or off, I made it a soft flag 
     lda #PREVENT_HUD_FLASH_ON_LAG
-    beq -
+    beq EarlyExitIrq
     ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
     lda $fe
     and #$10
-    beq -
+    beq EarlyExitIrq
     ; Check that we are in the side view mode
     lda $0736
     cmp #$0b
-    bne -
+    bne EarlyExitIrq
     ; Check if we even have a sprite zero on the screen
     lda $200
     cmp #$f0
-    bcs -
+    bcs EarlyExitIrq
     ; keep all flags except for the nametable select to always use nametable 0
     lda $ff
     and #$fc
@@ -135,14 +141,22 @@ HandleLagFrame:
 .import NmiBankShadow8,NmiBankShadowA
 NmiRunLagFrame:
     pha
+        lda NmiBankShadowA
+        pha
+        lda NmiBankShadow8
+        pha
         lda #$8c  ; (bank 6)
+        sta NmiBankShadow8
         sta $5114
         lda #$8d  ; (bank 6)
+        sta NmiBankShadowA
         sta $5115
         jsr RunAudioFrameOrLagFrame
-        lda NmiBankShadow8
+        pla
+        sta NmiBankShadow8
         sta $5114
-        lda NmiBankShadowA
+        pla
+        sta NmiBankShadowA
         sta $5115
     pla
     rti
@@ -173,7 +187,13 @@ Nmi:
     lda #$80
     sta a:LagFrameVar
 
+; This exact location is needed by both lag frame handling and z2ft
+
+.if !ENABLE_Z2FT
+
 .org $C1a8
     ; Soft enable NMI
     clc
     ror LagFrameVar
+
+.endif

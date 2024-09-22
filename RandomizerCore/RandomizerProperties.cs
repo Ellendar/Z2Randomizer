@@ -199,6 +199,8 @@ public class RandomizerProperties
     public bool FastCast { get; set; }
     public String BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
+    public bool RandomizeMusic { get; set; }
+    public bool DisableUnsafeMusic { get; set; }
     [NotMapped]
     public CharacterSprite CharSprite { get; set; }
     public String TunicColor { get; set; }

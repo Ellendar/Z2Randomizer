@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RandomizerCore", "RandomizerCore\RandomizerCore.csproj", "{34CEBF26-BA9D-4B1F-83EA-9FA87EDC2328}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA} = {6C838F98-8DAC-4E99-A756-EFFBD4331FBA}
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Z2RandomizerSetup", "Setup1\Setup1.vdproj", "{45FE0E64-60F2-47CF-AE93-FD5A41FF8F52}"
 EndProject
@@ -26,6 +29,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "CommandLine\CommandLine.csproj", "{5277C962-4F26-422B-9982-3F1EE81E0975}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assembler", "Assembler\Assembler.csproj", "{985AF39A-F067-46E1-8ACE-5332F81C4FDC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FtRandoLib", "FtRandoLib\FtRandoLib.csproj", "{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +104,14 @@ Global
 		{985AF39A-F067-46E1-8ACE-5332F81C4FDC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{985AF39A-F067-46E1-8ACE-5332F81C4FDC}.Release|x64.ActiveCfg = Release|x64
 		{985AF39A-F067-46E1-8ACE-5332F81C4FDC}.Release|x64.Build.0 = Release|x64
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Debug|x64.Build.0 = Debug|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|x64.ActiveCfg = Release|Any CPU
+		{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
