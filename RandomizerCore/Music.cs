@@ -234,10 +234,7 @@ internal class MusicRandomizer
             ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData));
         }
 
-        //// TODO: Fix the issue with transitioning from builtin to FT in z2ft so builtins can be used
-        List<ISong> songs = new(/*builtins*/);
-        songs.AddRange(ftSongs);
-
+        List<ISong> songs = new(Enumerable.Concat<ISong>(builtins, ftSongs));
         return songs;
     }
 
