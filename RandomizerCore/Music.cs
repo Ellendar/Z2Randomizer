@@ -31,30 +31,6 @@ internal enum Usage
     Credits,
 }
 
-internal class RomAccessAdapter : IRomAccess
-{
-    byte[] _rom;
-
-    public RomAccessAdapter(byte[] rom) => _rom = rom.ToArray();
-
-    public byte[] Rom => _rom.ToArray();
-
-    public void Write(int offset, byte data, string comment = "")
-    {
-        _rom[offset] = data;
-    }
-
-    public void Write(int offset, IReadOnlyList<byte> data, string comment = "")
-    {
-        byte[]? byteArray = data as byte[];
-        if (byteArray is not null)
-            Array.Copy(byteArray, 0, _rom, offset, byteArray.Length);
-        else
-            for (int i = 0; i < data.Count; i++)
-                _rom[offset + i] = data[i];
-    }
-}
-
 /*internal  class LoggerAdapter : Logger
 {
     StringBuilder sb;
@@ -171,8 +147,9 @@ internal class MusicRandomizer
     }
 
     Hyrule _hyrule;
-    Random _rng;
-    RomAccessAdapter _romAccess;
+    IShuffler _shuffler;
+    byte[] _rom;
+    SimpleRomAccess _romAccess;
     List<string> _libPaths;
     List<int> _freeBanks;
 
@@ -186,8 +163,9 @@ internal class MusicRandomizer
         bool safeOnly)
     {
         _hyrule = hyrule;
-        _rng = new Random(seed);
-        _romAccess = new(_hyrule.ROMData.GetBytes(0, ROM.RomSize));
+        _shuffler = new RandomShuffler(new Random(seed));
+        _rom = _hyrule.ROMData.GetBytes(0, ROM.RomSize);
+        _romAccess = new(_rom);
         _libPaths = new(libPaths);
         _freeBanks = new(freeBanks);
 
@@ -201,10 +179,26 @@ internal class MusicRandomizer
             return _freeBanks; // Nothing to do
 
         var songs = LoadSongs();
-        var usesSongs = SelectUsesSongs(songs);
-        var songMap = CreateSongMap(usesSongs);
-        var areaSongMap = CreateAreaSongMap(usesSongs);
-        var enemySongMap = CreateEnemySongMap(usesSongs);
+        var usesSongs = _imptr.SplitSongsByUsage<Usage>(songs);
+
+        Dictionary<Usage, int> numUsageSongs = new()
+        {
+            { Usage.Overworld, 1 },
+            { Usage.Town, 4 },
+            { Usage.Encounter, 4 },
+            { Usage.Cave, 4 },
+            { Usage.Palace, 6 },
+            { Usage.GreatPalace, 1 },
+            { Usage.Boss, 1 },
+            { Usage.LastBoss, 1 },
+            { Usage.Credits, 1 },
+        };
+        var selUsesSongs = _imptr.SelectUsesSongs<Usage>(
+            usesSongs, numUsageSongs, _shuffler);
+
+        var songMap = CreateSongMap(selUsesSongs);
+        var areaSongMap = CreateAreaSongMap(selUsesSongs);
+        var enemySongMap = CreateEnemySongMap(selUsesSongs);
 
         IstringDictionary<IReadOnlyDictionary<int, ISong?>> songMaps = new()
         {
@@ -218,7 +212,7 @@ internal class MusicRandomizer
             songMaps,
             out freeBanks);
 
-        _hyrule.ROMData.Put(0, _romAccess.Rom);
+        _hyrule.ROMData.Put(0, _rom);
 
         return freeBanks;
     }
@@ -236,46 +230,6 @@ internal class MusicRandomizer
 
         List<ISong> songs = new(Enumerable.Concat<ISong>(builtins, ftSongs));
         return songs;
-    }
-
-    UsesSongs SelectUsesSongs(IEnumerable<ISong> songs)
-    {
-        Dictionary<Usage, int> numUsageSongs = new()
-        {
-            { Usage.Overworld, 1 },
-            { Usage.Town, 4 },
-            { Usage.Encounter, 4 },
-            { Usage.Cave, 4 },
-            { Usage.Palace, 6 },
-            { Usage.GreatPalace, 1 },
-            { Usage.Boss, 1 },
-            { Usage.LastBoss, 1 },
-            { Usage.Credits, 1 },
-        };
-
-        var usesSongs = _imptr.SplitSongsByUsage(songs);
-        UsesSongs selUsesSongs = new();
-        foreach (var usage in Enum.GetValues<Usage>())
-        {
-            string usageStr = usage.ToString();
-            List<ISong> selSongs = selUsesSongs[usage] = new();
-            List<ISong>? usageSongs = null;
-
-            if (!usesSongs.TryGetValue(usageStr, out usageSongs)
-                || usageSongs.Count == 0)
-                continue;
-
-            int numNeeded = numUsageSongs[usage],
-                repsNeeded = numNeeded / usageSongs.Count + 1;
-            ISong[] shufSongs = Enumerable.Repeat(usageSongs, repsNeeded)
-                .SelectMany(x => x).ToArray();
-
-            _rng.Shuffle(shufSongs);
-
-            selSongs.AddRange(shufSongs.Take(numNeeded));
-        }
-
-        return selUsesSongs;
     }
 
     SongMap CreateSongMap(UsesSongs usesSongs)
