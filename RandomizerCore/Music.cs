@@ -4,6 +4,7 @@ using Assembler;
 using FtRandoLib.Importer;
 using FtRandoLib.Library;
 using FtRandoLib.Utility;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -178,6 +179,9 @@ internal class MusicRandomizer
         if (_libPaths.Count == 0)
             return _freeBanks; // Nothing to do
 
+        // Testing songs is to help in making libraries. As libraries will be something that the average user can make, it can't be limited to debug builds like in MM2R. However, if people end up using libraries so large that this ends up taking a lot of time, it may be necessary to remove it. It's also entirely possible that the optimizer will notice that this function doesn't actually do anything that affects the rest of the program and eliminate it completely...
+        TestSongs();
+
         var songs = LoadSongs();
         var usesSongs = _imptr.SplitSongsByUsage<Usage>(songs);
 
@@ -195,6 +199,16 @@ internal class MusicRandomizer
         };
         var selUsesSongs = _imptr.SelectUsesSongs<Usage>(
             usesSongs, numUsageSongs, _shuffler);
+
+        WriteLogLine(null);
+        WriteLogLine("Selected songs:");
+        foreach (var (usage, usageSongs) in selUsesSongs)
+        {
+            string songNames = string.Join("}, {", usageSongs);
+            WriteLogLine($"{usage}: {{{songNames}}}");
+        }
+
+        WriteLogLine(null);
 
         var songMap = CreateSongMap(selUsesSongs);
         var areaSongMap = CreateAreaSongMap(selUsesSongs);
@@ -217,18 +231,29 @@ internal class MusicRandomizer
         return freeBanks;
     }
 
-    List<ISong> LoadSongs()
+    void WriteLogLine(string? line)
     {
-        List<BuiltinSong> builtins = new(_imptr.CreateBuiltinSongs());
+        Trace.WriteLine(line);
+        //// TODO: Write to spoiler log
+    }
 
+    List<ISong> LoadSongs(
+        bool includeBuiltin = true,
+        LibraryParserOptions? opts = null)
+    {
         List<FtSong> ftSongs = new();
         foreach (var libPath in _libPaths)
         {
             string libData = File.ReadAllText(libPath, Encoding.UTF8);
-            ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData));
+            ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData, opts));
         }
 
-        List<ISong> songs = new(Enumerable.Concat<ISong>(builtins, ftSongs));
+        List<ISong> songs = new();
+        if (includeBuiltin)
+            songs.AddRange(_imptr.CreateBuiltinSongs());
+
+        songs.AddRange(ftSongs);
+
         return songs;
     }
 
@@ -339,5 +364,13 @@ internal class MusicRandomizer
             .SelectMany(song => Enumerable.Repeat(song, 0x30))
             .Select((song, i) => (song, i))
             .ToDictionary(x => x.i, x => (ISong?)x.song);
+    }
+
+    void TestSongs()
+    {
+        LibraryParserOptions opts = new() { EnabledOnly = false, SafeOnly = false };
+
+        var songs = LoadSongs(false, opts);
+        _imptr.TestRebase(songs);
     }
 }
