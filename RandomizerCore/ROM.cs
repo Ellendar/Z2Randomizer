@@ -306,9 +306,9 @@ public class ROM
         }
     }
 
-    public void ApplyIps(byte[] patch)
+    public void ApplyIps(byte[] patch, bool expandRom = false)
     {
-        new IpsPatcher().Patch(ROMData, patch);
+        new IpsPatcher().Patch(ROMData, patch, expandRom);
     }
 
     private readonly int[] fireLocs = { 
@@ -357,8 +357,7 @@ public class ROM
         }
         else
         {
-            IpsPatcher patcher = new();
-            patcher.Patch(ROMData, charSprite.Path);
+            new IpsPatcher().Patch(ROMData, charSprite.Path, true);
         }
 
         Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
