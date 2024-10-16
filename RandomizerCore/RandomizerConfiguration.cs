@@ -204,6 +204,10 @@ public class RandomizerConfiguration
     [IgnoreInFlags]
     public bool DisableMusic { get; set; }
     [IgnoreInFlags]
+    public bool RandomizeMusic { get; set; }
+    [IgnoreInFlags]
+    public bool DisableUnsafeMusic { get; set; }
+    [IgnoreInFlags]
     public bool FastSpellCasting { get; set; }
     [IgnoreInFlags]
     public bool UpAOnController1 { get; set; }
@@ -914,6 +918,8 @@ public class RandomizerConfiguration
         config.BeepFrequency = 0x30;
         config.BeepThreshold = 0x20;
         config.DisableMusic = false;
+        config.RandomizeMusic = true;
+        config.DisableUnsafeMusic = true;
         config.FastSpellCasting = true;
         //ShuffleEn = false;
         //upaBox = false;
@@ -1493,6 +1499,8 @@ public class RandomizerConfiguration
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
+        properties.RandomizeMusic = RandomizeMusic;
+        properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = CharacterSprite.ByIndex(Sprite);
         properties.TunicColor = Tunic;
         properties.ShieldColor = ShieldTunic;

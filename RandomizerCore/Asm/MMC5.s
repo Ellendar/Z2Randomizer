@@ -1,10 +1,14 @@
 ﻿.macpack common
 
+.import nmi
 .export SwapPRG, SwapToSavedPRG, SwapToPRG0
 
-FREE "PRG7" [$FEAA, $FFFC)
+FREE "PRG7" [$FEAA, $FFE8)
 
 .segment "HEADER"
+.org $4
+.byte $10 ; 256 KB PRG-ROM
+
 .org $6
 .byte $52 ; Mapper 5
 .byte $08 ; use NES 2.0 header
@@ -20,71 +24,111 @@ bank7_code0 = $c000
 NmiBankShadow8 = $7b2
 NmiBankShadowA = $7b3
 
-.org $c4d0
-    lda     #$44            ; vertical mirroring
-    sta     $5105
+; To conserve space in the common bank, as much reset code as possible is moved to bank 1f. This requires reset to be done in 4 parts: 1. load bank 1f at e000 (this is done in both banks f and 1f, as a non-power-on reset will have bank f at e000), 2. do most reset stuff, 3. load bank f at e000 (again in both f and 1f), 4. do reset stuff that requires bank f.
+.org $ffe8
+	lda #($f | PRG_BANK_ROM)
+	sta PrgBankEReg
+	jmp bank7_reset_part4
+	
+.org $fff0
+bankf_reset:
+	sei
+	cld
+	lda #$ff
+	sta PrgBankEReg
+	jmp bank1f_reset_part2
 
 .org $fffc
-    .word (bank7_reset)
+    .word (bankf_reset)
 
 .reloc
-bank7_reset:
-    sei
-    cld
+bank7_reset_part4:
+    lda #$07
+    jsr SwapPRG
+
+    lda #$68
+    sta SpChrBank7Reg
+    jsr SwapCHR
+
+	jmp bank7_code0
+
+.segment "PRG1F"
+
+.org $ffe8
+bank1f_reset_part3:
+	lda #($f | PRG_BANK_ROM)
+	sta PrgBankEReg
+	jmp bank7_reset_part4
+
+.org $fff0
+bank1f_reset:
+	sei
+	cld
+	lda #$ff
+	sta PrgBankEReg
+	jmp bank1f_reset_part2
+
+.org $fffc
+    .word (bank1f_reset)
+	.word (bank1f_reset)
+
+.reloc
+bank1f_reset_part2:
     ldx #$00
-    stx $2000
+    stx PPUCTRL
     inx
-    stx $5103           ; Allow writing to WRAM
+    stx PrgRamProtReg2  ; Allow writing to WRAM
 wait_ppu:
-    lda $2002
+    lda PPUSTATUS
     bpl wait_ppu
     dex
     beq wait_ppu
     txs
-    stx $5117           ; Top bank is last bank
-    dex
-    stx $5116
-    ldx #2
-    stx $5102           ; Allow writing to WRAM
+    
+	ldx #($e | PRG_BANK_ROM)
+    stx PrgBankCReg
+    ldx #PRG_RAM_UNPROTECT1_VALUE
+    stx PrgRamProtReg1  ; Allow writing to WRAM
     inx
-    stx $5100           ; mode 3 is 4 8kb PRG banks
-    stx $5101           ; mode 3 is CHR mode 1x8k banks
-    lda #$50            ; horizontal mirroring
-    sta $5105
+    stx PrgBankModeReg  ; mode 3 is 4 8kb PRG banks
+    stx ChrBankModeReg  ; mode 3 is CHR mode 8x1k banks
+    lda #HORIZ_MIRROR_MODE
+    sta NameTableModeReg
     ; Set the last sprite bank to a fixed bank for items
-    lda #$68
-    sta $5127
-    jsr SwapCHR
-    lda #$07
-    jsr SwapPRG
-    sta $5113           ; Explicitly switching to PRG RAM bank 0 works around a bug in nintendulator
-    jmp bank7_code0
+    lda #$00
+    sta PrgRamBankReg   ; Explicitly switching to PRG RAM bank 0 works around a bug in nintendulator
+    jmp bank1f_reset_part3
 
+.segment "PRG7"
+
+.org $c4d0
+    lda     #VERT_MIRROR_MODE
+    sta     NameTableModeReg
 
 .reloc
 SwapCHR:
     ; 1kb sprite banks are 20-27 and the 1kb bg banks are 28-2b
     asl
     asl
-    sta $5120
+    sta SpChrBank0Reg
     adc #1
-    sta $5121
+    sta SpChrBank1Reg
     adc #1
-    sta $5122
+    sta SpChrBank2Reg
     adc #1
-    sta $5123
+    sta SpChrBank3Reg
     adc #1
-    sta $5124
-    sta $5128
+    sta SpChrBank4Reg
+    sta BgChrBank0Reg
     adc #1
-    sta $5125
-    sta $5129
+    sta SpChrBank5Reg
+    sta BgChrBank1Reg
     adc #1
-    sta $5126
-    sta $512a
+    sta SpChrBank6Reg
+    sta BgChrBank2Reg
     adc #1
-    ; sta $5127 ; Reserve the last sprite bank for new custom item tiles
-    sta $512b
+    ; sta SpChrBank7Reg ; Reserve the last sprite bank for new custom item tiles
+    sta BgChrBank3Reg
     lda #0
     rts
 
@@ -98,11 +142,11 @@ SwapPRG:
     asl
     ora #$80
     sta NmiBankShadow8
-    sta $5114
+    sta PrgBank8Reg
     clc
     adc #1
     sta NmiBankShadowA
-    sta $5115
+    sta PrgBankAReg
     lda #0
     rts
 
@@ -127,8 +171,8 @@ ClearPartialDevRAM:
 .segment "PRG0"
 ; Clean up stuff in bank zero - make it go via bank7's routines.
 .org $8149
-    lda     #$50            ; horizontal mirroring
-    sta     $5105
+    lda     #HORIZ_MIRROR_MODE
+    sta     NameTableModeReg
 .org $8150
     jsr     SwapCHR
 .org $a86b
@@ -137,8 +181,8 @@ ClearPartialDevRAM:
 .segment "PRG5"
 ; Clean up stuff in bank 5 - make it go via bank7's routines.
 .org $a712
-    lda     #$50            ; horizontal mirroring
-    sta     $5105
+    lda     #HORIZ_MIRROR_MODE
+    sta     NameTableModeReg
 .org $a728
     jsr     SwapCHR
 
@@ -207,7 +251,7 @@ LoadAreaBGMetatile:
     asl
     ora #$80
     sta NmiBankShadow8
-    sta $5114
+    sta PrgBank8Reg
     ; Store the loop counter back into $01
 @Loop:
         stx $01

@@ -4,6 +4,7 @@ using RandomizerCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -47,6 +48,19 @@ Classes Needed:
 */
 public class ROM
 {
+    public const int RomHdrSize = 0x10;
+    public const int PrgRomOffs = RomHdrSize;
+    public const int PrgRomSize = 0x40000;
+    public const int ChrRomOffs = RomHdrSize + PrgRomSize;
+    public const int ChrRomSize = 0x20000;
+    public const int RomSize = ChrRomOffs + ChrRomSize;
+
+    public const int VanillaPrgRomSize = 0x20000;
+    public const int VanillaChrRomOffs = RomHdrSize + VanillaPrgRomSize;
+    public const int VanillaRomSize = VanillaChrRomOffs + ChrRomSize;
+
+    public static readonly IReadOnlyList<int> FreeRomBanks = new List<int>(Enumerable.Range(0x10, 0xf));
+
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private const int textAddrStartinROM = 0xEFCE;
@@ -59,36 +73,52 @@ public class ROM
     private readonly int[] inWindows = { 0x13F19, 0x13F29, 0x13F39, 0x13F49, 0x13F59, 0x13F69, 0x14027 };
     private readonly int[] inCurtains = { 0x13F1D, 0x13F2D, 0x13F3D, 0x13F4D, 0x13F5D, 0x13F6D, 0x1402B };
 
-    private readonly int[] brickSprites = { 0x29650, 0x2B650, 0x2D650, 0x33650, 0x35650, 0x37650, 0x39650 };
-    private readonly int[] inBrickSprites = { 0x29690, 0x2B690, 0x2D690, 0x33690, 0x35690, 0x37690, 0x39690 };
+    private readonly int[] brickSprites = {
+        ChrRomOffs + 0x9640, 
+        ChrRomOffs + 0xB640, 
+        ChrRomOffs + 0xD640, 
+        ChrRomOffs + 0x13640, 
+        ChrRomOffs + 0x15640, 
+        ChrRomOffs + 0x17640, 
+        ChrRomOffs + 0x19640
+    };
+    private readonly int[] inBrickSprites = { 
+        ChrRomOffs + 0x9680, 
+        ChrRomOffs + 0xB680, 
+        ChrRomOffs + 0xD680, 
+        ChrRomOffs + 0x13680, 
+        ChrRomOffs + 0x15680, 
+        ChrRomOffs + 0x17680,
+        ChrRomOffs + 0x19680
+    };
 
     private const int textEndByte = 0xFF;
     private const int creditsLineOneAddr = 0x15377;
     private const int creditsLineTwoAddr = 0x15384;
 
     //sprite addresses for reading sprites from a ROM:
-    private const int titleSpriteStartAddr = 0x20D10;
-    private const int titleSpriteEndAddr = 0x20D30;
-    private const int beamSpriteStartAddr = 0x20850;
-    private const int beamSpriteEndAddr = 0x20870;
-    private const int raftSpriteStartAddr = 0x31450;
-    private const int raftSpriteEndAddr = 0x31490;
-    private const int OWSpriteStartAddr = 0x31750;
-    private const int OWSpriteEndAddr = 0x317d0;
-    private const int sleeperSpriteStartAddr = 0x21010;
-    private const int sleeperSpriteEndAddr = 0x21070;
-    private const int oneUpSpriteStartAddr = 0x20a90;
-    private const int oneUpSpriteEndAddr = 0x20ab0;
-    private const int endSprite1StartAddr = 0x2ed90;
-    private const int endSprite1EndAddr = 0x2ee90;
-    private const int endSprite2StartAddr = 0x2f010;
-    private const int endSprite2EndAddr = 0x2f0f0;
-    private const int endSprite3StartAddr = 0x2d010;
-    private const int endSprite3EndAddr = 0x2d050;
-    private const int headSpriteStartAddr = 0x21970;
-    private const int headSpriteEndAddr = 0x21980;
-    private const int playerSpriteStartAddr = 0x22010;
-    private const int playerSpriteEndAddr = 0x23010;
+    private const int titleSpriteStartAddr = ChrRomOffs + 0xD00;
+    private const int titleSpriteEndAddr = ChrRomOffs + 0xD20;
+    private const int beamSpriteStartAddr = ChrRomOffs + 0x840;
+    private const int beamSpriteEndAddr = ChrRomOffs + 0x860;
+    private const int raftSpriteStartAddr = ChrRomOffs + 0x11440;
+    private const int raftSpriteEndAddr = ChrRomOffs + 0x11480;
+    private const int OWSpriteStartAddr = ChrRomOffs + 0x11740;
+    private const int OWSpriteEndAddr = ChrRomOffs + 0x117c0;
+    private const int sleeperSpriteStartAddr = ChrRomOffs + 0x1000;
+    private const int sleeperSpriteEndAddr = ChrRomOffs + 0x1060;
+    private const int oneUpSpriteStartAddr = ChrRomOffs + 0xa80;
+    private const int oneUpSpriteEndAddr = ChrRomOffs + 0xaa0;
+    private const int endSprite1StartAddr = ChrRomOffs + 0xed80;
+    private const int endSprite1EndAddr = ChrRomOffs + 0xee80;
+    private const int endSprite2StartAddr = ChrRomOffs + 0xf000;
+    private const int endSprite2EndAddr = ChrRomOffs + 0xf0e0;
+    private const int endSprite3StartAddr = ChrRomOffs + 0xd000;
+    private const int endSprite3EndAddr = ChrRomOffs + 0xd040;
+    private const int headSpriteStartAddr = ChrRomOffs + 0x1960;
+    private const int headSpriteEndAddr = ChrRomOffs + 0x1970;
+    private const int playerSpriteStartAddr = ChrRomOffs + 0x2000;
+    private const int playerSpriteEndAddr = ChrRomOffs + 0x3000;
 
     //kasuto jars
     private const int kasutoJarTextAddr = 0xEEC9;
@@ -101,7 +131,7 @@ public class ROM
 
     private byte[] ROMData;
 
-    public ROM(string filename)
+    public ROM(string filename, bool expandRom = false)
     {
         try
         {
@@ -110,7 +140,7 @@ public class ROM
             fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
 
             BinaryReader br = new BinaryReader(fs, new ASCIIEncoding());
-            ROMData = br.ReadBytes(257 * 1024);
+            ROMData = ConvertData(br.ReadBytes(VanillaRomSize), expandRom);
 
         }
         catch (Exception err)
@@ -119,16 +149,30 @@ public class ROM
         }
     }
 
-    public ROM(ROM clone)
+    public ROM(ROM clone, bool expandRom = false)
     {
-        int length = clone.ROMData.Length;
-        ROMData = new byte[length];
-        Array.Copy(clone.ROMData, ROMData, length);
+        ROMData = ConvertData(clone.ROMData.ToArray(), expandRom);
     }
 
-    public ROM(byte[] data)
+    public ROM(byte[] data, bool expandRom = false)
     {
-        ROMData = data;
+        ROMData = ConvertData(data, expandRom);
+    }
+
+    private static byte[] ConvertData(byte[] data, bool expandRom)
+    {
+        if (!expandRom)
+            return data;
+
+        Debug.Assert(data.Length == VanillaRomSize);
+
+        // Expand the ROM from 128 KB PRG-ROM / 128 KB CHR-ROM to 256/128
+        var newdata = new byte[RomSize];
+
+        Array.Copy(data, newdata, VanillaChrRomOffs);
+        Array.Copy(data, VanillaChrRomOffs, newdata, ChrRomOffs, ChrRomSize);
+
+        return newdata;
     }
 
     public byte GetByte(int index)
@@ -262,7 +306,25 @@ public class ROM
         }
     }
 
-    private readonly int[] fireLocs = { 0x20850, 0x22850, 0x24850, 0x26850, 0x28850, 0x2a850, 0x2c850, 0x2e850, 0x36850, 0x32850, 0x34850, 0x38850 };
+    public void ApplyIps(byte[] patch, bool expandRom = false)
+    {
+        new IpsPatcher().Patch(ROMData, patch, expandRom);
+    }
+
+    private readonly int[] fireLocs = { 
+        ChrRomOffs + 0x00840, 
+        ChrRomOffs + 0x02840, 
+        ChrRomOffs + 0x04840, 
+        ChrRomOffs + 0x06840, 
+        ChrRomOffs + 0x08840, 
+        ChrRomOffs + 0x0a840, 
+        ChrRomOffs + 0x0c840, 
+        ChrRomOffs + 0x0e840, 
+        ChrRomOffs + 0x16840, 
+        ChrRomOffs + 0x12840, 
+        ChrRomOffs + 0x14840, 
+        ChrRomOffs + 0x18840 
+    };
 
     public void UpdateSprites(CharacterSprite charSprite, string tunicColor, string shieldColor, string beamSprite)
     {
@@ -295,8 +357,7 @@ public class ROM
         }
         else
         {
-            IpsPatcher patcher = new();
-            patcher.Patch(ROMData, charSprite.Path);
+            new IpsPatcher().Patch(ROMData, charSprite.Path, true);
         }
 
         Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
@@ -437,7 +498,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(0x20ab0 + i);
+                byte next = GetByte(ChrRomOffs + 0xaa0 + i);
                 newSprite[i] = next;
             }
         }
@@ -446,7 +507,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(0x22af0 + i);
+                byte next = GetByte(ChrRomOffs + 0x2ae0 + i);
                 newSprite[i] = next;
             }
         }
@@ -455,7 +516,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(0x22fb0 + i);
+                byte next = GetByte(ChrRomOffs + 0x2fa0 + i);
                 newSprite[i] = next;
             }
         }
@@ -464,7 +525,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(0x32ef0 + i);
+                byte next = GetByte(ChrRomOffs + 0x12ee0 + i);
                 newSprite[i] = next;
             }
         }
@@ -473,7 +534,7 @@ public class ROM
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(0x34dd0 + i);
+                byte next = GetByte(ChrRomOffs + 0x14dc0 + i);
                 newSprite[i] = next;
             }
         }

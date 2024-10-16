@@ -43,12 +43,14 @@
     <None Remove="Asm\FixedHud.s" />
     <None Remove="Asm\Graphics\item_sprites.chr" />
     <None Remove="Asm\Recoil.s" />
+    <None Remove="Asm\z2ft.s" />
     <None Remove="CustomRooms.json" />
     <None Remove="nlog.config" />
     <None Remove="PalaceRooms.json" />
     <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
+    <None Remove="Asm\z2rndft.ips" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CustomRooms.json">
@@ -78,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Assembler\Assembler.csproj" />
+    <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Sprites\Aneru.ips">
@@ -173,5 +176,7 @@
     <EmbeddedResource Include="Asm\MMC5.s" />
     <EmbeddedResource Include="Asm\DashSpell.s" />
     <EmbeddedResource Include="Asm\Recoil.s" />
+    <EmbeddedResource Include="Asm\z2ft.s" />
+    <EmbeddedResource Include="Asm\z2rndft.ips" />
   </ItemGroup>
 </Project>
