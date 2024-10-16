@@ -786,6 +786,202 @@ CheckController1ForUpAMagic:
     }
 
 
+    public void DontCountExpDuringTalking(Engine engine)
+    {
+        Assembler.Assembler a = new();
+
+        a.Code("""
+.segment "PRG7"
+; Patch the count up code and check to see if we are in a dialog
+.org $d433
+    jsr CheckForDialog
+.reloc
+CheckForDialog:
+    lda $74c ; current dialog type
+    beq OriginalPatchedCode
+        ; We are in a dialog or something, so don't tick down
+        ; by skipping ahead to after the counting code
+        pla
+        pla
+        jmp $d477
+OriginalPatchedCode:
+    lda $756 ; Low byte of EXP to add
+    rts
+""", "dont_count_during_talking.s");
+        engine.Modules.Add(a.Actions);
+    }
+
+    public void InstantText(Engine engine)
+    {
+        Assembler.Assembler a = new();
+
+        a.Code("""
+.segment "PRG3"
+
+DialogActionLoadTextPtr = $b480
+DialogActionDrawBox = $b0d2
+DrawTwoRowsOfTiles = $b2f2
+
+DialogPtr = $569
+
+; Swap the dialog action pointers for loading the text pointer and the dialog draw box
+.org $b0b9 ; actions 4 and 5
+    .word DialogActionLoadTextPtr
+    .word DialogActionDrawBox
+
+; Patch the count up code and check to see if we are in a dialog
+.org $b10b
+    jsr InstantDialog
+.reloc
+InstantDialog:
+    ; Run the original code to draw two rows of tiles
+    jsr DrawTwoRowsOfTiles
+    ; save the Draw Macro current write offset since the later code uses y
+    sty $362
+
+    ; Save the values in $00 which is used later for calculating the attribute offset
+    ; We could use any other unused zp temp (i originally used $09-0a) but this is just
+    ; extremely safe and it doesn't add lag to save/restore here since its in a menu load
+    lda $00
+    pha
+    lda $01
+    pha
+
+    ; Check the current line, no text on lines 0-1 so skip it
+    lda $525
+    beq Exit
+
+    lda #$60 ; 60 = typewriter sound
+    sta $ec  ; Sound Effects Type 1
+    ; If the current offset isn't on a $f4 tile, then move ahead until we get to it
+    ; This will happen if the text box is split across multiple nametables
+    ldx #0
+FindNextF4:
+    lda $368,x
+    cmp #$f4
+    beq StartReadingLetters
+        inx
+        bne FindNextF4
+StartReadingLetters:
+    ldy #0
+    ; Load the current pointer for the text and see if we reached the end.
+    lda DialogPtr+0
+    sta $00
+    lda DialogPtr+1
+    sta $01
+    lda ($00),y
+ReadLetterLoop:
+    ; if its FF then its end of string so just exit
+    cmp #$ff
+    beq ExitUpdatePtr
+    ; Read each letter until the end of the line
+    cmp #$fc
+    bcs NextLine
+    ; Draw the current letter over the blank space that we are rendering
+    sta $368,x
+    ; Move to the next spot in ram and check that its a blank space before writing.
+    inx
+FindNextF4Again:
+    lda $368,x
+    cmp #$f4
+    beq F4Found
+        inx
+        bne FindNextF4Again
+F4Found:
+    iny
+    lda ($00),y
+    jmp ReadLetterLoop
+NextLine:
+    ; Letters $fc-$fe indicate go to next line
+    iny
+ExitUpdatePtr:
+    ; Store current dialog pointer back into the text pointer
+    tya
+    clc
+    adc DialogPtr+0
+    sta DialogPtr+0
+    bcc Exit
+        inc DialogPtr+1
+Exit:
+    ; restore the saved values in $00 and $01
+    pla
+    sta $01
+    pla
+    sta $00
+    ldy $362
+    rts
+""", "instant_text.s");
+        engine.Modules.Add(a.Actions);
+    }
+
+    public void PreventLR(Engine engine)
+    {
+        Assembler.Assembler a = new();
+        a.Code("""
+.macpack common
+
+PollPadInput = $d367
+
+.define buttons $f5
+.define last_frame_buttons $f7
+
+.segment "PRG5"
+; Patch the title screen call to the read routine
+.org $A68A
+  jsr ControllerReading
+
+
+.segment "PRG7"
+; Clear the space for the vanilla controller reading code
+.org $d346
+FREE_UNTIL PollPadInput
+
+; Patch the main places that users the controller read routine
+.org $c137
+  jsr ControllerReading
+.org $cd9e
+  jsr ControllerReading
+
+; Make a new controller read routine that prevents L+R inputs
+.reloc
+ControllerReading:
+    jsr PollPadInput
+    lda $f5
+    sta $00
+    jsr PollPadInput
+    lda $f5
+    cmp $00
+    bne ControllerReading
+    ; for both player 1 and player 2 controller inputs
+    ldx #$01
+controller_process_loop:
+        ; Prevent L/R inputs
+        lda buttons, x
+        and #%00001010    ; Compare Up and Left...
+        lsr a
+        and buttons, x    ; to Down and Right
+        beq not_opposing
+            ; Use previous frame's directions
+            lda buttons, x
+            eor last_frame_buttons, x
+            and #%11110000
+            eor last_frame_buttons, x
+            sta buttons, x
+not_opposing:
+        ; and Calculate which buttons were pressed this frame
+        lda buttons,x
+        tay
+        eor last_frame_buttons,x
+        and buttons,x
+        sta buttons,x
+        sty last_frame_buttons,x
+        dex
+        bpl controller_process_loop
+    rts
+""", "prevent_lr.s");
+        engine.Modules.Add(a.Actions);
+    }
+
     public void BuffCarrock(Engine engine)
     {
         Assembler.Assembler assembler = new();
