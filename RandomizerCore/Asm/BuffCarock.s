@@ -1,4 +1,5 @@
-﻿.segment "PRG4"
+﻿.macpack common
+.segment "PRG4"
 
 .define ProjectileYPosition $30
 .define ProjectileXVelocity $77
@@ -152,19 +153,35 @@ RandomizeWifiShotType:
 @Exit:
     rts
 
-; Trying to hook other places for clearing the extra sin wave data didn't work well
-; So just hook into carock's death routine that starts the explosion. This means the beams
-; will stop "sin waving" at this point but whatever.
-.org $b231
-    jsr ClearProjectilesOnCarockDeath
-    nop
-.reloc
-; Its fine to scratch both A and Y as they are reloaded before use
-ClearProjectilesOnCarockDeath:
-    inc $b6,x
-    lda #0
-    ldy #5
-    -   sta ProjectileEnemyData,y
-        dey
-        bpl -
+.segment "PRG7"
+
+.org $d29c
+; Update the general RAM clear routine that runs when transitioning between rooms (among other things)
+; to also clear out the new object ram we added. In the future if we find space in $300 or $400 to fit
+; the carock extra data, we can slip it in there
+ClearCommonEnemyRAM:
+    ldx #0
+    txa
+@ClearPageLoop:
+    sta $300,x
+    sta $400,x
+    dex
+    bne @ClearPageLoop
+; A and X are 0
+; we want to clear [$00, $e0)
+@ClearZPLoop:
+    sta $00,x
+    inx
+    cpx #$e0
+    bne @ClearZPLoop
+; TODO: make this new clear code the default and add an `if` for the carock part
+; Now clear out the extra ram used for carock wifi beams
+    ldx #5
+@ClearCarockBeam:
+    sta ProjectileEnemyData,x
+    dex
+    bpl @ClearCarockBeam
+    stx $0302 ; Clear VRAM pointers by setting them to #$ff
+    stx $0363
     rts
+FREE_UNTIL $d2be
