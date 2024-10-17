@@ -2703,7 +2703,7 @@ partial class MainUI
         disableHUDLag.Size = new Size(161, 19);
         disableHUDLag.TabIndex = 44;
         disableHUDLag.Text = "Disable HUD Flash on Lag";
-        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens. A glove icon is added to the HUD as a visual indicator for lag");
+        toolTip1.SetToolTip(disableHUDLag, "When enabled, fixes the issue causing the whole HUD to flash when lag happens.");
         disableHUDLag.UseVisualStyleBackColor = true;
         // 
         // useCommunityTextCheckbox

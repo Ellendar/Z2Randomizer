@@ -63,6 +63,8 @@ HandleLagFrame:
     sta $2005
     sta $2005
 
+; DISABLE THE GLOVE for now....
+.if 0
     ; Here be dragons :) Write directly to OAM through OAMDATA to set a "lag sprite"
     ; There's two sources of corruptions when doing this that we need to avoid.
     ; The first is when you write to OAMADDR, it will corrupt the 8 bytes at that address
@@ -104,6 +106,7 @@ HandleLagFrame:
     sta $2004 ; OAMDATA
 
     ; That should prevent corruption
+.endif
 
     ; Use the MMC5 "in frame" flag to wait for the frame to start before waiting for sprite zero
 -
