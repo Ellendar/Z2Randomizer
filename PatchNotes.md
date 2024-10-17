@@ -6,12 +6,15 @@
 - Added options for +0/+4 for Max Hearts
 - Added support for Custom Music. See [this wiki entry](https://github.com/Ellendar/Z2Randomizer/wiki/Custom-Music)  for directions on how to set it up. Big thanks to Quantum for adding this.
 
+- Disabled simultaneous L+R inputs.
+- Removed the Glove indicator on lag frames when the HUD lag fix was enabled. It will return as an option in the next major release.
 - Fixed a bug where enemy projectiles could function incorrectly after killing hard carock
 - Fixed an issue where the sleepy bot in saria displayed his vanilla text when helpful hints were on and he didn't have a hint.
 - Fixed the upstab/downstab get text when community text is disabled and upstab/downstab are swapped.
 - Fixed an issue where items required to get reflect could be behind Carock
 - Fixed an issue where starting life level was controlled by the starting magic level selector.
 - Fixed an issue where low attack levels 1-6 were 1 damage lower than intended.
+- Fixed a bug that could crash the game if you leveled up or died while reading a sign.
 
 ## Version 4.3.12 - May 12, 2024
 
