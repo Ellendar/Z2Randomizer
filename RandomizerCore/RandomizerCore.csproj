@@ -36,6 +36,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
+    <Version>4.3.13</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
@@ -83,6 +84,9 @@
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Music\test.json5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Sprites\Aneru.ips">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

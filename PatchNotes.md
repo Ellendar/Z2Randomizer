@@ -1,5 +1,18 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.13 - October 16, 2024
+
+- Faster text is now instant text. Rejoice!
+- Added options for +0/+4 for Max Hearts
+- Added support for Custom Music. See [this wiki entry](https://github.com/Ellendar/Z2Randomizer/wiki/Custom-Music)  for directions on how to set it up. Big thanks to Quantum for adding this.
+
+- Fixed a bug where enemy projectiles could function incorrectly after killing hard carock
+- Fixed an issue where the sleepy bot in saria displayed his vanilla text when helpful hints were on and he didn't have a hint.
+- Fixed the upstab/downstab get text when community text is disabled and upstab/downstab are swapped.
+- Fixed an issue where items required to get reflect could be behind Carock
+- Fixed an issue where starting life level was controlled by the starting magic level selector.
+- Fixed an issue where low attack levels 1-6 were 1 damage lower than intended.
+
 ## Version 4.3.12 - May 12, 2024
 
 - Fixed a bug where hidden kasuto / 3-eyed rock could incorrectly select locations that were already placed under some circumstances in volcano biomes.
