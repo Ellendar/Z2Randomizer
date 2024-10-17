@@ -1194,7 +1194,7 @@ public class RandomizerConfiguration
         properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
         properties.StartMag = StartingMagicLevel;
-        properties.StartLifeLvl = StartingMagicLevel;
+        properties.StartLifeLvl = StartingLifeLevel;
 
         //Overworld
         properties.ShuffleEncounters = ShuffleEncounters == null ? random.Next(2) == 1 : (bool)ShuffleEncounters;
