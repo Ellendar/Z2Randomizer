@@ -1146,7 +1146,7 @@ public class RandomizerConfiguration
         }
         else if (MaxHeartContainers > 8)
         {
-            properties.MaxHearts = Math.Min(properties.StartHearts + (int)MaxHeartContainers - 8, 8);
+            properties.MaxHearts = Math.Min(properties.StartHearts + (int)MaxHeartContainers - 9, 8);
         }
         else
         {

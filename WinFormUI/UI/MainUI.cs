@@ -798,6 +798,8 @@ public partial class MainUI : Form
             9 => 9,
             10 => 10,
             11 => 11,
+            12 => 12,
+            13 => 13,
             _ => throw new Exception("Invalid StartHeartsMax setting")
         };
 
@@ -1268,6 +1270,8 @@ public partial class MainUI : Form
                 9 => 9,
                 10 => 10,
                 11 => 11,
+                12 => 12,
+                13 => 13,
                 _ => throw new Exception("Invalid MaxHearts setting")
             };
             startingTechsList.SelectedIndex = (configuration.StartWithDownstab, configuration.StartWithUpstab) switch

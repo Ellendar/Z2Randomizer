@@ -109,6 +109,7 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
+        useCustomRoomsBox = new CheckBox();
         HardBossesCheckbox = new CheckBox();
         noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         gpStyleLabel = new Label();
@@ -263,7 +264,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        useCustomRoomsBox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -393,7 +393,7 @@ partial class MainUI
         maxHeartsList.DropDownStyle = ComboBoxStyle.DropDownList;
         maxHeartsList.DropDownWidth = 40;
         maxHeartsList.FormattingEnabled = true;
-        maxHeartsList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "?", "+1", "+2", "+3" });
+        maxHeartsList.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "?", "+0", "+1", "+2", "+3", "+4" });
         maxHeartsList.Location = new Point(500, 56);
         maxHeartsList.Margin = new Padding(4, 3, 4, 3);
         maxHeartsList.MaxDropDownItems = 12;
@@ -1271,6 +1271,18 @@ partial class MainUI
         tabPage2.TabIndex = 1;
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
+        // 
+        // useCustomRoomsBox
+        // 
+        useCustomRoomsBox.AutoSize = true;
+        useCustomRoomsBox.Location = new Point(281, 212);
+        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
+        useCustomRoomsBox.Name = "useCustomRoomsBox";
+        useCustomRoomsBox.Size = new Size(130, 19);
+        useCustomRoomsBox.TabIndex = 36;
+        useCustomRoomsBox.Text = "Use Custom Rooms";
+        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
+        useCustomRoomsBox.UseVisualStyleBackColor = true;
         // 
         // HardBossesCheckbox
         // 
@@ -3169,18 +3181,6 @@ partial class MainUI
         // 
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
-        // 
-        // useCustomRoomsBox
-        // 
-        useCustomRoomsBox.AutoSize = true;
-        useCustomRoomsBox.Location = new Point(281, 212);
-        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
-        useCustomRoomsBox.Name = "useCustomRoomsBox";
-        useCustomRoomsBox.Size = new Size(130, 19);
-        useCustomRoomsBox.TabIndex = 36;
-        useCustomRoomsBox.Text = "Use Custom Rooms";
-        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
-        useCustomRoomsBox.UseVisualStyleBackColor = true;
         // 
         // MainUI
         // 
