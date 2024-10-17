@@ -296,6 +296,12 @@ public static class CustomTexts
         else
         {
             ShuffleWizardTexts(texts, spellMap, props.ReplaceFireWithDash);
+            if(props.SwapUpAndDownStab)
+            {
+                (texts[spellTextIndexes[Town.DARUNIA_ROOF]], texts[spellTextIndexes[Town.MIDO_CHURCH]])
+                    = (texts[spellTextIndexes[Town.MIDO_CHURCH]], texts[spellTextIndexes[Town.DARUNIA_ROOF]]);
+            }
+            
         }
 
         if (props.SpellItemHints)
