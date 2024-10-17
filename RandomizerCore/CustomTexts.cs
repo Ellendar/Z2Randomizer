@@ -12,7 +12,6 @@ public static class CustomTexts
     private static readonly int[] rauruHints = new int[] { 32, 12, 30 }; //Three houses, first screen
     private static readonly int[] rutoHints = new int[] { 18, 33, 25, 26 }; //error is 25 and 26, two houses, outside left
     private static readonly int[] sariaHints = new int[] { 50, 28 };//moving middle screen, sleeping thing, stationary right
-    private static readonly int[] sariaHintsWithBaguWoods = new int[] { 28 };
     private static readonly int[] kingsTomb = new int[] { 51 };
     private static readonly int[] midoHints = new int[] { 45 };//moving old lady left, moving kid middle, inside house right
     private static readonly int[] nabooruHints = new int[] { 67, 64, 97 };//inside house right, moving bagu middle, stationary left, moving left, persistent left
@@ -318,7 +317,7 @@ public static class CustomTexts
         if (props.HelpfulHints)
         {
             placedIndex = GenerateHelpfulHints(texts, itemLocs, hashRNG, props.SpellItemHints);
-            GenerateKnowNothings(texts, placedIndex, nonhashRNG, props.BagusWoods, props.UseCommunityText);
+            GenerateKnowNothings(texts, placedIndex, nonhashRNG, props.UseCommunityText);
         }
 
         if (props.UseCommunityText)
@@ -493,27 +492,31 @@ public static class CustomTexts
         }
     }
 
-    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndex, Random r, bool useBaguWoods, bool useCommunityText)
+    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndex, Random r, bool useCommunityText)
     {
-        List<int> stationary = new List<int>();
-        stationary.AddRange(rauruHints);
-        stationary.AddRange(rutoHints);
-        stationary.AddRange(useBaguWoods ? sariaHintsWithBaguWoods : sariaHints);
-        stationary.AddRange(midoHints);
-        stationary.AddRange(nabooruHints);
-        stationary.AddRange(daruniaHints);
-        stationary.AddRange(newkasutoHints);
-        stationary.AddRange(kingsTomb);
-        stationary.AddRange(oldkasutoHint);
+        List<int> stationary =
+        [
+            .. rauruHints,
+            .. rutoHints,
+            .. sariaHints,
+            .. midoHints,
+            .. nabooruHints,
+            .. daruniaHints,
+            .. newkasutoHints,
+            .. kingsTomb,
+            .. oldkasutoHint,
+        ];
 
-        List<int> moving = new List<int>();
-        moving.AddRange(rauruMoving);
-        moving.AddRange(rutoMoving);
-        moving.AddRange(sariaMoving);
-        moving.AddRange(movingMido);
-        moving.AddRange(movingNabooru);
-        moving.AddRange(daruniaMoving);
-        moving.AddRange(newkasutoMoving);
+        List<int> moving =
+        [
+            .. rauruMoving,
+            .. rutoMoving,
+            .. sariaMoving,
+            .. movingMido,
+            .. movingNabooru,
+            .. daruniaMoving,
+            .. newkasutoMoving,
+        ];
 
         Text defaultKnowNothing = new();
         for (int i = 0; i < stationary.Count; i++)
