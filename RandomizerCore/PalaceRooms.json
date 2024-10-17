@@ -4638,7 +4638,7 @@
     "memoryAddress": 67423,
     "name": "Vanilla Horsehead Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 1,
     "requirements": [
     ],
     "sideviewData": "20600E08E100D008208F23C829C8D40E8405E300D008A34992454103D80E9009"
@@ -4664,7 +4664,7 @@
     "memoryAddress": 67507,
     "name": "Vanilla Helmethead Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 2,
     "requirements": [
     ],
     "sideviewData": "20600E08E100D008208F23C829C8D40E8405E300D008A34992454103D80E9009"
@@ -4690,7 +4690,7 @@
     "memoryAddress": 74304,
     "name": "Vanilla Rebo Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 3,
     "requirements": [
     ],
     "sideviewData": "20600E08E100D008208F23C829C8D40E8405E300D008A34992454103D80E9009"
@@ -4716,7 +4716,7 @@
     "memoryAddress": 74360,
     "name": "Vanilla Carock Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 4,
     "requirements": [
     ],
     "sideviewData": "20600E08E100D008208F23C829C8D40E8405E300D008A34992454103D80E9009"
@@ -4742,7 +4742,7 @@
     "memoryAddress": 67535,
     "name": "Vanilla Gooma Room",
     "palaceGroup": null,
-    "palaceNumber": null,
+    "palaceNumber": 5,
     "requirements": [
     ],
     "sideviewData": "20600E08E100D008208F23C829C8D40E8405E300D008A34992454103D80E9009"

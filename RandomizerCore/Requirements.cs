@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SD.Tools.BCLExtensions.CollectionsRelated;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,34 +11,34 @@ namespace Z2Randomizer.Core;
 public class Requirements
 {
     internal bool IndividualRequirementsAreAnds { get; }
-    public RequirementType[] IndividualRequirements { get; private set; }
-    public RequirementType[][] CompositeRequirements { get; private set; }
+    private RequirementType[] individualRequirements;
+    private RequirementType[][] compositeRequirements;
 
     public Requirements(bool individualRequirementsAreAnds = false)
     {
-        IndividualRequirements = new RequirementType[] { };
-        CompositeRequirements = new RequirementType[][] { };
+        individualRequirements = [];
+        compositeRequirements = [];
         IndividualRequirementsAreAnds = individualRequirementsAreAnds;
     }
 
     public Requirements(RequirementType[] requirements, bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
     {
-        IndividualRequirements = requirements;
+        individualRequirements = requirements;
     }
 
     public Requirements(RequirementType[] requirements, RequirementType[][] compositeRequirements,
         bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
     {
-        IndividualRequirements = requirements;
-        CompositeRequirements = compositeRequirements;
+        individualRequirements = requirements;
+        this.compositeRequirements = compositeRequirements;
     }
 
     public Requirements(string json)
     {
         if(json == null)
         {
-            IndividualRequirements = new RequirementType[] { };
-            CompositeRequirements = new RequirementType[][] { };
+            this.individualRequirements = [];
+            compositeRequirements = [];
             return;
         }
         dynamic requirementsDynamic = JsonConvert.DeserializeObject(json);
@@ -60,28 +61,51 @@ public class Requirements
             }
         }
 
-        IndividualRequirements = individualRequirements.ToArray();
-        CompositeRequirements = compositeReqirements.Select(i => i.ToArray()).ToArray();
+        this.individualRequirements = individualRequirements.ToArray();
+        compositeRequirements = compositeReqirements.Select(i => i.ToArray()).ToArray();
+    }
+
+    public Requirements AddHardRequirement(RequirementType requirement)
+    {
+        Requirements newRequirements = new();
+        //if no requirements return a single requirement of the type
+        if(individualRequirements.Length == 0 && compositeRequirements.Length == 0)
+        {
+            newRequirements.individualRequirements = [requirement];
+            return newRequirements;
+        }
+        newRequirements.compositeRequirements = new RequirementType[compositeRequirements.Length + individualRequirements.Length][];
+        //all individual requirements become composite requirements containing the type
+        for(int i = 0; i < individualRequirements.Length; i++)
+        {
+            newRequirements.compositeRequirements[i] = [individualRequirements[i], requirement];
+        }
+        //all composite requirements not containing the type now contain the type
+        for (int i = 0; i < compositeRequirements.Length; i++)
+        {
+            newRequirements.compositeRequirements[i + individualRequirements.Length] = [.. compositeRequirements[i], requirement];
+        }
+        return newRequirements;
     }
 
     public string Serialize()
     {
         StringBuilder sb = new();
         sb.Append("[");
-        for (int i = 0; i < IndividualRequirements.Length; i++)
+        for (int i = 0; i < individualRequirements.Length; i++)
         {
             sb.Append('"');
-            sb.Append(IndividualRequirements[i].ToString());
+            sb.Append(individualRequirements[i].ToString());
             sb.Append('"');
             sb.Append(",");
         }
-        for (int i = 0; i < CompositeRequirements.Length; i++)
+        for (int i = 0; i < compositeRequirements.Length; i++)
         {
             sb.Append("[");
-            for (int j = 0; j < CompositeRequirements[i].Length; j++)
+            for (int j = 0; j < compositeRequirements[i].Length; j++)
             {
                 sb.Append('"');
-                sb.Append(CompositeRequirements[i][j].ToString());
+                sb.Append(compositeRequirements[i][j].ToString());
                 sb.Append('"');
                 sb.Append(",");
             }
@@ -105,46 +129,42 @@ public class Requirements
     public bool AreSatisfiedBy(IEnumerable<RequirementType> requireables)
     {
 
-        bool individualRequirementsSatisfied = false;
-        foreach (RequirementType requirement in IndividualRequirements)
+        var individualRequirementsSatisfied = false;
+        var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
+        foreach (var requirement in individualRequirements)
         {
-            if (requireables.Contains(requirement) && !IndividualRequirementsAreAnds)
+            if (requirementTypes.Contains(requirement) && !IndividualRequirementsAreAnds)
             {
                 individualRequirementsSatisfied = true;
                 break;
             }
-            else if(IndividualRequirementsAreAnds)
+
+            if (IndividualRequirementsAreAnds)
             {
                 return false;
             }
         }
-        if(IndividualRequirements.Length > 0 && !individualRequirementsSatisfied)
+        if (individualRequirements.Length > 0 && !individualRequirementsSatisfied)
         {
             return false;
         }
 
-        bool compositeRequirementSatisfied = CompositeRequirements.Length == 0;
-        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
-        {
-            if(compositeRequirement.All(i => requireables.Contains(i)))
-            {
-                compositeRequirementSatisfied = true;
-                break;
-            }
-        }
-        return compositeRequirementSatisfied;
+        var compositeRequirementSatisfied =
+            compositeRequirements.Length == 0 || compositeRequirements.Any(compositeRequirement =>
+            compositeRequirement.All(i => requirementTypes.Contains(i)));
+        return (individualRequirements.Length > 0 && individualRequirementsSatisfied) || compositeRequirementSatisfied;
     }
 
     public bool HasHardRequirement(RequirementType requireable)
     {
-        foreach (RequirementType requirement in IndividualRequirements)
+        foreach (RequirementType requirement in individualRequirements)
         {
             if (requirement != requireable)
             {
                 return false;
             }
         }
-        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
+        foreach (RequirementType[] compositeRequirement in compositeRequirements)
         {
             bool containsRequireable = false;
             foreach (RequirementType requirement in compositeRequirement)
