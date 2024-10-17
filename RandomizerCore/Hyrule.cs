@@ -597,7 +597,7 @@ public class Hyrule
                 //Meeting up at 6 where the curve would be anyway.
                 if (i <= 6)
                 {
-                    attack = i;
+                    attack = i + 1;
                 }
                 else
                 {
