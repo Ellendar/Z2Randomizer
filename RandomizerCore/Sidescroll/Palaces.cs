@@ -124,6 +124,8 @@ public class Palaces
             palaces.Add(palace);
         }
 
+        palaces[3].BossRoom.Requirements = palaces[3].BossRoom.Requirements.AddHardRequirement(RequirementType.GLOVE);
+
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {
             return [];

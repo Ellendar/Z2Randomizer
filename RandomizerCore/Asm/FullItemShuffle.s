@@ -436,7 +436,7 @@ ItemTileTable:
     .byte $8A, $F5 ; Blue Jar
     .byte $8A, $F5 ; Red Jar
     .byte $A8, $F5 ; Link Doll
-    .byte $df, $df ; Child
+    .byte $c9, $c9 ; Child
     .byte $f3, $f3 ; Trophy
     .byte $fd, $fd ; Medicine
     .byte $67, $67 ; Antifairy
@@ -453,7 +453,7 @@ ItemTileTable:
     .byte $db, $dd ; Reflect Spell
     .byte $f1, $f1 ; Spell Spell
     .byte $f7, $f9 ; Thunder Spell
-    .byte $c7, $c9 ; Dash Spell
+    .byte $c7, $92 ; Dash Spell
 
 ; In vanilla this table is limited only to the 6 items in $10-$16
 ; We can keep the first $10 items using the original, and just expand the rest

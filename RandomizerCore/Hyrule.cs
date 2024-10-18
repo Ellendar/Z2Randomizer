@@ -187,7 +187,7 @@ public class Hyrule
             RNG = new Random(SeedHash);
             props = config.Export(RNG);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
-            if(props.GenerateSpoiler)
+            if(config.GenerateSpoiler)
             {
                 RNG.NextBytes(new byte[64]);
             }
@@ -580,7 +580,7 @@ public class Hyrule
                 //Meeting up at 6 where the curve would be anyway.
                 if (i <= 6)
                 {
-                    attack = i;
+                    attack = i + 1;
                 }
                 else
                 {

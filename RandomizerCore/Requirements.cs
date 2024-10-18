@@ -26,11 +26,11 @@ public class Requirements
         IndividualRequirements = requirements;
     }
 
-    public Requirements(RequirementType[] requirements, RequirementType[][] compositeRequirements,
+    public Requirements(RequirementType[] requirements, RequirementType[][] CompositeRequirements,
         bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
     {
         IndividualRequirements = requirements;
-        CompositeRequirements = compositeRequirements;
+        CompositeRequirements = CompositeRequirements;
     }
 
     public Requirements(string? json)
@@ -110,6 +110,29 @@ public class Requirements
             CompositeRequirements.Length == 0 || CompositeRequirements.Any(compositeRequirement =>
             compositeRequirement.All(i => requirementTypes.Contains(i)));
         return (IndividualRequirements.Length > 0 && individualRequirementsSatisfied) || compositeRequirementSatisfied;
+    }
+
+    public Requirements AddHardRequirement(RequirementType requirement)
+    {
+        Requirements newRequirements = new();
+        //if no requirements return a single requirement of the type
+        if(IndividualRequirements.Length == 0 && CompositeRequirements.Length == 0)
+        {
+            newRequirements.IndividualRequirements = [requirement];
+            return newRequirements;
+        }
+        newRequirements.CompositeRequirements = new RequirementType[CompositeRequirements.Length + IndividualRequirements.Length][];
+        //all individual requirements become composite requirements containing the type
+        for(int i = 0; i < IndividualRequirements.Length; i++)
+        {
+            newRequirements.CompositeRequirements[i] = [IndividualRequirements[i], requirement];
+        }
+        //all composite requirements not containing the type now contain the type
+        for (int i = 0; i < CompositeRequirements.Length; i++)
+        {
+            newRequirements.CompositeRequirements[i + IndividualRequirements.Length] = [.. CompositeRequirements[i], requirement];
+        }
+        return newRequirements;
     }
 
     public bool HasHardRequirement(RequirementType requireable)

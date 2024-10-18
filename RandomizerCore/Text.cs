@@ -18,6 +18,7 @@ public class Text : IEquatable<Text>
 
     public Text()
     {
+        RawText = "I know$nothing";
         EncodedText = Util.ToGameText("I know$nothing", true);
     }
 

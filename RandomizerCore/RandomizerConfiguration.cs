@@ -1947,7 +1947,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
         properties.StartMag = StartingMagicLevel;
-        properties.StartLifeLvl = StartingMagicLevel;
+        properties.StartLifeLvl = StartingLifeLevel;
 
         //Overworld
         properties.ShuffleEncounters = ShuffleEncounters ?? GetIndeterminateFlagValue(r);

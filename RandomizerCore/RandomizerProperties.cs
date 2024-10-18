@@ -24,7 +24,6 @@ public class RandomizerProperties
     //ROM Info
     public string Seed { get; set; }
     public string Flags { get; set; }
-    public bool GenerateSpoiler { get; set; }
 
     //Items
     //public bool shuffleItems;

@@ -580,7 +580,7 @@ public class CustomTexts
         return new Text(RIVER_MAN_TEXTS[r.Next(RIVER_MAN_TEXTS.Length)]);
     }
 
-    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndex, Random r, bool useBaguWoods, bool useCommunityText)
+    private static void GenerateKnowNothings(List<Text> hints, List<int> placedIndexes, Random r, bool useBaguWoods, bool useCommunityText)
     {
         List<int> stationary =
         [
@@ -609,7 +609,7 @@ public class CustomTexts
         Text defaultKnowNothing = new();
         for (int i = 0; i < stationary.Count; i++)
         {
-            if (!placedIndex.Contains(stationary[i]))
+            if (!placedIndexes.Contains(stationary[i]))
             {
                 hints[stationary[i]] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
             }
