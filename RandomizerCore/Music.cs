@@ -299,7 +299,9 @@ internal class MusicRandomizer
             foreach (var loc in world.AllLocations)
             {
                 Usage usage;
-                if (loc.TerrainType == Terrain.TOWN)
+                if (object.ReferenceEquals(loc, _hyrule.westHyrule!.bagu))
+                    usage = Usage.Town;
+                else if (loc.TerrainType == Terrain.TOWN)
                 {
                     if (loc.ActualTown == Town.OLD_KASUTO // ??
                         /*|| loc.ActualTown == Town.SARIA_SOUTH*/)
@@ -328,7 +330,7 @@ internal class MusicRandomizer
 
         // Assign music to the locations
         SongMap areaSongMap = new();
-        foreach (var usage in new Usage[] { Usage.Town, Usage.Palace, Usage.Cave, Usage.Encounter })
+        foreach (var (usage, usageLocs) in usesLocs)
         {
             var usageSongs = usesSongs[usage];
             Func<Location, int> GetSongIdx = usage switch
@@ -340,7 +342,7 @@ internal class MusicRandomizer
                 _ => (loc => (int)loc.Continent),
             };
 
-            foreach (var loc in usesLocs[usage])
+            foreach (var loc in usageLocs)
             {
                 int contIdx = (int)loc.Continent,
                     areaIdx = loc.MemAddress - _hyrule.worlds[contIdx].baseAddr,
