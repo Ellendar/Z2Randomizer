@@ -178,6 +178,8 @@ TownToItemTable:
     .byte $22
 .org $8974 ; Darunia Right
     .byte $c0 | $22
+.org $89b9 ; Old Kasuto
+    .byte $c0 | $22
 
 ; Text uses the object id as an offset into a lookup table for text, so since the object id changed, we need
 ; to update the offset table as well to point to the original text. Subtract 1 from each of the vanilla data
@@ -185,7 +187,8 @@ TownToItemTable:
     .byte $2a - 1 ; Mido
 .org $a33d
     .byte $19 - 1 ; Darunia
-
+.org $a33f
+    .byte $2a ; Old Kasuto
 
 .segment "PRG7"
 
