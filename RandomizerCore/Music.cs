@@ -6,6 +6,7 @@ using FtRandoLib.Library;
 using FtRandoLib.Utility;
 using NLog;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -245,7 +246,28 @@ internal class MusicRandomizer
         foreach (var libPath in _libPaths)
         {
             string libData = File.ReadAllText(libPath, Encoding.UTF8);
-            ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData, opts));
+
+            try
+            {
+                ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData, opts));
+            }
+            catch (ParsingError ex)
+            {
+                StringBuilder sb = new();
+                sb.AppendLine($"Error loading custom music from '{libPath}'");
+
+                string? atStr = ex.AtString;
+                if (atStr is not null)
+                    sb.AppendLine(atStr);
+
+                sb.AppendLine();
+
+                sb.AppendLine(ex.Message);
+                if (ex.Submessage is not null)
+                    sb.AppendLine(ex.Submessage);
+
+                throw new Exception(sb.ToString(), ex);
+            }
         }
 
         List<ISong> songs = new();
