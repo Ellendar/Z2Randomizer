@@ -17,7 +17,7 @@ public class Location
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }
     public int Xpos { get; set; }
-    public byte[] LocationBytes { get; set; }
+    //public byte[] LocationBytes { get; set; }
 
     public int MemAddress { get; set; }
     
@@ -110,7 +110,6 @@ public class Location
     */
     public Location(byte[] bytes, Terrain t, int mem, Continent c)
     {
-        LocationBytes = bytes;
         ExternalWorld = bytes[0] & 128;
         Ypos = bytes[0] & 127;
         appear2loweruponexit = bytes[1] & 128;
@@ -326,6 +325,10 @@ public class Location
         {
             logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
         }
+        if(Name.Contains("FAKE"))
+        {
+            logger.Debug("Fake location encountered");
+        }
     }
 
     //Why does this empty constructor exist. Don't want to delete it if it's needed for serialization magic of some kind.
@@ -333,21 +336,22 @@ public class Location
     {
 
     }
-    //These bytes should not be kept synchromized on the object. They should just be written when the state pushes to the ROM
-    //at the very end.
-    public void UpdateBytes()
+
+    public byte[] GetLocationBytes()
     {
+        byte[] bytes = new byte[4];
         if (NeedHammer || NeedRecorder)
         {
-            LocationBytes[0] = 0;
+            bytes[0] = 0;
         }
         else
         {
-            LocationBytes[0] = (byte)(ExternalWorld + Ypos);
+            bytes[0] = (byte)(ExternalWorld + Ypos);
         }
-        LocationBytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
-        LocationBytes[2] = (byte)(MapPage + Map);
-        LocationBytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + World);
+        bytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
+        bytes[2] = (byte)(MapPage + Map);
+        bytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + World);
+        return bytes;
     }
 
     public string GetDebuggerDisplay()

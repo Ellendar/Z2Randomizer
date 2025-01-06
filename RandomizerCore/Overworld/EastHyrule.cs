@@ -307,7 +307,6 @@ public class EastHyrule : World
                 debug++;
 
                 desertTile.MapPage = 64;
-                desertTile.UpdateBytes();
                 Location desert = GetLocationByMem(0x8646);
                 Location swamp = GetLocationByMem(0x8644);
                 if (desert.PassThrough != 0)

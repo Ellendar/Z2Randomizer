@@ -815,6 +815,7 @@ public abstract class World
                 continue;
             }
             */
+            //Find a tile adjacent to water that isn't within a dead zone to start the bridge
             Direction waterDirection;
             int waterTries = 0;
             do
@@ -840,7 +841,7 @@ public abstract class World
 
             int startMass = globs[y, x];
 
-
+            //if there is a location at or 1 tile adjacent to the bridge start, it's no good.
             if (GetLocationByCoords((y + 30, x)) != null
                 || GetLocationByCoords((y + 30, x + 1)) != null
                 || GetLocationByCoords((y + 30, x - 1)) != null
@@ -853,8 +854,10 @@ public abstract class World
             x += deltaX;
             y += deltaY;
 
+            //iterate expanding the bridge
             while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && map[y, x] == riverTerrain)
             {
+                //if we hit the edge of the map or too close to a location, give up
                 if (x + 1 < MAP_COLS && GetLocationByCoords((y + 30, x + 1)) != null)
                 {
                     length = 100;
@@ -872,26 +875,26 @@ public abstract class World
                 {
                     length = 100;
                 }
+
+                //count how many tiles adjacent to the bridge are the passing terrain
                 int adjacentRiverTerrainDirectionCount = 0;
                 if (x + 1 < MAP_COLS && (map[y, x + 1] == riverTerrain || map[y, x + 1] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-
                 if (x - 1 >= 0 && (map[y, x - 1] == riverTerrain || map[y, x - 1] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-
                 if (y + 1 < MAP_ROWS && (map[y + 1, x] == riverTerrain || map[y + 1, x] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-
                 if (y - 1 >= 0 && (map[y - 1, x] == riverTerrain || map[y - 1, x] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
+
                 if (deltaX != 0)
                 {
                     if (y - 1 > 0)
@@ -928,6 +931,7 @@ public abstract class World
                     }
                 }
 
+                //if all 3 tiles adjacent to the new tile aren't the passing terrain, give up
                 if (adjacentRiverTerrainDirectionCount <= 2)
                 {
                     length = 100;
@@ -937,11 +941,14 @@ public abstract class World
                 length++;
 
             }
+
+            //no extending from single tile
             if (IsSingleTile(y, x))
             {
                 length = 100;
             }
 
+            //if we're ending, it has to be on a different chunk of terrain so the bridge doesn't just cross a bay
             int endMass = 0;
             if (y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
             {

@@ -2646,11 +2646,11 @@ public class Hyrule
             List<Location> locs = world.AllLocations;
             foreach (Location location in locs)
             {
-                location.UpdateBytes();
-                ROMData.Put(location.MemAddress, location.LocationBytes[0]);
-                ROMData.Put(location.MemAddress + overworldXOff, location.LocationBytes[1]);
-                ROMData.Put(location.MemAddress + overworldMapOff, location.LocationBytes[2]);
-                ROMData.Put(location.MemAddress + overworldWorldOff, location.LocationBytes[3]);
+                byte[] locationBytes = location.GetLocationBytes();
+                ROMData.Put(location.MemAddress, locationBytes[0]);
+                ROMData.Put(location.MemAddress + overworldXOff, locationBytes[1]);
+                ROMData.Put(location.MemAddress + overworldMapOff, locationBytes[2]);
+                ROMData.Put(location.MemAddress + overworldWorldOff, locationBytes[3]);
             }
             ROMData.RemoveUnusedConnectors(world);
         }

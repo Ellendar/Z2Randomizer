@@ -83,7 +83,13 @@
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Music\test%281%29.json5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Music\test.json5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Music\Z2R Custom.json5">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Sprites\Aneru.ips">
