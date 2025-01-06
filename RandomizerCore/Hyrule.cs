@@ -1421,6 +1421,7 @@ public class Hyrule
                 deathMountain = new DeathMountain(props, RNG, ROMData);
                 eastHyrule = new EastHyrule(props, RNG, ROMData);
                 mazeIsland = new MazeIsland(props, RNG, ROMData);
+
                 worlds.Add(westHyrule);
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
@@ -1644,6 +1645,7 @@ public class Hyrule
                 }
             } while (!AllContinentsHaveConnection(worlds));
 
+
             int nonContinentGenerationAttempts = 0;
             int nonTerrainShuffleAttempt = 0;
             DateTime timestamp;
@@ -1715,6 +1717,10 @@ public class Hyrule
                 if (!shouldContinue)
                 {
                     return;
+                }
+                if(CheckRaftOverlapping(westHyrule, eastHyrule, mazeIsland, deathMountain))
+                {
+                    continue;
                 }
 
 
@@ -3937,5 +3943,23 @@ FREE_UNTIL $c2ca
         }
 
         UpdateHints(engine, _hints);
+    }
+
+    public bool CheckRaftOverlapping(params World[] worlds)
+    {
+        List<(int, int)> raftCoordinates = new();
+        foreach(World world in worlds) 
+        {
+            if(world.raft != null)
+            {
+                raftCoordinates.Add((world.raft.Ypos, world.raft.Xpos));
+            }
+        }
+        if(raftCoordinates.Count != 2)
+        {
+            throw new Exception("The number of continents containing a raft tile was " + raftCoordinates.Count + " instead of 2");
+        }
+
+        return worlds.Any(world => world.PassthroughsIntersectRaftCoordinates(raftCoordinates));
     }
 }

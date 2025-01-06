@@ -2819,8 +2819,20 @@ public abstract class World
 
         return true;
     }
+    public bool PassthroughsIntersectRaftCoordinates(IEnumerable<(int, int)> raftCoordinates)
+    {
+        foreach (Location location in AllLocations.Where(i => i.PassThrough != 0))
+        {
+            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.Ypos == i.Item1))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
+
 }

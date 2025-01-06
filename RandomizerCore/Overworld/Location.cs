@@ -20,7 +20,12 @@ public class Location
     public byte[] LocationBytes { get; set; }
 
     public int MemAddress { get; set; }
-
+    
+    //This is really stupidly implemented. It _should_ be a boolean, which then gets written to the appropriate bit on the
+    //encounter data when it's written to the ROM. Instead, this has the value 0 if the area is not a passthrough
+    //and 64 if the area is a passthrough. This shouldn't be too hard to refactor, but I am lazy right now.
+    //Also probably refactoring this should be a part of removing the LocationBytes structure alltogether, so we only
+    //actually care about the structure of the ROM when we're reading or writing
     public int PassThrough { get; set; }
 
     public int Map { get; set; }
