@@ -335,7 +335,7 @@ public abstract class World
         Location l = null;
         foreach (Location loc in AllLocations)
         {
-            if (loc.LocationBytes[2] == map && loc.World == world)
+            if (loc.MapPage + loc.Map == map && loc.World == world)
             {
                 l = loc;
                 break;

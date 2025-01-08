@@ -9,8 +9,7 @@ namespace Z2Randomizer.Core.Overworld;
 public class Location
 {
     Logger logger = LogManager.GetCurrentClassLogger();
-    private int appear2loweruponexit;
-    private (int, int)coords;
+    public int appear2loweruponexit;
     public Item Item { get; set; }
     public bool ItemGet { get; set; }
 
@@ -41,7 +40,8 @@ public class Location
 
         set
         {
-            coords = value;
+            Ypos = value.Item1;
+            Xpos = value.Item2;
         }
     }
 
@@ -108,10 +108,10 @@ public class Location
     .x.. .... - Pass through
     x... .... - Fall in hole
     */
-    public Location(byte[] bytes, Terrain t, int mem, Continent c)
+    public Location(int yPos, int xPos, int memoryAddress, Continent continent)
     {
+        /*
         ExternalWorld = bytes[0] & 128;
-        Ypos = bytes[0] & 127;
         appear2loweruponexit = bytes[1] & 128;
         Secondpartofcave = bytes[1] & 64;
         Xpos = bytes[1] & 63;
@@ -122,14 +122,17 @@ public class Location
         ForceEnterRight = bytes[3] & 32;
         World = bytes[3] & 31;
         TerrainType = t;
-        MemAddress = mem;
+        */
+        Ypos = yPos;
+        Xpos = xPos;
+        MemAddress = memoryAddress;
         CanShuffle = true;
         Item = Item.DO_NOT_USE;
         ItemGet = false;
         Reachable = false;
         PalaceNumber = 0;
         ActualTown = 0;
-        Continent = c;
+        Continent = continent;
 
         //Shoutouts to thetruekingofspace for datamining this
         Name = (Continent, Ypos, Xpos, Map) switch
@@ -329,6 +332,21 @@ public class Location
         {
             logger.Debug("Fake location encountered");
         }
+    }
+
+    public Location(Location clone) : this(clone.Ypos, clone.Xpos, clone.MemAddress, clone.Continent)
+    {
+        ExternalWorld = clone.ExternalWorld;
+        appear2loweruponexit = clone.appear2loweruponexit;
+        Secondpartofcave = clone.Secondpartofcave;
+        Xpos = clone.Xpos;
+        MapPage = clone.MapPage;
+        Map = clone.Map;
+        FallInHole = clone.FallInHole;
+        PassThrough = clone.PassThrough;
+        ForceEnterRight = clone.ForceEnterRight;
+        World = clone.World;
+        TerrainType = clone.TerrainType;
     }
 
     //Why does this empty constructor exist. Don't want to delete it if it's needed for serialization magic of some kind.

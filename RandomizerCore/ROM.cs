@@ -1229,24 +1229,52 @@ not_opposing:
         List<Location> locations = new List<Location>();
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = new byte[4] { 
+            byte[] bytes = [ 
                 GetByte(startAddr + i), 
                 GetByte(startAddr + RomMap.overworldXOffset + i), 
                 GetByte(startAddr + RomMap.overworldMapOffset + i), 
-                GetByte(startAddr + RomMap.overworldWorldOffset + i) };
-            locations.Add(new Location(bytes, Terrains[startAddr + i], startAddr + i, continent));
+                GetByte(startAddr + RomMap.overworldWorldOffset + i) 
+            ];
+            Location location = new Location(bytes[0] & 127, bytes[1] & 63, startAddr + i, continent)
+            {
+                ExternalWorld = bytes[0] & 128,
+                appear2loweruponexit = bytes[1] & 128,
+                Secondpartofcave = bytes[1] & 64,
+                MapPage = bytes[2] & 192,
+                Map = bytes[2] & 63,
+                FallInHole = bytes[3] & 128,
+                PassThrough = bytes[3] & 64,
+                ForceEnterRight = bytes[3] & 32,
+                World = bytes[3] & 31,
+                TerrainType = Terrains[startAddr + i]
+            };
+            locations.Add(location);
         }
         return locations;
     }
 
+    //Why does this and LoadLocations not share any code. Eliminate one of them.
     public Location LoadLocation(int addr, Terrain t, Continent c)
     {
-        byte[] bytes = new byte[4] { 
+        byte[] bytes = [ 
             GetByte(addr), 
             GetByte(addr + RomMap.overworldXOffset), 
             GetByte(addr + RomMap.overworldMapOffset), 
-            GetByte(addr + RomMap.overworldWorldOffset) };
-        return new Location(bytes, t, addr, c);
+            GetByte(addr + RomMap.overworldWorldOffset) 
+        ];
+        return new Location(bytes[0] & 127, bytes[1] & 63, addr, c)
+        {
+            ExternalWorld = bytes[0] & 128,
+            appear2loweruponexit = bytes[1] & 128,
+            Secondpartofcave = bytes[1] & 64,
+            MapPage = bytes[2] & 192,
+            Map = bytes[2] & 63,
+            FallInHole = bytes[3] & 128,
+            PassThrough = bytes[3] & 64,
+            ForceEnterRight = bytes[3] & 32,
+            World = bytes[3] & 31,
+            TerrainType = t
+        };
     }
 
     public void RemoveUnusedConnectors(World world)

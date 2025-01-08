@@ -122,7 +122,7 @@ public class EastHyrule : World
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNewKasuto = GetLocationByMem(0x8660);
-        spellTower = new Location(townAtNewKasuto.LocationBytes, townAtNewKasuto.TerrainType, townAtNewKasuto.MemAddress, Continent.EAST);
+        spellTower = new Location(townAtNewKasuto);
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
         desertTile = GetLocationByMem(RomMap.VANILLA_DESERT_TILE_LOCATION);
