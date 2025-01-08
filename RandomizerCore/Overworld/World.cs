@@ -443,18 +443,22 @@ public abstract class World
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
+        return PlaceLocations(riverTerrain, saneCaves, null, -1);
+    }
+    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location hiddenKasutoLocation, int hiddenPalaceX)
+    {
         //return true;
         int i = 0;
         foreach (Location location in AllLocations)
         {
             i++;
-            if ((location.TerrainType != Terrain.BRIDGE 
-                    && location.CanShuffle 
-                    && !unimportantLocs.Contains(location) 
-                    && location.PassThrough == 0) 
+            if ((location.TerrainType != Terrain.BRIDGE
+                    && location.CanShuffle
+                    && !unimportantLocs.Contains(location)
+                    && location.PassThrough == 0)
                 || location.NeedHammer)
             {
-                int x,y;
+                int x, y;
                 //Place the location in a spot that is not adjacent to any other location
                 do
                 {
@@ -470,10 +474,12 @@ public abstract class World
                     || map[y + 1, x - 1] != Terrain.NONE
                     || map[y, x - 1] != Terrain.NONE
                     || map[y - 1, x - 1] != Terrain.NONE
+                    //#124
+                    || (x == hiddenPalaceX && location == hiddenKasutoLocation)
                 );
 
                 map[y, x] = location.TerrainType;
-                //Connect the cave
+                //If the location is a cave, connect it
                 if (location.TerrainType == Terrain.CAVE)
                 {
                     List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
@@ -484,10 +490,10 @@ public abstract class World
                     {
                         PlaceCaveCount++;
                         map[y, x] = Terrain.NONE;
-                        while(!PlaceSaneCave(direction, riverTerrain, location))
+                        while (!PlaceSaneCave(direction, riverTerrain, location))
                         {
                             caveDirections.Remove(direction);
-                            if(caveDirections.Count == 0)
+                            if (caveDirections.Count == 0)
                             {
                                 //Debug.WriteLine(GetMapDebug());
                                 return false;
