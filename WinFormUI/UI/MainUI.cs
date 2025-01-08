@@ -61,6 +61,7 @@ public partial class MainUI : Form
         beamSpriteList.SelectedIndex = Settings.Default.beams;
         disableMusicCheckbox.Checked = Settings.Default.music;
         randomizeMusicCheckbox.Checked = Settings.Default.randomizeMusic;
+        mixCustomAndOriginalMusicCheckbox.Checked = Settings.Default.mixCustomAndOriginalMusic;
         disableUnsafeMusicCheckbox.Checked = Settings.Default.disableUnsafeMusic;
         upAOnController1Checkbox.Checked = Settings.Default.upac1;
         flashingOffCheckbox.Checked = Settings.Default.noflash;
@@ -594,6 +595,7 @@ public partial class MainUI : Form
         Settings.Default.shield = shieldColorList.SelectedIndex;
         Settings.Default.music = disableMusicCheckbox.Checked;
         Settings.Default.randomizeMusic = randomizeMusicCheckbox.Checked;
+        Settings.Default.mixCustomAndOriginalMusic = mixCustomAndOriginalMusicCheckbox.Checked;
         Settings.Default.disableUnsafeMusic = disableUnsafeMusicCheckbox.Checked;
         Settings.Default.sprite = characterSpriteList.SelectedIndex;
         Settings.Default.upac1 = upAOnController1Checkbox.Checked;
@@ -1101,6 +1103,7 @@ public partial class MainUI : Form
         //Misc
         configuration.DisableMusic = disableMusicCheckbox.Checked;
         configuration.RandomizeMusic = randomizeMusicCheckbox.Checked;
+        configuration.MixCustomAndOriginalMusic = mixCustomAndOriginalMusicCheckbox.Checked;
         configuration.DisableUnsafeMusic = disableUnsafeMusicCheckbox.Checked;
         configuration.JumpAlwaysOn = jumpAlwaysOnCheckbox.Checked;
         configuration.DashAlwaysOn = dashAlwaysOnCheckbox.Checked;
@@ -1184,6 +1187,7 @@ public partial class MainUI : Form
         beepThresholdDropdown.SelectedIndex = BeepThreshold;
         disableMusicCheckbox.CheckState = DisableMusic;
         /*randomizeMusicCheckbox.Checked = Settings.Default.randomizeMusic;
+        mixCustomandOriginalMusicCheckbox.Checked = Settings.Default.mixCustomAndOriginalMusic;
         disableUnsafeMusicCheckbox.Checked = Settings.Default.disableUnsafeMusic;*/
         fastSpellCheckbox.CheckState = FastSpellCasting;
         upAOnController1Checkbox.CheckState = UpAOnController1;

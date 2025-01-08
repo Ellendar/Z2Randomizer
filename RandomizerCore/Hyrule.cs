@@ -453,6 +453,7 @@ public class Hyrule
                         musicRng.Next(),
                         musicLibPaths,
                         freeBanks,
+                        props.MixCustomAndOriginalMusic,
                         props.DisableUnsafeMusic));
 
                     success = true;
