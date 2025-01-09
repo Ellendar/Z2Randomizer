@@ -64,7 +64,7 @@ public class RandomizerProperties
     public bool ShuffleEncounters { get; set; }
     public bool AllowPathEnemies { get; set; }
     public bool IncludeLavaInEncounterShuffle { get; set; }
-    public bool SwapPalaceCont { get; set; }
+    public bool PalacesCanSwapContinent { get; set; }
     public bool P7shuffle { get; set; }
     public bool HiddenPalace { get; set; }
     public bool HiddenKasuto { get; set; }

@@ -148,14 +148,14 @@ internal class MusicRandomizer
         return randomizer.ImportSongs();
     }
 
-    Hyrule _hyrule;
-    IShuffler _shuffler;
-    byte[] _rom;
-    SimpleRomAccess _romAccess;
-    List<string> _libPaths;
-    List<int> _freeBanks;
+    internal Hyrule _hyrule;
+    internal IShuffler _shuffler;
+    internal byte[] _rom;
+    internal SimpleRomAccess _romAccess;
+    internal List<string> _libPaths;
+    internal List<int> _freeBanks;
 
-    Z2Importer _imptr;
+    internal Z2Importer _imptr;
 
     MusicRandomizer(
         Hyrule hyrule,

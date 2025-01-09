@@ -99,38 +99,39 @@ public class WestHyrule : World
     public WestHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
         isHorizontal = props.WestIsHorizontal;
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0x4639, 4, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x4640, 2, terrains, Continent.WEST));
-
-        locations.AddRange(rom.LoadLocations(0x462F, 10, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x463D, 3, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x4642, 12, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x464F, 1, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x465B, 2, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x465E, 8, terrains, Continent.WEST));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0x4639, 4, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x4640, 2, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x462F, 10, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x463D, 3, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x4642, 12, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x464F, 1, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x465B, 2, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x465E, 8, terrains, Continent.WEST),
+        ];
         locations.ForEach(AddLocation);
 
-        northPalace = GetLocationByMap(0x80, 0x00);
+        northPalace = GetLocationByMap(0x80);
         //reachableAreas = new HashSet<string>();
-        Location jumpCave = GetLocationByMap(9, 0);
+        Location jumpCave = GetLocationByMap(9);
         jumpCave.NeedJump = true;
-        medicineCave = GetLocationByMap(0x0E, 0);
-        Location heartCave = GetLocationByMap(0x10, 0);
-        Location fairyCave = GetLocationByMap(0x12, 0);
+        medicineCave = GetLocationByMap(0x0E);
+        Location heartCave = GetLocationByMap(0x10);
+        Location fairyCave = GetLocationByMap(0x12);
         fairyCave.NeedFairy = true;
-        locationAtRuto = GetLocationByMap(0xC5, 4);
+        locationAtRuto = GetLocationByMap(0xC5);
         locationAtRuto.Name = "Ruto";
-        bagu = GetLocationByMap(0x18, 4);
-        locationAtMido = GetLocationByMap(0xCB, 4);
+        bagu = GetLocationByMap(0x18);
+        locationAtMido = GetLocationByMap(0xCB);
         locationAtMido.Name = "Mido";
-        locationAtSariaNorth = GetLocationByMap(0xC8, 4);
-        locationAtSariaSouth = GetLocationByMap(0x06, 4);
+        locationAtSariaNorth = GetLocationByMap(0xC8);
+        locationAtSariaSouth = GetLocationByMap(0x06);
         locationAtSariaNorth.NeedBagu = true;
         locationAtSariaNorth.Name = "Saria North";
         locationAtSariaSouth.NeedBagu = true;
         locationAtSariaSouth.Name = "Saria South";
-        trophyCave = GetLocationByMap(0xE1, 0);
+        trophyCave = GetLocationByMap(0xE1);
         raft = GetLocationByMem(0x4658);
         locationAtPalace1 = GetLocationByMem(0x4663);
         locationAtPalace1.PalaceNumber = 1;
@@ -146,12 +147,12 @@ public class WestHyrule : World
         pbagCave = GetLocationByMem(0x463D);
 
 
-        Location parapaCave1 = GetLocationByMap(07, 0);
-        Location parapaCave2 = GetLocationByMap(0xC7, 0);
-        Location jumpCave2 = GetLocationByMap(0xCB, 0);
-        Location fairyCave2 = GetLocationByMap(0xD3, 0);
-        bridge1 = GetLocationByMap(0x04, 0);
-        bridge2 = GetLocationByMap(0xC5, 0);
+        Location parapaCave1 = GetLocationByMap(07);
+        Location parapaCave2 = GetLocationByMap(0xC7);
+        Location jumpCave2 = GetLocationByMap(0xCB);
+        Location fairyCave2 = GetLocationByMap(0xD3);
+        bridge1 = GetLocationByMap(0x04);
+        bridge2 = GetLocationByMap(0xC5);
 
         if (props.SaneCaves)
         {
@@ -341,7 +342,7 @@ public class WestHyrule : World
                 raft.PassThrough = 0;
                 bridge1.PassThrough = 0;
                 bridge2.PassThrough = 0;
-                GetLocationByMap(0x12, 0).PassThrough = 0; //fairy cave
+                GetLocationByMap(0x12).PassThrough = 0; //fairy cave
 
             }
         }
@@ -988,18 +989,18 @@ public class WestHyrule : World
         int cavenum1 = RNG.Next(availableConnectorCount);
         if(cavenum1 == 0)
         {
-            cave1l = GetLocationByMap(9, 0);//jump cave
-            cave1r = GetLocationByMap(0xCB, 0);
+            cave1l = GetLocationByMap(9);//jump cave
+            cave1r = GetLocationByMap(0xCB);
         }
         else if (cavenum1 == 1)
         {
-            cave1l = GetLocationByMap(07, 0); //parapa
-            cave1r = GetLocationByMap(0xC7, 0);
+            cave1l = GetLocationByMap(07); //parapa
+            cave1r = GetLocationByMap(0xC7);
         }
         else
         {
-            cave1l = GetLocationByMap(0x12, 0); //fairy cave
-            cave1r = GetLocationByMap(0xD3, 0);
+            cave1l = GetLocationByMap(0x12); //fairy cave
+            cave1r = GetLocationByMap(0xD3);
         }
         map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
@@ -1012,18 +1013,18 @@ public class WestHyrule : World
             }
             if (cavenum2 == 0)
             {
-                cave2l = GetLocationByMap(9, 0);//jump cave
-                cave2r = GetLocationByMap(0xCB, 0);
+                cave2l = GetLocationByMap(9);//jump cave
+                cave2r = GetLocationByMap(0xCB);
             }
             else if (cavenum2 == 1)
             {
-                cave2l = GetLocationByMap(07, 0); //parapa
-                cave2r = GetLocationByMap(0xC7, 0);
+                cave2l = GetLocationByMap(07); //parapa
+                cave2r = GetLocationByMap(0xC7);
             }
             else
             {
-                cave2l = GetLocationByMap(0x12, 0); //fairy cave
-                cave2r = GetLocationByMap(0xD3, 0);
+                cave2l = GetLocationByMap(0x12); //fairy cave
+                cave2r = GetLocationByMap(0xD3);
             }
             map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;

@@ -756,17 +756,17 @@ LoadMapData:
 
     public void DisableTurningPalacesToStone()
     {
-        Put(0x87b3, new byte[] { 0xea, 0xea, 0xea });
-        Put(0x47ba, new byte[] { 0xea, 0xea, 0xea });
-        Put(0x1e02e, new byte[] { 0xea, 0xea, 0xea });
+        Put(0x87b3, [0xea, 0xea, 0xea]);
+        Put(0x47ba, [0xea, 0xea, 0xea]);
+        Put(0x1e02e, [0xea, 0xea, 0xea]);
     }
 
     public void UpdateMapPointers()
     {
-        Put(0x4518, new byte[] { 0x70, 0xb4 }); //west
-        Put(0x451a, new byte[] { 0xf0, 0xb9 }); //dm
-        Put(0x8518, new byte[] { 0x70, 0xb4 }); //east
-        Put(0x851a, new byte[] { 0xf0, 0xb9 }); //maze island
+        Put(0x4518, [0x70, 0xb4]); //west
+        Put(0x451a, [0xf0, 0xb9]); //dm
+        Put(0x8518, [0x70, 0xb4]); //east
+        Put(0x851a, [0xf0, 0xb9]); //maze island
     }
 
     public void UpAController1(Engine engine)
@@ -1235,17 +1235,15 @@ not_opposing:
                 GetByte(startAddr + RomMap.overworldMapOffset + i), 
                 GetByte(startAddr + RomMap.overworldWorldOffset + i) 
             ];
-            Location location = new Location(bytes[0] & 127, bytes[1] & 63, startAddr + i, continent)
+            Location location = new Location(bytes[0] & 127, bytes[1] & 63, startAddr + i, bytes[2] & 63, continent)
             {
                 ExternalWorld = bytes[0] & 128,
                 appear2loweruponexit = bytes[1] & 128,
                 Secondpartofcave = bytes[1] & 64,
                 MapPage = bytes[2] & 192,
-                Map = bytes[2] & 63,
                 FallInHole = bytes[3] & 128,
                 PassThrough = bytes[3] & 64,
                 ForceEnterRight = bytes[3] & 32,
-                World = bytes[3] & 31,
                 TerrainType = Terrains[startAddr + i]
             };
             locations.Add(location);
@@ -1262,17 +1260,15 @@ not_opposing:
             GetByte(addr + RomMap.overworldMapOffset), 
             GetByte(addr + RomMap.overworldWorldOffset) 
         ];
-        return new Location(bytes[0] & 127, bytes[1] & 63, addr, c)
+        return new Location(bytes[0] & 127, bytes[1] & 63, addr, bytes[2] & 63, c)
         {
             ExternalWorld = bytes[0] & 128,
             appear2loweruponexit = bytes[1] & 128,
             Secondpartofcave = bytes[1] & 64,
             MapPage = bytes[2] & 192,
-            Map = bytes[2] & 63,
             FallInHole = bytes[3] & 128,
             PassThrough = bytes[3] & 64,
             ForceEnterRight = bytes[3] & 32,
-            World = bytes[3] & 31,
             TerrainType = t
         };
     }

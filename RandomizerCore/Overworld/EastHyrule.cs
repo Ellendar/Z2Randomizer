@@ -88,19 +88,20 @@ public class EastHyrule : World
     {
         isHorizontal = props.EastIsHorizontal;
         baseAddr = 0x862F;
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0x863E, 6, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x863A, 2, terrains, Continent.EAST));
-
-        locations.AddRange(rom.LoadLocations(0x862F, 11, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8644, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x863C, 2, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8646, 10, terrains, Continent.EAST));
-        //loadLocations(0x8657, 2, terrains, continent.east);
-        locations.AddRange(rom.LoadLocations(0x865C, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x865E, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8660, 1, terrains, Continent.EAST));
-        locations.AddRange(rom.LoadLocations(0x8662, 4, terrains, Continent.EAST));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0x863E, 6, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x863A, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x862F, 11, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8644, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x863C, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8646, 10, terrains, Continent.EAST),
+            //loadLocations(0x8657, 2, terrains, continent.east);
+            .. rom.LoadLocations(0x865C, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x865E, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8660, 1, terrains, Continent.EAST),
+            .. rom.LoadLocations(0x8662, 4, terrains, Continent.EAST),
+        ];
         locations.ForEach(AddLocation);
 
         //reachableAreas = new HashSet<string>();
@@ -117,7 +118,7 @@ public class EastHyrule : World
         locationAtPalace6 = GetLocationByMem(0x8664);
         locationAtPalace6.PalaceNumber = 6;
         townAtDarunia = GetLocationByMem(0x865E);
-        locationAtPalace5 = GetLocationByMap(0x23, 0x0E);
+        locationAtPalace5 = GetLocationByMap(0x23);
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNewKasuto = GetLocationByMem(0x8660);
