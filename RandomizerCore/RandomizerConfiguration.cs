@@ -206,6 +206,8 @@ public class RandomizerConfiguration
     [IgnoreInFlags]
     public bool RandomizeMusic { get; set; }
     [IgnoreInFlags]
+    public bool MixCustomAndOriginalMusic { get; set; }
+    [IgnoreInFlags]
     public bool DisableUnsafeMusic { get; set; }
     [IgnoreInFlags]
     public bool FastSpellCasting { get; set; }
@@ -919,6 +921,7 @@ public class RandomizerConfiguration
         config.BeepThreshold = 0x20;
         config.DisableMusic = false;
         config.RandomizeMusic = true;
+        config.MixCustomAndOriginalMusic = true;
         config.DisableUnsafeMusic = true;
         config.FastSpellCasting = true;
         //ShuffleEn = false;
@@ -1500,6 +1503,7 @@ public class RandomizerConfiguration
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
         properties.RandomizeMusic = RandomizeMusic;
+        properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = CharacterSprite.ByIndex(Sprite);
         properties.TunicColor = Tunic;
