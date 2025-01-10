@@ -1203,7 +1203,7 @@ public class RandomizerConfiguration
         properties.ShuffleEncounters = ShuffleEncounters == null ? random.Next(2) == 1 : (bool)ShuffleEncounters;
         properties.AllowPathEnemies = AllowUnsafePathEncounters;
         properties.IncludeLavaInEncounterShuffle = IncludeLavaInEncounterShuffle;
-        properties.SwapPalaceCont = PalacesCanSwapContinents == null ? random.Next(2) == 1 : (bool)PalacesCanSwapContinents;
+        properties.PalacesCanSwapContinent = PalacesCanSwapContinents == null ? random.Next(2) == 1 : (bool)PalacesCanSwapContinents;
         properties.P7shuffle = ShuffleGP == null ? random.Next(2) == 1 : (bool)ShuffleGP;
         properties.HiddenPalace = HidePalace == null ? random.Next(2) == 1 : (bool)HidePalace;
         properties.HiddenKasuto = HideKasuto == null ? random.Next(2) == 1 : (bool)HideKasuto;
@@ -1549,7 +1549,7 @@ public class RandomizerConfiguration
             properties.RemoveTbird = false;
         }
 
-        if (!properties.SwapPalaceCont)
+        if (!properties.PalacesCanSwapContinent)
         {
             properties.P7shuffle = false;
         }

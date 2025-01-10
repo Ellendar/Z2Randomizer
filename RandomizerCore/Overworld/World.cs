@@ -330,18 +330,10 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByMap(int map, int world)
+    protected Location GetLocationByMap(int map)
     {
-        Location l = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.MapPage + loc.Map == map && loc.World == world)
-            {
-                l = loc;
-                break;
-            }
-        }
-        return l;
+        Location location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map);
+        return location;
     }
 
     public void UpdateAllReached()
@@ -443,18 +435,22 @@ public abstract class World
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
+        return PlaceLocations(riverTerrain, saneCaves, null, -1);
+    }
+    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location hiddenKasutoLocation, int hiddenPalaceX)
+    {
         //return true;
         int i = 0;
         foreach (Location location in AllLocations)
         {
             i++;
-            if ((location.TerrainType != Terrain.BRIDGE 
-                    && location.CanShuffle 
-                    && !unimportantLocs.Contains(location) 
-                    && location.PassThrough == 0) 
+            if ((location.TerrainType != Terrain.BRIDGE
+                    && location.CanShuffle
+                    && !unimportantLocs.Contains(location)
+                    && location.PassThrough == 0)
                 || location.NeedHammer)
             {
-                int x,y;
+                int x, y;
                 //Place the location in a spot that is not adjacent to any other location
                 do
                 {
@@ -470,10 +466,12 @@ public abstract class World
                     || map[y + 1, x - 1] != Terrain.NONE
                     || map[y, x - 1] != Terrain.NONE
                     || map[y - 1, x - 1] != Terrain.NONE
+                    //#124
+                    || (x == hiddenPalaceX && location == hiddenKasutoLocation)
                 );
 
                 map[y, x] = location.TerrainType;
-                //Connect the cave
+                //If the location is a cave, connect it
                 if (location.TerrainType == Terrain.CAVE)
                 {
                     List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
@@ -484,10 +482,10 @@ public abstract class World
                     {
                         PlaceCaveCount++;
                         map[y, x] = Terrain.NONE;
-                        while(!PlaceSaneCave(direction, riverTerrain, location))
+                        while (!PlaceSaneCave(direction, riverTerrain, location))
                         {
                             caveDirections.Remove(direction);
-                            if(caveDirections.Count == 0)
+                            if (caveDirections.Count == 0)
                             {
                                 //Debug.WriteLine(GetMapDebug());
                                 return false;
@@ -1034,8 +1032,8 @@ public abstract class World
                 }
                 else if (placeLongBridge)
                 {
-                    Location bridge1 = GetLocationByMap(0x04, 0);
-                    Location bridge2 = GetLocationByMap(0xC5, 0);
+                    Location bridge1 = GetLocationByMap(0x04);
+                    Location bridge2 = GetLocationByMap(0xC5);
                     x -= deltaX;
                     y -= deltaY;
                     if (deltaX > 0 || deltaY > 0)
@@ -2011,45 +2009,45 @@ public abstract class World
 
     }
 
-    public Location LoadRaft(ROM rom, int world)
+    public Location LoadRaft(ROM rom, Continent continent, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, continent));
         raft = GetLocationByMem(baseAddr + 41);
+        raft.ConnectedContinent = connectedContinent;
         raft.ExternalWorld = 0x80;
-        raft.World = world;
         raft.Map = 41;
         raft.TerrainType = Terrain.BRIDGE;
         return raft;
     }
 
-    public Location LoadBridge(ROM rom, int world)
+    public Location LoadBridge(ROM rom, Continent continent, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, continent));
         bridge = GetLocationByMem(baseAddr + 40);
+        bridge.ConnectedContinent = connectedContinent;
         bridge.ExternalWorld = 0x80;
-        bridge.World = world;
         bridge.Map = 40;
         bridge.PassThrough = 0;
         return bridge;
     }
 
-    public Location LoadCave1(ROM rom, int world)
+    public Location LoadCave1(ROM rom, Continent continent, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, continent));
         cave1 = GetLocationByMem(baseAddr + 42);
+        cave1.ConnectedContinent = connectedContinent;
         cave1.ExternalWorld = 0x80;
-        cave1.World = world;
         cave1.Map = 42;
         cave1.CanShuffle = true;
         return cave1;
     }
 
-    public Location LoadCave2(ROM rom, int world)
+    public Location LoadCave2(ROM rom, Continent continent, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, continent));
         cave2 = GetLocationByMem(baseAddr + 43);
+        cave2.ConnectedContinent = connectedContinent;
         cave2.ExternalWorld = 0x80;
-        cave2.World = world;
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;
