@@ -2969,7 +2969,7 @@ public class Hyrule
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, root.Map);
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
-        ROMData.Put(0xDB8C, (byte)eastHyrule.townAtNewKasuto.Collectable); //map 46
+        ROMData.Put(0xDB8C, (byte)eastHyrule.newKasutoBasement.Collectable); //map 46
 
         ROMData.Put(0xA5A8, (byte)mazeIsland.magicContainerDrop.Collectable);
         ROMData.Put(0xA58B, (byte)mazeIsland.childDrop.Collectable);
