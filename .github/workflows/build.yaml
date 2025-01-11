@@ -38,7 +38,7 @@ jobs:
       - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Browser
         run: |
-          dotnet workload install wasm-tools --version 8.0.404
+          dotnet workload install wasm-tools-net8
           dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload To Artifacts
