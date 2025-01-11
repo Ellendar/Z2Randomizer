@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using FtRandoLib.Importer;
 using NLog;
 using RandomizerCore.Asm;
 using RandomizerCore.Overworld;
@@ -35,6 +36,7 @@ public class Hyrule
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    private MusicRandomizer? musicRandomizer = null;
 
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
@@ -217,7 +219,7 @@ public class Hyrule
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
             // Make a copy of the vanilla data to prevent seed bleed
-            ROMData = new ROM(vanillaRomData.ToArray());
+            ROMData = new ROM(vanillaRomData.ToArray(), true);
 
             if (props.RandomizeNewKasutoBasementRequirement)
             {
@@ -230,8 +232,10 @@ public class Hyrule
 
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
+            HashSet<int> freeBanks = new();
             while (palaces.Count != 7 || passedValidation == false)
             {
+                freeBanks = new(ROM.FreeRomBanks);
                 palaces = Palaces.CreatePalaces(ct, RNG, props, palaceRooms, raftIsRequired);
                 if (palaces.Count == 0)
                 {
@@ -369,10 +373,13 @@ public class Hyrule
                 ROMData.WriteFastCastMagic();
             }
 
+            bool randomizeMusic = false;
             if (props.DisableMusic)
             {
                 ROMData.DisableMusic();
             }
+            else
+                randomizeMusic = props.RandomizeMusic;
 
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
@@ -436,6 +443,47 @@ public class Hyrule
             // await assemblerTask; // .Wait(ct);
             // var rom = assemblerTask.Result;
             ROMData = new ROM(rom!);
+
+            if (randomizeMusic)
+            {
+                string musicDir = "Music";
+                List<string> musicLibPaths = new();
+                if (Directory.Exists(musicDir))
+                {
+                    musicLibPaths.AddRange(
+                        Directory.EnumerateFiles(musicDir).Where(path => StringComparer.InvariantCultureIgnoreCase.Equals(Path.GetExtension(path), ".json5")));
+                }
+
+                Random musicRng = new(SeedHash);
+                bool success = false;
+                int triesLeft = 8;
+                while (!success)
+                {
+                    try
+                    {
+                        MusicRandomizer musicRnd = new(
+                            this,
+                            musicRng.Next(),
+                            musicLibPaths,
+                            freeBanks,
+                            props.MixCustomAndOriginalMusic,
+                            props.DisableUnsafeMusic);
+                        musicRnd.ImportSongs();
+
+                        musicRandomizer = musicRnd;
+                        freeBanks = new(musicRnd.FreeBanks);
+
+                        success = true;
+                    }
+                    catch (RomFullException e)
+                    {
+                        if (--triesLeft == 0)
+                            throw;
+
+                        logger.Debug(e, $"Song packing failed. {triesLeft} tries left.");
+                    }
+                }
+            }
 
             byte[] finalRNGState = new byte[32];
             RNG.NextBytes(finalRNGState);
@@ -2212,7 +2260,7 @@ public class Hyrule
         }
 
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
-        rom.Put(0x20010 + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        rom.Put(ROM.ChrRomOffs + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -2649,14 +2697,14 @@ public class Hyrule
         // Copy heart and magic container sprite tiles to the new location.
         for (int i = 0; i < 64; i++)
         {
-            byte heartByte = ROMData.GetByte(0x27810 + i);
-            ROMData.Put(0x29810 + i, heartByte);
-            ROMData.Put(0x2B810 + i, heartByte);
-            ROMData.Put(0x2D810 + i, heartByte);
-            ROMData.Put(0x33810 + i, heartByte);
-            ROMData.Put(0x35810 + i, heartByte);
-            ROMData.Put(0x37810 + i, heartByte);
-            ROMData.Put(0x39810 + i, heartByte);
+            byte heartByte = ROMData.GetByte(ROM.ChrRomOffs + 0x7800 + i);
+            ROMData.Put(ROM.ChrRomOffs + 0x09800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffs + 0x0B800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffs + 0x0D800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffs + 0x13800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffs + 0x15800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffs + 0x17800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffs + 0x19800 + i, heartByte);
         }
 
         /*
@@ -2671,9 +2719,9 @@ public class Hyrule
         Location? trophyLoc = itemLocs.FirstOrDefault(i => i.Collectable == Collectable.TROPHY);
         Location? kidLoc = itemLocs.FirstOrDefault(i => i.Collectable == Collectable.CHILD);
 
-        byte[] medicineSprite = ROMData.GetBytes(0x23310, 32);
-        byte[] trophySprite = ROMData.GetBytes(0x232f0, 32);
-        byte[] kidSprite = ROMData.GetBytes(0x25310, 32);
+        byte[] medicineSprite = ROMData.GetBytes(ROM.ChrRomOffs + 0x3300, 32);
+        byte[] trophySprite = ROMData.GetBytes(ROM.ChrRomOffs + 0x32e0, 32);
+        byte[] kidSprite = ROMData.GetBytes(ROM.ChrRomOffs + 0x5300, 32);
 
         //This should be possible O(1) by referencing location.World, but it has issues so for now we deal with
         //the minor inefficency
@@ -2687,14 +2735,14 @@ public class Hyrule
             && eastHyrule.locationAtPalace6.Collectable != Collectable.MEDICINE
             && mazeIsland.locationAtPalace4.Collectable != Collectable.MEDICINE)
         {
-            ROMData.Put(0x25430, medicineSprite);
+            ROMData.Put(ROM.ChrRomOffs + 0x5420, medicineSprite);
             ROMData.Put(0x1eeb9, 0x43);
             ROMData.Put(0x1eeba, 0x43);
         }
         //trophy east
         if (trophyEast)
         {
-            ROMData.Put(0x25410, trophySprite);
+            ROMData.Put(ROM.ChrRomOffs + 0x5400, trophySprite);
             ROMData.Put(0x1eeb7, 0x41);
             ROMData.Put(0x1eeb8, 0x41);
         }
@@ -2704,7 +2752,7 @@ public class Hyrule
             && westHyrule.locationAtPalace2.Collectable != Collectable.CHILD
             && westHyrule.locationAtPalace3.Collectable != Collectable.CHILD)
         {
-            ROMData.Put(0x23570, kidSprite);
+            ROMData.Put(ROM.ChrRomOffs + 0x3560, kidSprite);
             ROMData.Put(0x1eeb5, 0x57);
             ROMData.Put(0x1eeb6, 0x57);
         }
@@ -2712,21 +2760,21 @@ public class Hyrule
         //trophy in town bank
         if (eastHyrule.townAtNewKasuto.Collectable == Collectable.TROPHY || eastHyrule.spellTower.Collectable == Collectable.TROPHY)
         {
-            ROMData.Put(0x27210, trophySprite);
+            ROMData.Put(ROM.ChrRomOffs + 0x7200, trophySprite);
             ROMData.Put(0x1eeb7, 0x21);
             ROMData.Put(0x1eeb8, 0x21);
         }
         //medicine in town bank
         if (eastHyrule.townAtNewKasuto.Collectable == Collectable.MEDICINE || eastHyrule.spellTower.Collectable == Collectable.MEDICINE)
         {
-            ROMData.Put(0x27230, medicineSprite);
+            ROMData.Put(ROM.ChrRomOffs + 0x7220, medicineSprite);
             ROMData.Put(0x1eeb9, 0x23);
             ROMData.Put(0x1eeba, 0x23);
         }
         //kid in town bank
         if (eastHyrule.townAtNewKasuto.Collectable == Collectable.CHILD || eastHyrule.spellTower.Collectable == Collectable.CHILD)
         {
-            ROMData.Put(0x27250, kidSprite);
+            ROMData.Put(ROM.ChrRomOffs + 0x7240, kidSprite);
             ROMData.Put(0x1eeb5, 0x25);
             ROMData.Put(0x1eeb6, 0x25);
         }
@@ -2741,7 +2789,7 @@ public class Hyrule
             eastHyrule.locationAtGP
         ];
 
-        int palaceMemBase = 0x27AD0;
+        int palaceMemBase = ROM.ChrRomOffs + 0x7AC0;
         Dictionary<Collectable, (byte[], int)> spritesByCollectable = new()
         {
             [Collectable.TROPHY] = (trophySprite, 0x1eeb7),
@@ -3087,7 +3135,7 @@ public class Hyrule
         //fix for rope graphical glitch
         for (int i = 0; i < 16; i++)
         {
-            ROMData.Put(0x32CD0 + i, ROMData.GetByte(0x34CD0 + i));
+            ROMData.Put(ROM.ChrRomOffs + 0x12CC0 + i, ROMData.GetByte(ROM.ChrRomOffs + 0x14CC0 + i));
         }
     }
 
@@ -3198,8 +3246,16 @@ public class Hyrule
         sb.AppendLine(eastHyrule.GenerateSpoiler());
         sb.AppendLine(mazeIsland.GenerateSpoiler());
 
+        if (musicRandomizer is not null)
+        {
+            //sb.AppendLine();
+            sb.AppendLine(musicRandomizer.SpoilerLog);
+            //sb.AppendLine();
+        }
+
         sb.AppendLine("DETAILS: ");
         sb.Append(JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties));
+
         return sb.ToString().Replace('$', ' ');
     }
 
@@ -3515,10 +3571,11 @@ FixSoftlock:
 """, "fix_softlock.s");
     }
 
-    public void ApplyHudFixes(Assembler asm, bool preventFlash)
+    public void ApplyHudFixes(Assembler asm, bool preventFlash, bool enableZ2ft)
     {
         var a = asm.Module();
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
+        a.Assign("ENABLE_Z2FT", enableZ2ft ? 1 : 0);
         a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
     }
     
@@ -3715,6 +3772,8 @@ FREE_UNTIL $c2ca
 
     private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
     {
+        bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
+
         rom.ChangeMapperToMMC5(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
@@ -3752,12 +3811,21 @@ FREE_UNTIL $c2ca
             StandardizeDrops(engine);
         }
         FixSoftLock(engine);
-        ApplyHudFixes(engine, props.DisableHUDLag);
+        ApplyHudFixes(engine, props.DisableHUDLag, randomizeMusic);
         RandomizeStartingValues(engine, rom);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
+
+        if (!props.DisableMusic && randomizeMusic)
+        {
+            ROMData.ApplyIps(
+                Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.z2rndft.ips"));
+
+            var asm = engine.Module();
+            asm.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.z2ft.s"), "z2ft.s");
+        }
 
         UpdateTexts(engine, texts);
     }

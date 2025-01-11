@@ -174,6 +174,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private BeepFrequency beepFrequency;
     private BeepThreshold beepThreshold;
     private bool disableMusic;
+    private bool randomizeMusic;
+    private bool mixCustomAndOriginalMusic;
+    private bool disableUnsafeMusic;
     private bool fastSpellCasting;
     private bool upAOnController1;
     private bool removeFlashing;
@@ -927,6 +930,27 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
+    public bool RandomizeMusic
+    {
+        get => randomizeMusic;
+        set => SetField(ref randomizeMusic, value);
+    }
+
+    [IgnoreInFlags]
+    public bool MixCustomAndOriginalMusic
+    {
+        get => mixCustomAndOriginalMusic;
+        set => SetField(ref mixCustomAndOriginalMusic, value);
+    }
+
+    [IgnoreInFlags]
+    public bool DisableUnsafeMusic
+    {
+        get => disableUnsafeMusic;
+        set => SetField(ref disableUnsafeMusic, value);
+    }
+
+    [IgnoreInFlags]
     public bool FastSpellCasting
     {
         get => fastSpellCasting;
@@ -1088,6 +1112,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         MagicLevelCap = 8;
         LifeLevelCap = 8;
 
+        DisableMusic = false;
+        RandomizeMusic = false;
+        MixCustomAndOriginalMusic = true;
+        DisableUnsafeMusic = true;
         FastSpellCasting = false;
         ShuffleSpritePalettes = false;
         PermanmentBeamSword = false;
@@ -1666,6 +1694,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         config.BeepFrequency = BeepFrequency.Normal; // 0x30;
         config.BeepThreshold = BeepThreshold.Normal; // 0x20;
         config.DisableMusic = false;
+        config.RandomizeMusic = true;
+        config.MixCustomAndOriginalMusic = true;
+        config.DisableUnsafeMusic = true;
         config.FastSpellCasting = true;
         //ShuffleEn = false;
         //upaBox = false;
@@ -2284,6 +2315,9 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;
+        properties.RandomizeMusic = RandomizeMusic;
+        properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
+        properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
         properties.TunicColor = Tunic;
         properties.ShieldColor = ShieldTunic;
