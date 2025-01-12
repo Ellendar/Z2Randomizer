@@ -1,3 +1,4 @@
+using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using RandomizerCore;
@@ -15,6 +16,11 @@ public class CustomizeViewModel : ReactiveObject
     {
         Main = main;
         SpritePreviewViewModel = new(main);
+
+        _randomizeMusicEnabled = Main.Config
+            .WhenAnyValue(c => c.DisableMusic, c => c.RandomizeMusic)
+            .Select(tuple => !tuple.Item1 && tuple.Item2)
+            .ToProperty(this, t => t.RandomizeMusicEnabled);
     }
 
     public bool DisableMusic
@@ -23,6 +29,35 @@ public class CustomizeViewModel : ReactiveObject
         set
         {
             Main.Config.DisableMusic = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    public bool RandomizeMusic
+    {
+        get => Main.Config.RandomizeMusic;
+        set
+        {
+            Main.Config.RandomizeMusic = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    private readonly ObservableAsPropertyHelper<bool> _randomizeMusicEnabled;
+    public bool RandomizeMusicEnabled => _randomizeMusicEnabled.Value;
+    public bool MixCustomAndOriginalMusic
+    {
+        get => Main.Config.MixCustomAndOriginalMusic;
+        set
+        {
+            Main.Config.MixCustomAndOriginalMusic = value;
+            this.RaisePropertyChanged();
+        }
+    }
+    public bool DisableUnsafeMusic
+    {
+        get => Main.Config.DisableUnsafeMusic;
+        set
+        {
+            Main.Config.DisableUnsafeMusic = value;
             this.RaisePropertyChanged();
         }
     }

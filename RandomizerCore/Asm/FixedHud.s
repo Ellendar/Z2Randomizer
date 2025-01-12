@@ -10,6 +10,12 @@
 
 LagFrameVar = $f4
 
+.if ENABLE_Z2FT
+    .import UpdateSound
+.else
+    UpdateSound = $9000
+.endif
+
 .segment "PRG6"
 
 .reloc
@@ -22,7 +28,7 @@ RunAudioFrameOrLagFrame:
         bpl @skip
             jmp HandleLagFrame
         @skip:
-        jsr $9000 ; audio handler
+        jsr UpdateSound
 EarlyExitIrq:
     pla
     tay
@@ -135,14 +141,22 @@ HandleLagFrame:
 .import NmiBankShadow8,NmiBankShadowA
 NmiRunLagFrame:
     pha
+        lda NmiBankShadowA
+        pha
+        lda NmiBankShadow8
+        pha
         lda #$8c  ; (bank 6)
+        sta NmiBankShadow8
         sta $5114
         lda #$8d  ; (bank 6)
+        sta NmiBankShadowA
         sta $5115
         jsr RunAudioFrameOrLagFrame
-        lda NmiBankShadow8
+        pla
+        sta NmiBankShadow8
         sta $5114
-        lda NmiBankShadowA
+        pla
+        sta NmiBankShadowA
         sta $5115
     pla
     rti
@@ -173,7 +187,13 @@ Nmi:
     lda #$80
     sta a:LagFrameVar
 
+; This exact location is needed by both lag frame handling and z2ft
+
+.if !ENABLE_Z2FT
+
 .org $C1a8
     ; Soft enable NMI
     clc
     ror LagFrameVar
+
+.endif

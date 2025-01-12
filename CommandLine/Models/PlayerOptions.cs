@@ -8,6 +8,9 @@ namespace CommandLine.Models
     public class PlayerOptions
     {
         public bool DisableMusic { get; set; }
+        public bool RandomizeMusic { get; set; }
+        public bool MixCustomAndOriginalMusic { get; set; }
+        public bool DisableUnsafeMusic { get; set; }
 
         public bool FastSpellCasting { get; set; }
 

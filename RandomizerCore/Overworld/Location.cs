@@ -68,6 +68,7 @@ public class Location
 
     public Town ActualTown { get; set; }
     public Continent Continent { get; set; }
+    public Continent? VanillaContinent { get; set; }
     public int FallInHole { get; set; }
     public int ForceEnterRight { get; set; }
     public int Secondpartofcave { get; set; }

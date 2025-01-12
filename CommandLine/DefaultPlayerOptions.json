@@ -1,5 +1,8 @@
 ﻿{
   "DisableMusic": false,
+  "RandomizeMusic": false,
+  "MixCustomAndOriginalMusic":  true,
+  "DisableUnsafeMusic":  true,
   "FastSpellCasting": true,
   "RemapUpAToUpSelect": true,
   "RemoveFlashingUponDeath": true,

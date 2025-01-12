@@ -222,6 +222,8 @@ partial class MainUI
         enableSpellItemHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         CustomTabPage = new TabPage();
+        disableUnsafeMusicCheckbox = new CheckBox();
+        randomizeMusicCheckbox = new CheckBox();
         disableHUDLag = new CheckBox();
         useCommunityTextCheckbox = new CheckBox();
         spriteCreditLabel = new Label();
@@ -268,6 +270,7 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
+        mixCustomAndOriginalMusicCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -2722,6 +2725,9 @@ partial class MainUI
         // 
         // CustomTabPage
         // 
+        CustomTabPage.Controls.Add(mixCustomAndOriginalMusicCheckbox);
+        CustomTabPage.Controls.Add(disableUnsafeMusicCheckbox);
+        CustomTabPage.Controls.Add(randomizeMusicCheckbox);
         CustomTabPage.Controls.Add(disableHUDLag);
         CustomTabPage.Controls.Add(useCommunityTextCheckbox);
         CustomTabPage.Controls.Add(spriteCreditLabel);
@@ -2751,10 +2757,34 @@ partial class MainUI
         CustomTabPage.Text = "Customize";
         CustomTabPage.UseVisualStyleBackColor = true;
         // 
+        // disableUnsafeMusicCheckbox
+        // 
+        disableUnsafeMusicCheckbox.AutoSize = true;
+        disableUnsafeMusicCheckbox.Location = new Point(4, 74);
+        disableUnsafeMusicCheckbox.Margin = new Padding(2);
+        disableUnsafeMusicCheckbox.Name = "disableUnsafeMusicCheckbox";
+        disableUnsafeMusicCheckbox.Size = new Size(138, 19);
+        disableUnsafeMusicCheckbox.TabIndex = 46;
+        disableUnsafeMusicCheckbox.Text = "Disable Unsafe Music";
+        toolTip1.SetToolTip(disableUnsafeMusicCheckbox, "Do not use custom tracks that are likely to interfere with streaming");
+        disableUnsafeMusicCheckbox.UseVisualStyleBackColor = true;
+        // 
+        // randomizeMusicCheckbox
+        // 
+        randomizeMusicCheckbox.AutoSize = true;
+        randomizeMusicCheckbox.Location = new Point(4, 27);
+        randomizeMusicCheckbox.Margin = new Padding(2);
+        randomizeMusicCheckbox.Name = "randomizeMusicCheckbox";
+        randomizeMusicCheckbox.Size = new Size(159, 19);
+        randomizeMusicCheckbox.TabIndex = 45;
+        randomizeMusicCheckbox.Text = "Use Custom Music If Any";
+        toolTip1.SetToolTip(randomizeMusicCheckbox, "Randomize music using any music libraries found in the Music directory");
+        randomizeMusicCheckbox.UseVisualStyleBackColor = true;
+        // 
         // disableHUDLag
         // 
         disableHUDLag.AutoSize = true;
-        disableHUDLag.Location = new Point(4, 149);
+        disableHUDLag.Location = new Point(4, 194);
         disableHUDLag.Margin = new Padding(2);
         disableHUDLag.Name = "disableHUDLag";
         disableHUDLag.Size = new Size(161, 19);
@@ -2766,7 +2796,7 @@ partial class MainUI
         // useCommunityTextCheckbox
         // 
         useCommunityTextCheckbox.AutoSize = true;
-        useCommunityTextCheckbox.Location = new Point(4, 100);
+        useCommunityTextCheckbox.Location = new Point(4, 171);
         useCommunityTextCheckbox.Margin = new Padding(2);
         useCommunityTextCheckbox.Name = "useCommunityTextCheckbox";
         useCommunityTextCheckbox.Size = new Size(114, 19);
@@ -2789,7 +2819,7 @@ partial class MainUI
         beepFrequencyDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
         beepFrequencyDropdown.FormattingEnabled = true;
         beepFrequencyDropdown.Items.AddRange(new object[] { "Normal", "Half Speed", "Quarter Speed", "Off" });
-        beepFrequencyDropdown.Location = new Point(8, 249);
+        beepFrequencyDropdown.Location = new Point(8, 299);
         beepFrequencyDropdown.Margin = new Padding(2);
         beepFrequencyDropdown.Name = "beepFrequencyDropdown";
         beepFrequencyDropdown.Size = new Size(142, 23);
@@ -2799,7 +2829,7 @@ partial class MainUI
         // label10
         // 
         label10.AutoSize = true;
-        label10.Location = new Point(4, 226);
+        label10.Location = new Point(4, 276);
         label10.Margin = new Padding(2, 0, 2, 0);
         label10.Name = "label10";
         label10.Size = new Size(91, 15);
@@ -2811,7 +2841,7 @@ partial class MainUI
         beepThresholdDropdown.DropDownStyle = ComboBoxStyle.DropDownList;
         beepThresholdDropdown.FormattingEnabled = true;
         beepThresholdDropdown.Items.AddRange(new object[] { "Normal", "Half Bar", "Quarter Bar", "Two Bars" });
-        beepThresholdDropdown.Location = new Point(8, 193);
+        beepThresholdDropdown.Location = new Point(8, 243);
         beepThresholdDropdown.Margin = new Padding(2);
         beepThresholdDropdown.Name = "beepThresholdDropdown";
         beepThresholdDropdown.Size = new Size(142, 23);
@@ -2821,7 +2851,7 @@ partial class MainUI
         // label9
         // 
         label9.AutoSize = true;
-        label9.Location = new Point(4, 170);
+        label9.Location = new Point(4, 220);
         label9.Margin = new Padding(2, 0, 2, 0);
         label9.Name = "label9";
         label9.Size = new Size(88, 15);
@@ -2851,7 +2881,7 @@ partial class MainUI
         flashingOffCheckbox.AutoSize = true;
         flashingOffCheckbox.Checked = true;
         flashingOffCheckbox.CheckState = CheckState.Checked;
-        flashingOffCheckbox.Location = new Point(4, 77);
+        flashingOffCheckbox.Location = new Point(4, 148);
         flashingOffCheckbox.Margin = new Padding(4, 3, 4, 3);
         flashingOffCheckbox.Name = "flashingOffCheckbox";
         flashingOffCheckbox.Size = new Size(182, 19);
@@ -2863,7 +2893,7 @@ partial class MainUI
         // upAOnController1Checkbox
         // 
         upAOnController1Checkbox.AutoSize = true;
-        upAOnController1Checkbox.Location = new Point(4, 52);
+        upAOnController1Checkbox.Location = new Point(4, 123);
         upAOnController1Checkbox.Margin = new Padding(4, 3, 4, 3);
         upAOnController1Checkbox.Name = "upAOnController1Checkbox";
         upAOnController1Checkbox.Size = new Size(250, 19);
@@ -2979,7 +3009,7 @@ partial class MainUI
         // fastSpellCheckbox
         // 
         fastSpellCheckbox.AutoSize = true;
-        fastSpellCheckbox.Location = new Point(4, 27);
+        fastSpellCheckbox.Location = new Point(4, 98);
         fastSpellCheckbox.Margin = new Padding(4, 3, 4, 3);
         fastSpellCheckbox.Name = "fastSpellCheckbox";
         fastSpellCheckbox.Size = new Size(118, 19);
@@ -3237,6 +3267,20 @@ partial class MainUI
         // 
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
+        // 
+        // mixCustomAndOriginalMusicCheckbox
+        // 
+        mixCustomAndOriginalMusicCheckbox.AutoSize = true;
+        mixCustomAndOriginalMusicCheckbox.Checked = true;
+        mixCustomAndOriginalMusicCheckbox.CheckState = CheckState.Checked;
+        mixCustomAndOriginalMusicCheckbox.Location = new Point(4, 51);
+        mixCustomAndOriginalMusicCheckbox.Margin = new Padding(2);
+        mixCustomAndOriginalMusicCheckbox.Name = "mixCustomAndOriginalMusicCheckbox";
+        mixCustomAndOriginalMusicCheckbox.Size = new Size(194, 19);
+        mixCustomAndOriginalMusicCheckbox.TabIndex = 47;
+        mixCustomAndOriginalMusicCheckbox.Text = "Mix Custom and Original Music";
+        toolTip1.SetToolTip(mixCustomAndOriginalMusicCheckbox, "When using custom music also include original tracks in the selection. If disabled, original tracks will only be selected when no custom tracks exist for a given usage.");
+        mixCustomAndOriginalMusicCheckbox.UseVisualStyleBackColor = true;
         // 
         // MainUI
         // 
@@ -3538,5 +3582,8 @@ partial class MainUI
     private Label ShortenPalaceLabel;
     private CheckBox shortenGPCheckbox;
     private CheckBox shortenNormalPalaceCheckbox;
+    private CheckBox disableUnsafeMusicCheckbox;
+    private CheckBox randomizeMusicCheckbox;
+    private CheckBox mixCustomAndOriginalMusicCheckbox;
 }
 

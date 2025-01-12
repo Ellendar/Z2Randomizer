@@ -5,8 +5,8 @@ using System.Text.Json;
 using RandomizerCore;
 using RandomizerCore.Sidescroll;
 
-//ROM ROMData = new ROM("args[0]");
-ROM ROMData = new ROM("C:\\Workspace\\Z2Randomizer_4_4\\DumpRooms\\bin\\Debug\\net8.0\\aaron_rooms_1.nes");
+ROM ROMData = new ROM(args[0], true);
+
 int[] connAddr = [0x1072B, 0x12208, 0x1472B];
 int[] side = [0x10533, 0x12010, 0x14533];
 int[] enemy = [0x105b1, 0x1208E, 0x145b1];
