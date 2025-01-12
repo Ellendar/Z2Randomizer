@@ -159,7 +159,8 @@ public class CustomTexts
         "Hurry!$I have to$preheat$the oven",
         "Poyo!",
         "Sploosh$Kaboom!",
-        "Let me$read my$Vogon$Poetry"
+        "Let me$read my$Vogon$Poetry",
+        "somebody$set up us$the bomb"
     };
 
     public static readonly string[] RIVER_MAN_TEXTS = 
@@ -239,6 +240,7 @@ public class CustomTexts
         "Tiger$Uppercut!",
         "Never$gonna let$you down",
         "Thanks$for not$skipping$me",
+        "The$Opportunity$Arises"
     ];
 
     public static readonly string[] KNOW_NOTHING_TEXTS =

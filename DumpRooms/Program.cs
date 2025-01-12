@@ -5,17 +5,18 @@ using System.Text.Json;
 using RandomizerCore;
 using RandomizerCore.Sidescroll;
 
-ROM ROMData = new ROM(args[0]);
+//ROM ROMData = new ROM("args[0]");
+ROM ROMData = new ROM("C:\\Workspace\\Z2Randomizer_4_4\\DumpRooms\\bin\\Debug\\net8.0\\aaron_rooms_1.nes");
 int[] connAddr = [0x1072B, 0x12208, 0x1472B];
 int[] side = [0x10533, 0x12010, 0x14533];
 int[] enemy = [0x105b1, 0x1208E, 0x145b1];
 int[] bit = [0x17ba5, 0x17bc5, 0x17be5];
 StringBuilder sb = new StringBuilder("[");
-for (int j = 0; j < 3; j++)
+for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
 {
-    for (int i = 0; i < 63; i++)
+    for (int map = 0; map < 63; map++)
     {
-        int addr = connAddr[j] + i * 4;
+        int addr = connAddr[palaceGroup] + map * 4;
         byte[] connectBytes = new byte[4];
         for (int k = 0; k < 4; k++)
         {
@@ -23,26 +24,26 @@ for (int j = 0; j < 3; j++)
 
         }
         Room r;
-        int sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0x8010;
-        if (j == 2)
+        int sideViewPtr = (ROMData.GetByte(side[palaceGroup] + map * 2) + (ROMData.GetByte(side[palaceGroup] + 1 + map * 2) << 8)) + 0x8010;
+        if (palaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
+            sideViewPtr = (ROMData.GetByte(side[palaceGroup] + map * 2) + (ROMData.GetByte(side[palaceGroup] + 1 + map * 2) << 8)) + 0xC010;
         }
         int sideViewLength = ROMData.GetByte(sideViewPtr);
         byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewLength);
 
-        int enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
-        if (j == 2)
+        int enemyPtr = ROMData.GetByte(enemy[palaceGroup] + map * 2) + (ROMData.GetByte(enemy[palaceGroup] + 1 + map * 2) << 8) + 0x98b0;
+        if (palaceGroup == 2)
         {
-            enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0xd8b0;
+            enemyPtr = ROMData.GetByte(enemy[palaceGroup] + map * 2) + (ROMData.GetByte(enemy[palaceGroup] + 1 + map * 2) << 8) + 0xd8b0;
         }
 
         int enemyLength = ROMData.GetByte(enemyPtr);
         byte[] enemies = ROMData.GetBytes(enemyPtr, enemyLength);
 
-        byte bitmask = ROMData.GetByte(bit[j] + i / 2);
+        byte bitmask = ROMData.GetByte(bit[palaceGroup] + map / 2);
 
-        if (i % 2 == 0)
+        if (map % 2 == 0)
         {
             bitmask = (byte)(bitmask & 0xF0);
             bitmask = (byte)(bitmask >> 4);
@@ -61,6 +62,11 @@ for (int j = 0; j < 3; j++)
             int yPos = sideView[sideviewIndex] & 0xF0;
             yPos >>= 4;
             //item
+            if(sideviewIndex == sideView.Length - 1)
+            {
+                Console.WriteLine("Malformed room breaks parsing. Group: " + palaceGroup + " Map: " + map);
+                break;
+            }
             if (yPos < 13 && sideView[sideviewIndex + 1] == 0x0F)
             {
                 int collectableIndex = sideView[sideviewIndex + 2];
@@ -93,18 +99,18 @@ for (int j = 0; j < 3; j++)
             HasItem = hasItem,
             IsThunderBirdRoom = false,
             PalaceNumber = null,
-            PalaceGroup = j,
+            PalaceGroup = palaceGroup,
             LinkedRoomName = null,
             IsDropZone = false,
             IsEntrance = false,
             //IsUpDownReversed = false,
-            Map = (byte)i,
+            Map = (byte)map,
             ConnectionStartAddress = sideViewPtr,
             Name = "",
             Requirements = new Requirements(),
             SideView = sideView,
         };
-        r.PalaceGroup = (j + 1);
+        r.PalaceGroup = (palaceGroup + 1);
         sb.Append(r.Serialize() + ",");
     }
 }

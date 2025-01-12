@@ -39,7 +39,7 @@
     <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
-    <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest"/>
+    <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="PreserveNewest" />
@@ -57,5 +57,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Music\README.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

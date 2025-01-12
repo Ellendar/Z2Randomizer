@@ -46,6 +46,7 @@ public class Room : IJsonOnDeserialized
 
     public byte Map { get; set; }
     public int? PalaceGroup { get; set; }
+    [JsonIgnore]
     public bool IsRoot { get; set; }
     
     [JsonIgnore]
@@ -54,13 +55,16 @@ public class Room : IJsonOnDeserialized
     public Room? Left { get; set; }
     [JsonIgnore]
     public Room? Right { get; set; }
+    [JsonIgnore]
     public Room Up { get; set; }
+    [JsonIgnore]
     public Room Down { get; set; }
-    
+    [JsonIgnore]
     public bool IsReachable { get; set; }
+    [JsonPropertyName("memoryAddress")]
     public int ConnectionStartAddress { get; set; }
 
-
+    [JsonIgnore]
     public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
     //public bool IsPlaced { get; set; }
 	
@@ -70,7 +74,7 @@ public class Room : IJsonOnDeserialized
     //Please do not reference it outside of that
     [JsonConverter(typeof(HexStringConverter))]
     public byte[] Connections { get; set; }
-
+    [JsonIgnore]
     public bool IsBeforeTbird { get; set; }
 
     public bool HasDrop { get; set; }
@@ -81,6 +85,7 @@ public class Room : IJsonOnDeserialized
     public bool HasItem { get; set; }
     [JsonConverter(typeof(HexStringConverter))]
     public byte[] Enemies { get; set; }
+    [JsonIgnore]
     public byte[] NewEnemies { get; set; }
     [JsonPropertyName("sideviewData")]
     [JsonConverter(typeof(HexStringConverter))]
@@ -99,13 +104,19 @@ public class Room : IJsonOnDeserialized
     public int? PalaceNumber { get; set; }
     public string LinkedRoomName { get; set; }
     //public int PageCount { get; private set; }
+    [JsonIgnore]
     public bool HasLeftExit { get; private set; }
+    [JsonIgnore]
     public bool HasRightExit { get; set; }
+    [JsonIgnore]
     public bool HasUpExit { get; private set; }
+    [JsonIgnore]
     public bool HasDownExit { get; private set; }
     public bool IsUpDownReversed { get; set; }
 
+    [JsonIgnore]
     public Room MergedPrimary { get; set; }
+    [JsonIgnore]
     public Room MergedSecondary { get; set; }
 
 
@@ -684,7 +695,7 @@ public class Room : IJsonOnDeserialized
         return exitCoords;
     }
 
-    internal RoomExitType CategorizeExits()
+    public RoomExitType CategorizeExits()
     {
         /*
         if(ElevatorScreen >= 0 && (HasDrop || IsDropZone))

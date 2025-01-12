@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using NLog;
 
 namespace RandomizerCore.Overworld;
@@ -317,6 +318,11 @@ public class Location
 
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
+        List<int> knownWorlds = [4, 12, 16, 10, 14, 18, 22, 17, 0, 1, 2, 3];
+        if(!knownWorlds.Contains(World))
+        {
+            logger.Trace("Unknown world");
+        }
         if(Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
         {
             logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
@@ -349,7 +355,7 @@ public class Location
     {
         return Continent.ToString()
             + " " + TerrainType.ToString()
-            + " " + Name
+            + " " + Name + "(" + World + ")"
             + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
             + (Collectable == Collectable.DO_NOT_USE ? "" : Collectable.ToString());
