@@ -3432,14 +3432,14 @@ CustomFileSelectData:
         return false;
     }
 
-    private void FullItemShuffle(Assembler asm, IEnumerable<Location> collectables)
+    private void FullItemShuffle(Assembler asm, IEnumerable<Location> collectableLocations)
     {
         var a = asm.Module();
         foreach (var collect in Enum.GetValues<Collectable>())
         {
             a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
         }
-        foreach (var loc in collectables)
+        foreach (var loc in collectableLocations)
         {
             a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectable);
         }
