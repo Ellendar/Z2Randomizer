@@ -361,12 +361,12 @@ internal class MusicRandomizer
                 Usage.Palace => (loc => loc.PalaceNumber - 1),
                 Usage.GreatPalace => (loc => 0),
                 // One song per continent
-                _ => (loc => (int)loc.Continent),
+                _ => (loc => (int)(loc.VanillaContinent ?? loc.Continent)),
             };
 
             foreach (var loc in usageLocs)
             {
-                int contIdx = (int)loc.Continent,
+                int contIdx = (int)(loc.VanillaContinent ?? loc.Continent),
                     areaIdx = loc.MemAddress - _hyrule.worlds[contIdx].baseAddr,
                     areaId = contIdx * 0x40 + areaIdx;
 

@@ -1175,6 +1175,7 @@ Exit:
                 GetByte(startAddr + RomMap.overworldWorldOffset + i) ];
             Location location = new(bytes, Terrains[startAddr + i], startAddr + i, continent);
             location.AppearsOnMap = true;
+            location.VanillaContinent = continent;
             locations.Add(location);
         }
         return locations;
@@ -1189,6 +1190,7 @@ Exit:
             GetByte(addr + RomMap.overworldWorldOffset) ];
         Location location = new(bytes, t, addr, c);
         location.AppearsOnMap = true;
+        location.VanillaContinent = c;
         return location;
     }
 
