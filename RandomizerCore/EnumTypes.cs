@@ -443,25 +443,25 @@ public enum CharacterColor
     Random,
 }
 
-[DefaultValue(Default)]
+[DefaultValue(DEFAULT)]
 public enum BeamSprites
 {
     [Description("Default")]
-    Default,
+    DEFAULT,
     [Description("Fire")]
-    Fire,
+    FIRE,
     [Description("Bubble")]
-    Bubble,
+    BUBBLE,
     [Description("Rock")]
-    Rock,
+    ROCK,
     [Description("Axe")]
-    Axe,
+    AXE,
     [Description("Hammer")]
-    Hammer,
+    HAMMER,
     [Description("Wizzrobe Beam")]
-    WizzrobeBeam,
+    WIZZROBE_BEAM,
     [Description("Random")]
-    Random,
+    RANDOM,
 }
 
 [DefaultValue(Normal)]

@@ -19,11 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8D37871B-98E7-480F-99B6-E96BCE4B0FA8}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.targets = Directory.Build.targets
 		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormUI", "WinFormUI\WinFormUI.csproj", "{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpRooms", "DumpRooms\DumpRooms.csproj", "{25230EEF-2BB9-4472-96E3-40AE6EDCF5DE}"
 EndProject
@@ -35,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossPlatformUI.Desktop", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrossPlatformUI.Browser", "CrossPlatformUI.Browser\CrossPlatformUI.Browser.csproj", "{1C1A049E-235C-4CD0-B6FA-D53AC418F4DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desktop.Common", "Desktop.Common\Desktop.Common.csproj", "{4757B891-A5AA-43B7-A52D-41453508E870}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desktop.Common", "Desktop.Common\Desktop.Common.csproj", "{4757B891-A5AA-43B7-A52D-41453508E870}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FtRandoLib", "FtRandoLib\FtRandoLib.csproj", "{6C838F98-8DAC-4E99-A756-EFFBD4331FBA}"
 EndProject
@@ -79,14 +77,6 @@ Global
 		{F47E6BD2-DD2F-4207-BB92-BD71AD91D420}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F47E6BD2-DD2F-4207-BB92-BD71AD91D420}.Release|x64.ActiveCfg = Release|x64
 		{F47E6BD2-DD2F-4207-BB92-BD71AD91D420}.Release|x64.Build.0 = Release|x64
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Debug|x64.ActiveCfg = Debug|x64
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Debug|x64.Build.0 = Debug|x64
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Release|x64.ActiveCfg = Release|x64
-		{32152FA5-E875-4D6E-B001-AEC7B8FA58CA}.Release|x64.Build.0 = Release|x64
 		{25230EEF-2BB9-4472-96E3-40AE6EDCF5DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{25230EEF-2BB9-4472-96E3-40AE6EDCF5DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25230EEF-2BB9-4472-96E3-40AE6EDCF5DE}.Debug|x64.ActiveCfg = Debug|x64

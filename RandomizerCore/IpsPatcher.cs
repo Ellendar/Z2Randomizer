@@ -56,7 +56,7 @@ internal class IpsPatcher
                     size -= segSize;
                 }
 
-                tgtOffs += ROM.ChrRomOffs - ROM.VanillaChrRomOffs;
+                tgtOffs += ROM.ChrRomOffset - ROM.VanillaChrRomOffs;
             }
 
             if (fillValue is not null)

@@ -50,9 +50,9 @@ public class ROM
     public const int RomHdrSize = 0x10;
     public const int PrgRomOffs = RomHdrSize;
     public const int PrgRomSize = 0x40000;
-    public const int ChrRomOffs = RomHdrSize + PrgRomSize;
+    public const int ChrRomOffset = RomHdrSize + PrgRomSize;
     public const int ChrRomSize = 0x20000;
-    public const int RomSize = ChrRomOffs + ChrRomSize;
+    public const int RomSize = ChrRomOffset + ChrRomSize;
 
     public const int VanillaPrgRomSize = 0x20000;
     public const int VanillaChrRomOffs = RomHdrSize + VanillaPrgRomSize;
@@ -73,22 +73,22 @@ public class ROM
     private readonly int[] inCurtains = { 0x13F1D, 0x13F2D, 0x13F3D, 0x13F4D, 0x13F5D, 0x13F6D, 0x1402B };
 
     private readonly int[] brickSprites = {
-        ChrRomOffs + 0x9640, 
-        ChrRomOffs + 0xB640, 
-        ChrRomOffs + 0xD640, 
-        ChrRomOffs + 0x13640, 
-        ChrRomOffs + 0x15640, 
-        ChrRomOffs + 0x17640, 
-        ChrRomOffs + 0x19640
+        ChrRomOffset + 0x9640, 
+        ChrRomOffset + 0xB640, 
+        ChrRomOffset + 0xD640, 
+        ChrRomOffset + 0x13640, 
+        ChrRomOffset + 0x15640, 
+        ChrRomOffset + 0x17640, 
+        ChrRomOffset + 0x19640
     };
     private readonly int[] inBrickSprites = { 
-        ChrRomOffs + 0x9680, 
-        ChrRomOffs + 0xB680, 
-        ChrRomOffs + 0xD680, 
-        ChrRomOffs + 0x13680, 
-        ChrRomOffs + 0x15680, 
-        ChrRomOffs + 0x17680,
-        ChrRomOffs + 0x19680
+        ChrRomOffset + 0x9680, 
+        ChrRomOffset + 0xB680, 
+        ChrRomOffset + 0xD680, 
+        ChrRomOffset + 0x13680, 
+        ChrRomOffset + 0x15680, 
+        ChrRomOffset + 0x17680,
+        ChrRomOffset + 0x19680
     };
 
     private const int STRING_TERMINATOR = 0xFF;
@@ -96,28 +96,28 @@ public class ROM
     private const int creditsLineTwoAddr = 0x15384;
 
     //sprite addresses for reading sprites from a ROM:
-    private const int titleSpriteStartAddr = ChrRomOffs + 0xD00;
-    private const int titleSpriteEndAddr = ChrRomOffs + 0xD20;
-    private const int beamSpriteStartAddr = ChrRomOffs + 0x840;
-    private const int beamSpriteEndAddr = ChrRomOffs + 0x860;
-    private const int raftSpriteStartAddr = ChrRomOffs + 0x11440;
-    private const int raftSpriteEndAddr = ChrRomOffs + 0x11480;
-    private const int OWSpriteStartAddr = ChrRomOffs + 0x11740;
-    private const int OWSpriteEndAddr = ChrRomOffs + 0x117c0;
-    private const int sleeperSpriteStartAddr = ChrRomOffs + 0x1000;
-    private const int sleeperSpriteEndAddr = ChrRomOffs + 0x1060;
-    private const int oneUpSpriteStartAddr = ChrRomOffs + 0xa80;
-    private const int oneUpSpriteEndAddr = ChrRomOffs + 0xaa0;
-    private const int endSprite1StartAddr = ChrRomOffs + 0xed80;
-    private const int endSprite1EndAddr = ChrRomOffs + 0xee80;
-    private const int endSprite2StartAddr = ChrRomOffs + 0xf000;
-    private const int endSprite2EndAddr = ChrRomOffs + 0xf0e0;
-    private const int endSprite3StartAddr = ChrRomOffs + 0xd000;
-    private const int endSprite3EndAddr = ChrRomOffs + 0xd040;
-    private const int headSpriteStartAddr = ChrRomOffs + 0x1960;
-    private const int headSpriteEndAddr = ChrRomOffs + 0x1970;
-    private const int playerSpriteStartAddr = ChrRomOffs + 0x2000;
-    private const int playerSpriteEndAddr = ChrRomOffs + 0x3000;
+    private const int titleSpriteStartAddr = ChrRomOffset + 0xD00;
+    private const int titleSpriteEndAddr = ChrRomOffset + 0xD20;
+    private const int beamSpriteStartAddr = ChrRomOffset + 0x840;
+    private const int beamSpriteEndAddr = ChrRomOffset + 0x860;
+    private const int raftSpriteStartAddr = ChrRomOffset + 0x11440;
+    private const int raftSpriteEndAddr = ChrRomOffset + 0x11480;
+    private const int OWSpriteStartAddr = ChrRomOffset + 0x11740;
+    private const int OWSpriteEndAddr = ChrRomOffset + 0x117c0;
+    private const int sleeperSpriteStartAddr = ChrRomOffset + 0x1000;
+    private const int sleeperSpriteEndAddr = ChrRomOffset + 0x1060;
+    private const int oneUpSpriteStartAddr = ChrRomOffset + 0xa80;
+    private const int oneUpSpriteEndAddr = ChrRomOffset + 0xaa0;
+    private const int endSprite1StartAddr = ChrRomOffset + 0xed80;
+    private const int endSprite1EndAddr = ChrRomOffset + 0xee80;
+    private const int endSprite2StartAddr = ChrRomOffset + 0xf000;
+    private const int endSprite2EndAddr = ChrRomOffset + 0xf0e0;
+    private const int endSprite3StartAddr = ChrRomOffset + 0xd000;
+    private const int endSprite3EndAddr = ChrRomOffset + 0xd040;
+    private const int headSpriteStartAddr = ChrRomOffset + 0x1960;
+    private const int headSpriteEndAddr = ChrRomOffset + 0x1970;
+    private const int playerSpriteStartAddr = ChrRomOffset + 0x2000;
+    private const int playerSpriteEndAddr = ChrRomOffset + 0x3000;
 
     //kasuto jars
     private const int kasutoJarTextAddr = 0xEEC9;
@@ -188,7 +188,7 @@ public class ROM
         var newdata = new byte[RomSize];
 
         Array.Copy(data, newdata, VanillaChrRomOffs);
-        Array.Copy(data, VanillaChrRomOffs, newdata, ChrRomOffs, ChrRomSize);
+        Array.Copy(data, VanillaChrRomOffs, newdata, ChrRomOffset, ChrRomSize);
 
         return newdata;
     }
@@ -333,18 +333,18 @@ public class ROM
     }
 
     private readonly int[] fireLocs = { 
-        ChrRomOffs + 0x00840, 
-        ChrRomOffs + 0x02840, 
-        ChrRomOffs + 0x04840, 
-        ChrRomOffs + 0x06840, 
-        ChrRomOffs + 0x08840, 
-        ChrRomOffs + 0x0a840, 
-        ChrRomOffs + 0x0c840, 
-        ChrRomOffs + 0x0e840, 
-        ChrRomOffs + 0x16840, 
-        ChrRomOffs + 0x12840, 
-        ChrRomOffs + 0x14840, 
-        ChrRomOffs + 0x18840 
+        ChrRomOffset + 0x00840, 
+        ChrRomOffset + 0x02840, 
+        ChrRomOffset + 0x04840, 
+        ChrRomOffset + 0x06840, 
+        ChrRomOffset + 0x08840, 
+        ChrRomOffset + 0x0a840, 
+        ChrRomOffset + 0x0c840, 
+        ChrRomOffset + 0x0e840, 
+        ChrRomOffset + 0x16840, 
+        ChrRomOffset + 0x12840, 
+        ChrRomOffset + 0x14840, 
+        ChrRomOffset + 0x18840 
     };
 
     public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
@@ -477,97 +477,41 @@ public class ROM
             }
         }
 
-        int beamType = -1;
-        switch (beamSprite)
+        if(beamSprite == BeamSprites.RANDOM)
         {
-            case BeamSprites.Random:
-            {
-                Random r2 = new Random();
-                beamType = r2.Next(6);
-                break;
-            }
-            case BeamSprites.Fire:
-                beamType = 0;
-                break;
-            case BeamSprites.Bubble:
-                beamType = 1;
-                break;
-            case BeamSprites.Rock:
-                beamType = 2;
-                break;
-            case BeamSprites.Axe:
-                beamType = 3;
-                break;
-            case BeamSprites.Hammer:
-                beamType = 4;
-                break;
-            case BeamSprites.WizzrobeBeam:
-                beamType = 5;
-                break;
-            case BeamSprites.Default:
-                break;
+            Random r2 = new Random();
+            beamSprite = (BeamSprites)r2.Next(Enum.GetNames(typeof(BeamSprites)).Length - 1);
         }
+       
         byte[] newSprite = new byte[32];
 
-        if (beamType == 0 || beamType == 3 || beamType == 4)
+        if (beamSprite == BeamSprites.FIRE || beamSprite == BeamSprites.AXE || beamSprite == BeamSprites.HAMMER)
         {
-            Put(0x18f5, 0xa9);
-            Put(0x18f6, 0x00);
-            Put(0x18f7, 0xea);
+            Put(0x18f5, [0xa9, 0x00, 0xea]);
         }
-        else if (beamType != -1)
+        else if (beamSprite != BeamSprites.DEFAULT)
         {
             Put(0X18FB, 0x84);
         }
 
-        if (beamType == 1)//bubbles
+        int beamSpriteOffset = beamSprite switch
+        {
+            BeamSprites.FIRE => 0,
+            BeamSprites.BUBBLE => 0xaa0,
+            BeamSprites.ROCK => 0x2ae0,
+            BeamSprites.AXE => 0x2fa0,
+            BeamSprites.HAMMER => 0x12ee0,
+            BeamSprites.WIZZROBE_BEAM => 0x14dc0,
+            BeamSprites.DEFAULT => 0,
+            _ => throw new Exception("Invalid beam sprite")
+        };
+        if(beamSpriteOffset != 0)
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(ChrRomOffs + 0xaa0 + i);
+                byte next = GetByte(ChrRomOffset + beamSpriteOffset + i);
                 newSprite[i] = next;
             }
-        }
-
-        if (beamType == 2)//rocks
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x2ae0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-        if (beamType == 3)//axes
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x2fa0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-        if (beamType == 4)//hammers
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x12ee0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-        if (beamType == 5)//wizzrobe beam
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x14dc0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-
-        if (beamType != 0 && beamType != -1)
-        {
             foreach (int loc in fireLocs)
             {
                 for (int i = 0; i < 32; i++)
@@ -613,7 +557,7 @@ public class ROM
         // The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
         // as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
         // keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5)
-        Put(0x13ec1, new byte[2] { 0xaa, 0xea, }); // tax nop
+        Put(0x13ec1, [0xaa, 0xea]); // tax nop
     }
 
     public void WriteKasutoJarAmount(int kasutoJars)

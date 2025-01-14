@@ -222,7 +222,7 @@ public class LoadedCharacterSprite : ReactiveObject
             // Location in the ROM where the sprite starts
             // 0x22000 = CHR page (bank $02) base, 0x10 = ines header, 0x80 for the tile offset
             // we are reading 8 sprites from [0x80, 0x100)
-            const int spriteBase = ROM.ChrRomOffs + 0x2000 + 0x80;
+            const int spriteBase = ROM.ChrRomOffset + 0x2000 + 0x80;
 
             // We only have one palette to read from, but should there be multipalette sprites someday
             // this could come in handy

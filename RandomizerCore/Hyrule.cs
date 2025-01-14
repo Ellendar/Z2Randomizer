@@ -2260,7 +2260,7 @@ public class Hyrule
         }
 
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
-        rom.Put(ROM.ChrRomOffs + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        rom.Put(ROM.ChrRomOffset + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -2697,14 +2697,14 @@ public class Hyrule
         // Copy heart and magic container sprite tiles to the new location.
         for (int i = 0; i < 64; i++)
         {
-            byte heartByte = ROMData.GetByte(ROM.ChrRomOffs + 0x7800 + i);
-            ROMData.Put(ROM.ChrRomOffs + 0x09800 + i, heartByte);
-            ROMData.Put(ROM.ChrRomOffs + 0x0B800 + i, heartByte);
-            ROMData.Put(ROM.ChrRomOffs + 0x0D800 + i, heartByte);
-            ROMData.Put(ROM.ChrRomOffs + 0x13800 + i, heartByte);
-            ROMData.Put(ROM.ChrRomOffs + 0x15800 + i, heartByte);
-            ROMData.Put(ROM.ChrRomOffs + 0x17800 + i, heartByte);
-            ROMData.Put(ROM.ChrRomOffs + 0x19800 + i, heartByte);
+            byte heartByte = ROMData.GetByte(ROM.ChrRomOffset + 0x7800 + i);
+            ROMData.Put(ROM.ChrRomOffset + 0x09800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffset + 0x0B800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffset + 0x0D800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffset + 0x13800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffset + 0x15800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffset + 0x17800 + i, heartByte);
+            ROMData.Put(ROM.ChrRomOffset + 0x19800 + i, heartByte);
         }
 
         /*
@@ -3135,7 +3135,7 @@ public class Hyrule
         //fix for rope graphical glitch
         for (int i = 0; i < 16; i++)
         {
-            ROMData.Put(ROM.ChrRomOffs + 0x12CC0 + i, ROMData.GetByte(ROM.ChrRomOffs + 0x14CC0 + i));
+            ROMData.Put(ROM.ChrRomOffset + 0x12CC0 + i, ROMData.GetByte(ROM.ChrRomOffset + 0x14CC0 + i));
         }
     }
 

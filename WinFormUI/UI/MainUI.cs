@@ -1194,15 +1194,15 @@ public partial class MainUI : Form
         };
         configuration.BeamSprite = beamSpriteList.SelectedIndex switch
         {
-            0 => BeamSprites.Default,
-            1 => BeamSprites.Fire,
-            2 => BeamSprites.Bubble,
-            3 => BeamSprites.Rock,
-            4 => BeamSprites.Axe,
-            5 => BeamSprites.Hammer,
-            6 => BeamSprites.WizzrobeBeam,
-            7 => BeamSprites.Random,
-            _ => BeamSprites.Default
+            0 => BeamSprites.DEFAULT,
+            1 => BeamSprites.FIRE,
+            2 => BeamSprites.BUBBLE,
+            3 => BeamSprites.ROCK,
+            4 => BeamSprites.AXE,
+            5 => BeamSprites.HAMMER,
+            6 => BeamSprites.WIZZROBE_BEAM,
+            7 => BeamSprites.RANDOM,
+            _ => BeamSprites.DEFAULT
         };
 
         return configuration;

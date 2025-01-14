@@ -1124,7 +1124,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         Sprite = CharacterSprite.LINK;
         Tunic = CharacterColor.Default;
         ShieldTunic = CharacterColor.Default;
-        BeamSprite = BeamSprites.Default;
+        BeamSprite = BeamSprites.DEFAULT;
         UseCustomRooms = false;
         DisableHUDLag = false;
     }
@@ -1688,7 +1688,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         config.Sprite = CharacterSprite.LINK;
         config.Tunic = CharacterColor.Default;
         config.ShieldTunic = CharacterColor.Default;
-        config.BeamSprite = BeamSprites.Default;
+        config.BeamSprite = BeamSprites.DEFAULT;
         config.UseCustomRooms = false;
 
         config.BeepFrequency = BeepFrequency.Normal; // 0x30;
