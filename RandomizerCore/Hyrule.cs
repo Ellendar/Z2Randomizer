@@ -551,7 +551,7 @@ public class Hyrule
     private string AsmFileReadTextCallback(string basePath, string path)
     {
         if (basePath == "")
-            return Util.ReadResource($"RandomizerCore.Asm.{path}");
+            return Util.ReadResource($"RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
 
         throw new FileNotFoundException();
     }
