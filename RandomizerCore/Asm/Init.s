@@ -1,4 +1,5 @@
-﻿
+﻿.include "z2r.inc"
+
 ;;; Initialization. This must come before all other modules.
 
 ;;; Tag for labels that we expect to override vanilla

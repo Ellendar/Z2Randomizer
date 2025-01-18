@@ -9,8 +9,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FtRandoLib.Importer;
+using js65;
 using NLog;
-using RandomizerCore.Asm;
 using RandomizerCore.Overworld;
 using RandomizerCore.Sidescroll;
 
@@ -36,6 +36,12 @@ public class Hyrule
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    private readonly Js65Options assemblerOptions = new()
+    {
+        // Must exist for the FileResolve callback to be called
+        includePaths = [""],
+    };
+    
     private MusicRandomizer? musicRandomizer = null;
 
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
@@ -169,14 +175,12 @@ public class Hyrule
         }
     }
 
-    private readonly IAsmEngine engine;
     private readonly PalaceRooms palaceRooms;
     
     public string Hash { get; private set; }
 
-    public Hyrule(IAsmEngine engine, PalaceRooms rooms)
+    public Hyrule(PalaceRooms rooms)
     {
-        this.engine = engine;
         palaceRooms = rooms;
     }
     public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
@@ -200,7 +204,7 @@ public class Hyrule
             }
             Flags = config.Flags;
 
-            Assembler assembler = new();
+            Assembler assembler = CreateAssemblyEngine();
             logger.Info($"Started generation for flags: {Flags} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
@@ -269,7 +273,7 @@ public class Hyrule
                 //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
                 //guaranteed to succeed iff running on the original engine would succeed.
                 //Jrowe feel free to engineer a less insane fix here. 
-                Assembler validationEngine = new();
+                Assembler validationEngine = CreateAssemblyEngine();
 
                 int i = 0;
                 //If multiple palaces use the same item room, they'll get consolidated under a single sideview
@@ -355,7 +359,7 @@ public class Hyrule
                     //be tested here, but we don't actually know what they will be until later, for now i'm just
                     //testing with the vanilla text, but this could be an issue down the line.
                     ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
-                    await testRom.ApplyAsm(engine, validationEngine); //.Wait(ct);
+                    await testRom.ApplyAsm(validationEngine); //.Wait(ct);
                 }
                 catch (Exception e)
                 {
@@ -438,7 +442,7 @@ public class Hyrule
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, RNG);
             ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
-            var rom = await ROMData.ApplyAsm(engine, assembler);
+            var rom = await ROMData.ApplyAsm(assembler);
 
             // await assemblerTask; // .Wait(ct);
             // var rom = assemblerTask.Result;
@@ -525,6 +529,25 @@ public class Hyrule
             Debug.WriteLine(e.StackTrace);
             throw;
         }
+    }
+
+    private Assembler CreateAssemblyEngine()
+    {
+        ClearScriptEngine asm = new(assemblerOptions);
+        asm.Callbacks = new Js65Callbacks
+        {
+            OnFileReadText = AsmFileReadTextCallback,
+        };
+
+        return asm;
+    }
+
+    private string AsmFileReadTextCallback(string basePath, string path)
+    {
+        if (basePath == "")
+            return Util.ReadResource($"RandomizerCore.Asm.{path}");
+
+        throw new FileNotFoundException();
     }
 
     private static byte[] ConvertHash(byte[] hash)
@@ -2260,7 +2283,7 @@ public class Hyrule
         }
 
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.ShieldColor, props.BeamSprite);
-        rom.Put(ROM.ChrRomOffset + 0x1a000, Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -3444,7 +3467,7 @@ CustomFileSelectData:
             a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectable);
         }
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
-        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
+        a.Code(Util.ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
     private void FixHelmetheadBossRoom(Assembler asm)
@@ -3576,12 +3599,12 @@ FixSoftlock:
         var a = asm.Module();
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Assign("ENABLE_Z2FT", enableZ2ft ? 1 : 0);
-        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
+        a.Code(Util.ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
     }
     
     public void ExpandedPauseMenu(Assembler a)
     {
-        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
+        a.Module().Code(Util.ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
     
     public void StandardizeDrops(Assembler a)
@@ -3641,7 +3664,8 @@ CheckIfEndOfData:
         a.Assign("PGreatPalette", (byte)palPalettes[eastHyrule?.locationAtGP.PalaceNumber ?? 6]);
         a.Code("""
 
-.macpack common
+.include "z2r.inc"
+
 .import SwapPRG
 
 CurrentRegion = $0706
@@ -3821,10 +3845,10 @@ FREE_UNTIL $c2ca
         if (!props.DisableMusic && randomizeMusic)
         {
             ROMData.ApplyIps(
-                Assembly.GetExecutingAssembly().ReadBinaryResource("RandomizerCore.Asm.z2rndft.ips"));
+                Util.ReadBinaryResource("RandomizerCore.Asm.z2rndft.ips"));
 
             var asm = engine.Module();
-            asm.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.z2ft.s"), "z2ft.s");
+            asm.Code(Util.ReadResource("RandomizerCore.Asm.z2ft.s"), "z2ft.s");
         }
 
         UpdateTexts(engine, texts);

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using js65;
 using NLog;
-using RandomizerCore.Asm;
 using RandomizerCore.Sidescroll;
 
 namespace RandomizerCore;

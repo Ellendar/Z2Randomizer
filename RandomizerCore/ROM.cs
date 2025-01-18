@@ -6,8 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using js65;
 using NLog;
-using RandomizerCore.Asm;
 using RandomizerCore.Overworld;
 
 namespace RandomizerCore;
@@ -661,7 +661,7 @@ public class ROM
         //Implements CF's map size hack:
         //https://github.com/cfrantz/z2doc/wiki/bigger-overworlds
         a.Module().Code("""
-.macpack common
+.include "z2r.inc"
 
 .segment "PRG0"
 ; Update the pointer to the overworld data
@@ -768,12 +768,12 @@ CheckController1ForUpAMagic:
 
     public void ChangeMapperToMMC5(Assembler a)
     {
-        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
+        a.Module().Code(Util.ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
-    public async Task<byte[]?> ApplyAsm(IAsmEngine engine, Assembler asm)
+    public async Task<byte[]?> ApplyAsm(Assembler engine)
     {
-        return await engine.Apply(rawdata, asm);
+        return await engine.Apply(rawdata);
     }
     public void RandomizeKnockback(Assembler asm, Random RNG)
     {
@@ -804,7 +804,7 @@ CheckController1ForUpAMagic:
             a.Byt(y_lo_arr);
             a.Byt(y_hi_arr);
         }
-        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
+        a.Code(Util.ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
     public void DontCountExpDuringTalking(Assembler a)
@@ -931,13 +931,13 @@ Exit:
 
     public void BuffCarrock(Assembler a)
     {
-        a.Module().Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
+        a.Module().Code(Util.ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
     }
 
     public void DashSpell(Assembler asm)
     {
         var a = asm.Module();
-        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
+        a.Code(Util.ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
 
         byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
         a.Org(0x9c62);

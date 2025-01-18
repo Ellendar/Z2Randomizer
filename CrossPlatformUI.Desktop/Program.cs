@@ -7,7 +7,6 @@ using Desktop.Common;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 using Microsoft.Extensions.DependencyInjection;
-using RandomizerCore.Asm;
 
 namespace CrossPlatformUI.Desktop;
 
@@ -23,7 +22,6 @@ public static class Program
             .AfterSetup(_ =>
             {
                 App.ServiceContainer ??= new ();
-                App.ServiceContainer.AddSingleton<IAsmEngine>(x => new DesktopJsEngine());
                 App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
                 App.FileSystemService = new DesktopFileService();
                 // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());

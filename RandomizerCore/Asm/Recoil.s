@@ -1,8 +1,6 @@
-
+.include "z2r.inc"
 
 .segment "PRG7"
-
-.macpack common
 
 LinkXVelocity = $70
 EnemyID = $a1
