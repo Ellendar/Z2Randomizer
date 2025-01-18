@@ -109,7 +109,7 @@ public class Program
         // };
         // worker.RunWorkerAsync();
         var cts = new CancellationTokenSource();
-        Hyrule.CreateAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
+        Hyrule.NewAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
         var roomsJson = RandomizerCore.Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = configuration!.UseCustomRooms ? RandomizerCore.Util.ReadAllTextFromFile("CustomRooms.json") : null;
         var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson : roomsJson, configuration!.UseCustomRooms);

@@ -18,7 +18,7 @@ namespace RandomizerCore;
 
 public class Hyrule
 {
-    public delegate Assembler CreateAssemblerFn(Js65Options? options = null, bool debugJavaScript = false);
+    public delegate Assembler NewAssemblerFn(Js65Options? options = null, bool debugJavaScript = false);
 
     //IMPORTANT: Tuning these factors can have a big impact on generation times.
     //In general, the non-terrain shuffle features are much cheaper than the cost of generating terrain or verifying the seed.
@@ -177,14 +177,14 @@ public class Hyrule
         includePaths = [""],
     };
 
-    private readonly CreateAssemblerFn CreateAssembler;
+    private readonly NewAssemblerFn NewAssembler;
     private readonly PalaceRooms palaceRooms;
     
     public string Hash { get; private set; }
 
-    public Hyrule(CreateAssemblerFn createAsm, PalaceRooms rooms)
+    public Hyrule(NewAssemblerFn createAsm, PalaceRooms rooms)
     {
-        CreateAssembler = createAsm;
+        NewAssembler = createAsm;
         palaceRooms = rooms;
     }
     public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
@@ -537,7 +537,7 @@ public class Hyrule
 
     private Assembler CreateAssemblyEngine()
     {
-        var asm = CreateAssembler(assemblerOptions);
+        var asm = NewAssembler(assemblerOptions);
         asm.Callbacks = new Js65Callbacks
         {
             OnFileReadText = AsmFileReadTextCallback,

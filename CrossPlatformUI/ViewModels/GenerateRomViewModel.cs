@@ -64,7 +64,7 @@ Seed: {config.Seed}
             tokenSource = new CancellationTokenSource();
             Progress = "";
             await App.PersistState();
-            var createAsm = App.Current?.Services?.GetService<Hyrule.CreateAssemblerFn>();
+            var createAsm = App.Current?.Services?.GetService<Hyrule.NewAssemblerFn>();
             var files = App.Current?.Services?.GetService<IFileSystemService>();
             var host = (HostScreen as MainViewModel)!;
             var config = host.Config;
