@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
 using DialogHostAvalonia;
-using js65;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +64,7 @@ Seed: {config.Seed}
             tokenSource = new CancellationTokenSource();
             Progress = "";
             await App.PersistState();
+            var createAsm = App.Current?.Services?.GetService<Hyrule.CreateAssemblerFn>();
             var files = App.Current?.Services?.GetService<IFileSystemService>();
             var host = (HostScreen as MainViewModel)!;
             var config = host.Config;
@@ -72,7 +72,7 @@ Seed: {config.Seed}
             var customJson = config.UseCustomRooms ? await files.OpenFile(IFileSystemService.RandomizerPath.Palaces, "CustomRooms.json") : null;
             var rooms = config.UseCustomRooms ? customJson : roomsJson;
             var palaceRooms = new PalaceRooms(rooms!, config.UseCustomRooms);
-            var randomizer = new Hyrule(palaceRooms);
+            var randomizer = new Hyrule(createAsm, palaceRooms);
             Dispatcher.UIThread.Post(GenerateSeed, DispatcherPriority.Background);
             return;
             

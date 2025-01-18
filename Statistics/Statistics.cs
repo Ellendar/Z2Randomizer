@@ -33,10 +33,11 @@ class Statistics
 
         RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
         Random random = new Random();
+        Hyrule.CreateAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
         var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
         var palaceRooms = new PalaceRooms(roomsJson, false);
-        var randomizer = new Hyrule(palaceRooms);
+        var randomizer = new Hyrule(createAsm,palaceRooms);
         logger.Info("Started statistics generation with limit: " + LIMIT);
         try
         {

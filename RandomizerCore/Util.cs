@@ -180,7 +180,7 @@ public class Util
 
 }
 
-internal static class AssemblyExtensions
+public static class AssemblyExtensions
 {
     public static string ReadResource(this Assembly assembly, string name)
     {

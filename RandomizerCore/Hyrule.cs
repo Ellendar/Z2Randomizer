@@ -18,6 +18,8 @@ namespace RandomizerCore;
 
 public class Hyrule
 {
+    public delegate Assembler CreateAssemblerFn(Js65Options? options = null, bool debugJavaScript = false);
+
     //IMPORTANT: Tuning these factors can have a big impact on generation times.
     //In general, the non-terrain shuffle features are much cheaper than the cost of generating terrain or verifying the seed.
 
@@ -36,12 +38,6 @@ public class Hyrule
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private readonly Js65Options assemblerOptions = new()
-    {
-        // Must exist for the FileResolve callback to be called
-        includePaths = [""],
-    };
-    
     private MusicRandomizer? musicRandomizer = null;
 
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
@@ -175,12 +171,20 @@ public class Hyrule
         }
     }
 
+    private static readonly Js65Options assemblerOptions = new()
+    {
+        // Must exist for the FileResolve callback to be called
+        includePaths = [""],
+    };
+
+    private readonly CreateAssemblerFn CreateAssembler;
     private readonly PalaceRooms palaceRooms;
     
     public string Hash { get; private set; }
 
-    public Hyrule(PalaceRooms rooms)
+    public Hyrule(CreateAssemblerFn createAsm, PalaceRooms rooms)
     {
+        CreateAssembler = createAsm;
         palaceRooms = rooms;
     }
     public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
@@ -533,11 +537,13 @@ public class Hyrule
 
     private Assembler CreateAssemblyEngine()
     {
-        ClearScriptEngine asm = new(assemblerOptions);
+        var asm = CreateAssembler(assemblerOptions);
         asm.Callbacks = new Js65Callbacks
         {
             OnFileReadText = AsmFileReadTextCallback,
         };
+
+        asm.Module().Code(Util.ReadResource("RandomizerCore.Asm.Init.s"), "__init.s");
 
         return asm;
     }
