@@ -429,9 +429,9 @@ public class CustomTexts
             {
                 //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
                 //enough magic containers and container requirements are on.
-                texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG));
+                texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
                 //Old kasuto guy has a different vanilla not enough containers message
-                texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG));
+                texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
             }
 
             if (props.TownNameHints)
@@ -515,14 +515,10 @@ public class CustomTexts
         return new Text(text);
     }
 
-    public static Text GenerateWizardText(List<Text> texts, Random r, Location? location, bool useCommunityText)
+    public static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
     {
         Town town = location.ActualTown;
         Collectable collectable = location.Collectable;
-        if (town == null)
-        {
-            throw new ArgumentException("Spell/Town is required to generate wizard text");
-        }
         if (collectable.IsSpell())
         {
             //If it's a spell, use the old behavior
@@ -629,7 +625,7 @@ public class CustomTexts
         List<int> placedIndex = new List<int>();
 
         List<Collectable> placedItems = [];
-        bool placedSmall = false;
+
         List<int> placedTowns = [];
 
         List<Collectable> items = locations.Select(i => i.Collectable).ToList();
@@ -694,11 +690,6 @@ public class CustomTexts
 
             placedTowns.Add(town);
             placedItems.Add(hintCollectable);
-            if (smallItems.Contains(hintCollectable))
-            {
-                placedSmall = true;
-            }
-
         }
         return placedIndex;
     }

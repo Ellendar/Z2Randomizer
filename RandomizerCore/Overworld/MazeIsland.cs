@@ -37,29 +37,29 @@ sealed class MazeIsland : World
 
     public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE));
-        locations.AddRange(rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE));
-        locations.AddRange(rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE));
-        locations.AddRange(rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE),
+            .. rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE),
+        ];
         locations.ForEach(AddLocation);
 
-        walkableTerrains = new List<Terrain>();
-        walkableTerrains.Add(Terrain.MOUNTAIN);
+        walkableTerrains = [Terrain.MOUNTAIN];
         enemyAddr = 0x88B0;
-        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-        generators = new List<int> { 0x0B, 0x0F, 0x17 };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
-        largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+        enemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
+        flyingEnemies = [0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15];
+        generators = [0x0B, 0x0F, 0x17];
+        smallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
+        largeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
         enemyPtr = 0xA08E;
-        overworldMaps = new List<int>();
+        overworldMaps = [];
 
         childDrop = GetLocationByMem(0xA143);
         magicContainerDrop = GetLocationByMem(0xA133);
         locationAtPalace4 = GetLocationByMem(0xA140);
         locationAtPalace4.PalaceNumber = 4;
-        locationAtPalace4.World = locationAtPalace4.World | 0x03;
         MAP_ROWS = 23;
         MAP_COLS = 23;
 
@@ -908,7 +908,7 @@ sealed class MazeIsland : World
 
         foreach (Location key in connections.Keys)
         {
-            if (requiredLocations.TryGetValue(key, out Location value))
+            if (requiredLocations.TryGetValue(key, out Location? value))
             {
                 requiredLocations.Add(key);
             }

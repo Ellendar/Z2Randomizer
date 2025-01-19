@@ -487,7 +487,8 @@ public class Hyrule
 
             byte[] finalRNGState = new byte[32];
             RNG.NextBytes(finalRNGState);
-            var version = Assembly.GetEntryAssembly().GetName().Version;
+            var version = (Assembly.GetEntryAssembly()?.GetName()?.Version) 
+                ?? throw new Exception("Invalid entry assembly version information");
             var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
             byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
                 Flags +
@@ -1154,7 +1155,7 @@ public class Hyrule
             else
             {
                 //TODO: Remove all the needX flags and replace them with a set of requirements.
-                hasItemNow = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedFlute || ItemGet[Collectable.FLUTE]);
+                hasItemNow = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
             }
 
             //Issue #3: Previously running UpdateItemGets multiple times could produce different results based on the sequence of times it ran
@@ -1898,37 +1899,17 @@ public class Hyrule
         if (props.SwapPalaceCont)
         {
 
-            List<Location> pals = new List<Location> { westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6 };
+            List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
 
             if (props.P7shuffle)
             {
                 pals.Add(eastHyrule.locationAtGP);
             }
 
-            //Replaced with fisher-yates
             for (int i = pals.Count() - 1; i > 0; i--)
             {
                 int swap = RNG.Next(i + 1);
                 Util.Swap(pals[i], pals[swap]);
-            }
-
-            westHyrule.locationAtPalace1.World = westHyrule.locationAtPalace1.World & 0xFC;
-            westHyrule.locationAtPalace2.World = westHyrule.locationAtPalace2.World & 0xFC;
-            westHyrule.locationAtPalace3.World = westHyrule.locationAtPalace3.World & 0xFC;
-
-            mazeIsland.locationAtPalace4.World = mazeIsland.locationAtPalace4.World & 0xFC;
-            mazeIsland.locationAtPalace4.World = mazeIsland.locationAtPalace4.World | 0x03;
-
-            eastHyrule.locationAtPalace5.World = eastHyrule.locationAtPalace5.World & 0xFC;
-            eastHyrule.locationAtPalace5.World = eastHyrule.locationAtPalace5.World | 0x02;
-
-            eastHyrule.locationAtPalace6.World = eastHyrule.locationAtPalace6.World & 0xFC;
-            eastHyrule.locationAtPalace6.World = eastHyrule.locationAtPalace6.World | 0x02;
-
-            if (props.P7shuffle)
-            {
-                eastHyrule.locationAtGP.World = eastHyrule.locationAtGP.World & 0xFC;
-                eastHyrule.locationAtGP.World = eastHyrule.locationAtGP.World | 0x02;
             }
         }
 
@@ -2685,11 +2666,11 @@ public class Hyrule
             List<Location> locs = world.AllLocations;
             foreach (Location location in locs.Where(i => i.AppearsOnMap))
             {
-                location.UpdateBytes();
-                ROMData.Put(location.MemAddress, location.LocationBytes[0]);
-                ROMData.Put(location.MemAddress + overworldXOff, location.LocationBytes[1]);
-                ROMData.Put(location.MemAddress + overworldMapOff, location.LocationBytes[2]);
-                ROMData.Put(location.MemAddress + overworldWorldOff, location.LocationBytes[3]);
+                byte[] locationBytes = location.GetLocationBytes();
+                ROMData.Put(location.MemAddress, locationBytes[0]);
+                ROMData.Put(location.MemAddress + overworldXOff, locationBytes[1]);
+                ROMData.Put(location.MemAddress + overworldMapOff, locationBytes[2]);
+                ROMData.Put(location.MemAddress + overworldWorldOff, locationBytes[3]);
             }
             ROMData.RemoveUnusedConnectors(world);
         }

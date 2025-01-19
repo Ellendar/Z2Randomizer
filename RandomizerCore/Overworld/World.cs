@@ -326,18 +326,10 @@ public abstract class World
         }
     }
 
-    protected Location? GetLocationByMap(int map, int world)
+    protected Location GetLocationByMap(int map, int world)
     {
-        Location? l = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.LocationBytes[2] == map && loc.World == world)
-            {
-                l = loc;
-                break;
-            }
-        }
-        return l;
+        Location? location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map);
+        return location ?? throw new Exception("Unable to find location. Map: " + map + " World: " + world);
     }
 
     public void UpdateAllReached()
@@ -362,36 +354,15 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByCoords((int, int)coords)
+    protected Location? GetLocationByCoords((int, int)coords)
     {
-        Location location = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.Coords.Equals(coords))
-            {
-                location = loc;
-                break;
-            }
-        }
-        if (location == null)
-        {
-            //Console.Write(coords);
-        }
-        return location;
+        return AllLocations.FirstOrDefault(i => i.Coords.Equals(coords));
     }
 
     protected Location GetLocationByMem(int mem)
     {
-        Location location = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.MemAddress == mem)
-            {
-                location = loc;
-                break;
-            }
-        }
-        return location;
+        return AllLocations.FirstOrDefault(i => i.MemAddress.Equals(mem)) 
+            ?? throw new Exception("Failed to find Location at address: " + mem);
     }
 
     public void ShuffleOverworldEnemies(ROM romData, bool generatorsAlwaysMatch, bool mixLargeAndSmallEnemies)
@@ -2033,7 +2004,6 @@ public abstract class World
         AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world));
         raft = GetLocationByMem(baseAddr + 41);
         raft.ExternalWorld = 0x80;
-        raft.World = world;
         raft.Map = 41;
         raft.TerrainType = Terrain.BRIDGE;
         return raft;
@@ -2044,7 +2014,6 @@ public abstract class World
         AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world));
         bridge = GetLocationByMem(baseAddr + 40);
         bridge.ExternalWorld = 0x80;
-        bridge.World = world;
         bridge.Map = 40;
         bridge.PassThrough = 0;
         return bridge;
@@ -2055,7 +2024,6 @@ public abstract class World
         AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world));
         cave1 = GetLocationByMem(baseAddr + 42);
         cave1.ExternalWorld = 0x80;
-        cave1.World = world;
         cave1.Map = 42;
         cave1.CanShuffle = true;
         return cave1;
@@ -2066,7 +2034,6 @@ public abstract class World
         AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world));
         cave2 = GetLocationByMem(baseAddr + 43);
         cave2.ExternalWorld = 0x80;
-        cave2.World = world;
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;

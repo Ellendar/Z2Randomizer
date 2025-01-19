@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using NLog;
+using System;
 using System.Diagnostics;
-using NLog;
+using RandomizerCore;
 
 namespace RandomizerCore.Overworld;
 
@@ -8,23 +9,27 @@ namespace RandomizerCore.Overworld;
 public class Location
 {
     Logger logger = LogManager.GetCurrentClassLogger();
-    private int appear2loweruponexit;
+    public int appear2loweruponexit;
     public Collectable Collectable { get; set; }
     public Collectable VanillaCollectable { get; set; }
     public bool ItemGet { get; set; }
+    public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }
     public int Xpos { get; set; }
-    public byte[] LocationBytes { get; set; }
+    //public byte[] LocationBytes { get; set; }
 
     public int MemAddress { get; set; }
 
+    //This is really stupidly implemented. It _should_ be a boolean, which then gets written to the appropriate bit on the
+    //encounter data when it's written to the ROM. Instead, this has the value 0 if the area is not a passthrough
+    //and 64 if the area is a passthrough. This shouldn't be too hard to refactor, but I am lazy right now.
+    //Also probably refactoring this should be a part of removing the LocationBytes structure alltogether, so we only
+    //actually care about the structure of the ROM when we're reading or writing
     public int PassThrough { get; set; }
 
     public int Map { get; set; }
-
-    public int World { get; set; }
 
     public (int, int) Coords
     {
@@ -40,13 +45,14 @@ public class Location
         }
     }
 
-    //TODO: Remove all of these location requirement properties, and refactor the whole thing to just use the requirements system.
-    //Probably this happens in conjunction with custom overworld.
     public bool NeedJump { get; set; }
+
     public bool NeedHammer { get; set; }
     public bool NeedBoots { get; set; }
     public bool NeedFairy { get; set; }
-    public bool NeedFlute { get; set; }
+
+    public bool NeedRecorder { get; set; }
+
     public bool NeedBagu { get; set; }
 
     //This does 2 things and should only do 1. It both tracks whether the location is a location that should be possible to shuffle,
@@ -69,13 +75,12 @@ public class Location
     public Town ActualTown { get; set; }
     public Continent Continent { get; set; }
     public Continent? VanillaContinent { get; set; }
+    public Continent? ConnectedContinent { get; set; }
     public int FallInHole { get; set; }
     public int ForceEnterRight { get; set; }
     public int Secondpartofcave { get; set; }
 
     public string Name { get; set; }
-
-    public bool AppearsOnMap { get; set; }
 
     /*
     Byte 0
@@ -105,11 +110,10 @@ public class Location
     .x.. .... - Pass through
     x... .... - Fall in hole
     */
-    public Location(byte[] bytes, Terrain t, int mem, Continent c)
+    public Location(int yPos, int xPos, int memoryAddress, int map, Continent continent)
     {
-        LocationBytes = bytes;
+        /*
         ExternalWorld = bytes[0] & 128;
-        Ypos = bytes[0] & 127;
         appear2loweruponexit = bytes[1] & 128;
         Secondpartofcave = bytes[1] & 64;
         Xpos = bytes[1] & 63;
@@ -120,19 +124,25 @@ public class Location
         ForceEnterRight = bytes[3] & 32;
         World = bytes[3] & 31;
         TerrainType = t;
-        MemAddress = mem;
+        */
+        Map = map;
+        Ypos = yPos;
+        Xpos = xPos;
+        MemAddress = memoryAddress;
         CanShuffle = true;
-        VanillaCollectable = Collectable = Collectable.DO_NOT_USE;
+        Collectable = Collectable.DO_NOT_USE;
         ItemGet = false;
         Reachable = false;
         PalaceNumber = 0;
         ActualTown = 0;
-        Continent = c;
+        Continent = continent;
+        VanillaContinent = continent;
+        ConnectedContinent = null;
 
         //Shoutouts to thetruekingofspace for datamining this
         Name = (Continent, Ypos, Xpos, Map) switch
         {
-            (Continent.WEST, 52, 23, 0) => "NORTH_CASTLE",
+            (Continent.WEST, 52, 23, 0) => "NORTH_PALACE",
             (Continent.WEST, 32, 29, 33) => "TROPHY_CAVE",
             (Continent.WEST, 42, 37, 43) => "FOREST_50P",
             (Continent.WEST, 60, 16, 45) => "MAGIC_CAVE",
@@ -142,10 +152,10 @@ public class Location
             (Continent.WEST, 57, 61, 6) => "BUBBLE_CLIFF",
             (Continent.WEST, 71, 8, 51) => "EX_LIFE_SWAMP_1",
             (Continent.WEST, 92, 48, 56) => "RED_JAR_CEM",
-            (Continent.WEST, 41, 48, 7) => "PARAPA_CAVE_N",
-            (Continent.WEST, 46, 55, 7) => "PARAPA_CAVE_S",
-            (Continent.WEST, 58, 1, 9) => "JUMP_CAVE_N",
-            (Continent.WEST, 62, 3, 11) => "JUMP_CAVE_S",
+            (Continent.WEST, 41, 48, _) => "PARAPA_CAVE_N",
+            (Continent.WEST, 46, 55, _) => "PARAPA_CAVE_S",
+            (Continent.WEST, 58, 1, _) => "JUMP_CAVE_N",
+            (Continent.WEST, 62, 3, _) => "JUMP_CAVE_S",
             (Continent.WEST, 62, 38, 12) => "PILLAR_PBAG_CAVE",
             (Continent.WEST, 69, 9, 14) => "MEDICINE_CAVE",
             (Continent.WEST, 62, 54, 16) => "HEART_CONTAINER_CAVE",
@@ -272,62 +282,29 @@ public class Location
             (Continent.MAZE, 46, 48, 50) => "MAZE_ISLAND_FORCED_BATTLE_5",
             (Continent.MAZE, 42, 50, 51) => "MAZE_ISLAND_FORCED_BATTLE_6",
 
-            //Junk locations
-            (Continent.DM, 127, 0, 41) => "UNKNOWN",
-            (Continent.EAST, 77, 61, 41) => "FAKE_RAFT",
-            (Continent.DM, 77, 61, 41) => "FAKE_RAFT",
-            (Continent.MAZE, 127, 0, 41) => "UNKNOWN",
-            (Continent.WEST, 127, 0, 41) => "UNKNOWN",
-            (Continent.WEST, 52, 7, 41) => "FAKE_RAFT",
-            (Continent.MAZE, 52, 7, 41) => "FAKE_RAFT",
-            (Continent.EAST, 67, 40, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.MAZE, 77, 61, 40) => "FAKE_RAFT",
-            (Continent.MAZE, 40, 52, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.MAZE, 77, 61, 41) => "FAKE_RAFT",
-            (Continent.WEST, 37, 7, 42) => "FAKE_DM_EXIT",
-            (Continent.WEST, 67, 40, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.EAST, 127, 0, 41) => "UNKNOWN",
-            (Continent.MAZE, 127, 0, 40) => "UNKNOWN",
-            (Continent.DM, 52, 7, 40) => "FAKE_RAFT",
-            (Continent.MAZE, 67, 40, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.DM, 82, 10, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.MAZE, 95, 10, 42) => "FAKE_DM_ENTRANCE",
-            (Continent.DM, 127, 0, 40) => "UNKNOWN",
-            (Continent.DM, 52, 7, 41) => "FAKE_RAFT",
-            (Continent.DM, 95, 10, 42) => "FAKE_DM_ENTRANCE",
-            (Continent.DM, 40, 52, 42) => "FAKE_MAZE_BRIDGE",
-            (Continent.WEST, 0, 0, 43) => "UNKNOWN",
-            (Continent.WEST, 40, 52, 43) => "FAKE_MAZE_BRIDGE",
-            (Continent.EAST, 96, 21, 43) => "FAKE_DM_ENTRANCE",
-            (Continent.WEST, 40, 52, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.EAST, 95, 10, 42) => "FAKE_DM_ENTRANCE",
-            (Continent.MAZE, 0, 0, 43) => "UNKNOWN",
-            (Continent.EAST, 37, 7, 42) => "FAKE_DM_EXIT",
-            (Continent.MAZE, 37, 23, 43) => "FAKE_DM_EXIT",
-            (Continent.DM, 40, 52, 43) => "FAKE_MAZE_BRIDGE",
-            (Continent.MAZE, 37, 7, 42) => "FAKE_DM_EXIT",
-            (Continent.DM, 0, 7, 42) => "UNKNOWN",
-            (Continent.WEST, 0, 0, 42) => "UNKNOWN",
-            (Continent.DM, 0, 0, 42) => "UNKNOWN",
-            (Continent.EAST, 37, 23, 42) => "FAKE_DM_EXIT",
-            (Continent.DM, 40, 52, 40) => "FAKE_MAZE_BRIDGE",
-            (Continent.MAZE, 0, 0, 42) => "UNKNOWN",
-            (Continent.EAST, 37, 23, 43) => "FAKE_DM_EXIT",
-            (Continent.MAZE, 96, 21, 43) => "FAKE_DM_ENTRANCE",
-            (Continent.WEST, 37, 23, 43) => "FAKE_DM_EXIT",
-            (Continent.DM, 96, 21, 43) => "FAKE_DM_ENTRANCE",
-
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
-        List<int> knownWorlds = [4, 12, 16, 10, 14, 18, 22, 17, 0, 1, 2, 3];
-        if(!knownWorlds.Contains(World))
-        {
-            logger.Trace("Unknown world");
-        }
-        if(Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
+        if (Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
         {
             logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
         }
+        if (Name.Contains("FAKE"))
+        {
+            logger.Debug("Fake location encountered");
+        }
+    }
+
+    public Location(Location clone) : this(clone.Ypos, clone.Xpos, clone.MemAddress, clone.Map, clone.Continent)
+    {
+        ExternalWorld = clone.ExternalWorld;
+        appear2loweruponexit = clone.appear2loweruponexit;
+        Secondpartofcave = clone.Secondpartofcave;
+        Xpos = clone.Xpos;
+        MapPage = clone.MapPage;
+        FallInHole = clone.FallInHole;
+        PassThrough = clone.PassThrough;
+        ForceEnterRight = clone.ForceEnterRight;
+        TerrainType = clone.TerrainType;
     }
 
     //Why does this empty constructor exist. Don't want to delete it if it's needed for serialization magic of some kind.
@@ -335,35 +312,71 @@ public class Location
     {
 
     }
-    //These bytes should not be kept synchromized on the object. They should just be written when the state pushes to the ROM
-    //at the very end.
-    public void UpdateBytes()
+
+    public byte[] GetLocationBytes()
     {
-        if (NeedHammer || NeedFlute)
+        byte[] bytes = new byte[4];
+        if (NeedHammer || NeedRecorder)
         {
-            LocationBytes[0] = 0;
+            bytes[0] = 0;
         }
         else
         {
-            LocationBytes[0] = (byte)(ExternalWorld + Ypos);
+            bytes[0] = (byte)(ExternalWorld + Ypos);
         }
-        LocationBytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
-        LocationBytes[2] = (byte)(MapPage + Map);
-        LocationBytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + World);
+        bytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
+        bytes[2] = (byte)(MapPage + Map);
+        bytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + GetWorld());
+        return bytes;
     }
 
     public string GetDebuggerDisplay()
     {
         return Continent.ToString()
             + " " + TerrainType.ToString()
-            + " " + Name + "(" + World + ")"
+            + " " + Name
             + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
             + (Collectable == Collectable.DO_NOT_USE ? "" : Collectable.ToString());
     }
 
-    public bool HasVanillaItem()
+    public int GetWorld()
     {
-        return Collectable == VanillaCollectable;
+        //Towns reference their banks
+        if (TerrainType == Terrain.TOWN || TerrainType == Terrain.GRAVE)
+        {
+            return Continent == Continent.WEST ? 4 : 10;
+        }
+        //Connectors use the world bits to indicate which continent they take you to
+        if (ConnectedContinent != null)
+        {
+            return ConnectedContinent switch
+            {
+                Continent.WEST => 0,
+                Continent.DM => 1,
+                Continent.EAST => 2,
+                Continent.MAZE => 3,
+            };
+        }
+        //Palaces... have world numbers that kind... of... make sense?
+        //This is what they are.
+        if (TerrainType == Terrain.PALACE)
+        {
+            return PalaceNumber switch
+            {
+                //North palace
+                0 => 0,
+                1 => 12,
+                2 => 12,
+                3 => 16,
+                4 => 17,
+                5 => 14,
+                6 => 18,
+                7 => 22,
+                _ => throw new Exception("Invalid palace number in Location.GetWorld()")
+            };
+        }
+        //Otherwise the world doesn't matter, so 0
+        return 0;
     }
 }

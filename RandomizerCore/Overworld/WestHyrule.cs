@@ -30,7 +30,6 @@ public sealed class WestHyrule : World
     public Location bridge1;
     public Location bridge2;
     public Location pbagCave;
-    private int bridgeCount;
     private int calderaCenterX, calderaCenterY;
 
     private const int CALDERA_DEAD_ZONE_X = 7;
@@ -100,16 +99,17 @@ public sealed class WestHyrule : World
     public WestHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
         isHorizontal = props.WestIsHorizontal;
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0x4639, 4, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x4640, 2, terrains, Continent.WEST));
-
-        locations.AddRange(rom.LoadLocations(0x462F, 10, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x463D, 3, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x4642, 12, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x464F, 1, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x465B, 2, terrains, Continent.WEST));
-        locations.AddRange(rom.LoadLocations(0x465E, 8, terrains, Continent.WEST));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0x4639, 4, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x4640, 2, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x462F, 10, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x463D, 3, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x4642, 12, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x464F, 1, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x465B, 2, terrains, Continent.WEST),
+            .. rom.LoadLocations(0x465E, 8, terrains, Continent.WEST),
+        ];
         locations.ForEach(AddLocation);
 
         northPalace = GetLocationByMap(0x80, 0x00);
@@ -166,14 +166,14 @@ public sealed class WestHyrule : World
         bridge2 = GetLocationByMap(0xC5, 0);
 
         //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
-        mirrorTable = new Location(locationAtSariaNorth.LocationBytes, locationAtSariaNorth.TerrainType, locationAtSariaNorth.MemAddress, Continent.WEST);
+        mirrorTable = new Location(locationAtSariaNorth);
         mirrorTable.Collectable = Collectable.MIRROR;
         mirrorTable.ActualTown = Town.SARIA_TABLE;
         mirrorTable.Name = "Saria Mirror Table";
         mirrorTable.CanShuffle = false;
         AddLocation(mirrorTable);
 
-        midoChurch = new Location(locationAtMido.LocationBytes, locationAtMido.TerrainType, locationAtMido.MemAddress, Continent.WEST);
+        midoChurch = new Location(locationAtMido);
         midoChurch.Collectable = Collectable.DOWNSTAB;
         midoChurch.ActualTown = Town.MIDO_CHURCH;
         midoChurch.Name = "Mido Church";
@@ -1007,7 +1007,8 @@ public sealed class WestHyrule : World
             starty += deltay;
         }
         int caveCount = RNG.Next(2) + 1;
-        Location cave1l, cave1r, cave2l = null, cave2r = null;
+        Location cave1l, cave1r;
+        Location? cave2l = null, cave2r = null;
         int availableConnectorCount = 2;
         if(useSaneCaves)
         {
@@ -1513,7 +1514,7 @@ public sealed class WestHyrule : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable

@@ -49,7 +49,7 @@ public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
             Room bird = new(roomPool.TbirdRooms.First());
             bird.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(bird);
-            palace.Tbird = bird;
+            palace.TbirdRoom = bird;
 
         }
         foreach (Room v in roomPool.NormalRooms)

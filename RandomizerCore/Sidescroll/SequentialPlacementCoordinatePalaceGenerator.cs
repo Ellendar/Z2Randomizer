@@ -7,15 +7,11 @@ using System.Threading;
 
 namespace RandomizerCore.Sidescroll;
 
-public class SequentialPlacementCoordinatePalaceGenerator(CancellationToken ct) : CoordinatePalaceGenerator(ct)
+public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
-    private static int debug = 0;
-    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-    private static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
     private const int STALL_LIMIT = 1000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
-        debug++;
         Palace palace = new(palaceNumber);
         List<(int, int)> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;

@@ -80,7 +80,7 @@ public class Util
     }
     public static void Swap(Location p1, Location p2)
     {
-        (p2.World, p1.World) = (p1.World, p2.World);
+        (p2.Continent, p1.Continent) = (p1.Continent, p2.Continent);
         (p2.Map, p1.Map) = (p1.Map, p2.Map);
         (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
 
@@ -126,7 +126,8 @@ public class Util
 
     private static string FilePathFromAssemblyLocation(string fileName)
     {
-        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
+            ?? throw new ImpossibleException("Invalid executing assembly directory");
 
         return Path.Combine(executingDirectory, fileName);
     }

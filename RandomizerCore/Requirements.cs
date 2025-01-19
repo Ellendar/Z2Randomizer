@@ -26,11 +26,11 @@ public class Requirements
         IndividualRequirements = requirements;
     }
 
-    public Requirements(RequirementType[] requirements, RequirementType[][] CompositeRequirements,
+    public Requirements(RequirementType[] requirements, RequirementType[][] compositeRequirements,
         bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
     {
         IndividualRequirements = requirements;
-        CompositeRequirements = CompositeRequirements;
+        CompositeRequirements = compositeRequirements;
     }
 
     public Requirements(string? json)

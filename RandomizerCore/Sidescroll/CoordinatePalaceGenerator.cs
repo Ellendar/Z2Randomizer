@@ -6,7 +6,7 @@ using NLog;
 
 namespace RandomizerCore.Sidescroll;
 
-public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGenerator
+public abstract class CoordinatePalaceGenerator() : PalaceGenerator
 {
 
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
@@ -47,7 +47,8 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
                         palace.ItemRoom = new(itemRoomCandidate);
                         if (itemRoomCandidate.LinkedRoomName != null)
                         {
-                            Room linkedRoom = new(roomPool.LinkedRooms[palace.ItemRoom.LinkedRoomName]);
+                            Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];
+                            Room newLinkedRoom = new();
                             palace.ItemRoom = palace.ItemRoom.Merge(linkedRoom);
                         }
                         palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);
@@ -68,7 +69,7 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
 
             foreach (Room tbirdRoomCandidate in tbirdRoomCandidates)
             {
-                if (palace.Tbird != null)
+                if (palace.TbirdRoom != null)
                 {
                     break;
                 }
@@ -82,8 +83,8 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
                     if (tbirdRoomReplacementRoom != null &&
                         (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == tbirdRoomCandidate.IsDropZone))
                     {
-                        palace.Tbird = new(tbirdRoomCandidate);
-                        palace.ReplaceRoom(tbirdRoomReplacementRoom, palace.Tbird);
+                        palace.TbirdRoom = new(tbirdRoomCandidate);
+                        palace.ReplaceRoom(tbirdRoomReplacementRoom, palace.TbirdRoom);
                         break;
                     }
                 }
@@ -134,7 +135,7 @@ public abstract class CoordinatePalaceGenerator(CancellationToken ct) : PalaceGe
 
         if (palace.BossRoom == null
             || palace.Entrance == null
-            || (palace.Number == 7 && palace.Tbird == null)
+            || (palace.Number == 7 && palace.TbirdRoom == null)
             || (palace.Number < 7 && palace.ItemRoom == null))
         {
             logger.Debug("Failed to place critical room in palace");

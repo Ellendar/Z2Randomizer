@@ -1100,7 +1100,7 @@ sealed class DeathMountain : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable

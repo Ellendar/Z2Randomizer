@@ -1112,30 +1112,50 @@ Exit:
         List<Location> locations = new List<Location>();
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = [ 
-                GetByte(startAddr + i), 
-                GetByte(startAddr + RomMap.overworldXOffset + i), 
-                GetByte(startAddr + RomMap.overworldMapOffset + i), 
-                GetByte(startAddr + RomMap.overworldWorldOffset + i) ];
-            Location location = new(bytes, Terrains[startAddr + i], startAddr + i, continent);
-            location.AppearsOnMap = true;
-            location.VanillaContinent = continent;
+            byte[] bytes = [
+                GetByte(startAddr + i),
+                GetByte(startAddr + RomMap.overworldXOffset + i),
+                GetByte(startAddr + RomMap.overworldMapOffset + i),
+                GetByte(startAddr + RomMap.overworldWorldOffset + i)
+            ];
+            Location location = new Location(bytes[0] & 127, bytes[1] & 63, startAddr + i, bytes[2] & 63, continent)
+            {
+                ExternalWorld = bytes[0] & 128,
+                appear2loweruponexit = bytes[1] & 128,
+                Secondpartofcave = bytes[1] & 64,
+                MapPage = bytes[2] & 192,
+                FallInHole = bytes[3] & 128,
+                PassThrough = bytes[3] & 64,
+                ForceEnterRight = bytes[3] & 32,
+                TerrainType = Terrains[startAddr + i],
+                AppearsOnMap = true
+            };
             locations.Add(location);
         }
         return locations;
     }
 
+    //Why does this and LoadLocations not share any code. Eliminate one of them.
     public Location LoadLocation(int addr, Terrain t, Continent c)
     {
-        byte[] bytes = [ 
-            GetByte(addr), 
-            GetByte(addr + RomMap.overworldXOffset), 
-            GetByte(addr + RomMap.overworldMapOffset), 
-            GetByte(addr + RomMap.overworldWorldOffset) ];
-        Location location = new(bytes, t, addr, c);
-        location.AppearsOnMap = true;
-        location.VanillaContinent = c;
-        return location;
+        byte[] bytes = [
+            GetByte(addr),
+            GetByte(addr + RomMap.overworldXOffset),
+            GetByte(addr + RomMap.overworldMapOffset),
+            GetByte(addr + RomMap.overworldWorldOffset)
+        ];
+        return new Location(bytes[0] & 127, bytes[1] & 63, addr, bytes[2] & 63, c)
+        {
+            ExternalWorld = bytes[0] & 128,
+            appear2loweruponexit = bytes[1] & 128,
+            Secondpartofcave = bytes[1] & 64,
+            MapPage = bytes[2] & 192,
+            FallInHole = bytes[3] & 128,
+            PassThrough = bytes[3] & 64,
+            ForceEnterRight = bytes[3] & 32,
+            TerrainType = t,
+            AppearsOnMap = true
+        };
     }
 
     public void RemoveUnusedConnectors(World world)
@@ -1177,11 +1197,11 @@ Exit:
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
-        hiddenPalaceLocation.NeedFlute = true;
+        hiddenPalaceLocation.NeedRecorder = true;
         if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
         {
-            townAtNewKasuto.NeedFlute = true;
-            spellTower.NeedFlute = true;
+            townAtNewKasuto.NeedRecorder = true;
+            spellTower.NeedRecorder = true;
         }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {

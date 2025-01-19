@@ -23,7 +23,7 @@ public class ClimateFlagSerializer : IFlagSerializer
         return 5;
     }
 
-    public int Serialize(Object climate)
+    public int Serialize(object? climate)
     {
         if(climate == null)
         {

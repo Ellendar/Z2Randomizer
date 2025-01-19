@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Avalonia.Controls.Primitives;
 using DynamicData;
 using McMaster.Extensions.CommandLineUtils;
 using RandomizerCore;
@@ -73,10 +75,41 @@ public class Utils
         byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(Regex.Replace(roomsJson, @"[\n\r\f]", "")));
         Debug.WriteLine(Convert.ToBase64String(hash));
     }
+    [TestMethod]
+    public void GameText()
+    {
+        List<char> text = Util.ToGameText("saved", false);
+        byte[] bytes = new byte[text.Count];
+        for(int i = 0; i < bytes.Length; i++) 
+        {
+            bytes[i] = (byte)text[i];
+        }
+        Debug.WriteLine(Util.ByteArrayToHexString(bytes));
+        text = Util.ToGameText("hyrule", false);
+        bytes = new byte[text.Count];
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            bytes[i] = (byte)text[i];
+        }
+        Debug.WriteLine(Util.ByteArrayToHexString(bytes));
+
+        byte[] fromRom = [0x60, 0xF2, 0xE8, 0xEE, 0x00, 0xEC, 0xDA, 0xEF, 0xDE, 0xDD, 0x00, 0xE1, 0xF2, 0xEB, 0xEE, 0xE5];
+        char[] chars = new char[text.Count];
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            chars[i] = (char)text[i];
+        }
+        Debug.WriteLine(Util.FromGameText(chars));
+    }
 
     [TestMethod]
     public void GenerateRoomStats()
     {
+        //Drop zone room shapes that also have up elevators aren't as needed because the
+        //random walk generator can't generate them
+        bool ignoreDropZonesWithUps = true;
+        //for making reports on what's still needed
+        int displayThreshold = 0;
         //For each of GP / Not GP
         //Pull all the rooms
         //Categorize the rooms by their shape
@@ -119,8 +152,9 @@ public class Utils
         {
             counts.Add((key, categorizedRooms[key].Count));
         }
+        missingExitTypes.ForEach(i => counts.Add((i, 0)));
+        counts = counts.Where(i => i.Item2 <= displayThreshold).ToList();
         counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
-        missingExitTypes.ForEach(i => Debug.WriteLine(i + " : 0"));
 
         //Normal, DROP
         Debug.WriteLine("\nNormal, DropZone");
@@ -141,8 +175,9 @@ public class Utils
         {
             counts.Add((key, categorizedRooms[key].Count));
         }
+        missingExitTypes.ForEach(i => counts.Add((i, 0)));
+        counts = counts.Where(i => i.Item2 <= displayThreshold && (!ignoreDropZonesWithUps || !i.Item1.ContainsUp())).ToList();
         counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
-        missingExitTypes.ForEach(i => Debug.WriteLine(i + " : 0"));
 
         //GP, NON-DROP
         Debug.WriteLine("\nGP, Non-DropZone");
@@ -163,8 +198,9 @@ public class Utils
         {
             counts.Add((key, categorizedRooms[key].Count));
         }
+        missingExitTypes.ForEach(i => counts.Add((i, 0)));
+        counts = counts.Where(i => i.Item2 <= displayThreshold).ToList();
         counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
-        missingExitTypes.ForEach(i => Debug.WriteLine(i + " : 0"));
 
         //GP, DROP
         Debug.WriteLine("\nGP, DropZone");
@@ -185,7 +221,8 @@ public class Utils
         {
             counts.Add((key, categorizedRooms[key].Count));
         }
+        missingExitTypes.ForEach(i => counts.Add((i, 0)));
+        counts = counts.Where(i => i.Item2 <= displayThreshold && (!ignoreDropZonesWithUps || !i.Item1.ContainsUp())).ToList();
         counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
-        missingExitTypes.ForEach(i => Debug.WriteLine(i + " : 0"));
     }
 }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -12,12 +10,12 @@ public class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private const bool DROPS_ARE_BLOCKERS = false;
+    //private const bool DROPS_ARE_BLOCKERS = false;
     private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
-    private Room entrance;
-    private Room itemRoom;
-    private Room bossRoom;
-    private Room tbirdRoom;
+    private Room? entrance;
+    private Room? itemRoom;
+    private Room? bossRoom;
+    private Room? tbirdRoom;
     private readonly SortedDictionary<int, List<Room>> rooms;
     internal bool IsValid { get; set; } = false;
 
@@ -32,18 +30,13 @@ public class Palace
         Collectable.ONEUP
     ];
 
-    //private int numRooms;
-    private List<Room> openRooms;
-    //private int maxRooms;
-    private int netDeadEnds;
-
     internal List<Room> AllRooms { get; private set; }
 
     public Room Entrance { get => entrance; set => entrance = value; }
     public Room ItemRoom { get => itemRoom; set => itemRoom = value; }
     public Room BossRoom { get => bossRoom; set => bossRoom = value; }
     public int Number { get; set; }
-    internal Room Tbird { get => tbirdRoom; set => tbirdRoom = value; }
+    internal Room TbirdRoom { get => tbirdRoom; set => tbirdRoom = value; }
     
     //DEBUG
     public int Generations { get; set; }
@@ -52,121 +45,10 @@ public class Palace
     {
         Number = number;
         entrance = null;
-        rooms = new SortedDictionary<int, List<Room>>();
-        AllRooms = new List<Room>();
-        openRooms = new List<Room>();
-        if (Number < 7)
-        {
-            netDeadEnds = 3;
-        }
-        else
-        {
-            netDeadEnds = 2;
-        }
+        rooms = [];
+        AllRooms = [];
     }
 
-    public int GetOpenRooms()
-    {
-        return openRooms.Count;
-    }
-
-    public bool AddRoom(Room r, bool blockersAnywhere)
-    {
-        bool placed;
-        r.PalaceGroup = GetPalaceGroup();
-
-        if (netDeadEnds > 3 && r.IsDeadEnd)
-        {
-            return false;
-        }
-
-        if (netDeadEnds < -3 && r.CountOpenExits() > 2)
-        {
-            return false;
-        }
-
-        if(!blockersAnywhere)
-        {
-            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[Number-1];
-            if(!r.IsTraversable(allowedBlockers))
-            {
-                return false;
-            }
-            if ((Number == 1 || Number == 2 || Number == 5 || Number == 7) && r.HasBoss)
-            {
-                return false;
-            }
-        }
-
-        if (openRooms.Count == 0)
-        {
-            openRooms.Add(r);
-            ProcessRoom(r);
-            return true;
-        }
-        //#13: Iterate over a copy of the open rooms list to prevent concurrent modification if AttachToOpen both removes an entry from openRooms and returns false
-        foreach (Room open in openRooms.ToList())
-        {
-            placed = AttachToOpen(r, open);
-
-            if (placed)
-            {
-                ProcessRoom(r);
-                return true;
-            }
-
-        }
-        return false;
-    }
-
-    private void ProcessRoom(Room r)
-    {
-        if (r.IsDeadEnd)
-        {
-            netDeadEnds++;
-        }
-        else if (r.CountOpenExits() > 1)
-        {
-            netDeadEnds--;
-        }
-        AllRooms.Add(r);
-        //SortRoom(r);
-        //numRooms++;
-
-        if (Number != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
-        {
-            foreach (Room open2 in openRooms)
-            {
-                bool item = AttachToOpen(open2, itemRoom);
-                if (item)
-                {
-                    break;
-                }
-            }
-        }
-        if (openRooms.Count > 1 && bossRoom.CountOpenExits() > 0)
-        {
-            foreach (Room open2 in openRooms)
-            {
-                bool boss = AttachToOpen(open2, bossRoom);
-                if (boss)
-                {
-                    break;
-                }
-            }
-        }
-        if (Number == 7 && openRooms.Count > 1 && Tbird != null && Tbird.CountOpenExits() > 1)
-        {
-            foreach (Room open2 in openRooms)
-            {
-                bool boss = AttachToOpen(open2, tbirdRoom);
-                if (boss)
-                {
-                    break;
-                }
-            }
-        }
-    }
     public void UpdateSideviewItem(Collectable collectable)
     {
         if(Number == 7)
@@ -193,112 +75,7 @@ public class Palace
 
     public void UpdateRomItem(Collectable collectable, ROM ROMData)
     {
-        //XXX: HERE
         itemRoom.UpdateRomItem(collectable, ROMData);
-    }
-
-    public void Consolidate()
-    {
-        Room[] openCopy = new Room[openRooms.Count];
-        openRooms.CopyTo(openCopy);
-        foreach (Room r2 in openCopy)
-        {
-            foreach (Room r3 in openCopy)
-            {
-                if (r2 != r3 && openRooms.Contains(r2) && openRooms.Contains(r3))
-                {
-                    AttachToOpen(r2, r3);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Attach the provided room to the open room if there is a compatable pair of exits between the two rooms.
-    /// Rooms attempt to use the exits in the following order (from the perspective of open):  
-    /// </summary>
-    /// <param name="r"></param> The room to be attached
-    /// <param name="open"></param> The room onto which R is attached
-    /// <returns>Whether or not the room was actually able to be attached.</returns>
-    private bool AttachToOpen(Room r, Room open)
-    {
-        bool placed = false;
-        //Right from open into r
-        if (!placed && open.HasRightExit && open.Right == null && r.HasLeftExit && r.Left == null)
-        {
-            open.Right = r;
-            r.Left = open;
-
-            placed = true;
-        }
-        //Left open into r
-        if (!placed && open.HasLeftExit && open.Left == null && r.HasRightExit && r.Right == null)
-        {
-            open.Left = r;
-
-            r.Right = open;
-
-            placed = true;
-        }
-        //Elevator Up from open
-        if (!placed && open.HasUpExit && open.Up == null && r.HasDownExit && r.Down == null && !r.HasDrop)
-        {
-            open.Up = r;
-            r.Down = open;
-
-            placed = true;
-        }
-        //Down Elevator from open
-        if (!placed && open.HasDownExit && !open.HasDrop && open.Down == null && r.HasUpExit && r.Up == null)
-        {
-            open.Down = r;
-            r.Up = open;
-
-            placed = true;
-        }
-        //Drop from open into r
-        if (!placed && open.HasDownExit && open.HasDrop && open.Down == null && r.IsDropZone)
-        {
-
-            open.Down = r;
-            r.IsDropZone = false;
-            placed = true;
-        }
-        //Drop from r into open 
-        if (!placed && open.IsDropZone && r.HasDrop && r.Down == null && r.HasDownExit)
-        {
-
-            r.Down = open;
-
-            open.IsDropZone = false;
-            placed = true;
-        }
-        //If the room doesn't have any open exits anymore, remove it from the list
-        //#13: If the room doesn't have any open exits, how did it get into the 
-        if (open.CountOpenExits() == 0)
-        {
-            openRooms.Remove(open);
-        }
-        //Otherwise, if the open room isn't in the open rooms list (What? How?) and the pending openings hasn't been met,
-        //put the open room in openRooms where it belongs, and then for some reason mark that we successfully placed the room even though we didn't.
-        else if (!openRooms.Contains(open) && (openRooms.Count < 3 || placed))
-        {
-            openRooms.Add(open);
-            placed = true;
-        }
-        //If the room itself is already in the open rooms list (How?), but we filled the last exit, remove it from the open rooms list.
-        if (r.CountOpenExits() == 0)
-        {
-            openRooms.Remove(r);
-        }
-        //Otherwise, if the room being added still has unmatched openings, and the maximum pending openings hasn't been met, add this room to the open rooms list
-        else if (!openRooms.Contains(r) && (openRooms.Count < 3 || placed))
-        {
-            openRooms.Add(r);
-            placed = true;
-        }
-
-        return placed;
     }
 
     public bool RequiresThunderbird()
@@ -533,7 +310,7 @@ public class Palace
         {
             int swap = r.Next(i, roomsWithDropExits.Count);
 
-            Room temp = roomsWithDropExits[i].Down;
+            Room temp = roomsWithDropExits[i].Down!;
 
             roomsWithDropExits[i].Down = roomsWithDropExits[swap].Down;
             roomsWithDropExits[swap].Down = temp;
@@ -586,11 +363,6 @@ public class Palace
                 throw new Exception("Invalid room connections while shuffling");
             }
         }
-    }
-
-    public void SetOpenRoom(Room r)
-    {
-        openRooms.Add(r);
     }
 
     public void WriteConnections(ROM ROMData)
@@ -787,13 +559,13 @@ public class Palace
         }
         if (removeTbird)
         {
-            Tbird.Left.Connections[3] = Tbird.Connections[3];
-            Tbird.Right.Connections[0] = Tbird.Connections[0];
-            Tbird.Left.Right = Tbird.Right;
-            Tbird.Right.Left = Tbird.Left;
+            TbirdRoom.Left.Connections[3] = TbirdRoom.Connections[3];
+            TbirdRoom.Right.Connections[0] = TbirdRoom.Connections[0];
+            TbirdRoom.Left.Right = TbirdRoom.Right;
+            TbirdRoom.Right.Left = TbirdRoom.Left;
             //leftExits.Remove(Tbird);
             //rightExits.Remove(Tbird);
-            AllRooms.Remove(Tbird);
+            AllRooms.Remove(TbirdRoom);
         }
     }
 
@@ -1130,7 +902,7 @@ public class Palace
             room.RandomizeEnemies(props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             if (props.NoDuplicateRooms)
             {
-                Room duplicateRoom = null;
+                Room? duplicateRoom = null;
                 while(duplicateRoom == null && count++ < ENEMY_SHUFFLE_LIMIT)
                 {
                     duplicateRoom = AllRooms.FirstOrDefault(i =>
