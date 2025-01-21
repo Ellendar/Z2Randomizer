@@ -77,7 +77,7 @@ public sealed class EastHyrule : World
     public Location locationAtGP;
     public Location pbagCave1;
     public Location pbagCave2;
-    public Location hiddenPalaceCallSpot;
+    public (int, int) hiddenPalaceCoords;
     private bool canyonShort;
     //I'm not sure precisely what these are supposed to track, but they're never initialized so apparently nothing
     //private Location vodcave1;
@@ -122,7 +122,7 @@ public sealed class EastHyrule : World
 
         locationAtPalace6 = GetLocationByMem(0x8664);
         locationAtPalace6.PalaceNumber = 6;
-        locationAtPalace5 = GetLocationByMap(0x23, 0x0E) ?? GetLocationByMem(0x8657);
+        locationAtPalace5 = GetLocationByMap(0x23, false);
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNabooru = GetLocationByMem(0x865C);
@@ -144,9 +144,7 @@ public sealed class EastHyrule : World
             locationAtPalace5.PalaceNumber = 5;
         }
 
-        hiddenPalaceCallSpot = new Location();
-        hiddenPalaceCallSpot.Xpos = 0;
-        hiddenPalaceCallSpot.Ypos = 0;
+        hiddenPalaceCoords = (0, 0);
 
         enemyAddr = 0x88B0;
         enemies = [03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
@@ -305,7 +303,7 @@ public sealed class EastHyrule : World
                 //areasByLocation.Add("horn", new List<Location>());
                 foreach (Location location in AllLocations)
                 {
-                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords));
+                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords)!);
                 }
 
                 ChooseConn("kasuto", connections, true);
@@ -337,8 +335,14 @@ public sealed class EastHyrule : World
                 {
                     location.PassThrough = 0;
                 }
-                raft.PassThrough = 0;
-                bridge.PassThrough = 0;
+                if(raft != null)
+                {
+                    raft.PassThrough = 0;
+                }
+                if (bridge != null)
+                {
+                    bridge.PassThrough = 0;
+                }
                 //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
                 desertTile.PassThrough = 0;
                 debug++;
@@ -769,7 +773,7 @@ public sealed class EastHyrule : World
         }
         if (props.HiddenPalace)
         {
-            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCallSpot, hiddenPalaceLocation,
+            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
                 townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
         }
         if (props.HiddenKasuto)
@@ -1553,8 +1557,7 @@ public sealed class EastHyrule : World
         //map[hpLoc.Ypos - 30, hpLoc.Xpos] = map[hpLoc.Ypos - 29, hpLoc.Xpos];
         hiddenPalaceLocation.Xpos = xpos;
         hiddenPalaceLocation.Ypos = ypos + 2 + 30;
-        hiddenPalaceCallSpot.Xpos = xpos;
-        hiddenPalaceCallSpot.Ypos = ypos + 30;
+        hiddenPalaceCoords = (ypos + 30, xpos);
         //This is the only thing requiring a reference to the rom here and I have no idea what the fuck it is doing.
         rom.Put(0x1df70, (byte)t);
         hiddenPalaceLocation.CanShuffle = false;

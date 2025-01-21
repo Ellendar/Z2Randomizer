@@ -20,9 +20,12 @@ namespace CrossPlatformUI.ViewModels;
 
 public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
-    
+
+#pragma warning disable CS8618
+
     [JsonConstructor]
     public GenerateRomViewModel() {}
+#pragma warning restore CS8618 
     public GenerateRomViewModel(MainViewModel main)
     {
         Main = main;
@@ -116,6 +119,7 @@ Seed: {config.Seed}
         set => this.RaiseAndSetIfChanged(ref progress, value);
     }
     
+
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
     [JsonIgnore]

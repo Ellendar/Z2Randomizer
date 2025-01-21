@@ -165,7 +165,8 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                                 if (possibleDropZones.Count == 0)
                                 {
                                     logger.Debug("Exhausted all available drop zones");
-                                    return null;
+                                    palace.IsValid = false;
+                                    return palace;
                                 }
                                 Room dropZoneRoom = new(possibleDropZones[r.Next(0, possibleDropZones.Count)]);
                                 bool added2 = AddRoom(palace, dropZoneRoom, props.BlockersAnywhere);

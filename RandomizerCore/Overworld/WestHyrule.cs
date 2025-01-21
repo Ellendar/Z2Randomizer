@@ -112,38 +112,38 @@ public sealed class WestHyrule : World
         ];
         locations.ForEach(AddLocation);
 
-        northPalace = GetLocationByMap(0x80, 0x00);
+        northPalace = GetLocationByMap(0x80, false);
         //reachableAreas = new HashSet<string>();
-        Location jumpCave = GetLocationByMap(9, 0);
+        Location jumpCave = GetLocationByMap(9, false);
         jumpCave.NeedJump = true;
-        medicineCave = GetLocationByMap(0x0E, 0);
-        Location heartCave = GetLocationByMap(0x10, 0);
-        Location fairyCave = GetLocationByMap(0x12, 0);
+        medicineCave = GetLocationByMap(0x0E, false);
+        Location heartCave = GetLocationByMap(0x10, false);
+        Location fairyCave = GetLocationByMap(0x12, false);
         fairyCave.NeedFairy = true;
-        bagu = GetLocationByMap(0x18, 4);
+        bagu = GetLocationByMap(0x18, true);
         bagu.ActualTown = Town.BAGU;
         bagu.Collectable = Collectable.BAGUS_NOTE;
 
         locationAtRauru = GetLocationByMem(0x465C);
-        locationAtRauru.Name = "Rauru";
+        //locationAtRauru.Name = "Rauru";
         locationAtRauru.Collectable = Collectable.SHIELD_SPELL;
-        locationAtRuto = GetLocationByMap(0xC5, 4);
-        locationAtRuto.Name = "Ruto";
+        locationAtRuto = GetLocationByMap(0xC5, true);
+        //locationAtRuto.Name = "Ruto";
         locationAtRuto.Collectable = Collectable.JUMP_SPELL;
-        locationAtSariaNorth = GetLocationByMap(0xC8, 4);
-        locationAtSariaSouth = GetLocationByMap(0x06, 4);
+        locationAtSariaNorth = GetLocationByMap(0xC8, true);
+        locationAtSariaSouth = GetLocationByMap(0x06, true);
         locationAtSariaNorth.NeedBagu = true;
-        locationAtSariaNorth.Name = "Saria North";
+        //locationAtSariaNorth.Name = "Saria North";
         locationAtSariaSouth.NeedBagu = true;
-        locationAtSariaSouth.Name = "Saria South";
+        //locationAtSariaSouth.Name = "Saria South";
         locationAtSariaNorth.Collectable = Collectable.FAIRY_SPELL;
-        locationAtMido = GetLocationByMap(0xCB, 4);
-        locationAtMido.Name = "Mido";
+        locationAtMido = GetLocationByMap(0xCB, true);
+        //locationAtMido.Name = "Mido";
         locationAtMido.Collectable = Collectable.LIFE_SPELL;
 
 
-        trophyCave = GetLocationByMap(0xE1, 0);
-        raft = GetLocationByMem(0x4658);
+        trophyCave = GetLocationByMap(0xE1, false);
+        //raft = GetLocationByMem(0x4658);
 
         locationAtPalace1 = GetLocationByMem(0x4663);
         locationAtPalace1.PalaceNumber = 1;
@@ -158,12 +158,12 @@ public sealed class WestHyrule : World
         pbagCave = GetLocationByMem(0x463D);
 
 
-        Location parapaCave1 = GetLocationByMap(07, 0);
-        Location parapaCave2 = GetLocationByMap(0xC7, 0);
-        Location jumpCave2 = GetLocationByMap(0xCB, 0);
-        Location fairyCave2 = GetLocationByMap(0xD3, 0);
-        bridge1 = GetLocationByMap(0x04, 0);
-        bridge2 = GetLocationByMap(0xC5, 0);
+        Location parapaCave1 = GetLocationByMap(07, false);
+        Location parapaCave2 = GetLocationByMap(0xC7, false);
+        Location jumpCave2 = GetLocationByMap(0xCB, false);
+        Location fairyCave2 = GetLocationByMap(0xD3, false);
+        bridge1 = GetLocationByMap(0x04, false);
+        bridge2 = GetLocationByMap(0xC5, false);
 
         //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
         mirrorTable = new Location(locationAtSariaNorth);
@@ -309,7 +309,13 @@ public sealed class WestHyrule : World
             { (0x40, 0x0B), "mid" },
             { (0x62, 0x39), "island" }
         };
-        lostWoods = new List<Location> { GetLocationByMem(0x4649), GetLocationByMem(0x464A), GetLocationByMem(0x464B), GetLocationByMem(0x464C), GetLocationByMem(0x4635) };
+        lostWoods = [
+            GetLocationByMem(0x4649), 
+            GetLocationByMem(0x464A), 
+            GetLocationByMem(0x464B), 
+            GetLocationByMem(0x464C), 
+            GetLocationByMem(0x4635)
+        ];
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
@@ -340,7 +346,7 @@ public sealed class WestHyrule : World
                 };
                 foreach (Location location in AllLocations)
                 {
-                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords));
+                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords)!);
                 }
                 ChooseConn("parapa", connections, true);
                 ChooseConn("lifesouth", connections, true);
@@ -367,10 +373,13 @@ public sealed class WestHyrule : World
                 {
                     location.PassThrough = 0;
                 }
-                raft.PassThrough = 0;
+                if(raft != null)
+                {
+                    raft.PassThrough = 0;
+                }
                 bridge1.PassThrough = 0;
                 bridge2.PassThrough = 0;
-                GetLocationByMap(0x12, 0).PassThrough = 0; //fairy cave
+                GetLocationByMap(0x12, false).PassThrough = 0; //fairy cave
 
             }
         }
@@ -1017,18 +1026,18 @@ public sealed class WestHyrule : World
         int cavenum1 = RNG.Next(availableConnectorCount);
         if(cavenum1 == 0)
         {
-            cave1l = GetLocationByMap(9, 0);//jump cave
-            cave1r = GetLocationByMap(0xCB, 0);
+            cave1l = GetLocationByMap(9, false);//jump cave
+            cave1r = GetLocationByMap(0xCB, false);
         }
         else if (cavenum1 == 1)
         {
-            cave1l = GetLocationByMap(07, 0); //parapa
-            cave1r = GetLocationByMap(0xC7, 0);
+            cave1l = GetLocationByMap(07, false); //parapa
+            cave1r = GetLocationByMap(0xC7, false);
         }
         else
         {
-            cave1l = GetLocationByMap(0x12, 0); //fairy cave
-            cave1r = GetLocationByMap(0xD3, 0);
+            cave1l = GetLocationByMap(0x12, false); //fairy cave
+            cave1r = GetLocationByMap(0xD3, false);
         }
         map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
@@ -1041,23 +1050,26 @@ public sealed class WestHyrule : World
             }
             if (cavenum2 == 0)
             {
-                cave2l = GetLocationByMap(9, 0);//jump cave
-                cave2r = GetLocationByMap(0xCB, 0);
+                cave2l = GetLocationByMap(9, false);//jump cave
+                cave2r = GetLocationByMap(0xCB, false);
             }
             else if (cavenum2 == 1)
             {
-                cave2l = GetLocationByMap(07, 0); //parapa
-                cave2r = GetLocationByMap(0xC7, 0);
+                cave2l = GetLocationByMap(07, false); //parapa
+                cave2r = GetLocationByMap(0xC7, false);
             }
             else
             {
-                cave2l = GetLocationByMap(0x12, 0); //fairy cave
-                cave2r = GetLocationByMap(0xD3, 0);
+                cave2l = GetLocationByMap(0x12, false); //fairy cave
+                cave2r = GetLocationByMap(0xD3, false);
             }
             map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
         }
-        //
+        if (cave2l == null || cave2r == null)
+        {
+            throw new Exception("Failed to find connection caves while constructing caldera");
+        }
         int caveOrientation = RNG.Next(2);
         if (isHorizontal)
         {

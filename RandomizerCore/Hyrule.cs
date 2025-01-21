@@ -101,7 +101,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 130;
+    private static int DEBUG_THRESHOLD = 1;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -129,7 +129,7 @@ public class Hyrule
     public int debug = 0;
     public int totalReachableCheck = 0;
 
-
+    /*
     private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
     {
         {1, 0x1072B},
@@ -151,6 +151,7 @@ public class Hyrule
         {6, 0x8664 },
         {7, 0x8665 }
     };
+    */
 
     public ROM ROMData { get; set; }
     public Random RNG { get; set; }
@@ -174,7 +175,12 @@ public class Hyrule
     
     public string Hash { get; private set; }
 
+    //This entire class structure is hot fucking garbage, but refactoring it such that it makes sense is
+    //going to be a massive project, so for now we're just ignoring the fact that basically every property
+    //is not guaranteed to initialize to the analyzer
+#pragma warning disable CS8618 
     public Hyrule(IAsmEngine engine, PalaceRooms rooms)
+#pragma warning restore CS8618 
     {
         this.engine = engine;
         palaceRooms = rooms;
@@ -421,14 +427,14 @@ public class Hyrule
 
             Dictionary<Town, Collectable> spellMap = new()
             {
-                { westHyrule.locationAtRauru.ActualTown, westHyrule.locationAtRauru.Collectable },
-                { westHyrule.locationAtMido.ActualTown, westHyrule.locationAtMido.Collectable },
-                { westHyrule.locationAtSariaNorth.ActualTown, westHyrule.locationAtSariaNorth.Collectable },
-                { westHyrule.locationAtRuto.ActualTown, westHyrule.locationAtRuto.Collectable },
-                { eastHyrule.townAtNabooru.ActualTown, eastHyrule.townAtNabooru.Collectable },
-                { eastHyrule.townAtDarunia.ActualTown, eastHyrule.townAtDarunia.Collectable },
-                { eastHyrule.townAtNewKasuto.ActualTown, eastHyrule.townAtNewKasuto.Collectable },
-                { eastHyrule.townAtOldKasuto.ActualTown, eastHyrule.townAtOldKasuto.Collectable },
+                { (Town)westHyrule.locationAtRauru.ActualTown!, westHyrule.locationAtRauru.Collectable },
+                { (Town)westHyrule.locationAtMido.ActualTown!, westHyrule.locationAtMido.Collectable },
+                { (Town)westHyrule.locationAtSariaNorth.ActualTown!, westHyrule.locationAtSariaNorth.Collectable },
+                { (Town)westHyrule.locationAtRuto.ActualTown!, westHyrule.locationAtRuto.Collectable },
+                { (Town)eastHyrule.townAtNabooru.ActualTown!, eastHyrule.townAtNabooru.Collectable },
+                { (Town)eastHyrule.townAtDarunia.ActualTown!, eastHyrule.townAtDarunia.Collectable },
+                { (Town)eastHyrule.townAtNewKasuto.ActualTown!, eastHyrule.townAtNewKasuto.Collectable },
+                { (Town)eastHyrule.townAtOldKasuto.ActualTown!, eastHyrule.townAtOldKasuto.Collectable },
             };
             f = await UpdateProgress(progress, ct, 9);
             if (!f)
@@ -931,7 +937,6 @@ public class Hyrule
         int eh = 0;
         int count = 1;
         int prevCount = 0;
-        int loopCount = 0;
         debug++;
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count 
@@ -1130,9 +1135,9 @@ public class Hyrule
             bool hadItemPreviously = location.ItemGet;
             bool hasItemNow;
             //Location is a palace
-            if (location.PalaceNumber > 0 && location.PalaceNumber < 7)
+            if (location.PalaceNumber != null && location.PalaceNumber < 7)
             {
-                Palace palace = palaces[location.PalaceNumber - 1];
+                Palace palace = palaces[(int)location.PalaceNumber - 1];
                 hasItemNow = CanGet(location)
                     //All palaces inherently required fairy spell or magic key
                     && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
@@ -1148,9 +1153,9 @@ public class Hyrule
                 hasItemNow = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
             }
             //Location is a town
-            else if(location.ActualTown != 0)
+            else if(location.ActualTown != null)
             {
-                hasItemNow = CanGet(location) && Towns.townSpellAndItemRequirements[location.ActualTown].AreSatisfiedBy(requireables);
+                hasItemNow = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown].AreSatisfiedBy(requireables);
             }
             else
             {
@@ -2796,13 +2801,13 @@ public class Hyrule
 
         ROMData.AddCredits();
 
-        ROMData.Put(0x1CD3A, (byte)palGraphics[westHyrule.locationAtPalace1.PalaceNumber]);
-        ROMData.Put(0x1CD3B, (byte)palGraphics[westHyrule.locationAtPalace2.PalaceNumber]);
-        ROMData.Put(0x1CD3C, (byte)palGraphics[westHyrule.locationAtPalace3.PalaceNumber]);
-        ROMData.Put(0x1CD46, (byte)palGraphics[mazeIsland.locationAtPalace4.PalaceNumber]);
-        ROMData.Put(0x1CD42, (byte)palGraphics[eastHyrule.locationAtPalace5.PalaceNumber]);
-        ROMData.Put(0x1CD43, (byte)palGraphics[eastHyrule.locationAtPalace6.PalaceNumber]);
-        ROMData.Put(0x1CD44, (byte)palGraphics[eastHyrule.locationAtGP.PalaceNumber]);
+        ROMData.Put(0x1CD3A, (byte)palGraphics[(int)westHyrule.locationAtPalace1.PalaceNumber!]);
+        ROMData.Put(0x1CD3B, (byte)palGraphics[(int)westHyrule.locationAtPalace2.PalaceNumber!]);
+        ROMData.Put(0x1CD3C, (byte)palGraphics[(int)westHyrule.locationAtPalace3.PalaceNumber!]);
+        ROMData.Put(0x1CD46, (byte)palGraphics[(int)mazeIsland.locationAtPalace4.PalaceNumber!]);
+        ROMData.Put(0x1CD42, (byte)palGraphics[(int)eastHyrule.locationAtPalace5.PalaceNumber!]);
+        ROMData.Put(0x1CD43, (byte)palGraphics[(int)eastHyrule.locationAtPalace6.PalaceNumber!]);
+        ROMData.Put(0x1CD44, (byte)palGraphics[(int)eastHyrule.locationAtGP.PalaceNumber!]);
 
         if (props.ShuffleDripper)
         {
@@ -2911,42 +2916,42 @@ public class Hyrule
         ROMData.ElevatorBossFix(props.BossItem);
         if (westHyrule.locationAtPalace1.PalaceNumber != 7)
         {
-            palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace1.Collectable, ROMData);
+            palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace1.Collectable, ROMData);
         }
         if (westHyrule.locationAtPalace2.PalaceNumber != 7)
         {
-            palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace2.Collectable, ROMData);
+            palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace2.Collectable, ROMData);
         }
         if (westHyrule.locationAtPalace3.PalaceNumber != 7)
         {
-            palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace3.Collectable, ROMData);
+            palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace3.Collectable, ROMData);
         }
         if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
         {
-            palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace5.Collectable, ROMData);
+            palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace5.Collectable, ROMData);
         }
         if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
         {
-            palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace6.Collectable, ROMData);
+            palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace6.Collectable, ROMData);
         }
         if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
         {
-            palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
+            palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
         }
 
-        Room root = palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance;
+        Room root = palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance;
         ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, root.Map);
-        root = palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance;
+        root = palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance;
         ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, root.Map);
-        root = palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance;
+        root = palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance;
         ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, root.Map);
-        root = palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance;
         ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, root.Map);
-        root = palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance;
         ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, root.Map);
-        root = palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].Entrance;
         ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, root.Map);
-        root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance;
+        root = palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance;
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, root.Map);
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
@@ -3057,7 +3062,7 @@ public class Hyrule
         {
             // Use the old spell menu behavior where the spells are placed in the menu in the location it came from
             var wizardCollectables = AllLocationsForReal()
-                .Where(l => Towns.STRICT_SPELL_LOCATIONS.Contains(l.ActualTown))
+                .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
                 .Select(l => l.Collectable).ToList();
             
             for (int i = 0; i < magFunction.Length; i++)

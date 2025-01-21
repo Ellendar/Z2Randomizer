@@ -70,9 +70,9 @@ public class Location
 
     public bool Reachable { get; set; }
 
-    public int PalaceNumber { get; set; }
+    public int? PalaceNumber { get; set; }
 
-    public Town ActualTown { get; set; }
+    public Town? ActualTown { get; set; }
     public Continent Continent { get; set; }
     public Continent? VanillaContinent { get; set; }
     public Continent? ConnectedContinent { get; set; }
@@ -133,8 +133,7 @@ public class Location
         Collectable = Collectable.DO_NOT_USE;
         ItemGet = false;
         Reachable = false;
-        PalaceNumber = 0;
-        ActualTown = 0;
+        PalaceNumber = null;
         Continent = continent;
         VanillaContinent = continent;
         ConnectedContinent = null;
@@ -180,11 +179,11 @@ public class Location
             (Continent.WEST, 96, 21, 43) => "DM_EXIT",
             (Continent.WEST, 88, 50, 60) => "KINGS_TOMB",
             (Continent.WEST, 54, 46, 2) => "RAURU",
-            (Continent.WEST, 36, 2, 5) => "JUMP_TOWN",
+            (Continent.WEST, 36, 2, 5) => "RUTO",
             (Continent.WEST, 91, 8, 6) => "SARIA_S",
             (Continent.WEST, 89, 8, 8) => "SARIA_N",
             (Continent.WEST, 76, 21, 24) => "BAGUS_CABIN",
-            (Continent.WEST, 75, 60, 11) => "FAIRY_TOWN",
+            (Continent.WEST, 75, 60, 11) => "MIDO",
             (Continent.WEST, 32, 62, 0) => "P1",
             (Continent.WEST, 64, 11, 14) => "P2",
             (Continent.WEST, 98, 57, 0) => "P3",
@@ -284,6 +283,22 @@ public class Location
 
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
+
+        ActualTown = (Continent, Ypos, Xpos, Map) switch
+        {
+            (Continent.WEST, 54, 46, 2) => Town.RAURU,
+            (Continent.WEST, 36, 2, 5) => Town.RUTO,
+            (Continent.WEST, 91, 8, 6) => Town.SARIA_SOUTH,
+            (Continent.WEST, 89, 8, 8) => Town.SARIA_NORTH,
+            (Continent.WEST, 76, 21, 24) => Town.BAGU,
+            (Continent.WEST, 75, 60, 11) => Town.MIDO_WEST,
+            (Continent.EAST, 60, 23, 14) => Town.NABOORU,
+            (Continent.EAST, 33, 3, 17) => Town.DARUNIA_WEST,
+            (Continent.EAST, 81, 61, 18) => Town.NEW_KASUTO,
+            (Continent.EAST, 99, 34, 23) => Town.OLD_KASUTO,
+            _ => null
+        };
+
         if (Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
         {
             logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
@@ -305,12 +320,6 @@ public class Location
         PassThrough = clone.PassThrough;
         ForceEnterRight = clone.ForceEnterRight;
         TerrainType = clone.TerrainType;
-    }
-
-    //Why does this empty constructor exist. Don't want to delete it if it's needed for serialization magic of some kind.
-    public Location()
-    {
-
     }
 
     public byte[] GetLocationBytes()
@@ -356,6 +365,7 @@ public class Location
                 Continent.DM => 1,
                 Continent.EAST => 2,
                 Continent.MAZE => 3,
+                _ => throw new ImpossibleException("Invalid connected continent value")
             };
         }
         //Palaces... have world numbers that kind... of... make sense?
@@ -365,7 +375,7 @@ public class Location
             return PalaceNumber switch
             {
                 //North palace
-                0 => 0,
+                null => 0,
                 1 => 12,
                 2 => 12,
                 3 => 16,

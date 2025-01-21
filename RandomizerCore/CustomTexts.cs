@@ -499,9 +499,9 @@ public class CustomTexts
 
     private static void GenerateTownNameHints(List<Text> texts, IEnumerable<Location> locations, bool linkedFire)
     {
-        foreach (Location location in locations.Where(i => i.VanillaCollectable.IsSpell()))
+        foreach (Location location in locations.Where(i => i.ActualTown != null && i.VanillaCollectable.IsSpell()))
         {
-            texts[TOWN_SIGN_INDEXES[location.ActualTown]] = GenerateTownSignHint(location.Collectable, linkedFire);
+            texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectable, linkedFire);
         }
     }
     public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
@@ -517,7 +517,11 @@ public class CustomTexts
 
     public static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
     {
-        Town town = location.ActualTown;
+        if(location.ActualTown == null)
+        {
+            throw new Exception("Cannot generate text for Wizard outside of town");
+        }
+        Town town = (Town)location.ActualTown;
         Collectable collectable = location.Collectable;
         if (collectable.IsSpell())
         {
@@ -738,16 +742,20 @@ public class CustomTexts
     {
         List<Text> vanillaText = new(texts);
         List<Text> usedWizardTexts = [];
-        List<Location> wizardLocations = itemLocs.Where(i => i.ActualTown != 0 && i.ActualTown.IsWizardTown()).ToList();
+        List<Location> wizardLocations = itemLocs.Where(i => i.ActualTown != 0 && (i?.ActualTown?.IsWizardTown() ?? false)).ToList();
         foreach (Location location in wizardLocations)
         {
+            if(location.ActualTown == null)
+            {
+                throw new Exception("Invalid town that is not a town");
+            }
             Text wizardHint;
             do
             {
                 wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText);
             } while (usedWizardTexts.Contains(wizardHint));
             usedWizardTexts.Add(wizardHint);
-            texts[townWizardTextIndexes[location.ActualTown]] = wizardHint;
+            texts[townWizardTextIndexes[(Town)location.ActualTown]] = wizardHint;
         }
     }
 

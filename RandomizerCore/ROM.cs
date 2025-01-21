@@ -1182,13 +1182,13 @@ Exit:
     }
 
     //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, Location hiddenPalaceCallSpot, Location hiddenPalaceLocation, 
+    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, 
         Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
     {
         if (biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE)
         {
-            Put(0x8382, (byte)hiddenPalaceCallSpot.Ypos);
-            Put(0x8388, (byte)hiddenPalaceCallSpot.Xpos);
+            Put(0x8382, (byte)hiddenPalaceCoords.Item1);
+            Put(0x8388, (byte)hiddenPalaceCoords.Item2);
         }
         int pos = hiddenPalaceLocation.Ypos;
 

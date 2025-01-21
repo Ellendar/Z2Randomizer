@@ -137,8 +137,20 @@ public class Util
     /// </summary>
     public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
-        public bool Equals(byte[] x, byte[] y)
+        public bool Equals(byte[]? x, byte[]? y)
         {
+            if(x == null)
+            {
+                if(y == null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            if(y == null)
+            {
+                return false;
+            }
             if (x.Length != y.Length)
             {
                 return false;
@@ -176,6 +188,10 @@ internal static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
+        if(stream == null)
+        {
+            throw new Exception("Unable to read ManifestResourceStream: " + name);
+        }
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
@@ -190,6 +206,10 @@ internal static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
+        if(stream == null)
+        {
+            throw new Exception("Unable to read binary resource: " + name);
+        }
         using var reader = new BinaryReader(stream);
         return reader.ReadBytes((int)stream.Length);
     }
