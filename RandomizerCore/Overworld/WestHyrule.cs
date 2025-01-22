@@ -1066,10 +1066,6 @@ public sealed class WestHyrule : World
             map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
         }
-        if (cave2l == null || cave2r == null)
-        {
-            throw new Exception("Failed to find connection caves while constructing caldera");
-        }
         int caveOrientation = RNG.Next(2);
         if (isHorizontal)
         {
@@ -1090,7 +1086,11 @@ public sealed class WestHyrule : World
 
             if (caveCount > 1)
             {
-                if(caveOrientation == 0)
+                if (cave2l == null || cave2r == null)
+                {
+                    throw new Exception("Failed to find connection caves while constructing caldera");
+                }
+                if (caveOrientation == 0)
                 {
                     caveOrientation = 1;
                 }

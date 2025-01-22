@@ -111,7 +111,10 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 {
                     if (roomPool.NormalRooms.Count == 0)
                     {
-                        throw new Exception("Palace room pool was empty");
+                        //Room pool was exhausted. This is likely with this old structure. In theory we could refactor this
+                        //to work better, but for now just restart.
+                        palace.IsValid = false;
+                        return palace;
                     }
                     int roomIndex = r.Next(roomPool.NormalRooms.Count);
                     Room roomToAdd = new(roomPool.NormalRooms[roomIndex]);
@@ -215,28 +218,29 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 }
 
                 innertries++;
-            } while (roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT
-                || palace.AllRooms.Any(i => i.CountOpenExits() > 0)
-                );
-
-            if (roomPlacementFailures != ROOM_PLACEMENT_FAILURE_LIMIT)
-            {
-                int count = 0;
-                bool reachable = false;
-                do
+                //If we've exceeded this threshold, either the palace is so convoluted, or the room pool is so exhausted
+                //that the palace will never succeed, so give up.
+                if(roomPlacementFailures >= ROOM_PLACEMENT_FAILURE_LIMIT)
                 {
-                    palace.ResetRooms();
-                    count++;
-                    palace.ShuffleRooms(r);
-                    reachable = palace.AllReachable();
-                    tries++;
-                    logger.Debug("Palace room shuffle attempt #" + tries);
+                    palace.IsValid = false;
+                    return palace;
                 }
-                while (
-                (!reachable || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
-                && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
-                    );
+            } while (palace.AllRooms.Any(i => i.CountOpenExits() > 0));
+            int count = 0;
+            bool reachable = false;
+            do
+            {
+                palace.ResetRooms();
+                count++;
+                palace.ShuffleRooms(r);
+                reachable = palace.AllReachable();
+                tries++;
+                logger.Debug("Palace room shuffle attempt #" + tries);
             }
+            while (
+            (!reachable || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
+            && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
+                );
         } while (tries >= ROOM_SHUFFLE_ATTEMPT_LIMIT);
         palace.Generations += tries;
         palace.IsValid = true;
