@@ -41,6 +41,7 @@ public class Hyrule
     private readonly int[] palPalettes = [0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60];
     private readonly int[] palGraphics = [0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06];
 
+    /*
     private static readonly Collectable[] SHUFFLABLE_STARTING_ITEMS = [
         Collectable.CANDLE, Collectable.GLOVE,
         Collectable.RAFT,
@@ -50,15 +51,17 @@ public class Hyrule
         Collectable.HAMMER,
         Collectable.MAGIC_KEY
     ];
-
+    */
 
     //private ROM romData;
     private const int overworldXOff = 0x3F;
     private const int overworldMapOff = 0x7E;
     private const int overworldWorldOff = 0xBD;
 
+    /*
     private static readonly List<Town> spellTowns = new List<Town>() { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
         Town.MIDO_CHURCH, Town.NABOORU, Town.DARUNIA_WEST, Town.DARUNIA_ROOF, Town.NEW_KASUTO, Town.OLD_KASUTO};
+    */
 
     //Unused
     //private Dictionary<int, int> spellEnters;
@@ -1458,17 +1461,17 @@ public class Hyrule
 
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL)
                 {
-                    westHyrule.LoadCave1(ROMData, 1);
-                    westHyrule.LoadCave2(ROMData, 1);
-                    westHyrule.LoadRaft(ROMData, 2);
+                    westHyrule.LoadCave1(ROMData, Continent.WEST, Continent.DM);
+                    westHyrule.LoadCave2(ROMData, Continent.WEST, Continent.DM);
+                    westHyrule.LoadRaft(ROMData, Continent.WEST, Continent.EAST);
 
-                    deathMountain.LoadCave1(ROMData, 0);
-                    deathMountain.LoadCave2(ROMData, 0);
+                    deathMountain.LoadCave1(ROMData, Continent.DM, Continent.WEST);
+                    deathMountain.LoadCave2(ROMData, Continent.DM, Continent.WEST);
 
-                    eastHyrule.LoadRaft(ROMData, 0);
-                    eastHyrule.LoadBridge(ROMData, 3);
+                    eastHyrule.LoadRaft(ROMData, Continent.EAST, Continent.WEST);
+                    eastHyrule.LoadBridge(ROMData, Continent.EAST, Continent.MAZE);
 
-                    mazeIsland.LoadBridge(ROMData, 2);
+                    mazeIsland.LoadBridge(ROMData, Continent.MAZE, Continent.EAST);
                 }
                 else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
@@ -1580,8 +1583,8 @@ public class Hyrule
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
 
-                    l1 = worlds[raftw1].LoadRaft(ROMData, raftw2);
-                    l2 = worlds[raftw2].LoadRaft(ROMData, raftw1);
+                    l1 = worlds[raftw1].LoadRaft(ROMData, (Continent)raftw1, (Continent)raftw2);
+                    l2 = worlds[raftw2].LoadRaft(ROMData, (Continent)raftw2, (Continent)raftw1);
                     connections[0] = (l1, l2);
 
                     int bridgew1 = RNG.Next(worlds.Count);
@@ -1609,8 +1612,8 @@ public class Hyrule
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
 
-                    l1 = worlds[bridgew1].LoadBridge(ROMData, bridgew2);
-                    l2 = worlds[bridgew2].LoadBridge(ROMData, bridgew1);
+                    l1 = worlds[bridgew1].LoadBridge(ROMData, (Continent)bridgew1, (Continent)bridgew2);
+                    l2 = worlds[bridgew2].LoadBridge(ROMData, (Continent)bridgew2, (Continent)bridgew1);
                     connections[1] = (l1, l2);
 
                     int c1w1 = RNG.Next(worlds.Count);
@@ -1638,8 +1641,8 @@ public class Hyrule
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
 
-                    l1 = worlds[c1w1].LoadCave1(ROMData, c1w2);
-                    l2 = worlds[c1w2].LoadCave1(ROMData, c1w1);
+                    l1 = worlds[c1w1].LoadCave1(ROMData, (Continent)c1w1, (Continent)c1w2);
+                    l2 = worlds[c1w2].LoadCave1(ROMData, (Continent)c1w2, (Continent)c1w1);
                     connections[2] = (l1, l2);
 
                     int c2w1 = RNG.Next(worlds.Count);
@@ -1667,8 +1670,8 @@ public class Hyrule
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
 
-                    l1 = worlds[c2w1].LoadCave2(ROMData, c2w2);
-                    l2 = worlds[c2w2].LoadCave2(ROMData, c2w1);
+                    l1 = worlds[c2w1].LoadCave2(ROMData, (Continent)c2w1, (Continent)c2w2);
+                    l2 = worlds[c2w2].LoadCave2(ROMData, (Continent)c2w2, (Continent)c2w1);
                     connections[3] = (l1, l2);
                 }
             } while (!AllContinentsHaveConnection(worlds));
@@ -1849,26 +1852,26 @@ public class Hyrule
         Location l1, l2;
         if (type == 1)
         {
-            l1 = worlds[w1].LoadRaft(ROMData, w2);
-            l2 = worlds[w2].LoadRaft(ROMData, w1);
+            l1 = worlds[w1].LoadRaft(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadRaft(ROMData, (Continent)w2, (Continent)w1);
             connections[0] = (l1, l2);
         }
         else if (type == 2)
         {
-            l1 = worlds[w1].LoadBridge(ROMData, w2);
-            l2 = worlds[w2].LoadBridge(ROMData, w1);
+            l1 = worlds[w1].LoadBridge(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadBridge(ROMData, (Continent)w2, (Continent)w1);
             connections[1] = (l1, l2);
         }
         else if (type == 3)
         {
-            l1 = worlds[w1].LoadCave1(ROMData, w2);
-            l2 = worlds[w2].LoadCave1(ROMData, w1);
+            l1 = worlds[w1].LoadCave1(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadCave1(ROMData, (Continent)w2, (Continent)w1);
             connections[2] = (l1, l2);
         }
         else
         {
-            l1 = worlds[w1].LoadCave2(ROMData, w2);
-            l2 = worlds[w2].LoadCave2(ROMData, w1);
+            l1 = worlds[w1].LoadCave2(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadCave2(ROMData, (Continent)w2, (Continent)w1);
             connections[3] = (l1, l2);
         }
     }

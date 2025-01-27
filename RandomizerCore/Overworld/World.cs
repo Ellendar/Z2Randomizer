@@ -2025,41 +2025,49 @@ public abstract class World
 
     }
 
-    public Location LoadRaft(ROM rom, int world)
+    public Location LoadRaft(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, world));
         raft = GetLocationByMem(baseAddr + 41);
+        raft.Continent = world;
+        raft.ConnectedContinent = connectedContinent;
         raft.ExternalWorld = 0x80;
         raft.Map = 41;
         raft.TerrainType = Terrain.BRIDGE;
         return raft;
     }
 
-    public Location LoadBridge(ROM rom, int world)
+    public Location LoadBridge(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, world));
         bridge = GetLocationByMem(baseAddr + 40);
+        bridge.Continent = world;
+        bridge.ConnectedContinent = connectedContinent;
         bridge.ExternalWorld = 0x80;
         bridge.Map = 40;
         bridge.PassThrough = 0;
         return bridge;
     }
 
-    public Location LoadCave1(ROM rom, int world)
+    public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, world));
         cave1 = GetLocationByMem(baseAddr + 42);
+        cave1.Continent = world;
+        cave1.ConnectedContinent = connectedContinent;
         cave1.ExternalWorld = 0x80;
         cave1.Map = 42;
         cave1.CanShuffle = true;
         return cave1;
     }
 
-    public Location LoadCave2(ROM rom, int world)
+    public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, world));
         cave2 = GetLocationByMem(baseAddr + 43);
         cave2.ExternalWorld = 0x80;
+        cave2.Continent = world;
+        cave2.ConnectedContinent = connectedContinent;
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;
