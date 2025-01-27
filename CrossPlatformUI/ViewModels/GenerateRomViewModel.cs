@@ -39,7 +39,7 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
         });
         CopyError = ReactiveCommand.CreateFromTask(async () =>
         {
-            var clipboard = App.TopLevel.Clipboard!;
+            var clipboard = App.TopLevel!.Clipboard!;
             var host = (HostScreen as MainViewModel)!;
             var config = host.Config;
             var version = Assembly.GetEntryAssembly()!.GetName().Version!;

@@ -27,13 +27,14 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
             _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
         };
 
-        Palace palace;
+        Palace palace = new(palaceNumber);
         do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
         {
             RoomPool roomPool = new(rooms);
             if (ct.IsCancellationRequested)
             {
-                return new(palaceNumber);
+                palace.IsValid = false;
+                return palace;
             }
 
             tries = 0;
@@ -302,7 +303,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     {
         palace.AllRooms.Add(room);
 
-        if (palace.Number != 7 && openRooms.Count > 1 && palace.ItemRoom.CountOpenExits() > 0)
+        if (palace.Number != 7 && openRooms.Count > 1 && palace.ItemRoom!.CountOpenExits() > 0)
         {
             foreach (Room open2 in openRooms)
             {
@@ -313,7 +314,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 }
             }
         }
-        if (openRooms.Count > 1 && palace.BossRoom.CountOpenExits() > 0)
+        if (openRooms.Count > 1 && palace.BossRoom!.CountOpenExits() > 0)
         {
             foreach (Room open2 in openRooms)
             {

@@ -22,8 +22,8 @@ public class RandomizerProperties
 {
 
     //ROM Info
-    public string Seed { get; set; }
-    public string Flags { get; set; }
+    public string? Seed { get; set; }
+    public string? Flags { get; set; }
 
     //Items
     //public bool shuffleItems;
@@ -84,7 +84,9 @@ public class RandomizerProperties
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
     public bool EastRockIsPath { get; set; }
-    public Climate Climates { get; set; }
+#pragma warning disable CS8618
+    public Climate Climate { get; set; }
+#pragma warning restore CS8618 
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
@@ -197,7 +199,9 @@ public class RandomizerProperties
     public bool MixCustomAndOriginalMusic { get; set; }
     public bool DisableUnsafeMusic { get; set; }
     [NotMapped]
+#pragma warning disable CS8618 
     public CharacterSprite CharSprite { get; set; }
+#pragma warning restore CS8618
     public CharacterColor TunicColor { get; set; }
     public CharacterColor ShieldColor { get; set; }
     public bool UpAC1 { get; set; }

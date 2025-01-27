@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 
 using System.Text;
 using System.Text.Json;
@@ -116,5 +117,8 @@ for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
 }
 sb[sb.Length - 1] = ']';
 var jsonElement = JsonSerializer.Deserialize<JsonElement>(sb.ToString());
-string prettyPrintedJson = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions() { WriteIndented = true, });
+JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true, };
+string prettyPrintedJson = JsonSerializer.Serialize(jsonElement, options);
 File.WriteAllText("Rooms.dump", prettyPrintedJson);
+
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code

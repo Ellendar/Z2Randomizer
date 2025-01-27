@@ -38,7 +38,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         Collectable.THUNDER_SPELL
     ];
 
-    private string seed;
+    private string? seed;
     
     private bool shuffleStartingItems;
     private bool startWithCandle;
@@ -197,7 +197,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     //Meta
     [Required]
     [IgnoreInFlags]
-    public string Seed { get => seed; set => SetField(ref seed, value); }
+    public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
     [IgnoreInFlags]
     public string Flags
     {
@@ -1122,6 +1122,14 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         UpAOnController1 = false;
         RemoveFlashing = false;
         Sprite = CharacterSprite.LINK;
+        Climate = Climates.Classic;
+        //This is a NOP, but it satisfies a quirk in the analyzer
+        sprite = Sprite;
+        climate = Climate;
+        if (Sprite == null || Climate == null)
+        {
+            throw new ImpossibleException();
+        }
         Tunic = CharacterColor.Default;
         ShieldTunic = CharacterColor.Default;
         BeamSprite = BeamSprites.DEFAULT;
@@ -1129,7 +1137,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         DisableHUDLag = false;
     }
 
-    public RandomizerConfiguration(string flagstring)
+    public RandomizerConfiguration(string flagstring) : this()
     {
         ConvertFlags(flagstring, this);
     }
@@ -1137,7 +1145,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(RandomizerConfiguration))]
     private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
     {
-
+        //seed - climate - sprite
         var config = newThis ?? new RandomizerConfiguration();
         FlagReader flagReader = new FlagReader(flagstring);
         PropertyInfo[] properties = GetType().GetProperties();
@@ -1813,7 +1821,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 }
                 else
                 {
-                    int value = (int)property.GetValue(this, null);
+                    int value = (int)property.GetValue(this, null)!;
                     if (value < minimum || value > minimum + limit)
                     {
                         logger.Warn("Property (" + property.Name + " was out of range.");
@@ -1833,17 +1841,18 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
     public RandomizerProperties Export(Random r)
     {
-        RandomizerProperties properties = new();
+        RandomizerProperties properties = new()
+        {
+            Flags = Flags,
 
-        properties.Flags = Flags;
+            WestIsHorizontal = r.Next(2) == 1,
+            EastIsHorizontal = r.Next(2) == 1,
+            DmIsHorizontal = r.Next(2) == 1,
+            EastRockIsPath = r.Next(2) == 1,
 
-        properties.WestIsHorizontal = r.Next(2) == 1;
-        properties.EastIsHorizontal = r.Next(2) == 1;
-        properties.DmIsHorizontal = r.Next(2) == 1;
-        properties.EastRockIsPath = r.Next(2) == 1;
-
-        //ROM Info
-        properties.Seed = Seed;
+            //ROM Info
+            Seed = Seed
+        };
 
         //Start Configuration
         ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
@@ -1991,7 +2000,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.BoulderBlockConnections = AllowConnectionCavesToBeBlocked;
         if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA || WestBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = WestBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            int shuffleLimit = WestBiome switch {
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 6,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
+                _ => throw new ImpossibleException()
+            };
             properties.WestBiome = r.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -2013,7 +2027,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA || EastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = EastBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            int shuffleLimit = EastBiome switch { 
+                Biome.RANDOM => 7, 
+                Biome.RANDOM_NO_VANILLA => 6, 
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
+                _ => throw new ImpossibleException()
+            };
             properties.EastBiome = r.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -2036,7 +2055,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA || DMBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = DMBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            int shuffleLimit = DMBiome switch {
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 6,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
+                _ => throw new ImpossibleException()
+            };
             properties.DmBiome = r.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -2073,7 +2097,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (Climate == null)
         {
-            properties.Climates = r.Next(5) switch
+            properties.Climate = r.Next(5) switch
             {
                 0 => Climates.Classic,
                 1 => Climates.Chaos,
@@ -2085,7 +2109,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         else
         {
-            properties.Climates = Climate;
+            properties.Climate = Climate;
         }
         properties.VanillaShuffleUsesActualTerrain = VanillaShuffleUsesActualTerrain;
         properties.ShuffleHidden = ShuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
@@ -2466,6 +2490,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             IndeterminateOptionRate.HALF => .50,
             IndeterminateOptionRate.THREE_QUARTERS => .75,
             IndeterminateOptionRate.NINETY_PERCENT => .90,
+            _ => throw new Exception("Unrecognized IndeterminateOptionRate")
         };
     }
 

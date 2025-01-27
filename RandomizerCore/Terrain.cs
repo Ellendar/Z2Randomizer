@@ -45,6 +45,7 @@ static class TerrainExtensions
             Terrain.ROCK => true,
             Terrain.RIVER_DEVIL => true,
             Terrain.NONE => false,
+            _ => throw new ImpossibleException("Unrecognized Terrain")
         };
     }
 }

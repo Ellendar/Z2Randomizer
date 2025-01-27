@@ -38,8 +38,8 @@ public class Hyrule
 
     private MusicRandomizer? musicRandomizer = null;
 
-    private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
-    private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
+    private readonly int[] palPalettes = [0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60];
+    private readonly int[] palGraphics = [0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06];
 
     private static readonly Collectable[] SHUFFLABLE_STARTING_ITEMS = [
         Collectable.CANDLE, Collectable.GLOVE,
@@ -238,7 +238,7 @@ public class Hyrule
 
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
-            HashSet<int> freeBanks = new();
+            HashSet<int> freeBanks = [];
             while (palaces.Count != 7 || passedValidation == false)
             {
                 freeBanks = new(ROM.FreeRomBanks);
@@ -295,7 +295,7 @@ public class Hyrule
                     }
                     else
                     {
-                        List<Room> l = new List<Room> { room };
+                        List<Room> l = [room];
                         sideviews.Add(room.SideView, l);
                     }
                 }
@@ -2938,20 +2938,24 @@ public class Hyrule
         {
             palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
         }
+        if (palaces.Any(i => i.Entrance == null))
+        {
+            throw new Exception("Invalid palace without a palace number");
+        }
 
-        Room root = palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance;
+        Room root = palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance!;
         ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance;
+        root = palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance!;
         ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance;
+        root = palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance!;
         ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance!;
         ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance!;
         ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].Entrance!;
         ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance;
+        root = palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance!;
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, root.Map);
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
@@ -3442,7 +3446,7 @@ CustomFileSelectData:
         }
         else
         {
-            helmetRoom = (byte)palaces[1].BossRoom.Map;
+            helmetRoom = (byte)palaces[1].BossRoom!.Map;
         }
 
         var a = asm.Module();

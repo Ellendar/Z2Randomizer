@@ -257,7 +257,7 @@ public sealed class WestHyrule : World
         biome = props.WestBiome;
 
         //Climate filtering
-        climate = props.Climates.Clone();
+        climate = props.Climate.Clone();
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
@@ -1175,6 +1175,10 @@ public sealed class WestHyrule : World
 
             if (caveCount > 1)
             {
+                if (cave2l == null || cave2r == null)
+                {
+                    throw new Exception("Failed to find connection caves while constructing caldera");
+                }
                 if (caveOrientation == 0)
                 {
                     caveOrientation = 1;

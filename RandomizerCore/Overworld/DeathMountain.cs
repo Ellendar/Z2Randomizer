@@ -138,7 +138,7 @@ sealed class DeathMountain : World
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
-        climate = props.Climates.Clone();
+        climate = props.Climate.Clone();
         float dmOpennessFactor = biome switch
         {
             Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),

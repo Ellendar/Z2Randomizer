@@ -43,7 +43,9 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
     }
     
     [JsonConstructor]
+#pragma warning disable CS8618
     public SpritePreviewViewModel() {}
+#pragma warning restore CS8618
     public SpritePreviewViewModel(MainViewModel main)
     {
         Main = main;

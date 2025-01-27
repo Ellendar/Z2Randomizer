@@ -36,11 +36,6 @@ public class Text : IEquatable<Text>
     public Text(string text, Collectable collectable)
     {
         RawText = text;
-        ApplyCollectableName(collectable);
-    }
-
-    public void ApplyCollectableName(Collectable collectable)
-    {
         if (RawText.Contains("%%"))
         {
             RawText = RawText.Replace("%%", collectable.EnglishText());
@@ -109,12 +104,12 @@ public class Text : IEquatable<Text>
         return RawText;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return Equals(obj as Text);
     }
 
-    public bool Equals(Text other)
+    public bool Equals(Text? other)
     {
         return other is not null &&
                EqualityComparer<List<char>>.Default.Equals(EncodedText, other.EncodedText);

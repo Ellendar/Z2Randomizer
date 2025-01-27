@@ -119,7 +119,9 @@ public class Room : IJsonOnDeserialized
     [JsonIgnore]
     public Room MergedSecondary { get; set; }
 
-
+    //The json loads the fields the analyzer says aren't loaded. Source: trust me bro
+    //But seriously eventually put some validation here.
+#pragma warning disable CS8618
     public Room() {}
     
     public Room(Room room)
@@ -127,7 +129,9 @@ public class Room : IJsonOnDeserialized
         CopyFrom(room);
     }
 
+
     public Room(string json)
+#pragma warning restore CS8618 
     {
         var room = JsonSerializer.Deserialize(json, RoomSerializationContext.Default.Room);
         CopyFrom(room!);
@@ -135,7 +139,7 @@ public class Room : IJsonOnDeserialized
         var length = SideView?[0] ?? 0;
         if(SideView?.Length != length)
         {
-            throw new Exception($"Room length header {length} does not match actual length for sideview: {SideView.Length}");
+            throw new Exception($"Room length header {length} does not match actual length for sideview: {SideView!.Length}");
         }
     }
 

@@ -17,8 +17,10 @@ public class RoomPool
 
     private PalaceRooms palaceRooms;
 
+#pragma warning disable CS8618 
     protected RoomPool() { }
-    
+#pragma warning restore CS8618 
+
     public RoomPool(RoomPool target)
     {
         palaceRooms = target.palaceRooms;

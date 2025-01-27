@@ -5,7 +5,7 @@ using NLog;
 
 namespace RandomizerCore.Sidescroll;
 
-public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
+public class VanillaPalaceGenerator() : PalaceGenerator
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -38,7 +38,7 @@ public class VanillaPalaceGenerator(CancellationToken ct) : PalaceGenerator
         palace.AllRooms.Add(palace.Entrance);
         if (palaceNumber != 7)
         {
-            Room itemRoom = new(roomPool.ItemRoom);
+            Room itemRoom = new(roomPool.ItemRoom!);
             palace.ItemRoom = itemRoom;
             palace.ItemRoom.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(palace.ItemRoom);

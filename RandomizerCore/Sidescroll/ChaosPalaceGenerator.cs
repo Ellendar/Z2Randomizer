@@ -62,7 +62,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             palace.AllRooms.Add(palace.ItemRoom);
         }
 
-        if (palaceNumber < 7 && palace.ItemRoom.LinkedRoomName != null)
+        if (palaceNumber < 7 && palace.ItemRoom!.LinkedRoomName != null)
         {
             Room segmentedItemRoom1, segmentedItemRoom2;
             segmentedItemRoom1 = palace.ItemRoom;

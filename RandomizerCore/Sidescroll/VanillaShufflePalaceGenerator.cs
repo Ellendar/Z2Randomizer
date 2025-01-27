@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace RandomizerCore.Sidescroll;
 
-public class VanillaShufflePalaceGenerator(CancellationToken ct) : VanillaPalaceGenerator(ct)
+public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
 {
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber) 
     {

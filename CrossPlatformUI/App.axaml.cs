@@ -27,7 +27,7 @@ public sealed partial class App : Application // , IDisposable
 
     public static IFileSystemService? FileSystemService;
     
-    public static TopLevel TopLevel { get; private set; }
+    public static TopLevel? TopLevel { get; private set; }
 
     // public static MainViewModel? Main { get; set; }
 
@@ -42,7 +42,7 @@ public sealed partial class App : Application // , IDisposable
             var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
             main = JsonSerializer.Deserialize(json, SerializationContext.Default.MainViewModel);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // Could not load settings, so just use the default instead
         }
