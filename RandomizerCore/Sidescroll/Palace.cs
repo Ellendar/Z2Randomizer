@@ -1049,15 +1049,15 @@ public class Palace
         {
             return AllRooms.Max(i => (byte)(i.Map + 1));
         }
-        if(Entrance == null || !AllRooms.Contains(Entrance))
+        if (!AllRooms.Contains(Entrance!))
         {
-            throw new Exception("Palace lost its Entrance");
+            throw new Exception("Palace lost its entrance");
         }
-        if (ItemRoom == null || AllRooms.Any(i => i.HasItem && i != ItemRoom))
+        if (AllRooms.Any(i => i.IsEntrance && i != Entrance))
         {
-            throw new Exception("Palace has an extra Entrance");
+            throw new Exception("Palace has an extra entrance");
         }
-        Entrance.Map = currentMap++;
+        Entrance!.Map = currentMap++;
         if (BossRoom == null || !AllRooms.Contains(BossRoom))
         {
             throw new Exception("Palace lost its boss room");
@@ -1081,7 +1081,7 @@ public class Palace
         }
         else
         {
-            if (!AllRooms.Contains(ItemRoom))
+            if (!AllRooms.Contains(ItemRoom!))
             {
                 throw new Exception("Palace lost its item room");
             }
@@ -1089,7 +1089,7 @@ public class Palace
             {
                 throw new Exception("Palace has an extra item room");
             }
-            ItemRoom.Map = currentMap++;
+            ItemRoom!.Map = currentMap++;
         }
         List<Room> normalRooms = AllRooms.Where(i => i.IsNormalRoom()).ToList();
         foreach(Room room in normalRooms)
