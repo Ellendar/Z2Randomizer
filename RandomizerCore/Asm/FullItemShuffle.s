@@ -146,6 +146,8 @@ WizardMagicContainerRequirement:
         cmp WizardMagicContainerRequirement,y
         bcc @EarlyExit
 .endif
+        ; Earning the item so move the dialog to the next state
+        inc $05
         lda LocationTableWizard
         ora JankPowerOfTwo,y
         sta LocationTableWizard
