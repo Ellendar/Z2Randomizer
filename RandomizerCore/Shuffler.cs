@@ -229,7 +229,7 @@ public class Shuffler
             ; otherwise resume the previous track (palace theme)
             lda #2
             sta $eb
-    + 
+    +
     ; Write the "grab item" sound effect to the sfx queue
     lda #8
     sta $ef
