@@ -40,6 +40,7 @@
     <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
+    <None Remove="Asm\z2r.inc" />
     <None Remove="Asm\z2rndft.ips" />
     <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
@@ -53,12 +54,17 @@
     <Content Include="js65\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" />
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
     <PackageReference Include="NLog" Version="5.2.6" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
+    <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />
   </ItemGroup>
   <ItemGroup>

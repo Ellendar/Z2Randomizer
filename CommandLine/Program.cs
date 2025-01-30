@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using CommandLine;
+using CrossPlatformUI;
 using Desktop.Common;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
@@ -108,11 +109,11 @@ public class Program
         // };
         // worker.RunWorkerAsync();
         var cts = new CancellationTokenSource();
-        var engine = new DesktopJsEngine();
-        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
-        var customJson = configuration!.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
-        var palaceRooms = new PalaceRooms(configuration.UseCustomRooms ? customJson! : roomsJson, configuration!.UseCustomRooms);
-        var randomizer = new Hyrule(engine, palaceRooms);
+        Hyrule.NewAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
+        var roomsJson = RandomizerCore.Util.ReadAllTextFromFile("PalaceRooms.json");
+        var customJson = configuration!.UseCustomRooms ? RandomizerCore.Util.ReadAllTextFromFile("CustomRooms.json") : null;
+        var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson : roomsJson, configuration!.UseCustomRooms);
+        var randomizer = new Hyrule(createAsm,palaceRooms);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 
         if (rom != null)

@@ -6,8 +6,8 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using js65;
 using NLog;
-using RandomizerCore.Asm;
 
 namespace RandomizerCore.Sidescroll;
 

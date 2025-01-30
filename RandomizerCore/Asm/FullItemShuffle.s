@@ -1,5 +1,4 @@
-
-.macpack common
+.include "z2r.inc"
 
 ; This is a list of items that are potentially replaced. The randomizer must set these values to the replacement value
 ;.import SHIELD_SPELL_ITEMLOC, JUMP_SPELL_ITEMLOC, LIFE_SPELL_ITEMLOC, FAIRY_SPELL_ITEMLOC

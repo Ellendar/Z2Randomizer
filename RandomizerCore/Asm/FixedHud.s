@@ -1,5 +1,4 @@
-
-.macpack common
+.include "z2r.inc"
 
 ; Summary of the bug
 ; On a lag frame NMI is skipped, which means the hud scroll value of 0 isn't set

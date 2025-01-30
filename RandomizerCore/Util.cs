@@ -180,9 +180,20 @@ public class Util
     }
 
     public static IEqualityComparer<byte[]> byteArrayEqualityComparer = new StandardByteArrayEqualityComparer();
+
+    public static string ReadResource(string path)
+    {
+        return Assembly.GetExecutingAssembly().ReadResource(path);
+    }
+
+    public static byte[] ReadBinaryResource(string path)
+    {
+        return Assembly.GetExecutingAssembly().ReadBinaryResource(path);
+    }
+
 }
 
-internal static class AssemblyExtensions
+public static class AssemblyExtensions
 {
     public static string ReadResource(this Assembly assembly, string name)
     {

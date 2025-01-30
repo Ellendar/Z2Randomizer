@@ -1,4 +1,4 @@
-﻿.macpack common
+﻿.include "z2r.inc"
 
 .import nmi
 .export SwapPRG, SwapToSavedPRG, SwapToPRG0

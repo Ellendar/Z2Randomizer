@@ -26,7 +26,7 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Microsoft.JSInterop" Version="8.0.4" />
+        <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-.macpack common
+.include "z2r.inc"
 
 .segment "PRG0"
 

@@ -1,4 +1,4 @@
-.macpack common
+.include "z2r.inc"
 
 .import SwapPRG, SwapToSavedPRG, SwapToPRG0, NmiBankShadow8, NmiBankShadowA
 .export UpdateSound

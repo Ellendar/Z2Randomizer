@@ -1,4 +1,5 @@
-﻿.macpack common
+﻿.include "z2r.inc"
+
 .segment "PRG4"
 
 ProjectileYPosition = $30

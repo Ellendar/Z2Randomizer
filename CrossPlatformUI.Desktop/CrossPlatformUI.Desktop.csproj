@@ -29,15 +29,4 @@
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
         <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-		<PackageReference Include="Microsoft.ClearScript.V8" Version="7.4.5" />
-		<PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Linux'))" />
-		<PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('OSX'))" />
-		<PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
-<!--        <TrimmerRootAssembly Include="Microsoft.ClearScript.V8" />-->
-<!--        <TrimmerRootAssembly Include="ClearscriptV8.linux-x64" Condition="$([MSBuild]::IsOsPlatform('Linux'))"/>-->
-<!--        <TrimmerRootAssembly Include="ClearscriptV8.osx-x64" Condition="$([MSBuild]::IsOsPlatform('OSX'))"/>-->
-<!--        <TrimmerRootAssembly Include="Microsoft.ClearScript.V8.Native.win-x64" Condition="$([MSBuild]::IsOsPlatform('Windows'))"/>-->
-	</ItemGroup>
 </Project>
