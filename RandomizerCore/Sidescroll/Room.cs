@@ -50,15 +50,15 @@ public class Room : IJsonOnDeserialized
     public bool IsRoot { get; set; }
     
     [JsonIgnore]
-    public Room LinkedRoom { get; set; }
+    public Room? LinkedRoom { get; set; }
     [JsonIgnore]
     public Room? Left { get; set; }
     [JsonIgnore]
     public Room? Right { get; set; }
     [JsonIgnore]
-    public Room Up { get; set; }
+    public Room? Up { get; set; }
     [JsonIgnore]
-    public Room Down { get; set; }
+    public Room? Down { get; set; }
     [JsonIgnore]
     public bool IsReachable { get; set; }
     [JsonPropertyName("memoryAddress")]
@@ -102,7 +102,7 @@ public class Room : IJsonOnDeserialized
     public bool Enabled { get; set; }
     public bool IsEntrance { get; set; }
     public int? PalaceNumber { get; set; }
-    public string LinkedRoomName { get; set; }
+    public string? LinkedRoomName { get; set; }
     //public int PageCount { get; private set; }
     [JsonIgnore]
     public bool HasLeftExit { get; private set; }
@@ -119,7 +119,9 @@ public class Room : IJsonOnDeserialized
     [JsonIgnore]
     public Room MergedSecondary { get; set; }
 
-
+    //The json loads the fields the analyzer says aren't loaded. Source: trust me bro
+    //But seriously eventually put some validation here.
+#pragma warning disable CS8618
     public Room() {}
     
     public Room(Room room)
@@ -127,7 +129,9 @@ public class Room : IJsonOnDeserialized
         CopyFrom(room);
     }
 
+
     public Room(string json)
+#pragma warning restore CS8618 
     {
         var room = JsonSerializer.Deserialize(json, RoomSerializationContext.Default.Room);
         CopyFrom(room!);
@@ -135,7 +139,7 @@ public class Room : IJsonOnDeserialized
         var length = SideView?[0] ?? 0;
         if(SideView?.Length != length)
         {
-            throw new Exception($"Room length header {length} does not match actual length for sideview: {SideView.Length}");
+            throw new Exception($"Room length header {length} does not match actual length for sideview: {SideView!.Length}");
         }
     }
 
@@ -818,6 +822,14 @@ public class Room : IJsonOnDeserialized
     public bool IsNormalRoom()
     {
         return !(IsBossRoom || IsThunderBirdRoom || HasItem || IsEntrance);
+    }
+
+    public bool IsOpen()
+    {
+        return HasLeftExit && Left == null
+            || HasRightExit && Right == null
+            || HasUpExit && Up == null
+            || HasDownExit && Down == null;
     }
 }
 

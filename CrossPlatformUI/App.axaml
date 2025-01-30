@@ -5,6 +5,7 @@
              xmlns:converters="using:CrossPlatformUI.Converters"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              x:Class="CrossPlatformUI.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -31,6 +32,22 @@
         </Style>
         <Style Selector="Separator">
             <Setter Property="Margin" Value="0 10" />
+        </Style>
+        
+        <!-- Indeterminate state -->
+        <Style Selector="CheckBox">
+            <Style Selector="^:indeterminate /template/ Path#Graphic">
+                
+                <!-- Question Mark SVG data. The top line is the actual ? shape, the second line is the bounding box -->
+                <!-- If the avalonia material style changes for the bounding box, find it and update it here. Its probably -->
+                <!-- gonna be somewhere around here: https://github.com/AvaloniaCommunity/Material.Avalonia/blob/8d272f3c61be4f77674731c2bf0186ec1d7923ce/Material.Styles/Resources/Themes/CheckBox.axaml#L72-L78 -->
+                <Setter Property="Data"
+                        Value="
+                        m 10.4794,13.821542 q 0,-0.98651 0.355144,-1.657337 0.355144,-0.690557 1.361384,-1.400844 0.710287,-0.493255 1.065431,-0.8483983 0.355143,-0.3551436 0.473524,-0.6708268 0.138112,-0.3354134 0.138112,-0.7300174 0,-0.6116362 -0.473525,-0.9470496 -0.453795,-0.3354134 -1.262733,-0.3354134 -0.828668,0 -1.657337,0.2564926 -0.8089379,0.2564926 -1.6573364,0.690557 L 7.776363,6.0281133 Q 8.7431428,5.4953979 9.8677641,5.1599845 10.992386,4.8245711 12.334039,4.8245711 q 2.071671,0 3.196292,0.9470496 1.144352,0.9470496 1.144352,2.5451958 0,1.2035422 -0.572176,2.0322105 -0.572176,0.828668 -1.736257,1.657337 -0.611636,0.434064 -0.94705,0.769478 -0.335413,0.315683 -0.473525,0.611636 -0.118381,0.295953 -0.118381,0.710287 v 0.434064 H 10.4794 Z m -0.414334,3.90658 q 0,-0.907589 0.493255,-1.282463 0.493255,-0.374874 1.223273,-0.374874 0.670826,0 1.164081,0.374874 0.512986,0.374874 0.512986,1.282463 0,0.868129 -0.512986,1.262733 -0.493255,0.374873 -1.164081,0.374873 -0.730018,0 -1.223273,-0.374873 -0.493255,-0.394604 -0.493255,-1.262733 z
+                        M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z
+                        " />
+                <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(assists:SelectionControlAssist.InnerForeground)}" />
+            </Style>
         </Style>
     </Application.Styles>
   <Application.Resources>

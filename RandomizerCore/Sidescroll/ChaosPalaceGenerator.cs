@@ -47,7 +47,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         if (palaceNumber < 7)
         {
             Direction itemRoomDirection;
-            Room itemRoom = null;
+            Room? itemRoom = null;
             while (itemRoom == null)
             {
                 itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
@@ -62,7 +62,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             palace.AllRooms.Add(palace.ItemRoom);
         }
 
-        if (palaceNumber < 7 && palace.ItemRoom.LinkedRoomName != null)
+        if (palaceNumber < 7 && palace.ItemRoom!.LinkedRoomName != null)
         {
             Room segmentedItemRoom1, segmentedItemRoom2;
             segmentedItemRoom1 = palace.ItemRoom;
@@ -71,7 +71,6 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
             segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
             palace.AllRooms.Add(segmentedItemRoom2);
-            palace.SetOpenRoom(segmentedItemRoom2);
             roomCount += 1;
         }
 
@@ -79,9 +78,9 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         {
             if (!props.RemoveTbird)
             {
-                palace.Tbird = new(roomPool.TbirdRooms[r.Next(roomPool.TbirdRooms.Count)]);
-                palace.Tbird.PalaceGroup = 3;
-                palace.AllRooms.Add(palace.Tbird);
+                palace.TbirdRoom = new(roomPool.TbirdRooms[r.Next(roomPool.TbirdRooms.Count)]);
+                palace.TbirdRoom.PalaceGroup = 3;
+                palace.AllRooms.Add(palace.TbirdRoom);
             }
         }
 
@@ -114,7 +113,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         List<Room> canEnterGoingRight = roomExits.Where(i => i.Value.ContainsLeft()).Select(i => i.Key).ToList();
         List<Room> canDropInto = roomExits.Where(i => i.Key.IsDropZone).Select(i => i.Key).ToList();
 
-        int connectionAttempt = 0;
+        //int connectionAttempt = 0;
         foreach (Room room in palace.AllRooms)
         {
             if (room.HasLeftExit)
@@ -149,7 +148,8 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             unreachableRooms.FisherYatesShuffle(r);
             foreach(Room unreachableRoom in unreachableRooms)
             {
-                reachableRooms.Sample(r).ConnectRandomly(unreachableRoom, r);
+                Room reachableRoom = reachableRooms.Sample(r) ?? throw new Exception("No reachable rooms remain)");
+                reachableRoom.ConnectRandomly(unreachableRoom, r);
             }
             reachableRooms = palace.GetReachableRooms().ToList();
             unreachableRooms = palace.AllRooms.Except(reachableRooms).ToList();

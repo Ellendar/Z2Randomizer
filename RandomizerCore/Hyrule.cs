@@ -40,9 +40,10 @@ public class Hyrule
 
     private MusicRandomizer? musicRandomizer = null;
 
-    private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
-    private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
+    private readonly int[] palPalettes = [0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60];
+    private readonly int[] palGraphics = [0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06];
 
+    /*
     private static readonly Collectable[] SHUFFLABLE_STARTING_ITEMS = [
         Collectable.CANDLE, Collectable.GLOVE,
         Collectable.RAFT,
@@ -52,15 +53,17 @@ public class Hyrule
         Collectable.HAMMER,
         Collectable.MAGIC_KEY
     ];
-
+    */
 
     //private ROM romData;
     private const int overworldXOff = 0x3F;
     private const int overworldMapOff = 0x7E;
     private const int overworldWorldOff = 0xBD;
 
+    /*
     private static readonly List<Town> spellTowns = new List<Town>() { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
         Town.MIDO_CHURCH, Town.NABOORU, Town.DARUNIA_WEST, Town.DARUNIA_ROOF, Town.NEW_KASUTO, Town.OLD_KASUTO};
+    */
 
     //Unused
     //private Dictionary<int, int> spellEnters;
@@ -103,7 +106,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 130;
+    private static int DEBUG_THRESHOLD = 1;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -131,7 +134,7 @@ public class Hyrule
     public int debug = 0;
     public int totalReachableCheck = 0;
 
-
+    /*
     private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
     {
         {1, 0x1072B},
@@ -153,6 +156,7 @@ public class Hyrule
         {6, 0x8664 },
         {7, 0x8665 }
     };
+    */
 
     public ROM ROMData { get; set; }
     public Random RNG { get; set; }
@@ -182,7 +186,12 @@ public class Hyrule
     
     public string Hash { get; private set; }
 
+    //This entire class structure is hot fucking garbage, but refactoring it such that it makes sense is
+    //going to be a massive project, so for now we're just ignoring the fact that basically every property
+    //is not guaranteed to initialize to the analyzer
+#pragma warning disable CS8618 
     public Hyrule(NewAssemblerFn createAsm, PalaceRooms rooms)
+#pragma warning restore CS8618 
     {
         NewAssembler = createAsm;
         palaceRooms = rooms;
@@ -240,7 +249,7 @@ public class Hyrule
 
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
-            HashSet<int> freeBanks = new();
+            HashSet<int> freeBanks = [];
             while (palaces.Count != 7 || passedValidation == false)
             {
                 freeBanks = new(ROM.FreeRomBanks);
@@ -297,7 +306,7 @@ public class Hyrule
                     }
                     else
                     {
-                        List<Room> l = new List<Room> { room };
+                        List<Room> l = [room];
                         sideviews.Add(room.SideView, l);
                     }
                 }
@@ -429,14 +438,14 @@ public class Hyrule
 
             Dictionary<Town, Collectable> spellMap = new()
             {
-                { westHyrule.locationAtRauru.ActualTown, westHyrule.locationAtRauru.Collectable },
-                { westHyrule.locationAtMido.ActualTown, westHyrule.locationAtMido.Collectable },
-                { westHyrule.locationAtSariaNorth.ActualTown, westHyrule.locationAtSariaNorth.Collectable },
-                { westHyrule.locationAtRuto.ActualTown, westHyrule.locationAtRuto.Collectable },
-                { eastHyrule.townAtNabooru.ActualTown, eastHyrule.townAtNabooru.Collectable },
-                { eastHyrule.townAtDarunia.ActualTown, eastHyrule.townAtDarunia.Collectable },
-                { eastHyrule.townAtNewKasuto.ActualTown, eastHyrule.townAtNewKasuto.Collectable },
-                { eastHyrule.townAtOldKasuto.ActualTown, eastHyrule.townAtOldKasuto.Collectable },
+                { (Town)westHyrule.locationAtRauru.ActualTown!, westHyrule.locationAtRauru.Collectable },
+                { (Town)westHyrule.locationAtMido.ActualTown!, westHyrule.locationAtMido.Collectable },
+                { (Town)westHyrule.locationAtSariaNorth.ActualTown!, westHyrule.locationAtSariaNorth.Collectable },
+                { (Town)westHyrule.locationAtRuto.ActualTown!, westHyrule.locationAtRuto.Collectable },
+                { (Town)eastHyrule.townAtNabooru.ActualTown!, eastHyrule.townAtNabooru.Collectable },
+                { (Town)eastHyrule.townAtDarunia.ActualTown!, eastHyrule.townAtDarunia.Collectable },
+                { (Town)eastHyrule.townAtNewKasuto.ActualTown!, eastHyrule.townAtNewKasuto.Collectable },
+                { (Town)eastHyrule.townAtOldKasuto.ActualTown!, eastHyrule.townAtOldKasuto.Collectable },
             };
             f = await UpdateProgress(progress, ct, 9);
             if (!f)
@@ -495,7 +504,8 @@ public class Hyrule
 
             byte[] finalRNGState = new byte[32];
             RNG.NextBytes(finalRNGState);
-            var version = Assembly.GetEntryAssembly().GetName().Version;
+            var version = (Assembly.GetEntryAssembly()?.GetName()?.Version) 
+                ?? throw new Exception("Invalid entry assembly version information");
             var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
             byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
                 Flags +
@@ -959,7 +969,6 @@ public class Hyrule
         int eh = 0;
         int count = 1;
         int prevCount = 0;
-        int loopCount = 0;
         debug++;
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count 
@@ -1158,9 +1167,9 @@ public class Hyrule
             bool hadItemPreviously = location.ItemGet;
             bool hasItemNow;
             //Location is a palace
-            if (location.PalaceNumber > 0 && location.PalaceNumber < 7)
+            if (location.PalaceNumber != null && location.PalaceNumber < 7)
             {
-                Palace palace = palaces[location.PalaceNumber - 1];
+                Palace palace = palaces[(int)location.PalaceNumber - 1];
                 hasItemNow = CanGet(location)
                     //All palaces inherently required fairy spell or magic key
                     && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
@@ -1176,14 +1185,14 @@ public class Hyrule
                 hasItemNow = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
             }
             //Location is a town
-            else if(location.ActualTown != 0)
+            else if(location.ActualTown != null)
             {
-                hasItemNow = CanGet(location) && Towns.townSpellAndItemRequirements[location.ActualTown].AreSatisfiedBy(requireables);
+                hasItemNow = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown].AreSatisfiedBy(requireables);
             }
             else
             {
                 //TODO: Remove all the needX flags and replace them with a set of requirements.
-                hasItemNow = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedFlute || ItemGet[Collectable.FLUTE]);
+                hasItemNow = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
             }
 
             //Issue #3: Previously running UpdateItemGets multiple times could produce different results based on the sequence of times it ran
@@ -1481,17 +1490,17 @@ public class Hyrule
 
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL)
                 {
-                    westHyrule.LoadCave1(ROMData, 1);
-                    westHyrule.LoadCave2(ROMData, 1);
-                    westHyrule.LoadRaft(ROMData, 2);
+                    westHyrule.LoadCave1(ROMData, Continent.WEST, Continent.DM);
+                    westHyrule.LoadCave2(ROMData, Continent.WEST, Continent.DM);
+                    westHyrule.LoadRaft(ROMData, Continent.WEST, Continent.EAST);
 
-                    deathMountain.LoadCave1(ROMData, 0);
-                    deathMountain.LoadCave2(ROMData, 0);
+                    deathMountain.LoadCave1(ROMData, Continent.DM, Continent.WEST);
+                    deathMountain.LoadCave2(ROMData, Continent.DM, Continent.WEST);
 
-                    eastHyrule.LoadRaft(ROMData, 0);
-                    eastHyrule.LoadBridge(ROMData, 3);
+                    eastHyrule.LoadRaft(ROMData, Continent.EAST, Continent.WEST);
+                    eastHyrule.LoadBridge(ROMData, Continent.EAST, Continent.MAZE);
 
-                    mazeIsland.LoadBridge(ROMData, 2);
+                    mazeIsland.LoadBridge(ROMData, Continent.MAZE, Continent.EAST);
                 }
                 else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
@@ -1603,8 +1612,8 @@ public class Hyrule
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
 
-                    l1 = worlds[raftw1].LoadRaft(ROMData, raftw2);
-                    l2 = worlds[raftw2].LoadRaft(ROMData, raftw1);
+                    l1 = worlds[raftw1].LoadRaft(ROMData, (Continent)raftw1, (Continent)raftw2);
+                    l2 = worlds[raftw2].LoadRaft(ROMData, (Continent)raftw2, (Continent)raftw1);
                     connections[0] = (l1, l2);
 
                     int bridgew1 = RNG.Next(worlds.Count);
@@ -1632,8 +1641,8 @@ public class Hyrule
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
 
-                    l1 = worlds[bridgew1].LoadBridge(ROMData, bridgew2);
-                    l2 = worlds[bridgew2].LoadBridge(ROMData, bridgew1);
+                    l1 = worlds[bridgew1].LoadBridge(ROMData, (Continent)bridgew1, (Continent)bridgew2);
+                    l2 = worlds[bridgew2].LoadBridge(ROMData, (Continent)bridgew2, (Continent)bridgew1);
                     connections[1] = (l1, l2);
 
                     int c1w1 = RNG.Next(worlds.Count);
@@ -1661,8 +1670,8 @@ public class Hyrule
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
 
-                    l1 = worlds[c1w1].LoadCave1(ROMData, c1w2);
-                    l2 = worlds[c1w2].LoadCave1(ROMData, c1w1);
+                    l1 = worlds[c1w1].LoadCave1(ROMData, (Continent)c1w1, (Continent)c1w2);
+                    l2 = worlds[c1w2].LoadCave1(ROMData, (Continent)c1w2, (Continent)c1w1);
                     connections[2] = (l1, l2);
 
                     int c2w1 = RNG.Next(worlds.Count);
@@ -1690,8 +1699,8 @@ public class Hyrule
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
 
-                    l1 = worlds[c2w1].LoadCave2(ROMData, c2w2);
-                    l2 = worlds[c2w2].LoadCave2(ROMData, c2w1);
+                    l1 = worlds[c2w1].LoadCave2(ROMData, (Continent)c2w1, (Continent)c2w2);
+                    l2 = worlds[c2w2].LoadCave2(ROMData, (Continent)c2w2, (Continent)c2w1);
                     connections[3] = (l1, l2);
                 }
             } while (!AllContinentsHaveConnection(worlds));
@@ -1872,26 +1881,26 @@ public class Hyrule
         Location l1, l2;
         if (type == 1)
         {
-            l1 = worlds[w1].LoadRaft(ROMData, w2);
-            l2 = worlds[w2].LoadRaft(ROMData, w1);
+            l1 = worlds[w1].LoadRaft(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadRaft(ROMData, (Continent)w2, (Continent)w1);
             connections[0] = (l1, l2);
         }
         else if (type == 2)
         {
-            l1 = worlds[w1].LoadBridge(ROMData, w2);
-            l2 = worlds[w2].LoadBridge(ROMData, w1);
+            l1 = worlds[w1].LoadBridge(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadBridge(ROMData, (Continent)w2, (Continent)w1);
             connections[1] = (l1, l2);
         }
         else if (type == 3)
         {
-            l1 = worlds[w1].LoadCave1(ROMData, w2);
-            l2 = worlds[w2].LoadCave1(ROMData, w1);
+            l1 = worlds[w1].LoadCave1(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadCave1(ROMData, (Continent)w2, (Continent)w1);
             connections[2] = (l1, l2);
         }
         else
         {
-            l1 = worlds[w1].LoadCave2(ROMData, w2);
-            l2 = worlds[w2].LoadCave2(ROMData, w1);
+            l1 = worlds[w1].LoadCave2(ROMData, (Continent)w1, (Continent)w2);
+            l2 = worlds[w2].LoadCave2(ROMData, (Continent)w2, (Continent)w1);
             connections[3] = (l1, l2);
         }
     }
@@ -1927,37 +1936,17 @@ public class Hyrule
         if (props.SwapPalaceCont)
         {
 
-            List<Location> pals = new List<Location> { westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6 };
+            List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
 
             if (props.P7shuffle)
             {
                 pals.Add(eastHyrule.locationAtGP);
             }
 
-            //Replaced with fisher-yates
             for (int i = pals.Count() - 1; i > 0; i--)
             {
                 int swap = RNG.Next(i + 1);
                 Util.Swap(pals[i], pals[swap]);
-            }
-
-            westHyrule.locationAtPalace1.World = westHyrule.locationAtPalace1.World & 0xFC;
-            westHyrule.locationAtPalace2.World = westHyrule.locationAtPalace2.World & 0xFC;
-            westHyrule.locationAtPalace3.World = westHyrule.locationAtPalace3.World & 0xFC;
-
-            mazeIsland.locationAtPalace4.World = mazeIsland.locationAtPalace4.World & 0xFC;
-            mazeIsland.locationAtPalace4.World = mazeIsland.locationAtPalace4.World | 0x03;
-
-            eastHyrule.locationAtPalace5.World = eastHyrule.locationAtPalace5.World & 0xFC;
-            eastHyrule.locationAtPalace5.World = eastHyrule.locationAtPalace5.World | 0x02;
-
-            eastHyrule.locationAtPalace6.World = eastHyrule.locationAtPalace6.World & 0xFC;
-            eastHyrule.locationAtPalace6.World = eastHyrule.locationAtPalace6.World | 0x02;
-
-            if (props.P7shuffle)
-            {
-                eastHyrule.locationAtGP.World = eastHyrule.locationAtGP.World & 0xFC;
-                eastHyrule.locationAtGP.World = eastHyrule.locationAtGP.World | 0x02;
             }
         }
 
@@ -2714,11 +2703,11 @@ public class Hyrule
             List<Location> locs = world.AllLocations;
             foreach (Location location in locs.Where(i => i.AppearsOnMap))
             {
-                location.UpdateBytes();
-                ROMData.Put(location.MemAddress, location.LocationBytes[0]);
-                ROMData.Put(location.MemAddress + overworldXOff, location.LocationBytes[1]);
-                ROMData.Put(location.MemAddress + overworldMapOff, location.LocationBytes[2]);
-                ROMData.Put(location.MemAddress + overworldWorldOff, location.LocationBytes[3]);
+                byte[] locationBytes = location.GetLocationBytes();
+                ROMData.Put(location.MemAddress, locationBytes[0]);
+                ROMData.Put(location.MemAddress + overworldXOff, locationBytes[1]);
+                ROMData.Put(location.MemAddress + overworldMapOff, locationBytes[2]);
+                ROMData.Put(location.MemAddress + overworldWorldOff, locationBytes[3]);
             }
             ROMData.RemoveUnusedConnectors(world);
         }
@@ -2844,13 +2833,13 @@ public class Hyrule
 
         ROMData.AddCredits();
 
-        ROMData.Put(0x1CD3A, (byte)palGraphics[westHyrule.locationAtPalace1.PalaceNumber]);
-        ROMData.Put(0x1CD3B, (byte)palGraphics[westHyrule.locationAtPalace2.PalaceNumber]);
-        ROMData.Put(0x1CD3C, (byte)palGraphics[westHyrule.locationAtPalace3.PalaceNumber]);
-        ROMData.Put(0x1CD46, (byte)palGraphics[mazeIsland.locationAtPalace4.PalaceNumber]);
-        ROMData.Put(0x1CD42, (byte)palGraphics[eastHyrule.locationAtPalace5.PalaceNumber]);
-        ROMData.Put(0x1CD43, (byte)palGraphics[eastHyrule.locationAtPalace6.PalaceNumber]);
-        ROMData.Put(0x1CD44, (byte)palGraphics[eastHyrule.locationAtGP.PalaceNumber]);
+        ROMData.Put(0x1CD3A, (byte)palGraphics[(int)westHyrule.locationAtPalace1.PalaceNumber!]);
+        ROMData.Put(0x1CD3B, (byte)palGraphics[(int)westHyrule.locationAtPalace2.PalaceNumber!]);
+        ROMData.Put(0x1CD3C, (byte)palGraphics[(int)westHyrule.locationAtPalace3.PalaceNumber!]);
+        ROMData.Put(0x1CD46, (byte)palGraphics[(int)mazeIsland.locationAtPalace4.PalaceNumber!]);
+        ROMData.Put(0x1CD42, (byte)palGraphics[(int)eastHyrule.locationAtPalace5.PalaceNumber!]);
+        ROMData.Put(0x1CD43, (byte)palGraphics[(int)eastHyrule.locationAtPalace6.PalaceNumber!]);
+        ROMData.Put(0x1CD44, (byte)palGraphics[(int)eastHyrule.locationAtGP.PalaceNumber!]);
 
         if (props.ShuffleDripper)
         {
@@ -2959,42 +2948,46 @@ public class Hyrule
         ROMData.ElevatorBossFix(props.BossItem);
         if (westHyrule.locationAtPalace1.PalaceNumber != 7)
         {
-            palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace1.Collectable, ROMData);
+            palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace1.Collectable, ROMData);
         }
         if (westHyrule.locationAtPalace2.PalaceNumber != 7)
         {
-            palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace2.Collectable, ROMData);
+            palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace2.Collectable, ROMData);
         }
         if (westHyrule.locationAtPalace3.PalaceNumber != 7)
         {
-            palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace3.Collectable, ROMData);
+            palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace3.Collectable, ROMData);
         }
         if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
         {
-            palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace5.Collectable, ROMData);
+            palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace5.Collectable, ROMData);
         }
         if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
         {
-            palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace6.Collectable, ROMData);
+            palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace6.Collectable, ROMData);
         }
         if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
         {
-            palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
+            palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
+        }
+        if (palaces.Any(i => i.Entrance == null))
+        {
+            throw new Exception("Invalid palace without a palace number");
         }
 
-        Room root = palaces[westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance;
+        Room root = palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance!;
         ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, root.Map);
-        root = palaces[westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance;
+        root = palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance!;
         ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, root.Map);
-        root = palaces[westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance;
+        root = palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance!;
         ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, root.Map);
-        root = palaces[eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance!;
         ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, root.Map);
-        root = palaces[eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance!;
         ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, root.Map);
-        root = palaces[eastHyrule.locationAtGP.PalaceNumber - 1].Entrance;
+        root = palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].Entrance!;
         ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, root.Map);
-        root = palaces[mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance;
+        root = palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance!;
         ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, root.Map);
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
@@ -3105,7 +3098,7 @@ public class Hyrule
         {
             // Use the old spell menu behavior where the spells are placed in the menu in the location it came from
             var wizardCollectables = AllLocationsForReal()
-                .Where(l => Towns.STRICT_SPELL_LOCATIONS.Contains(l.ActualTown))
+                .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
                 .Select(l => l.Collectable).ToList();
             
             for (int i = 0; i < magFunction.Length; i++)
@@ -3472,6 +3465,7 @@ CustomFileSelectData:
         {
             a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectable);
         }
+        a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Code(Util.ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
@@ -3485,7 +3479,7 @@ CustomFileSelectData:
         }
         else
         {
-            helmetRoom = (byte)palaces[1].BossRoom.Map;
+            helmetRoom = (byte)palaces[1].BossRoom!.Map;
         }
 
         var a = asm.Module();

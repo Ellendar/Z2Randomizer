@@ -29,7 +29,9 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
     public bool HasRomData => !RomData.IsNullOrEmpty();
 
     [JsonConstructor]
+#pragma warning disable CS8618
     public RomFileViewModel() {}
+#pragma warning restore CS8618
 
     public RomFileViewModel(MainViewModel main)
     {

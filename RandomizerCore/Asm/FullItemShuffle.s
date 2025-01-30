@@ -145,6 +145,8 @@ WizardMagicContainerRequirement:
         cmp WizardMagicContainerRequirement,y
         bcc @EarlyExit
 .endif
+        ; Earning the item so move the dialog to the next state
+        inc $05
         lda LocationTableWizard
         ora JankPowerOfTwo,y
         sta LocationTableWizard
@@ -162,8 +164,13 @@ TownToItemTable:
     .byte JUMP_SPELL_ITEMLOC
     .byte LIFE_SPELL_ITEMLOC
     .byte FAIRY_SPELL_ITEMLOC
-    .byte REFLECT_SPELL_ITEMLOC
+; For some reason, when dash replaces fire it even replaces the "vanilla" spell
+.if _REPLACE_FIRE_WITH_DASH
+    .byte DASH_SPELL_ITEMLOC
+.else
     .byte FIRE_SPELL_ITEMLOC
+.endif
+    .byte REFLECT_SPELL_ITEMLOC
     .byte SPELL_SPELL_ITEMLOC
     .byte THUNDER_SPELL_ITEMLOC
 

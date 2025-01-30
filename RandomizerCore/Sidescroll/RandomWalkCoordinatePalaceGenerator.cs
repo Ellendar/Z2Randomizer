@@ -6,15 +6,10 @@ using System.Threading;
 
 namespace RandomizerCore.Sidescroll;
 
-public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : CoordinatePalaceGenerator(ct)
+public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
-    private static int debug = 0;
-
-    private static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
-    private const int STALL_LIMIT = 1000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
-        debug++;
         Palace palace = new(palaceNumber);
         List<(int, int)> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
@@ -149,7 +144,7 @@ public class RandomWalkCoordinatePalaceGenerator(CancellationToken ct) : Coordin
             roomsByExitType.TryGetValue(roomExitType, out var roomCandidates);
             roomCandidates ??= [];
             roomCandidates.FisherYatesShuffle(r);
-            Room newRoom = null;
+            Room? newRoom = null;
             Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
             foreach (Room roomCandidate in roomCandidates)
             {

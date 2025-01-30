@@ -38,7 +38,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         Collectable.THUNDER_SPELL
     ];
 
-    private string seed;
+    private string? seed;
     
     private bool shuffleStartingItems;
     private bool startWithCandle;
@@ -197,7 +197,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     //Meta
     [Required]
     [IgnoreInFlags]
-    public string Seed { get => seed; set => SetField(ref seed, value); }
+    public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
     [IgnoreInFlags]
     public string Flags
     {
@@ -1122,6 +1122,14 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         UpAOnController1 = false;
         RemoveFlashing = false;
         Sprite = CharacterSprite.LINK;
+        Climate = Climates.Classic;
+        //This is a NOP, but it satisfies a quirk in the analyzer
+        sprite = Sprite;
+        climate = Climate;
+        if (Sprite == null || Climate == null)
+        {
+            throw new ImpossibleException();
+        }
         Tunic = CharacterColor.Default;
         ShieldTunic = CharacterColor.Default;
         BeamSprite = BeamSprites.DEFAULT;
@@ -1129,7 +1137,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         DisableHUDLag = false;
     }
 
-    public RandomizerConfiguration(string flagstring)
+    public RandomizerConfiguration(string flagstring) : this()
     {
         ConvertFlags(flagstring, this);
     }
@@ -1137,6 +1145,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(RandomizerConfiguration))]
     private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
     {
+        //seed - climate - sprite
         var config = newThis ?? new RandomizerConfiguration();
         FlagReader flagReader = new FlagReader(flagstring);
         PropertyInfo[] properties = GetType().GetProperties();
@@ -1144,37 +1153,38 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         foreach (PropertyInfo property in properties)
         {
             Type propertyType = property.PropertyType;
-            int limit = 0;
+            int limit;
             bool isNullable = false;
 
             if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
             {
                 continue;
             }
-            if (Attribute.IsDefined(property, typeof(LimitAttribute)))
-            {
-                LimitAttribute limitAttribute = (LimitAttribute)property.GetCustomAttribute(typeof(LimitAttribute));
-                limit = limitAttribute.Limit;
-            }
+            LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
+            limit = limitAttribute?.Limit ?? 0;
+
             if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 propertyType = propertyType.GetGenericArguments()[0];
                 isNullable = true;
             }
-            if(Attribute.IsDefined(property, typeof(CustomFlagSerializerAttribute)))
+//The analyzer simultaneously complains about this warning that doesn't matter,
+//and then complains about the warning suppression being unnecessary once it's suppressed.
+#pragma warning disable IL2072
+            CustomFlagSerializerAttribute? attribute = 
+                (CustomFlagSerializerAttribute?)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
+            if (attribute != null)
             {
-                CustomFlagSerializerAttribute attribute = (CustomFlagSerializerAttribute)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
-                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type);
-                property.SetValue(config, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
+                IFlagSerializer? serializer = (IFlagSerializer?)Activator.CreateInstance(attribute.Type);
+                property.SetValue(config, serializer?.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
             }
+#pragma warning restore IL2072 
             else if (propertyType == typeof(bool))
             {
                 property.SetValue(config, isNullable ? flagReader.ReadNullableBool() : flagReader.ReadBool());
             }
             else if (propertyType.IsEnum)
             {
-                limit = System.Enum.GetValues(propertyType).Length;
-                //int? index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
                 var methodType = isNullable ? "ReadNullableEnum" : "ReadEnum";
                 MethodInfo method = typeof(FlagReader).GetMethod(methodType)!
                     .MakeGenericMethod([propertyType]);
@@ -1185,11 +1195,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             {
                 if (Attribute.IsDefined(property, typeof(LimitAttribute)))
                 {
-                    int minimum = 0;
-                    if (Attribute.IsDefined(property, typeof(MinimumAttribute)))
-                    {
-                        minimum = ((MinimumAttribute)property.GetCustomAttribute(typeof(MinimumAttribute))).Minimum;
-                    }
+                    int minimum = ((MinimumAttribute?)property.GetCustomAttribute(typeof(MinimumAttribute)))?.Minimum ?? 0;
 
                     if (isNullable)
                     {
@@ -1746,29 +1752,32 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         foreach (PropertyInfo property in properties)
         {
             Type propertyType = property.PropertyType;
-            int limit = 0;
             bool isNullable = false;
 
             if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
             {
                 continue;
             }
-            if (Attribute.IsDefined(property, typeof(LimitAttribute)))
-            {
-                LimitAttribute limitAttribute = (LimitAttribute)property.GetCustomAttribute(typeof(LimitAttribute));
-                limit = limitAttribute.Limit;
-            }
+            LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
+            int limit = limitAttribute?.Limit ?? 0;
             if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
                 propertyType = propertyType.GetGenericArguments()[0];
                 isNullable = true;
             }
-            if (Attribute.IsDefined(property, typeof(CustomFlagSerializerAttribute)))
+#pragma warning disable IL2072
+            CustomFlagSerializerAttribute? attribute = 
+                (CustomFlagSerializerAttribute?)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
+            if(attribute != null)
             {
-                CustomFlagSerializerAttribute attribute = (CustomFlagSerializerAttribute)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
-                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type);
-                flags.Append(serializer.Serialize(property.GetValue(this, null)), serializer.GetLimit());
+                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type)!;
+                if(serializer?.GetLimit() == null)
+                {
+                    throw new Exception("Missing limit on serializer");
+                }
+                flags.Append(serializer?.Serialize(property.GetValue(this, null)), serializer!.GetLimit());
             }
+#pragma warning restore IL2072
             else if (propertyType == typeof(bool))
             {
                 if (isNullable)
@@ -1777,20 +1786,20 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 }
                 else
                 {
-                    flags.Append((bool)property.GetValue(this, null));
+                    flags.Append((bool)property.GetValue(this, null)!);
                 }
             }
             else if (propertyType.IsEnum)
             {
                 limit = Enum.GetValues(propertyType).Length;
-                int? index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
-                if (isNullable && index == null)
+                int index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
+                if (isNullable)
                 {
-                    flags.Append((int)index + 1, limit + 1);
+                    flags.Append(index == -1 ? null : index, limit + 1);
                 }
                 else
                 {
-                    flags.Append((int)index, limit);
+                    flags.Append(index, limit);
                 }
             }
             else if (IsIntegerType(propertyType))
@@ -1799,11 +1808,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 {
                     logger.Error("Numeric Property " + property.Name + " is missing a limit!");
                 }
-                int minimum = 0;
-                if (Attribute.IsDefined(property, typeof(MinimumAttribute)))
-                {
-                    minimum = ((MinimumAttribute)property.GetCustomAttribute(typeof(MinimumAttribute))).Minimum;
-                }
+                int minimum = ((MinimumAttribute?)property.GetCustomAttribute(typeof(MinimumAttribute)))?.Minimum ?? 0;
                 if (isNullable)
                 {
                     int? value = (int?)property.GetValue(this, null);
@@ -1816,7 +1821,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 }
                 else
                 {
-                    int value = (int)property.GetValue(this, null);
+                    int value = (int)property.GetValue(this, null)!;
                     if (value < minimum || value > minimum + limit)
                     {
                         logger.Warn("Property (" + property.Name + " was out of range.");
@@ -1836,17 +1841,18 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
     public RandomizerProperties Export(Random r)
     {
-        RandomizerProperties properties = new();
+        RandomizerProperties properties = new()
+        {
+            Flags = Flags,
 
-        properties.Flags = Flags;
+            WestIsHorizontal = r.Next(2) == 1,
+            EastIsHorizontal = r.Next(2) == 1,
+            DmIsHorizontal = r.Next(2) == 1,
+            EastRockIsPath = r.Next(2) == 1,
 
-        properties.WestIsHorizontal = r.Next(2) == 1;
-        properties.EastIsHorizontal = r.Next(2) == 1;
-        properties.DmIsHorizontal = r.Next(2) == 1;
-        properties.EastRockIsPath = r.Next(2) == 1;
-
-        //ROM Info
-        properties.Seed = Seed;
+            //ROM Info
+            Seed = Seed
+        };
 
         //Start Configuration
         ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
@@ -1994,7 +2000,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.BoulderBlockConnections = AllowConnectionCavesToBeBlocked;
         if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA || WestBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = WestBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            int shuffleLimit = WestBiome switch {
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 6,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
+                _ => throw new ImpossibleException()
+            };
             properties.WestBiome = r.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -2016,7 +2027,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA || EastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = EastBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            int shuffleLimit = EastBiome switch { 
+                Biome.RANDOM => 7, 
+                Biome.RANDOM_NO_VANILLA => 6, 
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
+                _ => throw new ImpossibleException()
+            };
             properties.EastBiome = r.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -2039,7 +2055,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA || DMBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = DMBiome switch { Biome.RANDOM => 7, Biome.RANDOM_NO_VANILLA => 6, Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5 };
+            int shuffleLimit = DMBiome switch {
+                Biome.RANDOM => 7,
+                Biome.RANDOM_NO_VANILLA => 6,
+                Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
+                _ => throw new ImpossibleException()
+            };
             properties.DmBiome = r.Next(shuffleLimit) switch
             {
                 0 => Biome.VANILLALIKE,
@@ -2076,7 +2097,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         if (Climate == null)
         {
-            properties.Climates = r.Next(5) switch
+            properties.Climate = r.Next(5) switch
             {
                 0 => Climates.Classic,
                 1 => Climates.Chaos,
@@ -2088,7 +2109,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         else
         {
-            properties.Climates = Climate;
+            properties.Climate = Climate;
         }
         properties.VanillaShuffleUsesActualTerrain = VanillaShuffleUsesActualTerrain;
         properties.ShuffleHidden = ShuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
@@ -2469,6 +2490,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             IndeterminateOptionRate.HALF => .50,
             IndeterminateOptionRate.THREE_QUARTERS => .75,
             IndeterminateOptionRate.NINETY_PERCENT => .90,
+            _ => throw new Exception("Unrecognized IndeterminateOptionRate")
         };
     }
 

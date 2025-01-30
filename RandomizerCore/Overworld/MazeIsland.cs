@@ -37,29 +37,29 @@ sealed class MazeIsland : World
 
     public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE));
-        locations.AddRange(rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE));
-        locations.AddRange(rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE));
-        locations.AddRange(rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE),
+            .. rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE),
+        ];
         locations.ForEach(AddLocation);
 
-        walkableTerrains = new List<Terrain>();
-        walkableTerrains.Add(Terrain.MOUNTAIN);
+        walkableTerrains = [Terrain.MOUNTAIN];
         enemyAddr = 0x88B0;
-        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15 };
-        generators = new List<int> { 0x0B, 0x0F, 0x17 };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
-        largeEnemies = new List<int> { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+        enemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
+        flyingEnemies = [0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15];
+        generators = [0x0B, 0x0F, 0x17];
+        smallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
+        largeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
         enemyPtr = 0xA08E;
-        overworldMaps = new List<int>();
+        overworldMaps = [];
 
         childDrop = GetLocationByMem(0xA143);
         magicContainerDrop = GetLocationByMem(0xA133);
         locationAtPalace4 = GetLocationByMem(0xA140);
         locationAtPalace4.PalaceNumber = 4;
-        locationAtPalace4.World = locationAtPalace4.World | 0x03;
         MAP_ROWS = 23;
         MAP_COLS = 23;
 
@@ -100,7 +100,10 @@ sealed class MazeIsland : World
                 {
                     location.PassThrough = 0;
                 }
-                bridge.PassThrough = 0;
+                if (bridge != null)
+                {
+                    bridge.PassThrough = 0;
+                }
                 magicContainerDrop.PassThrough = 0;
                 childDrop.PassThrough = 0;
             }
@@ -291,22 +294,24 @@ sealed class MazeIsland : World
                 map[palace4y + 1, palace4x - 1] = Terrain.ROAD;
 
                 //draw a river
-                int riverstart = starty;
-                while (riverstart == starty)
+                int riverStartY = starty;
+                while (riverStartY == starty)
                 {
-                    riverstart = RNG.Next(10) * 2 + 1;
+                    riverStartY = RNG.Next(10) * 2 + 1;
                 }
 
-                int riverend = RNG.Next(10) * 2 + 1;
+                int riverEndY = RNG.Next(10) * 2 + 1;
 
+                /*
                 Location riverStart = new Location();
                 riverStart.Xpos = 1;
-                riverStart.Ypos = riverstart + 30;
+                riverStart.Ypos = riverStartY + 30;
 
                 Location riverEnd = new Location();
                 riverEnd.Xpos = 21;
-                riverEnd.Ypos = riverend + 30;
-                DrawLine(riverStart, riverEnd, Terrain.WALKABLEWATER);
+                riverEnd.Ypos = riverEndY + 30;
+                */
+                DrawLine(riverStartY, 21, riverEndY, 21, Terrain.WALKABLEWATER);
 
                 //Place raft
                 Direction raftDirection = Direction.EAST;
@@ -507,7 +512,7 @@ sealed class MazeIsland : World
                     else if (bridgeDirection == Direction.WEST)
                     {
                         bridgeY = RNG.Next(2, MAP_ROWS - 2);
-                        while(bridgeY == riverend || bridgeY == riverstart)
+                        while(bridgeY == riverEndY || bridgeY == riverStartY)
                         {
                             bridgeY = RNG.Next(2, MAP_ROWS - 2);
                         }
@@ -542,7 +547,7 @@ sealed class MazeIsland : World
                     {
                         bridgeX = MAP_COLS + 3;
                         bridgeY = RNG.Next(2, MAP_ROWS - 2);
-                        while (bridgeY == riverend || bridgeY == riverstart)
+                        while (bridgeY == riverEndY || bridgeY == riverStartY)
                         {
                             bridgeY = RNG.Next(2, MAP_ROWS - 2);
 
@@ -699,7 +704,7 @@ sealed class MazeIsland : World
 
     private List<(int, int)> GetListOfNeighbors(int currx, int curry, bool[,] v)
     {
-        List<(int, int)> x = new List<(int, int)>();
+        List<(int, int)> x = [];
 
         if (currx - 2 > 1 && v[curry, currx - 2] == false)
         {
@@ -723,46 +728,49 @@ sealed class MazeIsland : World
         return x;
     }
 
-    private void DrawLine(Location to, Location from, Terrain t)
+    private void DrawLine((int, int) from, (int, int) to, Terrain t)
     {
-        int x = from.Xpos;
-        int y = from.Ypos - 30;
-        while (x != to.Xpos)
+        DrawLine(from.Item1, from.Item2, to.Item1, to.Item2, t);
+    }
+
+    private void DrawLine(int fromY, int fromX, int toY, int toX, Terrain t)
+    {
+        while (fromX != toX)
         {
-            if (x == 21 || (RNG.NextDouble() > .5 && x != to.Xpos))
+            if (fromX == 21 || (RNG.NextDouble() > .5 && fromX != toX))
             {
-                int diff = to.Xpos - x;
+                int diff = toX - fromX;
                 int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
 
  
-                while (Math.Abs(move) > 0 && !(x == to.Xpos && y == to.Ypos - 30))
+                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY - 30))
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords((y + 30, x)) == null)
+                        if ((fromX != toX || fromY != (toY - 30)) && GetLocationByCoords((fromY + 30, fromX)) == null)
                         {
-                            if(map[y, x] == Terrain.MOUNTAIN)
+                            if(map[fromY, fromX] == Terrain.MOUNTAIN)
                             {
-                                map[y, x] = t;
+                                map[fromY, fromX] = t;
                             }
-                            else if (map[y, x] == Terrain.ROAD && ((diff > 0 && (map[y, x + 1] == Terrain.MOUNTAIN)) || (diff < 0 && map[y, x - 1] == Terrain.MOUNTAIN)))
+                            else if (map[fromY, fromX] == Terrain.ROAD && ((diff > 0 && (map[fromY, fromX + 1] == Terrain.MOUNTAIN)) || (diff < 0 && map[fromY, fromX - 1] == Terrain.MOUNTAIN)))
                             {
-                                map[y, x] = Terrain.BRIDGE;
+                                map[fromY, fromX] = Terrain.BRIDGE;
                             }
-                            else if (map[y, x] != Terrain.PALACE && map[y, x] != Terrain.BRIDGE && map[y, x] != Terrain.CAVE)
+                            else if (map[fromY, fromX] != Terrain.PALACE && map[fromY, fromX] != Terrain.BRIDGE && map[fromY, fromX] != Terrain.CAVE)
                             {
-                                map[y, x] = t;
+                                map[fromY, fromX] = t;
                             }
 
                         }
-                        if (diff > 0 && x < MAP_COLS - 1)
+                        if (diff > 0 && fromX < MAP_COLS - 1)
                         {
-                            x++;
+                            fromX++;
                             
                         }
-                        else if (x > 0)
+                        else if (fromX > 0)
                         {
-                            x--;
+                            fromX--;
                             
                         }
                         
@@ -770,37 +778,37 @@ sealed class MazeIsland : World
                     }
                 }
             }
-            else if(y != to.Ypos - 30)
+            else if(fromY != toY - 30)
             {
-                int diff = to.Ypos - 30 - y;
+                int diff = toY - 30 - fromY;
                 int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
-                while (Math.Abs(move) > 0 && !(x == to.Xpos && y == to.Ypos - 30))
+                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY - 30))
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((x != to.Xpos || y != (to.Ypos - 30)) && GetLocationByCoords((y + 30, x)) == null)
+                        if ((fromX != toX || fromY != (toY - 30)) && GetLocationByCoords((fromY + 30, fromX)) == null)
                         {
-                            if (map[y, x] == Terrain.MOUNTAIN)
+                            if (map[fromY, fromX] == Terrain.MOUNTAIN)
                             {
-                                map[y, x] = t;
+                                map[fromY, fromX] = t;
                             }
-                            else if(map[y, x] == Terrain.ROAD && ((diff > 0 && (map[y + 1, x] == Terrain.MOUNTAIN)) || (diff < 0 && map[y - 1, x] == Terrain.MOUNTAIN)))
+                            else if(map[fromY, fromX] == Terrain.ROAD && ((diff > 0 && (map[fromY + 1, fromX] == Terrain.MOUNTAIN)) || (diff < 0 && map[fromY - 1, fromX] == Terrain.MOUNTAIN)))
                             {
-                                map[y, x] = Terrain.BRIDGE;
+                                map[fromY, fromX] = Terrain.BRIDGE;
                             }
-                            else if (map[y, x] != Terrain.PALACE && map[y, x] != Terrain.BRIDGE && map[y, x] != Terrain.CAVE)
+                            else if (map[fromY, fromX] != Terrain.PALACE && map[fromY, fromX] != Terrain.BRIDGE && map[fromY, fromX] != Terrain.CAVE)
                             {
-                                map[y, x] = t;
+                                map[fromY, fromX] = t;
                             }
                         }
-                        if (diff > 0 && y < MAP_ROWS - 1)
+                        if (diff > 0 && fromY < MAP_ROWS - 1)
                         {
-                            y++;
+                            fromY++;
                             
                         }
-                        else if (y > 0)
+                        else if (fromY > 0)
                         {
-                            y--;
+                            fromY--;
                             
                         }
                         move--;
@@ -908,7 +916,7 @@ sealed class MazeIsland : World
 
         foreach (Location key in connections.Keys)
         {
-            if (requiredLocations.TryGetValue(key, out Location value))
+            if (requiredLocations.TryGetValue(key, out Location? value))
             {
                 requiredLocations.Add(key);
             }

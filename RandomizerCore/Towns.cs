@@ -21,11 +21,11 @@ internal class Towns
         { Town.SARIA_TABLE, new Requirements() }
     };
 
-    public static readonly Town[] STRICT_SPELL_LOCATIONS = { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
-        Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
+    public static readonly List<Town> STRICT_SPELL_LOCATIONS = [ Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
+        Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO ];
 
-    public static readonly Town[] ITEM_LOCATION_TOWNS = { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
+    public static readonly List<Town> ITEM_LOCATION_TOWNS = [ Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST, 
         Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO, 
         Town.MIDO_CHURCH, Town.DARUNIA_ROOF, 
-        Town.SARIA_TABLE, Town.NABOORU_FOUNTAIN, Town.BAGU};
+        Town.SARIA_TABLE, Town.NABOORU_FOUNTAIN, Town.BAGU];
 }

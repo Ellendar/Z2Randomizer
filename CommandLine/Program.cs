@@ -145,13 +145,13 @@ public class Program
 
         if (level == LogLevel.Off)
         {
-            LogManager.DisableLogging();
+            LogManager.SuspendLogging();
         }
         else
         {
             if (!LogManager.IsLoggingEnabled())
             {
-                LogManager.EnableLogging();
+                LogManager.SuspendLogging();
             }
 
             foreach (var rule in LogManager.Configuration.LoggingRules)

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -12,12 +10,8 @@ public class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private const bool DROPS_ARE_BLOCKERS = false;
+    //private const bool DROPS_ARE_BLOCKERS = false;
     private const byte OUTSIDE_ROOM_EXIT = 0b11111100;
-    private Room entrance;
-    private Room itemRoom;
-    private Room bossRoom;
-    private Room tbirdRoom;
     private readonly SortedDictionary<int, List<Room>> rooms;
     internal bool IsValid { get; set; } = false;
 
@@ -32,146 +26,34 @@ public class Palace
         Collectable.ONEUP
     ];
 
-    //private int numRooms;
-    private List<Room> openRooms;
-    //private int maxRooms;
-    private int netDeadEnds;
-
     internal List<Room> AllRooms { get; private set; }
 
-    public Room Entrance { get => entrance; set => entrance = value; }
-    public Room ItemRoom { get => itemRoom; set => itemRoom = value; }
-    public Room BossRoom { get => bossRoom; set => bossRoom = value; }
+    public Room? Entrance { get; set; }
+    public Room? ItemRoom { get; set; }
+    public Room? BossRoom { get; set; }
     public int Number { get; set; }
-    internal Room Tbird { get => tbirdRoom; set => tbirdRoom = value; }
-    
+    internal Room? TbirdRoom { get; set; }
+
     //DEBUG
     public int Generations { get; set; }
 
     public Palace(int number)
     {
         Number = number;
-        entrance = null;
-        rooms = new SortedDictionary<int, List<Room>>();
-        AllRooms = new List<Room>();
-        openRooms = new List<Room>();
-        if (Number < 7)
-        {
-            netDeadEnds = 3;
-        }
-        else
-        {
-            netDeadEnds = 2;
-        }
+        Entrance = null;
+        rooms = [];
+        AllRooms = [];
     }
 
-    public int GetOpenRooms()
-    {
-        return openRooms.Count;
-    }
-
-    public bool AddRoom(Room r, bool blockersAnywhere)
-    {
-        bool placed;
-        r.PalaceGroup = GetPalaceGroup();
-
-        if (netDeadEnds > 3 && r.IsDeadEnd)
-        {
-            return false;
-        }
-
-        if (netDeadEnds < -3 && r.CountOpenExits() > 2)
-        {
-            return false;
-        }
-
-        if(!blockersAnywhere)
-        {
-            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[Number-1];
-            if(!r.IsTraversable(allowedBlockers))
-            {
-                return false;
-            }
-            if ((Number == 1 || Number == 2 || Number == 5 || Number == 7) && r.HasBoss)
-            {
-                return false;
-            }
-        }
-
-        if (openRooms.Count == 0)
-        {
-            openRooms.Add(r);
-            ProcessRoom(r);
-            return true;
-        }
-        //#13: Iterate over a copy of the open rooms list to prevent concurrent modification if AttachToOpen both removes an entry from openRooms and returns false
-        foreach (Room open in openRooms.ToList())
-        {
-            placed = AttachToOpen(r, open);
-
-            if (placed)
-            {
-                ProcessRoom(r);
-                return true;
-            }
-
-        }
-        return false;
-    }
-
-    private void ProcessRoom(Room r)
-    {
-        if (r.IsDeadEnd)
-        {
-            netDeadEnds++;
-        }
-        else if (r.CountOpenExits() > 1)
-        {
-            netDeadEnds--;
-        }
-        AllRooms.Add(r);
-        //SortRoom(r);
-        //numRooms++;
-
-        if (Number != 7 && openRooms.Count > 1 && itemRoom.CountOpenExits() > 0)
-        {
-            foreach (Room open2 in openRooms)
-            {
-                bool item = AttachToOpen(open2, itemRoom);
-                if (item)
-                {
-                    break;
-                }
-            }
-        }
-        if (openRooms.Count > 1 && bossRoom.CountOpenExits() > 0)
-        {
-            foreach (Room open2 in openRooms)
-            {
-                bool boss = AttachToOpen(open2, bossRoom);
-                if (boss)
-                {
-                    break;
-                }
-            }
-        }
-        if (Number == 7 && openRooms.Count > 1 && Tbird != null && Tbird.CountOpenExits() > 1)
-        {
-            foreach (Room open2 in openRooms)
-            {
-                bool boss = AttachToOpen(open2, tbirdRoom);
-                if (boss)
-                {
-                    break;
-                }
-            }
-        }
-    }
     public void UpdateSideviewItem(Collectable collectable)
     {
         if(Number == 7)
         {
             return;
+        }
+        if(ItemRoom == null)
+        {
+            throw new Exception("Unable to update item for a palace with no item room"); 
         }
         byte[] sideView = ItemRoom.SideView;
         for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
@@ -193,132 +75,32 @@ public class Palace
 
     public void UpdateRomItem(Collectable collectable, ROM ROMData)
     {
-        //XXX: HERE
-        itemRoom.UpdateRomItem(collectable, ROMData);
-    }
-
-    public void Consolidate()
-    {
-        Room[] openCopy = new Room[openRooms.Count];
-        openRooms.CopyTo(openCopy);
-        foreach (Room r2 in openCopy)
-        {
-            foreach (Room r3 in openCopy)
-            {
-                if (r2 != r3 && openRooms.Contains(r2) && openRooms.Contains(r3))
-                {
-                    AttachToOpen(r2, r3);
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Attach the provided room to the open room if there is a compatable pair of exits between the two rooms.
-    /// Rooms attempt to use the exits in the following order (from the perspective of open):  
-    /// </summary>
-    /// <param name="r"></param> The room to be attached
-    /// <param name="open"></param> The room onto which R is attached
-    /// <returns>Whether or not the room was actually able to be attached.</returns>
-    private bool AttachToOpen(Room r, Room open)
-    {
-        bool placed = false;
-        //Right from open into r
-        if (!placed && open.HasRightExit && open.Right == null && r.HasLeftExit && r.Left == null)
-        {
-            open.Right = r;
-            r.Left = open;
-
-            placed = true;
-        }
-        //Left open into r
-        if (!placed && open.HasLeftExit && open.Left == null && r.HasRightExit && r.Right == null)
-        {
-            open.Left = r;
-
-            r.Right = open;
-
-            placed = true;
-        }
-        //Elevator Up from open
-        if (!placed && open.HasUpExit && open.Up == null && r.HasDownExit && r.Down == null && !r.HasDrop)
-        {
-            open.Up = r;
-            r.Down = open;
-
-            placed = true;
-        }
-        //Down Elevator from open
-        if (!placed && open.HasDownExit && !open.HasDrop && open.Down == null && r.HasUpExit && r.Up == null)
-        {
-            open.Down = r;
-            r.Up = open;
-
-            placed = true;
-        }
-        //Drop from open into r
-        if (!placed && open.HasDownExit && open.HasDrop && open.Down == null && r.IsDropZone)
-        {
-
-            open.Down = r;
-            r.IsDropZone = false;
-            placed = true;
-        }
-        //Drop from r into open 
-        if (!placed && open.IsDropZone && r.HasDrop && r.Down == null && r.HasDownExit)
-        {
-
-            r.Down = open;
-
-            open.IsDropZone = false;
-            placed = true;
-        }
-        //If the room doesn't have any open exits anymore, remove it from the list
-        //#13: If the room doesn't have any open exits, how did it get into the 
-        if (open.CountOpenExits() == 0)
-        {
-            openRooms.Remove(open);
-        }
-        //Otherwise, if the open room isn't in the open rooms list (What? How?) and the pending openings hasn't been met,
-        //put the open room in openRooms where it belongs, and then for some reason mark that we successfully placed the room even though we didn't.
-        else if (!openRooms.Contains(open) && (openRooms.Count < 3 || placed))
-        {
-            openRooms.Add(open);
-            placed = true;
-        }
-        //If the room itself is already in the open rooms list (How?), but we filled the last exit, remove it from the open rooms list.
-        if (r.CountOpenExits() == 0)
-        {
-            openRooms.Remove(r);
-        }
-        //Otherwise, if the room being added still has unmatched openings, and the maximum pending openings hasn't been met, add this room to the open rooms list
-        else if (!openRooms.Contains(r) && (openRooms.Count < 3 || placed))
-        {
-            openRooms.Add(r);
-            placed = true;
-        }
-
-        return placed;
+        ItemRoom?.UpdateRomItem(collectable, ROMData);
     }
 
     public bool RequiresThunderbird()
     {
-        CheckSpecialPaths(entrance);
-        return !bossRoom.IsBeforeTbird;
+        CheckSpecialPaths(Entrance!);
+        return !BossRoom!.IsBeforeTbird;
     }
 
     public bool HasDeadEnd()
     {
+
         List<Room> dropExits = AllRooms.Where(i => i.HasDownExit && i.HasDrop).ToList();
         if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
         {
             return false;
         }
-        Room end = BossRoom;
+        Room end = BossRoom!;
         foreach (Room r in dropExits)
         {
-            List<Room> reachable = new List<Room>();
-            List<Room> roomsToCheck = new List<Room>();
+            if(r.Down == null)
+            {
+                continue;
+            }
+            List<Room> reachable = [];
+            List<Room> roomsToCheck = [];
             reachable.Add(r.Down);
             roomsToCheck.Add(r.Down);
 
@@ -347,7 +129,7 @@ public class Palace
                 }
                 roomsToCheck.Remove(c);
             }
-            if (!reachable.Contains(entrance) && !reachable.Contains(end))
+            if (!reachable.Contains(Entrance!) && !reachable.Contains(end))
             {
                 return true;
             }
@@ -392,15 +174,19 @@ public class Palace
 
     public IEnumerable<Room> GetReachableRooms(bool allowBacktracking = false)
     {
+        if(Entrance == null)
+        {
+            throw new Exception("Palace Entrance is missing");
+        }
         foreach (Room r in AllRooms)
         {
             if (r.HasBoss && CanEnterBossFromLeft(r))
             {
-                return new Room[] { entrance };
+                return [Entrance];
             }
         }
         List<Room> reachedRooms = [];
-        List<(Room, Direction)> roomsToCheck = [(entrance, Direction.WEST)];
+        List<(Room, Direction)> roomsToCheck = [(Entrance, Direction.WEST)];
         while (roomsToCheck.Count > 0)
         {
             Room room = roomsToCheck.Last().Item1;
@@ -411,7 +197,7 @@ public class Palace
             {
                 if (originDirection == Direction.EAST)
                 {
-                    return new Room[] { entrance };
+                    return new Room[] { Entrance };
                 }
             }
             roomsToCheck.Remove(roomsToCheck.Last());
@@ -453,24 +239,24 @@ public class Palace
         List<Room> reachable = [];
         List<Room> roomsToCheck = [];
 
-        Room entrance = AllRooms.First(i => i.IsEntrance);
+        Room Entrance = AllRooms.First(i => i.IsEntrance);
 
-        if(entrance.Down != null)
+        if(Entrance.Down != null)
         {
-            reachable.Add(entrance.Down);
-            roomsToCheck.Add(entrance.Down);
+            reachable.Add(Entrance.Down);
+            roomsToCheck.Add(Entrance.Down);
         }
 
-        if (entrance.Up != null)
+        if (Entrance.Up != null)
         {
-            reachable.Add(entrance.Up);
-            roomsToCheck.Add(entrance.Up);
+            reachable.Add(Entrance.Up);
+            roomsToCheck.Add(Entrance.Up);
         }
 
-        if (entrance.Right != null)
+        if (Entrance.Right != null)
         {
-            reachable.Add(entrance.Right);
-            roomsToCheck.Add(entrance.Right);
+            reachable.Add(Entrance.Right);
+            roomsToCheck.Add(Entrance.Right);
         }
 
         while (roomsToCheck.Count > 0)
@@ -520,8 +306,8 @@ public class Palace
         {
             Room selectedRoom = roomsWithUpExits[i];
             Room swapRoom = roomsWithUpExits.Sample(r)!;
-            selectedRoom.Up.Down = swapRoom;
-            swapRoom.Up.Down = selectedRoom;
+            selectedRoom.Up!.Down = swapRoom;
+            swapRoom.Up!.Down = selectedRoom;
 
             (selectedRoom.Up, swapRoom.Up) = (swapRoom.Up, selectedRoom.Up);
             if (AllRooms.Any(i => !i.ValidateExits()))
@@ -533,7 +319,7 @@ public class Palace
         {
             int swap = r.Next(i, roomsWithDropExits.Count);
 
-            Room temp = roomsWithDropExits[i].Down;
+            Room temp = roomsWithDropExits[i].Down!;
 
             roomsWithDropExits[i].Down = roomsWithDropExits[swap].Down;
             roomsWithDropExits[swap].Down = temp;
@@ -548,8 +334,8 @@ public class Palace
             Room selectedRoom = roomsWithDownExits[i];
             Room swapRoom = roomsWithDownExits.Sample(r)!;
 
-            selectedRoom.Down.Up = swapRoom;
-            swapRoom.Down.Up = selectedRoom;
+            selectedRoom.Down!.Up = swapRoom;
+            swapRoom.Down!.Up = selectedRoom;
 
             (selectedRoom.Down, swapRoom.Down) = (swapRoom.Down, selectedRoom.Down);
             if (AllRooms.Any(i => !i.ValidateExits()))
@@ -563,8 +349,8 @@ public class Palace
 
             Room selectedRoom = roomsWithLeftExits[i];
             Room swapRoom = roomsWithLeftExits.Sample(r)!;
-            selectedRoom.Left.Right = swapRoom;
-            swapRoom.Left.Right = selectedRoom;
+            selectedRoom.Left!.Right = swapRoom;
+            swapRoom.Left!.Right = selectedRoom;
 
             (selectedRoom.Left, swapRoom.Left) = (swapRoom.Left, selectedRoom.Left);
             if (AllRooms.Any(i => !i.ValidateExits()))
@@ -577,8 +363,8 @@ public class Palace
         {
             Room selectedRoom = roomsWithRightExits[i];
             Room swapRoom = roomsWithRightExits.Sample(r)!;
-            selectedRoom.Right.Left = swapRoom;
-            swapRoom.Right.Left = selectedRoom;
+            selectedRoom.Right!.Left = swapRoom;
+            swapRoom.Right!.Left = selectedRoom;
 
             (selectedRoom.Right, swapRoom.Right) = (swapRoom.Right, selectedRoom.Right);
             if (AllRooms.Any(i => !i.ValidateExits()))
@@ -588,14 +374,9 @@ public class Palace
         }
     }
 
-    public void SetOpenRoom(Room r)
-    {
-        openRooms.Add(r);
-    }
-
     public void WriteConnections(ROM ROMData)
     {
-        List<Room> roomsToRemove = new();
+        List<Room> roomsToRemove = [];
         //Unify the parts of segmented rooms back together
         foreach (Room room in AllRooms.ToList())
         {
@@ -780,20 +561,24 @@ public class Palace
                 }
             }
             if (((r.IsUpDownReversed ? r.Connections[1] : r.Connections[2]) & 0xFC) == 0 
-                && ((entrance.IsUpDownReversed ? entrance.Connections[2] : entrance.Connections[1]) & 0xFC) / 4 == r.Map)
+                && ((Entrance!.IsUpDownReversed ? Entrance.Connections[2] : Entrance.Connections[1]) & 0xFC) / 4 == r.Map)
             {
-                r.Up = entrance;
+                r.Up = Entrance;
             }
         }
         if (removeTbird)
         {
-            Tbird.Left.Connections[3] = Tbird.Connections[3];
-            Tbird.Right.Connections[0] = Tbird.Connections[0];
-            Tbird.Left.Right = Tbird.Right;
-            Tbird.Right.Left = Tbird.Left;
+            if(TbirdRoom!.Left == null || TbirdRoom.Right == null)
+            {
+                throw new Exception("Invalid vanilla tbird room");
+            }
+            TbirdRoom.Left.Connections[3] = TbirdRoom.Connections[3];
+            TbirdRoom.Right.Connections[0] = TbirdRoom.Connections[0];
+            TbirdRoom.Left.Right = TbirdRoom.Right;
+            TbirdRoom.Right.Left = TbirdRoom.Left;
             //leftExits.Remove(Tbird);
             //rightExits.Remove(Tbird);
-            AllRooms.Remove(Tbird);
+            AllRooms.Remove(TbirdRoom);
         }
     }
 
@@ -837,8 +622,8 @@ public class Palace
 
             if (hasLeft && hasRight && !dropExits.Any(i => i.Down == remove))
             {
-                remove.Left.Right = remove.Right;
-                remove.Right.Left = remove.Left;
+                remove.Left!.Right = remove.Right;
+                remove.Right!.Left = remove.Left;
                 rooms--;
                 //logger.WriteLine("removed 1 room");
                 leftExits.Remove(remove);
@@ -850,8 +635,8 @@ public class Palace
 
             if (hasUp && hasDown)
             {
-                remove.Up.Down = remove.Down;
-                remove.Down.Up = remove.Up;
+                remove.Up!.Down = remove.Down;
+                remove.Down!.Up = remove.Up;
                 //logger.WriteLine("removed 1 room");
                 rooms--;
                 upExits.Remove(remove);
@@ -874,14 +659,14 @@ public class Palace
                         continue;
                     }
 
-                    if (remove.Left.Up == null || remove.Left.Up != entrance)
+                    if (remove.Left!.Up == null || remove.Left.Up != Entrance)
                     {
                         tries++;
                         continue;
                     }
 
                     remove.Left.Up.Down = remove.Down;
-                    remove.Down.Up = remove.Left.Up;
+                    remove.Down!.Up = remove.Left.Up;
 
                     downExits.Remove(remove);
                     leftExits.Remove(remove);
@@ -905,14 +690,14 @@ public class Palace
                         continue;
                     }
 
-                    if (remove.Right.Up == null || remove.Right.Up == entrance)
+                    if (remove.Right!.Up == null || remove.Right.Up == Entrance)
                     {
                         tries++;
                         continue;
                     }
 
                     remove.Right.Up.Down = remove.Down;
-                    remove.Down.Up = remove.Right.Up;
+                    remove.Down!.Up = remove.Right.Up;
 
                     downExits.Remove(remove);
                     rightExits.Remove(remove);
@@ -940,14 +725,14 @@ public class Palace
                         continue;
                     }
 
-                    if (remove.Left.Down == null || dropExits.Contains(remove.Left))
+                    if (remove.Left!.Down == null || dropExits.Contains(remove.Left))
                     {
                         tries++;
                         continue;
                     }
 
                     remove.Left.Down.Up = remove.Up;
-                    remove.Up.Down = remove.Left.Down;
+                    remove.Up!.Down = remove.Left.Down;
 
                     upExits.Remove(remove);
                     leftExits.Remove(remove);
@@ -972,14 +757,14 @@ public class Palace
                         continue;
                     }
 
-                    if (remove.Right.Down == null || dropExits.Contains(remove.Right))
+                    if (remove.Right!.Down == null || dropExits.Contains(remove.Right))
                     {
                         tries++;
                         continue;
                     }
 
                     remove.Right.Down.Up = remove.Up;
-                    remove.Up.Down = remove.Right.Down;
+                    remove.Up!.Down = remove.Right.Down;
 
                     upExits.Remove(remove);
                     rightExits.Remove(remove);
@@ -1083,12 +868,12 @@ public class Palace
 
     public List<Room> CheckBlocks()
     {
-        return CheckBlocksHelper(new List<Room>(), new List<Room>(), entrance);
+        return CheckBlocksHelper([], [], Entrance!);
     }
 
     private List<Room> CheckBlocksHelper(List<Room> c, List<Room> blockers, Room r)
     {
-        if (c.Contains(this.itemRoom))
+        if (c.Contains(ItemRoom!))
         {
             return c;
         }
@@ -1130,7 +915,7 @@ public class Palace
             room.RandomizeEnemies(props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             if (props.NoDuplicateRooms)
             {
-                Room duplicateRoom = null;
+                Room? duplicateRoom = null;
                 while(duplicateRoom == null && count++ < ENEMY_SHUFFLE_LIMIT)
                 {
                     duplicateRoom = AllRooms.FirstOrDefault(i =>
@@ -1264,47 +1049,47 @@ public class Palace
         {
             return AllRooms.Max(i => (byte)(i.Map + 1));
         }
-        if(!AllRooms.Contains(entrance))
+        if (!AllRooms.Contains(Entrance!))
         {
             throw new Exception("Palace lost its entrance");
         }
-        if (AllRooms.Any(i => i.HasItem && i != itemRoom))
+        if (AllRooms.Any(i => i.IsEntrance && i != Entrance))
         {
             throw new Exception("Palace has an extra entrance");
         }
-        entrance.Map = currentMap++;
-        if (!AllRooms.Contains(bossRoom))
+        Entrance!.Map = currentMap++;
+        if (BossRoom == null || !AllRooms.Contains(BossRoom))
         {
             throw new Exception("Palace lost its boss room");
         }
-        if (AllRooms.Any(i => i.HasItem && i != itemRoom))
+        if (AllRooms.Count(i => i.IsBossRoom) > 1)
         {
             throw new Exception("Palace has an extra boss room");
         }
-        bossRoom.Map = currentMap++;
+        BossRoom.Map = currentMap++;
         if (isGP)
         {
-            if (!AllRooms.Contains(tbirdRoom))
+            if (TbirdRoom == null || !AllRooms.Contains(TbirdRoom))
             {
                 throw new Exception("Palace lost its tbird room");
             }
-            if (AllRooms.Any(i => i.HasItem && i != itemRoom))
+            if (AllRooms.Count(i => i.IsThunderBirdRoom) > 1)
             {
                 throw new Exception("Palace has an extra tbird room");
             }
-            tbirdRoom.Map = currentMap++;
+            TbirdRoom.Map = currentMap++;
         }
         else
         {
-            if (!AllRooms.Contains(itemRoom))
+            if (!AllRooms.Contains(ItemRoom!))
             {
                 throw new Exception("Palace lost its item room");
             }
-            if(AllRooms.Any(i => i.HasItem && i != itemRoom))
+            if(AllRooms.Any(i => i.HasItem && i != ItemRoom))
             {
                 throw new Exception("Palace has an extra item room");
             }
-            itemRoom.Map = currentMap++;
+            ItemRoom!.Map = currentMap++;
         }
         List<Room> normalRooms = AllRooms.Where(i => i.IsNormalRoom()).ToList();
         foreach(Room room in normalRooms)
@@ -1318,7 +1103,7 @@ public class Palace
         //Linked room secondaries share a map number with their primary
         foreach(Room room in AllRooms.Where(i => i.LinkedRoom != null && !i.Enabled))
         {
-            room.Map = room.LinkedRoom.Map;
+            room.Map = room.LinkedRoom!.Map;
         }
         if(currentMap > 63)
         {

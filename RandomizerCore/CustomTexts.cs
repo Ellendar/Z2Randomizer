@@ -429,9 +429,9 @@ public class CustomTexts
             {
                 //Generate replacements for "COME BACK WHEN YOU ARE READY" that is displayed when you don't have
                 //enough magic containers and container requirements are on.
-                texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG));
+                texts[17] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
                 //Old kasuto guy has a different vanilla not enough containers message
-                texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG));
+                texts[95] = new Text(NOT_ENOUGH_CONTAINERS_TEXT.Sample(nonhashRNG)!);
             }
 
             if (props.TownNameHints)
@@ -499,9 +499,9 @@ public class CustomTexts
 
     private static void GenerateTownNameHints(List<Text> texts, IEnumerable<Location> locations, bool linkedFire)
     {
-        foreach (Location location in locations.Where(i => i.VanillaCollectable.IsSpell()))
+        foreach (Location location in locations.Where(i => i.ActualTown != null && i.VanillaCollectable.IsSpell()))
         {
-            texts[TOWN_SIGN_INDEXES[location.ActualTown]] = GenerateTownSignHint(location.Collectable, linkedFire);
+            texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectable, linkedFire);
         }
     }
     public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
@@ -515,14 +515,14 @@ public class CustomTexts
         return new Text(text);
     }
 
-    public static Text GenerateWizardText(List<Text> texts, Random r, Location? location, bool useCommunityText)
+    public static Text GenerateWizardText(List<Text> texts, Random r, Location location, bool useCommunityText)
     {
-        Town town = location.ActualTown;
-        Collectable collectable = location.Collectable;
-        if (town == null)
+        if(location.ActualTown == null)
         {
-            throw new ArgumentException("Spell/Town is required to generate wizard text");
+            throw new Exception("Cannot generate text for Wizard outside of town");
         }
+        Town town = (Town)location.ActualTown;
+        Collectable collectable = location.Collectable;
         if (collectable.IsSpell())
         {
             //If it's a spell, use the old behavior
@@ -629,7 +629,7 @@ public class CustomTexts
         List<int> placedIndex = new List<int>();
 
         List<Collectable> placedItems = [];
-        bool placedSmall = false;
+
         List<int> placedTowns = [];
 
         List<Collectable> items = locations.Select(i => i.Collectable).ToList();
@@ -694,11 +694,6 @@ public class CustomTexts
 
             placedTowns.Add(town);
             placedItems.Add(hintCollectable);
-            if (smallItems.Contains(hintCollectable))
-            {
-                placedSmall = true;
-            }
-
         }
         return placedIndex;
     }
@@ -747,16 +742,20 @@ public class CustomTexts
     {
         List<Text> vanillaText = new(texts);
         List<Text> usedWizardTexts = [];
-        List<Location> wizardLocations = itemLocs.Where(i => i.ActualTown != 0 && i.ActualTown.IsWizardTown()).ToList();
+        List<Location> wizardLocations = itemLocs.Where(i => i.ActualTown != 0 && (i?.ActualTown?.IsWizardTown() ?? false)).ToList();
         foreach (Location location in wizardLocations)
         {
+            if(location.ActualTown == null)
+            {
+                throw new Exception("Invalid town that is not a town");
+            }
             Text wizardHint;
             do
             {
                 wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText);
             } while (usedWizardTexts.Contains(wizardHint));
             usedWizardTexts.Add(wizardHint);
-            texts[townWizardTextIndexes[location.ActualTown]] = wizardHint;
+            texts[townWizardTextIndexes[(Town)location.ActualTown]] = wizardHint;
         }
     }
 

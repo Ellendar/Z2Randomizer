@@ -4,7 +4,7 @@ namespace RandomizerCore.Flags;
 
 public class StartingLivesSerializer : IFlagSerializer
 {
-    public object Deserialize(int option)
+    public object? Deserialize(int option)
     {
         return option switch
         {
@@ -25,7 +25,7 @@ public class StartingLivesSerializer : IFlagSerializer
         return 8;
     }
 
-    public int Serialize(object lives)
+    public int Serialize(object? lives)
     {
         if(lives == null)
         {

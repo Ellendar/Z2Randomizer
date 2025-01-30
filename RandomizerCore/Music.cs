@@ -358,7 +358,7 @@ internal class MusicRandomizer
             Func<Location, int> GetSongIdx = usage switch
             {
                 // One song per palace
-                Usage.Palace => (loc => loc.PalaceNumber - 1),
+                Usage.Palace => (loc => (int)loc.PalaceNumber! - 1),
                 Usage.GreatPalace => (loc => 0),
                 // One song per continent
                 _ => (loc => (int)(loc.VanillaContinent ?? loc.Continent)),

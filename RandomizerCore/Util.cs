@@ -80,7 +80,7 @@ public class Util
     }
     public static void Swap(Location p1, Location p2)
     {
-        (p2.World, p1.World) = (p1.World, p2.World);
+        (p2.Continent, p1.Continent) = (p1.Continent, p2.Continent);
         (p2.Map, p1.Map) = (p1.Map, p2.Map);
         (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
 
@@ -126,7 +126,8 @@ public class Util
 
     private static string FilePathFromAssemblyLocation(string fileName)
     {
-        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
+            ?? throw new ImpossibleException("Invalid executing assembly directory");
 
         return Path.Combine(executingDirectory, fileName);
     }
@@ -136,8 +137,20 @@ public class Util
     /// </summary>
     public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
-        public bool Equals(byte[] x, byte[] y)
+        public bool Equals(byte[]? x, byte[]? y)
         {
+            if(x == null)
+            {
+                if(y == null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            if(y == null)
+            {
+                return false;
+            }
             if (x.Length != y.Length)
             {
                 return false;
@@ -186,6 +199,10 @@ public static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
+        if(stream == null)
+        {
+            throw new Exception("Unable to read ManifestResourceStream: " + name);
+        }
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
@@ -200,6 +217,10 @@ public static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
+        if(stream == null)
+        {
+            throw new Exception("Unable to read binary resource: " + name);
+        }
         using var reader = new BinaryReader(stream);
         return reader.ReadBytes((int)stream.Length);
     }

@@ -5,7 +5,7 @@ namespace RandomizerCore.Sidescroll;
 
 internal class VanillaRoomPool : RoomPool
 {
-    public Room ItemRoom { get; private set; }
+    public Room? ItemRoom { get; private set; }
     public VanillaRoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
         Entrances.AddRange(palaceRooms.Entrances(RoomGroup.VANILLA)

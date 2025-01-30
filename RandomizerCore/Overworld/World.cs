@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NLog;
@@ -51,10 +52,10 @@ public abstract class World
     protected bool isHorizontal;
     protected int VANILLA_MAP_ADDR;
     protected SortedDictionary<(int, int), string> section;
-    public Location raft;
-    public Location bridge;
-    public Location cave1;
-    public Location cave2;
+    public Location? raft;
+    public Location? bridge;
+    public Location? cave1;
+    public Location? cave2;
     //private bool allreached;
 
     public int baseAddr;
@@ -131,7 +132,11 @@ public abstract class World
 
     public bool AllReached { get; set; }
 
-    public World(Random r)
+    //The analyzer doesn't understand the design pattern of an inaccessable constructor as a forced inheritance anchor
+    //maybe that's just a javaism it doesn't like. In either case, I don't care.
+#pragma warning disable CS8618
+    protected World(Random r)
+#pragma warning restore CS8618 
     {
         RNG = r;
 
@@ -142,11 +147,11 @@ public abstract class World
             Locations.Add(Terrain, new List<Location>());
         }
         //Locations = new List<Location>[11] { Towns, Caves, Palaces, Bridges, Deserts, Grasses, Forests, Swamps, Graves, Roads, Lavas };
-        AllLocations = new List<Location>();
-        locsByCoords = new SortedDictionary<(int, int), Location>();
+        AllLocations = [];
+        locsByCoords = [];
         //reachableAreas = new HashSet<string>();
-        unimportantLocs = new List<Location>();
-        areasByLocation = new SortedDictionary<string, List<Location>>();
+        unimportantLocs = [];
+        areasByLocation = [];
         AllReached = false;
     }
 
@@ -326,18 +331,10 @@ public abstract class World
         }
     }
 
-    protected Location? GetLocationByMap(int map, int world)
+    protected Location GetLocationByMap(int map, bool isTown)
     {
-        Location? l = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.LocationBytes[2] == map && loc.World == world)
-            {
-                l = loc;
-                break;
-            }
-        }
-        return l;
+        Location? location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map && isTown == (loc.ActualTown != null));
+        return location ?? throw new Exception("Unable to find location. Map: " + map + " IsTown: " + isTown);
     }
 
     public void UpdateAllReached()
@@ -362,36 +359,15 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByCoords((int, int)coords)
+    protected Location? GetLocationByCoords((int, int)coords)
     {
-        Location location = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.Coords.Equals(coords))
-            {
-                location = loc;
-                break;
-            }
-        }
-        if (location == null)
-        {
-            //Console.Write(coords);
-        }
-        return location;
+        return AllLocations.FirstOrDefault(i => i.Coords.Equals(coords));
     }
 
     protected Location GetLocationByMem(int mem)
     {
-        Location location = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.MemAddress == mem)
-            {
-                location = loc;
-                break;
-            }
-        }
-        return location;
+        return AllLocations.FirstOrDefault(i => i.MemAddress.Equals(mem)) 
+            ?? throw new Exception("Failed to find Location at address: " + mem);
     }
 
     public void ShuffleOverworldEnemies(ROM romData, bool generatorsAlwaysMatch, bool mixLargeAndSmallEnemies)
@@ -480,10 +456,10 @@ public abstract class World
                     {
                         PlaceCaveCount++;
                         map[y, x] = Terrain.NONE;
-                        while(!PlaceSaneCave(direction, riverTerrain, location))
+                        while (!PlaceSaneCave(direction, riverTerrain, location))
                         {
                             caveDirections.Remove(direction);
-                            if(caveDirections.Count == 0)
+                            if (caveDirections.Count == 0)
                             {
                                 //Debug.WriteLine(GetMapDebug());
                                 return false;
@@ -515,7 +491,8 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || (location.ActualTown > 0 && location.ActualTown.AppearsOnMap()))
+                else if (location.TerrainType != Terrain.TOWN || 
+                    (location.ActualTown > 0 && (location?.ActualTown?.AppearsOnMap() ?? false)))
                 {
                     Terrain t;
                     do
@@ -536,10 +513,10 @@ public abstract class World
                 }
             }
 
-            if(location.TerrainType == Terrain.TOWN)
+            if(location!.TerrainType == Terrain.TOWN)
             {
                 foreach (Location linkedLocation in AllLocations.Where(
-                    i => !i.AppearsOnMap && i.ActualTown.GetMasterTown() == location.ActualTown))
+                    i => !i.AppearsOnMap && i?.ActualTown?.GetMasterTown() == location.ActualTown))
                 {
                     linkedLocation.Coords = location.Coords;
                 }
@@ -1033,8 +1010,8 @@ public abstract class World
                 }
                 else if (placeLongBridge)
                 {
-                    Location bridge1 = GetLocationByMap(0x04, 0);
-                    Location bridge2 = GetLocationByMap(0xC5, 0);
+                    Location bridge1 = GetLocationByMap(0x04, false);
+                    Location bridge2 = GetLocationByMap(0xC5, false);
                     x -= deltaX;
                     y -= deltaY;
                     if (deltaX > 0 || deltaY > 0)
@@ -1748,6 +1725,7 @@ public abstract class World
     protected void UpdateReachable(Dictionary<Collectable, bool> itemGet)
     {
         //Setup
+        /*
         bool needJump = false;
         Location location = GetLocationByMem(0x8646);
         int jumpBlockY = -1;
@@ -1769,6 +1747,7 @@ public abstract class World
             fairyBlockY = location.Ypos - 30;
             fairyBlockX = location.Xpos;
         }
+        */
 
         List<Location> starts = GetPathingStarts();
 
@@ -1786,7 +1765,7 @@ public abstract class World
         {
             if (start.Ypos >= 30 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet);
             }
         }
 
@@ -1799,8 +1778,7 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Collectable, bool> itemGet, 
-        int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Collectable, bool> itemGet)
     {
         Stack<(int, int)> to_visit = new();
         // push the initial coord to the visitation stack
@@ -1816,6 +1794,13 @@ public abstract class World
                     continue;
                 }
                 covered[y, x] = true;
+                Location? location = GetLocationByCoords((y + 30, x));
+                /*
+                if(location != null)
+                {
+                    Debug.WriteLine(location.Name + " " + location.NeedFairy + " " + location.NeedJump);
+                }
+                */
 
                 Terrain terrain = map[y, x];
                 if ((terrain == Terrain.LAVA
@@ -1828,15 +1813,19 @@ public abstract class World
                     || (terrain == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
                     || (terrain == Terrain.ROCK && itemGet[Collectable.HAMMER])
                     || (terrain == Terrain.RIVER_DEVIL && itemGet[Collectable.FLUTE]))
+                    //XXX: not done
                     //East desert jump blocker
                     && !(
-                        needJump
-                        && jumpBlockY == y
-                        && jumpBlockX == x
+                        location != null
+                        && location.NeedJump
                         && (!itemGet[Collectable.JUMP_SPELL] && !itemGet[Collectable.FAIRY_SPELL])
                     )
                     //Fairy cave is traversable
-                    && !(needFairy && fairyBlockY == y && fairyBlockX == x && !itemGet[Collectable.FAIRY_SPELL])
+                    && !(
+                        location != null
+                        && location.NeedFairy 
+                        && !itemGet[Collectable.FAIRY_SPELL]
+                    )
                 )
                 {
                     visitation[y, x] = true;
@@ -1884,7 +1873,7 @@ public abstract class World
         }
     }
 
-    protected bool DrawRaft(bool bridge, Direction direction)
+    protected bool DrawRaft(bool drawBridgeInstead, Direction direction)
     {
         int raftx = 0;
         int deltax = 1;
@@ -1976,25 +1965,22 @@ public abstract class World
                 raftx += deltax;
                 length++;
             }
-        } while (rafty < 0 || rafty >= MAP_ROWS || raftx < 0 || raftx >= MAP_COLS || !walkableTerrains.Contains(map[rafty, raftx]) || (bridge && length > 10) || (bridge && length <= 1));
+        } while (rafty < 0 || rafty >= MAP_ROWS || raftx < 0 || raftx >= MAP_COLS || !walkableTerrains.Contains(map[rafty, raftx]) || (drawBridgeInstead && length > 10) || (drawBridgeInstead && length <= 1));
 
 
         rafty -= deltay;
         raftx -= deltax;
-        if (!bridge)
+        if (drawBridgeInstead)
         {
+            if(bridge == null)
+            {
+                throw new Exception("Unable to draw unloaded bridge");
+            }
             map[rafty, raftx] = Terrain.BRIDGE;
-            raft.Xpos = raftx;
-            raft.Ypos = rafty + 30;
-            raft.CanShuffle = false;
-        }
-        else
-        {
-            map[rafty, raftx] = Terrain.BRIDGE;
-            this.bridge.Xpos = raftx;
-            this.bridge.Ypos = rafty + 30;
-            this.bridge.PassThrough = 0;
-            this.bridge.CanShuffle = false;
+            bridge.Xpos = raftx;
+            bridge.Ypos = rafty + 30;
+            bridge.PassThrough = 0;
+            bridge.CanShuffle = false;
             if (direction == Direction.EAST)
             {
                 for (int i = raftx + 1; i < MAP_COLS; i++)
@@ -2024,49 +2010,64 @@ public abstract class World
                 }
             }
         }
+        else
+        {
+            if (raft == null)
+            {
+                throw new Exception("Unable to draw unloaded raft");
+            }
+            map[rafty, raftx] = Terrain.BRIDGE;
+            raft.Xpos = raftx;
+            raft.Ypos = rafty + 30;
+            raft.CanShuffle = false;
+        }
         return true;
 
     }
 
-    public Location LoadRaft(ROM rom, int world)
+    public Location LoadRaft(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, world));
         raft = GetLocationByMem(baseAddr + 41);
+        raft.Continent = world;
+        raft.ConnectedContinent = connectedContinent;
         raft.ExternalWorld = 0x80;
-        raft.World = world;
         raft.Map = 41;
         raft.TerrainType = Terrain.BRIDGE;
         return raft;
     }
 
-    public Location LoadBridge(ROM rom, int world)
+    public Location LoadBridge(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, world));
         bridge = GetLocationByMem(baseAddr + 40);
+        bridge.Continent = world;
+        bridge.ConnectedContinent = connectedContinent;
         bridge.ExternalWorld = 0x80;
-        bridge.World = world;
         bridge.Map = 40;
         bridge.PassThrough = 0;
         return bridge;
     }
 
-    public Location LoadCave1(ROM rom, int world)
+    public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, world));
         cave1 = GetLocationByMem(baseAddr + 42);
+        cave1.Continent = world;
+        cave1.ConnectedContinent = connectedContinent;
         cave1.ExternalWorld = 0x80;
-        cave1.World = world;
         cave1.Map = 42;
         cave1.CanShuffle = true;
         return cave1;
     }
 
-    public Location LoadCave2(ROM rom, int world)
+    public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, (Continent)world));
+        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, world));
         cave2 = GetLocationByMem(baseAddr + 43);
         cave2.ExternalWorld = 0x80;
-        cave2.World = world;
+        cave2.Continent = world;
+        cave2.ConnectedContinent = connectedContinent;
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;
@@ -2112,7 +2113,7 @@ public abstract class World
 
     public List<Location> GetContinentConnections()
     {
-        return new List<Location>() { cave1, cave2, bridge, raft }.Where(i => i != null).ToList();
+        return new List<Location>() { cave1!, cave2!, bridge!, raft! }.Where(i => i != null).ToList();
     }
 
     protected void DrawRiver(bool canWalkOnWaterWithBoots)

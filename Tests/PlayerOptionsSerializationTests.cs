@@ -16,7 +16,7 @@ namespace Tests
                 var input = "{BeepThreshold: 'QuarterBar'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepThreshold.QuarterBar, output.BeepThreshold);
+                Assert.AreEqual(BeepThreshold.QuarterBar, output?.BeepThreshold);
             }
 
             [TestMethod]
@@ -25,7 +25,7 @@ namespace Tests
                 var input = "{BeepThreshold: 'HalfBar'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepThreshold.HalfBar, output.BeepThreshold);
+                Assert.AreEqual(BeepThreshold.HalfBar, output?.BeepThreshold);
             }
 
             [TestMethod]
@@ -34,7 +34,7 @@ namespace Tests
                 var input = "{BeepThreshold: 'Normal'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepThreshold.Normal, output.BeepThreshold);
+                Assert.AreEqual(BeepThreshold.Normal, output?.BeepThreshold);
             }
 
             [TestMethod]
@@ -43,7 +43,7 @@ namespace Tests
                 var input = "{BeepThreshold: 'TwoBars'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepThreshold.TwoBars, output.BeepThreshold);
+                Assert.AreEqual(BeepThreshold.TwoBars, output?.BeepThreshold);
             }
         }
 
@@ -56,7 +56,7 @@ namespace Tests
                 var input = "{BeepFrequency: 'Normal'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepFrequency.Normal, output.BeepFrequency);
+                Assert.AreEqual(BeepFrequency.Normal, output?.BeepFrequency);
             }
 
             [TestMethod]
@@ -65,7 +65,7 @@ namespace Tests
                 var input = "{BeepFrequency: 'HalfSpeed'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepFrequency.HalfSpeed, output.BeepFrequency);
+                Assert.AreEqual(BeepFrequency.HalfSpeed, output?.BeepFrequency);
             }
 
             [TestMethod]
@@ -74,7 +74,7 @@ namespace Tests
                 var input = "{BeepFrequency: 'QuarterSpeed'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepFrequency.QuarterSpeed, output.BeepFrequency);
+                Assert.AreEqual(BeepFrequency.QuarterSpeed, output?.BeepFrequency);
             }
 
             [TestMethod]
@@ -83,9 +83,9 @@ namespace Tests
                 var input = "{BeepFrequency: 'Off'}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
-                Assert.AreEqual(BeepFrequency.Off, output.BeepFrequency);
+                Assert.AreEqual(BeepFrequency.Off, output?.BeepFrequency);
 
-                output.Sprite = "Link";
+                output!.Sprite = "Link";
                 Console.WriteLine(JsonConvert.SerializeObject(output));
             }
         }

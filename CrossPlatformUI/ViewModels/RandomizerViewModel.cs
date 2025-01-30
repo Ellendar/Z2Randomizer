@@ -10,6 +10,8 @@ using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using RandomizerCore;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks;
 
 namespace CrossPlatformUI.ViewModels;
 
@@ -43,7 +45,9 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
     
     [JsonConstructor]
+#pragma warning disable CS8618 
     public RandomizerViewModel() {}
+#pragma warning restore CS8618
     public RandomizerViewModel(MainViewModel main)
     {
         Main = main;
@@ -77,10 +81,12 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             (flags, seed, hasRomData) =>
                 IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData
         );
-        // Generate = ReactiveCommand.CreateFromTask(async () =>
-        // {
-        //     await DialogHost.Show("GenerateRomDialog");
-        // }, CanGenerate);
+        Generate = ReactiveCommand.CreateFromTask(async () =>
+        {
+            //NYI
+            await Task.CompletedTask;
+            //await DialogHost.Show("GenerateRomDialog");
+        }, CanGenerate);
         this.WhenActivated(OnActivate);
     }
 

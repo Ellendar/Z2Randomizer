@@ -29,7 +29,7 @@ public enum RoomExitType
     //Drop down
     DROP_STUB = 0b00100,
     DROP_SE_L = 0b00101,
-    DROP_COLUMN = 0b00110,
+    DROP_ELEVATOR_UP = 0b00110,
     DROP_RIGHT_T = 0b00111,
     DROP_SW_L = 0b10100,
     DROP_T = 0b10101,

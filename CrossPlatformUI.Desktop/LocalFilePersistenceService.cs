@@ -17,7 +17,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
 {
     // TODO put this in appdata
     public const string SettingsFilename = "Settings.json";
-    public string SettingsPath;
+    public string? SettingsPath;
 
     public LocalFilePersistenceService()
     {
@@ -31,7 +31,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         }
     }
     
-    private readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+    private readonly JsonSerializerSettings serializerSettings = new()
     {
         TypeNameHandling = TypeNameHandling.All
     };
@@ -69,7 +69,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         try
         {
             File.Delete(SettingsFilename);
-        } catch (IOException e) {}
+        } catch (IOException) {}
     }
     
     public Task<IEnumerable<string>> ListLocalFiles(string path)

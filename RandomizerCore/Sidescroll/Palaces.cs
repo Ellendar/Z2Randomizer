@@ -79,10 +79,10 @@ public class Palaces
         {
             PalaceGenerator palaceGenerator = props.PalaceStyles[currentPalace - 1] switch
             {
-                PalaceStyle.VANILLA => new VanillaPalaceGenerator(ct),
-                PalaceStyle.SHUFFLED => new VanillaShufflePalaceGenerator(ct),
-                PalaceStyle.SEQUENTIAL => new SequentialPlacementCoordinatePalaceGenerator(ct),
-                PalaceStyle.RANDOM_WALK => new RandomWalkCoordinatePalaceGenerator(ct),
+                PalaceStyle.VANILLA => new VanillaPalaceGenerator(),
+                PalaceStyle.SHUFFLED => new VanillaShufflePalaceGenerator(),
+                PalaceStyle.SEQUENTIAL => new SequentialPlacementCoordinatePalaceGenerator(),
+                PalaceStyle.RANDOM_WALK => new RandomWalkCoordinatePalaceGenerator(),
                 PalaceStyle.RECONSTRUCTED => new ReconstructedPalaceGenerator(ct),
                 PalaceStyle.CHAOS => new ChaosPalaceGenerator(),
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
@@ -124,7 +124,7 @@ public class Palaces
             palaces.Add(palace);
         }
 
-        palaces[3].BossRoom.Requirements = palaces[3].BossRoom.Requirements.AddHardRequirement(RequirementType.GLOVE);
+        palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.GLOVE);
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {

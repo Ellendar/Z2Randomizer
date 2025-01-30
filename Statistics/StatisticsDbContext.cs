@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RandomizerCore;
 using RandomizerCore.Overworld;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Z2Randomizer.Statistics;
 
@@ -12,6 +13,9 @@ internal class StatisticsDbContext : DbContext
 
     private string dbPath;
 
+    [UnconditionalSuppressMessage("Trimming", 
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", 
+        Justification = "Statistics Doesn't ship with the trimmed package")]
     public StatisticsDbContext(string dbPath) : base()
     {
         this.dbPath = dbPath;
@@ -29,7 +33,7 @@ internal class StatisticsDbContext : DbContext
     {
         modelBuilder
         .Entity<RandomizerProperties>()
-        .Property(e => e.Climates)
+        .Property(e => e.Climate)
         .HasConversion(
             v => v.Name,
             v => Climates.ByName(v));

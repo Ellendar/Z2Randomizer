@@ -52,15 +52,6 @@ class Result
     public int WestFailedOnConnectIslands { get; set; }
 
 
-
-    //Spell costs
-    //XP thresholds
-    //Which items are required (is this cleanly saved?)
-    public Result()
-    {
-
-    }
-
     public Result(Hyrule hyrule)
     {
         Flags = hyrule.Flags;

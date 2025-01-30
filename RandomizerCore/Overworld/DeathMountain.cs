@@ -138,7 +138,7 @@ sealed class DeathMountain : World
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
-        climate = props.Climates.Clone();
+        climate = props.Climate.Clone();
         float dmOpennessFactor = biome switch
         {
             Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
@@ -1100,7 +1100,7 @@ sealed class DeathMountain : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable
