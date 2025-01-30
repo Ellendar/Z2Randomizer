@@ -32,7 +32,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
 
     //private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -106,7 +106,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 1;
+    private static int DEBUG_THRESHOLD = 128;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -218,7 +218,7 @@ public class Hyrule
             Flags = config.Flags;
 
             Assembler assembler = CreateAssemblyEngine();
-            logger.Info($"Started generation for flags: {Flags} seedhash: {SeedHash}");
+            logger.Info($"Started generation for flags: {Flags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
 
@@ -716,7 +716,7 @@ public class Hyrule
             eastHyrule.pbagCave2.Collectable = Collectable.XL_BAG;
         }
 
-        if(UNSAFE_DEBUG && props.IncludeSpellsInShuffle)
+        if(props.IncludeSpellsInShuffle)
         {
             shufflableItems.Add(Collectable.SHIELD_SPELL);
             shufflableItems.Add(Collectable.JUMP_SPELL);
@@ -732,7 +732,7 @@ public class Hyrule
             ShuffleSpells();
         }
 
-        if (UNSAFE_DEBUG && props.IncludeQuestItemsInShuffle)
+        if (props.IncludeQuestItemsInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
             shufflableItems.Add(Collectable.MIRROR);
@@ -921,12 +921,6 @@ public class Hyrule
 
         if (props.MixOverworldPalaceItems)
         {
-            /*
-            for (int i = itemList.Count - 1; i > 0; i--)
-            {
-                int s = RNG.Next(i, itemList.Count);
-                (itemList[i], itemList[s]) = (itemList[s], itemList[i]);
-            }*/
             shufflableItems.FisherYatesShuffle(RNG);
         }
         else

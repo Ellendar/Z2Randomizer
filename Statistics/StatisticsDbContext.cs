@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RandomizerCore;
 using RandomizerCore.Overworld;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace Z2Randomizer.Statistics;
 
@@ -31,11 +33,18 @@ internal class StatisticsDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        JsonSerializerOptions options = new JsonSerializerOptions();
+
         modelBuilder
         .Entity<RandomizerProperties>()
         .Property(e => e.Climate)
         .HasConversion(
             v => v.Name,
             v => Climates.ByName(v));
+
+        modelBuilder.Entity<RandomizerProperties>()
+            .Property(e => e.PalaceStyles)
+            .HasConversion(v => JsonSerializer.Serialize(v, options),
+            v => JsonSerializer.Deserialize<PalaceStyle[]>(v, options) ?? new PalaceStyle[7]);
     }
 }

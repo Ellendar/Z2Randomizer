@@ -7,8 +7,6 @@ using System.Runtime.InteropServices.JavaScript;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using RandomizerCore.Asm;
-
 namespace CrossPlatformUI.Browser;
 
 [JsonSourceGenerationOptions(WriteIndented = false)]
@@ -27,6 +25,8 @@ namespace CrossPlatformUI.Browser;
 // [JsonSerializable(typeof(Dictionary<string, string>))]
 internal partial class AssmeblerContext : JsonSerializerContext;
 
+//XXX: We broke the web version. We'll fix it later
+/*
 public partial class BrowserJsEngine : IAsmEngine
 {
     [JSImport("compile", "js65.js65.js")]
@@ -82,3 +82,4 @@ internal static class AssemblyExtensions
         return reader.ReadBytes((int)stream.Length);
     }
 }
+*/

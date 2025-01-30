@@ -51,7 +51,12 @@ class Result
     public int WestFailedOnMakeCaldera { get; set; }
     public int WestFailedOnConnectIslands { get; set; }
 
+#pragma warning disable CS8618 
+    public Result()
+#pragma warning restore CS8618 
+    {
 
+    }
     public Result(Hyrule hyrule)
     {
         Flags = hyrule.Flags;

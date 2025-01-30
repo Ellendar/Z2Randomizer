@@ -45,7 +45,7 @@
     <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="nlog.config" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="nlog.config" CopyToOutputDirectory="Always" />
     <Content Include="*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

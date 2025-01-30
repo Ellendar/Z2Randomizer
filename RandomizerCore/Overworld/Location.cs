@@ -174,7 +174,6 @@ public class Location
             (Continent.WEST, 68, 37, 57) => "P2_RED_JAR",
             (Continent.WEST, 0, 0, 57) => "RED_JAR_BEACH",
             (Continent.WEST, 102, 38, 57) => "EX_LIFE_BEACH",
-            (Continent.WEST, 77, 61, 41) => "RAFT_DOCK",
             (Continent.WEST, 95, 10, 42) => "DM_ENTRANCE",
             (Continent.WEST, 96, 21, 43) => "DM_EXIT",
             (Continent.WEST, 88, 50, 60) => "KINGS_TOMB",
@@ -221,7 +220,6 @@ public class Location
             (Continent.EAST, 86, 8, 24) => "DEATH_VALLEY_BATTLE_2",
             (Continent.EAST, 99, 8, 26) => "DEATH_VALLEY_BATTLE_1",
             (Continent.EAST, 40, 52, 40) => "MAZE_ISLAND_BRIDGE",
-            (Continent.EAST, 52, 7, 41) => "RAFT_DOCK",
             (Continent.EAST, 60, 23, 14) => "NABOORU",
             (Continent.EAST, 33, 3, 17) => "DARUNIA",
             (Continent.EAST, 81, 61, 18) => "NEW_KASUTO",
@@ -269,9 +267,6 @@ public class Location
             (Continent.MAZE, 62, 45, 34) => "MAZE_ISLAND_FORCED_BATTLE_2",
             (Continent.MAZE, 68, 48, 35) => "MAZE_ISLAND_FORCED_BATTLE_1",
             (Continent.MAZE, 58, 41, 36) => "MAZE_ISLAND_MAGIC",
-            (Continent.DM, 67, 40, 40) => "EAST_HYRULE_BRIDGE",
-            (Continent.DM, 37, 7, 42) => "CAVE_A",
-            (Continent.DM, 37, 23, 43) => "CAVE_K",
             (Continent.MAZE, 58, 60, 15) => "P4",
             (Continent.MAZE, 60, 57, 37) => "MAZE_ISLAND_CHILD",
             (Continent.DM, 64, 8, 26) => "DM_MAGIC",
@@ -280,7 +275,11 @@ public class Location
             (Continent.MAZE, 50, 46, 49) => "MAZE_ISLAND_FORCED_BATTLE_4",
             (Continent.MAZE, 46, 48, 50) => "MAZE_ISLAND_FORCED_BATTLE_5",
             (Continent.MAZE, 42, 50, 51) => "MAZE_ISLAND_FORCED_BATTLE_6",
-
+            (_, 67, 40, 40) => "BRIDGE",
+            (_, 77, 61, 41) => "RAFT_TILE",
+            (_, 52, 7, 41) => "RAFT_TILE",
+            (_, 37, 7, 42) => "DM_ENTRANCE_CAVE",
+            (_, 37, 23, 43) => "DM_EXIT_CAVE",
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
 
@@ -301,7 +300,7 @@ public class Location
 
         if (Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
         {
-            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
+            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Ypos + ", " + Xpos + ") Map: " + Map);
         }
         if (Name.Contains("FAKE"))
         {

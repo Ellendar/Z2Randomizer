@@ -6,7 +6,6 @@ using Avalonia.Browser;
 using Avalonia.ReactiveUI;
 using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
-using RandomizerCore.Asm;
 
 [assembly: SupportedOSPlatform("browser")]
 
@@ -20,7 +19,8 @@ internal sealed partial class Program
         .AfterSetup(_ =>
         {
             App.ServiceContainer ??= new ();
-            App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
+            //XXX: We broke the web version. We'll fix it later.
+            //App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
             App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
             App.FileSystemService = new BrowserFileService();
             // App.SyncSuspensionDriver = new LocalStoragePersistenceService();

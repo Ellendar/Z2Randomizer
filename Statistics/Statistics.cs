@@ -19,13 +19,13 @@ namespace Z2Randomizer.Statistics;
 /// </summary>
 class Statistics
 {
-    private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
-    //private static readonly string FLAGS = "hEAK0thCqbs36emL4XpGU+!5@W4xeWvdAALhA"; //Random%
-    //"hEAK0sALirpUe5RLkbgZQ+2c4YX@4X4yAASA" v4 only Random%
+    //private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
+    //private static readonly string FLAGS = "hEAAp1dAOR4YXs0uhjGs371g+hBswv9svsthABVA"; //Random%
+    private static readonly string FLAGS = "hEAAp1dAOR4YXs0uhjGs371g+hBswv9svsthABVA"; //test
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
-    private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-    private static readonly int LIMIT = 1000;
+    private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer_4_4\\Statistics\\db\\stats.sqlite";
+    private static readonly int LIMIT = 1;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
     {
@@ -43,8 +43,8 @@ class Statistics
         {
             for (int i = 0; i < LIMIT; i++)
             {
-                int seed = random.Next(1000000000);
-                //int seed = 38955385;
+                //int seed = random.Next(1000000000);
+                int seed = 704113586;
                 config.Seed = seed.ToString();
                 var vanillaRomData = File.ReadAllBytes(VANILLA_ROM_PATH);
                 DateTime startTime = DateTime.Now;
