@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RandomizerCore;
 using RandomizerCore.Overworld;
 using System.Diagnostics.CodeAnalysis;
@@ -31,6 +30,7 @@ internal class StatisticsDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={dbPath}");
 
+    [SuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         JsonSerializerOptions options = new JsonSerializerOptions();

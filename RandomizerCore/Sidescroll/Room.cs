@@ -580,15 +580,15 @@ public class Room : IJsonOnDeserialized
     }
 
 
-    private const int CONFLICT = -99;
+    private const int CONFLICT = -100;
     public int FitsWithDown(Room? down)
     {
         if (down == null)
         {
             return 0;
         }
-        //No down
-        if (!HasDownExit && !HasDrop)
+        //This room doesn't go down but the room below goes up.
+        if (!HasDownExit && !HasDrop && down.HasUpExit)
         {
             return CONFLICT;
         }
@@ -607,8 +607,12 @@ public class Room : IJsonOnDeserialized
             //types don't match
             return CONFLICT;
         }
+        if (!HasDownExit && !HasDrop && !down.HasUpExit)
+        {
+            return 0;
+        }
         throw new ImpossibleException("Room " + Name + Util.ByteArrayToHexString(SideView) +
-            " is marked as a down exit with no elevator or drop.");
+            " Failed in FitsWithDown");
     }
 
     public int FitsWithUp(Room? up)
@@ -617,20 +621,30 @@ public class Room : IJsonOnDeserialized
         {
             return 0;
         }
-        //No up
-        if (!HasUpExit && !IsDropZone)
+        //There is a room above, but the room above goes down in a way that doesn't support this room
+        //Or, this room goes up, but the room above can't do down
+        if ((up.HasDrop && !IsDropZone)
+            || (up.HasDrop && !IsDropZone)
+            || (HasUpExit && !up.HasDownExit))
         {
             return CONFLICT;
         }
         //Up
         if (HasUpExit)
         {
-            if(ElevatorScreen >= 0 && up.ElevatorScreen >= 0 && up.HasDownExit)
+            if (ElevatorScreen >= 0 && up.ElevatorScreen >= 0 && up.HasDownExit)
             {
                 return 1;
             }
             //types don't match
             return CONFLICT;
+        }
+        else
+        {
+            if(up.HasDownExit)
+            {
+                return CONFLICT;
+            }
         }
         //Drop down
         if (IsDropZone)
@@ -641,8 +655,14 @@ public class Room : IJsonOnDeserialized
             }
             return CONFLICT;
         }
+        //There is a room Above, but they don't interact at all
+        //Theoretically we could just default true but this is a good safety
+        if(!HasUpExit && !up.HasDownExit && !up.HasDrop)
+        {
+            return 0;
+        }
         throw new ImpossibleException("Room " + Name + Util.ByteArrayToHexString(SideView) +
-            " is marked as a down exit with no elevator or drop.");
+            " failed in FitsWithUp");
     }
 
     public int FitsWithLeft(Room? left)
@@ -651,8 +671,8 @@ public class Room : IJsonOnDeserialized
         {
             return 0;
         }
-        //No left
-        if (!HasLeftExit)
+        //This room doesn't go left, but the room to the left goes right
+        if (!HasLeftExit && left.HasRightExit)
         {
             return CONFLICT;
         }
@@ -664,8 +684,8 @@ public class Room : IJsonOnDeserialized
         {
             return 0;
         }
-        //No left
-        if (!HasRightExit)
+        //This room doesn't go right, but the room to the left goes left
+        if (!HasRightExit && right.HasLeftExit)
         {
             return CONFLICT;
         }

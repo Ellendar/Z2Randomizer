@@ -36,7 +36,7 @@ public class Palaces
         VANILLA_P7_ALLOWED_BLOCKERS
     ];
 
-    public static List<Palace> CreatePalaces(CancellationToken ct, Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired)
+    public static List<Palace> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {

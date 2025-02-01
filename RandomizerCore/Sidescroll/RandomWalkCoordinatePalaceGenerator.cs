@@ -157,7 +157,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             }
             if (newRoom == null)
             {
-                roomPool.StubsByDirection.TryGetValue(roomExitType, out newRoom);
+                roomPool.DefaultStubsByDirection.TryGetValue(roomExitType, out newRoom);
             }
             if (newRoom == null)
             {

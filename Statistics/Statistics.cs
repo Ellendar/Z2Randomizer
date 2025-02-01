@@ -25,7 +25,7 @@ class Statistics
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
     private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer_4_4\\Statistics\\db\\stats.sqlite";
-    private static readonly int LIMIT = 1;
+    private static readonly int LIMIT = 10;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
     {
@@ -43,8 +43,8 @@ class Statistics
         {
             for (int i = 0; i < LIMIT; i++)
             {
-                //int seed = random.Next(1000000000);
-                int seed = 704113586;
+                int seed = random.Next(1000000000);
+                //int seed = 704113586;
                 config.Seed = seed.ToString();
                 var vanillaRomData = File.ReadAllBytes(VANILLA_ROM_PATH);
                 DateTime startTime = DateTime.Now;

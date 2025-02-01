@@ -106,7 +106,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 128;
+    private static int DEBUG_THRESHOLD = 120;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -253,7 +253,7 @@ public class Hyrule
             while (palaces.Count != 7 || passedValidation == false)
             {
                 freeBanks = new(ROM.FreeRomBanks);
-                palaces = Palaces.CreatePalaces(ct, RNG, props, palaceRooms, raftIsRequired);
+                palaces = Palaces.CreatePalaces(RNG, props, palaceRooms, raftIsRequired, ct);
                 if (palaces.Count == 0)
                 {
                     continue;

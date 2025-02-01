@@ -13,7 +13,7 @@ public class RoomPool
     public Room VanillaBossRoom { get; set; }
     public Dictionary<string, Room> LinkedRooms { get; } = [];
     public MultiValueDictionary<Direction, Room> ItemRoomsByDirection { get; set; } = [];
-    public Dictionary<RoomExitType, Room> StubsByDirection { get; set; } = [];
+    public Dictionary<RoomExitType, Room> DefaultStubsByDirection { get; set; } = [];
 
     private PalaceRooms palaceRooms;
 
@@ -37,16 +37,19 @@ public class RoomPool
         {
             ItemRoomsByDirection.AddRange(key, target.ItemRoomsByDirection[key]);
         }
-        foreach (var key in target.StubsByDirection.Keys)
+        foreach (var key in target.DefaultStubsByDirection.Keys)
         {
-            StubsByDirection.Add(key, target.StubsByDirection[key]);
+            DefaultStubsByDirection.Add(key, target.DefaultStubsByDirection[key]);
         }
     }
 
     public RoomPool(PalaceRooms palaceRooms, int palaceNumber, RandomizerProperties props)
     {
         this.palaceRooms = palaceRooms;
-        if (props.AllowVanillaRooms)
+        if (props.AllowVanillaRooms
+            //4.4 GP room pool is too shallow to create proper palaces from right now, so if you pick 4.4 only,
+            //GP also has vanilla rooms added.
+            || (palaceNumber == 7 && !props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV4_4Rooms))
         {
             Entrances.AddRange(palaceRooms.Entrances(RoomGroup.VANILLA)
                 .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
@@ -62,10 +65,6 @@ public class RoomPool
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction).ToList());
             }
-            //If we are using these categorized exits to cap paths, there needs to always be a path of each type
-            //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
-            StubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
-            StubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
         }
 
         if (props.AllowV4Rooms)
@@ -103,6 +102,15 @@ public class RoomPool
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_4, direction).ToList());
             }
         }
+        else
+        {
+            //If we are using these categorized exits to cap paths, there needs to always be a path of each type
+            //Since vanilla and 4.0 don't normally contain up/down elevator deadends, we add some dummy ones
+            DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_DOWN, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasDownExit).First());
+            DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
+        }
+
+
 
         //If we're using a room set that has no entraces, we still need to have something, so add the vanilla entrances.
         if (Entrances.Count == 0)
@@ -114,7 +122,10 @@ public class RoomPool
 
         if (palaceNumber == 7)
         {
-            if (props.AllowVanillaRooms)
+            if (props.AllowVanillaRooms
+            //4.4 GP room pool is too shallow to create proper palaces from right now, so if you pick 4.4 only,
+            //GP also has vanilla rooms added.
+            || (!props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV4_4Rooms))
             {
                 NormalRooms.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.VANILLA));
             }

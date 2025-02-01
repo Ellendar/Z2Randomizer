@@ -89,14 +89,14 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
             palace.AllRooms.Add(newRoom);
-            if (props.NoDuplicateRoomsBySideview)
+            if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
             {
                 if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)))
                 {
                     continue;
                 }
             }
-            if (props.NoDuplicateRooms)
+            if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
             {
                 roomPool.NormalRooms.RemoveAt(roomIndex);
             }
@@ -158,4 +158,6 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         palace.IsValid = palace.AllReachable(true);
         return palace;
     }
+
+
 }

@@ -83,4 +83,10 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         palace.IsValid = true;
         return palace;
     }
+
+    protected new bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
+    {
+        return true;
+    }
+
 }

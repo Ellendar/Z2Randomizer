@@ -127,7 +127,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         //Debug.WriteLine(palace.AllRooms.Count + " - 0");
                         added = false;
                     }
-                    if (props.NoDuplicateRoomsBySideview)
+                    if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
                     {
                         if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, roomToAdd.SideView)))
                         {
@@ -148,7 +148,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     }
                     if (added)
                     {
-                        if (props.NoDuplicateRooms)
+                        if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
                         {
                             roomPool.NormalRooms.RemoveAt(roomIndex);
                         }
@@ -176,7 +176,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                                 bool added2 = AddRoom(palace, dropZoneRoom, props.BlockersAnywhere);
                                 if (added2)
                                 {
-                                    if (props.NoDuplicateRooms)
+                                    if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
                                     {
                                         roomPool.NormalRooms.Remove(dropZoneRoom);
                                     }

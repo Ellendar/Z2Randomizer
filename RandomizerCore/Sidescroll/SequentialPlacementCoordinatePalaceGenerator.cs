@@ -9,7 +9,7 @@ namespace RandomizerCore.Sidescroll;
 
 public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
-    private const int STALL_LIMIT = 1000;
+    private const int STALL_LIMIT = 5000;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         Palace palace = new(palaceNumber);
@@ -98,14 +98,14 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                 {
                     continue;
                 }
-                if (props.NoDuplicateRoomsBySideview)
+                if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
                 {
                     if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)))
                     {
                         continue;
                     }
                 }
-                if (props.NoDuplicateRooms)
+                if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
                 {
                     roomPool.NormalRooms.Remove(newRoom);
                 }
@@ -226,7 +226,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                     Room? newRoom = possibleStubs?.Sample(r);
                     if (newRoom == null)
                     {
-                        roomPool.StubsByDirection.TryGetValue(exitType, out newRoom);
+                        roomPool.DefaultStubsByDirection.TryGetValue(exitType, out newRoom);
                     }
                     //The most likely cause of this is roomPool exhaustion in no duplicate rooms seeds.
                     //There could be some compromise to try and save it, but might as well regen
@@ -271,11 +271,11 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                         right.Left = newRoom;
                     }
 
-                    if (props.NoDuplicateRooms && newRoom.Group != RoomGroup.STUBS)
+                    if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber) && newRoom.Group != RoomGroup.STUBS)
                     {
                         roomsByExitType[exitType].Remove(newRoom);
                     }
-                    if (props.NoDuplicateRoomsBySideview)
+                    if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
                     {
                         if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView))
                             && newRoom.Group != RoomGroup.STUBS)
