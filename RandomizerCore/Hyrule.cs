@@ -27,12 +27,10 @@ public class Hyrule
     //The higher you set it, the more likely a given terrain is to find a set of items that works, resulting in fewer terrain generations.
     //It will also increase the number of seeds that have more arcane solutions, where only a specific item route works.
     //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
-    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 500;
+    private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 200;
 
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
-
-    public const bool UNSAFE_DEBUG = false;
 
     //private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -106,7 +104,8 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 120;
+    public const bool UNSAFE_DEBUG = false;
+    private static int DEBUG_THRESHOLD = 80;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -1077,7 +1076,8 @@ public class Hyrule
                 Debug.WriteLine("Unreachable locations:");
                 Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
 
-                if(nonDmLocations.Count == 0 && UNSAFE_DEBUG)
+                //XXX: DEBUG
+                if(nonDmLocations.Count == 0)
                 {
                     return false;
                 }
@@ -1697,7 +1697,7 @@ public class Hyrule
                     l2 = worlds[c2w2].LoadCave2(ROMData, (Continent)c2w2, (Continent)c2w1);
                     connections[3] = (l1, l2);
                 }
-            } while (!AllContinentsHaveConnection(worlds));
+            } while (!AllContinentsAreConnected(connections));
 
             int nonContinentGenerationAttempts = 0;
             int nonTerrainShuffleAttempt = 0;
@@ -1899,16 +1899,32 @@ public class Hyrule
         }
     }
 
-    private bool AllContinentsHaveConnection(List<World> worlds)
+    private bool AllContinentsAreConnected((Location, Location)[] connections)
     {
-        foreach (World w in worlds)
+        if(connections.Length != 4)
         {
-            if (!w.HasConnections())
+            throw new ImpossibleException("Too many connections!");
+        }
+        HashSet<Continent> continentsFound = [Continent.WEST];
+        bool progress = true;
+        while(progress == true)
+        {
+            progress = false;
+            foreach ((Location, Location) connection in connections)
             {
-                return false;
+                if(continentsFound.Contains(connection.Item1.Continent) && !continentsFound.Contains(connection.Item2.Continent))
+                {
+                    continentsFound.Add(connection.Item2.Continent);
+                    progress = true;
+                }
+                if (continentsFound.Contains(connection.Item2.Continent) && !continentsFound.Contains(connection.Item1.Continent))
+                {
+                    continentsFound.Add(connection.Item1.Continent);
+                    progress = true;
+                }
             }
         }
-        return true;
+        return continentsFound.Count == 4;
     }
 
     private void ResetTowns()

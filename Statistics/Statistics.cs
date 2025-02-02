@@ -25,7 +25,7 @@ class Statistics
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
     private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer_4_4\\Statistics\\db\\stats.sqlite";
-    private static readonly int LIMIT = 10;
+    private static readonly int LIMIT = 100;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
     {

@@ -118,7 +118,12 @@ public class RoomPool
             Entrances.AddRange(palaceRooms.Entrances(RoomGroup.VANILLA).Where(i => i.PalaceNumber == palaceNumber).ToList());
         }
 
+        //same with boss rooms
         VanillaBossRoom = palaceRooms.VanillaBossRoom(palaceNumber);
+        if (BossRooms.Count == 0)
+        {
+            BossRooms.Add(VanillaBossRoom);
+        }
 
         if (palaceNumber == 7)
         {

@@ -44,35 +44,58 @@ public class Palaces
         }
         List<Palace> palaces = [];
 
-        int[] sizes = new int[7];
+        int[] sizes = [14, 21, 15, 21, 28, 27, 55];
+        //1-4/7 first, then 5-6 because they're dependant
+        for(int i = 0; i < 7; i++)
+        {
+            if (props.PalaceStyles[i] == PalaceStyle.VANILLA)
+            {
+                sizes[i] = i + 1 switch
+                {
+                    //Shortened values consistent with the old shorten vanilla logic
+                    1 => props.ShortenNormalPalaces ? r.Next(8, 12) : 14,
+                    2 => props.ShortenNormalPalaces ? r.Next(11, 17) : 21,
+                    3 => props.ShortenNormalPalaces ? r.Next(8, 13) : 15,
+                    4 => props.ShortenNormalPalaces ? r.Next(11, 17) : 21,
+                    7 => props.ShortenGP ? r.Next(28, 43) : 55,
+                    _ => 0
+                };
+            }
+            else
+            {
+                sizes[i] = i + 1 switch
+                {
+                    1 => props.ShortenNormalPalaces ? r.Next(7, 12) : r.Next(10, 17), //13
+                    2 => props.ShortenNormalPalaces ? r.Next(11, 17) : r.Next(16, 25),//20
+                    3 => props.ShortenNormalPalaces ? r.Next(8, 13) : r.Next(11, 18),//14
+                    4 => props.ShortenNormalPalaces ? r.Next(11, 17) : r.Next(16, 25), //20
+                    7 => props.ShortenGP ? r.Next(27, 41) /*34*/ : sizes[6] = r.Next(54, 60),//57
+                    _ => 0
+                };
+            }
+        }
+        for (int i = 4; i < 6; i++)
+        {
+            if (props.PalaceStyles[i] == PalaceStyle.VANILLA)
+            {
+                sizes[i] = i + 1 switch
+                {
+                    5 => props.ShortenNormalPalaces ? r.Next(15, Math.Min(63 - sizes[0] - sizes[1], 23)) : 28,
+                    6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : 27,
+                    _ => sizes[i]
+                };
+            }
+            else
+            {
+                sizes[i] = i + 1 switch
+                {
+                    5 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[0] - sizes[1], 23)) : r.Next(23, 63 - sizes[0] - sizes[1]), //23 to 20-36
+                    6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : r.Next(22, 63 - sizes[2] - sizes[3]), //22 to 21-37
+                    _ => sizes[i]
+                };
+            }
+        }
 
-        if (props.ShortenNormalPalaces)
-        {
-            sizes[0] = r.Next(6, 11);
-            sizes[1] = r.Next(10, 16);
-            sizes[2] = r.Next(7, 12);
-            sizes[3] = r.Next(10, 16);
-            sizes[4] = r.Next(14, Math.Min(63 - sizes[0] - sizes[1], 22));
-            sizes[5] = r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22));
-        }
-        else
-        {
-            sizes[0] = r.Next(10, 17); //13
-            sizes[1] = r.Next(16, 25); //20
-            sizes[2] = r.Next(11, 18); //14
-            sizes[3] = r.Next(16, 25); //20
-            sizes[4] = r.Next(23, 63 - sizes[0] - sizes[1]); //23 to 20-36
-            sizes[5] = r.Next(22, 63 - sizes[2] - sizes[3]); //22 to 21-37
-        }
-
-        if (props.ShortenGP)
-        {
-            sizes[6] = r.Next(27, 41); //34
-        }
-        else
-        {
-            sizes[6] = r.Next(54, 60); //57
-        }
 
         byte group1MapIndex = 0, group2MapIndex = 0, group3MapIndex = 0;
         for (int currentPalace = 1; currentPalace < 8; currentPalace++)
@@ -122,6 +145,7 @@ public class Palaces
             }
             palace.ValidateRoomConnections();
             palaces.Add(palace);
+            sizes[currentPalace - 1] = palace.AllRooms.Count;
         }
 
         palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.GLOVE);
