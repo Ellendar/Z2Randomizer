@@ -170,6 +170,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                 //Debug.WriteLine("Added Room at (" + newRoom.coords.Item1 + ", " + newRoom.coords.Item2 + ")");
             }
         }
+        //close stubs
         if(openCoords.Count > 0)
         {
             roomsByExitType = roomPool.CategorizeNormalRoomExits();
@@ -188,48 +189,48 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                     throw new Exception("Junction remains in stub closing that should have been cleaned up");
                 }
 
-                bool placed = false;
-                do
+                RoomExitType exitType;
+                if (left != null && left.HasRightExit)
                 {
-                    RoomExitType exitType;
-                    if (left != null && left.HasRightExit)
+                    exitType = RoomExitType.DEADEND_EXIT_LEFT;
+                }
+                else if (right != null && right.HasLeftExit)
+                {
+                    exitType = RoomExitType.DEADEND_EXIT_RIGHT;
+                }
+                else if (up != null && up.HasDownExit)
+                {
+                    if (up.HasDrop)
                     {
-                        exitType = RoomExitType.DEADEND_EXIT_LEFT;
-                    }
-                    else if (right != null && right.HasLeftExit)
-                    {
-                        exitType = RoomExitType.DEADEND_EXIT_RIGHT;
-                    }
-                    else if (up != null && up.HasDownExit)
-                    {
-                        if (up.HasDrop)
-                        {
-                            exitType = RoomExitType.NO_ESCAPE;
-                            logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
-                            palace.IsValid = false;
-                            return palace;
-                        }
-                        else
-                        {
-                            exitType = RoomExitType.DEADEND_EXIT_UP;
-                        }
-                    }
-                    else if (down != null && down.HasUpExit)
-                    {
-                        exitType = RoomExitType.DEADEND_EXIT_DOWN;
+                        exitType = RoomExitType.NO_ESCAPE;
+                        logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
+                        palace.IsValid = false;
+                        return palace;
                     }
                     else
                     {
-                        throw new ImpossibleException("Open coordinate has no adjacent exits");
+                        exitType = RoomExitType.DEADEND_EXIT_UP;
                     }
-                    roomsByExitType.TryGetValue(exitType, out var possibleStubs);
+                }
+                else if (down != null && down.HasUpExit)
+                {
+                    exitType = RoomExitType.DEADEND_EXIT_DOWN;
+                }
+                else
+                {
+                    throw new ImpossibleException("Open coordinate has no adjacent exits");
+                }
+                roomsByExitType.TryGetValue(exitType, out var possibleStubs);
+
+                bool placed = false;
+                do //while (placed == false)
+                {
                     Room? newRoom = possibleStubs?.Sample(r);
                     if (newRoom == null)
                     {
                         roomPool.DefaultStubsByDirection.TryGetValue(exitType, out newRoom);
                     }
-                    //The most likely cause of this is roomPool exhaustion in no duplicate rooms seeds.
-                    //There could be some compromise to try and save it, but might as well regen
+                    //This should no longer be possible since default stubs aren't removable
                     if (newRoom == null)
                     {
                         palace.IsValid = false;
@@ -277,12 +278,10 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                     }
                     if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
                     {
-                        if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView))
-                            && newRoom.Group != RoomGroup.STUBS)
-                        {
-                            roomsByExitType[exitType].Remove(newRoom);
-                            placed = false;
-                        }
+                        List<Room> duplicateSideviewStubs = roomPool.NormalRooms.Where(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)
+                            && i.Group != RoomGroup.STUBS).ToList();
+                        roomPool.NormalRooms.RemoveAll(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)
+                            && i.Group != RoomGroup.STUBS);
                     }
                 } while (placed == false);
             }
