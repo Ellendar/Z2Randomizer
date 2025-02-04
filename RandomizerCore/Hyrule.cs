@@ -33,7 +33,7 @@ public class Hyrule
     //This controls how many times 
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
-    public const bool UNSAFE_DEBUG = false;
+    public const bool UNSAFE_DEBUG = true;
 
     private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
 
@@ -97,7 +97,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 170;
+    private static int DEBUG_THRESHOLD = 0;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -124,29 +124,6 @@ public class Hyrule
 
     public int debug = 0;
     public int totalReachableCheck = 0;
-
-
-    private readonly SortedDictionary<int, int> palaceConnectionLocs = new SortedDictionary<int, int>
-    {
-        {1, 0x1072B},
-        {2, 0x1072B},
-        {3, 0x12208},
-        {4, 0x12208},
-        {5, 0x1072B},
-        {6, 0x12208},
-        {7, 0x1472B},
-    };
-
-    private readonly Dictionary<int, int> palaceAddr = new Dictionary<int, int>
-    {
-        {1, 0x4663 },
-        {2, 0x4664 },
-        {3, 0x4665 },
-        {4, 0xA140 },
-        {5, 0x8663 },
-        {6, 0x8664 },
-        {7, 0x8665 }
-    };
 
     public ROM ROMData { get; set; }
     public Dictionary<Spell, bool> SpellGet { get; set; }

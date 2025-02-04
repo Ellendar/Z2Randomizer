@@ -330,9 +330,10 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByMap(int map)
+    protected Location GetLocationByMap(int map, Terrain? terrainType = null)
     {
-        Location location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map);
+        Location location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map 
+            && loc.TerrainType == (terrainType ?? loc.TerrainType));
         return location;
     }
 
