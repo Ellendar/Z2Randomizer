@@ -10,8 +10,10 @@ namespace RandomizerCore.Sidescroll;
 public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
     private const int STALL_LIMIT = 5000;
+    static int debug = 0;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
+        debug++;
         Palace palace = new(palaceNumber);
         List<(int, int)> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
@@ -141,6 +143,10 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                 }
                 openCoords.AddRange(newOpenCoords);
                 openCoords.Remove(bestFit);
+                if(newRoom.Name.Contains("Central Complex drop fourway"))
+                {
+                    //debug++;
+                }
                 palace.AllRooms.Add(newRoom);
                 stallCount = 0;
 
@@ -171,7 +177,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
             }
         }
         //close stubs
-        if(openCoords.Count > 0)
+        if (openCoords.Count > 0)
         {
             roomsByExitType = roomPool.CategorizeNormalRoomExits();
 

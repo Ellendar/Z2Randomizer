@@ -426,18 +426,19 @@ public class Palace
             byte rightByte = (byte)(room.Right == null ? OUTSIDE_ROOM_EXIT : (room.Right.Map * 4));
             int pageCount = ((room.SideView[1] & 0b01100000) >> 5) + 1;
 
-            if(room.IsUpDownReversed)
-            {
-                (downByte, upByte) = (upByte, downByte);
-            }
             //if the up/down exit is an elevator type, go to the page the elevator is on on that screen
-            if(room.Down != null && room.Down.ElevatorScreen >= 0)
+            if (room.Down != null && room.Down.ElevatorScreen >= 0)
             {
                 downByte = (byte)(downByte + room.Down.ElevatorScreen);
             }
             if (room.Up != null && room.Up.ElevatorScreen >= 0)
             {
                 upByte = (byte)(upByte + room.Up.ElevatorScreen);
+            }
+
+            if (room.IsUpDownReversed)
+            {
+                (downByte, upByte) = (upByte, downByte);
             }
 
             //if the room on the left is a 2/3 page room, make the left exit go to the rightmost page in that room

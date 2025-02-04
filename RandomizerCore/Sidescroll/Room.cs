@@ -600,7 +600,7 @@ public class Room : IJsonOnDeserialized
             {
                 return 1;
             }
-            if (ElevatorScreen >= 0 && down.ElevatorScreen >= 0 && down.HasUpExit)
+            if (ElevatorScreen >= 0 && down.ElevatorScreen >= 0 && down.HasUpExit && !HasDrop)
             {
                 return 1;
             }

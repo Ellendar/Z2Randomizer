@@ -154,7 +154,14 @@ public class Palaces
         {
             return [];
         }
-        
+
+        List<Room> validDrops = palaces[0].AllRooms.Where(i => i.HasDrop)
+            .Union(palaces[1].AllRooms.Where(i => i.HasDrop))
+            .Union(palaces[2].AllRooms.Where(i => i.HasDrop))
+            .Union(palaces[3].AllRooms.Where(i => i.HasDrop))
+            .Union(palaces[4].AllRooms.Where(i => i.HasDrop))
+            .Union(palaces[5].AllRooms.Where(i => i.HasDrop))
+            .ToList();
         return palaces;
     }
 
