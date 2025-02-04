@@ -218,7 +218,7 @@ public class Hyrule
                 palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
             }
 
-            palaces[3].BossRoom.Requirements = palaces[3].BossRoom.Requirements.AddHardRequirement(RequirementType.GLOVE);
+            palaces[3].BossRoom.Requirements = palaces[3].BossRoom.Requirements.AddHardRequirement(RequirementType.REFLECT);
 
             Assembler.Assembler sideview_module = new();
             Assembler.Assembler gp_sideview_module = new();
