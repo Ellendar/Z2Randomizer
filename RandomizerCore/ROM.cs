@@ -800,9 +800,10 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
-    public void ChangeMapperToMMC5(Engine engine)
+    public void ChangeMapperToMMC5(Engine engine, bool enableZ2ft)
     {
         Assembler.Assembler assembler = new();
+        assembler.Assign("ENABLE_Z2FT", enableZ2ft ? 1 : 0);
         assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
 
         engine.Modules.Add(assembler.Actions);
