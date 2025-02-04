@@ -3846,7 +3846,7 @@ FREE_UNTIL $c2ca
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
-        rom.ChangeMapperToMMC5(engine);
+        rom.ChangeMapperToMMC5(engine, randomizeMusic);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadItemRoomDespawn(engine);
         rom.DontCountExpDuringTalking(engine);
