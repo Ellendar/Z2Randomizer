@@ -26,9 +26,18 @@ public class WestHyrule : World
     public Location locationAtSariaNorth;
     public Location locationAtSariaSouth;
     public Location locationAtRauru;
-    public Location bridge1;
-    public Location bridge2;
+
+    private Location bridge1;
+    private Location bridge2;
     public Location pbagCave;
+    private Location jumpCave;
+    private Location heartCave;
+    private Location fairyCave;
+
+    private Location parapaCave1;
+    private Location parapaCave2;
+    private Location jumpCave2;
+    private Location fairyCave2;
     private int bridgeCount;
     private int calderaCenterX, calderaCenterY;
 
@@ -112,22 +121,22 @@ public class WestHyrule : World
         ];
         locations.ForEach(AddLocation);
 
-        northPalace = GetLocationByMap(0x80);
+        northPalace = GetLocationByMem(0x462f); //0x462f
         //reachableAreas = new HashSet<string>();
-        Location jumpCave = GetLocationByMap(9);
+        jumpCave = GetLocationByMem(0x463b); //0x463b
         jumpCave.NeedJump = true;
-        medicineCave = GetLocationByMap(0x0E);
-        Location heartCave = GetLocationByMap(0x10);
-        Location fairyCave = GetLocationByMap(0x12);
+        medicineCave = GetLocationByMem(0x463e); //0x463e
+        heartCave = GetLocationByMem(0x463f); //0x463f
+        fairyCave = GetLocationByMem(0x4640); //0x4640
         fairyCave.NeedFairy = true;
-        locationAtRuto = GetLocationByMap(0xC5, Terrain.TOWN);
-        bagu = GetLocationByMap(0x18);
-        locationAtMido = GetLocationByMap(0xCB);
-        locationAtSariaNorth = GetLocationByMap(0xC8);
-        locationAtSariaSouth = GetLocationByMap(0x06);
+        locationAtRuto = GetLocationByMem(0x465e); //0x465e
+        bagu = GetLocationByMem(0x4661); //0x4661
+        locationAtMido = GetLocationByMem(0x4662); //0x00004662
+        locationAtSariaNorth = GetLocationByMem(0x4660); //0x00004660
+        locationAtSariaSouth = GetLocationByMem(0x465f); //0x0000465f
         locationAtSariaNorth.NeedBagu = true;
         locationAtSariaSouth.NeedBagu = true;
-        trophyCave = GetLocationByMap(0xE1);
+        trophyCave = GetLocationByMem(0x4630); //0x00004630
         raft = GetLocationByMem(0x4658);
         locationAtPalace1 = GetLocationByMem(0x4663);
         locationAtPalace1.PalaceNumber = 1;
@@ -143,22 +152,22 @@ public class WestHyrule : World
         pbagCave = GetLocationByMem(0x463D);
 
 
-        Location parapaCave1 = GetLocationByMap(07);
-        Location parapaCave2 = GetLocationByMap(0xC7);
-        Location jumpCave2 = GetLocationByMap(0xCB);
-        Location fairyCave2 = GetLocationByMap(0xD3);
-        bridge1 = GetLocationByMap(0x04);
-        bridge2 = GetLocationByMap(0xC5);
+        parapaCave1 = GetLocationByMem(0x4639); //0x4639
+        parapaCave2 = GetLocationByMem(0x463a); //0x463a
+        jumpCave2 = GetLocationByMem(0x463c); //0x463c
+        fairyCave2 = GetLocationByMem(0x4641); //0x4641
+        bridge1 = GetLocationByMem(0x4644); //0x4644
+        bridge2 = GetLocationByMem(0x4645); //0x4645
 
         if (props.SaneCaves)
         {
             fairyCave.TerrainType = Terrain.CAVE;
         }
 
-        caveConn = new Dictionary<Location, Location>();
-        bridgeConn = new Dictionary<Location, Location>();
-        cityConn = new Dictionary<Location, Location>();
-        graveConn = new Dictionary<Location, Location>();
+        caveConn = [];
+        bridgeConn = [];
+        cityConn = [];
+        graveConn = [];
 
         //connections.Add(hammerEnter, hammerExit);
         //connections.Add(hammerExit, hammerEnter);
@@ -338,7 +347,7 @@ public class WestHyrule : World
                 raft.PassThrough = 0;
                 bridge1.PassThrough = 0;
                 bridge2.PassThrough = 0;
-                GetLocationByMap(0x12).PassThrough = 0; //fairy cave
+                fairyCave.PassThrough = 0; //fairy cave
 
             }
         }
@@ -985,18 +994,18 @@ public class WestHyrule : World
         int cavenum1 = RNG.Next(availableConnectorCount);
         if(cavenum1 == 0)
         {
-            cave1l = GetLocationByMap(9);//jump cave
-            cave1r = GetLocationByMap(0xCB);
+            cave1l = jumpCave;//jump cave
+            cave1r = jumpCave2;
         }
         else if (cavenum1 == 1)
         {
-            cave1l = GetLocationByMap(07); //parapa
-            cave1r = GetLocationByMap(0xC7);
+            cave1l = parapaCave1; //parapa
+            cave1r = parapaCave2;
         }
         else
         {
-            cave1l = GetLocationByMap(0x12); //fairy cave
-            cave1r = GetLocationByMap(0xD3);
+            cave1l = fairyCave; //fairy cave
+            cave1r = fairyCave2;
         }
         map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
@@ -1009,18 +1018,18 @@ public class WestHyrule : World
             }
             if (cavenum2 == 0)
             {
-                cave2l = GetLocationByMap(9);//jump cave
-                cave2r = GetLocationByMap(0xCB);
+                cave2l = jumpCave;//jump cave
+                cave2r = jumpCave2;
             }
             else if (cavenum2 == 1)
             {
-                cave2l = GetLocationByMap(07); //parapa
-                cave2r = GetLocationByMap(0xC7);
+                cave2l = parapaCave1; //parapa
+                cave2r = parapaCave2;
             }
             else
             {
-                cave2l = GetLocationByMap(0x12); //fairy cave
-                cave2r = GetLocationByMap(0xD3);
+                cave2l = fairyCave; //fairy cave
+                cave2r = fairyCave2;
             }
             map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;

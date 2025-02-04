@@ -118,7 +118,7 @@ public class EastHyrule : World
         locationAtPalace6 = GetLocationByMem(0x8664);
         locationAtPalace6.PalaceNumber = 6;
         townAtDarunia = GetLocationByMem(0x865E);
-        locationAtPalace5 = GetLocationByMap(0x23);
+        locationAtPalace5 = GetLocationByMem(0x8663);
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNewKasuto = GetLocationByMem(0x8660);

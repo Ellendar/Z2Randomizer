@@ -330,13 +330,6 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByMap(int map, Terrain? terrainType = null)
-    {
-        Location location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map 
-            && loc.TerrainType == (terrainType ?? loc.TerrainType));
-        return location;
-    }
-
     public void UpdateAllReached()
     {
         if (AllReached)
@@ -1033,8 +1026,8 @@ public abstract class World
                 }
                 else if (placeLongBridge)
                 {
-                    Location bridge1 = GetLocationByMap(0x04);
-                    Location bridge2 = GetLocationByMap(0xC5);
+                    Location bridge1 = GetLocationByMem(0x4644);
+                    Location bridge2 = GetLocationByMem(0x4645);
                     x -= deltaX;
                     y -= deltaY;
                     if (deltaX > 0 || deltaY > 0)
