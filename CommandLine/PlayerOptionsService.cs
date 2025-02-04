@@ -80,6 +80,7 @@ namespace CommandLine
             configuration.ShieldTunic = playerOptions.ShieldTunicColor;
             configuration.DisableMusic = playerOptions.DisableMusic;
             configuration.RandomizeMusic = playerOptions.RandomizeMusic;
+            configuration.MixCustomAndOriginalMusic = playerOptions.MixCustomAndOriginalMusic;
             configuration.DisableUnsafeMusic = playerOptions.DisableUnsafeMusic;
             configuration.DisableHUDLag = playerOptions.DisableHUDLag;
             configuration.FastSpellCasting = playerOptions.FastSpellCasting;

@@ -141,9 +141,10 @@ internal class MusicRandomizer
         int seed,
         IEnumerable<string> libPaths,
         IEnumerable<int> freeBanks,
+        bool includeBuiltin,
         bool safeOnly)
     {
-        MusicRandomizer randomizer = new(hyrule, seed, libPaths, freeBanks, safeOnly);
+        MusicRandomizer randomizer = new(hyrule, seed, libPaths, freeBanks, includeBuiltin, safeOnly);
 
         return randomizer.ImportSongs();
     }
@@ -154,6 +155,7 @@ internal class MusicRandomizer
     internal SimpleRomAccess _romAccess;
     internal List<string> _libPaths;
     internal List<int> _freeBanks;
+    internal bool _includeBuiltin;
 
     internal Z2Importer _imptr;
 
@@ -162,6 +164,7 @@ internal class MusicRandomizer
         int seed,
         IEnumerable<string> libPaths,
         IEnumerable<int> freeBanks,
+        bool includeBuiltin,
         bool safeOnly)
     {
         _hyrule = hyrule;
@@ -170,6 +173,7 @@ internal class MusicRandomizer
         _romAccess = new(_rom);
         _libPaths = new(libPaths);
         _freeBanks = new(freeBanks);
+        _includeBuiltin = includeBuiltin;
 
         _imptr = new(_romAccess, _freeBanks);
         _imptr.DefaultParserOptions.SafeOnly = safeOnly;
@@ -183,7 +187,7 @@ internal class MusicRandomizer
         // Testing songs is to help in making libraries. As libraries will be something that the average user can make, it can't be limited to debug builds like in MM2R. However, if people end up using libraries so large that this ends up taking a lot of time, it may be necessary to remove it. It's also entirely possible that the optimizer will notice that this function doesn't actually do anything that affects the rest of the program and eliminate it completely...
         TestSongs();
 
-        var songs = LoadSongs();
+        var songs = LoadSongs(_includeBuiltin);
         var usesSongs = _imptr.SplitSongsByUsage<Usage>(songs);
 
         Dictionary<Usage, int> numUsageSongs = new()
@@ -239,7 +243,7 @@ internal class MusicRandomizer
     }
 
     List<ISong> LoadSongs(
-        bool includeBuiltin = true,
+        bool includeBuiltin,
         LibraryParserOptions? opts = null)
     {
         List<FtSong> ftSongs = new();
@@ -355,6 +359,9 @@ internal class MusicRandomizer
         foreach (var (usage, usageLocs) in usesLocs)
         {
             var usageSongs = usesSongs[usage];
+            if (usageSongs.Count == 0)
+                continue;
+
             Func<Location, int> GetSongIdx = usage switch
             {
                 // One song per palace
