@@ -343,6 +343,14 @@ public class Location
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
+
+        //Bagu is 4. This should be a check based on ActualTown, but bagu isn't a town until 4.4
+        //so for now this hack.
+        if(MemAddress == 0x4661)
+        {
+            return 4;
+        }
+
         //Connectors use the world bits to indicate which continent they take you to
         if(ConnectedContinent != null)
         {
