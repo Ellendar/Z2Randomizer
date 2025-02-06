@@ -161,6 +161,7 @@ public class Palaces
             .Union(palaces[3].AllRooms.Where(i => i.HasDrop))
             .Union(palaces[4].AllRooms.Where(i => i.HasDrop))
             .Union(palaces[5].AllRooms.Where(i => i.HasDrop))
+            .Union(palaces[6].AllRooms.Where(i => i.HasDrop))
             .ToList();
         return palaces;
     }
