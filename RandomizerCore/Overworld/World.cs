@@ -13,21 +13,8 @@ public abstract class World
 {
     protected readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected SortedDictionary<string, List<Location>> areasByLocation;
-    /*private List<Location> caves;
-    private List<Location> towns;
-    private List<Location> palaces;
-    private List<Location> grasses;
-    private List<Location> swamps;
-    private List<Location> bridges;
-    private List<Location> deserts;
-    private List<Location> forests;
-    private List<Location> graves;
-    private List<Location> lavas;
-    private List<Location> roads;
-    private List<Location> allLocations;
-    */
+
     public Dictionary<Location, Location> connections;
-    //protected HashSet<String> reachableAreas;
     protected int enemyAddr;
     protected List<int> enemies;
     protected List<int> flyingEnemies;
@@ -37,12 +24,9 @@ public abstract class World
     protected int enemyPtr;
     protected List<int> overworldMaps;
     protected SortedDictionary<(int, int), Location> locsByCoords;
-    //protected Hyrule hyrule;
     protected Terrain[,] map;
-    //private List<int> visitedEnemies;
     protected int MAP_ROWS;
     protected int MAP_COLS;
-    //protected int bytesWritten;
     protected List<Terrain> randomTerrainFilter;
     protected List<Terrain> walkableTerrains;
     protected bool[,] visitation;
@@ -56,14 +40,12 @@ public abstract class World
     public Location? bridge;
     public Location? cave1;
     public Location? cave2;
-    //private bool allreached;
 
     public int baseAddr;
     protected Climate climate;
 
     protected Random RNG;
 
-    //private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
 
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
@@ -146,10 +128,8 @@ public abstract class World
         {
             Locations.Add(Terrain, new List<Location>());
         }
-        //Locations = new List<Location>[11] { Towns, Caves, Palaces, Bridges, Deserts, Grasses, Forests, Swamps, Graves, Roads, Lavas };
         AllLocations = [];
         locsByCoords = [];
-        //reachableAreas = new HashSet<string>();
         unimportantLocs = [];
         areasByLocation = [];
         AllReached = false;
@@ -178,7 +158,6 @@ public abstract class World
             Locations[location.TerrainType].Add(location);
         }
         AllLocations.Add(location);
-        //locsByCoords.Add(l.Coords, l);
     }
 
     protected void ShuffleLocations(List<Location> locationsToShuffle)
@@ -666,8 +645,8 @@ public abstract class World
             }
             else if (biome == Biome.VOLCANO || biome == Biome.CALDERA)
             {
-                range = 10;
-                offset = 15;
+                range = 15;
+                offset = 5;
             }
             crossing = true;
             if (direction == Direction.NORTH)

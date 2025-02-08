@@ -351,7 +351,9 @@ public class Location
     public int GetWorld()
     {
         //Towns reference their banks
-        if (TerrainType == Terrain.TOWN || TerrainType == Terrain.GRAVE)
+        if (TerrainType == Terrain.TOWN 
+            || TerrainType == Terrain.GRAVE
+            || (TerrainType == Terrain.FOREST && NeedHammer))
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
