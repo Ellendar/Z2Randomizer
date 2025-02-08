@@ -50,7 +50,7 @@ public class Palaces
         {
             if (props.PalaceStyles[i] == PalaceStyle.VANILLA)
             {
-                sizes[i] = i + 1 switch
+                sizes[i] = (i + 1) switch
                 {
                     //Shortened values consistent with the old shorten vanilla logic
                     1 => props.ShortenNormalPalaces ? r.Next(8, 12) : 14,
@@ -63,7 +63,7 @@ public class Palaces
             }
             else
             {
-                sizes[i] = i + 1 switch
+                sizes[i] = (i + 1) switch
                 {
                     1 => props.ShortenNormalPalaces ? r.Next(7, 12) : r.Next(10, 17), //13
                     2 => props.ShortenNormalPalaces ? r.Next(11, 17) : r.Next(16, 25),//20
@@ -78,7 +78,7 @@ public class Palaces
         {
             if (props.PalaceStyles[i] == PalaceStyle.VANILLA)
             {
-                sizes[i] = i + 1 switch
+                sizes[i] = (i + 1) switch
                 {
                     5 => props.ShortenNormalPalaces ? r.Next(15, Math.Min(63 - sizes[0] - sizes[1], 23)) : 28,
                     6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : 27,
@@ -87,7 +87,7 @@ public class Palaces
             }
             else
             {
-                sizes[i] = i + 1 switch
+                sizes[i] = (i + 1) switch
                 {
                     5 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[0] - sizes[1], 23)) : r.Next(23, 63 - sizes[0] - sizes[1]), //23 to 20-36
                     6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : r.Next(22, 63 - sizes[2] - sizes[3]), //22 to 21-37

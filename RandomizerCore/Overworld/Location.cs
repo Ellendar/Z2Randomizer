@@ -375,19 +375,19 @@ public class Location
         }
         //Palaces... have world numbers that kind... of... make sense?
         //This is what they are.
-        if (TerrainType == Terrain.PALACE)
+        if (PalaceNumber != null)
         {
             return PalaceNumber switch
             {
                 //North palace
                 null => 0,
-                1 => 12,
-                2 => 12,
-                3 => 16,
-                4 => 19,
-                5 => 14,
-                6 => 18,
-                7 => 22,
+                1 => 0b00001100 + (int)Continent, //12,
+                2 => 0b00001100 + (int)Continent, //12,
+                3 => 0b00010000 + (int)Continent, //16,
+                4 => 0b00010000 + (int)Continent, //19,
+                5 => 0b00001100 + (int)Continent, //14,
+                6 => 0b00010000 + (int)Continent, //18,
+                7 => 0b00010100 + (int)Continent, //22,
                 _ => throw new Exception("Invalid palace number in Location.GetWorld()")
             };
         }
