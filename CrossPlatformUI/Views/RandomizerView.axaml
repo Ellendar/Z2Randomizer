@@ -35,7 +35,7 @@
                                 <avalonia:MaterialIcon Kind="ReloadAlert" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Choose ROM Save Folder" IsVisible="{Binding  IsDesktop}" Command="{Binding SaveFolder}" >
+                        <MenuItem Header="Choose ROM Save Folder" IsVisible="{Binding IsDesktop}" Command="{Binding SaveFolder}" >
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
                             </MenuItem.Icon>

@@ -72,7 +72,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         {
             var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
             var folder = await fileDialog.OpenFolderAsync();
-            Main.OutputFilePath = folder?.Path.AbsolutePath ?? "";
+            Main.OutputFilePath = folder?.Path.LocalPath ?? "";
         });
         CanGenerate = this.WhenAnyValue(
             x => x.Flags,
