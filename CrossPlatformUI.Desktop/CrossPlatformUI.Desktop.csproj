@@ -16,7 +16,14 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <AssemblyName>Z2Randomizer</AssemblyName>
+    </PropertyGroup>
+
+
+    <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+        <SignAssembly>False</SignAssembly>
+        <StartupObject>CrossPlatformUI.Desktop.Program</StartupObject>
     </PropertyGroup>
 
     <ItemGroup>

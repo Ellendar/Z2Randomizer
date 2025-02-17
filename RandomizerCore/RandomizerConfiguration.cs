@@ -181,6 +181,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool upAOnController1;
     private bool removeFlashing;
     private CharacterSprite sprite;
+    private string spriteName;
     private CharacterColor tunic;
     private CharacterColor shieldTunic;
     private BeamSprites beamSprite;
@@ -976,6 +977,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => sprite;
         set => SetField(ref sprite, value);
+    }
+    [IgnoreInFlags]
+    public string SpriteName
+    {
+        get => spriteName;
+        set => SetField(ref spriteName, value);
     }
 
     [IgnoreInFlags]

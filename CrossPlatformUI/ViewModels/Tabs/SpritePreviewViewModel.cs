@@ -24,7 +24,12 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
     private CancellationTokenSource backgroundUpdateTask = new ();
     private CancellationTokenSource backgroundLoadTask = new ();
 
-    public string? SpriteName { get; set; } = "";
+    private string spriteName = "Link";
+
+    public string? SpriteName { 
+        get { return spriteName; }
+        set { spriteName = value ?? "Link"; Main.Config.SpriteName = value ?? "Link"; }
+    }
 
     public CharacterColor TunicColor
     {
@@ -49,6 +54,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
     public SpritePreviewViewModel(MainViewModel main)
     {
         Main = main;
+        SpriteName = main.Config.SpriteName;
         Activator = new();
         this.WhenActivated(OnActivate);
     }

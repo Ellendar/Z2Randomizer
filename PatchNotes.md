@@ -1,5 +1,96 @@
 # Z2Randomizer Changelog
 
+## Version 4.4 - ???
+
+### BETA SPECIFIC NOTES
+- The 4.4 rooms are still very rough. Please let me know rooms you like/hate so they can be fixed/removed.
+- Some of the changes from very recent versions of 4.3 have not been applied yet. You may see some weirdness from this (like the anti-lag glove being back.) Expect this to be fixed in the next beta releases
+- Batch generation is not in the new UI yet. Should be back next release.
+
+### New Features
+- Rebuilt the User Interface - This new interface is more customizable than the old one and should allow more improvements in the future.
+- New web version! (BETA: Not yet but it's close) Check it out at (LINK)
+- New palace rooms from the 4.4 Room Jam.
+- Added options to add additional items to the item pool.
+	- Include spells in shuffle - Wizards can give normal items and spells can be found out in the world
+		- If helpful hints are on, this option adds 1 hint that always contains the location of one of reflect/fairy/thunder spell.
+	- Include Sword Techniques in Shuffle - Up/Down stab can be found in the world and their trainers could hand out other items.
+	- Include Quest Items in Shuffle - Saria's mirror table, the fountain in Nabooru, and bagu all have any item, and their items could be out in the world.
+		- If spell item hints are on, the Nabooru and Saria door ladies will provide a hint where their required items are.
+- New palace styles
+	- Sequential - Like reconstructed, rooms are picked from the pool at random and placed into the palace, except in a way where the geometry of the palace makes sense. If you go up -> right -> down -> left, you will always end up back where you started.
+	- Random walk - Creates a random dungeon shape, and then fills that shape up with rooms that fit. Like sequential this style has sane geometry. Generally creates palaces with fewer dead ends, but more chances for long paths.
+	- Chaos - An evil palace style where any exit can lead to any room. You're guaranteed to be able to get to all rooms, but going back the way you came is not guaranteed to lead you to the room you were in before. This style is never selected with any random option.
+	- Random (All Same) - All palaces use the same style, chosen at random.
+	- Random (Per Palace) - Each palace selects its own style randomly.
+- Added an option to generate a spoiler log. If selected a .spoiler file will be generated with the same name as the output ROM. Seeds generated with spoiler log on will be completely different than seeds with spoilers off.
+- Added an option to shorten normal palaces.
+- Re-enabled the ability to shorten vanilla palaces.
+- Starting items/spells can now be limited
+	- If the number of selected starting items is greater than the limit, items will be randomly removed down to the limit. 
+	- If shuffle starting items is on and there are fewer selected starting items than the limit, the number of starting items may be less than or equal to the limit.
+- Random flag rate is now configurable. Any ? flags have the indicated percent chance (either 25/50/75/90%) to be turned on.
+- River devil has learned some new tricks! He may now block paths (like vanilla), one of the east caves, or siege one of the towns.
+- Added a setting to allow rock blocks in the east.
+- Added new sprites. Thanks to the authors for providing them.
+	- Alucard
+	- Barba
+	- Beard Link
+	- Garfield
+	- Gooma
+	- Helmethead
+	- LittleMagic
+	- Mario
+	- NinjaGaiden
+	- Peach
+	- PowerRanger
+	- PsycoRanger
+	- PunchOut
+	- Shadow
+	- Shantae
+	- SlothLink
+	- Sonic
+	- TMNT Leo
+	- Trogdor
+	
+### Enhancements / bugfixes
+- Improvements to the command line interface to better support other OSes.
+- Added the ability to load settings via JSON file instead of a flag string (BETA: Not in this release)
+
+## Version 4.3.13 - October 16, 2024
+
+- Faster text is now instant text. Rejoice!
+- Added options for +0/+4 for Max Hearts
+- Added support for Custom Music. See [this wiki entry](https://github.com/Ellendar/Z2Randomizer/wiki/Custom-Music)  for directions on how to set it up. Big thanks to Quantum for adding this.
+
+- Disabled simultaneous L+R inputs.
+- Removed the Glove indicator on lag frames when the HUD lag fix was enabled. It will return as an option in the next major release.
+- Fixed a bug where enemy projectiles could function incorrectly after killing hard carock
+- Fixed an issue where the sleepy bot in saria displayed his vanilla text when helpful hints were on and he didn't have a hint.
+- Fixed the upstab/downstab get text when community text is disabled and upstab/downstab are swapped.
+- Fixed an issue where items required to get reflect could be behind Carock
+- Fixed an issue where starting life level was controlled by the starting magic level selector.
+- Fixed an issue where low attack levels 1-6 were 1 damage lower than intended.
+- Fixed a bug that could crash the game if you leveled up or died while reading a sign.
+
+## Version 4.3.12 - May 12, 2024
+
+- Fixed a bug where hidden kasuto / 3-eyed rock could incorrectly select locations that were already placed under some circumstances in volcano biomes.
+
+## Version 4.3.11 - May 10, 2024
+
+- Fixed a bug where the basement guard in New Kasuto could tell you an incorrect number of required containers.
+
+## Version 4.3.10 - May 5, 2024
+
+- Fixed a bug where wizards would display text based on their town and not the spell they had when community text was off.
+- Fixed an issue where rock blocked caves could "double up" and be offset by 2 with two rocks.
+- Added a safety so if a cave exits directly into water, there is a one tile road so you can turn around and go back in.
+- Increased the number of allowed room placement failures before a palace is rejected. This should result in fewer seeds where GP takes a long time to generate.
+- (Room Jam) Fixed some issues that arise when using only room jam rooms in the pool (still doesn't work properly until we have more GP rooms.
+- (Room Jam) Fixed a drop room with invalid exit data.
+- (Room Jam) Updated the default custom rooms file to contain more submitted rooms.
+
 ## Version 4.3.9 - April 29th, 2024
 
 - Fixed a bug that could result in text/items being incorrect

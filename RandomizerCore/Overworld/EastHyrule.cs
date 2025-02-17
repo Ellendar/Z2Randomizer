@@ -165,12 +165,14 @@ public sealed class EastHyrule : World
         spellTower.VanillaCollectable = spellTower.Collectable = Collectable.MAGIC_KEY;
         spellTower.Name = "Spell Tower";
         spellTower.CanShuffle = false;
+        spellTower.ActualTown = null;
         AddLocation(spellTower);
 
         newKasutoBasement = new Location(townAtNewKasuto);
         newKasutoBasement.VanillaCollectable = newKasutoBasement.Collectable = Collectable.MAGIC_CONTAINER;
         newKasutoBasement.Name = "Granny's basement";
         newKasutoBasement.CanShuffle = false;
+        newKasutoBasement.ActualTown = null;
         AddLocation(newKasutoBasement);
 
         fountain = new Location(townAtNabooru);

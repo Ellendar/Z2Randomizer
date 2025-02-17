@@ -636,15 +636,18 @@ public abstract class World
         bool crossing;
         do
         {
+            //6-18
             int range = 12;
             int offset = 6;
             if (biome == Biome.ISLANDS || biome == Biome.MOUNTAINOUS)
             {
+                //10-20
                 range = 10;
                 offset = 10;
             }
             else if (biome == Biome.VOLCANO || biome == Biome.CALDERA)
             {
+                //5-20
                 range = 15;
                 offset = 5;
             }

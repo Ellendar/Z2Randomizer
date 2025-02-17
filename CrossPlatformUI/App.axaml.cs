@@ -1,9 +1,6 @@
 using System;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -41,6 +38,7 @@ public sealed partial class App : Application // , IDisposable
         {
             var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
             main = JsonSerializer.Deserialize(json, SerializationContext.Default.MainViewModel);
+            main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.SpriteName = main.Config.SpriteName;
         }
         catch (Exception)
         {
