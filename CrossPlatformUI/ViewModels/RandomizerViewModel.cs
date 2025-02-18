@@ -125,6 +125,74 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             x => x.Flags,
             flagsValidation,
             "Invalid Flags");
+
+        AddValidationRules();
+    }
+
+    private void AddValidationRules()
+    {
+        Main.Config.WhenAnyValue(
+            x => x.ShuffleOverworldEnemies,
+            x => x.ShufflePalaceEnemies,
+            (a,b) => (a ?? true) || (b ?? true)
+        ).Subscribe(_ =>
+        {
+            var overworldEnemyShuffle = Main.Config.ShuffleOverworldEnemies ?? true;
+            var palaceEnemyShuffle = Main.Config.ShufflePalaceEnemies ?? true;
+            if (!overworldEnemyShuffle && !palaceEnemyShuffle)
+            {
+                Main.Config.MixLargeAndSmallEnemies = false;
+            }
+            if (!palaceEnemyShuffle)
+            {
+                Main.Config.ShuffleDripperEnemy = false;
+                Main.Config.GeneratorsAlwaysMatch = false;
+            }
+        });
+        
+        // When PalaceItems and OverworldItems are off, then don't allow MixingOverworldAndPalaceItems
+        Main.Config.WhenAnyValue(
+            x => x.ShufflePalaceItems,
+            x => x.ShuffleOverworldItems,
+            (palaceItems, overworldItems) =>
+                (palaceItems ?? true) || (overworldItems ?? true)
+        ).Subscribe(_ =>
+        {
+            Main.Config.MixOverworldAndPalaceItems = false;            
+        });
+        
+        // If shuffle overworld items is off, turn off pbag cave item shuffle too
+        Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems)
+        .Subscribe(x =>
+        {
+            if (x.Value ?? true) return;
+            Main.Config.IncludePBagCavesInItemShuffle = false;
+        });
+        
+        // If Palaces can't swap continents 
+        Main.Config.ObservableForProperty(x => x.ShuffleEncounters)
+        .Subscribe(x =>
+        {
+            if (x.Value ?? true) return;
+            Main.Config.IncludeLavaInEncounterShuffle = false;
+            Main.Config.AllowUnsafePathEncounters = false;
+        });
+
+        // If shuffle encounters is off, then don't allow shuffling GP
+        Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents)
+            .Subscribe(x =>
+            {
+                if (x.Value ?? true) return;
+                Main.Config.ShuffleGP = false;
+            });
+
+        Main.ObservableForProperty(x => x.ShuffleAllExpState).Subscribe(x =>
+        {
+            if (!x.Value) return;
+            Main.Config.ShuffleAttackExperience = true;
+            Main.Config.ShuffleMagicExperience = true;
+            Main.Config.ShuffleLifeExperience = true;
+        });
     }
 
     private string validatedFlags = "";

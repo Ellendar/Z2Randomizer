@@ -74,6 +74,14 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     //     App.Main = this;
     // }
 
+    private bool shuffleAllExp;
+    [JsonIgnore]
+    public bool ShuffleAllExpState
+    {
+        get => shuffleAllExp;
+        set => this.RaiseAndSetIfChanged(ref shuffleAllExp, value);
+    }
+    
     // The Router associated with this Screen.
     // Required by the IScreen interface.
     [JsonIgnore]
