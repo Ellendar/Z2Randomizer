@@ -12,12 +12,10 @@
     <Grid ColumnDefinitions="*, *">
         <StackPanel>
             <CheckBox Name="ShuffleOverworldEnemiesCheckbox" 
-                      Unchecked="EnemyShuffleChecked"
                       IsThreeState="True"
                       IsChecked="{Binding Config.ShuffleOverworldEnemies}" 
                       Content="Shuffle Overworld Enemies" />
             <CheckBox Name="ShufflePalaceEnemiesCheckbox"
-                      Unchecked="EnemyShuffleChecked"
                       IsThreeState="True" 
                       IsChecked="{Binding Config.ShufflePalaceEnemies}" 
                       Content="Shuffle Palace Enemies" />

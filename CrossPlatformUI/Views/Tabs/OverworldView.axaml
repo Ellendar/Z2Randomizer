@@ -12,8 +12,7 @@
              x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel>
-            <CheckBox Unchecked="PalacesSwapContinentsUnchecked"
-                      IsThreeState="True" 
+            <CheckBox IsThreeState="True" 
                       IsChecked="{Binding Config.PalacesCanSwapContinents}" 
                       Content="Allow Palaces To Swap Continents" />
             <CheckBox Name="IncludeGPInShuffleCheckbox"
@@ -22,8 +21,7 @@
                       IsEnabled="{Binding Config.PalacesCanSwapContinents}"
                       Content="Include Great Palace In Shuffle" />
             <Separator />
-            <CheckBox Unchecked="ShuffleEncountersUnchecked"
-                      IsThreeState="True" 
+            <CheckBox IsThreeState="True" 
                       IsChecked="{Binding Config.ShuffleEncounters}" 
                       Content="Shuffle Encounters" />
         

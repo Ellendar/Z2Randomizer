@@ -81,7 +81,7 @@
                 <tabs:SpellsView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Enemies">
-              <tabs:EnemiesView DataContext="{Binding Main}"/>
+                <tabs:EnemiesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Items">
                 <tabs:ItemsView DataContext="{Binding Main}"/>

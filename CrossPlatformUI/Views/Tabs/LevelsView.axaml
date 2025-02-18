@@ -12,14 +12,22 @@
              x:Class="CrossPlatformUI.Views.Tabs.LevelsView">
     <Grid ColumnDefinitions="*,*">
         <StackPanel>
-            <CheckBox Checked="ShuffleAllExpChecked" 
-                      Unchecked="ShuffleAllExpUnchecked"
+            <CheckBox IsChecked="{Binding ShuffleAllExpState}"
                       Content="Shuffle All Experience"/>
             <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
                 <StackPanel>
-                    <CheckBox Name="AtkExp" IsChecked="{Binding Config.ShuffleAttackExperience}" Content="Shuffle Attack Experience" />
-                    <CheckBox Name="MagExp" IsChecked="{Binding Config.ShuffleMagicExperience}" Content="Shuffle Magic Experience" />
-                    <CheckBox Name="LifExp" IsChecked="{Binding Config.ShuffleLifeExperience}" Content="Shuffle Life Experience" />
+                    <CheckBox Name="AtkExp"
+                              IsEnabled="{Binding !ShuffleAllExpState}"
+                              IsChecked="{Binding Config.ShuffleAttackExperience}"
+                              Content="Shuffle Attack Experience" />
+                    <CheckBox Name="MagExp"
+                              IsEnabled="{Binding !ShuffleAllExpState}"
+                              IsChecked="{Binding Config.ShuffleMagicExperience}"
+                              Content="Shuffle Magic Experience" />
+                    <CheckBox Name="LifExp"
+                              IsEnabled="{Binding !ShuffleAllExpState}"
+                              IsChecked="{Binding Config.ShuffleLifeExperience}"
+                              Content="Shuffle Life Experience" />
                 </StackPanel>
             </Border>
             
