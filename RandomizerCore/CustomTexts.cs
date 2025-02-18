@@ -626,7 +626,7 @@ public class CustomTexts
     private static List<int> GenerateHelpfulHints(List<Text> hints, IEnumerable<Location> locations, Random r, 
         RandomizerProperties props)
     {
-        List<int> placedIndex = new List<int>();
+        List<int> placedIndex = [];
 
         List<Collectable> placedItems = [];
 
@@ -635,11 +635,17 @@ public class CustomTexts
         List<Collectable> items = locations.Select(i => i.Collectable).ToList();
         items = items.Where(i => !i.IsInternalUse()).ToList();
 
-        if (props.StartWithSpellItems)
+        if (props.StartWithSpellItems || props.SpellItemHints)
         {
             items.Remove(Collectable.TROPHY);
             items.Remove(Collectable.CHILD);
             items.Remove(Collectable.MEDICINE);
+        }
+
+        if(props.SpellItemHints && props.IncludeSpellsInShuffle)
+        {
+            items.Remove(Collectable.MIRROR);
+            items.Remove(Collectable.WATER);
         }
 
         int hintsCount = HELPFUL_HINTS_COUNT;
