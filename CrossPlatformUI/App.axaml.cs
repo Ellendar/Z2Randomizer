@@ -43,6 +43,7 @@ public sealed partial class App : Application // , IDisposable
         catch (Exception)
         {
             // Could not load settings, so just use the default instead
+            // TODO: We need to do something to try and recover if the settings failed so we don't lose the rom data
         }
 
         main ??= new MainViewModel();

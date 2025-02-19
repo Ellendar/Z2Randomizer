@@ -921,6 +921,40 @@ OriginalPatchedCode:
 """, "dont_count_during_talking.s");
     }
 
+    public void Global5050Jar(Assembler a)
+    {
+        a.Module().Code("""
+; TODO: Add RAM segment support to js65 for allocating variables
+;.segment "SHORTRAM"
+;Global5050JarDrop: .res 1
+Global5050JarDrop = $123 ; $0123
+
+.segment "PRG4"
+; Patch the count up code and check to see if we are in a dialog
+.org $AF78
+    jsr IncreaseGlobal5050JarDropPRG4
+    beq *+8
+.reloc
+IncreaseGlobal5050JarDropPRG4:
+    inc Global5050JarDrop
+    lda Global5050JarDrop
+    and #1
+    rts
+
+.segment "PRG5"
+; Patch the count up code and check to see if we are in a dialog
+.org $A536
+    jsr IncreaseGlobal5050JarDropPRG5
+    beq *+8
+.reloc
+IncreaseGlobal5050JarDropPRG5:
+    inc Global5050JarDrop
+    lda Global5050JarDrop
+    and #1
+    rts
+""", "global5050jar.s");
+    }
+
     public void InstantText(Assembler a)
     {
         a.Module().Code("""

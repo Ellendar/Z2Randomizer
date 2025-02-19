@@ -3817,6 +3817,11 @@ FREE_UNTIL $c2ca
         rom.AllowForChangingDoorYPosition(engine);
         rom.InstantText(engine);
 
+        if (props.Global5050JarDrop)
+        {
+            rom.Global5050Jar(engine);
+        }
+
         if (props.RandomizeKnockback)
         {
             rom.RandomizeKnockback(engine, RNG);

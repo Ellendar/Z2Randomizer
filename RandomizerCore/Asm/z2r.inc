@@ -70,3 +70,4 @@ ENABLE_SCANLINE_IRQ = $80
 
 MulLoReg = $5205
 MulHiReg = $5206
+
