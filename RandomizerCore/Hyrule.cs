@@ -3814,6 +3814,7 @@ FREE_UNTIL $c2ca
         FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
         rom.FixElevatorPositionInFallRooms(engine);
+        rom.AllowForChangingDoorYPosition(engine);
         rom.InstantText(engine);
 
         if (props.RandomizeKnockback)

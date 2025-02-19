@@ -807,6 +807,64 @@ CheckController1ForUpAMagic:
         a.Code(Util.ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
+    public void AllowForChangingDoorYPosition(Assembler a)
+    {
+        a.Module().Code("""
+ObjectYPositionData = $0730
+KeyDoorYPosition = $075e ; just a piece of unused ram afaict
+
+.segment "PRG4"
+.org $813D
+.word KeyDoorCustomPositionPRG4
+.word KeyDoorCustomPositionPRG4 ; its in the item table twice for reasons i don't know
+.reloc
+KeyDoorCustomPositionPRG4:
+    lda ObjectYPositionData
+    and #$f0
+    clc
+    adc #$20
+    sta KeyDoorYPosition
+    jmp $8245 ; finish with original door code
+
+.segment "PRG5"
+.org $813D
+.word KeyDoorCustomPositionPRG5
+.reloc
+KeyDoorCustomPositionPRG5:
+    lda ObjectYPositionData
+    and #$f0
+    clc
+    adc #$20
+    sta KeyDoorYPosition
+    jmp $8256 ; finish with original doorcode
+
+.segment "PRG0"
+.org $9118
+    jsr LoadDoorYPos
+    nop
+
+.reloc
+LoadDoorYPos:
+    lda KeyDoorYPosition
+    sta $2b
+    rts
+
+; Fix up the key door sparkle "poof" animation to not use a fixed position
+.segment "PRG7"
+.org $D9AA
+    jsr LoadDoorYPosition
+    nop
+
+.reloc
+LoadDoorYPosition:
+    lda $2a,x
+    clc
+    adc #$0c
+    sta $30
+    rts
+""", "change_door_position.s");
+    }
+
     public void FixElevatorPositionInFallRooms(Assembler a)
     {
         // When falling into a fallroom, it will also run the elevator enemy setup code
@@ -815,7 +873,6 @@ CheckController1ForUpAMagic:
         // position. We pull this off by setting $0705 to `2` instead of `1` when falling
         // and checking for exactly 1 when updating the elevator position
         a.Module().Code("""
-
 .segment "PRG0", "PRG7"
 
 .org $C68D
