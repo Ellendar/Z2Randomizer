@@ -87,6 +87,12 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             await Task.CompletedTask;
             //await DialogHost.Show("GenerateRomDialog");
         }, CanGenerate);
+
+        SaveNewPreset = ReactiveCommand.CreateFromTask(async () =>
+        {
+            Main.SaveNewPresetDialogOpen = true;
+        });
+        
         this.WhenActivated(OnActivate);
     }
 
@@ -224,6 +230,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public ReactiveCommand<Unit, Unit> Generate { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveFolder { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> SaveNewPreset { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> ClearSavedPresets { get; }
     [JsonIgnore]
     public ReactiveCommand<string, Unit> LoadPreset { get; }
     [JsonIgnore]

@@ -34,7 +34,7 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
         CancelGeneration = ReactiveCommand.Create(() =>
         {
             tokenSource?.Cancel();
-            DialogHost.Close("GenerateRomDialog");
+            Main.GenerateRomDialogOpen = false;
         });
         CopyError = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -59,6 +59,8 @@ Seed: {config.Seed}
 
         async void Randomize(CompositeDisposable disposables)
         {
+            if (!Main.GenerateRomDialogOpen) return;
+            
             Disposable.Create(() => tokenSource?.Cancel())
                 .DisposeWith(disposables);
             lastError = null;

@@ -26,6 +26,9 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RandomizerViewModel RandomizerViewModel { get; set; }
 
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    public SaveNewPresetViewModel SaveNewPresetViewModel { get; set; }
+
     public CustomPixelPoint WindowPosition { get => windowPosition; set => this.RaiseAndSetIfChanged(ref windowPosition, value); }
 
     public CustomSize WindowSize { get => windowSize; set => this.RaiseAndSetIfChanged(ref windowSize, value); }
@@ -34,6 +37,7 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     {
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);
+        SaveNewPresetViewModel = new(this);
         RandomizerViewModel = new(this);
         Router.Navigate.Execute(RandomizerViewModel);
 
@@ -93,6 +97,16 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     
     [JsonIgnore]
     public GenerateRomViewModel GenerateRomViewModel { get; }
+
+    private bool generateRomDialogOpen = false;
+    [JsonIgnore]
+    public bool GenerateRomDialogOpen { get => generateRomDialogOpen; set => this.RaiseAndSetIfChanged(ref generateRomDialogOpen, value); }
+
+
+    private bool saveNewPresetDialogOpen = false;
+    [JsonIgnore]
+    public bool SaveNewPresetDialogOpen { get => saveNewPresetDialogOpen; set => this.RaiseAndSetIfChanged(ref saveNewPresetDialogOpen, value); }
+
     
     // Unique identifier for the routable view model.
     [JsonIgnore]

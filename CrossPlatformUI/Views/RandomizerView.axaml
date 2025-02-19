@@ -10,6 +10,7 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="RandomizerViewControl"
              x:DataType="viewModels:RandomizerViewModel"
              x:Class="CrossPlatformUI.Views.RandomizerView">
     <StackPanel Orientation="Vertical">
@@ -40,12 +41,12 @@
                                 <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Save Flags As New Preset" IsEnabled="False">
+                        <MenuItem Header="Save Flags As New Preset" Command="{Binding SaveNewPreset}">
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="ContentSaveAddOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Clear Saved Presets" IsEnabled="False">
+                        <MenuItem Header="Clear Saved Presets" Command="{Binding ClearSavedPresets}">
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="TrashCanOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
@@ -59,6 +60,35 @@
                                   CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.MaxRandoPreset}}"/>
                         <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.RandoPercentPreset}}"/>
+                        <Separator />
+                        <MenuItem Header="Custom Presets"
+                                  Classes="SubItems"
+                                  ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
+                            <!-- Itemsource Itemtemplate seems broken for reasons I can't figure out ...  -->
+                            <!-- <MenuItem.ItemTemplate> -->
+                            <!--     <DataTemplate> -->
+                            <!--         <MenuItem Header="{Binding Preset}" -->
+                            <!--                   CommandParameter="{Binding Flags}" -->
+                            <!--                   Command="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).LoadPreset}"> -->
+                            <!--             <MenuItem.Icon> -->
+                            <!--                 <avalonia:MaterialIcon Kind="ContentSave" Width="24" Height="24" /> -->
+                            <!--             </MenuItem.Icon> -->
+                            <!--         </MenuItem> -->
+                            <!--     </DataTemplate> -->
+                            <!-- </MenuItem.ItemTemplate> -->
+                            <!-- Worked around the issue with the following code  -->
+                            <MenuItem.Styles>
+                                <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
+                                    <Setter Property="Header" Value="{Binding Preset}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding Flags}" />
+                                    <Setter Property="Command"
+                                            Value="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).LoadPreset}"/>
+                                </Style>
+                                <Style Selector="MenuItem.SubItems MenuItem MenuItem.Icon avalonia|MaterialIcon">
+                                    <Setter Property="Kind" Value="ContentSave"/>
+                                </Style>
+                            </MenuItem.Styles>
+                        </MenuItem>
                         <Separator />
                     </MenuItem>
                 </Menu>

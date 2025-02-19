@@ -10,9 +10,22 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <dialogHost:DialogHost Identifier="GenerateRomDialog" CloseOnClickAway="False">
+    <dialogHost:DialogHost Identifier="BaseDialog" CloseOnClickAway="False">
+        <dialogHost:DialogHost.IsOpen>
+            <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                <Binding Path="GenerateRomDialogOpen"/>
+                <Binding Path="SaveNewPresetDialogOpen"/>
+            </MultiBinding>
+        </dialogHost:DialogHost.IsOpen>
         <dialogHost:DialogHost.DialogContent>
-            <views:GenerateRomView MinHeight="200" MinWidth="400" DataContext="{Binding GenerateRomViewModel}"/>
+            <Grid>
+                <views:GenerateRomView
+                    IsVisible="{Binding $parent[dialogHost:DialogHost].((vm:MainViewModel)DataContext).GenerateRomDialogOpen, Mode=TwoWay}"
+                    MinHeight="200" MinWidth="400" DataContext="{Binding GenerateRomViewModel}"/>
+                <views:SaveNewPresetView
+                    IsVisible="{Binding $parent[dialogHost:DialogHost].((vm:MainViewModel)DataContext).SaveNewPresetDialogOpen, Mode=TwoWay}"
+                    MinHeight="200" MinWidth="400" DataContext="{Binding SaveNewPresetViewModel}"/>
+            </Grid>
         </dialogHost:DialogHost.DialogContent>
         <Grid>
             <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
