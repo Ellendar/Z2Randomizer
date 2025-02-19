@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
@@ -88,11 +89,20 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             //await DialogHost.Show("GenerateRomDialog");
         }, CanGenerate);
 
-        SaveNewPreset = ReactiveCommand.CreateFromTask(async () =>
+        SaveNewPreset = ReactiveCommand.Create(() =>
         {
             Main.SaveNewPresetDialogOpen = true;
         });
-        
+        SaveAsPreset = ReactiveCommand.Create((string name) =>
+        {
+            Main.SaveNewPresetViewModel.SavedPresets
+                .First(x => x.Preset == name)
+                .Flags = Main.Config.Flags;
+        });
+        ClearSavedPresets = ReactiveCommand.Create(() =>
+        {
+            Main.SaveNewPresetViewModel.SavedPresets.Clear();
+        });
         this.WhenActivated(OnActivate);
     }
 
@@ -232,6 +242,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public ReactiveCommand<Unit, Unit> SaveFolder { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveNewPreset { get; }
+    [JsonIgnore]
+    public ReactiveCommand<string, Unit> SaveAsPreset { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> ClearSavedPresets { get; }
     [JsonIgnore]

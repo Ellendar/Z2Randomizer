@@ -41,16 +41,6 @@
                                 <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Save Flags As New Preset" Command="{Binding SaveNewPreset}">
-                            <MenuItem.Icon>
-                                <avalonia:MaterialIcon Kind="ContentSaveAddOutline" Width="24" Height="24" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Clear Saved Presets" Command="{Binding ClearSavedPresets}">
-                            <MenuItem.Icon>
-                                <avalonia:MaterialIcon Kind="TrashCanOutline" Width="24" Height="24" />
-                            </MenuItem.Icon>
-                        </MenuItem>
                         <Separator />
                         <MenuItem Header="Beginner Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.BeginnerPreset}}"/>
@@ -60,10 +50,11 @@
                                   CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.MaxRandoPreset}}"/>
                         <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.RandoPercentPreset}}"/>
-                        <Separator />
-                        <MenuItem Header="Custom Presets"
-                                  Classes="SubItems"
+                        <MenuItem Header="Load Custom Preset" Classes="SubItems"
                                   ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="CategoryOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
                             <!-- Itemsource Itemtemplate seems broken for reasons I can't figure out ...  -->
                             <!-- <MenuItem.ItemTemplate> -->
                             <!--     <DataTemplate> -->
@@ -76,6 +67,7 @@
                             <!--         </MenuItem> -->
                             <!--     </DataTemplate> -->
                             <!-- </MenuItem.ItemTemplate> -->
+
                             <!-- Worked around the issue with the following code  -->
                             <MenuItem.Styles>
                                 <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
@@ -88,6 +80,34 @@
                                     <Setter Property="Kind" Value="ContentSave"/>
                                 </Style>
                             </MenuItem.Styles>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Save Flags as New Preset" Command="{Binding SaveNewPreset}">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="ContentSaveAddOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Save Flags as ..." Classes="SubItems"
+                                  ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                            <MenuItem.Styles>
+                                <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
+                                    <Setter Property="Header" Value="{Binding Preset}"/>
+                                    <Setter Property="CommandParameter" Value="{Binding Preset}" />
+                                    <Setter Property="Command"
+                                            Value="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).SaveAsPreset}"/>
+                                </Style>
+                                <Style Selector="MenuItem.SubItems MenuItem MenuItem.Icon avalonia|MaterialIcon">
+                                    <Setter Property="Kind" Value="ContentSave"/>
+                                </Style>
+                            </MenuItem.Styles>
+                        </MenuItem>
+                        <MenuItem Header="Clear All Saved Presets" Command="{Binding ClearSavedPresets}">
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="TrashCanOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
                     </MenuItem>
