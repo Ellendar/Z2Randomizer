@@ -82,10 +82,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             (flags, seed, hasRomData) =>
                 IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData
         );
-        Generate = ReactiveCommand.CreateFromTask(async () =>
+        Generate = ReactiveCommand.Create(() =>
         {
+            Main.GenerateRomDialogOpen = true;
             //NYI
-            await Task.CompletedTask;
             //await DialogHost.Show("GenerateRomDialog");
         }, CanGenerate);
 

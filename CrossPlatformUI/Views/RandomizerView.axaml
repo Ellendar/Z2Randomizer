@@ -28,7 +28,7 @@
             </StackPanel>
             <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button HorizontalAlignment="Right" Content="Generate" IsEnabled="{Binding CanGenerate^}"
-                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=dialogHostAvalonia:DialogHost}, Path=OpenDialogCommand}" />
+                        Command="{Binding Generate}" />
                 <Menu Padding="0" Margin="0">
                     <MenuItem Height="32" Width="32" Header="{avalonia:MaterialIconExt Cog, Size=32}">
                         <MenuItem Header="Reload ROM" Command="{Binding LoadRom}" >
