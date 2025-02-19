@@ -85,8 +85,6 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         Generate = ReactiveCommand.Create(() =>
         {
             Main.GenerateRomDialogOpen = true;
-            //NYI
-            //await DialogHost.Show("GenerateRomDialog");
         }, CanGenerate);
 
         SaveNewPreset = ReactiveCommand.Create(() =>

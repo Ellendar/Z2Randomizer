@@ -807,6 +807,41 @@ CheckController1ForUpAMagic:
         a.Code(Util.ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
+    public void FixElevatorPositionInFallRooms(Assembler a)
+    {
+        // When falling into a fallroom, it will also run the elevator enemy setup code
+        // which causes the elevator to try and position at link's height. But in a fall
+        // room when you fall into it, then we want the elevator to spawn at the default
+        // position. We pull this off by setting $0705 to `2` instead of `1` when falling
+        // and checking for exactly 1 when updating the elevator position
+        a.Module().Code("""
+
+.segment "PRG0", "PRG7"
+
+.org $C68D
+    ; This is the entry point for the "falling down" game mode
+    jmp SetFlagForFalling
+
+.reloc
+SetFlagForFalling:
+    ; The next code block will also inc this value, so this sets it to two.
+    inc $0705
+    ; instead of returning, jump to where the original code was planning on going
+    jmp $C67C
+
+.org $916F
+; Patch the check to just check for the elevator falling
+jsr CheckIfElevatorEntrance
+bne $9188
+
+.reloc
+CheckIfElevatorEntrance:
+    lda $0705
+    cmp #1
+    rts
+""", "fix_elevator_position_in_fall_rooms.s");
+    }
+
     public void DontCountExpDuringTalking(Assembler a)
     {
         a.Module().Code("""

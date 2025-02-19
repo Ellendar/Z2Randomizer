@@ -3813,6 +3813,7 @@ FREE_UNTIL $c2ca
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());
         rom.DontCountExpDuringTalking(engine);
+        rom.FixElevatorPositionInFallRooms(engine);
         rom.InstantText(engine);
 
         if (props.RandomizeKnockback)
