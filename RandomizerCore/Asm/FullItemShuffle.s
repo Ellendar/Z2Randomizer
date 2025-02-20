@@ -196,6 +196,21 @@ TownToItemTable:
 .org $a33f
     .byte $2a ; Old Kasuto
 
+; After changing the main signs in the front of the town to be the "sign" object $22, this broke the hints
+; inside the houses which use the sign object in vanilla. For consistency sake, we change the signs in the
+; houses to the "invisible dialog" object $0c
+
+.org $89a8
+    .byte $0c | $80 ; Update Darunia hint sign to an invis dialog object (at Y=8)
+.org $a2e5
+    .byte $19 ; And use the original "sign" hint text that we moved
+
+.org $89a8
+    .byte $0c | $80 ; Update Old kasuto hint sign to an invis dialog object (at Y=9)
+.org $a2e7
+    .byte $16 ; And use the original "sign" hint text that we moved
+
+
 .segment "PRG7"
 
 .reloc
