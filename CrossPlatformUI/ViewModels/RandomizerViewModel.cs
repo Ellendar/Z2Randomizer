@@ -60,9 +60,11 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             Main.Config.Seed = new Random().Next(0, 999999999).ToString();
         });
         
-        LoadPreset = ReactiveCommand.Create<string>((flags) =>
+        LoadPreset = ReactiveCommand.Create<RandomizerConfiguration>(config =>
         {
-            Main.Config.Flags = flags;
+            // By writing the flags like this, it will update all the reactive elements watching each
+            // individual fields.
+            Main.Config.Flags = config.Flags;
         });
         
         LoadRom = ReactiveCommand.CreateFromObservable(
@@ -95,7 +97,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         {
             Main.SaveNewPresetViewModel.SavedPresets
                 .First(x => x.Preset == name)
-                .Flags = Main.Config.Flags;
+                .Config = Main.Config;
         });
         ClearSavedPresets = ReactiveCommand.Create(() =>
         {
@@ -107,7 +109,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     private void OnActivate(CompositeDisposable disposable)
     {
         Flags = string.IsNullOrEmpty(Main.Config.Flags)
-            ? MainViewModel.BeginnerPreset
+            ? BuiltinPreset.BeginnerPreset.Flags
             : Main.Config.Flags;
 
         Main.Config.PropertyChanged += (sender, args) =>
@@ -245,7 +247,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> ClearSavedPresets { get; }
     [JsonIgnore]
-    public ReactiveCommand<string, Unit> LoadPreset { get; }
+    public ReactiveCommand<RandomizerConfiguration, Unit> LoadPreset { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
     [JsonIgnore]

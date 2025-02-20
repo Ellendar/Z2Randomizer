@@ -9,6 +9,7 @@
              xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:crossPlatformUi="clr-namespace:CrossPlatformUI"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="RandomizerViewControl"
              x:DataType="viewModels:RandomizerViewModel"
@@ -43,13 +44,13 @@
                         </MenuItem>
                         <Separator />
                         <MenuItem Header="Beginner Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.BeginnerPreset}}"/>
+                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.BeginnerPreset}}"/>
                         <MenuItem Header="Standard Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.StandardPreset}}"/>
+                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.StandardPreset}}"/>
                         <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.MaxRandoPreset}}"/>
+                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.MaxRandoPreset}}"/>
                         <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static viewModels:MainViewModel.RandoPercentPreset}}"/>
+                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.RandoPercentPreset}}"/>
                         <MenuItem Header="Load Custom Preset" Classes="SubItems"
                                   ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
                             <MenuItem.Icon>
@@ -72,7 +73,7 @@
                             <MenuItem.Styles>
                                 <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
                                     <Setter Property="Header" Value="{Binding Preset}"/>
-                                    <Setter Property="CommandParameter" Value="{Binding Flags}" />
+                                    <Setter Property="CommandParameter" Value="{Binding Config}" />
                                     <Setter Property="Command"
                                             Value="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).LoadPreset}"/>
                                 </Style>
