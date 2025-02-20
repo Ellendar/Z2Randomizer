@@ -18277,7 +18277,7 @@
     "map": 11,
     "palaceGroup": null,
     "memoryAddress": 83008,
-    "connections": "2B92FF2C",
+    "connections": "2BFF922C",
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
@@ -18295,7 +18295,7 @@
     "isEntrance": false,
     "palaceNumber": 7,
     "linkedRoomName": null,
-    "isUpDownReversed": false
+    "isUpDownReversed": true
   },
     {
     "bitmask": "0F",
@@ -18826,7 +18826,7 @@
     "map": 48,
     "palaceGroup": null,
     "memoryAddress": 97801,
-    "connections": "BB00FFFC",
+    "connections": "FF00FF00",
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
