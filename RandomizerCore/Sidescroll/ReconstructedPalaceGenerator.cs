@@ -263,19 +263,6 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
             return false;
         }
 
-        if (!blockersAnywhere)
-        {
-            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palace.Number - 1];
-            if (!room.IsTraversable(allowedBlockers))
-            {
-                return false;
-            }
-            if ((palace.Number == 1 || palace.Number == 2 || palace.Number == 5 || palace.Number == 7) && room.HasBoss)
-            {
-                return false;
-            }
-        }
-
         List<Room> openRooms = palace.AllRooms.Where(i => i.IsOpen()).ToList();
 
         if (openRooms.Count == 0)

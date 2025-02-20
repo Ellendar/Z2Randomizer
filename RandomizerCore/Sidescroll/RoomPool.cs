@@ -197,6 +197,22 @@ public class RoomPool
                 NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V5_0));
             }
         }
+
+        if (!props.BlockersAnywhere)
+        {
+            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
+            NormalRooms.RemoveAll(room => !room.IsTraversable(allowedBlockers));
+            NormalRooms.RemoveAll(room => room.LinkedRoomName != null && !LinkedRooms[room.LinkedRoomName].IsTraversable(allowedBlockers));
+            foreach (var key in ItemRoomsByDirection.Keys)
+            {
+                var values = ItemRoomsByDirection[key];
+                var toRemove = values.Where(room => !room.IsTraversable(allowedBlockers)).ToList();
+                foreach (var room in toRemove)
+                {
+                    ItemRoomsByDirection.Remove(key, room);
+                }
+            }
+        }
     }
 
     public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits(bool linkRooms = false)
