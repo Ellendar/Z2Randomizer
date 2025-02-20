@@ -340,7 +340,7 @@ public class Room : IJsonOnDeserialized
             yPos = (byte)(yPos >> 4);
             byte2 = romData.GetByte(ptr++);
 
-            if(yPos == 13 && byte2 == 0x0F)
+            if(yPos < 13 && byte2 == 0x0F)
             {
                 byte3 = romData.GetByte(ptr++);
             }
