@@ -312,7 +312,7 @@ public class Room : IJsonOnDeserialized
         }
     }
 
-    public void UpdateRomItem(Collectable i, ROM romData)
+    public void UpdateRomItem(Collectable item, ROM romData)
     {
         if (PalaceGroup is <= 0 or > 3)
         {
@@ -330,19 +330,24 @@ public class Room : IJsonOnDeserialized
         sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
         sideViewPtr += 0x10; // Add the offset for the iNES header
         int ptr = sideViewPtr + 4;
-        int data = romData.GetByte(ptr);
-        data = (byte)(data & 0xF0);
-        data = (byte)(data >> 4);
-        int data2 = romData.GetByte(ptr+1);
-        while (data >= 13 || data2 != 0x0F)
+
+        int yPos, byte2, byte3;
+        do
         {
-            ptr+=2;
-            data = romData.GetByte(ptr);
-            data = (byte)(data & 0xF0);
-            data = (byte)(data >> 4);
-            data2 = romData.GetByte(ptr + 1);
-        }
-        romData.Put(ptr + 2, (byte)i);
+            byte3 = 0;
+            yPos = romData.GetByte(ptr++);
+            yPos = (byte)(yPos & 0xF0);
+            yPos = (byte)(yPos >> 4);
+            byte2 = romData.GetByte(ptr++);
+
+            if(yPos == 13 && byte2 == 0x0F)
+            {
+                byte3 = romData.GetByte(ptr++);
+            }
+
+            ptr += 2;
+        } while (yPos >= 13 || byte2 != 0x0F || ((Collectable)byte3).IsMinorItem());
+        romData.Put(ptr + 2, (byte)item);
         //System.Diagnostics.Debug.WriteLine($"Writing palace number {PalaceNumber} group {PalaceGroup} map {Map} item 0x{i:X} at address 0x{ptr+2:X}");
     }
 

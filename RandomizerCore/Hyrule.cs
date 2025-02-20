@@ -1484,17 +1484,12 @@ public class Hyrule
 
                 if (props.ContinentConnections == ContinentConnectionType.NORMAL)
                 {
-                    westHyrule.LoadCave1(ROMData, Continent.WEST, Continent.DM);
-                    westHyrule.LoadCave2(ROMData, Continent.WEST, Continent.DM);
-                    westHyrule.LoadRaft(ROMData, Continent.WEST, Continent.EAST);
-
-                    deathMountain.LoadCave1(ROMData, Continent.DM, Continent.WEST);
-                    deathMountain.LoadCave2(ROMData, Continent.DM, Continent.WEST);
-
-                    eastHyrule.LoadRaft(ROMData, Continent.EAST, Continent.WEST);
-                    eastHyrule.LoadBridge(ROMData, Continent.EAST, Continent.MAZE);
-
-                    mazeIsland.LoadBridge(ROMData, Continent.MAZE, Continent.EAST);
+                    connections = [
+                        (westHyrule.LoadCave1(ROMData, Continent.WEST, Continent.DM), deathMountain.LoadCave1(ROMData, Continent.DM, Continent.WEST)),
+                        (westHyrule.LoadCave2(ROMData, Continent.WEST, Continent.DM), deathMountain.LoadCave2(ROMData, Continent.DM, Continent.WEST)),
+                        (westHyrule.LoadRaft(ROMData, Continent.WEST, Continent.EAST), eastHyrule.LoadRaft(ROMData, Continent.EAST, Continent.WEST)),
+                        (eastHyrule.LoadBridge(ROMData, Continent.EAST, Continent.MAZE), mazeIsland.LoadBridge(ROMData, Continent.MAZE, Continent.EAST))
+                    ];
                 }
                 else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
@@ -1558,7 +1553,7 @@ public class Hyrule
                     }
                     SetTransportation(2, 3, type);
                 }
-                else
+                else if(props.ContinentConnections == ContinentConnectionType.ANYTHING_GOES)
                 {
                     Location l1, l2;
                     List<int> doNotPick = new List<int>();
@@ -1696,6 +1691,10 @@ public class Hyrule
                     l1 = worlds[c2w1].LoadCave2(ROMData, (Continent)c2w1, (Continent)c2w2);
                     l2 = worlds[c2w2].LoadCave2(ROMData, (Continent)c2w2, (Continent)c2w1);
                     connections[3] = (l1, l2);
+                }
+                else
+                {
+                    throw new ImpossibleException("Unrecognized continent connector type");
                 }
             } while (!AllContinentsAreConnected(connections));
 
