@@ -624,7 +624,7 @@ public class Palace
                 rooms--;
                 AllRooms.Remove(remove);
                 tries = 0;
-                ValidateRoomConnections();
+                //ValidateRoomConnections();
                 continue;
             }
             //Up + Down
@@ -640,7 +640,7 @@ public class Palace
                 rooms--;
                 AllRooms.Remove(remove);
                 tries = 0;
-                ValidateRoomConnections();
+                //ValidateRoomConnections();
                 continue;
             }
 
@@ -671,7 +671,7 @@ public class Palace
                         AllRooms.Remove(remove.Left);
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     //also remove the down room
                     else if (removeVerticalRoom 
@@ -686,7 +686,7 @@ public class Palace
                         AllRooms.Remove(remove.Down);
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     else
                     {
@@ -710,7 +710,7 @@ public class Palace
                         AllRooms.Remove(remove.Right);
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     //also remove the down room
                     else if(removeVerticalRoom 
@@ -725,7 +725,7 @@ public class Palace
                         AllRooms.Remove(remove.Down);
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     else
                     {
@@ -754,7 +754,7 @@ public class Palace
 
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     //Also remove up
                     else if (removeVerticalRoom
@@ -770,7 +770,7 @@ public class Palace
 
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     else
                     {
@@ -795,7 +795,7 @@ public class Palace
 
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     //Also remove up
                     else if(removeVerticalRoom 
@@ -811,7 +811,7 @@ public class Palace
 
                         rooms -= 2;
                         tries = 0;
-                        ValidateRoomConnections();
+                        //ValidateRoomConnections();
                     }
                     else
                     {
@@ -821,7 +821,6 @@ public class Palace
                 }
             }
         }
-        ValidateRoomConnections();
         logger.Debug("Target: " + target + " Rooms: " + rooms);
     }
 
