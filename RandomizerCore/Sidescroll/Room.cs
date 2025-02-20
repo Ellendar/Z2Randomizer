@@ -363,6 +363,11 @@ public class Room : IJsonOnDeserialized
         };
     }
 
+    public int CountExits()
+    {
+        return (HasLeftExit ? 1 : 0) + (HasDownExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasRightExit ? 1 : 0);
+    }
+
     public int CountOpenExits()
     {
         var exits = 0;

@@ -585,17 +585,13 @@ public class Palace
 
     public void Shorten(Random random)
     {
-        List<Room> upExits = AllRooms.Where(i => i.HasUpExit).ToList();
-        List<Room> downExits = AllRooms.Where(i => i.HasDownExit && !i.HasDrop).ToList();
-        List<Room> leftExits = AllRooms.Where(i => i.HasLeftExit).ToList();
-        List<Room> rightExits = AllRooms.Where(i => i.HasRightExit).ToList();
-        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit && i.HasDrop).ToList();
+        ValidateRoomConnections();
         int numRooms = AllRooms.Count;
 
         int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
         int tries = 0;
-        while (rooms > target && tries < 100000)
+        while (rooms > target && tries < 1000)
         {
             //remove rooms without bias
             //don't remove important rooms
@@ -610,177 +606,222 @@ public class Palace
             bool hasUp = remove.Up != null;
             bool hasDown = remove.Down != null;
 
-            bool[] exits = [hasRight, hasLeft, hasUp, hasDown];
-            int exitCount = exits.Count(i => i);
-
-            //logger.WriteLine(n);
-
-            if (exitCount != 2)
+            if (remove.CountExits() != 2)
             {
                 tries++;
                 continue;
             }
-
-            if (hasLeft && hasRight && !dropExits.Any(i => i.Down == remove))
+            //Left + Right
+            else if (hasLeft && hasRight)
             {
+                if (AllRooms.Any(i => i.Down == remove))
+                {
+                    tries++;
+                    continue;
+                }
                 remove.Left!.Right = remove.Right;
                 remove.Right!.Left = remove.Left;
                 rooms--;
-                //logger.WriteLine("removed 1 room");
-                leftExits.Remove(remove);
-                rightExits.Remove(remove);
                 AllRooms.Remove(remove);
                 tries = 0;
+                ValidateRoomConnections();
                 continue;
             }
-
-            if (hasUp && hasDown)
+            //Up + Down
+            else if (hasUp && hasDown)
             {
-                remove.Up!.Down = remove.Down;
-                remove.Down!.Up = remove.Up;
-                //logger.WriteLine("removed 1 room");
-                rooms--;
-                upExits.Remove(remove);
-                downExits.Remove(remove);
-                AllRooms.Remove(remove);
-                tries = 0;
-                continue;
-            }
-
-            if (hasDown)
-            {
-                if (hasLeft)
+                if (remove.Up.HasDrop != remove.HasDrop)
                 {
-                    exits = [hasLeft, hasUp, hasDown];
-                    exitCount = exits.Count(i => i);
-
-                    if (exitCount != 2)
-                    {
-                        tries++;
-                        continue;
-                    }
-
-                    if (remove.Left!.Up == null || remove.Left.Up != Entrance)
-                    {
-                        tries++;
-                        continue;
-                    }
-
-                    remove.Left.Up.Down = remove.Down;
-                    remove.Down!.Up = remove.Left.Up;
-
-                    downExits.Remove(remove);
-                    leftExits.Remove(remove);
-                    rightExits.Remove(remove.Left);
-                    upExits.Remove(remove.Left);
-                    AllRooms.Remove(remove);
-                    AllRooms.Remove(remove.Left);
-                    //logger.WriteLine("removed 2 room");
-                    rooms = rooms - 2;
-                    tries = 0;
+                    tries++;
                     continue;
                 }
+                remove.Up!.Down = remove.Down;
+                remove.Down!.Up = remove.Up;
+                rooms--;
+                AllRooms.Remove(remove);
+                tries = 0;
+                ValidateRoomConnections();
+                continue;
+            }
+
+            //In angled pairs, we could remove the vertically or horizonally oriented room. In order to prevent 
+            //a directional bias in shortening, only attempt a random direction each time
+            bool removeVerticalRoom = random.Next(2) == 0;
+            
+            //If the room is an angled room, we can only remove it as a pair with one of its adjacent rooms.
+            //example, if this is left + down, remove this, and the room on the left, and connect the room above the
+            //left room to the room below this one (only if the room on the left has a room above it).
+            //each such angle has 2 cases to remove the paired room at each end.
+            if (hasDown)
+            {
+                //DOWN + LEFT
+                if (hasLeft)
+                {
+                    //also remove the left room
+                    if (!removeVerticalRoom 
+                        && remove.Left?.Up != null 
+                        && remove.Left.CountExits() == 2
+                        && !AllRooms.Any(i => i.Up == remove)
+                        && remove.Left.Up.HasDrop == remove.HasDrop)
+                    {
+                        remove.Left!.Up!.Down = remove.Down;
+                        remove.Down!.Up = remove.Left.Up;
+
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Left);
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    //also remove the down room
+                    else if (removeVerticalRoom 
+                        && remove.Down?.Right != null 
+                        && !AllRooms.Any(i => i.Down == remove)
+                        && remove.Down.CountExits() == 2)
+                    {
+                        remove.Down!.Right!.Left = remove.Left;
+                        remove.Left!.Right = remove.Down.Right;
+
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Down);
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    else
+                    {
+                        tries++;
+                    }
+                }
+                //DOWN + RIGHT
                 else
                 {
-                    exits = [hasRight, hasUp, hasDown];
-                    exitCount = exits.Count(i => i);
+                    //also remove the right room
+                    if (!removeVerticalRoom 
+                        && remove.Right?.Up != null 
+                        && remove.Right.CountExits() == 2
+                        && !AllRooms.Any(i => i.Up == remove)
+                        && remove.Right.Up.HasDrop == remove.HasDrop)
+                    {
+                        remove.Right.Up.Down = remove.Down;
+                        remove.Down!.Up = remove.Right.Up;
 
-                    if (exitCount != 2)
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Right);
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    //also remove the down room
+                    else if(removeVerticalRoom 
+                        && remove.Down?.Left != null
+                        && !AllRooms.Any(i => i.Down == remove)
+                        && remove.Down.CountExits() == 2)
+                    {
+                        remove.Down!.Left!.Right = remove.Right;
+                        remove.Right!.Left = remove.Down.Left;
+
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Down);
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    else
                     {
                         tries++;
-                        continue;
                     }
 
-                    if (remove.Right!.Up == null || remove.Right.Up == Entrance)
-                    {
-                        tries++;
-                        continue;
-                    }
-
-                    remove.Right.Up.Down = remove.Down;
-                    remove.Down!.Up = remove.Right.Up;
-
-                    downExits.Remove(remove);
-                    rightExits.Remove(remove);
-                    leftExits.Remove(remove.Right);
-                    upExits.Remove(remove.Right);
-                    AllRooms.Remove(remove);
-                    AllRooms.Remove(remove.Right);
-                    //logger.WriteLine("removed 2 room");
-
-                    rooms = rooms - 2;
-                    tries = 0;
-                    continue;
                 }
             }
             else
             {
+                //UP + LEFT
                 if (hasLeft)
                 {
-                    exits = [hasLeft, hasUp, hasDown];
-                    exitCount = exits.Count(i => i);
+                    //Also remove left
+                    if (!removeVerticalRoom
+                        && remove.Left!.Down != null
+                        && remove.Left.CountExits() == 2
+                        && remove.Left.HasDrop == remove.Up!.HasDrop
+                        && !AllRooms.Any(i => i.Up == remove.Left))
+                    {
+                        remove.Left!.Down!.Up = remove.Up;
+                        remove.Up!.Down = remove.Left.Down;
 
-                    if (exitCount != 2)
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Left);
+
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    //Also remove up
+                    else if (removeVerticalRoom
+                        && remove.Up!.Right != null
+                        && !AllRooms.Any(i => i.Up == remove)
+                        && remove.Up.CountExits() == 2)
+                    {
+                        remove.Up.Right.Left = remove.Left;
+                        remove.Left.Right = remove.Up.Right;
+
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Up);
+
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    else
                     {
                         tries++;
-                        continue;
                     }
-
-                    if (remove.Left!.Down == null || dropExits.Contains(remove.Left))
-                    {
-                        tries++;
-                        continue;
-                    }
-
-                    remove.Left.Down.Up = remove.Up;
-                    remove.Up!.Down = remove.Left.Down;
-
-                    upExits.Remove(remove);
-                    leftExits.Remove(remove);
-                    rightExits.Remove(remove.Left);
-                    downExits.Remove(remove.Left);
-                    AllRooms.Remove(remove);
-                    AllRooms.Remove(remove.Left);
-                    //logger.WriteLine("removed 2 room");
-
-                    rooms = rooms - 2;
-                    tries = 0;
-                    continue;
                 }
+                //UP + RIGHT
                 else
                 {
-                    exits = [hasRight, hasUp, hasDown];
-                    exitCount = exits.Count(i => i);
+                    //Also remove right
+                    if (!removeVerticalRoom 
+                        && remove.Right!.Down != null
+                        && remove.Right.CountExits() == 2
+                        && remove.Right.HasDrop == remove.Up!.HasDrop
+                        && !AllRooms.Any(i => i.Up == remove.Right))
+                    {
+                        remove.Right!.Down!.Up = remove.Up;
+                        remove.Up!.Down = remove.Right.Down;
 
-                    if (exitCount != 2)
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Right);
+
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    //Also remove up
+                    else if(removeVerticalRoom 
+                        && remove.Up!.Left != null
+                        && !AllRooms.Any(i => i.Up == remove)
+                        && remove.Up.CountExits() == 2)
+                    {
+                        remove.Up.Left.Right = remove.Right;
+                        remove.Right.Left = remove.Up.Left;
+
+                        AllRooms.Remove(remove);
+                        AllRooms.Remove(remove.Up);
+
+                        rooms -= 2;
+                        tries = 0;
+                        ValidateRoomConnections();
+                    }
+                    else
                     {
                         tries++;
-                        continue;
                     }
 
-                    if (remove.Right!.Down == null || dropExits.Contains(remove.Right))
-                    {
-                        tries++;
-                        continue;
-                    }
-
-                    remove.Right.Down.Up = remove.Up;
-                    remove.Up!.Down = remove.Right.Down;
-
-                    upExits.Remove(remove);
-                    rightExits.Remove(remove);
-                    leftExits.Remove(remove.Right);
-                    downExits.Remove(remove.Right);
-                    AllRooms.Remove(remove);
-                    AllRooms.Remove(remove.Right);
-                    //logger.WriteLine("removed 2 room");
-
-                    rooms = rooms - 2;
-                    tries = 0;
-                    continue;
                 }
             }
         }
+        ValidateRoomConnections();
         logger.Debug("Target: " + target + " Rooms: " + rooms);
     }
 
