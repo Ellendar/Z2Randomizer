@@ -10,15 +10,11 @@ namespace CrossPlatformUI.ViewModels;
 
 public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
 {
-    public const string BeginnerPreset = "RAAA2dqAJAhJiLamhRjVC54g+o5VFRDWcBYhAAsA";
-    public const string StandardPreset = "AAAA2dJALw3qnbamhRjVs#2g+hBWFc9WaBYhAAsA";
-    public const string MaxRandoPreset = "hEAAH1dALw3qnbsqhRjVs7yg+hBWKc9WaFYhAAsA";
-    public const string RandoPercentPreset = "hEAAp1dAOR4YXs0uhjGs371g+hBswv9svsthABVA";
-    
     public string? OutputFilePath { get; set; }
+    private RandomizerConfiguration config = new();
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
-    public RandomizerConfiguration Config { get; set; } = new();
+    public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RomFileViewModel RomFileViewModel { get; set; }

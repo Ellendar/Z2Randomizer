@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
 using Avalonia.Controls;
 using DialogHostAvalonia;
+using RandomizerCore;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 
@@ -17,8 +18,8 @@ public class CustomPreset : ReactiveObject
 {
     private string preset = "";
     public string Preset { get => preset; set => this.RaiseAndSetIfChanged(ref preset, value); }
-    private string flags = "";
-    public string Flags { get => flags; set => this.RaiseAndSetIfChanged(ref flags, value); }
+    private RandomizerConfiguration config = new ();
+    public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
 }
 
 public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
@@ -37,7 +38,16 @@ public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewMod
         Activator = new();
         SavePreset = ReactiveCommand.Create(() => {
             Main.SaveNewPresetDialogOpen = false;
-            SavedPresets.Add(new CustomPreset{Preset = PresetName, Flags = Main.RandomizerViewModel.Flags});
+            // Setting the preset config through the flags creates a deep clone instead of a reference
+            var preset = new CustomPreset
+            {
+                Preset = PresetName,
+                Config =
+                {
+                    Flags = Main.Config.Flags
+                }
+            };
+            SavedPresets.Add(preset);
         });
         CancelPreset = ReactiveCommand.Create(() =>
         {
