@@ -427,6 +427,8 @@ public enum CharacterColor
     DarkGreen,
     [Description("Aqua")]
     Aqua,
+    [Description("Light Blue")]
+    LightBlue,
     [Description("Dark Blue")]
     DarkBlue,
     [Description("Purple")]
@@ -439,6 +441,14 @@ public enum CharacterColor
     Red,
     [Description("Turd")]
     Turd,
+    [Description("White")]
+    White,
+    [Description("Light Gray")]
+    LightGray,
+    [Description("Dark Gray")]
+    DarkGray,
+    [Description("Black")]
+    Black,
     [Description("Random")]
     Random,
 }

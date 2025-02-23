@@ -347,7 +347,7 @@ public class ROM
         ChrRomOffset + 0x18840 
     };
 
-    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
+    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite)
     {
         /*
          * Dear future digshake,
@@ -381,100 +381,100 @@ public class ROM
             { CharacterColor.Green, 0x2A },
             { CharacterColor.DarkGreen, 0x0A },
             { CharacterColor.Aqua, 0x3C },
+            { CharacterColor.LightBlue, 0x11 },
             { CharacterColor.DarkBlue, 0x02 },
             { CharacterColor.Purple, 0x04 },
             { CharacterColor.Pink, 0x24 },
             { CharacterColor.Red, 0x16 },
             { CharacterColor.Orange, 0x27 },
-            { CharacterColor.Turd, 0x18 }
+            { CharacterColor.Turd, 0x18 },
+            { CharacterColor.White, 0x30 },
+            { CharacterColor.LightGray, 0x10 },
+            { CharacterColor.DarkGray, 0x2d },
+            { CharacterColor.Black, 0x0d },
         };
 
-        /*colors to include
-            Green (2A)
-            Dark Green (0A)
-            Aqua (3C)
-            Dark Blue (02)
-            Purple (04)
-            Pink (24)
-            Red (16)
-            Orange (27)
-            Turd (08)
-        */
-        int? c2 = null;
-        int? c1 = null;
+        int? tunicColorInt = null;
+        int? outlineColorInt = null;
+        int? shieldColorInt = null;
+        // We won't write the default color to the ROM, but we set it
+        // to avoid another random color rolling the same value.
+        if (tunicColor != CharacterColor.Random)
+        {
+            tunicColorInt = colorMap[tunicColor != CharacterColor.Default ? tunicColor : CharacterColor.Green];
+        }
+        if (outlineColor != CharacterColor.Random)
+        {
+            outlineColorInt = colorMap[outlineColor != CharacterColor.Default ? outlineColor : CharacterColor.Turd];
+        }
+        if (shieldColor != CharacterColor.Random)
+        {
+            shieldColorInt = colorMap[shieldColor != CharacterColor.Default ? shieldColor : CharacterColor.Red];
+        }
         if (tunicColor == CharacterColor.Random)
         {
             Random r2 = new Random();
-
             int c2p1 = r2.Next(3);
             int c2p2 = r2.Next(1, 13);
-            c2 = c2p1 * 16 + c2p2;
+            tunicColorInt = c2p1 * 16 + c2p2;
 
-            while (c1 == c2)
+            while (tunicColorInt == outlineColorInt || tunicColorInt == shieldColorInt)
             {
                 c2p1 = r2.Next(3);
                 c2p2 = r2.Next(1, 13);
-                c2 = c2p1 * 16 + c2p2;
+                tunicColorInt = c2p1 * 16 + c2p2;
             }
-        } else if (tunicColor != CharacterColor.Default)
-        {
-            c2 = colorMap[tunicColor];
         }
-
-        if (shieldColor == CharacterColor.Random)
+        if (outlineColor == CharacterColor.Random)
         {
             Random r2 = new Random();
+            int c2p1 = r2.Next(3);
+            int c2p2 = r2.Next(1, 13);
+            outlineColorInt = c2p1 * 16 + c2p2;
 
-            int c1p1 = r2.Next(3);
-            int c1p2 = r2.Next(1, 13);
-
-            c1 = c1p1 * 16 + c1p2;
-
-            while (c1 == c2)
+            while (outlineColorInt == tunicColorInt || outlineColorInt == shieldColorInt)
             {
-                c1p1 = r2.Next(3);
-                c1p2 = r2.Next(1, 13);
-                c1 = c1p1 * 16 + c1p2;
+                c2p1 = r2.Next(3);
+                c2p2 = r2.Next(1, 13);
+                outlineColorInt = c2p1 * 16 + c2p2;
             }
-        } else if (shieldColor != CharacterColor.Default)
-        {
-            c1 = colorMap[shieldColor];
         }
-
-        int[] tunicLocs = { 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
-
-        foreach (int l in tunicLocs)
+        if(shieldColor == CharacterColor.Random)
         {
-            if (c2 != null)
+            Random r2 = new Random();
+            int c2p1 = r2.Next(3);
+            int c2p2 = r2.Next(1, 13);
+            shieldColorInt = c2p1 * 16 + c2p2;
+
+            while(shieldColorInt == tunicColorInt || shieldColorInt == outlineColorInt)
             {
-                Put(0x10ea, (byte)c2);
-                // if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
-                // {
-                    if (tunicColor != CharacterColor.Default)
-                    {
-                        Put(0x10ea, (byte)c2);
-                        Put(l, (byte)c2);
-                    }
-                    //Don't overwrite for null 
-                // }
-                // else
-                // {
-                //     Put(0x10ea, (byte)c2);
-                //     Put(l, (byte)c2);
-                // }
+                c2p1 = r2.Next(3);
+                c2p2 = r2.Next(1, 13);
+                shieldColorInt = c2p1 * 16 + c2p2;
             }
         }
 
-        if (shieldColor == CharacterColor.Default)
-        {
-            //Don't overwrite default shield. For custom sprite IPS base
-        }
-        else
-        {
-            if(c1 != null)
+        int[] tunicLocs = { 0x10ea, 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
+        int[] outlineLocs = { 0x285a, 0x2a0a, 0x40af, 0x40bf, 0x40cf, 0x40df, 0x80af, 0x80bf, 0x80cf, 0x80df, 0xc0af, 0xc0bf, 0xc0cf, 0xc0df, 0xc0ef, 0x100af, 0x100bf, 0x100cf, 0x100df, 0x140af, 0x140bf, 0x140cf, 0x140df, 0x17c19, 0x1c464, 0x1c47c };
+        int shieldLoc = 0xe9e;
+
+        if(tunicColor != CharacterColor.Default && tunicColorInt != null)
+        { 
+            foreach(int l in tunicLocs)
             {
-                Put(0xe9e, (byte)c1);
+                Put(l, (byte)tunicColorInt);
             }
+        }
+        if(outlineColor != CharacterColor.Default && outlineColorInt != null)
+        {
+            foreach(int l in outlineLocs)
+            {
+                Put(l, (byte)outlineColorInt);
+            }
+        }
+        if(shieldColor != CharacterColor.Default && shieldColorInt != null)
+        {
+            Put(shieldLoc, (byte)shieldColorInt);
         }
 
         if(beamSprite == BeamSprites.RANDOM)

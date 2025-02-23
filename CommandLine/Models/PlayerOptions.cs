@@ -26,6 +26,9 @@ namespace CommandLine.Models
         public CharacterColor TunicColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
+        public CharacterColor TunicOutlineColor { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public CharacterColor ShieldTunicColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]

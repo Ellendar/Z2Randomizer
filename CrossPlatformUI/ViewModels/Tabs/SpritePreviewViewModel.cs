@@ -36,6 +36,11 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         get => Main.Config.Tunic;
         set { Main.Config.Tunic = value; this.RaisePropertyChanged(); }
     }
+    public CharacterColor OutlineColor
+    {
+        get => Main.Config.TunicOutline;
+        set { Main.Config.TunicOutline = value; this.RaisePropertyChanged(); }
+    }
     public CharacterColor ShieldColor
     {
         get => Main.Config.ShieldTunic;
@@ -64,11 +69,12 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,
             x => x.Main.Config.Tunic,
+            x => x.Main.Config.TunicOutline,
             // x => x.Main.Config.ShieldTunic,
             // x => x.Main.Config.BeamSprite,
             x => x.Main.RomFileViewModel.HasRomData
         ).Subscribe(tuple => {
-            var (_, _, hasRom) = tuple;
+            var (_, _, _, hasRom) = tuple;
             if (hasRom)
             {
                 backgroundUpdateTask.CancelAsync().ToObservable().Subscribe(_ =>
@@ -97,12 +103,12 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             // Load the selected sprite first so that one updates fastest
             var current = Options.FirstOrDefault(loaded => loaded.Name == Main.Config.Sprite.DisplayName);
             if (current != null)
-                await current.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+                await current.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             foreach (var loaded in Options)
             {
                 if (token.IsCancellationRequested)
                     return;
-                await loaded.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+                await loaded.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             }
         }
 
@@ -110,7 +116,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         {
             Options.Clear();
             var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.LINK);
-            await link.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+            await link.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             if (token.IsCancellationRequested)
                 return;
             Options.Add(link);
@@ -123,7 +129,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
                 var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
                 var ch = new CharacterSprite(parsedName, patch);
                 var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, ch);
-                await loaded.Update(Main.Config.Tunic, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+                await loaded.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
                 if (token.IsCancellationRequested)
                     return;
                 Options.Add(loaded);
@@ -172,10 +178,10 @@ public class LoadedCharacterSprite : ReactiveObject
         Name = spr.DisplayName;
     }
 
-    public async Task Update(CharacterColor tunicColor, CharacterColor shieldColor, BeamSprites beamSprite)
+    public async Task Update(CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite)
     {
         var tmp = new ROM(rom, true);
-        tmp.UpdateSprites(Sprite, tunicColor, shieldColor, beamSprite);
+        tmp.UpdateSprites(Sprite, tunicColor, outlineColor, shieldColor, beamSprite);
         var data = await LoadPreviewFromRom(tmp);
         unsafe
         {
