@@ -11071,12 +11071,12 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 67503,
-    "name": "",
+    "name": "Elevator up left normal item room (formerly with walldoor)",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "29600F08D608A245910F0083C1D40E8205D208440048004800D402007BD204D206D70FF05020DA21DA"
+    "sideviewData": "27600F08D600A245910F0083C1D40E8305D200340038003800D402D204D206F65010EB11EBD10F"
   },
   {
     "author": "downOpenItemRooms",
@@ -11284,7 +11284,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "27608708307FD280A245910F0C83C145756075337F800558C5967F727B5277E300987772755273"
+    "sideviewData": "27608708307FD280A245910F0183C145756075337F800558C5967F727B5277E300987772755273"
   },
   {
     "author": "benthicKing",
@@ -16702,7 +16702,7 @@
     "map": 53,
     "palaceGroup": null,
     "memoryAddress": 69619,
-    "connections": "D300BAEC",
+    "connections": "D300BAFC",
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": ["GLOVE", "FAIRY", "JUMP"],
@@ -17655,7 +17655,7 @@
     "connections": "4356FF48",
     "hasDrop": false,
     "elevatorScreen": 2,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "09695E65D90A8D058D",

@@ -143,12 +143,13 @@ public class Palaces
                 group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
                 palace.AllRooms.ForEach(i => i.PalaceGroup = 3);
             }
+            palace.AllRooms.ForEach(i => i.PalaceNumber = currentPalace);
             palace.ValidateRoomConnections();
             palaces.Add(palace);
             sizes[currentPalace - 1] = palace.AllRooms.Count;
         }
 
-        palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.GLOVE);
+        palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.REFLECT);
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {

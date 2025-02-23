@@ -73,7 +73,7 @@ public class CustomTexts
     private const int gotWaterTextIndex = 63;
     private const int gotMirrorTextIndex = 21;
 
-    private const int HELPFUL_HINTS_COUNT = 99;
+    private const int HELPFUL_HINTS_COUNT = 4;
 
     private const int errorTextIndex1 = 25;
     private const int errorTextIndex2 = 26;

@@ -106,6 +106,15 @@ public static class RoomExitTypeExtensions
         return (RoomExitType)((int)exitType & 0b10111 | DROP);
     }
 
+    public static RoomExitType ConvertFromDropToDown(this RoomExitType exitType)
+    {
+        if (!exitType.ContainsDrop())
+        {
+            throw new Exception("Cannot convert non-drop room to down");
+        }
+        return (RoomExitType)((int)exitType & 0b11011 | DOWN);
+    }
+
     public static RoomExitType RemoveUp(this RoomExitType exitType)
     {
         return (RoomExitType)((int)exitType & 0b11101);

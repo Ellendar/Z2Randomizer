@@ -329,26 +329,30 @@ public class Room : IJsonOnDeserialized
         sideViewPtr -= 0x8000;
         sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
         sideViewPtr += 0x10; // Add the offset for the iNES header
-        int ptr = sideViewPtr + 4;
+        byte sideviewLength = romData.GetByte(sideViewPtr);
+        int offset = 4;
 
         int yPos, byte2, byte3;
         do
         {
             byte3 = 0;
-            yPos = romData.GetByte(ptr++);
+            yPos = romData.GetByte(sideViewPtr + offset++);
             yPos = (byte)(yPos & 0xF0);
             yPos = (byte)(yPos >> 4);
-            byte2 = romData.GetByte(ptr++);
+            byte2 = romData.GetByte(sideViewPtr + offset++);
 
-            if(yPos < 13 && byte2 == 0x0F)
+            if (yPos < 13 && byte2 == 0x0F)
             {
-                byte3 = romData.GetByte(ptr++);
+                byte3 = romData.GetByte(sideViewPtr + offset++);
+                if (!((Collectable)byte3).IsMinorItem())
+                {
+                    romData.Put(sideViewPtr + offset - 1, (byte)item);
+                    return;
+                }
             }
-
-            ptr += 2;
-        } while (yPos >= 13 || byte2 != 0x0F || ((Collectable)byte3).IsMinorItem());
-        romData.Put(ptr + 2, (byte)item);
-        //System.Diagnostics.Debug.WriteLine($"Writing palace number {PalaceNumber} group {PalaceGroup} map {Map} item 0x{i:X} at address 0x{ptr+2:X}");
+        } while (offset < sideviewLength);
+        logger.Warn("Could not write Collectable to Item room in palace " + PalaceNumber);
+        //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
 
 

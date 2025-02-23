@@ -8,8 +8,11 @@ namespace RandomizerCore.Sidescroll;
 
 public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
+    public static int debug = 0;
+    private const float DROP_CHANCE = .10f;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
+        debug++;
         Palace palace = new(palaceNumber);
         List<(int, int)> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
@@ -106,7 +109,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             {
                 continue;
             }
-            double dropChance = .15d;
+            double dropChance = DROP_CHANCE;
             Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
             //if we dropped into this room
             if (upRoom != null && upRoom.HasDrop)
@@ -128,6 +131,14 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 walkGraph[item.Key] = item.Value.ConvertToDrop();
                 walkGraph[(x, y - 1)] = walkGraph[(x, y - 1)].RemoveUp();
             }
+        }
+
+        //drop stubs can't / shouldn't exist, so convert them to regular down stubs
+        foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.Where(i => i.Value == RoomExitType.DROP_STUB))
+        {
+            walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_UP;
+            walkGraph[(item.Key.Item1, item.Key.Item2 - 1)] = item.Value.ConvertFromDropToDown();
+
         }
 
         //Add rooms
@@ -161,14 +172,6 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             }
             if (newRoom == null)
             {
-                if(roomExitType == RoomExitType.DROP_STUB)
-                {
-                    if(upRoom?.IsDropZone ?? false)
-                    {
-                        upRoom.Down = upRoom;
-                        continue;
-                    }
-                }
                 palace.IsValid = false;
                 return palace;
             }
@@ -180,7 +183,11 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             palace.AllRooms.Add(newRoom);
             if(newRoom.LinkedRoomName != null)
             {
-                palace.AllRooms.Add(new(roomPool.LinkedRooms[newRoom.LinkedRoomName]));
+                Room linkedRoom = new(roomPool.LinkedRooms[newRoom.LinkedRoomName]);
+                newRoom.LinkedRoom = linkedRoom;
+                linkedRoom.LinkedRoom = newRoom;
+                linkedRoom.coords = item.Key;
+                palace.AllRooms.Add(linkedRoom);
                 roomCount++;
             }
             newRoom.coords = item.Key;

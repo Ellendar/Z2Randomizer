@@ -2975,6 +2975,10 @@ public class Hyrule
         {
             palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace6.Collectable, ROMData);
         }
+        if (eastHyrule.locationAtGP.PalaceNumber != 7)
+        {
+            palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtGP.Collectable, ROMData);
+        }
         if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
         {
             palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
