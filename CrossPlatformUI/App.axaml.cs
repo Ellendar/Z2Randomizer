@@ -23,7 +23,7 @@ public sealed partial class App : Application // , IDisposable
     public static ServiceCollection? ServiceContainer;
 
     public static IFileSystemService? FileSystemService;
-    
+
     public static TopLevel? TopLevel { get; private set; }
 
     // public static MainViewModel? Main { get; set; }
@@ -32,13 +32,17 @@ public sealed partial class App : Application // , IDisposable
 
     public override void OnFrameworkInitializationCompleted()
     {
-        ServiceContainer ??= new ();
+        ServiceContainer ??= new();
         var files = FileSystemService!;
         try
         {
             var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
             main = JsonSerializer.Deserialize(json, SerializationContext.Default.MainViewModel);
             main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.SpriteName = main.Config.SpriteName;
+            if (main.Config.SpriteName != "Link")
+            {
+                main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.OnActivate(null!);
+            }
         }
         catch (Exception)
         {
@@ -47,11 +51,11 @@ public sealed partial class App : Application // , IDisposable
         }
 
         main ??= new MainViewModel();
-        
+
         switch (ApplicationLifetime)
         {
             case IClassicDesktopStyleApplicationLifetime desktop:
-                desktop.Exit += (_,_) =>
+                desktop.Exit += (_, _) =>
                 {
                     PersistStateInternal().Wait();
                 };
@@ -79,7 +83,7 @@ public sealed partial class App : Application // , IDisposable
 
         ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
         Services = ServiceContainer.BuildServiceProvider();
-        
+
         base.OnFrameworkInitializationCompleted();
     }
 
@@ -87,7 +91,7 @@ public sealed partial class App : Application // , IDisposable
     {
         await Current!.PersistStateInternal();
     }
-    
+
     private Task PersistStateInternal()
     {
         return Task.Run(async () =>
@@ -99,7 +103,7 @@ public sealed partial class App : Application // , IDisposable
     }
 
     public new static App? Current => Application.Current as App;
-    
+
     /// <summary>
     /// Gets the <see cref="IServiceProvider"/> instance to resolve application services.
     /// </summary>

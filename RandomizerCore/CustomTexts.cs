@@ -145,7 +145,7 @@ public class CustomTexts
         "No pom pom$shaking$here",
         "Youre$a wizard,$Link",
         "Take any$Robe you$want",
-        "The child$can stay$lost",
+        //"The child$can stay$lost", //potentially 
         "Dont Move$I dropped$a contact$lens",
         "Please$support$ZSR",
         "This wont$hurt a bit",
