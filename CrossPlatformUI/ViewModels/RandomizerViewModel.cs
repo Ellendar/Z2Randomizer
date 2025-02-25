@@ -5,14 +5,12 @@ using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels.Tabs;
-using DialogHostAvalonia;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using RandomizerCore;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
+using Avalonia.Styling;
 
 namespace CrossPlatformUI.ViewModels;
 
@@ -42,6 +40,24 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         }
     }
 
+    private string themeVariantName = "";
+    public string ThemeVariantName 
+    {
+        get
+        {
+            return themeVariantName;
+        }
+        set
+        {
+            App.Current!.RequestedThemeVariant = value switch
+            {
+                "Light" => ThemeVariant.Light,
+                "Dark" => ThemeVariant.Dark,
+                _ => ThemeVariant.Default
+            };
+            themeVariantName = value;
+        }
+    }
     private int currentTabIndex;
     public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
     
@@ -55,6 +71,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         HostScreen = Main;
         CustomizeViewModel = new(Main);
         Activator = new ViewModelActivator();
+
         RerollSeed = ReactiveCommand.Create(() =>
         {
             Main.Config.Seed = new Random().Next(0, 999999999).ToString();
@@ -76,6 +93,18 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             var fileDialog = App.Current?.Services?.GetService<IFileDialogService>()!;
             var folder = await fileDialog.OpenFolderAsync();
             Main.OutputFilePath = folder?.Path.LocalPath ?? "";
+        });
+        ToggleTheme = ReactiveCommand.CreateFromTask(async () =>
+        {
+            if(App.Current!.ActualThemeVariant == ThemeVariant.Dark)
+            {
+                App.Current!.RequestedThemeVariant = ThemeVariant.Light;
+            }
+            else if (App.Current!.ActualThemeVariant == ThemeVariant.Light)
+            {
+                App.Current!.RequestedThemeVariant = ThemeVariant.Dark;
+            }
+            ThemeVariantName = App.Current.RequestedThemeVariant.Key.ToString();
         });
         CanGenerate = this.WhenAnyValue(
             x => x.Flags,
@@ -165,18 +194,22 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
                 Main.Config.GeneratorsAlwaysMatch = false;
             }
         });
-        
+
         // When PalaceItems and OverworldItems are off, then don't allow MixingOverworldAndPalaceItems
         Main.Config.WhenAnyValue(
             x => x.ShufflePalaceItems,
             x => x.ShuffleOverworldItems,
             (palaceItems, overworldItems) =>
-                (palaceItems ?? true) || (overworldItems ?? true)
+                !(palaceItems ?? true) || !(overworldItems ?? true)
         ).Subscribe(_ =>
         {
-            Main.Config.MixOverworldAndPalaceItems = false;            
+            if(!(Main.Config.ShufflePalaceItems ?? true) || !(Main.Config.ShufflePalaceItems ?? true))
+            {
+                Main.Config.MixOverworldAndPalaceItems = false;
+            }
         });
-        
+
+
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
         Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems)
         .Subscribe(x =>
@@ -240,6 +273,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public ReactiveCommand<Unit, Unit> Generate { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveFolder { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> ToggleTheme { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveNewPreset { get; }
     [JsonIgnore]

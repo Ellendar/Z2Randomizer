@@ -509,7 +509,7 @@ public class CustomTexts
         string text = spell.EnglishText();
         if(spell == Collectable.FIRE_SPELL && linkedFire)
         {
-            text += "!";
+            text = "FIRE!$SPELL";
         }
         text += "$town";
         return new Text(text);

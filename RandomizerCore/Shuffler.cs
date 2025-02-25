@@ -73,8 +73,9 @@ public class Shuffler
 
     public void ShuffleDrops(ROM ROMData, Random r)
     {
-        List<int> small = new List<int>();
-        List<int> large = new List<int>();
+        List<int> small = [];
+        List<int> large = [];
+
 
         if (props.Smallbluejar)
         {

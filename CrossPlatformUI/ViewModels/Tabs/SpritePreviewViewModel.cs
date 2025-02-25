@@ -59,7 +59,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         this.WhenActivated(OnActivate);
     }
 
-    private void OnActivate(CompositeDisposable disposable)
+    internal void OnActivate(CompositeDisposable disposable)
     {
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,

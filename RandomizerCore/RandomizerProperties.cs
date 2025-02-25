@@ -182,6 +182,7 @@ public class RandomizerProperties
     public bool Large1up { get; set; }
     public bool Largekey { get; set; }
     public bool StandardizeDrops { get; set; }
+    public bool RandomizeDrops { get; set; }
 
     //Hints
     public bool SpellItemHints { get; set; }

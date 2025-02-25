@@ -311,7 +311,7 @@ sealed class MazeIsland : World
                 riverEnd.Xpos = 21;
                 riverEnd.Ypos = riverEndY + 30;
                 */
-                DrawLine(riverStartY, 21, riverEndY, 21, Terrain.WALKABLEWATER);
+                DrawLine(riverStartY, 1, riverEndY, 21, Terrain.WALKABLEWATER);
 
                 //Place raft
                 Direction raftDirection = Direction.EAST;
@@ -733,7 +733,7 @@ sealed class MazeIsland : World
         DrawLine(from.Item1, from.Item2, to.Item1, to.Item2, t);
     }
 
-    private void DrawLine(int fromY, int fromX, int toY, int toX, Terrain t)
+    private void DrawLine(int fromY, int fromX, int toY, int toX, Terrain terrain)
     {
         while (fromX != toX)
         {
@@ -743,15 +743,15 @@ sealed class MazeIsland : World
                 int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
 
  
-                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY - 30))
+                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY))
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((fromX != toX || fromY != (toY - 30)) && GetLocationByCoords((fromY + 30, fromX)) == null)
+                        if ((fromX != toX || fromY != (toY)) && GetLocationByCoords((fromY, fromX)) == null)
                         {
                             if(map[fromY, fromX] == Terrain.MOUNTAIN)
                             {
-                                map[fromY, fromX] = t;
+                                map[fromY, fromX] = terrain;
                             }
                             else if (map[fromY, fromX] == Terrain.ROAD && ((diff > 0 && (map[fromY, fromX + 1] == Terrain.MOUNTAIN)) || (diff < 0 && map[fromY, fromX - 1] == Terrain.MOUNTAIN)))
                             {
@@ -759,7 +759,7 @@ sealed class MazeIsland : World
                             }
                             else if (map[fromY, fromX] != Terrain.PALACE && map[fromY, fromX] != Terrain.BRIDGE && map[fromY, fromX] != Terrain.CAVE)
                             {
-                                map[fromY, fromX] = t;
+                                map[fromY, fromX] = terrain;
                             }
 
                         }
@@ -778,19 +778,19 @@ sealed class MazeIsland : World
                     }
                 }
             }
-            else if(fromY != toY - 30)
+            else if(fromY != toY)
             {
-                int diff = toY - 30 - fromY;
+                int diff = toY - fromY;
                 int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
-                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY - 30))
+                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY))
                 {
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((fromX != toX || fromY != (toY - 30)) && GetLocationByCoords((fromY + 30, fromX)) == null)
+                        if ((fromX != toX || fromY != (toY)) && GetLocationByCoords((fromY, fromX)) == null)
                         {
                             if (map[fromY, fromX] == Terrain.MOUNTAIN)
                             {
-                                map[fromY, fromX] = t;
+                                map[fromY, fromX] = terrain;
                             }
                             else if(map[fromY, fromX] == Terrain.ROAD && ((diff > 0 && (map[fromY + 1, fromX] == Terrain.MOUNTAIN)) || (diff < 0 && map[fromY - 1, fromX] == Terrain.MOUNTAIN)))
                             {
@@ -798,7 +798,7 @@ sealed class MazeIsland : World
                             }
                             else if (map[fromY, fromX] != Terrain.PALACE && map[fromY, fromX] != Terrain.BRIDGE && map[fromY, fromX] != Terrain.CAVE)
                             {
-                                map[fromY, fromX] = t;
+                                map[fromY, fromX] = terrain;
                             }
                         }
                         if (diff > 0 && fromY < MAP_ROWS - 1)
