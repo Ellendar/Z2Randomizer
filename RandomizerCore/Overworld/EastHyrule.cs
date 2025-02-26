@@ -1459,6 +1459,7 @@ public sealed class EastHyrule : World
                 || hiddenKasutoLocation == bridge
                 || hiddenKasutoLocation == cave1
                 || hiddenKasutoLocation == cave2
+                || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
                 || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
@@ -1492,7 +1493,8 @@ public sealed class EastHyrule : World
                 || hiddenPalaceLocation == cave2 
                 || connections.ContainsKey(hiddenPalaceLocation) 
                 || !hiddenPalaceLocation.CanShuffle 
-                || hiddenPalaceLocation == hiddenKasutoLocation 
+                || hiddenPalaceLocation == hiddenKasutoLocation
+                || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
                 || (biome != Biome.VANILLA 
                     && biome != Biome.VANILLA_SHUFFLE
                     && hiddenPalaceLocation.TerrainType == Terrain.LAVA 
