@@ -16705,7 +16705,7 @@
     "connections": "D300BAFC",
     "hasDrop": false,
     "elevatorScreen": 3,
-    "requirements": ["GLOVE", "FAIRY", "JUMP"],
+    "requirements": [],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B0146705D7D5D0E867E9D",
@@ -18002,7 +18002,7 @@
     "map": 31,
     "palaceGroup": null,
     "memoryAddress": 73527,
-    "connections": "FF8080FC",
+    "connections": "FFFF80FC",
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
@@ -18020,7 +18020,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false
+    "isUpDownReversed": true
   },
   {
     "bitmask": "0D",

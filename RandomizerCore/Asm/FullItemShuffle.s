@@ -135,6 +135,7 @@ WizardMagicContainerRequirement:
     .byte $01,$02,$03,$04,$05,$06,$07,$08
 .endif
 
+.if _DO_SPELL_SHUFFLE_WIZARD_UPDATE
 .org WizardDialogGetItem
     lda LocationTableWizard
     and JankPowerOfTwo,y
@@ -157,6 +158,7 @@ WizardMagicContainerRequirement:
 @EarlyExit:
     jmp DialogConditionsDefault
     FREE_UNTIL $b54e
+.endif
 
 .reloc
 TownToItemTable:

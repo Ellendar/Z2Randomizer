@@ -3483,6 +3483,7 @@ CustomFileSelectData:
         }
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
+        a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
         a.Code(Util.ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
