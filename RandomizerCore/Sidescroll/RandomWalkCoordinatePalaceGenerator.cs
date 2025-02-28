@@ -138,7 +138,6 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         {
             walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_UP;
             walkGraph[(item.Key.Item1, item.Key.Item2 - 1)] = item.Value.ConvertFromDropToDown();
-
         }
 
         //Add rooms

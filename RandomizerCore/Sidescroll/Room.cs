@@ -588,6 +588,7 @@ public class Room : IJsonOnDeserialized
         sb.Append(Map + " ");
         sb.Append(Name + " ");
         sb.Append(coords + " ");
+        sb.Append(CategorizeExits() + " ");
         sb.Append("[" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
         sb.Append("[" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
         return sb.ToString();
@@ -657,17 +658,8 @@ public class Room : IJsonOnDeserialized
         {
             if(up.HasDownExit)
             {
-                return CONFLICT;
+                return up.HasDrop && IsDropZone ? 1 : CONFLICT;
             }
-        }
-        //Drop down
-        if (IsDropZone)
-        {
-            if(up.HasDrop)
-            {
-                return 1;
-            }
-            return CONFLICT;
         }
         //There is a room Above, but they don't interact at all
         //Theoretically we could just default true but this is a good safety

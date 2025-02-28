@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -1182,5 +1183,65 @@ public class Palace
 
         AllRooms.Remove(roomToReplace);
         AllRooms.Add(newRoom);
+    }
+
+    public string GetLayoutDebug()
+    {
+        StringBuilder sb = new();
+        sb.Append("   ");
+        for(int headerX = -20; headerX <= 20; headerX++)
+        {
+            sb.Append(headerX.ToString().PadLeft(3, ' '));
+        }
+        sb.Append('\n');
+        for (int y = 20; y >= -20; y--)
+        {
+            sb.Append("   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                Room? room = AllRooms.FirstOrDefault(i => i.coords == (x, y));
+                if (room == null)
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(" " + (room.HasUpExit ? "|" : " ") + " ");
+                }
+            }
+            sb.Append('\n');
+            sb.Append(y.ToString().PadLeft(3, ' '));
+            for (int x = -20; x <= 20; x++)
+            {
+                Room? room = AllRooms.FirstOrDefault(i => i.coords == (x, y));
+                if(room == null)
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(room.HasLeftExit ? '-' : ' ');
+                    sb.Append('x');
+                    sb.Append(room.HasRightExit ? '-' : ' ');
+                }
+            }
+            sb.Append('\n');
+            sb.Append("   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                Room? room = AllRooms.FirstOrDefault(i => i.coords == (x, y));
+                if (room == null)
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(" " + (room.HasDownExit ? "|" : " ") + " ");
+                }
+            }
+            sb.Append('\n');
+        }
+
+        return sb.ToString();
     }
 }

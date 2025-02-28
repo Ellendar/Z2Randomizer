@@ -9,6 +9,10 @@ namespace RandomizerCore.Sidescroll;
 
 public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
+    public static int[] dropFailureCounts = [0, 0, 0, 0, 0, 0, 0];
+    public static int[] stallFailureCounts = [0, 0, 0, 0, 0, 0, 0];
+    public static int[] specialRoomFailureCounts = [0, 0, 0, 0, 0, 0, 0];
+
     private const int STALL_LIMIT = 5000;
     static int debug = 0;
     internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
@@ -43,9 +47,10 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
         while (palace.AllRooms.Count + openCoords.Count < roomCount || openJunctionsCount > 0)
         {
             //Stalled out, try again from the start
-            if(openCoords.Count == 0 || stallCount++ > STALL_LIMIT)
+            if(openCoords.Count == 0 || stallCount++ >= STALL_LIMIT)
             {
                 palace.IsValid = false;
+                stallFailureCounts[palaceNumber - 1]++;
                 return palace;
             }
             Room? newRoom = roomPool.NormalRooms.Sample(r);
@@ -209,7 +214,8 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                     if (up.HasDrop)
                     {
                         exitType = RoomExitType.NO_ESCAPE;
-                        logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
+                        dropFailureCounts[palaceNumber - 1]++;
+                        //logger.Debug("Drop stubs are currently unsupported. Ask discord how we feel about these");
                         palace.IsValid = false;
                         return palace;
                     }
@@ -307,6 +313,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
 
         if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
         {
+            specialRoomFailureCounts[palaceNumber - 1]++;
             palace.IsValid = false;
             return palace;
         }
