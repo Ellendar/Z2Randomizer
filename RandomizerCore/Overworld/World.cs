@@ -162,8 +162,8 @@ public abstract class World
 
     protected void ShuffleLocations(List<Location> locationsToShuffle)
     {
-        List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle).ToList();
-        for (int i = shufflableLocations.Count() - 1; i > 0; i--)
+        List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle && i.AppearsOnMap).ToList();
+        for (int i = shufflableLocations.Count - 1; i > 0; i--)
         {
             int n = RNG.Next(i + 1);
             Swap(shufflableLocations[i], shufflableLocations[n]);
@@ -171,11 +171,25 @@ public abstract class World
     }
 
 
-    protected static void Swap(Location l1, Location l2)
+    protected void Swap(Location l1, Location l2)
     {
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
         (l2.Ypos, l1.Ypos) = (l1.Ypos, l2.Ypos);
         (l2.PassThrough, l1.PassThrough) = (l1.PassThrough, l2.PassThrough);
+
+        foreach (Location child in l1.Children)
+        {
+            child.Xpos = l1.Xpos;
+            child.Ypos = l1.Ypos;
+            child.PassThrough = l1.PassThrough;
+        }
+
+        foreach (Location child in l2.Children)
+        {
+            child.Xpos = l2.Xpos;
+            child.Ypos = l2.Ypos;
+            child.PassThrough = l2.PassThrough;
+        }
     }
 
     //TODO: This should work like the new palace enemy shuffle. Shuffle should set what enemies are where into

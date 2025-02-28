@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using RandomizerCore;
+using System.Collections.Generic;
 
 namespace RandomizerCore.Overworld;
 
@@ -19,6 +20,7 @@ public class Location
     public int Ypos { get; set; }
     public int Xpos { get; set; }
     //public byte[] LocationBytes { get; set; }
+    public List<Location> Children { get; set; } = [];
 
     public int MemAddress { get; set; }
 

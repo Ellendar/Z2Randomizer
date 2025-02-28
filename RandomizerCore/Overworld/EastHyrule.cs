@@ -166,6 +166,7 @@ public sealed class EastHyrule : World
         spellTower.Name = "Spell Tower";
         spellTower.CanShuffle = false;
         spellTower.ActualTown = null;
+        townAtNewKasuto.Children.Add(spellTower);
         AddLocation(spellTower);
 
         newKasutoBasement = new Location(townAtNewKasuto);
@@ -173,6 +174,7 @@ public sealed class EastHyrule : World
         newKasutoBasement.Name = "Granny's basement";
         newKasutoBasement.CanShuffle = false;
         newKasutoBasement.ActualTown = null;
+        townAtNewKasuto.Children.Add(newKasutoBasement);
         AddLocation(newKasutoBasement);
 
         fountain = new Location(townAtNabooru);
@@ -180,6 +182,7 @@ public sealed class EastHyrule : World
         fountain.Name = "Water Fountain";
         fountain.ActualTown = Town.NABOORU_FOUNTAIN;
         fountain.CanShuffle = false;
+        townAtNabooru.Children.Add(fountain);
         AddLocation(fountain);
 
         daruniaRoof = new Location(townAtDarunia);
@@ -187,6 +190,7 @@ public sealed class EastHyrule : World
         daruniaRoof.Name = "Darunia Roof";
         daruniaRoof.ActualTown = Town.DARUNIA_ROOF;
         daruniaRoof.CanShuffle = false;
+        townAtDarunia.Children.Add(daruniaRoof);
         AddLocation(daruniaRoof);
 
         overworldMaps = [0x22, 0x1D, 0x27, 0x35, 0x30, 0x1E, 0x28, 0x3C];

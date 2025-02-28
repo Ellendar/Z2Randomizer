@@ -171,6 +171,7 @@ public sealed class WestHyrule : World
         mirrorTable.ActualTown = Town.SARIA_TABLE;
         mirrorTable.Name = "Saria Mirror Table";
         mirrorTable.CanShuffle = false;
+        locationAtSariaNorth.Children.Add(mirrorTable);
         AddLocation(mirrorTable);
 
         midoChurch = new Location(locationAtMido);
@@ -178,6 +179,7 @@ public sealed class WestHyrule : World
         midoChurch.ActualTown = Town.MIDO_CHURCH;
         midoChurch.Name = "Mido Church";
         midoChurch.CanShuffle = false;
+        locationAtMido.Children.Add(midoChurch);
         AddLocation(midoChurch);
 
 
