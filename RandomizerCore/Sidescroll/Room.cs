@@ -857,6 +857,51 @@ public class Room : IJsonOnDeserialized
             || HasUpExit && Up == null
             || HasDownExit && Down == null;
     }
+
+    public void ReplaceExitStatueWithCurtains()
+    {
+        try
+        {
+            const byte ironknuckleStatue = 0x09;
+            const byte replaceStatueXpos = 62;
+            const byte replaceStatueYpos = 9;
+            const byte curtains = 0x80;
+            const byte curtainsYpos = 7;
+            const byte curtainsWidth = 1;
+
+            int sideviewIndex = 4; // Header bytes
+            int xcursor = 0;
+            while (sideviewIndex < SideView.Length)
+            {
+                int firstByte = SideView[sideviewIndex++];
+                int secondByte = SideView[sideviewIndex++];
+                int ypos = (firstByte & 0xF0) >> 4;
+                if (ypos == 14) // x skip
+                {
+                    xcursor = 16 * (firstByte & 0x0F);
+                }
+                else
+                {
+                    xcursor += firstByte & 0x0F;
+                }
+                if (secondByte == ironknuckleStatue && xcursor == replaceStatueXpos && ypos == replaceStatueYpos)
+                {
+                    SideView = SideView[0..(sideviewIndex - 2)]
+                        .Concat(new byte[] { (byte)((curtainsYpos << 4) + (firstByte & 0x0F)), curtains + curtainsWidth })
+                        .Concat(SideView[sideviewIndex..SideView.Length])
+                        .ToArray();
+                }
+                if (secondByte == 15 && ypos < 13) // map command that uses an extra byte
+                {
+                    sideviewIndex++;
+                }
+            }
+        }
+        catch (IndexOutOfRangeException)
+        {
+            logger.Error("Failed to replace Statue in sideview: " + Util.ByteArrayToHexString(SideView));
+        }
+    }
 }
 
 public class HexStringConverter : JsonConverter<byte[]?>
