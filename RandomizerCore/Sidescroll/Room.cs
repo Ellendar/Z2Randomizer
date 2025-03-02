@@ -673,7 +673,8 @@ public class Room : IJsonOnDeserialized
 
     public int FitsWithLeft(Room? left)
     {
-        if (left == null)
+        //There is no left room or this and the room on the left don't interact
+        if (left == null || (!left.HasRightExit && !HasLeftExit))
         {
             return 0;
         }
@@ -686,7 +687,8 @@ public class Room : IJsonOnDeserialized
     }
     public int FitsWithRight(Room? right)
     {
-        if (right == null)
+        //There is no right room or this and the room on the right don't interact
+        if (right == null || (!right.HasLeftExit && !HasRightExit))
         {
             return 0;
         }

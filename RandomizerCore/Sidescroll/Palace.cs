@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using NLog;
 
@@ -999,6 +1000,72 @@ public class Palace
         return unclearableRooms.Count == 0;
     }
 
+    public bool HasInescapableDrop()
+    {
+        //get a list of effective drop zones in the palace
+        List<Room> dropZonesToCheck = [];
+        foreach (Room room in AllRooms.Where(i => i.HasDrop))
+        {
+            if(room.Down!.IsDropZone)
+            {
+                dropZonesToCheck.Add(room.Down);
+            }
+        }
+        //while the list is not empty
+        while (dropZonesToCheck.Count > 0)
+        {
+            List<Room> pendingRooms = [dropZonesToCheck[0]];
+            List<Room> coveredRooms = [];
+            Room initialDropZone = dropZonesToCheck[0];
+            bool found = false;
+
+            while (pendingRooms.Count > 0)
+            {
+                Room room = pendingRooms.First();
+                //if you find the entrance, remove and continue
+                if (room == Entrance)
+                {
+                    found = true;
+                    break;
+                }
+                //if you find another drop zone, remove it from the list, either it works together with this or they both fail
+                //either way we don't care
+                dropZonesToCheck.Remove(room);
+                if (coveredRooms.Contains(room))
+                {
+                    pendingRooms.Remove(room);
+                    continue;
+                }
+                coveredRooms.Add(room);
+                pendingRooms.Remove(room);
+                //explore rooms
+                if (room.Left != null)
+                {
+                    pendingRooms.Add(room.Left);
+                }
+                if (room.Right != null)
+                {
+                    pendingRooms.Add(room.Right);
+                }
+                if (room.Up != null)
+                {
+                    pendingRooms.Add(room.Up);
+                }
+                if (room.Down != null)
+                {
+                    pendingRooms.Add(room.Down);
+                }
+            }
+            //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
+            if (found == false)
+            {
+                //Debug.WriteLine(GetLayoutDebug());
+                return true;
+            }
+        }
+        return false;
+    }
+
     public bool CanGetItem(IEnumerable<RequirementType> requireables)
     {
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
@@ -1221,7 +1288,26 @@ public class Palace
                 else
                 {
                     sb.Append(room.HasLeftExit ? '-' : ' ');
-                    sb.Append('x');
+                    if(room.IsEntrance)
+                    {
+                        sb.Append('E');
+                    }
+                    else if (room.HasItem)
+                    {
+                        sb.Append('I');
+                    }
+                    else if (room.IsBossRoom)
+                    {
+                        sb.Append('B');
+                    }
+                    else if (room.IsThunderBirdRoom)
+                    {
+                        sb.Append('T');
+                    }
+                    else
+                    {
+                        sb.Append('X');
+                    }
                     sb.Append(room.HasRightExit ? '-' : ' ');
                 }
             }
@@ -1236,7 +1322,7 @@ public class Palace
                 }
                 else
                 {
-                    sb.Append(" " + (room.HasDownExit ? "|" : " ") + " ");
+                    sb.Append(" " + (room.HasDownExit ? (room.HasDrop ? "v" : "|") : " ") + " ");
                 }
             }
             sb.Append('\n');

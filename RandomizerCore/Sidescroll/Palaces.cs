@@ -124,7 +124,7 @@ public class Palaces
             do
             {
                 palace = palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
-            } while (!palace.IsValid);
+            } while (!palace.IsValid || palace.HasInescapableDrop());
 
             if(palace.GetPalaceGroup() == 1)
             {

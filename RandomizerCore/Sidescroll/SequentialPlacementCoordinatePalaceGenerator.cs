@@ -50,7 +50,11 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
             if(openCoords.Count == 0 || stallCount++ >= STALL_LIMIT)
             {
                 palace.IsValid = false;
-                stallFailureCounts[palaceNumber - 1]++;
+                if(stallCount++ >= STALL_LIMIT)
+                {
+                    //Debug.WriteLine(palace.GetLayoutDebug());
+                    stallFailureCounts[palaceNumber - 1]++;
+                }
                 return palace;
             }
             Room? newRoom = roomPool.NormalRooms.Sample(r);
