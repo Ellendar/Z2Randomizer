@@ -74,6 +74,7 @@ namespace CommandLine
             configuration.RemoveFlashing = playerOptions.RemoveFlashingUponDeath;
             configuration.UpAOnController1 = playerOptions.RemapUpAToUpSelect;
             configuration.Tunic = playerOptions.TunicColor;
+            configuration.TunicOutline = playerOptions.TunicOutlineColor;
             configuration.ShieldTunic = playerOptions.ShieldTunicColor;
             configuration.DisableMusic = playerOptions.DisableMusic;
             configuration.RandomizeMusic = playerOptions.RandomizeMusic;

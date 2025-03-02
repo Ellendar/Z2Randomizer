@@ -9,6 +9,7 @@
   "DisableHUDLag": true,
   "Sprite": "Link",
   "TunicColor": "Default",
+  "TunicOutlineColor": "Default",
   "ShieldTunicColor": "Default",
   "BeamSprite": "Default",
   "BeepThreshold": "Normal",

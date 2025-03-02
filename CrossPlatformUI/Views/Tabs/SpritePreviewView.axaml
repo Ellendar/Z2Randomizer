@@ -29,7 +29,10 @@
             <ComboBox assists:ComboBoxAssist.Label="Tunic Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
                       SelectedItem="{Binding TunicColor, Converter={x:Static ui:Util.EnumConvert}}" />
-            <ComboBox assists:ComboBoxAssist.Label="Shield Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+			<ComboBox assists:ComboBoxAssist.Label="Tunic Outline Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
+                      SelectedItem="{Binding OutlineColor, Converter={x:Static ui:Util.EnumConvert}}" />
+			<ComboBox assists:ComboBoxAssist.Label="Shield Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
                       SelectedItem="{Binding ShieldColor, Converter={x:Static ui:Util.EnumConvert}}" />
             <ComboBox assists:ComboBoxAssist.Label="Beam Sprite" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"

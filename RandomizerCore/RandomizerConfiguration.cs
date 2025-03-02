@@ -184,6 +184,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private CharacterSprite sprite;
     private string spriteName;
     private CharacterColor tunic;
+    private CharacterColor tunicOutline;
     private CharacterColor shieldTunic;
     private BeamSprites beamSprite;
     private bool useCustomRooms;
@@ -1000,6 +1001,13 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
+    public CharacterColor TunicOutline
+    {
+        get => tunicOutline;
+        set => SetField(ref tunicOutline, value);
+    }
+
+    [IgnoreInFlags]
     public CharacterColor ShieldTunic
     {
         get => shieldTunic;
@@ -1145,6 +1153,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             throw new ImpossibleException();
         }
         Tunic = CharacterColor.Default;
+        TunicOutline = CharacterColor.Default;
         ShieldTunic = CharacterColor.Default;
         BeamSprite = BeamSprites.DEFAULT;
         UseCustomRooms = false;
@@ -1827,6 +1836,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
         properties.TunicColor = Tunic;
+        properties.OutlineColor = TunicOutline;
         properties.ShieldColor = ShieldTunic;
         properties.UpAC1 = UpAOnController1;
         properties.RemoveFlashing = RemoveFlashing;
