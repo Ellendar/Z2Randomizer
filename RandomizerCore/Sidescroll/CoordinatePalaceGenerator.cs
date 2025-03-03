@@ -126,6 +126,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                     if (props.BossRoomConnect && palace.Number < 7)
                     {
                         palace.BossRoom.HasRightExit = true;
+                        palace.BossRoom.AdjustContinuingBossRoom();
                     }
                     palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
                     break;
