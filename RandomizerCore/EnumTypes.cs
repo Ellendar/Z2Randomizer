@@ -243,6 +243,19 @@ public static class PalaceStyleExtensions
     }
 }
 
+[DefaultValue(OVERWORLD)]
+public enum BossRoomsExitType
+{
+    [Description("Overworld")]
+    OVERWORLD,
+    [Description("More Palace")]
+    PALACE,
+    [Description("Random(All Same)")]
+    RANDOM_ALL,
+    [Description("Random(Per Palace)")]
+    RANDOM_PER_PALACE
+}
+
 [DefaultValue(VANILLA)]
 public enum Biome
 {
@@ -564,6 +577,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }  = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
+    public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
+
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
     public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
