@@ -546,6 +546,21 @@ public class Room : IJsonOnDeserialized
         }
     }
 
+    public void AdjustContinuingBossRoom()
+    {
+        const byte statueId = 0x09; // Iron Knuckle statue map command ID
+        const byte statueXpos = 62;
+        const byte statueYpos = 9;
+
+        SideViewEditable edit = new SideViewEditable(SideView);
+        SideViewMapCommand? statue = edit.Find(o => o.Id == statueId && o.AbsX == statueXpos && o.Y == statueYpos);
+        if (statue != null)
+        {
+            edit.Remove(statue);
+            SideView = edit.Finalize();
+        }
+    }
+
     public string Debug()
     {
         StringBuilder sb = new();

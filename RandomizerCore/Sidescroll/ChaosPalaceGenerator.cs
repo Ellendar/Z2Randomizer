@@ -42,6 +42,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         if (props.BossRoomConnect)
         {
             palace.BossRoom.HasRightExit = true;
+            palace.BossRoom.AdjustContinuingBossRoom();
         }
 
         if (palaceNumber < 7)
