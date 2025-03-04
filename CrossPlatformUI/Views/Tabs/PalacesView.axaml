@@ -67,8 +67,10 @@
                       Checked="NoDuplicateRoomsByEnemiesChecked" 
                       Content="No Duplicate Rooms (By Layout/Enemies)" />
             <CheckBox IsChecked="{Binding Config.BlockingRoomsInAnyPalace}" Content="Blocking Rooms In Any Palace" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.BossRoomsExitToPalace}" Content="Boss Rooms Exit To Palace" />
-            <CheckBox IsChecked="{Binding Config.HardBosses}" Content="Harder Carock" />
+			<ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="Boss Rooms Exit To" Theme="{StaticResource MaterialOutlineComboBox}"
+		              ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomsExitTypeList}}"
+		              SelectedItem="{Binding Config.BossRoomsExitType, Converter={x:Static ui:Util.EnumConvert}}" />
+			<CheckBox IsChecked="{Binding Config.HardBosses}" Content="Harder Carock" />
         </StackPanel>
     </Grid>
 </UserControl>

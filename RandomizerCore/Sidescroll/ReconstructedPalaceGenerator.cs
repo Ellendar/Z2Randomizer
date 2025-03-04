@@ -78,7 +78,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     palace.ItemRoom.PalaceGroup = palaceGroup;
                     palace.AllRooms.Add(palace.ItemRoom);
 
-                    if (props.BossRoomConnect)
+                    if (props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
                     {
                         palace.BossRoom.HasRightExit = true;
                         palace.BossRoom.AdjustContinuingBossRoom();

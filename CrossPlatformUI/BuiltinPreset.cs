@@ -49,7 +49,7 @@ public static class BuiltinPreset
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
-        BossRoomsExitToPalace = false,
+        BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
 
         //Levels
@@ -152,7 +152,7 @@ public static class BuiltinPreset
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
-        BossRoomsExitToPalace = true,
+        BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = false,
         NoDuplicateRoomsByEnemies = true,
         BlockingRoomsInAnyPalace = true,
@@ -268,7 +268,7 @@ public static class BuiltinPreset
         RestartAtPalacesOnGameOver = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
-        BossRoomsExitToPalace = true,
+        BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = false,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
