@@ -106,7 +106,7 @@ public class RandomizerProperties
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
-    public bool BossRoomConnect { get; set; }
+    public BossRoomsExitType[] BossRoomsExits { get; set; } = new BossRoomsExitType[6];
     public bool NoDuplicateRooms { get; set; }
     public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }

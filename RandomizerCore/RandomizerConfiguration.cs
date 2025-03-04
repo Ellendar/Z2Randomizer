@@ -95,7 +95,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool? includev40Rooms;
     private bool? includev44Rooms;
     private bool blockingRoomsInAnyPalace;
-    private bool? bossRoomsExitToPalace;
+    private BossRoomsExitType bossRoomsExitType;
     private bool? birdRequired;
     private bool removeTBird;
     private bool restartAtPalacesOnGameOver;
@@ -438,10 +438,10 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         set => SetField(ref blockingRoomsInAnyPalace, value);
     }
 
-    public bool? BossRoomsExitToPalace
+    public BossRoomsExitType BossRoomsExitType
     {
-        get => bossRoomsExitToPalace;
-        set => SetField(ref bossRoomsExitToPalace, value);
+        get => bossRoomsExitType;
+        set => SetField(ref bossRoomsExitType, value);
     }
 
     public bool? TBirdRequired
@@ -1652,7 +1652,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
         {
-            PalaceStyle style = r.Next(4) switch
+            PalaceStyle style = r.Next(5) switch
             {
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
@@ -1670,7 +1670,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         {
             for (int i = 0; i < 6; i++)
             {
-                PalaceStyle style = r.Next(4) switch
+                PalaceStyle style = r.Next(5) switch
                 {
                     0 => PalaceStyle.VANILLA,
                     1 => PalaceStyle.SHUFFLED,
@@ -1713,7 +1713,41 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
 
         properties.BlockersAnywhere = BlockingRoomsInAnyPalace;
-        properties.BossRoomConnect = BossRoomsExitToPalace ?? GetIndeterminateFlagValue(r); ;
+
+        if (BossRoomsExitType == BossRoomsExitType.RANDOM_ALL)
+        {
+            BossRoomsExitType option = r.Next(2) switch
+            {
+                0 => BossRoomsExitType.OVERWORLD,
+                1 => BossRoomsExitType.PALACE,
+                _ => throw new Exception("Invalid BossRoomsExit")
+            };
+            for (int i = 0; i < 6; i++)
+            {
+                properties.BossRoomsExits[i] = option;
+            }
+        }
+        else if (BossRoomsExitType == BossRoomsExitType.RANDOM_PER_PALACE)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                BossRoomsExitType option = r.Next(2) switch
+                {
+                    0 => BossRoomsExitType.OVERWORLD,
+                    1 => BossRoomsExitType.PALACE,
+                    _ => throw new Exception("Invalid BossRoomsExit")
+                };
+                properties.BossRoomsExits[i] = option;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                properties.BossRoomsExits[i] = BossRoomsExitType;
+            }
+        }
+
         properties.NoDuplicateRooms = NoDuplicateRoomsByEnemies;
         properties.NoDuplicateRoomsBySideview = NoDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = GeneratorsAlwaysMatch;
