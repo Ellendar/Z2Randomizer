@@ -552,7 +552,7 @@ public class Room : IJsonOnDeserialized
         const byte statueXpos = 62;
         const byte statueYpos = 9;
 
-        SideViewEditable edit = new SideViewEditable(SideView);
+        SideviewEditable edit = new SideviewEditable(SideView);
         SideViewMapCommand? statue = edit.Find(o => o.Id == statueId && o.AbsX == statueXpos && o.Y == statueYpos);
         if (statue != null)
         {
