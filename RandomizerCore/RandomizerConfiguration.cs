@@ -1652,7 +1652,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
         {
-            PalaceStyle style = r.Next(4) switch
+            PalaceStyle style = r.Next(5) switch
             {
                 0 => PalaceStyle.VANILLA,
                 1 => PalaceStyle.SHUFFLED,
@@ -1670,7 +1670,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         {
             for (int i = 0; i < 6; i++)
             {
-                PalaceStyle style = r.Next(4) switch
+                PalaceStyle style = r.Next(5) switch
                 {
                     0 => PalaceStyle.VANILLA,
                     1 => PalaceStyle.SHUFFLED,
