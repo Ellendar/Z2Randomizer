@@ -14238,7 +14238,7 @@
     "palaceNumber": 1,
     "requirements": [
     ],
-    "sideviewData": "32600E08DE08208AA120F111A22221C7F211A221F2112088A22221C7F211A220D20E8405DA08A34992454103D80E80219009"
+    "sideviewData": "30600E08DE08208AA120F111A22221C7F211A221F2112088A22221C7F211A220D20E8405DA08A34992454103D80E9009"
   },
   {
     "author": "valence",
@@ -14657,7 +14657,7 @@
     "palaceNumber": 1,
     "requirements": [
     ],
-    "sideviewData": "22600E08E100D008208F23C829C891B1D30E8405DC08A34992454103D80E80219009"
+    "sideviewData": "20600E08E100D008208F23C829C891B1D30E8405DC08A34992454103D80E9009"
   },
   {
     "author": "aaron2u2",
@@ -15178,7 +15178,7 @@
     "palaceNumber": 2,
     "requirements": [
     ],
-    "sideviewData": "24600E08E100D008208FF21050C5FB1050C5D30E8405DC08A34992454103D80E80219009"
+    "sideviewData": "22600E08E100D008208FF21050C5FB1050C5D30E8405DC08A34992454103D80E9009"
   },
   {
     "author": "Ellendar",
@@ -16409,7 +16409,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "056C6166D4",
-    "sideviewData": "28600E08E100D00D708673C3D4001081D20D708673C3D40E8405DC08A34992454103D80E80219009",
+    "sideviewData": "26600E08E100D00D708673C3D4001081D20D708673C3D40E8405DC08A34992454103D80E9009",
     "hasBoss": true,
     "isBossRoom": true,
     "name": "aaron jam 4_4 Curtian gooma room",
@@ -17934,7 +17934,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "076B6266D47845",
-    "sideviewData": "22600E08E100D008208F23C8950924C8D40E8405DC08A34992454103D80E80219009",
+    "sideviewData": "20600E08E100D008208F23C8950924C8D40E8405DC08A34992454103D80E9009",
     "hasBoss": true,
     "isBossRoom": true,
     "name": "aaron jam 4_4 P4_M28 - Magic jar carock room",
