@@ -130,7 +130,7 @@ class SideviewEditable
                 int xDiff = o.AbsX - xCursor;
                 if (xDiff > 15) // create new "x skip" command
                 {
-                    SideViewMapCommand xSkip = new SideViewMapCommand(xDiff / 16, 0xE, 0);
+                    SideViewMapCommand xSkip = new(xDiff / 16, 0xE, 0);
                     Commands.Insert(i, xSkip);
                     i++;
                     xDiff = xDiff & 0xF;
@@ -140,7 +140,10 @@ class SideviewEditable
             xCursor = o.AbsX;
             i++;
         }
-        byte[] bytes = header.Concat(Commands.SelectMany(o => o.Bytes)).ToArray();
+        byte[] bytes = [
+            .. header, 
+            .. Commands.SelectMany(o => o.Bytes)
+        ];
         bytes[0] = (byte)bytes.Length;
         return bytes;
     }
