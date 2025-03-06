@@ -13,14 +13,14 @@ namespace RandomizerCore.Sidescroll;
 //these will be very useful for the future (as well as just being easier to read)
 
 /// <summary>
-/// Holds a list of <see cref="SideViewMapCommand"/>s in order to allow programmatically editing a room. 
+/// Holds a list of <see cref="SideviewMapCommand"/>s in order to allow programmatically editing a room. 
 /// 
 /// <see cref="Finalize"/> must be called after editing to retrieve the updated bytes for the room.
 /// </summary>
 class SideviewEditable
 {
     private byte[] header;
-    public List<SideViewMapCommand> Commands { get; set; } 
+    public List<SideviewMapCommand> Commands { get; set; } 
 
     /// <summary>
     /// Create a SideViewEditable from an array of bytes for a side view.
@@ -33,7 +33,7 @@ class SideviewEditable
             throw new Exception("SideView data has no header.");
         }
         header = bytes[0..4];
-        Commands = new List<SideViewMapCommand>();
+        Commands = new List<SideviewMapCommand>();
         int i = 4; // start after header
         int xcursor = 0;
         while (i < bytes.Length)
@@ -61,23 +61,23 @@ class SideviewEditable
             {
                 xcursor += firstByte & 0x0F;
             }
-            SideViewMapCommand o = new(objectBytes);
+            SideviewMapCommand o = new(objectBytes);
             o.AbsX = xcursor;
             Commands.Add(o);
         }
     }
 
-    public SideViewMapCommand? Find(Predicate<SideViewMapCommand> match)
+    public SideviewMapCommand? Find(Predicate<SideviewMapCommand> match)
     {
         return Commands.Find(match);
     }
 
-    public void Add(SideViewMapCommand command)
+    public void Add(SideviewMapCommand command)
     {
         Commands.Add(command);
     }
 
-    public void Remove(SideViewMapCommand item)
+    public void Remove(SideviewMapCommand item)
     {
         Commands.Remove(item);
     }
@@ -96,7 +96,7 @@ class SideviewEditable
         // they are easily re-created if needed
         while (i < Commands.Count)
         {
-            SideViewMapCommand o = Commands[i];
+            SideviewMapCommand o = Commands[i];
             if (o.Y == 0xE)
             {
                 Commands.RemoveAt(i);
@@ -124,13 +124,13 @@ class SideviewEditable
         int xCursor = 0;
         while (i < Commands.Count)
         {
-            SideViewMapCommand o = Commands[i];
+            SideviewMapCommand o = Commands[i];
             if (xCursor + o.RelX != o.AbsX)
             {
                 int xDiff = o.AbsX - xCursor;
                 if (xDiff > 15) // create new "x skip" command
                 {
-                    SideViewMapCommand xSkip = new(xDiff / 16, 0xE, 0);
+                    SideviewMapCommand xSkip = new(xDiff / 16, 0xE, 0);
                     Commands.Insert(i, xSkip);
                     i++;
                     xDiff = xDiff & 0xF;
