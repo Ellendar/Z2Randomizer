@@ -8,7 +8,7 @@ namespace RandomizerCore.Sidescroll;
 /// Map commands can be things like: defining floors, walls,
 /// decorative objects - everything that make up a palace room.
 /// </summary>
-public class SideviewMapCommand
+public class SideviewMapCommand<T> where T : Enum
 {
     /// <summary>
     /// The bytes making up the map command. The array must be 2 or 3 long.
@@ -35,7 +35,7 @@ public class SideviewMapCommand
         Array.Copy(data, Bytes, data.Length);
     }
 
-    public SideviewMapCommand(int x, int y, int id)
+    public SideviewMapCommand(int x, int y, T id)
     {
         Bytes = new byte[2];
         AbsX = x;
@@ -44,15 +44,23 @@ public class SideviewMapCommand
         Id = id;
     }
 
-    public SideviewMapCommand(int x, int y, int id, int extra)
+    public static SideviewMapCommand<T> CreateXSkip(int page)
     {
-        Debug.Assert(id == 15 && y < 13, "Illegal 3 byte map command");
-        Bytes = new byte[3];
-        AbsX = x;
-        RelX = x;
-        Y = y;
-        Id = id;
-        Extra = extra;
+        byte[] bytes = [(byte)(0xE0 + page), 0];
+        return new SideviewMapCommand<T>(bytes);
+    }
+
+    public static SideviewMapCommand<T> CreateCollectable(int x, int y, Collectable extra)
+    {
+        Debug.Assert(y < 13, "Collectable command must have y < 13");
+        byte[] bytes = new byte[3];
+        var obj = new SideviewMapCommand<T>(bytes);
+        obj.AbsX = x;
+        obj.RelX = x;
+        obj.Y = y;
+        obj.Bytes[1] = 0x0F;
+        obj.Extra = extra;
+        return obj;
     }
 
     /// <summary>
@@ -68,34 +76,115 @@ public class SideviewMapCommand
     /// Access the relative x position of the map command, the second 4 bits.
     /// </summary>
     public int RelX {
-        get { return (Bytes[0] & 0x0F); }
+        get { return Bytes[0] & 0x0F; }
         set { Bytes[0] = (byte)((Bytes[0] & 0xF0) + (value & 0x0F)); }
     }
 
     /// <summary>
     /// Access the second byte of the map command.
     /// </summary>
-    public int Id
+    public T Id
     {
-        get { return Bytes[1]; }
-        set { Bytes[1] = (byte)value; }
+        get { return (T)Enum.ToObject(typeof(T), (Bytes[1] < 0x10) ? Bytes[1] : (Bytes[1] & 0xF0)); }
+        set { Bytes[1] = Convert.ToByte(value); }
+    }
+
+    /// <summary>
+    /// Access the second 4 bits of the 2nd byte. Typically it's the length of platforms.
+    /// </summary>
+    public int Param
+    {
+        get
+        {
+            Debug.Assert(HasParam(), "This map command does not have a parameter.");
+            return Bytes[1] & 0x0F;
+        }
+        set
+        {
+            Debug.Assert(HasParam(), "This map command does not have a parameter.");
+            Bytes[1] = (byte)((Bytes[1] & 0xF0) + (value & 0x0F));
+        }
     }
 
     /// <summary>
     /// Access the third byte of the map command. This only exists
     /// for special cases like items that you can pick up.
     /// </summary>
-    public int Extra
+    public Collectable Extra
     {
         get
         {
-            Debug.Assert(Bytes.Length > 2, "This map command does not have the extra byte.");
-            return Bytes[2];
+            Debug.Assert(HasExtra(), "This map command does not have the extra byte.");
+            return (Collectable)Bytes[2];
         }
         set
         {
-            Debug.Assert(Bytes.Length > 2, "This map command does not have the extra byte.");
+            Debug.Assert(HasExtra(), "This map command does not have the extra byte.");
             Bytes[2] = (byte)value;
         }
+    }
+
+    public bool HasParam()
+    {
+        return (Bytes[1] & 0xF0) > 0;
+    }
+
+    public bool HasExtra()
+    {
+        return Bytes.Length > 2;
+    }
+
+    public bool IsItem()
+    {
+        return Bytes[1] == 0x0F && Y < 13 && HasExtra();
+    }
+
+    public bool IsNewFloor()
+    {
+        return Y == 13;
+    }
+
+    public bool IsXSkip()
+    {
+        return Y == 14;
+    }
+
+    public bool IsLava()
+    {
+        switch (this)
+        {
+            case SideviewMapCommand<PalaceObject>:
+            case SideviewMapCommand<GreatPalaceObject>:
+                return Y == 15 && (Bytes[1] & 0xF0) == 0x10;
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    public bool IsElevator()
+    {
+        return Y == 15 && (Bytes[1] & 0xF0) == 0x50;
+    }
+
+    public String DebugString()
+    {
+        var bytes = Convert.ToHexString(Bytes);
+        var idString = Enum.GetName(typeof(T), Id);
+        if (IsNewFloor())
+        {
+            return $"{bytes,-6}  {AbsX,2}     {"NewFloor",-26}{Bytes[1]}";
+        }
+        if (IsXSkip())
+        {
+            return $"{bytes,-6}         XSkip";
+        }
+        if (IsLava()) { idString = "Lava"; }
+        if (IsElevator()) { idString = "Elevator"; }
+        var param = HasParam() ? $"{Param}" : "";
+        if (HasExtra())
+        {
+            param = Enum.GetName(typeof(Collectable), Extra);
+        }
+        return $"{bytes,-6}  {AbsX,2},{Y,2}  {idString,-26}{param}";
     }
 }
