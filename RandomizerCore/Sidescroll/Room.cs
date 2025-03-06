@@ -718,25 +718,26 @@ public class Room : IJsonOnDeserialized
     public List<(int, int)> GetOpenExitCoords()
     {
         List<(int, int)> exitCoords = [];
+        var (x, y) = coords;
         if (coords == (0, 0) && !IsRoot)
         {
             throw new Exception("Uninitialized coordinates referenced in coordinate palace generation");
         }
         if (HasLeftExit && Left == null)
         {
-            exitCoords.Add((coords.Item1 - 1, coords.Item2));
+            exitCoords.Add((x - 1, y));
         }
         if (HasRightExit && Right == null)
         {
-            exitCoords.Add((coords.Item1 + 1, coords.Item2));
+            exitCoords.Add((x + 1, y));
         }
         if (HasUpExit && Up == null)
         {
-            exitCoords.Add((coords.Item1, coords.Item2 + 1));
+            exitCoords.Add((x, y + 1));
         }
         if (HasDownExit && Down == null)
         {
-            exitCoords.Add((coords.Item1, coords.Item2 - 1));
+            exitCoords.Add((x, y - 1));
         }
 
         return exitCoords;

@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FtRandoLib.Importer;
 using js65;
+using Microsoft.ClearScript;
 using NLog;
 using RandomizerCore.Overworld;
 using RandomizerCore.Sidescroll;
@@ -373,10 +374,15 @@ public class Hyrule
                     ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
                     await testRom.ApplyAsm(validationEngine); //.Wait(ct);
                 }
-                catch (Exception e)
+                catch (ScriptEngineException e)
                 {
-                    logger.Debug(e, "Room packing failed. Retrying.");
-                    continue;
+                    if (e.ErrorDetails.Contains("Could not find space for"))
+                    {
+                        logger.Debug(e, "Room packing failed. Retrying.");
+                        continue;
+                    }
+                    logger.Error(e, "Failed to build assembly patches");
+                    throw;
                 }
                 passedValidation = true;
                 assembler.Add(sideview_module);
