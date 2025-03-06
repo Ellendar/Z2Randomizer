@@ -365,13 +365,13 @@ public class Hyrule
 
                 try
                 {
-                    validationEngine.Add(sideview_module);
-                    validationEngine.Add(gp_sideview_module);
                     ROM testRom = new(ROMData);
                     //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
                     //be tested here, but we don't actually know what they will be until later, for now i'm just
                     //testing with the vanilla text, but this could be an issue down the line.
                     ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
+                    validationEngine.Add(sideview_module);
+                    validationEngine.Add(gp_sideview_module);
                     await testRom.ApplyAsm(validationEngine); //.Wait(ct);
                 }
                 catch (ScriptEngineException e)

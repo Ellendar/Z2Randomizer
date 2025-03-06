@@ -817,6 +817,8 @@ KeyDoorYPosition = $075e ; just a piece of unused ram afaict
 .org $813D
 .word KeyDoorCustomPositionPRG4
 .word KeyDoorCustomPositionPRG4 ; its in the item table twice for reasons i don't know
+
+.segment "PRG4", "PRG7"
 .reloc
 KeyDoorCustomPositionPRG4:
     lda ObjectYPositionData
@@ -829,6 +831,8 @@ KeyDoorCustomPositionPRG4:
 .segment "PRG5"
 .org $813D
 .word KeyDoorCustomPositionPRG5
+
+.segment "PRG5", "PRG7"
 .reloc
 KeyDoorCustomPositionPRG5:
     lda ObjectYPositionData
