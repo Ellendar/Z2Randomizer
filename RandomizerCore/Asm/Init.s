@@ -34,6 +34,10 @@
 ; FREE "PRG0" [$AA40, $c000)
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
+; $b480 is where the new map data is written for the overworlds
+FREE "PRG1" [$A933, $b480)
+FREE "PRG2" [$A933, $b480)
+
 FREE "PRG3" [$B803, $c000)
 
 FREE "PRG4" [$83DC, $8470)
@@ -87,7 +91,3 @@ FREE "PRG7" [$f3d0, $fcfb) ; allow code in the ganon laugh sfx but not the hurt 
 
 ; Most of bank 1f is reserved for z2ft
 FREE "PRG1F" [$ff80, $ffe8)
-
-nmi = $c07b
-
-.export nmi

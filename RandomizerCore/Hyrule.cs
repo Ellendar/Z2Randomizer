@@ -2295,8 +2295,9 @@ public class Hyrule
             rom.Put(0x17b18, 0x20); //Child
         }
 
-        rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.randomizer_text.chr"));
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite);
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -3822,6 +3823,7 @@ FREE_UNTIL $c2ca
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
         rom.ChangeMapperToMMC5(engine);
+        rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
         FullItemShuffle(engine, GetNonSideviewItemLocations());

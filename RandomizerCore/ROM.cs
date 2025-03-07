@@ -327,6 +327,121 @@ public class ROM
         }
     }
 
+    public void AddRandomizerToTitle(Assembler asm)
+    {
+        // This is just updating the macro commands used to draw the title screen tiles
+        // The actual tile data will be imported into the rom data later
+        asm.Module().Code("""
+.macpack common
+.segment "PRG5"
+
+VERTICAL = $80
+REPEAT = $40
+
+; When looping the title screen, the game will draw this part in 7 different chunks
+; so we need to update the hardcoded sizes of the chunks here and fit in one more line
+
+; Free the locations of the vanilla table and relocate them to fit the extra line
+FREE "PRG5" [$AEE7, $AEEE)
+FREE "PRG5" [$AB5F, $AB6D)
+
+; Update the vanilla table pointers
+.org $AE76
+    lda TitleLineTable,x
+    sta $00
+    lda TitleLineTable+1,x
+
+.org $AEF0
+    ldy TitleLineLenTable,x
+
+.org $AE9F
+    lda $34
+    cmp #$08
+
+.reloc
+TitleLineLenTable:
+.byte Line1 - Line0
+.byte Line2 - Line1
+.byte Line3 - Line2
+.byte Line4 - Line3
+.byte Line5 - Line4
+.byte Line6 - Line5
+.byte Line7 - Line6
+.byte TitleEnd - Line7
+
+.reloc
+TitleLineTable:
+.word (Line0)
+.word (Line1)
+.word (Line2)
+.word (Line3)
+.word (Line4)
+.word (Line5)
+.word (Line6)
+.word (Line7)
+
+.org $af69
+
+Line0:
+; ZELDA II
+.byte $22, $4c, 8 ; Write 8 bytes to $224c
+.byte $00, $01, $02, $03, $04, $05, $06, $07
+; setup the attributes for the right hand size
+.byte $23,$E0,REPEAT | 16,$00
+.byte $23,$E7,1,$cc
+; .byte $23,$E8,REPEAT | 7,$00
+.byte $23,$EF,1,$cc
+.byte $23,$f0,REPEAT | 16,$00
+.byte $23,$f7,1,$cc
+;.byte $23,$f8,REPEAT | 7,$00
+.byte $23,$ff,1,$cc
+
+
+Line1:
+; RANDOMIZER
+.byte $22, $6a, 12 ; Write 12 bytes to $226a
+; skipping over $0e since its the copyright symbol used at the end
+.byte $08, $09, $0a, $0b, $0c, $0d, $0f, $10, $11, $12, $13, $14
+
+Line2:
+; THE ADVENTURE OF TOP
+.byte $22, $88, 17 ; Write 17 bytes to $2288
+.byte $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f, $20, $21, $22, $23, $24, $25 ; Top
+
+
+Line3:
+; THE ADVENTURE OF BOT
+.byte $22, $a7, 18 ; Write 18 bytes to $22a7
+.byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
+
+Line4:
+; LINK(TM)
+.byte $22, $ca, 14 ; Write 14 bytes to $22a7
+.byte $38, $39, $3a, $f4, $3b, $3c, $39, $3d, $39, $3e, $3f, $40, $41, $42
+
+Line5:
+.byte $22, $ea, 13 ; Write 13 bytes to $22ea
+.byte $43, $44, $45, $f4, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e
+Line6:
+.byte $23, $09, 15 ; Write 15 bytes to $2309
+.byte $4f, $50, $51, $52, $53, $54, $55, $56, $57, $54, $58, $59, $5a, $5b, $5c
+Line7:
+.byte $23, $29, 15 ; Write 15 bytes to $2329
+.byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
+TitleEnd:
+
+; Add some filler commands to take up the rest of the space
+.byte $23, $40, $b02e - TitleEnd-3-4
+.repeat $b02e - TitleEnd-3-4
+    .byte $f4
+.endrepeat
+
+.byte $20,$1F,VERTICAL | REPEAT | $1f,$FD
+
+.assert * = $b02e
+""", "randomizer_title_text.s");
+    }
+
     public void ApplyIps(byte[] patch, bool expandRom = false)
     {
         IpsPatcher.Patch(rawdata, patch, expandRom);
