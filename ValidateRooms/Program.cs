@@ -13,7 +13,7 @@ void ValidateRoomsForFile(string filename)
     var json = RandomizerCore.Util.ReadAllTextFromFile(filename);
     var palaceRooms = JsonSerializer.Deserialize(json, RoomSerializationContext.Default.ListRoom);
 
-    foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber != 7))
+    foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber != 7 && !r.SuppressValidation))
     {
         var name = room.Name.Length > 0 ? room.Name : Convert.ToHexString(room.SideView);
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
@@ -95,6 +95,14 @@ void ValidateRoomsForFile(string filename)
         {
             sb.AppendLine($"{name}: ElevatorScreen={room.ElevatorScreen} but room has no elevator");
         }
+        if (room.ElevatorScreen == -1 && elevators.Count == 0 && room.HasUpExit)
+        {
+            sb.AppendLine($"{name}: Room has no elevator but is marked as having an up exit");
+        }
+        if (room.ElevatorScreen == -1 && elevators.Count == 0 && dropTiles.Count == 0 && room.HasDownExit)
+        {
+            sb.AppendLine($"{name}: Room has no elevator or drop but is marked as having a down exit");
+        }
 
         if (dropTiles.Count > 0)
         {
@@ -108,7 +116,7 @@ void ValidateRoomsForFile(string filename)
         }
     }
 
-    foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber == 7))
+    foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber == 7 && !r.SuppressValidation))
     {
         var name = room.Name.Length > 0 ? room.Name : Convert.ToHexString(room.SideView);
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
@@ -159,9 +167,18 @@ void ValidateRoomsForFile(string filename)
                 sb.AppendLine($"{name}: Elevator.xpos={x} is close to page end");
             }
         }
+
         if (room.ElevatorScreen != -1 && elevators.Count == 0)
         {
             sb.AppendLine($"{name}: ElevatorScreen={room.ElevatorScreen} but room has no elevator");
+        }
+        if(room.ElevatorScreen == -1 && elevators.Count == 0 && room.HasUpExit)
+        {
+            sb.AppendLine($"{name}: Room has no elevator but is marked as having an up exit");
+        }
+        if (room.ElevatorScreen == -1 && elevators.Count == 0 && dropTiles.Count == 0 && room.HasDownExit)
+        {
+            sb.AppendLine($"{name}: Room has no elevator or drop but is marked as having a down exit");
         }
 
         if (dropTiles.Count > 0)

@@ -6048,7 +6048,7 @@
     "author": "winterSolstice",
     "bitmask": "0F",
     "connections": "67FCFCFC",
-    "elevatorScreen": 2,
+    "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0B075F504E778473D87B04",
     "group": "V4_0",
@@ -14813,7 +14813,8 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "21600009990F0181409040880597737271527770779077F8505225565455245554"
+    "sideviewData": "21600009990F0181409040880597737271527770779077F8505225565455245554",
+	"suppressValidation":true
   },
   {
     "author": "aaron2u2",
@@ -15536,7 +15537,7 @@
   {
     "author": "miralupa",
     "bitmask": "0F",
-    "connections": "FCFC5964",
+    "connections": "FCFCFF64",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "09036373DD749D0887",
@@ -16620,7 +16621,8 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false
+    "isUpDownReversed": false,
+	"suppressValidation": true
   },
   {
     "bitmask": "0F",
@@ -16995,7 +16997,8 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false
+    "isUpDownReversed": false,
+	"suppressValidation": true
   },
   {
     "bitmask": "0F",
@@ -17545,7 +17548,8 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false
+    "isUpDownReversed": false,
+	"suppressValidation": true
   },
   {
     "bitmask": "0F",
@@ -18902,10 +18906,10 @@
     "palaceGroup": null,
     "memoryAddress": 97790,
     "connections": "F01AFF08",
-    "hasDrop": true,
+    "hasDrop": false,
     "elevatorScreen": 0,
     "requirements": [],
-    "isDropZone": false,
+    "isDropZone": true,
     "hasItem": false,
     "enemies": "0B525A4B5D429A5A9D5E57",
     "sideviewData": "28600E08D280F550502160066106663790373B3340D3803343D3343340D3803343D364379037DF0E",
@@ -19376,7 +19380,7 @@
     "map": 23,
     "palaceGroup": null,
     "memoryAddress": 98124,
-    "connections": "5B6C00E8",
+    "connections": "5BFFFFE8",
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
