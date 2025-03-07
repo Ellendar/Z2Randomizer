@@ -50,6 +50,15 @@ public class SideviewMapCommand<T> where T : Enum
         return new SideviewMapCommand<T>(bytes);
     }
 
+    public static SideviewMapCommand<T> CreateNewFloor(int x, int param)
+    {
+        byte[] bytes = [(byte)0xD0, (byte)param];
+        var obj = new SideviewMapCommand<T>(bytes);
+        obj.RelX = x;
+        obj.AbsX = x;
+        return obj;
+    }
+
     public static SideviewMapCommand<T> CreateCollectable(int x, int y, Collectable extra)
     {
         Debug.Assert(y < 13, "Collectable command must have y < 13");
@@ -164,6 +173,23 @@ public class SideviewMapCommand<T> where T : Enum
     public bool IsElevator()
     {
         return Y == 15 && (Bytes[1] & 0xF0) == 0x50;
+    }
+
+    public bool IsFloorSolidAt(int y)
+    {
+        Debug.Assert(IsNewFloor());
+        var floorByte = Bytes[1];
+        if ((floorByte & 0xf) == 0xf) { return true; }        // 0f = complete wall
+        if (y == 0) { return (floorByte & 0b10000000) == 0; } // 8th bit is the ceiling
+        if (y > 10) { return true; }                          // bottom 2 rows are always floor
+        if ((floorByte & 0b1000) == 0)                        // 4th bit branches logic
+        {
+            return y > 10 - (floorByte & 0b0111);
+        }
+        else
+        {
+            return y < (floorByte & 0b0111) + 2;
+        }
     }
 
     public String DebugString()
