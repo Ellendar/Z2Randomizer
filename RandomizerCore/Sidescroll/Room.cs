@@ -548,12 +548,12 @@ public class Room : IJsonOnDeserialized
 
     public void AdjustContinuingBossRoom()
     {
-        const byte statueId = 0x09; // Iron Knuckle statue map command ID
+        const PalaceObject statueId = PalaceObject.IronknuckleStatue;
         const byte statueXpos = 62;
         const byte statueYpos = 9;
 
-        SideviewEditable edit = new SideviewEditable(SideView);
-        SideViewMapCommand? statue = edit.Find(o => o.Id == statueId && o.AbsX == statueXpos && o.Y == statueYpos);
+        var edit = new SideviewEditable<PalaceObject>(SideView);
+        var statue = edit.Find(o => o.Id == statueId && o.AbsX == statueXpos && o.Y == statueYpos);
         if (statue != null)
         {
             edit.Remove(statue);
@@ -718,25 +718,26 @@ public class Room : IJsonOnDeserialized
     public List<(int, int)> GetOpenExitCoords()
     {
         List<(int, int)> exitCoords = [];
+        var (x, y) = coords;
         if (coords == (0, 0) && !IsRoot)
         {
             throw new Exception("Uninitialized coordinates referenced in coordinate palace generation");
         }
         if (HasLeftExit && Left == null)
         {
-            exitCoords.Add((coords.Item1 - 1, coords.Item2));
+            exitCoords.Add((x - 1, y));
         }
         if (HasRightExit && Right == null)
         {
-            exitCoords.Add((coords.Item1 + 1, coords.Item2));
+            exitCoords.Add((x + 1, y));
         }
         if (HasUpExit && Up == null)
         {
-            exitCoords.Add((coords.Item1, coords.Item2 + 1));
+            exitCoords.Add((x, y + 1));
         }
         if (HasDownExit && Down == null)
         {
-            exitCoords.Add((coords.Item1, coords.Item2 - 1));
+            exitCoords.Add((x, y - 1));
         }
 
         return exitCoords;

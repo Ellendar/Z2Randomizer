@@ -55,34 +55,17 @@ for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
         }
 
         bool hasItem = false;
-        int currentX = 0;
         int elevatorScreen = -1;
-        for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
+        try
         {
-            int xAdvance = sideView[sideviewIndex] & 0x0F;
-            int yPos = sideView[sideviewIndex] & 0xF0;
-            yPos >>= 4;
-            //item
-            if(sideviewIndex == sideView.Length - 1)
-            {
-                Console.WriteLine("Malformed room breaks parsing. Group: " + palaceGroup + " Map: " + map);
-                break;
-            }
-            if (yPos < 13 && sideView[sideviewIndex + 1] == 0x0F)
-            {
-                int collectableIndex = sideView[sideviewIndex + 2];
-                sideviewIndex++;
-                if (collectableIndex <= 0x07)
-                {
-                    hasItem = true;
-                }
-            }
-            //elevator
-            else if (sideView[sideviewIndex + 1] == 0x50)
-            {
-               elevatorScreen = currentX >> 4;
-            }
-            currentX += xAdvance;
+            SideviewEditable<PalaceObject> sideviewEditable = new(sideView);
+            hasItem = sideviewEditable.HasItem();
+            var elevator = sideviewEditable.Find(o => o.IsElevator());
+            if (elevator != null) { elevatorScreen = elevator.AbsX / 16; }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Malformed room breaks parsing. Group: " + palaceGroup + " Map: " + map);
         }
 
         r = new Room

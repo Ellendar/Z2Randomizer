@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FtRandoLib.Importer;
 using js65;
+using Microsoft.ClearScript;
 using NLog;
 using RandomizerCore.Overworld;
 using RandomizerCore.Sidescroll;
@@ -364,19 +365,24 @@ public class Hyrule
 
                 try
                 {
-                    validationEngine.Add(sideview_module);
-                    validationEngine.Add(gp_sideview_module);
                     ROM testRom = new(ROMData);
                     //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
                     //be tested here, but we don't actually know what they will be until later, for now i'm just
                     //testing with the vanilla text, but this could be an issue down the line.
                     ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
+                    validationEngine.Add(sideview_module);
+                    validationEngine.Add(gp_sideview_module);
                     await testRom.ApplyAsm(validationEngine); //.Wait(ct);
                 }
-                catch (Exception e)
+                catch (ScriptEngineException e)
                 {
-                    logger.Debug(e, "Room packing failed. Retrying.");
-                    continue;
+                    if (e.ErrorDetails.Contains("Could not find space for"))
+                    {
+                        logger.Debug(e, "Room packing failed. Retrying.");
+                        continue;
+                    }
+                    logger.Error(e, "Failed to build assembly patches");
+                    throw;
                 }
                 passedValidation = true;
                 assembler.Add(sideview_module);

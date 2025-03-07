@@ -89,7 +89,7 @@ public class Palace
     public bool HasDeadEnd()
     {
 
-        List<Room> dropExits = AllRooms.Where(i => i.HasDownExit && i.HasDrop).ToList();
+        List<Room> dropExits = AllRooms.Where(i => i is { HasDownExit: true, HasDrop: true }).ToList();
         if (dropExits.Count == 0 || dropExits.Any(i => i.Down == null))
         {
             return false;
@@ -101,35 +101,30 @@ public class Palace
             {
                 continue;
             }
-            List<Room> reachable = [];
-            List<Room> roomsToCheck = [];
+            HashSet<Room> reachable = [];
+            Stack<Room> roomsToCheck = [];
             reachable.Add(r.Down);
-            roomsToCheck.Add(r.Down);
+            roomsToCheck.Push(r.Down);
 
             while (roomsToCheck.Count > 0)
             {
-                Room c = roomsToCheck[0];
-                if (c.Left != null && !reachable.Contains(c.Left))
+                Room c = roomsToCheck.Pop();
+                if (c.Left != null && reachable.Add(c.Left))
                 {
-                    reachable.Add(c.Left);
-                    roomsToCheck.Add(c.Left);
+                    roomsToCheck.Push(c.Left);
                 }
-                if (c.Right != null && !reachable.Contains(c.Right))
+                if (c.Right != null && reachable.Add(c.Right))
                 {
-                    reachable.Add(c.Right);
-                    roomsToCheck.Add(c.Right);
+                    roomsToCheck.Push(c.Right);
                 }
-                if (c.Up != null && !reachable.Contains(c.Up))
+                if (c.Up != null && reachable.Add(c.Up))
                 {
-                    reachable.Add(c.Up);
-                    roomsToCheck.Add(c.Up);
+                    roomsToCheck.Push(c.Up);
                 }
-                if (c.Down != null && !reachable.Contains(c.Down))
+                if (c.Down != null && reachable.Add(c.Down))
                 {
-                    reachable.Add(c.Down);
-                    roomsToCheck.Add(c.Down);
+                    roomsToCheck.Push(c.Down);
                 }
-                roomsToCheck.Remove(c);
             }
             if (!reachable.Contains(Entrance!) && !reachable.Contains(end))
             {
@@ -143,34 +138,32 @@ public class Palace
 
     private void CheckSpecialPaths(Room r)
     {
-        if (!r.IsBeforeTbird)
+        if (r.IsBeforeTbird) return;
+        if (Number == 7 && r.IsThunderBirdRoom)
         {
-            if ((Number == 7) && r.IsThunderBirdRoom)
-            {
-                r.IsBeforeTbird = true;
-                return;
-            }
-
             r.IsBeforeTbird = true;
-            if (r.Left != null)
-            {
-                CheckSpecialPaths(r.Left);
-            }
+            return;
+        }
 
-            if (r.Right != null)
-            {
-                CheckSpecialPaths(r.Right);
-            }
+        r.IsBeforeTbird = true;
+        if (r.Left != null)
+        {
+            CheckSpecialPaths(r.Left);
+        }
 
-            if (r.Up != null)
-            {
-                CheckSpecialPaths(r.Up);
-            }
+        if (r.Right != null)
+        {
+            CheckSpecialPaths(r.Right);
+        }
 
-            if (r.Down != null)
-            {
-                CheckSpecialPaths(r.Down);
-            }
+        if (r.Up != null)
+        {
+            CheckSpecialPaths(r.Up);
+        }
+
+        if (r.Down != null)
+        {
+            CheckSpecialPaths(r.Down);
         }
     }
 
@@ -187,45 +180,47 @@ public class Palace
                 return [Entrance];
             }
         }
-        List<Room> reachedRooms = [];
-        List<(Room, Direction)> roomsToCheck = [(Entrance, Direction.WEST)];
+        HashSet<Room> reachedRooms = [];
+        Stack<(Room, Direction)> roomsToCheck = [];
+        roomsToCheck.Push((Entrance, Direction.WEST));
         while (roomsToCheck.Count > 0)
         {
-            Room room = roomsToCheck.Last().Item1;
-            Direction originDirection = roomsToCheck.Last().Item2;
+            var (room, originDirection) = roomsToCheck.Peek();
             //For required thunderbird, you can't path backwards into tbird room
             if ((Number == 7 && room.IsThunderBirdRoom) 
                 || (Number < 7 && room.IsBossRoom))
             {
                 if (originDirection == Direction.EAST)
                 {
-                    return new Room[] { Entrance };
+                    return [Entrance];
                 }
             }
-            roomsToCheck.Remove(roomsToCheck.Last());
-            if (reachedRooms.Contains(room))
+            roomsToCheck.Pop();
+            
+            // This will return false if the room is already added, so then we go to the next room to check
+            if (!reachedRooms.Add(room))
             {
                 continue;
             }
-            reachedRooms.Add(room);
+
             if (room.Left != null && (originDirection != Direction.WEST || allowBacktracking))
             {
-                roomsToCheck.Add((room.Left, Direction.EAST));
+                roomsToCheck.Push((room.Left, Direction.EAST));
             }
 
             if (room.Right != null && (originDirection != Direction.EAST || allowBacktracking))
             {
-                roomsToCheck.Add((room.Right, Direction.WEST));
+                roomsToCheck.Push((room.Right, Direction.WEST));
             }
 
             if (room.Up != null && (originDirection != Direction.NORTH || allowBacktracking))
             {
-                roomsToCheck.Add((room.Up, Direction.SOUTH));
+                roomsToCheck.Push((room.Up, Direction.SOUTH));
             }
 
             if (room.Down != null && (originDirection != Direction.SOUTH || allowBacktracking))
             {
-                roomsToCheck.Add((room.Down, Direction.NORTH));
+                roomsToCheck.Push((room.Down, Direction.NORTH));
             }
         }
         return reachedRooms;
@@ -233,69 +228,65 @@ public class Palace
 
     public bool AllReachable(bool allowBacktracking = false)
     {
-        return !AllRooms.Any(i => !GetReachableRooms(allowBacktracking).Contains(i));
+        var reachableRooms = GetReachableRooms(allowBacktracking);
+        return AllRooms.All(i => reachableRooms.Contains(i));
     }
 
     private bool CanEnterBossFromLeft(Room b)
     {
-        List<Room> reachable = [];
-        List<Room> roomsToCheck = [];
+        HashSet<Room> reachable = [];
+        Stack<Room> roomsToCheck = [];
 
         Room Entrance = AllRooms.First(i => i.IsEntrance);
 
         if(Entrance.Down != null)
         {
             reachable.Add(Entrance.Down);
-            roomsToCheck.Add(Entrance.Down);
+            roomsToCheck.Push(Entrance.Down);
         }
 
         if (Entrance.Up != null)
         {
             reachable.Add(Entrance.Up);
-            roomsToCheck.Add(Entrance.Up);
+            roomsToCheck.Push(Entrance.Up);
         }
 
         if (Entrance.Right != null)
         {
             reachable.Add(Entrance.Right);
-            roomsToCheck.Add(Entrance.Right);
+            roomsToCheck.Push(Entrance.Right);
         }
 
         while (roomsToCheck.Count > 0)
         {
-            Room c = roomsToCheck[0];
-            if (c.Left != null && c.Left == b)
+            Room c = roomsToCheck.Pop();
+            if (c.Left is not null && c.Left == b)
             {
                 return true;
             }
-            if (c.Left != null && !reachable.Contains(c.Left))
+            if (c.Left is not null && reachable.Add(c.Left))
             {
-                reachable.Add(c.Left);
-                roomsToCheck.Add(c.Left);
+                roomsToCheck.Push(c.Left);
             }
-            if (c.Right != null && !reachable.Contains(c.Right) && c.Right != b)
+            if (c.Right is not null && c.Right != b && reachable.Add(c.Right))
             {
-                reachable.Add(c.Right);
-                roomsToCheck.Add(c.Right);
+                roomsToCheck.Push(c.Right);
             }
-            if (c.Up != null && !reachable.Contains(c.Up) && c.Up != b)
+            if (c.Up is not null && c.Up != b && reachable.Add(c.Up))
             {
-                reachable.Add(c.Up);
-                roomsToCheck.Add(c.Up);
+                roomsToCheck.Push(c.Up);
             }
-            if (c.Down != null && !reachable.Contains(c.Down) && c.Down != b)
+            if (c.Down is not null && c.Down != b && reachable.Add(c.Down))
             {
-                reachable.Add(c.Down);
-                roomsToCheck.Add(c.Down);
+                roomsToCheck.Push(c.Down);
             }
-            roomsToCheck.Remove(c);
         }
         return false;
     }
     public void ShuffleRooms(Random r)
     {
         List<Room> roomsWithUpExits = AllRooms.Where(i => i.HasUpExit).ToList();
-        List<Room> roomsWithDownExits = AllRooms.Where(i => i.HasDownExit && !i.HasDrop).ToList();
+        List<Room> roomsWithDownExits = AllRooms.Where(i => i is { HasDownExit: true, HasDrop: false }).ToList();
         List<Room> roomsWithLeftExits = AllRooms.Where(i => i.HasLeftExit).ToList();
         List<Room> roomsWithRightExits = AllRooms.Where(i => i.HasRightExit).ToList();
         List<Room> roomsWithDropExits = AllRooms.Where(i => i.HasDrop).ToList();
@@ -1014,14 +1005,15 @@ public class Palace
         //while the list is not empty
         while (dropZonesToCheck.Count > 0)
         {
-            List<Room> pendingRooms = [dropZonesToCheck[0]];
-            List<Room> coveredRooms = [];
-            Room initialDropZone = dropZonesToCheck[0];
+            Room initialDropZone = dropZonesToCheck.First();
+            Stack<Room> pendingRooms = [];
+            pendingRooms.Push(initialDropZone);
+            HashSet<Room> coveredRooms = [];
             bool found = false;
 
             while (pendingRooms.Count > 0)
             {
-                Room room = pendingRooms.First();
+                Room room = pendingRooms.Peek();
                 //if you find the entrance, remove and continue
                 if (room == Entrance)
                 {
@@ -1030,36 +1022,35 @@ public class Palace
                 }
                 //if you find another drop zone, remove it from the list, either it works together with this or they both fail
                 //either way we don't care
+                pendingRooms.Pop();
                 dropZonesToCheck.Remove(room);
-                if (coveredRooms.Contains(room))
+                if (!coveredRooms.Add(room))
                 {
-                    pendingRooms.Remove(room);
                     continue;
                 }
-                coveredRooms.Add(room);
-                pendingRooms.Remove(room);
+
                 //explore rooms
                 if (room.Left != null)
                 {
-                    pendingRooms.Add(room.Left);
+                    pendingRooms.Push(room.Left);
                 }
                 if (room.Right != null)
                 {
-                    pendingRooms.Add(room.Right);
+                    pendingRooms.Push(room.Right);
                 }
                 if (room.Up != null)
                 {
-                    pendingRooms.Add(room.Up);
+                    pendingRooms.Push(room.Up);
                 }
                 if (room.Down != null)
                 {
-                    pendingRooms.Add(room.Down);
+                    pendingRooms.Push(room.Down);
                 }
             }
             //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
-            if (found == false)
+            if (!found)
             {
-                //Debug.WriteLine(GetLayoutDebug());
+                Debug.WriteLine(GetLayoutDebug());
                 return true;
             }
         }
