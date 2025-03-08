@@ -616,27 +616,24 @@ public class Hyrule
 
     private void RandomizeAttackEffectiveness(ROM rom, AttackEffectiveness attackEffectiveness)
     {
+        byte[] attackValues = rom.GetBytes(0x1E67D, 8);
+        byte[] newAttackValueBytes = RandomizeAttackEffectiveness(RNG, attackValues, attackEffectiveness);
+        rom.Put(0x1E67D, newAttackValueBytes);
+    }
+
+    private static byte[] RandomizeAttackEffectiveness(Random RNG, byte[] attackValues, AttackEffectiveness attackEffectiveness)
+    {
         if (attackEffectiveness == AttackEffectiveness.OHKO)
         {
-            //This is a duplicate of a more advanced version in RandomizeEnemyStats()
-            /*
-            for (int i = 0; i < 8; i++)
-            {
-                ROMData.Put(0x1E67D + i, 192);
-            }*/
-            return;
+            // handled in RandomizeEnemyStats()
+            return attackValues;
         }
         if(attackEffectiveness == AttackEffectiveness.VANILLA)
         {
-            return;
-        }
-        int[] attackValues = new int[8];
-        for (int i = 0; i < 8; i++)
-        {
-            attackValues[i] = rom.GetByte(0x1E67D + i);
+            return attackValues;
         }
 
-        int[] newAttackValues = new int[8];
+        byte[] newAttackValues = new byte[8];
         for (int i = 0; i < 8; i++)
         {
             double minAtk = attackValues[i] - attackValues[i] * .333;
@@ -686,15 +683,9 @@ public class Hyrule
             {
                 throw new Exception("Invalid Attack Effectiveness");
             }
-
-            newAttackValues[i] = (int)attack;
+            newAttackValues[i] = (byte)attack;
         }
-
-
-        for (int i = 0; i < 8; i++)
-        {
-            rom.Put(0x1E67D + i, (byte)newAttackValues[i]);
-        }
+        return newAttackValues;
     }
 
     private void ShuffleItems()
@@ -1253,15 +1244,21 @@ public class Hyrule
                 life[i, j] = highPart * 8 + lowPart / 2;
             }
         }
+        byte[] newLifeBytes = RandomizeLifeEffectiveness(RNG, life, props.LifeEffectiveness);
+        rom.Put(start, newLifeBytes);
+    }
 
-        LifeEffectiveness lifeEffectiveness = props.LifeEffectiveness;
+    private static byte[] RandomizeLifeEffectiveness(Random RNG, int[,] life, LifeEffectiveness statEffectiveness)
+    {
+        int numBanks = 7;
+        int[,] newLife = new int[numBanks, 8];
 
         for (int j = 0; j < 8; j++)
         {
             for (int i = 0; i < numBanks; i++)
             {
                 int nextVal = life[i, j];
-                if (lifeEffectiveness == LifeEffectiveness.AVERAGE)
+                if (statEffectiveness == LifeEffectiveness.AVERAGE)
                 {
                     int max = (int)(life[i, j] + life[i, j] * .5);
                     int min = (int)(life[i, j] - life[i, j] * .25);
@@ -1272,31 +1269,32 @@ public class Hyrule
                     else
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
-                        if (nextVal > life[i, j - 1])
+                        if (nextVal > newLife[i, j - 1])
                         {
-                            nextVal = life[i, j - 1];
+                            nextVal = newLife[i, j - 1];
                         }
                     }
                 }
-                else if (props.LifeEffectiveness == LifeEffectiveness.HIGH)
+                else if (statEffectiveness == LifeEffectiveness.HIGH)
                 {
                     nextVal = (int)(life[i, j] * .5);
                 }
 
-                life[i, j] = nextVal;
+                newLife[i, j] = nextVal;
             }
         }
 
+        byte[] lifeBytes = new byte[numBanks * 8];
         for (int i = 0; i < numBanks; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                int highPart = (life[i, j] / 8) << 4;
-                int lowPart = (life[i, j] % 8);
-                rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
+                int highPart = (newLife[i, j] / 8) << 4;
+                int lowPart = (newLife[i, j] % 8);
+                lifeBytes[i * 8 + j] = (byte)(highPart + (lowPart * 2));
             }
         }
-
+        return lifeBytes;
     }
 
     private void RandomizeMagicEffectiveness(ROM rom)
@@ -1315,15 +1313,22 @@ public class Hyrule
                 magicCosts[i, j] = highPart * 8 + lowPart / 2;
             }
         }
+        byte[] newMagicCostBytes = RandomizeMagicEffectiveness(RNG, magicCosts, props.MagicEffectiveness);
+        rom.Put(start, newMagicCostBytes);
+    }
 
-        MagicEffectiveness currentStatEffectiveness = props.MagicEffectiveness;
+    private static byte[] RandomizeMagicEffectiveness(Random RNG, int[,] magicCosts, MagicEffectiveness statEffectiveness)
+    {
+        int numBanks = 8;
+
+        int[,] newMagicCosts = new int[numBanks, 8];
 
         for (int j = 0; j < 8; j++)
         {
             for (int i = 0; i < numBanks; i++)
             {
                 int nextVal = magicCosts[i, j];
-                if (currentStatEffectiveness == MagicEffectiveness.AVERAGE)
+                if (statEffectiveness == MagicEffectiveness.AVERAGE)
                 {
                     int max = (int)(magicCosts[i, j] + magicCosts[i, j] * .5);
                     int min = (int)(magicCosts[i, j] - magicCosts[i, j] * .5);
@@ -1335,36 +1340,37 @@ public class Hyrule
                     else
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
-                        if (nextVal > magicCosts[i, j - 1])
+                        if (nextVal > newMagicCosts[i, j - 1])
                         {
-                            nextVal = magicCosts[i, j - 1];
+                            nextVal = newMagicCosts[i, j - 1];
                         }
                     }
                 }
-                else if (props.MagicEffectiveness == MagicEffectiveness.HIGH_COST)
+                else if (statEffectiveness == MagicEffectiveness.HIGH_COST)
                 {
                     nextVal = (int)(magicCosts[i, j] + (magicCosts[i, j] * .5));
                 }
-                else if (props.MagicEffectiveness == MagicEffectiveness.LOW_COST)
+                else if (statEffectiveness == MagicEffectiveness.LOW_COST)
                 {
                     nextVal = (int)(magicCosts[i, j] * .5);
                 }
 
                 nextVal = Math.Min(120, nextVal);
-                magicCosts[i, j] = nextVal;
+                newMagicCosts[i, j] = nextVal;
             }
         }
 
+        byte[] magicCostBytes = new byte[numBanks * 8];
         for (int i = 0; i < numBanks; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                int highPart = (magicCosts[i, j] / 8) << 4;
-                int lowPart = (magicCosts[i, j] % 8);
-                rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
+                int highPart = (newMagicCosts[i, j] / 8) << 4;
+                int lowPart = (newMagicCosts[i, j] % 8);
+                magicCostBytes[i * 8 + j] = (byte)(highPart + (lowPart * 2));
             }
         }
-
+        return magicCostBytes;
     }
 
     private void RandomizeEnemyStats()
