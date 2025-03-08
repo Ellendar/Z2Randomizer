@@ -1,5 +1,7 @@
 .include "z2r.inc"
 
+.export Nmi
+
 ; Summary of the bug
 ; On a lag frame NMI is skipped, which means the hud scroll value of 0 isn't set
 ; We can work around this by never disabling NMI and using a soft disable instead
@@ -167,16 +169,32 @@ NmiHandleLagFrame:
     jmp NmiRunLagFrame
 NmiRunTitleScreen:
     jmp $a610      ; Assumes bank 5 is banked in, which is used for title screen mostly
-FREE_UNTIL $C079
-.org $C079
+
+FREE_UNTIL $C06C
+.org $C06C
 Nmi:
-    bit LagFrameVar
+    inc StatTimer+0
+        bne +
+        inc StatTimer+1
+            bne +
+            inc StatTimer+2
+;    inc StatTimer+0
+;        bne +
+;        inc StatTimer+1
+;            bne +
+;            inc StatTimer+2
++   bit LagFrameVar
     bmi NmiHandleLagFrame
     bit $100
     bpl NmiHandleLagFrame ; run audio
     bvc NmiRunTitleScreen
 .assert * = $C084
 
+; Add a patch to increment the stat timer every NMI
+; This is cleared when a new save file is loaded for the first time
+.reloc
+IncStatTimer:
+  rts
 
 ; Patch locations that hard disable NMI to set the soft disable instead
 .org $C087

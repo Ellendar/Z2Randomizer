@@ -3791,6 +3791,7 @@ FREE_UNTIL $c2ca
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
         rom.InstantText(engine);
+        rom.StatTracking(engine);
 
         if (props.Global5050JarDrop)
         {

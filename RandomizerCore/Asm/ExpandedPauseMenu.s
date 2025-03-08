@@ -72,6 +72,7 @@ PauseMenuRow2Tiles:
 DrawPauseMenuRowOfItems = $9B19
 
 .reloc
+.export AddExtraRowOfItems
 AddExtraRowOfItems:
     jsr DrawPauseMenuRowOfItems
     ; $01 is the base X offset for the items

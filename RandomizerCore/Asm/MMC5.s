@@ -1,6 +1,5 @@
 ﻿.include "z2r.inc"
 
-.import nmi
 .export SwapPRG, SwapToSavedPRG, SwapToPRG0
 
 FREE "PRG7" [$FEAA, $FFE8)
@@ -190,6 +189,7 @@ ClearPartialDevRAM:
 .org $a6a3
     jsr ClearStackRAM
 
+.segment "PRG5","PRG7"
 .reloc
 ClearStackRAM:
     lda #0
