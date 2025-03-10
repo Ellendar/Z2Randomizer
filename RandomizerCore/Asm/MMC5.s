@@ -23,9 +23,64 @@ bank7_code0 = $c000
 NmiBankShadow8 = $7b2
 NmiBankShadowA = $7b3
 
-; To conserve space in the common bank, as much reset code as possible is moved to bank 1f. This requires reset to be done in 4 parts: 1. load bank 1f at e000 (this is done in both banks f and 1f, as a non-power-on reset will have bank f at e000), 2. do most reset stuff, 3. load bank f at e000 (again in both f and 1f), 4. do reset stuff that requires bank f.
+; Replace the code to wait for sprite 0 with code to set up the scanline IRQ
+.org $d4b2
+	; Can clobber all registers
+	lda PpuCtrlShadow
+	ora $746 ; Have concerns about this
+	;sta PpuCtrlShadow
+	sta PpuCtrlForIrq
+	lda ScrollPosShadow
+	sta ScrollPosForIrq
+
+	lda #31
+	sta LineIrqTgtReg
+	
+	lda #ENABLE_SCANLINE_IRQ
+	sta LineIrqStatusReg
+	
+	cli
+    jmp $D4CE
+
+;.assert * = $D4CE
+
+.reloc
+.proc IrqHdlr
+	pha
+	txa
+	pha
+	
+	lda LineIrqStatusReg
+	;lda #DISABLE_SCANLINE_IRQ
+	;sta LineIrqStatusReg
+	
+	ldx PpuCtrlForIrq
+	lda ScrollPosForIrq
+	sta PPUSCROLL
+	lda #$0
+	sta PPUSCROLL
+	stx PPUCTRL
+	
+	stx PpuCtrlShadow ; Not sure about this
+	
+	pla
+	tax
+	pla
+	
+	rti
+.endproc ; IrqHdlr
+
+.org $fffe
+	.word IrqHdlr
+
+; To conserve space in the common bank, as much reset code as possible is moved to bank 1f.
+; This requires reset to be done in 4 parts:
+;   1. load bank 1f at e000 (this is done in both banks f and 1f, as a non-power-on reset will have bank f at e000)
+;   2. do most reset stuff
+;   3. load bank f at e000 (again in both f and 1f)
+;   4. do reset stuff that requires bank f.
 .org $ffe8
-	lda #($f | PRG_BANK_ROM)
+	lda #($0f | PRG_BANK_ROM)
 	sta PrgBankEReg
 	jmp bank7_reset_part4
 	

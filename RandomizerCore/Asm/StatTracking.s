@@ -6,20 +6,74 @@
 .define StatDisplayState $130
 .define InternalState $131
 
+BUFFER_OFF = $301
+PPUADDR_HI = $302
+PPUADDR_LO = $303
+BUFFER_LEN = $304
+BUFFER_DAT = $305
+
+CONVERT = $80
+
 ; TODO: Add patches to update stats
 
 .segment "PRG7"
+
+;;;
+; Writes the current timestamp to SRAM.
+; [In a] - index of the type of timestamp to write
+; Notice this does NOT preserve registers!
+.reloc
+.export AddTimestamp
+AddTimestamp:
+  ldx TimestampCount
+  sta TimestampTypeList,x
+  asl ; clears carry
+  adc TimestampTypeList,x
+  tax
+  ; double read the timestamp. this prevents an issue where reading is interrupted by NMI
+  ; keep the lo value in X so we can check if it changed and read again if it does
+-   ldy StatTimer+0
+    tya
+    sta TimestampList,x
+    lda StatTimer+1
+    sta TimestampList + 1,x
+    lda StatTimer+2
+    sta TimestampList + 2,x
+    cpy StatTimer+0
+    bne -
+  inc TimestampCount
+  rts
+
 .reloc
 UpdateCreditsSwitchBank:
+    ; This is a bit lame, but while we have BANK5 banked in,
+    ; lets copy over the seed hash into RAM somewhere we can access
+    ldy #11-1
+    -   lda $BC1C, y
+        sta $03d5, y
+        dey
+        bpl -
     lda #1
     jsr SwapPRG
     jmp UpdateCredits
 
+.reloc
 .import AddExtraRowOfItems
 DrawPauseMenuRowSwitchBank:
     lda #0
     jsr SwapPRG
     jsr AddExtraRowOfItems
+    lda #1
+    jmp SwapPRG
+
+.reloc
+Experience_Convertion_and_Display_Routine = $A5A4
+TwoByteBCDConversion:
+    lda #0
+    jsr SwapPRG
+    lda $01 ; lo byte of value. $00 has hi byte
+    jsr Experience_Convertion_and_Display_Routine
+    sta $01
     lda #1
     jmp SwapPRG
 
@@ -42,7 +96,7 @@ DisablePaletteCycle:
     lda $0761
     cmp #$0d
     ; perform the patched instructions
-    ldx $0301
+    ldx BUFFER_OFF
     ldy #0
     rts
 ;;; Rendering the stats page
@@ -93,6 +147,10 @@ RestartToTitle:
 
 .reloc
 RenderPlayerInfo:
+    lda InternalState
+    beq +
+        jmp RenderPlayerInfoBg
+    +
     ; Render the sprites
     jsr DrawPauseMenuRowSwitchBank
 
@@ -143,35 +201,175 @@ RenderPlayerInfo:
     sta $202 + $54
     sta $202 + $5c
     
-    
     ; Draw the name(s) / hash / levels / lives
-    inc StatDisplayState
+    jmp RenderPlayerInfoBg
+
+.reloc
+RenderPlayerInfoBg:
+    ldx BUFFER_OFF
+    ; Setup the read ptr
+    lda #<PlayerInfoCommandList
+    sta $04
+    lda #>PlayerInfoCommandList
+    sta $05
+    lda #6
+    sta $07
+    ; Setup the next VRAM write
+@VramLoop:
+        ldy InternalState
+        ; check if we've run out of things to render
+        cpy #PlayerInfoCommandListLen
+        bcc +
+            inc StatDisplayState
+            jmp @Exit
+        +
+        ; Setup the source ptr
+        lda ($04),y
+        iny
+        sta $02
+        lda ($04),y
+        iny
+        sta $03
+        ; Setup the buffer address to write to
+        lda ($04),y
+        iny
+        sta PPUADDR_LO,x
+        lda ($04),y
+        iny
+        sta PPUADDR_HI,x
+    
+        ; Setup the src/dst lengths
+        lda ($04),y
+        iny
+        cmp #$80
+        and #$7f
+        sta $06
+        lda ($04),y
+        iny
+        sta BUFFER_LEN,x
+        sty InternalState
+        ldy #0
+        bcs @ReadWithConvert
+        ; direct read
+        ; Read all bytes from source byte into $302,x
+        -   lda ($02),y
+            sta BUFFER_DAT,x
+            iny
+            inx
+            dec $06
+            bne -
+        jmp @NextIteration0
+    @ReadWithConvert:
+        ; check if we are doing a single digit convert or a multi digit
+        lda ($02),y
+        iny
+        sta $01
+        lda $06
+        cmp #1
+        beq @CheckForSingleConvert
+            lda ($02),y
+            iny
+            sta $00
+            jmp @ConvertMulti
+    @CheckForSingleConvert:
+        lda BUFFER_LEN,x
+        cmp #2
+        bcs @ConvertMulti
+            ; Do a very simple conversion of the data from dest for a single digit
+            ; this keeps the "F" lives display working as expected
+            lda $01
+            clc
+            adc #$d0
+            sta BUFFER_DAT,x
+            jmp @NextIteration1
+    @ConvertMulti:
+        tya
+        pha
+            lda BUFFER_LEN,x
+            cmp #2
+            bcc +
+            jsr TwoByteBCDConversion
+            lda $01
+            sta BUFFER_DAT+2,x
+            lda BUFFER_LEN,x
+            cmp #2
+            bcc +
+                tya
+                sta BUFFER_DAT+1,x
+                lda BUFFER_LEN,x
+                inx
+                cmp #3
+                bcc +
+                    lda $00
+                    sta BUFFER_DAT-1,x ; -1 to account for an extra inx
+                    inx
+        +
+        pla
+        tay
+    @NextIteration1:
+        inx
+    @NextIteration0:
+        inx
+        inx
+        inx
+        dec $07
+        beq @Exit
+        jmp @VramLoop
+@Exit:
+    lda #$ff
+    sta PPUADDR_HI,x
+    stx BUFFER_OFF
     rts
 
-ARRAY_INDEX .set 0
-.macro PPU_BUFFER_APPEND Src, SrcLen, Dst, DstLen
-.ident(.concat("ARRAY_SRC_", .string(ARRAY_INDEX)) = Src
-.ident(.concat("ARRAY_SRCLEN_", .string(ARRAY_INDEX)) = SrcLen
-.ident(.concat("ARRAY_DST_", .string(ARRAY_INDEX)) = Dst
-.ident(.concat("ARRAY_DSTLEN_", .string(ARRAY_INDEX)) = DstLen
-ARRAY_INDEX .set CONVERT_ARRAY_INDEX + 1
-.endmacro
 
-PPU_BUFFER_APPEND $07A1, 8, $2062, 8 ; Player Name
-PPU_BUFFER_APPEND $0784, 1, $20a9, 1 ; Heart Containers
-PPU_BUFFER_APPEND $0783, 1, $20e9, 1 ; Magic Containers
-PPU_BUFFER_APPEND $0777, 1, $21a4, 1 ; Atk
-PPU_BUFFER_APPEND $0779, 1, $21c4, 1 ; Lif
-PPU_BUFFER_APPEND $0778, 1, $21a8, 1 ; Mag
-PPU_BUFFER_APPEND $0700, 1, $21c8, 1 ; Lives
-
+.reloc
+; Source, Dest, SrcLen, DstLen
+; Technically I don't need src/dst len but I can reuse the function to render both
+PlayerInfoCommandList:
+; Player Name
+.word $07A1, $2062
+.byte 8, 8
+; Seed Hash (copied to $3d5 every frame cause its cheap :p)
+.word $03d5, $202a
+.byte 11, 11
 ; Data that should be converted to base 10
-PPU_BUFFER_APPEND $0777, 1, $21a4, 3 ; Deaths
-PPU_BUFFER_APPEND $0779, 1, $21c4, 3 ; Resets
-PPU_BUFFER_APPEND $0778, 2, $21a8, 3 ; Hi Stab
-PPU_BUFFER_APPEND $0700, 2, $21c8, 3 ; Lo Stab
-PPU_BUFFER_APPEND $0778, 2, $21a8, 3 ; Up Stab
-PPU_BUFFER_APPEND $0700, 2, $21c8, 3 ; Dw Stab
+; Heart Containers
+.word $0784, $20a9
+.byte 1 | CONVERT, 1
+; Magic Containers
+.word $0783, $20e9
+.byte 1 | CONVERT, 1
+; Atk
+.word $0777, $21a4
+.byte 1 | CONVERT, 1
+; Lif
+.word $0779, $21c4
+.byte 1 | CONVERT, 1
+; Mag
+.word $0778, $21a8
+.byte 1 | CONVERT, 1
+; Lives
+.word $0700, $21c8
+.byte 1 | CONVERT, 1
+; Deaths
+.word $079F, $2209
+.byte 1 | CONVERT, 3
+; Resets
+.word $079F, $2249
+.byte 1 | CONVERT, 3
+; Hi Stab
+.word $0778, $2289
+.byte 2 | CONVERT, 3
+; Lo Stab
+.word $0700, $22c9
+.byte 2 | CONVERT, 3
+; Up Stab
+.word $0778, $2309
+.byte 2 | CONVERT, 3
+; Dw Stab
+.word $0700, $2349
+.byte 2 | CONVERT, 3
+PlayerInfoCommandListLen = * - PlayerInfoCommandList
 
 .reloc
 UpdateSpritePosition:
@@ -188,11 +386,11 @@ UpdateSpritePosition:
         dex
         bpl -
     ; heart container y
-    lda #4 * 8 - 1
+    lda #4 * 8
     sta $200 + $50
     sta $200 + $54
     ; magic container y
-    lda #6 * 8 - 1
+    lda #6 * 8
     sta $200 + $58
     sta $200 + $5c
     ; link sprite offset
@@ -202,7 +400,7 @@ UpdateSpritePosition:
     lda #$08+4
     sta $cc
     ; link y offset
-    lda #$15+8
+    lda #$20
     sta $29
     ; link metasprite
     lda #3
@@ -226,42 +424,42 @@ DrawBackground:
     ; Since we don't have any unplanned ppu updates, we can just use
     ; hardcoded offsets into the ppu buffer to simplify the code
     lda #0
-    sta $302
+    sta PPUADDR_HI
     lda InternalState
     ; Mult by 6
     asl
-    rol $302
+    rol PPUADDR_HI
     asl
-    rol $302
+    rol PPUADDR_HI
     asl
-    rol $302
+    rol PPUADDR_HI
     asl
-    rol $302
+    rol PPUADDR_HI
     asl
-    rol $302
+    rol PPUADDR_HI
     asl
-    rol $302
-    sta $303
+    rol PPUADDR_HI
+    sta PPUADDR_LO
     sta $00
-    lda $302
+    lda PPUADDR_HI
     sta $01
     clc
     adc #$20
-    sta $302
+    sta PPUADDR_HI
     
     ; 32 bytes
     lda #$20
-    sta $304
-    sta $327
+    sta BUFFER_LEN
+    sta BUFFER_LEN + $23
     
     ; Copy the address to the second location but offset by 32 bytes
-    lda $303
+    lda PPUADDR_LO
     clc
     adc #$20
-    sta $326
-    lda $302
+    sta PPUADDR_LO + $23
+    lda PPUADDR_HI
     adc #0
-    sta $325
+    sta PPUADDR_HI + $23
     
     ; setup the read ptr
     lda #<BackgroundData
@@ -274,17 +472,17 @@ DrawBackground:
     
     ldy #$20-1
     -   lda ($00),y
-        sta $305,y
+        sta BUFFER_DAT,y
         dey
         bpl -
     ldy #$40-1
     -   lda ($00),y
-        sta $305 + 3,y ; +3 to account for the header
+        sta BUFFER_DAT + 3,y ; +3 to account for the header
         dey
         cpy #$20-1
         bne -
     lda #$ff
-    sta $348
+    sta PPUADDR_HI + $23 + $23
     inc InternalState
     lda InternalState
     cmp #$10
@@ -311,22 +509,22 @@ FadeOut:
         inc StatDisplayState
         rts
     +
-    ldy $301
+    ldy BUFFER_OFF
     lda #$3f
-    sta $302,y
-    sta $306,y
+    sta PPUADDR_HI,y
+    sta PPUADDR_HI + 4,y
     lda RandomOrderTable,x
-    sta $303,y
+    sta PPUADDR_LO,y
     ora #$10
-    sta $307,y
+    sta PPUADDR_LO + 4,y
     lda #1
-    sta $304,y
-    sta $308,y
+    sta BUFFER_LEN,y
+    sta BUFFER_LEN + 4,y
     lda #$0f
-    sta $305,y
-    sta $309,y
+    sta BUFFER_DAT,y
+    sta BUFFER_DAT + 4,y
     lda #$ff
-    sta $30a,y
+    sta PPUADDR_HI + 8,y
     ; Move to the next
     inc InternalState
     ; and clear out the sprite zero memory while we are at it :p
@@ -350,62 +548,36 @@ FadeIn:
         inc StatDisplayState
         rts
     +
-    ldy $301
+    ldy BUFFER_OFF
     lda #$3f
-    sta $302,y
-    sta $306,y
+    sta PPUADDR_HI,y
+    sta PPUADDR_HI+4,y
     lda RandomOrderTable,x
     tax
-    sta $303,y
+    sta PPUADDR_LO,y
     ora #$10
-    sta $307,y
+    sta PPUADDR_LO+4,y
     lda #1
-    sta $304,y
-    sta $308,y
+    sta BUFFER_LEN,y
+    sta BUFFER_LEN+4,y
     lda BGPaletteTable,x
-    sta $305,y
+    sta BUFFER_DAT,y
     lda SprPaletteTable,x
-    sta $309,y
+    sta BUFFER_DAT+4,y
     lda #$ff
-    sta $30a,y
+    sta PPUADDR_HI + 8,y
     ; Move to the next color
     inc InternalState
     rts
 BGPaletteTable:
 ; Border
 .byte $0f, $30, $12, $16
-; Red Text
+; Red Text ?
 .byte $0f, $0f, $0f, $0f
-; Blue Text
+; Blue Text ?
 .byte $0f, $0f, $0f, $0f
 ; unused
 .byte $0f, $0f, $0f, $0f
-
-
-;;;
-; Writes the current timestamp to SRAM.
-; [In a] - index of the type of timestamp to write
-; Notice this does NOT preserve registers!
-.reloc
-AddTimestamp:
-  ldx TimestampCount
-  sta TimestampTypeList,x
-  asl ; clears carry
-  adc TimestampTypeList,x
-  tax
-  ; double read the timestamp. this prevents an issue where reading is interrupted by NMI
-  ; keep the lo value in X so we can check if it changed and read again if it does
--   ldy StatTimer+0
-    tya
-    sta TimestampList,x
-    lda StatTimer+1
-    sta TimestampList + 1,x
-    lda StatTimer+2
-    sta TimestampList + 2,x
-    cpy StatTimer+0
-    bne -
-  inc TimestampCount
-  rts
 
 ;; Long division routine copied from here:
 ;; https://codebase64.org/doku.php?id=base:24bit_division_24-bit_result
@@ -531,34 +703,3 @@ BackgroundData:
 	.byte $88,$aa,$22,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	.byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
 	.byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-
-.reloc
-PPUBufferSrcLo:
-.repeat ARRAY_INDEX, I
-    .byte .lobyte(.ident(.concat("ARRAY_SRC_", .string(I))))
-.endrepeat
-.reloc
-PPUBufferSrcHi:
-.repeat ARRAY_INDEX, I
-    .byte .hibyte(.ident(.concat("ARRAY_SRC_", .string(I))))
-.endrepeat
-.reloc
-PPUBufferSrcLen:
-.repeat ARRAY_INDEX, I
-    .byte .lobyte(.ident(.concat("ARRAY_SRCLEN_", .string(I))))
-.endrepeat
-.reloc
-PPUBufferDstLo:
-.repeat ARRAY_INDEX, I
-    .byte .lobyte(.ident(.concat("ARRAY_DST_", .string(I))))
-.endrepeat
-.reloc
-PPUBufferDstHi:
-.repeat ARRAY_INDEX, I
-    .byte .hibyte(.ident(.concat("ARRAY_DST_", .string(I))))
-.endrepeat
-.reloc
-PPUBufferDstLen:
-.repeat ARRAY_INDEX, I
-    .byte .lobyte(.ident(.concat("ARRAY_DSTLEN_", .string(I))))
-.endrepeat

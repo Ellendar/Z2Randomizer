@@ -1,6 +1,5 @@
 .include "z2r.inc"
 
-.export Nmi
 
 ; Summary of the bug
 ; On a lag frame NMI is skipped, which means the hud scroll value of 0 isn't set
@@ -9,7 +8,7 @@
 ; and then keep the "sprite zero" hud split check on.
 ; All of these changes are always on no matter the setting, 
 
-LagFrameVar = $f4
+LagFrameVar = $100
 
 .if ENABLE_Z2FT
     .import UpdateSound
@@ -87,42 +86,33 @@ HandleLagFrame:
     sta $2004 ; OAMDATA
 
     ; Load the current health/magic bar into here
-    lda $200 + $f8
-    sta $2004 ; OAMDATA
-    lda $200 + $f9
-    sta $2004 ; OAMDATA
-    lda $200 + $fa
-    sta $2004 ; OAMDATA
-    lda $200 + $fb
-    sta $2004 ; OAMDATA
-    lda $200 + $fc
-    sta $2004 ; OAMDATA
-    lda $200 + $fd
-    sta $2004 ; OAMDATA
-    lda $200 + $fe
-    sta $2004 ; OAMDATA
-    lda $200 + $ff
-    sta $2004 ; OAMDATA
+    ; That should prevent sprite corruption since the internal OAM ADDR ends at #0
+    ldx #$f8
+    -   lda $200,x
+        sta $2004
+        inx
+        beq -
 
-    ; That should prevent corruption
+	lda ScrollPosShadow
+	sta ScrollPosForIrq
 
     ; Use the MMC5 "in frame" flag to wait for the frame to start before waiting for sprite zero
--
-    bit $5204
-    bvc -
-    ; and now wait for sprite zero and switch the scroll when that finished
--
-    bit $2002
-    bvc -
-    lda $FF
-    ldx $FD
-    ldy #$10
-    -
-        dey
-        bne -
-    sta $2000
-    stx $2005
-    sty $2005
+;-
+;    bit $5204
+;    bvc -
+;    ; and now wait for sprite zero and switch the scroll when that finished
+;-
+;    bit $2002
+;    bvc -
+;    lda $FF
+;    ldx $FD
+;    ldy #$10
+;    -
+;        dey
+;        bne -
+;    sta $2000
+;    stx $2005
+;    sty $2005
 
     pla
     tay
@@ -133,34 +123,6 @@ HandleLagFrame:
 .segment "PRG7"
 
 .import SwapPRG, SwapToSavedPRG
-
-
-.org $fffa
-    .word (Nmi)
-
-.reloc
-.import NmiBankShadow8,NmiBankShadowA
-NmiRunLagFrame:
-    pha
-        lda NmiBankShadowA
-        pha
-        lda NmiBankShadow8
-        pha
-        lda #$8c  ; (bank 6)
-        sta NmiBankShadow8
-        sta $5114
-        lda #$8d  ; (bank 6)
-        sta NmiBankShadowA
-        sta $5115
-        jsr RunAudioFrameOrLagFrame
-        pla
-        sta NmiBankShadow8
-        sta $5114
-        pla
-        sta NmiBankShadowA
-        sta $5115
-    pla
-    rti
 
 ; Rewrite the loading screen audio handler to fit the new lag frame handler
 ; Move the phx and phy to the bank
@@ -173,22 +135,50 @@ NmiRunTitleScreen:
 FREE_UNTIL $C06C
 .org $C06C
 Nmi:
-    inc StatTimer+0
-        bne +
-        inc StatTimer+1
-            bne +
-            inc StatTimer+2
+    pha
+    ; Increment the time spent in trackers before checking for lag frame handling so we always
+    ; track the time spent
+    lda 
+    bit LagFrameVar
+    
+    
+    bmi NmiHandleLagFrame
+    bit LagFrameVar
+    bpl NmiHandleLagFrame ; run audio
+    bvc NmiRunTitleScreen
+.assert * = $C084
+
+.org $fffa
+    .word (Nmi)
+
+.reloc
+.import NmiBankShadow8,NmiBankShadowA
+NmiRunLagFrame:
+    lda NmiBankShadowA
+    pha
+    lda NmiBankShadow8
+    pha
+    lda #$8c  ; (bank 6)
+    sta NmiBankShadow8
+    sta $5114
+    lda #$8d  ; (bank 6)
+    sta NmiBankShadowA
+    sta $5115
+    jsr RunAudioFrameOrLagFrame
+    pla
+    sta NmiBankShadow8
+    sta $5114
+    pla
+    sta NmiBankShadowA
+    sta $5115
+    pla
+    rti
+
 ;    inc StatTimer+0
 ;        bne +
 ;        inc StatTimer+1
 ;            bne +
 ;            inc StatTimer+2
-+   bit LagFrameVar
-    bmi NmiHandleLagFrame
-    bit $100
-    bpl NmiHandleLagFrame ; run audio
-    bvc NmiRunTitleScreen
-.assert * = $C084
 
 ; Add a patch to increment the stat timer every NMI
 ; This is cleared when a new save file is loaded for the first time
@@ -201,16 +191,16 @@ IncStatTimer:
     and #$fc
 ; Replace a useless branch with turning on the soft disable
 .org $C091
-    lda #$80
+    lda #$c0
     sta a:LagFrameVar
 
 ; This exact location is needed by both lag frame handling and z2ft
 
 .if !ENABLE_Z2FT
 
-.org $C1a8
+.org $C1A8
     ; Soft enable NMI
-    clc
+    sec
     ror LagFrameVar
 
 .endif

@@ -105,8 +105,15 @@ MulLoReg = $5205
 MulHiReg = $5206
 
 ;; Common locations used in the code
+PpuCtrlShadow = $ff
+ScrollPosShadow = $fd
+
 ClearNametables = $d266
 JumpEngine = $d385
+
+; These are new variables that use free memory
+PpuCtrlForIrq = $06c7
+ScrollPosForIrq = $06c8
 
 ;; Collectable items
 ; Hardcoded list of item ids for the new global item table.
@@ -214,9 +221,9 @@ TimestampId TsPalaceGP
 ; Used to create timestamps for when items are collected
 RESV StatTimer, 3
 ; Ticks up whenever a death occurs. Game already tracks this :p
-;RESV StatDeaths, 1
-; Ticks up whenever Up + A shortcut or console reset happens
-RESV StatResets, 1
+RESV StatDeaths, 1
+; Ticks up whenever Up + A shortcut happens. Not in use, game naturally tracks this
+;RESV StatResets, 1
 ; Ticks up for every stab you make based on type of stab 
 RESV StatHiStabCount, 2
 RESV StatLoStabCount, 2
