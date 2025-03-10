@@ -78,12 +78,16 @@ public static class StartingTechsExtensions
 [DefaultValue(VANILLA)]
 public enum AttackEffectiveness
 {
-    [Description("Random")]
-    AVERAGE,
-    [Description("Low Attack")]
-    LOW,
     [Description("Vanilla")]
     VANILLA,
+    [Description("Low Attack")]
+    LOW,
+    [Description("Randomize (Low)")]
+    AVERAGE_LOW,
+    [Description("Randomize")]
+    AVERAGE,
+    [Description("Randomize (High)")]
+    AVERAGE_HIGH,
     [Description("High Attack")]
     HIGH,
     [Description("Instant Kill")]
@@ -93,12 +97,16 @@ public enum AttackEffectiveness
 [DefaultValue(VANILLA)]
 public enum MagicEffectiveness
 {
-    [Description("Random")]
-    AVERAGE,
-    [Description("High Spell Cost")]
-    HIGH_COST,
     [Description("Vanilla")]
     VANILLA,
+    [Description("High Spell Cost")]
+    HIGH_COST,
+    [Description("Randomize (High Cost)")]
+    AVERAGE_HIGH_COST,
+    [Description("Randomize")]
+    AVERAGE,
+    [Description("Randomize (Low Cost)")]
+    AVERAGE_LOW_COST,
     [Description("Low Spell Cost")]
     LOW_COST,
     [Description("Free Spells")]
@@ -108,12 +116,16 @@ public enum MagicEffectiveness
 [DefaultValue(VANILLA)]
 public enum LifeEffectiveness
 {
-    [Description("Random")]
-    AVERAGE,
-    [Description("OHKO Link")]
-    OHKO,
     [Description("Vanilla")]
     VANILLA,
+    [Description("OHKO Link")]
+    OHKO,
+    [Description("Randomize (Low)")]
+    AVERAGE_LOW,
+    [Description("Randomize")]
+    AVERAGE,
+    [Description("Randomize (High)")]
+    AVERAGE_HIGH,
     [Description("High Defense")]
     HIGH,
     [Description("Invincible")]
