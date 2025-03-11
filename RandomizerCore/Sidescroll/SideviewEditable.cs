@@ -19,7 +19,7 @@ namespace RandomizerCore.Sidescroll;
 /// </summary>
 public class SideviewEditable<T> where T : Enum
 {
-    private byte[] header;
+    private byte[] Header;
     public List<SideviewMapCommand<T>> Commands { get; set; } 
 
     /// <summary>
@@ -29,7 +29,7 @@ public class SideviewEditable<T> where T : Enum
     public SideviewEditable(byte[] bytes)
     {
         if(bytes.Length < 4) { throw new ArgumentException("Sideview data has no header."); }
-        header = bytes[0..4];
+        Header = bytes[0..4];
         Commands = new List<SideviewMapCommand<T>>();
         int i = 4; // start after header
         int xcursor = 0;
@@ -62,6 +62,12 @@ public class SideviewEditable<T> where T : Enum
             o.AbsX = xcursor;
             Commands.Add(o);
         }
+    }
+
+    public byte FloorHeader
+    {
+        get { return Header[2]; }
+        set { Header[2] = value; }
     }
 
     public SideviewMapCommand<T>? Find(Predicate<SideviewMapCommand<T>> match)
@@ -149,7 +155,7 @@ public class SideviewEditable<T> where T : Enum
             i++;
         }
         byte[] bytes = [
-            .. header, 
+            .. Header, 
             .. Commands.SelectMany(o => o.Bytes)
         ];
         bytes[0] = (byte)bytes.Length;
