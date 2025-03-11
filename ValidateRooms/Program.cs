@@ -25,6 +25,14 @@ void ValidateRoomsForFile(string filename)
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
         if (sv.HasItem() != room.HasItem) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
 
+        if (room.IsBossRoom)
+        {
+            var statue = sv.Find(o => o.Id == PalaceObject.IronknuckleStatue && o.AbsX == 62 && o.Y == 9);
+            if (statue == null) { sb.AppendLine($"{GetName(room)}: Boss room is missing exit statue."); }
+            var exitBlocker = sv.Find(o => o.Id == PalaceObject.HorizontalBrick && o.AbsX == 62 && o.Y > 7 && o.Y < 11);
+            if (exitBlocker != null) { sb.AppendLine($"{GetName(room)}: Boss room has low ceiling at exit preventing re-entry."); }
+        }
+
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];
 
