@@ -58,6 +58,7 @@
         <StackPanel Grid.Column="1">
             <ComboBox assists:ComboBoxAssist.Label="Attack Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.AttackEffectivenessList}}"
+					  ToolTip.Tip="{Binding Source={x:Static rc:ToolTips.AttackEffectiveness}}"
                       SelectedItem="{Binding Config.AttackEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
             <ComboBox assists:ComboBoxAssist.Label="Magic Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
                       ItemsSource="{Binding Source={x:Static rc:Enums.MagicEffectivenessList}}"

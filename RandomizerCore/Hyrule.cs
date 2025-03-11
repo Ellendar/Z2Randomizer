@@ -616,85 +616,77 @@ public class Hyrule
 
     private void RandomizeAttackEffectiveness(ROM rom, AttackEffectiveness attackEffectiveness)
     {
+        byte[] attackValues = rom.GetBytes(0x1E67D, 8);
+        byte[] newAttackValueBytes = RandomizeAttackEffectiveness(RNG, attackValues, attackEffectiveness);
+        rom.Put(0x1E67D, newAttackValueBytes);
+    }
+
+    private static byte[] RandomizeAttackEffectiveness(Random RNG, byte[] attackValues, AttackEffectiveness attackEffectiveness)
+    {
+        if (attackEffectiveness == AttackEffectiveness.VANILLA)
+        {
+            return attackValues;
+        }
         if (attackEffectiveness == AttackEffectiveness.OHKO)
         {
-            //This is a duplicate of a more advanced version in RandomizeEnemyStats()
-            /*
-            for (int i = 0; i < 8; i++)
-            {
-                ROMData.Put(0x1E67D + i, 192);
-            }*/
-            return;
-        }
-        if(attackEffectiveness == AttackEffectiveness.VANILLA)
-        {
-            return;
-        }
-        int[] attackValues = new int[8];
-        for (int i = 0; i < 8; i++)
-        {
-            attackValues[i] = rom.GetByte(0x1E67D + i);
+            // handled in RandomizeEnemyStats()
+            return attackValues;
         }
 
-        int[] newAttackValues = new int[8];
+        int RandomInRange(double minVal, double maxVal)
+        {
+            int nextVal = (int)Math.Round(RNG.NextDouble() * (maxVal - minVal) + minVal);
+            nextVal = (int)Math.Min(nextVal, maxVal);
+            nextVal = (int)Math.Max(nextVal, minVal);
+            return nextVal;
+        }
+
+        byte[] newAttackValues = new byte[8];
         for (int i = 0; i < 8; i++)
         {
-            double minAtk = attackValues[i] - attackValues[i] * .333;
-            double maxAtk = attackValues[i] + attackValues[i] * .5;
-
-            double attack;
-            if (attackEffectiveness == AttackEffectiveness.AVERAGE)
+            int nextVal;
+            byte vanilla = attackValues[i];
+            switch (attackEffectiveness)
             {
-                attack = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
-                if (i == 0)
-                {
-                    attack = (int)Math.Round(Math.Max(attack, 2));
-                }
-                else
-                {
-                    if (attack < newAttackValues[i - 1])
+                case AttackEffectiveness.LOW:
+                    //This would be less than 1 damage per level which will be fixed below
+                    nextVal = (int)Math.Round(attackValues[i] * .5, MidpointRounding.ToPositiveInfinity);
+                    break;
+                case AttackEffectiveness.AVERAGE_LOW:
+                    nextVal = RandomInRange(vanilla * .5, vanilla);
+                    break;
+                case AttackEffectiveness.AVERAGE:
+                    nextVal = RandomInRange(vanilla * .667, vanilla * 1.5);
+                    if (i == 0)
                     {
-                        attack = newAttackValues[i - 1];
+                        nextVal = Math.Max(nextVal, 2); // legacy hardcoded max 2 damage to start
                     }
-                    else
-                    {
-                        attack = (int)Math.Round(attack);
-                    }
-                }
-                attack = (int)Math.Min(attack, maxAtk);
-                attack = (int)Math.Max(attack, minAtk);
+                    break;
+                case AttackEffectiveness.AVERAGE_HIGH:
+                    nextVal = RandomInRange(vanilla, vanilla * 1.5);
+                    break;
+                case AttackEffectiveness.HIGH:
+                    nextVal = (int)(attackValues[i] * 1.5);
+                    break;
+                default:
+                    throw new Exception("Invalid Attack Effectiveness");
             }
-            else if (attackEffectiveness == AttackEffectiveness.HIGH)
+            if (i > 0)
             {
-                attack = (int)(attackValues[i] + (attackValues[i] * .5));
-            }
-            else if (attackEffectiveness == AttackEffectiveness.LOW)
-            {
-                //Low attack does really dumb stuff with rounding regardless of what you do because the values are so low
-                //This causes at least 1 level to to literal nothing. To avoid this, we just have a linear increase from 1-6
-                //Meeting up at 6 where the curve would be anyway.
-                if (i <= 6)
+                byte lastValue = newAttackValues[i - 1];
+                if (nextVal < lastValue)
                 {
-                    attack = i + 1;
-                }
-                else
-                {
-                    attack = (int)Math.Round(attackValues[i] - (attackValues[i] * .5), MidpointRounding.ToPositiveInfinity);
+                    nextVal = lastValue; // levelling up should never be worse
                 }
             }
-            else
+            if (nextVal < i + 1)
             {
-                throw new Exception("Invalid Attack Effectiveness");
+                nextVal = i + 1; // at the very minimum always get 1 damage per level
             }
 
-            newAttackValues[i] = (int)attack;
+            newAttackValues[i] = (byte)nextVal;
         }
-
-
-        for (int i = 0; i < 8; i++)
-        {
-            rom.Put(0x1E67D + i, (byte)newAttackValues[i]);
-        }
+        return newAttackValues;
     }
 
     private void ShuffleItems()
@@ -1242,129 +1234,137 @@ public class Hyrule
         //There are 7 different damage categories for which damage taken scales with life level
         //Each of those 7 categories has 8 values coresponding to each life level
         //Damage values that do not scale with life levels are currently not randomized.
-        int[,] life = new int[numBanks, 8];
-        for (int i = 0; i < numBanks; i++)
+        byte[] life = rom.GetBytes(start, numBanks * 8);
+        byte[] newLifeBytes = RandomizeLifeEffectiveness(RNG, life, props.LifeEffectiveness);
+        rom.Put(start, newLifeBytes);
+    }
+
+    private static byte[] RandomizeLifeEffectiveness(Random RNG, byte[] life, LifeEffectiveness statEffectiveness)
+    {
+        if (statEffectiveness == LifeEffectiveness.VANILLA)
         {
-            for (int j = 0; j < 8; j++)
-            {
-                int lifeVal = rom.GetByte(start + (i * 8) + j);
-                int highPart = (lifeVal & 0xF0) >> 4;
-                int lowPart = lifeVal & 0x0F;
-                life[i, j] = highPart * 8 + lowPart / 2;
-            }
+            return life;
         }
 
-        LifeEffectiveness lifeEffectiveness = props.LifeEffectiveness;
+        int numBanks = 7;
+        byte[] newLife = new byte[numBanks * 8];
+
+        if (statEffectiveness == LifeEffectiveness.OHKO)
+        {
+            Array.Fill<byte>(newLife, 0xFF);
+            return newLife;
+        }
+        if (statEffectiveness == LifeEffectiveness.INVINCIBLE)
+        {
+            Array.Fill<byte>(newLife, 0x00);
+            return newLife;
+        }
 
         for (int j = 0; j < 8; j++)
         {
             for (int i = 0; i < numBanks; i++)
             {
-                int nextVal = life[i, j];
-                if (lifeEffectiveness == LifeEffectiveness.AVERAGE)
+                byte nextVal;
+                byte vanilla = (byte)(life[i * 8 + j] >> 1);
+                int min = (int)(vanilla * .75);
+                int max = Math.Min((int)(vanilla * 1.5), 120);
+                switch (statEffectiveness)
                 {
-                    int max = (int)(life[i, j] + life[i, j] * .5);
-                    int min = (int)(life[i, j] - life[i, j] * .25);
-                    if (j == 0)
+                    case LifeEffectiveness.AVERAGE_LOW:
+                        nextVal = (byte)RNG.Next(vanilla, max);
+                        break;
+                    case LifeEffectiveness.AVERAGE:
+                        nextVal = (byte)RNG.Next(min, max);
+                        break;
+                    case LifeEffectiveness.AVERAGE_HIGH:
+                        nextVal = (byte)RNG.Next(min, vanilla);
+                        break;
+                    case LifeEffectiveness.HIGH:
+                        nextVal = (byte)(vanilla * .5);
+                        break;
+                    default:
+                        throw new Exception("Invalid Life Effectiveness");
+                }
+                if (j > 0)
+                {
+                    byte lastVal = (byte)(newLife[i * 8 + j - 1] >> 1);
+                    if (nextVal > lastVal)
                     {
-                        nextVal = RNG.Next(min, Math.Min(max, 120));
-                    }
-                    else
-                    {
-                        nextVal = RNG.Next(min, Math.Min(max, 120));
-                        if (nextVal > life[i, j - 1])
-                        {
-                            nextVal = life[i, j - 1];
-                        }
+                        nextVal = lastVal; // levelling up should never be worse
                     }
                 }
-                else if (props.LifeEffectiveness == LifeEffectiveness.HIGH)
-                {
-                    nextVal = (int)(life[i, j] * .5);
-                }
-
-                life[i, j] = nextVal;
+                newLife[i * 8 + j] = (byte)(nextVal << 1);
             }
         }
-
-        for (int i = 0; i < numBanks; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                int highPart = (life[i, j] / 8) << 4;
-                int lowPart = (life[i, j] % 8);
-                rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
-            }
-        }
-
+        return newLife;
     }
 
     private void RandomizeMagicEffectiveness(ROM rom)
     {
+        //8 spells by 8 magic levels
         int numBanks = 8;
         int start = 0xD8B;
-        //8 spells by 8 magic levels
-        int[,] magicCosts = new int[numBanks, 8];
-        for (int i = 0; i < numBanks; i++)
+        byte[] magicCosts = rom.GetBytes(start, numBanks * 8);
+        byte[] newMagicCostBytes = RandomizeMagicEffectiveness(RNG, magicCosts, props.MagicEffectiveness);
+        rom.Put(start, newMagicCostBytes);
+    }
+
+    private byte[] RandomizeMagicEffectiveness(Random RNG, byte[] magicCosts, MagicEffectiveness statEffectiveness)
+    {
+        if (statEffectiveness == MagicEffectiveness.VANILLA)
         {
-            for (int j = 0; j < 8; j++)
-            {
-                int magicCost = rom.GetByte(start + (i * 8) + j);
-                int highPart = (magicCost & 0xF0) >> 4;
-                int lowPart = magicCost & 0x0F;
-                magicCosts[i, j] = highPart * 8 + lowPart / 2;
-            }
+            return magicCosts;
         }
 
-        MagicEffectiveness currentStatEffectiveness = props.MagicEffectiveness;
+        int numBanks = 8;
+        byte[] newMagicCosts = new byte[numBanks * 8];
 
-        for (int j = 0; j < 8; j++)
+        if (statEffectiveness == MagicEffectiveness.FREE)
         {
-            for (int i = 0; i < numBanks; i++)
-            {
-                int nextVal = magicCosts[i, j];
-                if (currentStatEffectiveness == MagicEffectiveness.AVERAGE)
-                {
-                    int max = (int)(magicCosts[i, j] + magicCosts[i, j] * .5);
-                    int min = (int)(magicCosts[i, j] - magicCosts[i, j] * .5);
+            Array.Fill<byte>(newMagicCosts, 0);
+            return newMagicCosts;
+        }
 
-                    if (j == 0)
+        for (int level = 0; level < 8; level++)
+        {
+            for (int spellIndex = 0; spellIndex < numBanks; spellIndex++)
+            {
+                byte nextVal;
+                byte vanilla = (byte)(magicCosts[spellIndex * 8 + level] >> 1);
+                int min = (int)(vanilla * .5);
+                int max = Math.Min((int)(vanilla * 1.5), 120);
+                switch (statEffectiveness)
+                {
+                    case MagicEffectiveness.HIGH_COST:
+                        nextVal = (byte)max;
+                        break;
+                    case MagicEffectiveness.AVERAGE_HIGH_COST:
+                        nextVal = (byte)RNG.Next(vanilla, max);
+                        break;
+                    case MagicEffectiveness.AVERAGE:
+                        nextVal = (byte)RNG.Next(min, max);
+                        break;
+                    case MagicEffectiveness.AVERAGE_LOW_COST:
+                        nextVal = (byte)RNG.Next(min, vanilla);
+                        break;
+                    case MagicEffectiveness.LOW_COST:
+                        nextVal = (byte)min;
+                        break;
+                    default:
+                        throw new Exception("Invalid Magic Effectiveness");
+                }
+                if (level > 0)
+                {
+                    byte lastVal = (byte)(newMagicCosts[spellIndex * 8 + level - 1] >> 1);
+                    if (nextVal > lastVal)
                     {
-                        nextVal = RNG.Next(min, Math.Min(max, 120));
-                    }
-                    else
-                    {
-                        nextVal = RNG.Next(min, Math.Min(max, 120));
-                        if (nextVal > magicCosts[i, j - 1])
-                        {
-                            nextVal = magicCosts[i, j - 1];
-                        }
+                        nextVal = lastVal; // levelling up should never be worse
                     }
                 }
-                else if (props.MagicEffectiveness == MagicEffectiveness.HIGH_COST)
-                {
-                    nextVal = (int)(magicCosts[i, j] + (magicCosts[i, j] * .5));
-                }
-                else if (props.MagicEffectiveness == MagicEffectiveness.LOW_COST)
-                {
-                    nextVal = (int)(magicCosts[i, j] * .5);
-                }
-
-                nextVal = Math.Min(120, nextVal);
-                magicCosts[i, j] = nextVal;
+                newMagicCosts[spellIndex * 8 + level] = (byte)(nextVal << 1);
             }
         }
-
-        for (int i = 0; i < numBanks; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                int highPart = (magicCosts[i, j] / 8) << 4;
-                int lowPart = (magicCosts[i, j] % 8);
-                rom.Put(start + (i * 8) + j, (byte)(highPart + (lowPart * 2)));
-            }
-        }
-
+        return newMagicCosts;
     }
 
     private void RandomizeEnemyStats()
@@ -2649,30 +2649,6 @@ public class Hyrule
             //Swap the ANDs that check whether or not you have the stab
             rom.Put(0xF4D3, 0x04);
             rom.Put(0xF4EB, 0x10);
-        }
-
-        if (props.LifeEffectiveness == LifeEffectiveness.INVINCIBLE)
-        {
-            for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
-            {
-                rom.Put(i, 0);
-            }
-        }
-
-        if (props.LifeEffectiveness == LifeEffectiveness.OHKO)
-        {
-            for (int i = 0x1E2BF; i < 0x1E2BF + 56; i++)
-            {
-                rom.Put(i, 0xFF);
-            }
-        }
-
-        if (props.MagicEffectiveness == MagicEffectiveness.FREE)
-        {
-            for (int i = 0xD8B; i < 0xD8b + 64; i++)
-            {
-                rom.Put(i, 0);
-            }
         }
 
         if (props.ShufflePalacePalettes)
