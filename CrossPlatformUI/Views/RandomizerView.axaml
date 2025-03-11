@@ -17,7 +17,7 @@
     <StackPanel Orientation="Vertical">
         <Grid ColumnDefinitions="2*, *, *" RowDefinitions="Auto" Margin="0">
             <StackPanel Grid.Column="0">
-                <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}" />
+                <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}"/>
             </StackPanel>
             <StackPanel Grid.Column="1">
                 <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">

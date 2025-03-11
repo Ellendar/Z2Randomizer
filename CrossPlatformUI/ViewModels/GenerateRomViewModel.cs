@@ -91,8 +91,8 @@ Seed: {config.Seed}
                     await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
                     if(config.GenerateSpoiler)
                     {
-                        filename = $"Z2_{config.Seed}_{config.Flags}.spoiler";
-                        await files.SaveSpoilerFile(filename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
+                        var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}.spoiler";
+                        await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
                     }
                     Progress = $"Generation Complete! Hash: {randomizer.Hash}\n\nFile {filename} created";
                     IsComplete = true;

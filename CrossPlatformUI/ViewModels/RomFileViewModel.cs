@@ -59,6 +59,10 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
             if (read == 1024 * 256 + 0x10)
             {
                 RomData = tmp;
+                if((Main.OutputFilePath ?? "") == "")
+                {
+                    Main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
+                }
                 HostScreen.Router.NavigateBack.Execute();
                 // Manually save the state 
                 if (OperatingSystem.IsBrowser())

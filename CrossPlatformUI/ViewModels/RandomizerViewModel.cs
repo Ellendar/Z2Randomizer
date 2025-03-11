@@ -94,6 +94,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             var folder = await fileDialog.OpenFolderAsync();
             Main.OutputFilePath = folder?.Path.LocalPath ?? "";
         });
+
         ToggleTheme = ReactiveCommand.CreateFromTask(async () =>
         {
             if(App.Current!.ActualThemeVariant == ThemeVariant.Dark)
@@ -139,7 +140,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     {
         Flags = string.IsNullOrEmpty(Main.Config.Flags)
             ? BuiltinPreset.BeginnerPreset.Flags
-            : Main.Config.Flags;
+            : Main.Config.Flags?.Trim() ?? "";
 
         Main.Config.PropertyChanged += (sender, args) =>
         {
@@ -252,11 +253,12 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         get => validatedFlags;
         set
         {
-            if (IsFlagStringValid(value) && value != Main.Config.Flags)
+            string trimmedValue = value.Trim() ?? "";
+            if (IsFlagStringValid(trimmedValue) && value != Main.Config.Flags)
             {
-                Main.Config.Flags = value;
+                Main.Config.Flags = trimmedValue;
             }
-            this.RaiseAndSetIfChanged(ref validatedFlags, value);
+            this.RaiseAndSetIfChanged(ref validatedFlags, trimmedValue);
         }
     }
 

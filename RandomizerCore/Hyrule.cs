@@ -649,8 +649,17 @@ public class Hyrule
             switch (attackEffectiveness)
             {
                 case AttackEffectiveness.LOW:
-                    //This would be less than 1 damage per level which will be fixed below
-                    nextVal = (int)Math.Round(attackValues[i] * .5, MidpointRounding.ToPositiveInfinity);
+                    //the naieve approach here gives a curve of 1,2,2,4,5,6 which is weird, or a different 
+                    //irregular curve in digshake's old approach. Just use a linear increase for the first 6 levels on low
+                    if(i < 6)
+                    {
+                        nextVal = i + 1;
+                    }
+                    else
+                    {
+                        //This would be less than 1 damage per level which will be fixed below
+                        nextVal = (int)Math.Round(attackValues[i] * .5, MidpointRounding.ToPositiveInfinity);
+                    }
                     break;
                 case AttackEffectiveness.AVERAGE_LOW:
                     nextVal = RandomInRange(vanilla * .5, vanilla);
@@ -2231,18 +2240,13 @@ public class Hyrule
                 low = 0;
             }
 
-            if (props.EnemyXPDrops != XPEffectiveness.RANDOM)
+            if (props.EnemyXPDrops.IsRandom())
             {
                 low = RNG.Next(low - 2, low + 3);
             }
-            if (low < 0)
-            {
-                low = 0;
-            }
-            else if (low > 15)
-            {
-                low = 15;
-            }
+
+            low = Math.Min(Math.Max(low, 0), 15);
+
             rom.Put(i, (byte)(high + low));
         }
     }

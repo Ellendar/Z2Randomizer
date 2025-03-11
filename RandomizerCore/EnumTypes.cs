@@ -149,19 +149,21 @@ public enum XPEffectiveness
     NONE
 }
 
-//The old unified stateffectiveness is still used on the rando side, but moved
-//to separate effectivenesses for the config mapping
-/*
-public enum StatEffectiveness
+public static class XPEffectivenessExtensions
 {
-    NONE, 
-    LOW, 
-    VANILLA, 
-    AVERAGE, 
-    HIGH, 
-    MAX
+    public static bool IsRandom(this XPEffectiveness effectiveness)
+    {
+        return effectiveness switch
+        {
+            XPEffectiveness.RANDOM_LOW => true,
+            XPEffectiveness.RANDOM_HIGH => true,
+            XPEffectiveness.RANDOM => true,
+            XPEffectiveness.NONE => false,
+            XPEffectiveness.VANILLA => false,
+            _ => throw new Exception("Unrecognized XPEffectiveness")
+        };
+    }
 }
-*/
 
 
 [DefaultValue(NORMAL)]

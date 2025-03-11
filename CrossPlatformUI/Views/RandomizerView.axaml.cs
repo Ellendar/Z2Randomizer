@@ -17,4 +17,5 @@ public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
         this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);
     }
+
 }
