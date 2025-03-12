@@ -147,7 +147,7 @@ public class SideviewEditable<T> where T : Enum
                     var xSkip = SideviewMapCommand<T>.CreateXSkip(xDiff / 16);
                     Commands.Insert(i, xSkip);
                     i++;
-                    xDiff = xDiff & 0xF;
+                    xDiff = o.AbsX & 0xF;
                 }
                 o.RelX = xDiff;
             }
@@ -168,7 +168,7 @@ public class SideviewEditable<T> where T : Enum
         foreach (var c in Commands)
         {
             sb.AppendLine(c.DebugString());
-}
+        }
         return sb.ToString();
     }
 }
