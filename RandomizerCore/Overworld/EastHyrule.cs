@@ -777,16 +777,6 @@ public sealed class EastHyrule : World
             }
 
         }
-        if (props.HiddenPalace)
-        {
-            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
-                townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
-        }
-        if (props.HiddenKasuto)
-        {
-            rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
-                baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
-        }
 
         if (!ValidateBasicRouting())
         {
@@ -796,6 +786,17 @@ public sealed class EastHyrule : World
         if (!ValidateCaves())
         {
             return false;
+        }
+
+        if (props.HiddenPalace)
+        {
+            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
+                townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
+        }
+        if (props.HiddenKasuto)
+        {
+            rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
+                baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
         }
 
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);

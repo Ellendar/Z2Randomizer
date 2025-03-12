@@ -353,15 +353,12 @@ public class Location
     public int GetWorld()
     {
         //Towns reference their banks
-        if (TerrainType == Terrain.TOWN 
-            || TerrainType == Terrain.GRAVE
-            || (TerrainType == Terrain.FOREST && NeedHammer))
+        if (ActualTown != null)
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
-        //Bagu is 4. This should be a check based on ActualTown, but bagu isn't a town until 4.4
-        //so for now this hack.
-        if (MemAddress == 0x4661)
+        //king's tomb - Get a better signal for this later
+        if (MemAddress == 0x465B)
         {
             return 4;
         }

@@ -55,7 +55,7 @@ public sealed class WestHyrule : World
             { 0x4635, Terrain.FOREST },
             { 0x4636, Terrain.ROAD },
             { 0x4637, Terrain.SWAMP },
-            { 0x4638, Terrain.GRAVE },
+            { 0x4638, Terrain.GRAVE }, //09: Grave red jar
             { 0x4639, Terrain.CAVE },
             { 0x463A, Terrain.CAVE },
             { 0x463B, Terrain.CAVE },
@@ -63,7 +63,7 @@ public sealed class WestHyrule : World
             { 0x463D, Terrain.CAVE },
             { 0x463E, Terrain.CAVE },
             { 0x463F, Terrain.CAVE },
-            { 0x4640, Terrain.GRAVE },
+            { 0x4640, Terrain.GRAVE }, //17: Fairy cave drop
             { 0x4641, Terrain.CAVE },
             { 0x4642, Terrain.BRIDGE },
             { 0x4643, Terrain.BRIDGE },
@@ -82,7 +82,7 @@ public sealed class WestHyrule : World
             //{ 0x4658, terrain.bridge },
             //{ 0x4659, terrain.cave },
             //{ 0x465A, terrain.cave },
-            { 0x465B, Terrain.GRAVE },
+            { 0x465B, Terrain.GRAVE }, //44: King's tomb
             { 0x465C, Terrain.TOWN },
             { 0x465E, Terrain.TOWN },
             { 0x465F, Terrain.TOWN },

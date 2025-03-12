@@ -688,10 +688,6 @@ public class Hyrule
                     nextVal = lastValue; // levelling up should never be worse
                 }
             }
-            if (nextVal < i + 1)
-            {
-                nextVal = i + 1; // at the very minimum always get 1 damage per level
-            }
 
             newAttackValues[i] = (byte)nextVal;
         }
