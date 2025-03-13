@@ -2295,9 +2295,9 @@ public class Hyrule
             rom.Put(0x17b18, 0x20); //Child
         }
 
-        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.randomizer_text.chr"));
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.randomizer_text.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
