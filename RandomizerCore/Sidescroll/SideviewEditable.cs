@@ -70,6 +70,12 @@ public class SideviewEditable<T> where T : Enum
         set { Header[2] = value; }
     }
 
+    public byte BackgroundMap
+    {
+        get { return (byte)(Header[3] & 0b00000111); }
+        set { Header[3] = (byte)((Header[3] & 0b11111000) + (value & 0b00000111)); }
+    }
+
     public SideviewMapCommand<T>? Find(Predicate<SideviewMapCommand<T>> match)
     {
         return Commands.Find(match);
