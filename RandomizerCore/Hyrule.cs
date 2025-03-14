@@ -657,18 +657,21 @@ public class Hyrule
                     }
                     else
                     {
-                        //This would be less than 1 damage per level which will be fixed below
                         nextVal = (int)Math.Round(attackValues[i] * .5, MidpointRounding.ToPositiveInfinity);
                     }
                     break;
                 case AttackEffectiveness.AVERAGE_LOW:
                     nextVal = RandomInRange(vanilla * .5, vanilla);
+                    if (i == 1)
+                    {
+                        nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at level 2
+                    }
                     break;
                 case AttackEffectiveness.AVERAGE:
                     nextVal = RandomInRange(vanilla * .667, vanilla * 1.5);
                     if (i == 0)
                     {
-                        nextVal = Math.Max(nextVal, 2); // legacy hardcoded max 2 damage to start
+                        nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at start
                     }
                     break;
                 case AttackEffectiveness.AVERAGE_HIGH:
@@ -2295,9 +2298,9 @@ public class Hyrule
             rom.Put(0x17b18, 0x20); //Child
         }
 
-        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.randomizer_text.chr"));
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.randomizer_text.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
         {

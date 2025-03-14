@@ -179,10 +179,20 @@ public class SideviewMapCommand<T> where T : Enum
     {
         Debug.Assert(IsNewFloor());
         var floorByte = Bytes[1];
-        if ((floorByte & 0xf) == 0xf) { return true; }        // 0f = complete wall
-        if (y == 0) { return (floorByte & 0b10000000) == 0; } // 8th bit is the ceiling
-        if (y > 10) { return true; }                          // bottom 2 rows are always floor
-        if ((floorByte & 0b1000) == 0)                        // 4th bit branches logic
+        if ((floorByte & 0xf) == 0xf) { return true; } // xf = complete wall, always
+        if ((floorByte & 0b10000000) == 0b10000000) // 8th bit == 1 means open sky
+        {
+            // the 2nd row is normally solid when the "floor" grows from the top,
+            // but open sky overrides that row specifically
+            // (Z2Edit is incorrect when growing from the top with no ceiling)
+            if (y < 2) { return false; }
+        }
+        else
+        {
+            if (y == 0) { return true; }
+        }
+        if (y > 10) { return true; } // bottom 2 rows are always floor
+        if ((floorByte & 0b1000) == 0) // 4th bit branches logic
         {
             return y > 10 - (floorByte & 0b0111);
         }
