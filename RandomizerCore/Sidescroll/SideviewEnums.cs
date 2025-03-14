@@ -28,7 +28,7 @@ public enum PalaceObject
     Curtains = 0x80,
     BreakableBlock2 = 0x90,
     WalkThruBricks = 0xA0,
-    BreakableBlock3 = 0xB0,
+    BreakableBlockVertical = 0xB0,
     Pillar = 0xC0,
     VerticalPit1 = 0xD0,
     VerticalPit2 = 0xE0,

@@ -19,11 +19,36 @@ void ValidateRoomsForFile(string filename)
         .Select(g => g.Key);
     foreach (var name in duplicateNames) { sb.AppendLine($"{name}: room name is used more than once."); }
 
+    // Checking that all room data is conforming to the structure
+    // (It would be very bad if any of the length bytes were wrong.)
+    foreach (var room in palaceRooms!.Where(r => r.Enabled))
+    {
+        try
+        {
+            // From testing: the game can handle the full 255 bytes of sideview map commands
+            var sv = new SideviewEditable<PalaceObject>(room.SideView);
+        }
+        catch (Exception e) { sb.AppendLine($"{GetName(room)}: Room enemies data error. {e.Message}"); }
+
+        try
+        {
+            // From testing: a room with 12 enemies crashes the game. 11 seemed to work.
+            // In the vanilla palace rooms, the max amount of enemies is 9
+            var ee = new EnemiesEditable(room.Enemies);
+            if (ee.Enemies.Count > 9) { sb.AppendLine($"{GetName(room)}: Room has too many enemies ({ee.Enemies.Count})."); }
+        }
+        catch (Exception e) { sb.AppendLine($"{GetName(room)}: Room enemies data error. {e.Message}"); }
+
+        if (room.Connections.Length != 4) { sb.AppendLine($"{GetName(room)}: Room Connections data error."); }
+    }
+
     // REGULAR PALACE ROOMS
     foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber != 7 && !r.SuppressValidation))
     {
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
         if (sv.HasItem() != room.HasItem) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
+
+        if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
 
         if (room.IsBossRoom)
         {
@@ -89,6 +114,8 @@ void ValidateRoomsForFile(string filename)
     foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber == 7 && !r.SuppressValidation))
     {
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
+
+        if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
 
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];

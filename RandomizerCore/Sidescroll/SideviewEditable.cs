@@ -70,6 +70,12 @@ public class SideviewEditable<T> where T : Enum
         set { Header[2] = value; }
     }
 
+    public byte BackgroundMap
+    {
+        get { return (byte)(Header[3] & 0b00000111); }
+        set { Header[3] = (byte)((Header[3] & 0b11111000) + (value & 0b00000111)); }
+    }
+
     public SideviewMapCommand<T>? Find(Predicate<SideviewMapCommand<T>> match)
     {
         return Commands.Find(match);
@@ -147,7 +153,7 @@ public class SideviewEditable<T> where T : Enum
                     var xSkip = SideviewMapCommand<T>.CreateXSkip(xDiff / 16);
                     Commands.Insert(i, xSkip);
                     i++;
-                    xDiff = xDiff & 0xF;
+                    xDiff = o.AbsX & 0xF;
                 }
                 o.RelX = xDiff;
             }
@@ -168,7 +174,7 @@ public class SideviewEditable<T> where T : Enum
         foreach (var c in Commands)
         {
             sb.AppendLine(c.DebugString());
-}
+        }
         return sb.ToString();
     }
 }
