@@ -30,6 +30,10 @@ public class SideviewEditable<T> where T : Enum
     {
         if(bytes.Length < 4) { throw new ArgumentException("Sideview data has no header."); }
         Header = bytes[0..4];
+        if (bytes.Length != Length)
+        {
+            throw new ArgumentException("Sideview data has no header.");
+        }
         Commands = new List<SideviewMapCommand<T>>();
         int i = 4; // start after header
         int xcursor = 0;
@@ -63,6 +67,8 @@ public class SideviewEditable<T> where T : Enum
             Commands.Add(o);
         }
     }
+
+    public byte Length { get => Header[0]; }
 
     public byte FloorHeader
     {
