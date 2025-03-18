@@ -26,9 +26,6 @@ FREE "PRG7" [$FEAA, $FFE8)
 
 bank7_code0 = $c000
 
-.export NmiBankShadow8, NmiBankShadowA
-NmiBankShadow8 = $07b2
-NmiBankShadowA = $07b3
 
 ; Replace the code to wait for sprite 0 with code to set up the scanline IRQ
 .org $d4b2
@@ -65,9 +62,6 @@ SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weir
 .reloc
 .proc IrqHdlr
 	pha
-;	txa
-;	pha
-	
 	lda LineIrqStatusReg
 	
 	lda PpuCtrlForIrq
@@ -78,10 +72,7 @@ SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weir
 	lda #$0
 	sta PPUSCROLL
 	sta LineIrqStatusReg
-;	pla
-;	tax
 	pla
-	
 	rti
 .endproc ; IrqHdlr
 
@@ -107,6 +98,69 @@ LagFrameVar = $100
 ; And since its a lag frame anyway, it doesn't matter what we do since the game will do nothing
 ; for a whole frame anyway.
 HandleLagFrame:
+    ; To allow for testing between the flag on or off, I made it a soft flag 
+    lda #PREVENT_HUD_FLASH_ON_LAG
+    beq @HandleAudio
+    ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
+    lda $fe
+    and #$10
+    beq @HandleAudio
+    ; Check that we are in the side view mode
+    lda $0736
+    cmp #$0b
+    bne @HandleAudio
+    ; Check if we even have a sprite zero on the screen
+    lda $200
+    cmp #$f0
+    bcs @HandleAudio
+    ; keep all flags except for the nametable select to always use nametable 0
+
+    lda $ff
+    and #$fc
+    sta $2000
+    lda #0
+    sta $2005
+    sta $2005
+
+
+    ; Here be dragons :) Write directly to OAM through OAMDATA to set a "lag sprite"
+    ; There's two sources of corruptions when doing this that we need to avoid.
+    ; The first is when you write to OAMADDR, it will corrupt the 8 bytes at that address
+    ; The second is before the start of the frame you need to make sure OAMADDR is at 0
+    ; So the magic trick is if we write 8 bytes starting from $f8, then we'll overwrite the corruption
+    ; and also end with the address 0
+
+    ; But theres one hold up, the sprites at $f8 and $fc are the life bar sprites, so instead
+    ; we can start the write from $f4 and write to the end still
+    lda #$f4
+    sta $2003 ; OAMADDR
+    ; and write a Hand sprite
+    
+    lda #$0e  ; y = 14
+    sta $2004 ; OAMDATA
+    lda #$8E  ; tile = hand sprite
+    sta $2004 ; OAMDATA
+    lda #1    ; attr = palette 1
+    sta $2004 ; OAMDATA
+    lda #248  ; x = 248
+    sta $2004 ; OAMDATA
+
+    ; Load the current health/magic bar into here
+    ; That should prevent sprite corruption since the internal OAM ADDR ends at #0
+    ldx #$f8
+    -   lda $200,x
+        sta $2004
+        inx
+        bne -
+    jsr SetupScanlineIRQ
+@HandleAudio:
+    ; Skip processing audio during a real lag frame since thats what
+    ; vanilla accomplishes with a hard disabled NMI
+    lda SoftDisableNmi
+    bne @skip
+        jsr UpdateSound
+@skip:
+    rts
 
 .segment "PRG7"
 
@@ -118,68 +172,6 @@ RunAudioFrameOrLagFrame:
     tya
     pha
         jsr IncStatTimer
-        ; To allow for testing between the flag on or off, I made it a soft flag 
-        lda #PREVENT_HUD_FLASH_ON_LAG
-        beq @HandleAudio
-        ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
-        lda $fe
-        and #$10
-        beq @HandleAudio
-        ; Check that we are in the side view mode
-        lda $0736
-        cmp #$0b
-        bne @HandleAudio
-        ; Check if we even have a sprite zero on the screen
-        lda $200
-        cmp #$f0
-        bcs @HandleAudio
-        ; keep all flags except for the nametable select to always use nametable 0
-    
-        lda $ff
-        and #$fc
-        sta $2000
-        lda #0
-        sta $2005
-        sta $2005
-    
-    
-        ; Here be dragons :) Write directly to OAM through OAMDATA to set a "lag sprite"
-        ; There's two sources of corruptions when doing this that we need to avoid.
-        ; The first is when you write to OAMADDR, it will corrupt the 8 bytes at that address
-        ; The second is before the start of the frame you need to make sure OAMADDR is at 0
-        ; So the magic trick is if we write 8 bytes starting from $f8, then we'll overwrite the corruption
-        ; and also end with the address 0
-    
-        ; But theres one hold up, the sprites at $f8 and $fc are the life bar sprites, so instead
-        ; we can start the write from $f4 and write to the end still
-        lda #$f4
-        sta $2003 ; OAMADDR
-        ; and write a Hand sprite
-        
-        lda #$0e  ; y = 14
-        sta $2004 ; OAMDATA
-        lda #$8E  ; tile = hand sprite
-        sta $2004 ; OAMDATA
-        lda #1    ; attr = palette 1
-        sta $2004 ; OAMDATA
-        lda #248  ; x = 248
-        sta $2004 ; OAMDATA
-    
-        ; Load the current health/magic bar into here
-        ; That should prevent sprite corruption since the internal OAM ADDR ends at #0
-        ldx #$f8
-        -   lda $200,x
-            sta $2004
-            inx
-            bne -
-        jsr SetupScanlineIRQ
-@HandleAudio:
-        ; Skip processing audio during a real lag frame since thats what
-        ; vanilla accomplishes with a hard disabled NMI
-        lda LagFrameVar
-        lsr
-        bcs @skip
-        
         lda NmiBankShadowA
         pha
         lda NmiBankShadow8
@@ -190,7 +182,7 @@ RunAudioFrameOrLagFrame:
         lda #$8d  ; (bank 6)
         sta NmiBankShadowA
         sta $5115
-            jsr UpdateSound
+            jsr HandleLagFrame
         pla
         sta NmiBankShadow8
         sta $5114
@@ -208,26 +200,20 @@ RunAudioFrameOrLagFrame:
 ; Disable the final sta PPUCTRL in NMI if we handle that in the IRQ instead
 .org $C1B1
     jmp *+3
-; TODO We can't force disable or force enable these.
-; I think I need to also make this a soft enable
-.org $D2C1
-    ldy #$30 | $80
-    jsr SoftDisableNmi
-.reloc
-SoftDisableNmi:
-    inc LagFrameVar
-    sty PPUCTRL
-    rts
-
 .org $C060
-FREE_UNTIL $C06f
+FREE_UNTIL $C06a
+DisabledNmi:
+;    jsr IncStatTimer
+;    rti
 NmiHandleLagFrame:
     jmp RunAudioFrameOrLagFrame
 NmiRunTitleScreen:
     jmp $a610      ; Assumes bank 5 is banked in, which is used for title screen mostly
 Nmi:
+    bit SoftDisableNmi
+    bmi DisabledNmi
     bit LagFrameVar
-    bpl NmiHandleLagFrame ; run audio
+    bpl NmiHandleLagFrame ; run audio or check for lag frame
     bvc NmiRunTitleScreen
     pha
     jsr IncStatTimer
@@ -235,29 +221,20 @@ Nmi:
     sta PreventDoubleLag
 .assert * = $C085
 
-;.reloc
-;NmiRunLagFrame:
-;    jsr RunAudioFrameOrLagFrame
-;    pla
-;    rti
-
 ; Also run the stat timers during the title/menu in case they push the reset button
 .pushseg
 .segment "PRG5"
 .org $A612
     ; Change this from and #$7c to $fc to keep NMI running
-    and #$fc
+    and #$7c | $80
     ; Then insert a quick patch to run the stat timers
     jsr IncStatTimerTitle
 .reloc
 IncStatTimerTitle:
-    pha
-    txa
-    pha
-        jsr IncStatTimer
-    pla
-    tax
-    pla ; perform original patch
+    jsr IncStatTimer
+    ; TODO This doesn't seem right. But maybe the value for
+    ; the title screen in A is always at least $80 ? 
+    sta SoftDisableNmi
     ora $0747
     rts
 .popseg
@@ -267,9 +244,11 @@ IncStatTimerTitle:
 ; This is cleared when a new save file is loaded for the first time
 .reloc
 IncStatTimer:
-    ; TODO validate these aren't needed. It shouldn't be....
-;    txa
-;    pha
+    pha
+    txa
+    pha
+    tya
+    pha
     inc StatTimer+0
     bne @Continue
     inc StatTimer+1
@@ -299,6 +278,11 @@ IncStatTimer:
 ;        bne @Exit ; unconditional also not needed
 @OverworldOrEncounter:
 @Exit:
+    pla
+    tay
+    pla
+    tax
+    pla
     rts
 
 ; These values are exported from the randomizer and map from internal palace number
@@ -326,12 +310,20 @@ Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
     and #$fc
 ; Replace a useless branch with turning on the soft disable
 .org $C091
-    lda #$41
-    sta a:LagFrameVar
+    lda #$80
+    sta a:SoftDisableNmi
 
 .org $C1A8
     jsr SoftEnableNmi
-    
+
+.org $C4CB
+    lda #$80
+    sta a:SoftDisableNmi
+
+.org $C4D8
+    lda #$00
+    sta a:SoftDisableNmi
+
 .reloc
 SoftEnableNmi:
 .if ENABLE_Z2FT
@@ -340,8 +332,22 @@ SoftEnableNmi:
 .endif
     lda #$c0
     sta LagFrameVar
+    lda #0
+    sta SoftDisableNmi
 	; Copy what was overwritten from original game
 	lda PPUSTATUS
+    rts
+
+; TODO We can't force disable or force enable these.
+; I think I need to also make this a soft enable
+.org $D2C1
+    ldy #$30 | $80
+    jsr SetSoftDisableNmi
+.reloc
+SetSoftDisableNmi:
+    sty PPUCTRL
+    ldy #$80
+    sty SoftDisableNmi
     rts
 
 ; To conserve space in the common bank, as much reset code as possible is moved to bank 1f.
@@ -522,6 +528,18 @@ ClearPartialDevRAM:
 ; Patch power off/ soft reset to clear out some stack ram for use
 .org $a6a3
     jsr ClearStackRAM
+
+
+.org $a69c
+    jsr SetSoftEnableNmiWithSta
+.org $a6d5
+    jsr SetSoftEnableNmiWithSta
+.reloc
+SetSoftEnableNmiWithSta:
+    sta PPUCTRL
+    lda #0
+    sta SoftDisableNmi
+    rts
 
 .segment "PRG5","PRG7"
 .reloc

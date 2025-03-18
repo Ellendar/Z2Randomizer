@@ -268,3 +268,8 @@ CHECKPOINT_LEN = RES_OFFSET - CHECKPOINT_START
 ; Duplicate the timestamp memory here that we'll copy after saving
 RESV Checkpoint, CHECKPOINT_LEN
 
+.export NmiBankShadow8, NmiBankShadowA
+; Reserve these in SRAM to prevent issues when clearing ram
+RESV NmiBankShadow8, 1
+RESV NmiBankShadowA, 1
+RESV SoftDisableNmi, 1
