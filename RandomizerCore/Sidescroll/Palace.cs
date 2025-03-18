@@ -1145,10 +1145,13 @@ public class Palace
 
     public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla)
     {
+        //I have no idea why this was here and it breaks stuff. For future removal.
+        /*
         if(isVanilla)
         {
             return AllRooms.Max(i => (byte)(i.Map + 1));
         }
+        */
         if (!AllRooms.Contains(Entrance!))
         {
             throw new Exception("Palace lost its entrance");

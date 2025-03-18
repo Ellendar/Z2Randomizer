@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using CommandLine;
 using CrossPlatformUI;
 using Desktop.Common;
@@ -21,6 +22,9 @@ public class Program
     [Option(ShortName = "r", Description = "Path to the base ROM file")]
     public string? Rom { get; }
 
+    [Option(ShortName = "c", Description = "Path to a file containing the JSON for a RandomizerConfiguration. See the included examples.")]
+    public string? Configuration { get; }
+
     [Option(ShortName = "o", Description = "Path to the folder to save the ROM")]
     public string? OutputPath { get; }
 
@@ -35,23 +39,38 @@ public class Program
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]
-    private int OnExecute()
+    public int OnExecute()
     {
         SetNlogLogLevel(LogLevel.Info);
-        if (string.IsNullOrEmpty(Flags))
-        {
-            logger.Error("The flag string is required");
-            return -1;
-        }
 
-        this.configuration = new RandomizerConfiguration(Flags);
+
+        if (Configuration == null)
+        {
+            if (string.IsNullOrEmpty(Flags))
+            {
+                logger.Error("The flag string is required");
+                return -1;
+            }
+            configuration = new RandomizerConfiguration(Flags);
+        }
+        else
+        {
+
+            if (!File.Exists(Configuration))
+            {
+                logger.Error($"The specified Configuration file does not exist: {Configuration}");
+                return -4;
+            }
+            string configurationString = File.ReadAllText(Configuration);
+            configuration = JsonSerializer.Deserialize(configurationString, SerializationContext.Default.RandomizerConfiguration);
+        }
 
         if (!Seed.HasValue) 
         {
             var r = new Random();
-            this.Seed = r.Next(1000000000);
+            Seed = r.Next(1000000000);
         } 
-        this.configuration.Seed = Seed.Value.ToString();
+        configuration.Seed = Seed.Value.ToString();
 
         if (string.IsNullOrEmpty(Rom))
         {
@@ -64,8 +83,6 @@ public class Program
             logger.Error($"The specified ROM file does not exist: {Rom}");
             return -3;
         }
-
-        // configuration.FileName = Rom;
 
         vanillaRomData = File.ReadAllBytes(Rom);
 
