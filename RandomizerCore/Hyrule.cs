@@ -441,7 +441,12 @@ public class Hyrule
 
             if (props.CombineFire)
             {
-                LinkFire();
+                List<Collectable>? customSpellOrder = props.IncludeSpellsInShuffle
+                    ? null
+                    : AllLocationsForReal()
+                        .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
+                        .Select(l => l.Collectable).ToList();
+                ROMData.CombineFireSpell(assembler, customSpellOrder, RNG);
             }
 
             Dictionary<Town, Collectable> spellMap = new()
@@ -2081,20 +2086,6 @@ public class Hyrule
         eastHyrule.daruniaRoof.Collectable = Collectable.DOWNSTAB;
         westHyrule.midoChurch.Collectable = Collectable.UPSTAB;
     }
-
-    private void LinkFire()
-    {
-        int i = RNG.Next(7);
-        int linkedFireSpellIndex = i > 3 ? i + 1 : i;
-        int linkedFireSpellAddress = 0xDCB + linkedFireSpellIndex;
-        byte linkedFireSpellBit = ROMData.GetByte(linkedFireSpellAddress);
-        int vanillaFireSpellAddress = 0xDCF;
-        byte vanillaFireSpellBit = ROMData.GetByte(vanillaFireSpellAddress);
-        byte combinedSpellBits = (byte)(vanillaFireSpellBit | linkedFireSpellBit);
-        ROMData.Put(linkedFireSpellAddress, combinedSpellBits);
-        ROMData.Put(vanillaFireSpellAddress, combinedSpellBits);
-    }
-
 
     private void RandomizeExperience(ROM rom, int start, int cap)
     {
