@@ -2074,17 +2074,6 @@ public class Hyrule
             townLocation.Collectable = spell;
             unallocatedTowns.Remove(town);
         }
-
-        if (props.CombineFire)
-        {
-            int newFire = RNG.Next(7);
-            if (newFire > 3)
-            {
-                newFire++;
-            }
-            byte newnewFire = (byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
-            ROMData.Put(0xDCF, newnewFire);
-        }
     }
 
     private void SwapUpAndDownstab()
@@ -2095,14 +2084,15 @@ public class Hyrule
 
     private void LinkFire()
     {
-        //LinkedFire
-        int newFire = RNG.Next(7);
-        if (newFire > 3)
-        {
-            newFire++;
-        }
-        byte newnewFire = (byte)(0x10 | ROMData.GetByte(0xDCB + newFire));
-        ROMData.Put(0xDCF, newnewFire);
+        int i = RNG.Next(7);
+        int linkedFireSpellIndex = i > 3 ? i + 1 : i;
+        int linkedFireSpellAddress = 0xDCB + linkedFireSpellIndex;
+        byte linkedFireSpellBit = ROMData.GetByte(linkedFireSpellAddress);
+        int vanillaFireSpellAddress = 0xDCF;
+        byte vanillaFireSpellBit = ROMData.GetByte(vanillaFireSpellAddress);
+        byte combinedSpellBits = (byte)(vanillaFireSpellBit | linkedFireSpellBit);
+        ROMData.Put(linkedFireSpellAddress, combinedSpellBits);
+        ROMData.Put(vanillaFireSpellAddress, combinedSpellBits);
     }
 
 
