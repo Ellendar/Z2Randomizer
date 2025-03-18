@@ -5,73 +5,344 @@
 FREE "PRG7" [$FEAA, $FFE8)
 
 .segment "HEADER"
-.org $4
+.org $04
 .byte $10 ; 256 KB PRG-ROM
 
-.org $6
+.org $06
 .byte $52 ; Mapper 5
 .byte $08 ; use NES 2.0 header
 
-.org $a
+.org $0a
 .byte $70 ; reserve 8kb of PRG NVRAM (SRAM)
 
 .segment "PRG7"
 
+; Replacements for the NMI and IRQ vectors
+
+.org $fffa
+    .word Nmi
+.org $fffe
+	.word IrqHdlr
+
 bank7_code0 = $c000
 
 .export NmiBankShadow8, NmiBankShadowA
-NmiBankShadow8 = $7b2
-NmiBankShadowA = $7b3
+NmiBankShadow8 = $07b2
+NmiBankShadowA = $07b3
 
 ; Replace the code to wait for sprite 0 with code to set up the scanline IRQ
 .org $d4b2
-	; Can clobber all registers
-	lda PpuCtrlShadow
-	ora $746 ; Have concerns about this
-	;sta PpuCtrlShadow
-	sta PpuCtrlForIrq
-	lda ScrollPosShadow
-	sta ScrollPosForIrq
+    jsr SetupScanlineIRQ
+    jmp $D4CE
+FREE_UNTIL $D4CE
+
+.reloc
+SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weird issues on double lags
+    lda PreventDoubleLag
+    bne +
+        ; Can clobber all registers
+        lda PpuCtrlShadow
+        ora $0746 ; Have concerns about this
+        ;sta PpuCtrlShadow
+        sta PpuCtrlForIrq
+        lda ScrollPosShadow
+        sta ScrollPosForIrq
+        inc PreventDoubleLag
+    +
 
 	lda #31
 	sta LineIrqTgtReg
 	
 	lda #ENABLE_SCANLINE_IRQ
 	sta LineIrqStatusReg
-	
-	cli
-    jmp $D4CE
-
-;.assert * = $D4CE
+    ; We have to CLI here to allow IRQ to interrupt NMI
+    ; and we have to CLI on the main thread during reset
+    ; to allow IRQ to fire even after NMI ends (otherwise rti will
+    ; restore the I flag from the initial sei)
+    cli
+    rts
 
 .reloc
 .proc IrqHdlr
 	pha
-	txa
-	pha
+;	txa
+;	pha
 	
 	lda LineIrqStatusReg
-	;lda #DISABLE_SCANLINE_IRQ
-	;sta LineIrqStatusReg
 	
-	ldx PpuCtrlForIrq
+	lda PpuCtrlForIrq
+	sta PPUCTRL
+	sta PpuCtrlShadow ; Not sure about this
 	lda ScrollPosForIrq
 	sta PPUSCROLL
 	lda #$0
 	sta PPUSCROLL
-	stx PPUCTRL
-	
-	stx PpuCtrlShadow ; Not sure about this
-	
-	pla
-	tax
+	sta LineIrqStatusReg
+;	pla
+;	tax
 	pla
 	
 	rti
 .endproc ; IrqHdlr
 
-.org $fffe
-	.word IrqHdlr
+; Summary of the bug
+; On a lag frame NMI is skipped, which means the hud scroll value of 0 isn't set
+; We can work around this by never disabling NMI and using a soft disable instead
+; and if the soft disable flag is set and NMI fires, then we need to just set the scroll to zero
+; and then keep the "sprite zero" hud split check on.
+; All of these changes are always on no matter the setting, 
+
+LagFrameVar = $100
+
+.if ENABLE_Z2FT
+    .import UpdateSound
+.else
+    UpdateSound = $9000
+.endif
+
+.segment "PRG6"
+
+
+; Put our lovely lag frame handler in bank 6 because its pretty empty
+; And since its a lag frame anyway, it doesn't matter what we do since the game will do nothing
+; for a whole frame anyway.
+HandleLagFrame:
+
+.segment "PRG7"
+
+.reloc
+RunAudioFrameOrLagFrame:
+    pha
+    txa
+    pha
+    tya
+    pha
+        jsr IncStatTimer
+        ; To allow for testing between the flag on or off, I made it a soft flag 
+        lda #PREVENT_HUD_FLASH_ON_LAG
+        beq @HandleAudio
+        ; check to see if rendering is even enabled (if its not then we aren't gonna scroll split)
+        lda $fe
+        and #$10
+        beq @HandleAudio
+        ; Check that we are in the side view mode
+        lda $0736
+        cmp #$0b
+        bne @HandleAudio
+        ; Check if we even have a sprite zero on the screen
+        lda $200
+        cmp #$f0
+        bcs @HandleAudio
+        ; keep all flags except for the nametable select to always use nametable 0
+    
+        lda $ff
+        and #$fc
+        sta $2000
+        lda #0
+        sta $2005
+        sta $2005
+    
+    
+        ; Here be dragons :) Write directly to OAM through OAMDATA to set a "lag sprite"
+        ; There's two sources of corruptions when doing this that we need to avoid.
+        ; The first is when you write to OAMADDR, it will corrupt the 8 bytes at that address
+        ; The second is before the start of the frame you need to make sure OAMADDR is at 0
+        ; So the magic trick is if we write 8 bytes starting from $f8, then we'll overwrite the corruption
+        ; and also end with the address 0
+    
+        ; But theres one hold up, the sprites at $f8 and $fc are the life bar sprites, so instead
+        ; we can start the write from $f4 and write to the end still
+        lda #$f4
+        sta $2003 ; OAMADDR
+        ; and write a Hand sprite
+        
+        lda #$0e  ; y = 14
+        sta $2004 ; OAMDATA
+        lda #$8E  ; tile = hand sprite
+        sta $2004 ; OAMDATA
+        lda #1    ; attr = palette 1
+        sta $2004 ; OAMDATA
+        lda #248  ; x = 248
+        sta $2004 ; OAMDATA
+    
+        ; Load the current health/magic bar into here
+        ; That should prevent sprite corruption since the internal OAM ADDR ends at #0
+        ldx #$f8
+        -   lda $200,x
+            sta $2004
+            inx
+            bne -
+        jsr SetupScanlineIRQ
+@HandleAudio:
+        ; Skip processing audio during a real lag frame since thats what
+        ; vanilla accomplishes with a hard disabled NMI
+        lda LagFrameVar
+        lsr
+        bcs @skip
+        
+        lda NmiBankShadowA
+        pha
+        lda NmiBankShadow8
+        pha
+        lda #$8c  ; (bank 6)
+        sta NmiBankShadow8
+        sta $5114
+        lda #$8d  ; (bank 6)
+        sta NmiBankShadowA
+        sta $5115
+            jsr UpdateSound
+        pla
+        sta NmiBankShadow8
+        sta $5114
+        pla
+        sta NmiBankShadowA
+        sta $5115
+@skip:
+    pla
+    tay
+    pla
+    tax
+    pla
+    rti
+
+; Disable the final sta PPUCTRL in NMI if we handle that in the IRQ instead
+.org $C1B1
+    jmp *+3
+; TODO We can't force disable or force enable these.
+; I think I need to also make this a soft enable
+.org $D2C1
+    ldy #$30 | $80
+    jsr SoftDisableNmi
+.reloc
+SoftDisableNmi:
+    inc LagFrameVar
+    sty PPUCTRL
+    rts
+
+.org $C060
+FREE_UNTIL $C06f
+NmiHandleLagFrame:
+    jmp RunAudioFrameOrLagFrame
+NmiRunTitleScreen:
+    jmp $a610      ; Assumes bank 5 is banked in, which is used for title screen mostly
+Nmi:
+    bit LagFrameVar
+    bpl NmiHandleLagFrame ; run audio
+    bvc NmiRunTitleScreen
+    pha
+    jsr IncStatTimer
+    lda #0
+    sta PreventDoubleLag
+.assert * = $C085
+
+;.reloc
+;NmiRunLagFrame:
+;    jsr RunAudioFrameOrLagFrame
+;    pla
+;    rti
+
+; Also run the stat timers during the title/menu in case they push the reset button
+.pushseg
+.segment "PRG5"
+.org $A612
+    ; Change this from and #$7c to $fc to keep NMI running
+    and #$fc
+    ; Then insert a quick patch to run the stat timers
+    jsr IncStatTimerTitle
+.reloc
+IncStatTimerTitle:
+    pha
+    txa
+    pha
+        jsr IncStatTimer
+    pla
+    tax
+    pla ; perform original patch
+    ora $0747
+    rts
+.popseg
+
+
+; Add a patch to increment the stat timer every NMI
+; This is cleared when a new save file is loaded for the first time
+.reloc
+IncStatTimer:
+    ; TODO validate these aren't needed. It shouldn't be....
+;    txa
+;    pha
+    inc StatTimer+0
+    bne @Continue
+    inc StatTimer+1
+    bne @Continue
+    inc StatTimer+2
+@Continue:
+    ldx #0
+    lda WorldNumber
+    beq @OverworldOrEncounter
+        cmp #3
+        ; 1-West Town, 2-East Town: Increment the timer for the towns
+        bcc @IncrementTimer
+@Palace:
+        ; Palaces
+        lda $0706
+        asl
+        asl
+        adc PalaceNumber
+        tay
+        ldx @PalaceMappingTable,y
+@IncrementTimer:
+        inc StatTimeAtLocation+0,x
+        bne @Exit
+        inc StatTimeAtLocation+1,x
+        bne @Exit
+        inc StatTimeAtLocation+2,x
+;        bne @Exit ; unconditional also not needed
+@OverworldOrEncounter:
+@Exit:
+    rts
+
+; These values are exported from the randomizer and map from internal palace number
+; to the "real palace" at this offset. This way if Palace 5 is in the location of Palace 1,
+; then we increment the correct timer for Palace 5
+.reloc
+Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
+@PalaceMappingTable:
+    .byte RealPalaceAtLocation1 * 3 + Palace1Offset
+    .byte RealPalaceAtLocation2 * 3 + Palace1Offset
+    .byte RealPalaceAtLocation3 * 3 + Palace1Offset
+    .byte $ff ; unused 4th palace in region 0
+    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
+    .byte $ff ; unused 2th palace in region 1
+    .byte $ff ; unused 3th palace in region 1
+    .byte $ff ; unused 4th palace in region 1
+    .byte RealPalaceAtLocation5 * 3 + Palace1Offset
+    .byte RealPalaceAtLocation6 * 3 + Palace1Offset
+    .byte RealPalaceAtLocationGP * 3 + Palace1Offset
+
+; Screen split IRQ implementation. This is not technically a part of z2ft, but due to the policy of not making the game faster than vanilla, this optimization is only enabled when z2ft is enabled to partially offset the cost of FT playback.
+
+; Patch locations that hard disable NMI to set the soft disable instead
+.org $C087
+    and #$fc
+; Replace a useless branch with turning on the soft disable
+.org $C091
+    lda #$41
+    sta a:LagFrameVar
+
+.org $C1A8
+    jsr SoftEnableNmi
+    
+.reloc
+SoftEnableNmi:
+.if ENABLE_Z2FT
+.import CallUpdateSound
+    jsr CallUpdateSound
+.endif
+    lda #$c0
+    sta LagFrameVar
+	; Copy what was overwritten from original game
+	lda PPUSTATUS
+    rts
 
 ; To conserve space in the common bank, as much reset code as possible is moved to bank 1f.
 ; This requires reset to be done in 4 parts:
@@ -139,7 +410,7 @@ wait_ppu:
     beq wait_ppu
     txs
     
-	ldx #($e | PRG_BANK_ROM)
+	ldx #($0e | PRG_BANK_ROM)
     stx PrgBankCReg
     ldx #PRG_RAM_UNPROTECT1_VALUE
     stx PrgRamProtReg1  ; Allow writing to WRAM
@@ -148,6 +419,14 @@ wait_ppu:
     stx ChrBankModeReg  ; mode 3 is CHR mode 8x1k banks
     lda #HORIZ_MIRROR_MODE
     sta NameTableModeReg
+    ; Clear any pending scanline IRQs before before allowing them
+	lda LineIrqStatusReg
+	lda #DISABLE_SCANLINE_IRQ
+	sta LineIrqStatusReg
+    ; And disable Framecounter IRQ
+    lda #$ff
+    sta $4017
+    cli
     ; Set the last sprite bank to a fixed bank for items
     lda #$00
     sta PrgRamBankReg   ; Explicitly switching to PRG RAM bank 0 works around a bug in nintendulator
@@ -256,8 +535,7 @@ ClearStackRAM:
         bne @Loop2
     jmp $d281 ; clear rest of ram
 
-; Fix sword flashing on title screen bug
-
+;;;;; Fix sword flashing on title screen bug
 ; Switch the OAM position of an unused sprite and the glitchy sword tile
 ; and move that just off to the left. This sprite just doesn't seem to glitch?
 

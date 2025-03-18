@@ -17,7 +17,6 @@ UpStabGetItem = $b4d7
 TalkWithStandingStillNpc = $b554
 MirrorWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
-DontKillEnemyFlag = $0122
 
 ; This is in the middle of the normal get item check after it checks if its a item
 ; that uses the $600 flags or the $700 flags

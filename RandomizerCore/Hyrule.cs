@@ -276,8 +276,8 @@ public class Hyrule
                     palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
                 }
 
-                AsmModule sideview_module = new();
-                AsmModule gp_sideview_module = new();
+                AsmModule sideviewModule = new();
+                AsmModule gpSideviewModule = new();
                 //AssemblerCommon.AssemblerCommon validation_sideview_module = new();
                 //AssemblerCommon.AssemblerCommon validation_gp_sideview_module = new();
 
@@ -326,14 +326,14 @@ public class Hyrule
                 foreach (byte[] sv in sideviews.Keys)
                 {
                     var name = "Sideview_" + i++;
-                    sideview_module.Segment("PRG4", "PRG7");
-                    sideview_module.Reloc();
-                    sideview_module.Label(name);
-                    sideview_module.Byt(sv);
+                    sideviewModule.Segment("PRG4", "PRG7");
+                    sideviewModule.Reloc();
+                    sideviewModule.Label(name);
+                    sideviewModule.Byt(sv);
                     List<Room> rooms = sideviews[sv];
                     foreach (Room room in rooms)
                     {
-                        room.WriteSideViewPtr(sideview_module, name);
+                        room.WriteSideViewPtr(sideviewModule, name);
                         room.UpdateItemGetBits(ROMData);
                         room.UpdateEnemies(enemyAddr, ROMData);
                         enemyAddr += room.NewEnemies.Length;
@@ -348,14 +348,14 @@ public class Hyrule
                 {
                     var name = "SideviewGP_" + i++;
 
-                    gp_sideview_module.Segment("PRG5", "PRG7");
-                    gp_sideview_module.Reloc();
-                    gp_sideview_module.Label(name);
-                    gp_sideview_module.Byt(sv);
+                    gpSideviewModule.Segment("PRG5", "PRG7");
+                    gpSideviewModule.Reloc();
+                    gpSideviewModule.Label(name);
+                    gpSideviewModule.Byt(sv);
                     List<Room> rooms = sideviewsgp[sv];
                     foreach (Room room in rooms)
                     {
-                        room.WriteSideViewPtr(gp_sideview_module, name);
+                        room.WriteSideViewPtr(gpSideviewModule, name);
                         room.UpdateItemGetBits(ROMData);
                         room.UpdateEnemies(enemyAddr, ROMData);
                         enemyAddr += room.NewEnemies.Length;
@@ -370,8 +370,8 @@ public class Hyrule
                     //be tested here, but we don't actually know what they will be until later, for now i'm just
                     //testing with the vanilla text, but this could be an issue down the line.
                     ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
-                    validationEngine.Add(sideview_module);
-                    validationEngine.Add(gp_sideview_module);
+                    validationEngine.Add(sideviewModule);
+                    validationEngine.Add(gpSideviewModule);
                     await testRom.ApplyAsm(validationEngine); //.Wait(ct);
                 }
                 catch (ScriptEngineException e)
@@ -385,8 +385,8 @@ public class Hyrule
                     throw;
                 }
                 passedValidation = true;
-                assembler.Add(sideview_module);
-                assembler.Add(gp_sideview_module);
+                assembler.Add(sideviewModule);
+                assembler.Add(gpSideviewModule);
             }
 
             //Allows casting magic without requeueing a spell
@@ -1963,22 +1963,18 @@ public class Hyrule
 
     private void ShufflePalaces()
     {
+        if (!props.SwapPalaceCont) return;
+        List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
 
-        if (props.SwapPalaceCont)
+        if (props.P7shuffle)
         {
+            pals.Add(eastHyrule.locationAtGP);
+        }
 
-            List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
-
-            if (props.P7shuffle)
-            {
-                pals.Add(eastHyrule.locationAtGP);
-            }
-
-            for (int i = pals.Count() - 1; i > 0; i--)
-            {
-                int swap = RNG.Next(i + 1);
-                Util.Swap(pals[i], pals[swap]);
-            }
+        for (int i = pals.Count - 1; i > 0; i--)
+        {
+            int swap = RNG.Next(i + 1);
+            Util.Swap(pals[i], pals[swap]);
         }
 
     }
@@ -3495,13 +3491,13 @@ HelmetHeadGoomaFix:
 
     private void RestartWithPalaceUpA(Assembler a) {
         a.Module().Code("""
+.include "z2r.inc"
+
 update_next_level_exp = $a057
 
 ;(0=caves, enemy encounters...; 1=west hyrule towns; 2=east hyrule towns; 3=palace 1,2,5 ; 4=palace 3,4,6 ; 5=great palace)
 world_number = $707
 room_code = $561
-temp_room_code = $120
-temp_room_flag = $121
 
 .segment "PRG7"
 
@@ -3576,14 +3572,6 @@ FixSoftlock:
         stx $074c
 +   rts
 """, "fix_softlock.s");
-    }
-
-    public void ApplyHudFixes(Assembler asm, bool preventFlash, bool enableZ2ft)
-    {
-        var a = asm.Module();
-        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
-        a.Assign("ENABLE_Z2FT", enableZ2ft ? 1 : 0);
-        a.Code(Util.ReadResource("RandomizerCore.Asm.FixedHud.s"), "fixed_hud.s");
     }
     
     public void ExpandedPauseMenu(Assembler a)
@@ -3743,7 +3731,7 @@ FREE_UNTIL $c2ca
 """, "fix_continent_transitions.s");
     }
 
-    public void UpdateTexts(Assembler asm, List<Text> hints)
+    private void UpdateTexts(Assembler asm, List<Text> hints)
     {
         var a = asm.Module();
         // Clear out the ROM for the existing tables
@@ -3778,11 +3766,26 @@ FREE_UNTIL $c2ca
         }
     }
 
+    private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
+    {
+        var a = asm.Module();
+        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
+        a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
+        a.Assign("RealPalaceAtLocation1", (westHyrule?.locationAtPalace1.PalaceNumber ?? 1) - 1);
+        a.Assign("RealPalaceAtLocation2", (westHyrule?.locationAtPalace2.PalaceNumber ?? 2) - 1);
+        a.Assign("RealPalaceAtLocation3", (westHyrule?.locationAtPalace3.PalaceNumber ?? 3) - 1);
+        a.Assign("RealPalaceAtLocation4", (mazeIsland?.locationAtPalace4.PalaceNumber ?? 4) - 1);
+        a.Assign("RealPalaceAtLocation5", (eastHyrule?.locationAtPalace5.PalaceNumber ?? 5) - 1);
+        a.Assign("RealPalaceAtLocation6", (eastHyrule?.locationAtPalace6.PalaceNumber ?? 6) - 1);
+        a.Assign("RealPalaceAtLocationGP", (eastHyrule?.locationAtGP.PalaceNumber ?? 7) - 1);
+        a.Code(Util.ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
+    }
+
     private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
-        rom.ChangeMapperToMMC5(engine);
+        ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic);
         rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
@@ -3828,7 +3831,7 @@ FREE_UNTIL $c2ca
             StandardizeDrops(engine);
         }
         FixSoftLock(engine);
-        ApplyHudFixes(engine, props.DisableHUDLag, randomizeMusic);
+        
         RandomizeStartingValues(engine, rom);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);

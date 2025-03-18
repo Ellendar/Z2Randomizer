@@ -108,6 +108,9 @@ MulHiReg = $5206
 PpuCtrlShadow = $ff
 ScrollPosShadow = $fd
 
+PalaceNumber = $056c
+WorldNumber = $0707
+
 ClearNametables = $d266
 JumpEngine = $d385
 
@@ -160,11 +163,22 @@ ITEM_SPELL_SPELL = $22
 ITEM_THUNDER_SPELL = $23
 ITEM_DASH_SPELL = $24
 
+;; NEW VARIABLE ALLOCATIONS
+; Stack RAM
+StackRAMBase = $0120
+SET_RES_BASE StackRAMBase
+RESV temp_room_code ; , $0120
+RESV temp_room_flag ; , $0121
+RESV DontKillEnemyFlag ; , $0122
+RESV Global5050JarDrop ; = $123 ; $0123
+RESV PreventDoubleLag
+
+
 
 ;; Stat tracking variables in SRAM
 ;; The follow stats are NOT checkpointed because they persist between reloads
 
-StatTrackingBase  = $6380
+StatTrackingBase = $6380
 SET_RES_BASE StatTrackingBase
 
 ; All Timestamp types listed below for reference
@@ -231,6 +245,7 @@ RESV StatUpStabCount, 2
 RESV StatDownStabCount, 2
 ; When we tick up the main timer, if the flag for "in town" or "in palace" is set
 ; we tick those respective timers as well.
+StatTimeAtLocation = StatTimeInTowns 
 RESV StatTimeInTowns, 3
 RESV StatTimeInPalace1, 3
 RESV StatTimeInPalace2, 3

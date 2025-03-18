@@ -881,11 +881,6 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
-    public void ChangeMapperToMMC5(Assembler a)
-    {
-        a.Module().Code(Util.ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
-    }
-
     public async Task<byte[]?> ApplyAsm(Assembler engine)
     {
         return await engine.Apply(rawdata);
@@ -1076,10 +1071,7 @@ OriginalPatchedCode:
     public void Global5050Jar(Assembler a)
     {
         a.Module().Code("""
-; TODO: Add RAM segment support to js65 for allocating variables
-;.segment "SHORTRAM"
-;Global5050JarDrop: .res 1
-Global5050JarDrop = $123 ; $0123
+.include "z2r.inc"
 
 .segment "PRG4"
 ; Patch the count up code and check to see if we are in a dialog
