@@ -50,6 +50,8 @@ void ValidateRoomsForFile(string filename)
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
 
+        CheckLeftAndRightExits(room, sv);
+
         if (room.IsBossRoom)
         {
             var statue = sv.Find(o => o.Id == PalaceObject.IronknuckleStatue && o.AbsX == 62 && o.Y == 9);
@@ -116,6 +118,8 @@ void ValidateRoomsForFile(string filename)
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
+
+        CheckLeftAndRightExits(room, sv);
 
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];
@@ -216,6 +220,28 @@ void RemoveTilesThatAreLavaPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<i
             dropTiles.Remove(pit.AbsX + i);
         }
     }
+}
+
+void CheckLeftAndRightExits<T>(Room room, SideviewEditable<T> sv) where T : Enum
+{
+    var floor = SideviewMapCommand<T>.CreateNewFloor(0, sv.FloorHeader);
+    List<SideviewMapCommand<T>> floors = sv.FindAll(o => o.IsNewFloor());
+    while (floors.Count > 0 && floors[0].AbsX == 0)
+    {
+        floor = floors[0];
+        floors.RemoveAt(0);
+    }
+    // solid wall (0xf) is the only floor without an opening
+    bool hasLeftOpeningWall = (floor.Bytes[1] & 0xf) != 0xf;
+    if (room.HasLeftExit && !hasLeftOpeningWall) { sb.AppendLine($"{GetName(room)}: Room is marked as having a left exit, but there is no left wall opening"); }
+
+    while (floors.Count > 0 && floors[0].AbsX <= 63)
+    {
+        floor = floors[0];
+        floors.RemoveAt(0);
+    }
+    bool hasRightOpeningWall = (floor.Bytes[1] & 0xf) != 0xf;
+    if (room.HasRightExit && !hasRightOpeningWall) { sb.AppendLine($"{GetName(room)}: Room is marked as having a right exit, but there is no right wall opening"); }
 }
 
 void CheckElevators<T>(Room room, List<SideviewMapCommand<T>> elevators, SortedSet<int> openCeilingTiles, SortedSet<int> dropTiles) where T : Enum
