@@ -255,9 +255,9 @@ IncStatTimer:
     bne @Continue
     inc StatTimer+2
 @Continue:
-    ldx #0
     lda WorldNumber
     beq @OverworldOrEncounter
+        ldx #0
         cmp #3
         ; 1-West Town, 2-East Town: Increment the timer for the towns
         bcc @IncrementTimer
@@ -331,7 +331,9 @@ SoftEnableNmi:
 .import CallUpdateSound
     jsr CallUpdateSound
 .endif
-    lda #$c0
+;    lda #$c0
+    lda LagFrameVar
+    ora #$80
     sta LagFrameVar
     lda #0
     sta SoftDisableNmi

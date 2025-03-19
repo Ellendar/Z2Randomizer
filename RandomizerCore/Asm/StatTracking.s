@@ -17,9 +17,185 @@ SPACE = $f4
 
 CONVERT = $80
 
-; TODO: Add patches to update stats
+.segment "PRG7"
+.reloc
+LinkJustDied:
+    inc StatDeaths
+    inc $0494
+    rts
+
+; Update all locations that sets $0494 - link just died
+.org $E349
+    jsr LinkJustDied
+
+.segment "PRG0"
+.org $9199
+    jsr LinkJustDied
+.segment "PRG5"
+.org $A279
+    jsr LinkJustDied
+
+.segment "PRG0"
+; The game essentially "resets" the metasprite each frame at the start,
+; so we patch it to store elsewhere for checking if we downstabbed.
+.org $949b ; sta $80 rts
+    jmp SetPreviousFrameAction
+.reloc
+SetPreviousFrameAction:
+    ldy $80
+    sty PreviousFrameMetasprite
+    sta $80
+    rts
+
+.org $95FC ; sty $0400
+    jsr StatTrackSwordSwipe
+.reloc
+StatTrackSwordSwipe:
+    sty $0400
+    ; Need to use X so we need to preserve it
+    txa
+    tay
+    lda $17 ; 1 if crouching 0 if not
+    asl
+    tax
+    inc StatHiStabCount+0,x
+    bne @Exit
+    inc StatHiStabCount+1,x
+    tya
+    tax
+@Exit:
+    rts
+
+.org $9586 ; bmi $958A lda #$02
+    jsr StatTrackUpStab
+    nop
+
+.reloc
+StatTrackUpStab:
+    ; At this point its decided we will upstab, but if we are falling we cant
+    ; a = upstab anim, y = links y velocity, so if its falling, do the original lda #2
+    bpl @Falling
+        ; we are rising, check for upstab
+        ; We are actually upstabing frfr so now we can stat track it
+        ; check if we are on cooldown since the game doesn't have a cooldown builtin
+        ; we do this by checking if the previous animation frame was an upstab
+        cmp #8
+        bne @Exit ; not an upstab
+        cmp PreviousFrameMetasprite
+        beq @Exit ; not a new upstab
+        ldy $0400 ; current stab timer
+        bne @Exit ; upstab canceled by regular stab
+            inc StatUpStabCount+0
+            bne @Exit
+            inc StatUpStabCount+1
+        jmp @Exit
+@Falling:
+    lda #2
+@Exit:
+    rts
+
+.org $9597 ; lda #$09 sta $80
+   jsr StatTrackDownStab
+   nop
+.reloc
+StatTrackDownStab:
+    lda #9
+    cmp PreviousFrameMetasprite
+    beq @NotNewDownstab
+    ldy $0400 ; current stab timer
+    bne @Exit ; downstab canceled by regular stab
+        inc StatDownStabCount+0
+        bne @Exit
+        inc StatDownStabCount+1
+@NotNewDownstab:
+@Exit:
+    sta $80
+    rts
+    
+
+.segment "PRG4"
+
+.org $9B0F ; dec $0794
+    jsr SaveTimestampForPalace
+
+.reloc
+SaveTimestampForPalace:
+    dec $0794
+    lda $0706
+    asl
+    asl
+    adc PalaceNumber
+    tay
+    lda PalaceTable,y
+    jmp AddTimestamp
+PalaceTable:
+    .byte RealPalaceAtLocation1 + TsPalace1
+    .byte RealPalaceAtLocation2 + TsPalace1
+    .byte RealPalaceAtLocation3 + TsPalace1
+    .byte $ff ; unused 4th palace in region 0
+    .byte RealPalaceAtLocation4 + TsPalace1
+    .byte $ff ; unused 2th palace in region 1
+    .byte $ff ; unused 3th palace in region 1
+    .byte $ff ; unused 4th palace in region 1
+    .byte RealPalaceAtLocation5 + TsPalace1
+    .byte RealPalaceAtLocation6 + TsPalace1
+    .byte RealPalaceAtLocationGP + TsPalace1
 
 .segment "PRG7"
+
+.reloc
+.export CheckAddItemTimestamp
+CheckAddItemTimestamp:
+    ; Check if the item is tracked and add timestamp if it is
+    ; Item is in A, we must preserve X
+    pha
+        tay
+        lda ItemIDToTimestampId,y
+        bmi @NotTracked ; Item is not tracked
+            jsr AddTimestamp
+@NotTracked:
+    pla
+    tay
+    cpy #8
+    rts
+ItemIDToTimestampId:
+    .byte $ff ; ITEM_CANDLE
+    .byte TsGlove ; ITEM_GLOVE
+    .byte TsRaft ; ITEM_RAFT
+    .byte TsBoots ; ITEM_BOOTS
+    .byte $ff ; ITEM_FLUTE
+    .byte $ff ; ITEM_CROSS
+    .byte TsHammer ; ITEM_HAMMER
+    .byte $ff ; ITEM_MAGIC_KEY
+    .byte $ff ; ITEM_KEY
+    .byte $ff ; ITEM_DO_NOT_USE
+    .byte $ff ; ITEM_SMALL_PBAG
+    .byte $ff ; ITEM_MEDIUM_PBAG
+    .byte $ff ; ITEM_LARGE_PBAG
+    .byte $ff ; ITEM_XL_PBAG
+    .byte $ff ; ITEM_MAGIC_CONTAINER
+    .byte $ff ; ITEM_HEART_CONTAINER
+    .byte $ff ; ITEM_BLUE_MAGIC_JAR
+    .byte $ff ; ITEM_RED_MAGIC_JAR
+    .byte $ff ; ITEM_1UP
+    .byte $ff ; ITEM_CHILD
+    .byte $ff ; ITEM_TROPHY
+    .byte $ff ; ITEM_MEDICINE
+    .byte $ff ; ITEM_DO_NOT_USE_ANTIFAIRY
+    .byte $ff ; ITEM_UPSTAB
+    .byte $ff ; ITEM_DOWNSTAB
+    .byte $ff ; ITEM_BAGU
+    .byte $ff ; ITEM_MIRROR
+    .byte $ff ; ITEM_WATER
+    .byte $ff ; ITEM_SHIELD_SPELL
+    .byte TsJumpSpell ; ITEM_JUMP_SPELL
+    .byte $ff ; ITEM_LIFE_SPELL
+    .byte TsFairySpell ; ITEM_FAIRY_SPELL
+    .byte $ff ; ITEM_FIRE_SPELL
+    .byte TsReflectSpell ; ITEM_REFLECT_SPELL
+    .byte $ff ; ITEM_SPELL_SPELL
+    .byte TsThunderSpell ; ITEM_THUNDER_SPELL
+    .byte $ff ; ITEM_DASH_SPELL
 
 ;;;
 ; Writes the current timestamp to SRAM.
@@ -28,21 +204,22 @@ CONVERT = $80
 .reloc
 .export AddTimestamp
 AddTimestamp:
-  ldx TimestampCount
-  sta TimestampTypeList,x
+  ldy TimestampCount
+  sta TimestampTypeList,y
   asl ; clears carry
-  adc TimestampTypeList,x
-  tax
+  adc TimestampTypeList,y
+  tay
   ; double read the timestamp. this prevents an issue where reading is interrupted by NMI
   ; keep the lo value in X so we can check if it changed and read again if it does
--   ldy StatTimer+0
-    tya
-    sta TimestampList,x
-    lda StatTimer+1
-    sta TimestampList + 1,x
-    lda StatTimer+2
-    sta TimestampList + 2,x
-    cpy StatTimer+0
+-   lda StatTimer+0
+    pha
+        sta TimestampList,y
+        lda StatTimer+1
+        sta TimestampList+1,y
+        lda StatTimer+2
+        sta TimestampList+2,y
+    pla
+    cmp StatTimer+0
     bne -
   inc TimestampCount
   rts
@@ -89,7 +266,18 @@ LoadSaveFile = $B911
 LoadSaveFileCopyPointers = $BA6C
 LoadSaveFileCopyPointersSlotA = $BA6F
 
+; Patch the save check on restart to copy over from checkpoint since we
+; "lost" whatever timestamps we had after a reset
+.org $B963
+    jsr PatchLoadStatsFromCheckpoint
+.reloc
+PatchLoadStatsFromCheckpoint:
+    jsr LoadStatsFromCheckpoint
+    jmp LoadSaveFileCopyPointersSlotA
 
+; Hook the save file load routine to see if our special flag is set
+; If its set, then this is the first time its loaded, so we reset all stat tracking data
+; If its not set, then we do nothing (ie: the player reset the console during a playthrough)
 .org $B2B9
     jsr CheckIfNewSaveFile
 
@@ -108,6 +296,7 @@ CheckIfNewSaveFile:
     +
     jmp LoadSaveFile
 
+; Patch the "Register" end button to set a flag for a new save file  
 .org $B45E
     jsr SetNewSaveFile
 
@@ -118,6 +307,7 @@ SetNewSaveFile:
     sta StatTrackingSaveFileClear ; 1 = new file, 0 = old file 
     rts
 
+; Patch a few save/load locations in the game to also update the timestamp checkpoints
 .org $B931
     jsr LoadStatsFromCheckpoint
 
@@ -127,8 +317,8 @@ SetNewSaveFile:
 .reloc
 SaveStatsToCheckpoint:
   ldy #CHECKPOINT_LEN-1
--   lda Checkpoint,y
-    sta Checkpoint+CHECKPOINT_LEN,y
+-   lda TimestampCount,y
+    sta Checkpoint,y
     dey
     bpl -
   jmp LoadSaveFileCopyPointers
@@ -136,11 +326,31 @@ SaveStatsToCheckpoint:
 .reloc
 LoadStatsFromCheckpoint:
   ldy #CHECKPOINT_LEN-1
--   lda Checkpoint+CHECKPOINT_LEN,y
-    sta Checkpoint,y
+-   lda Checkpoint,y
+    sta TimestampCount,y
     dey
     bpl -
   jmp LoadSaveFileCopyPointers
+
+; Hook the common runtime code for the credits to allow skipping to the end at any time
+.org $8BE1
+    jsr CheckToSkipToEnd
+.reloc
+CheckToSkipToEnd:
+    ; check if start is pressed
+    lda $f5
+    and #$10
+    beq +
+        ; and we made it through the init end of credits
+        lda $0761
+        cmp #10
+        bcc +
+            ; skip ahead
+            lda #13
+            sta $0761
+    +
+    lda $0761
+    rts
 
 ; Hook into the final step before restarting to display our new credits scene
 .org $8C01
@@ -309,7 +519,9 @@ RenderPlayerInfoBg:
         iny
         sta BUFFER_LEN,x
         sty InternalState
+        ; clear out $00 before we start processing numbers
         ldy #0
+        sty $00
         bcs @ReadWithConvert
         ; direct read
         ; Read all bytes from source byte into $302,x
@@ -347,24 +559,36 @@ RenderPlayerInfoBg:
         tya
         pha
             lda BUFFER_LEN,x
-            cmp #2
-            bcc +
+            sta $03
             jsr TwoByteBCDConversion
-            lda $02
-            sta BUFFER_DAT+2,x
-            lda BUFFER_LEN,x
-            cmp #2
-            bcc +
-                tya
-                sta BUFFER_DAT+1,x
-                lda BUFFER_LEN,x
+            ; digit 4
+            lda $03 ; write len
+            cmp #4
+            bcc @digit3
+                lda $01
+                cmp #$d0
+                bne @notzero
+                    lda #DOT ; use a dot instead if the 4'th number is zero
+            @notzero:
+                sta BUFFER_DAT,x
+            inx
+        @digit3:
+            lda $03 ; write len
+            cmp #3
+            bcc @digit2
+                lda $00
+                sta BUFFER_DAT,x
                 inx
-                cmp #3
-                bcc +
-                    lda $00
-                    sta BUFFER_DAT-1,x ; -1 to account for an extra inx
-                    inx
-        +
+        @digit2:
+            lda $03 ; write len
+            cmp #2
+            bcc @digit1
+                tya
+                sta BUFFER_DAT,x
+                inx
+        @digit1:
+            lda $02
+            sta BUFFER_DAT,x
         pla
         tay
     @NextIteration1:
@@ -413,23 +637,23 @@ PlayerInfoCommandList:
 .word $0700, $21c8
 .byte 1 | CONVERT, 1
 ; Deaths
-.word $079F, $2209
+.word StatDeaths, $2209
 .byte 1 | CONVERT, 3
 ; Resets
 .word $079F, $2249
 .byte 1 | CONVERT, 3
 ; Hi Stab
-.word $0778, $2289
-.byte 2 | CONVERT, 3
+.word StatHiStabCount, $2288
+.byte 2 | CONVERT, 4
 ; Lo Stab
-.word $0700, $22c9
-.byte 2 | CONVERT, 3
+.word StatLoStabCount, $22c8
+.byte 2 | CONVERT, 4
 ; Up Stab
-.word $0778, $2309
-.byte 2 | CONVERT, 3
+.word StatUpStabCount, $2308
+.byte 2 | CONVERT, 4
 ; Dw Stab
-.word $0700, $2349
-.byte 2 | CONVERT, 3
+.word StatDownStabCount, $2348
+.byte 2 | CONVERT, 4
 PlayerInfoCommandListLen = * - PlayerInfoCommandList
 
 .reloc
@@ -572,7 +796,8 @@ SetPPUAddr:
 .reloc
 ; random ordering chosen by fair dice roll
 RandomOrderTable:
-.byte 3, 14, 5, 10, 1, 7, 13, 15, 2, 9, 6,11
+.byte 0, 3, 14, 5, 10, 1, 7, 13, 15, 2, 9, 6, 11
+PALETTE_FADE_LEN = * - RandomOrderTable 
 
 .reloc
 FadeOut:
@@ -581,7 +806,7 @@ FadeOut:
     and #$01
     beq :>rts
     ldx InternalState
-    cpx #12
+    cpx #PALETTE_FADE_LEN
     bne +
         ; Fade out complete so exit
         inc StatDisplayState
@@ -729,10 +954,11 @@ DrawAllTimestamps:
         lda @TimeSpentInTable,y
         tay
         jsr LoadNamePointer
-        
+    
         ; Calculate PPU address to draw to
         lda $c1
         jsr Multiply32
+        ; start drawing from ppu addr $208d
         lda #$8d
         jsr SetPPUAddr
 
@@ -780,9 +1006,9 @@ DrawAllTimestamps:
         ; to deal with the fact that NES frame rate is closer to 60.1 FPS
         lda $c1
         jsr Multiply32
+        ; start drawing from ppu addr $21ad
         inc $01
-        inc $01
-        lda #$8d
+        lda #$ad
         jsr SetPPUAddr
         ; Get the read offset for this element
         ldy $c1
@@ -987,67 +1213,67 @@ Multiply16:
 
 .reloc
 BackgroundData:
-	.byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
-	.byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
-	.byte $f5,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$f5,$f4,$f4,$f4,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f5,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$f5
-	.byte $f5,$f5,$f4,$f4,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
-	.byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
-	.byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$ca,$cb,$f5,$ed
-	.byte $e2,$e6,$de,$f5,$ec,$e9,$de,$e7,$ed,$f5,$e2,$e7,$f5,$cb,$ca,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$fc,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$fc,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$ca,$cb,$cb,$cb
-	.byte $cb,$f5,$e3,$e8,$ee,$eb,$e7,$de,$f2,$f5,$cb,$cb,$cb,$cb,$ca,$f5
-	.byte $f5,$f4,$c9,$f6,$f4,$f4,$fa,$f6,$f4,$f5,$f5,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$f4,$f8,$f6,$f4,$f4,$96,$fc,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$ca,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$dd,$de,$da,$ed,$e1,$ec,$cf,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$eb,$de,$ec,$de,$ed,$ec,$cf,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$e1,$e2,$ec,$ed,$da,$db,$cf,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$e5,$e8,$ec,$ed,$da,$db,$cf,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$ee,$e9,$ec,$ed,$da,$db,$cf,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$dd,$f0,$ec,$ed,$da,$db,$cf,$f4,$f4,$f4,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$cc,$f4,$f4,$f4
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
-	.byte $f5,$ca,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$cb,$cb,$cb
-	.byte $cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$f5
-	.byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
-	.byte $f4,$f4,$f4,$f4,$f4,$f4,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
-	.byte $00,$00,$00,$00,$00,$00,$00,$00,$44,$11,$00,$00,$00,$00,$00,$00
-	.byte $88,$aa,$22,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-	.byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-	.byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
+    .byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
+    .byte $f5,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$f5,$f4,$f4,$f4,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f5,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$f5
+    .byte $f5,$f5,$f4,$f4,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
+    .byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
+    .byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$ca,$cb,$f5,$ed
+    .byte $e2,$e6,$de,$f5,$ec,$e9,$de,$e7,$ed,$f5,$e2,$e7,$f5,$cb,$ca,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$fc,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$fc,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$ca,$cb,$cb,$cb
+    .byte $cb,$f5,$e3,$e8,$ee,$eb,$e7,$de,$f2,$f5,$cb,$cb,$cb,$cb,$ca,$f5
+    .byte $f5,$f4,$c9,$f6,$f4,$f4,$fa,$f6,$f4,$f5,$f5,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$f4,$f8,$f6,$f4,$f4,$96,$fc,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$ca,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$dd,$de,$da,$ed,$e1,$ec,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$eb,$de,$ec,$de,$ed,$ec,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$e1,$e2,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$e5,$e8,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$ee,$e9,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$f4,$f5,$f5,$f5,$f5,$f5,$f4,$f4,$f4,$f4,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$dd,$f0,$ec,$ed,$da,$db,$cf,$d0,$d0,$d0,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$cc,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$cc,$f4,$f4,$f4
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$f4,$cc,$f5
+    .byte $f5,$ca,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$cb,$cb,$cb
+    .byte $cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$cb,$ca,$f5
+    .byte $f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
+    .byte $f4,$f4,$f4,$f4,$f4,$f4,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5,$f5
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$44,$11,$00,$00,$00,$00,$00,$00
+    .byte $88,$aa,$22,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
+    .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00

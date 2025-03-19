@@ -170,6 +170,11 @@ TownToItemTable:
 
 .segment "PRG7"
 
+; Patch GetItem to add stat tracking
+.import CheckAddItemTimestamp
+.org GetItem
+    jsr CheckAddItemTimestamp
+
 .reloc
 ; Check first if we've already gotten this item from a custom location before
 ; we call the get item for this spot

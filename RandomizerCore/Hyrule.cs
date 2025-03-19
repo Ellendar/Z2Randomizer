@@ -3766,11 +3766,8 @@ FREE_UNTIL $c2ca
         }
     }
 
-    private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
+    private void AssignRealPalaceLocations(AsmModule a)
     {
-        var a = asm.Module();
-        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
-        a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
         a.Assign("RealPalaceAtLocation1", (westHyrule?.locationAtPalace1.PalaceNumber ?? 1) - 1);
         a.Assign("RealPalaceAtLocation2", (westHyrule?.locationAtPalace2.PalaceNumber ?? 2) - 1);
         a.Assign("RealPalaceAtLocation3", (westHyrule?.locationAtPalace3.PalaceNumber ?? 3) - 1);
@@ -3778,6 +3775,49 @@ FREE_UNTIL $c2ca
         a.Assign("RealPalaceAtLocation5", (eastHyrule?.locationAtPalace5.PalaceNumber ?? 5) - 1);
         a.Assign("RealPalaceAtLocation6", (eastHyrule?.locationAtPalace6.PalaceNumber ?? 6) - 1);
         a.Assign("RealPalaceAtLocationGP", (eastHyrule?.locationAtGP.PalaceNumber ?? 7) - 1);
+    }
+
+    public void StatTracking(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Segment("PRG1");
+        a.Reloc();
+        a.Label("TsNameList");
+        // Convert and write all the names of the types of checks you can timestamp
+        var allTimeStampNames = new List<string>
+        {
+            "Glove",
+            "Raft",
+            "Boots",
+            "Hammer",
+            "Jump",
+            "Fairy",
+            "Reflect",
+            "Thunder",
+            "Palace 1",
+            "Palace 2",
+            "Palace 3",
+            "Palace 4",
+            "Palace 5",
+            "Palace 6",
+            "G.Palace",
+            "Towns",
+        }.Select(s => s.PadRight(8, ' '));
+        foreach (var name in allTimeStampNames)
+        {
+            a.Byt(Util.ToGameText(name).Select(x => (byte)x).ToArray());
+        }
+
+        AssignRealPalaceLocations(a);
+        a.Code(Util.ReadResource("RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
+    }
+
+    private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
+    {
+        var a = asm.Module();
+        a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
+        a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
+        AssignRealPalaceLocations(a);
         a.Code(Util.ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
@@ -3794,7 +3834,7 @@ FREE_UNTIL $c2ca
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
         rom.InstantText(engine);
-        rom.StatTracking(engine);
+        StatTracking(engine);
 
         if (props.Global5050JarDrop)
         {

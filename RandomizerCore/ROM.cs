@@ -917,40 +917,6 @@ CheckController1ForUpAMagic:
         a.Code(Util.ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
-    public void StatTracking(Assembler asm)
-    {
-        var a = asm.Module();
-        a.Segment("PRG1");
-        a.Reloc();
-        a.Label("TsNameList");
-        // Convert and write all the names of the types of checks you can timestamp
-        var allTimeStampNames = new List<string>
-        {
-            "Glove",
-            "Raft",
-            "Boots",
-            "Hammer",
-            "Jump",
-            "Fairy",
-            "Reflect",
-            "Thunder",
-            "Palace 1",
-            "Palace 2",
-            "Palace 3",
-            "Palace 4",
-            "Palace 5",
-            "Palace 6",
-            "G.Palace",
-            "Towns",
-        }.Select(s => s.PadRight(8, ' '));
-        foreach (var name in allTimeStampNames)
-        {
-            a.Byt(Util.ToGameText(name).Select(x => (byte)x).ToArray());
-        }
-
-        a.Code(Util.ReadResource("RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
-    }
-
     public void AllowForChangingDoorYPosition(Assembler a)
     {
         a.Module().Code("""

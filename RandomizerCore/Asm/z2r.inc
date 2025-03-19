@@ -172,6 +172,7 @@ RESV temp_room_flag ; , $0121
 RESV DontKillEnemyFlag ; , $0122
 RESV Global5050JarDrop ; = $123 ; $0123
 RESV PreventDoubleLag
+RESV PreviousFrameMetasprite
 
 
 
@@ -219,7 +220,7 @@ TimestampId TsTowns
 ; Overall gameplay timer ticks every NMI and never stops
 ; Used to create timestamps for when items are collected
 RESV StatTimer, 3
-; Ticks up whenever a death occurs. Game already tracks this :p
+; Ticks up whenever a death occurs
 RESV StatDeaths, 1
 ; Ticks up whenever Up + A shortcut happens. Not in use, game naturally tracks this
 ;RESV StatResets, 1
