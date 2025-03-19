@@ -109,6 +109,7 @@ PpuCtrlShadow = $ff
 ScrollPosShadow = $fd
 
 PalaceNumber = $056c
+RegionNumber = $0706
 WorldNumber = $0707
 
 ClearNametables = $d266

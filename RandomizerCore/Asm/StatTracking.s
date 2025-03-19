@@ -121,26 +121,33 @@ StatTrackDownStab:
 .reloc
 SaveTimestampForPalace:
     dec $0794
-    lda $0706
+    lda RegionNumber
     asl
     asl
     adc PalaceNumber
     tay
     lda PalaceTable,y
     jmp AddTimestamp
+
+.reloc
 PalaceTable:
+    ; region 0 - east hyrule
     .byte RealPalaceAtLocation1 + TsPalace1
     .byte RealPalaceAtLocation2 + TsPalace1
     .byte RealPalaceAtLocation3 + TsPalace1
     .byte $ff ; unused 4th palace in region 0
-    .byte RealPalaceAtLocation4 + TsPalace1
-    .byte $ff ; unused 2th palace in region 1
+    ; region 1 - death mountain 
+    .byte $ff ; unused 1st palace in region 1
+    .byte $ff ; unused 2nd palace in region 1
     .byte $ff ; unused 3th palace in region 1
     .byte $ff ; unused 4th palace in region 1
+    ; region 2 - west hyrule
     .byte RealPalaceAtLocation5 + TsPalace1
     .byte RealPalaceAtLocation6 + TsPalace1
-    .byte RealPalaceAtLocationGP + TsPalace1
-
+    .byte RealPalaceAtLocationGP+ TsPalace1
+    .byte $ff ; unused 4th palace in region 2
+    ; region 3 - maze island
+    .byte RealPalaceAtLocation4 + TsPalace1
 .segment "PRG7"
 
 .reloc

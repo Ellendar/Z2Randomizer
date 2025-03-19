@@ -263,12 +263,12 @@ IncStatTimer:
         bcc @IncrementTimer
 @Palace:
         ; Palaces
-        lda $0706
+        lda RegionNumber
         asl
         asl
         adc PalaceNumber
         tay
-        ldx @PalaceMappingTable,y
+        ldx PalaceMappingTable,y
 @IncrementTimer:
         inc StatTimeAtLocation+0,x
         bne @Exit
@@ -290,18 +290,25 @@ IncStatTimer:
 ; then we increment the correct timer for Palace 5
 .reloc
 Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
-@PalaceMappingTable:
+PalaceMappingTable:
+    ; region 0 - east hyrule
     .byte RealPalaceAtLocation1 * 3 + Palace1Offset
     .byte RealPalaceAtLocation2 * 3 + Palace1Offset
     .byte RealPalaceAtLocation3 * 3 + Palace1Offset
     .byte $ff ; unused 4th palace in region 0
-    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
-    .byte $ff ; unused 2th palace in region 1
+    ; region 1 - death mountain 
+    .byte $ff ; unused 1st palace in region 1
+    .byte $ff ; unused 2nd palace in region 1
     .byte $ff ; unused 3th palace in region 1
     .byte $ff ; unused 4th palace in region 1
+    ; region 2 - west hyrule
     .byte RealPalaceAtLocation5 * 3 + Palace1Offset
     .byte RealPalaceAtLocation6 * 3 + Palace1Offset
     .byte RealPalaceAtLocationGP * 3 + Palace1Offset
+    .byte $ff ; unused 4th palace in region 2
+    ; region 3 - maze island
+    .byte RealPalaceAtLocation4 * 3 + Palace1Offset
+    ; 3 unused location bytes could follow if needed
 
 ; Screen split IRQ implementation. This is not technically a part of z2ft, but due to the policy of not making the game faster than vanilla, this optimization is only enabled when z2ft is enabled to partially offset the cost of FT playback.
 
@@ -331,7 +338,7 @@ SoftEnableNmi:
 .import CallUpdateSound
     jsr CallUpdateSound
 .endif
-;    lda #$c0
+    ; If the game is reset to the title screen, we need to set only bit 7
     lda LagFrameVar
     ora #$80
     sta LagFrameVar

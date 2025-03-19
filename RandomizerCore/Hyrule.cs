@@ -3640,7 +3640,6 @@ CheckIfEndOfData:
 
 .import SwapPRG
 
-CurrentRegion = $0706
 PRG_bank = $0769
 
 .segment "PRG7"
@@ -3648,7 +3647,7 @@ PRG_bank = $0769
 ; Patch switching the bank when loading the overworld
 .org $cd48
     bne +
-    ldy CurrentRegion
+    ldy RegionNumber
     lda ExpandedRegionBankTable,y
 +   sta PRG_bank
     jsr SwapPRG
@@ -3673,6 +3672,7 @@ FREE_UNTIL $cd5f
 .reloc
 ExpandedRegionBankTable:
     .byte $01, $01, $02, $02
+.reloc
 PalacePaletteOffset:
     .byte P1Palette, P2Palette, P3Palette, $20, $30, $30, $30, $30, P5Palette, P6Palette, PGreatPalette, $60, P4Palette
 .reloc
