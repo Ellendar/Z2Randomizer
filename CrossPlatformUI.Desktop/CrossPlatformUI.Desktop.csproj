@@ -36,4 +36,13 @@
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
         <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Update="WinSparkle_0_8_0_x32.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="WinSparkle_0_8_0_x64.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

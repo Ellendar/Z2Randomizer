@@ -23,6 +23,7 @@ public sealed partial class App : Application // , IDisposable
     public static ServiceCollection? ServiceContainer;
 
     public static IFileSystemService? FileSystemService;
+    public static ICheckUpdateService? CheckUpdateService;
 
     public static TopLevel? TopLevel { get; private set; }
 

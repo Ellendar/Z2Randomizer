@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+		<title>Z2Randomizer Changelog</title>
+		<link>https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml</link>
+		<description>Most recent changes.</description>
+		<language>en</language>
+		<item>
+			<title>Version 5.0 Beta 5</title>
+			<description>
+				<![CDATA[
+			Cleared out the appcast for just new stuff.
+			]]>
+			</description>
+			<pubDate>2025-03-15</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta5/Z2Randomizer_4_4_Beta5_1.msi" sparkle:version="4.4.5" />
+		</item>
+	</channel>
+</rss>

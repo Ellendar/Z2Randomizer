@@ -11,6 +11,7 @@ using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using RandomizerCore;
 using Avalonia.Styling;
+using Avalonia.Logging;
 
 namespace CrossPlatformUI.ViewModels;
 
@@ -95,6 +96,16 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             Main.OutputFilePath = folder?.Path.LocalPath ?? "";
         });
 
+        CheckForUpdates = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var checkUpdateService = App.Current?.Services?.GetService<ICheckUpdateService>();
+            if(checkUpdateService == null)
+            {
+                throw new Exception("Unable to load update service");
+            }
+            await checkUpdateService.CheckUpdate();
+        });
+
         ToggleTheme = ReactiveCommand.CreateFromTask(async () =>
         {
             if(App.Current!.ActualThemeVariant == ThemeVariant.Dark)
@@ -107,6 +118,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
             ThemeVariantName = App.Current.RequestedThemeVariant.Key.ToString();
         });
+
         CanGenerate = this.WhenAnyValue(
             x => x.Flags,
             x => x.Main.Config.Seed,
@@ -275,6 +287,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public ReactiveCommand<Unit, Unit> Generate { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveFolder { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Unit, Unit> CheckForUpdates { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> ToggleTheme { get; }
     [JsonIgnore]
