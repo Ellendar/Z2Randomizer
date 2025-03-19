@@ -316,13 +316,14 @@ Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
 .org $C1A8
     jsr SoftEnableNmi
 
-.org $C4CB
-    lda #$80
-    sta a:SoftDisableNmi
-
-.org $C4D8
-    lda #$00
-    sta a:SoftDisableNmi
+; These are in the credits so don't bother
+;.org $C4CB
+;    lda #$80
+;    sta a:SoftDisableNmi
+;
+;.org $C4D8
+;    lda #$00
+;    sta a:SoftDisableNmi
 
 .reloc
 SoftEnableNmi:
@@ -338,8 +339,6 @@ SoftEnableNmi:
 	lda PPUSTATUS
     rts
 
-; TODO We can't force disable or force enable these.
-; I think I need to also make this a soft enable
 .org $D2C1
     ldy #$30 | $80
     jsr SetSoftDisableNmi

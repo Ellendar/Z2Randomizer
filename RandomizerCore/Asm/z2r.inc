@@ -176,7 +176,16 @@ RESV PreventDoubleLag
 
 
 ;; Stat tracking variables in SRAM
+
+; This value is the second header byte for file 1 thats unused.
+; In a perfect world we would stat track multiple times and copy
+; the data over with the save files like vanilla does, but for now
+; just hardcode the stats only to one file.
+StatTrackingSaveFileClear = $7401
+
+
 ;; The follow stats are NOT checkpointed because they persist between reloads
+
 
 StatTrackingBase = $6380
 SET_RES_BASE StatTrackingBase
@@ -203,31 +212,7 @@ TimestampId TsPalace4
 TimestampId TsPalace5
 TimestampId TsPalace6
 TimestampId TsPalaceGP
-
-;TsGlove         = $00
-;TsRaft          = $01
-;TsBoots         = $02
-;TsHammer        = $03
-;TsUpstab        = $04
-;TsDownstab      = $05
-;TsChild         = $06
-;TsTrophy        = $07
-;TsMedicine      = $08
-;TsShieldSpell   = $09
-;TsJumpSpell     = $0a
-;TsFairySpell    = $0b
-;TsFireSpell     = $0c
-;TsReflectSpell  = $0d
-;TsSpellSpell    = $0e
-;TsThunderSpell  = $0f
-;TsPalace1       = $10
-;TsPalace2       = $11
-;TsPalace3       = $12
-;TsPalace4       = $13
-;TsPalace5       = $14
-;TsPalace6       = $15
-;TsPalaceGP      = $16
-;TS_COUNT        = $17
+TimestampId TsTowns
 
 ; All of the values prefixed with Stat are persisted across resets and Continue without saves
 
@@ -267,9 +252,11 @@ CHECKPOINT_LEN = RES_OFFSET - CHECKPOINT_START
 
 ; Duplicate the timestamp memory here that we'll copy after saving
 RESV Checkpoint, CHECKPOINT_LEN
+STAT_TRACKING_SIZE = RES_OFFSET
 
 .export NmiBankShadow8, NmiBankShadowA
 ; Reserve these in SRAM to prevent issues when clearing ram
 RESV NmiBankShadow8, 1
 RESV NmiBankShadowA, 1
 RESV SoftDisableNmi, 1
+

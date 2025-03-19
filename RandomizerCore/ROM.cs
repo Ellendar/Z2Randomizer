@@ -921,7 +921,8 @@ CheckController1ForUpAMagic:
     {
         var a = asm.Module();
         a.Segment("PRG1");
-        a.RelocExportLabel("TsNameList");
+        a.Reloc();
+        a.Label("TsNameList");
         // Convert and write all the names of the types of checks you can timestamp
         var allTimeStampNames = new List<string>
         {
@@ -929,18 +930,18 @@ CheckController1ForUpAMagic:
             "Raft",
             "Boots",
             "Hammer",
-            "Upstab",
-            "Downstab",
-            "Child",
-            "Trophy",
-            "Medicine",
-            "Shield",
             "Jump",
             "Fairy",
-            "Fire",
             "Reflect",
-            "Spell",
             "Thunder",
+            "Palace 1",
+            "Palace 2",
+            "Palace 3",
+            "Palace 4",
+            "Palace 5",
+            "Palace 6",
+            "G.Palace",
+            "Towns",
         }.Select(s => s.PadRight(8, ' '));
         foreach (var name in allTimeStampNames)
         {

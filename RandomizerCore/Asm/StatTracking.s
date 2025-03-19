@@ -12,6 +12,9 @@ PPUADDR_LO = $303
 BUFFER_LEN = $304
 BUFFER_DAT = $305
 
+DOT = $cf
+SPACE = $f4
+
 CONVERT = $80
 
 ; TODO: Add patches to update stats
@@ -68,24 +71,82 @@ DrawPauseMenuRowSwitchBank:
 
 .reloc
 Experience_Convertion_and_Display_Routine = $A5A4
+; returns the tiles for 4 digits in $01, $00, y, $02
 TwoByteBCDConversion:
     lda #0
     jsr SwapPRG
     lda $01 ; lo byte of value. $00 has hi byte
     jsr Experience_Convertion_and_Display_Routine
-    sta $01
+    ; digits out in order: 1 0 y a
+    sta $02
     lda #1
     jmp SwapPRG
 
 .segment "PRG5"
 
 RestartAfterCredits = $921C
+LoadSaveFile = $B911
+LoadSaveFileCopyPointers = $BA6C
+LoadSaveFileCopyPointersSlotA = $BA6F
+
+
+.org $B2B9
+    jsr CheckIfNewSaveFile
+
+.reloc
+CheckIfNewSaveFile:
+    lda StatTrackingSaveFileClear
+    beq +
+        ; New save file loaded, so clear stats entirely
+        ldy #STAT_TRACKING_SIZE
+        lda #0
+        -
+            sta StatTimer-1,y
+            dey
+            bne -
+        sta StatTrackingSaveFileClear
+    +
+    jmp LoadSaveFile
+
+.org $B45E
+    jsr SetNewSaveFile
+
+.reloc
+SetNewSaveFile:
+    ; a = 1
+    sta $0736
+    sta StatTrackingSaveFileClear ; 1 = new file, 0 = old file 
+    rts
+
+.org $B931
+    jsr LoadStatsFromCheckpoint
+
+.org $B9F5
+    jsr SaveStatsToCheckpoint
+
+.reloc
+SaveStatsToCheckpoint:
+  ldy #CHECKPOINT_LEN-1
+-   lda Checkpoint,y
+    sta Checkpoint+CHECKPOINT_LEN,y
+    dey
+    bpl -
+  jmp LoadSaveFileCopyPointers
+
+.reloc
+LoadStatsFromCheckpoint:
+  ldy #CHECKPOINT_LEN-1
+-   lda Checkpoint+CHECKPOINT_LEN,y
+    sta Checkpoint,y
+    dey
+    bpl -
+  jmp LoadSaveFileCopyPointers
 
 ; Hook into the final step before restarting to display our new credits scene
 .org $8C01
 .word (UpdateCreditsSwitchBank)
 
-; Hook the main PRG5 entrypoint to turn off the palette cycle
+; Hook the main PRG5 entrypoint to turn off the palette cycle for the triforce
 .org $8BBF
     jsr DisablePaletteCycle
     bcs $8BE1
@@ -99,6 +160,7 @@ DisablePaletteCycle:
     ldx BUFFER_OFF
     ldy #0
     rts
+
 ;;; Rendering the stats page
 ; Trying to fill in whatever data is needed into free space in PRG1 / 2 since they don't have many custom code patches
 .segment "PRG1"
@@ -128,7 +190,7 @@ RunFrame:
 .word (DrawBackground)
 .word (RenderPlayerInfo)
 .word (DrawStats)
-.word (DrawTimeStamp)
+.word (DrawAllTimestamps)
 .word (FadeIn)
 .word (WaitForStart)
 .word (FadeOut)
@@ -136,7 +198,6 @@ RunFrame:
 
 .reloc
 DrawStats:
-DrawTimeStamp:
     inc StatDisplayState
     rts
 
@@ -289,7 +350,7 @@ RenderPlayerInfoBg:
             cmp #2
             bcc +
             jsr TwoByteBCDConversion
-            lda $01
+            lda $02
             sta BUFFER_DAT+2,x
             lda BUFFER_LEN,x
             cmp #2
@@ -405,8 +466,8 @@ UpdateSpritePosition:
     ; link metasprite
     lda #3
     sta $80
-    jsr $EC02
-    rts
+    jmp $EC02 ; Draw Link based on metasprite
+;    rts
 
 .reloc
 WaitForStart:
@@ -418,48 +479,35 @@ WaitForStart:
         rts
     ; TODO we can make link animated here?
     rts
-
+.reloc
+DisableRendering:
+    ; disable rendering
+    lda #$40
+    sta $100
+    lda $FE
+    and #$e0
+    sta PPUMASK
+    rts
+EnableRendering:
+    ; re-enable rendering
+    lda #$c0
+    sta $100
+    lda $FE
+    ora #$1E
+    sta PPUMASK
+    rts
 .reloc
 DrawBackground:
+    jsr DisableRendering
+@Loop:
     ; Since we don't have any unplanned ppu updates, we can just use
     ; hardcoded offsets into the ppu buffer to simplify the code
     lda #0
-    sta PPUADDR_HI
-    lda InternalState
-    ; Mult by 6
-    asl
-    rol PPUADDR_HI
-    asl
-    rol PPUADDR_HI
-    asl
-    rol PPUADDR_HI
-    asl
-    rol PPUADDR_HI
-    asl
-    rol PPUADDR_HI
-    asl
-    rol PPUADDR_HI
-    sta PPUADDR_LO
     sta $00
-    lda PPUADDR_HI
-    sta $01
-    clc
-    adc #$20
-    sta PPUADDR_HI
-    
-    ; 32 bytes
-    lda #$20
-    sta BUFFER_LEN
-    sta BUFFER_LEN + $23
-    
-    ; Copy the address to the second location but offset by 32 bytes
-    lda PPUADDR_LO
-    clc
-    adc #$20
-    sta PPUADDR_LO + $23
-    lda PPUADDR_HI
-    adc #0
-    sta PPUADDR_HI + $23
+    lda InternalState
+    jsr Multiply32
+    lda #0
+    jsr SetPPUAddr
     
     ; setup the read ptr
     lda #<BackgroundData
@@ -470,25 +518,55 @@ DrawBackground:
     adc $01
     sta $01
     
-    ldy #$20-1
+    ldy #0
     -   lda ($00),y
-        sta BUFFER_DAT,y
-        dey
-        bpl -
-    ldy #$40-1
-    -   lda ($00),y
-        sta BUFFER_DAT + 3,y ; +3 to account for the header
-        dey
-        cpy #$20-1
+        sta PPUDATA
+;        sta BUFFER_DAT + 3,y ; +3 to account for the header
+        iny
+        cpy #$20
         bne -
     lda #$ff
-    sta PPUADDR_HI + $23 + $23
+    sta PPUADDR_HI
     inc InternalState
     lda InternalState
-    cmp #$10
-    bne +
-        inc StatDisplayState
-    +
+    cmp #$20
+    bne @Loop
+    
+    ; Done with drawing the background
+    inc StatDisplayState
+    jmp EnableRendering
+;    rts
+
+.reloc
+Multiply32:
+    pha
+        lda #0
+        sta $01
+    pla
+    ; Mult by 6
+    asl
+    rol $01
+    asl
+    rol $01
+    asl
+    rol $01
+    asl
+    rol $01
+    asl
+    rol $01
+    sta $00
+    rts
+
+.reloc
+SetPPUAddr:
+    clc
+    adc $00
+    pha
+        lda $01
+        adc #$20
+        sta PPUADDR
+    pla
+    sta PPUADDR
     rts
 
 .reloc
@@ -537,11 +615,11 @@ FadeOut:
 
 SprPaletteTable = $80AE
 FadeIn:
+    ldx InternalState
     ; Every 16 frames step to the next palette
     lda $12 ; global timer
     and #$01
     beq :>rts
-    ldx InternalState
     cpx #12
     bne +
         ; Fade out complete so exit
@@ -582,21 +660,22 @@ BGPaletteTable:
 ;; Long division routine copied from here:
 ;; https://codebase64.org/doku.php?id=base:24bit_division_24-bit_result
 
-.define Remainder  $60
-.define Dividend   $63
-.define Divisor    $66
-.define DivTmp     $69
+.define Remainder  <$60
+.define Dividend   <$63
+.define Divisor    <$66
+.define DivTmp     <$69
 
-.define Hex0        $70
-.define DecOnes     $71
-.define DecTens     $72
-.define DecHundreds $73
+.define Hex0        <$70
+.define DecOnes     <$71
+.define DecTens     <$72
+.define DecHundreds <$73
 
-.define TmpHoursOnes   $75
-.define TmpMinutesOnes $76
-.define TmpMinutesTens $77
-.define TmpSecondsOnes $78
-.define TmpSecondsTens $79
+.define TmpHoursTens   <$74
+.define TmpHoursOnes   <$75
+.define TmpMinutesOnes <$76
+.define TmpMinutesTens <$77
+.define TmpSecondsOnes <$78
+.define TmpSecondsTens <$79
 
 .reloc
 LongDivision24bit:
@@ -636,6 +715,275 @@ LongDivision24bit:
   pla
   tay
   rts
+
+.reloc
+DrawAllTimestamps:
+    jsr DisableRendering
+    ; Draw the Time Spent In time stamps
+    lda #8
+    sta $c0
+    lda #0
+    sta $c1
+@DrawTimeSpentLoop:
+        ldy $c1
+        lda @TimeSpentInTable,y
+        tay
+        jsr LoadNamePointer
+        
+        ; Calculate PPU address to draw to
+        lda $c1
+        jsr Multiply32
+        lda #$8d
+        jsr SetPPUAddr
+
+        ; Get the read offset for this element
+        lda $c1
+        asl
+        clc
+        adc $c1
+        tax
+        ; read the 3 digits of the timestamp into the divide memory
+        lda StatTimeInTowns,x
+        sta Dividend
+        lda StatTimeInTowns+1,x
+        sta Dividend+1
+        lda StatTimeInTowns+2,x
+        sta Dividend+2
+
+        jsr RenderTimestamp
+        
+        inc $c1
+        lda $c1
+        cmp $c0
+        beq @NextStep
+        jmp @DrawTimeSpentLoop
+    
+    ; Now draw the Journey
+@NextStep:
+    lda TimestampCount
+    bne +
+        ; Sanity check that they have any timestamps. Really only possible with hacks.
+        jmp @Exit
+    +
+    sta $c0
+    lda #0
+    sta $c1
+
+@DrawJourneyLoop:
+        ; Get the read offset for this element
+        ldy $c1
+        ; Get the type of timestamp
+        lda TimestampTypeList, y
+        jsr LoadNamePointer
+        
+        ; We premultiply the timestamp by 16 to try and get a little more precision
+        ; to deal with the fact that NES frame rate is closer to 60.1 FPS
+        lda $c1
+        jsr Multiply32
+        inc $01
+        inc $01
+        lda #$8d
+        jsr SetPPUAddr
+        ; Get the read offset for this element
+        ldy $c1
+        ; Get the type of timestamp
+        lda TimestampTypeList, y
+        ; multiply i * 3 to get offset into timestamp list
+        asl
+        adc TimestampTypeList, y
+        tax
+        ; read the 3 digits of the timestamp into the divide memory
+        ; We premultiply the timestamp by 16 to try and get a little more precision
+        ; to deal with the fact that NES frame rate is closer to 60.1 FPS
+        lda TimestampList,x
+        sta Dividend
+        lda TimestampList+1,x
+        sta Dividend+1
+        lda TimestampList+2,x
+        sta Dividend+2
+        jsr RenderTimestamp
+    
+        inc $c1
+        lda $c1
+        cmp $c0
+        beq @Exit
+        jmp @DrawJourneyLoop
+@Exit:
+    inc StatDisplayState
+    jmp EnableRendering
+;  rts
+
+@TimeSpentInTable:
+    .byte TsTowns
+    .byte TsPalace1
+    .byte TsPalace2
+    .byte TsPalace3
+    .byte TsPalace4
+    .byte TsPalace5
+    .byte TsPalace6
+    .byte TsPalaceGP
+
+.reloc
+LoadNamePointer:
+    ; multiply i * 8 to get the offset into the timestamp name list
+    asl
+    asl
+    asl
+    ; a = index into name list
+    clc
+    adc #<TsNameList
+    sta $c4
+    lda #>TsNameList
+    adc #0
+    sta $c5
+    rts
+
+.reloc
+RenderTimestamp:
+  ; copy name of timestamp
+  ldy #0
+@CopyNameLoop:
+    lda ($c4),y
+    sta PPUDATA
+    iny
+    cpy #8
+    bne @CopyNameLoop
+
+  lda #SPACE
+  sta PPUDATA
+
+  ; mult the dividend by 16
+  jsr Multiply16
+
+  ; 60.1 frm/sec * 60 sec/min * 60 min/hr = 216360 or 34d28 in hex
+  ; multiplied by 16 is 34d280
+  lda #$80
+  sta Divisor
+  lda #$d2
+  sta Divisor+1
+  lda #$34
+  sta Divisor+2
+  jsr LongDivision24bit
+  ; results in Dividend, Remainder will be divided again to find minutes
+;  jsr Divide16
+  lda Dividend
+  sta $01
+  lda Dividend+1
+  sta $00
+  jsr TwoByteBCDConversion
+;  sta Hex0
+;  jsr HexToDecimal8Bit
+  ; if theres a ten's place for the hours, then just write 9:99:99
+;  lda DecTens
+  sty TmpHoursTens
+  lda $02
+  sta TmpHoursOnes
+
+  ; Update the minutes
+  lda Remainder
+  sta Dividend
+  lda Remainder + 1
+  sta Dividend + 1
+  lda Remainder + 2
+  sta Dividend + 2
+  ; 60.1 frm/sec * 60 sec/min = 3606 or 0e16 in hex * 16 = e160
+  lda #$60
+  sta Divisor
+  lda #$e1
+  sta Divisor+1
+  lda #$00
+  sta Divisor+2
+  jsr LongDivision24bit
+;  jsr Divide16
+
+  lda Dividend
+  sta $01
+  lda Dividend+1
+  sta $00
+  jsr TwoByteBCDConversion
+;  sta Hex0
+;  jsr HexToDecimal8Bit
+;  lda DecTens
+  sty TmpMinutesTens
+  lda $02
+  sta TmpMinutesOnes
+
+  ; update the seconds
+  lda Remainder
+  sta Dividend
+  lda Remainder + 1
+  sta Dividend + 1
+  lda Remainder + 2
+  sta Dividend + 2
+  ; 60.1 frm/sec * 16 = 960 or $3c0 in hex
+  lda #$c0
+  sta Divisor
+  lda #$03
+  sta Divisor+1
+  lda #$00
+  sta Divisor+2
+  jsr LongDivision24bit
+;  jsr Divide16
+
+  lda Dividend
+  sta $01
+  lda Dividend+1
+  sta $00
+  jsr TwoByteBCDConversion
+  sty TmpSecondsTens
+  lda $02
+  sta TmpSecondsOnes
+
+  ; Finally draw write the numbers to the screen
+@WriteNumber:
+  lda TmpHoursTens
+  sta PPUDATA
+  lda TmpHoursOnes
+  sta PPUDATA
+  lda #DOT
+  sta PPUDATA
+  lda TmpMinutesTens
+  sta PPUDATA
+  lda TmpMinutesOnes
+  sta PPUDATA
+  lda #DOT
+  sta PPUDATA
+  lda TmpSecondsTens
+  sta PPUDATA
+  lda TmpSecondsOnes
+  sta PPUDATA
+  rts
+
+.reloc
+Multiply16:
+  asl Dividend
+  rol Dividend+1
+  rol Dividend+2
+  asl Dividend
+  rol Dividend+1
+  rol Dividend+2
+  asl Dividend
+  rol Dividend+1
+  rol Dividend+2
+  asl Dividend
+  rol Dividend+1
+  rol Dividend+2
+  rts
+;.reloc
+;Divide16:
+;  lsr Dividend+2
+;  ror Dividend+1
+;  ror Dividend
+;  lsr Dividend+2
+;  ror Dividend+1
+;  ror Dividend
+;  lsr Dividend+2
+;  ror Dividend+1
+;  ror Dividend
+;  lsr Dividend+2
+;  ror Dividend+1
+;  ror Dividend
+;  rts
 
 .reloc
 BackgroundData:
