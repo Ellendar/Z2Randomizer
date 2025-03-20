@@ -304,7 +304,7 @@ StopTimers:
 .reloc
 PatchLoadStatsFromCheckpoint:
     jsr LoadStatsFromCheckpoint
-    lda #0
+    txa ; This is run for each save file and X has the save file index
     jmp LoadSaveFileCopyPointersSlotA
 
 ; Hook the save file load routine to see if our special flag is set
