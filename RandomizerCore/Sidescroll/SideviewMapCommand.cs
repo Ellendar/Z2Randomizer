@@ -175,6 +175,122 @@ public class SideviewMapCommand<T> where T : Enum
         return Y == 15 && (Bytes[1] & 0xF0) == 0x50;
     }
 
+    public int Width
+    {
+        get
+        {
+            if (Y < 13)
+            {
+                switch (this)
+                {
+                    case SideviewMapCommand<PalaceObject>:
+                        return PalaceObjectExtensions.Width((this as SideviewMapCommand<PalaceObject>)!);
+                    case SideviewMapCommand<GreatPalaceObject>:
+                        return GreatPalaceObjectExtensions.Width((this as SideviewMapCommand<GreatPalaceObject>)!);
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else if (Y < 15)
+            {
+                return 0;
+            }
+            else
+            {
+                if (IsElevator())
+                {
+                    return 2;
+                }
+                else if (IsLava())
+                {
+                    return 1 + Param;
+                }
+            }
+            throw new NotImplementedException();
+        }
+    }
+
+    public int Height
+    {
+        get
+        {
+            if (Y < 13)
+            {
+                switch (this)
+                {
+                    case SideviewMapCommand<PalaceObject>:
+                        return PalaceObjectExtensions.Height((this as SideviewMapCommand<PalaceObject>)!);
+                    case SideviewMapCommand<GreatPalaceObject>:
+                        return GreatPalaceObjectExtensions.Height((this as SideviewMapCommand<GreatPalaceObject>)!);
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else if (Y < 15)
+            {
+                return 0;
+            }
+            else
+            {
+                if (IsElevator())
+                {
+                    return 13;
+                }
+                else if (IsLava())
+                {
+                    return 13;
+                }
+            }
+            throw new NotImplementedException();
+        }
+    }
+
+    public bool IsSolid
+    {
+        get
+        {
+            if (Y < 13)
+            {
+                switch (this)
+                {
+                    case SideviewMapCommand<PalaceObject>:
+                        return PalaceObjectExtensions.IsSolid((this as SideviewMapCommand<PalaceObject>)!);
+                    case SideviewMapCommand<GreatPalaceObject>:
+                        return GreatPalaceObjectExtensions.IsSolid((this as SideviewMapCommand<GreatPalaceObject>)!);
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public bool IsBreakable
+    {
+        get
+        {
+            if (Y < 13)
+            {
+                switch (this)
+                {
+                    case SideviewMapCommand<PalaceObject>:
+                        return PalaceObjectExtensions.IsBreakable((this as SideviewMapCommand<PalaceObject>)!);
+                    case SideviewMapCommand<GreatPalaceObject>:
+                        return GreatPalaceObjectExtensions.IsBreakable((this as SideviewMapCommand<GreatPalaceObject>)!);
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
     public bool IsFloorSolidAt(int y)
     {
         Debug.Assert(IsNewFloor());
@@ -200,6 +316,13 @@ public class SideviewMapCommand<T> where T : Enum
         {
             return y < (floorByte & 0b0111) + 2;
         }
+    }
+
+    public bool Intersects(int x1, int x2, int y1, int y2)
+    {
+        if ((Y + Height <= y1) || Y > y2) { return false; }
+        if ((AbsX + Width) <= x1 || AbsX > x2) { return false; }
+        return true;
     }
 
     public String DebugString()

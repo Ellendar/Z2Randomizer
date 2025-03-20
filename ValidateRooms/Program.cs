@@ -99,6 +99,7 @@ void ValidateRoomsForFile(string filename)
         }
 
         var lavaPits = sv.FindAll(o => o.IsLava());
+        CheckDropsOverLava(room, sv, lavaPits, openCeilingTiles);
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
@@ -140,6 +141,7 @@ void ValidateRoomsForFile(string filename)
         AddTilesFrom2HighHorizontalPits(walkthruDrop, openCeilingTiles, dropTiles);
 
         var lavaPits = sv.FindAll(o => o.IsLava());
+        CheckDropsOverLava(room, sv, lavaPits, openCeilingTiles);
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
@@ -167,7 +169,10 @@ void AddOpenCeilingTiles<T>(SideviewEditable<T> sv, SortedSet<int> openCeilingTi
         }
         if (!floor.IsFloorSolidAt(0))
         {
-            openCeilingTiles.Add(x);
+            if (sv.Find(o => o.IsSolid && o.Intersects(x, x, 0, 0)) == null)
+            {
+                openCeilingTiles.Add(x);
+            }
         }
     }
 }
@@ -218,6 +223,34 @@ void RemoveTilesThatAreLavaPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<i
         for (var i = 0; i < pit.Param + 1; i++)
         {
             dropTiles.Remove(pit.AbsX + i);
+        }
+    }
+}
+
+void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> openCeilingTiles) where T : Enum
+{
+    if (room.IsDropZone)
+    {
+        SortedSet<int> dropTilesOverLava = [];
+
+        foreach (var lavaPit in lavaPits)
+        {
+            var endX = lavaPit.AbsX + lavaPit.Width;
+            for (int x = lavaPit.AbsX; x < endX; x++)
+            {
+                if (x < 16 || x > 47) { continue; }
+                if (openCeilingTiles.Contains(x))
+                {
+                    if (sv.Find(o => o.IsSolid && o.Intersects(x, x, 8, 11)) == null)
+                    {
+                        dropTilesOverLava.Add(x);
+                    }
+                }
+            }
+        }
+        if (dropTilesOverLava.Count > 0)
+        {
+            sb.AppendLine($"{GetName(room)}: Room is a drop zone over lava at x={ConvertToRangeString(dropTilesOverLava)}");
         }
     }
 }
