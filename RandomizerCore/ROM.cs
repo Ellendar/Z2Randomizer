@@ -1189,6 +1189,37 @@ Exit:
         a.Byt(dash);
     }
 
+    public void CombineFireSpell(Assembler asm, List<Collectable>? customSpellOrder, Random RNG)
+    {
+        // These are the bit flags for each spell.  The old implementation
+        // changed this table directly. However as this table is also used in
+        // the BIT comparison operation when determining if a spell should be
+        // cast, it lead to inconsistent behavior where some spells would be
+        // two-way linked and some would not.
+        byte[] spellBytes = GetBytes(0xdcb, 8);
+
+        int fireSpellIndex = 4;
+        int r = RNG.Next(7);
+        int linkedSpellIndex = r > 3 ? r + 1 : r;
+
+        byte combinedSpellBits = (byte)(spellBytes[linkedSpellIndex] | spellBytes[fireSpellIndex]);
+        spellBytes[fireSpellIndex] = combinedSpellBits;
+        spellBytes[linkedSpellIndex] = combinedSpellBits;
+
+        byte[] finalSpellBytes = customSpellOrder != null
+            ? customSpellOrder.Select(s => spellBytes[s.VanillaSpellOrder()]).ToArray()
+            : spellBytes;
+
+        var a = asm.Module();
+        a.Segment("PRG0");
+        a.Reloc();
+        a.Label("CombinedSpellTable");
+        a.Byt(finalSpellBytes);
+        // When a spell is cast, load from our new table instead
+        a.Org(0x8dfb);
+        a.Code("lda CombinedSpellTable,Y");
+    }
+
     public void MoveAfterGem()
     {
         Put(0x11b15, new byte[] { 0xea, 0xea });
