@@ -3801,7 +3801,7 @@ FREE_UNTIL $c2ca
             "Palace 5",
             "Palace 6",
             "G.Palace",
-            "Towns",
+            "Ambushes",
         }.Select(s => s.PadRight(8, ' '));
         foreach (var name in allTimeStampNames)
         {

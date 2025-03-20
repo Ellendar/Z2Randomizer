@@ -174,8 +174,9 @@ RESV DontKillEnemyFlag ; , $0122
 RESV Global5050JarDrop ; = $123 ; $0123
 RESV PreventDoubleLag
 RESV PreviousFrameMetasprite
-
-
+RESV StatDisplayState
+RESV InternalState
+RESV GameComplete ; set when you beat the game to stop the timers
 
 ;; Stat tracking variables in SRAM
 
@@ -232,8 +233,8 @@ RESV StatUpStabCount, 2
 RESV StatDownStabCount, 2
 ; When we tick up the main timer, if the flag for "in town" or "in palace" is set
 ; we tick those respective timers as well.
-StatTimeAtLocation = StatTimeInTowns 
-RESV StatTimeInTowns, 3
+StatTimeAtLocation = StatTimeInEncounters
+RESV StatTimeInEncounters, 3
 RESV StatTimeInPalace1, 3
 RESV StatTimeInPalace2, 3
 RESV StatTimeInPalace3, 3

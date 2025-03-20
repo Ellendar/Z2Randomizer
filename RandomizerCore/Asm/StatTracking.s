@@ -3,14 +3,11 @@
 
 .import SwapPRG, SwapToSavedPRG
 
-.define StatDisplayState $130
-.define InternalState $131
-
-BUFFER_OFF = $301
-PPUADDR_HI = $302
-PPUADDR_LO = $303
-BUFFER_LEN = $304
-BUFFER_DAT = $305
+BUFFER_OFF = $0301
+PPUADDR_HI = $0302
+PPUADDR_LO = $0303
+BUFFER_LEN = $0304
+BUFFER_DAT = $0305
 
 DOT = $cf
 SPACE = $f4
@@ -272,6 +269,33 @@ RestartAfterCredits = $921C
 LoadSaveFile = $B911
 LoadSaveFileCopyPointers = $BA6C
 LoadSaveFileCopyPointersSlotA = $BA6F
+bank7_Display = $ef11
+
+; Set the final timer stop command when you stop being able to move
+; also show the triforce immediately to show when the timer has ended
+.org $9B57 ; ldy $0504
+    jsr StopTimers
+.reloc
+StopTimers:
+    lda GameComplete
+    bmi @AlreadyDoneOnce
+        ora #$80
+        sta GameComplete
+        ; Set the timestamp for GP
+        lda #TsPalaceGP
+        jsr AddTimestamp
+@AlreadyDoneOnce:
+    ; setup and draw the old man over an over
+    lda #$d0
+    sta $4e  ;monster x
+    lda #$50
+    sta $2a  ;monster y
+    lda #$cf
+    sta $cd  ;monster position on screen (fixes triforce position on first frame)
+    jsr bank7_Display ; its the credits who cares about a few cycles
+    lda #$03
+    ldy $0504
+    rts
 
 ; Patch the save check on restart to copy over from checkpoint since we
 ; "lost" whatever timestamps we had after a reset
@@ -280,6 +304,7 @@ LoadSaveFileCopyPointersSlotA = $BA6F
 .reloc
 PatchLoadStatsFromCheckpoint:
     jsr LoadStatsFromCheckpoint
+    lda #0
     jmp LoadSaveFileCopyPointersSlotA
 
 ; Hook the save file load routine to see if our special flag is set
@@ -976,11 +1001,11 @@ DrawAllTimestamps:
         adc $c1
         tax
         ; read the 3 digits of the timestamp into the divide memory
-        lda StatTimeInTowns,x
+        lda StatTimeAtLocation,x
         sta Dividend
-        lda StatTimeInTowns+1,x
+        lda StatTimeAtLocation+1,x
         sta Dividend+1
-        lda StatTimeInTowns+2,x
+        lda StatTimeAtLocation+2,x
         sta Dividend+2
 
         jsr RenderTimestamp

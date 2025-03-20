@@ -36,7 +36,7 @@ FREE_UNTIL $D4CE
 .reloc
 SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weird issues on double lags
     lda PreventDoubleLag
-    bne +
+    bne @DontSetScrollTwice
         ; Can clobber all registers
         lda PpuCtrlShadow
         ora $0746 ; Have concerns about this
@@ -45,7 +45,7 @@ SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weir
         lda ScrollPosShadow
         sta ScrollPosForIrq
         inc PreventDoubleLag
-    +
+@DontSetScrollTwice:
 
 	lda #31
 	sta LineIrqTgtReg
@@ -148,10 +148,11 @@ HandleLagFrame:
     ; Load the current health/magic bar into here
     ; That should prevent sprite corruption since the internal OAM ADDR ends at #0
     ldx #$f8
-    -   lda $200,x
+    @loop:
+        lda $200,x
         sta $2004
         inx
-        bne -
+        bne @loop
     jsr SetupScanlineIRQ
 @HandleAudio:
     ; Skip processing audio during a real lag frame since thats what
@@ -231,9 +232,19 @@ Nmi:
     jsr IncStatTimerTitle
 .reloc
 IncStatTimerTitle:
+    pha
+    txa
+    pha
+    tya
+    pha
     jsr IncStatTimer
+    pla
+    tay
+    pla
+    tax
+    pla
     ; TODO This doesn't seem right. But maybe the value for
-    ; the title screen in A is always at least $80 ? 
+    ; the title screen in A is always at least $80 ?
     sta SoftDisableNmi
     ora $0747
     rts
@@ -244,11 +255,10 @@ IncStatTimerTitle:
 ; This is cleared when a new save file is loaded for the first time
 .reloc
 IncStatTimer:
-    pha
-    txa
-    pha
-    tya
-    pha
+    bit GameComplete
+    bpl @RunTimers
+        rts
+@RunTimers:
     inc StatTimer+0
     bne @Continue
     inc StatTimer+1
@@ -256,12 +266,23 @@ IncStatTimer:
     inc StatTimer+2
 @Continue:
     lda WorldNumber
-    beq @OverworldOrEncounter
-        ldx #0
+    bne @PalaceOrTown
+        ; Overworld is game mode ($737) = 5 and Encounter is $737 = $b 
+        ; Random encounters set the "area location index" $748 to $3e
+        lda $0737
+        cmp #$0b
+        bne @Exit
+            ; in an encounter (includes caves)
+            lda $0748
+            cmp #$3e
+            bne @Exit
+                ; In a random encounter
+                ldx #0
+                beq @IncrementTimer ; unconditional
+@PalaceOrTown:
+        ; 1-West Town, 2-East Town
         cmp #3
-        ; 1-West Town, 2-East Town: Increment the timer for the towns
-        bcc @IncrementTimer
-@Palace:
+        bcc @Exit
         ; Palaces
         lda RegionNumber
         asl
@@ -275,14 +296,8 @@ IncStatTimer:
         inc StatTimeAtLocation+1,x
         bne @Exit
         inc StatTimeAtLocation+2,x
-;        bne @Exit ; unconditional also not needed
-@OverworldOrEncounter:
+;        bne @Exit ; unconditional
 @Exit:
-    pla
-    tay
-    pla
-    tax
-    pla
     rts
 
 ; These values are exported from the randomizer and map from internal palace number
@@ -556,7 +571,7 @@ ClearStackRAM:
     ldx #$d0 - $20
     ; clear stack RAM we can use for variables
 @Loop2:
-        sta $100 + $20 - 1,x
+        sta $0100 + $20 - 1,x
         dex
         bne @Loop2
     jmp $d281 ; clear rest of ram
