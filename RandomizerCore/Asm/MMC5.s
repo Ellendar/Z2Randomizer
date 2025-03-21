@@ -179,17 +179,17 @@ RunAudioFrameOrLagFrame:
         pha
         lda #$8c  ; (bank 6)
         sta NmiBankShadow8
-        sta $5114
+        sta PrgBank8Reg
         lda #$8d  ; (bank 6)
         sta NmiBankShadowA
-        sta $5115
+        sta PrgBankAReg
             jsr HandleLagFrame
         pla
         sta NmiBankShadow8
-        sta $5114
+        sta PrgBank8Reg
         pla
         sta NmiBankShadowA
-        sta $5115
+        sta PrgBankAReg
 @skip:
     pla
     tay
@@ -619,7 +619,7 @@ UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $
 
 .reloc
 LoadAreaBGMetatile:
-; if the code is in a000 or higher that would switch this bank out from under itself
+; guarantee the code is in a000 or higher otherwise we would switch this bank out from under itself
 .assert * > $a000
     lda $0769
     asl

@@ -215,7 +215,8 @@ AddTimestamp:
   tay
   ; double read the timestamp. this prevents an issue where reading is interrupted by NMI
   ; keep the lo value in X so we can check if it changed and read again if it does
--   lda StatTimer+0
+@validate:
+    lda StatTimer+0
     pha
         sta TimestampList,y
         lda StatTimer+1
@@ -224,7 +225,7 @@ AddTimestamp:
         sta TimestampList+2,y
     pla
     cmp StatTimer+0
-    bne -
+    bne @validate
   inc TimestampCount
   rts
 
@@ -233,10 +234,11 @@ UpdateCreditsSwitchBank:
     ; This is a bit lame, but while we have BANK5 banked in,
     ; lets copy over the seed hash into RAM somewhere we can access
     ldy #11-1
-    -   lda $BC1C, y
+@hash:
+        lda $BC1C, y
         sta $03d5, y
         dey
-        bpl -
+        bpl @hash
     lda #1
     jsr SwapPRG
     jmp UpdateCredits
@@ -264,12 +266,33 @@ TwoByteBCDConversion:
     jmp SwapPRG
 
 .segment "PRG5"
-
+ITEM_SPRITE_OFFSET = 4
 RestartAfterCredits = $921C
 LoadSaveFile = $B911
 LoadSaveFileCopyPointers = $BA6C
 LoadSaveFileCopyPointersSlotA = $BA6F
 bank7_Display = $ef11
+
+; Add a little blurb about press start to skip to the stats
+.org $8BB0 ; JMP      L9255 - jumps to inc $0736 rts
+    jmp AddPressStartToSkip
+.reloc
+AddPressStartToSkip:
+    inc $0736
+    
+    ; rendering is off so we can just draw whatever we want
+    lda #$23
+    sta PPUADDR
+    lda #$63
+    sta PPUADDR
+    ldy #0
+@loop:
+        lda PressStartString,y
+        sta PPUDATA
+        iny
+        cpy #PressStartStringLen
+        bne @loop
+    rts
 
 ; Set the final timer stop command when you stop being able to move
 ; also show the triforce immediately to show when the timer has ended
@@ -316,16 +339,16 @@ PatchLoadStatsFromCheckpoint:
 .reloc
 CheckIfNewSaveFile:
     lda StatTrackingSaveFileClear
-    beq +
+    beq @skip
         ; New save file loaded, so clear stats entirely
         ldy #STAT_TRACKING_SIZE
         lda #0
-        -
+    @loop:
             sta StatTimer-1,y
             dey
-            bne -
+            bne @loop
         sta StatTrackingSaveFileClear
-    +
+@skip:
     jmp LoadSaveFile
 
 ; Patch the "Register" end button to set a flag for a new save file  
@@ -349,19 +372,21 @@ SetNewSaveFile:
 .reloc
 SaveStatsToCheckpoint:
   ldy #CHECKPOINT_LEN-1
--   lda TimestampCount,y
+@loop:
+    lda TimestampCount,y
     sta Checkpoint,y
     dey
-    bpl -
+    bpl @loop
   jmp LoadSaveFileCopyPointers
 
 .reloc
 LoadStatsFromCheckpoint:
   ldy #CHECKPOINT_LEN-1
--   lda Checkpoint,y
+@loop:
+    lda Checkpoint,y
     sta TimestampCount,y
     dey
-    bpl -
+    bpl @loop
   jmp LoadSaveFileCopyPointers
 
 ; Hook the common runtime code for the credits to allow skipping to the end at any time
@@ -372,15 +397,20 @@ CheckToSkipToEnd:
     ; check if start is pressed
     lda $f5
     and #$10
-    beq +
-        ; and we made it through the init end of credits
+    beq @skip
+        ; don't let this skip code run once we've moved to the stats
         lda $0761
-        cmp #10
-        bcc +
+        ; the step right before the final scene with the blinking triforce
+        ; since the blinking triforce scene already has a press start check
+        cmp #12
+        bcs @skip
+            ; set the music to the final end song
+            lda #8
+            sta $eb
             ; skip ahead
             lda #13
             sta $0761
-    +
+@skip:
     lda $0761
     rts
 
@@ -414,19 +444,20 @@ UpdateCredits:
         jsr RunFrame
     pla
     cmp StatDisplayState
-    beq +
+    beq @skip
         ; Reset the internal state after every state ends
         lda #0
         sta InternalState
-    +
+@skip:
     jmp SwapToSavedPRG
 
 RunFrame:
     ; a == StatDisplayState
     cmp #4
-    bcc +
+    bcc @skip
         jsr UpdateSpritePosition
-+   lda StatDisplayState
+@skip:
+    lda StatDisplayState
     jsr JumpEngine
 .word (FadeOut)
 .word (DrawBackground)
@@ -451,58 +482,59 @@ RestartToTitle:
 .reloc
 RenderPlayerInfo:
     lda InternalState
-    beq +
+    beq @skip
         jmp RenderPlayerInfoBg
-    +
+@skip:
     ; Render the sprites
     jsr DrawPauseMenuRowSwitchBank
 
     ; Move those sprites to the position that we want them at
     ldx #16-1
     ldy #(16-1)*4
--       lda $200,y
+@loop:
+        lda $0200 + ITEM_SPRITE_OFFSET,y
         ; Don't move offscreen sprites over
         cmp #$f0
-        bcs +
+        bcs @offscreen
             sec 
             sbc #$80-10
-        +
-        sta $200,y
-        sta $390,x
-        lda $203,y
+    @offscreen:
+        sta $0200 + ITEM_SPRITE_OFFSET,y
+        sta $0390,x
+        lda $0203 + ITEM_SPRITE_OFFSET,y
         sec 
         sbc #$80+8
-        sta $203,y
-        sta $3b0,x
+        sta $0203 + ITEM_SPRITE_OFFSET,y
+        sta $03b0,x
         dey
         dey
         dey
         dey
         dex
-        bpl -
+        bpl @loop
     ; Create the heart and jar sprite
     ; ignore the y pos for now. we'll add it in the update
     ; x pos
     lda #6 * 8 - 1
-    sta $203 + $50
-    sta $203 + $58
+    sta $0203 + $60
+    sta $0203 + $68
     lda #7 * 8 - 1
-    sta $203 + $54
-    sta $203 + $5c
+    sta $0203 + $64
+    sta $0203 + $6c
     ; tile id
     lda #$81
-    sta $201 + $50
-    sta $201 + $54
+    sta $0201 + $60
+    sta $0201 + $64
     lda #$83
-    sta $201 + $58
-    sta $201 + $5c
+    sta $0201 + $68
+    sta $0201 + $6c
     ; attr
     lda #$01
-    sta $202 + $50
-    sta $202 + $58
+    sta $0202 + $60
+    sta $0202 + $68
     lda #$41
-    sta $202 + $54
-    sta $202 + $5c
+    sta $0202 + $64
+    sta $0202 + $6c
     
     ; Draw the name(s) / hash / levels / lives
     jmp RenderPlayerInfoBg
@@ -693,9 +725,9 @@ UpdateSpritePosition:
     ldy #(16-1)*4
     ldx #16-1
 -       lda $390,x
-        sta $200,y
+        sta $200 + ITEM_SPRITE_OFFSET,y
         lda $3b0,x
-        sta $203,y
+        sta $203 + ITEM_SPRITE_OFFSET,y
         dey
         dey
         dey
@@ -704,14 +736,14 @@ UpdateSpritePosition:
         bpl -
     ; heart container y
     lda #4 * 8
-    sta $200 + $50
-    sta $200 + $54
+    sta $200 + $60
+    sta $200 + $64
     ; magic container y
     lda #6 * 8
-    sta $200 + $58
-    sta $200 + $5c
+    sta $200 + $68
+    sta $200 + $6c
     ; link sprite offset
-    lda #$70
+    lda #$80
     sta $90
     ; link x offset
     lda #$08+4

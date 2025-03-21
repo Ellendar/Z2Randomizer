@@ -3802,12 +3802,18 @@ FREE_UNTIL $c2ca
             "Palace 6",
             "G.Palace",
             "Ambushes",
-        }.Select(s => s.PadRight(8, ' '));
+        }.Select(s => s.ToUpper().PadRight(8, ' '));
         foreach (var name in allTimeStampNames)
         {
             a.Byt(Util.ToGameText(name).Select(x => (byte)x).ToArray());
         }
 
+        var message = " Press Start to view stats ".ToUpper();
+        a.Segment("PRG5");
+        a.Reloc();
+        a.Label("PressStartString");
+        a.Byt(Util.ToGameText(message).Select(x => (byte)x).ToArray());
+        a.Assign("PressStartStringLen", message.Length);
         AssignRealPalaceLocations(a);
         a.Code(Util.ReadResource("RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
