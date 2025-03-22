@@ -177,6 +177,10 @@ public class SideviewEditable<T> where T : Enum
     public String DebugString()
     {
         StringBuilder sb = new StringBuilder("");
+        var headerBytes = Convert.ToHexString(Header);
+        var floor = SideviewMapCommand<T>.CreateNewFloor(0, FloorHeader);
+        sb.AppendLine($"{headerBytes}       {"Floor",-26}{FloorHeader}");
+
         foreach (var c in Commands)
         {
             sb.AppendLine(c.DebugString());
