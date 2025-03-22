@@ -33,12 +33,11 @@
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\ExpandedPauseMenu.s" />
-    <None Remove="Asm\FixedHud.s" />
     <None Remove="Asm\Graphics\item_sprites.chr" />
     <None Remove="Asm\Graphics\randomizer_text.chr" />
     <None Remove="Asm\Recoil.s" />
+    <None Remove="Asm\StatTracking.s" />
     <None Remove="Asm\z2ft.s" />
-    <None Remove="Asm\" />
     <None Remove="Asm\BuffCarock.s" />
     <None Remove="Asm\MMC5.s" />
     <None Remove="Asm\z2r.inc" />
