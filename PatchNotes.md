@@ -1,5 +1,16 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.14 - March 22, 2025
+
+- Fixed an issue where items required for Reflect could be behind Carock when palaces continue after bosses.
+- Fixed an issue where hidden palace/kasuto could be tracked wrong and sometimes not work correctly
+- Fixed an issue caused by the previous issue that could cause 3-eyed rock to appear in an incorrect position
+- Fixed multiple issues that could cause the raft tile to overlap with a bridge.
+
+- Reduced the amount of lag produced by custom music
+- Fixed several custom music related issues
+- Added an option to use/disable vanilla music when custom music is enabled
+
 ## Version 4.3.13 - October 16, 2024
 
 - Faster text is now instant text. Rejoice!
