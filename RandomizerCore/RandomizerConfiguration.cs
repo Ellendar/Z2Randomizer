@@ -182,6 +182,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool removeFlashing;
     private CharacterSprite sprite;
     private string spriteName;
+    private bool sanitizeSprite;
+    private bool changeItemSprites;
     private CharacterColor tunic;
     private CharacterColor tunicOutline;
     private CharacterColor shieldTunic;
@@ -995,6 +997,20 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     }
 
     [IgnoreInFlags]
+    public bool SanitizeSprite
+    {
+        get => sanitizeSprite;
+        set => SetField(ref sanitizeSprite, value);
+    }
+
+    [IgnoreInFlags]
+    public bool ChangeItemSprites
+    {
+        get => changeItemSprites;
+        set => SetField(ref changeItemSprites, value);
+    }
+
+    [IgnoreInFlags]
     public CharacterColor Tunic
     {
         get => tunic;
@@ -1796,6 +1812,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
+        properties.SanitizeSprite = SanitizeSprite;
+        properties.ChangeItemSprites = ChangeItemSprites;
         properties.TunicColor = Tunic;
         properties.OutlineColor = TunicOutline;
         properties.ShieldColor = ShieldTunic;

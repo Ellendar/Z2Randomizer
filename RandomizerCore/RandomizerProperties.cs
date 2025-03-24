@@ -204,6 +204,8 @@ public class RandomizerProperties
 #pragma warning disable CS8618 
     public CharacterSprite CharSprite { get; set; }
 #pragma warning restore CS8618
+    public bool SanitizeSprite { get; set; }
+    public bool ChangeItemSprites { get; set; }
     public CharacterColor TunicColor { get; set; }
     public CharacterColor OutlineColor { get; set; }
     public CharacterColor ShieldColor { get; set; }

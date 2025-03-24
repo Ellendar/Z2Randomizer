@@ -29,7 +29,16 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         get { return spriteName; }
         set { spriteName = value ?? "Link"; Main.Config.SpriteName = value ?? "Link"; }
     }
-
+    public bool SanitizeSprite
+    {
+        get => Main.Config.SanitizeSprite;
+        set { Main.Config.SanitizeSprite = value; this.RaisePropertyChanged(); }
+    }
+    public bool ChangeItemSprites
+    {
+        get => Main.Config.ChangeItemSprites;
+        set { Main.Config.ChangeItemSprites = value; this.RaisePropertyChanged(); }
+    }
     public CharacterColor TunicColor
     {
         get => Main.Config.Tunic;
@@ -180,7 +189,8 @@ public class LoadedCharacterSprite : ReactiveObject
     public async Task Update(CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite)
     {
         var tmp = new ROM(rom, true);
-        tmp.UpdateSprites(Sprite, tunicColor, outlineColor, shieldColor, beamSprite);
+        // sanitizing will be slower, we don't need to do it for every sprite in the dropdown
+        tmp.UpdateSprites(Sprite, tunicColor, outlineColor, shieldColor, beamSprite, false, false);
         var data = await LoadPreviewFromRom(tmp);
         unsafe
         {

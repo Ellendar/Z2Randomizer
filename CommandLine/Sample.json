@@ -156,6 +156,8 @@
 "StartWithThunder": false,
 "SwapUpAndDownStab": false,
 "TBirdRequired": true,
+"SanitizeSprite": true,
+"ChangeItemSprites": true,
 "Tunic": "Pink",
 "TunicOutline": "Default",
 "UpAOnController1": false,
