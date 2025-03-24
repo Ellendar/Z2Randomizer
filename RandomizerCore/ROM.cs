@@ -549,7 +549,7 @@ TitleEnd:
         ChrRomOffset + 0x18840 
     };
 
-    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite)
+    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite, bool sanitize, bool changeItems)
     {
         /*
          * Dear future digshake,
@@ -575,7 +575,14 @@ TitleEnd:
          */
 
         if (charSprite.Patch != null) {
-            IpsPatcher.Patch(rawdata, charSprite.Patch, true);
+            if (sanitize)
+            {
+                SpritePatcher.PatchSpriteSanitized(rawdata, charSprite.Patch, true, changeItems);
+            }
+            else
+            {
+                IpsPatcher.Patch(rawdata, charSprite.Patch, true);
+            }
         }
 
         var colorMap = new Dictionary<CharacterColor, int>()
