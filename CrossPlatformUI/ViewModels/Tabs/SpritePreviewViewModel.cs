@@ -222,78 +222,17 @@ public class LoadedCharacterSprite : ReactiveObject
         {
 
             // var img = new WriteableBitmap(new PixelSize(16, 32), Vector.One, PixelFormat.Rgba8888);
-        
+
             // Load the new palette for the sprite from the ROM
             const int charPaletteAddr = 0x10 + 0x1c46b;
             var palette = tmp.GetBytes(charPaletteAddr, 4);
-
-            // 8 pixels in each 8x8 sprite :P
-            var pixelsPerTileRow = 8;
-
-            // 8 tile sprites in the main character data
-            const int tileCount = 8;
 
             // Location in the ROM where the sprite starts
             // 0x22000 = CHR page (bank $02) base, 0x10 = ines header, 0x80 for the tile offset
             // we are reading 8 sprites from [0x80, 0x100)
             const int spriteBase = ROM.ChrRomOffset + 0x2000 + 0x80;
 
-            // We only have one palette to read from, but should there be multipalette sprites someday
-            // this could come in handy
-            const int paletteIdx = 0;
-
-            // TODO jroweboy:
-            // Its late at night, and I'm too tired to math this out properly
-            int[] xpattern = [ 0, 0, 1, 1, 0, 0, 1, 1 ];
-            int[] ypattern = [ 0, 1, 0, 1, 2, 3, 2, 3 ];
-
-            // using var framebuffer = img.Lock();
-            // var buffer = new Span<byte>(framebuffer.Address.ToPointer(), 16 * 32 * 4); // assume each pixel is 1 byte in size and my image has 4 channels
-            var buffer = new byte[4 * 16 * 32];
-            for (var n = 0; n < tileCount; ++n)
-            {
-                var offset = n * 16;
-
-                int tilex = xpattern[n] * 8;
-                int tiley = ypattern[n] * 8;
-                for (var j = 0; j < pixelsPerTileRow; ++j)
-                {
-                    var plane0 = tmp.GetByte(spriteBase + offset + j);
-                    var plane1 = tmp.GetByte(spriteBase + offset + j + 8);
-                    for (var i = 0; i < pixelsPerTileRow; ++i)
-                    {
-                        var pixelbit = 7 - i;
-                        var bit0 = (plane0 >> pixelbit) & 1;
-                        var bit1 = ((plane1 >> pixelbit) & 1) << 1;
-                        var color = (bit0 | bit1) + (paletteIdx * 4);
-                        var appliedColor = BaseColors[palette[color]];
-                        var withAlpha = Color.FromArgb((color == 0) ? 0 : 255, appliedColor);
-
-                        var x = tilex + i;
-                        var y = tiley + j;
-                        SetPixel(buffer, x, y, withAlpha);
-                    }
-                }
-            }
-            return buffer;
+            return tmp.ReadSprite(spriteBase, 2, 4, palette);
         });
     }
-
-    private static void SetPixel(Span<byte> buffer, int x, int y, Color c)
-    {
-        buffer[0 + 4 * x + 4 * 16 * y] = c.R;
-        buffer[1 + 4 * x + 4 * 16 * y] = c.G;
-        buffer[2 + 4 * x + 4 * 16 * y] = c.B;
-        buffer[3 + 4 * x + 4 * 16 * y] = c.A;
-    }
-
-    // Basic look up table to convert from the original NES palette value to RGB
-    private static readonly Color[] BaseColors = new Color[]
-    {
-Color.FromArgb( 84,  84,  84), Color.FromArgb(  0,  30, 116), Color.FromArgb(  8,  16, 144), Color.FromArgb( 48,   0, 136), Color.FromArgb( 68,   0, 100), Color.FromArgb( 92,   0,  48), Color.FromArgb( 84,   4,   0), Color.FromArgb( 60,  24,   0), Color.FromArgb( 32,  42,   0), Color.FromArgb(  8,  58,   0), Color.FromArgb(  0,  64,   0), Color.FromArgb(  0,  60,   0), Color.FromArgb(  0,  50,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-Color.FromArgb(152, 150, 152), Color.FromArgb(  8,  76, 196), Color.FromArgb( 48,  50, 236), Color.FromArgb( 92,  30, 228), Color.FromArgb(136,  20, 176), Color.FromArgb(160,  20, 100), Color.FromArgb(152,  34,  32), Color.FromArgb(120,  60,   0), Color.FromArgb( 84,  90,   0), Color.FromArgb( 40, 114,   0), Color.FromArgb(  8, 124,   0), Color.FromArgb(  0, 118,  40), Color.FromArgb(  0, 102, 120), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-Color.FromArgb(236, 238, 236), Color.FromArgb( 76, 154, 236), Color.FromArgb(120, 124, 236), Color.FromArgb(176,  98, 236), Color.FromArgb(228,  84, 236), Color.FromArgb(236,  88, 180), Color.FromArgb(236, 106, 100), Color.FromArgb(212, 136,  32), Color.FromArgb(160, 170,   0), Color.FromArgb(116, 196,   0), Color.FromArgb( 76, 208,  32), Color.FromArgb( 56, 204, 108), Color.FromArgb( 56, 180, 204), Color.FromArgb( 60,  60,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188, 188, 236), Color.FromArgb(212, 178, 236), Color.FromArgb(236, 174, 236), Color.FromArgb(236, 174, 212), Color.FromArgb(236, 180, 176), Color.FromArgb(228, 196, 144), Color.FromArgb(204, 210, 120), Color.FromArgb(180, 222, 120), Color.FromArgb(168, 226, 144), Color.FromArgb(152, 226, 180), Color.FromArgb(160, 214, 228), Color.FromArgb(160, 162, 160), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-    };
-
 }
