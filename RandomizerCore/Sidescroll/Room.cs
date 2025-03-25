@@ -126,7 +126,7 @@ public class Room : IJsonOnDeserialized
     public Room MergedPrimary { get; set; }
     [JsonIgnore]
     public Room MergedSecondary { get; set; }
-    public bool SuppressValidation { get; set; } = false;
+    public List<string> SuppressWarning { get; set; } = [];
 
     //The json loads the fields the analyzer says aren't loaded. Source: trust me bro
     //But seriously eventually put some validation here.

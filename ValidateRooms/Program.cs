@@ -22,7 +22,7 @@ void ValidateRoomsForFile(string filename)
 
     // Checking that all room data is conforming to the structure
     // (It would be very bad if any of the length bytes were wrong.)
-    foreach (var room in palaceRooms!.Where(r => r.Enabled))
+    foreach (var room in palaceRooms!.Where(r => IsActuallyEnabled(palaceRooms!, r)))
     {
         try
         {
@@ -44,67 +44,42 @@ void ValidateRoomsForFile(string filename)
     }
 
     // REGULAR PALACE ROOMS
-    foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber != 7 && !r.SuppressValidation))
+    foreach (var room in palaceRooms!.Where(r => r.PalaceNumber != 7 && IsActuallyEnabled(palaceRooms!, r)))
     {
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
-        if (sv.HasItem() != room.HasItem) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
+        // checking Enabled here to skip linked rooms
+        if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
+        var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
 
-        CheckLeftAndRightExits(room, sv);
+        // a lot can probably be rewritten to use this now instead of doing their own checks
+        bool[,] solidGrid = sv.CreateSolidGrid();
+
+        CheckLeftExit(room, solidGrid);
+        CheckRightExit(room, sv.PageCount, solidGrid);
+        CheckDoorsAndItems(room, sv, ee);
 
         if (room.IsBossRoom)
         {
             var statue = sv.Find(o => o.Id == PalaceObject.IronknuckleStatue && o.AbsX == 62 && o.Y == 9);
-            if (statue == null) { sb.AppendLine($"{GetName(room)}: Boss room is missing exit statue."); }
-            var exitBlocker = sv.Find(o => o.Id == PalaceObject.HorizontalBrick && o.AbsX == 62 && o.Y > 7 && o.Y < 11);
-            if (exitBlocker != null) { sb.AppendLine($"{GetName(room)}: Boss room has low ceiling at exit preventing re-entry."); }
+            if (statue == null) { Warning(room, "BossRoomMissingStatue", "Boss room is missing exit statue."); }
+            bool hasRightOpeningWall = FindTileOpeningAtX(solidGrid, (sv.PageCount * 16) - 1);
+            if (!hasRightOpeningWall) { Warning(room, "BossRoomLowCeiling", "Boss room has too low ceiling at exit, preventing re-entry."); }
         }
 
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];
 
-        AddOpenCeilingTiles(sv, openCeilingTiles);
-
-        var horizontalPits = sv.FindAll(o => o.Id == PalaceObject.HorizontalPit && o.Y < 12);
-        AddTilesFromHorizontalPits(horizontalPits, openCeilingTiles, dropTiles);
-
-        var walkthruDrop = sv.FindAll(o => o.Id == PalaceObject.WalkThruBricks && o.Y < 12);
-        AddTilesFrom2HighHorizontalPits(walkthruDrop, openCeilingTiles, dropTiles);
-
-        var singleRowDrop11 = sv.FindAll(o => o.Id == PalaceObject.HorizontalPitOrLava && o.Y == 11);
-        var singleRowDrop12 = sv.FindAll(o => o.Id == PalaceObject.HorizontalPitOrLava && o.Y == 12);
-        if (singleRowDrop11.Count > 0 && singleRowDrop12.Count > 0)
-        {
-            // assuming both rows line-up here
-            foreach (var pit in singleRowDrop12)
-            {
-                for (var i = 0; i < pit.Param + 1; i++)
-                {
-                    dropTiles.Add(pit.AbsX + i);
-                }
-            }
-        }
-
-        var verticalPits = sv.FindAll(o => (o.Id == PalaceObject.VerticalPit1 || o.Id == PalaceObject.VerticalPit2) && o.Y < 13);
-        foreach (var pit in verticalPits)
-        {
-            if (pit.Y == 0)
-            {
-                openCeilingTiles.Add(pit.AbsX);
-            }
-            else if (pit.Y + pit.Param >= 12)
-            {
-                dropTiles.Add(pit.AbsX);
-            }
-        }
+        AddOpenCeilingTiles(sv, solidGrid, openCeilingTiles);
+        AddDropTiles(sv, solidGrid, dropTiles);
 
         var lavaPits = sv.FindAll(o => o.IsLava());
         CheckDropsOverLava(room, sv, lavaPits, openCeilingTiles);
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
-        CheckElevators(room, elevators, openCeilingTiles, dropTiles);
+        CheckElevators(room, sv, solidGrid, elevators, openCeilingTiles);
         foreach (var elevator in elevators)
         {
             dropTiles.Remove(elevator.AbsX);
@@ -115,38 +90,32 @@ void ValidateRoomsForFile(string filename)
     }
 
     // GREAT PALACE ROOMS
-    foreach (var room in palaceRooms!.Where(r => r.Enabled && r.PalaceNumber == 7 && !r.SuppressValidation))
+    foreach (var room in palaceRooms!.Where(r => r.PalaceNumber == 7 && IsActuallyEnabled(palaceRooms!, r)))
     {
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
+        var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
 
-        CheckLeftAndRightExits(room, sv);
+        // a lot can probably be rewritten to use this now instead of doing their own checks
+        bool[,] solidGrid = sv.CreateSolidGrid();
+
+        CheckLeftExit(room, solidGrid);
+        CheckRightExit(room, sv.PageCount, solidGrid);
+        CheckDoorsAndItems(room, sv, ee);
 
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];
 
-        AddOpenCeilingTiles(sv, openCeilingTiles);
-
-        var verticalPits = sv.FindAll(o => o.Id == GreatPalaceObject.ElevatorShaft && o.Y < 13);
-        foreach (var pit in verticalPits)
-        {
-            if (pit.Y == 0)
-            {
-                openCeilingTiles.Add(pit.AbsX);
-            }
-            dropTiles.Add(pit.AbsX);
-        }
-
-        var walkthruDrop = sv.FindAll(o => o.Id == GreatPalaceObject.WalkThruBricks && o.Y < 12);
-        AddTilesFrom2HighHorizontalPits(walkthruDrop, openCeilingTiles, dropTiles);
+        AddOpenCeilingTiles(sv, solidGrid, openCeilingTiles);
+        AddDropTiles(sv, solidGrid, dropTiles);
 
         var lavaPits = sv.FindAll(o => o.IsLava());
         CheckDropsOverLava(room, sv, lavaPits, openCeilingTiles);
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
-        CheckElevators(room, elevators, openCeilingTiles, dropTiles);
+        CheckElevators(room, sv, solidGrid, elevators, openCeilingTiles);
         foreach (var elevator in elevators)
         {
             dropTiles.Remove(elevator.AbsX);
@@ -157,62 +126,65 @@ void ValidateRoomsForFile(string filename)
     }
 }
 
-void AddOpenCeilingTiles<T>(SideviewEditable<T> sv, SortedSet<int> openCeilingTiles) where T : Enum
+void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
 {
-    var floor = SideviewMapCommand<T>.CreateNewFloor(0, sv.FloorHeader);
-    List<SideviewMapCommand<T>> floors = sv.FindAll(o => o.IsNewFloor());
-    for (var x = 0; x < 64; x++)
+    var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LockedDoor);
+    var itemCmds = sv.Commands.Where(o => o.HasExtra());
+
+    var lockedDoorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesShared.LOCKED_DOOR);
+    var elevatorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesPalaceShared.ELEVATOR);
+    var strikeForJarEnemies = ee.Enemies.Where(o => o.Id switch
     {
-        while (floors.Count > 0 && floors[0].AbsX == x)
+        EnemiesPalace125.STRIKE_FOR_RED_JAR => true,
+        EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE => true,
+        EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA => true,
+        _ => false,
+    });
+
+    if (lockedDoorEnemies.Count() > 0) { Warning(room, "LockedDoorEnemy", "Room uses LockedDoor enemy."); }
+    if (elevatorEnemies.Count() > 0) { Warning(room, "ElevatorEnemy", "Room uses Elevator enemy."); }
+
+    if (room.Group == RoomGroup.VANILLA) { return; }
+
+    for (int page = 0; page < 4; page++)
+    {
+        List<string> itemsOnPage = new();
+
+        foreach (var o in lockedDoorCmds.Where(o => o.Page == page)) { itemsOnPage.Add($"Cmd:{o.Id} ({Convert.ToHexString(o.Bytes)})"); }
+        foreach (var o in itemCmds.Where(o => o.Page == page)) { itemsOnPage.Add($"Cmd:{o.Extra} ({Convert.ToHexString(o.Bytes)})"); }
+        if (itemsOnPage.Count == 0)
         {
-            floor = floors[0];
-            floors.RemoveAt(0);
+            continue; // if no locked doors or items are involved, we don't mind.
         }
-        if (!floor.IsFloorSolidAt(0))
+        foreach (var o in strikeForJarEnemies.Where(o => o.Page == page)) { itemsOnPage.Add($"Enemy:{o.Id} ({Convert.ToHexString(o.Bytes)})"); }
+
+        if (itemsOnPage.Count > 1)
         {
-            if (sv.Find(o => o.IsSolid && o.Intersects(x, x, 0, 0)) == null)
-            {
-                openCeilingTiles.Add(x);
-            }
+            Warning(room, "MultipleItemsOnPage", $"Has multiple items on page { page + 1}: { string.Join(", ", itemsOnPage)}");
         }
     }
 }
 
-void AddTilesFromHorizontalPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<int> openCeilingTiles, SortedSet<int> dropTiles) where T : Enum
+void AddOpenCeilingTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> openCeilingTiles) where T : Enum
 {
-    foreach (var pit in pits)
+    int w = sv.PageCount * 16;
+    for (var x = 0; x < w; x++)
     {
-        if (pit.Y == 0)
+        if (!solidGrid[x, 0])
         {
-            for (var i = 0; i < pit.Param + 1; i++)
-            {
-                openCeilingTiles.Add(pit.AbsX + i);
-            }
-        }
-        for (var i = 0; i < pit.Param + 1; i++)
-        {
-            dropTiles.Add(pit.AbsX + i);
+            openCeilingTiles.Add(x);
         }
     }
 }
 
-void AddTilesFrom2HighHorizontalPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<int> openCeilingTiles, SortedSet<int> dropTiles) where T : Enum
+void AddDropTiles<T>(SideviewEditable<T> sv, bool[,] solidGrid, SortedSet<int> dropTiles) where T : Enum
 {
-    foreach (var pit in pits)
+    int w = sv.PageCount * 16;
+    for (var x = 0; x < w; x++)
     {
-        if (pit.Y == 0)
+        if (!solidGrid[x, 12] && !solidGrid[x, 11])
         {
-            for (var i = 0; i < pit.Param + 1; i++)
-            {
-                openCeilingTiles.Add(pit.AbsX + i);
-            }
-        }
-        else if (pit.Y == 11)
-        {
-            for (var i = 0; i < pit.Param + 1; i++)
-            {
-                dropTiles.Add(pit.AbsX + i);
-            }
+            dropTiles.Add(x);
         }
     }
 }
@@ -251,69 +223,118 @@ void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCo
         }
         if (dropTilesOverLava.Count > 0)
         {
-            sb.AppendLine($"{GetName(room)}: Room is a drop zone over lava at x={ConvertToRangeString(dropTilesOverLava)}");
+            Warning(room, "DropOverLava", $"Room is a drop zone over lava at x={ConvertToRangeString(dropTilesOverLava)}");
         }
     }
 }
 
-void CheckLeftAndRightExits<T>(Room room, SideviewEditable<T> sv) where T : Enum
+void CheckLeftExit(Room room, bool[,] solidGrid)
 {
-    var floor = SideviewMapCommand<T>.CreateNewFloor(0, sv.FloorHeader);
-    List<SideviewMapCommand<T>> floors = sv.FindAll(o => o.IsNewFloor());
-    while (floors.Count > 0 && floors[0].AbsX == 0)
-    {
-        floor = floors[0];
-        floors.RemoveAt(0);
-    }
-    // solid wall (0xf) is the only floor without an opening
-    bool hasLeftOpeningWall = (floor.Bytes[1] & 0xf) != 0xf;
-    if (room.HasLeftExit && !hasLeftOpeningWall) { sb.AppendLine($"{GetName(room)}: Room is marked as having a left exit, but there is no left wall opening"); }
-
-    while (floors.Count > 0 && floors[0].AbsX <= 63)
-    {
-        floor = floors[0];
-        floors.RemoveAt(0);
-    }
-    bool hasRightOpeningWall = (floor.Bytes[1] & 0xf) != 0xf;
-    if (room.HasRightExit && !hasRightOpeningWall) { sb.AppendLine($"{GetName(room)}: Room is marked as having a right exit, but there is no right wall opening"); }
+    bool hasLeftOpeningWall = FindTileOpeningAtX(solidGrid, 0);
+    if (room.HasLeftExit && !hasLeftOpeningWall) { Warning(room, "LeftExitNotOpen", "Room is marked as having a left exit, but there is no left wall opening"); }
 }
 
-void CheckElevators<T>(Room room, List<SideviewMapCommand<T>> elevators, SortedSet<int> openCeilingTiles, SortedSet<int> dropTiles) where T : Enum
+void CheckRightExit(Room room, int pageCount, bool[,] solidGrid)
 {
+    bool hasRightOpeningWall = FindTileOpeningAtX(solidGrid, (pageCount * 16) - 1);
+    if (room.HasRightExit && !hasRightOpeningWall) { Warning(room, "RightExitNotOpen", "Room is marked as having a right exit, but there is no right wall opening"); }
+}
+
+bool FindTileOpeningAtX(bool[,] solidGrid, int x, int n = 3)
+{
+    int count = 0;
+    for (int j = 0; j < solidGrid.GetLength(1); j++)
+    {
+        count = !solidGrid[x, j] ? count + 1 : 0;
+        if (count == n) return true;
+    }
+    return false;
+}
+
+void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> elevators, SortedSet<int> openCeilingTiles) where T : Enum
+{
+    bool IsDownElevator(SideviewMapCommand<T> o)
+    {
+        // check if there is at least a 1 tile wide open path down
+        // from the default elevator y start position
+        int x = o.AbsX;
+        int y = 8;
+        for (; y < 13; y++)
+        {
+            if (solidGrid[x, y]) { break; }
+        }
+        if (y != 13)
+        {
+            x = o.AbsX + 1;
+            y = 8;
+            for (; y < 13; y++)
+            {
+                if (solidGrid[x, y]) { break; }
+            }
+        }
+        return y == 13;
+    }
+    bool IsUpElevator(SideviewMapCommand<T> o) => openCeilingTiles.Contains(o.AbsX) || openCeilingTiles.Contains(o.AbsX + 1);
+
     // skip non-exit elevators
-    elevators = elevators.TakeWhile(o => openCeilingTiles.Contains(o.AbsX) || openCeilingTiles.Contains(o.AbsX + 1) || dropTiles.Contains(o.AbsX) || dropTiles.Contains(o.AbsX + 1)).ToList();
-    if (elevators.Count > 1) { sb.AppendLine($"{GetName(room)}: Room has more than one exit elevator"); }
+    elevators = elevators.TakeWhile(o => IsUpElevator(o) || IsDownElevator(o)).ToList();
+
+    foreach (var elevator in elevators)
+    {
+        if (IsDownElevator(elevator))
+        {
+            if (elevator.Param > 0) {
+                Warning(room, "ElevatorParam", $"Down elevator has param > 0.\n{FixedElevatorHexString(sv, elevator, 0)}");
+            }
+        }
+        else
+        {
+            int y = 0;
+            for (; y < 11; y++)
+            {
+                if (solidGrid[elevator.AbsX, y] && solidGrid[elevator.AbsX + 1, y]) { break; }
+            }
+            if (y < 3) { continue; /* not up elevator */ }
+            int optimalParam = Math.Min((11 - y) * 2, 0xf);
+            if (Math.Abs(elevator.Param - optimalParam) > 2) // allow a little offset from the optimal position
+            {
+                Warning(room, "ElevatorParam", $"Up elevator optimal param is {optimalParam}.\n{FixedElevatorHexString(sv, elevator, optimalParam)}");
+            }
+        }
+    }
+
+    if (elevators.Count > 1) { Warning(room, "MultipleExitElevators", "Room has more than one exit elevator"); }
     foreach (var elevator in elevators)
     {
         var x = elevator.AbsX;
-        if (x / 16 != room.ElevatorScreen) { sb.AppendLine($"{GetName(room)}: ElevatorScreen={room.ElevatorScreen} but elevator.xpos={x}"); }
+        if (x / 16 != room.ElevatorScreen) { Warning(room, "ElevatorWrongScreen", $"ElevatorScreen={room.ElevatorScreen} but elevator.xpos={x}"); }
         var pageX = x % 16;
-        if (pageX < 7) { sb.AppendLine($"{GetName(room)}: Elevator.xpos={x} is too far left on the page"); }
-        if (pageX > 7) { sb.AppendLine($"{GetName(room)}: Elevator.xpos={x} is too far right on the page"); }
+        if (pageX < 7) { Warning(room, "ElevatorNotCentered", $"Elevator.xpos={x} is too far left on the page"); }
+        if (pageX > 7) { Warning(room, "ElevatorNotCentered", $"Elevator.xpos={x} is too far right on the page"); }
     }
 
-    if (room.ElevatorScreen != -1 && elevators.Count == 0) { sb.AppendLine($"{GetName(room)}: ElevatorScreen={room.ElevatorScreen} but room has no elevator"); }
+    if (room.ElevatorScreen != -1 && elevators.Count == 0) { Warning(room, "ElevatorMissing", $"ElevatorScreen={room.ElevatorScreen} but room has no elevator"); }
     if (room.HasUpExit)
     {
-        if (room.ElevatorScreen == -1) { sb.AppendLine($"{GetName(room)}: Room is marked as having an up exit but ElevatorScreen=-1"); }
-        if (elevators.Count == 0) { sb.AppendLine($"{GetName(room)}: Room has no elevator but is marked as having an up exit"); }
+        if (room.ElevatorScreen == -1) { Warning(room, "ElevatorMissing", $"Room is marked as having an up exit but ElevatorScreen=-1"); }
+        if (elevators.Count == 0) { Warning(room, "ElevatorMissing", "Room has no elevator but is marked as having an up exit"); }
         else
         {
-            if (elevators.Find(o => openCeilingTiles.Contains(o.AbsX) || openCeilingTiles.Contains(o.AbsX + 1)) == null)
+            if (elevators.Find(o => IsUpElevator(o)) == null)
             {
-                sb.AppendLine($"{GetName(room)}: Elevator cannot go up but is marked as having an up exit");
+                Warning(room, "ElevatorCannotGoUp", "Elevator cannot go up but room is marked as having an up exit");
             }
         }
     }
     if (room.HasDownExit && !room.HasDrop)
     {
-        if (room.ElevatorScreen == -1) { sb.AppendLine($"{GetName(room)}: Room is marked as having a down exit but ElevatorScreen=-1"); }
-        if (elevators.Count == 0) { sb.AppendLine($"{GetName(room)}: Room has no elevator but is marked as having a down exit"); }
+        if (room.ElevatorScreen == -1) { Warning(room, "ElevatorMissing", "Room is marked as having a down exit but ElevatorScreen=-1"); }
+        if (elevators.Count == 0) { Warning(room, "ElevatorMissing", "Room has no elevator but is marked as having a down exit"); }
         else
         {
-            if (elevators.Find(o => dropTiles.Contains(o.AbsX) || dropTiles.Contains(o.AbsX + 1)) == null)
+            if (elevators.Find(o => IsDownElevator(o)) == null)
             {
-                sb.AppendLine($"{GetName(room)}: Elevator cannot go down but is marked as having a down exit");
+                Warning(room, "ElevatorCannotGoDown", "Elevator cannot go down but room is marked as having a down exit");
             }
         }
     }
@@ -326,7 +347,7 @@ void CheckDropZones(Room room, SortedSet<int> openCeilingTiles)
     shouldBeOpen.IntersectWith(openCeilingTiles);
     if (shouldBeOpen.Count < 6) // not sure what is the lowest allowed
     {
-        sb.AppendLine($"{GetName(room)}: Is drop zone but is only open at x={ConvertToRangeString(shouldBeOpen)}");
+        Warning(room, "DropZoneNotOpen", $"Is drop zone but is only open at x={ConvertToRangeString(shouldBeOpen)}");
     }
 }
 
@@ -334,21 +355,21 @@ void CheckDrops(Room room, SortedSet<int> dropTiles)
 {
     if (!room.HasDrop)
     {
-        // probbaly this is something like a bridge over a drop you can't get to
-        // if (dropTiles.Count > 0) { sb.AppendLine($"{GetName(room)}: is not drop, but has drop tiles at x={ConvertToRangeString(dropTiles)}"); }
+        // probably this is something like a bridge over a drop that you can't get to
+        if (dropTiles.Count > 0) { Warning(room, "DropTilesInNonDropRoom", $"Room is not a drop room, but has drop tiles at x={ConvertToRangeString(dropTiles)}"); }
     }
     else
     {
         if (dropTiles.Count == 0)
         {
-            sb.AppendLine(GetName(room) + ": HasDrop but no drop tiles found.");
+            Warning(room, "NoDropTilesInDropRoom", "Room HasDrop but no drop tiles found.");
         }
         else
         {
             var dropScreen = room.IsUpDownReversed ? 2 : 1;
             var badDropTiles = dropTiles.Where(x => x < dropScreen * 16 + 1 || dropScreen * 16 + 15 < x);
             if (badDropTiles.Count() > 0) {
-                sb.AppendLine($"{GetName(room)}: Drop tiles outside of valid range at x={ConvertToRangeString(badDropTiles)} (dropScreen={dropScreen})");
+                Warning(room, "DropTilesOutsideRange", $"Drop tiles outside of valid range at x={ConvertToRangeString(badDropTiles)} (dropScreen={dropScreen})");
             }
         }
     }
@@ -359,12 +380,32 @@ string GetName(Room room)
     return room.Name.Length > 0 ? room.Name : Convert.ToHexString(room.SideView);
 }
 
+bool IsActuallyEnabled(List<Room> allRooms, Room room)
+{
+    if (room.Enabled) { return true; }
+    Room? linkedRoom = room.LinkedRoomName is { } name ? allRooms!.Find(r => r.Name == name) : null;
+    return linkedRoom?.Enabled ?? false;
+}
+
 static string ConvertToRangeString(IEnumerable<int> numbers)
 {
     return string.Join(",", numbers
         .Select((num, index) => new { num, index })
         .GroupBy(x => x.num - x.index) // group by how many numbers skipped
         .Select(g => g.Count() > 1 ? $"{g.First().num}-{g.Last().num}" : $"{g.First().num}"));
+}
+
+string FixedElevatorHexString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> elevator, int param) where T : Enum
+{
+    elevator.Param = param;
+    var newBytes = sv.Finalize();
+    return $"Fixed bytes:\n{Convert.ToHexString(newBytes)}\n\n";
+}
+
+void Warning(Room room, string id, string msg)
+{
+    if (room.SuppressWarning.Contains(id)) { return; }
+    sb.AppendLine($"{$"[{id}]", -26} \"{GetName(room)}\": " + msg);
 }
 
 #pragma warning disable CS8321 // Local function is declared but never used
