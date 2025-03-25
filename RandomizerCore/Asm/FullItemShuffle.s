@@ -17,6 +17,7 @@ UpStabGetItem = $b4d7
 TalkWithStandingStillNpc = $b554
 MirrorWaterGetItem = $b5ae
 WizardDialogGetItem = $b518
+WizardDialogCheckSecondTimeTalking = $B645
 
 ; This is in the middle of the normal get item check after it checks if its a item
 ; that uses the $600 flags or the $700 flags
@@ -91,6 +92,17 @@ WizardMagicContainerRequirement:
 .endif
 
 .if _DO_SPELL_SHUFFLE_WIZARD_UPDATE
+
+; The game has a check to see if it should clear the learn spell flash timer
+; in a different spot. It clears it if you already have learned the spell before
+.org WizardDialogCheckSecondTimeTalking
+    jsr CheckIfWeAlreadyHaveItemForTown
+.reloc
+CheckIfWeAlreadyHaveItemForTown:
+    lda LocationTableWizard
+    and JankPowerOfTwo,y
+    rts
+
 .org WizardDialogGetItem
     lda LocationTableWizard
     and JankPowerOfTwo,y
@@ -306,18 +318,35 @@ ExpandedGetItem:
         cpy #ITEM_DASH_SPELL
         bcc @NotDashSpell
             ; Dash always replaces fire, so if we get the dash spell load fire instead
-            ldy #ITEM_FIRE_SPELL
+            ldy #ITEM_FIRE_SPELL + ITEM_SHIELD_SPELL
     @NotDashSpell:
         ; flash screen as if you got the spell from a wizard 
         lda #$c0
         sta $074b
-        ; Update the cursor position to point to the new spell
+        ; Convert from expanded item ID to regular spell ID 
         tya
         sec
         sbc #ITEM_SHIELD_SPELL
+        pha
+        ; Now check to see if this is the first spell we've learned.
+        ; if it is, then we want to update the cursor to its position
+        ldy #7
+    @CheckAllSpells:
+            lda $077b,y
+            ; if nonzero, ignore the spell and restore the spell index
+            bne @FoundLearnedSpell
+            dey
+            bpl @CheckAllSpells
+        ; Update the cursor position to point to the new spell
+        pla
         sta $0749
+        .byte $24 ; OPCODE bit $zp (hides pla)
+    @FoundLearnedSpell:
+        pla
+    @Continue:
+        tay ; Restore the learned spell to Y here
         lda #1
-        sta $077b - ITEM_SHIELD_SPELL,y
+        sta $077b,y
         bne @Exit ; unconditional
 @NotSpell:
     cpy #ITEM_UPSTAB
