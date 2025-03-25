@@ -2,6 +2,7 @@
 
 using System.Text;
 using System.Text.Json;
+using RandomizerCore;
 using RandomizerCore.Sidescroll;
 
 StringBuilder sb = new StringBuilder("");
@@ -34,7 +35,7 @@ void ValidateRoomsForFile(string filename)
         {
             // From testing: a room with 12 enemies crashes the game. 11 seemed to work.
             // In the vanilla palace rooms, the max amount of enemies is 9
-            var ee = new EnemiesEditable(room.Enemies);
+            var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
             if (ee.Enemies.Count > 9) { sb.AppendLine($"{GetName(room)}: Room has too many enemies ({ee.Enemies.Count})."); }
         }
         catch (Exception e) { sb.AppendLine($"{GetName(room)}: Room enemies data error. {e.Message}"); }
