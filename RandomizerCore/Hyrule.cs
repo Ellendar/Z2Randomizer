@@ -3453,15 +3453,7 @@ CustomFileSelectData:
     
     private void FixHelmetheadBossRoom(Assembler asm)
     {
-        byte helmetRoom;
-        if (props.PalaceStyles[1] == PalaceStyle.VANILLA)
-        {
-            helmetRoom = 0x22;
-        }
-        else
-        {
-            helmetRoom = (byte)palaces[1].BossRoom!.Map;
-        }
+        byte helmetRoom = (byte)palaces[1].BossRoom!.Map;
 
         var a = asm.Module();
         a.Assign("HelmetRoom", helmetRoom);
