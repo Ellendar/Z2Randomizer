@@ -43,7 +43,7 @@
         </StackPanel>
         <StackPanel Grid.Column="1">
           <CheckBox IsChecked="{Binding Config.ShuffleSmallItems}" Content="Shuffle Small Items" />
-          <CheckBox IsThreeState="True" IsChecked="{Binding Config.RemoveSpellItems}" Content="Remove Spell Items" />
+          <CheckBox IsThreeState="True" IsChecked="{Binding Config.RemoveSpellItems}" Content="Start With Spell Items" />
           <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePBagAmounts}" Content="Shuffle PBag Amounts" />
           <CheckBox IsThreeState="True" IsChecked="{Binding Config.PalacesContainExtraKeys}" Content="Palaces Contain Extra Keys" />
           <CheckBox IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}" Content="Randomize New Kasuto Jar Requirements" />
