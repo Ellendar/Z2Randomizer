@@ -29,6 +29,7 @@
     <ManifestKeyFile>Z2Randomizer_1_TemporaryKey.pfx</ManifestKeyFile>
     <GenerateManifests>true</GenerateManifests>
     <SignManifests>false</SignManifests>
+    <Version>4.4.6</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />

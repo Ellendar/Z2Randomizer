@@ -14472,8 +14472,7 @@
     "name": "aaron jam 4_4 P1_M6",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "2D600E08D208208DDE0E8205D208208F70B07FB02189607780C2A125F250500F0C80F184C27130228FE300DE0E"
   },
   {

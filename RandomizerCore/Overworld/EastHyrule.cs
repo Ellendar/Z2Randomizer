@@ -2093,22 +2093,6 @@ public sealed class EastHyrule : World
         pbagCave2.VanillaCollectable = Collectable.XL_BAG;
     }
 
-    //XXX: delete this
-    public void DebugTowns()
-    {
-        for (int y = 0; y < MAP_ROWS; y++)
-        {
-            for (int x = 0; x < MAP_COLS; x++)
-            {
-                if (map[y, x] == Terrain.TOWN)
-                {
-                    Debug.WriteLine("(" + y + "," + x + ")");
-                }
-            }
-        }
-        Debug.WriteLine("");
-    }
-
     public override string GenerateSpoiler()
     {
         StringBuilder sb = new();
