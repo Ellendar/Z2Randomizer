@@ -10,24 +10,21 @@ namespace RandomizerCore;
 
 public class Requirements
 {
-    internal bool IndividualRequirementsAreAnds { get; }
     public RequirementType[] IndividualRequirements { get; private set; }
     public RequirementType[][] CompositeRequirements { get; private set; }
 
-    public Requirements(bool individualRequirementsAreAnds = false)
+    public Requirements()
     {
         IndividualRequirements = [];
         CompositeRequirements = [];
-        IndividualRequirementsAreAnds = individualRequirementsAreAnds;
     }
 
-    public Requirements(RequirementType[] requirements, bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
+    public Requirements(RequirementType[] requirements) : this()
     {
         IndividualRequirements = requirements;
     }
 
-    public Requirements(RequirementType[] requirements, RequirementType[][] compositeRequirements,
-        bool individualRequirementsAreAnds = false) : this(individualRequirementsAreAnds)
+    public Requirements(RequirementType[] requirements, RequirementType[][] compositeRequirements) : this()
     {
         IndividualRequirements = requirements;
         CompositeRequirements = compositeRequirements;
@@ -90,17 +87,13 @@ public class Requirements
         var requirementTypes = requireables as RequirementType[] ?? requireables.ToArray();
         foreach (var requirement in IndividualRequirements)
         {
-            if (requirementTypes.Contains(requirement) && !IndividualRequirementsAreAnds)
+            if (requirementTypes.Contains(requirement))
             {
                 individualRequirementsSatisfied = true;
                 break;
             }
-
-            if(IndividualRequirementsAreAnds)
-            {
-                return false;
-            }
         }
+
         if(IndividualRequirements.Length > 0 && !individualRequirementsSatisfied)
         {
             return false;
