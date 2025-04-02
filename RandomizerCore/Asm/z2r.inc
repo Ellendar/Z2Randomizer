@@ -177,6 +177,7 @@ RESV PreviousFrameMetasprite
 RESV StatDisplayState
 RESV InternalState
 RESV GameComplete ; set when you beat the game to stop the timers
+RESV ElevatorYStart
 
 ;; Stat tracking variables in SRAM
 

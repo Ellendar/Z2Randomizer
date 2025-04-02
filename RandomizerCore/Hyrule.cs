@@ -3840,6 +3840,7 @@ FREE_UNTIL $c2ca
         rom.DontCountExpDuringTalking(engine);
         rom.FixElevatorPositionInFallRooms(engine);
         rom.AllowForChangingDoorYPosition(engine);
+        rom.AllowForChangingElevatorYPosition(engine);
         rom.InstantText(engine);
         StatTracking(engine);
 
