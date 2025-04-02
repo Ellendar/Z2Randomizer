@@ -182,7 +182,7 @@ public abstract class World
 
     protected void ShuffleLocations(List<Location> locationsToShuffle)
     {
-        List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle).ToList();
+        List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle && i.AppearsOnMap).ToList();
         for (int i = shufflableLocations.Count() - 1; i > 0; i--)
         {
             int n = RNG.Next(i + 1);

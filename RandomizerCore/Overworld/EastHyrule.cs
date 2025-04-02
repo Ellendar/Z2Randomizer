@@ -327,20 +327,21 @@ public class EastHyrule : World
                 }
 
             }
-            hiddenKasutoLocation = GetLocationByCoords((81, 61));
-            hiddenPalaceLocation = GetLocationByCoords((102, 45));
+
+            Location vanillaKasutoLocation = GetLocationByCoords((81, 61));
+            Location vanillaP6Location = GetLocationByCoords((102, 45));
 
             if (props.HiddenKasuto)
             {
 
-                if (connections.ContainsKey(hiddenKasutoLocation) || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge)
+                if (connections.ContainsKey(vanillaKasutoLocation) || vanillaKasutoLocation == raft || vanillaKasutoLocation == bridge)
                 {
                     return false;
                 }
             }
             if (props.HiddenPalace)
             {
-                if (connections.ContainsKey(hiddenPalaceLocation) || hiddenPalaceLocation == raft || hiddenPalaceLocation == bridge)
+                if (connections.ContainsKey(vanillaP6Location) || vanillaP6Location == raft || vanillaP6Location == bridge)
                 {
                     return false;
                 }
@@ -694,16 +695,16 @@ public class EastHyrule : World
                 //logger.Debug("East:" + bytesWritten);
             }
 
-        }
-        if (props.HiddenPalace)
-        {
-            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCallSpot, hiddenPalaceLocation,
-                townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
-        }
-        if (props.HiddenKasuto)
-        {
-            rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
-                baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
+            if (props.HiddenPalace)
+            {
+                rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCallSpot, hiddenPalaceLocation,
+                    townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
+            }
+            if (props.HiddenKasuto)
+            {
+                rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
+                    baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
+            }
         }
 
         if (!ValidateBasicRouting())
@@ -1375,18 +1376,19 @@ public class EastHyrule : World
     {
         if (shuffleHidden)
         {
-            do
-            {
-                hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            } while ((hiddenKasutoLocation == null
+            hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
+            while (hiddenKasutoLocation == null
                 || hiddenKasutoLocation == raft
                 || hiddenKasutoLocation == bridge
                 || hiddenKasutoLocation == cave1
                 || hiddenKasutoLocation == cave2
+                || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
                 || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))
-            );
+            {
+                hiddenKasutoLocation = AllLocations[RNG.Next(AllLocations.Count)];
+            }
         }
         else
         {
@@ -1406,18 +1408,23 @@ public class EastHyrule : World
         int ypos = RNG.Next(6, MAP_ROWS - 6);
         if (shuffleHidden)
         {
-            do
+            hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
+            while (hiddenPalaceLocation == null
+                || hiddenPalaceLocation == raft
+                || hiddenPalaceLocation == bridge
+                || hiddenPalaceLocation == cave1
+                || hiddenPalaceLocation == cave2
+                || connections.ContainsKey(hiddenPalaceLocation)
+                || !hiddenPalaceLocation.CanShuffle
+                || hiddenPalaceLocation == hiddenKasutoLocation
+                || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
+                || (biome != Biome.VANILLA
+                    && biome != Biome.VANILLA_SHUFFLE
+                    && hiddenPalaceLocation.TerrainType == Terrain.LAVA
+                    && hiddenPalaceLocation.PassThrough != 0))
             {
                 hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            } while (hiddenPalaceLocation == null
-            || hiddenPalaceLocation == raft
-            || hiddenPalaceLocation == bridge
-            || hiddenPalaceLocation == cave1
-            || hiddenPalaceLocation == cave2
-            || connections.ContainsKey(hiddenPalaceLocation)
-            || !hiddenPalaceLocation.CanShuffle
-            || hiddenPalaceLocation == hiddenKasutoLocation
-            || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenPalaceLocation.TerrainType == Terrain.LAVA && hiddenPalaceLocation.PassThrough != 0));
+            }
         }
         else
         {
@@ -1429,6 +1436,11 @@ public class EastHyrule : World
             xpos = RNG.Next(6, MAP_COLS - 6);
             ypos = RNG.Next(6, MAP_ROWS - 6);
             done = true;
+            //#124
+            if (hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
+            {
+                continue;
+            }
             for (int i = ypos - 3; i < ypos + 4; i++)
             {
                 for (int j = xpos - 3; j < xpos + 4; j++)
@@ -1444,6 +1456,10 @@ public class EastHyrule : World
         if (!done)
         {
             return false;
+        }
+        if (hiddenPalaceLocation == null || hiddenKasutoLocation == null)
+        {
+            throw new ImpossibleException("Failure in hidden location shuffle");
         }
         Terrain t = climate.GetRandomTerrain(RNG, walkableTerrains);
         while (t == Terrain.FOREST)
@@ -1468,8 +1484,7 @@ public class EastHyrule : World
         //map[hpLoc.Ypos - 30, hpLoc.Xpos] = map[hpLoc.Ypos - 29, hpLoc.Xpos];
         hiddenPalaceLocation.Xpos = xpos;
         hiddenPalaceLocation.Ypos = ypos + 2 + 30;
-        hiddenPalaceCallSpot.Xpos = xpos;
-        hiddenPalaceCallSpot.Ypos = ypos + 30;
+        //hiddenPalaceCoords = (ypos + 30, xpos);
         //This is the only thing requiring a reference to the rom here and I have no idea what the fuck it is doing.
         rom.Put(0x1df70, (byte)t);
         hiddenPalaceLocation.CanShuffle = false;

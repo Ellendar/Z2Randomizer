@@ -1245,7 +1245,8 @@ not_opposing:
                 FallInHole = bytes[3] & 128,
                 PassThrough = bytes[3] & 64,
                 ForceEnterRight = bytes[3] & 32,
-                TerrainType = Terrains[startAddr + i]
+                TerrainType = Terrains[startAddr + i],
+                AppearsOnMap = true
             };
             locations.Add(location);
         }
@@ -1270,7 +1271,8 @@ not_opposing:
             FallInHole = bytes[3] & 128,
             PassThrough = bytes[3] & 64,
             ForceEnterRight = bytes[3] & 32,
-            TerrainType = t
+            TerrainType = t,
+            AppearsOnMap = true
         };
     }
 

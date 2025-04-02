@@ -12,6 +12,7 @@ public class Location
     public int appear2loweruponexit;
     public Item Item { get; set; }
     public bool ItemGet { get; set; }
+    public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }

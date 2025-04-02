@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.15 - April 2, 2025
+
+- Fixed a bug that sometimes causes hidden kasuto/palace to not work properly.
+
 ## Version 4.3.14 - March 22, 2025
 
 - Fixed an issue where items required for Reflect could be behind Carock when palaces continue after bosses.
