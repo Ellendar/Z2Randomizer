@@ -70,6 +70,11 @@ public class SideviewEditable<T> where T : Enum
 
     public byte Length { get => Header[0]; }
 
+    public byte PageCount {
+        get => (byte)(((Header[1] & 0b01100000) >> 5) + 1);
+        set { Header[1] = (byte)((Header[1] & 0b10011111) | (((value - 1) << 5) & 0b01100000)); }
+    }
+
     public byte FloorHeader
     {
         get { return Header[2]; }
@@ -156,7 +161,7 @@ public class SideviewEditable<T> where T : Enum
                 int xDiff = o.AbsX - xCursor;
                 if (xDiff > 15) // create new "x skip" command
                 {
-                    var xSkip = SideviewMapCommand<T>.CreateXSkip(xDiff / 16);
+                    var xSkip = SideviewMapCommand<T>.CreateXSkip(o.AbsX / 16);
                     Commands.Insert(i, xSkip);
                     i++;
                     xDiff = o.AbsX & 0xF;
@@ -186,5 +191,54 @@ public class SideviewEditable<T> where T : Enum
             sb.AppendLine(c.DebugString());
         }
         return sb.ToString();
+    }
+
+    public bool[,] CreateSolidGrid()
+    {
+        int width = PageCount * 16;
+        const int height = 13;
+        bool[,] result = new bool[width, height];
+        var floor = SideviewMapCommand<T>.CreateNewFloor(0, FloorHeader);
+        List<SideviewMapCommand<T>> floors = FindAll(o => o.IsNewFloor());
+        for (var x = 0; x < width; x++)
+        {
+            while (floors.Count > 0 && floors[0].AbsX == x)
+            {
+                floor = floors[0];
+                floors.RemoveAt(0);
+            }
+            for (int y = 0; y < height; y++)
+            {
+                result[x, y] = floor.IsFloorSolidAt(y);
+            }
+        }
+        foreach (var cmd in Commands)
+        {
+            if (cmd.IsSolid)
+            {
+                int w = Math.Min(width, cmd.AbsX + cmd.Width);
+                int h = Math.Min(height, cmd.Y + cmd.Height);
+                for (var x = cmd.AbsX; x < w; x++)
+                {
+                    for (int y = cmd.Y; y < h; y++)
+                    {
+                        result[x, y] = true;
+                    }
+                }
+            }
+            else if (cmd.IsPit)
+            {
+                int w = Math.Min(width, cmd.AbsX + cmd.Width);
+                int h = Math.Min(height, cmd.Y + cmd.Height);
+                for (var x = cmd.AbsX; x < w; x++)
+                {
+                    for (int y = cmd.Y; y < h; y++)
+                    {
+                        result[x, y] = false;
+                    }
+                }
+            }
+        }
+        return result;
     }
 }

@@ -219,6 +219,21 @@ public static class PalaceObjectExtensions
                 return false;
         }
     }
+
+    public static bool IsPit(SideviewMapCommand<PalaceObject> command)
+    {
+        switch (command.Id)
+        {
+            case PalaceObject.HorizontalPitOrLava:
+            case PalaceObject.WalkThruBricks:
+            case PalaceObject.VerticalPit1:
+            case PalaceObject.VerticalPit2:
+            case PalaceObject.HorizontalPit:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
 
 public static class GreatPalaceObjectExtensions
@@ -333,6 +348,18 @@ public static class GreatPalaceObjectExtensions
             case GreatPalaceObject.BreakableBlock1:
             case GreatPalaceObject.BreakableBlock2:
             case GreatPalaceObject.BreakableBlockVertical:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static bool IsPit(SideviewMapCommand<GreatPalaceObject> command)
+    {
+        switch (command.Id)
+        {
+            case GreatPalaceObject.ElevatorShaft:
+            case GreatPalaceObject.WalkThruBricks:
                 return true;
             default:
                 return false;
