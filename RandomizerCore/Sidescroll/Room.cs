@@ -216,7 +216,7 @@ public class Room : IJsonOnDeserialized
         a.Word(a.Symbol(label));
     }
 
-    public void UpdateEnemies(AsmModule a, string label)
+    public int UpdateEnemies(AsmModule a, int enemyAddr)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if (NewEnemies[0] == 0)
@@ -242,48 +242,34 @@ public class Room : IJsonOnDeserialized
             }
         }
 
-        var segment = "PRG4";
-        var baseAddr = 0x85A1;
+        //Reconstructed palaces require us to rewrite the enemy pointers table.
+        var enemyDataAddr = enemyAddr;
+        var tableAddr = 0;
         switch (PalaceGroup)
         {
-            case PalaceGrouping.Palace346:
-                baseAddr = 0xA07E;
+            //Write the updated pointers
+            case PalaceGrouping.Palace125:
+                enemyDataAddr -= 0x98b0;
+                tableAddr = RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2;
                 break;
-            case PalaceGrouping.PalaceGp:
-                segment = "PRG5";
+            case PalaceGrouping.Palace346:
+                enemyDataAddr -= 0x98b0;
+                tableAddr = RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2;
+                break;
+            default:
+                enemyDataAddr -= 0xd8b0;
+                tableAddr = RandomizerCore.Enemies.GPEnemyPtr + Map * 2;
                 break;
         }
-        a.Segment(segment);
-        a.Org((ushort)(baseAddr + Map * 2));
-        a.Word(a.Symbol(label));
-        a.Reloc();
-        a.Label(label);
-        a.Byt(NewEnemies);
+        
+        Console.WriteLine($"memaddr: {tableAddr:X4}");
+        a.RomOrg(tableAddr);
+        a.Word((ushort)enemyDataAddr);
 
-        //Reconstructed palaces require us to rewrite the enemy pointers table.
-        // var memAddr = enemyAddr;
-        // switch (PalaceGroup)
-        // {
-        //     //Write the updated pointers
-        //     case 1:
-        //         memAddr -= 0x98b0;
-        //         romData.Put(RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-        //         romData.Put(RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-        //         break;
-        //     case 2:
-        //         memAddr -= 0x98b0;
-        //         romData.Put(RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-        //         romData.Put(RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-        //         break;
-        //     default:
-        //         memAddr -= 0xd8b0;
-        //         romData.Put(RandomizerCore.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-        //         romData.Put(RandomizerCore.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
-        //         break;
-        // }
-        //
-        //
-        // romData.Put(enemyAddr, NewEnemies);
+        Console.WriteLine($"enemyAddr: {enemyAddr:X4}");
+        a.RomOrg(enemyAddr);
+        a.Byt(NewEnemies);
+        return NewEnemies.Length;
     }
 
     public void UpdateItemGetBits(Dictionary<PalaceGrouping, byte[]> palaceItemBits)

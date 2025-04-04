@@ -921,6 +921,7 @@ public class Hyrule
             [PalaceGrouping.PalaceGp] = new byte[0x20],
         };
 
+        int enemyAddr = Enemies.NormalPalaceEnemyAddr;
         foreach (var sv in sideviews.Keys)
         {
             var name = "Sideview_" + i++;
@@ -933,12 +934,13 @@ public class Hyrule
             {
                 room.WriteSideViewPtr(sideviewModule, name);
                 room.UpdateItemGetBits(palaceItemBits);
-                room.UpdateEnemies(sideviewModule, name + "_Enemy_" + j++);
+                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
                 room.UpdateConnectionStartAddress();
             }
         }
 
         i = 0;
+        enemyAddr = Enemies.GPEnemyAddr;
         //GP Reconstructed
         foreach (var sv in sideviewsgp.Keys)
         {
@@ -952,7 +954,7 @@ public class Hyrule
             {
                 room.WriteSideViewPtr(sideviewModule, name);
                 room.UpdateItemGetBits(palaceItemBits);
-                room.UpdateEnemies(sideviewModule, name + "_Enemy_" + j++);
+                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
                 room.UpdateConnectionStartAddress();
             }
         }
@@ -3878,6 +3880,7 @@ FREE_UNTIL $c2ca
         FixSoftLock(engine);
         
         RandomizeStartingValues(engine, rom);
+        rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
         FixContinentTransitions(engine);

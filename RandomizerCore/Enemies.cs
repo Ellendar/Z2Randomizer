@@ -4,8 +4,8 @@ namespace RandomizerCore;
 
 public class Enemies
 {
-    // public const int NormalPalaceEnemyAddr = 0x108B0;
-    // public const int GPEnemyAddr = 0x148B0;
+    public const int NormalPalaceEnemyAddr = 0x108B0;
+    public const int GPEnemyAddr = 0x148B0;
     public const int OverworldEnemyAddr = 0x88B0;
     //Palaces 1,2,5
     public const int Palace125EnemyPtr = 0x105B1;
