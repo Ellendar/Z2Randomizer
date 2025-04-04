@@ -23,8 +23,8 @@
 .segment "PRG19"   :bank $19 :size $2000 :mem $8000 :off $32010
 .segment "PRG1A"   :bank $1A :size $2000 :mem $8000 :off $34010
 .segment "PRG1B"   :bank $1B :size $2000 :mem $8000 :off $36010
-.segment "PRG1C"   :bank $1C :size $2000 :mem $8000 :off $38010
-.segment "PRG1D"   :bank $1D :size $2000 :mem $8000 :off $3a010
+.segment "PRG1C"   :bank $1C :size $2000 :mem $8000 :off $38010 ; Using segment C and D for extended sideview data
+.segment "PRG1D"   :bank $1D :size $2000 :mem $a000 :off $3a010
 .segment "PRG1E"   :bank $1E :size $2000 :mem $c000 :off $3c010
 .segment "PRG1F"   :bank $1F :size $2000 :mem $e000 :off $3e010
 .segment "CHR"    :size $20000 :off $40010 :out
@@ -85,9 +85,9 @@ FREE "PRG7" [$f3d0, $fcfb) ; allow code in the ganon laugh sfx but not the hurt 
 ;FREE "PRG19" [$a000, $c000)
 ;FREE "PRG1A" [$a000, $c000)
 ;FREE "PRG1B" [$a000, $c000)
-;FREE "PRG1C" [$a000, $c000)
-;FREE "PRG1D" [$a000, $c000)
-;FREE "PRG1E" [$a000, $c000)
+FREE "PRG1C" [$8000, $a000)
+FREE "PRG1D" [$a000, $c000)
+FREE "PRG1E" [$a000, $c000)
 
 ; Most of bank 1f is reserved for z2ft
 FREE "PRG1F" [$ff80, $ffe8)

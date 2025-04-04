@@ -174,11 +174,13 @@ public class RoomPool
             {
                 type = type.Merge(LinkedRooms[room.LinkedRoomName].CategorizeExits());
             }
-            if(!categorizedRooms.ContainsKey(type))
+            if(!categorizedRooms.TryGetValue(type, out List<Room>? value))
             {
-                categorizedRooms[type] = [];
+                value = ([]);
+                categorizedRooms[type] = value;
             }
-            categorizedRooms[type].Add(room);
+
+            value.Add(room);
         }
         
         return categorizedRooms;

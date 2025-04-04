@@ -86,7 +86,7 @@ Seed: {config.Seed}
                 try
                 {
                     var romdata = host.RomFileViewModel.RomData!.ToArray();
-                    var output = await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token);
+                    var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
                     var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
                     await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
                     if(config.GenerateSpoiler)

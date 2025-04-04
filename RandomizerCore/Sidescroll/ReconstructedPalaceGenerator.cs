@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NLog;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -11,25 +12,16 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         int tries = 0;
         int innertries = 0;
-        int palaceGroup = palaceNumber switch
-        {
-            1 => 1,
-            2 => 1,
-            3 => 2,
-            4 => 2,
-            5 => 1,
-            6 => 2,
-            7 => 3,
-            _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
-        };
 
+        // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
         Palace palace = new(palaceNumber);
         do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
         {
+            await Task.Yield();
             RoomPool roomPool = new(rooms);
             if (ct.IsCancellationRequested)
             {
@@ -47,14 +39,14 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
                 {
                     IsRoot = true,
-                    PalaceGroup = palaceGroup
+                    // PalaceGroup = palaceGroup
                 };
                 palace.AllRooms.Add(palace.Entrance);
 
                 palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
                 palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
                 palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
-                palace.BossRoom.PalaceGroup = palaceGroup;
+                // palace.BossRoom.PalaceGroup = palaceGroup;
                 palace.AllRooms.Add(palace.BossRoom);
 
                 if (palaceNumber < 7) //Not GP
@@ -75,7 +67,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
                     }
                     palace.ItemRoom = itemRoom;
-                    palace.ItemRoom.PalaceGroup = palaceGroup;
+                    // palace.ItemRoom.PalaceGroup = palaceGroup;
                     palace.AllRooms.Add(palace.ItemRoom);
 
                     if (props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
@@ -89,7 +81,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         Room segmentedItemRoom1, segmentedItemRoom2;
                         segmentedItemRoom1 = palace.ItemRoom;
                         segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-                        segmentedItemRoom2.PalaceGroup = palaceGroup;
+                        // segmentedItemRoom2.PalaceGroup = palaceGroup;
                         //segmentedItemRoom2.SetItem((Item)palaceNumber);
                         segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
                         segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
@@ -102,7 +94,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     if (!props.RemoveTbird)
                     {
                         palace.TbirdRoom = new(roomPool.TbirdRooms[r.Next(roomPool.TbirdRooms.Count)]);
-                        palace.TbirdRoom.PalaceGroup = 3;
+                        // palace.TbirdRoom.PalaceGroup = PalaceGrouping.PalaceGp;
                         palace.AllRooms.Add(palace.TbirdRoom);
                     }
                 }
@@ -121,13 +113,8 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     int roomIndex = r.Next(roomPool.NormalRooms.Count);
                     Room roomToAdd = new(roomPool.NormalRooms[roomIndex]);
 
-                    roomToAdd.PalaceGroup = palaceGroup;
-                    bool added = true;
-                    if (roomToAdd.HasDrop && !roomPool.NormalRooms.Any(i => i.IsDropZone && i != roomToAdd))
-                    {
-                        //Debug.WriteLine(palace.AllRooms.Count + " - 0");
-                        added = false;
-                    }
+                    // roomToAdd.PalaceGroup = palaceGroup;
+                    bool added = !(roomToAdd.HasDrop && !roomPool.NormalRooms.Any(i => i.IsDropZone && i != roomToAdd));
                     if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
                     {
                         if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, roomToAdd.SideView)))
@@ -252,7 +239,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     public bool AddRoom(Palace palace, Room room, bool blockersAnywhere)
     {
         bool placed;
-        room.PalaceGroup = palace.GetPalaceGroup();
+        // room.PalaceGroup = palace.PalaceGroup;
         int netDeadEnds = palace.AllRooms.Count(i => i.IsDeadEnd);
 
         if (netDeadEnds > 3 && room.IsDeadEnd)

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RandomizerCore.Sidescroll;
 internal class ChaosPalaceGenerator : PalaceGenerator
@@ -10,33 +11,23 @@ internal class ChaosPalaceGenerator : PalaceGenerator
 
     private const int CONNECTION_ATTEMPT_LIMIT = 200;
 
-    internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         RoomPool roomPool = new(rooms);
         Palace palace = new(palaceNumber);
-        int palaceGroup = palaceNumber switch
-        {
-            1 => 1,
-            2 => 1,
-            3 => 2,
-            4 => 2,
-            5 => 1,
-            6 => 2,
-            7 => 3,
-            _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
-        };
+        var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         palace.Entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
         {
             IsRoot = true,
-            PalaceGroup = palaceGroup
+            // PalaceGroup = palaceGroup,
         };
         palace.AllRooms.Add(palace.Entrance);
 
         palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
         palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
         palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
-        palace.BossRoom.PalaceGroup = palaceGroup;
+        // palace.BossRoom.PalaceGroup = palaceGroup;
         palace.AllRooms.Add(palace.BossRoom);
 
         if (palace.Number < 7 && props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
@@ -59,7 +50,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
                 itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
             }
             palace.ItemRoom = itemRoom;
-            palace.ItemRoom.PalaceGroup = palaceGroup;
+            // palace.ItemRoom.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(palace.ItemRoom);
         }
 
@@ -68,7 +59,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             Room segmentedItemRoom1, segmentedItemRoom2;
             segmentedItemRoom1 = palace.ItemRoom;
             segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-            segmentedItemRoom2.PalaceGroup = palaceGroup;
+            // segmentedItemRoom2.PalaceGroup = palaceGroup;
             segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
             segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
             palace.AllRooms.Add(segmentedItemRoom2);
@@ -80,13 +71,14 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             if (!props.RemoveTbird)
             {
                 palace.TbirdRoom = new(roomPool.TbirdRooms[r.Next(roomPool.TbirdRooms.Count)]);
-                palace.TbirdRoom.PalaceGroup = 3;
+                // palace.TbirdRoom.PalaceGroup = PalaceGrouping.PalaceGp;
                 palace.AllRooms.Add(palace.TbirdRoom);
             }
         }
 
         while (palace.AllRooms.Count < roomCount)
         {
+            await Task.Yield();
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
             palace.AllRooms.Add(newRoom);
@@ -146,6 +138,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         int connectionCount = 0;
         while(unreachableRooms.Count > 0 && connectionCount++ < CONNECTION_ATTEMPT_LIMIT)
         {
+            await Task.Yield();
             unreachableRooms.FisherYatesShuffle(r);
             foreach(Room unreachableRoom in unreachableRooms)
             {

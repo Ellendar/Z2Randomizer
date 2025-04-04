@@ -58,7 +58,7 @@ public class ROM
     public const int VanillaChrRomOffs = RomHdrSize + VanillaPrgRomSize;
     public const int VanillaRomSize = VanillaChrRomOffs + ChrRomSize;
 
-    public static readonly IReadOnlyList<int> FreeRomBanks = new List<int>(Enumerable.Range(0x10, 0xf));
+    public static readonly IReadOnlyList<int> FreeRomBanks = Enumerable.Range(0x10, 0xc).ToList();
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -770,6 +770,7 @@ TitleEnd:
 
 
     }
+
 
     public void ExtendMapSize(Assembler a)
     {

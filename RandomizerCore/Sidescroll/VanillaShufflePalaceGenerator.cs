@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RandomizerCore.Sidescroll;
 
 public class VanillaShufflePalaceGenerator() : VanillaPalaceGenerator()
 {
-    internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber) 
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber) 
     {
-        Palace palace = base.GeneratePalace(props, rooms, r, roomCount, palaceNumber);
+        Palace palace = await base.GeneratePalace(props, rooms, r, roomCount, palaceNumber);
 
         palace.ResetRooms();
         palace.ShuffleRooms(r);
