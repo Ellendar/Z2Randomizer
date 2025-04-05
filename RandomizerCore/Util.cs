@@ -177,7 +177,7 @@ public class Util
         return Assembly.GetExecutingAssembly().ReadBinaryResource(path);
     }
 
-    public static PalaceGrouping AsPalaceGrouping(int? palaceNumber)
+    public static PalaceGrouping? AsPalaceGrouping(int? palaceNumber)
     {
         return palaceNumber switch
         {
@@ -188,8 +188,31 @@ public class Util
             5 => PalaceGrouping.Palace125,
             6 => PalaceGrouping.Palace346,
             7 => PalaceGrouping.PalaceGp,
-            _ => PalaceGrouping.Unintialized,
+            _ => null
         };
+    }
+
+    /// <summary>
+    /// Gets a PalaceGrouping based on the vanilla memory address of a room. Should only be used for actual vanilla rooms.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public static PalaceGrouping GetPalaceGroupingByMemoryAddress(int address)
+    {
+        if(address >= 67371 && address <= 67619)
+        {
+            return PalaceGrouping.Palace125;
+        }
+        if (address >= 74248 && address <= 74496)
+        {
+            return PalaceGrouping.Palace346;
+        }
+        if (address >= 83755 && address <= 83971)
+        {
+            return PalaceGrouping.PalaceGp;
+        }
+        throw new Exception("Unrecognized memory range for PalaceGrouping assignment");
     }
 }
 

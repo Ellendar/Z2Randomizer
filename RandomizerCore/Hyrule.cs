@@ -286,6 +286,7 @@ public class Hyrule
                 AsmModule sideviewModule = new();
                 passedValidation = await FillPalaceRooms(sideviewModule);
 
+                
                 assembler.Add(sideviewModule);
             }
 
@@ -929,7 +930,7 @@ public class Hyrule
             sideviewModule.Reloc();
             sideviewModule.Label(name);
             sideviewModule.Byt(sv);
-            var j = 0;
+            //var j = 0;
             foreach (var room in sideviews[sv])
             {
                 room.WriteSideViewPtr(sideviewModule, name);
@@ -949,7 +950,7 @@ public class Hyrule
             sideviewModule.Reloc();
             sideviewModule.Label(name);
             sideviewModule.Byt(sv);
-            var j = 0;
+            //var j = 0;
             foreach (var room in sideviewsgp[sv])
             {
                 room.WriteSideViewPtr(sideviewModule, name);

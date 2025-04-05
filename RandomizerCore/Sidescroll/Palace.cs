@@ -39,8 +39,7 @@ public class Palace
     //DEBUG
     public int Generations { get; set; }
     
-    [JsonIgnore]
-    public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(Number);
+    public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(Number) ?? throw new Exception("Palace number out of range");
 
     public Palace(int number)
     {

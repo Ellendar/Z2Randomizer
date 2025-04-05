@@ -44,7 +44,7 @@ public partial class PalaceRooms
     public IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum)
     {
         int mapMin, mapMax;
-        var palaceGroup = Util.AsPalaceGrouping(palaceNum);
+        PalaceGrouping palaceGroup = Util.AsPalaceGrouping(palaceNum) ?? throw new Exception("Invalid vanilla palace room without PalaceGroup set");
         switch (palaceNum)
         {
             case 1:
@@ -81,8 +81,10 @@ public partial class PalaceRooms
         
 
         var roomgroup = roomsByGroup[RoomGroup.VANILLA];
+
         return roomgroup.Where(
-            i => i.PalaceGroup == palaceGroup
+            i => //i.Group == RoomGroup.VANILLA &&
+                 Util.GetPalaceGroupingByMemoryAddress(i.ConnectionStartAddress) == palaceGroup
                  && i.Map >= mapMin
                  && i.Map <= mapMax
                  && i is { IsEntrance: false, IsBossRoom: false, HasItem: false, IsThunderBirdRoom: false }

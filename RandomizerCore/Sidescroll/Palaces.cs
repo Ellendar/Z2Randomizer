@@ -12,8 +12,7 @@ public enum PalaceGrouping
 {
     Palace125 = 0,
     Palace346 = 1,
-    PalaceGp = 2,
-    Unintialized = 255,
+    PalaceGp = 2
 }
 
 public class Palaces
@@ -132,7 +131,7 @@ public class Palaces
                 {
                     //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
                     sizes[0] -= (groupPalaceRoomCount - 63) / 2;
-                    sizes[1] -= 63 - sizes[0] - sizes[4];
+                    sizes[1] += 63 - sizes[0] - sizes[1] - sizes[4];
                 }
             }
         }
@@ -160,7 +159,7 @@ public class Palaces
                 {
                     //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
                     sizes[2] -= (groupPalaceRoomCount - 63) / 2;
-                    sizes[3] -= 63 - sizes[2] - sizes[5];
+                    sizes[3] += 63 - sizes[2] - sizes[3] - sizes[5];
                 }
             }
         }

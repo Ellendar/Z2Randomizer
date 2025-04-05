@@ -52,8 +52,9 @@ public class Room : IJsonOnDeserialized
     public byte[] ItemGetBits { get; set; }
 
     public byte Map { get; set; }
-    [JsonIgnore]
-    public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(PalaceNumber);
+
+    [JsonConverter(typeof(JsonNumberEnumConverter<PalaceGrouping>))]
+    public PalaceGrouping? PalaceGroup => Util.AsPalaceGrouping(PalaceNumber);
     [JsonIgnore]
     public bool IsRoot { get; set; }
     
@@ -274,7 +275,9 @@ public class Room : IJsonOnDeserialized
 
     public void UpdateItemGetBits(Dictionary<PalaceGrouping, byte[]> palaceItemBits)
     {
-        var old = palaceItemBits[PalaceGroup][Map / 2];
+        PalaceGrouping palaceGroup = PalaceGroup ?? throw new Exception("Unable to assign ItemGetBits on a room with no palace group");
+
+        var old = palaceItemBits[palaceGroup][Map / 2];
         if(Map % 2 == 0)
         {
             old = (byte)(old & 0x0F);
@@ -285,7 +288,7 @@ public class Room : IJsonOnDeserialized
             old = (byte)(old & 0xF0);
             old = (byte)((ItemGetBits[0]) | old);
         }
-        palaceItemBits[PalaceGroup][Map / 2] = old;
+        palaceItemBits[palaceGroup][Map / 2] = old;
     }
 
     public void UpdateRomItem(Collectable item, ROM romData)

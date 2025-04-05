@@ -134,7 +134,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 
         //Add rooms
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
-        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.X).ThenBy(i => i.Key.Y))
+        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
         {
             if (item.Key == Coord.Uninitialized)
             {

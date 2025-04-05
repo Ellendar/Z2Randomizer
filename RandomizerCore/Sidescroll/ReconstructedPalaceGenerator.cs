@@ -10,6 +10,8 @@ namespace RandomizerCore.Sidescroll;
 
 public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerator
 {
+
+    static int debug = 0;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
@@ -17,6 +19,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         int tries = 0;
         int innertries = 0;
 
+        debug++;
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
         Palace palace = new(palaceNumber);
         do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
