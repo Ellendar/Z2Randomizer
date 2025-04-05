@@ -40,9 +40,9 @@ public class Room : IJsonOnDeserialized
     private const int sideview1 = 0x10533;
     private const int sideview2 = 0x12010;
     private const int sideview3 = 0x14533;
-    // private const int Group1ItemGetStartAddress = 0x17ba5;
-    // private const int Group2ItemGetStartAddress = 0x17bc5;
-    // private const int Group3ItemGetStartAddress = 0x17be5;
+    public const int Group1ItemGetStartAddress = 0x17ba5;
+    public const int Group2ItemGetStartAddress = 0x17bc5;
+    public const int Group3ItemGetStartAddress = 0x17be5;
     private const int connectors1 = 0x1072b;
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;

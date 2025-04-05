@@ -324,7 +324,7 @@ PalaceMappingTable:
     .byte $ff ; unused 4th palace in region 2
     ; region 3 - maze island
     .byte RealPalaceAtLocation4 * 3 + Palace1Offset
-    .byte $ff, $ff, $ff ; 3 unused palace locatios
+    .byte $ff, $ff, $ff ; 3 unused palace locations
 
 ; Screen split IRQ implementation. This is not technically a part of z2ft, but due to the policy of not making the game faster than vanilla, this optimization is only enabled when z2ft is enabled to partially offset the cost of FT playback.
 

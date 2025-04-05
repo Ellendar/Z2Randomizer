@@ -917,9 +917,9 @@ public class Hyrule
 
         var palaceItemBits = new Dictionary<PalaceGrouping, byte[]>
         {
-            [PalaceGrouping.Palace125] = new byte[0x20],
-            [PalaceGrouping.Palace346] = new byte[0x20],
-            [PalaceGrouping.PalaceGp] = new byte[0x20],
+            [PalaceGrouping.Palace125] = ROMData.GetBytes(Room.Group1ItemGetStartAddress, 0x20),
+            [PalaceGrouping.Palace346] = ROMData.GetBytes(Room.Group2ItemGetStartAddress, 0x20),
+            [PalaceGrouping.PalaceGp] = ROMData.GetBytes(Room.Group3ItemGetStartAddress, 0x20),
         };
 
         int enemyAddr = Enemies.NormalPalaceEnemyAddr;
