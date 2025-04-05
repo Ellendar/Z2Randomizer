@@ -2,22 +2,51 @@
 
 namespace RandomizerCore.Sidescroll;
 
+/// <summary>
+/// IDs that are shared in all palaces.
+/// 
+/// It's a class of constants and not an enum, so that
+/// PalaceObjectShared.Window == PalaceObject.Window is true.
+/// </summary>
+public static class PalaceObjectShared
+{
+    public const int Window = 0x00;
+    public const int DragonHead = 0x01;
+    public const int WolfHead = 0x02;
+    public const int CrystalReturnStatue1 = 0x03;
+    public const int CrystalReturnStatue2 = 0x04;
+    public const int LockedDoor = 0x05;
+    public const int LargeCloud = 0x07;
+    public const int SmallCloud08 = 0x08;
+    public const int SmallCloud0B = 0x0B;
+    public const int SmallCloud0C = 0x0C;
+    public const int SmallCloud0D = 0x0D;
+    public const int SmallCloud0E = 0x0E;
+    public const int Collectable = 0x0F;
+    public const int HorizontalBrick = 0x20;
+    public const int BreakableBlock1 = 0x30;
+    public const int SteelBrick = 0x40;
+}
+
+/// <summary>
+/// IDs for palace 1-6
+/// </summary>
 public enum PalaceObject
 {
     Window = 0x00,
-    UnicornHead = 0x01,
-    RatHead = 0x02,
+    DragonHead = 0x01,
+    WolfHead = 0x02,
     CrystalReturnStatue1 = 0x03,
     CrystalReturnStatue2 = 0x04,
     LockedDoor = 0x05,
     LargeCloud = 0x07,
-    SmallCloud1 = 0x08,
+    SmallCloud08 = 0x08,
     IronknuckleStatue = 0x09,
-    SmallCloud2 = 0x0A,
-    SmallCloud3 = 0x0B,
-    SmallCloud4 = 0x0C,
-    SmallCloud5 = 0x0D,
-    SmallCloud6 = 0x0E,
+    SmallCloud0A = 0x0A,
+    SmallCloud0B = 0x0B,
+    SmallCloud0C = 0x0C,
+    SmallCloud0D = 0x0D,
+    SmallCloud0E = 0x0E,
     Collectable = 0x0F,
     HorizontalPitOrLava = 0x10,
     HorizontalBrick = 0x20,
@@ -36,23 +65,26 @@ public enum PalaceObject
     HorizontalPit = 0xF0,
 }
 
+/// <summary>
+/// IDs for Great Palace
+/// </summary>
 public enum GreatPalaceObject
 {
     Window = 0x00,
-    UnicornHead = 0x01,
-    RatHead = 0x02,
+    DragonHead = 0x01,
+    WolfHead = 0x02,
     CrystalReturnStatue1 = 0x03,
     CrystalReturnStatue2 = 0x04,
     LockedDoor = 0x05,
     ElevatorShaft = 0x06,
     LargeCloud = 0x07,
-    SmallCloud1 = 0x08,
+    SmallCloud08 = 0x08,
     SleepingZelda = 0x09,
     BirdKnight = 0x0A,
-    SmallCloud2 = 0x0B,
-    SmallCloud3 = 0x0C,
-    SmallCloud4 = 0x0D,
-    SmallCloud5 = 0x0E,
+    SmallCloud0B = 0x0B,
+    SmallCloud0C = 0x0C,
+    SmallCloud0D = 0x0D,
+    SmallCloud0E = 0x0E,
     Collectable = 0x0F,
     FinalBossCanopyOrLava = 0x10,
     HorizontalBrick = 0x20,
@@ -90,12 +122,12 @@ public static class PalaceObjectExtensions
             case PalaceObject.HorizontalPit:
                 return 1 + command.Param;
             case PalaceObject.LargeCloud:
-            case PalaceObject.SmallCloud1:
-            case PalaceObject.SmallCloud2:
-            case PalaceObject.SmallCloud3:
-            case PalaceObject.SmallCloud4:
-            case PalaceObject.SmallCloud5:
-            case PalaceObject.SmallCloud6:
+            case PalaceObject.SmallCloud08:
+            case PalaceObject.SmallCloud0A:
+            case PalaceObject.SmallCloud0B:
+            case PalaceObject.SmallCloud0C:
+            case PalaceObject.SmallCloud0D:
+            case PalaceObject.SmallCloud0E:
                 return 2;
             case PalaceObject.CrystalReturnStatue1:
             case PalaceObject.CrystalReturnStatue2:
@@ -139,19 +171,19 @@ public static class PalaceObjectExtensions
         switch (command.Id)
         {
             case PalaceObject.Window:
-            case PalaceObject.UnicornHead:
-            case PalaceObject.RatHead:
+            case PalaceObject.DragonHead:
+            case PalaceObject.WolfHead:
             case PalaceObject.CrystalReturnStatue1:
             case PalaceObject.CrystalReturnStatue2:
             case PalaceObject.LockedDoor:
             case PalaceObject.LargeCloud:
-            case PalaceObject.SmallCloud1:
+            case PalaceObject.SmallCloud08:
             case PalaceObject.IronknuckleStatue:
-            case PalaceObject.SmallCloud2:
-            case PalaceObject.SmallCloud3:
-            case PalaceObject.SmallCloud4:
-            case PalaceObject.SmallCloud5:
-            case PalaceObject.SmallCloud6:
+            case PalaceObject.SmallCloud0A:
+            case PalaceObject.SmallCloud0B:
+            case PalaceObject.SmallCloud0C:
+            case PalaceObject.SmallCloud0D:
+            case PalaceObject.SmallCloud0E:
             case PalaceObject.Collectable:
             case PalaceObject.HorizontalPitOrLava:
             case PalaceObject.Curtains:
@@ -209,11 +241,11 @@ public static class GreatPalaceObjectExtensions
             case GreatPalaceObject.BreakableBlock2:
                 return 1 + command.Param;
             case GreatPalaceObject.LargeCloud:
-            case GreatPalaceObject.SmallCloud1:
-            case GreatPalaceObject.SmallCloud2:
-            case GreatPalaceObject.SmallCloud3:
-            case GreatPalaceObject.SmallCloud4:
-            case GreatPalaceObject.SmallCloud5:
+            case GreatPalaceObject.SmallCloud08:
+            case GreatPalaceObject.SmallCloud0B:
+            case GreatPalaceObject.SmallCloud0C:
+            case GreatPalaceObject.SmallCloud0D:
+            case GreatPalaceObject.SmallCloud0E:
             case GreatPalaceObject.SleepingZelda:
                 return 2;
             case GreatPalaceObject.CrystalReturnStatue1:
@@ -257,20 +289,20 @@ public static class GreatPalaceObjectExtensions
         switch (command.Id)
         {
             case GreatPalaceObject.Window:
-            case GreatPalaceObject.UnicornHead:
-            case GreatPalaceObject.RatHead:
+            case GreatPalaceObject.DragonHead:
+            case GreatPalaceObject.WolfHead:
             case GreatPalaceObject.CrystalReturnStatue1:
             case GreatPalaceObject.CrystalReturnStatue2:
             case GreatPalaceObject.LockedDoor:
             case GreatPalaceObject.ElevatorShaft:
             case GreatPalaceObject.LargeCloud:
-            case GreatPalaceObject.SmallCloud1:
+            case GreatPalaceObject.SmallCloud08:
             case GreatPalaceObject.SleepingZelda:
             case GreatPalaceObject.BirdKnight:
-            case GreatPalaceObject.SmallCloud2:
-            case GreatPalaceObject.SmallCloud3:
-            case GreatPalaceObject.SmallCloud4:
-            case GreatPalaceObject.SmallCloud5:
+            case GreatPalaceObject.SmallCloud0B:
+            case GreatPalaceObject.SmallCloud0C:
+            case GreatPalaceObject.SmallCloud0D:
+            case GreatPalaceObject.SmallCloud0E:
             case GreatPalaceObject.Collectable:
             case GreatPalaceObject.FinalBossCanopyOrLava:
             case GreatPalaceObject.Curtains:

@@ -128,155 +128,194 @@ Towns
 	07 - Purple Kees (again?)
 	08 - Gold colored girl, crashes game if you talk to her
 	09-24 - Various townspeople
-Palace 1,2,5
-	00 - Fairy
-	01 - Item in Palace Sprite
-	02 - Locked Door
-	03 - Myu
-	04 - Bot
-	05 - Strike for Red Jar
-	06 - Slow Magic Stealing Skull
-	07 - Orange Moa
-	08 - Falling Block Generator
-	09 - Single falling block
-	0A - Blue Skull Head
-	0B - Rathead Generator
-	0C - Rathead
-	0D - Dripping Column
-	0E - Fast Magic Stealing Skull
-	0F - Bago Bago Generator
-	10 - Bago Bago
-	11 - Rope Jumping Only
-	12 - Rope Jumping and Moving
-	13 - Elevator
-	14 - Crystal Slot
-	15 - Crystal
-	16 - Energy ball shooter (to down-right)
-	17 - Energy ball shooter (to down-left)
-	18 - Orange Iron Knuckle
-	19 - Red Iron Knuckle
-	1A - Blue Iron Knuckle
-	1B - Wolf Head Generator
-	1C - Wolf Head
-	1D - Mago
-	1E - Hammer Thrower
-	1F - Red Stalfos
-	20 - Horse Head
-	21 - Helmethead/Gooma (5th Palace Boss) 
-	22 - Helmethead's floating head
-	23 - Blue Stalfos
-	24-FF crash
-Palace 3,4,6
-	00 - Fairy
-	01 - Item in Palace sprite
-	02 - Locked Door
-	03 - Myu
-	04 - Bot
-	05 - Strike for Red Jar/Ironknuckle
-	06 - Slow Magic Stealing Skulls
-	07 - Orange Moa
-	08 - Falling Blocks Generator
-	09 - Single falling block
-	0A - Blue Skull Head
-	0B - Rathead Generator
-	0C - Rathead
-	0D - Dripping Column
-	0E - Fast Magic Stealing Skulls
-	0F - ???
-	10 - Flame
-	11 - Rope
-	12 - ???
-	13 - Elevator
-	14 - Crystal Slot
-	15 - Crystal
-	16 - Energy ball shooter (to down-right)
-	17 - Energy ball shooter (to down-left)
-	18 - Orange Iron Knuckle
-	19 - Red Iron Knuckle
-	1A - Blue Iron Knuckle
-	1B - Wolf Head Generator
-	1C - Wolf Head
-	1D - Wizrobe
-	1E - Red Stalfos Knight
-	1F - Doomknocker
-	20 - Blue Iron Knuckle on horse
-	21 - Dragon (6th palace boss)
-	22 - Wizard (4th palace boss)
-	23 - Blue Stalfos Knight
-
-	00 - Fairy
-	01 - Candle
-	02 - Door
-	03 - Myu
-	04 - Bot
-	05 - Strike for Red Jar/Ironknuckle
-	06 - Bubble
-	07 - Orange Moa
-	08 - Falling blocks
-	09 - Single falling block
-	0A - Unicorn Head
-	0B - Rat Head generator
-	0C - Rat Head
-	0D - Column dripper
-	0E - Fast bubble
-	0F - ? nothing
-	10 - Fire
-	11 - snake/octorock thingy
-	12 - ? nothing
-	13 - elevator
-	14 - crystal return
-	15 - crystal
-	16 - unicorn head shooter (to down-right)
-	17 - unicorn head shooter (to down-left)
-	18 - Orange Ironknuckle
-	19 - Red Ironknuckle
-	1A - Blue Ironknuckle
-	1B - red wolf head generator
-	1C - wolf head
-	1D - reflect wizrobe
-	1E - Red stalfos
-	1F - blue boomerang-club thing
-	20 - Ironknuckle on horse
-	21 - 6th palace boss
-	22 - 4th palace boss
-	23 - Blue stalfos
-	24-FF crash
-Great Palace (NOT VERIFED!)
-	00 - Fairy
-	01 - Red Magic Jar
-	02 - Locked Door
-	03 - Myu
-	04 - Bot (blue)
-	05 - Bit (red)
-	06 - Moa
-	07 - Ache
-	08 - ???
-	09 - ???
-	0A - Acheman
-	0B - Bubble Generator
-	0C - Rock Generator
-	0D - Red Deeler
-	0E - Blue Deeler
-	0F - Fire Bago Bago Generator
-	10 - Fire Bago Bago
-	11 - Fire Rope Jumping Only
-	12 - Fire Rope Jumping and Moving
-	13 - Elevator
-	14 - Slow Magic Stealing Skull
-	15 - Fast Magic Stealing Skull
-	16 - Orange Skull Head
-	17 - Large Magic Stealing Skull
-	18 - Orange Dreadhawk
-	19 - Red Dreadhawk
-	1A - Blue Dreadhawk
-	1B - ???
-	1C - ???
-	1D - Firebird
-	1E - King Bot
-	1F - ???
-	20 - Barrier for Grand Palace
-	21 - ???
-	22 - Thunder Bird Boss
-	23 - Trigger for Dark Link battle 
 */
+}
+
+/// <summary>
+/// IDs that are shared everywhere in the game.
+/// 
+/// It's a class of constants and not an enum, so that
+/// EnemiesAnywhere.Fairy == EnemiesPalace125.Fairy is true.
+/// </summary>
+public static class EnemiesShared
+{
+    public const int Fairy = 0x00;
+    public const int LockedDoor = 0x02;
+    public const int Myu = 0x03;
+    public const int Bot = 0x04;
+}
+
+/// <summary>
+/// IDs that are shared in palace 1-6
+/// 
+/// It's a class of constants and not an enum, so that
+/// EnemiesRegularPalace.Fairy == EnemiesPalace125.Fairy is true.
+/// </summary>
+public static class EnemiesRegularPalaceShared
+{
+    public const int Fairy = 0x00;
+    public const int ItemInPalaceSprite = 0x01;
+    public const int LockedDoor = 0x02;
+    public const int Myu = 0x03;
+    public const int Bot = 0x04;
+    public const int StrikeForRedJar = 0x05; // close enough
+    public const int SlowBubble = 0x06;
+    public const int OrangeMoa = 0x07;
+    public const int FallingBlockGenerator = 0x08;
+    public const int SingleFallingBlock = 0x09;
+
+    public const int TinsuitGenerator = 0x0B;
+    public const int Tinsuit = 0x0C;
+    public const int Dripper = 0x0D;
+    public const int FastBubble = 0x0E;
+
+    public const int Elevator = 0x13;
+    public const int CrystalSpot = 0x14;
+    public const int Crystal = 0x15;
+    public const int EnergyBallShooterDownRight = 0x16;
+    public const int EnergyBallShooterDownLeft = 0x17;
+    public const int OrangeIronKnuckle = 0x18;
+    public const int RedIronKnuckle = 0x19;
+    public const int BlueIronKnuckle = 0x1A;
+    public const int WolfHeadGenerator = 0x1B;
+    public const int WolfHead = 0x1C;
+    public const int RedStalfos = 0x1F; // close enough
+    public const int BlueStalfos = 0x23; // close enough
+}
+
+/// <summary>
+/// IDs that are shared in all palaces, including Great Palace.
+/// 
+/// It's a class of constants and not an enum, so that
+/// EnemiesAnyPalace.Fairy == EnemiesPalace125.Fairy is true.
+/// </summary>
+public static class EnemiesPalaceShared
+{
+    public const int Fairy = 0x00;
+    public const int LockedDoor = 0x02;
+    public const int Myu = 0x03;
+    public const int Bot = 0x04;
+    public const int Elevator = 0x13;
+}
+
+/// <summary>
+/// IDs for Palace Group 1 (Palace 1, 2, 5)
+/// </summary>
+public enum EnemiesPalace125
+{
+    Fairy = 0x00,
+    ItemInPalaceSprite = 0x01,
+    LockedDoor = 0x02,
+    Myu = 0x03,
+    Bot = 0x04,
+    StrikeForRedJar = 0x05,
+    SlowBubble = 0x06,
+    OrangeMoa = 0x07,
+    FallingBlockGenerator = 0x08,
+    SingleFallingBlock = 0x09,
+    BlueDragonHeadGenerator = 0x0A,
+    TinsuitGenerator = 0x0B,
+    Tinsuit = 0x0C,
+    Dripper = 0x0D,
+    FastBubble = 0x0E,
+    BagoBagoGenerator = 0x0F,
+    BagoBago = 0x10,
+    RopeJumpingOnly = 0x11,
+    RopeJumpingAndMoving = 0x12,
+    Elevator = 0x13,
+    CrystalSpot = 0x14,
+    Crystal = 0x15,
+    EnergyBallShooterDownRight = 0x16,
+    EnergyBallShooterDownLeft = 0x17,
+    OrangeIronKnuckle = 0x18,
+    RedIronKnuckle = 0x19,
+    BlueIronKnuckle = 0x1A,
+    WolfHeadGenerator = 0x1B,
+    WolfHead = 0x1C,
+    Mago = 0x1D,
+    Guma = 0x1E,
+    RedStalfos = 0x1F,
+    Horsehead = 0x20,
+    HelmetheadOrGooma = 0x21,
+    HelmetheadsFloatingHead = 0x22,
+    BlueStalfos = 0x23
+}
+
+/// <summary>
+/// IDs for Palace Group 2 (Palace 3, 4, 6)
+/// </summary>
+public enum EnemiesPalace346
+{
+    Fairy = 0x00,
+    ItemInPalaceSprite = 0x01,
+    LockedDoor = 0x02,
+    Myu = 0x03,
+    Bot = 0x04,
+    StrikeForRedJarOrIronKnuckle = 0x05,
+    SlowBubble = 0x06,
+    OrangeMoa = 0x07,
+    FallingBlockGenerator = 0x08,
+    SingleFallingBlock = 0x09,
+    RebonackPostHorse = 0x0A,
+    TinsuitGenerator = 0x0B,
+    Tinsuit = 0x0C,
+    Dripper = 0x0D,
+    FastBubble = 0x0E,
+    BlueDragonHeadGenerator = 0x0F,
+    Flame = 0x10,
+    Rope = 0x11,
+    Elevator = 0x13,
+    CrystalSpot = 0x14,
+    Crystal = 0x15,
+    EnergyBallShooterDownRight = 0x16,
+    EnergyBallShooterDownLeft = 0x17,
+    OrangeIronKnuckle = 0x18,
+    RedIronKnuckle = 0x19,
+    BlueIronKnuckle = 0x1A,
+    WolfHeadGenerator = 0x1B,
+    WolfHead = 0x1C,
+    Wizard = 0x1D,
+    Doomknocker = 0x1E,
+    ArmoredRedStalfos = 0x1F,
+    Rebonack = 0x20,
+    Barba = 0x21,
+    Carock = 0x22,
+    ArmoredBlueStalfos = 0x23
+}
+
+/// <summary>
+/// IDs for Palace Group 3 (Great Palace)
+/// </summary>
+public enum EnemiesGreatPalace
+{
+    Fairy = 0x00,
+    StrikeForRedJarOrFokka = 0x01,
+    LockedDoor = 0x02,
+    Myu = 0x03,
+    Bot = 0x04,
+    Bit = 0x05,
+    OrangeMoa = 0x06,
+    Ache = 0x07,
+    Acheman = 0x0A,
+    BubbleGenerator = 0x0B,
+    RockGenerator = 0x0C,
+    RedDeeler = 0x0D,
+    BlueDeeler = 0x0E,
+    FireBagoBagoGenerator = 0x0F,
+    FireBagoBago = 0x10,
+    RopeJumpingOnly = 0x11,
+    RopeJumpingAndMoving = 0x12,
+    Elevator = 0x13,
+    SlowBubble = 0x14,
+    FastBubble = 0x15,
+    OrangeDragonHeadGenerator = 0x16,
+    KingBubble = 0x17,
+    OrangeFokka = 0x18,
+    RedFokka = 0x19,
+    BlueFokka = 0x1A,
+    Fokkeru = 0x1D,
+    KingBot = 0x1E,
+    GreatPalaceBarrier = 0x20,
+    Thunderbird = 0x22,
+    DarkLinkTrigger = 0x23
 }
