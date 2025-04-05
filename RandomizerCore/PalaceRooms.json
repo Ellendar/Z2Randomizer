@@ -2377,6 +2377,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "19600E10E100D0086001A80F086702D10ED60860016F02D10E"
   },
   {
@@ -3827,6 +3828,7 @@
     "palaceNumber": 7,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "166005081023D408609E6F9FDD80A03F639CB1B1DC0E"
   },
   {
@@ -4222,6 +4224,7 @@
     "palaceNumber": 7,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
   },
   {
@@ -6146,6 +6149,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
   },
   {
@@ -6666,6 +6670,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
   },
   {
@@ -6692,6 +6697,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
   },
   {
@@ -6718,6 +6724,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "2960030804FE802F96C3240705FD802D95C3730F0C06FE802E130794C3A40704FB802B330792C3D703"
   },
   {
@@ -6770,6 +6777,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "2E600F10D1034001D300F01FA05F622C940F0AAA72D305F05070F1D400F01F622C46B1970F08F11F612C46B1D905"
   },
   {
@@ -7062,6 +7070,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "19600E10E100D0086001A80F086702D10ED60860016F02D10E"
   },
   {
@@ -7400,12 +7409,13 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 67379,
-    "name": "",
+    "name": "dusterRoomJam outdoors key",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A043820F0890417109D1FF"
+    "suppressWarning": ["MultipleItemsOnPage"],
+    "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A033820F0890317109D1FF"
   },
   {
     "author": "dusterRoomJam",
@@ -11912,6 +11922,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "20600E10D0804900460046004600D66B6202D16E8105F25000F1B071D56B6001"
   },
   {
@@ -13446,6 +13457,7 @@
     "palaceNumber": 7,
     "requirements": [
     ],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "18600E08E100D080609CA03FBAB1639FD3086D9EDF051023"
   },
   {
@@ -14370,6 +14382,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
+    "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "19600E08D408208E70019573880F0890717109D10FE300DE0F"
   },
   {
@@ -14811,8 +14824,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "21600009990F0181409040880597737271527770779077F8505225565455245554",
-	"suppressValidation":true
+    "sideviewData": "21600009990F0181409040880597737271527770779077F8505225565455245554"
   },
   {
     "author": "aaron2u2",
@@ -16605,7 +16617,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
-    "isDropZone": true,
+    "isDropZone": false,
     "hasItem": false,
     "enemies": "090F0F5E596A8400CF",
     "sideviewData": "2E601E08D280A4236131F31F92355130513F9633F61F903576319233523F9435F21B963354320223A023F250D60E",
@@ -16619,8 +16631,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false,
-	"suppressValidation": true
+    "isUpDownReversed": false
   },
   {
     "bitmask": "0F",
@@ -16995,8 +17006,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false,
-	"suppressValidation": true
+    "isUpDownReversed": false
   },
   {
     "bitmask": "0F",
@@ -17546,8 +17556,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": false,
-	"suppressValidation": true
+    "isUpDownReversed": false
   },
   {
     "bitmask": "0F",
@@ -18571,7 +18580,6 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-	"suppressValidation" : true,
     "isUpDownReversed": false
   },
   {
@@ -18758,6 +18766,7 @@
     "hasDrop": false,
     "elevatorScreen": 1,
     "requirements": [],
+    "suppressWarning": ["DropTilesInNonDropRoom", "ElevatorEnemy"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0501855793",
@@ -18786,7 +18795,7 @@
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0D8751795170D182D164D16551",
-    "sideviewData": "56600F08D20EF550B006B106D4884300D50820D831306030903021D821305030803021D841D07030A03021D8D188450044004400D70820D841D07030A03021D821305030803021D831D06030903021D8D1884400F400",
+    "sideviewData": "54600F08D20EF550B006B106D4884300D50820D831306030903021D821305030803021D841D07030A03021D8D188450044004400D70820D841D07030A03021D821305030803021D831D06030903021D8D1884400",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Drop waffles",

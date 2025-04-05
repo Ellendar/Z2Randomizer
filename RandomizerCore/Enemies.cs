@@ -139,7 +139,7 @@ Towns
 /// </summary>
 public static class EnemiesShared
 {
-    public const int FAIRT = 0x00;
+    public const int FAIRY = 0x00;
     public const int LOCKED_DOOR = 0x02;
     public const int MYU = 0x03;
     public const int BOT = 0x04;

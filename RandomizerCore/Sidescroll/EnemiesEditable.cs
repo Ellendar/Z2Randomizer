@@ -6,11 +6,11 @@ using System.Text;
 
 namespace RandomizerCore.Sidescroll;
 
-public class EnemiesEditable
+public class EnemiesEditable<T> where T : Enum
 {
     private byte[] Header;
 
-    public List<Enemy> Enemies { get; set; }
+    public List<Enemy<T>> Enemies { get; set; }
 
     /// <summary>
     /// Create an EnemiesEditable from an array of bytes for the enemies of a room.
@@ -21,13 +21,13 @@ public class EnemiesEditable
         if (bytes.Length < 1) { throw new ArgumentException("Enemies data has no header."); }
         if (bytes.Length != bytes[0]) { throw new ArgumentException("Enemies data length byte is incorrect."); }
         Header = bytes[0..1];
-        Enemies = new List<Enemy>();
+        Enemies = new List<Enemy<T>>();
         int i = 1; // start after header
         while (i < bytes.Length)
         {
             if (i + 1 == bytes.Length) { throw new ArgumentException("Enemies data contains incomplete enemy bytes data."); }
             byte[] objectBytes = bytes[i..(i + 2)];
-            Enemy o = new(objectBytes);
+            Enemy<T> o = new(objectBytes);
             Enemies.Add(o);
             i += 2;
         }
@@ -80,7 +80,7 @@ public class EnemiesEditable
     }
 }
 
-public class Enemy
+public class Enemy<T> where T : Enum
 {
     /// <summary>
     /// The bytes making up the enemy definition
@@ -104,8 +104,8 @@ public class Enemy
     /// </summary>
     public int Y
     {
-        get { return (Bytes[0] & 0xF0) >> 4; }
-        set { Bytes[0] = (byte)((value << 4) + (Bytes[0] & 0x0F)); }
+        get => (Bytes[0] & 0xF0) >> 4;
+        set { Bytes[0] = (byte)((value << 4) | (Bytes[0] & 0x0F)); }
     }
 
     /// <summary>
@@ -115,20 +115,26 @@ public class Enemy
     /// </summary>
     public int X
     {
-        get { return ((Bytes[1] & 0b11000000) >> 2) + (Bytes[0] & 0x0F); }
+        get => ((Bytes[1] & 0b11000000) >> 2) | (Bytes[0] & 0x0F);
         set {
-            Bytes[1] = (byte)(((value & 0xF0) << 2) + (Bytes[1] & 0b00111111));
-            Bytes[0] = (byte)((Bytes[0] & 0xF0) + (value & 0x0F));
+            Bytes[1] = (byte)(((value & 0b110000) << 2) | (Bytes[1] & 0b00111111));
+            Bytes[0] = (byte)((Bytes[0] & 0xF0) | (value & 0x0F));
         }
+    }
+
+    public int Page
+    {
+        get => (Bytes[1] & 0b11000000) >> 6;
+        set { Bytes[1] = (byte)(((value & 0b11) << 6) | (Bytes[1] & 0b00111111)); }
     }
 
     /// <summary>
     /// Access the enemy number
     /// </summary>
-    public int Id
+    public T Id
     {
-        get { return Bytes[1] & 0b00111111; }
-        set { Bytes[1] = (byte)((Bytes[1] & 0b11000000) + (value & 0b00111111)); }
+        get => (T)Enum.ToObject(typeof(T), Bytes[1] & 0b00111111);
+        set { Bytes[1] = (byte)((Bytes[1] & 0b11000000) | (Convert.ToByte(value) & 0b00111111)); }
     }
 
     public String DebugString()

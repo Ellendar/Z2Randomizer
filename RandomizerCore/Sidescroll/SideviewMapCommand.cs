@@ -23,6 +23,11 @@ public class SideviewMapCommand<T> where T : Enum
     /// </summary>
     public int AbsX { get; set; }
 
+    public int Page
+    {
+        get => AbsX / 16;
+    }
+
     /// <summary>
     /// Create from an array of bytes making up a single map command.
     /// </summary>
@@ -77,16 +82,16 @@ public class SideviewMapCommand<T> where T : Enum
     /// </summary>
     public int Y
     {
-        get { return (Bytes[0] & 0xF0) >> 4; }
-        set { Bytes[0] = (byte)((value << 4) + (Bytes[0] & 0x0F)); }
+        get => (Bytes[0] & 0xF0) >> 4;
+        set { Bytes[0] = (byte)((value << 4) | (Bytes[0] & 0x0F)); }
     }
 
     /// <summary>
     /// Access the relative x position of the map command, the second 4 bits.
     /// </summary>
     public int RelX {
-        get { return Bytes[0] & 0x0F; }
-        set { Bytes[0] = (byte)((Bytes[0] & 0xF0) + (value & 0x0F)); }
+        get => Bytes[0] & 0x0F;
+        set { Bytes[0] = (byte)((Bytes[0] & 0xF0) | (value & 0x0F)); }
     }
 
     /// <summary>
@@ -94,7 +99,7 @@ public class SideviewMapCommand<T> where T : Enum
     /// </summary>
     public T Id
     {
-        get { return (T)Enum.ToObject(typeof(T), (Bytes[1] < 0x10) ? Bytes[1] : (Bytes[1] & 0xF0)); }
+        get => (T)Enum.ToObject(typeof(T), (Bytes[1] < 0x10) ? Bytes[1] : (Bytes[1] & 0xF0));
         set { Bytes[1] = Convert.ToByte(value); }
     }
 
@@ -280,6 +285,29 @@ public class SideviewMapCommand<T> where T : Enum
                         return PalaceObjectExtensions.IsBreakable((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
                         return GreatPalaceObjectExtensions.IsBreakable((this as SideviewMapCommand<GreatPalaceObject>)!);
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    public bool IsPit
+    {
+        get
+        {
+            if (Y < 13)
+            {
+                switch (this)
+                {
+                    case SideviewMapCommand<PalaceObject>:
+                        return PalaceObjectExtensions.IsPit((this as SideviewMapCommand<PalaceObject>)!);
+                    case SideviewMapCommand<GreatPalaceObject>:
+                        return GreatPalaceObjectExtensions.IsPit((this as SideviewMapCommand<GreatPalaceObject>)!);
                     default:
                         throw new NotImplementedException();
                 }
