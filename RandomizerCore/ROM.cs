@@ -861,7 +861,7 @@ CopySideviewIntoRAMAndLoadPointer:
     ; 1 = west hyrule town
     ; 2 = easy hyrule town
     ; 3 = palace group 1,2,5
-    ; 4 = palace group 3,4,6
+    ; 4 = palace group 3,4,6 AND death mountain/maze island encounters
     ; 5 = palace GP
     ; So if Y >= 3 we need to change banks when loading the sideview data
 
@@ -896,12 +896,23 @@ CopySideviewIntoRAMAndLoadPointer:
     lda ($02),y
     sta $d7
 
+    ; if its not a palace area, skip switching banks
     cpx #3
-    bcc +
-        ; Loading a palace sideview so use the data from extended banks instead
-        lda #$0e
-        jsr SwapPRG
-    +
+    bcc @skipswap
+        ; maze island palace is X=3 A=1
+        beq @palace
+        ; if its MAZE ISLAND or DEATH MOUNTAIN encounters
+        ; x=4 a=3 death mountain encounter
+        ; x=4 a=1 maze island encounter
+        ; so just check if its odd
+        lda RegionNumber
+        lsr
+        bcs @skipswap
+        @palace:
+            ; Loading a palace sideview so use the data from extended banks instead
+            lda #$0e
+            jsr SwapPRG
+@skipswap:
 
     ; Read from wherever the vanilla table to the sideview data takes us.
     ; (if its a palace, its using the extended banks now)
@@ -917,10 +928,9 @@ CopySideviewIntoRAMAndLoadPointer:
         bne -
 
     ; If we switched banks to load the sideview, switch it back
-    cpx #3
-    bcc +
-        jsr SwapToSavedPRG
-    +
+    ; the conditional is kinda heavy, so just always switch
+    jsr SwapToSavedPRG
+
     ; Now reload the pointers that the game expects
     ; Load the Sideview RAM buffer pointer
     lda #.lobyte(SideViewBuffer)
