@@ -262,11 +262,9 @@ public class Room : IJsonOnDeserialized
                 break;
         }
         
-        Console.WriteLine($"memaddr: {tableAddr:X4}");
         a.RomOrg(tableAddr);
         a.Word((ushort)enemyDataAddr);
 
-        Console.WriteLine($"enemyAddr: {enemyAddr:X4}");
         a.RomOrg(enemyAddr);
         a.Byt(NewEnemies);
         return NewEnemies.Length;
