@@ -40,7 +40,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 foreach (Room itemRoomReplacementRoom in itemRoomReplacementCandidates)
                 {
                     Room? upRoom = palace.AllRooms.FirstOrDefault(
-                        i => i.coords == (itemRoomReplacementRoom.coords.Item1, itemRoomReplacementRoom.coords.Item2 + 1));
+                        i => i.coords == itemRoomReplacementRoom.coords with { Y = itemRoomReplacementRoom.coords.Y + 1 });
                     if (itemRoomReplacementRoom != null && 
                         (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == itemRoomCandidate.IsDropZone))
                     {
@@ -79,7 +79,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 foreach (Room tbirdRoomReplacementRoom in tbirdRoomReplacementCandidates)
                 {
                     Room? upRoom = palace.AllRooms.FirstOrDefault(
-                        i => i.coords == (tbirdRoomReplacementRoom.coords.Item1, tbirdRoomReplacementRoom.coords.Item2 + 1));
+                        i => i.coords == tbirdRoomReplacementRoom.coords with { Y = tbirdRoomReplacementRoom.coords.Y + 1 });
                     if (tbirdRoomReplacementRoom != null &&
                         (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == tbirdRoomCandidate.IsDropZone))
                     {
@@ -117,7 +117,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             foreach (Room bossRoomReplacementRoom in bossRoomReplacementCandidates)
             {
                 Room? upRoom = palace.AllRooms.FirstOrDefault(
-                    i => i.coords == (bossRoomReplacementRoom.coords.Item1, bossRoomReplacementRoom.coords.Item2 + 1));
+                    i => i.coords == bossRoomReplacementRoom.coords with { Y = bossRoomReplacementRoom.coords.Y + 1 });
                 if (bossRoomReplacementRoom != null &&
                     (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == bossRoomCandidate.IsDropZone))
                 {

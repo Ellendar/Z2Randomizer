@@ -3,9 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
+
+public enum PalaceGrouping
+{
+    Palace125 = 0,
+    Palace346 = 1,
+    PalaceGp = 2,
+    Unintialized = 255,
+}
 
 public class Palaces
 {
@@ -36,7 +45,7 @@ public class Palaces
         VANILLA_P7_ALLOWED_BLOCKERS
     ];
 
-    public static List<Palace> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
+    public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
         {
@@ -183,28 +192,22 @@ public class Palaces
             Palace palace;
             do
             {
-                palace = palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
+                palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
             } while (!palace.IsValid || (props.PalaceStyles[currentPalace - 1] != PalaceStyle.VANILLA && palace.HasInescapableDrop()));
 
-            if(palace.GetPalaceGroup() == 1)
+            if(palace.PalaceGroup == PalaceGrouping.Palace125)
             {
-                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, 
-                    props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
-                palace.AllRooms.ForEach(i => i.PalaceGroup = 1);
+                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }
-
-            if (palace.GetPalaceGroup() == 2)
+            
+            if (palace.PalaceGroup == PalaceGrouping.Palace346)
             {
-                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, 
-                    props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
-                palace.AllRooms.ForEach(i => i.PalaceGroup = 2);
+                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }
-
-            if (palace.GetPalaceGroup() == 3)
+            
+            if (palace.PalaceGroup == PalaceGrouping.PalaceGp)
             {
-                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, 
-                    props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
-                palace.AllRooms.ForEach(i => i.PalaceGroup = 3);
+                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }
             palace.AllRooms.ForEach(i => i.PalaceNumber = currentPalace);
             palace.ValidateRoomConnections();

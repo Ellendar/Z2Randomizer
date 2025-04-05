@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.OpenGL;
@@ -29,14 +30,18 @@ public static class Program
                 App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
                 App.FileSystemService = new DesktopFileService();
                 // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
-
-                var version = Assembly.GetEntryAssembly().GetName().Version;
-                var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
-                WinSparkle.win_sparkle_set_appcast_url("https://github.com/Ellendar/Z2Randomizer/raw/refs/heads/4.4/appcast.xml");
-                WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer", versionString); // THIS CALL NOT IMPLEMENTED YET
-                WinSparkle.win_sparkle_init();
-                App.CheckUpdateService = new DesktopCheckUpdateService();
-                App.ServiceContainer.AddSingleton<ICheckUpdateService>(x => App.CheckUpdateService!);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    var version = Assembly.GetEntryAssembly().GetName().Version;
+                    var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
+                    WinSparkle.win_sparkle_set_appcast_url(
+                        "https://github.com/Ellendar/Z2Randomizer/raw/refs/heads/4.4/appcast.xml");
+                    WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer",
+                        versionString); // THIS CALL NOT IMPLEMENTED YET
+                    WinSparkle.win_sparkle_init();
+                    App.CheckUpdateService = new DesktopCheckUpdateService();
+                    App.ServiceContainer.AddSingleton<ICheckUpdateService>(x => App.CheckUpdateService!);
+                }
             })
             .StartWithClassicDesktopLifetime(args);
     }

@@ -43,43 +43,37 @@ public partial class PalaceRooms
 
     public IEnumerable<Room> VanillaPalaceRoomsByPalaceNumber(int palaceNum)
     {
-        int mapMin, mapMax, palaceGroup;
+        int mapMin, mapMax;
+        var palaceGroup = Util.AsPalaceGrouping(palaceNum);
         switch (palaceNum)
         {
             case 1:
                 mapMin = 0;
                 mapMax = 13;
-                palaceGroup = 1;
                 break;
             case 2:
                 mapMin = 14;
                 mapMax = 34;
-                palaceGroup = 1;
                 break;
             case 3:
                 mapMin = 0;
                 mapMax = 14;
-                palaceGroup = 2;
                 break;
             case 4:
                 mapMin = 15;
                 mapMax = 35;
-                palaceGroup = 2;
                 break;
             case 5:
                 mapMin = 35;
                 mapMax = 62;
-                palaceGroup = 1;
                 break;
             case 6:
                 mapMin = 36;
                 mapMax = 62;
-                palaceGroup = 2;
                 break;
             case 7:
                 mapMin = 0;
                 mapMax = 54;
-                palaceGroup = 3;
                 break;
             default:
             throw new ArgumentException("Invalid palace number: " + palaceNum);

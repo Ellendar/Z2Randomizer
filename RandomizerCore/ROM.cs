@@ -58,7 +58,7 @@ public class ROM
     public const int VanillaChrRomOffs = RomHdrSize + VanillaPrgRomSize;
     public const int VanillaRomSize = VanillaChrRomOffs + ChrRomSize;
 
-    public static readonly IReadOnlyList<int> FreeRomBanks = new List<int>(Enumerable.Range(0x10, 0xf));
+    public static readonly IReadOnlyList<int> FreeRomBanks = Enumerable.Range(0x10, 0xc).ToList();
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -769,6 +769,97 @@ TitleEnd:
         Put(0x28B9, (byte)lifeMax);
 
 
+    }
+
+    public void UseExtendedBanksForPalaceRooms(Assembler a)
+    {
+        a.Module().Code("""
+.include "z2r.inc"
+
+.import SwapPRG, SwapToSavedPRG
+
+; move the pointers for the data for the sideviews to load from RAM instead.
+.segment "PRG7"
+.org $C50C ; patch where the pointer for sideview data is loaded
+    jsr CopySideviewIntoRAMAndLoadPointer
+    jmp $C53A
+FREE_UNTIL $C53A
+
+.reloc
+CopySideviewIntoRAMAndLoadPointer:
+    ; y is the offset for the type to load from.
+    ; 0 = encounter
+    ; 1 = west hyrule town
+    ; 2 = easy hyrule town
+    ; 3 = palace group 1,2,5
+    ; 4 = palace group 3,4,6
+    ; 5 = palace GP
+    ; So if Y >= 3 we need to change banks when loading the sideview data
+
+    ; Save the sideview type into X for use later
+    tya
+    tax
+
+    ; And setup the read pointer address to read the sideview from ROM
+    ldy $C4BD, x
+    lda $C4C3, y ; Area pointer table lo word
+    sta $00
+    lda $C4C3 + 1, y ; Area pointer table hi word
+    sta $01
+    ; And the enemy pointer address
+    lda $C4C3 + 4, y ; Enemy pointer table lo word
+    sta $02
+    lda $C4C3 + 4 + 1, y ; Enemy pointer table hi word
+    sta $03
+    
+    ; Now we have the pointer to the sideview address, load that so we can read the data
+    ; and also load the enemy pointer into $d6 as well
+    lda $0561
+    asl
+    tay
+    lda ($00),y
+    sta $d4
+    lda ($02),y
+    sta $d6
+    iny
+    lda ($00),y
+    sta $d5
+    lda ($02),y
+    sta $d7
+
+    cpx #3
+    bcc +
+        ; Loading a palace sideview so use the data from extended banks instead
+        lda #$0e
+        jsr SwapPRG
+    +
+
+    ; Read from wherever the vanilla table to the sideview data takes us.
+    ; (if its a palace, its using the extended banks now)
+    ldy #0
+    lda ($d4),y
+    sta SideViewBuffer
+    tay ; Read the sideview length byte
+    ; And start reading all of the data into the buffer
+-
+        lda ($d4),y
+        sta SideViewBuffer,y ; don't need to use indirect addressing since its a fixed buffer
+        dey
+        bne -
+
+    ; If we switched banks to load the sideview, switch it back
+    cpx #3
+    bcc +
+        jsr SwapToSavedPRG
+    +
+    ; Now reload the pointers that the game expects
+    ; Load the Sideview RAM buffer pointer
+    lda #.lobyte(SideViewBuffer)
+    sta $d4
+    lda #.hibyte(SideViewBuffer)
+    sta $d5
+    rts
+""");
     }
 
     public void ExtendMapSize(Assembler a)

@@ -263,3 +263,9 @@ RESV NmiBankShadow8, 1
 RESV NmiBankShadowA, 1
 RESV SoftDisableNmi, 1
 
+; Reserve 256 bytes to store a sideview buffer.
+; The sideview loading code is patched to quickly bank switch to the extended banks for palace data,
+; or load regular sideviews from the usual location
+RESV SideViewBuffer, $0100
+
+.assert RES_OFFSET + StatTrackingBase < $6957

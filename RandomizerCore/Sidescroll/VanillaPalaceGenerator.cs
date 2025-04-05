@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -9,7 +10,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         VanillaRoomPool roomPool = (VanillaRoomPool)rooms;
         if(roomPool.BossRooms.Count != 1
@@ -19,49 +20,40 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         }
         Palace palace = new(palaceNumber);
 
-        int palaceGroup = palaceNumber switch
-        {
-            1 => 1,
-            2 => 1,
-            3 => 2,
-            4 => 2,
-            5 => 1,
-            6 => 2,
-            7 => 3,
-            _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
-        };
+        // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         palace.Entrance = new(roomPool.Entrances.First());
-        palace.Entrance.PalaceGroup = palaceGroup;
+        // palace.Entrance.PalaceGroup = palaceGroup;
         palace.BossRoom = new(roomPool.BossRooms.First());
-        palace.BossRoom.PalaceGroup = palaceGroup;
+        // palace.BossRoom.PalaceGroup = palaceGroup;
         palace.AllRooms.Add(palace.Entrance);
         if (palaceNumber != 7)
         {
             Room itemRoom = new(roomPool.ItemRoom!);
             palace.ItemRoom = itemRoom;
-            palace.ItemRoom.PalaceGroup = palaceGroup;
+            // palace.ItemRoom.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(palace.ItemRoom);
         }
         palace.AllRooms.Add(palace.BossRoom);
         if (palaceNumber == 7)
         {
             Room bird = new(roomPool.TbirdRooms.First());
-            bird.PalaceGroup = palaceGroup;
+            // bird.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(bird);
             palace.TbirdRoom = bird;
 
         }
         foreach (Room v in roomPool.NormalRooms)
         {
+            await Task.Yield();
             Room room = new(v);
-            room.PalaceGroup = palaceGroup;
+            // room.PalaceGroup = palaceGroup;
             palace.AllRooms.Add(room);
 
             if (room.LinkedRoomName != null)
             {
                 Room linkedRoom = new(roomPool.LinkedRooms[room.LinkedRoomName]);
-                linkedRoom.PalaceGroup = palaceGroup;
+                // linkedRoom.PalaceGroup = palaceGroup;
                 linkedRoom.LinkedRoom = room;
                 room.LinkedRoom = linkedRoom;
                 palace.AllRooms.Add(linkedRoom);

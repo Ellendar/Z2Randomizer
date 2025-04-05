@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RandomizerCore.Sidescroll;
 
@@ -12,7 +13,7 @@ public abstract class PalaceGenerator
 
     protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
 
-    internal abstract Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber);
+    internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber);
 
     protected bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {

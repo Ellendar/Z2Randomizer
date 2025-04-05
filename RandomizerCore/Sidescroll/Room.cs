@@ -11,6 +11,12 @@ using NLog;
 
 namespace RandomizerCore.Sidescroll;
 
+public record struct Coord(int X, int Y)
+{
+    public Coord((int, int) coords) : this(coords.Item1, coords.Item2) {}
+    public static Coord Uninitialized = new(0, 0);
+}
+
 [JsonSourceGenerationOptions(
     UseStringEnumConverter = true,
     WriteIndented = false,
@@ -21,6 +27,7 @@ namespace RandomizerCore.Sidescroll;
 [JsonSerializable(typeof(List<Room>))]
 [JsonSerializable(typeof(Room))]
 [JsonSerializable(typeof(Requirements))]
+[JsonSerializable(typeof(Coord))]
 public partial class RoomSerializationContext : JsonSerializerContext { }
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
@@ -28,14 +35,14 @@ public class Room : IJsonOnDeserialized
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    internal (int, int) coords;
+    internal Coord coords;
 
     private const int sideview1 = 0x10533;
     private const int sideview2 = 0x12010;
     private const int sideview3 = 0x14533;
-    private const int Group1ItemGetStartAddress = 0x17ba5;
-    private const int Group2ItemGetStartAddress = 0x17bc5;
-    private const int Group3ItemGetStartAddress = 0x17be5;
+    // private const int Group1ItemGetStartAddress = 0x17ba5;
+    // private const int Group2ItemGetStartAddress = 0x17bc5;
+    // private const int Group3ItemGetStartAddress = 0x17be5;
     private const int connectors1 = 0x1072b;
     private const int connectors2 = 0x12208;
     private const int connectors3 = 0x1472b;
@@ -45,7 +52,8 @@ public class Room : IJsonOnDeserialized
     public byte[] ItemGetBits { get; set; }
 
     public byte Map { get; set; }
-    public int? PalaceGroup { get; set; }
+    [JsonIgnore]
+    public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(PalaceNumber);
     [JsonIgnore]
     public bool IsRoot { get; set; }
     
@@ -168,7 +176,7 @@ public class Room : IJsonOnDeserialized
         Author = room.Author;
         Enabled = room.Enabled;
         Group = room.Group;
-        PalaceGroup = room.PalaceGroup;
+        // PalaceGroup = room.PalaceGroup;
         PalaceNumber = room.PalaceNumber;
 
         Connections = room.Connections;
@@ -193,31 +201,22 @@ public class Room : IJsonOnDeserialized
 
     public void WriteSideViewPtr(AsmModule a, string label)
     {
-        if(PalaceGroup is <= 0 or > 3)
+        // var tableAddr = (ushort)(0x8000 + (byte)PalaceGroup * 0x40 * 2 + Map * 2);
+        var tableAddr = PalaceGroup switch
         {
-            throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
-        }
-        int addr;
-        switch (PalaceGroup)
-        {
-            case 1:
-                a.Segment("PRG4");
-                addr = sideview1;
-                break;
-            case 2:
-                a.Segment("PRG4");
-                addr = sideview2;
-                break;
-            default:
-                a.Segment("PRG5", "PRG7");
-                addr = sideview3;
-                break;
-        }
-        a.RomOrg(addr + Map * 2);
+            PalaceGrouping.Palace125 => sideview1,
+            PalaceGrouping.Palace346 => sideview2,
+            PalaceGrouping.PalaceGp => sideview3,
+            _ => throw new NotImplementedException(),
+        };
+        tableAddr += Map * 2;
+        // Console.WriteLine($"whatever {label} here: ${tableAddr:X6}");
+        a.Segment(PalaceGroup == PalaceGrouping.PalaceGp ? "PRG5" : "PRG4");
+        a.RomOrg(tableAddr);
         a.Word(a.Symbol(label));
     }
 
-    public void UpdateEnemies(int enemyAddr, ROM romData)
+    public int UpdateEnemies(AsmModule a, int enemyAddr)
     {
         //If we're using vanilla enemies, just clone them to newenemies so the logic can be the same for shuffled vs not
         if (NewEnemies[0] == 0)
@@ -227,27 +226,12 @@ public class Room : IJsonOnDeserialized
         //#76: If the item room is a boss item room, and it's in palace group 1, move the boss up 1 tile.
         //For some reason a bunch of the boss item rooms are fucked up in a bunch of different ways, so i'm keeping digshake's catch-all
         //though repositioned into the place it belongs.
-        if (PalaceGroup == 1 && HasItem && HasBoss)
+        if (PalaceGroup == PalaceGrouping.Palace125 && HasItem && HasBoss)
         {
             NewEnemies[1] = 0x6C;
         }
-        var enemyPtr = PalaceGroup switch
-        {
-            1 => RandomizerCore.Enemies.Palace125EnemyPtr,
-            2 => RandomizerCore.Enemies.Palace346EnemyPtr,
-            3 => RandomizerCore.Enemies.GPEnemyPtr,
-            _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
-        };
 
-        var baseEnemyAddr = PalaceGroup switch
-        {
-            1 => RandomizerCore.Enemies.NormalPalaceEnemyAddr,
-            2 => RandomizerCore.Enemies.NormalPalaceEnemyAddr,
-            3 => RandomizerCore.Enemies.GPEnemyAddr,
-            _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
-        };
-
-        if (NewEnemies.Length > 1 && PalaceGroup == 2)
+        if (NewEnemies.Length > 1 && PalaceGroup == PalaceGrouping.Palace346)
         {
             for (var i = 2; i < NewEnemies.Length; i += 2)
             {
@@ -259,111 +243,97 @@ public class Room : IJsonOnDeserialized
         }
 
         //Reconstructed palaces require us to rewrite the enemy pointers table.
-        var memAddr = enemyAddr;
+        var enemyDataAddr = enemyAddr;
+        var tableAddr = 0;
         switch (PalaceGroup)
         {
             //Write the updated pointers
-            case 1:
-                memAddr -= 0x98b0;
-                romData.Put(RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-                romData.Put(RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            case PalaceGrouping.Palace125:
+                enemyDataAddr -= 0x98b0;
+                tableAddr = RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2;
                 break;
-            case 2:
-                memAddr -= 0x98b0;
-                romData.Put(RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-                romData.Put(RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+            case PalaceGrouping.Palace346:
+                enemyDataAddr -= 0x98b0;
+                tableAddr = RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2;
                 break;
             default:
-                memAddr -= 0xd8b0;
-                romData.Put(RandomizerCore.Enemies.GPEnemyPtr + Map * 2, (byte)(memAddr & 0x00FF));
-                romData.Put(RandomizerCore.Enemies.GPEnemyPtr + Map * 2 + 1, (byte)((memAddr >> 8) & 0xFF));
+                enemyDataAddr -= 0xd8b0;
+                tableAddr = RandomizerCore.Enemies.GPEnemyPtr + Map * 2;
                 break;
         }
+        
+        Console.WriteLine($"memaddr: {tableAddr:X4}");
+        a.RomOrg(tableAddr);
+        a.Word((ushort)enemyDataAddr);
 
-
-        romData.Put(enemyAddr, NewEnemies);
+        Console.WriteLine($"enemyAddr: {enemyAddr:X4}");
+        a.RomOrg(enemyAddr);
+        a.Byt(NewEnemies);
+        return NewEnemies.Length;
     }
 
-    public void UpdateItemGetBits(ROM romData)
+    public void UpdateItemGetBits(Dictionary<PalaceGrouping, byte[]> palaceItemBits)
     {
-        if (PalaceGroup is <= 0 or > 3)
-        {
-            throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
-        }
-
-        var ptr = PalaceGroup switch
-        {
-            2 => Group2ItemGetStartAddress,
-            3 => Group3ItemGetStartAddress,
-            _ => Group1ItemGetStartAddress
-        };
+        var old = palaceItemBits[PalaceGroup][Map / 2];
         if(Map % 2 == 0)
         {
-            var old = romData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0x0F);
             old = (byte)((ItemGetBits[0] << 4) | old);
-            romData.Put(ptr + Map / 2, old);
         }
         else
         {
-            var old = romData.GetByte(ptr + Map / 2);
             old = (byte)(old & 0xF0);
             old = (byte)((ItemGetBits[0]) | old);
-            romData.Put(ptr + Map / 2, old);
         }
+        palaceItemBits[PalaceGroup][Map / 2] = old;
     }
 
     public void UpdateRomItem(Collectable item, ROM romData)
     {
-        if (PalaceGroup is <= 0 or > 3)
+        // Sideview data is moved to the expanded banks at $1c/$1d
+        var baseAddr = sideview1;
+        if (PalaceGroup == PalaceGrouping.Palace346)
         {
-            throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup);
-        }
-        int sideViewPtr = (romData.GetByte(sideview1 + Map * 2) + (romData.GetByte(sideview1 + 1 + Map * 2) << 8));
-        if (PalaceGroup == 2)
-        {
-            sideViewPtr = (romData.GetByte(sideview2 + Map * 2) + (romData.GetByte(sideview2 + 1 + Map * 2) << 8));
+            baseAddr = sideview2;
         }
 
+        int sideViewPtr = romData.GetByte(baseAddr + Map * 2) | (romData.GetByte(baseAddr + 1 + Map * 2) << 8);
+
+        // Start of the segment memory address is $8000, so offset for that
+        sideViewPtr -= 0x8000;
         // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
         // otherwise we want to use the bank offset for PRG4 (0x10000)
-        sideViewPtr -= 0x8000;
-        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
+        // sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
+        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x38000;
         sideViewPtr += 0x10; // Add the offset for the iNES header
         byte sideviewLength = romData.GetByte(sideViewPtr);
         int offset = 4;
 
-        int yPos, byte2, byte3;
         do
         {
-            byte3 = 0;
-            yPos = romData.GetByte(sideViewPtr + offset++);
+            int yPos = romData.GetByte(sideViewPtr + offset++);
             yPos = (byte)(yPos & 0xF0);
             yPos = (byte)(yPos >> 4);
-            byte2 = romData.GetByte(sideViewPtr + offset++);
+            int byte2 = romData.GetByte(sideViewPtr + offset++);
 
-            if (yPos < 13 && byte2 == 0x0F)
-            {
-                byte3 = romData.GetByte(sideViewPtr + offset++);
-                if (!((Collectable)byte3).IsMinorItem())
-                {
-                    romData.Put(sideViewPtr + offset - 1, (byte)item);
-                    return;
-                }
-            }
+            if (yPos >= 13 || byte2 != 0x0F) continue;
+            int byte3 = romData.GetByte(sideViewPtr + offset++);
+            
+            if (((Collectable)byte3).IsMinorItem()) continue;
+            romData.Put(sideViewPtr + offset - 1, (byte)item);
+            return;
         } while (offset < sideviewLength);
         logger.Warn("Could not write Collectable to Item room in palace " + PalaceNumber);
         //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
 
-
     public void UpdateConnectionStartAddress()
     {
         ConnectionStartAddress = PalaceGroup switch
         {
-            1 => connectors1 + Map * 4,
-            2 => connectors2 + Map * 4,
-            3 => connectors3 + Map * 4,
+            PalaceGrouping.Palace125 => connectors1 + Map * 4,
+            PalaceGrouping.Palace346 => connectors2 + Map * 4,
+            PalaceGrouping.PalaceGp => connectors3 + Map * 4,
             _ => throw new ImpossibleException("INVALID PALACE GROUP: " + PalaceGroup)
         };
     }
@@ -414,7 +384,7 @@ public class Room : IJsonOnDeserialized
         int[] shufflableGenerators;
         switch (PalaceGroup)
         {
-            case 1:
+            case PalaceGrouping.Palace125:
                 allEnemies = RandomizerCore.Enemies.Palace125Enemies;
                 smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
                 largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
@@ -426,7 +396,7 @@ public class Room : IJsonOnDeserialized
                 shufflableFlyingEnemies = RandomizerCore.Enemies.StandardPalaceFlyingEnemies;
                 shufflableGenerators = RandomizerCore.Enemies.StandardPalaceGenerators;
                 break;
-            case 2:
+            case PalaceGrouping.Palace346:
                 allEnemies = RandomizerCore.Enemies.Palace346Enemies;
                 smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
                 largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
@@ -438,7 +408,7 @@ public class Room : IJsonOnDeserialized
                 shufflableFlyingEnemies = RandomizerCore.Enemies.StandardPalaceFlyingEnemies;
                 shufflableGenerators = RandomizerCore.Enemies.StandardPalaceGenerators;
                 break;
-            case 3:
+            case PalaceGrouping.PalaceGp:
                 allEnemies = RandomizerCore.Enemies.GPEnemies;
                 smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
                 largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
@@ -473,14 +443,14 @@ public class Room : IJsonOnDeserialized
                     if (shufflableSmallEnemies.Contains(enemyNumber) && shufflableLargeEnemies.Contains(swapEnemy))
                     {
                         ypos -= 16;
-                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != 3)
+                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != PalaceGrouping.PalaceGp)
                         {
                             swapEnemy = largeEnemies[RNG.Next(0, largeEnemies.Length)];
                         }
                     }
                     else
                     {
-                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != 3)
+                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != PalaceGrouping.PalaceGp)
                         {
                             swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
                         }
@@ -498,7 +468,7 @@ public class Room : IJsonOnDeserialized
                     var swap = RNG.Next(0, largeEnemies.Length);
                     var ypos = Enemies[i] & 0xF0;
                     var xpos = Enemies[i] & 0x0F;
-                    while (largeEnemies[swap] == 0x1D && ypos != 0x70 && PalaceGroup != 3)
+                    while (largeEnemies[swap] == 0x1D && ypos != 0x70 && PalaceGroup != PalaceGrouping.PalaceGp)
                     {
                         swap = RNG.Next(0, largeEnemies.Length);
                     }
@@ -716,29 +686,29 @@ public class Room : IJsonOnDeserialized
         return right.HasLeftExit ? 1 : CONFLICT;
     }
 
-    public List<(int, int)> GetOpenExitCoords()
+    public HashSet<Coord> GetOpenExitCoords()
     {
-        List<(int, int)> exitCoords = [];
+        HashSet<Coord> exitCoords = [];
         var (x, y) = coords;
-        if (coords == (0, 0) && !IsRoot)
+        if (coords == Coord.Uninitialized && !IsRoot)
         {
             throw new Exception("Uninitialized coordinates referenced in coordinate palace generation");
         }
         if (HasLeftExit && Left == null)
         {
-            exitCoords.Add((x - 1, y));
+            exitCoords.Add(new Coord(x - 1, y));
         }
         if (HasRightExit && Right == null)
         {
-            exitCoords.Add((x + 1, y));
+            exitCoords.Add(new Coord(x + 1, y));
         }
         if (HasUpExit && Up == null)
         {
-            exitCoords.Add((x, y + 1));
+            exitCoords.Add(new Coord(x, y + 1));
         }
         if (HasDownExit && Down == null)
         {
-            exitCoords.Add((x, y - 1));
+            exitCoords.Add(new Coord(x, y - 1));
         }
 
         return exitCoords;

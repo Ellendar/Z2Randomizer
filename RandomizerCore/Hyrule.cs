@@ -250,10 +250,17 @@ public class Hyrule
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
+            bool f = await UpdateProgress(progress, ct, 1);
+            if (!f)
+            {
+                return null;
+            }
+            
             while (palaces.Count != 7 || passedValidation == false)
             {
                 freeBanks = new(ROM.FreeRomBanks);
-                palaces = Palaces.CreatePalaces(RNG, props, palaceRooms, raftIsRequired, ct);
+                var palaceGenerator = new Palaces();
+                palaces = await palaceGenerator.CreatePalaces(RNG, props, palaceRooms, raftIsRequired, ct);
                 if (palaces.Count == 0)
                 {
                     continue;
@@ -277,116 +284,9 @@ public class Hyrule
                 }
 
                 AsmModule sideviewModule = new();
-                AsmModule gpSideviewModule = new();
-                //AssemblerCommon.AssemblerCommon validation_sideview_module = new();
-                //AssemblerCommon.AssemblerCommon validation_gp_sideview_module = new();
+                passedValidation = await FillPalaceRooms(sideviewModule);
 
-                //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
-                //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
-                //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
-                //guaranteed to succeed iff running on the original engine would succeed.
-                //Jrowe feel free to engineer a less insane fix here. 
-                Assembler validationEngine = CreateAssemblyEngine();
-
-                int i = 0;
-                //If multiple palaces use the same item room, they'll get consolidated under a single sideview
-                //with multiple pointers, but then when the item update happens later, it will affect all the rooms,
-                //so do a first pass with distinct items so all item rooms are always separate sideviews
-                palaces.ForEach(i => i.UpdateSideviewItem((Collectable)i.Number));
-                //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
-                //so we just start at the 125 pointer address
-                int enemyAddr = Enemies.NormalPalaceEnemyAddr;
-                Dictionary<byte[], List<Room>> sideviews = new(new Util.StandardByteArrayEqualityComparer());
-                Dictionary<byte[], List<Room>> sideviewsgp = new(new Util.StandardByteArrayEqualityComparer());
-                foreach (Room room in palaces.Where(i => i.Number < 7).SelectMany(i => i.AllRooms))
-                {
-                    if (sideviews.ContainsKey(room.SideView))
-                    {
-                        sideviews[room.SideView].Add(room);
-                    }
-                    else
-                    {
-                        List<Room> l = [room];
-                        sideviews.Add(room.SideView, l);
-                    }
-                }
-                foreach (Room room in palaces.Where(i => i.Number == 7).SelectMany(i => i.AllRooms))
-                {
-                    if (sideviewsgp.ContainsKey(room.SideView))
-                    {
-                        sideviewsgp[room.SideView].Add(room);
-                    }
-                    else
-                    {
-                        List<Room> l = new List<Room> { room };
-                        sideviewsgp.Add(room.SideView, l);
-                    }
-                }
-
-                foreach (byte[] sv in sideviews.Keys)
-                {
-                    var name = "Sideview_" + i++;
-                    sideviewModule.Segment("PRG4", "PRG7");
-                    sideviewModule.Reloc();
-                    sideviewModule.Label(name);
-                    sideviewModule.Byt(sv);
-                    List<Room> rooms = sideviews[sv];
-                    foreach (Room room in rooms)
-                    {
-                        room.WriteSideViewPtr(sideviewModule, name);
-                        room.UpdateItemGetBits(ROMData);
-                        room.UpdateEnemies(enemyAddr, ROMData);
-                        enemyAddr += room.NewEnemies.Length;
-                        room.UpdateConnectionStartAddress();
-                    }
-                }
-
-                i = 0;
-                //GP Reconstructed
-                enemyAddr = Enemies.GPEnemyAddr;
-                foreach (byte[] sv in sideviewsgp.Keys)
-                {
-                    var name = "SideviewGP_" + i++;
-
-                    gpSideviewModule.Segment("PRG5", "PRG7");
-                    gpSideviewModule.Reloc();
-                    gpSideviewModule.Label(name);
-                    gpSideviewModule.Byt(sv);
-                    List<Room> rooms = sideviewsgp[sv];
-                    foreach (Room room in rooms)
-                    {
-                        room.WriteSideViewPtr(gpSideviewModule, name);
-                        room.UpdateItemGetBits(ROMData);
-                        room.UpdateEnemies(enemyAddr, ROMData);
-                        enemyAddr += room.NewEnemies.Length;
-                        room.UpdateConnectionStartAddress();
-                    }
-                }
-
-                try
-                {
-                    ROM testRom = new(ROMData);
-                    //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
-                    //be tested here, but we don't actually know what they will be until later, for now i'm just
-                    //testing with the vanilla text, but this could be an issue down the line.
-                    ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
-                    validationEngine.Add(sideviewModule);
-                    validationEngine.Add(gpSideviewModule);
-                    await testRom.ApplyAsm(validationEngine); //.Wait(ct);
-                }
-                catch (ScriptEngineException e)
-                {
-                    if (e.ErrorDetails.Contains("Could not find space for"))
-                    {
-                        logger.Warn(e, "Room packing failed. Retrying.");
-                        continue;
-                    }
-                    logger.Error(e, "Failed to build assembly patches");
-                    throw;
-                }
-                passedValidation = true;
                 assembler.Add(sideviewModule);
-                assembler.Add(gpSideviewModule);
             }
 
             //Allows casting magic without requeueing a spell
@@ -433,7 +333,7 @@ public class Hyrule
 
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
-            bool f = await UpdateProgress(progress, ct, 8);
+            f = await UpdateProgress(progress, ct, 8);
             if (!f)
             {
                 return null;
@@ -528,7 +428,9 @@ public class Hyrule
                 // Util.ReadAllTextFromFile(config.GetRoomsFile()) +
                 Util.ByteArrayToHexString(finalRNGState)
             ));
+
             UpdateRom();
+
             var z2Hash = ConvertHash(hash);
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash.Select(x => (char)x));
@@ -965,6 +867,127 @@ public class Hyrule
         {
             itemLocs[i].Collectable = shufflableItems[i];
         }
+    }
+
+    private async Task<bool> FillPalaceRooms(AsmModule sideviewModule)
+    {
+        //AssemblerCommon.AssemblerCommon validation_sideview_module = new();
+        //AssemblerCommon.AssemblerCommon validation_gp_sideview_module = new();
+
+        //This is an awful hack. We need to make a determination about whether the sideviews can fit in the available space,
+        //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
+        //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
+        //guaranteed to succeed iff running on the original engine would succeed.
+        //Jrowe feel free to engineer a less insane fix here. 
+        Assembler validationEngine = CreateAssemblyEngine();
+
+        int i = 0;
+        //If multiple palaces use the same item room, they'll get consolidated under a single sideview
+        //with multiple pointers, but then when the item update happens later, it will affect all the rooms,
+        //so do a first pass with distinct items so all item rooms are always separate sideviews
+        palaces.ForEach(palace => palace.UpdateSideviewItem((Collectable)palace.Number));
+        //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
+        //so we just start at the 125 pointer address
+        // int enemyAddr = Enemies.NormalPalaceEnemyAddr;
+        Dictionary<byte[], List<Room>> sideviews = new(new Util.StandardByteArrayEqualityComparer());
+        Dictionary<byte[], List<Room>> sideviewsgp = new(new Util.StandardByteArrayEqualityComparer());
+        foreach (Room room in palaces.Where(palace => palace.Number < 7).SelectMany(palace => palace.AllRooms))
+        {
+            if (sideviews.TryGetValue(room.SideView, out var value))
+            {
+                value.Add(room);
+            }
+            else
+            {
+                sideviews.Add(room.SideView, [room]);
+            }
+        }
+        foreach (Room room in palaces.Where(palace => palace.Number == 7).SelectMany(palace => palace.AllRooms))
+        {
+            if (sideviewsgp.TryGetValue(room.SideView, out var value))
+            {
+                value.Add(room);
+            }
+            else
+            {
+                sideviewsgp.Add(room.SideView, [room]);
+            }
+        }
+
+        var palaceItemBits = new Dictionary<PalaceGrouping, byte[]>
+        {
+            [PalaceGrouping.Palace125] = new byte[0x20],
+            [PalaceGrouping.Palace346] = new byte[0x20],
+            [PalaceGrouping.PalaceGp] = new byte[0x20],
+        };
+
+        int enemyAddr = Enemies.NormalPalaceEnemyAddr;
+        foreach (var sv in sideviews.Keys)
+        {
+            var name = "Sideview_" + i++;
+            sideviewModule.Segment("PRG1C", "PRG1D");
+            sideviewModule.Reloc();
+            sideviewModule.Label(name);
+            sideviewModule.Byt(sv);
+            var j = 0;
+            foreach (var room in sideviews[sv])
+            {
+                room.WriteSideViewPtr(sideviewModule, name);
+                room.UpdateItemGetBits(palaceItemBits);
+                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
+                room.UpdateConnectionStartAddress();
+            }
+        }
+
+        i = 0;
+        enemyAddr = Enemies.GPEnemyAddr;
+        //GP Reconstructed
+        foreach (var sv in sideviewsgp.Keys)
+        {
+            var name = "SideviewGP_" + i++;
+            sideviewModule.Segment("PRG1C", "PRG1D");
+            sideviewModule.Reloc();
+            sideviewModule.Label(name);
+            sideviewModule.Byt(sv);
+            var j = 0;
+            foreach (var room in sideviewsgp[sv])
+            {
+                room.WriteSideViewPtr(sideviewModule, name);
+                room.UpdateItemGetBits(palaceItemBits);
+                enemyAddr += room.UpdateEnemies(sideviewModule, enemyAddr);
+                room.UpdateConnectionStartAddress();
+            }
+        }
+        
+        // Add the palace item bits to the assembler
+        sideviewModule.Segment("PRG4");
+        foreach (var (palaceGroup, itemBits) in palaceItemBits)
+        {
+            sideviewModule.Org((ushort)(0xBB95 + ((byte)palaceGroup) * 0x20));
+            sideviewModule.Byt(itemBits);
+        }
+
+        try
+        {
+            ROM testRom = new(ROMData);
+            //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
+            //be tested here, but we don't actually know what they will be until later, for now i'm just
+            //testing with the vanilla text, but this could be an issue down the line.
+            ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
+            validationEngine.Add(sideviewModule);
+            await testRom.ApplyAsm(validationEngine); //.Wait(ct);
+        }
+        catch (ScriptEngineException e)
+        {
+            if (e.ErrorDetails.Contains("Could not find space for"))
+            {
+                logger.Debug(e, "Room packing failed. Retrying.");
+                return false;
+            }
+            logger.Error(e, "Failed to build assembly patches");
+            throw;
+        }
+        return true;
     }
 
     private bool IsEverythingReachable(Dictionary<Collectable, bool> itemGet)
@@ -1863,6 +1886,9 @@ public class Hyrule
         }
         switch (v)
         {
+            case 1:
+                await progress.Invoke("Generating Palaces");
+                break;
             case 2:
                 await progress.Invoke("Generating Western Hyrule");
                 break;
@@ -2921,53 +2947,28 @@ public class Hyrule
         ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Collectable);
 
         ROMData.ElevatorBossFix(props.BossItem);
-        if (westHyrule.locationAtPalace1.PalaceNumber != 7)
+        
+        // Update item rooms and entrances for all palaces
+        Location[] locations = [
+            westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3,
+            eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6, eastHyrule.locationAtGP,
+            mazeIsland.locationAtPalace4,
+        ];
+        foreach (var loc in locations)
         {
-            palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace1.Collectable, ROMData);
-        }
-        if (westHyrule.locationAtPalace2.PalaceNumber != 7)
-        {
-            palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace2.Collectable, ROMData);
-        }
-        if (westHyrule.locationAtPalace3.PalaceNumber != 7)
-        {
-            palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].UpdateRomItem(westHyrule.locationAtPalace3.Collectable, ROMData);
-        }
-        if (eastHyrule.locationAtPalace5.PalaceNumber != 7)
-        {
-            palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace5.Collectable, ROMData);
-        }
-        if (eastHyrule.locationAtPalace6.PalaceNumber != 7)
-        {
-            palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtPalace6.Collectable, ROMData);
-        }
-        if (eastHyrule.locationAtGP.PalaceNumber != 7)
-        {
-            palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].UpdateRomItem(eastHyrule.locationAtGP.Collectable, ROMData);
-        }
-        if (mazeIsland.locationAtPalace4.PalaceNumber != 7)
-        {
-            palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].UpdateRomItem(mazeIsland.locationAtPalace4.Collectable, ROMData);
-        }
-        if (palaces.Any(i => i.Entrance == null))
-        {
-            throw new Exception("Invalid palace without a palace number");
-        }
+            var idx = (int)loc.PalaceNumber! - 1;
+            if (loc.PalaceNumber != 7)
+            {
+                palaces[idx].UpdateRomItem(loc.Collectable, ROMData);
+            }
 
-        Room root = palaces[(int)westHyrule.locationAtPalace1.PalaceNumber - 1].Entrance!;
-        ROMData.Put(westHyrule.locationAtPalace1.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)westHyrule.locationAtPalace2.PalaceNumber - 1].Entrance!;
-        ROMData.Put(westHyrule.locationAtPalace2.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)westHyrule.locationAtPalace3.PalaceNumber - 1].Entrance!;
-        ROMData.Put(westHyrule.locationAtPalace3.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)eastHyrule.locationAtPalace5.PalaceNumber - 1].Entrance!;
-        ROMData.Put(eastHyrule.locationAtPalace5.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)eastHyrule.locationAtPalace6.PalaceNumber - 1].Entrance!;
-        ROMData.Put(eastHyrule.locationAtPalace6.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)eastHyrule.locationAtGP.PalaceNumber - 1].Entrance!;
-        ROMData.Put(eastHyrule.locationAtGP.MemAddress + 0x7e, root.Map);
-        root = palaces[(int)mazeIsland.locationAtPalace4.PalaceNumber - 1].Entrance!;
-        ROMData.Put(mazeIsland.locationAtPalace4.MemAddress + 0x7e, root.Map);
+            if (palaces[idx].Entrance == null)
+            {
+                throw new Exception("Invalid palace without a palace number");
+            }
+            var root = palaces[idx].Entrance!;
+            ROMData.Put(loc.MemAddress + 0x7e, root.Map);
+        }
 
         ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
         ROMData.Put(0xDB8C, (byte)eastHyrule.newKasutoBasement.Collectable); //map 46
@@ -3879,6 +3880,7 @@ FREE_UNTIL $c2ca
         FixSoftLock(engine);
         
         RandomizeStartingValues(engine, rom);
+        rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
         FixContinentTransitions(engine);

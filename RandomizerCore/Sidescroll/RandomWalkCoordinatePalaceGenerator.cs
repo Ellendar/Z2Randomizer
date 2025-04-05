@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RandomizerCore.Sidescroll;
 
@@ -10,55 +11,46 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
     public static int debug = 0;
     private const float DROP_CHANCE = .10f;
-    internal override Palace GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         debug++;
         Palace palace = new(palaceNumber);
-        List<(int, int)> openCoords = new();
+        List<Coord> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
         RoomPool roomPool = new(rooms);
-        int palaceGroup = palaceNumber switch
-        {
-            1 => 1,
-            2 => 1,
-            3 => 2,
-            4 => 2,
-            5 => 1,
-            6 => 2,
-            7 => 3,
-            _ => throw new ImpossibleException("Invalid palace number: " + palaceNumber)
-        };
+        // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
         Room entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
         {
             IsRoot = true,
-            PalaceGroup = palaceGroup
+            // PalaceGroup = palaceGroup
         };
         openCoords.AddRange(entrance.GetOpenExitCoords());
         palace.AllRooms.Add(entrance);
         palace.Entrance = entrance;
 
-        Dictionary<(int, int), RoomExitType> walkGraph = [];
-        walkGraph[(0, 0)] = entrance.CategorizeExits();
+        Dictionary<Coord, RoomExitType> walkGraph = [];
+        walkGraph[Coord.Uninitialized] = entrance.CategorizeExits();
 
-        (int, int) currentCoord = (0, 0);
+        var currentCoord = Coord.Uninitialized;
 
         //Create graph
         while (walkGraph.Count < roomCount)
         {
+            await Task.Yield();
             int direction = r.Next(4);
-            (int, int) nextCoord = direction switch
+            Coord nextCoord = direction switch
             {
-                0 => (currentCoord.Item1 - 1, currentCoord.Item2), //left
-                1 => (currentCoord.Item1, currentCoord.Item2 - 1), //down
-                2 => (currentCoord.Item1, currentCoord.Item2 + 1), //up
-                3 => (currentCoord.Item1 + 1, currentCoord.Item2), //right
+                0 => currentCoord with { X = currentCoord.X - 1 }, //left
+                1 => currentCoord with { Y = currentCoord.Y - 1 }, //down
+                2 => currentCoord with { Y = currentCoord.Y + 1 }, //up
+                3 => currentCoord with { X = currentCoord.X + 1 }, //right
                 _ => throw new ImpossibleException()
             };
-            if (nextCoord == (0, 0)
-                || (currentCoord == (0, 0) && nextCoord == (-1, 0)) //can't ever go left from an entrance.
-                || (currentCoord == (0, 0) && nextCoord == (1, 0) && !entrance.HasRightExit)
-                || (currentCoord == (0, 0) && nextCoord == (0, 1) && !entrance.HasUpExit)
-                || (currentCoord == (0, 0) && nextCoord == (0, -1) && !entrance.HasDownExit)
+            if (nextCoord == Coord.Uninitialized
+                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(-1, 0)) //can't ever go left from an entrance.
+                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(1, 0) && !entrance.HasRightExit)
+                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, 1) && !entrance.HasUpExit)
+                || (currentCoord == Coord.Uninitialized && nextCoord == new Coord(0, -1) && !entrance.HasDownExit)
             )
             {
                 continue;
@@ -90,27 +82,27 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 
         //Dropify graph
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
-        foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.Item2).ThenBy(i => i.Key.Item1))
+        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.X).ThenBy(i => i.Key.Y))
         {
-            int x = item.Key.Item1;
-            int y = item.Key.Item2;
+            await Task.Yield();
+            var (x, y) = item.Key;
             RoomExitType exitType = item.Value;
-            if (item.Key == (0, 0))
+            if (item.Key == Coord.Uninitialized)
             {
                 continue;
             }
 
             RoomExitType? downExitType = null;
-            if (walkGraph.ContainsKey((x, y - 1)))
+            if (walkGraph.ContainsKey(new Coord(x, y - 1)))
             {
-                downExitType = walkGraph[(x, y - 1)];
+                downExitType = walkGraph[new Coord(x, y - 1)];
             }
             else
             {
                 continue;
             }
             double dropChance = DROP_CHANCE;
-            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
+            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
             //if we dropped into this room
             if (upRoom != null && upRoom.HasDrop)
             {
@@ -129,33 +121,32 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             if (r.NextDouble() < dropChance)
             {
                 walkGraph[item.Key] = item.Value.ConvertToDrop();
-                walkGraph[(x, y - 1)] = walkGraph[(x, y - 1)].RemoveUp();
+                walkGraph[new Coord(x, y - 1)] = walkGraph[new Coord(x, y - 1)].RemoveUp();
             }
         }
 
         //drop stubs can't / shouldn't exist, so convert them to regular down stubs
-        foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.Where(i => i.Value == RoomExitType.DROP_STUB))
+        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.Where(i => i.Value == RoomExitType.DROP_STUB))
         {
             walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_UP;
-            walkGraph[(item.Key.Item1, item.Key.Item2 - 1)] = item.Value.ConvertFromDropToDown();
+            walkGraph[item.Key with { Y = item.Key.Y - 1 }] = item.Value.ConvertFromDropToDown();
         }
 
         //Add rooms
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
-        foreach (KeyValuePair<(int, int), RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.Item2).ThenBy(i => i.Key.Item1))
+        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.X).ThenBy(i => i.Key.Y))
         {
-            if (item.Key == (0, 0))
+            if (item.Key == Coord.Uninitialized)
             {
                 continue;
             }
-            int x = item.Key.Item1;
-            int y = item.Key.Item2;
+            var (x, y) = item.Key;
             RoomExitType roomExitType = item.Value;
             roomsByExitType.TryGetValue(roomExitType, out var roomCandidates);
             roomCandidates ??= [];
             roomCandidates.FisherYatesShuffle(r);
             Room? newRoom = null;
-            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == (x, y + 1));
+            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
             foreach (Room roomCandidate in roomCandidates)
             {
                 if((upRoom == null || (upRoom.HasDrop == roomCandidate.IsDropZone))
@@ -195,10 +186,11 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         //Connect adjacent rooms if they exist
         foreach (Room room in palace.AllRooms)
         {
-            Room[] leftRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1 - 1, room.coords.Item2)).ToArray();
-            Room[] downRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1, room.coords.Item2 - 1)).ToArray();
-            Room[] upRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1, room.coords.Item2 + 1)).ToArray();
-            Room[] rightRooms = palace.AllRooms.Where(i => i.coords == (room.coords.Item1 + 1, room.coords.Item2)).ToArray();
+            await Task.Yield();
+            Room[] leftRooms = palace.AllRooms.Where(i => i.coords == room.coords with { X = room.coords.X - 1 }).ToArray();
+            Room[] downRooms = palace.AllRooms.Where(i => i.coords == room.coords with { Y = room.coords.Y - 1 }).ToArray();
+            Room[] upRooms = palace.AllRooms.Where(i => i.coords == room.coords with { Y = room.coords.Y + 1 }).ToArray();
+            Room[] rightRooms = palace.AllRooms.Where(i => i.coords == room.coords with { X = room.coords.X + 1 }).ToArray();
 
             foreach(Room left in leftRooms)
             {

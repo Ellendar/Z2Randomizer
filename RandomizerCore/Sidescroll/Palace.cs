@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Text.Json.Serialization;
 using NLog;
 
 namespace RandomizerCore.Sidescroll;
@@ -38,6 +38,9 @@ public class Palace
 
     //DEBUG
     public int Generations { get; set; }
+    
+    [JsonIgnore]
+    public PalaceGrouping PalaceGroup => Util.AsPalaceGrouping(Number);
 
     public Palace(int number)
     {
@@ -1048,7 +1051,7 @@ public class Palace
                 }
             }
             //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
-            if (!found)
+            if (Hyrule.UNSAFE_DEBUG && !found)
             {
                 //Debug.WriteLine(GetLayoutDebug());
                 return true;
@@ -1095,21 +1098,6 @@ public class Palace
         }
 
         return false;
-    }
-
-    public int GetPalaceGroup()
-    {
-        return Number switch
-        {
-            1 => 1,
-            2 => 1,
-            3 => 2,
-            4 => 2,
-            5 => 1,
-            6 => 2,
-            7 => 3,
-            _ => throw new ImpossibleException("Invalid palace number: " + Number)
-        };
     }
 
     public void ValidateRoomConnections()
@@ -1218,7 +1206,7 @@ public class Palace
     public void ReplaceRoom(Room roomToReplace, Room newRoom)
     {
         newRoom.coords = roomToReplace.coords;
-        newRoom.PalaceGroup = roomToReplace.PalaceGroup;
+        // newRoom.PalaceGroup = roomToReplace.PalaceGroup;
 
         foreach(Room room in AllRooms.Where(i => i.Left == roomToReplace))
         {
@@ -1260,7 +1248,7 @@ public class Palace
             sb.Append("   ");
             for (int x = -20; x <= 20; x++)
             {
-                Room? room = AllRooms.FirstOrDefault(i => i.coords == (x, y));
+                Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
                 if (room == null)
                 {
                     sb.Append("   ");
@@ -1274,7 +1262,7 @@ public class Palace
             sb.Append(y.ToString().PadLeft(3, ' '));
             for (int x = -20; x <= 20; x++)
             {
-                Room? room = AllRooms.FirstOrDefault(i => i.coords == (x, y));
+                Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
                 if(room == null)
                 {
                     sb.Append("   ");
@@ -1309,7 +1297,7 @@ public class Palace
             sb.Append("   ");
             for (int x = -20; x <= 20; x++)
             {
-                Room? room = AllRooms.FirstOrDefault(i => i.coords == (x, y));
+                Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
                 if (room == null)
                 {
                     sb.Append("   ");

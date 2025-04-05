@@ -83,7 +83,7 @@ for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
             HasItem = hasItem,
             IsThunderBirdRoom = false,
             PalaceNumber = null,
-            PalaceGroup = palaceGroup,
+            // PalaceGroup = (PalaceGrouping)palaceGroup,
             LinkedRoomName = null,
             IsDropZone = false,
             IsEntrance = false,
@@ -94,7 +94,7 @@ for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
             Requirements = new Requirements(),
             SideView = sideView,
         };
-        r.PalaceGroup = (palaceGroup + 1);
+        // r.PalaceGroup = (PalaceGrouping)palaceGroup;
         sb.Append(r.Serialize() + ",");
     }
 }

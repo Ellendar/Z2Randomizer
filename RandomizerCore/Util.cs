@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using RandomizerCore.Overworld;
+using RandomizerCore.Sidescroll;
 
 namespace RandomizerCore;
 
@@ -141,38 +142,23 @@ public class Util
         {
             if(x == null)
             {
-                if(y == null)
-                {
-                    return true;
-                }
-                return false;
+                return y == null;
             }
             if(y == null)
             {
                 return false;
             }
-            if (x.Length != y.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < x.Length; i++)
-            {
-                if (x[i] != y[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return x.Length == y.Length && x.SequenceEqual(y);
         }
 
         public int GetHashCode(byte[] obj)
         {
             int result = 17;
-            for (int i = 0; i < obj.Length; i++)
+            foreach (var t in obj)
             {
                 unchecked
                 {
-                    result = result * 23 + obj[i];
+                    result = result * 23 + t;
                 }
             }
             return result;
@@ -191,6 +177,20 @@ public class Util
         return Assembly.GetExecutingAssembly().ReadBinaryResource(path);
     }
 
+    public static PalaceGrouping AsPalaceGrouping(int? palaceNumber)
+    {
+        return palaceNumber switch
+        {
+            1 => PalaceGrouping.Palace125,
+            2 => PalaceGrouping.Palace125,
+            3 => PalaceGrouping.Palace346,
+            4 => PalaceGrouping.Palace346,
+            5 => PalaceGrouping.Palace125,
+            6 => PalaceGrouping.Palace346,
+            7 => PalaceGrouping.PalaceGp,
+            _ => PalaceGrouping.Unintialized,
+        };
+    }
 }
 
 public static class AssemblyExtensions
