@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -147,6 +148,16 @@ public class ROM
         {Town.NABOORU_FOUNTAIN, textPointerTableStart + 63 * 2 },
     };*/
 
+    // Basic look up table to convert from the original NES palette value to RGB
+    public static readonly Color[] BaseColors = new Color[]
+    {
+Color.FromArgb( 84,  84,  84), Color.FromArgb(  0,  30, 116), Color.FromArgb(  8,  16, 144), Color.FromArgb( 48,   0, 136), Color.FromArgb( 68,   0, 100), Color.FromArgb( 92,   0,  48), Color.FromArgb( 84,   4,   0), Color.FromArgb( 60,  24,   0), Color.FromArgb( 32,  42,   0), Color.FromArgb(  8,  58,   0), Color.FromArgb(  0,  64,   0), Color.FromArgb(  0,  60,   0), Color.FromArgb(  0,  50,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+Color.FromArgb(152, 150, 152), Color.FromArgb(  8,  76, 196), Color.FromArgb( 48,  50, 236), Color.FromArgb( 92,  30, 228), Color.FromArgb(136,  20, 176), Color.FromArgb(160,  20, 100), Color.FromArgb(152,  34,  32), Color.FromArgb(120,  60,   0), Color.FromArgb( 84,  90,   0), Color.FromArgb( 40, 114,   0), Color.FromArgb(  8, 124,   0), Color.FromArgb(  0, 118,  40), Color.FromArgb(  0, 102, 120), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+Color.FromArgb(236, 238, 236), Color.FromArgb( 76, 154, 236), Color.FromArgb(120, 124, 236), Color.FromArgb(176,  98, 236), Color.FromArgb(228,  84, 236), Color.FromArgb(236,  88, 180), Color.FromArgb(236, 106, 100), Color.FromArgb(212, 136,  32), Color.FromArgb(160, 170,   0), Color.FromArgb(116, 196,   0), Color.FromArgb( 76, 208,  32), Color.FromArgb( 56, 204, 108), Color.FromArgb( 56, 180, 204), Color.FromArgb( 60,  60,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188, 188, 236), Color.FromArgb(212, 178, 236), Color.FromArgb(236, 174, 236), Color.FromArgb(236, 174, 212), Color.FromArgb(236, 180, 176), Color.FromArgb(228, 196, 144), Color.FromArgb(204, 210, 120), Color.FromArgb(180, 222, 120), Color.FromArgb(168, 226, 144), Color.FromArgb(152, 226, 180), Color.FromArgb(160, 214, 228), Color.FromArgb(160, 162, 160), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+    };
+
+
     public byte[] rawdata { get; }
 
     public ROM(string filename, bool expandRom = false)
@@ -232,6 +243,64 @@ public class ROM
     public void Dump(string filename)
     {
         File.WriteAllBytes(filename, rawdata);
+    }
+
+    public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)
+    {
+        // Each byte specifies 1 color bit for an 8 pixel column
+        const int pixelsPerByte = 8;
+        // These bytes are arranged in groups of 8
+        const int bytesPerTile = 8;
+
+        // We only have one palette to read from, but should there be multipalette sprites someday
+        // this could come in handy
+        const int paletteIdx = 0;
+        int width = tilesWide * 8;
+        int height = tilesHigh * 8;
+        const int colorDepth = 4;
+        int tileCount = tilesWide * tilesHigh;
+
+        var buffer = new byte[colorDepth * width * height];
+        for (var tile = 0; tile < tileCount; ++tile)
+        {
+            var offset = tile * 16;
+            int tilex, tiley;
+            if (tilesHigh % 2 == 1)
+            {
+                // If a sprite is only 1 tile (8 pixels) high, it is read horizontally
+                tilex = (tile % tilesWide) * 8;
+                tiley = (tile / tilesWide) * 8;
+            }
+            else
+            {
+                // In all other cases, 2 tiles (16 pixels) is read vertically at a time
+                int halfTile = tile >> 1;
+                tilex = (halfTile % tilesWide) * 8;
+                tiley = (2 * (halfTile / tilesWide) + (tile & 1)) * 8;
+            }
+            for (var j = 0; j < bytesPerTile; ++j)
+            {
+                // The color bits for a single pixel is defined 8 bytes apart
+                var colorByte0 = GetByte(spriteAddr + offset + j);
+                var colorByte1 = GetByte(spriteAddr + offset + j + 8);
+                for (var i = 0; i < pixelsPerByte; ++i)
+                {
+                    var pixelShift = 7 - i;
+                    var bit0 = (colorByte0 >> pixelShift) & 1;
+                    var bit1 = ((colorByte1 >> pixelShift) & 1) << 1;
+                    var color = (bit0 | bit1) + (paletteIdx * 4);
+                    var appliedColor = BaseColors[palette[color]];
+
+                    var x = tilex + i;
+                    var y = tiley + j;
+                    buffer[0 + 4 * (x + width * y)] = appliedColor.R;
+                    buffer[1 + 4 * (x + width * y)] = appliedColor.G;
+                    buffer[2 + 4 * (x + width * y)] = appliedColor.B;
+                    buffer[3 + 4 * (x + width * y)] = (byte)((color == 0) ? 0 : 255);
+                }
+            }
+        }
+        return buffer;
     }
 
     public List<Text> GetGameText()
