@@ -1070,6 +1070,58 @@ LoadDoorYPosition:
 """, "change_door_position.s");
     }
 
+    public void AllowForChangingElevatorYPosition(Assembler a)
+    {
+        a.Module().Code("""
+.include "z2r.inc"
+
+.segment "PRG4"
+.org $823E ; palace 1-6
+    jsr StoreElevatorParam
+
+.segment "PRG4", "PRG7"
+.reloc
+StoreElevatorParam:
+    lda $0731 ; load the current elevator command
+    and #$0f ; the last 4 bits are the param
+    sta ElevatorYStart
+    lda $010A ; re-do the command JSR overwrote
+    rts
+
+.segment "PRG5"
+.org $824F ; palace 7
+    jsr StoreElevatorParamGP
+
+.segment "PRG5", "PRG7"
+.reloc
+StoreElevatorParamGP:
+    lda $0731 ; load the current elevator command
+    and #$0f ; the last 4 bits are the param
+    sta ElevatorYStart
+    lda $010A ; re-do the command JSR overwrote
+    rts
+
+.segment "PRG0", "PRG7"
+.org $9169 ; palace 1-7
+    lda ElevatorYStart ; load param here to utilize the bytes
+    jsr SetElevatorYPosition
+
+.reloc
+SetElevatorYPosition:
+    ; we will do: A = 0x98 - (ElevatorParam * 8)
+    asl
+    asl
+    asl
+    ; optimized way to do A = 0x98 - A
+    ; carry is 0 from asl, which makes sbc subtract 1 more
+    sbc #$98 ; A = A - (0x98 + 1)
+    eor #$FF ; invert bits (two's complement negation)
+    sta $2A ; was originally set to #$98
+    sta $BC ; was originally set to #$98
+    rts
+""", "change_elevator_y_position.s");
+    }
+
     public void FixElevatorPositionInFallRooms(Assembler a)
     {
         // When falling into a fallroom, it will also run the elevator enemy setup code
