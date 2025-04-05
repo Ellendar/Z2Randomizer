@@ -1050,7 +1050,7 @@ public class Palace
             //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
             if (!found)
             {
-                Debug.WriteLine(GetLayoutDebug());
+                //Debug.WriteLine(GetLayoutDebug());
                 return true;
             }
         }

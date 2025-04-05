@@ -48,7 +48,7 @@ public class Palaces
         //1-4/7 first, then 5-6 because they're dependant
         for(int i = 0; i < 7; i++)
         {
-            if (props.PalaceStyles[i] == PalaceStyle.VANILLA)
+            if (props.PalaceStyles[i].UsesVanillaRoomPool())
             {
                 sizes[i] = (i + 1) switch
                 {
@@ -76,7 +76,7 @@ public class Palaces
         }
         for (int i = 4; i < 6; i++)
         {
-            if (props.PalaceStyles[i] == PalaceStyle.VANILLA)
+            if (props.PalaceStyles[i].UsesVanillaRoomPool())
             {
                 sizes[i] = (i + 1) switch
                 {
@@ -93,6 +93,66 @@ public class Palaces
                     6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : r.Next(22, 63 - sizes[2] - sizes[3]), //22 to 21-37
                     _ => sizes[i]
                 };
+            }
+        }
+
+        //If P5/6 is vanilla, it's possible the previous palace(s) rolled up and the vanilla palace took us beyond the limit
+        //if so, subtract the difference in rooms between the number and max proportionally between the non-vanilla palaces
+        //There is almost certainly a more elegant solution for this but I don't care.
+        int groupPalaceRoomCount = sizes[0] + sizes[1] + sizes[4];
+        if(groupPalaceRoomCount > 63)
+        {
+            if (props.PalaceStyles[0].UsesVanillaRoomPool())
+            {
+                if (props.PalaceStyles[1].UsesVanillaRoomPool())
+                {
+                    throw new ImpossibleException("Palace room pool count was impossibly high");
+                }
+                else
+                {
+                    sizes[1] -= groupPalaceRoomCount - 63;
+                }
+            }
+            else
+            {
+                if (props.PalaceStyles[1].UsesVanillaRoomPool())
+                {
+                    sizes[0] -= groupPalaceRoomCount - 63;
+                }
+                else
+                {
+                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
+                    sizes[0] -= (groupPalaceRoomCount - 63) / 2;
+                    sizes[1] -= 63 - sizes[0] - sizes[4];
+                }
+            }
+        }
+        groupPalaceRoomCount = sizes[2] + sizes[3] + sizes[5];
+        if (groupPalaceRoomCount > 63)
+        {
+            if (props.PalaceStyles[2].UsesVanillaRoomPool())
+            {
+                if (props.PalaceStyles[3].UsesVanillaRoomPool())
+                {
+                    throw new ImpossibleException("Palace room pool count was impossibly high");
+                }
+                else
+                {
+                    sizes[3] -= groupPalaceRoomCount - 63;
+                }
+            }
+            else
+            {
+                if (props.PalaceStyles[3].UsesVanillaRoomPool())
+                {
+                    sizes[2] -= groupPalaceRoomCount - 63;
+                }
+                else
+                {
+                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
+                    sizes[2] -= (groupPalaceRoomCount - 63) / 2;
+                    sizes[3] -= 63 - sizes[2] - sizes[5];
+                }
             }
         }
 
@@ -128,19 +188,22 @@ public class Palaces
 
             if(palace.GetPalaceGroup() == 1)
             {
-                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
+                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, 
+                    props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
                 palace.AllRooms.ForEach(i => i.PalaceGroup = 1);
             }
 
             if (palace.GetPalaceGroup() == 2)
             {
-                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
+                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, 
+                    props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
                 palace.AllRooms.ForEach(i => i.PalaceGroup = 2);
             }
 
             if (palace.GetPalaceGroup() == 3)
             {
-                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
+                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, 
+                    props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
                 palace.AllRooms.ForEach(i => i.PalaceGroup = 3);
             }
             palace.AllRooms.ForEach(i => i.PalaceNumber = currentPalace);

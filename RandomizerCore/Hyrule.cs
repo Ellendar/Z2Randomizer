@@ -378,7 +378,7 @@ public class Hyrule
                 {
                     if (e.ErrorDetails.Contains("Could not find space for"))
                     {
-                        logger.Debug(e, "Room packing failed. Retrying.");
+                        logger.Warn(e, "Room packing failed. Retrying.");
                         continue;
                     }
                     logger.Error(e, "Failed to build assembly patches");
