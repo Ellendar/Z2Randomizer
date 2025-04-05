@@ -305,6 +305,7 @@ IncStatTimer:
 ; then we increment the correct timer for Palace 5
 .reloc
 Palace1Offset = StatTimeInPalace1 - StatTimeAtLocation
+.export PalaceMappingTable
 PalaceMappingTable:
     ; region 0 - east hyrule
     .byte RealPalaceAtLocation1 * 3 + Palace1Offset
@@ -323,7 +324,7 @@ PalaceMappingTable:
     .byte $ff ; unused 4th palace in region 2
     ; region 3 - maze island
     .byte RealPalaceAtLocation4 * 3 + Palace1Offset
-    ; 3 unused location bytes could follow if needed
+    .byte $ff, $ff, $ff ; 3 unused palace locatios
 
 ; Screen split IRQ implementation. This is not technically a part of z2ft, but due to the policy of not making the game faster than vanilla, this optimization is only enabled when z2ft is enabled to partially offset the cost of FT playback.
 

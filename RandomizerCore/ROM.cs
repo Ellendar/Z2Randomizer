@@ -845,7 +845,7 @@ TitleEnd:
         a.Module().Code("""
 .include "z2r.inc"
 
-.import SwapPRG, SwapToSavedPRG
+.import SwapPRG, SwapToSavedPRG, PalaceMappingTable
 
 ; move the pointers for the data for the sideviews to load from RAM instead.
 .segment "PRG7"
@@ -897,18 +897,17 @@ CopySideviewIntoRAMAndLoadPointer:
     sta $d7
 
     ; if its not a palace area, skip switching banks
-    cpx #3
+    lda WorldNumber
+    cmp #3
     bcc @skipswap
-        ; maze island palace is X=3 A=1
-        beq @palace
-        ; if its MAZE ISLAND or DEATH MOUNTAIN encounters
-        ; x=4 a=3 death mountain encounter
-        ; x=4 a=1 maze island encounter
-        ; so just check if its odd
         lda RegionNumber
-        lsr
-        bcs @skipswap
-        @palace:
+        asl
+        asl
+        adc PalaceNumber
+        tay
+        lda PalaceMappingTable,y
+        cmp #$ff
+        beq @skipswap
             ; Loading a palace sideview so use the data from extended banks instead
             lda #$0e
             jsr SwapPRG

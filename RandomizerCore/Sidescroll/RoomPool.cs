@@ -166,7 +166,7 @@ public class RoomPool
 
     public Dictionary<RoomExitType, List<Room>> CategorizeNormalRoomExits(bool linkRooms = false)
     {
-        Dictionary<RoomExitType, List<Room>> categorizedRooms = [];
+        Dictionary<RoomExitType, List<Room>> categorizedRooms = new Dictionary<RoomExitType, List<Room>>(NormalRooms.Count);
         foreach(Room room in NormalRooms)
         {
             RoomExitType type = room.CategorizeExits();
@@ -176,7 +176,7 @@ public class RoomPool
             }
             if(!categorizedRooms.TryGetValue(type, out List<Room>? value))
             {
-                value = ([]);
+                value = new List<Room>(NormalRooms.Count);
                 categorizedRooms[type] = value;
             }
 
