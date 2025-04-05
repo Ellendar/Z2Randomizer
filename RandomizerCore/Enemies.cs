@@ -139,10 +139,10 @@ Towns
 /// </summary>
 public static class EnemiesShared
 {
-    public const int Fairy = 0x00;
-    public const int LockedDoor = 0x02;
-    public const int Myu = 0x03;
-    public const int Bot = 0x04;
+    public const int FAIRT = 0x00;
+    public const int LOCKED_DOOR = 0x02;
+    public const int MYU = 0x03;
+    public const int BOT = 0x04;
 }
 
 /// <summary>
@@ -153,34 +153,34 @@ public static class EnemiesShared
 /// </summary>
 public static class EnemiesRegularPalaceShared
 {
-    public const int Fairy = 0x00;
-    public const int ItemInPalaceSprite = 0x01;
-    public const int LockedDoor = 0x02;
-    public const int Myu = 0x03;
-    public const int Bot = 0x04;
-    public const int StrikeForRedJar = 0x05; // close enough
-    public const int SlowBubble = 0x06;
-    public const int OrangeMoa = 0x07;
-    public const int FallingBlockGenerator = 0x08;
-    public const int SingleFallingBlock = 0x09;
+    public const int FAIRY = 0x00;
+    public const int ITEM_IN_PALACE_SPRITE = 0x01;
+    public const int LOCKED_DOOR = 0x02;
+    public const int MYU = 0x03;
+    public const int BOT = 0x04;
+    public const int STRIKE_FOR_RED_JAR = 0x05; // close enough
+    public const int SLOW_BUBBLE = 0x06;
+    public const int ORANGE_MOA = 0x07;
+    public const int FALLING_BLOCK_GENERATOR = 0x08;
+    public const int SINGLE_FALLING_BLOCK = 0x09;
 
-    public const int TinsuitGenerator = 0x0B;
-    public const int Tinsuit = 0x0C;
-    public const int Dripper = 0x0D;
-    public const int FastBubble = 0x0E;
+    public const int TINSUIT_GENERATOR = 0x0B;
+    public const int TINSUIT = 0x0C;
+    public const int DRIPPER = 0x0D;
+    public const int FAST_BUBBLE = 0x0E;
 
-    public const int Elevator = 0x13;
-    public const int CrystalSpot = 0x14;
-    public const int Crystal = 0x15;
-    public const int EnergyBallShooterDownRight = 0x16;
-    public const int EnergyBallShooterDownLeft = 0x17;
-    public const int OrangeIronKnuckle = 0x18;
-    public const int RedIronKnuckle = 0x19;
-    public const int BlueIronKnuckle = 0x1A;
-    public const int WolfHeadGenerator = 0x1B;
-    public const int WolfHead = 0x1C;
-    public const int RedStalfos = 0x1F; // close enough
-    public const int BlueStalfos = 0x23; // close enough
+    public const int ELEVATOR = 0x13;
+    public const int CRYSTAL_SPOT = 0x14;
+    public const int CRYSTAL = 0x15;
+    public const int ENERGY_BALL_SHOOTER_DOWN_RIGHT = 0x16;
+    public const int ENERGY_BALL_SHOOTER_DOWN_LEFT = 0x17;
+    public const int ORANGE_IRON_KNUCKLE = 0x18;
+    public const int RED_IRON_KNUCKLE = 0x19;
+    public const int BLUE_IRON_KNUCKLE = 0x1A;
+    public const int WOLF_HEAD_GENERATOR = 0x1B;
+    public const int WOLF_HEAD = 0x1C;
+    public const int RED_STALFOS = 0x1F; // close enough
+    public const int BLUE_STALFOS = 0x23; // close enough
 }
 
 /// <summary>
@@ -191,11 +191,11 @@ public static class EnemiesRegularPalaceShared
 /// </summary>
 public static class EnemiesPalaceShared
 {
-    public const int Fairy = 0x00;
-    public const int LockedDoor = 0x02;
-    public const int Myu = 0x03;
-    public const int Bot = 0x04;
-    public const int Elevator = 0x13;
+    public const int FAIRY = 0x00;
+    public const int LOCKED_DOOR = 0x02;
+    public const int MYU = 0x03;
+    public const int BOT = 0x04;
+    public const int ELEVATOR = 0x13;
 }
 
 /// <summary>
@@ -203,42 +203,42 @@ public static class EnemiesPalaceShared
 /// </summary>
 public enum EnemiesPalace125
 {
-    Fairy = 0x00,
-    ItemInPalaceSprite = 0x01,
-    LockedDoor = 0x02,
-    Myu = 0x03,
-    Bot = 0x04,
-    StrikeForRedJar = 0x05,
-    SlowBubble = 0x06,
-    OrangeMoa = 0x07,
-    FallingBlockGenerator = 0x08,
-    SingleFallingBlock = 0x09,
-    BlueDragonHeadGenerator = 0x0A,
-    TinsuitGenerator = 0x0B,
-    Tinsuit = 0x0C,
-    Dripper = 0x0D,
-    FastBubble = 0x0E,
-    BagoBagoGenerator = 0x0F,
-    BagoBago = 0x10,
-    RopeJumpingOnly = 0x11,
-    RopeJumpingAndMoving = 0x12,
-    Elevator = 0x13,
-    CrystalSpot = 0x14,
-    Crystal = 0x15,
-    EnergyBallShooterDownRight = 0x16,
-    EnergyBallShooterDownLeft = 0x17,
-    OrangeIronKnuckle = 0x18,
-    RedIronKnuckle = 0x19,
-    BlueIronKnuckle = 0x1A,
-    WolfHeadGenerator = 0x1B,
-    WolfHead = 0x1C,
-    Mago = 0x1D,
-    Guma = 0x1E,
-    RedStalfos = 0x1F,
-    Horsehead = 0x20,
-    HelmetheadOrGooma = 0x21,
-    HelmetheadsFloatingHead = 0x22,
-    BlueStalfos = 0x23
+    FAIRY = 0x00,
+    ITEM_IN_PALACE_SPRITE = 0x01,
+    LOCKED_DOOR = 0x02,
+    MYU = 0x03,
+    BOT = 0x04,
+    STRIKE_FOR_RED_JAR = 0x05,
+    SLOW_BUBBLE = 0x06,
+    ORANGE_MOA = 0x07,
+    FALLING_BLOCK_GENERATOR = 0x08,
+    SINGLE_FALLING_BLOCK = 0x09,
+    BLUE_DRAGON_HEAD_GENERATOR = 0x0A,
+    TINSUIT_GENERATOR = 0x0B,
+    TINSUIT = 0x0C,
+    DRIPPER = 0x0D,
+    FAST_BUBBLE = 0x0E,
+    BAGO_BAGO_GENERATOR = 0x0F,
+    BAGO_BAGO = 0x10,
+    ROPE_STATIONARY = 0x11,
+    ROPE_MOVING = 0x12,
+    ELEVATOR = 0x13,
+    CRYSTAL_SPOT = 0x14,
+    CRYSTAL = 0x15,
+    ENERGY_BALL_SHOOTER_DOWN_RIGHT = 0x16,
+    ENERGY_BALL_SHOOTER_DOWN_LEFT = 0x17,
+    ORANGE_IRON_KNUCKLE = 0x18,
+    RED_IRON_KNUCKLE = 0x19,
+    BLUE_IRON_KNUCKLE = 0x1A,
+    WOLF_HEAD_GENERATOR = 0x1B,
+    WOLF_HEAD = 0x1C,
+    MAGO = 0x1D,
+    GUMA = 0x1E,
+    RED_STALFOS = 0x1F,
+    HORSEHEAD = 0x20,
+    HELMETHEAD_OR_GOOMA = 0x21,
+    HELMETHEAD_HEAD = 0x22,
+    BLUE_STALFOS = 0x23
 }
 
 /// <summary>
@@ -246,41 +246,41 @@ public enum EnemiesPalace125
 /// </summary>
 public enum EnemiesPalace346
 {
-    Fairy = 0x00,
-    ItemInPalaceSprite = 0x01,
-    LockedDoor = 0x02,
-    Myu = 0x03,
-    Bot = 0x04,
-    StrikeForRedJarOrIronKnuckle = 0x05,
-    SlowBubble = 0x06,
-    OrangeMoa = 0x07,
-    FallingBlockGenerator = 0x08,
-    SingleFallingBlock = 0x09,
-    RebonackPostHorse = 0x0A,
-    TinsuitGenerator = 0x0B,
-    Tinsuit = 0x0C,
-    Dripper = 0x0D,
-    FastBubble = 0x0E,
-    BlueDragonHeadGenerator = 0x0F,
-    Flame = 0x10,
-    Rope = 0x11,
-    Elevator = 0x13,
-    CrystalSpot = 0x14,
-    Crystal = 0x15,
-    EnergyBallShooterDownRight = 0x16,
-    EnergyBallShooterDownLeft = 0x17,
-    OrangeIronKnuckle = 0x18,
-    RedIronKnuckle = 0x19,
-    BlueIronKnuckle = 0x1A,
-    WolfHeadGenerator = 0x1B,
-    WolfHead = 0x1C,
-    Wizard = 0x1D,
-    Doomknocker = 0x1E,
-    ArmoredRedStalfos = 0x1F,
-    Rebonack = 0x20,
-    Barba = 0x21,
-    Carock = 0x22,
-    ArmoredBlueStalfos = 0x23
+    FAIRY = 0x00,
+    ITEM_IN_PALACE_SPRITE = 0x01,
+    LOCKED_DOOR = 0x02,
+    MYU = 0x03,
+    BOT = 0x04,
+    STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE = 0x05,
+    SLOW_BUBBLE = 0x06,
+    ORANGE_MOA = 0x07,
+    FALLING_BLOCK_GENERATOR = 0x08,
+    SINGLE_FALLING_BLOCK = 0x09,
+    REBO_UNHORSED = 0x0A,
+    TINSUIT_GENERATOR = 0x0B,
+    TINSUIT = 0x0C,
+    DRIPPER = 0x0D,
+    FAST_BUBBLE = 0x0E,
+    BLUE_DRAGON_HEAD_GENERATOR = 0x0F,
+    FLAME = 0x10,
+    ROPE = 0x11,
+    ELEVATOR = 0x13,
+    CRYSTAL_SPOT = 0x14,
+    CRYSTAL = 0x15,
+    ENERGY_BALL_SHOOTER_DOWN_RIGHT = 0x16,
+    ENERGY_BALL_SHOOTER_DOWN_LEFT = 0x17,
+    ORANGE_IRON_KNUCKLE = 0x18,
+    RED_IRON_KNUCKLE = 0x19,
+    BLUE_IRON_KNUCKLE = 0x1A,
+    WOLF_HEAD_GENERATOR = 0x1B,
+    WOLF_HEAD = 0x1C,
+    WIZARD = 0x1D,
+    DOOMKNOCKER = 0x1E,
+    ARMORED_RED_STALFOS = 0x1F,
+    REBONAK = 0x20,
+    BARBA = 0x21,
+    CAROCK = 0x22,
+    BLUE_STALFOS = 0x23
 }
 
 /// <summary>
@@ -288,34 +288,34 @@ public enum EnemiesPalace346
 /// </summary>
 public enum EnemiesGreatPalace
 {
-    Fairy = 0x00,
-    StrikeForRedJarOrFokka = 0x01,
-    LockedDoor = 0x02,
-    Myu = 0x03,
-    Bot = 0x04,
-    Bit = 0x05,
-    OrangeMoa = 0x06,
-    Ache = 0x07,
-    Acheman = 0x0A,
-    BubbleGenerator = 0x0B,
-    RockGenerator = 0x0C,
-    RedDeeler = 0x0D,
-    BlueDeeler = 0x0E,
-    FireBagoBagoGenerator = 0x0F,
-    FireBagoBago = 0x10,
-    RopeJumpingOnly = 0x11,
-    RopeJumpingAndMoving = 0x12,
-    Elevator = 0x13,
-    SlowBubble = 0x14,
-    FastBubble = 0x15,
-    OrangeDragonHeadGenerator = 0x16,
-    KingBubble = 0x17,
-    OrangeFokka = 0x18,
-    RedFokka = 0x19,
-    BlueFokka = 0x1A,
-    Fokkeru = 0x1D,
-    KingBot = 0x1E,
-    GreatPalaceBarrier = 0x20,
-    Thunderbird = 0x22,
-    DarkLinkTrigger = 0x23
+    FAIRY = 0x00,
+    STRIKE_FOR_RED_JAR_OR_FOKKA = 0x01,
+    LOCKED_DOOR = 0x02,
+    MYU = 0x03,
+    BOT = 0x04,
+    BIT = 0x05,
+    ORANGE_MOA = 0x06,
+    ACHE = 0x07,
+    ACHEMAN = 0x0A,
+    BUBBLE_GENERATOR = 0x0B,
+    ROCK_GENERATOR = 0x0C,
+    RED_DEELER = 0x0D,
+    BLUE_DEELER = 0x0E,
+    FIRE_BAGO_BAGO_GENERATOR = 0x0F,
+    FIRE_BAGO_BAGO = 0x10,
+    ROPE_STATIONARY = 0x11,
+    ROPE_MOBILE = 0x12,
+    ELEVATOR = 0x13,
+    SLOW_BUBBLE = 0x14,
+    FAST_BUBBLE = 0x15,
+    ORANGE_DRAGON_HEAD_GENERATOR = 0x16,
+    BIG_BUBBLE = 0x17,
+    ORANGE_FOKKA = 0x18,
+    RED_FOKKA = 0x19,
+    BLUE_FOKKA = 0x1A,
+    FOKKERU = 0x1D,
+    KING_BOT = 0x1E,
+    GP_BARRIER = 0x20,
+    THUNDERBIRD = 0x22,
+    DARK_LINK = 0x23
 }
