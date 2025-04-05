@@ -961,7 +961,7 @@ public class Hyrule
         }
         
         // Add the palace item bits to the assembler
-        sideviewModule.Segment("PRG4");
+        sideviewModule.Segment("PRG5");
         foreach (var (palaceGroup, itemBits) in palaceItemBits)
         {
             sideviewModule.Org((ushort)(0xBB95 + ((byte)palaceGroup) * 0x20));
