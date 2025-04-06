@@ -415,25 +415,59 @@ public class Room : IJsonOnDeserialized
 
     private void RandomizeEnemiesInner<T>(EnemiesEditable<T> ee, bool mixEnemies, bool generatorsAlwaysMatch, Random RNG, T[] allEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
+        bool[,]? solidGridLazy = null; // lazily instanced if needed
+        bool[,] GetSolidGrid<P>() where P : Enum
+        {
+            if (solidGridLazy == null)
+            {
+                var sv = new SideviewEditable<P>(SideView);
+                solidGridLazy = sv.CreateSolidGrid();
+            }
+            return solidGridLazy;
+        }
+        bool AreaIsOpen<P>(ref bool? cachedResult, int x1, int x2, int y1, int y2) where P : Enum
+        {
+            if (cachedResult == null)
+            {
+                var solidGrid = GetSolidGrid<P>();
+                cachedResult = SideviewEditable<P>.AreaIsOpen(solidGrid, x1, x2, y1, y2);
+            }
+            return cachedResult.Value;
+        }
+
         T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
         {
             if (PalaceGroup != PalaceGrouping.PalaceGp)
             {
+                bool? roomForStalfos = null;
                 while (true)
                 {
+                    bool reroll = false;
                     switch (swapToId)
                     {
+                        // Re-roll Magos and Wizards unless their y pos is 7.
                         case EnemiesPalace125.MAGO:
                         case EnemiesPalace346.WIZARD:
-                            // Re-roll Magos and Wizards unless their y pos is 7.
-                            if (enemy.Y != 0x07)
-                            {
-                                swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
-                                continue;
-                            }
+                            reroll = enemy.Y != 0x07;
+                            break;
+
+                        // Re-roll Stalfos if they don't have room to dive from the ceiling to their position
+                        case EnemiesPalace125.RED_STALFOS:
+                        case EnemiesPalace125.BLUE_STALFOS:
+                        case EnemiesPalace346.RED_STALFOS:
+                        case EnemiesPalace346.BLUE_STALFOS:
+                            reroll = !AreaIsOpen<PalaceObject>(ref roomForStalfos, enemy.X, enemy.X, 3, enemy.Y);
                             break;
                     }
-                    break;
+
+                    if (reroll)
+                    {
+                        swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             return swapToId;
@@ -447,6 +481,41 @@ public class Room : IJsonOnDeserialized
                 if (enemy.IdByte == EnemiesRegularPalaceShared.ORANGE_MOA)
                 {
                     swapToId = enemy.Id; // swap it back to Moa
+                }
+            }
+            else // GP
+            {
+                bool? roomForBubble = null;
+                bool? roomForBigBubble = null;
+                bool? roomForKingBot = null;
+                while (true)
+                {
+                    // Re-roll enemies that do not fit (get stuck in walls)
+                    bool reroll = false;
+                    switch (swapToId)
+                    {
+                        case EnemiesGreatPalace.SLOW_BUBBLE:
+                        case EnemiesGreatPalace.FAST_BUBBLE:
+                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBubble, enemy.X, enemy.X, enemy.Y, enemy.Y);
+                            break;
+
+                        case EnemiesGreatPalace.BIG_BUBBLE:
+                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBigBubble, enemy.X, enemy.X + 1, enemy.Y, enemy.Y + 1);
+                            break;
+
+                        case EnemiesGreatPalace.KING_BOT:
+                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForKingBot, enemy.X, enemy.X + 2, enemy.Y, enemy.Y + 1);
+                            break;
+                    };
+
+                    if (reroll)
+                    {
+                        swapToId = flyingEnemies[RNG.Next(0, flyingEnemies.Length)];
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             return swapToId;
