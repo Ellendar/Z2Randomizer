@@ -1157,6 +1157,19 @@ LoadDoorYPosition:
         a.Module().Code("""
 .include "z2r.inc"
 
+.segment "PRG1"
+.org $82BA ; death mountain
+    jsr StoreElevatorParamDM
+
+.segment "PRG1", "PRG7"
+.reloc
+StoreElevatorParamDM:
+    lda $0731 ; load the current elevator command
+    and #$0f ; the last 4 bits are the param
+    sta ElevatorYStart
+    lda $010A ; re-do the command JSR overwrote
+    rts
+
 .segment "PRG4"
 .org $823E ; palace 1-6
     jsr StoreElevatorParam
