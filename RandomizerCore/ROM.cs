@@ -908,6 +908,9 @@ CopySideviewIntoRAMAndLoadPointer:
         lda PalaceMappingTable,y
         cmp #$ff
         beq @skipswap
+        ; Prevent bank swapping during the end game cutscene
+        bit GameComplete
+        bmi @skipswap
             ; Loading a palace sideview so use the data from extended banks instead
             lda #$0e
             jsr SwapPRG
