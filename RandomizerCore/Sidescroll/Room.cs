@@ -371,151 +371,153 @@ public class Room : IJsonOnDeserialized
 
     public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)
     {
-        int[] allEnemies;
-        int[] smallEnemies;
-        int[] largeEnemies;
-        int[] flyingEnemies;
-        int[] generators;
         //Because a 125 room could be shuffled into 346 or vice versa, we have to check if the enemy is that type in either
         //palace group, and if so, shuffle that enemy into a new enemy specifically appropriate to that palace
-        int[] shufflableEnemies;
-        int[] shufflableSmallEnemies;
-        int[] shufflableLargeEnemies;
-        int[] shufflableFlyingEnemies;
-        int[] shufflableGenerators;
         switch (PalaceGroup)
         {
             case PalaceGrouping.Palace125:
-                allEnemies = RandomizerCore.Enemies.Palace125Enemies;
-                smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
-                largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
-                flyingEnemies = RandomizerCore.Enemies.Palace125FlyingEnemies;
-                generators = RandomizerCore.Enemies.Palace125Generators;
-                shufflableEnemies = RandomizerCore.Enemies.StandardPalaceEnemies;
-                shufflableSmallEnemies = RandomizerCore.Enemies.StandardPalaceSmallEnemies;
-                shufflableLargeEnemies = RandomizerCore.Enemies.StandardPalaceLargeEnemies;
-                shufflableFlyingEnemies = RandomizerCore.Enemies.StandardPalaceFlyingEnemies;
-                shufflableGenerators = RandomizerCore.Enemies.StandardPalaceGenerators;
-                break;
+                {
+                    var allEnemies = RandomizerCore.Enemies.Palace125GroundEnemies;
+                    var smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
+                    var largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
+                    var flyingEnemies = RandomizerCore.Enemies.Palace125FlyingEnemies;
+                    var generators = RandomizerCore.Enemies.Palace125Generators;
+                    var ee = new EnemiesEditable<EnemiesPalace125>(Enemies);
+                    RandomizeEnemiesInner(ee, mixEnemies, generatorsAlwaysMatch, RNG, allEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+                    break;
+                }
             case PalaceGrouping.Palace346:
-                allEnemies = RandomizerCore.Enemies.Palace346Enemies;
-                smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
-                largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
-                flyingEnemies = RandomizerCore.Enemies.Palace346FlyingEnemies;
-                generators = RandomizerCore.Enemies.Palace346Generators;
-                shufflableEnemies = RandomizerCore.Enemies.StandardPalaceEnemies;
-                shufflableSmallEnemies = RandomizerCore.Enemies.StandardPalaceSmallEnemies;
-                shufflableLargeEnemies = RandomizerCore.Enemies.StandardPalaceLargeEnemies;
-                shufflableFlyingEnemies = RandomizerCore.Enemies.StandardPalaceFlyingEnemies;
-                shufflableGenerators = RandomizerCore.Enemies.StandardPalaceGenerators;
-                break;
+                {
+                    var allEnemies = RandomizerCore.Enemies.Palace346GroundEnemies;
+                    var smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
+                    var largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
+                    var flyingEnemies = RandomizerCore.Enemies.Palace346FlyingEnemies;
+                    var generators = RandomizerCore.Enemies.Palace346Generators;
+                    var ee = new EnemiesEditable<EnemiesPalace346>(Enemies);
+                    RandomizeEnemiesInner(ee, mixEnemies, generatorsAlwaysMatch, RNG, allEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+                    break;
+                }
             case PalaceGrouping.PalaceGp:
-                allEnemies = RandomizerCore.Enemies.GPEnemies;
-                smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
-                largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
-                flyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
-                generators = RandomizerCore.Enemies.GPGenerators;
-                shufflableEnemies = RandomizerCore.Enemies.GPEnemies;
-                shufflableSmallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
-                shufflableLargeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
-                shufflableFlyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
-                shufflableGenerators = RandomizerCore.Enemies.GPGenerators;
-                break;
+                {
+                    var allEnemies = RandomizerCore.Enemies.GPGroundEnemies;
+                    var smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
+                    var largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
+                    var flyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
+                    var generators = RandomizerCore.Enemies.GPGenerators;
+                    var ee = new EnemiesEditable<EnemiesGreatPalace>(Enemies);
+                    RandomizeEnemiesInner(ee, mixEnemies, generatorsAlwaysMatch, RNG, allEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+                    break;
+                }
             default:
                 throw new ImpossibleException("Invalid Palace Group");
         }
+    }
+
+    private void RandomizeEnemiesInner<T>(EnemiesEditable<T> ee, bool mixEnemies, bool generatorsAlwaysMatch, Random RNG, T[] allEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    {
+        T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
+        {
+            if (PalaceGroup != PalaceGrouping.PalaceGp)
+            {
+                while (true)
+                {
+                    switch (swapToId)
+                    {
+                        case EnemiesPalace125.MAGO:
+                        case EnemiesPalace346.WIZARD:
+                            // Re-roll Magos and Wizards unless their y pos is 7.
+                            if (enemy.Y != 0x07)
+                            {
+                                swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
+                                continue;
+                            }
+                            break;
+                    }
+                    break;
+                }
+            }
+            return swapToId;
+        }
+
+        T RerollFlyingEnemyIfNeeded(Enemy<T> enemy, T swapToId)
+        {
+            if (PalaceGroup != PalaceGrouping.PalaceGp)
+            {
+                // The rando does not re-roll Moas in regular palaces (I just simplified the legacy behavior)
+                if (enemy.IdByte == EnemiesRegularPalaceShared.ORANGE_MOA)
+                {
+                    swapToId = enemy.Id; // swap it back to Moa
+                }
+            }
+            return swapToId;
+        }
 
         int? firstGenerator = null;
-        var enemiesLength = (int)Enemies[0] - 1;
-        NewEnemies[0] = Enemies[0];
-        for (int i = 1; i <= enemiesLength; i += 2)
+        for (int i = 0; i < ee.Enemies.Count; i++)
         {
-            NewEnemies[i] = Enemies[i];
-            var enemyNumber = Enemies[i + 1] & 0x3F;
-            var enemyPage = Enemies[i + 1] & 0xC0;
-            if (mixEnemies)
+            Enemy<T> enemy = ee.Enemies[i];
+
+            if (mixEnemies) // mix small and large enemies
             {
                 //If this is a shufflable enemy (As opposed to something like a crystal marker)
-                if (shufflableEnemies.Contains(enemyNumber))
+                if (enemy.IsShufflableSmallOrLarge())
                 {
-                    var swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
-                    var ypos = Enemies[i] & 0xF0;
-                    var xpos = Enemies[i] & 0x0F;
-                    if (shufflableSmallEnemies.Contains(enemyNumber) && shufflableLargeEnemies.Contains(swapEnemy))
+                    T swapToId = allEnemies[RNG.Next(0, allEnemies.Length)];
+                    if (enemy.IsShufflableSmall() && largeEnemies.Contains(swapToId))
                     {
-                        ypos -= 16;
-                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != PalaceGrouping.PalaceGp)
-                        {
-                            swapEnemy = largeEnemies[RNG.Next(0, largeEnemies.Length)];
-                        }
+                        enemy.Y--; // subtract Y by 1 when switching a small enemy to a large enemy
+                        swapToId = RerollLargeEnemyIfNeeded(enemy, swapToId);
                     }
                     else
                     {
-                        while (swapEnemy == 0x1D && ypos != 0x70 && PalaceGroup != PalaceGrouping.PalaceGp)
-                        {
-                            swapEnemy = allEnemies[RNG.Next(0, allEnemies.Length)];
-                        }
+                        swapToId = RerollLargeEnemyIfNeeded(enemy, swapToId);
                     }
-
-                    NewEnemies[i] = (byte)(ypos + xpos);
-                    NewEnemies[i + 1] = (byte)(enemyPage + swapEnemy);
+                    enemy.Id = swapToId;
                     continue;
                 }
             }
             else
             {
-                if (shufflableLargeEnemies.Contains(enemyNumber))
+                if (enemy.IsShufflableLarge())
                 {
-                    var swap = RNG.Next(0, largeEnemies.Length);
-                    var ypos = Enemies[i] & 0xF0;
-                    var xpos = Enemies[i] & 0x0F;
-                    while (largeEnemies[swap] == 0x1D && ypos != 0x70 && PalaceGroup != PalaceGrouping.PalaceGp)
-                    {
-                        swap = RNG.Next(0, largeEnemies.Length);
-                    }
-                    NewEnemies[i + 1] = (byte)(largeEnemies[swap] + enemyPage);
+                    T swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
+                    swapToId = RerollLargeEnemyIfNeeded(enemy, swapToId);
+                    enemy.Id = swapToId;
                     continue;
                 }
-                else if (shufflableSmallEnemies.Contains(enemyNumber))
+                else if (enemy.IsShufflableSmall())
                 {
-                    int swap = RNG.Next(0, smallEnemies.Length);
-                    NewEnemies[i + 1] = (byte)(smallEnemies[swap] + enemyPage);
+                    T swapEnemy = smallEnemies[RNG.Next(0, smallEnemies.Length)];
+                    enemy.Id = swapEnemy;
                     continue;
                 }
             }
 
-
-            if (shufflableFlyingEnemies.Contains(enemyNumber))
+            if (enemy.IsShufflableFlying())
             {
-                var swap = RNG.Next(0, flyingEnemies.Length);
-                while (enemyNumber == 0x07 && (flyingEnemies[swap] == 0x06 || flyingEnemies[swap] == 0x0E))
-                {
-                    swap = RNG.Next(0, flyingEnemies.Length);
-                }
-                NewEnemies[i + 1] = (byte)(flyingEnemies[swap] + enemyPage);
+                T swapToId = flyingEnemies[RNG.Next(0, flyingEnemies.Length)];
+                swapToId = RerollFlyingEnemyIfNeeded(enemy, swapToId);
+                enemy.Id = swapToId;
                 continue;
             }
 
-            if (shufflableGenerators.Contains(enemyNumber))
+            if (enemy.IsShufflableGenerator())
             {
-                var swap = RNG.Next(0, generators.Length);
-                firstGenerator ??= swap;
+                T swapToId = generators[RNG.Next(0, generators.Length)];
+                firstGenerator ??= (int)(object)swapToId;
                 if (generatorsAlwaysMatch)
                 {
-                    NewEnemies[i + 1] = (byte)(generators[firstGenerator ?? 0] + enemyPage);
+                    enemy.Id = (T)(object)firstGenerator;
                     continue;
                 }
                 else
                 {
-                    NewEnemies[i + 1] = (byte)(generators[swap] + enemyPage);
+                    enemy.Id = swapToId;
                     continue;
                 }
             }
-
-            //If this is not a shufflable enemy, just copy it as is.
-            NewEnemies[i] = Enemies[i];
-            NewEnemies[i + 1] = Enemies[i + 1];
         }
+        NewEnemies = ee.Finalize();
     }
 
     public void AdjustContinuingBossRoom()
