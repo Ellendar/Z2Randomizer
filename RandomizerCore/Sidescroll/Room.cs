@@ -415,10 +415,22 @@ public class Room : IJsonOnDeserialized
 
     private void RandomizeEnemiesInner<T>(EnemiesEditable<T> ee, bool mixEnemies, bool generatorsAlwaysMatch, Random RNG, T[] allEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
+        bool[,]? solidGridLazy = null; // lazily instanced if needed
+        bool[,] GetSolidGrid<P>() where P : Enum
+        {
+            if (solidGridLazy == null)
+            {
+                var sv = new SideviewEditable<P>(SideView);
+                solidGridLazy = sv.CreateSolidGrid();
+            }
+            return solidGridLazy;
+        }
+
         T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
         {
             if (PalaceGroup != PalaceGrouping.PalaceGp)
             {
+                bool? roomForStalfos = null;
                 while (true)
                 {
                     switch (swapToId)
@@ -427,6 +439,22 @@ public class Room : IJsonOnDeserialized
                         case EnemiesPalace346.WIZARD:
                             // Re-roll Magos and Wizards unless their y pos is 7.
                             if (enemy.Y != 0x07)
+                            {
+                                swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
+                                continue;
+                            }
+                            break;
+                        case EnemiesPalace125.RED_STALFOS:
+                        case EnemiesPalace125.BLUE_STALFOS:
+                        case EnemiesPalace346.RED_STALFOS:
+                        case EnemiesPalace346.BLUE_STALFOS:
+                            // Re-roll Stalfos if they don't have room to dive from the ceiling to their position
+                            if (roomForStalfos == null)
+                            {
+                                var solidGrid = GetSolidGrid<PalaceObject>();
+                                roomForStalfos = SideviewEditable<PalaceObject>.AreaIsOpen(solidGrid, enemy.X, enemy.X, 3, enemy.Y);
+                            }
+                            if (roomForStalfos == false)
                             {
                                 swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
                                 continue;
@@ -447,6 +475,28 @@ public class Room : IJsonOnDeserialized
                 if (enemy.IdByte == EnemiesRegularPalaceShared.ORANGE_MOA)
                 {
                     swapToId = enemy.Id; // swap it back to Moa
+                }
+            }
+            else // GP
+            {
+                bool? roomForKingBot = null;
+                while (true)
+                {
+                    // Re-roll KingBot if they don't fit
+                    if (swapToId is EnemiesGreatPalace.KING_BOT)
+                    {
+                        if (roomForKingBot == null)
+                        {
+                            var solidGrid = GetSolidGrid<GreatPalaceObject>();
+                            roomForKingBot = SideviewEditable<GreatPalaceObject>.AreaIsOpen(solidGrid, enemy.X, enemy.X + 2, enemy.Y, enemy.Y + 1);
+                        }
+                        if (roomForKingBot == false)
+                        {
+                            swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
+                            continue;
+                        }
+                    }
+                    break;
                 }
             }
             return swapToId;
