@@ -21,30 +21,98 @@ public class Enemies
 
 
 
+    public static readonly EnemiesPalace125[] Palace125SmallEnemies = [
+        EnemiesPalace125.MYU,
+        EnemiesPalace125.BOT,
+        EnemiesPalace125.ROPE_STATIONARY,
+        EnemiesPalace125.ROPE_MOVING,
+    ];
+    public static readonly EnemiesPalace125[] Palace125LargeEnemies = [
+        EnemiesPalace125.TINSUIT,
+        EnemiesPalace125.ORANGE_IRON_KNUCKLE,
+        EnemiesPalace125.RED_IRON_KNUCKLE,
+        EnemiesPalace125.BLUE_IRON_KNUCKLE,
+        EnemiesPalace125.MAGO,
+        EnemiesPalace125.GUMA,
+        EnemiesPalace125.RED_STALFOS,
+        EnemiesPalace125.BLUE_STALFOS,
+    ];
+    public static readonly EnemiesPalace125[] Palace125GroundEnemies = [.. Palace125SmallEnemies, .. Palace125LargeEnemies];
+    public static readonly EnemiesPalace125[] Palace125FlyingEnemies = [
+        EnemiesPalace125.SLOW_BUBBLE,
+        EnemiesPalace125.ORANGE_MOA,
+        EnemiesPalace125.FAST_BUBBLE,
+    ];
+    public static readonly EnemiesPalace125[] Palace125Generators = [
+        EnemiesPalace125.TINSUIT_GENERATOR,
+        EnemiesPalace125.BAGO_BAGO_GENERATOR,
+        EnemiesPalace125.WOLF_HEAD_GENERATOR,
+        EnemiesPalace125.BLUE_DRAGON_HEAD_GENERATOR,
+    ];
 
-	public static readonly int[] Palace125Enemies = new int[] { 0x03, 0x04, 0x0C, 0x11, 0x12, 0x18, 0x19, 0x1A, 0x1D, 0x1E, 0x1F, 0x23 };
-    public static readonly int[] Palace125FlyingEnemies = new int[] { 0x06, 0x07, 0x0E };
-    public static readonly int[] Palace125Generators = new int[] { 0x0B, 0x0F, 0x1B, 0x0A };
-    public static readonly int[] Palace125SmallEnemies = new int[] { 0x03, 0x04, 0x11, 0x12 };
-    public static readonly int[] Palace125LargeEnemies = new int[] { 0x0C, 0x18, 0x19, 0x1A, 0x1D, 0x1E, 0x1F, 0x23 };
 
-    public static readonly int[] Palace346Enemies = new int[] { 0x03, 0x04, 0x0C, 0x11, 0x18, 0x19, 0x1A, 0x1D, 0x1F, 0x1E, 0x23 };
-    public static readonly int[] Palace346FlyingEnemies = new int[] { 0x06, 0x07, 0x0E };
-    public static readonly int[] Palace346Generators = new int[] { 0x0B, 0x0F, 0x1B  };
-    public static readonly int[] Palace346SmallEnemies = new int[] { 0x03, 0x04, 0x11 };
-    public static readonly int[] Palace346LargeEnemies = new int[] { 0x0C, 0x18, 0x19, 0x1A, 0x1D, 0x1F, 0x1E, 0x23 };
+    public static readonly EnemiesPalace346[] Palace346SmallEnemies = [
+        EnemiesPalace346.MYU,
+        EnemiesPalace346.BOT,
+        EnemiesPalace346.ROPE,
+    ];
+    public static readonly EnemiesPalace346[] Palace346LargeEnemies = [
+        EnemiesPalace346.TINSUIT,
+        EnemiesPalace346.ORANGE_IRON_KNUCKLE,
+        EnemiesPalace346.RED_IRON_KNUCKLE,
+        EnemiesPalace346.BLUE_IRON_KNUCKLE,
+        EnemiesPalace346.WIZARD,
+        EnemiesPalace346.DOOMKNOCKER,
+        EnemiesPalace346.RED_STALFOS,
+        EnemiesPalace346.BLUE_STALFOS,
+    ];
+    public static readonly EnemiesPalace346[] Palace346GroundEnemies = [.. Palace346SmallEnemies, .. Palace346LargeEnemies];
+    public static readonly EnemiesPalace346[] Palace346FlyingEnemies = [
+        EnemiesPalace346.SLOW_BUBBLE,
+        EnemiesPalace346.ORANGE_MOA,
+        EnemiesPalace346.FAST_BUBBLE,
+    ];
+    public static readonly EnemiesPalace346[] Palace346Generators = [
+        EnemiesPalace346.TINSUIT_GENERATOR,
+        EnemiesPalace346.BLUE_DRAGON_HEAD_GENERATOR,
+        EnemiesPalace346.WOLF_HEAD_GENERATOR,
+    ];
 
-    public static readonly int[] GPEnemies = new int[] { 0x03, 0x04, 0x11, 0x12, 0x18, 0x19, 0x1A, 0x1D };
-    public static readonly int[] GPFlyingEnemies = new int[] { 0x06, 0x14, 0x15, 0x17, 0x1E };
-    public static readonly int[] GPGenerators = new int[] { 0x0B, 0x0C, 0x0F, 0x16 };
-    public static readonly int[] GPSmallEnemies = new int[] { 03, 0x04, 0x11, 0x12 };
-    public static readonly int[] GPLargeEnemies = new int[] { 0x18, 0x19, 0x1A, 0x1D };
 
-	public static readonly int[] StandardPalaceEnemies = Palace125Enemies.Union(Palace346Enemies).ToArray();
-    public static readonly int[] StandardPalaceFlyingEnemies = Palace125FlyingEnemies.Union(Palace346FlyingEnemies).ToArray();
-    public static readonly int[] StandardPalaceGenerators = Palace125Generators.Union(Palace346Generators).ToArray();
-    public static readonly int[] StandardPalaceSmallEnemies = Palace125SmallEnemies.Union(Palace346SmallEnemies).ToArray();
-    public static readonly int[] StandardPalaceLargeEnemies = Palace125LargeEnemies.Union(Palace346LargeEnemies).ToArray();
+    public static readonly EnemiesGreatPalace[] GPSmallEnemies = [
+        EnemiesGreatPalace.MYU,
+        EnemiesGreatPalace.BOT,
+        EnemiesGreatPalace.ROPE_STATIONARY,
+        EnemiesGreatPalace.ROPE_MOBILE,
+    ];
+    public static readonly EnemiesGreatPalace[] GPLargeEnemies = [
+        EnemiesGreatPalace.ORANGE_FOKKA,
+        EnemiesGreatPalace.RED_FOKKA,
+        EnemiesGreatPalace.BLUE_FOKKA,
+        EnemiesGreatPalace.FOKKERU,
+    ];
+    public static readonly EnemiesGreatPalace[] GPGroundEnemies = [.. GPSmallEnemies, .. GPLargeEnemies];
+    public static readonly EnemiesGreatPalace[] GPFlyingEnemies = [
+        EnemiesGreatPalace.ORANGE_MOA,
+        EnemiesGreatPalace.SLOW_BUBBLE,
+        EnemiesGreatPalace.FAST_BUBBLE,
+        EnemiesGreatPalace.BIG_BUBBLE,
+        EnemiesGreatPalace.KING_BOT, // Not actually a flying enemy
+    ];
+    public static readonly EnemiesGreatPalace[] GPGenerators = [
+        EnemiesGreatPalace.BUBBLE_GENERATOR,
+        EnemiesGreatPalace.ROCK_GENERATOR,
+        EnemiesGreatPalace.FIRE_BAGO_BAGO_GENERATOR,
+        EnemiesGreatPalace.ORANGE_DRAGON_HEAD_GENERATOR,
+    ];
+
+
+    public static readonly int[] StandardPalaceGroundEnemies = Palace125GroundEnemies.Select(e => (int)e).Union(Palace346GroundEnemies.Select(e => (int)e)).ToArray();
+    public static readonly int[] StandardPalaceFlyingEnemies = Palace125FlyingEnemies.Select(e => (int)e).Union(Palace346FlyingEnemies.Select(e => (int)e)).ToArray();
+    public static readonly int[] StandardPalaceGenerators = Palace125Generators.Select(e => (int)e).Union(Palace346Generators.Select(e => (int)e)).ToArray();
+    public static readonly int[] StandardPalaceSmallEnemies = Palace125SmallEnemies.Select(e => (int)e).Union(Palace346SmallEnemies.Select(e => (int)e)).ToArray();
+    public static readonly int[] StandardPalaceLargeEnemies = Palace125LargeEnemies.Select(e => (int)e).Union(Palace346LargeEnemies.Select(e => (int)e)).ToArray();
+
 
     //TODO: Turn this into constants and a lookup, then replace the above nonsense with const arrays of constants instead of garbage
     /*
@@ -276,7 +344,7 @@ public enum EnemiesPalace346
     WOLF_HEAD = 0x1C,
     WIZARD = 0x1D,
     DOOMKNOCKER = 0x1E,
-    ARMORED_RED_STALFOS = 0x1F,
+    RED_STALFOS = 0x1F,
     REBONAK = 0x20,
     BARBA = 0x21,
     CAROCK = 0x22,

@@ -2845,7 +2845,7 @@ public class Hyrule
 
         if (props.ShuffleDripper)
         {
-            ROMData.Put(0x11927, (byte)Enemies.Palace125Enemies[RNG.Next(Enemies.Palace125Enemies.Length)]);
+            ROMData.Put(0x11927, (byte)Enemies.Palace125GroundEnemies[RNG.Next(Enemies.Palace125GroundEnemies.Length)]);
         }
 
         if (props.ShuffleEnemyPalettes)
