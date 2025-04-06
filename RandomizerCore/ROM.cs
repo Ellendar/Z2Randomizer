@@ -909,8 +909,9 @@ CopySideviewIntoRAMAndLoadPointer:
         cmp #$ff
         beq @skipswap
         ; Prevent bank swapping during the end game cutscene
-        bit GameComplete
-        bmi @skipswap
+        lda $076c ; Game mode
+        cmp #3 ; 03=wake up zelda, 04=roll credits, 06=show the lives then restart the scene
+        bcs @skipswap
             ; Loading a palace sideview so use the data from extended banks instead
             lda #$0e
             jsr SwapPRG
