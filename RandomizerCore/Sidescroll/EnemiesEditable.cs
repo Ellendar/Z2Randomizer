@@ -129,7 +129,7 @@ public class Enemy<T> where T : Enum
     }
 
     /// <summary>
-    /// Access the enemy number
+    /// Access the enemy ID as its enum representation
     /// </summary>
     public T Id
     {
@@ -137,10 +137,109 @@ public class Enemy<T> where T : Enum
         set { Bytes[1] = (byte)((Bytes[1] & 0b11000000) | (Convert.ToByte(value) & 0b00111111)); }
     }
 
+    /// <summary>
+    /// Access the enemy ID as a byte
+    /// </summary>
+    public byte IdByte
+    {
+        get => (byte)(Bytes[1] & 0b00111111);
+        set { Bytes[1] = (byte)((Bytes[1] & 0b11000000) | (value & 0b00111111)); }
+    }
+
     public String DebugString()
     {
         var bytes = Convert.ToHexString(Bytes);
         var idString = $"Id";
         return $"{bytes,-4}  {X,2},{Y,2}  {idString}";
+    }
+
+    /// <summary>
+    /// Is this a shufflable small enemy? EnemiesPalace125 and EnemiesPalace346 IDs may be mixed.
+    /// </summary>
+    public bool IsShufflableSmall()
+    {
+        switch (this)
+        {
+            case Enemy<EnemiesPalace125>:
+                return Enemies.StandardPalaceSmallEnemies.Contains(IdByte);
+            case Enemy<EnemiesPalace346>:
+                return Enemies.StandardPalaceSmallEnemies.Contains(IdByte);
+            case Enemy<EnemiesGreatPalace>:
+                return Enemies.GPSmallEnemies.Any(e => e.Equals(Id));
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Is this a shufflable large enemy? EnemiesPalace125 and EnemiesPalace346 IDs may be mixed.
+    /// </summary>
+    public bool IsShufflableLarge()
+    {
+        switch (this)
+        {
+            case Enemy<EnemiesPalace125>:
+                return Enemies.StandardPalaceLargeEnemies.Contains(IdByte);
+            case Enemy<EnemiesPalace346>:
+                return Enemies.StandardPalaceLargeEnemies.Contains(IdByte);
+            case Enemy<EnemiesGreatPalace>:
+                return Enemies.GPLargeEnemies.Any(e => e.Equals(Id));
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Is this a shufflable regular large or small enemy? EnemiesPalace125 and EnemiesPalace346 IDs may be mixed.
+    /// </summary>
+    public bool IsShufflableSmallOrLarge()
+    {
+        switch (this)
+        {
+            case Enemy<EnemiesPalace125>:
+                return Enemies.StandardPalaceGroundEnemies.Contains(IdByte);
+            case Enemy<EnemiesPalace346>:
+                return Enemies.StandardPalaceGroundEnemies.Contains(IdByte);
+            case Enemy<EnemiesGreatPalace>:
+                return Enemies.GPGroundEnemies.Any(e => e.Equals(Id));
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Is this a shufflable flying enemy? EnemiesPalace125 and EnemiesPalace346 IDs may be mixed.
+    /// </summary>
+    public bool IsShufflableFlying()
+    {
+        switch (this)
+        {
+            case Enemy<EnemiesPalace125>:
+                return Enemies.StandardPalaceFlyingEnemies.Contains(IdByte);
+            case Enemy<EnemiesPalace346>:
+                return Enemies.StandardPalaceFlyingEnemies.Contains(IdByte);
+            case Enemy<EnemiesGreatPalace>:
+                return Enemies.GPFlyingEnemies.Any(e => e.Equals(Id));
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// Is this a shufflable enemy generator? EnemiesPalace125 and EnemiesPalace346 IDs may be mixed.
+    /// </summary>
+    public bool IsShufflableGenerator()
+    {
+        switch (this)
+        {
+            case Enemy<EnemiesPalace125>:
+                return Enemies.StandardPalaceGenerators.Contains(IdByte);
+            case Enemy<EnemiesPalace346>:
+                return Enemies.StandardPalaceGenerators.Contains(IdByte);
+            case Enemy<EnemiesGreatPalace>:
+                return Enemies.GPGenerators.Any(e => e.Equals(Id));
+            default:
+                throw new NotImplementedException();
+        }
     }
 }

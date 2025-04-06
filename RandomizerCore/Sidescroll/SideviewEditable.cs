@@ -241,4 +241,18 @@ public class SideviewEditable<T> where T : Enum
         }
         return result;
     }
+
+    public static bool AreaIsOpen(bool[,] solidGrid, int x1, int x2, int y1, int y2)
+    {
+        for (int x = x1; x <= x2; x++)
+        {
+            if (x >= solidGrid.GetLength(0)) { return false; }
+            for (int y = y1; y <= y2; y++)
+            {
+                if (y >= solidGrid.GetLength(1)) { return false; }
+                if (solidGrid[x, y]) { return false; }
+            }
+        }
+        return true;
+    }
 }
