@@ -1,4 +1,9 @@
 # Z2Randomizer Changelog
+
+## Version 4.3.16 - April 7, 2025
+
+- Fixed yet another hidden palace issue.
+
 ## Version 4.3.16 - April 5, 2025
 
 - Fixed a bug with hidden palace caused by the previous fix to hidden palace.

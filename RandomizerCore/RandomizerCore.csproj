@@ -36,7 +36,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
-    <Version>4.3.16</Version>
+    <Version>4.3.17</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />

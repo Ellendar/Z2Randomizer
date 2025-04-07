@@ -74,12 +74,12 @@ public class EastHyrule : World
     public Location locationAtGP;
     public Location pbagCave1;
     public Location pbagCave2;
-    public Location hiddenPalaceCallSpot;
     private bool canyonShort;
     private Location vodcave1;
     private Location vodcave2;
     public Location hiddenPalaceLocation;
     public Location hiddenKasutoLocation;
+    public (int, int) hiddenPalaceCoords;
 
     private const int MAP_ADDR = 0xb480;
 
@@ -132,10 +132,6 @@ public class EastHyrule : World
             locationAtPalace5 = GetLocationByMem(0x8657);
             locationAtPalace5.PalaceNumber = 5;
         }
-
-        hiddenPalaceCallSpot = new Location();
-        hiddenPalaceCallSpot.Xpos = 0;
-        hiddenPalaceCallSpot.Ypos = 0;
 
         enemyAddr = 0x88B0;
         enemies = new List<int> { 03, 04, 05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
@@ -335,7 +331,6 @@ public class EastHyrule : World
 
             if (props.HiddenKasuto)
             {
-
                 if (connections.ContainsKey(hiddenKasutoLocation) || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge)
                 {
                     return false;
@@ -717,7 +712,7 @@ public class EastHyrule : World
 
         if (props.HiddenPalace)
         {
-            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCallSpot, hiddenPalaceLocation,
+            rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
                 townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
         }
         if (props.HiddenKasuto)
@@ -1493,7 +1488,7 @@ public class EastHyrule : World
         //map[hpLoc.Ypos - 30, hpLoc.Xpos] = map[hpLoc.Ypos - 29, hpLoc.Xpos];
         hiddenPalaceLocation.Xpos = xpos;
         hiddenPalaceLocation.Ypos = ypos + 2 + 30;
-        //hiddenPalaceCoords = (ypos + 30, xpos);
+        hiddenPalaceCoords = (ypos + 30, xpos);
         //This is the only thing requiring a reference to the rom here and I have no idea what the fuck it is doing.
         rom.Put(0x1df70, (byte)t);
         hiddenPalaceLocation.CanShuffle = false;
