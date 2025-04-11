@@ -318,7 +318,7 @@ ExpandedGetItem:
         cpy #ITEM_DASH_SPELL
         bcc @NotDashSpell
             ; Dash always replaces fire, so if we get the dash spell load fire instead
-            ldy #ITEM_FIRE_SPELL + ITEM_SHIELD_SPELL
+            ldy #ITEM_FIRE_SPELL
     @NotDashSpell:
         ; flash screen as if you got the spell from a wizard 
         lda #$c0
@@ -482,6 +482,7 @@ ItemPaletteTable:
     .byte $01 ; Child
     .byte $01 ; Trophy
     .byte $01 ; Medicine
+    .byte $ff ; DONT USE ANTIFAIRY
     .byte $01 ; Upstab
     .byte $01 ; Downstab
     .byte $01 ; Bagu
