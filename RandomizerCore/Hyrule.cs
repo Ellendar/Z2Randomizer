@@ -2206,7 +2206,32 @@ public class Hyrule
                 }
             }
 
-            return cappedExp;
+            randomized = cappedExp;
+        }
+
+        // Make sure all 1-up levels are higher cost than regular levels
+        int highestRegularLevelExp = 0;
+        for (int stat = 0; stat < 3; stat++)
+        {
+            var cap = levelCap[stat];
+            if (cap < 2) { continue; }
+            var statStartIndex = stat * 8;
+            int statMaxLevelIndex = statStartIndex + cap - 2;
+            var maxExp = randomized[statMaxLevelIndex];
+            if (highestRegularLevelExp < maxExp) { highestRegularLevelExp = maxExp; }
+        }
+
+        int min1upExp = Math.Min(highestRegularLevelExp + 10, 9990);
+        for (int stat = 0; stat < 3; stat++)
+        {
+            var cap = levelCap[stat];
+            Debug.Assert(cap >= 1);
+            var statStartIndex = stat * 8;
+            int stat1upLevelIndex = statStartIndex + cap - 1;
+            var exp1up = randomized[stat1upLevelIndex];
+            if (exp1up < min1upExp) {
+                randomized[stat1upLevelIndex] = RNG.Next(min1upExp, 9990) / 10 * 10;
+            }
         }
 
         return randomized;
