@@ -2668,6 +2668,8 @@ public class Hyrule
 
         rom.SetLevelCap(a, props.AttackCap, props.MagicCap, props.LifeCap);
 
+        rom.ChangeLevelUpCancelling(a);
+
         RandomizeAttackEffectiveness(rom, props.AttackEffectiveness);
 
         RandomizeLifeEffectiveness(rom);

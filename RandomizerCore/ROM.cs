@@ -840,6 +840,49 @@ LoadNewLevelCap:
         a.Byt((byte)lifeMax);
     }
 
+    /// <summary>
+    /// If the level cap for a stat is less than 8, we do not want to allow
+    /// the player to cancel out of the level up screen to continue chasing
+    /// the experience for that stat once it is maxed. To stay true to vanilla,
+    /// this is still allowed if the level cap is 8.
+    /// 
+    /// The point of this is to be able to have lower max stat levels, but
+    /// not have this be abusable to reach high amounts of exp quickly using
+    /// crystals.
+    /// </summary>
+    public void ChangeLevelUpCancelling(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code("""
+; This is called when the game checks if it should skip the cancel option
+; in the level up menu or not. It runs once for each stat (X).
+.segment "PRG0"
+.org $A0D4
+    jmp CheckIfStatMaxed
+CheckStatNormally:           ;  $A0D7
+
+.org $A0ED
+SkipNormalStatCheck:
+
+.segment "PRG0"
+.reloc
+CheckIfStatMaxed:
+    lda LevelCaps,X
+    cmp #$08
+    bcs ReturnNormally       ; if level cap >= 8
+    cmp $0777,X              ; current level for stat X
+    bne ReturnNormally       ; if current level != level cap
+    jmp SkipNormalStatCheck
+ReturnNormally:
+    txa                      ; things we overwrote to do jmp
+    asl a
+    asl a
+    jmp CheckStatNormally
+""");
+        a.Org(0xa8a7);
+        a.Label("LevelCaps");
+    }
+
     public void UseExtendedBanksForPalaceRooms(Assembler a)
     {
         a.Module().Code("""
