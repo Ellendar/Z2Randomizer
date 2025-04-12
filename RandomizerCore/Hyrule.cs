@@ -2110,19 +2110,22 @@ public class Hyrule
         westHyrule.midoChurch.Collectable = Collectable.UPSTAB;
     }
 
-    private void RandomizeExperience(ROM rom, int statIndex, int cap)
+    private void RandomizeExperience(ROM rom)
     {
-        var startAddr = 0x1669 + statIndex * 8;
-        var startAddrText = 0x1e42 + statIndex * 8;
+        bool[] shuffleStat = [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp];
+        int[] levelCap = [props.AttackCap, props.MagicCap, props.LifeCap];
 
-        int[] vanillaExp = new int[8];
+        var startAddr = 0x1669;
+        var startAddrText = 0x1e42;
+
+        int[] vanillaExp = new int[24];
 
         for (int i = 0; i < vanillaExp.Length; i++)
         {
             vanillaExp[i] = rom.GetShort(startAddr + i, startAddr + 24 + i);
         }
 
-        int[] randomizedExp = RandomizeExperience(RNG, vanillaExp, cap, props.ScaleLevels);
+        int[] randomizedExp = RandomizeExperience(RNG, vanillaExp, shuffleStat, levelCap, props.ScaleLevels);
 
         for (int i = 0; i < randomizedExp.Length; i++)
         {
@@ -2143,21 +2146,32 @@ public class Hyrule
         }
     }
 
-    private static int[] RandomizeExperience(Random RNG, int[] vanillaExp, int cap, bool scaleLevels)
+    private static int[] RandomizeExperience(Random RNG, int[] vanillaExp, bool[] shuffleStat, int[] levelCap, bool scaleLevels)
     {
-        int[] randomized = new int[8];
+        int[] randomized = new int[24];
+        Span<int> randomizedSpan = randomized;
+        ReadOnlySpan<int> vanillaSpan = vanillaExp;
 
-        for (int i = 0; i < vanillaExp.Length; i++)
+        for (int stat = 0; stat < 3; stat++)
         {
-            int nextMin = (int)(vanillaExp[i] - vanillaExp[i] * 0.25);
-            int nextMax = (int)(vanillaExp[i] + vanillaExp[i] * 0.25);
-            if (i == 0)
-            {
-                randomized[i] = RNG.Next(Math.Max(10, nextMin), nextMax);
+            var statStartIndex = stat * 8;
+            if (!shuffleStat[stat]) {
+                vanillaSpan.Slice(statStartIndex, 8).CopyTo(randomizedSpan.Slice(statStartIndex, 8));
+                continue;
             }
-            else
+            for (int i = 0; i < 8; i++)
             {
-                randomized[i] = RNG.Next(Math.Max(randomized[i - 1], nextMin), Math.Min(nextMax, 9990));
+                var vanilla = vanillaExp[statStartIndex + i];
+                int nextMin = (int)(vanilla - vanilla * 0.25);
+                int nextMax = (int)(vanilla + vanilla * 0.25);
+                if (i == 0)
+                {
+                    randomized[statStartIndex + i] = RNG.Next(Math.Max(10, nextMin), nextMax);
+                }
+                else
+                {
+                    randomized[statStartIndex + i] = RNG.Next(Math.Max(randomized[statStartIndex + i - 1], nextMin), Math.Min(nextMax, 9990));
+                }
             }
         }
 
@@ -2168,21 +2182,27 @@ public class Hyrule
 
         if (scaleLevels)
         {
-            int[] cappedExp = new int[8];
+            int[] cappedExp = new int[24];
 
-            for (int i = 0; i < randomized.Length; i++)
+            for (int stat = 0; stat < 3; stat++)
             {
-                if (i >= cap)
+                var statStartIndex = stat * 8;
+                var cap = levelCap[stat];
+
+                for (int i = 0; i < 8; i++)
                 {
-                    cappedExp[i] = randomized[i]; //shouldn't matter, just wanna put something here
-                }
-                else if (i == cap - 1)
-                {
-                    cappedExp[i] = randomized[7]; //exp to get a 1up
-                }
-                else
-                {
-                    cappedExp[i] = randomized[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
+                    if (i >= cap)
+                    {
+                        cappedExp[statStartIndex + i] = randomized[statStartIndex + i]; //shouldn't matter, just wanna put something here
+                    }
+                    else if (i == cap - 1)
+                    {
+                        cappedExp[statStartIndex + i] = randomized[7]; //exp to get a 1up
+                    }
+                    else
+                    {
+                        cappedExp[statStartIndex + i] = randomized[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
+                    }
                 }
             }
 
@@ -2619,20 +2639,7 @@ public class Hyrule
             rom.Put(0xF53A, (byte)0);
         }
 
-        if (props.ShuffleAtkExp)
-        {
-            RandomizeExperience(rom, 0, props.AttackCap);
-        }
-
-        if (props.ShuffleMagicExp)
-        {
-            RandomizeExperience(rom, 1, props.MagicCap);
-        }
-
-        if (props.ShuffleLifeExp)
-        {
-            RandomizeExperience(rom, 2, props.LifeCap);
-        }
+        RandomizeExperience(rom);
 
         rom.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
 
