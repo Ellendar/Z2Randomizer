@@ -222,6 +222,11 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         return bytes;
     }
 
+    public int GetShort(int indexMsb, int indexLsb)
+    {
+        return (GetByte(indexMsb) << 8) + GetByte(indexLsb);
+    }
+
     public void Put(int index, byte data)
     {
         rawdata[index] = data;
@@ -238,6 +243,12 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         {
             rawdata[index + i] = data[i];
         }
+    }
+
+    public void PutShort(int indexMsb, int indexLsb, int data)
+    {
+        Put(indexMsb, (byte)(data / 256));
+        Put(indexLsb, (byte)(data % 256));
     }
 
     public void Dump(string filename)

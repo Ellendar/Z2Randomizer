@@ -2110,75 +2110,86 @@ public class Hyrule
         westHyrule.midoChurch.Collectable = Collectable.UPSTAB;
     }
 
-    private void RandomizeExperience(ROM rom, int start, int cap)
+    private void RandomizeExperience(ROM rom, int statIndex, int cap)
     {
-        int[] exp = new int[8];
+        var startAddr = 0x1669 + statIndex * 8;
+        var startAddrText = 0x1e42 + statIndex * 8;
 
-        for (int i = 0; i < exp.Length; i++)
+        int[] vanillaExp = new int[8];
+
+        for (int i = 0; i < vanillaExp.Length; i++)
         {
-            exp[i] = rom.GetByte(start + i) * 256;
-            exp[i] = exp[i] + rom.GetByte(start + 24 + i);
+            vanillaExp[i] = rom.GetShort(startAddr + i, startAddr + 24 + i);
         }
 
-        for (int i = 0; i < exp.Length; i++)
+        int[] randomizedExp = RandomizeExperience(RNG, vanillaExp, cap, props.ScaleLevels);
+
+        for (int i = 0; i < randomizedExp.Length; i++)
         {
-            int nextMin = (int)(exp[i] - exp[i] * 0.25);
-            int nextMax = (int)(exp[i] + exp[i] * 0.25);
+            rom.PutShort(startAddr + i, startAddr + 24 + i, randomizedExp[i]);
+        }
+
+        for (int i = 0; i < randomizedExp.Length; i++)
+        {
+            var n = randomizedExp[i];
+            var digit1 = IntToText(n / 1000);
+            n %= 1000;
+            var digit2 = IntToText(n / 100);
+            n %= 100;
+            var digit3 = IntToText(n / 10);
+            rom.Put(startAddrText + 48 + i, digit1);
+            rom.Put(startAddrText + 24 + i, digit2);
+            rom.Put(startAddrText + 0 + i, digit3);
+        }
+    }
+
+    private static int[] RandomizeExperience(Random RNG, int[] vanillaExp, int cap, bool scaleLevels)
+    {
+        int[] randomized = new int[8];
+
+        for (int i = 0; i < vanillaExp.Length; i++)
+        {
+            int nextMin = (int)(vanillaExp[i] - vanillaExp[i] * 0.25);
+            int nextMax = (int)(vanillaExp[i] + vanillaExp[i] * 0.25);
             if (i == 0)
             {
-                exp[i] = RNG.Next(Math.Max(10, nextMin), nextMax);
+                randomized[i] = RNG.Next(Math.Max(10, nextMin), nextMax);
             }
             else
             {
-                exp[i] = RNG.Next(Math.Max(exp[i - 1], nextMin), Math.Min(nextMax, 9990));
+                randomized[i] = RNG.Next(Math.Max(randomized[i - 1], nextMin), Math.Min(nextMax, 9990));
             }
         }
 
-        for (int i = 0; i < exp.Length; i++)
+        for (int i = 0; i < randomized.Length; i++)
         {
-            exp[i] = exp[i] / 10 * 10; //wtf is this line of code? -digshake, 2020
+            randomized[i] = randomized[i] / 10 * 10; //wtf is this line of code? -digshake, 2020
         }
 
-        int[] cappedExp = new int[8];
-        if (props.ScaleLevels)
+        if (scaleLevels)
         {
-            for (int i = 0; i < exp.Length; i++)
+            int[] cappedExp = new int[8];
+
+            for (int i = 0; i < randomized.Length; i++)
             {
                 if (i >= cap)
                 {
-                    cappedExp[i] = exp[i]; //shouldn't matter, just wanna put something here
+                    cappedExp[i] = randomized[i]; //shouldn't matter, just wanna put something here
                 }
                 else if (i == cap - 1)
                 {
-                    cappedExp[i] = exp[7]; //exp to get a 1up
+                    cappedExp[i] = randomized[7]; //exp to get a 1up
                 }
                 else
                 {
-                    int index = (int)(8 * ((i + 1.0) / (cap - 1)));
-                    cappedExp[i] = exp[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
+                    cappedExp[i] = randomized[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
                 }
             }
-        }
-        else
-        {
-            cappedExp = exp;
+
+            return cappedExp;
         }
 
-        for (int i = 0; i < exp.Length; i++)
-        {
-            rom.Put(start + i, (byte)(cappedExp[i] / 256));
-            rom.Put(start + 24 + i, (byte)(cappedExp[i] % 256));
-        }
-
-        for (int i = 0; i < exp.Length; i++)
-        {
-
-            rom.Put(start + 2057 + i, IntToText(cappedExp[i] / 1000));
-            cappedExp[i] = cappedExp[i] - ((cappedExp[i] / 1000) * 1000);
-            rom.Put(start + 2033 + i, IntToText(cappedExp[i] / 100));
-            cappedExp[i] = cappedExp[i] - ((cappedExp[i] / 100) * 100);
-            rom.Put(start + 2009 + i, IntToText(cappedExp[i] / 10));
-        }
+        return randomized;
     }
 
     /// <summary>
@@ -2610,17 +2621,17 @@ public class Hyrule
 
         if (props.ShuffleAtkExp)
         {
-            RandomizeExperience(rom, 0x1669, props.AttackCap);
+            RandomizeExperience(rom, 0, props.AttackCap);
         }
 
         if (props.ShuffleMagicExp)
         {
-            RandomizeExperience(rom, 0x1671, props.MagicCap);
+            RandomizeExperience(rom, 1, props.MagicCap);
         }
 
         if (props.ShuffleLifeExp)
         {
-            RandomizeExperience(rom, 0x1679, props.LifeCap);
+            RandomizeExperience(rom, 2, props.LifeCap);
         }
 
         rom.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
