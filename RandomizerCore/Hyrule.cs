@@ -2641,7 +2641,7 @@ public class Hyrule
 
         RandomizeExperience(rom);
 
-        rom.SetLevelCap(props.AttackCap, props.MagicCap, props.LifeCap);
+        rom.SetLevelCap(a, props.AttackCap, props.MagicCap, props.LifeCap);
 
         RandomizeAttackEffectiveness(rom, props.AttackEffectiveness);
 

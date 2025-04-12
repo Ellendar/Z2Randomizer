@@ -816,39 +816,28 @@ TitleEnd:
         Put(0x1a975, 0);
     }
 
-    public void SetLevelCap(int atkMax, int magicMax, int lifeMax)
+    public void SetLevelCap(Assembler asm, int atkMax, int magicMax, int lifeMax)
     {
+        var a = asm.Module();
+        a.Code("""
+.segment "PRG0"
+.org $9F7A
+    jmp LoadNewLevelCap
+    nop
+    nop
+LoadNewLevelCapReturn:        ; $9F7F
 
-        //jump to check which attribute is levelling up
-        Put(0x1f8a, 0x4C);
-        Put(0x1f8b, 0x9e);
-        Put(0x1f8c, 0xa8);
-
-        ////x = 2 life, x = 1 magic, x = 0 attack
-        //load current level for (attack, magic, life)
-        //compare to address of cap
-        //go back to $9f7f
-
-        //BD 77 07 (load level)
-        //DD A7 A8
-        //4C 7F 9F
-
-        Put(0x28AE, 0xBD);
-        Put(0x28AF, 0x77);
-        Put(0x28B0, 0x07);
-        Put(0x28B1, 0xDD);
-        Put(0x28B2, 0xA7);
-        Put(0x28B3, 0xA8);
-        Put(0x28B4, 0x4C);
-        Put(0x28B5, 0x7F);
-        Put(0x28B6, 0x9F);
-
-        //these are the actual caps
-        Put(0x28B7, (byte)atkMax);
-        Put(0x28B8, (byte)magicMax);
-        Put(0x28B9, (byte)lifeMax);
-
-
+.org $A89E
+LoadNewLevelCap:
+    lda $0777,X               ; the instruction we overwrote with jmp
+    cmp LevelCaps,X
+    jmp LoadNewLevelCapReturn
+""");
+        a.Org(0xa8a7);
+        a.Label("LevelCaps");
+        a.Byt((byte)atkMax);
+        a.Byt((byte)magicMax);
+        a.Byt((byte)lifeMax);
     }
 
     public void UseExtendedBanksForPalaceRooms(Assembler a)
