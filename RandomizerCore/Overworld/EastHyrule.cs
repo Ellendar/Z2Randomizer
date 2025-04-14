@@ -147,11 +147,6 @@ public sealed class EastHyrule : World
         hiddenPalaceCoords = (0, 0);
 
         enemyAddr = 0x88B0;
-        enemies = Enemies.EastGroundEnemies.Select(e => (int)e).ToList();
-        flyingEnemies = Enemies.EastFlyingEnemies.Select(e => (int)e).ToList();
-        generators = Enemies.EastGeneratorEnemies.Select(e => (int)e).ToList();
-        smallEnemies = Enemies.EastSmallEnemies.Select(e => (int)e).ToList();
-        largeEnemies = Enemies.EastLargeEnemies.Select(e => (int)e).ToList();
         enemyPtr = 0x85B1;
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
@@ -257,6 +252,18 @@ public sealed class EastHyrule : World
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
         SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    {
+        var groundEnemies = Enemies.EastGroundEnemies;
+        var flyingEnemies = Enemies.EastFlyingEnemies;
+        var generators = Enemies.EastGeneratorEnemies;
+        var smallEnemies = Enemies.EastSmallEnemies;
+        var largeEnemies = Enemies.EastLargeEnemies;
+        var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
+        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

@@ -48,11 +48,6 @@ sealed class MazeIsland : World
 
         walkableTerrains = [Terrain.MOUNTAIN];
         enemyAddr = 0x88B0;
-        enemies = Enemies.EastGroundEnemies.Select(e => (int)e).ToList();
-        flyingEnemies = Enemies.EastFlyingEnemies.Select(e => (int)e).ToList();
-        generators = Enemies.EastGeneratorEnemies.Select(e => (int)e).ToList();
-        smallEnemies = Enemies.EastSmallEnemies.Select(e => (int)e).ToList();
-        largeEnemies = Enemies.EastLargeEnemies.Select(e => (int)e).ToList();
         enemyPtr = 0xA08E;
         overworldMaps = [];
 
@@ -68,6 +63,18 @@ sealed class MazeIsland : World
 
         biome = props.MazeBiome;
         SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    {
+        var groundEnemies = Enemies.EastGroundEnemies;
+        var flyingEnemies = Enemies.EastFlyingEnemies;
+        var generators = Enemies.EastGeneratorEnemies;
+        var smallEnemies = Enemies.EastSmallEnemies;
+        var largeEnemies = Enemies.EastLargeEnemies;
+        var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
+        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

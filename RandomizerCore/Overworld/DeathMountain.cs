@@ -114,11 +114,6 @@ sealed class DeathMountain : World
             { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
         };
 
-        enemies = Enemies.WestGroundEnemies.Select(e => (int)e).ToList();
-        flyingEnemies = Enemies.WestFlyingEnemies.Select(e => (int)e).ToList();
-        generators = Enemies.WestGeneratorEnemies.Select(e => (int)e).ToList();
-        smallEnemies = Enemies.WestSmallEnemies.Select(e => (int)e).ToList();
-        largeEnemies = Enemies.WestLargeEnemies.Select(e => (int)e).ToList();
         enemyAddr = 0x48B0;
         enemyPtr = 0x608E;
 
@@ -147,6 +142,18 @@ sealed class DeathMountain : World
         climate.ApplyDeathMountainSafety(walkableTerrains, dmOpennessFactor);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    {
+        var groundEnemies = Enemies.WestGroundEnemies;
+        var flyingEnemies = Enemies.WestFlyingEnemies;
+        var generators = Enemies.WestGeneratorEnemies;
+        var smallEnemies = Enemies.WestSmallEnemies;
+        var largeEnemies = Enemies.WestLargeEnemies;
+        var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
+        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

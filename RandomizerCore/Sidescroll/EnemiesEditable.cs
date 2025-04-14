@@ -160,6 +160,10 @@ public class Enemy<T> where T : Enum
     {
         switch (this)
         {
+            case Enemy<EnemiesWest>:
+                return Enemies.WestSmallEnemies.Any(e => e.Equals(Id));
+            case Enemy<EnemiesEast>:
+                return Enemies.EastSmallEnemies.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceSmallEnemies.Contains(IdByte);
             case Enemy<EnemiesPalace346>:
@@ -178,6 +182,10 @@ public class Enemy<T> where T : Enum
     {
         switch (this)
         {
+            case Enemy<EnemiesWest>:
+                return Enemies.WestLargeEnemies.Any(e => e.Equals(Id));
+            case Enemy<EnemiesEast>:
+                return Enemies.EastLargeEnemies.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceLargeEnemies.Contains(IdByte);
             case Enemy<EnemiesPalace346>:
@@ -196,6 +204,10 @@ public class Enemy<T> where T : Enum
     {
         switch (this)
         {
+            case Enemy<EnemiesWest>:
+                return Enemies.WestGroundEnemies.Any(e => e.Equals(Id));
+            case Enemy<EnemiesEast>:
+                return Enemies.EastGroundEnemies.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceGroundEnemies.Contains(IdByte);
             case Enemy<EnemiesPalace346>:
@@ -214,6 +226,10 @@ public class Enemy<T> where T : Enum
     {
         switch (this)
         {
+            case Enemy<EnemiesWest>:
+                return Enemies.WestFlyingEnemies.Any(e => e.Equals(Id));
+            case Enemy<EnemiesEast>:
+                return Enemies.EastFlyingEnemies.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceFlyingEnemies.Contains(IdByte);
             case Enemy<EnemiesPalace346>:
@@ -232,6 +248,10 @@ public class Enemy<T> where T : Enum
     {
         switch (this)
         {
+            case Enemy<EnemiesWest>:
+                return Enemies.WestGeneratorEnemies.Any(e => e.Equals(Id));
+            case Enemy<EnemiesEast>:
+                return Enemies.EastGeneratorEnemies.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceGenerators.Contains(IdByte);
             case Enemy<EnemiesPalace346>:
