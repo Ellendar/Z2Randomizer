@@ -19,7 +19,71 @@ public class Enemies
     public const int MAXIMUM_ENEMY_BYTES = 0x400;
 	public const int MAXIMUM_ENEMY_BYTES_GP = 681;
 
+    public static readonly EnemiesWest[] WestSmallEnemies = [
+        EnemiesWest.MYU,
+        EnemiesWest.BOT,
+        EnemiesWest.BIT,
+        EnemiesWest.OCTOROC_STATIONARY,
+        EnemiesWest.OCTOROC_MOVING,
+        EnemiesWest.LOWDER,
+        EnemiesWest.MEGMET,
+    ];
+    public static readonly EnemiesWest[] WestLargeEnemies = [
+        EnemiesWest.ORANGE_MOBLIN,
+        EnemiesWest.RED_MOBLIN,
+        EnemiesWest.BLUE_MOBLIN,
+        EnemiesWest.ORANGE_DIARA,
+        EnemiesWest.RED_DIARA,
+        EnemiesWest.ORANGE_GORYIA,
+        EnemiesWest.RED_GORYIA,
+        EnemiesWest.BLUE_GORYIA,
+        EnemiesWest.GELDARM,
+    ];
+    public static readonly EnemiesWest[] WestGroundEnemies = [.. WestSmallEnemies, .. WestLargeEnemies];
+    public static readonly EnemiesWest[] WestFlyingEnemies = [
+        EnemiesWest.MOA,
+        EnemiesWest.ACHE,
+        EnemiesWest.ACHEMAN,
+        EnemiesWest.RED_DEELER,
+        EnemiesWest.BLUE_DEELER,
+    ];
+    public static readonly EnemiesWest[] WestGeneratorEnemies = [
+        EnemiesWest.BUBBLE_GENERATOR,
+        EnemiesWest.ROCK_GENERATOR,
+        EnemiesWest.BAGO_BAGO_GENERATOR,
+        EnemiesWest.MOBY_GENERATOR,
+    ];
 
+    public static readonly EnemiesEast[] EastSmallEnemies = [
+        EnemiesEast.MYU,
+        EnemiesEast.BOT,
+        EnemiesEast.BIT,
+        EnemiesEast.BLUE_OCTOROC_STATIONARY,
+        EnemiesEast.BLUE_OCTOROC_MOVING,
+        EnemiesEast.LEEVER,
+    ];
+    public static readonly EnemiesEast[] EastLargeEnemies = [
+        EnemiesEast.TEKTITE,
+        EnemiesEast.BASILISK,
+        EnemiesEast.SCORPION,
+        EnemiesEast.RED_LIZALFOS,
+        EnemiesEast.ORANGE_LIZALFOS,
+        EnemiesEast.BLUE_LIZALFOS,
+    ];
+    public static readonly EnemiesEast[] EastGroundEnemies = [.. EastSmallEnemies, .. EastLargeEnemies];
+    public static readonly EnemiesEast[] EastFlyingEnemies = [
+        EnemiesEast.MOA,
+        EnemiesEast.ACHE,
+        EnemiesEast.ACHEMAN,
+        EnemiesEast.RED_DEELER,
+        EnemiesEast.BLUE_DEELER,
+        EnemiesEast.GIRUBOKKU,
+    ];
+    public static readonly EnemiesEast[] EastGeneratorEnemies = [
+        EnemiesEast.BUBBLE_GENERATOR,
+        EnemiesEast.BAGO_BAGO_GENERATOR,
+        EnemiesEast.BOON_GENERATOR,
+    ];
 
     public static readonly EnemiesPalace125[] Palace125SmallEnemies = [
         EnemiesPalace125.MYU,
@@ -54,7 +118,7 @@ public class Enemies
     public static readonly EnemiesPalace346[] Palace346SmallEnemies = [
         EnemiesPalace346.MYU,
         EnemiesPalace346.BOT,
-        EnemiesPalace346.ROPE,
+        EnemiesPalace346.ROPE_STATIONARY,
     ];
     public static readonly EnemiesPalace346[] Palace346LargeEnemies = [
         EnemiesPalace346.TINSUIT,
@@ -112,79 +176,9 @@ public class Enemies
     public static readonly int[] StandardPalaceGenerators = Palace125Generators.Select(e => (int)e).Union(Palace346Generators.Select(e => (int)e)).ToArray();
     public static readonly int[] StandardPalaceSmallEnemies = Palace125SmallEnemies.Select(e => (int)e).Union(Palace346SmallEnemies.Select(e => (int)e)).ToArray();
     public static readonly int[] StandardPalaceLargeEnemies = Palace125LargeEnemies.Select(e => (int)e).Union(Palace346LargeEnemies.Select(e => (int)e)).ToArray();
+}
 
-
-    //TODO: Turn this into constants and a lookup, then replace the above nonsense with const arrays of constants instead of garbage
-    /*
-West Hyrule, Death Mountain:
-	00 - Fairy
-	01 - Red Jar
-	02 - Locked Door
-	03 - Myu
-	04 - Bot (blue)
-	05 - Bit (red)
-	06 - Moa
-	07 - Ache
-	08 - crash
-	09 - crash
-	0A - Acheman
-	0B - Bubble generator
-	0C - Rock Generator
-	0D - Red Deeler
-	0E - Blue Deeler
-	0F - Bago Bago Generator
-	10 - Bago Bago
-	11 - Red Octoroc (Jumping Only)
-	12 - Red Octorock (Moving and Jumping)
-	13 - Elevator
-	14 - Orange Moblin
-	15 - Red Moblin
-	16 - Blue Moblin
-	17 - Orange Diara
-	18 - Red Diara
-	19 - Orange Goryia
-	1A - Red Goryia
-	1B - Blue Goryia
-	1C - Lowder
-	1D - Moby generator
-	1E - Moby
-	1F - Megmet
-	20 - Geldarm
-	21 - Dumb Moblin Generator
-	22 - Dumb Moblin
-	23-FF crash
-East Hyrule, Maze Island
-	00 - Fairy
-	01 - Red Magic Jar
-	02 - Locked Door
-	03 - Myu
-	04 - Bot (blue)
-	05 - Bit (red)
-	06 - Moa
-	07 - Ache
-	08 - ???
-	09 - ???
-	0A - Acheman
-	0B - Bubble Generator
-	0C - Rock Generator (messed up link-doll sprite in east hyrule)
-	0D - Red Deeler
-	0E - Blue Deeler
-	0F - Bago Bago Generator
-	10 - Bago Bago
-	11 - Blue Octoroc (Jumping Only)
-	12 - Blue Octorock (Moving and Jumping)
-	13 - Elevator
-	14 - Tektite
-	15 - Eye
-	16 - Leever
-	17 - Boon
-	18 - Basilisk
-	19 - Scorpion
-	1A - Red Lizalfo
-	1B - Orange Lizalfo
-	1C - Blue Lizalfo
-	1D - Boulder Tossing Lizalfos 
-	1E-FF - Crash
+/*
 Towns
 	00 - Fairy
 	01 - Candle
@@ -197,7 +191,6 @@ Towns
 	08 - Gold colored girl, crashes game if you talk to her
 	09-24 - Various townspeople
 */
-}
 
 /// <summary>
 /// IDs that are shared everywhere in the game.
@@ -211,6 +204,80 @@ public static class EnemiesShared
     public const int LOCKED_DOOR = 0x02;
     public const int MYU = 0x03;
     public const int BOT = 0x04;
+}
+
+/// <summary>
+/// IDs for the west continent and Death Mountain
+/// </summary>
+public enum EnemiesWest
+{
+    FAIRY = 0x00,
+    RED_JAR = 0x01,
+    LOCKED_DOOR = 0x02,
+    MYU = 0x03,
+    BOT = 0x04,
+    BIT = 0x05,
+    MOA = 0x06,
+    ACHE = 0x07,
+    ACHEMAN = 0x0A,
+    BUBBLE_GENERATOR = 0x0B,
+    ROCK_GENERATOR = 0x0C,
+    RED_DEELER = 0x0D,
+    BLUE_DEELER = 0x0E,
+    BAGO_BAGO_GENERATOR = 0x0F,
+    BAGO_BAGO = 0x10,
+    OCTOROC_STATIONARY = 0x11,
+    OCTOROC_MOVING = 0x12,
+    ELEVATOR = 0x13,
+    ORANGE_MOBLIN = 0x14,
+    RED_MOBLIN = 0x15,
+    BLUE_MOBLIN = 0x16,
+    ORANGE_DIARA = 0x17,
+    RED_DIARA = 0x18,
+    ORANGE_GORYIA = 0x19,
+    RED_GORYIA = 0x1A,
+    BLUE_GORYIA = 0x1B,
+    LOWDER = 0x1C,
+    MOBY_GENERATOR = 0x1D,
+    MOBY = 0x1E,
+    MEGMET = 0x1F,
+    GELDARM = 0x20,
+    DUMB_MOBLIN_GENERATOR = 0x21,
+    DUMB_MOBLIN = 0x22,
+}
+
+/// <summary>
+/// IDs for the east continent and Maze Island
+/// </summary>
+public enum EnemiesEast
+{
+    FAIRY = 0x00,
+    RED_JAR = 0x01,
+    LOCKED_DOOR = 0x02,
+    MYU = 0x03,
+    BOT = 0x04,
+    BIT = 0x05,
+    MOA = 0x06,
+    ACHE = 0x07,
+    ACHEMAN = 0x0A,
+    BUBBLE_GENERATOR = 0x0B,
+    RED_DEELER = 0x0D,
+    BLUE_DEELER = 0x0E,
+    BAGO_BAGO_GENERATOR = 0x0F,
+    BAGO_BAGO = 0x10,
+    BLUE_OCTOROC_STATIONARY = 0x11,
+    BLUE_OCTOROC_MOVING = 0x12,
+    ELEVATOR = 0x13,
+    TEKTITE = 0x14,
+    GIRUBOKKU = 0x15,
+    LEEVER = 0x16,
+    BOON_GENERATOR = 0x17,
+    BASILISK = 0x18,
+    SCORPION = 0x19,
+    RED_LIZALFOS = 0x1A,
+    ORANGE_LIZALFOS = 0x1B,
+    BLUE_LIZALFOS = 0x1C,
+    BOULDER_TOSSING_LIZALFOS = 0x1D,
 }
 
 /// <summary>
@@ -237,6 +304,7 @@ public static class EnemiesRegularPalaceShared
     public const int DRIPPER = 0x0D;
     public const int FAST_BUBBLE = 0x0E;
 
+    public const int ROPE_STATIONARY = 0x11;
     public const int ELEVATOR = 0x13;
     public const int CRYSTAL_SPOT = 0x14;
     public const int CRYSTAL = 0x15;
@@ -331,7 +399,7 @@ public enum EnemiesPalace346
     FAST_BUBBLE = 0x0E,
     BLUE_DRAGON_HEAD_GENERATOR = 0x0F,
     FLAME = 0x10,
-    ROPE = 0x11,
+    ROPE_STATIONARY = 0x11,
     ELEVATOR = 0x13,
     CRYSTAL_SPOT = 0x14,
     CRYSTAL = 0x15,

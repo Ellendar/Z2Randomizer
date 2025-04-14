@@ -218,11 +218,6 @@ public sealed class WestHyrule : World
         bridgeConn.Add(bridge1, bridge2);
         bridgeConn.Add(bridge2, bridge1);
 
-        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1F, 0x20 };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        generators = new List<int> { 0x0B, 0x0C, 0x0F, 0x1D };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x1C, 0x1F };
-        largeEnemies = new List<int> { 0x20, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B };
         enemyAddr = 0x48B0;
         enemyPtr = 0x45B1;
 
@@ -319,6 +314,18 @@ public sealed class WestHyrule : World
             GetLocationByMem(0x4635)
         ];
         SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    {
+        var groundEnemies = Enemies.WestGroundEnemies;
+        var flyingEnemies = Enemies.WestFlyingEnemies;
+        var generators = Enemies.WestGeneratorEnemies;
+        var smallEnemies = Enemies.WestSmallEnemies;
+        var largeEnemies = Enemies.WestLargeEnemies;
+        var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
+        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
