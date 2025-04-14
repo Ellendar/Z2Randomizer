@@ -48,11 +48,11 @@ sealed class MazeIsland : World
 
         walkableTerrains = [Terrain.MOUNTAIN];
         enemyAddr = 0x88B0;
-        enemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x16, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
-        flyingEnemies = [0x06, 0x07, 0x0A, 0x0D, 0x0E, 0x15];
-        generators = [0x0B, 0x0F, 0x17];
-        smallEnemies = [0x03, 0x04, 0x05, 0x11, 0x12, 0x16];
-        largeEnemies = [0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C];
+        enemies = Enemies.EastGroundEnemies.Select(e => (int)e).ToList();
+        flyingEnemies = Enemies.EastFlyingEnemies.Select(e => (int)e).ToList();
+        generators = Enemies.EastGeneratorEnemies.Select(e => (int)e).ToList();
+        smallEnemies = Enemies.EastSmallEnemies.Select(e => (int)e).ToList();
+        largeEnemies = Enemies.EastLargeEnemies.Select(e => (int)e).ToList();
         enemyPtr = 0xA08E;
         overworldMaps = [];
 

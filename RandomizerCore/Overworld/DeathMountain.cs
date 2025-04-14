@@ -114,11 +114,11 @@ sealed class DeathMountain : World
             { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
         };
 
-        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1F, 0x20 };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        generators = new List<int> { 0x0B, 0x0C, 0x0F, 0x1D };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x1C, 0x1F };
-        largeEnemies = new List<int> { 0x20, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B };
+        enemies = Enemies.WestGroundEnemies.Select(e => (int)e).ToList();
+        flyingEnemies = Enemies.WestFlyingEnemies.Select(e => (int)e).ToList();
+        generators = Enemies.WestGeneratorEnemies.Select(e => (int)e).ToList();
+        smallEnemies = Enemies.WestSmallEnemies.Select(e => (int)e).ToList();
+        largeEnemies = Enemies.WestLargeEnemies.Select(e => (int)e).ToList();
         enemyAddr = 0x48B0;
         enemyPtr = 0x608E;
 
