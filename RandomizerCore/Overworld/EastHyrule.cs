@@ -1386,7 +1386,7 @@ public class EastHyrule : World
                 || hiddenKasutoLocation == bridge
                 || hiddenKasutoLocation == cave1
                 || hiddenKasutoLocation == cave2
-                || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
+                || (hiddenKasutoLocation.TerrainType == Terrain.TOWN && !hiddenKasutoLocation.AppearsOnMap) //no fake item locations
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
                 || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))

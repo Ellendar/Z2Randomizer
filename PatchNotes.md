@@ -1,6 +1,10 @@
 # Z2Randomizer Changelog
 
-## Version 4.3.16 - April 7, 2025
+## Version 4.3.18 - April 15, 2025
+
+- Fixed a rare hidden kasuto issue
+
+## Version 4.3.17 - April 7, 2025
 
 - Fixed yet another hidden palace issue.
 
