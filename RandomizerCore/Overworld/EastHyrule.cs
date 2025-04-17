@@ -352,7 +352,6 @@ public sealed class EastHyrule : World
                 }
                 //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
                 desertTile.PassThrough = 0;
-                debug++;
 
                 desertTile.MapPage = 64;
                 Location? desert = GetLocationByMem(0x8646);
@@ -608,6 +607,7 @@ public sealed class EastHyrule : World
                     DrawRiver(props.CanWalkOnWaterWithBoots);
                 }
 
+                debug++;
                 if (props.HiddenKasuto)
                 {
                     RandomizeHiddenKasuto(props.ShuffleHidden);
@@ -1465,7 +1465,7 @@ public sealed class EastHyrule : World
                 || hiddenKasutoLocation == bridge
                 || hiddenKasutoLocation == cave1
                 || hiddenKasutoLocation == cave2
-                || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
+                || (hiddenKasutoLocation.TerrainType == Terrain.TOWN && !hiddenKasutoLocation.AppearsOnMap) //no fake item locations
                 || connections.ContainsKey(hiddenKasutoLocation)
                 || !hiddenKasutoLocation.CanShuffle
                 || ((biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE) && hiddenKasutoLocation.TerrainType == Terrain.LAVA && hiddenKasutoLocation.PassThrough != 0))

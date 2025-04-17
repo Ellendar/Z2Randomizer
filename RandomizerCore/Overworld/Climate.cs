@@ -12,14 +12,14 @@ public class Climate
     private List<Terrain> terrainWeightTable;
     public string Name { get; set; }
 
-    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount)
+    public Climate(string name, Dictionary<Terrain, float> distanceCoefficients, Dictionary<Terrain, int> terrainWeights, int seedTerrainCount, bool providedDistancesAreInverted = false)
     {
         Name = name;
         // Precompute distance coefficients into a inverse list
         DistanceCoefficients = new float[(int)Terrain.NONE];
         foreach (var pair in distanceCoefficients)
         {
-            DistanceCoefficients[(int)pair.Key] = 1f / pair.Value;
+            DistanceCoefficients[(int)pair.Key] = providedDistancesAreInverted ? pair.Value : (1f / pair.Value);
         }
         TerrainWeights = new int[(int)Terrain.NONE];
         foreach (var pair in terrainWeights)
@@ -72,14 +72,14 @@ public class Climate
 
     public Climate Clone()
     {
-        return new(Name, 
+        return new(Name,
             new Dictionary<Terrain, float>(DistanceCoefficients
                 .Select((value, index) => new { value, index })
                 .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
-        new Dictionary<Terrain, int>(TerrainWeights
+            new Dictionary<Terrain, int>(TerrainWeights
                 .Select((value, index) => new { value, index })
-                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)), 
-            SeedTerrainCount);
+                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
+            SeedTerrainCount, providedDistancesAreInverted: true);
     }
 
     /// <summary>
@@ -93,21 +93,32 @@ public class Climate
     /// <param name="constraintLimitFactor">The relative permissible factor between walkable and mountain terrain growths</param>
     public void ApplyDeathMountainSafety(IEnumerable<Terrain> walkableTerrains, float constraintLimitFactor = 1f)
     {
+        float coefficientSum = 0f;
+        foreach (Terrain terrain in walkableTerrains)
+        {
+            if (terrain != Terrain.ROAD)
+            {
+                coefficientSum += DistanceCoefficients[(int)terrain];
+            }
+        }
+        float averageCoefficient = coefficientSum / (walkableTerrains.Count() - walkableTerrains.Count(i => i == Terrain.ROAD));
+        DistanceCoefficients[(int)Terrain.ROAD] = float.Min(DistanceCoefficients[(int)Terrain.ROAD], averageCoefficient);
+
         float totalRandomGrowthFactors = 0f;
         float totalWalkableTerrainWeight = 0f;
         foreach (Terrain terrain in walkableTerrains)
         {
-            totalRandomGrowthFactors += TerrainWeights[(int)terrain] * DistanceCoefficients[(int)terrain];
+            totalRandomGrowthFactors += TerrainWeights[(int)terrain] / DistanceCoefficients[(int)terrain];
             totalWalkableTerrainWeight += TerrainWeights[(int)terrain];
         }
         float aggregateWalkableTerrainGrowth = totalRandomGrowthFactors / totalWalkableTerrainWeight;
-        float mountainTerrainGrowth = DistanceCoefficients[(int)Terrain.MOUNTAIN];
+        float mountainTerrainGrowth = 1 / DistanceCoefficients[(int)Terrain.MOUNTAIN];
 
         if (mountainTerrainGrowth * constraintLimitFactor > aggregateWalkableTerrainGrowth)
         {
             foreach (Terrain terrain in walkableTerrains)
             {
-                DistanceCoefficients[(int)terrain] *= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
+                DistanceCoefficients[(int)terrain] /= ((mountainTerrainGrowth * constraintLimitFactor) / aggregateWalkableTerrainGrowth);
             }
         }
     }

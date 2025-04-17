@@ -16842,7 +16842,7 @@
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": [],
-    "isDropZone": true,
+    "isDropZone": false,
     "hasItem": false,
     "enemies": "0B224C735D4F852F4C779D",
     "sideviewData": "24600E08D2808834713261B48A34713261B48A34713261B46B02D10DF75000F1B071D20F",
