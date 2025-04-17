@@ -97,7 +97,7 @@ public class Hyrule
     public bool startMed;
 
     //DEBUG/STATS
-    private static int DEBUG_THRESHOLD = 0;
+    private static int DEBUG_THRESHOLD = 100;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -919,7 +919,7 @@ public class Hyrule
                     Debug.WriteLine("Failed on critical item");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
 
-                    return false;
+                    return true;
                 }
                 itemGetReachableFailures++;
                 return false;
@@ -935,7 +935,7 @@ public class Hyrule
                 {
                     Debug.WriteLine("Failed on items");
                     PrintRoutingDebug(count, wh, eh, dm, mi);
-                    return false;
+                    return true;
                 }
                 return false;
             }
@@ -960,7 +960,7 @@ public class Hyrule
                 Debug.WriteLine("Failed on spells");
                 debug++;
                 PrintRoutingDebug(count, wh, eh, dm, mi);
-                return false;
+                return true;
             }
             return false;
         }

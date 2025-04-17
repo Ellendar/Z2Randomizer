@@ -1435,7 +1435,7 @@ public abstract class World
                     {
                         dy = t.Item1 - y;
                         dx = t.Item2 - x;
-                        distance = (1f / climate.DistanceCoefficients[(int)map[t.Item1, t.Item2]]) * Math.Sqrt(dy * dy + dx * dx);
+                        distance = (climate.DistanceCoefficients[(int)map[t.Item1, t.Item2]]) * Math.Sqrt(dy * dy + dx * dx);
                         //distance = ((tx + (tx >> 31)) ^ (tx >> 31)) + ((ty + (ty >> 31)) ^ (ty >> 31));
                         //distance = Math.Abs(tx) + Math.Abs(ty);
                         if (distance < mindistance)

@@ -141,12 +141,7 @@ class DeathMountain : World
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
         climate = props.Climate.Clone();
-        float dmOpennessFactor = biome switch
-        {
-            Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
-            _ => 1f
-        };
-        climate.ApplyDeathMountainSafety(walkableTerrains, dmOpennessFactor);
+
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
     }
 
@@ -683,7 +678,14 @@ class DeathMountain : World
                 }
                 randomTerrainFilter.Add(Terrain.ROAD);
                 //Debug.WriteLine(GetMapDebug());
-                if (!GrowTerrain(climate))
+                Climate growthClimate = climate.Clone();
+                float dmOpennessFactor = biome switch
+                {
+                    Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
+                    _ => 1f
+                };
+                growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
+                if (!GrowTerrain(growthClimate))
                 {
                     return false;
                 }
