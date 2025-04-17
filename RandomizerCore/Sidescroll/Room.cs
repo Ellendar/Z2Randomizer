@@ -369,7 +369,7 @@ public class Room : IJsonOnDeserialized
         return exits;
     }
 
-    public void RandomizeEnemies(bool mixEnemies, bool generatorsAlwaysMatch, Random RNG)
+    public void RandomizeEnemies(bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG)
     {
         //Because a 125 room could be shuffled into 346 or vice versa, we have to check if the enemy is that type in either
         //palace group, and if so, shuffle that enemy into a new enemy specifically appropriate to that palace
@@ -377,35 +377,35 @@ public class Room : IJsonOnDeserialized
         {
             case PalaceGrouping.Palace125:
                 {
-                    var allEnemies = RandomizerCore.Enemies.Palace125GroundEnemies;
+                    var groundEnemies = RandomizerCore.Enemies.Palace125GroundEnemies;
                     var smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
                     var largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
                     var flyingEnemies = RandomizerCore.Enemies.Palace125FlyingEnemies;
                     var generators = RandomizerCore.Enemies.Palace125Generators;
                     var ee = new EnemiesEditable<EnemiesPalace125>(Enemies);
-                    RandomizeEnemiesInner(ee, mixEnemies, generatorsAlwaysMatch, RNG, allEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+                    RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
                     break;
                 }
             case PalaceGrouping.Palace346:
                 {
-                    var allEnemies = RandomizerCore.Enemies.Palace346GroundEnemies;
+                    var groundEnemies = RandomizerCore.Enemies.Palace346GroundEnemies;
                     var smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
                     var largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
                     var flyingEnemies = RandomizerCore.Enemies.Palace346FlyingEnemies;
                     var generators = RandomizerCore.Enemies.Palace346Generators;
                     var ee = new EnemiesEditable<EnemiesPalace346>(Enemies);
-                    RandomizeEnemiesInner(ee, mixEnemies, generatorsAlwaysMatch, RNG, allEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+                    RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
                     break;
                 }
             case PalaceGrouping.PalaceGp:
                 {
-                    var allEnemies = RandomizerCore.Enemies.GPGroundEnemies;
+                    var groundEnemies = RandomizerCore.Enemies.GPGroundEnemies;
                     var smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
                     var largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
                     var flyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
                     var generators = RandomizerCore.Enemies.GPGenerators;
                     var ee = new EnemiesEditable<EnemiesGreatPalace>(Enemies);
-                    RandomizeEnemiesInner(ee, mixEnemies, generatorsAlwaysMatch, RNG, allEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+                    RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
                     break;
                 }
             default:
@@ -413,7 +413,7 @@ public class Room : IJsonOnDeserialized
         }
     }
 
-    private void RandomizeEnemiesInner<T>(EnemiesEditable<T> ee, bool mixEnemies, bool generatorsAlwaysMatch, Random RNG, T[] allEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    private void RandomizeEnemiesInner<T>(EnemiesEditable<T> ee, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
         bool[,]? solidGridLazy = null; // lazily instanced if needed
         bool[,] GetSolidGrid<P>() where P : Enum
@@ -526,12 +526,11 @@ public class Room : IJsonOnDeserialized
         {
             Enemy<T> enemy = ee.Enemies[i];
 
-            if (mixEnemies) // mix small and large enemies
+            if (mixLargeAndSmallEnemies)
             {
-                //If this is a shufflable enemy (As opposed to something like a crystal marker)
                 if (enemy.IsShufflableSmallOrLarge())
                 {
-                    T swapToId = allEnemies[RNG.Next(0, allEnemies.Length)];
+                    T swapToId = groundEnemies[RNG.Next(0, groundEnemies.Length)];
                     if (enemy.IsShufflableSmall() && largeEnemies.Contains(swapToId))
                     {
                         enemy.Y--; // subtract Y by 1 when switching a small enemy to a large enemy
@@ -577,13 +576,12 @@ public class Room : IJsonOnDeserialized
                 if (generatorsAlwaysMatch)
                 {
                     enemy.Id = (T)(object)firstGenerator;
-                    continue;
                 }
                 else
                 {
                     enemy.Id = swapToId;
-                    continue;
                 }
+                continue;
             }
         }
         NewEnemies = ee.Finalize();

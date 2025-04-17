@@ -1874,7 +1874,7 @@ public class Hyrule
         {
             foreach (World world in worlds)
             {
-                world.ShuffleOverworldEnemies(ROMData, props.GeneratorsAlwaysMatch, props.MixLargeAndSmallEnemies);
+                world.ShuffleOverworldEnemies(ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch);
             }
         }
     }
