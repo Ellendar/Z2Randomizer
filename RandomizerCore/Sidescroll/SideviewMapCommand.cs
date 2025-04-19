@@ -167,6 +167,9 @@ public class SideviewMapCommand<T> where T : Enum
     {
         switch (this)
         {
+            case SideviewMapCommand<ForestObject>:
+            case SideviewMapCommand<CaveObject>:
+                return Y == 15 && (Bytes[1] & 0xF0) == 0x20;
             case SideviewMapCommand<PalaceObject>:
             case SideviewMapCommand<GreatPalaceObject>:
                 return Y == 15 && (Bytes[1] & 0xF0) == 0x10;
@@ -188,6 +191,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.Width((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.Width((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.Width((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -223,6 +230,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.Height((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.Height((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.Height((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -239,7 +250,7 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 if (IsElevator())
                 {
-                    return 13;
+                    return 3;
                 }
                 else if (IsLava())
                 {
@@ -258,6 +269,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.IsSolid((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.IsSolid((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.IsSolid((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -279,6 +294,10 @@ public class SideviewMapCommand<T> where T : Enum
         {
             switch (this)
             {
+                case SideviewMapCommand<ForestObject>:
+                    return ForestObjectExtensions.IsSolidAt((this as SideviewMapCommand<ForestObject>)!, x, y);
+                case SideviewMapCommand<CaveObject>:
+                    return CaveObjectExtensions.IsSolidAt((this as SideviewMapCommand<CaveObject>)!, x, y);
                 case SideviewMapCommand<PalaceObject>:
                     return PalaceObjectExtensions.IsSolidAt((this as SideviewMapCommand<PalaceObject>)!, x, y);
                 case SideviewMapCommand<GreatPalaceObject>:
@@ -301,6 +320,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.IsBreakable((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.IsBreakable((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.IsBreakable((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -324,6 +347,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.IsPit((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.IsPit((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.IsPit((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
