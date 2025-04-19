@@ -366,7 +366,7 @@ public class SideviewMapCommand<T> where T : Enum
         }
     }
 
-    public bool IsFloorSolidAt(int y)
+    public bool IsFloorSolidAt(SideviewEditable<T> sv, int y)
     {
         Debug.Assert(IsNewFloor());
         var floorByte = Bytes[1];
@@ -382,13 +382,21 @@ public class SideviewMapCommand<T> where T : Enum
         {
             if (y == 0) { return true; }
         }
-        if (y > 10) { return true; } // bottom 2 rows are always floor
         if ((floorByte & 0b1000) == 0) // 4th bit branches logic
         {
-            return y > 10 - (floorByte & 0b0111);
+            if ((sv.TilesHeader == 0x03 /* swamp */ || sv.TilesHeader == 0x04 /* sand */) && (sv is SideviewEditable<ForestObject> || sv is SideviewEditable<CaveObject>))
+            {
+                // in swamp and sand tilesets, floors start 1 step lower (because of course they do)
+                return y > 11 - (floorByte & 0b0111);
+            }
+            else
+            {
+                return y > 10 - (floorByte & 0b0111);
+            }
         }
         else
         {
+            if (y > 10) { return true; } // bottom 2 rows are always floor
             return y < (floorByte & 0b0111) + 2;
         }
     }
