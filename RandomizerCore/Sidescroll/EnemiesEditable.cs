@@ -104,8 +104,14 @@ public class Enemy<T> where T : Enum
     /// </summary>
     public int Y
     {
-        get => (Bytes[0] & 0xF0) >> 4;
-        set { Bytes[0] = (byte)((value << 4) | (Bytes[0] & 0x0F)); }
+        get {
+            int rawY = ((Bytes[0] & 0xF0) >> 4);
+            return rawY == 0 ? 1 : rawY + 2;
+        }
+        set {
+            int rawY = value < 3 ? 0 : value - 2;
+            Bytes[0] = (byte)((rawY << 4) | (Bytes[0] & 0x0F));
+        }
     }
 
     /// <summary>
@@ -249,9 +255,9 @@ public class Enemy<T> where T : Enum
         switch (this)
         {
             case Enemy<EnemiesWest>:
-                return Enemies.WestGeneratorEnemies.Any(e => e.Equals(Id));
+                return Enemies.WestGenerators.Any(e => e.Equals(Id));
             case Enemy<EnemiesEast>:
-                return Enemies.EastGeneratorEnemies.Any(e => e.Equals(Id));
+                return Enemies.EastGenerators.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceGenerators.Contains(IdByte);
             case Enemy<EnemiesPalace346>:

@@ -218,11 +218,14 @@ public sealed class WestHyrule : World
         bridgeConn.Add(bridge1, bridge2);
         bridgeConn.Add(bridge2, bridge1);
 
+        sideviewPtrTable = 0x4533;
+        sideviewBank = 1;
+
         enemyAddr = 0x48B0;
         enemyPtr = 0x45B1;
 
-        //34 29 39 48 35 58 30 53 40
-        overworldMaps = new List<int>() { 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
+        overworldMaps = [29, 30, 34, 35, 39, 40, 48, 53, 58];
+
         MAP_ROWS = 75;
         MAP_COLS = 64;
         baseAddr = 0x462F;
@@ -316,15 +319,15 @@ public sealed class WestHyrule : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(byte[] sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.WestGroundEnemies;
         var flyingEnemies = Enemies.WestFlyingEnemies;
-        var generators = Enemies.WestGeneratorEnemies;
+        var generators = Enemies.WestGenerators;
         var smallEnemies = Enemies.WestSmallEnemies;
         var largeEnemies = Enemies.WestLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 

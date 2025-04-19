@@ -256,6 +256,11 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         File.WriteAllBytes(filename, rawdata);
     }
 
+    public static int ConvertNesPtrToRomAddr(int bank, int nesPtr)
+    {
+        return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
+    }
+
     public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)
     {
         // Each byte specifies 1 color bit for an 8 pixel column

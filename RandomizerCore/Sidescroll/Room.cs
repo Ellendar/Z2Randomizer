@@ -425,12 +425,12 @@ public class Room : IJsonOnDeserialized
             }
             return solidGridLazy;
         }
-        bool AreaIsOpen<P>(ref bool? cachedResult, int x1, int x2, int y1, int y2) where P : Enum
+        bool AreaIsOpen<P>(ref bool? cachedResult, int x, int y, int w, int h) where P : Enum
         {
             if (cachedResult == null)
             {
                 var solidGrid = GetSolidGrid<P>();
-                cachedResult = SideviewEditable<P>.AreaIsOpen(solidGrid, x1, x2, y1, y2);
+                cachedResult = SideviewEditable<P>.AreaIsOpen(solidGrid, x, y, w, h);
             }
             return cachedResult.Value;
         }
@@ -445,10 +445,10 @@ public class Room : IJsonOnDeserialized
                     bool reroll = false;
                     switch (swapToId)
                     {
-                        // Re-roll Magos and Wizards unless their y pos is 7.
+                        // Re-roll Magos and Wizards unless their y pos is 9.
                         case EnemiesPalace125.MAGO:
                         case EnemiesPalace346.WIZARD:
-                            reroll = enemy.Y != 0x07;
+                            reroll = enemy.Y != 0x09;
                             break;
 
                         // Re-roll Stalfos if they don't have room to dive from the ceiling to their position
@@ -456,7 +456,8 @@ public class Room : IJsonOnDeserialized
                         case EnemiesPalace125.BLUE_STALFOS:
                         case EnemiesPalace346.RED_STALFOS:
                         case EnemiesPalace346.BLUE_STALFOS:
-                            reroll = !AreaIsOpen<PalaceObject>(ref roomForStalfos, enemy.X, enemy.X, 3, enemy.Y);
+                            // Stalfos will get fully stuck if the ceiling is solid until y=4. If it's solid only until y=3 or y=2, it will slowly slide down.
+                            reroll = !AreaIsOpen<PalaceObject>(ref roomForStalfos, enemy.X, 4, 1, Math.Max(enemy.Y - 4, 2));
                             break;
                     }
 
@@ -496,15 +497,15 @@ public class Room : IJsonOnDeserialized
                     {
                         case EnemiesGreatPalace.SLOW_BUBBLE:
                         case EnemiesGreatPalace.FAST_BUBBLE:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBubble, enemy.X, enemy.X, enemy.Y, enemy.Y);
+                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBubble, enemy.X, enemy.Y, 1, 1);
                             break;
 
                         case EnemiesGreatPalace.BIG_BUBBLE:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBigBubble, enemy.X, enemy.X + 1, enemy.Y, enemy.Y + 1);
+                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBigBubble, enemy.X, enemy.Y, 2, 2);
                             break;
 
                         case EnemiesGreatPalace.KING_BOT:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForKingBot, enemy.X, enemy.X + 2, enemy.Y, enemy.Y + 1);
+                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForKingBot, enemy.X, enemy.Y, 3, 2);
                             break;
                     };
 

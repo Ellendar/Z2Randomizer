@@ -47,7 +47,7 @@ public class Enemies
         EnemiesWest.RED_DEELER,
         EnemiesWest.BLUE_DEELER,
     ];
-    public static readonly EnemiesWest[] WestGeneratorEnemies = [
+    public static readonly EnemiesWest[] WestGenerators = [
         EnemiesWest.BUBBLE_GENERATOR,
         EnemiesWest.ROCK_GENERATOR,
         EnemiesWest.BAGO_BAGO_GENERATOR,
@@ -79,7 +79,7 @@ public class Enemies
         EnemiesEast.BLUE_DEELER,
         EnemiesEast.GIRUBOKKU,
     ];
-    public static readonly EnemiesEast[] EastGeneratorEnemies = [
+    public static readonly EnemiesEast[] EastGenerators = [
         EnemiesEast.BUBBLE_GENERATOR,
         EnemiesEast.BAGO_BAGO_GENERATOR,
         EnemiesEast.BOON_GENERATOR,
@@ -114,7 +114,6 @@ public class Enemies
         EnemiesPalace125.BLUE_DRAGON_HEAD_GENERATOR,
     ];
 
-
     public static readonly EnemiesPalace346[] Palace346SmallEnemies = [
         EnemiesPalace346.MYU,
         EnemiesPalace346.BOT,
@@ -142,7 +141,6 @@ public class Enemies
         EnemiesPalace346.WOLF_HEAD_GENERATOR,
     ];
 
-
     public static readonly EnemiesGreatPalace[] GPSmallEnemies = [
         EnemiesGreatPalace.MYU,
         EnemiesGreatPalace.BOT,
@@ -169,7 +167,6 @@ public class Enemies
         EnemiesGreatPalace.FIRE_BAGO_BAGO_GENERATOR,
         EnemiesGreatPalace.ORANGE_DRAGON_HEAD_GENERATOR,
     ];
-
 
     public static readonly int[] StandardPalaceGroundEnemies = Palace125GroundEnemies.Select(e => (int)e).Union(Palace346GroundEnemies.Select(e => (int)e)).ToArray();
     public static readonly int[] StandardPalaceFlyingEnemies = Palace125FlyingEnemies.Select(e => (int)e).Union(Palace346FlyingEnemies.Select(e => (int)e)).ToArray();
