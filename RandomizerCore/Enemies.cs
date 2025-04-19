@@ -114,7 +114,6 @@ public class Enemies
         EnemiesPalace125.BLUE_DRAGON_HEAD_GENERATOR,
     ];
 
-
     public static readonly EnemiesPalace346[] Palace346SmallEnemies = [
         EnemiesPalace346.MYU,
         EnemiesPalace346.BOT,
@@ -142,7 +141,6 @@ public class Enemies
         EnemiesPalace346.WOLF_HEAD_GENERATOR,
     ];
 
-
     public static readonly EnemiesGreatPalace[] GPSmallEnemies = [
         EnemiesGreatPalace.MYU,
         EnemiesGreatPalace.BOT,
@@ -169,7 +167,6 @@ public class Enemies
         EnemiesGreatPalace.FIRE_BAGO_BAGO_GENERATOR,
         EnemiesGreatPalace.ORANGE_DRAGON_HEAD_GENERATOR,
     ];
-
 
     public static readonly int[] StandardPalaceGroundEnemies = Palace125GroundEnemies.Select(e => (int)e).Union(Palace346GroundEnemies.Select(e => (int)e)).ToArray();
     public static readonly int[] StandardPalaceFlyingEnemies = Palace125FlyingEnemies.Select(e => (int)e).Union(Palace346FlyingEnemies.Select(e => (int)e)).ToArray();

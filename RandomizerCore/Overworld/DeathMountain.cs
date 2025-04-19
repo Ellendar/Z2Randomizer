@@ -116,6 +116,9 @@ sealed class DeathMountain : World
             { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
         };
 
+        sideviewPtrTable = 0x6010;
+        sideviewBank = 1;
+
         enemyAddr = 0x48B0;
         enemyPtr = 0x608E;
 
@@ -141,7 +144,7 @@ sealed class DeathMountain : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(byte[] sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.WestGroundEnemies;
         var flyingEnemies = Enemies.WestFlyingEnemies;
@@ -149,7 +152,7 @@ sealed class DeathMountain : World
         var smallEnemies = Enemies.WestSmallEnemies;
         var largeEnemies = Enemies.WestLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 
