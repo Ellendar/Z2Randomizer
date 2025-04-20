@@ -207,6 +207,17 @@ public static class PalaceObjectExtensions
         }
     }
 
+    public static bool IsSolidAt(SideviewMapCommand<PalaceObject> command, int x, int y)
+    {
+        switch (command.Id)
+        {
+            case PalaceObject.BRIDGE:
+                return y == command.Y + 1;
+            default:
+                return IsSolid(command);
+        }
+    }
+
     public static bool IsBreakable(SideviewMapCommand<PalaceObject> command)
     {
         switch (command.Id)
@@ -338,6 +349,17 @@ public static class GreatPalaceObjectExtensions
                 return true;
             default:
                 throw new NotImplementedException();
+        }
+    }
+
+    public static bool IsSolidAt(SideviewMapCommand<GreatPalaceObject> command, int x, int y)
+    {
+        switch (command.Id)
+        {
+            case GreatPalaceObject.BRIDGE:
+                return y == command.Y + 1;
+            default:
+                return IsSolid(command);
         }
     }
 

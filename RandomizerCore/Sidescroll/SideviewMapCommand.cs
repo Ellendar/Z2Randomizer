@@ -273,6 +273,26 @@ public class SideviewMapCommand<T> where T : Enum
         }
     }
 
+    public bool IsSolidAt(int x, int y)
+    {
+        if (Y < 13)
+        {
+            switch (this)
+            {
+                case SideviewMapCommand<PalaceObject>:
+                    return PalaceObjectExtensions.IsSolidAt((this as SideviewMapCommand<PalaceObject>)!, x, y);
+                case SideviewMapCommand<GreatPalaceObject>:
+                    return GreatPalaceObjectExtensions.IsSolidAt((this as SideviewMapCommand<GreatPalaceObject>)!, x, y);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public bool IsBreakable
     {
         get

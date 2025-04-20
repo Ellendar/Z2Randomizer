@@ -222,7 +222,7 @@ public class SideviewEditable<T> where T : Enum
                 {
                     for (int y = cmd.Y; y < h; y++)
                     {
-                        result[x, y] = true;
+                        result[x, y] = cmd.IsSolidAt(x, y);
                     }
                 }
             }
