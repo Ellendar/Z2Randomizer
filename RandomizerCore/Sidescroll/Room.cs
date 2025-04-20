@@ -588,7 +588,7 @@ public class Room : IJsonOnDeserialized
 
     public void AdjustContinuingBossRoom()
     {
-        const PalaceObject statueId = PalaceObject.IronknuckleStatue;
+        const PalaceObject statueId = PalaceObject.IRON_KNUCKLE_STATUE;
         const byte statueXpos = 62;
         const byte statueYpos = 9;
 
