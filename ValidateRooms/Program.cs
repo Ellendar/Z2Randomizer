@@ -62,7 +62,7 @@ void ValidateRoomsForFile(string filename)
 
         if (room.IsBossRoom)
         {
-            var statue = sv.Find(o => o.Id == PalaceObject.IronknuckleStatue && o.AbsX == 62 && o.Y == 9);
+            var statue = sv.Find(o => o.Id == PalaceObject.IRON_KNUCKLE_STATUE && o.AbsX == 62 && o.Y == 9);
             if (statue == null) { Warning(room, "BossRoomMissingStatue", "Boss room is missing exit statue."); }
             bool hasRightOpeningWall = FindTileOpeningAtX(solidGrid, (sv.PageCount * 16) - 1);
             if (!hasRightOpeningWall) { Warning(room, "BossRoomLowCeiling", "Boss room has too low ceiling at exit, preventing re-entry."); }
@@ -128,7 +128,7 @@ void ValidateRoomsForFile(string filename)
 
 void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
 {
-    var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LockedDoor);
+    var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
     var itemCmds = sv.Commands.Where(o => o.HasExtra());
 
     var lockedDoorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesShared.LOCKED_DOOR);
