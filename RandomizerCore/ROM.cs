@@ -222,6 +222,11 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         return bytes;
     }
 
+    public int GetShort(int indexMsb, int indexLsb)
+    {
+        return (GetByte(indexMsb) << 8) + GetByte(indexLsb);
+    }
+
     public void Put(int index, byte data)
     {
         rawdata[index] = data;
@@ -238,6 +243,12 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         {
             rawdata[index + i] = data[i];
         }
+    }
+
+    public void PutShort(int indexMsb, int indexLsb, int data)
+    {
+        Put(indexMsb, (byte)(data / 256));
+        Put(indexLsb, (byte)(data % 256));
     }
 
     public void Dump(string filename)
@@ -805,39 +816,71 @@ TitleEnd:
         Put(0x1a975, 0);
     }
 
-    public void SetLevelCap(int atkMax, int magicMax, int lifeMax)
+    public void SetLevelCap(Assembler asm, int atkMax, int magicMax, int lifeMax)
     {
+        var a = asm.Module();
+        a.Code("""
+.segment "PRG0"
+.org $9F7A
+    jmp LoadNewLevelCap
+    nop
+    nop
+LoadNewLevelCapReturn:        ; $9F7F
 
-        //jump to check which attribute is levelling up
-        Put(0x1f8a, 0x4C);
-        Put(0x1f8b, 0x9e);
-        Put(0x1f8c, 0xa8);
+.org $A89E
+LoadNewLevelCap:
+    lda $0777,X               ; the instruction we overwrote with jmp
+    cmp LevelCaps,X
+    jmp LoadNewLevelCapReturn
+""");
+        a.Org(0xa8a7);
+        a.Label("LevelCaps");
+        a.Byt((byte)atkMax);
+        a.Byt((byte)magicMax);
+        a.Byt((byte)lifeMax);
+    }
 
-        ////x = 2 life, x = 1 magic, x = 0 attack
-        //load current level for (attack, magic, life)
-        //compare to address of cap
-        //go back to $9f7f
+    /// <summary>
+    /// If the level cap for a stat is less than 8, we do not want to allow
+    /// the player to cancel out of the level up screen to continue chasing
+    /// the experience for that stat once it is maxed. To stay true to vanilla,
+    /// this is still allowed if the level cap is 8.
+    /// 
+    /// The point of this is to be able to have lower max stat levels, but
+    /// not have this be abusable to reach high amounts of exp quickly using
+    /// crystals.
+    /// </summary>
+    public void ChangeLevelUpCancelling(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code("""
+; This is called when the game checks if it should skip the cancel option
+; in the level up menu or not. It runs once for each stat (X).
+.segment "PRG0"
+.org $A0D4
+    jmp CheckIfStatMaxed
+CheckStatNormally:           ;  $A0D7
 
-        //BD 77 07 (load level)
-        //DD A7 A8
-        //4C 7F 9F
+.org $A0ED
+SkipNormalStatCheck:
 
-        Put(0x28AE, 0xBD);
-        Put(0x28AF, 0x77);
-        Put(0x28B0, 0x07);
-        Put(0x28B1, 0xDD);
-        Put(0x28B2, 0xA7);
-        Put(0x28B3, 0xA8);
-        Put(0x28B4, 0x4C);
-        Put(0x28B5, 0x7F);
-        Put(0x28B6, 0x9F);
-
-        //these are the actual caps
-        Put(0x28B7, (byte)atkMax);
-        Put(0x28B8, (byte)magicMax);
-        Put(0x28B9, (byte)lifeMax);
-
-
+.segment "PRG0"
+.reloc
+CheckIfStatMaxed:
+    lda LevelCaps,X
+    cmp #$08
+    bcs ReturnNormally       ; if level cap >= 8
+    cmp $0777,X              ; current level for stat X
+    bne ReturnNormally       ; if current level != level cap
+    jmp SkipNormalStatCheck
+ReturnNormally:
+    txa                      ; things we overwrote to do jmp
+    asl a
+    asl a
+    jmp CheckStatNormally
+""");
+        a.Org(0xa8a7);
+        a.Label("LevelCaps");
     }
 
     public void UseExtendedBanksForPalaceRooms(Assembler a)
