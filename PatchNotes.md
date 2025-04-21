@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 4.3.19 - April 20, 2025
+
+- Fixed several climate bugs, including a bug that would cause chaos vanillalike DM to never generate.
+
 ## Version 4.3.18 - April 15, 2025
 
 - Fixed a rare hidden kasuto issue
