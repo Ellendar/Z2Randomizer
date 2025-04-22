@@ -1794,12 +1794,7 @@ public abstract class World
                 }
                 covered[y, x] = true;
                 Location? location = GetLocationByCoords((y + 30, x));
-                /*
-                if(location != null)
-                {
-                    Debug.WriteLine(location.Name + " " + location.NeedFairy + " " + location.NeedJump);
-                }
-                */
+
 
                 Terrain terrain = map[y, x];
                 if ((terrain == Terrain.LAVA
@@ -1812,7 +1807,7 @@ public abstract class World
                     || (terrain == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
                     || (terrain == Terrain.ROCK && itemGet[Collectable.HAMMER])
                     || (terrain == Terrain.RIVER_DEVIL && itemGet[Collectable.FLUTE]))
-                    //XXX: not done
+
                     //East desert jump blocker
                     && !(
                         location != null

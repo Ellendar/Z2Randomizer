@@ -1114,11 +1114,6 @@ public class Hyrule
                 Debug.WriteLine("Unreachable locations:");
                 Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
 
-                //XXX: DEBUG
-                if(nonDmLocations.Count == 0)
-                {
-                    return false;
-                }
                 return false;
             }
         }
