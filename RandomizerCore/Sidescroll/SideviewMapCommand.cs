@@ -370,7 +370,6 @@ public class SideviewMapCommand<T> where T : Enum
     {
         Debug.Assert(IsNewFloor());
         var floorByte = Bytes[1];
-        if ((floorByte & 0xf) == 0xf) { return true; } // xf = complete wall, always
         if ((floorByte & 0b10000000) == 0b10000000) // 8th bit == 1 means open sky
         {
             // the 2nd row is normally solid when the "floor" grows from the top,
@@ -382,6 +381,7 @@ public class SideviewMapCommand<T> where T : Enum
         {
             if (y == 0) { return true; }
         }
+        if ((floorByte & 0xf) == 0xf) { return true; } // xf = complete wall
         if ((floorByte & 0b1000) == 0) // 4th bit branches logic
         {
             if ((sv.TilesHeader == 0x03 /* swamp */ || sv.TilesHeader == 0x04 /* sand */) && (sv is SideviewEditable<ForestObject> || sv is SideviewEditable<CaveObject>))
