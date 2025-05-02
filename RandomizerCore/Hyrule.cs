@@ -2544,8 +2544,13 @@ public class Hyrule
     private void RandomizeEnemyAttributes<T>(ROM rom, int baseAddr, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
         List<T> allEnemies = [.. groundEnemies, .. flyingEnemies, .. generators];
-        var addrsByte = allEnemies.Select(n => baseAddr + (int)(object)n).ToList();
-        byte[] enemyBytes = addrsByte.Select(a => rom.GetByte(a)).ToArray();
+        var addrsByte1 = allEnemies.Select(n => baseAddr + (int)(object)n).ToList();
+        var addrsByte2 = allEnemies.Select(n => baseAddr + 0x24 + (int)(object)n).ToList();
+        var vanillaEnemyBytes1 = addrsByte1.Select(a => rom.GetByte(a)).ToArray();
+        var vanillaEnemyBytes2 = addrsByte2.Select(a => rom.GetByte(a)).ToArray();
+
+        byte[] enemyBytes1 = vanillaEnemyBytes1.ToArray();
+        byte[] enemyBytes2 = vanillaEnemyBytes2.ToArray();
 
         // enemy attributes byte1
         // ..x. .... sword immune
@@ -2556,18 +2561,38 @@ public class Hyrule
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(RNG, enemyBytes, SWORD_IMMUNE_BIT);
+            RandomizeBits(RNG, enemyBytes1, SWORD_IMMUNE_BIT);
         }
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(RNG, enemyBytes, XP_STEAL_BIT);
+            RandomizeBits(RNG, enemyBytes1, XP_STEAL_BIT);
         }
         if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(RNG, enemyBytes, props.EnemyXPDrops);
+            RandomizeEnemyExp(RNG, enemyBytes1, props.EnemyXPDrops);
         }
 
-        for (int i = 0; i < addrsByte.Count; i++) { rom.Put(addrsByte[i], enemyBytes[i]); }
+        // enemy attributes byte2
+        // ..x. .... immune to projectiles
+        const int PROJECTILE_IMMUNE_BIT = 0b00100000;
+
+        for (int i = 0; i < allEnemies.Count; i++) {
+            if ((enemyBytes1[i] & SWORD_IMMUNE_BIT) != 0)
+            {
+                // if an enemy is becoming sword immune, make it not fire immune
+                if ((vanillaEnemyBytes1[i] & SWORD_IMMUNE_BIT) == 0)
+                {
+                    enemyBytes2[i] &= PROJECTILE_IMMUNE_BIT ^ 0xFF;
+                }
+            }
+        }
+
+        // byte4 could be used to randomize thunder immunity
+        // (then we must probably exclude generators so thunder doesn't destroy them)
+        // x... .... immune to thunder
+
+        for (int i = 0; i < addrsByte1.Count; i++) { rom.Put(addrsByte1[i], enemyBytes1[i]); }
+        for (int i = 0; i < addrsByte2.Count; i++) { rom.Put(addrsByte2[i], enemyBytes2[i]); }
     }
 
     private byte IntToText(int x)
