@@ -249,9 +249,9 @@ public class Enemy<T> where T : Enum
         switch (this)
         {
             case Enemy<EnemiesWest>:
-                return Enemies.WestGeneratorEnemies.Any(e => e.Equals(Id));
+                return Enemies.WestGenerators.Any(e => e.Equals(Id));
             case Enemy<EnemiesEast>:
-                return Enemies.EastGeneratorEnemies.Any(e => e.Equals(Id));
+                return Enemies.EastGenerators.Any(e => e.Equals(Id));
             case Enemy<EnemiesPalace125>:
                 return Enemies.StandardPalaceGenerators.Contains(IdByte);
             case Enemy<EnemiesPalace346>:

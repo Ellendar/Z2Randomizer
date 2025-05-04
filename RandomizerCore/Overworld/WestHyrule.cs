@@ -323,7 +323,7 @@ public sealed class WestHyrule : World
     {
         var groundEnemies = Enemies.WestGroundEnemies;
         var flyingEnemies = Enemies.WestFlyingEnemies;
-        var generators = Enemies.WestGeneratorEnemies;
+        var generators = Enemies.WestGenerators;
         var smallEnemies = Enemies.WestSmallEnemies;
         var largeEnemies = Enemies.WestLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
