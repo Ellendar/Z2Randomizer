@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -62,14 +63,18 @@ public sealed partial class App : Application // , IDisposable
                 };
                 // isLaunchingNew.OnNext(Unit.Default);
                 var context = main;
+                var version = Assembly.GetExecutingAssembly().GetName().Version;
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = context,
                     Position = new PixelPoint(context!.WindowPosition.X, context!.WindowPosition.Y),
                     Width = context.WindowSize.Width,
                     Height = context.WindowSize.Height,
+                    Title = $"Zelda II Randomizer v{version?.Major}.{version?.Minor} Beta{version?.Build}",
                 };
-
+#if DEBUG
+                desktop.MainWindow.Title += " (Debug build)";
+#endif
                 TopLevel = TopLevel.GetTopLevel(desktop.MainWindow)!;
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:
