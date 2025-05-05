@@ -1362,7 +1362,7 @@ IncreaseGlobal5050JarDropPRG5:
 """, "global5050jar.s");
     }
 
-    public void LimitDripperRng(Assembler a)
+    public void ReduceDripperVariance(Assembler a)
     {
         a.Module().Code("""
 .include "z2r.inc"
@@ -1374,17 +1374,17 @@ jmp NextDripColor
 .reloc
 NextDripColor:
     beq DripReturn            ; regular RNG hits (A == 0 here)
-    lda DripperMissCounter
+    lda DripperRedCounter
     clc
     adc #$01
     cmp #$08
     bcc DripReturn            ; less than 8 red drips in a row (A != 0 here)
     lda #$00                  ; force 8th red drip to be blue
 DripReturn:
-    sta DripperMissCounter
+    sta DripperRedCounter
     sta $044C,y
     rts
-""", "limit_dripper_rng.s");
+""", "reduce_dripper_variance.s");
     }
 
     public void InstantText(Assembler a)

@@ -56,6 +56,7 @@
             <!-- </Viewbox> -->
             <CheckBox IsChecked="{Binding Config.RestartAtPalacesOnGameOver}" Content="Restart At Palaces On Game Over" />
             <CheckBox IsChecked="{Binding Config.Global5050JarDrop}" IsThreeState="True" Content="50/50 Statue Cycles Between Jar and Knight" />
+            <CheckBox IsChecked="{Binding Config.ReduceDripperVariance}" IsThreeState="True" Content="Reduce Dripper Variance" />
             <CheckBox IsChecked="{Binding Config.ChangePalacePallettes}" Content="Change Palace Palettes" />
             <CheckBox IsChecked="{Binding Config.RandomizeBossItemDrop}" Content="Randomize Boss Item Drop" />
             <CheckBox Name="NoDuplicateRoomsByLayoutCheckbox"

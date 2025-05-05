@@ -3764,7 +3764,11 @@ FREE_UNTIL $c2ca
         if (props.Global5050JarDrop)
         {
             rom.Global5050Jar(engine);
-            rom.LimitDripperRng(engine);
+        }
+
+        if (props.ReduceDripperVariance)
+        {
+            rom.ReduceDripperVariance(engine);
         }
 
         if (props.RandomizeKnockback)
