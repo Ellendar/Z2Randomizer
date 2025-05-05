@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
 using System.ComponentModel.DataAnnotations;
@@ -204,6 +205,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [IgnoreInFlags]
     public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
     [IgnoreInFlags]
+    [JsonIgnore]
     public string Flags
     {
         get => Serialize();
