@@ -22,6 +22,10 @@ namespace Z2Randomizer.CommandLine.Models
 
         public string? Sprite { get; set; }
 
+        public bool SanitizeSprite { get; set; }
+
+        public bool ChangeItemSprites { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
         public CharacterColor TunicColor { get; set; }
 
