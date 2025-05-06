@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 internal class Towns
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 //TODO:Restructure this as a Sideview class that understands how the format actually works
 //has properties that describe things about it, and can answer questions about the net result of the format

@@ -2,7 +2,7 @@
 using System.Linq;
 using SD.Tools.Algorithmia.GeneralDataStructures;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class RoomPool
 {

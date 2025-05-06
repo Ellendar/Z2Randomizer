@@ -1,6 +1,5 @@
 using System;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -14,8 +13,8 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
-using RandomizerCore;
 using ReactiveUI;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 

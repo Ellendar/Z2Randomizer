@@ -8,12 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
-using DialogHostAvalonia;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
-using RandomizerCore;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 

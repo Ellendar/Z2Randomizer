@@ -12,10 +12,10 @@ using FtRandoLib.Importer;
 using js65;
 using Microsoft.ClearScript;
 using NLog;
-using RandomizerCore.Overworld;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public class Hyrule
 {
@@ -469,7 +469,7 @@ public class Hyrule
             OnFileReadText = AsmFileReadTextCallback,
         };
 
-        asm.Module().Code(Util.ReadResource("RandomizerCore.Asm.Init.s"), "__init.s");
+        asm.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Init.s"), "__init.s");
 
         return asm;
     }
@@ -477,7 +477,7 @@ public class Hyrule
     private string AsmFileReadTextCallback(string basePath, string path)
     {
         if (basePath == "")
-            return Util.ReadResource($"RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
+            return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
 
         throw new FileNotFoundException();
     }
@@ -1985,7 +1985,7 @@ public class Hyrule
 
     private void ShufflePalaces()
     {
-        if (!props.SwapPalaceCont) return;
+        if (!props.PalacesCanSwapContinent) return;
         List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6];
 
         if (props.P7shuffle)
@@ -2353,9 +2353,9 @@ public class Hyrule
             rom.Put(0x17b18, 0x20); //Child
         }
 
-        rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.item_sprites.chr"));
+        rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
         rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite);
-        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -3489,7 +3489,7 @@ CustomFileSelectData:
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
         a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
-        a.Code(Util.ReadResource("RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     
     private void FixHelmetheadBossRoom(Assembler asm)
@@ -3610,7 +3610,7 @@ FixSoftlock:
     
     public void ExpandedPauseMenu(Assembler a)
     {
-        a.Module().Code(Util.ReadResource("RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
+        a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
     
     public void StandardizeDrops(Assembler a)
@@ -3849,7 +3849,7 @@ FREE_UNTIL $c2ca
         a.Byt(Util.ToGameText(message).Select(x => (byte)x).ToArray());
         a.Assign("PressStartStringLen", message.Length);
         AssignRealPalaceLocations(a);
-        a.Code(Util.ReadResource("RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
     private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
@@ -3858,7 +3858,7 @@ FREE_UNTIL $c2ca
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
         AssignRealPalaceLocations(a);
-        a.Code(Util.ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
     private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
@@ -3923,10 +3923,10 @@ FREE_UNTIL $c2ca
         if (!props.DisableMusic && randomizeMusic)
         {
             ROMData.ApplyIps(
-                Util.ReadBinaryResource("RandomizerCore.Asm.z2rndft.ips"));
+                Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2rndft.ips"));
 
             var asm = engine.Module();
-            asm.Code(Util.ReadResource("RandomizerCore.Asm.z2ft.s"), "z2ft.s");
+            asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");
         }
 
         UpdateTexts(engine, texts);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 /// <summary>
 /// Holds and manipulates the bytes for a side view map command.

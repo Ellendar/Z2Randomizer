@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 internal class ChaosPalaceGenerator : PalaceGenerator
 {
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();

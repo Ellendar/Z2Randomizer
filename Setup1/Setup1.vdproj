@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5        "
+                "FrameworkVersion" = "8:v4.5         "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -249,15 +249,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
-        "ProductCode" = "8:{05430C14-2CA2-4A51-B9DE-936F8BE54ECD}"
-        "PackageCode" = "8:{4BA70629-D37D-4317-B434-D454B9B5C24F}"
+        "ProductCode" = "8:{BCDCC892-1925-4BB4-88AE-9E89AAAC76F2}"
+        "PackageCode" = "8:{24EEC57C-65E1-4E9F-B1DF-21D89F35D039}"
         "UpgradeCode" = "8:{3B4E898B-B60D-431D-9835-914997B9CC90}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.4.7"
+        "ProductVersion" = "8:4.4.8"
         "Manufacturer" = "8:Ellendar"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

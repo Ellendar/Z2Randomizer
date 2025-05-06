@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 [DefaultValue(EIGHT)]
 public enum StartingHeartsMaxOption

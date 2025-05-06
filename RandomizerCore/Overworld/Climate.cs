@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public class Climate
 {
@@ -96,7 +96,7 @@ public class Climate
         float coefficientSum = 0f;
         foreach (Terrain terrain in walkableTerrains)
         {
-            if (terrain != Terrain.ROAD)
+            if(terrain != Terrain.ROAD)
             {
                 coefficientSum += DistanceCoefficients[(int)terrain];
             }

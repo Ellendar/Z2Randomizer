@@ -1,12 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 namespace CrossPlatformUI.Browser;
 
 [JsonSourceGenerationOptions(WriteIndented = false)]
@@ -43,7 +37,7 @@ public partial class BrowserJsEngine : IAsmEngine
         
         var assembly = Assembly.Load("RandomizerCore");
         initmodule = new AsmModule();
-        initmodule.Code(assembly.ReadResource("RandomizerCore.Asm.Init.s"), "__init.s");
+        initmodule.Code(assembly.ReadResource("Z2Randomizer.RandomizerCore.Asm.Init.s"), "__init.s");
     }
     
     public async Task<byte[]?> Apply(byte[] rom, Assembler asmModule)

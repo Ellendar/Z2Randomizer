@@ -2,9 +2,9 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
-using RandomizerCore;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 

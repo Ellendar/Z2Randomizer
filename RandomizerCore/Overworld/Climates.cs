@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 public static class Climates
 {
     public static readonly Climate Classic = new(

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public class Enemies
 {

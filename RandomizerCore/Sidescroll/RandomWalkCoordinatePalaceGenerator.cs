@@ -1,11 +1,9 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {

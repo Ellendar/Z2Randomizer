@@ -1,8 +1,7 @@
 using System.Reactive.Linq;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
-using RandomizerCore;
 using ReactiveUI;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 

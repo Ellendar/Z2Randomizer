@@ -5,7 +5,7 @@
              xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"

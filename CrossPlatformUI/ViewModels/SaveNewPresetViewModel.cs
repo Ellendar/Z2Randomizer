@@ -1,19 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
-using Avalonia.Controls;
-using DialogHostAvalonia;
-using RandomizerCore;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
-    
-    
+
+
 public class CustomPreset : ReactiveObject
 {
     private string preset = "";

@@ -1,6 +1,6 @@
 # Z2Randomizer Changelog
 
-## Version 4.4 - ???
+## Version 5.0 - ???
 
 ### BETA SPECIFIC NOTES
 - The 4.4 rooms are still very rough. Please let me know rooms you like/hate so they can be fixed/removed.
@@ -56,6 +56,41 @@
 ### Enhancements / bugfixes
 - Improvements to the command line interface to better support other OSes.
 - Added the ability to load settings via JSON file instead of a flag string (BETA: Not in this release)
+
+## Version 4.3.19 - April 20, 2025
+
+- Fixed several climate bugs, including a bug that would cause chaos vanillalike DM to never generate.
+
+## Version 4.3.18 - April 15, 2025
+
+- Fixed a rare hidden kasuto issue
+
+## Version 4.3.17 - April 7, 2025
+
+- Fixed yet another hidden palace issue.
+
+## Version 4.3.16 - April 5, 2025
+
+- Fixed a bug with hidden palace caused by the previous fix to hidden palace.
+
+## Version 4.3.16 - April 5, 2025
+
+- Fixed a bug with hidden palace caused by the previous fix to hidden palace.
+
+## Version 4.3.15 - April 2, 2025
+
+- Fixed a bug that sometimes causes hidden kasuto/palace to not work properly.
+
+## Version 4.3.14 - March 22, 2025
+
+- Fixed an issue where items required for Reflect could be behind Carock when palaces continue after bosses.
+- Fixed an issue where hidden palace/kasuto could be tracked wrong and sometimes not work correctly
+- Fixed an issue caused by the previous issue that could cause 3-eyed rock to appear in an incorrect position
+- Fixed multiple issues that could cause the raft tile to overlap with a bridge.
+
+- Reduced the amount of lag produced by custom music
+- Fixed several custom music related issues
+- Added an option to use/disable vanilla music when custom music is enabled
 
 ## Version 4.3.13 - October 16, 2024
 

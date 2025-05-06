@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RandomizerCore.Flags;
+namespace Z2Randomizer.RandomizerCore.Flags;
 
 public class FlagReader
 {

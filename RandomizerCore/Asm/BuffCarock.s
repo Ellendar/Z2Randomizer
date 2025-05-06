@@ -1,4 +1,4 @@
-﻿.include "z2r.inc"
+.include "z2r.inc"
 
 .segment "PRG4"
 

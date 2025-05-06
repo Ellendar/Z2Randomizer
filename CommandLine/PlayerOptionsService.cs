@@ -1,13 +1,12 @@
-﻿using CommandLine.Models;
+﻿using Z2Randomizer.CommandLine.Models;
 using Newtonsoft.Json;
 using NLog;
 using System.Reflection;
 using CrossPlatformUI.Services;
-using CrossPlatformUI.ViewModels.Tabs;
 using Desktop.Common;
-using RandomizerCore;
+using Z2Randomizer.RandomizerCore;
 
-namespace CommandLine
+namespace Z2Randomizer.CommandLine
 {
     public class PlayerOptionsService
     {

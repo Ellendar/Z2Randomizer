@@ -3,14 +3,13 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.OpenGL;
 using Avalonia.ReactiveUI;
 using CrossPlatformUI.Services;
 using Desktop.Common;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 using Microsoft.Extensions.DependencyInjection;
-using RandomizerCore;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Desktop;
 

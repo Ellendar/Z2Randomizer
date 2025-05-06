@@ -1,10 +1,9 @@
 ﻿using NLog;
 using System;
 using System.Diagnostics;
-using RandomizerCore;
 using System.Collections.Generic;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Location
@@ -23,7 +22,7 @@ public class Location
     public List<Location> Children { get; set; } = [];
 
     public int MemAddress { get; set; }
-
+	
     //This is really stupidly implemented. It _should_ be a boolean, which then gets written to the appropriate bit on the
     //encounter data when it's written to the ROM. Instead, this has the value 0 if the area is not a passthrough
     //and 64 if the area is a passthrough. This shouldn't be too hard to refactor, but I am lazy right now.
@@ -62,6 +61,7 @@ public class Location
     //which causes a bunch of bugs. That said, tracking 100 references and reworking it everywhere is beyond what I want to mess with
     //so for now i'm going to keep this crap design but I am mad about it.
     public bool CanShuffle { get; set; }
+	
     /// <summary>
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
     /// that many pages total or midscren on other areas.
@@ -308,6 +308,10 @@ public class Location
         {
             logger.Debug("Fake location encountered");
         }
+        if(Name.Contains("FAKE"))
+        {
+            logger.Debug("Fake location encountered");
+        }
     }
 
     public Location(Location clone) : this(clone.Ypos, clone.Xpos, clone.MemAddress, clone.Map, clone.Continent)
@@ -353,7 +357,7 @@ public class Location
     public int GetWorld()
     {
         //Towns reference their banks
-        if (ActualTown != null)
+        if (ActualTown != 0)
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
@@ -362,6 +366,14 @@ public class Location
         {
             return 4;
         }
+
+        //Bagu is 4. This should be a check based on ActualTown, but bagu isn't a town until 4.4
+        //so for now this hack.
+        if (MemAddress == 0x4661)
+        {
+            return 4;
+        }
+
         //Connectors use the world bits to indicate which continent they take you to
         if (ConnectedContinent != null)
         {
@@ -376,12 +388,12 @@ public class Location
         }
         //Palaces... have world numbers that kind... of... make sense?
         //This is what they are.
-        if (PalaceNumber != null)
+        if (PalaceNumber != 0)
         {
             return PalaceNumber switch
             {
                 //North palace
-                null => 0,
+                0 => 0,
                 1 => 0b00001100 + (int)Continent, //12,
                 2 => 0b00001100 + (int)Continent, //12,
                 3 => 0b00010000 + (int)Continent, //16,

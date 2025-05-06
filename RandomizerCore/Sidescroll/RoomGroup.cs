@@ -1,4 +1,4 @@
-﻿namespace RandomizerCore.Sidescroll;
+﻿namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public enum RoomGroup
 {

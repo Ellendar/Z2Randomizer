@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public static class MD5Hash {
     public static byte[] ComputeHash(byte[] input)

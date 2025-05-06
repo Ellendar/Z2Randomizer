@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// Originally this class corresponded to the flags and controlled the logic, with all the actual configuration randomization
@@ -68,7 +68,7 @@ public class RandomizerProperties
     public bool ShuffleEncounters { get; set; }
     public bool AllowPathEnemies { get; set; }
     public bool IncludeLavaInEncounterShuffle { get; set; }
-    public bool SwapPalaceCont { get; set; }
+    public bool PalacesCanSwapContinent { get; set; }
     public bool P7shuffle { get; set; }
     public bool HiddenPalace { get; set; }
     public bool HiddenKasuto { get; set; }

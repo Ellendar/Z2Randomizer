@@ -3,8 +3,8 @@
 
 using System.Text;
 using System.Text.Json;
-using RandomizerCore;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 ROM ROMData = new ROM(args[0], true);
 

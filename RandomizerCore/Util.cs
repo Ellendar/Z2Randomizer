@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using RandomizerCore.Overworld;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public class Util
 {

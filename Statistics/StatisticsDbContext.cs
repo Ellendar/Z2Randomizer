@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RandomizerCore;
-using RandomizerCore.Overworld;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Statistics;
 

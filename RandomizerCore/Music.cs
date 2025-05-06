@@ -3,18 +3,15 @@
 using FtRandoLib.Importer;
 using FtRandoLib.Library;
 using FtRandoLib.Utility;
-using NLog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using RandomizerCore;
-using RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 using UsesSongs = Dictionary<Usage, List<ISong>>;
 using SongMap = Dictionary<int, ISong?>;
@@ -304,12 +301,12 @@ internal class MusicRandomizer
     SongMap CreateAreaSongMap(UsesSongs usesSongs)
     {
         // Find all the relevant locations
-        var usesLocs = new Usage[] 
-        { 
-            Usage.Town, 
-            Usage.Palace, 
-            Usage.GreatPalace, 
-            Usage.Cave, 
+        var usesLocs = new Usage[]
+        {
+            Usage.Town,
+            Usage.Palace,
+            Usage.GreatPalace,
+            Usage.Cave,
             Usage.Encounter,
         }.ToDictionary(k => k, k => new List<Location>());
 

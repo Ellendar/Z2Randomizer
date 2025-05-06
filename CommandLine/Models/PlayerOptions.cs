@@ -1,9 +1,9 @@
 ﻿
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RandomizerCore;
+using Z2Randomizer.RandomizerCore;
 
-namespace CommandLine.Models
+namespace Z2Randomizer.CommandLine.Models
 {
     public class PlayerOptions
     {

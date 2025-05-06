@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public class Requirements
 {
@@ -32,9 +32,9 @@ public class Requirements
 
     public Requirements(string? json)
     {
-        var n = Deserialize(json);
-        IndividualRequirements = n?.IndividualRequirements ?? [];
-        CompositeRequirements = n?.CompositeRequirements ?? [];
+        Requirements? deserialized = Deserialize(json);
+        IndividualRequirements = deserialized?.IndividualRequirements ?? [];
+        CompositeRequirements = deserialized?.CompositeRequirements ?? [];
     }
 
     public Requirements? Deserialize(string? json)
@@ -46,20 +46,20 @@ public class Requirements
     {
         StringBuilder sb = new();
         sb.Append('[');
-        foreach (var t in IndividualRequirements)
+        foreach (RequirementType requirement in IndividualRequirements)
         {
             sb.Append('"');
-            sb.Append(t.ToString());
+            sb.Append(requirement.ToString());
             sb.Append('"');
             sb.Append(',');
         }
-        foreach (var t in CompositeRequirements)
+        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
         {
             sb.Append('[');
-            foreach (var t1 in t)
+            foreach (RequirementType component in compositeRequirement)
             {
                 sb.Append('"');
-                sb.Append(t1.ToString());
+                sb.Append(component.ToString());
                 sb.Append('"');
                 sb.Append(',');
             }
@@ -134,10 +134,10 @@ public class Requirements
         {
             return false;
         }
-        foreach (var compositeRequirement in CompositeRequirements)
+        foreach (RequirementType[] compositeRequirement in CompositeRequirements)
         {
             var containsRequireable = false;
-            foreach (var requirement in compositeRequirement)
+            foreach (RequirementType requirement in compositeRequirement)
             {
                 if (requirement != requireable)
                 {

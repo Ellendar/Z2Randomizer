@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RandomizerCore
+namespace Z2Randomizer.RandomizerCore
 {
     //private readonly int[] drops = { 0x8a, 0x8b, 0x8c, 0x8d, 0x90, 0x91, 0x92, 0x88 }
     public enum SmallItem

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using js65;
 using NLog;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// --Ellendar

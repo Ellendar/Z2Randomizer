@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 /// <summary>
 /// IDs that are shared in all palaces.

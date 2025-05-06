@@ -1,8 +1,5 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
-using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RandomizerCore.Flags;
+namespace Z2Randomizer.RandomizerCore.Flags;
 
 public class StartingLivesSerializer : IFlagSerializer
 {

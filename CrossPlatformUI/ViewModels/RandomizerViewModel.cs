@@ -9,9 +9,8 @@ using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
-using RandomizerCore;
 using Avalonia.Styling;
-using Avalonia.Logging;
+using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 

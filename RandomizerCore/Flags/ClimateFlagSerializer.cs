@@ -1,7 +1,7 @@
 ﻿using System;
-using RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore.Flags;
+namespace Z2Randomizer.RandomizerCore.Flags;
 
 public class ClimateFlagSerializer : IFlagSerializer
 {

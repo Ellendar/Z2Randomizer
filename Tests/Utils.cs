@@ -1,13 +1,10 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Avalonia.Controls.Primitives;
 using DynamicData;
-using McMaster.Extensions.CommandLineUtils;
-using RandomizerCore;
-using RandomizerCore.Sidescroll;
 using SD.Tools.Algorithmia.GeneralDataStructures;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Tests;
 

@@ -1,5 +1,5 @@
 ﻿
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 /// <summary>
 /// Color combinations that may be chosen for palace bricks and

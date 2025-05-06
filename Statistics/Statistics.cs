@@ -4,8 +4,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Desktop.Common;
-using RandomizerCore;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Statistics;
 

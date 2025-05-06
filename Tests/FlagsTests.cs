@@ -1,6 +1,6 @@
 using System.Reflection;
-using RandomizerCore;
-using RandomizerCore.Flags;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Flags;
 
 namespace Z2Randomizer.Tests;
 

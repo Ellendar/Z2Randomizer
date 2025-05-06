@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using CommandLine;
 using CrossPlatformUI;
 using Desktop.Common;
 using McMaster.Extensions.CommandLineUtils;
 using NLog;
-using RandomizerCore;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.CommandLine;
 

@@ -16,7 +16,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <AssemblyName>Z2Randomizer</AssemblyName>
+        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     </PropertyGroup>
 
 
@@ -24,6 +24,7 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <SignAssembly>False</SignAssembly>
         <StartupObject>CrossPlatformUI.Desktop.Program</StartupObject>
+        <RootNamespace>Z2Randomizer.CrossPlatformUI.Desktop</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

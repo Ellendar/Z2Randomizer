@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// Applies IPS Patches

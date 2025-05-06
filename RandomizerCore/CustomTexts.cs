@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using NLog;
-using RandomizerCore.Overworld;
-using static System.Net.Mime.MediaTypeNames;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public class CustomTexts
 {

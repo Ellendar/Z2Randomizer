@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using js65;
 using NLog;
-using RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 /*
 Classes Needed:
@@ -1449,13 +1448,13 @@ Exit:
 
     public void BuffCarrock(Assembler a)
     {
-        a.Module().Code(Util.ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
+        a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
     }
 
     public void DashSpell(Assembler asm)
     {
         var a = asm.Module();
-        a.Code(Util.ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
 
         byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
         a.Org(0x9c62);
@@ -1973,3 +1972,4 @@ Exit:
         }
     }
 }
+

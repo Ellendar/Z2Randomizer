@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <TargetFramework>net8.0-windows8.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <RootNamespace>Z2Randomizer.Statistics</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
+    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

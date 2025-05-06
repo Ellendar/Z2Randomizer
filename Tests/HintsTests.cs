@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using RandomizerCore;
+using Z2Randomizer.RandomizerCore;
 
 namespace Tests;
 

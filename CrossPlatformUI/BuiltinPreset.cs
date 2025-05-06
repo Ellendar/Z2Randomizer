@@ -1,5 +1,5 @@
-using RandomizerCore;
-using RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI;
 

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using NLog;
-using RandomizerCore.Overworld;
-using static System.Net.Mime.MediaTypeNames;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Text : IEquatable<Text>

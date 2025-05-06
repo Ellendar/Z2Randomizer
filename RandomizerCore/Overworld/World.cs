@@ -7,7 +7,7 @@ using NLog;
 
 //using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public abstract class World
 {
@@ -327,12 +327,6 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByMap(int map, bool isTown)
-    {
-        Location? location = AllLocations.FirstOrDefault(loc => loc.MapPage + loc.Map == map && isTown == (loc.ActualTown != null));
-        return location ?? throw new Exception("Unable to find location. Map: " + map + " IsTown: " + isTown);
-    }
-
     public void UpdateAllReached()
     {
         if (AllReached)
@@ -411,18 +405,22 @@ public abstract class World
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
+        return PlaceLocations(riverTerrain, saneCaves, null, -1);
+    }
+    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location hiddenKasutoLocation, int hiddenPalaceX)
+    {
         //return true;
         int i = 0;
         foreach (Location location in AllLocations.Where(i => i.AppearsOnMap))
         {
             i++;
-            if ((location.TerrainType != Terrain.BRIDGE 
-                    && location.CanShuffle 
-                    && !unimportantLocs.Contains(location) 
-                    && location.PassThrough == 0) 
+            if ((location.TerrainType != Terrain.BRIDGE
+                    && location.CanShuffle
+                    && !unimportantLocs.Contains(location)
+                    && location.PassThrough == 0)
                 || location.NeedHammer)
             {
-                int x,y;
+                int x, y;
                 //Place the location in a spot that is not adjacent to any other location
                 do
                 {
@@ -438,10 +436,12 @@ public abstract class World
                     || map[y + 1, x - 1] != Terrain.NONE
                     || map[y, x - 1] != Terrain.NONE
                     || map[y - 1, x - 1] != Terrain.NONE
+                    //#124
+                    || (x == hiddenPalaceX && location == hiddenKasutoLocation)
                 );
 
                 map[y, x] = location.TerrainType;
-                //Connect the cave
+                //If the location is a cave, connect it
                 if (location.TerrainType == Terrain.CAVE)
                 {
                     List<Direction> caveDirections = new() { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
@@ -797,6 +797,7 @@ public abstract class World
                 continue;
             }
             */
+            //Find a tile adjacent to water that isn't within a dead zone to start the bridge
             Direction waterDirection;
             int waterTries = 0;
             do
@@ -822,7 +823,7 @@ public abstract class World
 
             int startMass = globs[y, x];
 
-
+            //if there is a location at or 1 tile adjacent to the bridge start, it's no good.
             if (GetLocationByCoords((y + 30, x)) != null
                 || GetLocationByCoords((y + 30, x + 1)) != null
                 || GetLocationByCoords((y + 30, x - 1)) != null
@@ -835,8 +836,10 @@ public abstract class World
             x += deltaX;
             y += deltaY;
 
+            //iterate expanding the bridge
             while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && map[y, x] == riverTerrain)
             {
+                //if we hit the edge of the map or too close to a location, give up
                 if (x + 1 < MAP_COLS && GetLocationByCoords((y + 30, x + 1)) != null)
                 {
                     length = 100;
@@ -854,26 +857,26 @@ public abstract class World
                 {
                     length = 100;
                 }
+
+                //count how many tiles adjacent to the bridge are the passing terrain
                 int adjacentRiverTerrainDirectionCount = 0;
                 if (x + 1 < MAP_COLS && (map[y, x + 1] == riverTerrain || map[y, x + 1] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-
                 if (x - 1 >= 0 && (map[y, x - 1] == riverTerrain || map[y, x - 1] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-
                 if (y + 1 < MAP_ROWS && (map[y + 1, x] == riverTerrain || map[y + 1, x] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
-
                 if (y - 1 >= 0 && (map[y - 1, x] == riverTerrain || map[y - 1, x] == Terrain.MOUNTAIN))
                 {
                     adjacentRiverTerrainDirectionCount++;
                 }
+
                 if (deltaX != 0)
                 {
                     if (y - 1 > 0)
@@ -910,6 +913,7 @@ public abstract class World
                     }
                 }
 
+                //if all 3 tiles adjacent to the new tile aren't the passing terrain, give up
                 if (adjacentRiverTerrainDirectionCount <= 2)
                 {
                     length = 100;
@@ -919,11 +923,14 @@ public abstract class World
                 length++;
 
             }
+
+            //no extending from single tile
             if (IsSingleTile(y, x))
             {
                 length = 100;
             }
 
+            //if we're ending, it has to be on a different chunk of terrain so the bridge doesn't just cross a bay
             int endMass = 0;
             if (y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
             {
@@ -1009,8 +1016,8 @@ public abstract class World
                 }
                 else if (placeLongBridge)
                 {
-                    Location bridge1 = GetLocationByMap(0x04, false);
-                    Location bridge2 = GetLocationByMap(0xC5, false);
+                    Location bridge1 = GetLocationByMem(0x4644);
+                    Location bridge2 = GetLocationByMem(0x4645);
                     x -= deltaX;
                     y -= deltaY;
                     if (deltaX > 0 || deltaY > 0)
@@ -1436,7 +1443,7 @@ public abstract class World
                     {
                         dy = t.Item1 - y;
                         dx = t.Item2 - x;
-                        distance = (1f / climate.DistanceCoefficients[(int)map[t.Item1, t.Item2]]) * Math.Sqrt(dy * dy + dx * dx);
+                        distance = (climate.DistanceCoefficients[(int)map[t.Item1, t.Item2]]) * Math.Sqrt(dy * dy + dx * dx);
                         //distance = ((tx + (tx >> 31)) ^ (tx >> 31)) + ((ty + (ty >> 31)) ^ (ty >> 31));
                         //distance = Math.Abs(tx) + Math.Abs(ty);
                         if (distance < mindistance)
@@ -1470,28 +1477,6 @@ public abstract class World
         map = (Terrain[,])mapCopy.Clone();
         return true;
     }
-
-    /*
-    //Keeping this around for vanilla DM support, but probably this gets removed in the future
-    protected void PlaceRandomTerrain(int numberOfTerrainsToPlace, Climate climate)
-    {
-        //randomly place remaining Terrain
-        int placed = 0;
-        while (placed < numberOfTerrainsToPlace)
-        {
-            int x = 0;
-            int y = 0;
-            Terrain t = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-            do
-            {
-                x = RNG.Next(MAP_COLS);
-                y = RNG.Next(MAP_ROWS);
-            } while (map[y, x] != Terrain.NONE);
-            map[y, x] = t;
-            placed++;
-        }
-    }
-    */
 
     protected void PlaceRandomTerrain(Climate climate, int seedCountMaximum = 500)
     {
@@ -1723,30 +1708,6 @@ public abstract class World
   
     protected void UpdateReachable(Dictionary<Collectable, bool> itemGet)
     {
-        //Setup
-        /*
-        bool needJump = false;
-        Location location = GetLocationByMem(0x8646);
-        int jumpBlockY = -1;
-        int jumpBlockX = -1;
-        if (location != null)
-        {
-            needJump = location.NeedJump;
-            jumpBlockY = location.Ypos - 30;
-            jumpBlockX = location.Xpos;
-        }
-
-        bool needFairy = false;
-        location = GetLocationByMem(0x8644);
-        int fairyBlockY = -1;
-        int fairyBlockX = -1;
-        if (location != null)
-        {
-            needFairy = location.NeedFairy;
-            fairyBlockY = location.Ypos - 30;
-            fairyBlockX = location.Xpos;
-        }
-        */
 
         List<Location> starts = GetPathingStarts();
 
@@ -2059,9 +2020,9 @@ public abstract class World
     {
         AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, world));
         cave2 = GetLocationByMem(baseAddr + 43);
+        cave2.ConnectedContinent = connectedContinent;
         cave2.ExternalWorld = 0x80;
         cave2.Continent = world;
-        cave2.ConnectedContinent = connectedContinent;
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;
@@ -2783,6 +2744,8 @@ public abstract class World
             {
                 if (map[y,x] == Terrain.CAVE)
                 {
+                    //If all 4 sides of a cave are unwalkable terrain, you can never leave the cave
+                    //and you softlock since you can't turn around
                     if (
                         (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
                         && (y == 0 || !map[y - 1, x].IsWalkable())
@@ -2792,11 +2755,60 @@ public abstract class World
                     {
                         return false;
                     }
+                    //If a cave exits into a lake, you softlock unless you have the boots, and the previous case
+                    //(correctly) considers walkable water as walkable, so we need to cover that case here.
+                    if (
+                        y + 1 < MAP_ROWS && map[y + 1, x] == Terrain.WALKABLEWATER
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
+                    {
+                        map[y + 1, x] = Terrain.ROAD;
+                    }
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && y > 0 && map[y - 1, x] == Terrain.WALKABLEWATER
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
+                    {
+                        map[y - 1, x] = Terrain.ROAD;
+                    }
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && x + 1 < MAP_COLS && map[y, x + 1] == Terrain.WALKABLEWATER
+                        && (x == 0 || !map[y, x - 1].IsWalkable())
+                    )
+                    {
+                        map[y, x + 1] = Terrain.ROAD;
+                    }
+                    if (
+                        (y + 1 >= MAP_ROWS || !map[y + 1, x].IsWalkable())
+                        && (y == 0 || !map[y - 1, x].IsWalkable())
+                        && (x + 1 >= MAP_COLS || !map[y, x + 1].IsWalkable())
+                        && x > 0 && map[y, x - 1] == Terrain.WALKABLEWATER
+                    )
+                    {
+                        map[y, x - 1] = Terrain.ROAD;
+                    }
                 }
             }
         }
 
         return true;
+    }
+    public bool PassthroughsIntersectRaftCoordinates(IEnumerable<(int, int)> raftCoordinates)
+    {
+        foreach (Location location in AllLocations.Where(i => i.PassThrough != 0))
+        {
+            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.Ypos == i.Item1))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);

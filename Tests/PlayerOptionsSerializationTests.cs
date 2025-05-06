@@ -1,6 +1,6 @@
-﻿using CommandLine.Models;
+﻿using Z2Randomizer.CommandLine.Models;
 using Newtonsoft.Json;
-using RandomizerCore;
+using Z2Randomizer.RandomizerCore;
 
 namespace Tests
 {

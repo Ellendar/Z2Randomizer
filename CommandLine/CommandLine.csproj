@@ -8,6 +8,7 @@
     <StartupObject>Z2Randomizer.CommandLine.Program</StartupObject>
     <AssemblyName>Z2R</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
+    <RootNamespace>Z2Randomizer.CommandLine</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Desktop.Common\Desktop.Common.csproj" />
-    <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

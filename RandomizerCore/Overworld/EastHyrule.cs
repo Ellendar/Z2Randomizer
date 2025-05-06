@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NLog;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 //6A31 - address in memory of kasuto y coord;
 //6A35 - address in memory of palace 6 y coord
@@ -77,16 +76,15 @@ public sealed class EastHyrule : World
     public Location locationAtGP;
     public Location pbagCave1;
     public Location pbagCave2;
-    public (int, int) hiddenPalaceCoords;
     private bool canyonShort;
     //I'm not sure precisely what these are supposed to track, but they're never initialized so apparently nothing
     //private Location vodcave1;
     //private Location vodcave2;
     public Location hiddenPalaceLocation;
     public Location hiddenKasutoLocation;
+    public (int, int) hiddenPalaceCoords;
 
     private const int MAP_ADDR = 0xb480;
-    public static int debug = 0;
 
 
     public EastHyrule(RandomizerProperties props, Random r, ROM rom) : base(r)
@@ -122,15 +120,18 @@ public sealed class EastHyrule : World
 
         locationAtPalace6 = GetLocationByMem(0x8664);
         locationAtPalace6.PalaceNumber = 6;
-        locationAtPalace5 = GetLocationByMap(0x23, false);
+        townAtDarunia = GetLocationByMem(0x865E);
+        locationAtPalace5 = GetLocationByMem(0x8663);
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNabooru = GetLocationByMem(0x865C);
         townAtNabooru.VanillaCollectable = townAtNabooru.Collectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
         townAtDarunia = GetLocationByMem(0x865E);
         townAtDarunia.VanillaCollectable = townAtDarunia.Collectable = Collectable.REFLECT_SPELL;
+		
         townAtNewKasuto = GetLocationByMem(0x8660);
         townAtNewKasuto.VanillaCollectable = townAtNewKasuto.Collectable = Collectable.SPELL_SPELL;
+		
         townAtOldKasuto = GetLocationByMem(0x8662);
         townAtOldKasuto.VanillaCollectable = townAtOldKasuto.Collectable = Collectable.THUNDER_SPELL;
 
@@ -361,12 +362,14 @@ public sealed class EastHyrule : World
                 desertTile.PassThrough = 0;
 
                 desertTile.MapPage = 64;
+
                 Location? desert = GetLocationByMem(0x8646);
                 Location? swamp = GetLocationByMem(0x8644);
                 if(desert == null || swamp == null)
                 {
                     throw new ImpossibleException("Unable to find desert/swamp passthrough on east.");
                 }
+
                 if (desert.PassThrough != 0)
                 {
                     desert.NeedJump = true;
@@ -386,7 +389,7 @@ public sealed class EastHyrule : World
                 }
 
             }
-
+			
             //in vanilla shuffle, post location shuffling, the locations have moved, but the hidden palace spot doesn't
             //so reset the reference
             hiddenKasutoLocation = GetLocationByCoords((81, 61))!;
@@ -407,7 +410,14 @@ public sealed class EastHyrule : World
             }
             else
             {
-                map[72, 45] = Terrain.PALACE;
+                if(props.ShuffleHidden)
+                {
+                    map[72, 45] = hiddenPalaceLocation.TerrainType;
+                }
+                else
+                {
+                    map[72, 45] = Terrain.PALACE;
+                }
             }
         }
         else //Not vanilla / vanillaShuffle
@@ -470,7 +480,7 @@ public sealed class EastHyrule : World
                         map[i, 0] = fillerWater;
                         map[i, MAP_COLS - 1] = fillerWater;
                     }
-                    MakeVolcano();
+                    MakeValleyOfDeath();
                     int cols = RNG.Next(2, 4);
                     int rows = RNG.Next(2, 4);
                     List<int> pickedC = [];
@@ -539,8 +549,6 @@ public sealed class EastHyrule : World
                 {
                     DrawCenterMountain();
 
-
-
                     walkableTerrains = new List<Terrain>() { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
                     randomTerrainFilter = new List<Terrain> { Terrain.LAVA, Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
 
@@ -560,7 +568,7 @@ public sealed class EastHyrule : World
                         map[i, 0] = Terrain.MOUNTAIN;
                         map[i, MAP_COLS - 1] = Terrain.MOUNTAIN;
                     }
-                    MakeVolcano();
+                    MakeValleyOfDeath();
 
                     int cols = RNG.Next(2, 4);
                     int rows = RNG.Next(2, 4);
@@ -607,14 +615,13 @@ public sealed class EastHyrule : World
                 {
                     walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
                     randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
-                    MakeVolcano();
+                    MakeValleyOfDeath();
 
 
                     DrawMountains(props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH);
                     DrawRiver(props.CanWalkOnWaterWithBoots);
                 }
 
-                debug++;
                 if (props.HiddenKasuto)
                 {
                     RandomizeHiddenKasuto(props.ShuffleHidden);
@@ -665,18 +672,21 @@ public sealed class EastHyrule : World
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
                 }
 
-                if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
+                if (props.HiddenKasuto)
                 {
-                    bool f = MakeVolcano();
-                    if (!f)
-                    {
-                        return false;
-                    }
+                    RandomizeHiddenKasuto(props.ShuffleHidden);
                 }
 
-                bool b = PlaceLocations(riverTerrain, props.SaneCaves);
-
-                if (!b)
+                bool placeLocationsResult;
+                if (props.HiddenKasuto && props.HiddenPalace)
+                {
+                    placeLocationsResult = PlaceLocations(riverTerrain, props.SaneCaves, hiddenKasutoLocation, hiddenPalaceLocation.Xpos);
+                }
+                else
+                {
+                    placeLocationsResult = PlaceLocations(riverTerrain, props.SaneCaves);
+                }
+                if (!placeLocationsResult)
                 {
                     return false;
                 }
@@ -823,7 +833,7 @@ public sealed class EastHyrule : World
         return true;
     }
 
-    public bool MakeVolcano()
+    public bool MakeValleyOfDeath()
     {
         int xmin = 21;
         int xmax = 41;
@@ -1499,18 +1509,19 @@ public sealed class EastHyrule : World
         if (shuffleHidden)
         {
             hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];
-            while (hiddenPalaceLocation == null 
-                || hiddenPalaceLocation == raft 
-                || hiddenPalaceLocation == bridge 
-                || hiddenPalaceLocation == cave1 
-                || hiddenPalaceLocation == cave2 
-                || connections.ContainsKey(hiddenPalaceLocation) 
-                || !hiddenPalaceLocation.CanShuffle 
+
+            while (hiddenPalaceLocation == null
+                || hiddenPalaceLocation == raft
+                || hiddenPalaceLocation == bridge
+                || hiddenPalaceLocation == cave1
+                || hiddenPalaceLocation == cave2
+                || connections.ContainsKey(hiddenPalaceLocation)
+                || !hiddenPalaceLocation.CanShuffle
                 || hiddenPalaceLocation == hiddenKasutoLocation
                 || (hiddenPalaceLocation.TerrainType == Terrain.TOWN && !hiddenPalaceLocation.AppearsOnMap) //no fake item locations
-                || (biome != Biome.VANILLA 
+                || (biome != Biome.VANILLA
                     && biome != Biome.VANILLA_SHUFFLE
-                    && hiddenPalaceLocation.TerrainType == Terrain.LAVA 
+                    && hiddenPalaceLocation.TerrainType == Terrain.LAVA
                     && hiddenPalaceLocation.PassThrough != 0))
             {
                 hiddenPalaceLocation = AllLocations[RNG.Next(AllLocations.Count)];

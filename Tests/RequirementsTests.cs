@@ -1,4 +1,4 @@
-﻿using RandomizerCore;
+﻿using Z2Randomizer.RandomizerCore;
 
 namespace Z2Randomizer.Tests;
 

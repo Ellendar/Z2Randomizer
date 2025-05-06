@@ -1,4 +1,4 @@
-﻿namespace RandomizerCore;
+﻿namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// The randomizer had an absolute crapton of raw memory addresses with no documentation.

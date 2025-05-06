@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public partial class PalaceRooms
 {
@@ -13,13 +13,12 @@ public partial class PalaceRooms
 
     private readonly Dictionary<string, Room> roomsByName = new();
 
-
-    private const string RoomsMd5 = "dKNxFT6dZjJevgj9khD11Q==";
+    public static readonly string roomsMD5 = "JCa3OsnJhIe/fZ5yrx/+mA==";
 
     public PalaceRooms(string palaceJson, bool doValidation)
     {
         var hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(RemoveNewLines().Replace(palaceJson, "")));
-        if (doValidation && RoomsMd5 != Convert.ToBase64String(hash))
+        if (doValidation && roomsMD5 != Convert.ToBase64String(hash))
         {
             throw new Exception("Invalid PalaceRooms.json");
         }
@@ -34,7 +33,7 @@ public partial class PalaceRooms
                     value = [];
                     roomsByGroup.Add(room.Group, value);
                 }
-            
+
                 value.Add(room);
             }
             roomsByName[room.Name] = room;

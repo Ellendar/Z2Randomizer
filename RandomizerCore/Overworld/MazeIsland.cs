@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 sealed class MazeIsland : World
 {
@@ -455,12 +455,26 @@ sealed class MazeIsland : World
                 {
                     int bridgeX = 0;
                     int bridgeY = 0;
+
                     if (bridgeDirection == Direction.NORTH)
                     {
                         bridgeX = RNG.Next(2, MAP_COLS - 1);
                         while (bridgeY < MAP_ROWS && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
+                            //the bridge can't intersect another bridge, either because it is a mini-bridge
+                            //or because that bridge is actually the raft tile.
+                            if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
+                            {
+                                return false;
+                            }
                             bridgeY++;
+                        }
+
+                        //If the bridge spawns on the edge of the map, and it also corresponds to where the river is, it creates a 
+                        //giant bridge across the entire map because it never finds road.
+                        if(bridgeY == MAP_ROWS)
+                        {
+                            return false;
                         }
                         
                         bridgeY--;
@@ -491,7 +505,16 @@ sealed class MazeIsland : World
                         bridgeX = RNG.Next(2, MAP_COLS - 1);
                         while (bridgeY > 0 && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
+                            if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
+                            {
+                                return false;
+                            }
                             bridgeY--;
+                        }
+
+                        if (bridgeY == 0)
+                        {
+                            return false;
                         }
 
                         bridgeY++;
@@ -525,7 +548,15 @@ sealed class MazeIsland : World
                         }
                         while (bridgeX < MAP_COLS && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
+                            if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
+                            {
+                                return false;
+                            }
                             bridgeX++;
+                        }
+                        if (bridgeX == MAP_COLS)
+                        {
+                            return false;
                         }
 
                         bridgeX--;
@@ -556,13 +587,21 @@ sealed class MazeIsland : World
                         bridgeY = RNG.Next(2, MAP_ROWS - 2);
                         while (bridgeY == riverEndY || bridgeY == riverStartY)
                         {
+                            if (map[bridgeY, bridgeX] == Terrain.BRIDGE)
+                            {
+                                return false;
+                            }
                             bridgeY = RNG.Next(2, MAP_ROWS - 2);
-
                         }
                         while (bridgeX > 0 && map[bridgeY, bridgeX] != Terrain.ROAD)
                         {
                             bridgeX--;
                         }
+                        if (bridgeX == 0)
+                        {
+                            return false;
+                        }
+
                         bridgeX++;
                         map[bridgeY, bridgeX] = Terrain.BRIDGE;
                         bridge.Ypos = bridgeY + 30;

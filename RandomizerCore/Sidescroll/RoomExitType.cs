@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public enum RoomExitType
 {

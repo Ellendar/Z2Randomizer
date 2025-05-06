@@ -9,6 +9,10 @@
         <InvariantGlobalization>true</InvariantGlobalization>
 
         <PublishTrimmed>false</PublishTrimmed>
+
+        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+
+        <RootNamespace>Z2Randomizer.CrossPlatformUI.Browser</RootNamespace>
 <!--        <TrimMode>partial</TrimMode>-->
 <!--        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>-->
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->

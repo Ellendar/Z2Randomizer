@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using SD.Tools.BCLExtensions.CollectionsRelated;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 sealed class DeathMountain : World
 {
@@ -61,10 +61,12 @@ sealed class DeathMountain : World
 
     public DeathMountain(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        List<Location> locations = new();
-        locations.AddRange(rom.LoadLocations(0x610C, 37, terrains, Continent.DM));
-        //loadLocations(0x6136, 2, terrains, continent.dm);
-        locations.AddRange(rom.LoadLocations(0x6144, 1, terrains, Continent.DM));
+        List<Location> locations =
+        [
+            .. rom.LoadLocations(0x610C, 37, terrains, Continent.DM),
+            //loadLocations(0x6136, 2, terrains, continent.dm);
+            .. rom.LoadLocations(0x6144, 1, terrains, Continent.DM),
+        ];
         locations.ForEach(AddLocation);
 
         isHorizontal = props.DmIsHorizontal;

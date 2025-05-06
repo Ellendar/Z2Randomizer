@@ -3,10 +3,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:rc="clr-namespace:RandomizerCore;assembly=RandomizerCore"
+             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
-             xmlns:overworld="clr-namespace:RandomizerCore.Overworld;assembly=RandomizerCore"
+             xmlns:overworld="clr-namespace:Z2Randomizer.RandomizerCore.Overworld;assembly=RandomizerCore"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.OverworldView"
              x:DataType="vm:MainViewModel">

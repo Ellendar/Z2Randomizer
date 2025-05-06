@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public static class ToolTips
 {

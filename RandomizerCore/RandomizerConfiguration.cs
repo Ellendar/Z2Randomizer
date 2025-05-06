@@ -5,11 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using NLog;
-using RandomizerCore.Flags;
+using Z2Randomizer.RandomizerCore.Flags;
 using System.ComponentModel.DataAnnotations;
-using RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 public sealed class RandomizerConfiguration : INotifyPropertyChanged
 {
@@ -1417,7 +1417,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShuffleEncounters = ShuffleEncounters ?? GetIndeterminateFlagValue(r);
         properties.AllowPathEnemies = AllowUnsafePathEncounters;
         properties.IncludeLavaInEncounterShuffle = IncludeLavaInEncounterShuffle;
-        properties.SwapPalaceCont = PalacesCanSwapContinents ?? GetIndeterminateFlagValue(r);
+        properties.PalacesCanSwapContinent = PalacesCanSwapContinents ?? GetIndeterminateFlagValue(r);
         properties.P7shuffle = ShuffleGP ?? GetIndeterminateFlagValue(r);
         properties.HiddenPalace = HidePalace ?? GetIndeterminateFlagValue(r);
         properties.HiddenKasuto = HideKasuto ?? GetIndeterminateFlagValue(r);
@@ -1845,7 +1845,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             properties.RemoveTbird = false;
         }
 
-        if (!properties.SwapPalaceCont)
+        if (!properties.PalacesCanSwapContinent)
         {
             properties.P7shuffle = false;
         }

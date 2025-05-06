@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NLog;
 
-namespace RandomizerCore.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public sealed class WestHyrule : World
 {
@@ -27,9 +27,21 @@ public sealed class WestHyrule : World
     public Location locationAtSariaNorth;
     public Location locationAtSariaSouth;
     public Location locationAtRauru;
-    public Location bridge1;
-    public Location bridge2;
+
+    private Location bridge1;
+    private Location bridge2;
     public Location pbagCave;
+	
+    private Location jumpCave;
+    private Location heartCave;
+    private Location fairyCave;
+
+    private Location parapaCave1;
+    private Location parapaCave2;
+    private Location jumpCave2;
+    private Location fairyCave2;
+    private int bridgeCount;
+
     private int calderaCenterX, calderaCenterY;
 
     private const int CALDERA_DEAD_ZONE_X = 7;
@@ -112,37 +124,30 @@ public sealed class WestHyrule : World
         ];
         locations.ForEach(AddLocation);
 
-        northPalace = GetLocationByMap(0x80, false);
-        //reachableAreas = new HashSet<string>();
-        Location jumpCave = GetLocationByMap(9, false);
+        northPalace = GetLocationByMem(0x462f); //0x462f
+        jumpCave = GetLocationByMem(0x463b); //0x463b
         jumpCave.NeedJump = true;
-        medicineCave = GetLocationByMap(0x0E, false);
-        Location heartCave = GetLocationByMap(0x10, false);
-        Location fairyCave = GetLocationByMap(0x12, false);
+        medicineCave = GetLocationByMem(0x463e); //0x463e
+        heartCave = GetLocationByMem(0x463f); //0x463f
+        fairyCave = GetLocationByMem(0x4640); //0x4640
         fairyCave.NeedFairy = true;
-        bagu = GetLocationByMap(0x18, true);
+        bagu = GetLocationByMem(0x4661); //0x4661
         bagu.ActualTown = Town.BAGU;
         bagu.Collectable = Collectable.BAGUS_NOTE;
 
         locationAtRauru = GetLocationByMem(0x465C);
-        //locationAtRauru.Name = "Rauru";
         locationAtRauru.Collectable = Collectable.SHIELD_SPELL;
-        locationAtRuto = GetLocationByMap(0xC5, true);
-        //locationAtRuto.Name = "Ruto";
+        locationAtRuto = GetLocationByMem(0x465e); //0x465e
         locationAtRuto.Collectable = Collectable.JUMP_SPELL;
-        locationAtSariaNorth = GetLocationByMap(0xC8, true);
-        locationAtSariaSouth = GetLocationByMap(0x06, true);
+        locationAtSariaNorth = GetLocationByMem(0x4660); //0x00004660
+        locationAtSariaSouth = GetLocationByMem(0x465f); //0x0000465f
         locationAtSariaNorth.NeedBagu = true;
-        //locationAtSariaNorth.Name = "Saria North";
         locationAtSariaSouth.NeedBagu = true;
-        //locationAtSariaSouth.Name = "Saria South";
         locationAtSariaNorth.Collectable = Collectable.FAIRY_SPELL;
-        locationAtMido = GetLocationByMap(0xCB, true);
-        //locationAtMido.Name = "Mido";
+        locationAtMido = GetLocationByMem(0x4662); //0x00004662
         locationAtMido.Collectable = Collectable.LIFE_SPELL;
 
-
-        trophyCave = GetLocationByMap(0xE1, false);
+        trophyCave = GetLocationByMem(0x4630); //0x00004630
         //raft = GetLocationByMem(0x4658);
 
         locationAtPalace1 = GetLocationByMem(0x4663);
@@ -157,13 +162,12 @@ public sealed class WestHyrule : World
         heartContainerCave = GetLocationByMem(0x4634);
         pbagCave = GetLocationByMem(0x463D);
 
-
-        Location parapaCave1 = GetLocationByMap(07, false);
-        Location parapaCave2 = GetLocationByMap(0xC7, false);
-        Location jumpCave2 = GetLocationByMap(0xCB, false);
-        Location fairyCave2 = GetLocationByMap(0xD3, false);
-        bridge1 = GetLocationByMap(0x04, false);
-        bridge2 = GetLocationByMap(0xC5, false);
+        parapaCave1 = GetLocationByMem(0x4639); //0x4639
+        parapaCave2 = GetLocationByMem(0x463a); //0x463a
+        jumpCave2 = GetLocationByMem(0x463c); //0x463c
+        fairyCave2 = GetLocationByMem(0x4641); //0x4641
+        bridge1 = GetLocationByMem(0x4644); //0x4644
+        bridge2 = GetLocationByMem(0x4645); //0x4645
 
         //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
         mirrorTable = new Location(locationAtSariaNorth);
@@ -182,16 +186,15 @@ public sealed class WestHyrule : World
         locationAtMido.Children.Add(midoChurch);
         AddLocation(midoChurch);
 
-
         if (props.SaneCaves)
         {
             fairyCave.TerrainType = Terrain.CAVE;
         }
 
-        caveConn = new Dictionary<Location, Location>();
-        bridgeConn = new Dictionary<Location, Location>();
-        cityConn = new Dictionary<Location, Location>();
-        graveConn = new Dictionary<Location, Location>();
+        caveConn = [];
+        bridgeConn = [];
+        cityConn = [];
+        graveConn = [];
 
         //connections.Add(hammerEnter, hammerExit);
         //connections.Add(hammerExit, hammerEnter);
@@ -388,7 +391,8 @@ public sealed class WestHyrule : World
                 }
                 bridge1.PassThrough = 0;
                 bridge2.PassThrough = 0;
-                GetLocationByMap(0x12, false).PassThrough = 0; //fairy cave
+
+                fairyCave.PassThrough = 0; //fairy cave
 
             }
         }
@@ -686,6 +690,7 @@ public sealed class WestHyrule : World
                 }
 
                 BlockCaves(props.BoulderBlockConnections);
+                //Debug.WriteLine(GetMapDebug());
                 PlaceHiddenLocations();
 
 
@@ -1035,18 +1040,18 @@ public sealed class WestHyrule : World
         int cavenum1 = RNG.Next(availableConnectorCount);
         if(cavenum1 == 0)
         {
-            cave1l = GetLocationByMap(9, false);//jump cave
-            cave1r = GetLocationByMap(0xCB, false);
+            cave1l = jumpCave;//jump cave
+            cave1r = jumpCave2;
         }
         else if (cavenum1 == 1)
         {
-            cave1l = GetLocationByMap(07, false); //parapa
-            cave1r = GetLocationByMap(0xC7, false);
+            cave1l = parapaCave1; //parapa
+            cave1r = parapaCave2;
         }
         else
         {
-            cave1l = GetLocationByMap(0x12, false); //fairy cave
-            cave1r = GetLocationByMap(0xD3, false);
+            cave1l = fairyCave; //fairy cave
+            cave1r = fairyCave2;
         }
         map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
@@ -1059,18 +1064,18 @@ public sealed class WestHyrule : World
             }
             if (cavenum2 == 0)
             {
-                cave2l = GetLocationByMap(9, false);//jump cave
-                cave2r = GetLocationByMap(0xCB, false);
+                cave2l = jumpCave;//jump cave
+                cave2r = jumpCave2;
             }
             else if (cavenum2 == 1)
             {
-                cave2l = GetLocationByMap(07, false); //parapa
-                cave2r = GetLocationByMap(0xC7, false);
+                cave2l = parapaCave1; //parapa
+                cave2r = parapaCave2;
             }
             else
             {
-                cave2l = GetLocationByMap(0x12, false); //fairy cave
-                cave2r = GetLocationByMap(0xD3, false);
+                cave2l = fairyCave; //fairy cave
+                cave2r = fairyCave2;
             }
             map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
@@ -1282,6 +1287,7 @@ public sealed class WestHyrule : World
                     }
                     cave.Xpos++;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null)
                 {
@@ -1294,6 +1300,7 @@ public sealed class WestHyrule : World
                     }
                     cave.Xpos--;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null)
                 {
@@ -1306,6 +1313,7 @@ public sealed class WestHyrule : World
                     }
                     cave.Ypos--;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null)
                 {
@@ -1318,8 +1326,8 @@ public sealed class WestHyrule : World
                     }
                     cave.Ypos++;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
-                cavePicked = cave.MemAddress;
             }
             //Connector caves
             else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
@@ -1328,24 +1336,26 @@ public sealed class WestHyrule : World
                 {
                     map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN)
                 {
                     map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN)
                 {
                     map[cave.Ypos - 29, cave.Xpos] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
                 else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN)
                 {
                     map[cave.Ypos - 31, cave.Xpos] = Terrain.ROCK;
                     rockNum--;
+                    cavePicked = cave.MemAddress;
                 }
-                cavePicked = cave.MemAddress;
-
             }
         }
     }

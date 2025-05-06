@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// Collection of singletons representing character sprite options. For now this is just a fake enum.

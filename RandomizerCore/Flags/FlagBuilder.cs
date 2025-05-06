@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace RandomizerCore.Flags;
+namespace Z2Randomizer.RandomizerCore.Flags;
 
 /// <summary>
 /// Extremely crude builder pattern implementation for flags backed by a bitarray. If I cared that much about efficency this would 

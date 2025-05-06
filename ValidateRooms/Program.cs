@@ -2,15 +2,15 @@
 
 using System.Text;
 using System.Text.Json;
-using RandomizerCore;
-using RandomizerCore.Sidescroll;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 StringBuilder sb = new StringBuilder("");
 
 void ValidateRoomsForFile(string filename)
 {
     sb.AppendLine("Validating \"" + filename + "\"...");
-    var json = RandomizerCore.Util.ReadAllTextFromFile(filename);
+    var json = Util.ReadAllTextFromFile(filename);
     var palaceRooms = JsonSerializer.Deserialize(json, RoomSerializationContext.Default.ListRoom);
 
     var duplicateNames = palaceRooms!
