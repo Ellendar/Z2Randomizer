@@ -103,6 +103,7 @@ public class RandomizerProperties
     public bool ShufflePalacePalettes { get; set; }
     public bool UpARestartsAtPalaces { get; set; }
     public bool Global5050JarDrop { get; set; }
+    public bool ReduceDripperVariance { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
