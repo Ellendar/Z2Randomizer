@@ -167,6 +167,9 @@ public class SideviewMapCommand<T> where T : Enum
     {
         switch (this)
         {
+            case SideviewMapCommand<ForestObject>:
+            case SideviewMapCommand<CaveObject>:
+                return Y == 15 && (Bytes[1] & 0xF0) == 0x20;
             case SideviewMapCommand<PalaceObject>:
             case SideviewMapCommand<GreatPalaceObject>:
                 return Y == 15 && (Bytes[1] & 0xF0) == 0x10;
@@ -188,6 +191,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.Width((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.Width((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.Width((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -223,6 +230,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.Height((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.Height((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.Height((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -239,7 +250,7 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 if (IsElevator())
                 {
-                    return 13;
+                    return 3;
                 }
                 else if (IsLava())
                 {
@@ -258,6 +269,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.IsSolid((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.IsSolid((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.IsSolid((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -273,6 +288,30 @@ public class SideviewMapCommand<T> where T : Enum
         }
     }
 
+    public bool IsSolidAt(int x, int y)
+    {
+        if (Y < 13)
+        {
+            switch (this)
+            {
+                case SideviewMapCommand<ForestObject>:
+                    return ForestObjectExtensions.IsSolidAt((this as SideviewMapCommand<ForestObject>)!, x, y);
+                case SideviewMapCommand<CaveObject>:
+                    return CaveObjectExtensions.IsSolidAt((this as SideviewMapCommand<CaveObject>)!, x, y);
+                case SideviewMapCommand<PalaceObject>:
+                    return PalaceObjectExtensions.IsSolidAt((this as SideviewMapCommand<PalaceObject>)!, x, y);
+                case SideviewMapCommand<GreatPalaceObject>:
+                    return GreatPalaceObjectExtensions.IsSolidAt((this as SideviewMapCommand<GreatPalaceObject>)!, x, y);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public bool IsBreakable
     {
         get
@@ -281,6 +320,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.IsBreakable((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.IsBreakable((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.IsBreakable((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -304,6 +347,10 @@ public class SideviewMapCommand<T> where T : Enum
             {
                 switch (this)
                 {
+                    case SideviewMapCommand<ForestObject>:
+                        return ForestObjectExtensions.IsPit((this as SideviewMapCommand<ForestObject>)!);
+                    case SideviewMapCommand<CaveObject>:
+                        return CaveObjectExtensions.IsPit((this as SideviewMapCommand<CaveObject>)!);
                     case SideviewMapCommand<PalaceObject>:
                         return PalaceObjectExtensions.IsPit((this as SideviewMapCommand<PalaceObject>)!);
                     case SideviewMapCommand<GreatPalaceObject>:
@@ -319,11 +366,10 @@ public class SideviewMapCommand<T> where T : Enum
         }
     }
 
-    public bool IsFloorSolidAt(int y)
+    public bool IsFloorSolidAt(SideviewEditable<T> sv, int y)
     {
         Debug.Assert(IsNewFloor());
         var floorByte = Bytes[1];
-        if ((floorByte & 0xf) == 0xf) { return true; } // xf = complete wall, always
         if ((floorByte & 0b10000000) == 0b10000000) // 8th bit == 1 means open sky
         {
             // the 2nd row is normally solid when the "floor" grows from the top,
@@ -335,13 +381,22 @@ public class SideviewMapCommand<T> where T : Enum
         {
             if (y == 0) { return true; }
         }
-        if (y > 10) { return true; } // bottom 2 rows are always floor
+        if ((floorByte & 0xf) == 0xf) { return true; } // xf = complete wall
         if ((floorByte & 0b1000) == 0) // 4th bit branches logic
         {
-            return y > 10 - (floorByte & 0b0111);
+            if ((sv.TilesHeader == 0x03 /* swamp */ || sv.TilesHeader == 0x04 /* sand */) && (sv is SideviewEditable<ForestObject> || sv is SideviewEditable<CaveObject>))
+            {
+                // in swamp and sand tilesets, floors start 1 step lower (because of course they do)
+                return y > 11 - (floorByte & 0b0111);
+            }
+            else
+            {
+                return y > 10 - (floorByte & 0b0111);
+            }
         }
         else
         {
+            if (y > 10) { return true; } // bottom 2 rows are always floor
             return y < (floorByte & 0b0111) + 2;
         }
     }
