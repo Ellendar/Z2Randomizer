@@ -2233,75 +2233,61 @@ public class Hyrule
     }
 
     /// <summary>
-    /// For a given set of addresses, set a masked portion of the value of each address on or off at a rate
+    /// For a given set of bytes, set a masked portion of the value of each byte on or off (all 1's or all 0's) at a rate
     /// equal to the proportion of values at the addresses that have that masked portion set to a nonzero value.
     /// In effect, turn some values in a range on or off randomly in the proportion of the number of such values that are on in vanilla.
     /// </summary>
-    /// <param name="addr">Addresses to randomize.</param>
-    /// <param name="mask">What part of the byte value at each address contains the configuration we care about.</param>
-    /// <exception cref="ArgumentException">Iff there are 0 addresses in the space to shuffle, as this would cause a divide by zero
-    /// while determining the proportion.</exception>
-    private void RandomizeBits(ROM rom, List<int> addr, int mask = 0b00010000)
+    /// <param name="bytes">Bytes to randomize.</param>
+    /// <param name="mask">What part of the byte value at each address contains the configuration bit(s) we care about.</param>
+    private static void RandomizeBits(Random RNG, byte[] bytes, int mask)
     {
-        if(addr.Count == 0)
-        {
-            throw new ArgumentException("Cannot shuffle 0 bits");
-        }
-        int notMask = mask ^ 0xFF;
+        if (bytes.Length == 0) { return; }
 
-        double count = 0;
-        foreach (int i in addr)
-        {
-            if ((rom.GetByte(i) & mask) > 0)
-            {
-                count++;
-            }
-        }
+        int notMask = mask ^ 0xFF;
+        double vanillaBitSetCount = bytes.Where(b => (b & mask) != 0).Count();
 
         //proportion of the bytes that have nonzero values in the masked portion
-        double fraction = count / addr.Count;
+        double fraction = vanillaBitSetCount / bytes.Length;
 
-        foreach (int i in addr)
+        for (int i = 0; i < bytes.Length; i++)
         {
-            int part1 = 0;
-            int part2 = rom.GetByte(i) & notMask;
+            int v = bytes[i] & notMask;
             if (RNG.NextDouble() <= fraction)
             {
-                part1 = mask;
+                v |= mask;
             }
-            rom.Put(i, (byte)(part1 + part2));
+            bytes[i] = (byte)v;
         }
     }
 
-    private void RandomizeEnemyExp(ROM rom, List<int> addr)
+    private static void RandomizeEnemyExp(Random RNG, byte[] bytes, XPEffectiveness effectiveness)
     {
-        foreach (int i in addr)
+        for (int i = 0; i < bytes.Length; i++)
         {
-            byte exp = rom.GetByte(i);
-            int high = exp & 0xF0;
-            int low = exp & 0x0F;
+            int b = bytes[i];
+            int low = b & 0x0f;
 
-            if (props.EnemyXPDrops == XPEffectiveness.RANDOM_HIGH)
+            if (effectiveness == XPEffectiveness.RANDOM_HIGH)
             {
                 low++;
             }
-            else if (props.EnemyXPDrops == XPEffectiveness.RANDOM_LOW)
+            else if (effectiveness == XPEffectiveness.RANDOM_LOW)
             {
                 low--;
             }
-            else if (props.EnemyXPDrops == XPEffectiveness.NONE)
+            else if (effectiveness == XPEffectiveness.NONE)
             {
                 low = 0;
             }
 
-            if (props.EnemyXPDrops.IsRandom())
+            if (effectiveness.IsRandom())
             {
                 low = RNG.Next(low - 2, low + 3);
             }
 
             low = Math.Min(Math.Max(low, 0), 15);
 
-            rom.Put(i, (byte)(high + low));
+            bytes[i] = (byte)((b & 0xf0) | low);
         }
     }
 
@@ -2424,187 +2410,31 @@ public class Hyrule
             rom.Put(0x1E314, (byte)big);
         }
 
+        RandomizeEnemyAttributes(rom, 0x54e5, Enemies.WestGroundEnemies, Enemies.WestFlyingEnemies, Enemies.WestGenerators);
+        RandomizeEnemyAttributes(rom, 0x94e5, Enemies.EastGroundEnemies, Enemies.EastFlyingEnemies, Enemies.EastGenerators);
+        RandomizeEnemyAttributes(rom, 0x114e5, Enemies.Palace125GroundEnemies, Enemies.Palace125FlyingEnemies, Enemies.Palace125Generators);
+        RandomizeEnemyAttributes(rom, 0x129e5, Enemies.Palace346GroundEnemies, Enemies.Palace346FlyingEnemies, Enemies.Palace346Generators);
+        RandomizeEnemyAttributes(rom, 0x154e5, Enemies.GPGroundEnemies, Enemies.GPFlyingEnemies, Enemies.GPGenerators);
+
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
+        {
+            List<int> addrs = new List<int>();
+            addrs.Add(0x11505); // Horsehead
+            addrs.Add(0x13C88); // Helmethead
+            addrs.Add(0x13C89); // Gooma
+            addrs.Add(0x129EF); // Rebonak unhorsed
+            addrs.Add(0x12A05); // Rebonak
+            addrs.Add(0x12A06); // Barba
+            addrs.Add(0x12A07); // Carock
+            addrs.Add(0x15507); // Thunderbird
+            byte[] enemyBytes = addrs.Select(a => rom.GetByte(a)).ToArray();
+            RandomizeEnemyExp(RNG, enemyBytes, props.EnemyXPDrops);
+            for (int i = 0; i < addrs.Count; i++) { rom.Put(addrs[i], enemyBytes[i]); };
+        }
+
         List<int> addr = new List<int>();
-        for (int i = 0x54E8; i < 0x54ED; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x54EF; i < 0x54F8; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x54F9; i < 0x5508; i++)
-        {
-            addr.Add(i);
-        }
-
-        if (props.ShuffleEnemyStealExp)
-        {
-            RandomizeBits(rom, addr);
-        }
-
-        if (props.ShuffleSwordImmunity)
-        {
-            RandomizeBits(rom, addr, 0x20);
-        }
-
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(rom, addr);
-        }
-        addr = new List<int>();
-        for (int i = 0x94E8; i < 0x94ED; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x94EF; i < 0x94F8; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x94F9; i < 0x9502; i++)
-        {
-            addr.Add(i);
-        }
-        if (props.ShuffleEnemyStealExp)
-        {
-            RandomizeBits(rom, addr);
-        }
-
-        if (props.ShuffleSwordImmunity)
-        {
-            RandomizeBits(rom, addr, 0x20);
-        }
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(rom, addr);
-        }
-
-        addr = new List<int>();
-        for (int i = 0x114E8; i < 0x114EA; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x114EB; i < 0x114ED; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x114EF; i < 0x114F8; i++)
-        {
-            addr.Add(i);
-        }
-        for (int i = 0x114FD; i < 0x11505; i++)
-        {
-            addr.Add(i);
-        }
-        addr.Add(0x11508);
-
-        if (props.ShuffleEnemyStealExp)
-        {
-            RandomizeBits(rom, addr);
-        }
-
-        if (props.ShuffleSwordImmunity)
-        {
-            RandomizeBits(rom, addr, 0x20);
-        }
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(rom, addr);
-        }
-
-        addr = new List<int>();
-        for (int i = 0x129E8; i < 0x129EA; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x129EB; i < 0x129ED; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x129EF; i < 0x129F4; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x129F5; i < 0x129F7; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x129FD; i < 0x12A05; i++)
-        {
-            addr.Add(i);
-        }
-
-        addr.Add(0x12A08);
-
-        if (props.ShuffleEnemyStealExp)
-        {
-            RandomizeBits(rom, addr);
-        }
-
-        if (props.ShuffleSwordImmunity)
-        {
-            RandomizeBits(rom, addr, 0x20);
-        }
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(rom, addr);
-        }
-
-        addr = new List<int>();
-        for (int i = 0x154E9; i < 0x154ED; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x154F2; i < 0x154F8; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x154F9; i < 0x15500; i++)
-        {
-            addr.Add(i);
-        }
-
-        for (int i = 0x15502; i < 15504; i++)
-        {
-            addr.Add(i);
-        }
-
-        if (props.ShuffleEnemyStealExp)
-        {
-            RandomizeBits(rom, addr);
-        }
-
-        if (props.ShuffleSwordImmunity)
-        {
-            RandomizeBits(rom, addr, 0x20);
-        }
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(rom, addr);
-        }
-
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            addr = new List<int>();
-            addr.Add(0x11505);
-            addr.Add(0x13C88);
-            addr.Add(0x13C89);
-            addr.Add(0x12A05);
-            addr.Add(0x12A06);
-            addr.Add(0x12A07);
-            addr.Add(0x15507);
-            RandomizeEnemyExp(rom, addr);
-        }
-
         if (props.ShuffleEncounters)
         {
-            addr = new List<int>();
             addr.Add(0x441b); // 0x62: West northern grass
             addr.Add(0x4419); // 0x5D: West northern desert
             addr.Add(0x441D); // 0x67: West northern forest
@@ -2709,6 +2539,60 @@ public class Hyrule
             rom.Put(0x1E8B0, (byte)drop);
         }
 
+    }
+
+    private void RandomizeEnemyAttributes<T>(ROM rom, int baseAddr, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    {
+        List<T> allEnemies = [.. groundEnemies, .. flyingEnemies, .. generators];
+        var addrsByte1 = allEnemies.Select(n => baseAddr + (int)(object)n).ToList();
+        var addrsByte2 = allEnemies.Select(n => baseAddr + 0x24 + (int)(object)n).ToList();
+        var vanillaEnemyBytes1 = addrsByte1.Select(a => rom.GetByte(a)).ToArray();
+        var vanillaEnemyBytes2 = addrsByte2.Select(a => rom.GetByte(a)).ToArray();
+
+        byte[] enemyBytes1 = vanillaEnemyBytes1.ToArray();
+        byte[] enemyBytes2 = vanillaEnemyBytes2.ToArray();
+
+        // enemy attributes byte1
+        // ..x. .... sword immune
+        // ...x .... steals exp
+        // .... xxxx exp
+        const int SWORD_IMMUNE_BIT = 0b00100000;
+        const int XP_STEAL_BIT =     0b00010000;
+
+        if (props.ShuffleSwordImmunity)
+        {
+            RandomizeBits(RNG, enemyBytes1, SWORD_IMMUNE_BIT);
+        }
+        if (props.ShuffleEnemyStealExp)
+        {
+            RandomizeBits(RNG, enemyBytes1, XP_STEAL_BIT);
+        }
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
+        {
+            RandomizeEnemyExp(RNG, enemyBytes1, props.EnemyXPDrops);
+        }
+
+        // enemy attributes byte2
+        // ..x. .... immune to projectiles
+        const int PROJECTILE_IMMUNE_BIT = 0b00100000;
+
+        for (int i = 0; i < allEnemies.Count; i++) {
+            if ((enemyBytes1[i] & SWORD_IMMUNE_BIT) != 0)
+            {
+                // if an enemy is becoming sword immune, make it not fire immune
+                if ((vanillaEnemyBytes1[i] & SWORD_IMMUNE_BIT) == 0)
+                {
+                    enemyBytes2[i] &= PROJECTILE_IMMUNE_BIT ^ 0xFF;
+                }
+            }
+        }
+
+        // byte4 could be used to randomize thunder immunity
+        // (then we must probably exclude generators so thunder doesn't destroy them)
+        // x... .... immune to thunder
+
+        for (int i = 0; i < addrsByte1.Count; i++) { rom.Put(addrsByte1[i], enemyBytes1[i]); }
+        for (int i = 0; i < addrsByte2.Count; i++) { rom.Put(addrsByte2[i], enemyBytes2[i]); }
     }
 
     private byte IntToText(int x)

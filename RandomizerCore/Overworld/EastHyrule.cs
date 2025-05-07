@@ -259,7 +259,7 @@ public sealed class EastHyrule : World
     {
         var groundEnemies = Enemies.EastGroundEnemies;
         var flyingEnemies = Enemies.EastFlyingEnemies;
-        var generators = Enemies.EastGeneratorEnemies;
+        var generators = Enemies.EastGenerators;
         var smallEnemies = Enemies.EastSmallEnemies;
         var largeEnemies = Enemies.EastLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);

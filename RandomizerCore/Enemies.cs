@@ -47,7 +47,7 @@ public class Enemies
         EnemiesWest.RED_DEELER,
         EnemiesWest.BLUE_DEELER,
     ];
-    public static readonly EnemiesWest[] WestGeneratorEnemies = [
+    public static readonly EnemiesWest[] WestGenerators = [
         EnemiesWest.BUBBLE_GENERATOR,
         EnemiesWest.ROCK_GENERATOR,
         EnemiesWest.BAGO_BAGO_GENERATOR,
@@ -79,7 +79,7 @@ public class Enemies
         EnemiesEast.BLUE_DEELER,
         EnemiesEast.GIRUBOKKU,
     ];
-    public static readonly EnemiesEast[] EastGeneratorEnemies = [
+    public static readonly EnemiesEast[] EastGenerators = [
         EnemiesEast.BUBBLE_GENERATOR,
         EnemiesEast.BAGO_BAGO_GENERATOR,
         EnemiesEast.BOON_GENERATOR,
