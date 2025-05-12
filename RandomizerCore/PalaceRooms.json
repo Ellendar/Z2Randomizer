@@ -20231,7 +20231,7 @@
     "isThunderBirdRoom": false,
     "enabled": true,
     "isEntrance": false,
-    "palaceNumber": null,
+    "palaceNumber": 7,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
