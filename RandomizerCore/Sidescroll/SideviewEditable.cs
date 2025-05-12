@@ -254,6 +254,39 @@ public class SideviewEditable<T> where T : Enum
         }
         return result;
     }
+}
+
+public static class SolidGridHelper
+{
+    public static bool[,] GridUnion(bool[,] gridA, bool[,] gridB)
+    {
+        int widthA = gridA.GetLength(0);
+        int widthB = gridB.GetLength(0);
+        int widthMin = Math.Min(widthA, widthB);
+        int widthMax = Math.Max(widthA, widthB);
+        const int height = 13;
+        var result = new bool[widthMax, height];
+
+        for (int x = 0; x < widthMin; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                result[x, y] = gridA[x, y] || gridB[x, y];
+            }
+        }
+        if (widthA != widthB)
+        {
+            var longerGrid = widthA > widthB ? gridA : gridB;
+            for (int x = widthMin; x < widthMax; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    result[x, y] = longerGrid[x, y];
+                }
+            }
+        }
+        return result;
+    }
 
     /// <summary>
     /// Check if solidGrid has a w x h opening at x, y.

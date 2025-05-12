@@ -429,7 +429,7 @@ public class Room : IJsonOnDeserialized
             if (cachedResult == null)
             {
                 var solidGrid = GetSolidGrid<P>();
-                cachedResult = SideviewEditable<P>.AreaIsOpen(solidGrid, x, y, w, h);
+                cachedResult = SolidGridHelper.AreaIsOpen(solidGrid, x, y, w, h);
             }
             return cachedResult.Value;
         }
