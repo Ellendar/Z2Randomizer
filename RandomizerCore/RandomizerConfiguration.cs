@@ -100,7 +100,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool removeTBird;
     private bool restartAtPalacesOnGameOver;
     private bool? global5050JarDrop = false;
-    private bool? reduceDripperVariance = false;
+    private bool reduceDripperVariance = false;
     private bool changePalacePallettes;
     private bool randomizeBossItemDrop;
     private int palacesToCompleteMin;
@@ -474,7 +474,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         set => SetField(ref global5050JarDrop, value);
     }
 
-    public bool? ReduceDripperVariance
+    public bool ReduceDripperVariance
     {
         get => reduceDripperVariance;
         set => SetField(ref reduceDripperVariance, value);
@@ -1649,7 +1649,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShufflePalacePalettes = ChangePalacePallettes;
         properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
         properties.Global5050JarDrop = Global5050JarDrop ?? GetIndeterminateFlagValue(r);
-        properties.ReduceDripperVariance = ReduceDripperVariance ?? GetIndeterminateFlagValue(r);
+        properties.ReduceDripperVariance = ReduceDripperVariance;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
 
