@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -70,6 +71,12 @@ public class SideviewEditable<T> where T : Enum
 
     public byte Length { get => Header[0]; }
 
+    public byte ObjectSet
+    {
+        get => (byte)((Header[1] & 0b10000000) >> 7);
+        set { Header[1] = (byte)((Header[1] & 0b01111111) | (((value) << 7) & 0b10000000)); }
+    }
+
     public byte PageCount {
         get => (byte)(((Header[1] & 0b01100000) >> 5) + 1);
         set { Header[1] = (byte)((Header[1] & 0b10011111) | (((value - 1) << 5) & 0b01100000)); }
@@ -77,8 +84,14 @@ public class SideviewEditable<T> where T : Enum
 
     public byte FloorHeader
     {
-        get { return Header[2]; }
-        set { Header[2] = value; }
+        get { return (byte)(Header[2] & 0b10001111); }
+        set { Header[2] = (byte)((Header[2] & 0b01110000) | (value & 0b10001111)); }
+    }
+
+    public byte TilesHeader
+    {
+        get { return (byte)((Header[2] & 0b01110000) >> 4); }
+        set { Header[2] = (byte)((Header[2] & 0b10001111) | ((value & 0b0111) << 4)); }
     }
 
     public byte BackgroundMap
@@ -209,7 +222,7 @@ public class SideviewEditable<T> where T : Enum
             }
             for (int y = 0; y < height; y++)
             {
-                result[x, y] = floor.IsFloorSolidAt(y);
+                result[x, y] = floor.IsFloorSolidAt(this, y);
             }
         }
         foreach (var cmd in Commands)
@@ -222,7 +235,7 @@ public class SideviewEditable<T> where T : Enum
                 {
                     for (int y = cmd.Y; y < h; y++)
                     {
-                        result[x, y] = true;
+                        result[x, y] = cmd.IsSolidAt(x, y);
                     }
                 }
             }
@@ -241,18 +254,134 @@ public class SideviewEditable<T> where T : Enum
         }
         return result;
     }
+}
 
-    public static bool AreaIsOpen(bool[,] solidGrid, int x1, int x2, int y1, int y2)
+public static class SolidGridHelper
+{
+    public static bool[,] GridUnion(bool[,] gridA, bool[,] gridB)
     {
-        for (int x = x1; x <= x2; x++)
+        int widthA = gridA.GetLength(0);
+        int widthB = gridB.GetLength(0);
+        int widthMin = Math.Min(widthA, widthB);
+        int widthMax = Math.Max(widthA, widthB);
+        const int height = 13;
+        var result = new bool[widthMax, height];
+
+        for (int x = 0; x < widthMin; x++)
         {
-            if (x >= solidGrid.GetLength(0)) { return false; }
-            for (int y = y1; y <= y2; y++)
+            for (int y = 0; y < height; y++)
             {
-                if (y >= solidGrid.GetLength(1)) { return false; }
-                if (solidGrid[x, y]) { return false; }
+                result[x, y] = gridA[x, y] || gridB[x, y];
+            }
+        }
+        if (widthA != widthB)
+        {
+            var longerGrid = widthA > widthB ? gridA : gridB;
+            for (int x = widthMin; x < widthMax; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    result[x, y] = longerGrid[x, y];
+                }
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Check if solidGrid has a w x h opening at x, y.
+    /// </summary>
+    public static bool AreaIsOpen(bool[,] solidGrid, int x, int y, int w, int h)
+    {
+        var xEnd = Math.Min(x + w, solidGrid.GetLength(0));
+        var yEnd = Math.Min(y + h, solidGrid.GetLength(1));
+        for (int i = x; i < xEnd; i++)
+        {
+            for (int j = y; j < yEnd; j++)
+            {
+                if (solidGrid[i, j]) { return false; }
             }
         }
         return true;
+    }
+
+    /// <summary>
+    /// Find the best floor y position that has a w x h opening. Optimally
+    /// such that y + h will end on top of the floor.
+    /// </summary>
+    public static int FindFloor(bool[,] solidGrid, int x, int y, int w, int h)
+    {
+        Debug.Assert(y < 13);
+        Debug.Assert(solidGrid.GetLength(1) == 13);
+
+        var xEnd = Math.Min(x + w, solidGrid.GetLength(0));
+
+        bool RowIsOpen(int j)
+        {
+            for (int i = x; i < xEnd; i++)
+            {
+                if (solidGrid[i, j])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // first try to find a floor close to the original position
+        int consecutiveOpens = 0;
+        int j;
+        // try scanning down
+        for (j = y; j < 13; j++)
+        {
+            if (RowIsOpen(j))
+            {
+                consecutiveOpens++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (consecutiveOpens >= h)
+        {
+            return j - h;
+        }
+        // try moving up
+        for (j = y - 1; j >= 0; j--)
+        {
+            if (RowIsOpen(j))
+            {
+                consecutiveOpens++;
+                if (consecutiveOpens == h)
+                {
+                    return j;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        // no luck, instead try to find the lowest floor possible
+        consecutiveOpens = 0;
+        for (j = 12; j >= 0; j--)
+        {
+            if (RowIsOpen(j))
+            {
+                consecutiveOpens++;
+                if (consecutiveOpens == h)
+                {
+                    return j;
+                }
+            }
+            else
+            {
+                consecutiveOpens = 0;
+            }
+        }
+
+        return 0;
     }
 }

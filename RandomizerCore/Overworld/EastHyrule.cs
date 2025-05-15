@@ -147,6 +147,9 @@ public sealed class EastHyrule : World
 
         hiddenPalaceCoords = (0, 0);
 
+        sideviewPtrTable = 0x8533;
+        sideviewBank = 2;
+
         enemyAddr = 0x88B0;
         enemyPtr = 0x85B1;
         locationAtGP = GetLocationByMem(0x8665);
@@ -189,7 +192,7 @@ public sealed class EastHyrule : World
         townAtDarunia.Children.Add(daruniaRoof);
         AddLocation(daruniaRoof);
 
-        overworldMaps = [0x22, 0x1D, 0x27, 0x35, 0x30, 0x1E, 0x28, 0x3C];
+        overworldMaps = [29, 30, 34, 35, 39, 40, 48, 53, 60];
 
         MAP_ROWS = 75;
         MAP_COLS = 64;
@@ -255,7 +258,7 @@ public sealed class EastHyrule : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.EastGroundEnemies;
         var flyingEnemies = Enemies.EastFlyingEnemies;
@@ -263,7 +266,7 @@ public sealed class EastHyrule : World
         var smallEnemies = Enemies.EastSmallEnemies;
         var largeEnemies = Enemies.EastLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
-        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 
