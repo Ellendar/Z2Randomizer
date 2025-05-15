@@ -72,6 +72,8 @@ namespace Z2Randomizer.CommandLine
 
             configuration.RemoveFlashing = playerOptions.RemoveFlashingUponDeath;
             configuration.UpAOnController1 = playerOptions.RemapUpAToUpSelect;
+            configuration.SanitizeSprite = playerOptions.SanitizeSprite;
+            configuration.ChangeItemSprites = playerOptions.ChangeItemSprites;
             configuration.Tunic = playerOptions.TunicColor;
             configuration.TunicOutline = playerOptions.TunicOutlineColor;
             configuration.ShieldTunic = playerOptions.ShieldTunicColor;
