@@ -94,6 +94,18 @@ public class SideviewEditable<T> where T : Enum
         set { Header[2] = (byte)((Header[2] & 0b10001111) | ((value & 0b0111) << 4)); }
     }
 
+    public byte SpritePalette
+    {
+        get { return (byte)((Header[3] & 0b11000000) >> 6); }
+        set { Header[3] = (byte)((Header[3] & 0b00111111) | ((value & 0b11) << 6)); }
+    }
+
+    public byte BackgroundPalette
+    {
+        get { return (byte)((Header[3] & 0b00111000) >> 3); }
+        set { Header[3] = (byte)((Header[3] & 0b11000111) | ((value & 0b111) << 3)); }
+    }
+
     public byte BackgroundMap
     {
         get { return (byte)(Header[3] & 0b00000111); }

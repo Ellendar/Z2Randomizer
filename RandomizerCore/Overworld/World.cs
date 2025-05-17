@@ -19,7 +19,7 @@ public abstract class World
     protected int sideviewBank;
     protected int enemyAddr;
     protected int enemyPtr;
-    protected List<int> overworldMaps;
+    protected List<int> overworldEncounterMaps;
     protected SortedDictionary<(int, int), Location> locsByCoords;
     protected Terrain[,] map;
     protected int MAP_ROWS;
@@ -189,9 +189,9 @@ public abstract class World
         }
     }
 
-    protected abstract byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch);
+    protected abstract byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch);
 
-    public void ShuffleEnemies(ROM romData, SortedSet<int> sideviewAddr, int enemiesAddr, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    public void ShuffleEnemies(ROM romData, SortedSet<int> sideviewAddr, int enemiesAddr, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         if (enemiesAddr == 0x4A88)
         {
@@ -209,12 +209,12 @@ public abstract class World
         List<byte[]> sideviewBytes = [.. sideviewAddr.Select(a => romData.GetBytes(a, romData.GetByte(a)))];
         int enemiesLength = romData.GetByte(enemiesAddr);
         byte[] enemiesBytes = romData.GetBytes(enemiesAddr, enemiesLength);
-        byte[] newEnemyBytes = RandomizeEnemies(sideviewBytes, enemiesBytes, mixLargeAndSmallEnemies, generatorsAlwaysMatch);
+        byte[] newEnemyBytes = RandomizeEnemies(sideviewBytes, enemiesBytes, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch);
         Debug.Assert(newEnemyBytes.Length == enemiesLength);
         romData.Put(enemiesAddr, newEnemyBytes);
     }
 
-    protected void RandomizeEnemiesInner<T>(List<byte[]> sideviewBytes, Sidescroll.EnemiesEditable<T> ee, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    protected void RandomizeEnemiesInner<T>(List<byte[]> sideviewBytes, Sidescroll.EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
         Debug.Assert(sideviewBytes.Count > 0);
         bool[,]? solidGrid = null;
@@ -234,10 +234,10 @@ public abstract class World
                 solidGrid = Sidescroll.SolidGridHelper.GridUnion(solidGrid, svGrid);
             }
         }
-        RandomizeEnemiesInner(solidGrid!, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(solidGrid!, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
     }
 
-    protected void RandomizeEnemiesInner<T>(bool[,] solidGrid, Sidescroll.EnemiesEditable<T> ee, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    protected void RandomizeEnemiesInner<T>(bool[,] solidGrid, Sidescroll.EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
         void PositionGeldarm(Sidescroll.Enemy<T> enemy)
         {
@@ -252,7 +252,7 @@ public abstract class World
                 }
             }
         }
-        void PositionSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        bool PositionSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
         {
             switch (swapToId)
             {
@@ -261,13 +261,21 @@ public abstract class World
                     {
                         enemy.Y -= 1;
                     }
-                    break;
+                    return true;
                 case EnemiesEast.LEEVER:
-                    enemy.Y = Math.Min(9, Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1));
-                    break;
+                    // Vanilla Leever positions for reference:
+                    // East Map 29 Small & Large encounter at y == 8
+                    // East Map 30 Large encounter at y == 8
+                    // East Map 33 at y == 9
+                    var floor = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1);
+                    if (floor < 8) {
+                        return false; // Don't roll Leevers above ground level
+                    }
+                    enemy.Y = Math.Min(9, floor); // Leever y > 9 warps to spawning from the top of the screen
+                    return true;
                 default:
                     enemy.Y = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1);
-                    break;
+                    return true;
             }
         }
         void PositionLargeEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
@@ -280,6 +288,38 @@ public abstract class World
                 default:
                     enemy.Y = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
                     break;
+            }
+        }
+        T RollSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        {
+            while (true)
+            {
+                if (PositionSmallEnemy(enemy, swapToId))
+                {
+                    break;
+                }
+                swapToId = flyingEnemies[RNG.Next(0, flyingEnemies.Length)];
+            }
+            return swapToId;
+        }
+        void MoveAwayFromLinkSpawnInEncounter(Sidescroll.Enemy<T> enemy)
+        {
+            if (encounter)
+            {
+                // Move ground enemies in encounters away from Link's spawning position at x == 24
+                // Geldarms are the only ones that appear very close in vanilla, so those are allowed.
+                int minSpace = enemy.Id is EnemiesWest.GELDARM ? 1 : 4;
+                var x = enemy.X;
+                var maxLeft = 24 - minSpace - 1;
+                var minRight = 24 + minSpace + 1;
+                if (maxLeft < x && x <= 24)
+                {
+                    enemy.X = maxLeft;
+                }
+                else if (24 < x && x < minRight)
+                {
+                    enemy.X = minRight;
+                }
             }
         }
 
@@ -303,9 +343,10 @@ public abstract class World
                     }
                     else
                     {
-                        PositionSmallEnemy(enemy, swapToId);
+                        swapToId = RollSmallEnemy(enemy, swapToId);
                     }
                     enemy.Id = swapToId;
+                    MoveAwayFromLinkSpawnInEncounter(enemy);
                     continue;
                 }
             }
@@ -316,13 +357,15 @@ public abstract class World
                     T swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
                     PositionLargeEnemy(enemy, swapToId);
                     enemy.Id = swapToId;
+                    MoveAwayFromLinkSpawnInEncounter(enemy);
                     continue;
                 }
                 else if (enemy.IsShufflableSmall())
                 {
                     T swapToId = smallEnemies[RNG.Next(0, smallEnemies.Length)];
-                    PositionSmallEnemy(enemy, swapToId);
+                    swapToId = RollSmallEnemy(enemy, swapToId);
                     enemy.Id = swapToId;
+                    MoveAwayFromLinkSpawnInEncounter(enemy);
                     continue;
                 }
             }
@@ -445,6 +488,7 @@ public abstract class World
         // rooms sometimes, it seemed best to keep track of all of them
         // to make the enemies fit into every one of the linked sideviews.
         SortedDictionary<int, SortedSet<int>> dict = new();
+        HashSet<int> encounterAddrs = new();
         for (int map = 0; map < 63; map++)
         {
             int i = enemyPtr + map * 2;
@@ -460,11 +504,12 @@ public abstract class World
             }
         }
         // encounters have a second enemy list (small & large encounter)
-        foreach (int map in overworldMaps)
+        foreach (int map in overworldEncounterMaps)
         {
             int i = enemyPtr + map * 2;
             int enemiesPtrOffset = romData.GetShort(i + 1, i) & 0x0FFF;
             int addr = enemyAddr + enemiesPtrOffset;
+            encounterAddrs.Add(addr);
             byte enemiesLength = romData.GetByte(addr);
             addr += enemiesLength; // go past first enemy list
 
@@ -475,11 +520,12 @@ public abstract class World
             {
                 dict[addr].Add(sideviewAddr); // add to existing set
             }
+            encounterAddrs.Add(addr);
         }
 
         foreach(var(eAddr, svAddrs) in dict)
         {
-            ShuffleEnemies(romData, svAddrs, eAddr, mixLargeAndSmallEnemies, generatorsAlwaysMatch);
+            ShuffleEnemies(romData, svAddrs, eAddr, encounterAddrs.Contains(eAddr), mixLargeAndSmallEnemies, generatorsAlwaysMatch);
         }
     }
 

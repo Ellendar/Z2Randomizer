@@ -52,7 +52,7 @@ sealed class MazeIsland : World
         walkableTerrains = [Terrain.MOUNTAIN];
         enemyAddr = 0x88B0;
         enemyPtr = 0xA08E;
-        overworldMaps = [];
+        overworldEncounterMaps = [];
 
         childDrop = GetLocationByMem(0xA143);
         magicContainerDrop = GetLocationByMem(0xA133);
@@ -68,7 +68,7 @@ sealed class MazeIsland : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.EastGroundEnemies;
         var flyingEnemies = Enemies.EastFlyingEnemies;
@@ -76,7 +76,7 @@ sealed class MazeIsland : World
         var smallEnemies = Enemies.EastSmallEnemies;
         var largeEnemies = Enemies.EastLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 
