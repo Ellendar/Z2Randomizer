@@ -247,12 +247,12 @@ public abstract class World
                 var newY = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 5 - j);
                 if (newY != 0)
                 {
-                    enemy.Y = newY - j;
+                    enemy.Y = Math.Min(9, newY - j);
                     break;
                 }
             }
         }
-        void PositionSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        bool PositionSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
         {
             switch (swapToId)
             {
@@ -261,13 +261,23 @@ public abstract class World
                     {
                         enemy.Y -= 1;
                     }
-                    break;
+                    return true;
                 case EnemiesEast.LEEVER:
-                    enemy.Y = Math.Min(9, Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1));
-                    break;
+                    // Vanilla Leever positions for reference:
+                    // East Map 29 Small & Large encounter at y == 8
+                    // East Map 30 Large encounter at y == 8
+                    // East Map 33 at y == 9
+                    var leeverFloor = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1);
+                    leeverFloor--; // because Leevers have strange y positioning.
+                    if (leeverFloor < 7) {
+                        return false; // Don't roll Leevers above ground level
+                    }
+                    enemy.Y = Math.Min(9, leeverFloor);
+                    return true;
                 default:
-                    enemy.Y = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1);
-                    break;
+                    var defaultFloor = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 1);
+                    enemy.Y = Math.Min(9, defaultFloor);
+                    return true;
             }
         }
         void PositionLargeEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
@@ -278,9 +288,22 @@ public abstract class World
                     PositionGeldarm(enemy);
                     break;
                 default:
-                    enemy.Y = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
+                    var defaultFloor = Sidescroll.SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
+                    enemy.Y = Math.Min(9, defaultFloor);
                     break;
             }
+        }
+        T RollSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        {
+            while (true)
+            {
+                if (PositionSmallEnemy(enemy, swapToId))
+                {
+                    break;
+                }
+                swapToId = smallEnemies[RNG.Next(0, flyingEnemies.Length)];
+            }
+            return swapToId;
         }
 
         int? firstGenerator = null;
@@ -303,7 +326,7 @@ public abstract class World
                     }
                     else
                     {
-                        PositionSmallEnemy(enemy, swapToId);
+                        swapToId = RollSmallEnemy(enemy, swapToId);
                     }
                     enemy.Id = swapToId;
                     continue;
@@ -321,7 +344,7 @@ public abstract class World
                 else if (enemy.IsShufflableSmall())
                 {
                     T swapToId = smallEnemies[RNG.Next(0, smallEnemies.Length)];
-                    PositionSmallEnemy(enemy, swapToId);
+                    swapToId = RollSmallEnemy(enemy, swapToId);
                     enemy.Id = swapToId;
                     continue;
                 }
