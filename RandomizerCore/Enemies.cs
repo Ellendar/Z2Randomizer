@@ -422,11 +422,11 @@ public enum EnemiesPalace346
 public enum EnemiesGreatPalace
 {
     FAIRY = 0x00,
-    STRIKE_FOR_RED_JAR_OR_FOKKA = 0x01,
+    ITEM_IN_PALACE_SPRITE = 0x01,
     LOCKED_DOOR = 0x02,
     MYU = 0x03,
     BOT = 0x04,
-    BIT = 0x05,
+    STRIKE_FOR_RED_JAR_OR_FOKKA = 0x05,
     ORANGE_MOA = 0x06,
     ACHE = 0x07,
     ACHEMAN = 0x0A,

@@ -1578,6 +1578,36 @@ Exit:
         Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
     }
 
+    public void AdjustGpProjectileDamage()
+    {
+        // We are using some enemies that are not present in vanilla
+        // Great Palace, some of which use bytes that are not set
+        // properly in bank 5 (the GP bank) as they never got used.
+
+        // ACHEMAN projectile
+        // West damage class: 1 (0x81)
+        // GP vanilla damage class: 6 (0x86)
+        //
+        // The damage class byte in bank 5 is likely from copying
+        // bank 4 where it is used for Barba's projectile damage.
+        // Lets lower it a bit, but not all the way to 1.
+        Put(0x1542b, 0x83);
+
+        // BUBBLE_GENERATOR
+        // West damage class: 0 (0x80)
+        // East damage class: 0 (0x80)
+        // Vanilla GP damage class: 3 (0x03)
+        //
+        // The damage class byte in bank 5 is likely from copying
+        // bank 4 where it is used for Helmethead's main projectile.
+        Put(0x15429, 0x80);
+
+        // ROCK_GENERATOR
+        // West damage class: 0 (0x00)
+        // Vanilla GP damage class: 0 (0x00)
+        //Put(0x15428, 0x00); // already at 0
+    }
+
     public string Z2BytesToString(byte[] data)
     {
         return new string(data.Select(letter => {

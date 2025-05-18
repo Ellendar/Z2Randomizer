@@ -155,7 +155,7 @@ public class Enemy<T> where T : Enum
     public String DebugString()
     {
         var bytes = Convert.ToHexString(Bytes);
-        var idString = $"Id";
+        var idString = $"{Id}";
         return $"{bytes,-4}  {X,2},{Y,2}  {idString}";
     }
 

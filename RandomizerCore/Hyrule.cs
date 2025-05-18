@@ -306,7 +306,8 @@ public class Hyrule
 
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
-            if(props.RandomizeDrops)
+            ROMData.AdjustGpProjectileDamage();
+            if (props.RandomizeDrops)
             {
                 shuffler.ShuffleDrops(ROMData, RNG);
             }

@@ -544,7 +544,7 @@ public class Room : IJsonOnDeserialized
                         case EnemiesGreatPalace.KING_BOT:
                             reroll = !PositionKingBot(ref roomForKingBot, enemy); // updates enemy position on success
                             break;
-                    };
+                    }
 
                     if (reroll)
                     {
