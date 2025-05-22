@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
 using System.ComponentModel.DataAnnotations;
@@ -99,6 +100,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool removeTBird;
     private bool restartAtPalacesOnGameOver;
     private bool? global5050JarDrop = false;
+    private bool reduceDripperVariance = false;
     private bool changePalacePallettes;
     private bool randomizeBossItemDrop;
     private int palacesToCompleteMin;
@@ -203,6 +205,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [IgnoreInFlags]
     public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
     [IgnoreInFlags]
+    [JsonIgnore]
     public string Flags
     {
         get => Serialize();
@@ -469,6 +472,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => global5050JarDrop;
         set => SetField(ref global5050JarDrop, value);
+    }
+
+    public bool ReduceDripperVariance
+    {
+        get => reduceDripperVariance;
+        set => SetField(ref reduceDripperVariance, value);
     }
 
     public bool ChangePalacePallettes
@@ -1640,6 +1649,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShufflePalacePalettes = ChangePalacePallettes;
         properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
         properties.Global5050JarDrop = Global5050JarDrop ?? GetIndeterminateFlagValue(r);
+        properties.ReduceDripperVariance = ReduceDripperVariance;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
 
