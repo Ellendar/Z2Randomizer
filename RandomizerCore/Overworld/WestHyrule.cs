@@ -227,7 +227,13 @@ public sealed class WestHyrule : World
         enemyAddr = 0x48B0;
         enemyPtr = 0x45B1;
 
-        overworldMaps = [29, 30, 34, 35, 39, 40, 48, 53, 58];
+        overworldEncounterMaps = [
+            29, 30, // Desert
+            34, 35, // Grass
+            39, 40, // Forest
+            47, 48, // Swamp
+            52, 53, // Graveyard
+        ];
 
         MAP_ROWS = 75;
         MAP_COLS = 64;
@@ -322,7 +328,7 @@ public sealed class WestHyrule : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.WestGroundEnemies;
         var flyingEnemies = Enemies.WestFlyingEnemies;
@@ -330,7 +336,7 @@ public sealed class WestHyrule : World
         var smallEnemies = Enemies.WestSmallEnemies;
         var largeEnemies = Enemies.WestLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 

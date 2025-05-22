@@ -152,6 +152,16 @@ public sealed class EastHyrule : World
 
         enemyAddr = 0x88B0;
         enemyPtr = 0x85B1;
+
+        overworldEncounterMaps = [
+            29, 30, // Desert
+            34, 35, // Grass
+            39, 40, // Forest
+            47, 48, // Swamp
+            52, 53, // Graveyard
+            59, 60, // Lava
+        ];
+
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
         locationAtGP.VanillaCollectable = locationAtGP.Collectable = Collectable.DO_NOT_USE;
@@ -191,8 +201,6 @@ public sealed class EastHyrule : World
         daruniaRoof.CanShuffle = false;
         townAtDarunia.Children.Add(daruniaRoof);
         AddLocation(daruniaRoof);
-
-        overworldMaps = [29, 30, 34, 35, 39, 40, 48, 53, 60];
 
         MAP_ROWS = 75;
         MAP_COLS = 64;
@@ -258,7 +266,7 @@ public sealed class EastHyrule : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.EastGroundEnemies;
         var flyingEnemies = Enemies.EastFlyingEnemies;
@@ -266,7 +274,7 @@ public sealed class EastHyrule : World
         var smallEnemies = Enemies.EastSmallEnemies;
         var largeEnemies = Enemies.EastLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 

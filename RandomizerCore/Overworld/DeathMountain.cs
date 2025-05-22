@@ -122,7 +122,14 @@ sealed class DeathMountain : World
         enemyAddr = 0x48B0;
         enemyPtr = 0x608E;
 
-        overworldMaps = new List<int>();
+        overworldEncounterMaps = [
+            29, 30, // Desert
+            34, 35, // Grass (not in Vanilla)
+            39, 40, // Forest
+            47, 48, // Swamp (not in Vanilla)
+            52, 53, // Graveyard
+        ];
+
         MAP_ROWS = 45;
         MAP_COLS = 64;
 
@@ -144,7 +151,7 @@ sealed class DeathMountain : World
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
+    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
     {
         var groundEnemies = Enemies.WestGroundEnemies;
         var flyingEnemies = Enemies.WestFlyingEnemies;
@@ -152,7 +159,7 @@ sealed class DeathMountain : World
         var smallEnemies = Enemies.WestSmallEnemies;
         var largeEnemies = Enemies.WestLargeEnemies;
         var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
+        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }
 

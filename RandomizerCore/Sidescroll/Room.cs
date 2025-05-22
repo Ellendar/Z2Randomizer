@@ -433,6 +433,44 @@ public class Room : IJsonOnDeserialized
             }
             return cachedResult.Value;
         }
+        bool PositionKingBot(ref bool? cachedResult, Enemy<T> enemy)
+        {
+            // Vanilla King Bot positions for reference:
+            // GP Map 37 at y == 1 where floor is at y == 8
+            // GP Map 48 at y == 3 where floor is at y == 11
+
+            // Do our best to position King Bots high up, so they are unlikely to
+            // spawn inside the player's position.  y==3 is the preferred spot unless
+            // the floor is high, as there is also the risk of having the King Bot
+            // spawn in your position when you are Fairying over a room.
+            // (Enemies in Zelda II cannot be positioned at y == 0 or y == 2.)
+
+            // Unless we find a 3x6 empty area here we will not spawn a King Bot.
+            if (cachedResult == null)
+            {
+                var solidGrid = GetSolidGrid<GreatPalaceObject>();
+
+                int newY = 0;
+                foreach (int j in new int[] { 3, 4, 1, 5 })
+                {
+                    if (SolidGridHelper.AreaIsOpen(solidGrid, enemy.X, j, 3, 6))
+                    {
+                        newY = j;
+                        break;
+                    }
+                }
+                if (newY != 0)
+                {
+                    enemy.Y = newY;
+                    cachedResult = true;
+                }
+                else
+                {
+                    cachedResult = false;
+                }
+            }
+            return cachedResult.Value;
+        }
 
         T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
         {
@@ -504,9 +542,9 @@ public class Room : IJsonOnDeserialized
                             break;
 
                         case EnemiesGreatPalace.KING_BOT:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForKingBot, enemy.X, enemy.Y, 3, 2);
+                            reroll = !PositionKingBot(ref roomForKingBot, enemy); // updates enemy position on success
                             break;
-                    };
+                    }
 
                     if (reroll)
                     {
