@@ -20335,5 +20335,31 @@
     "linkedRoomName": null,
     "isUpDownReversed": false,
     "suppressWarning": []
+  },
+  {
+    "name": "Pillars and Clouds",
+    "group": "V4_4",
+    "author": "initsu",
+    "enabled": true,
+    "map": 4,
+    "bitmask": "0F",
+    "palaceGroup": null,
+    "memoryAddress": 75756,
+    "connections": "0FFC02FC",
+    "hasDrop": false,
+    "elevatorScreen": 2,
+    "requirements": [],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "07795E3C447B04",
+    "sideviewData": "416090002074907443C42221A021250AA036833290333607602C71C37138052C11C4113872C3752581A7A074C02F11C5F2582008D20F631470148014800F0B9030",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "isUpDownReversed": false,
+    "suppressWarning": []
   }
 ]
