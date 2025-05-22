@@ -16262,7 +16262,7 @@
     "name": "hiddenkeyroom",
     "group": "V4_4",
     "map": 10,
-    "enabled": true,
+    "enabled": false,
     "connections": "FFFFFF24",
     "enemies": "0B07230B2375D835C77918",
     "sideviewData": "13608008D00FD200A00F08DD0F90AFE100DF00",
