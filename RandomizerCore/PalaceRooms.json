@@ -20308,5 +20308,31 @@
     "linkedRoomName": null,
     "author": "initsu",
     "palaceGroup": null
+  },
+  {
+    "name": "Inverse T Junction With Underneath Passage",
+    "group": "V4_4",
+    "author": "initsu",
+    "enabled": true,
+    "map": 4,
+    "bitmask": "0F",
+    "palaceGroup": null,
+    "memoryAddress": 75645,
+    "connections": "0FFC0114",
+    "hasDrop": false,
+    "elevatorScreen": 1,
+    "requirements": [],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "0578187398",
+    "sideviewData": "3D400E08D210420012C9420012C95152420F0B11C9420012C6802B90C1647390C1F15A00D501D591C114C690C1420012C9420012C9420012C94200D30E",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "isUpDownReversed": false,
+    "suppressWarning": []
   }
 ]
