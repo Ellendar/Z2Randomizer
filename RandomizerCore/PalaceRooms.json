@@ -16491,7 +16491,7 @@
     "connections": "AFFF9FB4",
     "hasDrop": false,
     "elevatorScreen": 2,
-    "requirements": [],
+    "requirements": ["JUMP", "FAIRY"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0927C61F06725D74DD",
