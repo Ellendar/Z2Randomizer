@@ -15523,7 +15523,7 @@
     "bitmask": "0B",
     "connections": "FCFC5B60",
     "elevatorScreen": 0,
-    "enabled": true,
+    "enabled": false,
     "enemies": "0F77DE1BCD14CD655A3D573E572D57",
     "group": "V4_4",
     "hasBoss": false,
