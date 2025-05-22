@@ -1487,6 +1487,37 @@ Exit:
 """, "instant_text.s");
     }
 
+    public void ChangeLavaKillPosition(Assembler asm)
+    {
+        // Don't grab the player at the top pixels of the lava block.
+        // This way we can have "floor level" lava without being sucked into it when we are close.
+        var a = asm.Module();
+        a.Code("""
+.include "z2r.inc"
+.segment "PRG7"
+
+closest_rts = $E0E5
+
+.org $E0A4
+HandleLavaTileCollision:
+    lda $29                          ; load Link's y pos
+    and #$0f                         ; mask the last 4 bits, to get the Link's pixel position inside the tile
+    cmp #$06                         ; check that we are deep into the lava tile
+    bcc closest_rts                  ; Link's position is not low enough, return
+    jmp ActualLavaDeath
+FREE_UNTIL $E0B0
+
+.reloc
+ActualLavaDeath:                     ; original code that we replaced
+    lda #$01
+    sta $e9                          ; $e9 = 01
+    lda #$10
+    sta $050c                        ; timer for Link being in injured state = 10
+    inc $b5                          ; increase Link's state to 2, meaning Link will die
+    rts
+""");
+    }
+
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
