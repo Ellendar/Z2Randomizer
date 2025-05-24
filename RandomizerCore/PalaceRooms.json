@@ -18726,7 +18726,7 @@
     "author": "Ellendar",
     "group": "V4_4",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": false,
     "palaceNumber": 7,
     "linkedRoomName": null,
