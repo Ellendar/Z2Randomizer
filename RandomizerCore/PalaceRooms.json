@@ -19923,6 +19923,7 @@
     "isBossRoom": false,
     "hasDrop": false,
     "elevatorScreen": 1,
+    "hasDroppableElevator": true,
     "memoryAddress": 75230,
     "isUpDownReversed": false,
     "isDropZone": false,
