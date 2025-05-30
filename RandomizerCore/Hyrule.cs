@@ -206,6 +206,8 @@ public class Hyrule
             World.ResetStats();
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
             RNG = new Random(SeedHash);
+
+            config.CheckForFlagConflicts();
             props = config.Export(RNG);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
             if(config.GenerateSpoiler)
