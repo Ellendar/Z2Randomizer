@@ -126,6 +126,7 @@ public class Room : IJsonOnDeserialized
     public Room MergedPrimary { get; set; }
     [JsonIgnore]
     public Room MergedSecondary { get; set; }
+    public string DuplicateGroup { get; set; } = "";
     public List<string> SuppressWarning { get; set; } = [];
     public List<string> Tags { get; set; } = [];
 
@@ -180,6 +181,7 @@ public class Room : IJsonOnDeserialized
         Group = room.Group;
         // PalaceGroup = room.PalaceGroup;
         PalaceNumber = room.PalaceNumber;
+        DuplicateGroup = room.DuplicateGroup;
 
         Connections = room.Connections;
         HasLeftExit = room.Connections[0] < 0xFC;

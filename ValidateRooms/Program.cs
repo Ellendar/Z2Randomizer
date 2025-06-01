@@ -6,8 +6,10 @@ using System.Text.Json;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using static Z2Randomizer.RandomizerCore.Util;
 
 StringBuilder sb = new StringBuilder("");
+var sideviewComparer = new StandardByteArrayEqualityComparer();
 
 void ValidateRoomsForFile(string filename)
 {
@@ -22,36 +24,44 @@ void ValidateRoomsForFile(string filename)
         .Select(g => g.Key);
     foreach (var name in duplicateNames) { sb.AppendLine($"{name}: room name is used more than once."); }
 
+    var enabledRooms = palaceRooms!.Where(r => IsActuallyEnabled(palaceRooms!, r)).ToArray();
+
     // Checking that all room data is conforming to the structure
     // (It would be very bad if any of the length bytes were wrong.)
-    foreach (var room in palaceRooms!.Where(r => IsActuallyEnabled(palaceRooms!, r)))
+    foreach (var room in enabledRooms)
     {
         try
         {
             // From testing: the game can handle the full 255 bytes of sideview map commands
             var sv = new SideviewEditable<PalaceObject>(room.SideView);
         }
-        catch (Exception e) { sb.AppendLine($"{GetName(room)}: Room enemies data error. {e.Message}"); }
+        catch (Exception e) { sb.AppendLine($"{room.Name}: Room enemies data error. {e.Message}"); }
 
         try
         {
             // From testing: a room with 12 enemies crashes the game. 11 seemed to work.
             // In the vanilla palace rooms, the max amount of enemies is 9
             var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
-            if (ee.Enemies.Count > 9) { sb.AppendLine($"{GetName(room)}: Room has too many enemies ({ee.Enemies.Count})."); }
+            if (ee.Enemies.Count > 9) { sb.AppendLine($"{room.Name}: Room has too many enemies ({ee.Enemies.Count})."); }
         }
-        catch (Exception e) { sb.AppendLine($"{GetName(room)}: Room enemies data error. {e.Message}"); }
+        catch (Exception e) { sb.AppendLine($"{room.Name}: Room enemies data error. {e.Message}"); }
 
-        if (room.Connections.Length != 4) { sb.AppendLine($"{GetName(room)}: Room Connections data error."); }
+        if (room.Connections.Length != 4) { sb.AppendLine($"{room.Name}: Room Connections data error."); }
+
+        if (string.IsNullOrEmpty(room.Name)) {
+            sb.AppendLine($"Room with sideview data={Convert.ToHexString(room.SideView)} is missing a name.");
+        };
     }
 
     // REGULAR PALACE ROOMS
-    foreach (var room in palaceRooms!.Where(r => r.PalaceNumber != 7 && IsActuallyEnabled(palaceRooms!, r)))
+    var enabledRegularPalaceRooms = enabledRooms.Where(r => r.PalaceNumber != 7);
+    var regularPalaceGroupedSideviews = palaceRooms!.Where(r => r.PalaceNumber != 7).GroupBy(x => x.SideView, sideviewComparer);
+    foreach (var room in enabledRegularPalaceRooms)
     {
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
         var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
         // checking Enabled here to skip linked rooms
-        if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
+        if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{room.Name}: Room HasItem mismatch."); }
 
         CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
@@ -87,10 +97,14 @@ void ValidateRoomsForFile(string filename)
         var elevators = sv.FindAll(o => o.IsElevator());
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
         CheckDropZones(room, openCeilingTiles);
+
+        CheckDupes(room, enabledRegularPalaceRooms, regularPalaceGroupedSideviews);
     }
 
     // GREAT PALACE ROOMS
-    foreach (var room in palaceRooms!.Where(r => r.PalaceNumber == 7 && IsActuallyEnabled(palaceRooms!, r)))
+    var enabledGreatPalaceRooms = enabledRooms.Where(r => r.PalaceNumber == 7);
+    var greatPalaceGroupedSideviews = palaceRooms!.Where(r => r.PalaceNumber == 7).GroupBy(x => x.SideView, sideviewComparer);
+    foreach (var room in enabledGreatPalaceRooms)
     {
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
         var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
@@ -120,6 +134,47 @@ void ValidateRoomsForFile(string filename)
         var elevators = sv.FindAll(o => o.IsElevator());
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
         CheckDropZones(room, openCeilingTiles);
+
+        CheckDupes(room, enabledGreatPalaceRooms, greatPalaceGroupedSideviews);
+    }
+}
+
+HashSet<String> globalReportedDupeRooms = new();
+
+void CheckDupes(Room room, IEnumerable<Room> enabledRegularPalaceRooms, IEnumerable<IGrouping<byte[], Room>> regularPalaceGroupedSideviews)
+{
+    if (!room.Enabled || room.IsEntrance || room.IsBossRoom) { return; }
+    var matchingGroup = regularPalaceGroupedSideviews.FirstOrDefault(g => sideviewComparer.Equals(g.Key, room.SideView));
+    Debug.Assert(matchingGroup != null);
+    var dupes = matchingGroup.ToList();
+    if (dupes.Count > 1)
+    {
+        var enabledInMatchingGroup = dupes.Where(r => r.Enabled).ToList();
+        if (enabledInMatchingGroup.Count < 2) { return; }
+        var dupeNames = dupes.Select(r => r.DuplicateGroup).ToHashSet();
+        dupeNames.Remove("");
+        if (dupeNames.Count > 1)
+        {
+            sb.AppendLine($"DuplicationGroup overlap for {String.Join(", ", dupeNames.Select(s => $"\"{s}\""))}. Remove at least one of these.");
+            return;
+        }
+        string dupeName = dupeNames.Count == 1 ? dupeNames.First() : room.Name;
+        var missingDupeGroup = dupes.Where(r => r.Enabled && r.DuplicateGroup != dupeName).ToList();
+
+        foreach (var r in missingDupeGroup)
+        {
+            if (globalReportedDupeRooms.Contains(r.Name)) { continue; }
+            var newDuplicateGroup = $"\"duplicateGroup\": \"{dupeName}\"";
+            Warning(r, "DuplicateGroupMismatch", $"Room duplicate group is not synchronized. Set:\n{newDuplicateGroup}\n");
+            globalReportedDupeRooms.Add(r.Name);
+        }
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(room.DuplicateGroup))
+        {
+            Warning(room, "DuplicateGroupMismatch", $"Room has DuplicateGroup set but has no duplicates.");
+        }
     }
 }
 
@@ -558,11 +613,6 @@ void CheckDropZones(Room room, SortedSet<int> openCeilingTiles)
     }
 }
 
-string GetName(Room room)
-{
-    return room.Name.Length > 0 ? room.Name : Convert.ToHexString(room.SideView);
-}
-
 bool IsActuallyEnabled(List<Room> allRooms, Room room)
 {
     if (room.Enabled) { return true; }
@@ -598,7 +648,7 @@ string FixedElevatorHexString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> e
 void Warning(Room room, string id, string msg)
 {
     if (room.SuppressWarning.Contains(id)) { return; }
-    sb.AppendLine($"{$"[{id}]", -26} \"{GetName(room)}\": " + msg);
+    sb.AppendLine($"{$"[{id}]", -26} \"{room.Name}\": " + msg);
 }
 
 #pragma warning disable CS8321 // Local function is declared but never used
