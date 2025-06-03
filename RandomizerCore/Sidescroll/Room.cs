@@ -447,9 +447,28 @@ public class Room : IJsonOnDeserialized
             // spawn in your position when you are Fairying over a room.
             // (Enemies in Zelda II cannot be positioned at y == 0 or y == 2.)
 
+            // We also check that we don't elevator or drop straight into a King Bot.
+
             // Unless we find a 3x6 empty area here we will not spawn a King Bot.
             if (cachedResult == null)
             {
+                if (ElevatorScreen != -1)
+                {
+                    var elevatorXPos = (ElevatorScreen * 16) + 7;
+                    if (elevatorXPos - 3 <= enemy.X && elevatorXPos + 2 >= enemy.X)
+                    {
+                        cachedResult = false;
+                        return false;
+                    }
+                }
+                if (IsDropZone)
+                {
+                    if (14 <= enemy.X && 48 >= enemy.X)
+                    {
+                        cachedResult = false;
+                        return false;
+                    }
+                }
                 var solidGrid = GetSolidGrid<GreatPalaceObject>();
 
                 int newY = 0;
