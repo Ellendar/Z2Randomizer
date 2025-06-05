@@ -150,10 +150,9 @@ public sealed class EastHyrule : World
 
         sideviewPtrTable = 0x8533;
         sideviewBank = 2;
-
-        enemyAddr = 0x88B0;
         enemyPtr = 0x85B1;
-
+        enemyAddr = 0x88B0;
+        groupedEnemies = Enemies.GroupedEastEnemies;
         overworldEncounterMaps = [
             29, 30, // Desert
             34, 35, // Grass
@@ -265,18 +264,6 @@ public sealed class EastHyrule : World
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
         SetVanillaCollectables(props.ReplaceFireWithDash);
-    }
-
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        var groundEnemies = Enemies.EastGroundEnemies;
-        var flyingEnemies = Enemies.EastFlyingEnemies;
-        var generators = Enemies.EastGenerators;
-        var smallEnemies = Enemies.EastSmallEnemies;
-        var largeEnemies = Enemies.EastLargeEnemies;
-        var ee = new EnemiesEditable<EnemiesEast>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

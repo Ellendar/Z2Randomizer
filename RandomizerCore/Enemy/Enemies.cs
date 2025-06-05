@@ -53,6 +53,7 @@ public class Enemies
         EnemiesWest.BAGO_BAGO_GENERATOR,
         EnemiesWest.MOBY_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesWest> GroupedWestEnemies = new(WestSmallEnemies, WestLargeEnemies, WestFlyingEnemies, WestGenerators);
 
     public static readonly EnemiesEast[] EastSmallEnemies = [
         EnemiesEast.MYU,
@@ -84,6 +85,7 @@ public class Enemies
         EnemiesEast.BAGO_BAGO_GENERATOR,
         EnemiesEast.BOON_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesEast> GroupedEastEnemies = new(EastSmallEnemies, EastLargeEnemies, EastFlyingEnemies, EastGenerators);
 
     public static readonly EnemiesPalace125[] Palace125SmallEnemies = [
         EnemiesPalace125.MYU,

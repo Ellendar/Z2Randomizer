@@ -119,10 +119,9 @@ sealed class DeathMountain : World
 
         sideviewPtrTable = 0x6010;
         sideviewBank = 1;
-
-        enemyAddr = 0x48B0;
         enemyPtr = 0x608E;
-
+        enemyAddr = 0x48B0;
+        groupedEnemies = Enemies.GroupedWestEnemies;
         overworldEncounterMaps = [
             29, 30, // Desert
             34, 35, // Grass (not in Vanilla)
@@ -150,18 +149,6 @@ sealed class DeathMountain : World
 
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
-    }
-
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        var groundEnemies = Enemies.WestGroundEnemies;
-        var flyingEnemies = Enemies.WestFlyingEnemies;
-        var generators = Enemies.WestGenerators;
-        var smallEnemies = Enemies.WestSmallEnemies;
-        var largeEnemies = Enemies.WestLargeEnemies;
-        var ee = new EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
