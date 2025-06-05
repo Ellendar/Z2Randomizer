@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 //using System.Runtime.InteropServices.WindowsRuntime;
 
@@ -214,7 +215,7 @@ public abstract class World
         romData.Put(enemiesAddr, newEnemyBytes);
     }
 
-    protected void RandomizeEnemiesInner<T>(List<byte[]> sideviewBytes, Sidescroll.EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    protected void RandomizeEnemiesInner<T>(List<byte[]> sideviewBytes, EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
         Debug.Assert(sideviewBytes.Count > 0);
         bool[,]? solidGrid = null;
@@ -237,9 +238,9 @@ public abstract class World
         RandomizeEnemiesInner(solidGrid!, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
     }
 
-    protected void RandomizeEnemiesInner<T>(bool[,] solidGrid, Sidescroll.EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    protected void RandomizeEnemiesInner<T>(bool[,] solidGrid, EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
     {
-        void PositionGeldarm(Sidescroll.Enemy<T> enemy)
+        void PositionGeldarm(Enemy<T> enemy)
         {
             // do our best to fit the Geldarm. if there is no space, prioritize aligning with the floor
             for (int j = 0; j < 5; j++)
@@ -252,7 +253,7 @@ public abstract class World
                 }
             }
         }
-        bool PositionSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        bool PositionSmallEnemy(Enemy<T> enemy, T swapToId)
         {
             switch (swapToId)
             {
@@ -280,7 +281,7 @@ public abstract class World
                     return true;
             }
         }
-        void PositionLargeEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        void PositionLargeEnemy(Enemy<T> enemy, T swapToId)
         {
             switch (swapToId)
             {
@@ -293,7 +294,7 @@ public abstract class World
                     break;
             }
         }
-        T RollSmallEnemy(Sidescroll.Enemy<T> enemy, T swapToId)
+        T RollSmallEnemy(Enemy<T> enemy, T swapToId)
         {
             while (true)
             {
@@ -305,7 +306,7 @@ public abstract class World
             }
             return swapToId;
         }
-        void MoveAwayFromLinkSpawnInEncounter(Sidescroll.Enemy<T> enemy)
+        void MoveAwayFromLinkSpawnInEncounter(Enemy<T> enemy)
         {
             if (encounter)
             {
@@ -329,7 +330,7 @@ public abstract class World
         int? firstGenerator = null;
         for (int i = 0; i < ee.Enemies.Count; i++)
         {
-            Sidescroll.Enemy<T> enemy = ee.Enemies[i];
+            Enemy<T> enemy = ee.Enemies[i];
 
             if (mixLargeAndSmallEnemies)
             {

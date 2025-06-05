@@ -12,6 +12,7 @@ using FtRandoLib.Importer;
 using js65;
 using Microsoft.ClearScript;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 

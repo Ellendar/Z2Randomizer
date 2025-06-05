@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SD.Tools.BCLExtensions.CollectionsRelated;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -158,7 +159,7 @@ sealed class DeathMountain : World
         var generators = Enemies.WestGenerators;
         var smallEnemies = Enemies.WestSmallEnemies;
         var largeEnemies = Enemies.WestLargeEnemies;
-        var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
+        var ee = new EnemiesEditable<EnemiesWest>(enemyBytes);
         RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }

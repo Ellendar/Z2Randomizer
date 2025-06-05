@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -75,7 +76,7 @@ sealed class MazeIsland : World
         var generators = Enemies.EastGenerators;
         var smallEnemies = Enemies.EastSmallEnemies;
         var largeEnemies = Enemies.EastLargeEnemies;
-        var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
+        var ee = new EnemiesEditable<EnemiesEast>(enemyBytes);
         RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
         return ee.Finalize();
     }

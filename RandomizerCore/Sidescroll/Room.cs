@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -250,15 +251,15 @@ public class Room : IJsonOnDeserialized
             //Write the updated pointers
             case PalaceGrouping.Palace125:
                 enemyDataAddr -= 0x98b0;
-                tableAddr = RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2;
+                tableAddr = Enemy.Enemies.Palace125EnemyPtr + Map * 2;
                 break;
             case PalaceGrouping.Palace346:
                 enemyDataAddr -= 0x98b0;
-                tableAddr = RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2;
+                tableAddr = Enemy.Enemies.Palace346EnemyPtr + Map * 2;
                 break;
             default:
                 enemyDataAddr -= 0xd8b0;
-                tableAddr = RandomizerCore.Enemies.GPEnemyPtr + Map * 2;
+                tableAddr = Enemy.Enemies.GPEnemyPtr + Map * 2;
                 break;
         }
         
@@ -376,33 +377,33 @@ public class Room : IJsonOnDeserialized
         {
             case PalaceGrouping.Palace125:
                 {
-                    var groundEnemies = RandomizerCore.Enemies.Palace125GroundEnemies;
-                    var smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
-                    var largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
-                    var flyingEnemies = RandomizerCore.Enemies.Palace125FlyingEnemies;
-                    var generators = RandomizerCore.Enemies.Palace125Generators;
+                    var groundEnemies = Enemy.Enemies.Palace125GroundEnemies;
+                    var smallEnemies = Enemy.Enemies.Palace125SmallEnemies;
+                    var largeEnemies = Enemy.Enemies.Palace125LargeEnemies;
+                    var flyingEnemies = Enemy.Enemies.Palace125FlyingEnemies;
+                    var generators = Enemy.Enemies.Palace125Generators;
                     var ee = new EnemiesEditable<EnemiesPalace125>(Enemies);
                     RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
                     break;
                 }
             case PalaceGrouping.Palace346:
                 {
-                    var groundEnemies = RandomizerCore.Enemies.Palace346GroundEnemies;
-                    var smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
-                    var largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
-                    var flyingEnemies = RandomizerCore.Enemies.Palace346FlyingEnemies;
-                    var generators = RandomizerCore.Enemies.Palace346Generators;
+                    var groundEnemies = Enemy.Enemies.Palace346GroundEnemies;
+                    var smallEnemies = Enemy.Enemies.Palace346SmallEnemies;
+                    var largeEnemies = Enemy.Enemies.Palace346LargeEnemies;
+                    var flyingEnemies = Enemy.Enemies.Palace346FlyingEnemies;
+                    var generators = Enemy.Enemies.Palace346Generators;
                     var ee = new EnemiesEditable<EnemiesPalace346>(Enemies);
                     RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
                     break;
                 }
             case PalaceGrouping.PalaceGp:
                 {
-                    var groundEnemies = RandomizerCore.Enemies.GPGroundEnemies;
-                    var smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
-                    var largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
-                    var flyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
-                    var generators = RandomizerCore.Enemies.GPGenerators;
+                    var groundEnemies = Enemy.Enemies.GPGroundEnemies;
+                    var smallEnemies = Enemy.Enemies.GPSmallEnemies;
+                    var largeEnemies = Enemy.Enemies.GPLargeEnemies;
+                    var flyingEnemies = Enemy.Enemies.GPFlyingEnemies;
+                    var generators = Enemy.Enemies.GPGenerators;
                     var ee = new EnemiesEditable<EnemiesGreatPalace>(Enemies);
                     RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
                     break;
