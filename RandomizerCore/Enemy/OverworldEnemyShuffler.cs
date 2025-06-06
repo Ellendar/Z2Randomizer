@@ -107,7 +107,12 @@ public class OverworldEnemyShuffler
                 
                 a.Word(newPointers.Select(p => (ushort)(tableRamBaseAddr + p)).ToArray());
             }
-            Debug.Assert(newTable.Count < 0x39c);
+            // 0x3ff bytes of data are copied to RAM
+            Debug.Assert(newTable.Count < 0x400);
+            // in PRG1, 0x39c bytes are used for the table already,
+            // then we made space for another 0x18 bytes
+            Debug.Assert(bank != 1 || newTable.Count < 0x39c + 0x18);
+            Debug.Assert(bank != 2 || newTable.Count < 0x3c2);
             a.Org((ushort)tablePrgBaseAddr);
             a.Byt(newTable.ToArray());
         }

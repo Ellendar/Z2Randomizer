@@ -344,6 +344,8 @@ public class Hyrule
 
             if (props.ShuffleOverworldEnemies)
             {
+                // move a PRG1 background map to make space for more enemy data
+                ROMData.RelocateData(assembler, 1, 0x8000);
                 OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, RNG);
             }
 

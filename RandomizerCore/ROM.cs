@@ -310,6 +310,27 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         }
     }
 
+    /// Read pointer at `nesPtr`. Then read the data it points to.
+    /// Relocate that data to a new address using js65. Write the
+    /// new pointer to `nesPtr`. This will be done at link time.
+    /// The rom data is not modified directly, only through js65.
+    public void RelocateData(Assembler asm, int bank, int nesPtr)
+    {
+        var romPtr = ConvertNesPtrToPrgRomAddr(bank, nesPtr);
+        var nesAddr = GetShort(romPtr + 1, romPtr);
+        var romAddr = ConvertNesPtrToPrgRomAddr(bank, nesAddr);
+        var length = GetByte(romAddr);
+        var bytes = GetBytes(romAddr, length);
+        const string label = "RelocateBytes";
+        var a = asm.Module();
+        a.Segment($"PRG{bank}");
+        a.Reloc();
+        a.Label(label);
+        a.Byt(bytes);
+        a.Org((ushort)nesPtr);
+        a.Word(a.Symbol(label));
+    }
+
     public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)
     {
         // Each byte specifies 1 color bit for an 8 pixel column

@@ -231,11 +231,11 @@ public sealed class WestHyrule : World
             34, 35, // Grass
             39, 40, // Forest
             47, 48, // Swamp     - in vanilla 47-48 use the same table
-            52,     // Graveyard - in vanilla 52-53 use the same table
+            52, 53, // Graveyard - in vanilla 52-53 use the same table
             57,     // Road      - in vanilla 57-58 use the same table
         ];
         overworldEncounterMapDuplicate = [
-            53, 58,
+            58,
         ];
         nonEncounterMaps = [
             00,             // NORTH_PALACE (start of game)
