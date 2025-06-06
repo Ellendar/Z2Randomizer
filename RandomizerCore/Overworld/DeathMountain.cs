@@ -120,14 +120,17 @@ sealed class DeathMountain : World
         sideviewPtrTable = 0x6010;
         sideviewBank = 1;
         enemyPtr = 0x608E;
-        enemyAddr = 0x48B0;
         groupedEnemies = Enemies.GroupedWestEnemies;
         overworldEncounterMaps = [
-            29,     // Desert - 30 is also an encounter, but they use the same data
-            34, 35, // Grass (not in Vanilla)
-            39,     // Forest - 40 -"-
-            47, 48, // Swamp (not in Vanilla)
-            52,     // Graveyard - 53 -"-
+            29,     // Desert    - in vanilla 29-30 use the same table
+            34, 35, // Grass     - not used in Vanilla
+            39,     // Forest    - in vanilla 39-40 use the same table
+            47, 48, // Swamp     - not used in Vanilla
+            52,     // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            30, 40, 53, 58,
         ];
         nonEncounterMaps = [
             1, 2, 3, 4, 5, 6, 7, 8, // Caves

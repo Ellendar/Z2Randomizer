@@ -151,15 +151,18 @@ public sealed class EastHyrule : World
         sideviewPtrTable = 0x8533;
         sideviewBank = 2;
         enemyPtr = 0x85B1;
-        enemyAddr = 0x88B0;
         groupedEnemies = Enemies.GroupedEastEnemies;
         overworldEncounterMaps = [
             29, 30, // Desert
             34, 35, // Grass
             39, 40, // Forest
-            47,     // Swamp - 48 is also an encounter, but they use the same data
-            52,     // Graveyard - 53 -"-
-            59,     // Lava - 60 -"-
+            47, 48, // Swamp     - in vanilla 47-48 use the same table
+            52, 53, // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+            59, 60, // Lava      - in vanilla 59-60 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            58,
         ];
         nonEncounterMaps = [
             00, 01,         // Bridges

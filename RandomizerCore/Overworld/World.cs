@@ -19,9 +19,9 @@ public abstract class World
     public int sideviewPtrTable { get; protected set; }
     public int sideviewBank { get; protected set; }
     public int enemyPtr { get; protected set; }
-    public int enemyAddr { get; protected set; }
     public GroupedEnemiesBase groupedEnemies { get; protected set; }
     public IReadOnlyList<int> overworldEncounterMaps { get; protected set; }
+    public IReadOnlyList<int> overworldEncounterMapDuplicate { get; protected set; } = [];
     public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
     protected Terrain[,] map;

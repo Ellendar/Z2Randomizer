@@ -342,6 +342,11 @@ public class Hyrule
                 return null;
             }
 
+            if (props.ShuffleOverworldEnemies)
+            {
+                OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, RNG);
+            }
+
             if (props.CombineFire)
             {
                 List<Collectable>? customSpellOrder = props.IncludeSpellsInShuffle
@@ -1866,14 +1871,6 @@ public class Hyrule
                 }
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
         } while (!IsEverythingReachable(ItemGet));
-
-        if (props.ShuffleOverworldEnemies)
-        {
-            foreach (World world in worlds)
-            {
-                OverworldEnemyShuffler.Shuffle(world, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, RNG);
-            }
-        }
     }
 
     private async Task<bool> UpdateProgress(Func<string, Task> progress, CancellationToken ct, int v)

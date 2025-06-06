@@ -225,14 +225,17 @@ public sealed class WestHyrule : World
         sideviewPtrTable = 0x4533;
         sideviewBank = 1;
         enemyPtr = 0x45B1;
-        enemyAddr = 0x48B0;
         groupedEnemies = Enemies.GroupedWestEnemies;
         overworldEncounterMaps = [
             29, 30, // Desert
             34, 35, // Grass
             39, 40, // Forest
-            47,     // Swamp - 48 is also an encounter, but they use the same data
-            52,     // Graveyard - 53 -"-
+            47, 48, // Swamp     - in vanilla 47-48 use the same table
+            52,     // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            53, 58,
         ];
         nonEncounterMaps = [
             00,             // NORTH_PALACE (start of game)

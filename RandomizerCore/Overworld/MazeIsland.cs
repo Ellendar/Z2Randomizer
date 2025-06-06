@@ -52,7 +52,6 @@ sealed class MazeIsland : World
         sideviewPtrTable = 0xA010;
         sideviewBank = 2;
         enemyPtr = 0xA08E;
-        enemyAddr = 0x88B0;
         groupedEnemies = Enemies.GroupedEastEnemies;
         overworldEncounterMaps = [];
         nonEncounterMaps = [
