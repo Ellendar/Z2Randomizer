@@ -55,6 +55,17 @@ sealed class MazeIsland : World
         enemyAddr = 0x88B0;
         groupedEnemies = Enemies.GroupedEastEnemies;
         overworldEncounterMaps = [];
+        nonEncounterMaps = [
+            34, // MAZE_ISLAND_FORCED_BATTLE_2
+            35, // MAZE_ISLAND_FORCED_BATTLE_1
+            36, // MAZE_ISLAND_MAGIC
+            37, // MAZE_ISLAND_CHILD
+            47, // MAZE_ISLAND_FORCED_BATTLE_3
+            48, // MAZE_ISLAND_FORCED_BATTLE_7
+            49, // MAZE_ISLAND_FORCED_BATTLE_4
+            50, // MAZE_ISLAND_FORCED_BATTLE_5
+            51, // MAZE_ISLAND_FORCED_BATTLE_6
+        ];
 
         childDrop = GetLocationByMem(0xA143);
         magicContainerDrop = GetLocationByMem(0xA133);

@@ -231,8 +231,30 @@ public sealed class WestHyrule : World
             29, 30, // Desert
             34, 35, // Grass
             39, 40, // Forest
-            47, 48, // Swamp
-            52, 53, // Graveyard
+            47,     // Swamp - 48 is also an encounter, but they use the same data
+            52,     // Graveyard - 53 -"-
+        ];
+        nonEncounterMaps = [
+            00,             // NORTH_PALACE (start of game)
+            01, 02, 04, 05, // Bridges
+            06,             // BUBBLE_CLIFF
+            07,             // Parapa passthrough
+            09, 10, 11,     // Jump Cave passthrough
+            12, 13,         // PILLAR_PBAG_CAVE
+            14, 15,         // MEDICINE_CAVE
+            16, 17,         // HEART_CONTAINER_CAVE
+            18, 19,         // Fairy Cave passthrough
+            20,             // SARIA_FAIRY
+            21, 22, 23,     // LOST_WOODS
+            33,             // TROPHY_CAVE
+            38,             // GRASS_TILE
+            43,             // FOREST_50P
+            44,             // LOST_WOODS_1
+            45,             // MAGIC_CAVE
+            46,             // FOREST_100P
+            51,             // EX_LIFE_SWAMP_1
+            56,             // RED_JAR_CEM
+            57,             // EX_LIFE_BEACH
         ];
 
         MAP_ROWS = 75;

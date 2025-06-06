@@ -22,6 +22,7 @@ public abstract class World
     public int enemyAddr { get; protected set; }
     public GroupedEnemiesBase groupedEnemies { get; protected set; }
     public IReadOnlyList<int> overworldEncounterMaps { get; protected set; }
+    public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
     protected Terrain[,] map;
     protected int MAP_ROWS;

@@ -157,9 +157,33 @@ public sealed class EastHyrule : World
             29, 30, // Desert
             34, 35, // Grass
             39, 40, // Forest
-            47, 48, // Swamp
-            52, 53, // Graveyard
-            59, 60, // Lava
+            47,     // Swamp - 48 is also an encounter, but they use the same data
+            52,     // Graveyard - 53 -"-
+            59,     // Lava - 60 -"-
+        ];
+        nonEncounterMaps = [
+            00, 01,         // Bridges
+            02, 03, 04, 05, // Wilson Fence
+            06,             // Darunia trap tile
+            07,             // WATER_TILE
+            08,             // Nabooru Cave passthrough
+            09, 10,         // SUNKEN_PBAG_CAVE
+            11, 12,         // RISEN_PBAG_CAVE
+            13, 14,         // NEW_KASUTO_CAVE
+            16, 17,         // DEATH_VALLEY_CAVE_1
+            19, 20, 22,     // DEATH_VALLEY_CAVE_2
+            23,             // Darunia trap tile
+            24,             // Valley of Death passthrough
+            25,             // Valley of Death passthrough
+            26,             // Valley of Death passthrough
+            33,             // Desert Hills 500 P-Bag
+            38,             // Grass Hills 200 P-Bag
+            44,             // Stonehenge 500 P-bag
+            45,             // FIRE_TOWN_FAIRY
+            46,             // DESERT_TILE
+            51,             // OLD_KASUTO_SWAMP_LIFE
+            57,             // FIRE_TOWN_RED_JAR
+            62,             // DEATH_VALLEY_RED_JAR
         ];
 
         locationAtGP = GetLocationByMem(0x8665);
