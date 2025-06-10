@@ -12,6 +12,7 @@ using FtRandoLib.Importer;
 using js65;
 using Microsoft.ClearScript;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -339,6 +340,13 @@ public class Hyrule
             if (!f)
             {
                 return null;
+            }
+
+            if (props.ShuffleOverworldEnemies)
+            {
+                // move a PRG1 background map to make space for more enemy data
+                ROMData.RelocateData(assembler, 1, 0x8000);
+                OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, RNG);
             }
 
             if (props.CombineFire)
@@ -1865,14 +1873,6 @@ public class Hyrule
                 }
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
         } while (!IsEverythingReachable(ItemGet));
-
-        if (props.ShuffleOverworldEnemies)
-        {
-            foreach (World world in worlds)
-            {
-                world.ShuffleOverworldEnemies(ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch);
-            }
-        }
     }
 
     private async Task<bool> UpdateProgress(Func<string, Task> progress, CancellationToken ct, int v)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -149,17 +150,43 @@ public sealed class EastHyrule : World
 
         sideviewPtrTable = 0x8533;
         sideviewBank = 2;
-
-        enemyAddr = 0x88B0;
         enemyPtr = 0x85B1;
-
+        groupedEnemies = Enemies.GroupedEastEnemies;
         overworldEncounterMaps = [
             29, 30, // Desert
             34, 35, // Grass
             39, 40, // Forest
-            47, 48, // Swamp
-            52, 53, // Graveyard
-            59, 60, // Lava
+            47, 48, // Swamp     - in vanilla 47-48 use the same table
+            52, 53, // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+            59, 60, // Lava      - in vanilla 59-60 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            58,
+        ];
+        nonEncounterMaps = [
+            00, 01,         // Bridges
+            02, 03, 04, 05, // Wilson Fence
+            06,             // Darunia trap tile
+            07,             // WATER_TILE
+            08,             // Nabooru Cave passthrough
+            09, 10,         // SUNKEN_PBAG_CAVE
+            11, 12,         // RISEN_PBAG_CAVE
+            13, 14,         // NEW_KASUTO_CAVE
+            16, 17,         // DEATH_VALLEY_CAVE_1
+            19, 20, 22,     // DEATH_VALLEY_CAVE_2
+            23,             // Darunia trap tile
+            24,             // Valley of Death passthrough
+            25,             // Valley of Death passthrough
+            26,             // Valley of Death passthrough
+            33,             // Desert Hills 500 P-Bag
+            38,             // Grass Hills 200 P-Bag
+            44,             // Stonehenge 500 P-bag
+            45,             // FIRE_TOWN_FAIRY
+            46,             // DESERT_TILE
+            51,             // OLD_KASUTO_SWAMP_LIFE
+            57,             // FIRE_TOWN_RED_JAR
+            62,             // DEATH_VALLEY_RED_JAR
         ];
 
         locationAtGP = GetLocationByMem(0x8665);
@@ -264,18 +291,6 @@ public sealed class EastHyrule : World
         climate.DisallowTerrain(props.CanWalkOnWaterWithBoots ? Terrain.WATER : Terrain.WALKABLEWATER);
         //climate.DisallowTerrain(Terrain.LAVA);
         SetVanillaCollectables(props.ReplaceFireWithDash);
-    }
-
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        var groundEnemies = Enemies.EastGroundEnemies;
-        var flyingEnemies = Enemies.EastFlyingEnemies;
-        var generators = Enemies.EastGenerators;
-        var smallEnemies = Enemies.EastSmallEnemies;
-        var largeEnemies = Enemies.EastLargeEnemies;
-        var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

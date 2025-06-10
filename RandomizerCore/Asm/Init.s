@@ -34,9 +34,15 @@
 ; FREE "PRG0" [$AA40, $c000)
 FREE "PRG0" [$AB00, $c000) ; give room for z2edit to patch $aa40
 
-; $b480 is where the new map data is written for the overworlds
-FREE "PRG1" [$A933, $b480)
-FREE "PRG2" [$A933, $b480)
+FREE "PRG1" [$87c6, $88a0)
+FREE "PRG1" [$93bb, $9400)
+FREE "PRG1" [$9eb9, $a000)
+FREE "PRG1" [$a933, $b480) ; $b480 is where the new map data is written for the overworlds
+
+FREE "PRG2" [$87d3, $88a0)
+FREE "PRG2" [$93c9, $9400)
+FREE "PRG2" [$9f85, $a000)
+FREE "PRG2" [$a933, $b480)
 
 FREE "PRG3" [$B803, $c000)
 

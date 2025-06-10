@@ -3,6 +3,7 @@
 using System.Text;
 using System.Text.Json;
 using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
 StringBuilder sb = new StringBuilder("");

@@ -263,9 +263,72 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         File.WriteAllBytes(filename, rawdata);
     }
 
-    public static int ConvertNesPtrToRomAddr(int bank, int nesPtr)
+    public static int ConvertNesPtrToPrgRomAddr(int bank, int nesPtr)
     {
-        return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
+        Debug.Assert(nesPtr >= 0x8000, "Non-PRG pointers (like SRAM) are not supported here");
+        if (bank < 0x10)
+        {
+            return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
+        }
+        else
+        {
+            return nesPtr - 0x8000 + bank * 0x2000 + RomHdrSize;
+        }
+    }
+
+    public static int ConvertPrgRomAddrToAsmAddr(int romAddr)
+    {
+        int minusHeader = romAddr - RomHdrSize;
+        // refer to Asm/Init.s for these values
+        if      (minusHeader < 0x1c000)
+        {
+            return 0x8000 + (minusHeader & 0x3fff);
+        }
+        else if (minusHeader < 0x20000)
+        {
+            return 0xc000 + (minusHeader & 0x3fff);
+        }
+        else if (minusHeader < 0x3a000)
+        {
+            return 0x8000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x3c000)
+        {
+            return 0xa000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x3e000)
+        {
+            return 0xc000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x40000)
+        {
+            return 0xe000 + (minusHeader & 0x1fff);
+        }
+        else
+        {
+            throw new ArgumentException("This is not a PRG address");
+        }
+    }
+
+    /// Read pointer at `nesPtr`. Then read the data it points to.
+    /// Relocate that data to a new address using js65. Write the
+    /// new pointer to `nesPtr`. This will be done at link time.
+    /// The rom data is not modified directly, only through js65.
+    public void RelocateData(Assembler asm, int bank, int nesPtr)
+    {
+        var romPtr = ConvertNesPtrToPrgRomAddr(bank, nesPtr);
+        var nesAddr = GetShort(romPtr + 1, romPtr);
+        var romAddr = ConvertNesPtrToPrgRomAddr(bank, nesAddr);
+        var length = GetByte(romAddr);
+        var bytes = GetBytes(romAddr, length);
+        const string label = "RelocateBytes";
+        var a = asm.Module();
+        a.Segment($"PRG{bank}");
+        a.Reloc();
+        a.Label(label);
+        a.Byt(bytes);
+        a.Org((ushort)nesPtr);
+        a.Word(a.Symbol(label));
     }
 
     public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)

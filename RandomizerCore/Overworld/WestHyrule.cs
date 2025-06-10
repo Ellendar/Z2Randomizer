@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -223,16 +224,40 @@ public sealed class WestHyrule : World
 
         sideviewPtrTable = 0x4533;
         sideviewBank = 1;
-
-        enemyAddr = 0x48B0;
         enemyPtr = 0x45B1;
-
+        groupedEnemies = Enemies.GroupedWestEnemies;
         overworldEncounterMaps = [
             29, 30, // Desert
             34, 35, // Grass
             39, 40, // Forest
-            47, 48, // Swamp
-            52, 53, // Graveyard
+            47, 48, // Swamp     - in vanilla 47-48 use the same table
+            52, 53, // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            58,
+        ];
+        nonEncounterMaps = [
+            00,             // NORTH_PALACE (start of game)
+            01, 02, 04, 05, // Bridges
+            06,             // BUBBLE_CLIFF
+            07,             // Parapa passthrough
+            09, 10, 11,     // Jump Cave passthrough
+            12, 13,         // PILLAR_PBAG_CAVE
+            14, 15,         // MEDICINE_CAVE
+            16, 17,         // HEART_CONTAINER_CAVE
+            18, 19,         // Fairy Cave passthrough
+            20,             // SARIA_FAIRY
+            21, 22, 23,     // LOST_WOODS
+            33,             // TROPHY_CAVE
+            38,             // GRASS_TILE
+            43,             // FOREST_50P
+            44,             // LOST_WOODS_1
+            45,             // MAGIC_CAVE
+            46,             // FOREST_100P
+            51,             // EX_LIFE_SWAMP_1
+            56,             // RED_JAR_CEM
+            57,             // EX_LIFE_BEACH
         ];
 
         MAP_ROWS = 75;
@@ -326,18 +351,6 @@ public sealed class WestHyrule : World
             GetLocationByMem(0x4635)
         ];
         SetVanillaCollectables(props.ReplaceFireWithDash);
-    }
-
-    protected override byte[] RandomizeEnemies(List<byte[]> sideviewBytes, byte[] enemyBytes, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        var groundEnemies = Enemies.WestGroundEnemies;
-        var flyingEnemies = Enemies.WestFlyingEnemies;
-        var generators = Enemies.WestGenerators;
-        var smallEnemies = Enemies.WestSmallEnemies;
-        var largeEnemies = Enemies.WestLargeEnemies;
-        var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(sideviewBytes, ee, encounter, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Z2Randomizer.RandomizerCore;
+namespace Z2Randomizer.RandomizerCore.Enemy;
 
 public class Enemies
 {
@@ -14,7 +14,6 @@ public class Enemies
     //GP
     public const int GPEnemyPtr = 0x145B1;
     public const int OverworldEnemyPtr = 0xA08E;
-
 
     public const int MAXIMUM_ENEMY_BYTES = 0x400;
 	public const int MAXIMUM_ENEMY_BYTES_GP = 681;
@@ -53,6 +52,7 @@ public class Enemies
         EnemiesWest.BAGO_BAGO_GENERATOR,
         EnemiesWest.MOBY_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesWest> GroupedWestEnemies = new(WestSmallEnemies, WestLargeEnemies, WestFlyingEnemies, WestGenerators);
 
     public static readonly EnemiesEast[] EastSmallEnemies = [
         EnemiesEast.MYU,
@@ -84,6 +84,7 @@ public class Enemies
         EnemiesEast.BAGO_BAGO_GENERATOR,
         EnemiesEast.BOON_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesEast> GroupedEastEnemies = new(EastSmallEnemies, EastLargeEnemies, EastFlyingEnemies, EastGenerators);
 
     public static readonly EnemiesPalace125[] Palace125SmallEnemies = [
         EnemiesPalace125.MYU,
@@ -113,6 +114,7 @@ public class Enemies
         EnemiesPalace125.WOLF_HEAD_GENERATOR,
         EnemiesPalace125.BLUE_DRAGON_HEAD_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesPalace125> GroupedPalace125Enemies = new(Palace125SmallEnemies, Palace125LargeEnemies, Palace125FlyingEnemies, Palace125Generators);
 
     public static readonly EnemiesPalace346[] Palace346SmallEnemies = [
         EnemiesPalace346.MYU,
@@ -140,6 +142,7 @@ public class Enemies
         EnemiesPalace346.BLUE_DRAGON_HEAD_GENERATOR,
         EnemiesPalace346.WOLF_HEAD_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesPalace346> GroupedPalace346Enemies = new(Palace346SmallEnemies, Palace346LargeEnemies, Palace346FlyingEnemies, Palace346Generators);
 
     public static readonly EnemiesGreatPalace[] GPSmallEnemies = [
         EnemiesGreatPalace.MYU,
@@ -167,6 +170,7 @@ public class Enemies
         EnemiesGreatPalace.FIRE_BAGO_BAGO_GENERATOR,
         EnemiesGreatPalace.ORANGE_DRAGON_HEAD_GENERATOR,
     ];
+    public static GroupedEnemies<EnemiesGreatPalace> GroupedGreatPalaceEnemies = new(GPSmallEnemies, GPLargeEnemies, GPFlyingEnemies, GPGenerators);
 
     public static readonly int[] StandardPalaceGroundEnemies = Palace125GroundEnemies.Select(e => (int)e).Union(Palace346GroundEnemies.Select(e => (int)e)).ToArray();
     public static readonly int[] StandardPalaceFlyingEnemies = Palace125FlyingEnemies.Select(e => (int)e).Union(Palace346FlyingEnemies.Select(e => (int)e)).ToArray();

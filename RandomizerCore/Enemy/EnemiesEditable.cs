@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace Z2Randomizer.RandomizerCore.Sidescroll;
+namespace Z2Randomizer.RandomizerCore.Enemy;
 
 public class EnemiesEditable<T> where T : Enum
 {
@@ -67,7 +68,7 @@ public class EnemiesEditable<T> where T : Enum
         }
     }
 
-    public String DebugString()
+    public string DebugString()
     {
         StringBuilder sb = new StringBuilder("");
         var headerBytes = Convert.ToHexString(Header);
@@ -105,12 +106,12 @@ public class Enemy<T> where T : Enum
     public int Y
     {
         get {
-            int rawY = ((Bytes[0] & 0xF0) >> 4);
+            int rawY = (Bytes[0] & 0xF0) >> 4;
             return rawY == 0 ? 1 : rawY + 2;
         }
         set {
             int rawY = value < 3 ? 0 : value - 2;
-            Bytes[0] = (byte)((rawY << 4) | (Bytes[0] & 0x0F));
+            Bytes[0] = (byte)(rawY << 4 | Bytes[0] & 0x0F);
         }
     }
 
@@ -121,17 +122,17 @@ public class Enemy<T> where T : Enum
     /// </summary>
     public int X
     {
-        get => ((Bytes[1] & 0b11000000) >> 2) | (Bytes[0] & 0x0F);
+        get => (Bytes[1] & 0b11000000) >> 2 | Bytes[0] & 0x0F;
         set {
-            Bytes[1] = (byte)(((value & 0b110000) << 2) | (Bytes[1] & 0b00111111));
-            Bytes[0] = (byte)((Bytes[0] & 0xF0) | (value & 0x0F));
+            Bytes[1] = (byte)((value & 0b110000) << 2 | Bytes[1] & 0b00111111);
+            Bytes[0] = (byte)(Bytes[0] & 0xF0 | value & 0x0F);
         }
     }
 
     public int Page
     {
         get => (Bytes[1] & 0b11000000) >> 6;
-        set { Bytes[1] = (byte)(((value & 0b11) << 6) | (Bytes[1] & 0b00111111)); }
+        set { Bytes[1] = (byte)((value & 0b11) << 6 | Bytes[1] & 0b00111111); }
     }
 
     /// <summary>
@@ -140,7 +141,7 @@ public class Enemy<T> where T : Enum
     public T Id
     {
         get => (T)Enum.ToObject(typeof(T), Bytes[1] & 0b00111111);
-        set { Bytes[1] = (byte)((Bytes[1] & 0b11000000) | (Convert.ToByte(value) & 0b00111111)); }
+        set { Bytes[1] = (byte)(Bytes[1] & 0b11000000 | Convert.ToByte(value) & 0b00111111); }
     }
 
     /// <summary>
@@ -149,10 +150,10 @@ public class Enemy<T> where T : Enum
     public byte IdByte
     {
         get => (byte)(Bytes[1] & 0b00111111);
-        set { Bytes[1] = (byte)((Bytes[1] & 0b11000000) | (value & 0b00111111)); }
+        set { Bytes[1] = (byte)(Bytes[1] & 0b11000000 | value & 0b00111111); }
     }
 
-    public String DebugString()
+    public string DebugString()
     {
         var bytes = Convert.ToHexString(Bytes);
         var idString = $"{Id}";
