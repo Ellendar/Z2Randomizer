@@ -76,19 +76,20 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             }
         }
 
-        while (palace.AllRooms.Count < roomCount)
+        while (palace.AllRooms.Count < roomCount && roomPool.NormalRooms.Count > 0)
         {
             await Task.Yield();
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
-            palace.AllRooms.Add(newRoom);
             if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
             {
                 if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)))
                 {
+                    roomPool.NormalRooms.RemoveAt(roomIndex);
                     continue;
                 }
             }
+            palace.AllRooms.Add(newRoom);
             if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
             {
                 roomPool.NormalRooms.RemoveAt(roomIndex);

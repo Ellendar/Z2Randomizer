@@ -1597,7 +1597,17 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
-        else 
+        else if (GPStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
+        {
+            properties.PalaceStyles[6] = r.Next(3) switch
+            {
+                0 => PalaceStyle.RECONSTRUCTED,
+                1 => PalaceStyle.SEQUENTIAL,
+                2 => PalaceStyle.RANDOM_WALK,
+                _ => throw new Exception("Invalid PalaceStyle")
+            };
+        }
+        else
         {
             properties.PalaceStyles[6] = GPStyle;
         }

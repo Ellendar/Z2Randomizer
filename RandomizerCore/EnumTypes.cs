@@ -238,9 +238,11 @@ public enum PalaceStyle
     CHAOS,
     [Description("Random")]
     RANDOM,
-    [Description("Random(All Same)")]
+    [Description("Random (No Vanilla or Shuffle)")]
+    RANDOM_NO_VANILLA_OR_SHUFFLE,
+    [Description("Random (All Same)")]
     RANDOM_ALL,
-    [Description("Random(Per Palace)")]
+    [Description("Random (Per Palace)")]
     RANDOM_PER_PALACE
 }
 
@@ -264,9 +266,9 @@ public enum BossRoomsExitType
     OVERWORLD,
     [Description("More Palace")]
     PALACE,
-    [Description("Random(All Same)")]
+    [Description("Random (All Same)")]
     RANDOM_ALL,
-    [Description("Random(Per Palace)")]
+    [Description("Random (Per Palace)")]
     RANDOM_PER_PALACE
 }
 
@@ -588,7 +590,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
-    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }  = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
+    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
+        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM && i != PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();

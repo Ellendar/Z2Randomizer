@@ -50,7 +50,7 @@ Seed: {config.Seed}
 {lastError}
 ```
 """);
-            Progress = "Error message copied to clipboard!";
+            ProgressBody = "Error message copied to clipboard";
         });
 
         this.WhenActivated(Randomize);
@@ -66,7 +66,8 @@ Seed: {config.Seed}
             HasError = false;
             IsComplete = false;
             tokenSource = new CancellationTokenSource();
-            Progress = "";
+            ProgressHeading = "";
+            ProgressBody = "";
             await App.PersistState();
             var createAsm = App.Current?.Services?.GetService<Hyrule.NewAssemblerFn>();
             var files = App.Current?.Services?.GetService<IFileSystemService>();
@@ -93,7 +94,8 @@ Seed: {config.Seed}
                         var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}.spoiler";
                         await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
                     }
-                    Progress = $"Generation Complete! Hash: {randomizer.Hash}\n\nFile {filename} created";
+                    ProgressHeading = "Generation Complete";
+                    ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
                     IsComplete = true;
                 }
                 catch (Exception e)
@@ -101,24 +103,48 @@ Seed: {config.Seed}
                     await tokenSource.CancelAsync();
                     lastError = e;
                     HasError = true;
-                    await UpdateProgress($"Error generating seed! Please report this on the discord");
+                    string errorHeading, errorBody;
+                    var userError = e as UserFacingException;
+                    if (userError != null)
+                    {
+                        errorHeading = userError.Heading;
+                        errorBody = userError.Message;
+                    }
+                    else
+                    {
+                        errorHeading = "Error Generating Seed";
+                        errorBody = "Please report this on the discord";
+                    }
+                    await UpdateProgress(errorHeading, errorBody);
                 }
             }
         }
     }
 
-    private Task UpdateProgress(string str)
+    private Task UpdateProgress(string body)
     {
-        return Dispatcher.UIThread.InvokeAsync(() => Progress = str).GetTask();
+        return Dispatcher.UIThread.InvokeAsync(() => { ProgressBody = body; }).GetTask();
     }
 
-    private string progress = "";
-    [JsonIgnore]
-    public string Progress {
-        get => string.IsNullOrEmpty(progress) ? "Starting Seed Generation" : progress;
-        set => this.RaiseAndSetIfChanged(ref progress, value);
+    private Task UpdateProgress(string heading, string body)
+    {
+        return Dispatcher.UIThread.InvokeAsync(() => { ProgressHeading = heading; ProgressBody = body; }).GetTask();
     }
-    
+
+    private string progressHeading = "";
+    [JsonIgnore]
+    public string ProgressHeading
+    {
+        get => string.IsNullOrEmpty(progressHeading) ? "Generating" : progressHeading;
+        set => this.RaiseAndSetIfChanged(ref progressHeading, value);
+    }
+
+    private string progressBody = "";
+    [JsonIgnore]
+    public string ProgressBody {
+        get => string.IsNullOrEmpty(progressBody) ? "Starting Seed Generation" : progressBody;
+        set => this.RaiseAndSetIfChanged(ref progressBody, value);
+    }
 
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
