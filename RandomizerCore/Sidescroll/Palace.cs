@@ -422,13 +422,43 @@ public class Palace
             int pageCount = ((room.SideView[1] & 0b01100000) >> 5) + 1;
 
             //if the up/down exit is an elevator type, go to the page the elevator is on on that screen
-            if (room.Down != null && room.Down.ElevatorScreen >= 0)
+            if (room.Down?.ElevatorScreen >= 0)
             {
                 downByte = (byte)(downByte + room.Down.ElevatorScreen);
             }
-            if (room.Up != null && room.Up.ElevatorScreen >= 0)
+            if (room.Up?.ElevatorScreen >= 0)
             {
                 upByte = (byte)(upByte + room.Up.ElevatorScreen);
+            }
+
+            if (room.HasDroppableElevator)
+            {
+                byte? elevatorDropByte = null;
+                if (room.Down?.ElevatorScreen == room.ElevatorScreen)
+                {
+                    // best option: drop into the room below if the elevator screen is the same
+                    elevatorDropByte = downByte;
+                }
+                else if (room.HasUpExit || room.IsDropZone)
+                {
+                    // 2nd best option: loop onto self
+                    elevatorDropByte = (byte)(room.Map * 4);
+                }
+                if (elevatorDropByte.HasValue)
+                {
+                    switch (room.ElevatorScreen)
+                    {
+                        case 0:
+                            if (leftByte == OUTSIDE_ROOM_EXIT) { leftByte = elevatorDropByte.Value; }
+                            break;
+                        case 2:
+                            if (upByte == OUTSIDE_ROOM_EXIT) { upByte = elevatorDropByte.Value; }
+                            break;
+                        case 3:
+                            if (rightByte == OUTSIDE_ROOM_EXIT) { rightByte = elevatorDropByte.Value; }
+                            break;
+                    }
+                }
             }
 
             if (room.IsUpDownReversed)
@@ -446,36 +476,50 @@ public class Palace
                 }
             }
 
-            if (pageCount <= 1)
+            if (pageCount < 1)
             {
-                throw new Exception("Palace rooms cannot have fewer than 2 pages");
+                throw new Exception("Palace rooms must have at least one page");
             }
             if (pageCount > 4)
             {
                 throw new Exception("Palace rooms cannot have more than 4 pages");
             }
 
-            //If a room is fewer than 4 pages, "right" doesn't actually work.
-            //Exits in Z2 point you not based on how you exit, but what page you exit from.
-            //Because of that the right exit from a 2 page map is actually the down connection
-            //this standardizes the exits so 2 page rooms are always left / right
-            //3 page rooms are always left / down / right
-            //and then 4 page rooms are always left / down / up / right
+            // How the connection bytes work: Each byte can be
+            // multipurpose, and you generally should only use them
+            // for one of the things in each room.
+            //
+            // Byte 0, "left" can be:
+            //   - The room to the left
+            //   - A drop on the first page
+            //
+            // Byte 1, "down" can be:
+            //   - If the room has an elevator going down: the room below
+            //   - If the room is 2 pages long: the room to the right
+            //   - A drop on the second page
+            //
+            // Byte 2, "up" can be:
+            //   - If the room has an elevator going up: the room above
+            //   - If the room is 3 pages long: the room to the right
+            //   - A drop on the third page
+            //
+            // Byte 3, "right" can be:
+            //   - If the room is 4 pages long: the room to the right
+            //   - A drop on the fourth page
+            if (pageCount == 2 && room.HasRightExit)
+            {
+                Debug.Assert(downByte == OUTSIDE_ROOM_EXIT);
+                downByte = rightByte;
+                rightByte = 0xFF;
+            }
+            else if (pageCount == 3 && room.HasRightExit)
+            {
+                Debug.Assert(upByte == OUTSIDE_ROOM_EXIT);
+                upByte = rightByte;
+                rightByte = 0xFF;
+            }
             ROMData.Put(room.ConnectionStartAddress + 0, leftByte);
-            if (pageCount == 2)
-            {
-                ROMData.Put(room.ConnectionStartAddress + 1, rightByte);
-                ROMData.Put(room.ConnectionStartAddress + 2, 0xFF);
-                ROMData.Put(room.ConnectionStartAddress + 3, 0xFF);
-                continue;
-            }
             ROMData.Put(room.ConnectionStartAddress + 1, downByte);
-            if (pageCount == 3)
-            {
-                ROMData.Put(room.ConnectionStartAddress + 2, rightByte);
-                ROMData.Put(room.ConnectionStartAddress + 3, 0xFF);
-                continue;
-            }
             ROMData.Put(room.ConnectionStartAddress + 2, upByte);
             ROMData.Put(room.ConnectionStartAddress + 3, rightByte);
 

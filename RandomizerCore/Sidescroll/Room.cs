@@ -87,6 +87,7 @@ public class Room : IJsonOnDeserialized
     public bool IsBeforeTbird { get; set; }
 
     public bool HasDrop { get; set; }
+    public bool HasDroppableElevator { get; set; }
     public int ElevatorScreen { get; set; }
     [JsonConverter(typeof(RequirementsJsonConverter))]
     public Requirements Requirements { get; set; }
@@ -166,6 +167,7 @@ public class Room : IJsonOnDeserialized
         IsBossRoom = room.IsBossRoom;
         HasDrop = room.HasDrop;
         ElevatorScreen = room.ElevatorScreen;
+        HasDroppableElevator = room.HasDroppableElevator;
         ConnectionStartAddress = room.ConnectionStartAddress;
         IsUpDownReversed = room.IsUpDownReversed;
         IsDropZone = room.IsDropZone;
