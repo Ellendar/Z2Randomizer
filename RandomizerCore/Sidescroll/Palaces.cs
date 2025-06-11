@@ -215,6 +215,10 @@ public class Palaces
         }
 
         palaces[3].BossRoom!.Requirements = palaces[3].BossRoom!.Requirements.AddHardRequirement(RequirementType.REFLECT);
+        foreach (Room room in palaces.SelectMany(i => i.ItemRooms).Where(i => i.Collectable == null))
+        {
+            room.Collectable = Collectable.LARGE_BAG;
+        }
 
         if (!ValidatePalaces(props, raftIsRequired, palaces))
         {
@@ -243,7 +247,12 @@ public class Palaces
 
         foreach(Palace palace in palaces)
         {
-            if(palace.Number < 7 && palace.ItemRoom == null || palace.BossRoom == null)
+            //If the palace doesn't have the right number of item rooms
+            //or an item room is null
+            //or it doesn't have a boss room when it should
+            if(palace.Number < 7 && (palace.ItemRooms.Count() != props.PalaceItemRoomCount 
+                    || palace.ItemRooms.Any(i => i == null))
+                || palace.BossRoom == null)
             {
                 return false;
             }
@@ -254,6 +263,11 @@ public class Palaces
     }
     private static bool AtLeastOnePalaceCanHaveGlove(RandomizerProperties props, List<Palace> palaces)
     {
+        //If overworld and palace items are mixed, we don't need glove to be in a palace
+        if(props.MixOverworldPalaceItems)
+        {
+            return true;
+        }
         List<RequirementType> requireables =
         [
             RequirementType.KEY,

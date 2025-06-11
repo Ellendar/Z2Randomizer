@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using js65;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -127,6 +129,11 @@ public class ROM
 
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
+
+    //TODO: rename these to be sensible
+    private const int sideview1 = 0x10533;
+    private const int sideview2 = 0x12010;
+    private const int sideview3 = 0x14533;
 
     //On second thought, all text processing should be moved to customTexts.
     /*
@@ -1970,6 +1977,44 @@ Exit:
                 Put(0x1dfc5, 0x5F);
             }
         }
+    }
+    public void UpdateItem(Collectable item, Room room)
+    {
+        // Sideview data is moved to the expanded banks at $1c/$1d
+        var baseAddr = sideview1;
+        if (room.PalaceGroup == PalaceGrouping.Palace346)
+        {
+            baseAddr = sideview2;
+        }
+
+        int sideViewPtr = GetByte(baseAddr + room.Map * 2) | (GetByte(baseAddr + 1 + room.Map * 2) << 8);
+
+        // Start of the segment memory address is $8000, so offset for that
+        sideViewPtr -= 0x8000;
+        // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
+        // otherwise we want to use the bank offset for PRG4 (0x10000)
+        // sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
+        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x38000;
+        sideViewPtr += 0x10; // Add the offset for the iNES header
+        byte sideviewLength = GetByte(sideViewPtr);
+        int offset = 4;
+
+        do
+        {
+            int yPos = GetByte(sideViewPtr + offset++);
+            yPos = (byte)(yPos & 0xF0);
+            yPos = (byte)(yPos >> 4);
+            int byte2 = GetByte(sideViewPtr + offset++);
+
+            if (yPos >= 13 || byte2 != 0x0F) continue;
+            int byte3 = GetByte(sideViewPtr + offset++);
+
+            if (((Collectable)byte3).IsMinorItem()) continue;
+            Put(sideViewPtr + offset - 1, (byte)item);
+            return;
+        } while (offset < sideviewLength);
+        logger.Warn($"Could not write Collectable {item} to Item room {room.GetDebuggerDisplay()} in palace {room.PalaceNumber}");
+        //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
 }
 

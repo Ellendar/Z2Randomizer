@@ -101,6 +101,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool? global5050JarDrop = false;
     private bool changePalacePallettes;
     private bool randomizeBossItemDrop;
+    private PalaceItemRoomCount palaceItemRoomCount;
     private int palacesToCompleteMin;
     private int palacesToCompleteMax;
     private bool noDuplicateRoomsByLayout;
@@ -479,6 +480,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => randomizeBossItemDrop;
         set => SetField(ref randomizeBossItemDrop, value);
+    }
+
+    public PalaceItemRoomCount PalaceItemRoomCount
+    {
+        get => palaceItemRoomCount;
+        set => SetField(ref palaceItemRoomCount, value);
     }
 
     [Limit(7)]
@@ -1626,6 +1633,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.Global5050JarDrop = Global5050JarDrop ?? GetIndeterminateFlagValue(r);
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
+        properties.PalaceItemRoomCount = PalaceItemRoomCount == PalaceItemRoomCount.RANDOM ? r.Next(3) : (int)PalaceItemRoomCount;
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms

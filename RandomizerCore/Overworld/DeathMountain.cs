@@ -1173,8 +1173,8 @@ sealed class DeathMountain : World
     {
         StringBuilder sb = new();
         sb.AppendLine("DEATH MOUNTAIN: ");
-        sb.AppendLine("\tHammer Cave: " + hammerCave.Collectable.EnglishText());
-        sb.AppendLine("\tSpec Rock: " + specRock.Collectable.EnglishText());
+        sb.AppendLine("\tHammer Cave: " + hammerCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tSpec Rock: " + specRock.Collectables[0].EnglishText());
 
         sb.AppendLine();
         return sb.ToString();

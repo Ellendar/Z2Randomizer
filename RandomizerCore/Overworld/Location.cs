@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -10,9 +11,8 @@ public class Location
 {
     Logger logger = LogManager.GetCurrentClassLogger();
     public int appear2loweruponexit;
-    public Collectable Collectable { get; set; }
+    public List<Collectable> Collectables { get; set; }
     public Collectable VanillaCollectable { get; set; }
-    public bool ItemGet { get; set; }
     public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
@@ -132,8 +132,7 @@ public class Location
         Xpos = xPos;
         MemAddress = memoryAddress;
         CanShuffle = true;
-        Collectable = Collectable.DO_NOT_USE;
-        ItemGet = false;
+        Collectables = [];
         Reachable = false;
         PalaceNumber = null;
         Continent = continent;
@@ -351,13 +350,13 @@ public class Location
             + " " + Name
             + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
-            + (Collectable == Collectable.DO_NOT_USE ? "" : Collectable.ToString());
+            + '[' + string.Join(", ", Collectables.Select(i => i.ToString())) + ']';
     }
 
     public int GetWorld()
     {
         //Towns reference their banks
-        if (ActualTown != 0)
+        if (ActualTown != null)
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
@@ -388,7 +387,7 @@ public class Location
         }
         //Palaces... have world numbers that kind... of... make sense?
         //This is what they are.
-        if (PalaceNumber != 0)
+        if (PalaceNumber != null)
         {
             return PalaceNumber switch
             {

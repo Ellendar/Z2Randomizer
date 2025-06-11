@@ -981,10 +981,23 @@ sealed class MazeIsland : World
     {
         StringBuilder sb = new();
         sb.AppendLine("MAZE ISLAND: ");
-        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.Collectable.EnglishText());
-        sb.AppendLine("\tChild Drop: " + childDrop.Collectable.EnglishText());
+        sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.Collectables[0].EnglishText());
+        sb.AppendLine("\tChild Drop: " + childDrop.Collectables[0].EnglishText());
 
-        sb.AppendLine("\tPalace 4 (" + locationAtPalace4.PalaceNumber + "): " + locationAtPalace4.Collectable.EnglishText());
+        sb.Append("\tPalace 1 (" + locationAtPalace4.PalaceNumber + "): ");
+        if (locationAtPalace4.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtPalace4.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
+
         sb.AppendLine();
         return sb.ToString();
     }

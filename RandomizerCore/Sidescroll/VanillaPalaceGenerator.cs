@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NLog;
@@ -26,13 +27,15 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         palace.BossRoom = new(roomPool.BossRooms.First());
         // palace.BossRoom.PalaceGroup = palaceGroup;
         palace.AllRooms.Add(palace.Entrance);
+        palace.ItemRooms = [];
+
         if (palaceNumber != 7)
         {
             Room itemRoom = new(roomPool.ItemRoom!);
-            palace.ItemRoom = itemRoom;
-            // palace.ItemRoom.PalaceGroup = palaceGroup;
-            palace.AllRooms.Add(palace.ItemRoom);
+            palace.ItemRooms.Add(itemRoom);
+            palace.AllRooms.Add(itemRoom);
         }
+
         palace.AllRooms.Add(palace.BossRoom);
         if (palaceNumber == 7)
         {
@@ -61,6 +64,37 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         bool removeTbird = (palaceNumber == 7 && props.RemoveTbird);
         palace.CreateTree(removeTbird);
 
+        if(palaceNumber != 7 && props.PalaceItemRoomCount == 0)
+        {
+            //Replace item room with an appropriately shaped stub
+            RoomExitType itemRoomExitType = roomPool.ItemRoom!.CategorizeExits();
+            Room itemRoomStub = new(roomPool.DefaultStubsByDirection[itemRoomExitType]);
+            palace.ReplaceRoom(palace.ItemRooms[0], itemRoomStub);
+            palace.ItemRooms.Clear();
+        }
+
+        if(palaceNumber != 7 && props.PalaceItemRoomCount > 1)
+        {
+            //Find all left/right dead ends that aren't special
+            List<Room> normalDeadEnds = palace.AllRooms.Where(i =>
+                !i.IsBossRoom
+                && !i.IsEntrance
+                && !i.HasItem
+                //Replacing a linked room removes half of it which theoretically could work but currently breaks stuff
+                && i.LinkedRoomName == null
+                && (i.CategorizeExits() == RoomExitType.DEADEND_EXIT_LEFT || i.CategorizeExits() == RoomExitType.DEADEND_EXIT_RIGHT)).ToList();
+            //pick N-1 of them 
+            IEnumerable<Room> roomsToItemRoomify = normalDeadEnds.Sample(r, props.PalaceItemRoomCount - 1);
+            //replace them with randomly selected vanilla item rooms of the same shape
+            foreach(Room room in roomsToItemRoomify)
+            {
+                Room itemRoom = new(roomPool.ItemRoomsByExitType[room.CategorizeExits()].Sample(r)
+                    ?? throw new Exception("There are no available item rooms for vanilla item room replacement"));
+                palace.ReplaceRoom(room, itemRoom);
+                palace.ItemRooms.Add(itemRoom);
+            }
+        }
+
         if(!palace.AllReachable() || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
         {
             throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
@@ -77,7 +111,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
 
     protected new bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
-        return true;
+        return false;
     }
 
 }

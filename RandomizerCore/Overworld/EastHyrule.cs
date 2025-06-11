@@ -125,15 +125,19 @@ public sealed class EastHyrule : World
         locationAtPalace5.PalaceNumber = 5;
 
         townAtNabooru = GetLocationByMem(0x865C);
-        townAtNabooru.VanillaCollectable = townAtNabooru.Collectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
+        townAtNabooru.VanillaCollectable = props.ReplaceFireWithDash ? Collectable.DASH_SPELL : Collectable.FIRE_SPELL;
+        townAtNabooru.Collectables = props.ReplaceFireWithDash ? [Collectable.DASH_SPELL] : [Collectable.FIRE_SPELL];
         townAtDarunia = GetLocationByMem(0x865E);
-        townAtDarunia.VanillaCollectable = townAtDarunia.Collectable = Collectable.REFLECT_SPELL;
+        townAtDarunia.VanillaCollectable = Collectable.REFLECT_SPELL;
+        townAtDarunia.Collectables = [Collectable.REFLECT_SPELL];
 		
         townAtNewKasuto = GetLocationByMem(0x8660);
-        townAtNewKasuto.VanillaCollectable = townAtNewKasuto.Collectable = Collectable.SPELL_SPELL;
+        townAtNewKasuto.VanillaCollectable = Collectable.SPELL_SPELL;
+        townAtNewKasuto.Collectables = [Collectable.SPELL_SPELL];
 		
         townAtOldKasuto = GetLocationByMem(0x8662);
-        townAtOldKasuto.VanillaCollectable = townAtOldKasuto.Collectable = Collectable.THUNDER_SPELL;
+        townAtOldKasuto.VanillaCollectable = Collectable.THUNDER_SPELL;
+        townAtOldKasuto.Collectables = [Collectable.THUNDER_SPELL];
 
         waterTile = GetLocationByMem(0x8639);
         waterTile.NeedBoots = true;
@@ -151,14 +155,16 @@ public sealed class EastHyrule : World
         enemyPtr = 0x85B1;
         locationAtGP = GetLocationByMem(0x8665);
         locationAtGP.PalaceNumber = 7;
-        locationAtGP.VanillaCollectable = locationAtGP.Collectable = Collectable.DO_NOT_USE;
+        locationAtGP.VanillaCollectable = Collectable.DO_NOT_USE;
+        locationAtGP.Collectables = [];
         pbagCave1 = GetLocationByMem(0x863C);
         pbagCave2 = GetLocationByMem(0x863D);
         VANILLA_MAP_ADDR = 0x9056;
 
         //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
         spellTower = new Location(townAtNewKasuto);
-        spellTower.VanillaCollectable = spellTower.Collectable = Collectable.MAGIC_KEY;
+        spellTower.VanillaCollectable = Collectable.MAGIC_KEY;
+        spellTower.Collectables = [Collectable.MAGIC_KEY];
         spellTower.Name = "Spell Tower";
         spellTower.CanShuffle = false;
         spellTower.ActualTown = null;
@@ -166,7 +172,8 @@ public sealed class EastHyrule : World
         AddLocation(spellTower);
 
         newKasutoBasement = new Location(townAtNewKasuto);
-        newKasutoBasement.VanillaCollectable = newKasutoBasement.Collectable = Collectable.MAGIC_CONTAINER;
+        newKasutoBasement.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+        newKasutoBasement.Collectables = [Collectable.MAGIC_CONTAINER];
         newKasutoBasement.Name = "Granny's basement";
         newKasutoBasement.CanShuffle = false;
         newKasutoBasement.ActualTown = null;
@@ -174,7 +181,8 @@ public sealed class EastHyrule : World
         AddLocation(newKasutoBasement);
 
         fountain = new Location(townAtNabooru);
-        fountain.VanillaCollectable = fountain.Collectable = Collectable.WATER;
+        fountain.VanillaCollectable = Collectable.WATER;
+        fountain.Collectables = [Collectable.WATER];
         fountain.Name = "Water Fountain";
         fountain.ActualTown = Town.NABOORU_FOUNTAIN;
         fountain.CanShuffle = false;
@@ -182,7 +190,8 @@ public sealed class EastHyrule : World
         AddLocation(fountain);
 
         daruniaRoof = new Location(townAtDarunia);
-        daruniaRoof.VanillaCollectable = daruniaRoof.Collectable = Collectable.UPSTAB;
+        daruniaRoof.VanillaCollectable = Collectable.UPSTAB;
+        daruniaRoof.Collectables = [Collectable.UPSTAB];
         daruniaRoof.Name = "Darunia Roof";
         daruniaRoof.ActualTown = Town.DARUNIA_ROOF;
         daruniaRoof.CanShuffle = false;
@@ -2041,6 +2050,7 @@ public sealed class EastHyrule : World
         if (AllLocations.Where(i => i.ActualTown == Town.NEW_KASUTO).FirstOrDefault()?.Reachable ?? false)
         {
             spellTower.Reachable = true;
+            newKasutoBasement.Reachable = true;
         }
     }
 
@@ -2116,22 +2126,61 @@ public sealed class EastHyrule : World
     {
         StringBuilder sb = new();
         sb.AppendLine("EAST: ");
-        sb.AppendLine("\tNabooru: " + AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectable.EnglishText());
-        sb.AppendLine("\tFountain: " + fountain.Collectable.EnglishText());
-        sb.AppendLine("\tDarunia: " + AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable.EnglishText());
-        sb.AppendLine("\tUpstab Guy: " + daruniaRoof.Collectable.EnglishText());
-        sb.AppendLine("\tNew Kasuto: " + AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Collectable.EnglishText());
-        sb.AppendLine("\tGranny's Basement: " + newKasutoBasement.Collectable.EnglishText());
-        sb.AppendLine("\tSpell Tower: " + spellTower.Collectable.EnglishText());
-        sb.AppendLine("\tOld Kasuto: " + AllLocations.First(i => i.ActualTown == Town.OLD_KASUTO).Collectable.EnglishText());
+        sb.AppendLine("\tNabooru: " + AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectables[0].EnglishText());
+        sb.AppendLine("\tFountain: " + fountain.Collectables[0].EnglishText());
+        sb.AppendLine("\tDarunia: " + AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0].EnglishText());
+        sb.AppendLine("\tUpstab Guy: " + daruniaRoof.Collectables[0].EnglishText());
+        sb.AppendLine("\tNew Kasuto: " + AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Collectables[0].EnglishText());
+        sb.AppendLine("\tGranny's Basement: " + newKasutoBasement.Collectables[0].EnglishText());
+        sb.AppendLine("\tSpell Tower: " + spellTower.Collectables[0].EnglishText());
+        sb.AppendLine("\tOld Kasuto: " + AllLocations.First(i => i.ActualTown == Town.OLD_KASUTO).Collectables[0].EnglishText());
 
-        sb.AppendLine("\tRisen Pbag Cave: " + pbagCave2.Collectable.EnglishText());
-        sb.AppendLine("\tSunken Pbag Cave: " + pbagCave1.Collectable.EnglishText());
-        sb.AppendLine("\tWater Tile: " + waterTile.Collectable.EnglishText());
-        sb.AppendLine("\tDesert tile: " + desertTile.Collectable.EnglishText());
+        sb.AppendLine("\tRisen Pbag Cave: " + pbagCave2.Collectables[0].EnglishText());
+        sb.AppendLine("\tSunken Pbag Cave: " + pbagCave1.Collectables[0].EnglishText());
+        sb.AppendLine("\tWater Tile: " + waterTile.Collectables[0].EnglishText());
+        sb.AppendLine("\tDesert tile: " + desertTile.Collectables[0].EnglishText());
 
-        sb.AppendLine("\tPalace 5 (" + locationAtPalace5.PalaceNumber + "): " + locationAtPalace5.Collectable.EnglishText());
-        sb.AppendLine("\tPalace 6 (" + locationAtPalace6.PalaceNumber + "): " + locationAtPalace6.Collectable.EnglishText());
+        sb.Append("\tPalace 5 (" + locationAtPalace5.PalaceNumber + "): ");
+        if (locationAtPalace5.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtPalace5.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
+
+        sb.Append("\tPalace 6 (" + locationAtPalace6.PalaceNumber + "): ");
+        if (locationAtPalace5.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtPalace6.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
+
+        sb.Append("\tPalace 7 (" + locationAtGP.PalaceNumber + "): ");
+        if (locationAtPalace5.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtGP.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
         sb.AppendLine();
         return sb.ToString();
     }

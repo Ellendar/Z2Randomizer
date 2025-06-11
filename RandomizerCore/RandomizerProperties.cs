@@ -114,6 +114,7 @@ public class RandomizerProperties
     public bool AllowV4Rooms { get; set; }
     public bool AllowV4_4Rooms { get; set; }
     public bool HardBosses { get; set; }
+    public int PalaceItemRoomCount { get; set; }
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }

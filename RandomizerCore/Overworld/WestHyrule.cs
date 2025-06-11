@@ -133,19 +133,19 @@ public sealed class WestHyrule : World
         fairyCave.NeedFairy = true;
         bagu = GetLocationByMem(0x4661); //0x4661
         bagu.ActualTown = Town.BAGU;
-        bagu.Collectable = Collectable.BAGUS_NOTE;
+        bagu.Collectables = [Collectable.BAGUS_NOTE];
 
         locationAtRauru = GetLocationByMem(0x465C);
-        locationAtRauru.Collectable = Collectable.SHIELD_SPELL;
+        locationAtRauru.Collectables = [Collectable.SHIELD_SPELL];
         locationAtRuto = GetLocationByMem(0x465e); //0x465e
-        locationAtRuto.Collectable = Collectable.JUMP_SPELL;
+        locationAtRuto.Collectables = [Collectable.JUMP_SPELL];
         locationAtSariaNorth = GetLocationByMem(0x4660); //0x00004660
         locationAtSariaSouth = GetLocationByMem(0x465f); //0x0000465f
         locationAtSariaNorth.NeedBagu = true;
         locationAtSariaSouth.NeedBagu = true;
-        locationAtSariaNorth.Collectable = Collectable.FAIRY_SPELL;
+        locationAtSariaNorth.Collectables = [Collectable.FAIRY_SPELL];
         locationAtMido = GetLocationByMem(0x4662); //0x00004662
-        locationAtMido.Collectable = Collectable.LIFE_SPELL;
+        locationAtMido.Collectables = [Collectable.LIFE_SPELL];
 
         trophyCave = GetLocationByMem(0x4630); //0x00004630
         //raft = GetLocationByMem(0x4658);
@@ -171,7 +171,7 @@ public sealed class WestHyrule : World
 
         //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
         mirrorTable = new Location(locationAtSariaNorth);
-        mirrorTable.Collectable = Collectable.MIRROR;
+        mirrorTable.Collectables = [Collectable.MIRROR];
         mirrorTable.ActualTown = Town.SARIA_TABLE;
         mirrorTable.Name = "Saria Mirror Table";
         mirrorTable.CanShuffle = false;
@@ -179,7 +179,7 @@ public sealed class WestHyrule : World
         AddLocation(mirrorTable);
 
         midoChurch = new Location(locationAtMido);
-        midoChurch.Collectable = Collectable.DOWNSTAB;
+        midoChurch.Collectables = [Collectable.DOWNSTAB];
         midoChurch.ActualTown = Town.MIDO_CHURCH;
         midoChurch.Name = "Mido Church";
         midoChurch.CanShuffle = false;
@@ -1648,25 +1648,70 @@ public sealed class WestHyrule : World
     {
         StringBuilder sb = new();
         sb.AppendLine("WEST: ");
-        sb.AppendLine("\tRauru: " + AllLocations.First(i => i.ActualTown == Town.RAURU).Collectable.EnglishText());
-        sb.AppendLine("\tRuto: " + AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable.EnglishText());
-        sb.AppendLine("\tMirror Table: " + mirrorTable.Collectable.EnglishText());
-        sb.AppendLine("\tSaria: " + AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectable.EnglishText());
-        sb.AppendLine("\tDownstab Guy: " + midoChurch.Collectable.EnglishText());
-        sb.AppendLine("\tMido: " + AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable.EnglishText());
-        sb.AppendLine("\tBagu: " + bagu.Collectable.EnglishText());
+        sb.AppendLine("\tRauru: " + AllLocations.First(i => i.ActualTown == Town.RAURU).Collectables[0].EnglishText());
+        sb.AppendLine("\tRuto: " + AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0].EnglishText());
+        sb.AppendLine("\tMirror Table: " + mirrorTable.Collectables[0].EnglishText());
+        sb.AppendLine("\tSaria: " + AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectables[0].EnglishText());
+        sb.AppendLine("\tDownstab Guy: " + midoChurch.Collectables[0].EnglishText());
+        sb.AppendLine("\tMido: " + AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0].EnglishText());
+        sb.AppendLine("\tBagu: " + bagu.Collectables[0].EnglishText());
 
-        sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.Collectable.EnglishText());
-        sb.AppendLine("\tTrophy Cave: " + trophyCave.Collectable.EnglishText());
-        sb.AppendLine("\tGrass Tile: " + grassTile.Collectable.EnglishText());
-        sb.AppendLine("\tHeart Container Cave: " + heartContainerCave.Collectable.EnglishText());
-        sb.AppendLine("\tPillar Pbag Cave: " + pbagCave.Collectable.EnglishText());
-        sb.AppendLine("\tMedicine Cave: " + medicineCave.Collectable.EnglishText());
+        sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tTrophy Cave: " + trophyCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tGrass Tile: " + grassTile.Collectables[0].EnglishText());
+        sb.AppendLine("\tHeart Container Cave: " + heartContainerCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tPillar Pbag Cave: " + pbagCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tMedicine Cave: " + medicineCave.Collectables[0].EnglishText());
 
-        sb.AppendLine("\tPalace 1 (" + locationAtPalace1.PalaceNumber + "): " + locationAtPalace1.Collectable.EnglishText());
-        sb.AppendLine("\tPalace 2 (" + locationAtPalace2.PalaceNumber + "): " + locationAtPalace2.Collectable.EnglishText());
-        sb.AppendLine("\tPalace 3 (" + locationAtPalace3.PalaceNumber + "): " + locationAtPalace3.Collectable.EnglishText());
+        sb.Append("\tPalace 1 (" + locationAtPalace1.PalaceNumber + "): ");
+        if (locationAtPalace1.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtPalace1.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
+
+        sb.Append("\tPalace 2 (" + locationAtPalace2.PalaceNumber + "): ");
+        if (locationAtPalace2.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtPalace2.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
+        sb.Append("\tPalace 3 (" + locationAtPalace3.PalaceNumber + "): ");
+        if (locationAtPalace3.Collectables.Count == 0)
+        {
+            sb.AppendLine("No Items");
+        }
+        else
+        {
+            foreach (Collectable collectable in locationAtPalace3.Collectables)
+            {
+                sb.Append(collectable.EnglishText() + ", ");
+            }
+            sb.AppendLine();
+        }
         sb.AppendLine();
         return sb.ToString();
+    }
+
+    protected override void OnUpdateReachableTrigger()
+    {
+        if (AllLocations.Where(i => i.ActualTown == Town.SARIA_NORTH).FirstOrDefault()?.Reachable ?? false)
+        {
+            mirrorTable.Reachable = true;
+        }
     }
 }

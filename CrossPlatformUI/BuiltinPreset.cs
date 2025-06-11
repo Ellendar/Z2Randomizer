@@ -51,6 +51,7 @@ public static class BuiltinPreset
         ChangePalacePallettes = true,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
+        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
 
         //Levels
         AttackLevelCap = 8,
@@ -157,6 +158,7 @@ public static class BuiltinPreset
         NoDuplicateRoomsByEnemies = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = false,
+        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
 
         //Levels
         ShuffleAttackExperience = true,
@@ -272,6 +274,7 @@ public static class BuiltinPreset
         NoDuplicateRoomsByLayout = false,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
+        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
 
         //Levels
         ShuffleAttackExperience = true,
@@ -331,6 +334,7 @@ public static class BuiltinPreset
         EnableSpellItemHints = true,
         EnableTownNameHints = true
     };
+
     public static readonly RandomizerConfiguration RandoPercentPreset = new ()
     {
         

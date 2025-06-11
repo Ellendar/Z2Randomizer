@@ -553,6 +553,18 @@ public enum RiverDevilBlockerOption
     RANDOM
 }
 
+public enum PalaceItemRoomCount
+{
+    [Description("Zero")]
+    ZERO = 0,
+    [Description("One")]
+    ONE = 1,
+    [Description("Two")]
+    TWO = 2,
+    [Description("Random")]
+    RANDOM = 3
+}
+
 public class StringValueAttribute(string v) : Attribute
 {
     public string Value => v;
@@ -588,6 +600,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
+    public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }  = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);

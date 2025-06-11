@@ -38,32 +38,35 @@ internal class ChaosPalaceGenerator : PalaceGenerator
 
         if (palaceNumber < 7)
         {
-            Direction itemRoomDirection;
-            Room? itemRoom = null;
-            while (itemRoom == null)
+            palace.ItemRooms = [];
+            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCount; itemRoomNumber++)
             {
-                itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
+                Direction itemRoomDirection;
+                Room? itemRoom = null;
+                while (itemRoom == null)
                 {
-                    continue;
+                    itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
+                    if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
+                    {
+                        continue;
+                    }
+                    itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
                 }
-                itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
-            }
-            palace.ItemRoom = itemRoom;
-            // palace.ItemRoom.PalaceGroup = palaceGroup;
-            palace.AllRooms.Add(palace.ItemRoom);
-        }
+                palace.ItemRooms.Add(itemRoom);
+                palace.AllRooms.Add(itemRoom);
 
-        if (palaceNumber < 7 && palace.ItemRoom!.LinkedRoomName != null)
-        {
-            Room segmentedItemRoom1, segmentedItemRoom2;
-            segmentedItemRoom1 = palace.ItemRoom;
-            segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-            // segmentedItemRoom2.PalaceGroup = palaceGroup;
-            segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
-            segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
-            palace.AllRooms.Add(segmentedItemRoom2);
-            roomCount += 1;
+                if (itemRoom.LinkedRoomName != null)
+                {
+                    Room segmentedItemRoom1, segmentedItemRoom2;
+                    segmentedItemRoom1 = itemRoom;
+                    segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
+                    // segmentedItemRoom2.PalaceGroup = palaceGroup;
+                    segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
+                    segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
+                    palace.AllRooms.Add(segmentedItemRoom2);
+                    roomCount += 1;
+                }
+            }
         }
 
         if(palaceNumber == 7)

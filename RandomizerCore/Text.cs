@@ -50,7 +50,7 @@ public class Text : IEquatable<Text>
         EncodedText = Util.ToGameText(RawText, true);
     }
 
-    public static Text GenerateHelpfulHint(Location location)
+    public static Text GenerateHelpfulHint(Location location, Collectable collectable)
     {
         string hint = "";
         if (location.PalaceNumber == 1)
@@ -94,7 +94,7 @@ public class Text : IEquatable<Text>
             hint += "in a maze$lies the$%%";
         }
 
-        return new Text(hint, location.Collectable);
+        return new Text(hint, collectable);
     }
 
     public string GetDebuggerDisplay()

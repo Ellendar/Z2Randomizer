@@ -71,6 +71,8 @@ public class Room : IJsonOnDeserialized
     public bool IsReachable { get; set; }
     [JsonPropertyName("memoryAddress")]
     public int ConnectionStartAddress { get; set; }
+    [JsonIgnore]
+    public Collectable? Collectable { get; set; }
 
     [JsonIgnore]
     public bool IsDeadEnd => (HasLeftExit ? 1 : 0) + (HasRightExit ? 1 : 0) + (HasUpExit ? 1 : 0) + (HasDownExit ? 1 : 0) == 1;
@@ -286,45 +288,6 @@ public class Room : IJsonOnDeserialized
             old = (byte)((ItemGetBits[0]) | old);
         }
         palaceItemBits[palaceGroup][Map / 2] = old;
-    }
-
-    public void UpdateRomItem(Collectable item, ROM romData)
-    {
-        // Sideview data is moved to the expanded banks at $1c/$1d
-        var baseAddr = sideview1;
-        if (PalaceGroup == PalaceGrouping.Palace346)
-        {
-            baseAddr = sideview2;
-        }
-
-        int sideViewPtr = romData.GetByte(baseAddr + Map * 2) | (romData.GetByte(baseAddr + 1 + Map * 2) << 8);
-
-        // Start of the segment memory address is $8000, so offset for that
-        sideViewPtr -= 0x8000;
-        // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
-        // otherwise we want to use the bank offset for PRG4 (0x10000)
-        // sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
-        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x38000;
-        sideViewPtr += 0x10; // Add the offset for the iNES header
-        byte sideviewLength = romData.GetByte(sideViewPtr);
-        int offset = 4;
-
-        do
-        {
-            int yPos = romData.GetByte(sideViewPtr + offset++);
-            yPos = (byte)(yPos & 0xF0);
-            yPos = (byte)(yPos >> 4);
-            int byte2 = romData.GetByte(sideViewPtr + offset++);
-
-            if (yPos >= 13 || byte2 != 0x0F) continue;
-            int byte3 = romData.GetByte(sideViewPtr + offset++);
-            
-            if (((Collectable)byte3).IsMinorItem()) continue;
-            romData.Put(sideViewPtr + offset - 1, (byte)item);
-            return;
-        } while (offset < sideviewLength);
-        logger.Warn("Could not write Collectable to Item room in palace " + PalaceNumber);
-        //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
 
     public void UpdateConnectionStartAddress()
@@ -915,6 +878,36 @@ public class Room : IJsonOnDeserialized
             || HasUpExit && Up == null
             || HasDownExit && Down == null;
     }
+
+    public void UpdateSideviewItem(Collectable collectable)
+    {
+        if (PalaceNumber == 7)
+        {
+            return;
+        }
+        if (Collectable == null)
+        {
+            throw new Exception("Unable to update item on a room with no set collectable.");
+        }
+
+        //XXX: This should just use the sideview parser.
+        byte[] sideView = SideView;
+        for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
+        {
+            int yPos = sideView[sideviewIndex] & 0xF0;
+            yPos >>= 4;
+            //item
+            if (yPos < 13 && sideView[sideviewIndex + 1] == 0x0F)
+            {
+                int collectableId = sideView[sideviewIndex + 2];
+                if (!((Collectable)collectableId).IsMinorItem())
+                {
+                    sideView[sideviewIndex + 2] = (byte)collectable;
+                }
+                sideviewIndex++;
+            }
+        }
+    }
 }
 
 public class HexStringConverter : JsonConverter<byte[]?>
@@ -930,4 +923,6 @@ public class HexStringConverter : JsonConverter<byte[]?>
     {
         writer.WriteStringValue(Convert.ToHexString(value?.ToArray() ?? []));
     }
+
+
 }

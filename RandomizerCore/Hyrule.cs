@@ -12,6 +12,7 @@ using FtRandoLib.Importer;
 using js65;
 using Microsoft.ClearScript;
 using NLog;
+using NLog.Targets;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -105,8 +106,8 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    public const bool UNSAFE_DEBUG = false;
-    private static int DEBUG_THRESHOLD = 80;
+    public const bool UNSAFE_DEBUG = true;
+    private static int DEBUG_THRESHOLD = 100;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -346,20 +347,22 @@ public class Hyrule
                     ? null
                     : AllLocationsForReal()
                         .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
-                        .Select(l => l.Collectable).ToList();
+                        //This makes the assumption that is currently true that each "town" has exactly one item.
+                        //If we later restructure towns to be omni-towns to get rid of fake towns, this will be untrue
+                        .Select(l => l.Collectables[0]).ToList();
                 ROMData.CombineFireSpell(assembler, customSpellOrder, RNG);
             }
 
             Dictionary<Town, Collectable> spellMap = new()
             {
-                { (Town)westHyrule.locationAtRauru.ActualTown!, westHyrule.locationAtRauru.Collectable },
-                { (Town)westHyrule.locationAtMido.ActualTown!, westHyrule.locationAtMido.Collectable },
-                { (Town)westHyrule.locationAtSariaNorth.ActualTown!, westHyrule.locationAtSariaNorth.Collectable },
-                { (Town)westHyrule.locationAtRuto.ActualTown!, westHyrule.locationAtRuto.Collectable },
-                { (Town)eastHyrule.townAtNabooru.ActualTown!, eastHyrule.townAtNabooru.Collectable },
-                { (Town)eastHyrule.townAtDarunia.ActualTown!, eastHyrule.townAtDarunia.Collectable },
-                { (Town)eastHyrule.townAtNewKasuto.ActualTown!, eastHyrule.townAtNewKasuto.Collectable },
-                { (Town)eastHyrule.townAtOldKasuto.ActualTown!, eastHyrule.townAtOldKasuto.Collectable },
+                { (Town)westHyrule.locationAtRauru.ActualTown!, westHyrule.locationAtRauru.Collectables[0] },
+                { (Town)westHyrule.locationAtMido.ActualTown!, westHyrule.locationAtMido.Collectables[0] },
+                { (Town)westHyrule.locationAtSariaNorth.ActualTown!, westHyrule.locationAtSariaNorth.Collectables[0] },
+                { (Town)westHyrule.locationAtRuto.ActualTown!, westHyrule.locationAtRuto.Collectables[0] },
+                { (Town)eastHyrule.townAtNabooru.ActualTown!, eastHyrule.townAtNabooru.Collectables[0] },
+                { (Town)eastHyrule.townAtDarunia.ActualTown!, eastHyrule.townAtDarunia.Collectables[0] },
+                { (Town)eastHyrule.townAtNewKasuto.ActualTown!, eastHyrule.townAtNewKasuto.Collectables[0] },
+                { (Town)eastHyrule.townAtOldKasuto.ActualTown!, eastHyrule.townAtOldKasuto.Collectables[0] },
             };
             f = await UpdateProgress(progress, ct, 9);
             if (!f)
@@ -618,18 +621,18 @@ public class Hyrule
 
         if (props.PbagItemShuffle)
         {
-            westHyrule.pbagCave.Collectable = (Collectable)ROMData.GetByte(0x4FE2);
-            eastHyrule.pbagCave1.Collectable = (Collectable)ROMData.GetByte(0x8ECC);
-            eastHyrule.pbagCave2.Collectable = (Collectable)ROMData.GetByte(0x8FB3);
-            shufflableItems.Add(westHyrule.pbagCave.Collectable);
-            shufflableItems.Add(eastHyrule.pbagCave1.Collectable);
-            shufflableItems.Add(eastHyrule.pbagCave2.Collectable);
+            westHyrule.pbagCave.Collectables = [(Collectable)ROMData.GetByte(0x4FE2)];
+            eastHyrule.pbagCave1.Collectables = [(Collectable)ROMData.GetByte(0x8ECC)];
+            eastHyrule.pbagCave2.Collectables = [(Collectable)ROMData.GetByte(0x8FB3)];
+            shufflableItems.Add(westHyrule.pbagCave.Collectables[0]);
+            shufflableItems.Add(eastHyrule.pbagCave1.Collectables[0]);
+            shufflableItems.Add(eastHyrule.pbagCave2.Collectables[0]);
         }
         else
         {
-            westHyrule.pbagCave.Collectable = Collectable.LARGE_BAG;
-            eastHyrule.pbagCave1.Collectable = Collectable.LARGE_BAG;
-            eastHyrule.pbagCave2.Collectable = Collectable.XL_BAG;
+            westHyrule.pbagCave.Collectables = [Collectable.LARGE_BAG];
+            eastHyrule.pbagCave1.Collectables = [Collectable.LARGE_BAG];
+            eastHyrule.pbagCave2.Collectables = [Collectable.XL_BAG];
         }
 
         if(props.IncludeSpellsInShuffle)
@@ -660,6 +663,7 @@ public class Hyrule
             shufflableItems.Add(Collectable.UPSTAB);
             shufflableItems.Add(Collectable.DOWNSTAB);
         }
+
         else if(props.SwapUpAndDownStab)
         {
             SwapUpAndDownstab();
@@ -671,13 +675,6 @@ public class Hyrule
         {
             ItemGet[item] = false;
         }
-        foreach (Location? location in itemLocs)
-        {
-            location.ItemGet = false;
-        }
-        westHyrule.pbagCave.ItemGet = false;
-        eastHyrule.pbagCave1.ItemGet = false;
-        eastHyrule.pbagCave2.ItemGet = false;
 
         //TODO: Refactor these puts out of this class
         ROMData.Put(RomMap.START_CANDLE, props.StartCandle ? (byte)1 : (byte)0);
@@ -710,52 +707,6 @@ public class Hyrule
             }
         }
 
-        //For heart containers beyond 4, replace small items in the pool as available.
-        if (heartContainersInItemPool > 4)
-        {
-            if (props.PbagItemShuffle)
-            {
-                int heartContainersToAdd = heartContainersInItemPool - 4;
-                while (heartContainersToAdd > 0)
-                {
-                    shufflableItems[22 - heartContainersToAdd] = Collectable.HEART_CONTAINER;
-                    heartContainersToAdd--;
-                }
-            }
-            else
-            {
-                int x = heartContainersInItemPool - 4;
-                while (x > 0)
-                {
-                    int y = RNG.Next(3);
-                    if (y == 0 && !pbagHearts.Contains(westHyrule.pbagCave))
-                    {
-                        pbagHearts.Add(westHyrule.pbagCave);
-                        westHyrule.pbagCave.Collectable = Collectable.HEART_CONTAINER;
-                        shufflableItems.Add(Collectable.HEART_CONTAINER);
-                        itemLocs.Add(westHyrule.pbagCave);
-                        x--;
-                    }
-                    if (y == 1 && !pbagHearts.Contains(eastHyrule.pbagCave1))
-                    {
-                        pbagHearts.Add(eastHyrule.pbagCave1);
-                        eastHyrule.pbagCave1.Collectable = Collectable.HEART_CONTAINER;
-                        shufflableItems.Add(Collectable.HEART_CONTAINER);
-                        itemLocs.Add(eastHyrule.pbagCave1);
-                        x--;
-                    }
-                    if (y == 2 && !pbagHearts.Contains(eastHyrule.pbagCave2))
-                    {
-                        pbagHearts.Add(eastHyrule.pbagCave2);
-                        eastHyrule.pbagCave2.Collectable = Collectable.HEART_CONTAINER;
-                        shufflableItems.Add(Collectable.HEART_CONTAINER);
-                        itemLocs.Add(eastHyrule.pbagCave2);
-                        x--;
-                    }
-                }
-            }
-        }
-
         if (props.StartWithSpellItems)
         {
             shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
@@ -766,19 +717,19 @@ public class Hyrule
             ItemGet[Collectable.CHILD] = true;
         }
 
-        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable] && !props.IncludeSpellsInShuffle)
+        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0]] && !props.IncludeSpellsInShuffle)
         {
             shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Collectable.TROPHY] = true;
         }
 
-        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable] && !props.IncludeSpellsInShuffle)
+        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
         {
             shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Collectable.MEDICINE] = true;
         }
 
-        if (ItemGet[eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable] && !props.IncludeSpellsInShuffle)
+        if (ItemGet[eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
         {
             shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
             ItemGet[Collectable.CHILD] = true;
@@ -835,6 +786,69 @@ public class Hyrule
             }
         }
 
+        //Handle excess items
+
+        List<Collectable> excessItems = [];
+
+        //Heart containers over 4 are excess
+        for (int i = 4; i < heartContainersInItemPool; i++)
+        {
+            excessItems.Add(Collectable.HEART_CONTAINER);
+        }
+
+        //palace items beyond the first are excess
+        if (props.PalaceItemRoomCount == 0)
+        {
+            excessItems.AddRange([Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, 
+                Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS]);
+        }
+
+        for (int i = 0; i < (props.PalaceItemRoomCount - 1) * 6; i++)
+        {
+            shufflableItems.Add(Collectable.LARGE_BAG);
+        }
+
+        List<int> minorItemIndexes = [];
+        for(int i = 0; i < shufflableItems.Count; i++)
+        {
+            if (shufflableItems[i].IsMinorItem())
+            {
+                minorItemIndexes.Add(i);
+            }
+        }
+
+        //Add the auto pbag cave promotion
+        List<Location> overflowLocations = [westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2];
+        int overflowLocationsRequired = excessItems.Count - minorItemIndexes.Count;
+
+
+        if (overflowLocationsRequired > overflowLocations.Count)
+        {
+            throw new Exception("Insufficient locations to place excess items. The validation should have caught this.");
+        }
+
+        for(int i = 0; i < overflowLocationsRequired; i++)
+        {
+            Location overflowLocation = overflowLocations.Sample(RNG)!;
+            itemLocs.Add(overflowLocation);
+            shufflableItems.Add(Collectable.SMALL_BAG);
+            minorItemIndexes.Add(shufflableItems.Count - 1);
+            overflowLocations.Remove(overflowLocation);
+        }
+
+        while(excessItems.Count > 0)
+        {
+            int minorItemIndexIndex = RNG.Next(0, minorItemIndexes.Count);
+            int minorItemIndex = minorItemIndexes[minorItemIndexIndex];
+            int excessItemIndex = RNG.Next(0, excessItems.Count);
+
+            shufflableItems[minorItemIndex] = excessItems[excessItemIndex];
+            minorItemIndexes.RemoveAt(minorItemIndexIndex);
+            excessItems.RemoveAt(excessItemIndex);
+        }
+
+        //Do the actual shuffling
+
         if (props.MixOverworldPalaceItems)
         {
             shufflableItems.FisherYatesShuffle(RNG);
@@ -859,14 +873,34 @@ public class Hyrule
                 }
             }
         }
-        if(shufflableItems.Count != itemLocs.Count)
+        if(shufflableItems.Count != itemLocs.Count + Math.Max((props.PalaceItemRoomCount * 6) - 6,0))
         {
             throw new Exception("Item locations must match number of items");
         }
 
-        for (int i = 0; i < shufflableItems.Count; i++)
+        itemLocs.ForEach(i => i.Collectables.Clear());
+        palaces.ForEach(i => i.ItemRooms.ForEach(j => j.Collectable = null));
+        using var itemLocsIterator = itemLocs.GetEnumerator();
+        Location? location = null;
+        int subIndex = 0;
+        foreach(Collectable item in shufflableItems)
         {
-            itemLocs[i].Collectable = shufflableItems[i];
+            if(location?.PalaceNumber == null)
+            {
+                itemLocsIterator.MoveNext();
+                location = itemLocsIterator.Current;
+            }
+            while(location.PalaceNumber != null && ++subIndex > props.PalaceItemRoomCount)
+            {
+                subIndex = 0;
+                itemLocsIterator.MoveNext();
+                location = itemLocsIterator.Current;
+            }
+            location.Collectables.Add(item);
+            if(location.PalaceNumber != null)
+            {
+                palaces[(location.PalaceNumber ?? 0) - 1].ItemRooms[subIndex - 1].Collectable = item;
+            }
         }
     }
 
@@ -886,7 +920,18 @@ public class Hyrule
         //If multiple palaces use the same item room, they'll get consolidated under a single sideview
         //with multiple pointers, but then when the item update happens later, it will affect all the rooms,
         //so do a first pass with distinct items so all item rooms are always separate sideviews
-        palaces.ForEach(palace => palace.UpdateSideviewItem((Collectable)palace.Number));
+        int itemRoomIndex = 0;
+        foreach(Palace palace in palaces)
+        {
+            foreach(Room itemRoom in palace.ItemRooms)
+            {
+                while(((Collectable)itemRoomIndex).IsMinorItem())
+                {
+                    itemRoomIndex++;
+                }
+                itemRoom.UpdateSideviewItem((Collectable)itemRoomIndex++);
+            }
+        }
         //In Reconstructed, enemy pointers aren't separated between 125 and 346, they're just all in 1 big pile,
         //so we just start at the 125 pointer address
         // int enemyAddr = Enemies.NormalPalaceEnemyAddr;
@@ -998,18 +1043,20 @@ public class Hyrule
         int mi = 0;
         int wh = 0;
         int eh = 0;
-        int count = 1;
-        int prevCount = 0;
+        int reachableLocationsCount = 1;
+        int previousReachableLocationsCount = 0;
+        int gettableItemsCount = 1;
+        int previousGettableItemsCount = 0;
         debug++;
 
         int totalLocationsCount = westHyrule.AllLocations.Count + eastHyrule.AllLocations.Count 
             + deathMountain.AllLocations.Count + mazeIsland.AllLocations.Count;
         //logger.Debug("Locations count: West-" + westHyrule.AllLocations.Count + " East-" + eastHyrule.AllLocations.Count +
         //   " DM-" + deathMountain.AllLocations.Count + " MI-" + mazeIsland.AllLocations.Count + " Total-" + totalLocationsCount);
-        bool updateItemsResult = false;
-        while (prevCount != count || updateItemsResult)
+        while (reachableLocationsCount != previousReachableLocationsCount || gettableItemsCount != previousGettableItemsCount)
         {
-            prevCount = count;
+            previousReachableLocationsCount = reachableLocationsCount;
+            previousGettableItemsCount = gettableItemsCount;
             westHyrule.UpdateVisit(itemGet);
             deathMountain.UpdateVisit(itemGet);
             eastHyrule.UpdateVisit(itemGet);
@@ -1037,7 +1084,7 @@ public class Hyrule
                     worlds.ForEach(i => i.VisitCave2());
                 }
             }
-            updateItemsResult = UpdateItemGets();
+            gettableItemsCount = UpdateItemGets();
 
             //This 2nd pass is weird and may not need to exist, eventually I should run some stats on whether it helps or not
             westHyrule.UpdateVisit(itemGet);
@@ -1045,9 +1092,9 @@ public class Hyrule
             eastHyrule.UpdateVisit(itemGet);
             mazeIsland.UpdateVisit(itemGet);
 
-            updateItemsResult |= UpdateItemGets();
+            gettableItemsCount = UpdateItemGets();
 
-            count = 0;
+            reachableLocationsCount = 0;
             dm = 0;
             mi = 0;
             wh = 0;
@@ -1057,7 +1104,7 @@ public class Hyrule
             eh = eastHyrule.AllLocations.Count(i => i.Reachable);
             dm = deathMountain.AllLocations.Count(i => i.Reachable);
             mi = mazeIsland.AllLocations.Count(i => i.Reachable);
-            count = wh + eh + dm + mi;
+            reachableLocationsCount = wh + eh + dm + mi;
 
             //logger.Debug("Starting reachable main loop(" + loopCount++ + ". prevCount:" + prevCount + " count:" + count
             //+ " updateItemsResult:" + updateItemsResult + " updateSpellsResult:" + updateSpellsResult);
@@ -1068,10 +1115,10 @@ public class Hyrule
             if (ItemGet[item] == false && item.IsItemGetItem())
             {
                 itemGetReachableFailures++;
-                if (UNSAFE_DEBUG && count >= DEBUG_THRESHOLD)
+                if (UNSAFE_DEBUG && reachableLocationsCount >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on collectables");
-                    PrintRoutingDebug(count, wh, eh, dm, mi);
+                    PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(eastHyrule.GetMapDebug());
                     return false;
                 }
@@ -1081,13 +1128,13 @@ public class Hyrule
         if (accessibleMagicContainers != 8)
         {
             magicContainerReachableFailures++;
-            //PrintRoutingDebug(count, wh, eh, dm, mi);
+            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
         if (heartContainers != maxHearts)
         {
             heartContainerReachableFailures++;
-            //PrintRoutingDebug(count, wh, eh, dm, mi);
+            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
 
@@ -1119,7 +1166,7 @@ public class Hyrule
         }
         if (UNSAFE_DEBUG && retval)
         {
-            PrintRoutingDebug(count, wh, eh, dm, mi);
+            PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
         }
         return retval;
     }
@@ -1182,80 +1229,79 @@ public class Hyrule
     /// 
     /// </summary>
     /// <returns>Whether any items were marked accessable</returns>
-    private bool UpdateItemGets()
+    private int UpdateItemGets()
     {
-        accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.ItemGet == true && i.Collectable == Collectable.MAGIC_CONTAINER).Count();
+        accessibleMagicContainers = 4;
         heartContainers = startHearts;
-        bool changed = false;
         List<RequirementType> requireables = GetRequireables();
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
-        foreach (Location location in AllLocationsForReal().Where(i => !i.Collectable.IsInternalUse()))
+        List<Collectable> gottenItems = [];
+        List<Location> locations = AllLocationsForReal().ToList();
+        foreach (Location location in AllLocationsForReal())
         {
-            bool hadItemPreviously = location.ItemGet;
-            bool hasItemNow;
-            //Location is a palace
-            if (location.PalaceNumber != null && location.PalaceNumber < 7)
+            foreach(Collectable collectable in location.Collectables) 
             {
-                Palace palace = palaces[(int)location.PalaceNumber - 1];
-                hasItemNow = CanGet(location)
-                    //All palaces inherently required fairy spell or magic key
-                    && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
-                    && palace.CanGetItem(requireables);
-            }
-            //Special handling for new kasuto's "linked" non-wizard collectables
-            else if (location == eastHyrule.spellTower)
-            {
-                hasItemNow = CanGet(newKasuto) && ItemGet[Collectable.SPELL_SPELL];
-            }
-            else if (location == eastHyrule.newKasutoBasement)
-            {
-                hasItemNow = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
-            }
-            //Location is a town
-            else if(location.ActualTown != null)
-            {
-                hasItemNow = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown].AreSatisfiedBy(requireables);
-            }
-            else
-            {
-                //TODO: Remove all the needX flags and replace them with a set of requirements.
-                hasItemNow = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
-            }
+                if(collectable.IsInternalUse())
+                {
+                    continue;
+                }
+                bool canGet;
+                //Location is a palace
+                if (location.PalaceNumber != null && location.PalaceNumber < 7)
+                {
+                    Palace palace = palaces[(int)location.PalaceNumber - 1];
+                    canGet = CanGet(location)
+                        //All palaces inherently required fairy spell or magic key
+                        && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
+                        && palace.GetGettableItems(requireables).Contains(collectable);
+                }
+                //Special handling for new kasuto's "linked" non-wizard collectables
+                else if (location == eastHyrule.spellTower)
+                {
+                    canGet = CanGet(newKasuto) && ItemGet[Collectable.SPELL_SPELL];
+                }
+                else if (location == eastHyrule.newKasutoBasement)
+                {
+                    continue;
+                    //canGet = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
+                }
+                //Location is a town
+                else if (location.ActualTown != null)
+                {
+                    canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown].AreSatisfiedBy(requireables);
+                }
+                else
+                {
+                    //TODO: Remove all the needX flags and replace them with a set of requirements.
+                    canGet = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
+                }
 
-            //Issue #3: Previously running UpdateItemGets multiple times could produce different results based on the sequence of times it ran
-            //For items that were blocked by MC requirements, different orders of parsing the same world could check the MCs at different times
-            //producing different results. Now it's not possible to "go back" in logic and call previously accessed items inaccesable.
-            location.ItemGet = hasItemNow || hadItemPreviously;
-            ItemGet[location.Collectable] = hasItemNow || hadItemPreviously;
+                ItemGet[collectable] = canGet;
+                if(canGet)
+                {
+                    gottenItems.Add(collectable);
+                }
 
-            if (location.ItemGet && location.Collectable == Collectable.HEART_CONTAINER)
-            {
-                heartContainers++;
-            }
-            if (!hadItemPreviously && location.ItemGet)
-            {
-                changed = true;
+                if (canGet && collectable == Collectable.HEART_CONTAINER)
+                {
+                    heartContainers++;
+                }
+                if (canGet && collectable == Collectable.MAGIC_CONTAINER)
+                {
+                    accessibleMagicContainers++;
+                }
             }
         }
-
-        if (!props.PbagItemShuffle)
+        
+        //Special case for granny's basement
+        if(CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars)
         {
-            if (westHyrule.pbagCave.Reachable)
-            {
-                westHyrule.pbagCave.ItemGet = true;
-            }
-            if (eastHyrule.pbagCave1.Reachable)
-            {
-                eastHyrule.pbagCave1.ItemGet = true;
-            }
-            if (eastHyrule.pbagCave2.Reachable)
-            {
-                eastHyrule.pbagCave2.ItemGet = true;
-            }
+            Collectable item = eastHyrule.newKasutoBasement.Collectables[0];
+            ItemGet[item] = true;
+            gottenItems.Add(item);
         }
 
-        accessibleMagicContainers = 4 + AllLocationsForReal().Where(i => i.ItemGet == true && i.Collectable == Collectable.MAGIC_CONTAINER).Count();
-        return changed;
+        return gottenItems.Count;
     }
 
     //This used to be one method for handling both, but it was rapidly approaching unreadable so I split it back out
@@ -1846,7 +1892,7 @@ public class Hyrule
                     westHyrule.SetStart();
 
                     ShufflePalaces();
-                    LoadItemLocs();
+                    LoadItemLocs(props.PalaceItemRoomCount);
                     ShuffleItems();
 
 
@@ -2003,7 +2049,7 @@ public class Hyrule
 
     //ItemLocs is specifically only those locations that contain shufflable items
     //If you're looking for a global reference for which items are where... too bad it doesn't exist :(
-    private List<Location> LoadItemLocs()
+    private List<Location> LoadItemLocs(int itemsPerPalace)
     {
         itemLocs =
         [
@@ -2061,6 +2107,17 @@ public class Hyrule
             itemLocs.Add(eastHyrule.daruniaRoof);
         }
 
+        if(props.PalaceItemRoomCount == 0)
+        {
+            itemLocs.Remove(westHyrule.locationAtPalace1);
+            itemLocs.Remove(westHyrule.locationAtPalace2);
+            itemLocs.Remove(westHyrule.locationAtPalace3);
+            itemLocs.Remove(mazeIsland.locationAtPalace4);
+            itemLocs.Remove(eastHyrule.locationAtPalace5);
+            itemLocs.Remove(eastHyrule.locationAtPalace6);
+            itemLocs.Remove(eastHyrule.locationAtGP);
+        }
+
         return itemLocs;
     }
 
@@ -2094,15 +2151,15 @@ public class Hyrule
             }
             Town town = unallocatedTowns[RNG.Next(unallocatedTowns.Count)];
             Location townLocation = GetTownLocation(town);
-            townLocation.Collectable = spell;
+            townLocation.Collectables = [spell];
             unallocatedTowns.Remove(town);
         }
     }
 
     private void SwapUpAndDownstab()
     {
-        eastHyrule.daruniaRoof.Collectable = Collectable.DOWNSTAB;
-        westHyrule.midoChurch.Collectable = Collectable.UPSTAB;
+        eastHyrule.daruniaRoof.Collectables = [Collectable.DOWNSTAB];
+        westHyrule.midoChurch.Collectables = [Collectable.UPSTAB];
     }
 
     private void RandomizeExperience(ROM rom)
@@ -2857,19 +2914,19 @@ public class Hyrule
 
         //WRITE UPDATES TO WIZARD/QUEST COLLECTABLES HERE
 
-        ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Collectable);
-        ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Collectable);
-        ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Collectable);
+        ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Collectables[0]);
+        ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Collectables[0]);
+        ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Collectables[0]);
 
         int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 
-        ROMData.Put(0x5069, (byte)westHyrule.medicineCave.Collectable);
-        ROMData.Put(0x4ff5, (byte)westHyrule.grassTile.Collectable);
+        ROMData.Put(0x5069, (byte)westHyrule.medicineCave.Collectables[0]);
+        ROMData.Put(0x4ff5, (byte)westHyrule.grassTile.Collectables[0]);
 
-        ROMData.Put(0x65C3, (byte)deathMountain.specRock.Collectable);
-        ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Collectable);
-        ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.Collectable);
-        ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Collectable);
+        ROMData.Put(0x65C3, (byte)deathMountain.specRock.Collectables[0]);
+        ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Collectables[0]);
+        ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.Collectables[0]);
+        ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Collectables[0]);
 
         ROMData.ElevatorBossFix(props.BossItem);
         
@@ -2884,7 +2941,10 @@ public class Hyrule
             var idx = (int)loc.PalaceNumber! - 1;
             if (loc.PalaceNumber != 7)
             {
-                palaces[idx].UpdateRomItem(loc.Collectable, ROMData);
+                for(int i = 0; i < palaces[idx].ItemRooms.Count; i++)
+                {
+                    ROMData.UpdateItem(loc.Collectables[i], palaces[idx].ItemRooms[i]);
+                }
             }
 
             if (palaces[idx].Entrance == null)
@@ -2895,17 +2955,17 @@ public class Hyrule
             ROMData.Put(loc.MemAddress + 0x7e, root.Map);
         }
 
-        ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectable); //map 47
-        ROMData.Put(0xDB8C, (byte)eastHyrule.newKasutoBasement.Collectable); //map 46
+        ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectables[0]); //map 47
+        ROMData.Put(0xDB8C, (byte)eastHyrule.newKasutoBasement.Collectables[0]); //map 46
 
-        ROMData.Put(0xA5A8, (byte)mazeIsland.magicContainerDrop.Collectable);
-        ROMData.Put(0xA58B, (byte)mazeIsland.childDrop.Collectable);
+        ROMData.Put(0xA5A8, (byte)mazeIsland.magicContainerDrop.Collectables[0]);
+        ROMData.Put(0xA58B, (byte)mazeIsland.childDrop.Collectables[0]);
 
         if (props.PbagItemShuffle)
         {
-            ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Collectable);
-            ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.Collectable);
-            ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.Collectable);
+            ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Collectables[0]);
+            ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.Collectables[0]);
+            ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.Collectables[0]);
 
         }
 
@@ -2913,16 +2973,16 @@ public class Hyrule
         {
             if (location == westHyrule.pbagCave)
             {
-                ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Collectable);
+                ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Collectables[0]);
             }
 
             if (location == eastHyrule.pbagCave1)
             {
-                ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.Collectable);
+                ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.Collectables[0]);
             }
             if (location == eastHyrule.pbagCave2)
             {
-                ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.Collectable);
+                ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.Collectables[0]);
             }
         }
 
@@ -3004,7 +3064,7 @@ public class Hyrule
             // Use the old spell menu behavior where the spells are placed in the menu in the location it came from
             var wizardCollectables = AllLocationsForReal()
                 .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
-                .Select(l => l.Collectable).ToList();
+                .Select(l => l.Collectables[0]).ToList();
             
             for (int i = 0; i < magFunction.Length; i++)
             {
@@ -3126,8 +3186,8 @@ public class Hyrule
     public void PrintDebugSpoiler(LogLevel logLevel)
     {
         logger.Log(logLevel, "ITEMS:");
-        List<Location> MC_Locations = [];
-        List<Location> HC_Locations = [];
+        List<string> magicContainerLocations = [];
+        List<string> heartContainerLocations = [];
 
         StringBuilder sb = new();
 
@@ -3135,28 +3195,42 @@ public class Hyrule
         {
             if (item.IsItemGetItem() && ItemGet.ContainsKey(item))
             {
-                Location? location = AllLocationsForReal().Where(i => i.Collectable == item).FirstOrDefault();
+                Location? location = AllLocationsForReal().Where(i => i.Collectables.Contains(item)).FirstOrDefault();
                 sb.AppendLine(item.ToString() + "(" + ItemGet[item] + ") : " + location?.Name);
             }
         }
         foreach(Location location in AllLocationsForReal())
         {
-            if(location.Collectable == Collectable.HEART_CONTAINER)
+            for(int i = 0; i < location.Collectables.Count; i++)
             {
-                HC_Locations.Add(location);
+                if (location.Collectables[i] == Collectable.HEART_CONTAINER)
+                {
+                    string locationName = location.Name;
+                    if(location.Collectables.Count > 1)
+                    {
+                        locationName += $"[{i}]";
+                    }
+                    heartContainerLocations.Add(locationName);
+                }
+                if (location.Collectables[i] == Collectable.MAGIC_CONTAINER)
+                {
+                    string locationName = location.Name;
+                    if (location.Collectables.Count > 1)
+                    {
+                        locationName += $"[{i}]";
+                    }
+                    magicContainerLocations.Add(locationName);
+                }
             }
-            if (location.Collectable == Collectable.MAGIC_CONTAINER)
-            {
-                MC_Locations.Add(location);
-            }
+
         }
-        foreach (Location location in HC_Locations)
+        foreach (string locationName in heartContainerLocations)
         {
-            sb.AppendLine("HeartContainer: " + location.Name);
+            sb.AppendLine(locationName);
         }
-        foreach (Location location in MC_Locations)
+        foreach (string locationName in magicContainerLocations)
         {
-            sb.AppendLine("MagicContainer: " + location.Name);
+            sb.AppendLine(locationName);
         }
         logger.Log(logLevel, sb.ToString());
     }
@@ -3260,6 +3334,7 @@ CustomFileSelectData:
         || i.VanillaCollectable.IsSwordTech());
     }
 
+    /*
     public string SpellDebug()
     {
         StringBuilder sb = new StringBuilder();
@@ -3315,6 +3390,7 @@ CustomFileSelectData:
         }
         return sb.ToString();
     }
+    */
 
     public void PrintRoutingDebug(int count, int wh, int eh, int dm, int mi)
     {
@@ -3327,11 +3403,18 @@ CustomFileSelectData:
         sb.AppendLine("mi: " + mi + " / " + mazeIsland.AllLocations.Count);
         sb.AppendLine("");
 
-        foreach(Location location in AllLocationsForReal().Where(i => !i.ItemGet && !i.Collectable.IsInternalUse()))
+        //Where(i => !i.ItemGet && !i.Collectable.IsInternalUse()
+        foreach (Location location in AllLocationsForReal())
         {
-            sb.AppendLine(location.Name + " / " + Enum.GetName(typeof(Collectable), location.Collectable));
+            foreach (Collectable collectable in location.Collectables)
+            {
+                if (!ItemGet[collectable])
+                {
+                    sb.AppendLine(location.Name + " / " + Enum.GetName(typeof(Collectable), collectable));
+                }
+                //TODO: figure out how to display individual heart/magic containers
+            }
         }
-
 
         sb.AppendLine("");
         logger.Error(sb.ToString());
@@ -3359,16 +3442,16 @@ CustomFileSelectData:
         return false;
     }
 
-    private void FullItemShuffle(Assembler asm, IEnumerable<Location> collectableLocations)
+    private void FullItemShuffle(Assembler asm, IEnumerable<Location> nonSideviewLocations)
     {
         var a = asm.Module();
         foreach (var collect in Enum.GetValues<Collectable>())
         {
             a.Set($"{collect.ToString().ToUpper()}_ITEMLOC", (int)collect);
         }
-        foreach (var loc in collectableLocations)
+        foreach (var loc in nonSideviewLocations)
         {
-            a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectable);
+            a.Set($"{loc.VanillaCollectable.ToString().ToUpper()}_ITEMLOC", (int)loc.Collectables[0]);
         }
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);

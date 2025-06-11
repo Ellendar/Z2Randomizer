@@ -143,7 +143,6 @@ public class CustomTexts
         "No pom pom$shaking$here",
         "Youre$a wizard,$Link",
         "Take any$Robe you$want",
-        //"The child$can stay$lost", //potentially 
         "Dont Move$I dropped$a contact$lens",
         "Please$support$ZSR",
         "This wont$hurt a bit",
@@ -158,7 +157,8 @@ public class CustomTexts
         "Poyo!",
         "Sploosh$Kaboom!",
         "Let me$read my$Vogon$Poetry",
-        "somebody$set up us$the bomb"
+        "somebody$set up us$the bomb",
+        "boat$league$confirmed"
     };
 
     public static readonly string[] RIVER_MAN_TEXTS = 
@@ -389,21 +389,21 @@ public class CustomTexts
             {
                 throw new Exception("Bagu location not found while generating text");
             }
-            Text? baguText = GenerateBaguText(baguLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Text? baguText = GenerateBaguText(baguLocation.Collectables[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if(baguText != null)
             {
                 texts[baguTextIndex] = baguText;
             }
 
             Location tableLocation = locations.FirstOrDefault(i => i.ActualTown == Town.SARIA_TABLE)!;
-            Text? mirrorText = GenerateMirrorTableText(tableLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Text? mirrorText = GenerateMirrorTableText(tableLocation.Collectables[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (mirrorText != null)
             {
                 texts[gotMirrorTextIndex] = mirrorText;
             }
 
             Location fountainLocation = locations.FirstOrDefault(i => i.ActualTown == Town.NABOORU_FOUNTAIN)!;
-            Text? fountainText = GenerateFountainText(fountainLocation.Collectable, nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
+            Text? fountainText = GenerateFountainText(fountainLocation.Collectables[0], nonhashRNG, props.UseCommunityText, props.IncludeQuestItemsInShuffle);
             if (fountainText != null)
             {
                 texts[gotWaterTextIndex] = fountainText;
@@ -499,7 +499,7 @@ public class CustomTexts
     {
         foreach (Location location in locations.Where(i => i.ActualTown != null && i.VanillaCollectable.IsSpell()))
         {
-            texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectable, linkedFire);
+            texts[TOWN_SIGN_INDEXES[(Town)location.ActualTown!]] = GenerateTownSignHint(location.Collectables[0], linkedFire);
         }
     }
     public static Text GenerateTownSignHint(Collectable spell, bool linkedFire)
@@ -520,7 +520,7 @@ public class CustomTexts
             throw new Exception("Cannot generate text for Wizard outside of town");
         }
         Town town = (Town)location.ActualTown;
-        Collectable collectable = location.Collectable;
+        Collectable collectable = location.Collectables[0];
         if (collectable.IsSpell())
         {
             //If it's a spell, use the old behavior
@@ -630,7 +630,7 @@ public class CustomTexts
 
         List<int> placedTowns = [];
 
-        List<Collectable> items = locations.Select(i => i.Collectable).ToList();
+        List<Collectable> items = locations.SelectMany(i => i.Collectables).ToList();
         items = items.Where(i => !i.IsInternalUse()).ToList();
 
         if (props.StartWithSpellItems || props.SpellItemHints)
@@ -674,9 +674,9 @@ public class CustomTexts
 
         foreach(Collectable hintCollectable in hintCollectables)
         {
-            List<Location> possibleHintLocations = locations.Where(i => i.Collectable == hintCollectable).ToList();
+            List<Location> possibleHintLocations = locations.Where(i => i.Collectables.Contains(hintCollectable)).ToList();
             Location hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
-            Text hint = Text.GenerateHelpfulHint(hintLocation);
+            Text hint = Text.GenerateHelpfulHint(hintLocation, hintCollectable);
             int town = r.Next(9);
             while (placedTowns.Contains(town))
             {
@@ -708,35 +708,35 @@ public class CustomTexts
         {
             Location itemLocation;
 
-            itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.TROPHY)!;
+            itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.TROPHY))!;
             if(itemLocation != null)
             {
-                Text trophyHint = Text.GenerateHelpfulHint(itemLocation);
+                Text trophyHint = Text.GenerateHelpfulHint(itemLocation, Collectable.TROPHY);
                 hints[trophySpellHintIndex] = trophyHint;
             }
 
-            itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MEDICINE)!;
+            itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MEDICINE))!;
             if (itemLocation != null)
             {
-                Text medHint = Text.GenerateHelpfulHint(itemLocation);
+                Text medHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MEDICINE);
                 hints[medicineSpellHintIndex] = medHint;
             }   
 
-            itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.CHILD)!;
+            itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.CHILD))!;
             if (itemLocation != null)
             {
-                Text kidHint = Text.GenerateHelpfulHint(itemLocation);
+                Text kidHint = Text.GenerateHelpfulHint(itemLocation, Collectable.CHILD);
                 hints[childSpellHintIndex] = kidHint;
             }
 
             if(props.IncludeQuestItemsInShuffle)
             {
-                itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.MIRROR)!;
-                Text mirrorHint = Text.GenerateHelpfulHint(itemLocation);
+                itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MIRROR))!;
+                Text mirrorHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MIRROR);
                 hints[mirrorSpellHintIndex] = mirrorHint;
 
-                itemLocation = locations.FirstOrDefault(i => i.Collectable == Collectable.WATER)!;
-                Text waterHint = Text.GenerateHelpfulHint(itemLocation);
+                itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
+                Text waterHint = Text.GenerateHelpfulHint(itemLocation, Collectable.WATER);
                 hints[waterSpellHintIndex] = waterHint;
             }
         }

@@ -86,7 +86,7 @@ public class Util
         (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
 
         (p2.ActualTown, p1.ActualTown) = (p1.ActualTown, p2.ActualTown);
-        (p2.Collectable, p1.Collectable) = (p1.Collectable, p2.Collectable);
+        (p2.Collectables, p1.Collectables) = (p1.Collectables, p2.Collectables);
         (p2.Name, p1.Name) = (p1.Name, p2.Name);
     }
 

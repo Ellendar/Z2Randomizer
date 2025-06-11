@@ -338,7 +338,10 @@ public abstract class World
             AllReached = true;
             foreach (Location location in AllLocations)
             {
-                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || !location.Collectable.IsInternalUse())
+                //TODO: Doing this off terrain type is a very bad idea for stuff like vanilla shuffle no actual terrain.
+                if (location.TerrainType == Terrain.PALACE 
+                    || location.TerrainType == Terrain.TOWN 
+                    || location.Collectables.Any(i => !i.IsInternalUse()))
                 {
                     if (!location.Reachable)
                     {
@@ -1824,7 +1827,6 @@ public abstract class World
         {
             location.CanShuffle = true;
             location.Reachable = false;
-            location.ItemGet = false;
         }
     }
 

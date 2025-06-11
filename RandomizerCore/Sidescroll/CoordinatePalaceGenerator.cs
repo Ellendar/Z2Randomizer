@@ -26,32 +26,35 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             List<Room> itemRoomCandidates = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList();
             itemRoomCandidates.FisherYatesShuffle(r);
 
-            foreach (Room itemRoomCandidate in itemRoomCandidates)
+            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCount; itemRoomNumber++)
             {
-                if(palace.ItemRoom != null)
+                foreach (Room itemRoomCandidate in itemRoomCandidates)
                 {
-                    break;
-                }
-                List<Room> itemRoomReplacementCandidates =
-                    palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
-
-                itemRoomReplacementCandidates.FisherYatesShuffle(r);
-                foreach (Room itemRoomReplacementRoom in itemRoomReplacementCandidates)
-                {
-                    Room? upRoom = palace.AllRooms.FirstOrDefault(
-                        i => i.coords == itemRoomReplacementRoom.coords with { Y = itemRoomReplacementRoom.coords.Y + 1 });
-                    if (itemRoomReplacementRoom != null && 
-                        (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == itemRoomCandidate.IsDropZone))
+                    if (palace.ItemRooms[itemRoomNumber] != null)
                     {
-                        palace.ItemRoom = new(itemRoomCandidate);
-                        if (itemRoomCandidate.LinkedRoomName != null)
-                        {
-                            Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];
-                            Room newLinkedRoom = new();
-                            palace.ItemRoom = palace.ItemRoom.Merge(linkedRoom);
-                        }
-                        palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRoom);
                         break;
+                    }
+                    List<Room> itemRoomReplacementCandidates =
+                        palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
+
+                    itemRoomReplacementCandidates.FisherYatesShuffle(r);
+                    foreach (Room itemRoomReplacementRoom in itemRoomReplacementCandidates)
+                    {
+                        Room? upRoom = palace.AllRooms.FirstOrDefault(
+                            i => i.coords == itemRoomReplacementRoom.coords with { Y = itemRoomReplacementRoom.coords.Y + 1 });
+                        if (itemRoomReplacementRoom != null &&
+                            (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == itemRoomCandidate.IsDropZone))
+                        {
+                            palace.ItemRooms[itemRoomNumber] = new(itemRoomCandidate);
+                            if (itemRoomCandidate.LinkedRoomName != null)
+                            {
+                                Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];
+                                Room newLinkedRoom = new();
+                                palace.ItemRooms[itemRoomNumber] = palace.ItemRooms[itemRoomNumber].Merge(linkedRoom);
+                            }
+                            palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRooms[itemRoomNumber]);
+                            break;
+                        }
                     }
                 }
             }
@@ -136,7 +139,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         if (palace.BossRoom == null
             || palace.Entrance == null
             || (palace.Number == 7 && palace.TbirdRoom == null)
-            || (palace.Number < 7 && palace.ItemRoom == null))
+            || (palace.Number < 7 && palace.ItemRooms.Count != props.PalaceItemRoomCount))
         {
             logger.Debug("Failed to place critical room in palace");
             return false;
@@ -151,9 +154,10 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 Room secondary = room.MergedSecondary;
                 palace.AllRooms.Add(primary);
                 palace.AllRooms.Add(secondary);
-                if(room == palace.ItemRoom)
+                if(palace.ItemRooms.Contains(room))
                 {
-                    palace.ItemRoom = room.MergedPrimary;
+                    palace.ItemRooms.Remove(room);
+                    palace.ItemRooms.Add(room.MergedPrimary);
                 }
                 primary.coords = room.coords;
                 secondary.coords = room.coords;

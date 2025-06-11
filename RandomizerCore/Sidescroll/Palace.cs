@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using NLog;
 
@@ -30,7 +31,7 @@ public class Palace
     internal List<Room> AllRooms { get; private set; }
 
     public Room? Entrance { get; set; }
-    public Room? ItemRoom { get; set; }
+    public List<Room> ItemRooms { get; set; }
     public Room? BossRoom { get; set; }
     public int Number { get; set; }
     internal Room? TbirdRoom { get; set; }
@@ -48,38 +49,12 @@ public class Palace
         AllRooms = [];
     }
 
-    public void UpdateSideviewItem(Collectable collectable)
-    {
-        if(Number == 7)
-        {
-            return;
-        }
-        if(ItemRoom == null)
-        {
-            throw new Exception("Unable to update item for a palace with no item room"); 
-        }
-        byte[] sideView = ItemRoom.SideView;
-        for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
-        {
-            int yPos = sideView[sideviewIndex] & 0xF0;
-            yPos >>= 4;
-            //item
-            if (yPos < 13 && sideView[sideviewIndex + 1] == 0x0F)
-            {
-                int collectableId = sideView[sideviewIndex + 2];
-                if (!((Collectable)collectableId).IsMinorItem())
-                {
-                    sideView[sideviewIndex + 2] = (byte)collectable;
-                }
-                sideviewIndex++;
-            }
-        }
-    }
-
+    /*
     public void UpdateRomItem(Collectable collectable, ROM ROMData)
     {
         ItemRoom?.UpdateRomItem(collectable, ROMData);
     }
+    */
 
     public bool RequiresThunderbird()
     {
@@ -134,8 +109,6 @@ public class Palace
         }
         return false;
     }
-
-
 
     private void CheckSpecialPaths(Room r)
     {
@@ -901,6 +874,7 @@ public class Palace
         }
     }
 
+    /*
     public List<Room> CheckBlocks()
     {
         return CheckBlocksHelper([], [], Entrance!);
@@ -931,6 +905,7 @@ public class Palace
         }
         return c;
     }
+    */
 
     public void ResetRooms()
     {
@@ -978,9 +953,9 @@ public class Palace
     {
         //If the palace's item can be reached with the current items, it can be used to clear the rest of the palace.
         RequirementType? palaceItemRequirement = palaceItem.AsRequirement();
-        if(palaceItemRequirement != null)
+        if (palaceItemRequirement != null)
         {
-            if (CanGetItem(requireables))
+            if (CanReachAnItemRoom(requireables))
             {
                 requireables = new List<RequirementType>(requireables);
                 ((List<RequirementType>)requireables).Add((RequirementType)palaceItemRequirement);
@@ -1058,7 +1033,7 @@ public class Palace
         return false;
     }
 
-    public bool CanGetItem(IEnumerable<RequirementType> requireables)
+    public bool CanReachAnItemRoom(IEnumerable<RequirementType> requireables)
     {
         List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
         List<Room> coveredRooms = new();
@@ -1066,7 +1041,7 @@ public class Palace
         while (pendingRooms.Count > 0)
         {
             Room room = pendingRooms.First();
-            if (room == ItemRoom)
+            if (ItemRooms.Contains(room))
             {
                 return true;
             }
@@ -1096,6 +1071,66 @@ public class Palace
         }
 
         return false;
+    }
+
+    public List<Collectable> GetGettableItems(IEnumerable<RequirementType> initialRequireables)
+    {
+        List<RequirementType> requireables = [];
+        requireables.AddRange(initialRequireables);
+        List<Room> pendingRooms = new() { AllRooms.First(i => i.IsEntrance) };
+        List<Room> coveredRooms = [];
+        List<Collectable> previousGettableItems = [];
+        List<Collectable> gettableItems = [];
+
+        do
+        {
+            previousGettableItems = gettableItems;
+            while (pendingRooms.Count > 0)
+            {
+                Room room = pendingRooms.First();
+                if (ItemRooms.Contains(room))
+                {
+                    if (room.Collectable == null)
+                    {
+                        throw new Exception("Unable to assess gettability of item room with no item");
+                    }
+                    Collectable roomCollectable = room.Collectable ?? Collectable.DO_NOT_USE;
+                    if(!gettableItems.Contains(roomCollectable))
+                    {
+                        gettableItems.Add(roomCollectable);
+                        if (roomCollectable.AsRequirement() != null)
+                        {
+                            requireables.Add(roomCollectable.AsRequirement() ?? RequirementType.JUMP);
+                        }
+                    }
+                }
+                if (coveredRooms.Contains(room))
+                {
+                    pendingRooms.Remove(room);
+                    continue;
+                }
+                coveredRooms.Add(room);
+                pendingRooms.Remove(room);
+                if (room.Left != null && room.Left.IsTraversable(requireables))
+                {
+                    pendingRooms.Add(room.Left);
+                }
+                if (room.Right != null && room.Right.IsTraversable(requireables))
+                {
+                    pendingRooms.Add(room.Right);
+                }
+                if (room.Up != null && room.Up.IsTraversable(requireables))
+                {
+                    pendingRooms.Add(room.Up);
+                }
+                if (room.Down != null && room.Down.IsTraversable(requireables))
+                {
+                    pendingRooms.Add(room.Down);
+                }
+            }
+        } while (gettableItems.Count != previousGettableItems.Count);
+
+        return gettableItems;
     }
 
     public void ValidateRoomConnections()
@@ -1170,15 +1205,18 @@ public class Palace
         }
         else
         {
-            if (!AllRooms.Contains(ItemRoom!))
+            foreach(Room itemRoom in ItemRooms)
             {
-                throw new Exception("Palace lost its item room");
+                if (!AllRooms.Contains(itemRoom))
+                {
+                    throw new Exception("Palace lost its item room");
+                }
+                if (AllRooms.Count(i => i.HasItem) != ItemRooms.Count)
+                {
+                    throw new Exception("Palace has the wrong number of item rooms");
+                }
+                itemRoom.Map = currentMap++;
             }
-            if(AllRooms.Any(i => i.HasItem && i != ItemRoom))
-            {
-                throw new Exception("Palace has an extra item room");
-            }
-            ItemRoom!.Map = currentMap++;
         }
         List<Room> normalRooms = AllRooms.Where(i => i.IsNormalRoom()).ToList();
         foreach(Room room in normalRooms)

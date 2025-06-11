@@ -50,27 +50,64 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 palace.BossRoom.NewEnemies = palace.BossRoom.Enemies;
                 // palace.BossRoom.PalaceGroup = palaceGroup;
                 palace.AllRooms.Add(palace.BossRoom);
+                palace.ItemRooms = [];
 
                 if (palaceNumber < 7) //Not GP
                 {
-                    if(roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
+                    for(int i = 0; i < props.PalaceItemRoomCount; i++)
                     {
-                        throw new Exception("No item rooms for generated palace");
-                    }
-                    Direction itemRoomDirection;
-                    Room? itemRoom = null;
-                    while (itemRoom == null)
-                    {
-                        itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                        if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
+                        if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
                         {
-                            continue;
+                            throw new Exception("No item rooms for reconstructed palace");
                         }
-                        itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
+                        Direction itemRoomDirection = Direction.NONE;
+                        Room itemRoom = null;
+                        Room? itemRoomCandidate = null;
+                        while (itemRoom == null)
+                        {
+                            itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
+                            if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
+                            {
+                                continue;
+                            }
+                            itemRoomCandidate = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList().Sample(r)!;
+                            if(itemRoomCandidate == null)
+                            {
+                                palace.IsValid = false;
+                                return palace;
+                            }
+                            itemRoom = itemRoomCandidate ?? throw new Exception("No item rooms for reconstructed palace");
+                        }
+
+                        palace.ItemRooms.Add(itemRoom);
+                        palace.AllRooms.Add(itemRoom);
+
+                        if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
+                        {
+                            roomPool.ItemRoomsByDirection[itemRoomDirection].Remove(itemRoomCandidate);
+                        }
+                        else if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
+                        {
+                            if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, itemRoom.SideView)))
+                            {
+                                roomPool.ItemRoomsByDirection[itemRoomDirection].Remove(itemRoomCandidate);
+                            }
+                        }
+
+                        if (itemRoom.LinkedRoomName != null)
+                        {
+                            Room segmentedItemRoom1, segmentedItemRoom2;
+                            segmentedItemRoom1 = itemRoom;
+                            segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
+                            // segmentedItemRoom2.PalaceGroup = palaceGroup;
+                            //segmentedItemRoom2.SetItem((Item)palaceNumber);
+                            segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
+                            segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
+                            palace.AllRooms.Add(segmentedItemRoom2);
+                        }
+
+
                     }
-                    palace.ItemRoom = itemRoom;
-                    // palace.ItemRoom.PalaceGroup = palaceGroup;
-                    palace.AllRooms.Add(palace.ItemRoom);
 
                     if (props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
                     {
@@ -78,17 +115,6 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         palace.BossRoom.AdjustContinuingBossRoom();
                     }
 
-                    if (palace.ItemRoom.LinkedRoomName != null)
-                    {
-                        Room segmentedItemRoom1, segmentedItemRoom2;
-                        segmentedItemRoom1 = palace.ItemRoom;
-                        segmentedItemRoom2 = new(roomPool.LinkedRooms[segmentedItemRoom1.LinkedRoomName]);
-                        // segmentedItemRoom2.PalaceGroup = palaceGroup;
-                        //segmentedItemRoom2.SetItem((Item)palaceNumber);
-                        segmentedItemRoom2.LinkedRoom = segmentedItemRoom1;
-                        segmentedItemRoom1.LinkedRoom = segmentedItemRoom2;
-                        palace.AllRooms.Add(segmentedItemRoom2);
-                    }
                 }
                 else //GP
                 {
@@ -293,11 +319,11 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
     {
         palace.AllRooms.Add(room);
 
-        if (palace.Number != 7 && openRooms.Count > 1 && palace.ItemRoom!.CountOpenExits() > 0)
+        if (palace.Number != 7 && openRooms.Count > 1 && palace.ItemRooms.Any(i => i.CountOpenExits() > 0))
         {
-            foreach (Room open2 in openRooms)
+            foreach (Room openRoom in openRooms)
             {
-                bool item = AttachToOpen(open2, palace.ItemRoom, openRooms);
+                bool item = AttachToOpen(openRoom, palace.ItemRooms.First(i => i.CountOpenExits() > 0), openRooms);
                 if (item)
                 {
                     break;
@@ -306,9 +332,9 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         }
         if (openRooms.Count > 1 && palace.BossRoom!.CountOpenExits() > 0)
         {
-            foreach (Room open2 in openRooms)
+            foreach (Room openRoom in openRooms)
             {
-                bool boss = AttachToOpen(open2, palace.BossRoom, openRooms);
+                bool boss = AttachToOpen(openRoom, palace.BossRoom, openRooms);
                 if (boss)
                 {
                     break;
