@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 //using System.Runtime.InteropServices.WindowsRuntime;
 
@@ -15,9 +16,13 @@ public abstract class World
     protected SortedDictionary<string, List<Location>> areasByLocation;
 
     public Dictionary<Location, Location> connections;
-    protected int enemyAddr;
-    protected int enemyPtr;
-    protected List<int> overworldMaps;
+    public int sideviewPtrTable { get; protected set; }
+    public int sideviewBank { get; protected set; }
+    public int enemyPtr { get; protected set; }
+    public GroupedEnemiesBase groupedEnemies { get; protected set; }
+    public IReadOnlyList<int> overworldEncounterMaps { get; protected set; }
+    public IReadOnlyList<int> overworldEncounterMapDuplicate { get; protected set; } = [];
+    public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
     protected Terrain[,] map;
     protected int MAP_ROWS;
@@ -187,124 +192,6 @@ public abstract class World
         }
     }
 
-    protected abstract byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch);
-
-    public void ShuffleEnemies(ROM romData, int addr, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        // what is this address?
-        if (addr == 0x95A4) { return; }
-
-        int numBytes = romData.GetByte(addr);
-        byte[] enemyBytes = romData.GetBytes(addr, numBytes);
-        byte[] newEnemyBytes = RandomizeEnemies(enemyBytes, mixLargeAndSmallEnemies, generatorsAlwaysMatch);
-        Debug.Assert(newEnemyBytes.Length == numBytes);
-        romData.Put(addr, newEnemyBytes);
-    }
-
-    protected void RandomizeEnemiesInner<T>(Sidescroll.EnemiesEditable<T> ee, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
-    {
-        int? firstGenerator = null;
-        for (int i = 0; i < ee.Enemies.Count; i++)
-        {
-            Sidescroll.Enemy<T> enemy = ee.Enemies[i];
-
-            if (mixLargeAndSmallEnemies)
-            {
-                if (enemy.IsShufflableSmallOrLarge())
-                {
-                    T swapToId = groundEnemies[RNG.Next(0, groundEnemies.Length)];
-                    // y position logic is left equivalent for now, but can likely be improved
-                    if (swapToId is EnemiesWest.GELDARM && enemy.Id is not EnemiesWest.GELDARM)
-                    {
-                        enemy.Y -= 3;
-                    }
-                    else if (enemy.IsShufflableSmall() && largeEnemies.Contains(swapToId) && swapToId is not EnemiesWest.GELDARM)
-                    {
-                        enemy.Y -= 2;
-                    }
-                    else if (swapToId is EnemiesWest.MEGMET && enemy.Id is not EnemiesWest.MEGMET)
-                    {
-                        enemy.Y -= 1;
-                    }
-                    enemy.Id = swapToId;
-                    continue;
-                }
-            }
-            else
-            {
-                if (enemy.IsShufflableLarge())
-                {
-                    T swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
-                    if (swapToId is EnemiesWest.GELDARM && enemy.Id is not EnemiesWest.GELDARM)
-                    {
-                        enemy.Y -= 3;
-                    }
-                    enemy.Id = swapToId;
-                    continue;
-                }
-                else if (enemy.IsShufflableSmall())
-                {
-                    T swapEnemy = smallEnemies[RNG.Next(0, smallEnemies.Length)];
-                    enemy.Id = swapEnemy;
-                    continue;
-                }
-            }
-
-            if (enemy.IsShufflableFlying())
-            {
-                T swapToId = flyingEnemies[RNG.Next(0, flyingEnemies.Length)];
-                switch (swapToId)
-                {
-                    case EnemiesWest.ACHE:
-                    case EnemiesWest.ACHEMAN:
-                    case EnemiesWest.BLUE_DEELER:
-                    case EnemiesWest.RED_DEELER:
-                    case EnemiesEast.ACHE:
-                    case EnemiesEast.ACHEMAN:
-                    case EnemiesEast.BLUE_DEELER:
-                    case EnemiesEast.RED_DEELER:
-                        enemy.Y = 0;
-                        break;
-                }
-                enemy.Id = swapToId;
-                continue;
-            }
-
-            if (enemy.IsShufflableGenerator())
-            {
-                T swapToId = generators[RNG.Next(0, generators.Length)];
-                firstGenerator ??= (int)(object)swapToId;
-                if (generatorsAlwaysMatch)
-                {
-                    enemy.Id = (T)(object)firstGenerator;
-                }
-                else
-                {
-                    enemy.Id = swapToId;
-                }
-                continue;
-            }
-
-            //Moblin generators can become things, but things can't become moblin generators.
-            //Why? I assume it causes some kind of issue, but I've never investigated.
-            if (enemy.Id is EnemiesWest.DUMB_MOBLIN_GENERATOR)
-            {
-                int swapIndex = RNG.Next(0, generators.Length + 1);
-                T swapToId = swapIndex == generators.Length ? (T)(object)EnemiesWest.DUMB_MOBLIN_GENERATOR : generators[RNG.Next(0, generators.Length)];
-                firstGenerator ??= (int)(object)swapToId;
-                if (generatorsAlwaysMatch)
-                {
-                    enemy.Id = (T)(object)firstGenerator;
-                }
-                else
-                {
-                    enemy.Id = swapToId;
-                }
-                continue;
-            }
-        }
-    }
-
     protected void ChooseConn(String section, Dictionary<Location, Location> co, bool changeType)
     {
         if (co.Count > 0)
@@ -361,49 +248,6 @@ public abstract class World
     {
         return AllLocations.FirstOrDefault(i => i.MemAddress.Equals(mem)) 
             ?? throw new Exception("Failed to find Location at address: " + mem);
-    }
-
-    public void ShuffleOverworldEnemies(ROM romData, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        List<int> shuffledEncounters = new List<int>();
-        //0x4581
-        for (int i = enemyPtr; i < enemyPtr + 126; i += 2)
-        {
-            int low = romData.GetByte(i);
-            int high = romData.GetByte(i + 1);
-            high <<= 8;
-            high &= 0x0FFF;
-            int addr = high + low + enemyAddr;
-            if(shuffledEncounters.Contains(addr))
-            {
-                logger.Debug("Duplicate encounter");
-            }
-            else
-            {
-                shuffledEncounters.Add(addr);
-                ShuffleEnemies(romData, addr, mixLargeAndSmallEnemies, generatorsAlwaysMatch);
-            }
-        }
-        //{ 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
-        foreach (int map in overworldMaps)
-        {
-            int ptrAddr = enemyPtr + map * 2;
-            int low = romData.GetByte(ptrAddr);
-            int high = romData.GetByte(ptrAddr + 1);
-            high <<= 8;
-            high &= 0x0FFF;
-            int addr = high + low + enemyAddr;
-            addr += romData.GetByte(addr);
-            if (shuffledEncounters.Contains(addr))
-            {
-                logger.Debug("Duplicate encounter");
-            }
-            else
-            {
-                shuffledEncounters.Add(addr);
-                ShuffleEnemies(romData, addr, mixLargeAndSmallEnemies, generatorsAlwaysMatch);
-            }
-        }
     }
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)

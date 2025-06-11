@@ -13,6 +13,7 @@ using js65;
 using Microsoft.ClearScript;
 using NLog;
 using NLog.Targets;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -307,7 +308,8 @@ public class Hyrule
 
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
-            if(props.RandomizeDrops)
+            ROMData.AdjustGpProjectileDamage();
+            if (props.RandomizeDrops)
             {
                 shuffler.ShuffleDrops(ROMData, RNG);
             }
@@ -339,6 +341,13 @@ public class Hyrule
             if (!f)
             {
                 return null;
+            }
+
+            if (props.ShuffleOverworldEnemies)
+            {
+                // move a PRG1 background map to make space for more enemy data
+                ROMData.RelocateData(assembler, 1, 0x8000);
+                OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, RNG);
             }
 
             if (props.CombineFire)
@@ -1910,14 +1919,6 @@ public class Hyrule
                 }
             } while (nonContinentGenerationAttempts < NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT);
         } while (!IsEverythingReachable(ItemGet));
-
-        if (props.ShuffleOverworldEnemies)
-        {
-            foreach (World world in worlds)
-            {
-                world.ShuffleOverworldEnemies(ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch);
-            }
-        }
     }
 
     private async Task<bool> UpdateProgress(Func<string, Task> progress, CancellationToken ct, int v)
@@ -2397,7 +2398,7 @@ public class Hyrule
         }
 
         rom.Put(ROM.ChrRomOffset + 0x1a000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.item_sprites.chr"));
-        rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite);
+        rom.UpdateSprites(props.CharSprite, props.TunicColor, props.OutlineColor, props.ShieldColor, props.BeamSprite, props.SanitizeSprite, props.ChangeItemSprites);
         rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
 
         if (props.EncounterRates == EncounterRate.NONE)
@@ -3842,11 +3843,18 @@ FREE_UNTIL $c2ca
         rom.AllowForChangingDoorYPosition(engine);
         rom.AllowForChangingElevatorYPosition(engine);
         rom.InstantText(engine);
+        rom.ChangeLavaKillPosition(engine);
+        rom.FixItemPickup(engine);
         StatTracking(engine);
 
         if (props.Global5050JarDrop)
         {
             rom.Global5050Jar(engine);
+        }
+
+        if (props.ReduceDripperVariance)
+        {
+            rom.ReduceDripperVariance(engine);
         }
 
         if (props.RandomizeKnockback)

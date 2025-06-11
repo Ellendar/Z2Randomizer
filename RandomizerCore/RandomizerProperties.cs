@@ -103,6 +103,7 @@ public class RandomizerProperties
     public bool ShufflePalacePalettes { get; set; }
     public bool UpARestartsAtPalaces { get; set; }
     public bool Global5050JarDrop { get; set; }
+    public bool ReduceDripperVariance { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
@@ -205,6 +206,8 @@ public class RandomizerProperties
 #pragma warning disable CS8618 
     public CharacterSprite CharSprite { get; set; }
 #pragma warning restore CS8618
+    public bool SanitizeSprite { get; set; }
+    public bool ChangeItemSprites { get; set; }
     public CharacterColor TunicColor { get; set; }
     public CharacterColor OutlineColor { get; set; }
     public CharacterColor ShieldColor { get; set; }

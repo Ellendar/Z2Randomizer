@@ -7,9 +7,10 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:GenerateRomViewModel"
              x:Class="CrossPlatformUI.Views.GenerateRomView">
-    <Grid RowDefinitions="*, Auto">
-        <TextBlock TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Progress}" />
-        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
+    <Grid RowDefinitions="*, *, Auto">
+        <TextBlock Grid.Row="0" Margin="16 16 16 0" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProgressHeading}" FontSize="24" FontWeight="Bold" />
+		<TextBlock Grid.Row="1" Margin="16 0 16 16" TextAlignment="Left" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProgressBody}" TextWrapping="WrapWithOverflow" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Copy Error" IsVisible="{Binding HasError}" Command="{Binding CopyError}" />
             <Button Content="Cancel" Classes="accent" IsVisible="{Binding !IsComplete}" Command="{Binding CancelGeneration}" />
             <Button Content="Close" IsVisible="{Binding IsComplete}" Command="{Binding CancelGeneration}" />

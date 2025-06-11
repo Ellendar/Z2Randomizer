@@ -163,6 +163,14 @@ Color.FromArgb(236, 238, 236), Color.FromArgb( 76, 154, 236), Color.FromArgb(120
 Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188, 188, 236), Color.FromArgb(212, 178, 236), Color.FromArgb(236, 174, 236), Color.FromArgb(236, 174, 212), Color.FromArgb(236, 180, 176), Color.FromArgb(228, 196, 144), Color.FromArgb(204, 210, 120), Color.FromArgb(180, 222, 120), Color.FromArgb(168, 226, 144), Color.FromArgb(152, 226, 180), Color.FromArgb(160, 214, 228), Color.FromArgb(160, 162, 160), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
     };
 
+    public static readonly int[] LinkOutlinePaletteAddr = {         0x285a, 0x2a0a, 0x40af, 0x40bf, 0x40cf, 0x40df, 0x80af, 0x80bf, 0x80cf, 0x80df, 0xc0af, 0xc0bf, 0xc0cf, 0xc0df, 0xc0ef, 0x100af, 0x100bf, 0x100cf, 0x100df, 0x140af, 0x140bf, 0x140cf, 0x140df, 0x17c19, 0x1c464, 0x1c47c };
+    public static readonly int[] LinkFacePaletteAddr =    {         0x285b, 0x2a10, 0x40b0, 0x40c0, 0x40d0, 0x40e0, 0x80b0, 0x80c0, 0x80d0, 0x80e0, 0xc0b0, 0xc0c0, 0xc0d0, 0xc0e0, 0xc0f0, 0x100b0, 0x100c0, 0x100d0, 0x100e0, 0x140b0, 0x140c0, 0x140d0, 0x140e0, 0x17c1a, 0x1c465, 0x1c47d };
+    public static readonly int[] LinkTunicPaletteAddr =   { 0x10ea, 0x285c, 0x2a16, 0x40b1, 0x40c1, 0x40d1, 0x40e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0xc0f1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
+    public const int LinkShieldPaletteAddr = 0xe9e;
+    public static readonly int[] ZeldaOutlinePaletteAddr = { 0x4025, 0x8025, 0x14049, 0x140c7 };
+    public static readonly int[] ZeldaFacePaletteAddr =    { 0x4023, 0x8023, 0x14047, 0x140c9 };
+    public static readonly int[] ZeldaDressPaletteAddr =   { 0x4024, 0x8024, 0x14048, 0x140c8 };
+
 
     public byte[] rawdata { get; }
 
@@ -260,6 +268,74 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
     public void Dump(string filename)
     {
         File.WriteAllBytes(filename, rawdata);
+    }
+
+    public static int ConvertNesPtrToPrgRomAddr(int bank, int nesPtr)
+    {
+        Debug.Assert(nesPtr >= 0x8000, "Non-PRG pointers (like SRAM) are not supported here");
+        if (bank < 0x10)
+        {
+            return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
+        }
+        else
+        {
+            return nesPtr - 0x8000 + bank * 0x2000 + RomHdrSize;
+        }
+    }
+
+    public static int ConvertPrgRomAddrToAsmAddr(int romAddr)
+    {
+        int minusHeader = romAddr - RomHdrSize;
+        // refer to Asm/Init.s for these values
+        if      (minusHeader < 0x1c000)
+        {
+            return 0x8000 + (minusHeader & 0x3fff);
+        }
+        else if (minusHeader < 0x20000)
+        {
+            return 0xc000 + (minusHeader & 0x3fff);
+        }
+        else if (minusHeader < 0x3a000)
+        {
+            return 0x8000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x3c000)
+        {
+            return 0xa000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x3e000)
+        {
+            return 0xc000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x40000)
+        {
+            return 0xe000 + (minusHeader & 0x1fff);
+        }
+        else
+        {
+            throw new ArgumentException("This is not a PRG address");
+        }
+    }
+
+    /// Read pointer at `nesPtr`. Then read the data it points to.
+    /// Relocate that data to a new address using js65. Write the
+    /// new pointer to `nesPtr`. This will be done at link time.
+    /// The rom data is not modified directly, only through js65.
+    public void RelocateData(Assembler asm, int bank, int nesPtr)
+    {
+        var romPtr = ConvertNesPtrToPrgRomAddr(bank, nesPtr);
+        var nesAddr = GetShort(romPtr + 1, romPtr);
+        var romAddr = ConvertNesPtrToPrgRomAddr(bank, nesAddr);
+        var length = GetByte(romAddr);
+        var bytes = GetBytes(romAddr, length);
+        const string label = "RelocateBytes";
+        var a = asm.Module();
+        a.Segment($"PRG{bank}");
+        a.Reloc();
+        a.Label(label);
+        a.Byt(bytes);
+        a.Org((ushort)nesPtr);
+        a.Word(a.Symbol(label));
     }
 
     public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)
@@ -548,7 +624,7 @@ TitleEnd:
         ChrRomOffset + 0x18840 
     };
 
-    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite)
+    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite, bool sanitize, bool changeItems)
     {
         /*
          * Dear future digshake,
@@ -574,7 +650,14 @@ TitleEnd:
          */
 
         if (charSprite.Patch != null) {
-            IpsPatcher.Patch(rawdata, charSprite.Patch, true);
+            if (sanitize)
+            {
+                SpritePatcher.PatchSpriteSanitized(rawdata, charSprite.Patch, true, changeItems);
+            }
+            else
+            {
+                IpsPatcher.Patch(rawdata, charSprite.Patch, true);
+            }
         }
 
         var colorMap = new Dictionary<CharacterColor, int>()
@@ -655,27 +738,23 @@ TitleEnd:
             }
         }
 
-        int[] tunicLocs = { 0x10ea, 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
-        int[] outlineLocs = { 0x285a, 0x2a0a, 0x40af, 0x40bf, 0x40cf, 0x40df, 0x80af, 0x80bf, 0x80cf, 0x80df, 0xc0af, 0xc0bf, 0xc0cf, 0xc0df, 0xc0ef, 0x100af, 0x100bf, 0x100cf, 0x100df, 0x140af, 0x140bf, 0x140cf, 0x140df, 0x17c19, 0x1c464, 0x1c47c };
-        int shieldLoc = 0xe9e;
-
         if(tunicColor != CharacterColor.Default && tunicColorInt != null)
         { 
-            foreach(int l in tunicLocs)
+            foreach(int l in LinkTunicPaletteAddr)
             {
                 Put(l, (byte)tunicColorInt);
             }
         }
         if(outlineColor != CharacterColor.Default && outlineColorInt != null)
         {
-            foreach(int l in outlineLocs)
+            foreach(int l in LinkOutlinePaletteAddr)
             {
                 Put(l, (byte)outlineColorInt);
             }
         }
         if(shieldColor != CharacterColor.Default && shieldColorInt != null)
         {
-            Put(shieldLoc, (byte)shieldColorInt);
+            Put(LinkShieldPaletteAddr, (byte)shieldColorInt);
         }
 
         if(beamSprite == BeamSprites.RANDOM)
@@ -740,9 +819,6 @@ TitleEnd:
        
         //Fix for extra battle scene
         Put(0x8645, 0x00);
-
-        //Disable hold over head animation
-        Put(0x1E54C, 0);
 
         //Make text go fast
         Put(0xF75E, 0x00);
@@ -1353,6 +1429,31 @@ IncreaseGlobal5050JarDropPRG5:
 """, "global5050jar.s");
     }
 
+    public void ReduceDripperVariance(Assembler a)
+    {
+        a.Module().Code("""
+.include "z2r.inc"
+
+.segment "PRG4"
+.org $B9F0
+jmp NextDripColor
+
+.reloc
+NextDripColor:
+    beq DripReturn            ; regular RNG hits (A == 0 here)
+    lda DripperRedCounter
+    clc
+    adc #$01
+    cmp #$08
+    bcc DripReturn            ; less than 8 red drips in a row (A != 0 here)
+    lda #$00                  ; force 8th red drip to be blue
+DripReturn:
+    sta DripperRedCounter
+    sta $044C,y
+    rts
+""", "reduce_dripper_variance.s");
+    }
+
     public void InstantText(Assembler a)
     {
         a.Module().Code("""
@@ -1451,6 +1552,72 @@ Exit:
     ldy $362
     rts
 """, "instant_text.s");
+    }
+
+    public void ChangeLavaKillPosition(Assembler asm)
+    {
+        // Don't grab the player at the top pixels of the lava block.
+        // This way we can have "floor level" lava without being sucked into it when we are close.
+        var a = asm.Module();
+        a.Code("""
+.include "z2r.inc"
+.segment "PRG7"
+
+closest_rts = $E0E5
+
+.org $E0A4
+HandleLavaTileCollision:
+    lda $29                          ; load Link's y pos
+    and #$0f                         ; mask the last 4 bits, to get the Link's pixel position inside the tile
+    cmp #$06                         ; check that we are deep into the lava tile
+    bcc closest_rts                  ; Link's position is not low enough, return
+    jmp ActualLavaDeath
+FREE_UNTIL $E0B0
+
+.reloc
+ActualLavaDeath:                     ; original code that we replaced
+    lda #$01
+    sta $e9                          ; $e9 = 01
+    lda #$10
+    sta $050c                        ; timer for Link being in injured state = 10
+    inc $b5                          ; increase Link's state to 2, meaning Link will die
+    rts
+""");
+    }
+
+    public void FixItemPickup(Assembler asm)
+    {
+        // In Z2R, Link never holds items above his head. So,
+        // we don't set the hold item over head timer ($0x49c), and
+        // we don't set the hold item over head ID ($0x49d).
+        // (If we wanted we could remove all code using these)
+        //
+        // Instead, we clear out $a8,x to fix the item pickup phantom damage,
+        // caused by generator code that interprets it as collision data.
+        //
+        // Also, since 1-ups can drop anywhere, if we're picking up a 1-up
+        // we don't reset the velocity.
+        var a = asm.Module();
+        a.Code("""
+.include "z2r.inc"
+
+.segment "PRG7"
+.org $e53b
+SetPostItemPickupVars:
+    lda $af,x                          ; this byte has the item ID we picked up
+    and #$7f                           ; the last 4 bits are the item ID
+    cmp #$12                           ; check if item is 1-up
+    beq SetPostItemPickupKeepVelocity  ; skip resetting velocity if 1-up
+    lda #$00
+    sta $70                            ; set Link's X velocity to zero
+    sta $57d                           ; set Link's Y velocity to zero
+SetPostItemPickupKeepVelocity:
+    lda #$00
+    sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
+    rts
+
+FREE_UNTIL $e54f
+""");
     }
 
     public void BuffCarrock(Assembler a)
@@ -1567,6 +1734,36 @@ Exit:
          * rts
          */
         Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
+    }
+
+    public void AdjustGpProjectileDamage()
+    {
+        // We are using some enemies that are not present in vanilla
+        // Great Palace, some of which use bytes that are not set
+        // properly in bank 5 (the GP bank) as they never got used.
+
+        // ACHEMAN projectile
+        // West damage class: 1 (0x81)
+        // GP vanilla damage class: 6 (0x86)
+        //
+        // The damage class byte in bank 5 is likely from copying
+        // bank 4 where it is used for Barba's projectile damage.
+        // Lets lower it a bit, but not all the way to 1.
+        Put(0x1542b, 0x83);
+
+        // BUBBLE_GENERATOR
+        // West damage class: 0 (0x80)
+        // East damage class: 0 (0x80)
+        // Vanilla GP damage class: 3 (0x03)
+        //
+        // The damage class byte in bank 5 is likely from copying
+        // bank 4 where it is used for Helmethead's main projectile.
+        Put(0x15429, 0x80);
+
+        // ROCK_GENERATOR
+        // West damage class: 0 (0x00)
+        // Vanilla GP damage class: 0 (0x00)
+        //Put(0x15428, 0x00); // already at 0
     }
 
     public string Z2BytesToString(byte[] data)

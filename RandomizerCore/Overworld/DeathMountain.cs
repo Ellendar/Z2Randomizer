@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SD.Tools.BCLExtensions.CollectionsRelated;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -116,10 +117,30 @@ sealed class DeathMountain : World
             { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
         };
 
-        enemyAddr = 0x48B0;
+        sideviewPtrTable = 0x6010;
+        sideviewBank = 1;
         enemyPtr = 0x608E;
+        groupedEnemies = Enemies.GroupedWestEnemies;
+        overworldEncounterMaps = [
+            29,     // Desert    - in vanilla 29-30 use the same table
+            34, 35, // Grass     - not used in Vanilla
+            39,     // Forest    - in vanilla 39-40 use the same table
+            47, 48, // Swamp     - not used in Vanilla
+            52,     // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            30, 40, 53, 58,
+        ];
+        nonEncounterMaps = [
+            1, 2, 3, 4, 5, 6, 7, 8, // Caves
+            9, 10, 11, 12, 13, 14,  // Caves
+            15, 16, 17,             // Hammer Cave floor 1
+            18, 19, 20, 21,         // Hammer Cave floor 2
+            22, 23, 24, 25,         // Caves with elevators
+            26,                     // Spectacle Rock
+        ];
 
-        overworldMaps = new List<int>();
         MAP_ROWS = 45;
         MAP_COLS = 64;
 
@@ -139,18 +160,6 @@ sealed class DeathMountain : World
 
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
-    }
-
-    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        var groundEnemies = Enemies.WestGroundEnemies;
-        var flyingEnemies = Enemies.WestFlyingEnemies;
-        var generators = Enemies.WestGenerators;
-        var smallEnemies = Enemies.WestSmallEnemies;
-        var largeEnemies = Enemies.WestLargeEnemies;
-        var ee = new Sidescroll.EnemiesEditable<EnemiesWest>(enemyBytes);
-        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)

@@ -3,6 +3,7 @@
 using System.Text;
 using System.Text.Json;
 using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
 StringBuilder sb = new StringBuilder("");
@@ -62,7 +63,7 @@ void ValidateRoomsForFile(string filename)
 
         if (room.IsBossRoom)
         {
-            var statue = sv.Find(o => o.Id == PalaceObject.IronknuckleStatue && o.AbsX == 62 && o.Y == 9);
+            var statue = sv.Find(o => o.Id == PalaceObject.IRON_KNUCKLE_STATUE && o.AbsX == 62 && o.Y == 9);
             if (statue == null) { Warning(room, "BossRoomMissingStatue", "Boss room is missing exit statue."); }
             bool hasRightOpeningWall = FindTileOpeningAtX(solidGrid, (sv.PageCount * 16) - 1);
             if (!hasRightOpeningWall) { Warning(room, "BossRoomLowCeiling", "Boss room has too low ceiling at exit, preventing re-entry."); }
@@ -79,14 +80,8 @@ void ValidateRoomsForFile(string filename)
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
-        CheckElevators(room, sv, solidGrid, elevators, openCeilingTiles);
-        foreach (var elevator in elevators)
-        {
-            dropTiles.Remove(elevator.AbsX);
-            dropTiles.Remove(elevator.AbsX + 1);
-        }
+        CheckElevatorsAndDrops(room, sv, solidGrid, elevators, openCeilingTiles, dropTiles);
         CheckDropZones(room, openCeilingTiles);
-        CheckDrops(room, dropTiles);
     }
 
     // GREAT PALACE ROOMS
@@ -115,20 +110,14 @@ void ValidateRoomsForFile(string filename)
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
-        CheckElevators(room, sv, solidGrid, elevators, openCeilingTiles);
-        foreach (var elevator in elevators)
-        {
-            dropTiles.Remove(elevator.AbsX);
-            dropTiles.Remove(elevator.AbsX + 1);
-        }
+        CheckElevatorsAndDrops(room, sv, solidGrid, elevators, openCeilingTiles, dropTiles);
         CheckDropZones(room, openCeilingTiles);
-        CheckDrops(room, dropTiles);
     }
 }
 
 void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
 {
-    var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LockedDoor);
+    var lockedDoorCmds = sv.FindAll(o =>  o.Y < 12 && (int)(object)o.Id == (int)PalaceObjectShared.LOCKED_DOOR);
     var itemCmds = sv.Commands.Where(o => o.HasExtra());
 
     var lockedDoorEnemies = ee.Enemies.Where(o => (int)(object)o.Id == (int)EnemiesShared.LOCKED_DOOR);
@@ -236,6 +225,8 @@ void CheckLeftExit(Room room, bool[,] solidGrid)
 
 void CheckRightExit(Room room, int pageCount, bool[,] solidGrid)
 {
+    if (pageCount == 1 && room.HasRightExit) { Warning(room, "SinglePageRightExit", "Single page rooms can not have a right exit"); }
+    if (pageCount == 3 && room.HasRightExit) { Warning(room, "ThreePageRightExit", "3-page rooms can't be entered from the right. (Engine limitation.)"); }
     bool hasRightOpeningWall = FindTileOpeningAtX(solidGrid, (pageCount * 16) - 1);
     if (room.HasRightExit && !hasRightOpeningWall) { Warning(room, "RightExitNotOpen", "Room is marked as having a right exit, but there is no right wall opening"); }
 }
@@ -251,7 +242,7 @@ bool FindTileOpeningAtX(bool[,] solidGrid, int x, int n = 3)
     return false;
 }
 
-void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> elevators, SortedSet<int> openCeilingTiles) where T : Enum
+void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> elevators, SortedSet<int> openCeilingTiles, SortedSet<int> dropTiles) where T : Enum
 {
     bool IsDownElevator(SideviewMapCommand<T> o)
     {
@@ -281,6 +272,7 @@ void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, Lis
 
     foreach (var elevator in elevators)
     {
+        // calculate optimal elevator param (y position)
         if (IsDownElevator(elevator))
         {
             if (elevator.Param > 0) {
@@ -296,7 +288,7 @@ void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, Lis
             }
             if (y < 3) { continue; /* not up elevator */ }
             int optimalParam = Math.Min((11 - y) * 2, 0xf);
-            if (Math.Abs(elevator.Param - optimalParam) > 2) // allow a little offset from the optimal position
+            if (Math.Abs(elevator.Param - optimalParam) > 2) // allow a little offset from the optimal position for style
             {
                 Warning(room, "ElevatorParam", $"Up elevator optimal param is {optimalParam}.\n{FixedElevatorHexString(sv, elevator, optimalParam)}");
             }
@@ -313,6 +305,7 @@ void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, Lis
         if (pageX > 7) { Warning(room, "ElevatorNotCentered", $"Elevator.xpos={x} is too far right on the page"); }
     }
 
+    if (room.ElevatorScreen != -1 && room.IsUpDownReversed) { Warning(room, "IsUpDownReversedElevator", $"IsUpDownReversed does not apply to elevators"); }
     if (room.ElevatorScreen != -1 && elevators.Count == 0) { Warning(room, "ElevatorMissing", $"ElevatorScreen={room.ElevatorScreen} but room has no elevator"); }
     if (room.HasUpExit)
     {
@@ -325,6 +318,7 @@ void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, Lis
                 Warning(room, "ElevatorCannotGoUp", "Elevator cannot go up but room is marked as having an up exit");
             }
         }
+        if (sv.PageCount == 3 && room.HasRightExit) { Warning(room, "UpConnectorConflict", "Up and Right exits cannot both use the 3rd connection byte"); }
     }
     if (room.HasDownExit && !room.HasDrop)
     {
@@ -337,22 +331,15 @@ void CheckElevators<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, Lis
                 Warning(room, "ElevatorCannotGoDown", "Elevator cannot go down but room is marked as having a down exit");
             }
         }
+        if (sv.PageCount == 2 && room.HasRightExit) { Warning(room, "DownConnectorConflict", "Down and Right exits cannot both use the 2nd connection byte"); }
     }
-}
 
-void CheckDropZones(Room room, SortedSet<int> openCeilingTiles)
-{
-    if (!room.IsDropZone) { return; }
-    SortedSet<int> shouldBeOpen = new(Enumerable.Range(16, 32));
-    shouldBeOpen.IntersectWith(openCeilingTiles);
-    if (shouldBeOpen.Count < 6) // not sure what is the lowest allowed
+    foreach (var elevator in elevators)
     {
-        Warning(room, "DropZoneNotOpen", $"Is drop zone but is only open at x={ConvertToRangeString(shouldBeOpen)}");
+        dropTiles.Remove(elevator.AbsX);
+        dropTiles.Remove(elevator.AbsX + 1);
     }
-}
 
-void CheckDrops(Room room, SortedSet<int> dropTiles)
-{
     if (!room.HasDrop)
     {
         // probably this is something like a bridge over a drop that you can't get to
@@ -368,10 +355,49 @@ void CheckDrops(Room room, SortedSet<int> dropTiles)
         {
             var dropScreen = room.IsUpDownReversed ? 2 : 1;
             var badDropTiles = dropTiles.Where(x => x < dropScreen * 16 + 1 || dropScreen * 16 + 15 < x);
-            if (badDropTiles.Count() > 0) {
+            if (badDropTiles.Count() > 0)
+            {
                 Warning(room, "DropTilesOutsideRange", $"Drop tiles outside of valid range at x={ConvertToRangeString(badDropTiles)} (dropScreen={dropScreen})");
             }
+
+            CheckDropConnector(room, sv, dropScreen);
         }
+    }
+    if (room.HasDroppableElevator)
+    {
+        if (room.ElevatorScreen < 0) { Warning(room, "ElevatorMissing", $"HasDroppableElevator==true but room has no elevator"); }
+        else { CheckDropConnector(room, sv, room.ElevatorScreen); }
+    }
+}
+
+void CheckDropConnector<T>(Room room, SideviewEditable<T> sv, int dropScreen) where T : Enum
+{
+    switch (dropScreen)
+    {
+        case 0:
+            if (room.HasLeftExit) { Warning(room, "DropConnectorConflict", "Drop on first page and Left exit cannot both use the 1st connection byte"); }
+            break;
+        case 1:
+            if (sv.PageCount == 2 && room.HasRightExit) { Warning(room, "DropConnectorConflict", "Drop on second page and Right exit cannot both use the 2nd connection byte"); }
+            break;
+        case 2:
+            if (sv.PageCount == 3 && room.HasRightExit) { Warning(room, "DropConnectorConflict", "Drop on third page and Right exit cannot both use the 3rd connection byte"); }
+            if (room.HasUpExit) { Warning(room, "DropConnectorConflict", "Drop on third page and Up elevator exit cannot both use the 3rd connection byte"); }
+            break;
+        case 3:
+            if (room.HasRightExit) { Warning(room, "DropConnectorConflict", "Drop on fourth page and Right exit cannot both use the 4th connection byte"); }
+            break;
+    }
+}
+
+void CheckDropZones(Room room, SortedSet<int> openCeilingTiles)
+{
+    if (!room.IsDropZone) { return; }
+    SortedSet<int> shouldBeOpen = new(Enumerable.Range(16, 32));
+    shouldBeOpen.IntersectWith(openCeilingTiles);
+    if (shouldBeOpen.Count < 6) // not sure what is the lowest allowed
+    {
+        Warning(room, "DropZoneNotOpen", $"Is drop zone but is only open at x={ConvertToRangeString(shouldBeOpen)}");
     }
 }
 

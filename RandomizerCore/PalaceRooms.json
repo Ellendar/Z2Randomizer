@@ -44,7 +44,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "P1 Left Key Deadend",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -70,7 +70,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "P1 First Locked Door",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -96,7 +96,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 67395,
-    "name": "",
+    "name": "P1 First T Junction",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -122,7 +122,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 67411,
-    "name": "",
+    "name": "P1 Bubble Room",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -148,7 +148,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 67399,
-    "name": "",
+    "name": "P1 Fairy Room",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -174,7 +174,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 67407,
-    "name": "",
+    "name": "P1 Lava Bridge",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -200,7 +200,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 67415,
-    "name": "",
+    "name": "P1 Breakable Blocks Stairs",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -226,7 +226,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "P1 Dragon Head Over 2Tile Stairs",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -252,7 +252,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 67419,
-    "name": "",
+    "name": "Vanilla P1 M12",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -278,7 +278,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 67379,
-    "name": "",
+    "name": "P1 Right Deadend Key",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -304,7 +304,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 67447,
-    "name": "",
+    "name": "Vanilla P2 M19",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -330,7 +330,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "Vanilla P2 M18",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -356,7 +356,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 67467,
-    "name": "",
+    "name": "Vanilla P2 M24",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -382,7 +382,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 67439,
-    "name": "",
+    "name": "Vanilla P2 M17",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -408,7 +408,7 @@
     "linkedRoomName": null,
     "map": 23,
     "memoryAddress": 67463,
-    "name": "",
+    "name": "Vanilla P2 M23",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -434,7 +434,7 @@
     "linkedRoomName": null,
     "map": 29,
     "memoryAddress": 67487,
-    "name": "",
+    "name": "Vanilla P2 M29",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -460,7 +460,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 67435,
-    "name": "",
+    "name": "Vanilla P2 M16",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -486,7 +486,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 67491,
-    "name": "",
+    "name": "Vanilla P2 M30",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -512,7 +512,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 67431,
-    "name": "",
+    "name": "Vanilla P2 M15",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -538,7 +538,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 67459,
-    "name": "",
+    "name": "Vanilla P2 M22",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -564,7 +564,7 @@
     "linkedRoomName": null,
     "map": 21,
     "memoryAddress": 67455,
-    "name": "",
+    "name": "P2 Falling Block Room",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -590,7 +590,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 67471,
-    "name": "",
+    "name": "Vanilla P2 M25",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -616,7 +616,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 67475,
-    "name": "",
+    "name": "Vanilla P2 M26",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -643,7 +643,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 67479,
-    "name": "",
+    "name": "Vanilla P2 M27",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -669,7 +669,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 67495,
-    "name": "",
+    "name": "Vanilla P2 M31",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -695,7 +695,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 67483,
-    "name": "",
+    "name": "Vanilla P2 M28",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -721,7 +721,7 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 67499,
-    "name": "",
+    "name": "Vanilla P2 M32",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -749,7 +749,7 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 67503,
-    "name": "",
+    "name": "Vanilla P2 M33",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -775,7 +775,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 74252,
-    "name": "",
+    "name": "P3 First Room Platforms On Pillars",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -801,7 +801,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 74256,
-    "name": "",
+    "name": "P3 Items Buried In Breakable Block Hallway",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -827,7 +827,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 74260,
-    "name": "",
+    "name": "P3 Floating 3x3 Bricks With Moas",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -853,7 +853,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 74264,
-    "name": "",
+    "name": "Vanilla P3 M4",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -879,7 +879,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 74268,
-    "name": "",
+    "name": "P3 3Tile Breakable Block Jumps and Iron Knuckles",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -905,7 +905,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 74284,
-    "name": "",
+    "name": "P3 Inverse T With Jar And Door On Same Page",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -931,7 +931,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 74272,
-    "name": "",
+    "name": "Vanilla P3 M6",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -957,7 +957,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 74280,
-    "name": "",
+    "name": "P3 T Glove And Jump For Key",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -983,7 +983,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 74288,
-    "name": "",
+    "name": "P3 Walled-off Jumps Over Lava Room",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1010,7 +1010,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 74276,
-    "name": "",
+    "name": "P3 Dig Stairs In Breakable Blocks For Key",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1036,7 +1036,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 74296,
-    "name": "",
+    "name": "P3 First Room Platforms On Pillars2",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1062,7 +1062,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 74300,
-    "name": "",
+    "name": "P3 First Room Platforms On Pillars3",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1096,7 +1096,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 74320,
-    "name": "",
+    "name": "Vanilla P4 M18",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1122,7 +1122,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 74316,
-    "name": "",
+    "name": "Vanilla P4 M17",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1148,7 +1148,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 74324,
-    "name": "",
+    "name": "Vanilla P4 M19",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1174,7 +1174,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 74312,
-    "name": "",
+    "name": "Vanilla P4 M16",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1200,7 +1200,7 @@
     "linkedRoomName": null,
     "map": 21,
     "memoryAddress": 74332,
-    "name": "",
+    "name": "Vanilla P4 M21",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1226,7 +1226,7 @@
     "linkedRoomName": null,
     "map": 23,
     "memoryAddress": 74340,
-    "name": "",
+    "name": "Vanilla P4 M23",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1252,7 +1252,7 @@
     "linkedRoomName": null,
     "map": 20,
     "memoryAddress": 74328,
-    "name": "",
+    "name": "Vanilla P4 M20",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1278,7 +1278,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 74336,
-    "name": "",
+    "name": "P4 Right Deadend Key Over Lava and Fire Pillars",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1304,7 +1304,7 @@
     "linkedRoomName": null,
     "map": 29,
     "memoryAddress": 74364,
-    "name": "",
+    "name": "P4 Vertical Elevator With Generators",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1330,7 +1330,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 74344,
-    "name": "",
+    "name": "Vanilla P4 M24",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1357,7 +1357,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 74352,
-    "name": "",
+    "name": "Vanilla P4 M26",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1383,7 +1383,7 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 74380,
-    "name": "",
+    "name": "Vanilla P4 M33",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1409,7 +1409,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 74368,
-    "name": "",
+    "name": "P4 Drop-through With Right Exit",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1435,7 +1435,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 74348,
-    "name": "",
+    "name": "Vanilla P4 M25",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1461,7 +1461,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 74356,
-    "name": "",
+    "name": "Vanilla P4 M27",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1487,7 +1487,7 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 74376,
-    "name": "",
+    "name": "Vanilla P4 M32",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1513,7 +1513,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 74384,
-    "name": "",
+    "name": "Vanilla P4 M34",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1539,7 +1539,7 @@
     "linkedRoomName": null,
     "map": 35,
     "memoryAddress": 74388,
-    "name": "",
+    "name": "Vanilla P4 M35",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -1565,7 +1565,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 67515,
-    "name": "",
+    "name": "Vanilla P5 M36",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1618,7 +1618,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 67523,
-    "name": "",
+    "name": "Vanilla P5 M38",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1644,7 +1644,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 67527,
-    "name": "",
+    "name": "P5 2Tile Breakable Blocks Separating Enemies",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1696,7 +1696,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 67543,
-    "name": "",
+    "name": "Vanilla P5 M43",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1722,7 +1722,7 @@
     "linkedRoomName": null,
     "map": 45,
     "memoryAddress": 67551,
-    "name": "",
+    "name": "Vanilla P5 M45",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1748,7 +1748,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 67539,
-    "name": "",
+    "name": "Vanilla P5 M42",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1774,7 +1774,7 @@
     "linkedRoomName": null,
     "map": 48,
     "memoryAddress": 67563,
-    "name": "",
+    "name": "Vanilla P5 M48",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1800,7 +1800,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 67559,
-    "name": "",
+    "name": "Vanilla P5 M47",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1826,7 +1826,7 @@
     "linkedRoomName": null,
     "map": 49,
     "memoryAddress": 67567,
-    "name": "",
+    "name": "Vanilla P5 M49",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1852,7 +1852,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 67555,
-    "name": "",
+    "name": "P5 3-way With Waste-of-time P-bag",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1878,7 +1878,7 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 67587,
-    "name": "",
+    "name": "Vanilla P5 M54",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1956,7 +1956,7 @@
     "linkedRoomName": null,
     "map": 53,
     "memoryAddress": 67583,
-    "name": "",
+    "name": "Vanilla P5 M53",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -1982,7 +1982,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 67531,
-    "name": "",
+    "name": "Vanilla P5 M40",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2008,7 +2008,7 @@
     "linkedRoomName": null,
     "map": 60,
     "memoryAddress": 67611,
-    "name": "",
+    "name": "Vanilla P5 M60",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2034,7 +2034,7 @@
     "linkedRoomName": null,
     "map": 55,
     "memoryAddress": 67591,
-    "name": "",
+    "name": "Vanilla P5 M55",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2060,7 +2060,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 67575,
-    "name": "",
+    "name": "Vanilla P5 M51",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2086,7 +2086,7 @@
     "linkedRoomName": null,
     "map": 52,
     "memoryAddress": 67579,
-    "name": "",
+    "name": "Vanilla P5 M52",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2112,7 +2112,7 @@
     "linkedRoomName": null,
     "map": 59,
     "memoryAddress": 67607,
-    "name": "",
+    "name": "Vanilla P5 M59",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2138,7 +2138,7 @@
     "linkedRoomName": null,
     "map": 56,
     "memoryAddress": 67595,
-    "name": "",
+    "name": "Vanilla P5 M56",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2164,7 +2164,7 @@
     "linkedRoomName": null,
     "map": 58,
     "memoryAddress": 67603,
-    "name": "",
+    "name": "Vanilla P5 M58",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2190,7 +2190,7 @@
     "linkedRoomName": null,
     "map": 57,
     "memoryAddress": 67599,
-    "name": "",
+    "name": "Vanilla P5 M57",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2216,7 +2216,7 @@
     "linkedRoomName": null,
     "map": 62,
     "memoryAddress": 67619,
-    "name": "",
+    "name": "Vanilla P5 M62",
     "palaceGroup": 1,
     "palaceNumber": null,
     "requirements": [
@@ -2242,7 +2242,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 74400,
-    "name": "",
+    "name": "Vanilla P6 M38",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2268,7 +2268,7 @@
     "linkedRoomName": null,
     "map": 37,
     "memoryAddress": 74396,
-    "name": "",
+    "name": "Vanilla P6 M37",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2294,7 +2294,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 74404,
-    "name": "",
+    "name": "Vanilla P6 M39",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2320,7 +2320,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 74408,
-    "name": "",
+    "name": "Vanilla P6 M40",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2346,7 +2346,7 @@
     "linkedRoomName": null,
     "map": 45,
     "memoryAddress": 74428,
-    "name": "",
+    "name": "P6 Drop-through With P-bag",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2372,7 +2372,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 74412,
-    "name": "",
+    "name": "Vanilla P6 M41",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2399,7 +2399,7 @@
     "linkedRoomName": null,
     "map": 48,
     "memoryAddress": 74440,
-    "name": "",
+    "name": "Vanilla P6 M48",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2425,7 +2425,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 74416,
-    "name": "",
+    "name": "Vanilla P6 M42",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2451,7 +2451,7 @@
     "linkedRoomName": null,
     "map": 55,
     "memoryAddress": 74468,
-    "name": "",
+    "name": "Vanilla P6 M55",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2477,7 +2477,7 @@
     "linkedRoomName": null,
     "map": 49,
     "memoryAddress": 74444,
-    "name": "",
+    "name": "Vanilla P6 M49",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2504,7 +2504,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 74432,
-    "name": "",
+    "name": "Vanilla P6 M46",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2557,7 +2557,7 @@
     "linkedRoomName": null,
     "map": 50,
     "memoryAddress": 74448,
-    "name": "",
+    "name": "Vanilla P6 M50",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2583,7 +2583,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 74436,
-    "name": "",
+    "name": "Vanilla P6 M47",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2610,7 +2610,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 74452,
-    "name": "",
+    "name": "Vanilla P6 M51",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2637,7 +2637,7 @@
     "linkedRoomName": null,
     "map": 52,
     "memoryAddress": 74456,
-    "name": "",
+    "name": "Vanilla P6 M52",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2663,7 +2663,7 @@
     "linkedRoomName": null,
     "map": 56,
     "memoryAddress": 74472,
-    "name": "",
+    "name": "Vanilla P6 M56",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2715,7 +2715,7 @@
     "linkedRoomName": null,
     "map": 60,
     "memoryAddress": 74488,
-    "name": "",
+    "name": "Vanilla P6 M60",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2741,7 +2741,7 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 74464,
-    "name": "",
+    "name": "Vanilla P6 M54",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2767,7 +2767,7 @@
     "linkedRoomName": null,
     "map": 59,
     "memoryAddress": 74484,
-    "name": "",
+    "name": "Vanilla P6 M59",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2793,7 +2793,7 @@
     "linkedRoomName": null,
     "map": 61,
     "memoryAddress": 74492,
-    "name": "",
+    "name": "Vanilla P6 M61",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2819,7 +2819,7 @@
     "linkedRoomName": null,
     "map": 57,
     "memoryAddress": 74476,
-    "name": "",
+    "name": "Vanilla P6 M57",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2846,7 +2846,7 @@
     "linkedRoomName": null,
     "map": 62,
     "memoryAddress": 74496,
-    "name": "",
+    "name": "Vanilla P6 M62",
     "palaceGroup": 2,
     "palaceNumber": null,
     "requirements": [
@@ -2872,7 +2872,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "GP Inverse T",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -2898,7 +2898,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 83759,
-    "name": "",
+    "name": "GP Breakable Block Stairs And False Floor",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -2950,7 +2950,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 83779,
-    "name": "",
+    "name": "Vanilla P7 M6",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -2976,7 +2976,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83771,
-    "name": "",
+    "name": "GP Scattered Breakable Blocks Deadend",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3002,7 +3002,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 83775,
-    "name": "",
+    "name": "Vanilla P7 M5",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3054,7 +3054,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 83791,
-    "name": "",
+    "name": "Waffle Room",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3081,7 +3081,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 83787,
-    "name": "",
+    "name": "Fokka Statue Above Elevator",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3107,7 +3107,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "",
+    "name": "Vanilla P7 M10",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3133,7 +3133,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 83803,
-    "name": "",
+    "name": "Vanilla P7 M12",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3160,7 +3160,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 83815,
-    "name": "",
+    "name": "Vanilla P7 M15",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3187,7 +3187,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 83799,
-    "name": "",
+    "name": "Vanilla P7 M11",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3214,7 +3214,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 83807,
-    "name": "",
+    "name": "GP Downstab Room",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3245,7 +3245,7 @@
     "linkedRoomName": null,
     "map": 14,
     "memoryAddress": 83811,
-    "name": "",
+    "name": "Vanilla P7 M14",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3271,7 +3271,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 83899,
-    "name": "",
+    "name": "Vanilla P7 M36",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3297,7 +3297,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 83819,
-    "name": "",
+    "name": "GP Elevator With Hidden Wall",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3323,7 +3323,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 83823,
-    "name": "",
+    "name": "Vanilla P7 M17",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3349,7 +3349,7 @@
     "linkedRoomName": null,
     "map": 35,
     "memoryAddress": 83895,
-    "name": "",
+    "name": "Vanilla P7 M35",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3402,7 +3402,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 83827,
-    "name": "",
+    "name": "Vanilla P7 M18",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3428,7 +3428,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 83831,
-    "name": "",
+    "name": "GP Hallway With Curtains",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3454,7 +3454,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 83851,
-    "name": "",
+    "name": "Vanilla P7 M24",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3506,7 +3506,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "Vanilla P7 M22",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3532,7 +3532,7 @@
     "linkedRoomName": null,
     "map": 20,
     "memoryAddress": 83835,
-    "name": "",
+    "name": "Vanilla P7 M20",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3558,7 +3558,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 83911,
-    "name": "",
+    "name": "Another Crumble Bridge Over Lava Room in GP",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3584,7 +3584,7 @@
     "linkedRoomName": null,
     "map": 21,
     "memoryAddress": 83839,
-    "name": "",
+    "name": "Vanilla P7 M21",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3610,7 +3610,7 @@
     "linkedRoomName": null,
     "map": 23,
     "memoryAddress": 83847,
-    "name": "",
+    "name": "Vanilla P7 M23",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3636,7 +3636,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 83927,
-    "name": "",
+    "name": "Vanilla P7 M43",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3663,7 +3663,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 83855,
-    "name": "",
+    "name": "Vanilla P7 M25",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3690,7 +3690,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 83863,
-    "name": "",
+    "name": "Vanilla P7 M27",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3717,7 +3717,7 @@
     "linkedRoomName": null,
     "map": 44,
     "memoryAddress": 83931,
-    "name": "",
+    "name": "Vanilla P7 M44",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3744,7 +3744,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 83859,
-    "name": "",
+    "name": "Vanilla P7 M26",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3770,7 +3770,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 83867,
-    "name": "",
+    "name": "Vanilla P7 M28",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3850,7 +3850,7 @@
     "linkedRoomName": null,
     "map": 29,
     "memoryAddress": 83871,
-    "name": "",
+    "name": "Vanilla P7 M29",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3876,7 +3876,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 83879,
-    "name": "",
+    "name": "Vanilla P7 M31",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3902,7 +3902,7 @@
     "linkedRoomName": null,
     "map": 48,
     "memoryAddress": 83947,
-    "name": "",
+    "name": "GP Drop Zone T-blocks That Might Have Red Jars",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3928,7 +3928,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 83939,
-    "name": "",
+    "name": "Vanilla P7 M46",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3954,7 +3954,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 83875,
-    "name": "",
+    "name": "Vanilla P7 M30",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -3980,7 +3980,7 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 83883,
-    "name": "",
+    "name": "Vanilla P7 M32",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4011,7 +4011,7 @@
     "linkedRoomName": null,
     "map": 49,
     "memoryAddress": 83951,
-    "name": "",
+    "name": "Vanilla P7 M49",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4037,7 +4037,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "Vanilla P7 M42",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4063,7 +4063,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 83943,
-    "name": "",
+    "name": "Vanilla P7 M47",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4089,7 +4089,7 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 83887,
-    "name": "",
+    "name": "Vanilla P7 M33",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4115,7 +4115,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 83891,
-    "name": "",
+    "name": "Vanilla P7 M34",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4141,7 +4141,7 @@
     "linkedRoomName": null,
     "map": 52,
     "memoryAddress": 83963,
-    "name": "",
+    "name": "Vanilla P7 M52",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4246,7 +4246,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 83915,
-    "name": "",
+    "name": "Vanilla P7 M40",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4272,7 +4272,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 83959,
-    "name": "",
+    "name": "Vanilla P7 M51",
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [
@@ -4402,7 +4402,7 @@
     "linkedRoomName": null,
     "map": 0,
     "memoryAddress": 67371,
-    "name": "",
+    "name": "Vanilla P1 Entrance",
     "palaceGroup": null,
     "palaceNumber": 1,
     "requirements": [
@@ -4428,7 +4428,7 @@
     "linkedRoomName": null,
     "map": 14,
     "memoryAddress": 67427,
-    "name": "",
+    "name": "Vanilla P2 Entrance",
     "palaceGroup": null,
     "palaceNumber": 2,
     "requirements": [
@@ -4454,7 +4454,7 @@
     "linkedRoomName": null,
     "map": 0,
     "memoryAddress": 74248,
-    "name": "",
+    "name": "Vanilla P3 Entrance",
     "palaceGroup": null,
     "palaceNumber": 3,
     "requirements": [
@@ -4480,7 +4480,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 74308,
-    "name": "",
+    "name": "Vanilla P4 Entrance",
     "palaceGroup": null,
     "palaceNumber": 4,
     "requirements": [
@@ -4506,7 +4506,7 @@
     "linkedRoomName": null,
     "map": 35,
     "memoryAddress": 67511,
-    "name": "",
+    "name": "Vanilla P5 Entrance",
     "palaceGroup": null,
     "palaceNumber": 5,
     "requirements": [
@@ -4532,7 +4532,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 74392,
-    "name": "",
+    "name": "Vanilla P6 Entrance",
     "palaceGroup": null,
     "palaceNumber": 6,
     "requirements": [
@@ -4558,7 +4558,7 @@
     "linkedRoomName": null,
     "map": 0,
     "memoryAddress": 83755,
-    "name": "",
+    "name": "Vanilla GP Entrance",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -4584,7 +4584,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 67403,
-    "name": "",
+    "name": "itemRooms M8",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -4610,7 +4610,7 @@
     "linkedRoomName": null,
     "map": 20,
     "memoryAddress": 67451,
-    "name": "",
+    "name": "itemRooms M20",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -4636,7 +4636,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 74292,
-    "name": "",
+    "name": "itemRooms M11",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -4662,7 +4662,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 74372,
-    "name": "",
+    "name": "itemRooms M31",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -4688,7 +4688,7 @@
     "linkedRoomName": null,
     "map": 61,
     "memoryAddress": 67615,
-    "name": "",
+    "name": "itemRooms M61",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -4948,7 +4948,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 67423,
-    "name": "",
+    "name": "newbossrooms M13",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -4974,7 +4974,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 67507,
-    "name": "",
+    "name": "newbossrooms M34",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5078,7 +5078,7 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 83971,
-    "name": "",
+    "name": "darkLinkRooms 1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5104,7 +5104,7 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 83971,
-    "name": "",
+    "name": "darkLinkRooms 2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5130,7 +5130,7 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 83971,
-    "name": "",
+    "name": "darkLinkRooms 3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5156,7 +5156,7 @@
     "linkedRoomName": null,
     "map": 53,
     "memoryAddress": 83967,
-    "name": "",
+    "name": "tbirdRooms 1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5182,7 +5182,7 @@
     "linkedRoomName": null,
     "map": 53,
     "memoryAddress": 83967,
-    "name": "",
+    "name": "tbirdRooms 2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5208,7 +5208,7 @@
     "linkedRoomName": null,
     "map": 53,
     "memoryAddress": 83967,
-    "name": "",
+    "name": "tbirdRooms 3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5234,7 +5234,7 @@
     "linkedRoomName": null,
     "map": 53,
     "memoryAddress": 83967,
-    "name": "",
+    "name": "thunderbird 1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -5286,7 +5286,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67399,
-    "name": "",
+    "name": "roomJamGTM 2",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5312,7 +5312,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "roomJamGTM 3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5338,7 +5338,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67419,
-    "name": "",
+    "name": "roomJamGTM 4",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5364,7 +5364,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67411,
-    "name": "",
+    "name": "roomJamGTM 5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5390,7 +5390,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67475,
-    "name": "",
+    "name": "roomJamGTM 6",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5416,7 +5416,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67387,
-    "name": "",
+    "name": "roomJamGTM 7",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5442,7 +5442,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67487,
-    "name": "",
+    "name": "roomJamGTM 8",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5468,7 +5468,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67415,
-    "name": "",
+    "name": "roomJamGTM 9",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5494,7 +5494,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "roomJamGTM 10",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5520,7 +5520,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "roomJamGTM 11",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5546,7 +5546,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67407,
-    "name": "",
+    "name": "roomJamGTM 12",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5572,7 +5572,7 @@
     "linkedRoomName": null,
     "map": 99,
     "memoryAddress": 67379,
-    "name": "",
+    "name": "roomJamGTM 13",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5598,7 +5598,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "dmInPalaces M1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5650,7 +5650,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "dmInPalaces M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5676,7 +5676,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 67387,
-    "name": "",
+    "name": "dmInPalaces M4",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5702,7 +5702,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "dmInPalaces M5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5728,7 +5728,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 67395,
-    "name": "",
+    "name": "dmInPalaces M6",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5754,7 +5754,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 67399,
-    "name": "",
+    "name": "dmInPalaces M7",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5780,7 +5780,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 67407,
-    "name": "",
+    "name": "dmInPalaces M9",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5806,7 +5806,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 67411,
-    "name": "",
+    "name": "dmInPalaces M10",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5858,7 +5858,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 67419,
-    "name": "",
+    "name": "dmInPalaces M12",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5884,7 +5884,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 67431,
-    "name": "",
+    "name": "dmInPalaces M15",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5910,7 +5910,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 67435,
-    "name": "",
+    "name": "dmInPalaces M16",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5936,7 +5936,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 67439,
-    "name": "",
+    "name": "dmInPalaces M17",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5962,7 +5962,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "dmInPalaces M18",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -5988,7 +5988,7 @@
     "linkedRoomName": null,
     "map": 21,
     "memoryAddress": 67455,
-    "name": "",
+    "name": "dmInPalaces M21",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6014,7 +6014,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 67479,
-    "name": "",
+    "name": "dmInPalaces M27",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6040,7 +6040,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 67483,
-    "name": "",
+    "name": "dmInPalaces M28",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6066,7 +6066,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 67399,
-    "name": "",
+    "name": "winterSolstice M7",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6092,7 +6092,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "winterSolstice 1 M1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6118,7 +6118,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 67379,
-    "name": "",
+    "name": "winterSolstice 1 M2",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6144,7 +6144,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "winterSolstice 1 M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6170,7 +6170,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "winterSolstice 1 M5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6196,7 +6196,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 67411,
-    "name": "",
+    "name": "winterSolstice M10",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6223,7 +6223,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 67415,
-    "name": "",
+    "name": "winterSolstice M11",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6249,7 +6249,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 67431,
-    "name": "",
+    "name": "winterSolstice M15",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6275,7 +6275,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "winterSolstice M18",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6301,7 +6301,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 67447,
-    "name": "",
+    "name": "winterSolstice M19",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6327,7 +6327,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 67459,
-    "name": "",
+    "name": "winterSolstice M22",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6353,7 +6353,7 @@
     "linkedRoomName": null,
     "map": 23,
     "memoryAddress": 67463,
-    "name": "",
+    "name": "winterSolstice M23",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6379,7 +6379,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 67471,
-    "name": "",
+    "name": "winterSolstice 1 M25",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6405,7 +6405,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 67483,
-    "name": "",
+    "name": "winterSolstice M28",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6431,7 +6431,7 @@
     "linkedRoomName": null,
     "map": 29,
     "memoryAddress": 67487,
-    "name": "",
+    "name": "winterSolstice M29",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6457,7 +6457,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 67491,
-    "name": "",
+    "name": "winterSolstice M30",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6483,7 +6483,7 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 67503,
-    "name": "",
+    "name": "winterSolstice M33",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6509,7 +6509,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 67515,
-    "name": "",
+    "name": "winterSolstice M36",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6535,7 +6535,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 67523,
-    "name": "",
+    "name": "winterSolstice M38",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6561,7 +6561,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 67527,
-    "name": "",
+    "name": "winterSolstice M39",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6587,7 +6587,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 67531,
-    "name": "",
+    "name": "winterSolstice M40",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6613,7 +6613,7 @@
     "linkedRoomName": null,
     "map": 45,
     "memoryAddress": 67551,
-    "name": "",
+    "name": "winterSolstice 1 M45",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6639,7 +6639,7 @@
     "linkedRoomName": null,
     "map": 49,
     "memoryAddress": 67567,
-    "name": "",
+    "name": "winterSolstice M49",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6665,7 +6665,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 67575,
-    "name": "",
+    "name": "winterSolstice M51",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6691,7 +6691,7 @@
     "linkedRoomName": null,
     "map": 52,
     "memoryAddress": 67579,
-    "name": "",
+    "name": "winterSolstice M52",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6717,7 +6717,7 @@
     "linkedRoomName": null,
     "map": 53,
     "memoryAddress": 67583,
-    "name": "",
+    "name": "winterSolstice M53",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6744,7 +6744,7 @@
     "linkedRoomName": null,
     "map": 58,
     "memoryAddress": 67603,
-    "name": "",
+    "name": "winterSolstice M58",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6771,7 +6771,7 @@
     "linkedRoomName": null,
     "map": 60,
     "memoryAddress": 67611,
-    "name": "",
+    "name": "winterSolstice M60",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6798,7 +6798,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 74252,
-    "name": "",
+    "name": "winterSolstice 2 M1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6824,7 +6824,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 74256,
-    "name": "",
+    "name": "winterSolstice 2 M2",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6851,7 +6851,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 74260,
-    "name": "",
+    "name": "winterSolstice 2 M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6877,7 +6877,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 74264,
-    "name": "",
+    "name": "winterSolstice M4",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6903,7 +6903,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 74268,
-    "name": "",
+    "name": "winterSolstice 2 M5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -6930,7 +6930,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 74272,
-    "name": "",
+    "name": "winterSolstice M6",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7039,7 +7039,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 74348,
-    "name": "",
+    "name": "winterSolstice 2 M25",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7065,7 +7065,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 74356,
-    "name": "",
+    "name": "winterSolstice M27",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7091,7 +7091,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 74384,
-    "name": "",
+    "name": "winterSolstice M34",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7117,7 +7117,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 74412,
-    "name": "",
+    "name": "winterSolstice M41",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7144,7 +7144,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 74416,
-    "name": "",
+    "name": "winterSolstice M42",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7170,7 +7170,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 74420,
-    "name": "",
+    "name": "winterSolstice M43",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7196,7 +7196,7 @@
     "linkedRoomName": null,
     "map": 45,
     "memoryAddress": 74428,
-    "name": "",
+    "name": "winterSolstice 2 M45",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7223,7 +7223,7 @@
     "linkedRoomName": null,
     "map": 50,
     "memoryAddress": 74448,
-    "name": "",
+    "name": "winterSolstice M50",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7249,7 +7249,7 @@
     "linkedRoomName": null,
     "map": 54,
     "memoryAddress": 74464,
-    "name": "",
+    "name": "winterSolstice M54",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7275,7 +7275,7 @@
     "linkedRoomName": null,
     "map": 55,
     "memoryAddress": 74468,
-    "name": "",
+    "name": "winterSolstice M55",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7302,7 +7302,7 @@
     "linkedRoomName": null,
     "map": 56,
     "memoryAddress": 74472,
-    "name": "",
+    "name": "winterSolstice M56",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7357,7 +7357,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 74400,
-    "name": "",
+    "name": "maxRoomJam 1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7383,7 +7383,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "aaronRoomJam M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7409,7 +7409,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 67407,
-    "name": "",
+    "name": "aaronRoomJam M9",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7435,7 +7435,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "dusterRoomJam M1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7467,7 +7467,7 @@
     "requirements": [
     ],
     "suppressWarning": ["MultipleItemsOnPage"],
-    "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A033820F0890317109D1FF"
+    "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A033820F0890317109D10F"
   },
   {
     "author": "dusterRoomJam",
@@ -7488,7 +7488,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "dusterRoomJam M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7514,7 +7514,7 @@
     "linkedRoomName": null,
     "map": 50,
     "memoryAddress": 74448,
-    "name": "",
+    "name": "knightCrawlerRoomJam M50",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -7566,7 +7566,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 83779,
-    "name": "",
+    "name": "link7777RoomJam M6",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7592,7 +7592,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 83791,
-    "name": "",
+    "name": "link7777RoomJam M9",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7618,7 +7618,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "",
+    "name": "link7777RoomJam M10",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7644,7 +7644,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 83799,
-    "name": "",
+    "name": "link7777RoomJam M11",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7670,7 +7670,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 83803,
-    "name": "",
+    "name": "link7777RoomJam M12",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7722,7 +7722,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 83819,
-    "name": "",
+    "name": "link7777RoomJam M16",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7748,7 +7748,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 83823,
-    "name": "",
+    "name": "link7777RoomJam M17",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7774,7 +7774,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 83827,
-    "name": "",
+    "name": "link7777RoomJam M18",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7800,7 +7800,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "link7777RoomJam M22",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7826,7 +7826,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 83851,
-    "name": "",
+    "name": "link7777RoomJam M24",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7852,7 +7852,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 83855,
-    "name": "",
+    "name": "link7777RoomJam M25",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7878,7 +7878,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 83859,
-    "name": "",
+    "name": "link7777RoomJam M26",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7904,7 +7904,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 83863,
-    "name": "",
+    "name": "link7777RoomJam M27",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7930,7 +7930,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 83867,
-    "name": "",
+    "name": "link7777RoomJam M28",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7956,7 +7956,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 83875,
-    "name": "",
+    "name": "link7777RoomJam M30",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -7982,7 +7982,7 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 83883,
-    "name": "",
+    "name": "link7777RoomJam M32",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8008,7 +8008,7 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 83887,
-    "name": "",
+    "name": "link7777RoomJam M33",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8034,7 +8034,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 83891,
-    "name": "",
+    "name": "link7777RoomJam M34",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8060,7 +8060,7 @@
     "linkedRoomName": null,
     "map": 35,
     "memoryAddress": 83895,
-    "name": "",
+    "name": "link7777RoomJam M35",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8086,7 +8086,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 83899,
-    "name": "",
+    "name": "link7777RoomJam M36",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8112,7 +8112,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 83911,
-    "name": "",
+    "name": "link7777RoomJam M39",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8138,7 +8138,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "link7777RoomJam M42",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8164,7 +8164,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 83927,
-    "name": "",
+    "name": "link7777RoomJam M43",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8190,7 +8190,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 83939,
-    "name": "",
+    "name": "link7777RoomJam M46",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8216,7 +8216,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 83759,
-    "name": "",
+    "name": "gtmNewgpRooms M1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8242,7 +8242,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "gtmNewgpRooms M2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8268,7 +8268,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 83767,
-    "name": "",
+    "name": "gtmNewgpRooms M3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8294,7 +8294,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83771,
-    "name": "",
+    "name": "gtmNewgpRooms M4",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8320,7 +8320,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 83775,
-    "name": "",
+    "name": "gtmNewgpRooms M5",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8346,7 +8346,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 83791,
-    "name": "",
+    "name": "gtmNewgpRooms M9",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8372,7 +8372,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "",
+    "name": "gtmNewgpRooms M10",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8398,7 +8398,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 83799,
-    "name": "",
+    "name": "gtmNewgpRooms M11",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8424,7 +8424,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 83803,
-    "name": "",
+    "name": "gtmNewgpRooms M12",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8450,7 +8450,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 83815,
-    "name": "",
+    "name": "gtmNewgpRooms M15",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8476,7 +8476,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 83819,
-    "name": "",
+    "name": "gtmNewgpRooms M16",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8502,7 +8502,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 83831,
-    "name": "",
+    "name": "gtmNewgpRooms 1 M19",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8528,7 +8528,7 @@
     "linkedRoomName": null,
     "map": 21,
     "memoryAddress": 83839,
-    "name": "",
+    "name": "gtmNewgpRooms M21",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8554,7 +8554,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "gtmNewgpRooms M22",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8580,7 +8580,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 83851,
-    "name": "",
+    "name": "gtmNewgpRooms M24",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8606,7 +8606,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 83855,
-    "name": "",
+    "name": "gtmNewgpRooms M25",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8632,7 +8632,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 83859,
-    "name": "",
+    "name": "gtmNewgpRooms M26",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8658,7 +8658,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 83863,
-    "name": "",
+    "name": "gtmNewgpRooms M27",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8684,7 +8684,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 83867,
-    "name": "",
+    "name": "gtmNewgpRooms M28",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8710,7 +8710,7 @@
     "linkedRoomName": null,
     "map": 29,
     "memoryAddress": 83871,
-    "name": "",
+    "name": "gtmNewgpRooms M29",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8736,7 +8736,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 83875,
-    "name": "",
+    "name": "gtmNewgpRooms M30",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8762,7 +8762,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 83879,
-    "name": "",
+    "name": "gtmNewgpRooms M31",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8788,7 +8788,7 @@
     "linkedRoomName": null,
     "map": 37,
     "memoryAddress": 83903,
-    "name": "",
+    "name": "gtmNewgpRooms M37",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8814,7 +8814,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 83907,
-    "name": "",
+    "name": "gtmNewgpRooms M38",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8840,7 +8840,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 83911,
-    "name": "",
+    "name": "gtmNewgpRooms M39",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8866,7 +8866,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 83915,
-    "name": "",
+    "name": "gtmNewgpRooms 1 M40",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8892,7 +8892,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 83915,
-    "name": "",
+    "name": "gtmNewgpRooms 2 M40",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8918,7 +8918,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 83927,
-    "name": "",
+    "name": "gtmNewgpRooms 1 M43",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8944,7 +8944,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "gtmNewgpRooms 1 M42",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8970,7 +8970,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "gtmNewgpRooms 2 M42",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -8996,7 +8996,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 83927,
-    "name": "",
+    "name": "gtmNewgpRooms 2 M43",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9022,7 +9022,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 83943,
-    "name": "",
+    "name": "gtmNewgpRooms M47",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9048,7 +9048,7 @@
     "linkedRoomName": null,
     "map": 49,
     "memoryAddress": 83951,
-    "name": "",
+    "name": "gtmNewgpRooms M49",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9074,7 +9074,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 83959,
-    "name": "",
+    "name": "gtmNewgpRooms M51",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9100,7 +9100,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 83831,
-    "name": "",
+    "name": "gtmNewgpRooms 2 M19",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9126,7 +9126,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 83759,
-    "name": "",
+    "name": "gtmOldgpRooms M1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9152,7 +9152,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "gtmOldgpRooms M2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9178,7 +9178,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 83767,
-    "name": "",
+    "name": "gtmOldgpRooms M3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9204,7 +9204,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 83783,
-    "name": "",
+    "name": "gtmOldgpRooms M7",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9230,7 +9230,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 83787,
-    "name": "",
+    "name": "gtmOldgpRooms M8",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9256,7 +9256,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "",
+    "name": "gtmOldgpRooms M10",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9282,7 +9282,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 83807,
-    "name": "",
+    "name": "gtmOldgpRooms M13",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9308,7 +9308,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 83815,
-    "name": "",
+    "name": "gtmOldgpRooms M15",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9334,7 +9334,7 @@
     "linkedRoomName": null,
     "map": 20,
     "memoryAddress": 83835,
-    "name": "",
+    "name": "gtmOldgpRooms M20",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9360,7 +9360,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "gtmOldgpRooms M22",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9386,7 +9386,7 @@
     "linkedRoomName": null,
     "map": 23,
     "memoryAddress": 83847,
-    "name": "",
+    "name": "gtmOldgpRooms M23",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9412,7 +9412,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 83879,
-    "name": "",
+    "name": "gtmOldgpRooms M31",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9438,7 +9438,7 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 83883,
-    "name": "",
+    "name": "gtmOldgpRooms M32",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9464,7 +9464,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 83919,
-    "name": "",
+    "name": "gtmOldgpRooms M41",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9490,7 +9490,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "gtmOldgpRooms M42",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9516,7 +9516,7 @@
     "linkedRoomName": null,
     "map": 44,
     "memoryAddress": 83931,
-    "name": "",
+    "name": "gtmOldgpRooms M44",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9542,7 +9542,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 83939,
-    "name": "",
+    "name": "gtmOldgpRooms M46",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9568,7 +9568,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 83943,
-    "name": "",
+    "name": "gtmOldgpRooms M47",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9594,7 +9594,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 83759,
-    "name": "",
+    "name": "winterSolsticeGP M1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9620,7 +9620,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "winterSolsticeGP M2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9646,7 +9646,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83771,
-    "name": "",
+    "name": "winterSolsticeGP M4",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9672,7 +9672,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 83775,
-    "name": "",
+    "name": "winterSolsticeGP M5",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9698,7 +9698,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "",
+    "name": "winterSolsticeGP M10",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9724,7 +9724,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 83799,
-    "name": "",
+    "name": "winterSolsticeGP M11",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9777,7 +9777,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 83819,
-    "name": "",
+    "name": "winterSolsticeGP M16",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9803,7 +9803,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 83823,
-    "name": "",
+    "name": "winterSolsticeGP M17",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9829,7 +9829,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 83827,
-    "name": "",
+    "name": "winterSolsticeGP M18",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9855,7 +9855,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "winterSolsticeGP M22",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9881,7 +9881,7 @@
     "linkedRoomName": null,
     "map": 24,
     "memoryAddress": 83851,
-    "name": "",
+    "name": "winterSolsticeGP M24",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9907,7 +9907,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 83859,
-    "name": "",
+    "name": "winterSolsticeGP M26",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9933,7 +9933,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 83867,
-    "name": "",
+    "name": "winterSolsticeGP M28",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9959,7 +9959,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 83875,
-    "name": "",
+    "name": "winterSolsticeGP M30",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -9985,7 +9985,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 83891,
-    "name": "",
+    "name": "winterSolsticeGP M34",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10011,7 +10011,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 83911,
-    "name": "",
+    "name": "winterSolsticeGP M39",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10037,7 +10037,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "winterSolsticeGP M42",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10063,7 +10063,7 @@
     "linkedRoomName": null,
     "map": 44,
     "memoryAddress": 83931,
-    "name": "",
+    "name": "winterSolsticeGP M44",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10089,7 +10089,7 @@
     "linkedRoomName": null,
     "map": 45,
     "memoryAddress": 83935,
-    "name": "",
+    "name": "winterSolsticeGP M45",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10115,7 +10115,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 83939,
-    "name": "",
+    "name": "winterSolsticeGP M46",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10141,7 +10141,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 83943,
-    "name": "",
+    "name": "winterSolsticeGP M47",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10167,7 +10167,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 83959,
-    "name": "",
+    "name": "winterSolsticeGP M51",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10193,7 +10193,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "triforceOfCourage M5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10219,7 +10219,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 67419,
-    "name": "",
+    "name": "triforceOfCourage M12",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10273,7 +10273,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "triforceOfCourage M18",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10299,7 +10299,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 67527,
-    "name": "",
+    "name": "triforceOfCourage M39",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10325,7 +10325,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 67575,
-    "name": "",
+    "name": "triforceOfCourage M51",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10351,7 +10351,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 74260,
-    "name": "",
+    "name": "triforceOfCourage M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10377,7 +10377,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 74316,
-    "name": "",
+    "name": "triforceOfCourage M17",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10403,7 +10403,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 74356,
-    "name": "",
+    "name": "triforceOfCourage M27",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10429,7 +10429,7 @@
     "linkedRoomName": null,
     "map": 50,
     "memoryAddress": 74448,
-    "name": "",
+    "name": "triforceOfCourage M50",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10483,7 +10483,7 @@
     "linkedRoomName": null,
     "map": 52,
     "memoryAddress": 74456,
-    "name": "",
+    "name": "triforceOfCourage M52",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10509,7 +10509,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 83787,
-    "name": "",
+    "name": "triforceOfCourageGP M8",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10587,7 +10587,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 83879,
-    "name": "",
+    "name": "triforceOfCourageGP M31",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10613,7 +10613,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 83915,
-    "name": "",
+    "name": "triforceOfCourageGP M40",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -10639,7 +10639,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 74404,
-    "name": "",
+    "name": "leftOpenItemRooms M39",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10665,7 +10665,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 74408,
-    "name": "",
+    "name": "leftOpenItemRooms M40",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10691,7 +10691,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 74412,
-    "name": "",
+    "name": "leftOpenItemRooms M41",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10743,7 +10743,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 74276,
-    "name": "",
+    "name": "leftOpenItemRooms M7",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10795,7 +10795,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 67423,
-    "name": "",
+    "name": "leftOpenItemRooms M13",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10821,7 +10821,7 @@
     "linkedRoomName": null,
     "map": 37,
     "memoryAddress": 74396,
-    "name": "",
+    "name": "rightOpenItemRooms M37",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10847,7 +10847,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 74416,
-    "name": "",
+    "name": "rightOpenItemRooms M42",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10873,7 +10873,7 @@
     "linkedRoomName": null,
     "map": 48,
     "memoryAddress": 74440,
-    "name": "",
+    "name": "rightOpenItemRooms M48",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10899,7 +10899,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 67403,
-    "name": "",
+    "name": "rightOpenItemRooms M8",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10925,7 +10925,7 @@
     "linkedRoomName": null,
     "map": 102,
     "memoryAddress": 74280,
-    "name": "",
+    "name": "rightOpenItemRooms M102",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10951,7 +10951,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 67419,
-    "name": "",
+    "name": "upOpenItemRooms M12",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -10977,7 +10977,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 67415,
-    "name": "",
+    "name": "upOpenItemRooms M11",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11003,7 +11003,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 67495,
-    "name": "",
+    "name": "upOpenItemRooms M31",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11029,7 +11029,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 67515,
-    "name": "",
+    "name": "upOpenItemRooms M36",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11055,7 +11055,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "downOpenItemRooms M1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11081,7 +11081,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "downOpenItemRooms M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11107,7 +11107,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "downOpenItemRooms M5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11159,7 +11159,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "downOpenItemRooms M18",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11263,7 +11263,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 67383,
-    "name": "",
+    "name": "throughItemRooms M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11289,7 +11289,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 67391,
-    "name": "",
+    "name": "throughItemRooms M5",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11315,7 +11315,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "throughItemRooms M18",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11367,7 +11367,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 67375,
-    "name": "",
+    "name": "benthicKing M1",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11393,7 +11393,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 67411,
-    "name": "",
+    "name": "benthicKing M10",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11419,7 +11419,7 @@
     "linkedRoomName": null,
     "map": 14,
     "memoryAddress": 67427,
-    "name": "",
+    "name": "benthicKing M14",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11445,7 +11445,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 67431,
-    "name": "",
+    "name": "benthicKing M15",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11471,7 +11471,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 67439,
-    "name": "",
+    "name": "benthicKing M17",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11497,7 +11497,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 74256,
-    "name": "",
+    "name": "benthicKing M2",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11523,7 +11523,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 74264,
-    "name": "",
+    "name": "benthicKing M4",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11549,7 +11549,7 @@
     "linkedRoomName": null,
     "map": 8,
     "memoryAddress": 74280,
-    "name": "",
+    "name": "benthicKing M8",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11575,7 +11575,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 74300,
-    "name": "",
+    "name": "benthicKing M13",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11601,7 +11601,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 74400,
-    "name": "",
+    "name": "benthicKing M38",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11627,7 +11627,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 74404,
-    "name": "",
+    "name": "benthicKing M39",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11653,7 +11653,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 74432,
-    "name": "",
+    "name": "benthicKing M46",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11679,7 +11679,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 74436,
-    "name": "",
+    "name": "benthicKing M47",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11705,7 +11705,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 67379,
-    "name": "",
+    "name": "easternShadow M2",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11731,7 +11731,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 67395,
-    "name": "",
+    "name": "easternShadow 1 M6",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11757,7 +11757,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 67399,
-    "name": "",
+    "name": "easternShadow M7",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11783,7 +11783,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 67407,
-    "name": "",
+    "name": "easternShadow M9",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11809,7 +11809,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 67411,
-    "name": "",
+    "name": "easternShadow M10",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11835,7 +11835,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 67415,
-    "name": "",
+    "name": "easternShadow M11",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11861,7 +11861,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 74260,
-    "name": "",
+    "name": "easternShadow M3",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11889,7 +11889,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 74272,
-    "name": "",
+    "name": "easternShadow 2 M6",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11942,7 +11942,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 74356,
-    "name": "",
+    "name": "eunosRooms M27",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11969,7 +11969,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 74284,
-    "name": "",
+    "name": "eunosRooms M9",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -11996,7 +11996,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 67443,
-    "name": "",
+    "name": "eunosRooms M18",
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [
@@ -12022,7 +12022,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 83907,
-    "name": "",
+    "name": "eunosGpRooms M38",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12048,7 +12048,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 83767,
-    "name": "",
+    "name": "eunosGpRooms M3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12074,7 +12074,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 83783,
-    "name": "",
+    "name": "eunosGpRooms M7",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12100,7 +12100,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83771,
-    "name": "",
+    "name": "eunosGpRooms M4",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12126,7 +12126,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 83943,
-    "name": "",
+    "name": "eunosGpRooms M47",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12152,7 +12152,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 83959,
-    "name": "",
+    "name": "eunosGpRooms M51",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12178,7 +12178,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "eunosGpRooms M2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12204,7 +12204,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 83779,
-    "name": "",
+    "name": "eunosGpRooms M6",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12230,7 +12230,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "eunosGpRooms M22",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12256,7 +12256,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 83939,
-    "name": "",
+    "name": "eunosGpRooms M46",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12282,7 +12282,7 @@
     "linkedRoomName": null,
     "map": 44,
     "memoryAddress": 83931,
-    "name": "",
+    "name": "eunosGpRooms M44",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12308,7 +12308,7 @@
     "linkedRoomName": null,
     "map": 1,
     "memoryAddress": 83759,
-    "name": "",
+    "name": "flippedGp M1",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12334,7 +12334,7 @@
     "linkedRoomName": null,
     "map": 2,
     "memoryAddress": 83763,
-    "name": "",
+    "name": "flippedGp M2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12360,7 +12360,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 83767,
-    "name": "",
+    "name": "flippedGp 1 M3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12386,7 +12386,7 @@
     "linkedRoomName": null,
     "map": 3,
     "memoryAddress": 83767,
-    "name": "",
+    "name": "flippedGp 2 M3",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12412,7 +12412,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83771,
-    "name": "",
+    "name": "flippedGp M4",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12438,7 +12438,7 @@
     "linkedRoomName": null,
     "map": 5,
     "memoryAddress": 83775,
-    "name": "",
+    "name": "flippedGp M5",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12464,7 +12464,7 @@
     "linkedRoomName": null,
     "map": 6,
     "memoryAddress": 83779,
-    "name": "",
+    "name": "flippedGp M6",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12490,7 +12490,7 @@
     "linkedRoomName": null,
     "map": 7,
     "memoryAddress": 83783,
-    "name": "",
+    "name": "flippedGp M7",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12542,7 +12542,7 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 83791,
-    "name": "",
+    "name": "flippedGp M9",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12568,7 +12568,7 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "",
+    "name": "flippedGp M10",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12594,7 +12594,7 @@
     "linkedRoomName": null,
     "map": 11,
     "memoryAddress": 83799,
-    "name": "",
+    "name": "flippedGp M11",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12620,7 +12620,7 @@
     "linkedRoomName": null,
     "map": 12,
     "memoryAddress": 83803,
-    "name": "",
+    "name": "flippedGp M12",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12646,7 +12646,7 @@
     "linkedRoomName": null,
     "map": 13,
     "memoryAddress": 83807,
-    "name": "",
+    "name": "flippedGp M13",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12672,7 +12672,7 @@
     "linkedRoomName": null,
     "map": 14,
     "memoryAddress": 83811,
-    "name": "",
+    "name": "flippedGp M14",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12698,7 +12698,7 @@
     "linkedRoomName": null,
     "map": 15,
     "memoryAddress": 83815,
-    "name": "",
+    "name": "flippedGp M15",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12724,7 +12724,7 @@
     "linkedRoomName": null,
     "map": 16,
     "memoryAddress": 83819,
-    "name": "",
+    "name": "flippedGp M16",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12750,7 +12750,7 @@
     "linkedRoomName": null,
     "map": 17,
     "memoryAddress": 83823,
-    "name": "",
+    "name": "flippedGp M17",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12776,7 +12776,7 @@
     "linkedRoomName": null,
     "map": 18,
     "memoryAddress": 83827,
-    "name": "",
+    "name": "flippedGp M18",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12802,7 +12802,7 @@
     "linkedRoomName": null,
     "map": 19,
     "memoryAddress": 83831,
-    "name": "",
+    "name": "flippedGp M19",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12854,7 +12854,7 @@
     "linkedRoomName": null,
     "map": 21,
     "memoryAddress": 83839,
-    "name": "",
+    "name": "flippedGp M21",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12880,7 +12880,7 @@
     "linkedRoomName": null,
     "map": 22,
     "memoryAddress": 83843,
-    "name": "",
+    "name": "flippedGp M22",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12958,7 +12958,7 @@
     "linkedRoomName": null,
     "map": 25,
     "memoryAddress": 83855,
-    "name": "",
+    "name": "flippedGp M25",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -12984,7 +12984,7 @@
     "linkedRoomName": null,
     "map": 26,
     "memoryAddress": 83859,
-    "name": "",
+    "name": "flippedGp M26",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13010,7 +13010,7 @@
     "linkedRoomName": null,
     "map": 27,
     "memoryAddress": 83863,
-    "name": "",
+    "name": "flippedGp M27",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13036,7 +13036,7 @@
     "linkedRoomName": null,
     "map": 28,
     "memoryAddress": 83867,
-    "name": "",
+    "name": "flippedGp M28",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13062,7 +13062,7 @@
     "linkedRoomName": null,
     "map": 29,
     "memoryAddress": 83871,
-    "name": "",
+    "name": "flippedGp M29",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13088,7 +13088,7 @@
     "linkedRoomName": null,
     "map": 30,
     "memoryAddress": 83875,
-    "name": "",
+    "name": "flippedGp M30",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13114,7 +13114,7 @@
     "linkedRoomName": null,
     "map": 31,
     "memoryAddress": 83879,
-    "name": "",
+    "name": "flippedGp M31",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13140,7 +13140,7 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 83883,
-    "name": "",
+    "name": "flippedGp M32",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13166,7 +13166,7 @@
     "linkedRoomName": null,
     "map": 33,
     "memoryAddress": 83887,
-    "name": "",
+    "name": "flippedGp M33",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13192,7 +13192,7 @@
     "linkedRoomName": null,
     "map": 34,
     "memoryAddress": 83891,
-    "name": "",
+    "name": "flippedGp M34",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13218,7 +13218,7 @@
     "linkedRoomName": null,
     "map": 35,
     "memoryAddress": 83895,
-    "name": "",
+    "name": "flippedGp M35",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13244,7 +13244,7 @@
     "linkedRoomName": null,
     "map": 37,
     "memoryAddress": 83903,
-    "name": "",
+    "name": "flippedGp M37",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13270,7 +13270,7 @@
     "linkedRoomName": null,
     "map": 38,
     "memoryAddress": 83907,
-    "name": "",
+    "name": "flippedGp M38",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13296,7 +13296,7 @@
     "linkedRoomName": null,
     "map": 39,
     "memoryAddress": 83911,
-    "name": "",
+    "name": "flippedGp M39",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13322,7 +13322,7 @@
     "linkedRoomName": null,
     "map": 40,
     "memoryAddress": 83915,
-    "name": "",
+    "name": "flippedGp M40",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13348,7 +13348,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 83919,
-    "name": "",
+    "name": "flippedGp 1 M41",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13374,7 +13374,7 @@
     "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 83919,
-    "name": "",
+    "name": "flippedGp 2 M41",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13400,7 +13400,7 @@
     "linkedRoomName": null,
     "map": 42,
     "memoryAddress": 83923,
-    "name": "",
+    "name": "flippedGp M42",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13426,7 +13426,7 @@
     "linkedRoomName": null,
     "map": 43,
     "memoryAddress": 83927,
-    "name": "",
+    "name": "flippedGp M43",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13452,7 +13452,7 @@
     "linkedRoomName": null,
     "map": 44,
     "memoryAddress": 83931,
-    "name": "",
+    "name": "flippedGp M44",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13531,7 +13531,7 @@
     "linkedRoomName": null,
     "map": 46,
     "memoryAddress": 83939,
-    "name": "",
+    "name": "flippedGp M46",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13557,7 +13557,7 @@
     "linkedRoomName": null,
     "map": 47,
     "memoryAddress": 83943,
-    "name": "",
+    "name": "flippedGp M47",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13583,7 +13583,7 @@
     "linkedRoomName": null,
     "map": 48,
     "memoryAddress": 83947,
-    "name": "",
+    "name": "flippedGp M48",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13635,7 +13635,7 @@
     "linkedRoomName": null,
     "map": 50,
     "memoryAddress": 83955,
-    "name": "",
+    "name": "flippedGp M50",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13661,7 +13661,7 @@
     "linkedRoomName": null,
     "map": 51,
     "memoryAddress": 83959,
-    "name": "",
+    "name": "flippedGp M51",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13687,7 +13687,7 @@
     "linkedRoomName": null,
     "map": 52,
     "memoryAddress": 83963,
-    "name": "",
+    "name": "flippedGp M52",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -13739,7 +13739,7 @@
     "linkedRoomName": null,
     "map": 36,
     "memoryAddress": 83831,
-    "name": "",
+    "name": "eonRoomjam M36",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -14382,7 +14382,7 @@
       "FAIRY",
       "JUMP"
     ],
-    "sideviewData": "6F600008E3008630E0008930E3009630E0009930E300A630E000A930E3006373E0006973327FE2003B79E1003B7FE0003A02E3003501E30083C2E0008CC2E20057C5E10057C5E2001709E1001709A80F0CE3001309E0001C09E3005321E0005B216700E2006200E1006C00E2006C00"
+    "sideviewData": "3D600008697380309030A0303102317F5021110980C26600150950C5347F6100A30F0C6300150950C53479610017095021607380C2320181309030A030"
   },
   {
     "author": "",
@@ -15575,7 +15575,7 @@
     "bitmask": "0B",
     "connections": "FCFC5B60",
     "elevatorScreen": 0,
-    "enabled": true,
+    "enabled": false,
     "enemies": "0F77DE1BCD14CD655A3D573E572D57",
     "group": "V4_4",
     "hasBoss": false,
@@ -16089,7 +16089,7 @@
     "name": "Key Room",
     "group": "V4_4",
     "map": 3,
-    "enabled": true,
+    "enabled": false,
     "connections": "FFFFFF10",
     "enemies": "0B05CD034D048D5D985919",
     "sideviewData": "35600F08D208208F800F089090F11F806F5600298F21C79090F3125500F312248F22C79090F11F905F5800258B23C89090F312D60E",
@@ -16314,7 +16314,7 @@
     "name": "hiddenkeyroom",
     "group": "V4_4",
     "map": 10,
-    "enabled": true,
+    "enabled": false,
     "connections": "FFFFFF24",
     "enemies": "0B07230B2375D835C77918",
     "sideviewData": "13608008D00FD200A00F08DD0F90AFE100DF00",
@@ -16347,7 +16347,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B035F0B993C5952DE549A",
-    "sideviewData": "31608F08D20EF55000F1B0715300D208A333949784337497909D909954914351425EA70F11939D455171975295D6060073",
+    "sideviewData": "31600F08D20EF55000F1B0715300D208A333949784337497909D909954914351425EA70F11939D455171975295D6060073",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P5_M36",
@@ -16543,7 +16543,7 @@
     "connections": "AFFF9FB4",
     "hasDrop": false,
     "elevatorScreen": 2,
-    "requirements": [],
+    "requirements": ["JUMP", "FAIRY"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0927C61F06725D74DD",
@@ -16671,8 +16671,8 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "090F0F5E596A8400CF",
-    "sideviewData": "2E601E08D280A4236131F31F92355130513F9633F61F903576319233523F9435F21B963354320223A023F250D60E",
+    "enemies": "051D997804",
+    "sideviewData": "31601E08D280A4236131F31F92355130513F9633420F0BF41F903576319233523F9435F21B963354320227A023F250D60E",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P5_M49",
@@ -16771,7 +16771,7 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "0B0146705D7D5D0E867E9D",
+    "enemies": "0901467B5D0E867E9D",
     "sideviewData": "35600E082307DC8032B2602535B2917132B26035520F0A33B2917132B2602535B2917132B2602535B2D30E8105F55000F12407D20F",
     "hasBoss": false,
     "isBossRoom": false,
@@ -16822,7 +16822,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "05148E1C8E",
-    "sideviewData": "2E608F08E100007FE200D0806060612D113320B14033702B8129912721B1F25AB071133320B1403323B16260D10F",
+    "sideviewData": "2E600F08E100007FE200D0806060612D113320B14033702B8129912721B1F25AB071133320B1403323B16260D10F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P5_M55",
@@ -16972,7 +16972,7 @@
     "isDropZone": true,
     "hasItem": true,
     "enemies": "09795A1CDE78983A06",
-    "sideviewData": "2F609F00D608A245910F0483C19340A040D180412F715F80B24F2F80057153547ADA0820B1A52A5532902523724072",
+    "sideviewData": "2F601F00D608A245910F0483C19340A040D180412F715F80B24F2F80057153547ADA0820B1A52A5532902523724072",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P5_M61 v2 (5)",
@@ -18021,7 +18021,7 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "090D8616467A0E7E8E",
+    "enemies": "050D861646",
     "sideviewData": "34600510D500F01F5062546254625462F41F5062546254625463D4051071F25000F11271D200F01F5063556254625462F310D105",
     "hasBoss": false,
     "isBossRoom": false,
@@ -18621,7 +18621,7 @@
     "isDropZone": true,
     "hasItem": false,
     "enemies": "050C0F0F8F",
-    "sideviewData": "23608008A6758273F41E706FFF1E710F11706FFE1472628373A075D80CF050B0F1D20F",
+    "sideviewData": "21608008A6758273F41E706FFF1E710F11706FFE1472628373A075D80FF05080F1",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "SW Dropzone bridge",
@@ -18695,8 +18695,8 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "036795",
-    "sideviewData": "2A600F08E200D000F016920A8490A090B090D180F0507021B006B106D100F0168090A090B090940AD30F",
+    "enemies": "037795",
+    "sideviewData": "22600F08E200D000F015820A9490D180F0568021B006B106D1009090F115830AD30F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Elevator dead end with lava",
@@ -18778,7 +18778,7 @@
     "author": "Ellendar",
     "group": "V4_4",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": false,
     "palaceNumber": 7,
     "linkedRoomName": null,
@@ -19472,7 +19472,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "05629D1F40",
-    "sideviewData": "26608F08E100D080A940B106B106A140530A7020D10EE300F7500006B0900106B090D30FD00F",
+    "sideviewData": "26600F08E100D080A940B106B106A140530A7020D10EE300F7500006B0900106B090D30FD00F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron GP set 2 M24 v2 (5)",
@@ -19622,7 +19622,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0572983F45",
-    "sideviewData": "26608F08E100D080A940B106B106A140530A7020D10EE300F7500006B0900106B090D30FD00F",
+    "sideviewData": "26600F08E100D080A940B106B106A140530A7020D10EE300F7500006B0900106B090D30FD00F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron GP set 2 M33 v2 (5)",
@@ -19647,7 +19647,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "01",
-    "sideviewData": "26608F08E100D080A940B106B106A140530A7020D10EE300F7500006B0900106B090D30FD00F",
+    "sideviewData": "26600F08E100D080A940B106B106A140530A7020D10EE300F7500006B0900106B090D30FD00F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron GP set 2 M34 v2 (5)",
@@ -19966,15 +19966,16 @@
     "map": 4,
     "enabled": true,
     "connections": "0F000214",
-    "enemies": "070F8300837C1E",
-    "sideviewData": "42600E08D20048C645C6D711D113D115D117D10033514052505360547055805648C6F25000F110F143C6825671556154515341523151D507D105D103D101D100D40E",
+    "enemies": "0700430F4373DE",
+    "sideviewData": "42600E08D200D401D103D105D107D10033514052505360547055805648C6F25000F110F143C6825671556154515341523151D517D115D113D111D10046C645C6D90E",
     "bitmask": "0F",
     "requirements": [],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
     "hasDrop": false,
-    "elevatorScreen": 2,
+    "elevatorScreen": 1,
+    "hasDroppableElevator": true,
     "memoryAddress": 75230,
     "isUpDownReversed": false,
     "isDropZone": false,
@@ -20285,5 +20286,132 @@
     "palaceNumber": null,
     "linkedRoomName": null,
     "isUpDownReversed": false
+  },
+  {
+    "name": "Floor Lava Quad Dripper",
+    "group": "V4_4",
+    "map": 3,
+    "enabled": true,
+    "connections": "00FCFC00",
+    "enemies": "0B0A0D094D068D05CD7F58",
+    "sideviewData": "34600E08D208F312510024C89090F11D905D5300570024C890905400550024C89090F11D905D5300570024C89090F3125100D50E",
+    "bitmask": "0F",
+    "requirements": [],
+    "hasItem": false,
+    "hasBoss": false,
+    "isBossRoom": false,
+    "hasDrop": false,
+    "elevatorScreen": -1,
+    "memoryAddress": 75710,
+    "isUpDownReversed": false,
+    "isDropZone": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "author": "initsu (original by deniableglint)",
+    "palaceGroup": null
+  },
+  {
+    "name": "Floor Lava Dripper Left Deadend",
+    "group": "V4_4",
+    "map": 3,
+    "enabled": true,
+    "connections": "FCFCFC00",
+    "enemies": "05698405CD",
+    "sideviewData": "21600F08E200D508600F08709090765500F2189058550024C89090F3125100D50E",
+    "bitmask": "0F",
+    "requirements": [],
+    "hasItem": false,
+    "hasBoss": false,
+    "isBossRoom": false,
+    "hasDrop": false,
+    "elevatorScreen": -1,
+    "memoryAddress": 75710,
+    "isUpDownReversed": false,
+    "isDropZone": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "author": "initsu",
+    "palaceGroup": null
+  },
+  {
+    "name": "Floor Lava Dripper Right Deadend",
+    "group": "V4_4",
+    "map": 3,
+    "enabled": true,
+    "connections": "03FCFCFC",
+    "enemies": "050A0D6644",
+    "sideviewData": "1F600E08D208F312510024C89090F1189058530096765100650F087090D10F",
+    "bitmask": "0F",
+    "requirements": [],
+    "hasItem": false,
+    "hasBoss": false,
+    "isBossRoom": false,
+    "hasDrop": false,
+    "elevatorScreen": -1,
+    "memoryAddress": 75710,
+    "isUpDownReversed": false,
+    "isDropZone": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "author": "initsu",
+    "palaceGroup": null
+  },
+  {
+    "name": "Inverse T Junction With Underneath Passage",
+    "group": "V4_4",
+    "author": "initsu",
+    "enabled": true,
+    "map": 4,
+    "bitmask": "0F",
+    "palaceGroup": null,
+    "memoryAddress": 75645,
+    "connections": "0FFC0114",
+    "hasDrop": false,
+    "elevatorScreen": 1,
+    "requirements": [],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "077818878470D8",
+    "sideviewData": "53600E08D200420012C9420012C941529093320F0B11C7420012C5702B80C24200822390C1F15600D701D791C1420012C580C2420012C99093420012C9420012C94200A03112C9420012C94200D30AD30CD30E",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "isUpDownReversed": false,
+    "suppressWarning": []
+  },
+  {
+    "name": "Pillars and Clouds",
+    "group": "V4_4",
+    "author": "initsu",
+    "enabled": true,
+    "map": 4,
+    "bitmask": "0F",
+    "palaceGroup": null,
+    "memoryAddress": 75756,
+    "connections": "0FFC02FC",
+    "hasDrop": false,
+    "elevatorScreen": 2,
+    "requirements": [],
+    "isDropZone": false,
+    "hasItem": false,
+    "enemies": "07795E3C447B04",
+    "sideviewData": "416090002074907443C42221A021250AA036833290333607602C71C37138052C11C4113872C3752581A7A074C02F11C5F2582008D20F631470148014800F0B9030",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "isUpDownReversed": false,
+    "suppressWarning": []
   }
 ]

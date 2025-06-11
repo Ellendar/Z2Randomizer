@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using js65;
 using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -88,6 +89,7 @@ public class Room : IJsonOnDeserialized
     public bool IsBeforeTbird { get; set; }
 
     public bool HasDrop { get; set; }
+    public bool HasDroppableElevator { get; set; }
     public int ElevatorScreen { get; set; }
     [JsonConverter(typeof(RequirementsJsonConverter))]
     public Requirements Requirements { get; set; }
@@ -167,6 +169,7 @@ public class Room : IJsonOnDeserialized
         IsBossRoom = room.IsBossRoom;
         HasDrop = room.HasDrop;
         ElevatorScreen = room.ElevatorScreen;
+        HasDroppableElevator = room.HasDroppableElevator;
         ConnectionStartAddress = room.ConnectionStartAddress;
         IsUpDownReversed = room.IsUpDownReversed;
         IsDropZone = room.IsDropZone;
@@ -252,15 +255,15 @@ public class Room : IJsonOnDeserialized
             //Write the updated pointers
             case PalaceGrouping.Palace125:
                 enemyDataAddr -= 0x98b0;
-                tableAddr = RandomizerCore.Enemies.Palace125EnemyPtr + Map * 2;
+                tableAddr = Enemy.Enemies.Palace125EnemyPtr + Map * 2;
                 break;
             case PalaceGrouping.Palace346:
                 enemyDataAddr -= 0x98b0;
-                tableAddr = RandomizerCore.Enemies.Palace346EnemyPtr + Map * 2;
+                tableAddr = Enemy.Enemies.Palace346EnemyPtr + Map * 2;
                 break;
             default:
                 enemyDataAddr -= 0xd8b0;
-                tableAddr = RandomizerCore.Enemies.GPEnemyPtr + Map * 2;
+                tableAddr = Enemy.Enemies.GPEnemyPtr + Map * 2;
                 break;
         }
         
@@ -331,227 +334,9 @@ public class Room : IJsonOnDeserialized
         return exits;
     }
 
-    public void RandomizeEnemies(bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG)
-    {
-        //Because a 125 room could be shuffled into 346 or vice versa, we have to check if the enemy is that type in either
-        //palace group, and if so, shuffle that enemy into a new enemy specifically appropriate to that palace
-        switch (PalaceGroup)
-        {
-            case PalaceGrouping.Palace125:
-                {
-                    var groundEnemies = RandomizerCore.Enemies.Palace125GroundEnemies;
-                    var smallEnemies = RandomizerCore.Enemies.Palace125SmallEnemies;
-                    var largeEnemies = RandomizerCore.Enemies.Palace125LargeEnemies;
-                    var flyingEnemies = RandomizerCore.Enemies.Palace125FlyingEnemies;
-                    var generators = RandomizerCore.Enemies.Palace125Generators;
-                    var ee = new EnemiesEditable<EnemiesPalace125>(Enemies);
-                    RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-                    break;
-                }
-            case PalaceGrouping.Palace346:
-                {
-                    var groundEnemies = RandomizerCore.Enemies.Palace346GroundEnemies;
-                    var smallEnemies = RandomizerCore.Enemies.Palace346SmallEnemies;
-                    var largeEnemies = RandomizerCore.Enemies.Palace346LargeEnemies;
-                    var flyingEnemies = RandomizerCore.Enemies.Palace346FlyingEnemies;
-                    var generators = RandomizerCore.Enemies.Palace346Generators;
-                    var ee = new EnemiesEditable<EnemiesPalace346>(Enemies);
-                    RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-                    break;
-                }
-            case PalaceGrouping.PalaceGp:
-                {
-                    var groundEnemies = RandomizerCore.Enemies.GPGroundEnemies;
-                    var smallEnemies = RandomizerCore.Enemies.GPSmallEnemies;
-                    var largeEnemies = RandomizerCore.Enemies.GPLargeEnemies;
-                    var flyingEnemies = RandomizerCore.Enemies.GPFlyingEnemies;
-                    var generators = RandomizerCore.Enemies.GPGenerators;
-                    var ee = new EnemiesEditable<EnemiesGreatPalace>(Enemies);
-                    RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-                    break;
-                }
-            default:
-                throw new ImpossibleException("Invalid Palace Group");
-        }
-    }
-
-    private void RandomizeEnemiesInner<T>(EnemiesEditable<T> ee, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG, T[] groundEnemies, T[] smallEnemies, T[] largeEnemies, T[] flyingEnemies, T[] generators) where T : Enum
-    {
-        bool[,]? solidGridLazy = null; // lazily instanced if needed
-        bool[,] GetSolidGrid<P>() where P : Enum
-        {
-            if (solidGridLazy == null)
-            {
-                var sv = new SideviewEditable<P>(SideView);
-                solidGridLazy = sv.CreateSolidGrid();
-            }
-            return solidGridLazy;
-        }
-        bool AreaIsOpen<P>(ref bool? cachedResult, int x1, int x2, int y1, int y2) where P : Enum
-        {
-            if (cachedResult == null)
-            {
-                var solidGrid = GetSolidGrid<P>();
-                cachedResult = SideviewEditable<P>.AreaIsOpen(solidGrid, x1, x2, y1, y2);
-            }
-            return cachedResult.Value;
-        }
-
-        T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
-        {
-            if (PalaceGroup != PalaceGrouping.PalaceGp)
-            {
-                bool? roomForStalfos = null;
-                while (true)
-                {
-                    bool reroll = false;
-                    switch (swapToId)
-                    {
-                        // Re-roll Magos and Wizards unless their y pos is 7.
-                        case EnemiesPalace125.MAGO:
-                        case EnemiesPalace346.WIZARD:
-                            reroll = enemy.Y != 0x07;
-                            break;
-
-                        // Re-roll Stalfos if they don't have room to dive from the ceiling to their position
-                        case EnemiesPalace125.RED_STALFOS:
-                        case EnemiesPalace125.BLUE_STALFOS:
-                        case EnemiesPalace346.RED_STALFOS:
-                        case EnemiesPalace346.BLUE_STALFOS:
-                            reroll = !AreaIsOpen<PalaceObject>(ref roomForStalfos, enemy.X, enemy.X, 3, enemy.Y);
-                            break;
-                    }
-
-                    if (reroll)
-                    {
-                        swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            return swapToId;
-        }
-
-        T RerollFlyingEnemyIfNeeded(Enemy<T> enemy, T swapToId)
-        {
-            if (PalaceGroup != PalaceGrouping.PalaceGp)
-            {
-                // The rando does not re-roll Moas in regular palaces (I just simplified the legacy behavior)
-                if (enemy.IdByte == EnemiesRegularPalaceShared.ORANGE_MOA)
-                {
-                    swapToId = enemy.Id; // swap it back to Moa
-                }
-            }
-            else // GP
-            {
-                bool? roomForBubble = null;
-                bool? roomForBigBubble = null;
-                bool? roomForKingBot = null;
-                while (true)
-                {
-                    // Re-roll enemies that do not fit (get stuck in walls)
-                    bool reroll = false;
-                    switch (swapToId)
-                    {
-                        case EnemiesGreatPalace.SLOW_BUBBLE:
-                        case EnemiesGreatPalace.FAST_BUBBLE:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBubble, enemy.X, enemy.X, enemy.Y, enemy.Y);
-                            break;
-
-                        case EnemiesGreatPalace.BIG_BUBBLE:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForBigBubble, enemy.X, enemy.X + 1, enemy.Y, enemy.Y + 1);
-                            break;
-
-                        case EnemiesGreatPalace.KING_BOT:
-                            reroll = !AreaIsOpen<GreatPalaceObject>(ref roomForKingBot, enemy.X, enemy.X + 2, enemy.Y, enemy.Y + 1);
-                            break;
-                    };
-
-                    if (reroll)
-                    {
-                        swapToId = flyingEnemies[RNG.Next(0, flyingEnemies.Length)];
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            return swapToId;
-        }
-
-        int? firstGenerator = null;
-        for (int i = 0; i < ee.Enemies.Count; i++)
-        {
-            Enemy<T> enemy = ee.Enemies[i];
-
-            if (mixLargeAndSmallEnemies)
-            {
-                if (enemy.IsShufflableSmallOrLarge())
-                {
-                    T swapToId = groundEnemies[RNG.Next(0, groundEnemies.Length)];
-                    if (enemy.IsShufflableSmall() && largeEnemies.Contains(swapToId))
-                    {
-                        enemy.Y--; // subtract Y by 1 when switching a small enemy to a large enemy
-                        swapToId = RerollLargeEnemyIfNeeded(enemy, swapToId);
-                    }
-                    else
-                    {
-                        swapToId = RerollLargeEnemyIfNeeded(enemy, swapToId);
-                    }
-                    enemy.Id = swapToId;
-                    continue;
-                }
-            }
-            else
-            {
-                if (enemy.IsShufflableLarge())
-                {
-                    T swapToId = largeEnemies[RNG.Next(0, largeEnemies.Length)];
-                    swapToId = RerollLargeEnemyIfNeeded(enemy, swapToId);
-                    enemy.Id = swapToId;
-                    continue;
-                }
-                else if (enemy.IsShufflableSmall())
-                {
-                    T swapEnemy = smallEnemies[RNG.Next(0, smallEnemies.Length)];
-                    enemy.Id = swapEnemy;
-                    continue;
-                }
-            }
-
-            if (enemy.IsShufflableFlying())
-            {
-                T swapToId = flyingEnemies[RNG.Next(0, flyingEnemies.Length)];
-                swapToId = RerollFlyingEnemyIfNeeded(enemy, swapToId);
-                enemy.Id = swapToId;
-                continue;
-            }
-
-            if (enemy.IsShufflableGenerator())
-            {
-                T swapToId = generators[RNG.Next(0, generators.Length)];
-                firstGenerator ??= (int)(object)swapToId;
-                if (generatorsAlwaysMatch)
-                {
-                    enemy.Id = (T)(object)firstGenerator;
-                }
-                else
-                {
-                    enemy.Id = swapToId;
-                }
-                continue;
-            }
-        }
-        NewEnemies = ee.Finalize();
-    }
-
     public void AdjustContinuingBossRoom()
     {
-        const PalaceObject statueId = PalaceObject.IronknuckleStatue;
+        const PalaceObject statueId = PalaceObject.IRON_KNUCKLE_STATUE;
         const byte statueXpos = 62;
         const byte statueYpos = 9;
 

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
 using System.ComponentModel.DataAnnotations;
@@ -99,6 +100,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool removeTBird;
     private bool restartAtPalacesOnGameOver;
     private bool? global5050JarDrop = false;
+    private bool reduceDripperVariance = false;
     private bool changePalacePallettes;
     private bool randomizeBossItemDrop;
     private PalaceItemRoomCount palaceItemRoomCount;
@@ -183,6 +185,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool removeFlashing;
     private CharacterSprite sprite;
     private string spriteName;
+    private bool sanitizeSprite;
+    private bool changeItemSprites;
     private CharacterColor tunic;
     private CharacterColor tunicOutline;
     private CharacterColor shieldTunic;
@@ -202,6 +206,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [IgnoreInFlags]
     public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
     [IgnoreInFlags]
+    [JsonIgnore]
     public string Flags
     {
         get => Serialize();
@@ -468,6 +473,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => global5050JarDrop;
         set => SetField(ref global5050JarDrop, value);
+    }
+
+    public bool ReduceDripperVariance
+    {
+        get => reduceDripperVariance;
+        set => SetField(ref reduceDripperVariance, value);
     }
 
     public bool ChangePalacePallettes
@@ -999,6 +1010,20 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => spriteName;
         set => SetField(ref spriteName, value);
+    }
+
+    [IgnoreInFlags]
+    public bool SanitizeSprite
+    {
+        get => sanitizeSprite;
+        set => SetField(ref sanitizeSprite, value);
+    }
+
+    [IgnoreInFlags]
+    public bool ChangeItemSprites
+    {
+        get => changeItemSprites;
+        set => SetField(ref changeItemSprites, value);
     }
 
     [IgnoreInFlags]
@@ -1579,7 +1604,17 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 _ => throw new Exception("Invalid PalaceStyle")
             };
         }
-        else 
+        else if (GPStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
+        {
+            properties.PalaceStyles[6] = r.Next(3) switch
+            {
+                0 => PalaceStyle.RECONSTRUCTED,
+                1 => PalaceStyle.SEQUENTIAL,
+                2 => PalaceStyle.RANDOM_WALK,
+                _ => throw new Exception("Invalid PalaceStyle")
+            };
+        }
+        else
         {
             properties.PalaceStyles[6] = GPStyle;
         }
@@ -1631,6 +1666,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShufflePalacePalettes = ChangePalacePallettes;
         properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
         properties.Global5050JarDrop = Global5050JarDrop ?? GetIndeterminateFlagValue(r);
+        properties.ReduceDripperVariance = ReduceDripperVariance;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
         properties.PalaceItemRoomCount = PalaceItemRoomCount == PalaceItemRoomCount.RANDOM ? r.Next(3) : (int)PalaceItemRoomCount;
@@ -1804,6 +1840,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
+        properties.SanitizeSprite = SanitizeSprite;
+        properties.ChangeItemSprites = ChangeItemSprites;
         properties.TunicColor = Tunic;
         properties.OutlineColor = TunicOutline;
         properties.ShieldColor = ShieldTunic;

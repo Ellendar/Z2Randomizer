@@ -238,9 +238,11 @@ public enum PalaceStyle
     CHAOS,
     [Description("Random")]
     RANDOM,
-    [Description("Random(All Same)")]
+    [Description("Random (No Vanilla or Shuffle)")]
+    RANDOM_NO_VANILLA_OR_SHUFFLE,
+    [Description("Random (All Same)")]
     RANDOM_ALL,
-    [Description("Random(Per Palace)")]
+    [Description("Random (Per Palace)")]
     RANDOM_PER_PALACE
 }
 
@@ -264,9 +266,9 @@ public enum BossRoomsExitType
     OVERWORLD,
     [Description("More Palace")]
     PALACE,
-    [Description("Random(All Same)")]
+    [Description("Random (All Same)")]
     RANDOM_ALL,
-    [Description("Random(Per Palace)")]
+    [Description("Random (Per Palace)")]
     RANDOM_PER_PALACE
 }
 

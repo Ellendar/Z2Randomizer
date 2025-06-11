@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -47,9 +48,23 @@ sealed class MazeIsland : World
         locations.ForEach(AddLocation);
 
         walkableTerrains = [Terrain.MOUNTAIN];
-        enemyAddr = 0x88B0;
+
+        sideviewPtrTable = 0xA010;
+        sideviewBank = 2;
         enemyPtr = 0xA08E;
-        overworldMaps = [];
+        groupedEnemies = Enemies.GroupedEastEnemies;
+        overworldEncounterMaps = [];
+        nonEncounterMaps = [
+            34, // MAZE_ISLAND_FORCED_BATTLE_2
+            35, // MAZE_ISLAND_FORCED_BATTLE_1
+            36, // MAZE_ISLAND_MAGIC
+            37, // MAZE_ISLAND_CHILD
+            47, // MAZE_ISLAND_FORCED_BATTLE_3
+            48, // MAZE_ISLAND_FORCED_BATTLE_7
+            49, // MAZE_ISLAND_FORCED_BATTLE_4
+            50, // MAZE_ISLAND_FORCED_BATTLE_5
+            51, // MAZE_ISLAND_FORCED_BATTLE_6
+        ];
 
         childDrop = GetLocationByMem(0xA143);
         magicContainerDrop = GetLocationByMem(0xA133);
@@ -63,18 +78,6 @@ sealed class MazeIsland : World
 
         biome = props.MazeBiome;
         SetVanillaCollectables(props.ReplaceFireWithDash);
-    }
-
-    protected override byte[] RandomizeEnemies(byte[] enemyBytes, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch)
-    {
-        var groundEnemies = Enemies.EastGroundEnemies;
-        var flyingEnemies = Enemies.EastFlyingEnemies;
-        var generators = Enemies.EastGenerators;
-        var smallEnemies = Enemies.EastSmallEnemies;
-        var largeEnemies = Enemies.EastLargeEnemies;
-        var ee = new Sidescroll.EnemiesEditable<EnemiesEast>(enemyBytes);
-        RandomizeEnemiesInner(ee, mixLargeAndSmallEnemies, generatorsAlwaysMatch, RNG, groundEnemies, smallEnemies, largeEnemies, flyingEnemies, generators);
-        return ee.Finalize();
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
