@@ -1598,7 +1598,7 @@ ActualLavaDeath:                     ; original code that we replaced
 .org $e53b
 SetPostItemPickupVars:
     lda $af,x                          ; this byte has the item ID we picked up
-    and #$7f                           ; the last 4 bits are the item ID
+    and #$7f                           ; keep bits .xxx xxxx
     cmp #$12                           ; check if item is 1-up
     beq SetPostItemPickupKeepVelocity  ; skip resetting velocity if 1-up
     lda #$00
