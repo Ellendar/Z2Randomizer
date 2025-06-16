@@ -8,7 +8,7 @@ using System.Reflection;
 namespace Z2Randomizer.RandomizerCore;
 
 [DefaultValue(EIGHT)]
-public enum StartingHeartsMaxOption
+public enum MaxHeartsOption
 {
     [Description("1")]
     ONE = 1,
@@ -411,6 +411,21 @@ public enum StartingResourceLimit
     FOUR,
 }
 
+public static class StartingResourceLimitExtensions
+{
+    public static int AsInt(this StartingResourceLimit resourceLimit)
+    {
+        return resourceLimit switch
+        {
+            StartingResourceLimit.ONE => 1,
+            StartingResourceLimit.TWO => 2,
+            StartingResourceLimit.FOUR => 4,
+            StartingResourceLimit.NO_LIMIT => 8,
+            _ => throw new Exception("Unrecognized StartingResourceLimit")
+        };
+    }
+}
+
 [DefaultValue(NONE)]
 public enum EncounterRate
 {
@@ -618,7 +633,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();
     public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions<BeepThreshold>();
     public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions<BeepFrequency>();
-    public static IEnumerable<EnumDescription> StartingHeartsMaxOptionList { get; } = ToDescriptions<StartingHeartsMaxOption>();
+    public static IEnumerable<EnumDescription> MaxHeartsOptionList { get; } = ToDescriptions<MaxHeartsOption>();
     public static IEnumerable<EnumDescription> IndeterminateOptionRateList { get; } = ToDescriptions<IndeterminateOptionRate>();
     public static IEnumerable<EnumDescription> RiverDevilBlockerOptionList { get; } = ToDescriptions<RiverDevilBlockerOption>();
     public static IEnumerable<EnumDescription> StartingResourceLimitList { get; } = ToDescriptions<StartingResourceLimit>();

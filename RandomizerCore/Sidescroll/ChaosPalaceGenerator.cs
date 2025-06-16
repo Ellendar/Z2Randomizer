@@ -10,9 +10,11 @@ internal class ChaosPalaceGenerator : PalaceGenerator
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
     private const int CONNECTION_ATTEMPT_LIMIT = 200;
+    private static int debug = 0;
 
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
+        debug++;
         RoomPool roomPool = new(rooms);
         Palace palace = new(palaceNumber);
         var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
@@ -116,14 +118,29 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             if (room.HasLeftExit)
             {
                 room.Left = canEnterGoingLeft.Sample(r);
+                if (room.Left == null)
+                {
+                    palace.IsValid = false;
+                    return palace;
+                }
             }
             if (room.HasRightExit)
             {
                 room.Right = canEnterGoingRight.Sample(r);
+                if (room.Right == null)
+                {
+                    palace.IsValid = false;
+                    return palace;
+                }
             }
             if (room.HasUpExit)
             {
                 room.Up = canEnterGoingUp.Sample(r);
+                if (room.Up == null)
+                {
+                    palace.IsValid = false;
+                    return palace;
+                }
             }
             if (room.HasDownExit)
             {
@@ -134,6 +151,11 @@ internal class ChaosPalaceGenerator : PalaceGenerator
                 else
                 {
                     room.Down = canEnterGoingDown.Sample(r);
+                }
+                if (room.Down == null)
+                {
+                    palace.IsValid = false;
+                    return palace;
                 }
             }
         }

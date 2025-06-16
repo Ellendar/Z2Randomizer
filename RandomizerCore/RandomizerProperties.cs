@@ -315,4 +315,48 @@ public class RandomizerProperties
             StartKey = starts;
         }
     }
+
+    public bool HasEnoughSpaceToAllocateItems()
+    {
+        //The 3 pbag caves are either explicitly minor items or allowable as overflow locations
+        //so they are counted either way.
+        int minorItemCount = 3;
+
+        //more or less than 4 containers in the seed adds/removes minor items
+        minorItemCount -= MaxHearts - StartHearts - 4;
+
+        //palace items other than 1 adjusts the count
+        minorItemCount += (PalaceItemRoomCount - 1) * 6;
+
+        //Start items add 1 to the count
+        minorItemCount += StartCandle ? 1 : 0;
+        minorItemCount += StartBoots ? 1 : 0;
+        minorItemCount += StartCross ? 1 : 0;
+        minorItemCount += StartFlute ? 1 : 0;
+        minorItemCount += StartGlove ? 1 : 0;
+        minorItemCount += StartHammer ? 1 : 0;
+        minorItemCount += StartKey ? 1 : 0;
+        minorItemCount += StartRaft ? 1 : 0;
+
+        if(IncludeSpellsInShuffle)
+        {
+            minorItemCount += StartShield ? 1 : 0;
+            minorItemCount += StartJump ? 1 : 0;
+            minorItemCount += StartLife ? 1 : 0;
+            minorItemCount += StartFairy ? 1 : 0;
+            minorItemCount += StartFire ? 1 : 0;
+            minorItemCount += StartReflect ? 1 : 0;
+            minorItemCount += StartSpell ? 1 : 0;
+            minorItemCount += StartThunder ? 1 : 0;
+        }
+
+        if(IncludeSwordTechsInShuffle)
+        {
+            minorItemCount += StartWithDownstab ? 1 : 0;
+            minorItemCount += StartWithUpstab ? 1 : 0;
+        }
+
+
+        return minorItemCount >= 0;
+    }
 }

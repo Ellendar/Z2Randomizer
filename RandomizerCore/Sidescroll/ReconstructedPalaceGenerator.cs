@@ -76,7 +76,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                                 palace.IsValid = false;
                                 return palace;
                             }
-                            itemRoom = itemRoomCandidate ?? throw new Exception("No item rooms for reconstructed palace");
+                            itemRoom = new(itemRoomCandidate);
                         }
 
                         palace.ItemRooms.Add(itemRoom);

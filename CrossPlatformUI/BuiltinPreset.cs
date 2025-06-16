@@ -11,7 +11,7 @@ public static class BuiltinPreset
         //Start
         StartWithCandle = true,
         StartWithLife = true,
-        MaxHeartContainers = StartingHeartsMaxOption.EIGHT,
+        MaxHeartContainers = MaxHeartsOption.EIGHT,
         StartingHeartContainersMin = 4,
         StartingHeartContainersMax = 4,
         StartingTechniques = StartingTechs.DOWNSTAB,
@@ -106,7 +106,7 @@ public static class BuiltinPreset
         StartWithCandle = true,
         ShuffleStartingItems = false,
         ShuffleStartingSpells = false,
-        MaxHeartContainers = StartingHeartsMaxOption.EIGHT,
+        MaxHeartContainers = MaxHeartsOption.EIGHT,
         StartingHeartContainersMin = 4,
         StartingHeartContainersMax = 4,
         StartingTechniques = StartingTechs.NONE,
@@ -223,7 +223,7 @@ public static class BuiltinPreset
         //Start
         ShuffleStartingItems = true,
         ShuffleStartingSpells = true,
-        MaxHeartContainers = StartingHeartsMaxOption.RANDOM,
+        MaxHeartContainers = MaxHeartsOption.RANDOM,
         StartingHeartContainersMin = 1,
         StartingHeartContainersMax = 8,
         StartingTechniques = StartingTechs.NONE,

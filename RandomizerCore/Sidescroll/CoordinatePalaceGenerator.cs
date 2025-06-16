@@ -11,6 +11,8 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props)
     {
+        palace.ItemRooms ??= [];
+
         //ItemRoom
         if (palace.Number < 7)
         {
@@ -27,10 +29,10 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             itemRoomCandidates.FisherYatesShuffle(r);
 
             for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCount; itemRoomNumber++)
-            {
+            {  
                 foreach (Room itemRoomCandidate in itemRoomCandidates)
                 {
-                    if (palace.ItemRooms[itemRoomNumber] != null)
+                    if (palace.ItemRooms.Count > itemRoomNumber)
                     {
                         break;
                     }
@@ -45,7 +47,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                         if (itemRoomReplacementRoom != null &&
                             (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == itemRoomCandidate.IsDropZone))
                         {
-                            palace.ItemRooms[itemRoomNumber] = new(itemRoomCandidate);
+                            palace.ItemRooms.Add(new(itemRoomCandidate));
                             if (itemRoomCandidate.LinkedRoomName != null)
                             {
                                 Room linkedRoom = roomPool.LinkedRooms[itemRoomCandidate.LinkedRoomName];

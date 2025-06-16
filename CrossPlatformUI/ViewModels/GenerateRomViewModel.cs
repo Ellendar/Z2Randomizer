@@ -89,7 +89,7 @@ Seed: {config.Seed}
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
                     var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
                     await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
-                    if(config.GenerateSpoiler)
+                    if (config.GenerateSpoiler)
                     {
                         var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}.spoiler";
                         await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
@@ -97,6 +97,17 @@ Seed: {config.Seed}
                     ProgressHeading = "Generation Complete";
                     ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
                     IsComplete = true;
+                }
+                catch(ImpossibleFlagsException e)
+                {
+                    await tokenSource.CancelAsync();
+                    lastError = e;
+                    HasError = false;
+                    string errorHeading, errorBody;
+                    errorHeading = "Impossible Flags";
+                    errorBody = e.Message;
+
+                    await UpdateProgress(errorHeading, errorBody);
                 }
                 catch (Exception e)
                 {

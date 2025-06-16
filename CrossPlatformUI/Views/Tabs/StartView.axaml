@@ -59,7 +59,7 @@
                                FormatString="N0" ParsingNumberStyle="Integer"
                                ClipValueToMinMax="True" Minimum="{Binding Config.StartingHeartContainersMin}" Maximum="8" assists:TextFieldAssist.Hints="Start Max"/>
               <ComboBox assists:ComboBoxAssist.Label="Seed Max" Theme="{StaticResource MaterialOutlineComboBox}"
-                        ItemsSource="{Binding Source={x:Static rc:Enums.StartingHeartsMaxOptionList}}"
+                        ItemsSource="{Binding Source={x:Static rc:Enums.MaxHeartsOptionList}}"
                         SelectedItem="{Binding Config.MaxHeartContainers, Converter={x:Static ui:Util.EnumConvert}}"/>
             </StackPanel>
             <Separator/>

@@ -41,7 +41,7 @@ public sealed class WestHyrule : World
     private Location parapaCave2;
     private Location jumpCave2;
     private Location fairyCave2;
-    private int bridgeCount;
+    //private int bridgeCount;
 
     private int calderaCenterX, calderaCenterY;
 

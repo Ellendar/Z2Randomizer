@@ -806,15 +806,36 @@ public class Hyrule
         }
 
         //palace items beyond the first are excess
+        for(int i = 0; i < int.Max(props.PalaceItemRoomCount - 1, 0) * 6; i++)
+        {
+            shufflableItems.Add(smallItems.Sample(RNG));
+        }
+
+        //No palace items handling
         if (props.PalaceItemRoomCount == 0)
         {
             excessItems.AddRange([Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, 
                 Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS]);
-        }
+            excessItems.RemoveAll(props.StartsWithCollectable);
 
-        for (int i = 0; i < (props.PalaceItemRoomCount - 1) * 6; i++)
-        {
-            shufflableItems.Add(Collectable.LARGE_BAG);
+            int removedPalaceItems = shufflableItems.Count;
+            excessItems.ForEach(i => shufflableItems.Remove(i));
+            removedPalaceItems -= shufflableItems.Count;
+
+            //Palace items you started with couldn't be removed in the previous step, so remove them now.
+            int palaceSmallItemCount = (props.StartCandle ? 1 : 0) + (props.StartGlove ? 1 : 0) + (props.StartRaft ? 1 : 0) +
+                (props.StartBoots ? 1 : 0) + (props.StartFlute ? 1 : 0) + (props.StartCross ? 1 : 0);
+            List<Collectable> shufflableItemsCopy = [.. shufflableItems];
+            int removedItems = 0;
+            for (int i = 0; i < shufflableItems.Count && palaceSmallItemCount > 0; i++)
+            {
+                if (shufflableItems[i].IsMinorItem())
+                {
+                    shufflableItemsCopy.RemoveAt(i - removedItems++);
+                    palaceSmallItemCount--;
+                }
+            }
+            shufflableItems = shufflableItemsCopy;
         }
 
         List<int> minorItemIndexes = [];
@@ -827,7 +848,11 @@ public class Hyrule
         }
 
         //Add the auto pbag cave promotion
-        List<Location> overflowLocations = [westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2];
+        List<Location> overflowLocations = [];
+        if (!props.PbagItemShuffle) 
+        {
+            overflowLocations.AddRange([westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2]);
+        }
         int overflowLocationsRequired = excessItems.Count - minorItemIndexes.Count;
 
 

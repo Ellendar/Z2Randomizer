@@ -62,7 +62,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private StartingResourceLimit startSpellsLimit;
     private int? startingHeartContainersMin;
     private int? startingHeartContainersMax;
-    private StartingHeartsMaxOption maxHeartContainers;
+    private MaxHeartsOption maxHeartContainers;
     private StartingTechs startingTechs;
     private StartingLives startingLives;
     private int startingAttackLevel;
@@ -246,7 +246,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     [Minimum(1)]
     public int? StartingHeartContainersMax { get => startingHeartContainersMax; set => SetField(ref startingHeartContainersMax, value); }
 
-    public StartingHeartsMaxOption MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
+    public MaxHeartsOption MaxHeartContainers { get => maxHeartContainers; set => SetField(ref maxHeartContainers, value); }
 
     public StartingTechs StartingTechniques { get => startingTechs; set => SetField(ref startingTechs, value); }
 
@@ -1085,7 +1085,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         StartingMagicLevel = 1;
         StartingLifeLevel = 1;
 
-        MaxHeartContainers = StartingHeartsMaxOption.EIGHT;
+        MaxHeartContainers = MaxHeartsOption.EIGHT;
         StartingHeartContainersMin = 8;
         StartingHeartContainersMax = 8;
 
@@ -1313,10 +1313,73 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             Seed = Seed
         };
 
-        //Start Configuration
-        ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
-        ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, StartSpellsLimit, ShuffleStartingSpells, properties, r);
+        int requiredMinorItemReplacements = 0;
+        if((StartingHeartContainersMax ?? 8) < 4)
+        {
+            requiredMinorItemReplacements = 4 - (StartingHeartContainersMax ?? 4);
+        }
+        if (PalaceItemRoomCount == PalaceItemRoomCount.ZERO)
+        {
+            requiredMinorItemReplacements += 6;
+        }
+        if (CountPossibleMinorItems() < requiredMinorItemReplacements)
+        {
+            throw new ImpossibleFlagsException("Not enough possible items to replace missing palace items");
+        }
 
+        //Properties that can affect available minor item replacements
+
+        while(!properties.HasEnoughSpaceToAllocateItems())
+        {
+            //Start Configuration
+            ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
+            ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, StartSpellsLimit, ShuffleStartingSpells, properties, r);
+
+            //Other starting attributes
+            int startHeartsMin, startHeartsMax;
+            if (StartingHeartContainersMin == null)
+            {
+                startHeartsMin = r.Next(1, 9);
+            }
+            else
+            {
+                startHeartsMin = (int)StartingHeartContainersMin;
+            }
+            if (StartingHeartContainersMax == null)
+            {
+                startHeartsMax = r.Next(startHeartsMin, 9);
+            }
+            else
+            {
+                startHeartsMax = (int)StartingHeartContainersMax;
+            }
+            properties.StartHearts = r.Next(startHeartsMin, startHeartsMax + 1);
+
+            //+1/+2/+3
+            if (MaxHeartContainers == MaxHeartsOption.RANDOM)
+            {
+                properties.MaxHearts = r.Next(properties.StartHearts, 9);
+            }
+            else if ((int)MaxHeartContainers <= 8)
+            {
+                properties.MaxHearts = (int)MaxHeartContainers;
+            }
+            else
+            {
+                int additionalHearts = MaxHeartContainers switch
+                {
+                    MaxHeartsOption.PLUS_ONE => 1,
+                    MaxHeartsOption.PLUS_TWO => 2,
+                    MaxHeartsOption.PLUS_THREE => 3,
+                    MaxHeartsOption.PLUS_FOUR => 4,
+                    _ => throw new ImpossibleException("Invalid heart container max configuration")
+                };
+                properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
+            }
+            properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
+        }
+
+        //Handle Fire
         switch (FireOption)
         {
             case FireOption.NORMAL:
@@ -1350,49 +1413,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 }
                 break;
         }
-
-        //Other starting attributes
-        int startHeartsMin, startHeartsMax;
-        if (StartingHeartContainersMin == null)
-        {
-            startHeartsMin = r.Next(1, 9);
-        }
-        else
-        {
-            startHeartsMin = (int)StartingHeartContainersMin;
-        }
-        if (StartingHeartContainersMax == null)
-        {
-            startHeartsMax = r.Next(startHeartsMin, 9);
-        }
-        else
-        {
-            startHeartsMax = (int)StartingHeartContainersMax;
-        }
-        properties.StartHearts = r.Next(startHeartsMin, startHeartsMax + 1);
-
-        //+1/+2/+3
-        if (MaxHeartContainers == StartingHeartsMaxOption.RANDOM)
-        {
-            properties.MaxHearts = r.Next(properties.StartHearts, 9);
-        }
-        else if ((int)MaxHeartContainers <= 8)
-        {
-            properties.MaxHearts = (int)MaxHeartContainers;
-        }
-        else
-        {
-            int additionalHearts = MaxHeartContainers switch
-            {
-                StartingHeartsMaxOption.PLUS_ONE => 1,
-                StartingHeartsMaxOption.PLUS_TWO => 2,
-                StartingHeartsMaxOption.PLUS_THREE => 3,
-                StartingHeartsMaxOption.PLUS_FOUR => 4,
-                _ => throw new ImpossibleException("Invalid heart container max configuration")
-            };
-            properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
-        }
-        properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
 
         //If both stabs are random, use the classic weightings
         if (StartingTechniques == StartingTechs.RANDOM)
@@ -2011,14 +2031,8 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private void ShuffleStartingCollectables(Collectable[] possibleCollectables, StartingResourceLimit limit, bool shuffleRandom, 
         RandomizerProperties properties, Random r)
     {
-        int itemLimit = limit switch
-        {
-            StartingResourceLimit.ONE => 1,
-            StartingResourceLimit.TWO => 2,
-            StartingResourceLimit.FOUR => 4,
-            StartingResourceLimit.NO_LIMIT => 8,
-            _ => throw new Exception("Unrecognized StartingResourceLimit in Export")
-        };
+        int itemLimit = limit.AsInt();
+
         List<Collectable> startingItems = [];
 
         Collectable[] randomPossibleCollectables = new Collectable[possibleCollectables.Length];
@@ -2058,5 +2072,71 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         {
             properties.SetStartingCollectable(collectable);
         }
+    }
+
+    private int CountPossibleMinorItems()
+    {
+        int count = 3, hardStartItemsCount = 0;
+
+        hardStartItemsCount += ShuffleStartingItems || StartWithCandle ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithBoots ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithCross ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithFlute ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithGlove ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithHammer ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithMagicKey ? 1 : 0;
+        hardStartItemsCount += ShuffleStartingItems || StartWithRaft ? 1 : 0;
+
+        count += Math.Max(hardStartItemsCount, ShuffleStartingItems ? StartItemsLimit.AsInt() : 0);
+
+        if(IncludeSpellsInShuffle ?? true)
+        {
+            hardStartItemsCount = 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithShield ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithJump ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithLife ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithFairy ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithFire ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithReflect ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithSpellSpell ? 1 : 0;
+            hardStartItemsCount += ShuffleStartingSpells || StartWithThunder ? 1 : 0;
+
+            count += Math.Max(hardStartItemsCount, ShuffleStartingItems ? StartItemsLimit.AsInt() : 0);
+        }
+
+        if(IncludeSwordTechsInShuffle ?? true)
+        {
+            hardStartItemsCount += StartingTechniques switch
+            {
+                StartingTechs.DOWNSTAB => 1,
+                StartingTechs.UPSTAB => 1,
+                StartingTechs.BOTH => 2,
+                StartingTechs.RANDOM => 2,
+                StartingTechs.NONE => 0,
+                _ => throw new Exception("Unrecognized starting tech option")
+            };
+        }
+
+        int containerReplacementSmallItemsCount = MaxHeartContainers switch
+        {
+            MaxHeartsOption.EIGHT => 4 - (8 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.SEVEN => 4 - (7 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.SIX => 4 - (6 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.FIVE => 4 - (5 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.FOUR => 4 - (4 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.THREE => 4 - (3 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.TWO => 4 - (2 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.ONE => 4 - (1 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.PLUS_ONE => 3,
+            MaxHeartsOption.PLUS_TWO => 2,
+            MaxHeartsOption.PLUS_THREE => 1,
+            MaxHeartsOption.PLUS_FOUR => 0,
+            MaxHeartsOption.RANDOM => 4 - (StartingHeartContainersMax ?? 1),
+            _ => throw new Exception("Unrecognized Max Hearts in CountPossibleMinorItems")
+        };
+
+        count += containerReplacementSmallItemsCount;
+
+        return count;
     }
 }
