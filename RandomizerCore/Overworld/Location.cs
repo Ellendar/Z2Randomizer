@@ -365,14 +365,6 @@ public class Location
         {
             return 4;
         }
-
-        //Bagu is 4. This should be a check based on ActualTown, but bagu isn't a town until 4.4
-        //so for now this hack.
-        if (MemAddress == 0x4661)
-        {
-            return 4;
-        }
-
         //Connectors use the world bits to indicate which continent they take you to
         if (ConnectedContinent != null)
         {
@@ -392,7 +384,7 @@ public class Location
             return PalaceNumber switch
             {
                 //North palace
-                0 => 0,
+                null => 0,
                 1 => 0b00001100 + (int)Continent, //12,
                 2 => 0b00001100 + (int)Continent, //12,
                 3 => 0b00010000 + (int)Continent, //16,
