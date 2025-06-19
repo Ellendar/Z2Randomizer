@@ -107,7 +107,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
     private static int DEBUG_THRESHOLD = 100;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
@@ -1265,9 +1265,9 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets()
     {
+        List<RequirementType> requireables = GetRequireables();
         accessibleMagicContainers = 4;
         heartContainers = startHearts;
-        List<RequirementType> requireables = GetRequireables();
         Location newKasuto = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO);
         List<Collectable> gottenItems = [];
         List<Location> locations = AllLocationsForReal().ToList();
@@ -1289,20 +1289,10 @@ public class Hyrule
                         && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
                         && palace.GetGettableItems(requireables).Contains(collectable);
                 }
-                //Special handling for new kasuto's "linked" non-wizard collectables
-                else if (location == eastHyrule.spellTower)
-                {
-                    canGet = CanGet(newKasuto) && ItemGet[Collectable.SPELL_SPELL];
-                }
-                else if (location == eastHyrule.newKasutoBasement)
-                {
-                    continue;
-                    //canGet = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
-                }
                 //Location is a town
-                else if (location.ActualTown != null)
+                else if (location.ActualTown != null && Towns.townSpellAndItemRequirements.ContainsKey(location.ActualTown ?? Town.INVALID))
                 {
-                    canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown].AreSatisfiedBy(requireables);
+                    canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
                 }
                 else
                 {

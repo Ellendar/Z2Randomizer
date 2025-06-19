@@ -4,6 +4,7 @@ namespace Z2Randomizer.RandomizerCore;
 
 public enum Town
 {
+    INVALID = 0,
     RAURU = 1,
     RUTO = 2,
     SARIA_NORTH = 3,

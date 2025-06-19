@@ -2073,10 +2073,9 @@ public sealed class EastHyrule : World
 
     protected override void OnUpdateReachableTrigger()
     {
-        if (AllLocations.Where(i => i.ActualTown == Town.NEW_KASUTO).FirstOrDefault()?.Reachable ?? false)
+        foreach(Location parentLocation in AllLocations.Where(i => i.Children != null && i.ActualTown != null))
         {
-            spellTower.Reachable = true;
-            newKasutoBasement.Reachable = true;
+            parentLocation.Children.ForEach(child => child.Reachable = parentLocation.Reachable);
         }
     }
 
