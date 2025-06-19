@@ -618,7 +618,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
-    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }  = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
+    public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
+        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM && i != PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();

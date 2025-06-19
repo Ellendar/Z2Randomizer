@@ -1328,7 +1328,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
 
         //Properties that can affect available minor item replacements
-        do
+        do // while (!properties.HasEnoughSpaceToAllocateItems())
         {
             //Start Configuration
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);

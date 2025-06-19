@@ -988,18 +988,7 @@ sealed class MazeIsland : World
         sb.AppendLine("\tChild Drop: " + childDrop.Collectables[0].EnglishText());
 
         sb.Append("\tPalace 4 (" + locationAtPalace4.PalaceNumber + "): ");
-        if (locationAtPalace4.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtPalace4.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtPalace4.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace4.Collectables.Select(c => c.EnglishText())));
 
         sb.AppendLine();
         return sb.ToString();
