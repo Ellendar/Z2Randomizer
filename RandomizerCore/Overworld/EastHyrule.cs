@@ -2166,46 +2166,14 @@ public sealed class EastHyrule : World
         sb.AppendLine("\tDesert tile: " + desertTile.Collectables[0].EnglishText());
 
         sb.Append("\tPalace 5 (" + locationAtPalace5.PalaceNumber + "): ");
-        if (locationAtPalace5.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtPalace5.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtPalace5.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace5.Collectables.Select(c => c.EnglishText())));
 
         sb.Append("\tPalace 6 (" + locationAtPalace6.PalaceNumber + "): ");
-        if (locationAtPalace5.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtPalace6.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtPalace6.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace6.Collectables.Select(c => c.EnglishText())));
 
         sb.Append("\tPalace 7 (" + locationAtGP.PalaceNumber + "): ");
-        if (locationAtPalace5.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtGP.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtGP.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtGP.Collectables.Select(c => c.EnglishText())));
+
         sb.AppendLine();
         return sb.ToString();
     }
