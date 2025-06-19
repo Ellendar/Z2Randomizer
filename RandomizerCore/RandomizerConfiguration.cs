@@ -1328,8 +1328,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
 
         //Properties that can affect available minor item replacements
-
-        while(!properties.HasEnoughSpaceToAllocateItems())
+        do // while (!properties.HasEnoughSpaceToAllocateItems())
         {
             //Start Configuration
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
@@ -1377,7 +1376,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
             }
             properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
-        }
+        } while (!properties.HasEnoughSpaceToAllocateItems());
 
         //Handle Fire
         switch (FireOption)
