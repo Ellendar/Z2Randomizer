@@ -1686,45 +1686,14 @@ public sealed class WestHyrule : World
         sb.AppendLine("\tMedicine Cave: " + medicineCave.Collectables[0].EnglishText());
 
         sb.Append("\tPalace 1 (" + locationAtPalace1.PalaceNumber + "): ");
-        if (locationAtPalace1.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtPalace1.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtPalace1.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace1.Collectables.Select(c => c.EnglishText())));
 
         sb.Append("\tPalace 2 (" + locationAtPalace2.PalaceNumber + "): ");
-        if (locationAtPalace2.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtPalace2.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtPalace2.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace2.Collectables.Select(c => c.EnglishText())));
+
         sb.Append("\tPalace 3 (" + locationAtPalace3.PalaceNumber + "): ");
-        if (locationAtPalace3.Collectables.Count == 0)
-        {
-            sb.AppendLine("No Items");
-        }
-        else
-        {
-            foreach (Collectable collectable in locationAtPalace3.Collectables)
-            {
-                sb.Append(collectable.EnglishText() + ", ");
-            }
-            sb.AppendLine();
-        }
+        sb.AppendLine(locationAtPalace3.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace3.Collectables.Select(c => c.EnglishText())));
+
         sb.AppendLine();
         return sb.ToString();
     }
