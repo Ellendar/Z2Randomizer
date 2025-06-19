@@ -1861,7 +1861,7 @@ FREE_UNTIL $e54f
 
     public List<Location> LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> Terrains, Continent continent)
     {
-        List<Location> locations = new List<Location>();
+        List<Location> locations = [];
         for (int i = 0; i < locNum; i++)
         {
             byte[] bytes = [

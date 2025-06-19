@@ -987,7 +987,7 @@ sealed class MazeIsland : World
         sb.AppendLine("\tMagic Container Drop: " + magicContainerDrop.Collectables[0].EnglishText());
         sb.AppendLine("\tChild Drop: " + childDrop.Collectables[0].EnglishText());
 
-        sb.Append("\tPalace 1 (" + locationAtPalace4.PalaceNumber + "): ");
+        sb.Append("\tPalace 4 (" + locationAtPalace4.PalaceNumber + "): ");
         if (locationAtPalace4.Collectables.Count == 0)
         {
             sb.AppendLine("No Items");

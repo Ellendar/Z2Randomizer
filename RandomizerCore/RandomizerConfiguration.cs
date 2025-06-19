@@ -1328,12 +1328,13 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
 
         //Properties that can affect available minor item replacements
-
-        while(!properties.HasEnoughSpaceToAllocateItems())
+        do
         {
             //Start Configuration
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, StartSpellsLimit, ShuffleStartingSpells, properties, r);
+
+            properties.PalaceItemRoomCount = PalaceItemRoomCount == PalaceItemRoomCount.RANDOM ? r.Next(3) : (int)PalaceItemRoomCount;
 
             //Other starting attributes
             int startHeartsMin, startHeartsMax;
@@ -1377,7 +1378,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                 properties.MaxHearts = Math.Min(properties.StartHearts + additionalHearts, 8);
             }
             properties.MaxHearts = Math.Max(properties.MaxHearts, properties.StartHearts);
-        }
+        } while (!properties.HasEnoughSpaceToAllocateItems());
 
         //Handle Fire
         switch (FireOption)
@@ -1689,7 +1690,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.ReduceDripperVariance = ReduceDripperVariance;
         properties.RemoveTbird = RemoveTBird;
         properties.BossItem = RandomizeBossItemDrop;
-        properties.PalaceItemRoomCount = PalaceItemRoomCount == PalaceItemRoomCount.RANDOM ? r.Next(3) : (int)PalaceItemRoomCount;
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms

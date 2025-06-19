@@ -257,7 +257,7 @@ public class Hyrule
             {
                 return null;
             }
-            
+
             while (palaces.Count != 7 || passedValidation == false)
             {
                 freeBanks = new(ROM.FreeRomBanks);
@@ -381,8 +381,8 @@ public class Hyrule
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, RNG);
             ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
-            var rom = await ROMData.ApplyAsm(assembler);
 
+            var rom = await ROMData.ApplyAsm(assembler);
             // await assemblerTask; // .Wait(ct);
             // var rom = assemblerTask.Result;
             ROMData = new ROM(rom!);
@@ -3920,6 +3920,7 @@ FREE_UNTIL $c2ca
         }
 
         UpdateTexts(engine, texts);
+
     }
 
     //This entire town location shuffle structure is awful if this method needs to exist.
