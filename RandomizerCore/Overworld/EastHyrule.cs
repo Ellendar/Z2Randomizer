@@ -189,7 +189,6 @@ public sealed class EastHyrule : World
             45,             // FIRE_TOWN_FAIRY
             46,             // DESERT_TILE
             51,             // OLD_KASUTO_SWAMP_LIFE
-            57,             // FIRE_TOWN_RED_JAR
             62,             // DEATH_VALLEY_RED_JAR
         ];
 

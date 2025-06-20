@@ -104,7 +104,6 @@ public class OverworldEnemyShuffler
                     newTable.AddRange(newEnemyBytes);
                 }
                 a.RomOrg(world.enemyPtr);
-                
                 a.Word(newPointers.Select(p => (ushort)(tableRamBaseAddr + p)).ToArray());
             }
             // 0x3ff bytes of data are copied to RAM
