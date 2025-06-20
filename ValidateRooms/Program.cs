@@ -51,6 +51,8 @@ void ValidateRoomsForFile(string filename)
         // checking Enabled here to skip linked rooms
         if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
 
+        CheckPageOverflow(room, sv);
+
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
         var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
 
@@ -89,6 +91,8 @@ void ValidateRoomsForFile(string filename)
     {
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
 
+        CheckPageOverflow(room, sv);
+
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
         var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
 
@@ -112,6 +116,18 @@ void ValidateRoomsForFile(string filename)
         var elevators = sv.FindAll(o => o.IsElevator());
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, openCeilingTiles, dropTiles);
         CheckDropZones(room, openCeilingTiles);
+    }
+}
+
+void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
+{
+    foreach (var cmd in sv.Commands)
+    {
+        if (cmd.AbsX + cmd.Width - 1 > 63)
+        {
+            Warning(room, "PageOverflow", $" has command that overflows into page 4.\n{cmd.DebugString()}\n{FixedOverflowCommandString(sv, cmd)}");
+            break;
+        }
     }
 }
 
@@ -421,6 +437,13 @@ static string ConvertToRangeString(IEnumerable<int> numbers)
         .Select(g => g.Count() > 1 ? $"{g.First().num}-{g.Last().num}" : $"{g.First().num}"));
 }
 
+string FixedOverflowCommandString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> cmd) where T : Enum
+{
+    cmd.AbsX = Math.Min(63, cmd.AbsX);
+    cmd.Param = 63 - cmd.AbsX;
+    var newBytes = sv.Finalize();
+    return $"Fixed bytes:\n{Convert.ToHexString(newBytes)}\n\n";
+}
 string FixedElevatorHexString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> elevator, int param) where T : Enum
 {
     elevator.Param = param;
