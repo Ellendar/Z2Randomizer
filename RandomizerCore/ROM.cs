@@ -1322,10 +1322,11 @@ StoreElevatorParamGP:
     rts
 
 .segment "PRG0", "PRG7"
-.org $9169 ; palace 1-7
+.org $9169
     lda ElevatorYStart ; load param here to utilize the bytes
     jsr SetElevatorYPosition
 
+.segment "PRG7"
 .reloc
 SetElevatorYPosition:
     ; we will do: A = 0x98 - (ElevatorParam * 8)
@@ -1336,8 +1337,9 @@ SetElevatorYPosition:
     ; carry is 0 from asl, which makes sbc subtract 1 more
     sbc #$98 ; A = A - (0x98 + 1)
     eor #$FF ; invert bits (two's complement negation)
-    sta $2A ; was originally set to #$98
-    sta $BC ; was originally set to #$98
+    sta $2A ; store the elevator y position. was originally always 0x98
+    lda #$98
+    sta $BC ; keeping this at 0x98 - changing it lead to weird bugs!
     rts
 """, "change_elevator_y_position.s");
     }
