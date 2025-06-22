@@ -12,19 +12,19 @@
              x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*,*">
         <StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0">
-                <ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="Normal Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
+            <StackPanel Orientation="Horizontal" Margin="0 0">
+                <ComboBox Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Normal Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
                           ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
                           SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}" />
-                <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenNormalPalaces}" Content="Shorten:" />
+                <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenNormalPalaces}" Content="Shorten" />
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0">
-              <ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="GP Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
+            <StackPanel Orientation="Horizontal" Margin="0 0">
+              <ComboBox Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="GP Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
                         ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
                         SelectedItem="{Binding Config.GPStyle, Converter={x:Static ui:Util.EnumConvert}}" />
-              <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenGP}" Content="Shorten:" />
+              <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenGP}" Content="Shorten" />
             </StackPanel>
-            <ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="Item Rooms Per Palace" Theme="{StaticResource MaterialOutlineComboBox}"
+            <ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Item Rooms Per Palace" Theme="{StaticResource MaterialOutlineComboBox}"
               ItemsSource="{Binding Source={x:Static rc:Enums.PalaceItemRoomCountOptions}}"
               SelectedItem="{Binding Config.PalaceItemRoomCount, Converter={x:Static ui:Util.EnumConvert}}" />
             <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeVanillaRooms}" Content="Include Vanilla Rooms" />
@@ -45,10 +45,10 @@
 
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <TextBlock HorizontalAlignment="Center">Number of Palaces To Complete</TextBlock>
+            <TextBlock Margin="43 0 0 0">Number of Palaces To Complete</TextBlock>
             <!-- Example of how to scale down elements  -->
             <!-- <Viewbox Stretch="Fill" Width="140" Height="70"> -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Margin="41 0 0 0">
                     <NumericUpDown Value="{Binding Config.PalacesToCompleteMin}"
                                    FormatString="N0" ParsingNumberStyle="Integer"
                                    ClipValueToMinMax="True" Minimum="0" Maximum="{Binding Config.PalacesToCompleteMax}" assists:TextFieldAssist.Hints="Min"/>
@@ -71,7 +71,7 @@
                       Checked="NoDuplicateRoomsByEnemiesChecked" 
                       Content="No Duplicate Rooms (By Layout/Enemies)" />
             <CheckBox IsChecked="{Binding Config.BlockingRoomsInAnyPalace}" Content="Blocking Rooms In Any Palace" />
-			<ComboBox Margin="0, 0" assists:ComboBoxAssist.Label="Boss Rooms Exit To" Theme="{StaticResource MaterialOutlineComboBox}"
+			<ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Boss Rooms Exit To" Theme="{StaticResource MaterialOutlineComboBox}"
 		              ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomsExitTypeList}}"
 		              SelectedItem="{Binding Config.BossRoomsExitType, Converter={x:Static ui:Util.EnumConvert}}" />
 			<CheckBox IsChecked="{Binding Config.HardBosses}" Content="Harder Carock" />
