@@ -257,7 +257,6 @@ public sealed class WestHyrule : World
             46,             // FOREST_100P
             51,             // EX_LIFE_SWAMP_1
             56,             // RED_JAR_CEM
-            57,             // EX_LIFE_BEACH
         ];
 
         MAP_ROWS = 75;
