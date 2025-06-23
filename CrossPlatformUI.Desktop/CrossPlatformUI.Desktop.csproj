@@ -16,7 +16,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+        <AssemblyName>Z2Randomizer</AssemblyName>
     </PropertyGroup>
 
 

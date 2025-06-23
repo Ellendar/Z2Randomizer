@@ -6,6 +6,13 @@
 		<description>Most recent changes.</description>
 		<language>en</language>
 		<item>
+			<title>Version 5.0 Beta 9</title>
+			<description>
+			</description>
+			<pubDate>2025-06-22</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta9/Z2Randomizer_4_4_Beta9.msi" sparkle:version="4.4.9" />
+		</item>
+		<item>
 			<title>Version 5.0 Beta 8</title>
 			<description>
 			</description>

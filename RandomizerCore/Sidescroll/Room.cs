@@ -675,7 +675,7 @@ public class Room : IJsonOnDeserialized
             throw new Exception("Unable to update item on a room with no set collectable.");
         }
 
-        //XXX: This should just use the sideview parser.
+        //TODO: This should just use the sideview parser.
         byte[] sideView = SideView;
         for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
         {
