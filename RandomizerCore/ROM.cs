@@ -1600,9 +1600,8 @@ ActualLavaDeath:                     ; original code that we replaced
         // Also, since 1-ups can drop anywhere, if we're picking up a 1-up
         // we don't reset the velocity.
         var a = asm.Module();
-        a.Code("""
+        a.Code(/* lang=s */"""
 .include "z2r.inc"
-
 .segment "PRG7"
 .org $e53b
 SetPostItemPickupVars:
@@ -1619,6 +1618,80 @@ SetPostItemPickupKeepVelocity:
     rts
 
 FREE_UNTIL $e54f
+
+""");
+    }
+
+    public void FixMinibossGlitchyAppearance(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import SwapCHR
+
+SideViewInit = $8CE1
+EnemyFacingDirection = $DC91
+CurrentPRGBank = $0769
+CurrentCHRBank = $076E
+
+.segment "PRG7"
+
+; Patch the start of the sideview initialization to check if the enemy is loaded in the first screen
+; This is after switching the CHR banks for the sideview
+.org $C638
+    jmp CheckToOverwriteChrBank
+
+.reloc
+CheckToOverwriteChrBank:
+; If A = $20 then we are horsehead/rebo
+    ldx #6
+@loop:
+        lda $a1 - 1,x
+        cmp #$20
+        bne @NotHorsehead
+            jsr OverwriteSpriteCHRBank
+@NotHorsehead:
+        dex
+        bne @loop
+    jmp SideViewInit
+
+.reloc
+OverwriteSpriteCHRBank:
+    ; We are loading that enemy, so switch the sprite banks based on which palace we are in
+    lda WorldNumber ; 3 = palace group 1,2,5 ; 4 = palace group 3,4,6
+    cmp #$03 ; we are fighting a Horsehead since this is palace set 4
+    beq @LoadHorsehead
+        lda #$18 * 4 + 4 ; CHR bank for rebo as mini boss
+        bne @WriteCHRBanks ; unconditional
+@LoadHorsehead:
+    lda #$0a * 4 + 4 ; CHR bank for horsehead as mini boss
+@WriteCHRBanks:
+    ; switch two banks which is enough for both mini bosses
+    sta SpChrBank4Reg
+    clc
+    adc #1
+    sta SpChrBank5Reg
+    ; due to an MMC5 issue, we need to write a bg bank as well.
+    lda CurrentCHRBank
+    asl
+    asl
+    ; clc ; carry is clear here
+    adc #4
+    sta BgChrBank0Reg
+    rts
+
+; Patch the enemy loading routine to check if the enemy is horsehead/rebo
+.org $D68B
+    jsr CheckIfHorseheadReboshark
+.reloc
+CheckIfHorseheadReboshark:
+    ; If A = $20 then we are horsehead/rebo
+    cmp #$20
+    bne @Exit
+        jsr OverwriteSpriteCHRBank
+@Exit:
+    jmp EnemyFacingDirection
+
 """);
     }
 
