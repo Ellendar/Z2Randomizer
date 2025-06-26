@@ -656,10 +656,6 @@ public sealed class EastHyrule : World
                     DrawRiver(props.CanWalkOnWaterWithBoots);
                 }
 
-                if (props.HiddenKasuto)
-                {
-                    RandomizeHiddenKasuto(props.ShuffleHidden);
-                }
                 if (props.HiddenPalace)
                 {
                     bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
