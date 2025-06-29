@@ -24,6 +24,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             IsRoot = true,
             // PalaceGroup = palaceGroup,
         };
+        palace.Entrance.AdjustEntrance(props.PalaceItemRoomCount, r);
         palace.AllRooms.Add(palace.Entrance);
 
         palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);

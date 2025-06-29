@@ -349,6 +349,31 @@ public class Room : IJsonOnDeserialized
         }
     }
 
+    public void AdjustEntrance(int palaceItemRoomCount, Random r)
+    {
+        if (PalaceNumber == 7) { return; }
+        var edit = new SideviewEditable<PalaceObject>(SideView);
+        edit.RemoveAll(o => o.Y < 13 && PalaceObjectExtensions.IsCloud(o));
+        List<SideviewMapCommand<PalaceObject>> clouds = [];
+        for (int i = 0; i < palaceItemRoomCount; i++)
+        {
+            var id = i == 0 ? PalaceObject.LARGE_CLOUD : PalaceObject.SMALL_CLOUD_08;
+            int x, y;
+            do
+            {
+                x = r.Next(1, 8);
+            } while (clouds.Find(o => o.AbsX == x) != null);
+            do
+            {
+                y = r.Next(1, 8);
+            } while (clouds.Find(o => o.Y == y) != null);
+            var cloud = new SideviewMapCommand<PalaceObject>(x, y, id);
+            clouds.Add(cloud);
+            edit.Add(cloud);
+        }
+        SideView = edit.Finalize();
+    }
+
     public string Debug()
     {
         StringBuilder sb = new();

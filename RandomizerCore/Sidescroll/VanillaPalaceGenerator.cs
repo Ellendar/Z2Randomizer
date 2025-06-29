@@ -23,6 +23,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         palace.Entrance = new(roomPool.Entrances.First());
+        palace.Entrance.AdjustEntrance(props.PalaceItemRoomCount, r);
         // palace.Entrance.PalaceGroup = palaceGroup;
         palace.BossRoom = new(roomPool.BossRooms.First());
         // palace.BossRoom.PalaceGroup = palaceGroup;
