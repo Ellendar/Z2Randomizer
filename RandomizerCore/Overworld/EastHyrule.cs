@@ -656,6 +656,14 @@ public sealed class EastHyrule : World
                     DrawRiver(props.CanWalkOnWaterWithBoots);
                 }
 
+                if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
+                {
+                    bool f = MakeValleyOfDeath();
+                    if (!f)
+                    {
+                        return false;
+                    }
+                }
                 if (props.HiddenPalace)
                 {
                     bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
