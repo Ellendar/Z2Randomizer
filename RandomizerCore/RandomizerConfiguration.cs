@@ -1,14 +1,16 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
-using System.ComponentModel.DataAnnotations;
 using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -1334,7 +1336,121 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, StartSpellsLimit, ShuffleStartingSpells, properties, r);
 
-            properties.PalaceItemRoomCount = PalaceItemRoomCount == PalaceItemRoomCount.RANDOM ? r.Next(3) : (int)PalaceItemRoomCount;
+            if (GPStyle == PalaceStyle.RANDOM)
+            {
+                properties.PalaceStyles[6] = r.Next(5) switch
+                {
+                    0 => PalaceStyle.VANILLA,
+                    1 => PalaceStyle.SHUFFLED,
+                    2 => PalaceStyle.RECONSTRUCTED,
+                    3 => PalaceStyle.SEQUENTIAL,
+                    4 => PalaceStyle.RANDOM_WALK,
+                    _ => throw new Exception("Invalid PalaceStyle")
+                };
+            }
+            else if (GPStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
+            {
+                properties.PalaceStyles[6] = r.Next(3) switch
+                {
+                    0 => PalaceStyle.RECONSTRUCTED,
+                    1 => PalaceStyle.SEQUENTIAL,
+                    2 => PalaceStyle.RANDOM_WALK,
+                    _ => throw new Exception("Invalid PalaceStyle")
+                };
+            }
+            else
+            {
+                properties.PalaceStyles[6] = GPStyle;
+            }
+
+            if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
+            {
+                PalaceStyle style = r.Next(5) switch
+                {
+                    0 => PalaceStyle.VANILLA,
+                    1 => PalaceStyle.SHUFFLED,
+                    2 => PalaceStyle.RECONSTRUCTED,
+                    3 => PalaceStyle.SEQUENTIAL,
+                    4 => PalaceStyle.RANDOM_WALK,
+                    _ => throw new Exception("Invalid PalaceStyle")
+                };
+                for (int i = 0; i < 6; i++)
+                {
+                    properties.PalaceStyles[i] = style;
+                }
+            }
+            else if (NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    PalaceStyle style = r.Next(5) switch
+                    {
+                        0 => PalaceStyle.VANILLA,
+                        1 => PalaceStyle.SHUFFLED,
+                        2 => PalaceStyle.RECONSTRUCTED,
+                        3 => PalaceStyle.SEQUENTIAL,
+                        4 => PalaceStyle.RANDOM_WALK,
+                        _ => throw new Exception("Invalid PalaceStyle")
+                    };
+                    properties.PalaceStyles[i] = style;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    properties.PalaceStyles[i] = NormalPalaceStyle;
+                }
+            }
+
+            properties.ShortenGP = ShortenGP ?? GetIndeterminateFlagValue(r);
+            properties.ShortenNormalPalaces = ShortenNormalPalaces ?? GetIndeterminateFlagValue(r);
+
+            switch (PalaceItemRoomCount)
+            {
+                case PalaceItemRoomCount.RANDOM:
+                    properties.PalaceItemRoomCounts = Enumerable.Range(0, 6).Select(palaceIndex =>
+                    {
+                        switch (palaceIndex + 1)
+                        {
+                            case 1:
+                            case 3: // Palace 1,3:  0-2 item rooms  (0-1 if shortened)
+                                return properties.ShortenNormalPalaces ? r.Next(2) : r.Next(3);
+                            case 2:
+                            case 4: // Palace 2,4:  0-3 item rooms  (0-2 if shortened)
+                                return properties.ShortenNormalPalaces ? r.Next(3) : r.Next(4);
+                            case 5:
+                            case 6: // Palace 5,6:  0-4 item rooms  (0-2 if shortened)
+                                return properties.ShortenNormalPalaces ? r.Next(3) : r.Next(5);
+                            default:
+                                throw new ImpossibleException();
+                        }
+                    }).ToArray();
+                    break;
+                default:
+                    properties.PalaceItemRoomCounts = Enumerable.Repeat((int)PalaceItemRoomCount, 6).ToArray();
+                    break;
+            }
+            for (int i = 0; i < 6; i++)
+            {
+                // Limit vanilla palace style to 1 item room to remain vanilla
+                if (properties.PalaceStyles[i] == PalaceStyle.VANILLA)
+                {
+                    properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
+                }
+                // Limit shuffled vanilla style to the max amount we can fit
+                // Palace 1-3: 2 item rooms max
+                // Palace 4-6: 3 item rooms max (unless shortened)
+                else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
+                {
+                    properties.PalaceItemRoomCounts[i] = (i + 1) switch
+                    {
+                        1 or 2 or 3 => Math.Min(properties.PalaceItemRoomCounts[i], 2),
+                        4 or 5 or 6 => Math.Min(properties.PalaceItemRoomCounts[i], properties.ShortenNormalPalaces ? 2 : 3),
+                        _ => throw new ImpossibleException(),
+                    };
+                }
+            }
 
             //Other starting attributes
             int startHeartsMin, startHeartsMax;
@@ -1611,77 +1727,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         }
         properties.EastRocks = EastRocks ?? GetIndeterminateFlagValue(r);
 
-        //Palaces
-
-        if (GPStyle == PalaceStyle.RANDOM)
-        {
-            properties.PalaceStyles[6] = r.Next(5) switch
-            {
-                0 => PalaceStyle.VANILLA,
-                1 => PalaceStyle.SHUFFLED,
-                2 => PalaceStyle.RECONSTRUCTED,
-                3 => PalaceStyle.SEQUENTIAL,
-                4 => PalaceStyle.RANDOM_WALK,
-                _ => throw new Exception("Invalid PalaceStyle")
-            };
-        }
-        else if (GPStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
-        {
-            properties.PalaceStyles[6] = r.Next(3) switch
-            {
-                0 => PalaceStyle.RECONSTRUCTED,
-                1 => PalaceStyle.SEQUENTIAL,
-                2 => PalaceStyle.RANDOM_WALK,
-                _ => throw new Exception("Invalid PalaceStyle")
-            };
-        }
-        else
-        {
-            properties.PalaceStyles[6] = GPStyle;
-        }
-
-        if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
-        {
-            PalaceStyle style = r.Next(5) switch
-            {
-                0 => PalaceStyle.VANILLA,
-                1 => PalaceStyle.SHUFFLED,
-                2 => PalaceStyle.RECONSTRUCTED,
-                3 => PalaceStyle.SEQUENTIAL,
-                4 => PalaceStyle.RANDOM_WALK,
-                _ => throw new Exception("Invalid PalaceStyle")
-            };
-            for (int i = 0; i < 6; i++)
-            {
-                properties.PalaceStyles[i] = style;
-            }
-        }
-        else if(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                PalaceStyle style = r.Next(5) switch
-                {
-                    0 => PalaceStyle.VANILLA,
-                    1 => PalaceStyle.SHUFFLED,
-                    2 => PalaceStyle.RECONSTRUCTED,
-                    3 => PalaceStyle.SEQUENTIAL,
-                    4 => PalaceStyle.RANDOM_WALK,
-                    _ => throw new Exception("Invalid PalaceStyle")
-                };
-                properties.PalaceStyles[i] = style;
-            }
-        }
-        else
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                properties.PalaceStyles[i] = NormalPalaceStyle;
-            }
-        }
-
-        properties.ShortenGP = ShortenGP ?? GetIndeterminateFlagValue(r);
-        properties.ShortenNormalPalaces = ShortenNormalPalaces ?? GetIndeterminateFlagValue(r);
         properties.StartGems = r.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired ?? GetIndeterminateFlagValue(r);
         properties.ShufflePalacePalettes = ChangePalacePallettes;

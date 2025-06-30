@@ -351,7 +351,7 @@ public class Room : IJsonOnDeserialized
 
     public void AdjustEntrance(int palaceItemRoomCount, Random r)
     {
-        if (PalaceNumber == 7) { return; }
+        Debug.Assert(PalaceNumber != 7);
         var edit = new SideviewEditable<PalaceObject>(SideView);
         // remove existing clouds
         edit.RemoveAll(o => o.Y < 13 && PalaceObjectExtensions.IsCloud(o));
@@ -385,7 +385,7 @@ public class Room : IJsonOnDeserialized
         SideView = edit.Finalize();
     }
 
-    public string Debug()
+    public string DebugString()
     {
         StringBuilder sb = new();
         sb.Append("Map: " + Map + " Name: " + Name + " Sideview: ");

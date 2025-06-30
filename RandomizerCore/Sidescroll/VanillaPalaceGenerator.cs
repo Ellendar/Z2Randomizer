@@ -23,7 +23,6 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
         palace.Entrance = new(roomPool.Entrances.First());
-        palace.Entrance.AdjustEntrance(props.PalaceItemRoomCount, r);
         // palace.Entrance.PalaceGroup = palaceGroup;
         palace.BossRoom = new(roomPool.BossRooms.First());
         // palace.BossRoom.PalaceGroup = palaceGroup;
@@ -32,6 +31,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
 
         if (palaceNumber != 7)
         {
+            palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
             Room itemRoom = new(roomPool.ItemRoom!);
             palace.ItemRooms.Add(itemRoom);
             palace.AllRooms.Add(itemRoom);
@@ -65,7 +65,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
         bool removeTbird = (palaceNumber == 7 && props.RemoveTbird);
         palace.CreateTree(removeTbird);
 
-        if(palaceNumber != 7 && props.PalaceItemRoomCount == 0)
+        if(palaceNumber != 7 && props.PalaceItemRoomCounts[palaceNumber - 1] == 0)
         {
             //Replace item room with an appropriately shaped stub
             RoomExitType itemRoomExitType = roomPool.ItemRoom!.CategorizeExits();
@@ -74,7 +74,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             palace.ItemRooms.Clear();
         }
 
-        if(palaceNumber != 7 && props.PalaceItemRoomCount > 1)
+        if(palaceNumber != 7 && props.PalaceItemRoomCounts[palaceNumber - 1] > 1)
         {
             //Find all left/right dead ends that aren't special
             List<Room> normalDeadEnds = palace.AllRooms.Where(i =>
@@ -86,7 +86,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
                 && !i.IsDropZone
                 && (i.CategorizeExits() == RoomExitType.DEADEND_EXIT_LEFT || i.CategorizeExits() == RoomExitType.DEADEND_EXIT_RIGHT)).ToList();
             //pick N-1 of them 
-            IEnumerable<Room> roomsToItemRoomify = normalDeadEnds.Sample(r, props.PalaceItemRoomCount - 1);
+            IEnumerable<Room> roomsToItemRoomify = normalDeadEnds.Sample(r, props.PalaceItemRoomCounts[palaceNumber - 1] - 1);
             //replace them with randomly selected vanilla item rooms of the same shape
             foreach(Room room in roomsToItemRoomify)
             {

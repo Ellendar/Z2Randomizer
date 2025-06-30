@@ -22,7 +22,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             IsRoot = true,
             // PalaceGroup = palaceGroup
         };
-        entrance.AdjustEntrance(props.PalaceItemRoomCount, r);
+        if (palaceNumber != 7) { entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r); }
         openCoords.AddRange(entrance.GetOpenExitCoords());
         palace.AllRooms.Add(entrance);
         palace.Entrance = entrance;

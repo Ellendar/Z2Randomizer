@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text.Json.Serialization;
 using Z2Randomizer.RandomizerCore.Overworld;
 
@@ -115,7 +116,7 @@ public class RandomizerProperties
     public bool AllowV4Rooms { get; set; }
     public bool AllowV4_4Rooms { get; set; }
     public bool HardBosses { get; set; }
-    public int PalaceItemRoomCount { get; set; }
+    public int[] PalaceItemRoomCounts { get; set; } = new int[6];
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }
@@ -326,7 +327,7 @@ public class RandomizerProperties
         minorItemCount -= MaxHearts - StartHearts - 4;
 
         //palace items other than 1 adjusts the count
-        minorItemCount += (PalaceItemRoomCount - 1) * 6;
+        minorItemCount += PalaceItemRoomCounts.Select(c => c - 1).Sum();
 
         //Start items add 1 to the count
         minorItemCount += StartCandle ? 1 : 0;
