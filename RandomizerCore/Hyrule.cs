@@ -1265,6 +1265,8 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets()
     {
+        Location[] delayedEvaluationLocations = [eastHyrule.townAtNabooru, eastHyrule.townAtDarunia,
+            eastHyrule.townAtNewKasuto, eastHyrule.townAtOldKasuto, eastHyrule.newKasutoBasement];
         List<RequirementType> requireables = GetRequireables();
         accessibleMagicContainers = 4;
         heartContainers = startHearts;
@@ -1273,9 +1275,9 @@ public class Hyrule
         List<Location> locations = AllLocationsForReal().ToList();
         foreach (Location location in AllLocationsForReal())
         {
-            foreach(Collectable collectable in location.Collectables) 
+            foreach (Collectable collectable in location.Collectables)
             {
-                if(collectable.IsInternalUse())
+                if (collectable.IsInternalUse())
                 {
                     continue;
                 }
@@ -1290,18 +1292,24 @@ public class Hyrule
                         && palace.GetGettableItems(requireables).Contains(collectable);
                 }
                 //Location is a town
-                else if (location.ActualTown != null && Towns.townSpellAndItemRequirements.ContainsKey(location.ActualTown ?? Town.INVALID))
+                else if (location.ActualTown != null
+                    && !delayedEvaluationLocations.Contains(location)
+                    && Towns.townSpellAndItemRequirements.ContainsKey(location.ActualTown ?? Town.INVALID))
                 {
                     canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
                 }
-                else
+                else if (location != eastHyrule.newKasutoBasement)
                 {
                     //TODO: Remove all the needX flags and replace them with a set of requirements.
                     canGet = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
                 }
+                else
+                {
+                    break;
+                }
 
                 ItemGet[collectable] = canGet;
-                if(canGet)
+                if (canGet)
                 {
                     gottenItems.Add(collectable);
                 }
@@ -1316,17 +1324,35 @@ public class Hyrule
                 }
             }
         }
-        
-        //Special case for granny's basement
-        if(CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars)
+
+        //Special case for locations that could be dependent on the number of magic containers
+        foreach (Location location in delayedEvaluationLocations)
         {
-            Collectable item = eastHyrule.newKasutoBasement.Collectables[0];
-            ItemGet[item] = true;
-            gottenItems.Add(item);
+            bool canGet;
+            if (location.ActualTown != null & Towns.townSpellAndItemRequirements.ContainsKey((Town)location.ActualTown!))
+            {
+                canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
+            }
+            else if (location == eastHyrule.newKasutoBasement)
+            {
+                canGet = CanGet(newKasuto) && accessibleMagicContainers >= kasutoJars;
+            }
+            else throw new Exception("Unrecognized delayed evaluation ItemGet location");
+
+            if (canGet)
+            {
+                foreach (Collectable item in location.Collectables)
+                {
+                    ItemGet[item] = true;
+                    gottenItems.Add(item);
+                }
+            }
         }
 
         return gottenItems.Count;
     }
+
+    
 
     //This used to be one method for handling both, but it was rapidly approaching unreadable so I split it back out
     private void RandomizeLifeEffectiveness(ROM rom)
