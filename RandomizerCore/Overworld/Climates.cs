@@ -5,7 +5,7 @@ using System.Linq;
 namespace Z2Randomizer.RandomizerCore.Overworld;
 public static class Climates
 {
-    public static readonly Climate Classic = new(
+    private static readonly Climate CLASSIC = new(
         "Classic",
         new Dictionary<Terrain, float>
             {
@@ -36,7 +36,9 @@ public static class Climates
         30 
     );
 
-    public static readonly Climate Chaos = new(
+    public static Climate Classic { get => CLASSIC.Clone(); }
+
+    private static readonly Climate CHAOS = new(
        "Chaos",
        //Coefficients
        new Dictionary<Terrain, float>
@@ -67,9 +69,11 @@ public static class Climates
                 { Terrain.ROAD, 5 }
            },
        220
-   );
+    );
 
-    public static readonly Climate Wetlands = new(
+    public static Climate Chaos { get => CHAOS.Clone(); }
+
+    private static readonly Climate WETLANDS = new(
         "Wetlands",
         //Size
         new Dictionary<Terrain, float>
@@ -102,7 +106,9 @@ public static class Climates
         30
     );
 
-    public static readonly Climate Scrubland = new(
+    public static Climate Wetlands { get => WETLANDS.Clone(); }
+
+    private static readonly Climate SCRUBLAND = new(
         "Scrubland",
         //Size
         new Dictionary<Terrain, float>
@@ -135,7 +141,9 @@ public static class Climates
         30
     );
 
-    public static readonly Climate GreatLakes = new(
+    public static Climate Scrubland { get => SCRUBLAND.Clone(); }
+
+    private static readonly Climate GREAT_LAKES = new(
         "GreatLakes",
         //Size
         new Dictionary<Terrain, float>
@@ -168,6 +176,8 @@ public static class Climates
         30
     );
 
+    public static Climate GreatLakes { get => GREAT_LAKES.Clone(); }
+
     public static Climate ByName(string name)
     {
         //This could probably all be done with reflection but quick fix for now.
@@ -184,11 +194,11 @@ public static class Climates
     
     public static IEnumerable<Climate> ClimateList =
     [
-        Classic,
-        Chaos,
-        Wetlands,
-        GreatLakes,
-        Scrubland,
+        CLASSIC,
+        CHAOS,
+        WETLANDS,
+        GREAT_LAKES,
+        SCRUBLAND,
     ];
 
     public static IEnumerable<string> ClimateNameList = ClimateList.Select(i => i.Name);
