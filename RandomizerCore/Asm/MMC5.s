@@ -470,6 +470,7 @@ wait_ppu:
     sta     NameTableModeReg
 
 .reloc
+.export SwapCHR
 SwapCHR:
     ; 1kb sprite banks are 20-27 and the 1kb bg banks are 28-2b
     asl

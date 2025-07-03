@@ -351,15 +351,18 @@ CheckIfNewSaveFile:
 @skip:
     jmp LoadSaveFile
 
-; Patch the "Register" end button to set a flag for a new save file  
-.org $B45E
+; Patch the "Register" button to set a flag for a new save file
+; NOTE: This will set the flag to clear the stats whenever any new file is registered
+; meaning registering a file after starting a run will reset your stats!
+;.org $B45E ; this is the "Elimination mode" end button
+.org $B67F ; this is the actual Register button.
     jsr SetNewSaveFile
 
 .reloc
 SetNewSaveFile:
-    ; a = 1
-    sta $0736
-    sta StatTrackingSaveFileClear ; 1 = new file, 0 = old file 
+    ; a = 6
+    sta $0725 ; sets the next screen to draw
+    sta StatTrackingSaveFileClear ; nonzero = new file, 0 = old file
     rts
 
 ; Patch a few save/load locations in the game to also update the timestamp checkpoints
