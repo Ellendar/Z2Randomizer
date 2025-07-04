@@ -1329,7 +1329,7 @@ public class Hyrule
         foreach (Location location in delayedEvaluationLocations)
         {
             bool canGet;
-            if (location.ActualTown != null & Towns.townSpellAndItemRequirements.ContainsKey((Town)location.ActualTown!))
+            if (location.ActualTown != null && Towns.townSpellAndItemRequirements.ContainsKey((Town)location.ActualTown))
             {
                 canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
             }
