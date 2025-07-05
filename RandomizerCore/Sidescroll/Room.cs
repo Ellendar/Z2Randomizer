@@ -349,7 +349,43 @@ public class Room : IJsonOnDeserialized
         }
     }
 
-    public string Debug()
+    public void AdjustEntrance(int palaceItemRoomCount, Random r)
+    {
+        Debug.Assert(PalaceNumber != 7);
+        var edit = new SideviewEditable<PalaceObject>(SideView);
+        // remove existing clouds
+        edit.RemoveAll(o => o.Y < 13 && PalaceObjectExtensions.IsCloud(o));
+        // add 1 cloud per palace item room
+        List<SideviewMapCommand<PalaceObject>> clouds = [];
+        for (int i = 0; i < palaceItemRoomCount; i++)
+        {
+            var id = i == 0 ? PalaceObject.LARGE_CLOUD : PalaceObject.SMALL_CLOUD_08;
+            int x, y;
+            do
+            {
+                x = r.Next(1, 8);
+            } while (clouds.Find(o => o.AbsX == x) != null);
+            do
+            {
+                y = r.Next(1, 8);
+            } while (clouds.Find(o => o.Y == y) != null);
+            var cloud = new SideviewMapCommand<PalaceObject>(x, y, id);
+            clouds.Add(cloud);
+            edit.Add(cloud);
+        }
+        // also add 1 wall Iron Knuckle per palace item room
+        for (int i = 0; i < palaceItemRoomCount; i++)
+        {
+            var id = PalaceObject.IRON_KNUCKLE_STATUE;
+            int x = 42 + i;
+            int y = 2;
+            var ik = new SideviewMapCommand<PalaceObject>(x, y, id);
+            edit.Add(ik);
+        }
+        SideView = edit.Finalize();
+    }
+
+    public string DebugString()
     {
         StringBuilder sb = new();
         sb.Append("Map: " + Map + " Name: " + Name + " Sideview: ");

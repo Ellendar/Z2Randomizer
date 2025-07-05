@@ -536,6 +536,23 @@ public static class PalaceObjectExtensions
                 return false;
         }
     }
+
+    public static bool IsCloud(SideviewMapCommand<PalaceObject> command)
+    {
+        switch (command.Id)
+        {
+            case PalaceObject.LARGE_CLOUD:
+            case PalaceObject.SMALL_CLOUD_08:
+            case PalaceObject.SMALL_CLOUD_0A:
+            case PalaceObject.SMALL_CLOUD_0B:
+            case PalaceObject.SMALL_CLOUD_0C:
+            case PalaceObject.SMALL_CLOUD_0D:
+            case PalaceObject.SMALL_CLOUD_0E:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
 
 public static class GreatPalaceObjectExtensions

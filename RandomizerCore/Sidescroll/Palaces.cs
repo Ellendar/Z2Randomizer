@@ -250,7 +250,7 @@ public class Palaces
             //If the palace doesn't have the right number of item rooms
             //or an item room is null
             //or it doesn't have a boss room when it should
-            if(palace.Number < 7 && (palace.ItemRooms.Count() != props.PalaceItemRoomCount 
+            if (palace.Number < 7 && (palace.ItemRooms.Count() != props.PalaceItemRoomCounts[palace.Number - 1]
                     || palace.ItemRooms.Any(i => i == null))
                 || palace.BossRoom == null)
             {

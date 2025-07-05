@@ -28,7 +28,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             List<Room> itemRoomCandidates = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList();
             itemRoomCandidates.FisherYatesShuffle(r);
 
-            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCount; itemRoomNumber++)
+            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCounts[palace.Number - 1]; itemRoomNumber++)
             {  
                 foreach (Room itemRoomCandidate in itemRoomCandidates)
                 {
@@ -141,7 +141,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         if (palace.BossRoom == null
             || palace.Entrance == null
             || (palace.Number == 7 && palace.TbirdRoom == null)
-            || (palace.Number < 7 && palace.ItemRooms.Count != props.PalaceItemRoomCount))
+            || (palace.Number < 7 && palace.ItemRooms.Count != props.PalaceItemRoomCounts[palace.Number - 1]))
         {
             logger.Debug("Failed to place critical room in palace");
             return false;

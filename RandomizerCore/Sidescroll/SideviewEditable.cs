@@ -133,6 +133,11 @@ public class SideviewEditable<T> where T : Enum
         Commands.Remove(item);
     }
 
+    public void RemoveAll(Predicate<SideviewMapCommand<T>> match)
+    {
+        Commands.RemoveAll(match);
+    }
+
     public bool HasItem()
     {
         return Find(o => o.IsItem() && !o.Extra.IsMinorItem()) != null;

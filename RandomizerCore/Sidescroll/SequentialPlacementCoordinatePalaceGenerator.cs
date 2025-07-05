@@ -44,6 +44,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
         openCoords.UnionWith(entrance.GetOpenExitCoords());
         
         allRooms= new() { { Coord.Uninitialized, entrance } };
+        if (palaceNumber != 7) { entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r); }
         palace.Entrance = entrance;
 
         stallCount = 0;

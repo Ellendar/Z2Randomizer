@@ -24,6 +24,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             IsRoot = true,
             // PalaceGroup = palaceGroup,
         };
+        if (palaceNumber != 7) { palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r); }
         palace.AllRooms.Add(palace.Entrance);
 
         palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
@@ -41,7 +42,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         if (palaceNumber < 7)
         {
             palace.ItemRooms = [];
-            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCount; itemRoomNumber++)
+            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCounts[palaceNumber - 1]; itemRoomNumber++)
             {
                 Direction itemRoomDirection;
                 Room? itemRoom = null;

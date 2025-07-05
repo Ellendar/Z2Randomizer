@@ -458,7 +458,7 @@ public class Hyrule
                     sb.AppendLine("Palace: " + palace.Number);
                     foreach (Room room in palace.AllRooms.OrderBy(i => i.Map))
                     {
-                        sb.AppendLine(room.Debug());
+                        sb.AppendLine(room.DebugString());
                     }
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
@@ -806,36 +806,34 @@ public class Hyrule
         }
 
         //palace items beyond the first are excess
-        for(int i = 0; i < int.Max(props.PalaceItemRoomCount - 1, 0) * 6; i++)
+        int extraPalaceItemCount = props.PalaceItemRoomCounts.Select(c => Math.Max(c - 1, 0)).Sum();
+        for (int i = 0; i < extraPalaceItemCount; i++)
         {
             shufflableItems.Add(smallItems.Sample(RNG));
         }
 
+
+        List<Collectable> vanillaPalaceItems = [Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS];
+
         //No palace items handling
-        if (props.PalaceItemRoomCount == 0)
+        for (int i = 0; i < 6; i++)
         {
-            excessItems.AddRange([Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, 
-                Collectable.BOOTS, Collectable.FLUTE, Collectable.CROSS]);
-            excessItems.RemoveAll(props.StartsWithCollectable);
-
-            int removedPalaceItems = shufflableItems.Count;
-            excessItems.ForEach(i => shufflableItems.Remove(i));
-            removedPalaceItems -= shufflableItems.Count;
-
-            //Palace items you started with couldn't be removed in the previous step, so remove them now.
-            int palaceSmallItemCount = (props.StartCandle ? 1 : 0) + (props.StartGlove ? 1 : 0) + (props.StartRaft ? 1 : 0) +
-                (props.StartBoots ? 1 : 0) + (props.StartFlute ? 1 : 0) + (props.StartCross ? 1 : 0);
-            List<Collectable> shufflableItemsCopy = [.. shufflableItems];
-            int removedItems = 0;
-            for (int i = 0; i < shufflableItems.Count && palaceSmallItemCount > 0; i++)
+            if (props.PalaceItemRoomCounts[i] == 0)
             {
-                if (shufflableItems[i].IsMinorItem())
+                var vanillaPalaceItem = vanillaPalaceItems[i];
+                if (props.StartsWithCollectable(vanillaPalaceItem))
                 {
-                    shufflableItemsCopy.RemoveAt(i - removedItems++);
-                    palaceSmallItemCount--;
+                    // since the palace item is replaced by a minor item, remove a minor item from the shuffle
+                    var firstMinorItemIndex = shufflableItems.FindIndex(c => c.IsMinorItem());
+                    Debug.Assert(firstMinorItemIndex != -1);
+                    shufflableItems.RemoveAt(firstMinorItemIndex);
+                }
+                else
+                {
+                    excessItems.Add(vanillaPalaceItem);
+                    shufflableItems.Remove(vanillaPalaceItem);
                 }
             }
-            shufflableItems = shufflableItemsCopy;
         }
 
         List<int> minorItemIndexes = [];
@@ -907,7 +905,7 @@ public class Hyrule
                 }
             }
         }
-        if(shufflableItems.Count != itemLocs.Count + Math.Max((props.PalaceItemRoomCount * 6) - 6,0))
+        if(shufflableItems.Count != itemLocs.Count + extraPalaceItemCount)
         {
             throw new Exception("Item locations must match number of items");
         }
@@ -921,21 +919,23 @@ public class Hyrule
         {
             if(location?.PalaceNumber == null)
             {
-                itemLocsIterator.MoveNext();
+                if (!itemLocsIterator.MoveNext()) { throw new InvalidOperationException("Ran out of item locations."); }
                 location = itemLocsIterator.Current;
             }
-            while(location.PalaceNumber != null && ++subIndex > props.PalaceItemRoomCount)
+            while(location.PalaceNumber is int palaceNum && ++subIndex > props.PalaceItemRoomCounts[palaceNum - 1])
             {
                 subIndex = 0;
-                itemLocsIterator.MoveNext();
+                if (!itemLocsIterator.MoveNext()) { throw new InvalidOperationException("Ran out of item locations."); }
                 location = itemLocsIterator.Current;
             }
+
             location.Collectables.Add(item);
-            if(location.PalaceNumber != null)
+            if(location.PalaceNumber is int palaceNumInIf)
             {
-                palaces[(location.PalaceNumber ?? 0) - 1].ItemRooms[subIndex - 1].Collectable = item;
+                palaces[palaceNumInIf - 1].ItemRooms[subIndex - 1].Collectable = item;
             }
         }
+        Debug.Assert(!itemLocsIterator.MoveNext(), "All item locations were not used. This should not happen.");
     }
 
     private async Task<bool> FillPalaceRooms(AsmModule sideviewModule)
@@ -1329,7 +1329,7 @@ public class Hyrule
         foreach (Location location in delayedEvaluationLocations)
         {
             bool canGet;
-            if (location.ActualTown != null & Towns.townSpellAndItemRequirements.ContainsKey((Town)location.ActualTown!))
+            if (location.ActualTown != null && Towns.townSpellAndItemRequirements.ContainsKey((Town)location.ActualTown))
             {
                 canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
             }
@@ -1942,7 +1942,7 @@ public class Hyrule
                     westHyrule.SetStart();
 
                     ShufflePalaces();
-                    LoadItemLocs(props.PalaceItemRoomCount);
+                    LoadItemLocs(props.PalaceItemRoomCounts);
                     ShuffleItems();
 
 
@@ -2091,7 +2091,7 @@ public class Hyrule
 
     //ItemLocs is specifically only those locations that contain shufflable items
     //If you're looking for a global reference for which items are where... too bad it doesn't exist :(
-    private List<Location> LoadItemLocs(int itemsPerPalace)
+    private List<Location> LoadItemLocs(int[] itemsPerPalaces)
     {
         itemLocs =
         [
@@ -2149,15 +2149,15 @@ public class Hyrule
             itemLocs.Add(eastHyrule.daruniaRoof);
         }
 
-        if(props.PalaceItemRoomCount == 0)
-        {
-            itemLocs.Remove(westHyrule.locationAtPalace1);
-            itemLocs.Remove(westHyrule.locationAtPalace2);
-            itemLocs.Remove(westHyrule.locationAtPalace3);
-            itemLocs.Remove(mazeIsland.locationAtPalace4);
-            itemLocs.Remove(eastHyrule.locationAtPalace5);
-            itemLocs.Remove(eastHyrule.locationAtPalace6);
-            itemLocs.Remove(eastHyrule.locationAtGP);
+        List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6, eastHyrule.locationAtGP];
+        foreach (var pal in pals) {
+            if (pal.PalaceNumber is int palaceNum)
+            {
+                if (palaceNum == 7 || props.PalaceItemRoomCounts[palaceNum - 1] == 0)
+                {
+                    itemLocs.Remove(pal);
+                }
+            }
         }
 
         return itemLocs;

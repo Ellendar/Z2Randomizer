@@ -43,6 +43,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     IsRoot = true,
                     // PalaceGroup = palaceGroup
                 };
+                if (palaceNumber != 7) { palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r); }
                 palace.AllRooms.Add(palace.Entrance);
 
                 palace.BossRoom = new(roomPool.BossRooms[r.Next(roomPool.BossRooms.Count)]);
@@ -54,7 +55,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                 if (palaceNumber < 7) //Not GP
                 {
-                    for(int i = 0; i < props.PalaceItemRoomCount; i++)
+                    for(int i = 0; i < props.PalaceItemRoomCounts[palaceNumber - 1]; i++)
                     {
                         if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
                         {
