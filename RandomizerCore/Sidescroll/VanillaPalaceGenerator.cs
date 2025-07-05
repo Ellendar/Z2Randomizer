@@ -82,6 +82,7 @@ public class VanillaPalaceGenerator() : PalaceGenerator
                 && !i.HasItem
                 //Replacing a linked room removes half of it which theoretically could work but currently breaks stuff
                 && i.LinkedRoomName == null
+                && !i.IsDropZone
                 && (i.CategorizeExits() == RoomExitType.DEADEND_EXIT_LEFT || i.CategorizeExits() == RoomExitType.DEADEND_EXIT_RIGHT)).ToList();
             //pick N-1 of them 
             IEnumerable<Room> roomsToItemRoomify = normalDeadEnds.Sample(r, props.PalaceItemRoomCount - 1);
