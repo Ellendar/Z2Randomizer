@@ -1661,8 +1661,10 @@ OverwriteSpriteCHRBank:
     lda WorldNumber ; 3 = palace group 1,2,5 ; 4 = palace group 3,4,6
     cmp #$03 ; we are fighting a Horsehead since this is palace set 4
     beq @LoadHorsehead
+        cmp #4
+        bne @Exit
         lda #$18 * 4 + 4 ; CHR bank for rebo as mini boss
-        bne @WriteCHRBanks ; unconditional
+        bne @WriteCHRBanks ; unconditional (we can't use BIT $abs here safely)
 @LoadHorsehead:
     lda #$0a * 4 + 4 ; CHR bank for horsehead as mini boss
 @WriteCHRBanks:
@@ -1678,6 +1680,7 @@ OverwriteSpriteCHRBank:
     ; clc ; carry is clear here
     adc #4
     sta BgChrBank0Reg
+@Exit:
     rts
 
 ; Patch the enemy loading routine to check if the enemy is horsehead/rebo
