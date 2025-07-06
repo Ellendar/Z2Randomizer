@@ -290,7 +290,9 @@ public class Hyrule
                     palaces[3].RandomizeSmallItems(RNG, props.ExtraKeys);
                     palaces[4].RandomizeSmallItems(RNG, props.ExtraKeys);
                     palaces[5].RandomizeSmallItems(RNG, props.ExtraKeys);
-                    palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    //Small items in GP shouldn't be randomized. This is intentional to keep
+                    //the randomization in line with the original "shuffle" behavior
+                    //palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
                 }
 
                 AsmModule sideviewModule = new();
