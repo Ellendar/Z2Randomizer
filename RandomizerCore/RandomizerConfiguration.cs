@@ -1426,30 +1426,36 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                                 throw new ImpossibleException();
                         }
                     }).ToArray();
+                    for (int i = 0; i < 6; i++)
+                    {
+                        // Limit vanilla palace style to 1 item rooms max
+                        // Rationale:
+                        // The benefit of the vanilla palace style is that you can use vanilla
+                        // knowledge to know exactly where to go. Changing random rooms into
+                        // additonal item rooms ruins this. So, unless the user specifically
+                        // sets two items per, we should not do it.
+                        //
+                        // This way we can combine the fun of having both style and item count
+                        // set to random, for Max Rando players, without the downside of having
+                        // to track down which room was changed in a vanilla palace.
+                        if (properties.PalaceStyles[i] == PalaceStyle.VANILLA)
+                        {
+                            properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
+                        }
+                        // Limit shuffled vanilla palace style to 2 item rooms max
+                        // Technically, non-shortened P4 & P5 can have 3 item rooms,
+                        // but lets keep it simple.
+                        else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
+                        {
+                            properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 2);
+                        }
+                    }
+                    properties.PalaceItemRoomCountIndicator = true;
                     break;
                 default:
                     properties.PalaceItemRoomCounts = Enumerable.Repeat((int)PalaceItemRoomCount, 6).ToArray();
+                    properties.PalaceItemRoomCountIndicator = false;
                     break;
-            }
-            for (int i = 0; i < 6; i++)
-            {
-                // Limit vanilla palace style to 1 item room to remain vanilla
-                if (properties.PalaceStyles[i] == PalaceStyle.VANILLA)
-                {
-                    properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
-                }
-                // Limit shuffled vanilla style to the max amount we can fit
-                // Palace 1-3: 2 item rooms max
-                // Palace 4-6: 3 item rooms max (unless shortened)
-                else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
-                {
-                    properties.PalaceItemRoomCounts[i] = (i + 1) switch
-                    {
-                        1 or 2 or 3 => Math.Min(properties.PalaceItemRoomCounts[i], 2),
-                        4 or 5 or 6 => Math.Min(properties.PalaceItemRoomCounts[i], properties.ShortenNormalPalaces ? 2 : 3),
-                        _ => throw new ImpossibleException(),
-                    };
-                }
             }
 
             //Other starting attributes
