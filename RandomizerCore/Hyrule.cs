@@ -108,7 +108,7 @@ public class Hyrule
 
     //DEBUG/STATS
     public const bool UNSAFE_DEBUG = false;
-    private static int DEBUG_THRESHOLD = 100;
+    private static int DEBUG_THRESHOLD = 200;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;

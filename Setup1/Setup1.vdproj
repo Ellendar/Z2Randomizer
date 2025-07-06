@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5          "
+                "FrameworkVersion" = "8:v4.5           "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -249,15 +249,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork (Beta)"
-        "ProductCode" = "8:{4076A597-E8F6-4AE3-8723-6EF4024124BB}"
-        "PackageCode" = "8:{F137E995-088C-449F-8A9A-AEEA6C36CC08}"
+        "ProductCode" = "8:{F6E80AE3-B176-4046-AE27-A9106294D4C8}"
+        "PackageCode" = "8:{2E0772DB-350A-426C-B3C1-023BE1123B83}"
         "UpgradeCode" = "8:{3B4E898B-B60D-431D-9835-914997B9CC90}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.4.9"
+        "ProductVersion" = "8:4.4.10"
         "Manufacturer" = "8:Ellendar"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -799,7 +799,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0F49DB0EDF54F159193D61E9D0E0F01"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\x64\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -827,7 +827,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FDAF64163E1242A1BC91894E0D2DCFA8"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\x64\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
