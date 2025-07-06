@@ -82,7 +82,7 @@ void ValidateRoomsForFile(string filename)
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
-        CheckElevatorsAndDrops(room, sv, solidGrid, elevators, openCeilingTiles, dropTiles);
+        CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
         CheckDropZones(room, openCeilingTiles);
     }
 
@@ -114,7 +114,7 @@ void ValidateRoomsForFile(string filename)
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
-        CheckElevatorsAndDrops(room, sv, solidGrid, elevators, openCeilingTiles, dropTiles);
+        CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
         CheckDropZones(room, openCeilingTiles);
     }
 }
@@ -258,7 +258,7 @@ bool FindTileOpeningAtX(bool[,] solidGrid, int x, int n = 3)
     return false;
 }
 
-void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> elevators, SortedSet<int> openCeilingTiles, SortedSet<int> dropTiles) where T : Enum
+void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> elevators, SortedSet<int> dropTiles) where T : Enum
 {
     bool IsDownElevator(SideviewMapCommand<T> o)
     {
@@ -281,7 +281,11 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         }
         return y == 13;
     }
-    bool IsUpElevator(SideviewMapCommand<T> o) => openCeilingTiles.Contains(o.AbsX) || openCeilingTiles.Contains(o.AbsX + 1);
+    bool IsUpElevator(SideviewMapCommand<T> elev)
+    {
+        var elevatorY = 10 - elev.Param * 2;
+        return SolidGridHelper.AreaIsOpen(solidGrid, elev.AbsX, 0, 1, elevatorY) || SolidGridHelper.AreaIsOpen(solidGrid, elev.AbsX + 1, 0, 1, elevatorY);
+    }
 
     // skip non-exit elevators
     elevators = elevators.TakeWhile(o => IsUpElevator(o) || IsDownElevator(o)).ToList();
@@ -348,6 +352,13 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
             }
         }
         if (sv.PageCount == 2 && room.HasRightExit) { Warning(room, "DownConnectorConflict", "Down and Right exits cannot both use the 2nd connection byte"); }
+    }
+    if (room.IsDropZone)
+    {
+        if (elevators.Find(o => IsUpElevator(o)) != null)
+        {
+            Warning(room, "ElevatorUpInDropZone", "Room cannot be a drop zone that has an up elevator");
+        }
     }
 
     foreach (var elevator in elevators)
