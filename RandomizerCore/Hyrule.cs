@@ -237,6 +237,14 @@ public class Hyrule
             accessibleMagicContainers = 4;
             reachableAreas = new HashSet<string>();
             //areasByLocation = new SortedDictionary<string, List<Location>>();
+
+            byte[] correctVanillaHash = [0x76, 0x4D, 0x36, 0xFA, 0x8A, 0x24, 0x50, 0x83, 0x4D, 0xA5, 0xE8, 0x19, 0x42, 0x81, 0x03, 0x5A];
+            var vanillaRomHash = MD5Hash.ComputeHash(vanillaRomData);
+            if (!correctVanillaHash.SequenceEqual(vanillaRomHash))
+            {
+                throw new UserFacingException("Vanilla ROM checksum failure", "Please provide an unmodified Zelda 2 ROM (US release).");
+            }
+
             // Make a copy of the vanilla data to prevent seed bleed
             ROMData = new ROM(vanillaRomData.ToArray(), true);
 
