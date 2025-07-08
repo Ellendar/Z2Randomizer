@@ -31,6 +31,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
         this.palaceNumber = palaceNumber;
 
         debug++;
+        bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         Palace palace = new(palaceNumber);
         openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
@@ -101,6 +102,7 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
 
             if (bestFitExitCount <= 0 || bestFit == Coord.Uninitialized) continue;
             UpdateRoom(bestFit);
+            if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, newRoom); }
         }
         //close stubs
         if (openCoords.Count > 0)
@@ -205,16 +207,9 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
                         right.Left = newRoom;
                     }
 
-                    if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber) && newRoom.Group != RoomGroup.STUBS)
+                    if (newRoom.Group != RoomGroup.STUBS)
                     {
-                        roomsByExitType[exitType].Remove(newRoom);
-                    }
-                    if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
-                    {
-                        List<Room> duplicateSideviewStubs = roomPool.NormalRooms.Where(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)
-                            && i.Group != RoomGroup.STUBS).ToList();
-                        roomPool.NormalRooms.RemoveAll(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)
-                            && i.Group != RoomGroup.STUBS);
+                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomsByExitType[exitType], newRoom); }
                     }
                 } while (placed == false);
             }
@@ -269,17 +264,6 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
         if (newOpenCoords.Count + openCoords.Count + allRooms.Count > roomCount)
         {
             return;
-        }
-        if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
-        {
-            if (allRooms.Values.Any(room => byteArrayEqualityComparer.Equals(room.SideView, newRoom.SideView)))
-            {
-                return;
-            }
-        }
-        if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
-        {
-            roomPool.NormalRooms.Remove(newRoom);
         }
         var (x, y) = bestFit;
         Room left = allRooms.GetValueOrDefault(new Coord(x - 1, y))!;
@@ -345,6 +329,5 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
             }
         }
         //Debug.WriteLine("Added Room at (" + newRoom.coords.Item1 + ", " + newRoom.coords.Item2 + ")");
-        
     }
 }
