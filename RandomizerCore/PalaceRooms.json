@@ -12918,7 +12918,7 @@
     "bitmask": "0F",
     "connections": "FCFFFFFC",
     "elevatorScreen": 0,
-    "enabled": true,
+    "enabled": false,
     "enemies": "035A80",
     "group": "V4_0",
     "hasBoss": false,
