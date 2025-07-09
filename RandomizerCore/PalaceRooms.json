@@ -16854,7 +16854,7 @@
     "author": "aaron2u2",
     "group": "V4_4",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
