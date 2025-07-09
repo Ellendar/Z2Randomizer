@@ -20488,5 +20488,31 @@
     "palaceNumber": 7,
     "requirements": [],
     "sideviewData": "30600D08D50012F9D60111F8F11B908B1CF8D20015F9D30E80F2F2500006010682F2D10012F9A3249122710A15F9D30D"
+  },
+  {
+    "author": "gtmNewgpRooms",
+    "bitmask": "0F",
+    "connections": "FF4AB758",
+    "elevatorScreen": 1,
+    "enabled": true,
+    "enemies": "09261A318527942F94",
+    "group": "V4_4",
+    "hasBoss": false,
+    "hasDrop": false,
+    "hasItem": false,
+    "isBossRoom": false,
+    "isDropZone": false,
+    "isEntrance": false,
+    "isThunderBirdRoom": false,
+    "isUpDownReversed": false,
+    "linkedRoomName": null,
+    "map": 10,
+    "memoryAddress": 83795,
+    "name": "gtmNewgpRooms M10 mirrored",
+    "palaceGroup": null,
+    "palaceNumber": 7,
+    "requirements": [
+    ],
+    "sideviewData": "40600F08D208DA0E80D281D2D10850015502D10EA125F25000060106D40850015502D10E80D281D2D10850015502D10ED20850015502D10E80D281D2D108DA0E"
   }
 ]
