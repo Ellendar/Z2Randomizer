@@ -13671,7 +13671,7 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FFFFFFFC",
+    "connections": "53FFFFFC",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "05798579C5",
