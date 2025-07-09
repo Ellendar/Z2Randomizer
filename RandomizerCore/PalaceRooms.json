@@ -20463,5 +20463,30 @@
   "palaceNumber": 7,
   "linkedRoomName": null,
   "isUpDownReversed": false
+  },
+  {
+    "author": "miralupa",
+    "bitmask": "0F",
+    "connections": "DBF2CAE0",
+    "elevatorScreen": 2,
+    "enabled": true,
+    "enemies": "056D1852DD",
+    "group": "V4_4",
+    "hasBoss": false,
+    "hasDrop": false,
+    "hasItem": false,
+    "isBossRoom": false,
+    "isDropZone": false,
+    "isEntrance": false,
+    "isThunderBirdRoom": false,
+    "isUpDownReversed": false,
+    "linkedRoomName": null,
+    "map": 55,
+    "memoryAddress": 69692,
+    "name": "island adventure confusion palace room as GP",
+    "palaceGroup": null,
+    "palaceNumber": 7,
+    "requirements": [],
+    "sideviewData": "30600D08D50012F9D60111F8F11B908B1CF8D20015F9D30E80F2F2500006010682F2D10012F9A3249122710A15F9D30D"
   }
 ]
