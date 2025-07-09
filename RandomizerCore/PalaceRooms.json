@@ -13698,7 +13698,7 @@
     "author": "maxBonusItemRoom",
     "bitmask": "0F",
     "connections": "9FFCFC98",
-    "elevatorScreen": 2,
+    "elevatorScreen": 0,
     "enabled": false,
     "enemies": "071A5950466E5E",
     "group": "V4_0",
@@ -14408,7 +14408,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "27600F08F75010F1D2071082138F1405D8136071D409A021D20B7102D10EE30082C29080A00F08"
+    "sideviewData": "27600F08F75010F1D2071082138F1305D9136071D409A021D20B7102D10EE30082C29080A00F08"
   },
   {
     "author": "aaron2u2",
@@ -14746,7 +14746,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "27600F08F75010F1D2071082138F1405D8136071D409A021D20B7102D10EE30082C29080A00F08"
+    "sideviewData": "27600F08F75010F1D2071082138F1305D9136071D409A021D20B7102D10EE30082C29080A00F08"
   },
   {
     "author": "aaron2u2",
@@ -15322,8 +15322,8 @@
     "name": "Winding reward room",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "24608008D087D480F0126030712F322DA00F0DA20F087B2F312F7F2F312F7F243126D787"
   },
   {
@@ -18670,8 +18670,8 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "05779A7F85",
-    "sideviewData": "1B600F08E200D0008321D480F05A6021A10F12D1008221940AD10F",
+    "enemies": "05779A70C5",
+    "sideviewData": "1B600F08E200D0008321D480F05A6021A10F12D1008221D50F900A",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Bird Pit",
