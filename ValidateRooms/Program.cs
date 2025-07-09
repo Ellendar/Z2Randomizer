@@ -128,6 +128,11 @@ void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
             Warning(room, "PageOverflow", $" has command that overflows into page 4.\n{cmd.DebugString()}\n{FixedOverflowCommandString(sv, cmd)}");
             break;
         }
+        if (cmd.Y < 13 && (cmd.Y + cmd.Height - 1 > 12))
+        {
+            Warning(room, "PageOverflow", $" has command that overflows below the last row.\n{cmd.DebugString()}");
+            break;
+        }
     }
 }
 

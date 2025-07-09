@@ -5629,7 +5629,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "26600608102DDA14D202D208D60EE200A525F25080D781D7D30ED10CD208D8021029D204D206"
+    "sideviewData": "24600608102DDA14D202D208D60EE200A525F25080F1D40ED10CD208D8021029D204D206"
   },
   {
     "author": "dmInPalaces",
@@ -18521,7 +18521,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "01",
-    "sideviewData": "1C600F10E100D10010F4D50C60F5D1E8F050C071D20CD10010F4D50F",
+    "sideviewData": "1C600F10E100D10010F4D50C60F5D1E8F050C021D20CD10010F4D50F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Void elevator to drop",
