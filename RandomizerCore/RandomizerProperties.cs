@@ -159,6 +159,7 @@ public class RandomizerProperties
     public bool IncludeQuestItemsInShuffle { get; set; }
     public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
+    public bool AllowImportantItemDuplicates { get; set; }
     public bool RandomizeNewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }

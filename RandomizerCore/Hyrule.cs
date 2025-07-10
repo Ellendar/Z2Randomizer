@@ -920,6 +920,50 @@ public class Hyrule
             throw new Exception("Item locations must match number of items");
         }
 
+        if (props.AllowImportantItemDuplicates)
+        {
+            List<Collectable> importantItemsToDuplicate = [ /* in (non-random) priority order */
+                Collectable.GLOVE,
+                Collectable.DOWNSTAB,
+                Collectable.FAIRY_SPELL,
+                Collectable.THUNDER_SPELL,
+                Collectable.REFLECT_SPELL,
+                Collectable.MAGIC_KEY,
+                Collectable.HAMMER,
+                Collectable.RAFT,
+                Collectable.FLUTE,
+                Collectable.JUMP_SPELL,
+                Collectable.UPSTAB,
+                Collectable.BOOTS,
+            ];
+            var shufflableImportantItems = importantItemsToDuplicate.Where(c => shufflableItems.Contains(c)).ToList();
+            // re-do the minor item indexes post-shuffle
+            minorItemIndexes = Enumerable.Range(0, shufflableItems.Count)
+                                         .Where(i => shufflableItems[i].IsMinorItem())
+                                         .ToList();
+            minorItemIndexes.FisherYatesShuffle(RNG);
+
+            for (int i = 0; i < shufflableImportantItems.Count; i++)
+            {
+                if (minorItemIndexes.Count == 0) { break; }
+                var collectable = shufflableImportantItems[i];
+                int originalItemIndex = shufflableItems.IndexOf(collectable);
+                for (int j = minorItemIndexes.Count - 1; j >= 0; j--)
+                {
+                    int minorItemIndex = minorItemIndexes[j];
+                    // make sure duplicate items are not right next to each other
+                    // (Both Maze Island drops etc.)
+                    if (Math.Abs(originalItemIndex - minorItemIndex) >= 4)
+                    {
+                        shufflableItems[minorItemIndex] = collectable;
+                        minorItemIndexes.RemoveAt(j);
+                        break;
+                    }
+                }
+            }
+        }
+
+        //Clear all locations, then set them to the newly shuffled items
         itemLocs.ForEach(i => i.Collectables.Clear());
         palaces.ForEach(i => i.ItemRooms.ForEach(j => j.Collectable = null));
         using var itemLocsIterator = itemLocs.GetEnumerator();

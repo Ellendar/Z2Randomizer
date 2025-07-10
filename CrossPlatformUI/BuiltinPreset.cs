@@ -89,6 +89,7 @@ public static class BuiltinPreset
         ShufflePBagAmounts = false,
         PalacesContainExtraKeys = true,
         RandomizeNewKasutoJarRequirements = true,
+        AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = true,
@@ -207,6 +208,7 @@ public static class BuiltinPreset
         ShufflePBagAmounts = false,
         PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
+        AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = true,
@@ -323,6 +325,7 @@ public static class BuiltinPreset
         ShufflePBagAmounts = true,
         PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
+        AllowImportantItemDuplicates = false,
 
         //Drops
         ShuffleItemDropFrequency = true,

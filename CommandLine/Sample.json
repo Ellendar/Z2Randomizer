@@ -82,6 +82,7 @@
 "RandomizeKnockback": false,
 "RandomizeMusic": false,
 "RandomizeNewKasutoJarRequirements": true,
+"AllowImportantItemDuplicates": false,
 "RandomizeSpellSpellEnemy": false,
 "RemoveFlashing": true,
 "RemoveSpellItems": false,
