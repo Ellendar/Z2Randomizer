@@ -1698,6 +1698,42 @@ CheckIfHorseheadReboshark:
 """);
     }
 
+    public void FixBossKillPaletteGlitch(Assembler asm)
+    {
+        // Restore red palette color that is set to black for Link's shadow during boss explosions
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.segment "PRG7"
+.org $DE3A
+HookIntoSpawnBossItem:
+    jmp RestorePaletteAfterBossKill
+
+.reloc
+RestorePaletteAfterBossKill:
+    sta $c2,x ; command overwritten by jmp
+    ldx #$00
+    ldy $362
+@CopyLoop:
+    lda ResetRedPalettePayload,x
+    sta $0363,y
+    inx
+    iny
+    cpx #$08
+    bne @CopyLoop
+    lda #$02
+    sta $0725 ; setting PPU macro 2
+    dey
+    sty $362
+    ldx $10
+    rts
+
+.reloc
+ResetRedPalettePayload:
+    ; 8 byte palette payload for PPU macro
+    .byte $3f, $18, $04, $0f, $06, $16, $30, $ff
+""");
+    }
+
     public void BuffCarrock(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
