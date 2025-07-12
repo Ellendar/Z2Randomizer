@@ -1,6 +1,7 @@
 ﻿using NLog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         debug++;
+        bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         RoomPool roomPool = new(rooms);
         Palace palace = new(palaceNumber);
         var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
@@ -57,6 +59,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
                     }
                     itemRoom = new(roomPool.ItemRoomsByDirection[itemRoomDirection].ElementAt(r.Next(roomPool.ItemRoomsByDirection[itemRoomDirection].Count)));
                 }
+                Debug.Assert(itemRoom != null);
                 palace.ItemRooms.Add(itemRoom);
                 palace.AllRooms.Add(itemRoom);
 
@@ -89,19 +92,8 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             await Task.Yield();
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
-            if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
-            {
-                if (palace.AllRooms.Any(i => byteArrayEqualityComparer.Equals(i.SideView, newRoom.SideView)))
-                {
-                    roomPool.NormalRooms.RemoveAt(roomIndex);
-                    continue;
-                }
-            }
             palace.AllRooms.Add(newRoom);
-            if (props.NoDuplicateRooms && AllowDuplicatePrevention(props, palaceNumber))
-            {
-                roomPool.NormalRooms.RemoveAt(roomIndex);
-            }
+            if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, newRoom); }
         }
 
         Dictionary<Room, RoomExitType> roomExits = [];

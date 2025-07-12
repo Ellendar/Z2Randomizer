@@ -128,6 +128,11 @@ void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
             Warning(room, "PageOverflow", $" has command that overflows into page 4.\n{cmd.DebugString()}\n{FixedOverflowCommandString(sv, cmd)}");
             break;
         }
+        if (cmd.Y < 13 && (cmd.Y + cmd.Height - 1 > 12))
+        {
+            Warning(room, "PageOverflow", $" has command that overflows below the last row.\n{cmd.DebugString()}");
+            break;
+        }
     }
 }
 
@@ -258,7 +263,7 @@ bool FindTileOpeningAtX(bool[,] solidGrid, int x, int n = 3)
     return false;
 }
 
-void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> elevators, SortedSet<int> dropTiles) where T : Enum
+void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidGrid, List<SideviewMapCommand<T>> allElevators, SortedSet<int> dropTiles) where T : Enum
 {
     bool IsDownElevator(SideviewMapCommand<T> o)
     {
@@ -287,16 +292,15 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         return SolidGridHelper.AreaIsOpen(solidGrid, elev.AbsX, 0, 1, elevatorY) || SolidGridHelper.AreaIsOpen(solidGrid, elev.AbsX + 1, 0, 1, elevatorY);
     }
 
-    // skip non-exit elevators
-    elevators = elevators.TakeWhile(o => IsUpElevator(o) || IsDownElevator(o)).ToList();
+    if (allElevators.Count > 1) { Warning(room, "MultipleExitElevators", "Room has more than one elevator"); }
 
-    foreach (var elevator in elevators)
+    foreach (var elevator in allElevators)
     {
         // calculate optimal elevator param (y position)
         if (IsDownElevator(elevator))
         {
             if (elevator.Param > 0) {
-                Warning(room, "ElevatorParam", $"Down elevator has param > 0.\n{FixedElevatorHexString(sv, elevator, 0)}");
+                Warning(room, "ElevatorParam", $"Down elevator has param > 2.\n{FixedElevatorHexString(sv, elevator, 2)}");
             }
         }
         else
@@ -315,8 +319,10 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         }
     }
 
-    if (elevators.Count > 1) { Warning(room, "MultipleExitElevators", "Room has more than one exit elevator"); }
-    foreach (var elevator in elevators)
+    // skip non-exit elevators
+    var exitElevators = allElevators.TakeWhile(o => IsUpElevator(o) || IsDownElevator(o)).ToList();
+
+    foreach (var elevator in exitElevators)
     {
         var x = elevator.AbsX;
         if (x / 16 != room.ElevatorScreen) { Warning(room, "ElevatorWrongScreen", $"ElevatorScreen={room.ElevatorScreen} but elevator.xpos={x}"); }
@@ -326,14 +332,14 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
     }
 
     if (room.ElevatorScreen != -1 && room.IsUpDownReversed) { Warning(room, "IsUpDownReversedElevator", $"IsUpDownReversed does not apply to elevators"); }
-    if (room.ElevatorScreen != -1 && elevators.Count == 0) { Warning(room, "ElevatorMissing", $"ElevatorScreen={room.ElevatorScreen} but room has no elevator"); }
+    if (room.ElevatorScreen != -1 && exitElevators.Count == 0) { Warning(room, "ElevatorMissing", $"ElevatorScreen={room.ElevatorScreen} but room has no exit elevator"); }
     if (room.HasUpExit)
     {
         if (room.ElevatorScreen == -1) { Warning(room, "ElevatorMissing", $"Room is marked as having an up exit but ElevatorScreen=-1"); }
-        if (elevators.Count == 0) { Warning(room, "ElevatorMissing", "Room has no elevator but is marked as having an up exit"); }
+        if (exitElevators.Count == 0) { Warning(room, "ElevatorMissing", "Room has no exit elevator but is marked as having an up exit"); }
         else
         {
-            if (elevators.Find(o => IsUpElevator(o)) == null)
+            if (exitElevators.Find(o => IsUpElevator(o)) == null)
             {
                 Warning(room, "ElevatorCannotGoUp", "Elevator cannot go up but room is marked as having an up exit");
             }
@@ -343,10 +349,10 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
     if (room.HasDownExit && !room.HasDrop)
     {
         if (room.ElevatorScreen == -1) { Warning(room, "ElevatorMissing", "Room is marked as having a down exit but ElevatorScreen=-1"); }
-        if (elevators.Count == 0) { Warning(room, "ElevatorMissing", "Room has no elevator but is marked as having a down exit"); }
+        if (exitElevators.Count == 0) { Warning(room, "ElevatorMissing", "Room has no exit elevator but is marked as having a down exit"); }
         else
         {
-            if (elevators.Find(o => IsDownElevator(o)) == null)
+            if (exitElevators.Find(o => IsDownElevator(o)) == null)
             {
                 Warning(room, "ElevatorCannotGoDown", "Elevator cannot go down but room is marked as having a down exit");
             }
@@ -355,13 +361,13 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
     }
     if (room.IsDropZone)
     {
-        if (elevators.Find(o => IsUpElevator(o)) != null)
+        if (exitElevators.Find(o => IsUpElevator(o)) != null)
         {
             Warning(room, "ElevatorUpInDropZone", "Room cannot be a drop zone that has an up elevator");
         }
     }
 
-    foreach (var elevator in elevators)
+    foreach (var elevator in exitElevators)
     {
         dropTiles.Remove(elevator.AbsX);
         dropTiles.Remove(elevator.AbsX + 1);

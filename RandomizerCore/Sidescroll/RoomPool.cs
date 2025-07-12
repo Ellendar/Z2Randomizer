@@ -186,5 +186,16 @@ public class RoomPool
         return categorizedRooms;
     }
 
+    public List<Room> GetNormalRoomsForExitType(RoomExitType exitType, bool linkRooms = false)
+    {
+        return NormalRooms.Where(room =>
+        {
+            var roomType = room.CategorizeExits();
+            if (room.LinkedRoomName != null)
+            {
+                roomType = roomType.Merge(LinkedRooms[room.LinkedRoomName].CategorizeExits());
+            }
+            return roomType == exitType;
+        }).ToList();
+    }
 }
-

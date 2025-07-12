@@ -193,6 +193,7 @@ public class Palaces
             {
                 palace = await palaceGenerator.GeneratePalace(props, roomPool, r, sizes[currentPalace - 1], currentPalace);
             } while (!palace.IsValid || (props.PalaceStyles[currentPalace - 1] != PalaceStyle.VANILLA && palace.HasInescapableDrop()));
+            PalaceGenerator.DebugCheckDuplicates(props, palace);
 
             if(palace.PalaceGroup == PalaceGrouping.Palace125)
             {

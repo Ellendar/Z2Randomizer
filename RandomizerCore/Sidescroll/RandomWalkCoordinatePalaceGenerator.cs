@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         debug++;
+        bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         Palace palace = new(palaceNumber);
         List<Coord> openCoords = new();
         Dictionary<RoomExitType, List<Room>> roomsByExitType;
@@ -82,7 +84,6 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         }
 
         //Dropify graph
-        roomsByExitType = roomPool.CategorizeNormalRoomExits();
         foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.X).ThenBy(i => i.Key.Y))
         {
             await Task.Yield();
@@ -135,6 +136,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 
         //Add rooms
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
+        Dictionary<RoomExitType, bool> stubOnlyExitTypes = new();
         foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
         {
             if (item.Key == Coord.Uninitialized)
@@ -143,19 +145,42 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             }
             var (x, y) = item.Key;
             RoomExitType roomExitType = item.Value;
-            roomsByExitType.TryGetValue(roomExitType, out var roomCandidates);
-            roomCandidates ??= [];
-            roomCandidates.FisherYatesShuffle(r);
+
+            bool stubOnly;
+            List<Room>? roomCandidates;
             Room? newRoom = null;
-            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
-            foreach (Room roomCandidate in roomCandidates)
+            if (!stubOnlyExitTypes.TryGetValue(roomExitType, out stubOnly))
             {
-                if((upRoom == null || (upRoom.HasDrop == roomCandidate.IsDropZone))
-                    && roomCandidate.IsNormalRoom())
+                roomsByExitType.TryGetValue(roomExitType, out roomCandidates);
+                stubOnly = roomCandidates == null || roomCandidates.Count == 0;
+                stubOnlyExitTypes[roomExitType] = stubOnly;
+            }
+            else
+            {
+                roomCandidates = stubOnly ? null : roomsByExitType.GetValueOrDefault(roomExitType);
+            }
+            if (!stubOnly)
+            {
+                Debug.Assert(roomCandidates != null);
+                if (duplicateProtection && roomCandidates!.Count == 0)
                 {
-                    newRoom = roomCandidate;
-                    break;
+                    roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
+                    Debug.Assert(roomCandidates.Count() > 0);
+                    roomsByExitType[roomExitType] = roomCandidates;
+                    logger.Info($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
                 }
+                roomCandidates!.FisherYatesShuffle(r);
+                Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
+                foreach (Room roomCandidate in roomCandidates!)
+                {
+                    if ((upRoom == null || (upRoom.HasDrop == roomCandidate.IsDropZone)))
+                    {
+                        Debug.Assert(roomCandidate.IsNormalRoom());
+                        newRoom = roomCandidate;
+                        break;
+                    }
+                }
+                if (newRoom != null && duplicateProtection) { RemoveDuplicatesFromPool(props, roomCandidates!, newRoom); }
             }
             if (newRoom == null)
             {

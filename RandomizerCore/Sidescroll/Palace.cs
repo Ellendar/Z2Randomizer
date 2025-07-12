@@ -1018,6 +1018,7 @@ public class Palace
         List<Room> dropZonesToCheck = [];
         foreach (Room room in AllRooms.Where(i => i.HasDrop))
         {
+            if(room.Down == null) { return true; }
             if(room.Down!.IsDropZone)
             {
                 dropZonesToCheck.Add(room.Down);
@@ -1069,7 +1070,7 @@ public class Palace
                 }
             }
             //if the exploration list runs out, we couldn't find the exit, so the drop is isolated.
-            if (Hyrule.UNSAFE_DEBUG && !found)
+            if (!found)
             {
                 //Debug.WriteLine(GetLayoutDebug());
                 return true;

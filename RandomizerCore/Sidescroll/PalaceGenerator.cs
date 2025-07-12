@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
@@ -15,7 +18,7 @@ public abstract class PalaceGenerator
 
     internal abstract Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber);
 
-    protected bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
+    protected static bool AllowDuplicatePrevention(RandomizerProperties props, int palaceNumber)
     {
         if (palaceNumber < 7)
         {
@@ -58,4 +61,50 @@ public abstract class PalaceGenerator
         return true;
     }
 
+    protected static void RemoveDuplicatesFromPool(RandomizerProperties props, ICollection<Room> rooms, Room roomThatWasUsed)
+    {
+        if (props.NoDuplicateRoomsBySideview)
+        {
+            var sideviewBytes = roomThatWasUsed.SideView;
+            if (rooms is List<Room> list)
+            {
+                list.RemoveAll(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
+            }
+            else if (rooms is HashSet<Room> set)
+            {
+                set.RemoveWhere(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
+            }
+            else { throw new NotImplementedException(); }
+        }
+        else if (props.NoDuplicateRooms)
+        {
+            rooms.Remove(roomThatWasUsed);
+        }
+    }
+
+    [Conditional("DEBUG")]
+    public static void DebugCheckDuplicates(RandomizerProperties props, Palace palace)
+    {
+        switch(props.PalaceStyles[palace.Number - 1])
+        {
+            case PalaceStyle.VANILLA:
+            case PalaceStyle.SHUFFLED:
+            case PalaceStyle.RANDOM_WALK: // not implemented
+                return;
+        }
+        if (!AllowDuplicatePrevention(props, palace.Number)) { return; }
+        if (props.NoDuplicateRoomsBySideview)
+        {
+            HashSet<byte[]> usedRoomVariants = new(byteArrayEqualityComparer);
+            for (int i = 0; i < palace.AllRooms.Count; i++)
+            {
+                var room = palace.AllRooms[i];
+                if (room.HasItem) { continue; }
+                if (room.LinkedRoom != null) { continue; }
+                var sideviewBytes = room.SideView;
+                Debug.Assert(!usedRoomVariants.Contains(sideviewBytes));
+                usedRoomVariants.Add(sideviewBytes);
+            }
+        }
+    }
 }
