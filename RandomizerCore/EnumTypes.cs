@@ -570,6 +570,18 @@ public enum RiverDevilBlockerOption
     RANDOM
 }
 
+public enum BossRoomMinDistance
+{
+    [Description("None")]
+    NONE = 0,
+    [Description("10 rooms")]
+    SHORT = 10,
+    [Description("16 rooms")]
+    MEDIUM = 16,
+    [Description("Max")]
+    MAX = 30,
+}
+
 public enum PalaceItemRoomCount
 {
     [Description("Zero")]
@@ -617,6 +629,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
+    public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM && i != PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE);

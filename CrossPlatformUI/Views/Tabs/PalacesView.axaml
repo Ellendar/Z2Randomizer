@@ -24,6 +24,9 @@
                         SelectedItem="{Binding Config.GPStyle, Converter={x:Static ui:Util.EnumConvert}}" />
               <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenGP}" Content="Shorten" />
             </StackPanel>
+            <ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Minimum Path To Dark Link" Theme="{StaticResource MaterialOutlineComboBox}"
+              ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomMinDistanceOptions}}"
+              SelectedItem="{Binding Config.DarkLinkMinDistance, Converter={x:Static ui:Util.EnumConvert}}" />
             <ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Item Rooms Per Palace" Theme="{StaticResource MaterialOutlineComboBox}"
               ItemsSource="{Binding Source={x:Static rc:Enums.PalaceItemRoomCountOptions}}"
               SelectedItem="{Binding Config.PalaceItemRoomCount, Converter={x:Static ui:Util.EnumConvert}}" />

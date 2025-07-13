@@ -39,6 +39,8 @@
 "GoodBoots": true,
 "GPStyle": "RECONSTRUCTED",
 "HardBosses": false,
+"PalaceItemRoomCount": "ONE",
+"DarkLinkMinDistance": "SHORT",
 "HideKasuto": false,
 "HideLessImportantLocations": true,
 "HidePalace": false,
