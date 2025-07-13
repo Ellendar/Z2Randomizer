@@ -230,6 +230,12 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
         // AddSpecialRoomsByReplacement below relies on palace.AllRooms, so fill it in now
         palace.AllRooms.AddRange(allRooms.Values);
 
+        if (palace.HasDeadEnd())
+        {
+            palace.IsValid = false;
+            return palace;
+        }
+
         if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
         {
             specialRoomFailureCounts[palaceNumber - 1]++;
