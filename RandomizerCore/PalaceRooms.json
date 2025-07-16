@@ -15706,7 +15706,7 @@
     "bitmask": "0F",
     "connections": "FC95FCA4",
     "elevatorScreen": 0,
-    "enabled": true,
+    "enabled": false,
     "enemies": "0F679E6E5E725081D082D073507150",
     "group": "V4_4",
     "hasBoss": false,
