@@ -14304,12 +14304,12 @@
     "sideviewData": "30600E08DE08208AA120F111A22221C7F211A221F2112088A22221C7F211A220D20E8405DA08A34992454103D80E9009"
   },
   {
-    "author": "valence",
+    "author": "valence / initsu",
     "bitmask": "0F",
     "connections": "27FCFC2C",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "09200F7743758373C3",
+    "enemies": "070F8D018D034D",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -14325,9 +14325,8 @@
     "name": "Second Chances",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
-    "sideviewData": "39600310D0E04300F41FA05483501200A05F72536753F21F13004253A05F5753F41F11003253F21FA05E5553150042536302900F12A020D1E7"
+    "requirements": [],
+    "sideviewData": "41608110008F4300D480F01FA05B833042007233028FA45C6133F21F430080304233048FA23B5153F41F41003253068B5153A03A4500F1144153920F126102D187"
   },
   {
     "author": "Dudude Dude",
