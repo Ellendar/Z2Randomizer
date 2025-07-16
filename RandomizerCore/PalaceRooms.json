@@ -14592,12 +14592,12 @@
     "sideviewData": "17600009A641930F008905E200A240F111A240E3003D09"
   },
   {
-    "author": "aaron2u2",
-    "bitmask": "0D",
+    "author": "aaron2u2 / initsu",
+    "bitmask": "0F",
     "connections": "23FFFF28",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0B085F079F0A0C0BCC0F5E",
+    "enemies": "0B085F079F0A0C05CC0F5E",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -14610,12 +14610,11 @@
     "linkedRoomName": null,
     "map": 9,
     "memoryAddress": 75300,
-    "name": "aaron jam 4_4 P1_M9",
+    "name": "Curtain Crab (aaron jam 4_4 P1_M9)",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
-    "sideviewData": "2C600E08D200F51E905EA340A440820F0AA2409477728F653591A39477F81E905EA340820F0CA240A440D90E"
+    "requirements": [],
+    "sideviewData": "37600E08D200A440F11E905EA340A440820F0AA2408481A02172819073628B708D8287613597758481F21E905EA340A440A440A440D50E"
   },
   {
     "author": "aaron2u2",
