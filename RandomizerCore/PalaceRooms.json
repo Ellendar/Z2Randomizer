@@ -15600,7 +15600,7 @@
     "connections": "FCFCFF64",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "09036373DD749D0887",
+    "enemies": "090B6373DD769D0887",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -15618,7 +15618,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "2A608F100074D5F0A06CC01C372140225023627F81ADA36EC01E5A21212030214021A46EC01EAF6FC01F"
+    "sideviewData": "24600F10E100D080A06FC01F342140225023627F81ADA96FC01F542121203071AB6FC01F"
   },
   {
     "author": "miralupa",
