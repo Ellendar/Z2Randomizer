@@ -52,6 +52,7 @@ void ValidateRoomsForFile(string filename)
         if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
 
         CheckPageOverflow(room, sv);
+        CheckHeaders(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
         var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
@@ -92,6 +93,7 @@ void ValidateRoomsForFile(string filename)
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
 
         CheckPageOverflow(room, sv);
+        CheckHeaders(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
         var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
@@ -117,6 +119,32 @@ void ValidateRoomsForFile(string filename)
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
         CheckDropZones(room, openCeilingTiles);
     }
+}
+
+void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
+{
+    // if (sv.SpritePalette != 0) { Warning(room, "SpritePalette", $"Using non-zero sprite palette={sv.SpritePalette}"); }
+    if (room.PalaceNumber == 7)
+    {
+        //Most combinations seem fine in GP (not thoroughly tested)
+    }
+    else if (sv.TilesHeader == 0 /* palace room/cave */)
+    {
+        //No problems found with this (not thoroughly tested)
+    }
+    else if (sv.TilesHeader == 1 /* palace entrance (blue sky)/forest */)
+    {
+        if (sv.BackgroundPalette != 0) { Warning(room, "BackgroundPalette", "Using a sprite palette > 0 with forest tiles"); }
+    }
+    else
+    {
+        Warning(room, "TilesHeader", $"Using odd tiles header byte={sv.TilesHeader}");
+    }
+
+    if (room.Group == RoomGroup.VANILLA) { return; }
+
+    // We have enough space, it's not worth maintaining rooms with background maps to save a few bytes.
+    if (sv.BackgroundMap != 0) { Warning(room, "BackgroundMapInCustomRoom", "Using a background map in custom rooms"); }
 }
 
 void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
