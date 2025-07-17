@@ -3953,6 +3953,7 @@ FREE_UNTIL $c2ca
         rom.ChangeLavaKillPosition(engine);
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);
+        rom.FixBossKillPaletteGlitch(engine);
         StatTracking(engine);
 
         if (props.Global5050JarDrop)
