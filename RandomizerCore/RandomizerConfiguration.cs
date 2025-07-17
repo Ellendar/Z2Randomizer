@@ -144,6 +144,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleSmallItems;
     private bool? palacesContainExtraKeys;
     private bool randomizeNewKasutoJarRequirements;
+    private bool allowImportantItemDuplicates;
     private bool? removeSpellItems;
     private bool? shufflePBagAmounts;
     private bool? includeSpellsInShuffle;
@@ -739,6 +740,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => randomizeNewKasutoJarRequirements;
         set => SetField(ref randomizeNewKasutoJarRequirements, value);
+    }
+
+    public bool AllowImportantItemDuplicates
+    {
+        get => allowImportantItemDuplicates;
+        set => SetField(ref allowImportantItemDuplicates, value);
     }
 
     public bool? RemoveSpellItems
@@ -1832,6 +1839,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         properties.RandomizeSmallItems = ShuffleSmallItems;
         properties.ExtraKeys = PalacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.RandomizeNewKasutoBasementRequirement = RandomizeNewKasutoJarRequirements;
+        properties.AllowImportantItemDuplicates = AllowImportantItemDuplicates;
         properties.PbagItemShuffle = IncludePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
         properties.StartWithSpellItems = RemoveSpellItems ?? GetIndeterminateFlagValue(r);
         properties.ShufflePbagXp = ShufflePBagAmounts ?? GetIndeterminateFlagValue(r);

@@ -47,6 +47,7 @@
           <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePBagAmounts}" Content="Shuffle PBag Amounts" />
           <CheckBox IsThreeState="True" IsChecked="{Binding Config.PalacesContainExtraKeys}" Content="Palaces Contain Extra Keys" />
           <CheckBox IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}" Content="Randomize New Kasuto Jar Requirements" />
+          <CheckBox IsChecked="{Binding Config.AllowImportantItemDuplicates}" Content="Allow Duplicates Of Important Items" />
         </StackPanel>
     </Grid>
 </UserControl>
