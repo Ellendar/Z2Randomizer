@@ -6460,9 +6460,9 @@
     "name": "winterSolstice M30",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
-    "sideviewData": "35601D08A844D1086032510F0CD20DA52FF65000E901E9D38880827381907652847074F513538D702DF11F81C289C2568670769076"
+    "requirements": [],
+    "suppressWarning": ["BackgroundPalette"],
+    "sideviewData": "35601D08A02FD9086032510F0CD20DA42DF75000E901E9D38880827381907652847074F513538D702DF11F81C289C2568670769076"
   },
   {
     "author": "winterSolstice",
