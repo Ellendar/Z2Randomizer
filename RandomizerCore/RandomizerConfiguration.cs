@@ -1322,20 +1322,6 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
             Seed = Seed
         };
 
-        int requiredMinorItemReplacements = 0;
-        if((StartingHeartContainersMax ?? 8) < 4)
-        {
-            requiredMinorItemReplacements = 4 - (StartingHeartContainersMax ?? 4);
-        }
-        if (PalaceItemRoomCount == PalaceItemRoomCount.ZERO)
-        {
-            requiredMinorItemReplacements += 6;
-        }
-        if (CountPossibleMinorItems() < requiredMinorItemReplacements)
-        {
-            throw new ImpossibleFlagsException("Not enough possible items to replace missing palace items");
-        }
-
         //Properties that can affect available minor item replacements
         do // while (!properties.HasEnoughSpaceToAllocateItems())
         {
@@ -2010,6 +1996,41 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         // string debug = JsonSerializer.Serialize(properties);
         return properties;
+    }
+
+    /// Let the user know when their combination of flags will not be
+    /// possible to achieve.
+    /// 
+    /// For indeterminate options, we will only check that the best case
+    /// scenario should work.
+    public void CheckForFlagConflicts()
+    {
+        int requiredMinorItemReplacements = 0;
+        if ((StartingHeartContainersMax ?? 8) < 4)
+        {
+            requiredMinorItemReplacements = 4 - (StartingHeartContainersMax ?? 4);
+        }
+        if (PalaceItemRoomCount == PalaceItemRoomCount.ZERO)
+        {
+            requiredMinorItemReplacements += 6;
+        }
+        if (CountPossibleMinorItems() < requiredMinorItemReplacements)
+        {
+            throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
+        }
+
+        if (NoDuplicateRoomsByLayout || NoDuplicateRoomsByEnemies)
+        {
+            // if current palace generation logic changes, this should be updated
+            int potentialRoomPools = 0;
+            if (IncludeVanillaRooms != false) { potentialRoomPools++; }
+            if (Includev4_0Rooms != false) { potentialRoomPools++; }
+            if (Includev4_4Rooms != false) { potentialRoomPools++; }
+            if (potentialRoomPools < 2)
+            {
+                throw new UserFacingException("Incompatible Palace Flags", "Not enough palace rooms in the pool.\n\nUnder the Palaces tab, include more room groups or disable No Duplicate Rooms.");
+            }
+        }
     }
 
     public static bool IsIntegerType(Type type)

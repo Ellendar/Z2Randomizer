@@ -98,17 +98,6 @@ Seed: {config.Seed}
                     ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
                     IsComplete = true;
                 }
-                catch(ImpossibleFlagsException e)
-                {
-                    await tokenSource.CancelAsync();
-                    lastError = e;
-                    HasError = false;
-                    string errorHeading, errorBody;
-                    errorHeading = "Impossible Flags";
-                    errorBody = e.Message;
-
-                    await UpdateProgress(errorHeading, errorBody);
-                }
                 catch (Exception e)
                 {
                     await tokenSource.CancelAsync();

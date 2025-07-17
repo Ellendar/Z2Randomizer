@@ -206,6 +206,8 @@ public class Hyrule
             World.ResetStats();
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
             RNG = new Random(SeedHash);
+
+            config.CheckForFlagConflicts();
             props = config.Export(RNG);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
             if(config.GenerateSpoiler)
@@ -673,8 +675,16 @@ public class Hyrule
         if (props.IncludeQuestItemsInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
-            shufflableItems.Add(Collectable.MIRROR);
-            shufflableItems.Add(Collectable.WATER);
+            if (!props.StartWithSpellItems)
+            {
+                shufflableItems.Add(Collectable.MIRROR);
+                shufflableItems.Add(Collectable.WATER);
+            }
+            else
+            {
+                shufflableItems.Add(smallItems[RNG.Next(smallItems.Count)]);
+                shufflableItems.Add(smallItems[RNG.Next(smallItems.Count)]);
+            }
         }
 
         if (props.IncludeSwordTechsInShuffle)
@@ -734,6 +744,8 @@ public class Hyrule
             ItemGet[Collectable.TROPHY] = true;
             ItemGet[Collectable.MEDICINE] = true;
             ItemGet[Collectable.CHILD] = true;
+            ItemGet[Collectable.MIRROR] = true;
+            ItemGet[Collectable.WATER] = true;
         }
 
         if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0]] && !props.IncludeSpellsInShuffle)
