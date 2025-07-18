@@ -48,15 +48,14 @@ void ValidateRoomsForFile(string filename)
     foreach (var room in palaceRooms!.Where(r => r.PalaceNumber != 7 && IsActuallyEnabled(palaceRooms!, r)))
     {
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
+        var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
         // checking Enabled here to skip linked rooms
         if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
 
-        CheckPageOverflow(room, sv);
+        CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
-        var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
-
         // a lot can probably be rewritten to use this now instead of doing their own checks
         bool[,] solidGrid = sv.CreateSolidGrid();
 
@@ -91,12 +90,12 @@ void ValidateRoomsForFile(string filename)
     foreach (var room in palaceRooms!.Where(r => r.PalaceNumber == 7 && IsActuallyEnabled(palaceRooms!, r)))
     {
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
+        var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
 
-        CheckPageOverflow(room, sv);
+        CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
-        var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
 
         // a lot can probably be rewritten to use this now instead of doing their own checks
         bool[,] solidGrid = sv.CreateSolidGrid();
@@ -147,7 +146,7 @@ void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
     if (sv.BackgroundMap != 0) { Warning(room, "BackgroundMapInCustomRoom", "Using a background map in custom rooms"); }
 }
 
-void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
+void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
 {
     foreach (var cmd in sv.Commands)
     {
@@ -159,6 +158,19 @@ void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
         if (cmd.Y < 13 && (cmd.Y + cmd.Height - 1 > 12))
         {
             Warning(room, "PageOverflow", $" has command that overflows below the last row.\n{cmd.DebugString()}");
+            break;
+        }
+    }
+    foreach (var e in ee.Enemies)
+    {
+        if (e.X > 63)
+        {
+            Warning(room, "PageOverflow", $" has enemy that overflows into page 4.\n{e.DebugString()}\n");
+            break;
+        }
+        if (e.Y > 12)
+        {
+            Warning(room, "PageOverflow", $" has enemy that overflows below the last row.\n{e.DebugString()}\n");
             break;
         }
     }
