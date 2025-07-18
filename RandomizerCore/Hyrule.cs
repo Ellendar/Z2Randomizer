@@ -2159,72 +2159,97 @@ public class Hyrule
     //If you're looking for a global reference for which items are where... too bad it doesn't exist :(
     private List<Location> LoadItemLocs(int[] itemsPerPalaces)
     {
-        itemLocs =
-        [
-            .. westHyrule.locationAtPalace1.PalaceNumber != 7 ? [westHyrule.locationAtPalace1] : (Location[])[],
-            .. westHyrule.locationAtPalace2.PalaceNumber != 7 ? [westHyrule.locationAtPalace2] : (Location[])[],
-            .. westHyrule.locationAtPalace3.PalaceNumber != 7 ? [westHyrule.locationAtPalace3] : (Location[])[],
-            .. mazeIsland.locationAtPalace4.PalaceNumber != 7 ? [mazeIsland.locationAtPalace4] : (Location[])[],
-            .. eastHyrule.locationAtPalace5.PalaceNumber != 7 ? [eastHyrule.locationAtPalace5] : (Location[])[],
-            .. eastHyrule.locationAtPalace6.PalaceNumber != 7 ? [eastHyrule.locationAtPalace6] : (Location[])[],
-            .. eastHyrule.locationAtGP.PalaceNumber != 7 ? [eastHyrule.locationAtGP] : (Location[])[],
+        List<Location> GetPalacesWithItems(IEnumerable<Location> palaces) =>
+            palaces.Where(p => p.PalaceNumber is int n && n != 7 && props.PalaceItemRoomCounts[n - 1] != 0).ToList();
+
+        // Listed somewhat in order of expected progression. This way we can
+        // use the indexes of two locations to determine approx distance.
+
+        itemLocs = new List<Location>(30);
+        itemLocs = GetPalacesWithItems([
+            westHyrule.locationAtPalace1,
+            westHyrule.locationAtPalace2,
+            westHyrule.locationAtPalace3
+        ]);
+        itemLocs.AddRange([
             westHyrule.grassTile,
             westHyrule.heartContainerCave,
             westHyrule.magicContainerCave,
             westHyrule.medicineCave,
             westHyrule.trophyCave,
-            eastHyrule.waterTile,
-            eastHyrule.desertTile,
-            eastHyrule.newKasutoBasement,
-            eastHyrule.spellTower,
-            deathMountain.specRock,
-            deathMountain.hammerCave,
-            mazeIsland.childDrop,
-            mazeIsland.magicContainerDrop
-        ];
-
-        if(props.PbagItemShuffle)
+        ]);
+        if (props.PbagItemShuffle)
         {
             itemLocs.Add(westHyrule.pbagCave);
-            itemLocs.Add(eastHyrule.pbagCave1);
-            itemLocs.Add(eastHyrule.pbagCave2);
         }
-
         if (props.IncludeQuestItemsInShuffle)
         {
             itemLocs.Add(westHyrule.bagu);
-            itemLocs.Add(westHyrule.mirrorTable);
-            itemLocs.Add(eastHyrule.fountain);
         }
-
         if (props.IncludeSpellsInShuffle)
         {
             itemLocs.Add(westHyrule.locationAtRauru);
             itemLocs.Add(westHyrule.locationAtRuto);
             itemLocs.Add(westHyrule.locationAtSariaNorth);
-            itemLocs.Add(westHyrule.locationAtMido);
-            itemLocs.Add(eastHyrule.townAtNabooru);
-            itemLocs.Add(eastHyrule.townAtDarunia);
-            itemLocs.Add(eastHyrule.townAtNewKasuto);
-            itemLocs.Add(eastHyrule.townAtOldKasuto);
         }
-
+        if (props.IncludeQuestItemsInShuffle)
+        {
+            itemLocs.Add(westHyrule.mirrorTable);
+        }
+        if (props.IncludeSpellsInShuffle)
+        {
+            itemLocs.Add(westHyrule.locationAtMido);
+        }
         if (props.IncludeSwordTechsInShuffle)
         {
             itemLocs.Add(westHyrule.midoChurch);
-            itemLocs.Add(eastHyrule.daruniaRoof);
         }
 
-        List<Location> pals = [westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3, mazeIsland.locationAtPalace4, eastHyrule.locationAtPalace5, eastHyrule.locationAtPalace6, eastHyrule.locationAtGP];
-        foreach (var pal in pals) {
-            if (pal.PalaceNumber is int palaceNum)
-            {
-                if (palaceNum == 7 || props.PalaceItemRoomCounts[palaceNum - 1] == 0)
-                {
-                    itemLocs.Remove(pal);
-                }
-            }
+        itemLocs.AddRange([
+            deathMountain.specRock,
+            deathMountain.hammerCave,
+        ]);
+
+        itemLocs.AddRange(GetPalacesWithItems([
+            eastHyrule.locationAtPalace5,
+            eastHyrule.locationAtPalace6,
+            eastHyrule.locationAtGP
+        ]));
+        itemLocs.AddRange([
+            eastHyrule.waterTile,
+            eastHyrule.desertTile,
+        ]);
+        if (props.PbagItemShuffle)
+        {
+            itemLocs.Add(eastHyrule.pbagCave1);
+            itemLocs.Add(eastHyrule.pbagCave2);
         }
+        if (props.IncludeQuestItemsInShuffle)
+        {
+            itemLocs.Add(eastHyrule.fountain);
+        }
+        if (props.IncludeSpellsInShuffle)
+        {
+            itemLocs.Add(eastHyrule.townAtNabooru);
+            itemLocs.Add(eastHyrule.townAtDarunia);
+        }
+        if (props.IncludeSwordTechsInShuffle)
+        {
+            itemLocs.Add(eastHyrule.daruniaRoof);
+        }
+        if (props.IncludeSpellsInShuffle)
+        {
+            itemLocs.Add(eastHyrule.townAtOldKasuto);
+            itemLocs.Add(eastHyrule.townAtNewKasuto);
+        }
+        itemLocs.Add(eastHyrule.newKasutoBasement);
+        itemLocs.Add(eastHyrule.spellTower);
+
+        itemLocs.AddRange(GetPalacesWithItems([mazeIsland.locationAtPalace4]));
+        itemLocs.AddRange([
+            mazeIsland.childDrop,
+            mazeIsland.magicContainerDrop
+        ]);
 
         return itemLocs;
     }
