@@ -4026,6 +4026,7 @@ FREE_UNTIL $c2ca
         rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
+        rom.MazeIslandItemBitsFix(engine);
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
 
