@@ -19969,8 +19969,8 @@
     "map": 4,
     "enabled": true,
     "connections": "0F000214",
-    "enemies": "0700430F4373DE",
-    "sideviewData": "40600E08D200D401D103D105D107D1004352505360547055805648C5A040F25000F143C5A04082567155615451534152D617D115D113D111D10046C645C6D90E",
+    "enemies": "070B073B1006C7",
+    "sideviewData": "3A600E08D20032C7D301D2036290D301D20032C7D30EF25000F1D40032C7D301D20083567155615451534152D617D415D213D211D20032C7D30E",
     "bitmask": "0F",
     "requirements": [],
     "hasItem": false,
@@ -19986,7 +19986,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "author": "miralupa",
+    "author": "miralupa / initsu",
     "palaceGroup": null
   },
   {
