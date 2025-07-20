@@ -101,6 +101,7 @@ public class RandomizerProperties
     public bool ShortenGP { get; set; }
     public int StartGems { get; set; }
     public bool RequireTbird { get; set; }
+    public int DarkLinkMinDistance { get; set; }
     public bool ShufflePalacePalettes { get; set; }
     public bool UpARestartsAtPalaces { get; set; }
     public bool Global5050JarDrop { get; set; }

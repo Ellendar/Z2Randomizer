@@ -160,7 +160,7 @@ public class Palace
         roomsToCheck.Push((Entrance, Direction.WEST));
         while (roomsToCheck.Count > 0)
         {
-            var (room, originDirection) = roomsToCheck.Peek();
+            var (room, originDirection) = roomsToCheck.Pop();
             //For required thunderbird, you can't path backwards into tbird room
             if ((Number == 7 && room.IsThunderBirdRoom) 
                 || (Number < 7 && room.IsBossRoom))
@@ -170,8 +170,7 @@ public class Palace
                     return [Entrance];
                 }
             }
-            roomsToCheck.Pop();
-            
+
             // This will return false if the room is already added, so then we go to the next room to check
             if (!reachedRooms.Add(room))
             {
@@ -199,6 +198,35 @@ public class Palace
             }
         }
         return reachedRooms;
+    }
+
+    public bool BossRoomMinDistance(int minSteps)
+    {
+        if (Entrance == null) { throw new Exception("Palace Entrance is missing"); }
+        HashSet<Room> reachedRooms = [];
+        Queue<(Room, int)> roomsToCheck = [];
+        roomsToCheck.Enqueue((Entrance, 0));
+        while (roomsToCheck.Count > 0)
+        {
+            var (room, stepsToRoom) = roomsToCheck.Dequeue();
+            if (stepsToRoom >= minSteps) {
+                return true;
+            }
+            if (room.IsBossRoom)
+            {
+                return false;
+            }
+
+            // This will return false if the room is already added
+            if (!reachedRooms.Add(room)) { continue; }
+
+            int stepsToNextRoom = stepsToRoom + 1;
+            if (room.Left != null) { roomsToCheck.Enqueue((room.Left, stepsToNextRoom)); }
+            if (room.Right != null) { roomsToCheck.Enqueue((room.Right, stepsToNextRoom)); }
+            if (room.Up != null) { roomsToCheck.Enqueue((room.Up, stepsToNextRoom)); }
+            if (room.Down != null) { roomsToCheck.Enqueue((room.Down, stepsToNextRoom)); }
+        }
+        return false; // Boss room not found??
     }
 
     public bool AllReachable(bool allowBacktracking = false)

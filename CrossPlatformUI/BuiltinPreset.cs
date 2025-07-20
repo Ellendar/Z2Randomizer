@@ -52,6 +52,7 @@ public static class BuiltinPreset
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
+        DarkLinkMinDistance = BossRoomMinDistance.SHORT,
 
         //Levels
         AttackLevelCap = 8,
@@ -160,6 +161,7 @@ public static class BuiltinPreset
         BlockingRoomsInAnyPalace = true,
         HardBosses = false,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
+        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
 
         //Levels
         ShuffleAttackExperience = true,
@@ -277,6 +279,7 @@ public static class BuiltinPreset
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
+        DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
         //Levels
         ShuffleAttackExperience = true,

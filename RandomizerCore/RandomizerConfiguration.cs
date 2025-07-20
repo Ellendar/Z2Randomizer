@@ -105,6 +105,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     private bool reduceDripperVariance = false;
     private bool changePalacePallettes;
     private bool randomizeBossItemDrop;
+    private BossRoomMinDistance darkLinkMinDistance;
     private PalaceItemRoomCount palaceItemRoomCount;
     private int palacesToCompleteMin;
     private int palacesToCompleteMax;
@@ -494,6 +495,12 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
     {
         get => randomizeBossItemDrop;
         set => SetField(ref randomizeBossItemDrop, value);
+    }
+
+    public BossRoomMinDistance DarkLinkMinDistance
+    {
+        get => darkLinkMinDistance;
+        set => SetField(ref darkLinkMinDistance, value);
     }
 
     public PalaceItemRoomCount PalaceItemRoomCount
@@ -1398,6 +1405,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
             properties.ShortenGP = ShortenGP ?? GetIndeterminateFlagValue(r);
             properties.ShortenNormalPalaces = ShortenNormalPalaces ?? GetIndeterminateFlagValue(r);
+            properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
             switch (PalaceItemRoomCount)
             {
@@ -2218,5 +2226,21 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
         count += containerReplacementSmallItemsCount;
 
         return count;
+    }
+
+    private int GetDarkLinkMinDistance()
+    {
+        if (DarkLinkMinDistance == BossRoomMinDistance.MAX)
+        {
+            // limiting here based on how long it takes to generate the seeds
+            if (gpStyle == PalaceStyle.RECONSTRUCTED) { return 16; }
+            if (shortenGP != false) { return 20; }
+            if (gpStyle == PalaceStyle.SEQUENTIAL) { return 24; }
+            return 28;
+        }
+        else
+        {
+            return (int)DarkLinkMinDistance;
+        }
     }
 }

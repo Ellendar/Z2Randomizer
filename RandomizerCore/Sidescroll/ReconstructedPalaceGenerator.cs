@@ -236,9 +236,12 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 logger.Debug("Palace room shuffle attempt #" + tries);
             }
             while (
-            (!reachable || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
-            && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
-                );
+                (!reachable
+                 || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
+                 || (palaceNumber == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
+                 || palace.HasDeadEnd()
+                ) && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
+            );
         } while (tries >= ROOM_SHUFFLE_ATTEMPT_LIMIT);
         palace.Generations += tries;
         palace.IsValid = true;
