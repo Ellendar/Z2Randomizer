@@ -48,15 +48,14 @@ void ValidateRoomsForFile(string filename)
     foreach (var room in palaceRooms!.Where(r => r.PalaceNumber != 7 && IsActuallyEnabled(palaceRooms!, r)))
     {
         var sv = new SideviewEditable<PalaceObject>(room.SideView);
+        var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
         // checking Enabled here to skip linked rooms
         if (sv.HasItem() != room.HasItem && room.Enabled) { sb.AppendLine($"{GetName(room)}: Room HasItem mismatch."); }
 
-        CheckPageOverflow(room, sv);
+        CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
-        var ee = new EnemiesEditable<EnemiesPalace125>(room.Enemies);
-
         // a lot can probably be rewritten to use this now instead of doing their own checks
         bool[,] solidGrid = sv.CreateSolidGrid();
 
@@ -80,6 +79,7 @@ void ValidateRoomsForFile(string filename)
 
         var lavaPits = sv.FindAll(o => o.IsLava());
         CheckDropsOverLava(room, sv, lavaPits, openCeilingTiles);
+        CheckFallingBlockRooms(room, sv, ee, lavaPits, dropTiles);
         RemoveTilesThatAreLavaPits(lavaPits, dropTiles);
 
         var elevators = sv.FindAll(o => o.IsElevator());
@@ -91,12 +91,12 @@ void ValidateRoomsForFile(string filename)
     foreach (var room in palaceRooms!.Where(r => r.PalaceNumber == 7 && IsActuallyEnabled(palaceRooms!, r)))
     {
         var sv = new SideviewEditable<GreatPalaceObject>(room.SideView);
+        var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
 
-        CheckPageOverflow(room, sv);
+        CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
-        var ee = new EnemiesEditable<EnemiesGreatPalace>(room.Enemies);
 
         // a lot can probably be rewritten to use this now instead of doing their own checks
         bool[,] solidGrid = sv.CreateSolidGrid();
@@ -147,7 +147,7 @@ void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
     if (sv.BackgroundMap != 0) { Warning(room, "BackgroundMapInCustomRoom", "Using a background map in custom rooms"); }
 }
 
-void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
+void CheckPageOverflow<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
 {
     foreach (var cmd in sv.Commands)
     {
@@ -159,6 +159,19 @@ void CheckPageOverflow<T>(Room room, SideviewEditable<T> sv) where T : Enum
         if (cmd.Y < 13 && (cmd.Y + cmd.Height - 1 > 12))
         {
             Warning(room, "PageOverflow", $" has command that overflows below the last row.\n{cmd.DebugString()}");
+            break;
+        }
+    }
+    foreach (var e in ee.Enemies)
+    {
+        if (e.X > 63)
+        {
+            Warning(room, "PageOverflow", $" has enemy that overflows into page 4.\n{e.DebugString()}\n");
+            break;
+        }
+        if (e.Y > 12)
+        {
+            Warning(room, "PageOverflow", $" has enemy that overflows below the last row.\n{e.DebugString()}\n");
             break;
         }
     }
@@ -262,6 +275,57 @@ void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCo
         if (dropTilesOverLava.Count > 0)
         {
             Warning(room, "DropOverLava", $"Room is a drop zone over lava at x={ConvertToRangeString(dropTilesOverLava)}");
+        }
+    }
+}
+
+void CheckFallingBlockRooms<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> dropTiles) where T : Enum where U : Enum
+{
+    var singles = ee.Enemies.Where(e => e.Id is EnemiesPalace125.SINGLE_FALLING_BLOCK || e.Id is EnemiesPalace346.SINGLE_FALLING_BLOCK).ToList();
+    // Generators create blocks from positions X-5 to X+4 (inclusive)
+    var gens = ee.Enemies.Where(e => e.Id is EnemiesPalace125.FALLING_BLOCK_GENERATOR || e.Id is EnemiesPalace346.FALLING_BLOCK_GENERATOR).ToList();
+
+    foreach (var lavaPit in lavaPits)
+    {
+        var endX = lavaPit.AbsX + lavaPit.Width;
+        for (int x = lavaPit.AbsX; x < endX; x++)
+        {
+            foreach (var gen in gens)
+            {
+                if (x <= gen.X + 4 && gen.X - 5 <= endX)
+                {
+                    Warning(room, "FallingBlockGenerator", $"Room has a falling block generator over lava");
+                    return;
+                }
+            }
+            foreach (var single in singles)
+            {
+                if (x <= single.X && single.X <= endX)
+                {
+                    Warning(room, "SingleFallingBlock", $"Room has a falling block generator over lava");
+                    return;
+                }
+            }
+        }
+    }
+
+    foreach (var x in dropTiles)
+    {
+        foreach (var gen in gens)
+        {
+            if (x <= gen.X + 4 && gen.X - 5 <= x)
+            {
+                Warning(room, "FallingBlockGenerator", $"Room has a falling block generator over drop");
+                return;
+            }
+        }
+        foreach (var single in singles)
+        {
+            if (x == single.X)
+            {
+                Warning(room, "SingleFallingBlock", $"Room has a falling block generator over drop");
+                return;
+            }
         }
     }
 }
