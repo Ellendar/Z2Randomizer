@@ -61,7 +61,9 @@
                                   CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.MaxRandoPreset}}"/>
                         <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.RandoPercentPreset}}"/>
-                        <MenuItem Header="Load Custom Preset" Classes="SubItems"
+						<MenuItem Header="Upstarts Tournament Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.UpstartsTournamentPreset}}"/>
+						<MenuItem Header="Load Custom Preset" Classes="SubItems"
                                   ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="CategoryOutline" Width="24" Height="24" />
