@@ -27,10 +27,17 @@
         <WasmExtraFilesToDeploy Include="..\RandomizerCore\PalaceRooms.json" />
         <WasmExtraFilesToDeploy Include="..\RandomizerCore\js65\**" TargetPath="js65\%(RecursiveDir)\%(Filename)%(Extension)" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="wwwroot\index.html" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
         <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Include="wwwroot\index.html" />
     </ItemGroup>
 
     <ItemGroup>
