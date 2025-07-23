@@ -3816,37 +3816,34 @@ RaftWorldMappingTable:
 
 .org $C265
 ; Change the pointer table for Item presence to include only the low byte
-; Since the high byte is always $06
-bank7_Pointer_table_for_Item_Presence:
-    .byte .lobyte($0600)  ; West Caves
-    .byte .lobyte($0660)  ; Towns
-    .byte .lobyte($0660)  ; Towns
-    .byte .lobyte($0680)  ; Palace 125
-    .byte .lobyte($06A0)  ; Palace 346
-    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves
-    .byte .lobyte($0660)  ; Towns (Region 1)
-    .byte .lobyte($0660)  ; Towns (Region 1)
-    .byte .lobyte($0680)  ; Palace 125 (Region 1)
-    .byte .lobyte($06A0)  ; Palace 346 (Region 1)
-    .byte .lobyte($0640)  ; East Caves
-    .byte .lobyte($0660)  ; Towns (Region 2)
-    .byte .lobyte($0660)  ; Towns (Region 2)
-    .byte .lobyte($0680)  ; Palace 125 (Region 2)
-    .byte .lobyte($06A0)  ; Palace 346 (Region 2)
-    .byte .lobyte($06C0)  ; Great Palace
-; Add these new pointers for item presence as well
-    .byte .lobyte($0660)  ; Towns (Region 3)
-    .byte .lobyte($0660)  ; Towns (Region 3)
-    .byte .lobyte($0680)  ; Palace 125 (Region 3)
-    .byte .lobyte($06A0)  ; Palace 346 (Region 3)
-    .byte .lobyte($06C0)  ; Great Palace (Region 3)
+; Since the high byte is always $06.
+;
+; Also breaking it up into two tables, one for World == 0,
+; where RegionNumber is used to determine the overworld we're in, and
+; one for World != 0, where the RegionNumber does not actually matter.
+bank7_Pointer_table_for_Item_Presence_World0_ByRegion:
+    .byte .lobyte($0600)  ; West Caves                           (Region 0)
+    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 1)
+    .byte .lobyte($0640)  ; East Caves                           (Region 2)
+    .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 3)
+bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as index 0 would use the table above
+    .byte .lobyte($0660)  ; Towns         (World 1)
+    .byte .lobyte($0660)  ; Towns         (World 2)
+    .byte .lobyte($0680)  ; Palace 125    (World 3)
+    .byte .lobyte($06A0)  ; Palace 346    (World 4)
+    .byte .lobyte($06C0)  ; Great Palace  (World 5)
 FREE_UNTIL $C285
 
 .org $c2b3
-    jsr GetItemPresenceTableIndex ; modified subroutine to get the index
-; Patch loading from the table to use the new address
-    tay
-    lda bank7_Pointer_table_for_Item_Presence,y
+; The vanilla index calculation was 5 * RegionNumber + WorldNumber, and was
+; done at $cf30 in bank 7.
+;
+; Maze Island has been split from Death Mountain, and has RegionNumber 3. This
+; conflicts with the Great Palace, with WorldNumber 5, in the item presence
+; table: 5 * 3 + 0 == 5 * 2 + 5
+; That calculation no longer works, so it's split into two tables now.
+    ldy WorldNumber
+    jsr GetItemPresenceLowByte
     sta $00
     lda #06
     sta $01
@@ -3858,24 +3855,14 @@ FREE_UNTIL $C285
 FREE_UNTIL $c2ca
 
 .reloc
-; The normal index calculation is 5 * RegionNumber + WorldNumber.
-; This is done at $cf30 in bank 7.
-
-; Maze Island has been split from Death Mountain, and has RegionNumber 3.
-; This conflicts with the Great Palace, with WorldNumber 5, in the
-; item presence table. (5 * 3 + 0 == 5 * 2 + 5)
-; Thus we check for Maze Island caves specificly and force them back to
-; the DM/MI index.
-GetItemPresenceTableIndex:
-    lda RegionNumber
-    cmp #3
-    bne NormalIndexCalcuation
-    ldy WorldNumber
-    beq ReturnMazeIslandIndex
-NormalIndexCalcuation:
-    jmp $cf33  ; jmp to the regular subroutine (RegionNumber already loaded)
-ReturnMazeIslandIndex:  ; RegionNumber == 3 && WorldNumber == 0 here
-    lda #$05   ; just set the DM / MI index here
+GetItemPresenceLowByte:
+    beq World0 ; y = WorldNumber & zero flag is already set by caller
+NonZeroWorld:
+    lda bank7_Pointer_table_for_Item_Presence_ByWorld - 1,y
+    rts
+World0:
+    ldy RegionNumber
+    lda bank7_Pointer_table_for_Item_Presence_World0_ByRegion,y
     rts
 
 ; Remove vanilla check to see if you are in east hyrule when using the raft
