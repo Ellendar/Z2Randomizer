@@ -124,17 +124,17 @@ void ValidateRoomsForFile(string filename)
 void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
 {
     // if (sv.SpritePalette != 0) { Warning(room, "SpritePalette", $"Using non-zero sprite palette={sv.SpritePalette}"); }
-    if (room.PalaceNumber == 7)
-    {
-        //Most combinations seem fine in GP (not thoroughly tested)
-    }
-    else if (sv.TilesHeader == 0 /* palace room/cave */)
+    if (sv.TilesHeader == 0 /* palace room/cave */)
     {
         //No problems found with this (not thoroughly tested)
     }
     else if (sv.TilesHeader == 1 /* palace entrance (blue sky)/forest */)
     {
-        if (sv.BackgroundPalette != 0) { Warning(room, "BackgroundPalette", "Using a sprite palette > 0 with forest tiles"); }
+        if (room.PalaceNumber != 7 && sv.BackgroundPalette != 0) { Warning(room, "BackgroundPalette", "Using a background palette > 0 with Palace forest tiles"); }
+        else if (room.PalaceNumber == 7 && sv.BackgroundPalette != 1 && !room.IsEntrance) { Warning(room, "BackgroundPalette", "Using a background palette != with GP forest tiles"); }
+    }
+    else if (sv.TilesHeader == 3 && room.PalaceNumber == 7 && room.IsBossRoom)
+    {
     }
     else
     {
