@@ -116,24 +116,24 @@ public class Utils
 
         List<Room> normalRooms =
         [
-            .. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA),
-            .. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0),
+            //.. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA),
+            //.. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0),
             .. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4),
         ];
 
         List<Room> gpRooms =
         [
-            .. palaceRooms.GpRoomsByGroup(RoomGroup.VANILLA),
-            .. palaceRooms.GpRoomsByGroup(RoomGroup.V4_0),
+            //.. palaceRooms.GpRoomsByGroup(RoomGroup.VANILLA),
+            //.. palaceRooms.GpRoomsByGroup(RoomGroup.V4_0),
             .. palaceRooms.GpRoomsByGroup(RoomGroup.V4_4),
         ];
 
         //This copypasta is lazy as fuck, I don't care.
 
         //Normal, NON-DROP
-        Debug.WriteLine("Normal, Non-DropZone");
+        Debug.WriteLine("Normal, Any");
         MultiValueDictionary<RoomExitType, Room> categorizedRooms = [];
-        foreach (Room room in normalRooms.Where(i => !i.IsDropZone))
+        foreach (Room room in normalRooms)
         {
             categorizedRooms.Add(room.CategorizeExits(), room);
         }
@@ -177,9 +177,9 @@ public class Utils
         counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
 
         //GP, NON-DROP
-        Debug.WriteLine("\nGP, Non-DropZone");
+        Debug.WriteLine("\nGP, Any");
         categorizedRooms.Clear();
-        foreach (Room room in gpRooms.Where(i => !i.IsDropZone))
+        foreach (Room room in gpRooms)
         {
             categorizedRooms.Add(room.CategorizeExits(), room);
         }
