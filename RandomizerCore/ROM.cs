@@ -965,33 +965,6 @@ ReturnNormally:
         a.Label("LevelCaps");
     }
 
-    /// <summary>
-    /// Since Maze Island has been split from Death Mountain, and
-    /// now has its own RegionNumber, 3, we need to provide a pointer
-    /// to the item availability bits ourselves.
-    /// </summary>
-    public void MazeIslandItemBitsFix(Assembler asm)
-    {
-        var a = asm.Module();
-        a.Code("""
-.include "z2r.inc"
-
-.segment "PRG7"
-.org $c2b3 ; hook into the function that sets {$00} to the item bits pointer
-    jsr GetItemTableIndex ; our modified subroutine to get the index
-
-.reloc
-GetItemTableIndex:
-    lda RegionNumber
-    cmp #3
-    beq GetMazeIslandPointer
-    jmp $cf33 ; jmp to the regular subroutine (RegionNumber already loaded)
-GetMazeIslandPointer:
-    lda #$05 ; just set the DM / MI index here
-    rts
-""");
-    }
-
     public void UseExtendedBanksForPalaceRooms(Assembler a)
     {
         a.Module().Code("""
