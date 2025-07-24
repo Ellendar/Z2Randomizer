@@ -1040,7 +1040,7 @@ public class Palace
         return unclearableRooms.Count == 0;
     }
 
-    public bool HasInescapableDrop()
+    public bool HasInescapableDrop(int palaceNumber)
     {
         //get a list of effective drop zones in the palace
         List<Room> dropZonesToCheck = [];
@@ -1052,10 +1052,9 @@ public class Palace
                 dropZonesToCheck.Add(room.Down);
             }
         }
-        //while the list is not empty
-        while (dropZonesToCheck.Count > 0)
+
+        foreach(Room initialDropZone in dropZonesToCheck)
         {
-            Room initialDropZone = dropZonesToCheck.First();
             Stack<Room> pendingRooms = [];
             pendingRooms.Push(initialDropZone);
             HashSet<Room> coveredRooms = [];
@@ -1063,17 +1062,14 @@ public class Palace
 
             while (pendingRooms.Count > 0)
             {
-                Room room = pendingRooms.Peek();
+                Room room = pendingRooms.Pop();
                 //if you find the entrance, remove and continue
-                if (room == Entrance)
+                if (room == Entrance || (room.IsBossRoom && palaceNumber == 7))
                 {
                     found = true;
                     break;
                 }
-                //if you find another drop zone, remove it from the list, either it works together with this or they both fail
-                //either way we don't care
-                pendingRooms.Pop();
-                dropZonesToCheck.Remove(room);
+
                 if (!coveredRooms.Add(room))
                 {
                     continue;
@@ -1104,6 +1100,7 @@ public class Palace
                 return true;
             }
         }
+        //Debug.WriteLine(GetLayoutDebug());
         return false;
     }
 

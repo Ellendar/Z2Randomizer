@@ -259,7 +259,9 @@ public class CustomTexts
         "Hola!",
         "I am not$a vire$in$disguise",
         "Woah!$Dude!",
-        "PAY ME$AND I'LL$TALK"
+        "PAY ME$AND I'LL$TALK",
+        "the hint$is in$another$castle",
+        "did you$check the$old kasuto$hint?"
     ];
 
     public static readonly string[] NOT_ENOUGH_CONTAINERS_TEXT =
@@ -353,7 +355,7 @@ public class CustomTexts
         "no whammy$no whammy$and stop!$%",
         "all you$need is$%%",
         "the secret$word is$%",
-        "have a$%$on the$house"
+        "have a$%$on the$house",
     ];
 
     public static List<Text> GenerateTexts(

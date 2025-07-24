@@ -1331,6 +1331,8 @@ public class Hyrule
     /// <returns>Whether any items were marked accessable</returns>
     private int UpdateItemGets()
     {
+        //TODO: Remove all the needX flags and replace them with a set of requirements.
+
         Location[] delayedEvaluationLocations = [eastHyrule.townAtNabooru, eastHyrule.townAtDarunia,
             eastHyrule.townAtNewKasuto, eastHyrule.townAtOldKasuto, eastHyrule.newKasutoBasement];
         List<RequirementType> requireables = GetRequireables();
@@ -1364,10 +1366,9 @@ public class Hyrule
                 {
                     canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
                 }
-                else if (location != eastHyrule.newKasutoBasement)
+                else if (location != eastHyrule.spellTower)
                 {
-                    //TODO: Remove all the needX flags and replace them with a set of requirements.
-                    canGet = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
+                    canGet = CanGet(location) && ItemGet[Collectable.SPELL_SPELL];
                 }
                 else
                 {

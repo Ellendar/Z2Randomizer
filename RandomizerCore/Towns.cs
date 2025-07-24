@@ -7,15 +7,15 @@ internal class Towns
     public static readonly Dictionary<Town, Requirements> townSpellAndItemRequirements = new()
     {
         { Town.RAURU, new Requirements() },
-        { Town.RUTO, new Requirements(new RequirementType[] {RequirementType.TROPHY }) },
-        { Town.SARIA_NORTH, new Requirements(new RequirementType[] {RequirementType.MIRROR }) },
-        { Town.MIDO_WEST, new Requirements(new RequirementType[] {RequirementType.MEDICINE }) },
-        { Town.MIDO_CHURCH, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
+        { Town.RUTO, new Requirements([RequirementType.TROPHY]) },
+        { Town.SARIA_NORTH, new Requirements([RequirementType.MIRROR]) },
+        { Town.MIDO_WEST, new Requirements([RequirementType.MEDICINE]) },
+        { Town.MIDO_CHURCH, new Requirements([RequirementType.JUMP, RequirementType.FAIRY]) },
         { Town.NABOORU, new Requirements([], [[RequirementType.WATER, RequirementType.FIVE_CONTAINERS]]) },
         { Town.DARUNIA_WEST, new Requirements([], [[RequirementType.CHILD, RequirementType.SIX_CONTAINERS]]) },
-        { Town.DARUNIA_ROOF, new Requirements(new RequirementType[] {RequirementType.JUMP, RequirementType.FAIRY }) },
-        { Town.NEW_KASUTO, new Requirements(new RequirementType[] {RequirementType.SEVEN_CONTAINERS })  },
-        { Town.OLD_KASUTO, new Requirements(new RequirementType[] { RequirementType.EIGHT_CONTAINERS }) },
+        { Town.DARUNIA_ROOF, new Requirements([RequirementType.JUMP, RequirementType.FAIRY]) },
+        { Town.NEW_KASUTO, new Requirements([RequirementType.SEVEN_CONTAINERS])  },
+        { Town.OLD_KASUTO, new Requirements([RequirementType.EIGHT_CONTAINERS]) },
         { Town.NABOORU_FOUNTAIN, new Requirements() },
         { Town.BAGU, new Requirements() },
         { Town.SARIA_TABLE, new Requirements() }

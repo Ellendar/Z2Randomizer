@@ -15276,7 +15276,7 @@
     "bitmask": "0F",
     "connections": "07FFFFFC",
     "elevatorScreen": -1,
-    "enabled": true,
+    "enabled": false,
     "enemies": "032A47",
     "group": "V4_4",
     "hasBoss": false,
@@ -15668,10 +15668,10 @@
     "name": "z2oot Ganon's castle fokka room",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
+    "requirements": [[
       "GLOVE",
       "KEY"
-    ],
+    ]],
     "sideviewData": "32600D08D4089491F217808728D6909121D6A822810A29D6909121D6F11780879891D50E8105F2500006B0900106B090D10F"
   },
   {
