@@ -20907,5 +20907,30 @@
     "requirements": [
     ],
     "sideviewData": "1A600C08DC88833793D191D1633B75D371D3453F57D551D5D80F"
+  },
+  {
+    "author": "initsu",
+    "bitmask": "0F",
+    "connections": "00FFFFFF",
+    "elevatorScreen": -1,
+    "enabled": true,
+    "enemies": "07725E8A041305",
+    "group": "V4_4",
+    "hasBoss": false,
+    "hasDrop": false,
+    "hasItem": true,
+    "isBossRoom": false,
+    "isDropZone": false,
+    "isEntrance": false,
+    "isThunderBirdRoom": false,
+    "isUpDownReversed": false,
+    "linkedRoomName": null,
+    "map": 52,
+    "memoryAddress": 83963,
+    "name": "Fairy Required Item Room Left Exit",
+    "palaceGroup": 1,
+    "palaceNumber": null,
+    "requirements": ["FAIRY"],
+    "sideviewData": "19600B0850239023A027D20831092DC1404550C5340F00D20F"
   }
 ]
