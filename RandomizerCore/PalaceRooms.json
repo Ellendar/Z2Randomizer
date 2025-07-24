@@ -6418,7 +6418,7 @@
     "connections": "0FFF62FC",
     "elevatorScreen": 3,
     "enabled": true,
-    "enemies": "0D551110991A4414513C113C9E",
+    "enemies": "0D571110991A4414513C113C9E",
     "group": "V4_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -7370,7 +7370,7 @@
     "connections": "2BFFFF10",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "09340C109F43C465C4",
+    "enemies": "09370C109F43C465C4",
     "group": "V4_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -8349,8 +8349,8 @@
     "name": "gtmNewgpRooms M9",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
   {
@@ -8661,8 +8661,8 @@
     "name": "gtmNewgpRooms M27",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
   {
@@ -14950,8 +14950,8 @@
     "name": "aaron jam 4_4 P2_M23",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "21600F08D00ED200400F085021949F729F9E935694979F729D7E9390955921D20E"
   },
   {
@@ -15321,7 +15321,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
-    "suppressWarning": ["MultipleItemsOnPage"],
+    "suppressWarning": ["EnemyTooCloseToEntrance", "MultipleItemsOnPage"],
     "sideviewData": "24608008D087D480F0126030712F322DA00F0DA20F087B2F312F7F2F312F7F243126D787"
   },
   {
@@ -15488,6 +15488,7 @@
     "requirements": [
       "GLOVE"
     ],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "36600E0803D5D1F073C2A020F115906576C2A0206875D20E4073A831929D611A701A511880306136709173948531A331A3306277D6F0"
   },
   {
@@ -16969,6 +16970,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": ["GLOVE"],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "isDropZone": true,
     "hasItem": true,
     "enemies": "0979581CDE78983A06",
@@ -17046,7 +17048,7 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "093919384611D83AC4",
+    "enemies": "093919384611D839C4",
     "sideviewData": "29600E10D20953005500D40ED5098425B211C011D80ED808F050622772B3A20F0B862731003500D31C",
     "hasBoss": false,
     "isBossRoom": false,
@@ -17594,6 +17596,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "072AC308DB3F9B",
@@ -19976,6 +19979,7 @@
     "sideviewData": "2C600E08D2F0A3208220712061209050512FE1006A2FAB25F25080F1632F822091505D20412031202150D10E",
     "bitmask": "09",
     "requirements": [],
+    "suppressWarning": ["EnemyTooCloseToEntrance"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,

@@ -62,6 +62,7 @@ void ValidateRoomsForFile(string filename)
         CheckLeftExit(room, solidGrid);
         CheckRightExit(room, sv.PageCount, solidGrid);
         CheckDoorsAndItems(room, sv, ee);
+        CheckEnemyPlacements(room, sv, ee);
 
         if (room.IsBossRoom)
         {
@@ -104,6 +105,7 @@ void ValidateRoomsForFile(string filename)
         CheckLeftExit(room, solidGrid);
         CheckRightExit(room, sv.PageCount, solidGrid);
         CheckDoorsAndItems(room, sv, ee);
+        CheckEnemyPlacements(room, sv, ee);
 
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];
@@ -213,6 +215,17 @@ void CheckDoorsAndItems<T,U>(Room room, SideviewEditable<T> sv, EnemiesEditable<
         {
             Warning(room, "MultipleItemsOnPage", $"Has multiple items on page { page + 1}: { string.Join(", ", itemsOnPage)}");
         }
+    }
+}
+
+void CheckEnemyPlacements<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditable<U> ee) where T : Enum where U : Enum
+{
+    var xEnd = sv.PageCount * 16 - 6;
+    foreach (var enemy in ee.Enemies)
+    {
+        if (!(enemy.IsShufflableSmallOrLarge())) { continue; }
+        if (room.HasLeftExit && enemy.X < 6) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the left entrance: {enemy.DebugString()}"); }
+        if (room.HasRightExit && enemy.X > xEnd) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the right entrance: {enemy.DebugString()}"); }
     }
 }
 
