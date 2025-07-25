@@ -145,6 +145,7 @@ PalaceTable:
     .byte $ff ; unused 4th palace in region 2
     ; region 3 - maze island
     .byte RealPalaceAtLocation4 + TsPalace1
+
 .segment "PRG7"
 
 .reloc
@@ -155,13 +156,25 @@ CheckAddItemTimestamp:
     pha
         tay
         lda ItemIDToTimestampId,y
-        bmi @NotTracked ; Item is not tracked
+        bmi @NotTrackingItem ; Item is not tracked
+.if _ALLOW_ITEM_DUPLICATES
+            ldy TimestampCount
+            beq @AddItemToTracker
+                @loop:
+                cmp TimestampTypeList - 1,y
+                beq @NotTrackingItem ; Item is already tracked
+                dey
+                bne @loop
+.endif
+            @AddItemToTracker:
             jsr AddTimestamp
-@NotTracked:
+@NotTrackingItem:
     pla
     tay
     cpy #8
     rts
+
+.reloc
 ItemIDToTimestampId:
     .byte $ff ; ITEM_CANDLE
     .byte TsGlove ; ITEM_GLOVE
