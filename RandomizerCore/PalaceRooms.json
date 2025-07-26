@@ -20932,5 +20932,30 @@
     "palaceNumber": null,
     "requirements": ["FAIRY"],
     "sideviewData": "19600B0850239023A027D20831092DC1404550C5340F00D20F"
+  },
+  {
+    "name": "Up Elevator Dead End Item Peek",
+    "group": "V4_4",
+    "map": 42,
+    "enabled": true,
+    "connections": "FF00FFFF",
+    "enemies": "091A597258709830C5",
+    "sideviewData": "2D600F08D70EF05080F1A221D1005045602B410F0333C1562F220028006327722783059771727290715109D10F",
+    "bitmask": "0F",
+    "requirements": [],
+    "hasItem": true,
+    "hasBoss": false,
+    "isBossRoom": false,
+    "hasDrop": false,
+    "elevatorScreen": 0,
+    "memoryAddress": 75877,
+    "isUpDownReversed": false,
+    "isDropZone": false,
+    "isThunderBirdRoom": false,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "author": "chadbert",
+    "palaceGroup": 1
   }
 ]
