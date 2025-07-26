@@ -20957,5 +20957,31 @@
     "linkedRoomName": null,
     "author": "chadbert",
     "palaceGroup": 1
+  },
+  {
+    "name": "Guma's Item Basement",
+    "author": "initsu",
+    "bitmask": "0F",
+    "map": 4,
+    "palaceGroup": null,
+    "memoryAddress": 75784,
+    "connections": "FFFF00FF",
+    "hasDrop": false,
+    "hasDroppableElevator": false,
+    "elevatorScreen": 2,
+    "requirements": [],
+    "isDropZone": false,
+    "hasItem": true,
+    "enemies": "056E5E6F92",
+    "sideviewData": "31600F08E100D20C60209045A02F810F13D20B71C1AC2E542360059023F15200D801D8D30840222109D10C62209020D10F",
+    "hasBoss": false,
+    "isBossRoom": false,
+    "group": "V4_4",
+    "isThunderBirdRoom": false,
+    "enabled": true,
+    "isEntrance": false,
+    "palaceNumber": null,
+    "linkedRoomName": null,
+    "isUpDownReversed": false
   }
 ]
