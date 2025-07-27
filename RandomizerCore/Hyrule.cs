@@ -3967,6 +3967,7 @@ World0:
         a.Byt(Util.ToGameText(message).Select(x => (byte)x).ToArray());
         a.Assign("PressStartStringLen", message.Length);
         AssignRealPalaceLocations(a);
+        a.Set("_ALLOW_ITEM_DUPLICATES", props.AllowImportantItemDuplicates ? 1 : 0);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
