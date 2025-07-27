@@ -1566,17 +1566,25 @@ public class Hyrule
     {
         if (props.ShuffleEnemyHP)
         {
+            // bank1_Enemy_Hit_Points at 0x5431 + Enemy ID (Overworld West)
             RandomizeHP(0x5434, 0x5453);
+            // bank2_Enemy_Hit_Points at 0x9431 + Enemy ID (Overworld East)
             RandomizeHP(0x9434, 0x944E);
-            RandomizeHP(0x11435, 0x11435);
-            RandomizeHP(0x11437, 0x11454);
-            RandomizeHP(0x13C86, 0x13C87);
-            RandomizeHP(0x15434, 0x15438);
-            RandomizeHP(0x15440, 0x15443);
-            RandomizeHP(0x15445, 0x1544B);
-            RandomizeHP(0x1544E, 0x1544E);
-            RandomizeHP(0x12935, 0x12935);
-            RandomizeHP(0x12937, 0x12954);
+            // bank4_Enemy_Hit_Points0 at 0x11431 + Enemy ID (Palace 125)
+            RandomizeHP(0x11434, 0x11435); // Myu, Bot
+            RandomizeHP(0x11437, 0x11454); // Remaining palace enemies
+            // bank4_Enemy_Hit_Points1 at 0x12931 + Enemy ID (Palace 346)
+            RandomizeHP(0x12934, 0x12935); // Myu, Bot
+            RandomizeHP(0x12937, 0x12954); // Remaining palace enemies
+            // bank4_Table_for_Helmethead_Gooma
+            RandomizeHP(0x13C86, 0x13C87); // Helmethead, Gooma
+            // bank5_Enemy_Hit_Points at 0x15431 + Enemy ID (Great Palace)
+            RandomizeHP(0x15434, 0x15435); // Myu, Bot
+            RandomizeHP(0x15437, 0x15438); // Moa, Ache
+            RandomizeHP(0x1543B, 0x1543B); // Acheman
+            RandomizeHP(0x15440, 0x15443); // Bago Bagos, Ropes
+            RandomizeHP(0x15445, 0x1544B); // Bubbles, Dragon Head, Fokkas
+            RandomizeHP(0x1544E, 0x1544E); // Fokkeru
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)
@@ -1598,7 +1606,7 @@ public class Hyrule
             ROMData.Put(0x15446, (byte)192);
             ROMData.Put(0x15448, (byte)192);
             ROMData.Put(0x15453, (byte)193);
-            ROMData.Put(0x12951, (byte)227);
+            ROMData.Put(0x12951, (byte)227); // Rebonack HP
 
         }
     }
@@ -4033,6 +4041,7 @@ World0:
         FixSoftLock(engine);
         
         RandomizeStartingValues(engine, rom);
+        rom.FixRebonackHorseKillBug();
         rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
