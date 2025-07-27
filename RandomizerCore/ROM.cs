@@ -1880,6 +1880,27 @@ ResetRedPalettePayload:
         //Put(0x15428, 0x00); // already at 0
     }
 
+    /// When Rebonack's HP is set to exactly 2 * your damage, it will
+    /// trigger a bug where you kill Rebo's horse while de-horsing him.
+    /// This causes an additional key to drop, as well as softlocking
+    /// the player if they die before killing Rebo. It seems to also
+    /// trigger if you have exactly damage == Rebo HP (very high damage).
+    /// 
+    /// This has to be called after RandomizeEnemyStats and
+    /// RandomizeAttackEffectiveness.
+    ///
+    /// (In Vanilla Zelda 2, your sword damage is never this high.)
+    public void FixRebonackHorseKillBug()
+    {
+        byte[] attackValues = GetBytes(0x1E67D, 8);
+        byte reboHp = GetByte(0x12951);
+        while (attackValues.Any(v => v * 2 == reboHp || v == reboHp))
+        {
+            reboHp++;
+            Put(0x12951, reboHp);
+        }
+    }
+
     public string Z2BytesToString(byte[] data)
     {
         return new string(data.Select(letter => {
