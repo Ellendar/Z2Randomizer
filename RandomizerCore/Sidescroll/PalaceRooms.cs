@@ -150,6 +150,11 @@ public partial class PalaceRooms
         };
     }
 
+    public IEnumerable<Room> ItemRooms(RoomGroup group)
+    {
+        return roomsByGroup[group].Where(i => i.HasItem);
+    }
+
     public IEnumerable<Room> NormalPalaceRoomsByGroup(RoomGroup group)
     {
         var roomgroup = roomsByGroup[group];

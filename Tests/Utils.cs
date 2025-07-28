@@ -1,10 +1,11 @@
-﻿using System.Diagnostics;
+﻿using DynamicData;
+using SD.Tools.Algorithmia.GeneralDataStructures;
+using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
-using DynamicData;
-using SD.Tools.Algorithmia.GeneralDataStructures;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Z2Randomizer.Tests;
 
@@ -220,6 +221,23 @@ public class Utils
         }
         missingExitTypes.ForEach(i => counts.Add((i, 0)));
         counts = counts.Where(i => i.Item2 <= displayThreshold && (!ignoreDropZonesWithUps || !i.Item1.ContainsUp())).ToList();
+        counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
+
+        //Item room counts
+        Debug.WriteLine("\nItem Rooms");
+        categorizedRooms.Clear();
+        normalRooms = [
+            .. palaceRooms.ItemRooms(RoomGroup.V4_4)
+        ];
+        foreach (Room room in normalRooms.Where(i => i.HasItem))
+        {
+            categorizedRooms.Add(room.CategorizeExits(), room);
+        }
+        counts.Clear();
+        foreach (RoomExitType key in categorizedRooms.Keys)
+        {
+            counts.Add((key, categorizedRooms[key].Count));
+        }
         counts.OrderByDescending(i => i.Item2).ToList().ForEach(i => Debug.WriteLine(i.Item1 + " : " + i.Item2));
     }
 }
