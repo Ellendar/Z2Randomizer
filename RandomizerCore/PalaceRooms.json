@@ -16010,7 +16010,7 @@
     "palaceGroup": null
   },
   {
-    "bitmask": "07",
+    "bitmask": "0F",
     "map": 16,
     "palaceGroup": null,
     "memoryAddress": 75274,
@@ -16021,7 +16021,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0F08800B901C901490039022900A90",
-    "sideviewData": "20600F10E100D500F01FE200D50161238020F15080F18220D200F01FE300DB0F",
+    "sideviewData": "1C600F10E100FF15D200D40161238020F15080F18220D200F015D40F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "fairy fairy room (corrected)",
@@ -16648,7 +16648,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "091E07294312CA2A84",
-    "sideviewData": "26609008A02F867865724462F11FA05F535245625456F41FA05F446255524463A32F81786172",
+    "sideviewData": "26608008A02F867865724462F11FA05F535245625456F41FA05F446255524463A32F81786172",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Red Floor Parkour (aaron jam 4_4 P5_M48)",
@@ -16999,7 +16999,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B3D8A368E79467A9F70CE",
-    "sideviewData": "23600F08E100D080930F10A04032357235373375353335DA0E86C2F15000F1B071D20F",
+    "sideviewData": "23600F08E100D080930F10A03032357235373375353335DA0E86C2F15000F1B071D20F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P5_M62",
@@ -20920,7 +20920,7 @@
     "hasDrop": false,
     "hasItem": true,
     "isBossRoom": false,
-    "isDropZone": true,
+    "isDropZone": false,
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
@@ -20928,8 +20928,8 @@
     "map": 52,
     "memoryAddress": 83963,
     "name": "Down elevator fairy skip hump item room",
-    "palaceGroup": 3,
-    "palaceNumber": 7,
+    "palaceGroup": 1,
+    "palaceNumber": null,
     "requirements": [
     ],
     "sideviewData": "27600F08D700F05000DA01DAD10ED108500970208C7B6277E200DE0E8105D21BA344920F00D60F"
@@ -20958,7 +20958,7 @@
     "palaceNumber": null,
     "requirements": ["FAIRY"],
     "sideviewData": "19600B0850239023A027D20831092DC1404550C5340F00D20F"
-  }
+  },
   {
     "name": "Up Elevator Dead End Item Peek",
     "group": "V4_4",
@@ -21008,7 +21008,6 @@
     "linkedRoomName": null,
     "author": "ellendar",
     "palaceGroup": null
-	}
   },
   {
     "name": "Guma's Item Basement",
@@ -21024,8 +21023,8 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": true,
-    "enemies": "076E5E6F920C85",
-    "sideviewData": "31600F08AF2FD20C60209145810F00D20B71C1A92F572360059023F15200E801E8D108209140232309D10C62209070D10F",
+    "enemies": "096A51605E6F920C85",
+    "sideviewData": "33600F08D80C6020A02F9145810F00D10B72C1AB2F562B902B6105F85200E801E8A026D100109130731309D10C62209070D10F",
     "hasBoss": false,
     "isBossRoom": false,
     "group": "V4_4",
