@@ -738,6 +738,9 @@ public class Hyrule
 
         if (props.StartWithSpellItems)
         {
+            Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
+            Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
+            Debug.Assert(shufflableItems[17] == Collectable.CHILD);
             shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
             shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
             shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
@@ -747,23 +750,28 @@ public class Hyrule
             ItemGet[Collectable.MIRROR] = true;
             ItemGet[Collectable.WATER] = true;
         }
-
-        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0]] && !props.IncludeSpellsInShuffle)
+        else
         {
-            shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
-            ItemGet[Collectable.TROPHY] = true;
-        }
+            if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0]] && !props.IncludeSpellsInShuffle)
+            {
+                Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
+                shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
+                ItemGet[Collectable.TROPHY] = true;
+            }
 
-        if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
-        {
-            shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
-            ItemGet[Collectable.MEDICINE] = true;
-        }
+            if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
+            {
+                Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
+                shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
+                ItemGet[Collectable.MEDICINE] = true;
+            }
 
-        if (ItemGet[eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
-        {
-            shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
-            ItemGet[Collectable.CHILD] = true;
+            if (ItemGet[eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
+            {
+                Debug.Assert(shufflableItems[17] == Collectable.CHILD);
+                shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
+                ItemGet[Collectable.CHILD] = true;
+            }
         }
 
         List<Collectable> possibleStartItems = [

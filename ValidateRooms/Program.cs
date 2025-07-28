@@ -54,6 +54,9 @@ void ValidateRoomsForFile(string filename)
 
         CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
+        CheckDoorsAndItems(room, sv, ee);
+        CheckEnemyPlacements(room, sv, ee);
+        CheckForFalseWalls(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
         // a lot can probably be rewritten to use this now instead of doing their own checks
@@ -61,8 +64,6 @@ void ValidateRoomsForFile(string filename)
 
         CheckLeftExit(room, solidGrid);
         CheckRightExit(room, sv.PageCount, solidGrid);
-        CheckDoorsAndItems(room, sv, ee);
-        CheckEnemyPlacements(room, sv, ee);
 
         if (room.IsBossRoom)
         {
@@ -96,6 +97,9 @@ void ValidateRoomsForFile(string filename)
 
         CheckPageOverflow(room, sv, ee);
         CheckHeaders(room, sv);
+        CheckDoorsAndItems(room, sv, ee);
+        CheckEnemyPlacements(room, sv, ee);
+        CheckForFalseWalls(room, sv);
 
         if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
 
@@ -104,8 +108,6 @@ void ValidateRoomsForFile(string filename)
 
         CheckLeftExit(room, solidGrid);
         CheckRightExit(room, sv.PageCount, solidGrid);
-        CheckDoorsAndItems(room, sv, ee);
-        CheckEnemyPlacements(room, sv, ee);
 
         SortedSet<int> openCeilingTiles = [];
         SortedSet<int> dropTiles = [];
@@ -129,6 +131,8 @@ void CheckHeaders<T>(Room room, SideviewEditable<T> sv) where T : Enum
     if (sv.TilesHeader == 0 /* palace room/cave */)
     {
         //No problems found with this (not thoroughly tested)
+        if (room.PalaceNumber == 7 && sv.BackgroundPalette != 1) { Warning(room, "BackgroundPalette", "Using an odd background palette"); }
+
     }
     else if (sv.TilesHeader == 1 /* palace entrance (blue sky)/forest */)
     {
@@ -226,6 +230,19 @@ void CheckEnemyPlacements<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditab
         if (!(enemy.IsShufflableSmallOrLarge())) { continue; }
         if (room.HasLeftExit && enemy.X < 6) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the left entrance: {enemy.DebugString()}"); }
         if (room.HasRightExit && enemy.X > xEnd) { Warning(room, "EnemyTooCloseToEntrance", $"Room has an enemy too close to the right entrance: {enemy.DebugString()}"); }
+    }
+}
+
+void CheckForFalseWalls<T>(Room room, SideviewEditable<T> sv) where T : Enum
+{
+    if (room.Group != RoomGroup.V4_4) { return; }
+    foreach (var cmd in sv.Commands)
+    {
+        if (cmd.Id is PalaceObject.WALKTHROUGH_WALL || cmd.Id is GreatPalaceObject.WALKTHROUGH_WALL)
+        {
+            Warning(room, "WalkthroughWall", $"Room uses walkthrough walls: {cmd.DebugString()}");
+            break;
+        }
     }
 }
 
