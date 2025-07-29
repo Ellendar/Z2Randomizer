@@ -21008,7 +21008,6 @@
     "linkedRoomName": null,
     "author": "ellendar",
     "palaceGroup": null
-	}
   },
   {
     "name": "Guma's Item Basement",
@@ -21025,7 +21024,7 @@
     "isDropZone": false,
     "hasItem": true,
     "enemies": "076E5E6F920C85",
-    "sideviewData": "31600F08AF2FD20C60209145810F00D20B71C1A92F572360059023F15200E801E8D108209140232309D10C62209070D10F",
+    "sideviewData": "31600F08AF2FD20C60209145810F00D20B71C1A92F572360059023F15200E801E8D100109130731309D10C62209070D10F",
     "hasBoss": false,
     "isBossRoom": false,
     "group": "V4_4",

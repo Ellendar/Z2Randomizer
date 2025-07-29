@@ -1367,6 +1367,10 @@ public class Hyrule
                         && (ItemGet[Collectable.FAIRY_SPELL] || ItemGet[Collectable.MAGIC_KEY])
                         && palace.GetGettableItems(requireables).Contains(collectable);
                 }
+                else if (location == eastHyrule.spellTower)
+                {
+                    canGet = CanGet(location) && ItemGet[Collectable.SPELL_SPELL];
+                }
                 //Location is a town
                 else if (location.ActualTown != null
                     && !delayedEvaluationLocations.Contains(location)
@@ -1374,9 +1378,10 @@ public class Hyrule
                 {
                     canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);
                 }
-                else if (location != eastHyrule.spellTower)
+                else if (!delayedEvaluationLocations.Contains(location))
                 {
-                    canGet = CanGet(location) && ItemGet[Collectable.SPELL_SPELL];
+                    //TODO: Remove all the needX flags and replace them with a set of requirements.
+                    canGet = CanGet(location) && (!location.NeedHammer || ItemGet[Collectable.HAMMER]) && (!location.NeedRecorder || ItemGet[Collectable.FLUTE]);
                 }
                 else
                 {
