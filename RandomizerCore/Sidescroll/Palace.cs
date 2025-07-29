@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Text.RegularExpressions;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
-public class Palace
+public partial class Palace
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -1341,82 +1342,104 @@ public class Palace
         AllRooms.Add(newRoom);
     }
 
-    public string GetLayoutDebug()
+    public string GetLayoutDebug(PalaceStyle style = PalaceStyle.VANILLA, bool includeCoordinateGrid = true)
     {
         StringBuilder sb = new();
-        sb.Append("   ");
-        for(int headerX = -20; headerX <= 20; headerX++)
+        sb.AppendLine(style.ToString());
+        if (style.IsCoordinateBased())
         {
-            sb.Append(headerX.ToString().PadLeft(3, ' '));
-        }
-        sb.Append('\n');
-        for (int y = 20; y >= -20; y--)
-        {
-            sb.Append("   ");
-            for (int x = -20; x <= 20; x++)
+            if (includeCoordinateGrid)
             {
-                Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
-                if (room == null)
+                sb.Append("   ");
+                for (int headerX = -20; headerX <= 20; headerX++)
                 {
-                    sb.Append("   ");
+                    sb.Append(headerX.ToString().PadLeft(3, ' '));
                 }
-                else
-                {
-                    sb.Append(" " + (room.HasUpExit ? "|" : " ") + " ");
-                }
+                sb.Append('\n');
             }
-            sb.Append('\n');
-            sb.Append(y.ToString().PadLeft(3, ' '));
-            for (int x = -20; x <= 20; x++)
+            for (int y = 20; y >= -20; y--)
             {
-                Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
-                if(room == null)
+                sb.Append("   ");
+                for (int x = -20; x <= 20; x++)
                 {
-                    sb.Append("   ");
-                }
-                else
-                {
-                    sb.Append(room.HasLeftExit ? '-' : ' ');
-                    if(room.IsEntrance)
+                    Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
+                    if (room == null)
                     {
-                        sb.Append('E');
-                    }
-                    else if (room.HasItem)
-                    {
-                        sb.Append('I');
-                    }
-                    else if (room.IsBossRoom)
-                    {
-                        sb.Append('B');
-                    }
-                    else if (room.IsThunderBirdRoom)
-                    {
-                        sb.Append('T');
+                        sb.Append("   ");
                     }
                     else
                     {
-                        sb.Append('X');
+                        sb.Append(" " + (room.HasUpExit ? "|" : " ") + " ");
                     }
-                    sb.Append(room.HasRightExit ? '-' : ' ');
                 }
-            }
-            sb.Append('\n');
-            sb.Append("   ");
-            for (int x = -20; x <= 20; x++)
-            {
-                Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
-                if (room == null)
+                sb.Append('\n');
+                sb.Append(includeCoordinateGrid ? y.ToString().PadLeft(3, ' ') : "   ");
+                for (int x = -20; x <= 20; x++)
                 {
-                    sb.Append("   ");
+                    Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
+                    if (room == null)
+                    {
+                        sb.Append("   ");
+                    }
+                    else
+                    {
+                        sb.Append(room.HasLeftExit ? '-' : ' ');
+                        if (room.IsEntrance)
+                        {
+                            sb.Append('E');
+                        }
+                        else if (room.HasItem)
+                        {
+                            sb.Append('I');
+                        }
+                        else if (room.IsBossRoom)
+                        {
+                            sb.Append('B');
+                        }
+                        else if (room.IsThunderBirdRoom)
+                        {
+                            sb.Append('T');
+                        }
+                        else
+                        {
+                            sb.Append('X');
+                        }
+                        sb.Append(room.HasRightExit ? '-' : ' ');
+                    }
                 }
-                else
+                sb.Append('\n');
+                sb.Append("   ");
+                for (int x = -20; x <= 20; x++)
                 {
-                    sb.Append(" " + (room.HasDownExit ? (room.HasDrop ? "v" : "|") : " ") + " ");
+                    Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
+                    if (room == null)
+                    {
+                        sb.Append("   ");
+                    }
+                    else
+                    {
+                        sb.Append(" " + (room.HasDownExit ? (room.HasDrop ? "v" : "|") : " ") + " ");
+                    }
                 }
+                sb.Append('\n');
             }
-            sb.Append('\n');
-        }
 
+            if (!includeCoordinateGrid)
+            {
+                StringBuilder condensed = new();
+                foreach (string line in sb.ToString().Split('\n'))
+                {
+                    if (!BlankLine().IsMatch(line))
+                    {
+                        condensed.AppendLine(line);
+                    }
+                }
+                return condensed.ToString();
+            }
+        }
         return sb.ToString();
     }
+
+    [GeneratedRegex(@"^[ \t\f\r\n]+$")]
+    private static partial Regex BlankLine();
 }

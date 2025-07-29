@@ -752,21 +752,25 @@ public class Hyrule
         }
         else
         {
-            if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0]] && !props.IncludeSpellsInShuffle)
+            Collectable townCollectable;
+            townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0];
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
                 shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
                 ItemGet[Collectable.TROPHY] = true;
             }
 
-            if (ItemGet[westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
+            townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0];
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
                 shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
                 ItemGet[Collectable.MEDICINE] = true;
             }
 
-            if (ItemGet[eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0]] && !props.IncludeSpellsInShuffle)
+            townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0];
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[17] == Collectable.CHILD);
                 shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
@@ -3409,6 +3413,27 @@ public class Hyrule
             //sb.AppendLine();
         }
 
+        sb.AppendLine("West:\n");
+        sb.AppendLine(westHyrule.GetMapDebug());
+
+        sb.AppendLine("\nEast:\n");
+        sb.AppendLine(eastHyrule.GetMapDebug());
+
+        sb.AppendLine("\nDeath Mountain:\n");
+        sb.AppendLine(deathMountain.GetMapDebug());
+
+        sb.AppendLine("\nMaze Island:\n");
+        sb.AppendLine(mazeIsland.GetMapDebug());
+
+        for(int i = 0; i < 6; i++)
+        {
+            sb.AppendLine($"\nPalace {i+1}:\n");
+            sb.AppendLine(palaces[i].GetLayoutDebug(props.PalaceStyles[i], false));
+        }
+
+        sb.AppendLine("\nGP:\n");
+        sb.AppendLine(palaces[6].GetLayoutDebug(props.PalaceStyles[6], false));
+
         sb.AppendLine("DETAILS: ");
         sb.Append(JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties));
 
@@ -3488,64 +3513,6 @@ CustomFileSelectData:
         || i.VanillaCollectable.IsQuestItem()
         || i.VanillaCollectable.IsSwordTech());
     }
-
-    /*
-    public string SpellDebug()
-    {
-        StringBuilder sb = new StringBuilder();
-        Collectable c = westHyrule.AllLocations.First(i => i.ActualTown == Town.RAURU).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Rauru: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Ruto: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Saria: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Mido West: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_CHURCH).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Mido Tower: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NABOORU).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Nabooru: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Darunia West: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_ROOF).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Darunia Roof: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("New Kasuto: " + Enum.GetName(typeof(Collectable), c));
-        }
-        c = eastHyrule.AllLocations.First(i => i.ActualTown == Town.OLD_KASUTO).Collectable;
-        if (!ItemGet[c])
-        {
-            sb.AppendLine("Old Kasuto: " + Enum.GetName(typeof(Collectable), c));
-        }
-        return sb.ToString();
-    }
-    */
 
     public void PrintRoutingDebug(int count, int wh, int eh, int dm, int mi)
     {

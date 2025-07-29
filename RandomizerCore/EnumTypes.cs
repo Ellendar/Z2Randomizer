@@ -257,6 +257,15 @@ public static class PalaceStyleExtensions
             _ => false
         };
     }
+    public static bool IsCoordinateBased(this PalaceStyle style)
+    {
+        return style switch
+        {
+            PalaceStyle.SEQUENTIAL => true,
+            PalaceStyle.RANDOM_WALK => true,
+            _ => false
+        };
+    }
 }
 
 [DefaultValue(OVERWORLD)]
