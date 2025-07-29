@@ -43,9 +43,9 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             palace.BossRoom.AdjustContinuingBossRoom();
         }
 
+        palace.ItemRooms = [];
         if (palaceNumber < 7)
         {
-            palace.ItemRooms = [];
             for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCounts[palaceNumber - 1]; itemRoomNumber++)
             {
                 Direction itemRoomDirection;

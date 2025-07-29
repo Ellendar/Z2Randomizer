@@ -3,10 +3,9 @@
 namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
-/// Collection of singletons representing character sprite options. For now this is just a fake enum.
-/// Eventually the plan is to refactor the sprite data out of Graphics and use this to be a proper representation
-/// This will also allow us to construct sprites in ways other than having them hardcoded.
-/// Ideally we create some standard file format so users can simply upload their sprite to the rando.
+/// Collection of singletons representing character sprite options.
+/// Sprites are now all IPS patches, which are loaded in from the /Sprites folder when installed
+/// so users can load their own sprites and they will automatically populate the menu
 /// </summary>
 public class CharacterSprite
 {
