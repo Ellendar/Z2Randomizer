@@ -3075,12 +3075,12 @@ public class Hyrule
 
         ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Collectables[0]);
         ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Collectables[0]);
-        ROMData.Put(0x4DD7, (byte)westHyrule.heartContainerCave.Collectables[0]);
-
+        ROMData.Put(0x4ff5, (byte)westHyrule.heartContainerCave.Collectables[0]);
+        
         int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
 
         ROMData.Put(0x5069, (byte)westHyrule.medicineCave.Collectables[0]);
-        ROMData.Put(0x4ff5, (byte)westHyrule.grassTile.Collectables[0]);
+        ROMData.Put(0x4DD7, (byte)westHyrule.grassTile.Collectables[0]);
 
         ROMData.Put(0x65C3, (byte)deathMountain.specRock.Collectables[0]);
         ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Collectables[0]);

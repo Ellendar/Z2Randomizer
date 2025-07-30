@@ -159,8 +159,8 @@ public sealed class WestHyrule : World
         locationAtPalace3.PalaceNumber = 3;
 
         magicContainerCave = GetLocationByMem(0x4632);
-        grassTile = GetLocationByMem(0x463F);
-        heartContainerCave = GetLocationByMem(0x4634);
+        grassTile = GetLocationByMem(0x4634);
+        heartContainerCave = GetLocationByMem(0x463F);
         pbagCave = GetLocationByMem(0x463D);
 
         parapaCave1 = GetLocationByMem(0x4639); //0x4639
