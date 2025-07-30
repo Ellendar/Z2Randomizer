@@ -2582,6 +2582,40 @@ public abstract class World
         return debug.ToString();
     }
 
+    public string GetReadableMap()
+    {
+        StringBuilder debug = new();
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                debug.Append(map[y, x] switch
+                {
+                    Terrain.TOWN => 'T',
+                    Terrain.CAVE => 'C',
+                    Terrain.PALACE => 'P',
+                    Terrain.BRIDGE => "=",
+                    Terrain.DESERT => '_',
+                    Terrain.GRASS => '_',
+                    Terrain.FOREST => '_',
+                    Terrain.SWAMP => '_',
+                    Terrain.GRAVE => '_',
+                    Terrain.ROAD => '_',
+                    Terrain.LAVA => '_',
+                    Terrain.MOUNTAIN => 'X',
+                    Terrain.WATER => 'w',
+                    Terrain.WALKABLEWATER => 'w',
+                    Terrain.ROCK => 'X',
+                    Terrain.RIVER_DEVIL => 'X',
+                    Terrain.NONE => ' ',
+                    _ => throw new Exception("Invalid Terrain")
+                });
+            }
+            debug.Append('\n');
+        }
+        return debug.ToString();
+    }
+
     public bool ValidateCaves()
     {
         for(int y = 0; y < MAP_ROWS; y++)

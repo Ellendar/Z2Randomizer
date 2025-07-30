@@ -3414,16 +3414,16 @@ public class Hyrule
         }
 
         sb.AppendLine("West:\n");
-        sb.AppendLine(westHyrule.GetMapDebug());
+        sb.AppendLine(westHyrule.GetReadableMap());
 
         sb.AppendLine("\nEast:\n");
-        sb.AppendLine(eastHyrule.GetMapDebug());
+        sb.AppendLine(eastHyrule.GetReadableMap());
 
         sb.AppendLine("\nDeath Mountain:\n");
-        sb.AppendLine(deathMountain.GetMapDebug());
+        sb.AppendLine(deathMountain.GetReadableMap());
 
         sb.AppendLine("\nMaze Island:\n");
-        sb.AppendLine(mazeIsland.GetMapDebug());
+        sb.AppendLine(mazeIsland.GetReadableMap());
 
         for(int i = 0; i < 6; i++)
         {
