@@ -642,9 +642,9 @@ public class Hyrule
 
         if (props.PbagItemShuffle)
         {
-            westHyrule.pbagCave.Collectables = [(Collectable)ROMData.GetByte(0x4FE2)];
-            eastHyrule.pbagCave1.Collectables = [(Collectable)ROMData.GetByte(0x8ECC)];
-            eastHyrule.pbagCave2.Collectables = [(Collectable)ROMData.GetByte(0x8FB3)];
+            westHyrule.pbagCave.Collectables = [(Collectable)ROMData.GetByte(RomMap.WEST_PBAG_CAVE_COLLECTABLE)];
+            eastHyrule.pbagCave1.Collectables = [(Collectable)ROMData.GetByte(RomMap.EAST_PBAG_CAVE1_COLLECTABLE)];
+            eastHyrule.pbagCave2.Collectables = [(Collectable)ROMData.GetByte(RomMap.EAST_PBAG_CAVE2_COLLECTABLE)];
             shufflableItems.Add(westHyrule.pbagCave.Collectables[0]);
             shufflableItems.Add(eastHyrule.pbagCave1.Collectables[0]);
             shufflableItems.Add(eastHyrule.pbagCave2.Collectables[0]);
@@ -3129,22 +3129,18 @@ public class Hyrule
 
         //WRITE UPDATES TO WIZARD/QUEST COLLECTABLES HERE
 
-        ROMData.Put(0x4DEA, (byte)westHyrule.trophyCave.Collectables[0]);
-        ROMData.Put(0x502A, (byte)westHyrule.magicContainerCave.Collectables[0]);
-        ROMData.Put(0x4ff5, (byte)westHyrule.heartContainerCave.Collectables[0]);
-        
-        int[] itemLocs2 = { 0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774 };
-
-        ROMData.Put(0x5069, (byte)westHyrule.medicineCave.Collectables[0]);
-        ROMData.Put(0x4DD7, (byte)westHyrule.grassTile.Collectables[0]);
-
-        ROMData.Put(0x65C3, (byte)deathMountain.specRock.Collectables[0]);
-        ROMData.Put(0x6512, (byte)deathMountain.hammerCave.Collectables[0]);
-        ROMData.Put(0x8FAA, (byte)eastHyrule.waterTile.Collectables[0]);
-        ROMData.Put(0x9011, (byte)eastHyrule.desertTile.Collectables[0]);
+        ROMData.Put(RomMap.WEST_TROPHY_CAVE_COLLECTABLE, (byte)westHyrule.trophyCave.Collectables[0]);
+        ROMData.Put(RomMap.WEST_MAGIC_CONTAINER_CAVE_COLLECTABLE, (byte)westHyrule.magicContainerCave.Collectables[0]);
+        ROMData.Put(RomMap.WEST_HEART_CONTAINER_CAVE_COLLECTABLE, (byte)westHyrule.heartContainerCave.Collectables[0]);
+        ROMData.Put(RomMap.WEST_MEDICINE_CAVE_COLLECTABLE, (byte)westHyrule.medicineCave.Collectables[0]);
+        ROMData.Put(RomMap.WEST_GRASS_TILE_COLLECTABLE, (byte)westHyrule.grassTile.Collectables[0]);
+        ROMData.Put(RomMap.DM_SPECTACLE_ROCK_COLLECTABLE, (byte)deathMountain.specRock.Collectables[0]);
+        ROMData.Put(RomMap.DM_HAMMER_CAVE_COLLECTABLE, (byte)deathMountain.hammerCave.Collectables[0]);
+        ROMData.Put(RomMap.EAST_WATER_TILE_COLLECTABLE, (byte)eastHyrule.waterTile.Collectables[0]);
+        ROMData.Put(RomMap.EAST_DESERT_TILE_COLLECTABLE, (byte)eastHyrule.desertTile.Collectables[0]);
 
         ROMData.ElevatorBossFix(props.BossItem);
-        
+
         // Update item rooms and entrances for all palaces
         Location[] locations = [
             westHyrule.locationAtPalace1, westHyrule.locationAtPalace2, westHyrule.locationAtPalace3,
@@ -3170,34 +3166,33 @@ public class Hyrule
             ROMData.Put(loc.MemAddress + 0x7e, root.Map);
         }
 
-        ROMData.Put(0xDB95, (byte)eastHyrule.spellTower.Collectables[0]); //map 47
-        ROMData.Put(0xDB8C, (byte)eastHyrule.newKasutoBasement.Collectables[0]); //map 46
+        ROMData.Put(RomMap.EAST_SPELL_TOWER_COLLECTABLE, (byte)eastHyrule.spellTower.Collectables[0]); //map 47
+        ROMData.Put(RomMap.EAST_NEW_KASUTO_BASEMENT_COLLECTABLE, (byte)eastHyrule.newKasutoBasement.Collectables[0]); //map 46
 
-        ROMData.Put(0xA5A8, (byte)mazeIsland.magicContainerDrop.Collectables[0]);
-        ROMData.Put(0xA58B, (byte)mazeIsland.childDrop.Collectables[0]);
+        ROMData.Put(RomMap.MI_MAGIC_CONTAINER_DROP_COLLECTABLE, (byte)mazeIsland.magicContainerDrop.Collectables[0]);
+        ROMData.Put(RomMap.MI_CHILD_DROP_COLLECTABLE, (byte)mazeIsland.childDrop.Collectables[0]);
 
         if (props.PbagItemShuffle)
         {
-            ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Collectables[0]);
-            ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.Collectables[0]);
-            ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.Collectables[0]);
-
+            ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, (byte)westHyrule.pbagCave.Collectables[0]);
+            ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, (byte)eastHyrule.pbagCave1.Collectables[0]);
+            ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, (byte)eastHyrule.pbagCave2.Collectables[0]);
         }
 
         foreach (Location location in pbagHearts)
         {
             if (location == westHyrule.pbagCave)
             {
-                ROMData.Put(0x4FE2, (byte)westHyrule.pbagCave.Collectables[0]);
+                ROMData.Put(RomMap.WEST_PBAG_CAVE_COLLECTABLE, (byte)westHyrule.pbagCave.Collectables[0]);
             }
 
             if (location == eastHyrule.pbagCave1)
             {
-                ROMData.Put(0x8ECC, (byte)eastHyrule.pbagCave1.Collectables[0]);
+                ROMData.Put(RomMap.EAST_PBAG_CAVE1_COLLECTABLE, (byte)eastHyrule.pbagCave1.Collectables[0]);
             }
             if (location == eastHyrule.pbagCave2)
             {
-                ROMData.Put(0x8FB3, (byte)eastHyrule.pbagCave2.Collectables[0]);
+                ROMData.Put(RomMap.EAST_PBAG_CAVE2_COLLECTABLE, (byte)eastHyrule.pbagCave2.Collectables[0]);
             }
         }
 
@@ -3893,7 +3888,7 @@ FREE_UNTIL $C285
     lda #06
     sta $01
     lda $0561
-    lsr a
+    lsr a  ; Sets the carry flag that determines which 4 bits of the item presence byte is used
     tay
     lda ($00),y
     rts
