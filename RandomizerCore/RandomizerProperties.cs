@@ -96,6 +96,7 @@ public class RandomizerProperties
     public bool EastRocks { get; set; }
 
     //Palaces
+    [NotMapped]
     public PalaceStyle[] PalaceStyles { get; set; } = new PalaceStyle[7];
     public bool ShortenNormalPalaces { get; set; }
     public bool ShortenGP { get; set; }
@@ -109,6 +110,7 @@ public class RandomizerProperties
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
+    [NotMapped]
     public BossRoomsExitType[] BossRoomsExits { get; set; } = new BossRoomsExitType[6];
     public bool NoDuplicateRooms { get; set; }
     public bool NoDuplicateRoomsBySideview { get; set; }
@@ -117,6 +119,7 @@ public class RandomizerProperties
     public bool AllowV4Rooms { get; set; }
     public bool AllowV4_4Rooms { get; set; }
     public bool HardBosses { get; set; }
+    [NotMapped]
     public int[] PalaceItemRoomCounts { get; set; } = new int[6];
     public bool PalaceItemRoomCountIndicator { get; set; }
 

@@ -21,7 +21,7 @@ class Statistics
 {
     //private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
     //private static readonly string FLAGS = "hEAAp1dAOR4YXs0uhjGs371g+hBswv9svsthABVA"; //Random%
-    private static readonly string FLAGS = "g7+z6e7AAAAAAAAAAFASAAAA+7AAArAAAAAAAAAAA"; //test
+    private static readonly string FLAGS = "hGAJHfdAOXWSXs0wysXs!vQZQ+2c4YTAWTLsAAAWAA"; //test
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
     private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer_4_4\\Statistics\\db\\stats.sqlite";

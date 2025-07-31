@@ -108,7 +108,7 @@ public class Hyrule
 
     //DEBUG/STATS
     public const bool UNSAFE_DEBUG = true;
-    private static int DEBUG_THRESHOLD = 100;
+    private static int DEBUG_THRESHOLD = 200;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -675,15 +675,15 @@ public class Hyrule
         if (props.IncludeQuestItemsInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
-            if (!props.StartWithSpellItems)
+            if (props.StartWithSpellItems)
             {
-                shufflableItems.Add(Collectable.MIRROR);
-                shufflableItems.Add(Collectable.WATER);
+                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
+                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
             }
             else
             {
-                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
-                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
+                shufflableItems.Add(Collectable.MIRROR);
+                shufflableItems.Add(Collectable.WATER);
             }
         }
 
@@ -839,7 +839,6 @@ public class Hyrule
             excessItems.Add(Collectable.HEART_CONTAINER);
         }
 
-        //palace items beyond the first are excess
         int extraPalaceItemCount = props.PalaceItemRoomCounts.Select(c => Math.Max(c - 1, 0)).Sum();
         for (int i = 0; i < extraPalaceItemCount; i++)
         {
@@ -1021,10 +1020,20 @@ public class Hyrule
 
     private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)
     {
-        if (itemsToShuffle.Count != itemShuffleLocations.Count)
+        int itemShuffleLocationsCount = itemShuffleLocations.Count;
+        if(itemShuffleLocations.Any(i => i.PalaceNumber != null))
+        {
+            itemShuffleLocationsCount = itemShuffleLocationsCount 
+                - itemShuffleLocations.Count(i => i.PalaceNumber != null)
+                + props.PalaceItemRoomCounts.Sum(i => i);
+                //- props.PalaceItemRoomCounts.Where(i => i == 0).Count();
+        }
+        if (itemsToShuffle.Count != itemShuffleLocationsCount)
         {
             throw new Exception("Item locations must match number of items");
         }
+
+        itemsToShuffle.FisherYatesShuffle(RNG);
 
         //Clear all locations, then set them to the newly shuffled items
         itemShuffleLocations.ForEach(i => i.Collectables.Clear());
@@ -1269,8 +1278,8 @@ public class Hyrule
                 if (UNSAFE_DEBUG && reachableLocationsCount >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on collectables");
-                    PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
-                    //Debug.WriteLine(eastHyrule.GetMapDebug());
+                    //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+                    //Debug.WriteLine(westHyrule.GetMapDebug());
                     return false;
                 }
                 return false;
@@ -3577,7 +3586,7 @@ CustomFileSelectData:
         {
             foreach (Collectable collectable in location.Collectables)
             {
-                if (!ItemGet[collectable])
+                if (!collectable.IsMinorItem() && !ItemGet[collectable])
                 {
                     sb.AppendLine(location.Name + " / " + Enum.GetName(typeof(Collectable), collectable));
                 }
