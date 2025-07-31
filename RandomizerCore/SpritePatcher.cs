@@ -1,8 +1,7 @@
-﻿using SD.Tools.BCLExtensions.CollectionsRelated;
+﻿using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -37,6 +36,8 @@ internal class AddressRange
 /// </summary>
 internal class SpritePatcher
 {
+    private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
     static readonly IReadOnlyList<byte> PatchSig = Encoding.ASCII.GetBytes("PATCH");
     static readonly IReadOnlyList<byte> EofSig = Encoding.ASCII.GetBytes("EOF");
 
@@ -80,16 +81,16 @@ internal class SpritePatcher
 
                     for (int i = 0; i < segSize; i++)
                     {
-                        if (IsSanitizedSpriteAddress(srcOffs + i, changeItems))
+                        int addr = srcOffs + i;
+                        byte newValue = fillValue is not null ? (byte)fillValue : ipsData[ipsOffs + i];
+                        if (IsSanitizedSpriteAddress(addr, changeItems))
                         {
-                            if (fillValue is not null)
-                            {
-                                romData[tgtOffs + i] = (byte)fillValue;
-                            }
-                            else
-                            {
-                                romData[tgtOffs + i] = ipsData[ipsOffs + i];
-                            }
+                            romData[tgtOffs + i] = newValue;
+                        }
+                        else
+                        {
+                            byte oldValue = romData[tgtOffs + i];
+                            logger.Error($"Moderating IPS patch at address: 0x{addr.ToString("x5")} from 0x{oldValue.ToString("x2")} to 0x{newValue.ToString("x2")}");
                         }
                     }
                     if (fillValue is null)
@@ -107,16 +108,16 @@ internal class SpritePatcher
 
             for (int i = 0; i < size; i++)
             {
-                if (IsSanitizedSpriteAddress(srcOffs + i, changeItems))
+                int addr = srcOffs + i;
+                byte newValue = fillValue is not null ? (byte)fillValue : ipsData[ipsOffs + i];
+                if (IsSanitizedSpriteAddress(addr, changeItems))
                 {
-                    if (fillValue is not null)
-                    {
-                        romData[tgtOffs + i] = (byte)fillValue;
-                    }
-                    else
-                    {
-                        romData[tgtOffs + i] = ipsData[ipsOffs + i];
-                    }
+                    romData[tgtOffs + i] = newValue;
+                }
+                else
+                {
+                    byte oldValue = romData[tgtOffs + i];
+                    logger.Error($"Moderating IPS patch at address: 0x{addr.ToString("x5")} from 0x{oldValue.ToString("x2")} to 0x{newValue.ToString("x2")}");
                 }
             }
             if (fillValue is null)
@@ -126,7 +127,7 @@ internal class SpritePatcher
         }
     }
 
-    private static bool IsSanitizedSpriteAddress(int addr, bool changeItems)
+    private static bool IsSanitizedSpriteAddress(int addr, bool changeItems, bool changeGameOver=true)
     {
         // NOTE: this isn't written in stone, if anything
         // more should be allowed, let us know.
@@ -153,20 +154,11 @@ internal class SpritePatcher
         if (ROM.ZeldaDressPaletteAddr.Contains(addr)) { return true; }
         // iNES header
         if (addr < 0x10) { return false; }
-        // PPU addr before Game over
-        if (0x10 <= addr && addr < 0x12) { return true; }
-        // Not allowing change of length of the text
-        if (0x12 == addr) { return false; }
-        // text: Game over
-        if (0x13 <= addr && addr < 0x13 + 0x0a) { return true; }
-        // PPU addr before Return of Ganon
-        if (0x1d <= addr && addr < 0x1f) { return true; }
-        // Not allowing change of length of the text
-        if (0x1f == addr) { return false; }
-        // text: Return of Ganon
-        if (0x20 <= addr && addr < 0x20 + 0x0f) { return true; }
-        // Palette Mappings
-        if (0x2f <= addr && addr < 0xE5) { return true; }
+        // Allow custom game over screens. Since this contains PPU pointers,
+        // it can probably crash if the patch is bad. We allow everything here
+        // until the next section. It's unlikely it will lead to *hard-to-trace* crashes.
+        // (We're keeping the final FF ending byte at 0xE4.)
+        if (0x10 <= addr && addr < 0xE4) { return changeGameOver; }
 
         // Beam sword projectile
         // LDA      #$32                      ; 0x18fa  A9 32
@@ -179,6 +171,8 @@ internal class SpritePatcher
         if (0x2a00 <= addr && addr < 0x2a18) { return true; }
 
         // bank1_Pointer_table_for_Background_Areas_Data
+        // This is the sideview map pointer table for the background maps in the west
+        // We deny all map command changes and pointers to room changes
         if (0x4010 <= addr && addr < 0x401e) { return false; }
         // Palettes_for_Overworld
         if (0x401e <= addr && addr < 0x40fe) { return true; }

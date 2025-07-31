@@ -3884,7 +3884,7 @@ FREE_UNTIL $C285
     lda #06
     sta $01
     lda $0561
-    lsr a
+    lsr a  ; Sets the carry flag that determines which 4 bits of the item presence byte is used
     tay
     lda ($00),y
     rts

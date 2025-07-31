@@ -1704,13 +1704,13 @@ CheckIfHorseheadReboshark:
         var a = asm.Module();
         a.Code(/* lang=s */"""
 .segment "PRG7"
-.org $DE3A
+.org $DE1A
 HookIntoSpawnBossItem:
     jmp RestorePaletteAfterBossKill
 
 .reloc
 RestorePaletteAfterBossKill:
-    sta $c2,x ; command overwritten by jmp
+    sta $af,x ; command overwritten by jmp
     ldx #$00
     ldy $362
 @CopyLoop:
