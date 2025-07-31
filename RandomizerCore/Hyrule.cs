@@ -107,8 +107,8 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    public const bool UNSAFE_DEBUG = false;
-    private static int DEBUG_THRESHOLD = 200;
+    public const bool UNSAFE_DEBUG = true;
+    private static int DEBUG_THRESHOLD = 100;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -637,7 +637,7 @@ public class Hyrule
             Collectable.MAGIC_CONTAINER, Collectable.MEDICINE, Collectable.TROPHY, Collectable.HEART_CONTAINER, 
             Collectable.HEART_CONTAINER, Collectable.MAGIC_CONTAINER, Collectable.MAGIC_KEY, Collectable.MAGIC_CONTAINER, 
             Collectable.HAMMER, Collectable.CHILD, Collectable.MAGIC_CONTAINER];
-        List<Collectable> smallItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG, 
+        List<Collectable> minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG, 
             Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP, Collectable.KEY];
 
         if (props.PbagItemShuffle)
@@ -682,8 +682,8 @@ public class Hyrule
             }
             else
             {
-                shufflableItems.Add(smallItems[RNG.Next(smallItems.Count)]);
-                shufflableItems.Add(smallItems[RNG.Next(smallItems.Count)]);
+                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
+                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
             }
         }
 
@@ -730,7 +730,7 @@ public class Hyrule
                 int remove = RNG.Next(shufflableItems.Count);
                 if (shufflableItems[remove] == Collectable.HEART_CONTAINER)
                 {
-                    shufflableItems[remove] = smallItems[RNG.Next(smallItems.Count)];
+                    shufflableItems[remove] = minorItems[RNG.Next(minorItems.Count)];
                     heartContainersToAdd--;
                 }
             }
@@ -741,9 +741,9 @@ public class Hyrule
             Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
             Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
             Debug.Assert(shufflableItems[17] == Collectable.CHILD);
-            shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
-            shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
-            shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
+            shufflableItems[9] = minorItems[RNG.Next(minorItems.Count)];
+            shufflableItems[10] = minorItems[RNG.Next(minorItems.Count)];
+            shufflableItems[17] = minorItems[RNG.Next(minorItems.Count)];
             ItemGet[Collectable.TROPHY] = true;
             ItemGet[Collectable.MEDICINE] = true;
             ItemGet[Collectable.CHILD] = true;
@@ -757,7 +757,7 @@ public class Hyrule
             if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
-                shufflableItems[10] = smallItems[RNG.Next(smallItems.Count)];
+                shufflableItems[10] = minorItems[RNG.Next(minorItems.Count)];
                 ItemGet[Collectable.TROPHY] = true;
             }
 
@@ -765,7 +765,7 @@ public class Hyrule
             if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
-                shufflableItems[9] = smallItems[RNG.Next(smallItems.Count)];
+                shufflableItems[9] = minorItems[RNG.Next(minorItems.Count)];
                 ItemGet[Collectable.MEDICINE] = true;
             }
 
@@ -773,7 +773,7 @@ public class Hyrule
             if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[17] == Collectable.CHILD);
-                shufflableItems[17] = smallItems[RNG.Next(smallItems.Count)];
+                shufflableItems[17] = minorItems[RNG.Next(minorItems.Count)];
                 ItemGet[Collectable.CHILD] = true;
             }
         }
@@ -802,7 +802,7 @@ public class Hyrule
         {
             if(props.StartsWithCollectable(item))
             {
-                shufflableItems[shufflableItems.IndexOf(item)] = smallItems.Sample(RNG);
+                shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(RNG);
             }
         }
 
@@ -812,7 +812,7 @@ public class Hyrule
             {
                 if (props.StartsWithCollectable(item) && shufflableItems.Contains(item))
                 {
-                    shufflableItems[shufflableItems.IndexOf(item)] = smallItems.Sample(RNG);
+                    shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(RNG);
                 }
             }
         }
@@ -821,11 +821,11 @@ public class Hyrule
         {
             if (props.StartWithDownstab)
             {
-                shufflableItems[shufflableItems.IndexOf(Collectable.DOWNSTAB)] = smallItems.Sample(RNG);
+                shufflableItems[shufflableItems.IndexOf(Collectable.DOWNSTAB)] = minorItems.Sample(RNG);
             }
             if (props.StartWithUpstab)
             {
-                shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = smallItems.Sample(RNG);
+                shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = minorItems.Sample(RNG);
             }
         }
 
@@ -843,7 +843,7 @@ public class Hyrule
         int extraPalaceItemCount = props.PalaceItemRoomCounts.Select(c => Math.Max(c - 1, 0)).Sum();
         for (int i = 0; i < extraPalaceItemCount; i++)
         {
-            shufflableItems.Add(smallItems.Sample(RNG));
+            shufflableItems.Add(minorItems.Sample(RNG));
         }
 
 
@@ -914,34 +914,64 @@ public class Hyrule
         }
 
         //Do the actual shuffling
-
+        palaces.ForEach(i => i.ItemRooms.ForEach(j => j.Collectable = null));
         if (props.MixOverworldPalaceItems)
         {
-            shufflableItems.FisherYatesShuffle(RNG);
+            DoShuffle(shufflableItems, itemLocs);
         }
         else
         {
+            List<Collectable> itemsToActuallyShuffle;
+            List<Location> shufflableItemLocations;
+
             if (props.ShufflePalaceItems)
             {
-                for (int i = 5; i > 0; i--)
+                itemsToActuallyShuffle = [];
+                shufflableItemLocations = [];
+                foreach (Location palaceLocation in itemLocs.Where(i => i.PalaceNumber != null))
                 {
-                    int s = RNG.Next(i + 1);
-                    (shufflableItems[i], shufflableItems[s]) = (shufflableItems[s], shufflableItems[i]);
+                    shufflableItemLocations.Add(palaceLocation);
+                    itemsToActuallyShuffle.Add(palaceLocation.VanillaCollectable);
+                    for (int i = 1; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
+                    {
+                        itemsToActuallyShuffle.Add(minorItems.Sample(RNG));
+                    }
                 }
+                DoShuffle(itemsToActuallyShuffle, shufflableItemLocations);
+            }
+            else
+            {
+                foreach (Location palaceLocation in itemLocs.Where(i => i.PalaceNumber != null && i.PalaceNumber < 7))
+                {
+                    palaceLocation.Collectables = [palaceLocation.VanillaCollectable];
+                    palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[0].Collectable = palaceLocation.VanillaCollectable;
+                    for (int i = 1; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
+                    {
+                        Collectable smallItem = minorItems.Sample(RNG);
+                        palaceLocation.Collectables.Add(smallItem);
+                        palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable = smallItem;
+                    }
+                }  
             }
 
             if (props.ShuffleOverworldItems)
             {
-                for (int i = shufflableItems.Count - 1; i > 6; i--)
+                itemsToActuallyShuffle = [];
+                shufflableItemLocations = [];
+                foreach (Location nonPalaceLocation in itemLocs.Where(i => i.PalaceNumber == null))
                 {
-                    int s = RNG.Next(6, i + 1);
-                    (shufflableItems[i], shufflableItems[s]) = (shufflableItems[s], shufflableItems[i]);
+                    shufflableItemLocations.Add(nonPalaceLocation);
+                    itemsToActuallyShuffle.Add(nonPalaceLocation.VanillaCollectable);
+                }
+                DoShuffle(itemsToActuallyShuffle, shufflableItemLocations);
+            }
+            else
+            {
+                foreach (Location nonPalaceLocation in itemLocs.Where(i => i.PalaceNumber == null))
+                {
+                    nonPalaceLocation.Collectables = [nonPalaceLocation.VanillaCollectable];
                 }
             }
-        }
-        if(shufflableItems.Count != itemLocs.Count + extraPalaceItemCount)
-        {
-            throw new Exception("Item locations must match number of items");
         }
 
         if (props.AllowImportantItemDuplicates)
@@ -987,20 +1017,29 @@ public class Hyrule
             }
         }
 
+    }
+
+    private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)
+    {
+        if (itemsToShuffle.Count != itemShuffleLocations.Count)
+        {
+            throw new Exception("Item locations must match number of items");
+        }
+
         //Clear all locations, then set them to the newly shuffled items
-        itemLocs.ForEach(i => i.Collectables.Clear());
-        palaces.ForEach(i => i.ItemRooms.ForEach(j => j.Collectable = null));
-        using var itemLocsIterator = itemLocs.GetEnumerator();
+        itemShuffleLocations.ForEach(i => i.Collectables.Clear());
+        
+        using var itemLocsIterator = itemShuffleLocations.GetEnumerator();
         Location? location = null;
         int subIndex = 0;
-        foreach(Collectable item in shufflableItems)
+        foreach (Collectable item in itemsToShuffle)
         {
-            if(location?.PalaceNumber == null)
+            if (location?.PalaceNumber == null)
             {
                 if (!itemLocsIterator.MoveNext()) { throw new InvalidOperationException("Ran out of item locations."); }
                 location = itemLocsIterator.Current;
             }
-            while(location.PalaceNumber is int palaceNum && ++subIndex > props.PalaceItemRoomCounts[palaceNum - 1])
+            while (location.PalaceNumber is int palaceNum && ++subIndex > props.PalaceItemRoomCounts[palaceNum - 1])
             {
                 subIndex = 0;
                 if (!itemLocsIterator.MoveNext()) { throw new InvalidOperationException("Ran out of item locations."); }
@@ -1008,7 +1047,7 @@ public class Hyrule
             }
 
             location.Collectables.Add(item);
-            if(location.PalaceNumber is int palaceNumInIf)
+            if (location.PalaceNumber is int palaceNumInIf)
             {
                 palaces[palaceNumInIf - 1].ItemRooms[subIndex - 1].Collectable = item;
             }
@@ -1429,6 +1468,14 @@ public class Hyrule
                 {
                     ItemGet[item] = true;
                     gottenItems.Add(item);
+                    if (canGet && item == Collectable.HEART_CONTAINER)
+                    {
+                        heartContainers++;
+                    }
+                    if (canGet && item == Collectable.MAGIC_CONTAINER)
+                    {
+                        accessibleMagicContainers++;
+                    }
                 }
             }
         }

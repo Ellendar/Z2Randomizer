@@ -270,7 +270,7 @@ public class Location
             (Continent.MAZE, 58, 41, 36) => "MAZE_ISLAND_MAGIC",
             (Continent.MAZE, 58, 60, 15) => "P4",
             (Continent.MAZE, 60, 57, 37) => "MAZE_ISLAND_CHILD",
-            (Continent.DM, 64, 8, 26) => "DM_MAGIC",
+            (Continent.DM, 64, 8, 26) => "SPEC_ROCK",
             (Continent.MAZE, 58, 48, 47) => "MAZE_ISLAND_FORCED_BATTLE_3",
             (Continent.MAZE, 49, 51, 48) => "MAZE_ISLAND_FORCED_BATTLE_7",
             (Continent.MAZE, 50, 46, 49) => "MAZE_ISLAND_FORCED_BATTLE_4",

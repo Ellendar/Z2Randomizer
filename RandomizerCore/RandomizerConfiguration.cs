@@ -1459,6 +1459,18 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
                     break;
             }
 
+            //If shuffle palace items is off, the minimum number of palace rooms for a palace must be 1
+            //otherwise it is impossible to place the palace items.
+            properties.ShufflePalaceItems = ShufflePalaceItems ?? GetIndeterminateFlagValue(r);
+            if (!properties.ShufflePalaceItems)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    properties.PalaceItemRoomCounts[i] = int.Max(properties.PalaceItemRoomCounts[i], 1);
+                }
+            }
+
+
             //Other starting attributes
             int startHeartsMin, startHeartsMax;
             if (StartingHeartContainersMin == null)
@@ -1828,7 +1840,7 @@ public sealed class RandomizerConfiguration : INotifyPropertyChanged
 
         //Items
         properties.ShuffleOverworldItems = ShuffleOverworldItems ?? GetIndeterminateFlagValue(r);
-        properties.ShufflePalaceItems = ShufflePalaceItems ?? GetIndeterminateFlagValue(r);
+        //shufflePalaceItems needed to be determined earlier.
         properties.MixOverworldPalaceItems = MixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r); 
         properties.RandomizeSmallItems = ShuffleSmallItems;
         properties.ExtraKeys = PalacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
