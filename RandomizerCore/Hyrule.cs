@@ -108,7 +108,7 @@ public class Hyrule
 
     //DEBUG/STATS
     public const bool UNSAFE_DEBUG = true;
-    private static int DEBUG_THRESHOLD = 200;
+    private static int DEBUG_THRESHOLD = 500;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -460,6 +460,7 @@ public class Hyrule
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash.Select(x => (char)x));
 
+            /*
             if (UNSAFE_DEBUG)
             {
                 PrintDebugSpoiler(LogLevel.Error);
@@ -474,7 +475,7 @@ public class Hyrule
                     }
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
-            }
+            }*/
             return ROMData.rawdata;
         }
         catch(Exception e)
@@ -724,14 +725,14 @@ public class Hyrule
         //Replace any unused heart containers with small items
         if (heartContainersInItemPool < 4)
         {
-            int heartContainersToAdd = 4 - heartContainersInItemPool;
-            while (heartContainersToAdd > 0)
+            int heartContainersToRemove = 4 - heartContainersInItemPool;
+            while (heartContainersToRemove > 0)
             {
                 int remove = RNG.Next(shufflableItems.Count);
                 if (shufflableItems[remove] == Collectable.HEART_CONTAINER)
                 {
                     shufflableItems[remove] = minorItems[RNG.Next(minorItems.Count)];
-                    heartContainersToAdd--;
+                    heartContainersToRemove--;
                 }
             }
         }
@@ -968,7 +969,44 @@ public class Hyrule
             {
                 foreach (Location nonPalaceLocation in itemLocs.Where(i => i.PalaceNumber == null))
                 {
-                    nonPalaceLocation.Collectables = [nonPalaceLocation.VanillaCollectable];
+                    Collectable vanillaCollectable = nonPalaceLocation.VanillaCollectable;
+                    nonPalaceLocation.Collectables = props.StartsWithCollectable(vanillaCollectable) ?
+                        [minorItems.Sample(RNG)] : [vanillaCollectable];
+                }
+            }
+        }
+
+        //Assigning unshuffled locations can make the number of heart containers wrong, so re-adjust them
+        List<Location> heartContainerLocations = itemLocs.Where(i => i.Collectables.Contains(Collectable.HEART_CONTAINER)).ToList();
+        int heartContainerCount = itemLocs.SelectMany(i => i.Collectables).Count(i => i == Collectable.HEART_CONTAINER);
+        while(heartContainerCount > heartContainersInItemPool)
+        {
+            Location location = heartContainerLocations.Sample(RNG)!;
+            int index = RNG.Next(location.Collectables.Count);
+            if (location.Collectables[index] == Collectable.HEART_CONTAINER)
+            {
+                location.Collectables[index] = minorItems.Sample(RNG);
+                heartContainerCount--;
+                if (!location.Collectables.Any(i => i == Collectable.HEART_CONTAINER))
+                {
+                    heartContainerLocations.Remove(location);
+                }
+            }
+        }
+
+        while(heartContainerCount < heartContainersInItemPool)
+        {
+            List<Location> minorItemLocations = itemLocs.Where(i => i.Collectables.Any(j => j.IsMinorItem())).ToList();
+
+            Location location = minorItemLocations.Sample(RNG)!;
+            int index = RNG.Next(location.Collectables.Count);
+            if (location.Collectables[index].IsMinorItem())
+            {
+                location.Collectables[index] = Collectable.HEART_CONTAINER;
+                heartContainerCount++;
+                if (!location.Collectables.Any(i => i.IsMinorItem()))
+                {
+                    minorItemLocations.Remove(location);
                 }
             }
         }
@@ -1278,8 +1316,9 @@ public class Hyrule
                 if (UNSAFE_DEBUG && reachableLocationsCount >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on collectables");
-                    //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+                    PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(westHyrule.GetMapDebug());
+                    //XXX: Debug
                     return false;
                 }
                 return false;
@@ -1291,11 +1330,15 @@ public class Hyrule
             //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
         }
-        if (heartContainers != maxHearts)
+        if (heartContainers < maxHearts)
         {
             heartContainerReachableFailures++;
             //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
             return false;
+        }
+        if(heartContainers > maxHearts)
+        {
+            throw new Exception("More hearts found than should exist in the seed.");
         }
 
         bool retval =
@@ -1326,7 +1369,7 @@ public class Hyrule
         }
         if (UNSAFE_DEBUG && retval)
         {
-            PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
+            //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
         }
         return retval;
     }
@@ -1405,7 +1448,7 @@ public class Hyrule
         {
             foreach (Collectable collectable in location.Collectables)
             {
-                if (collectable.IsInternalUse())
+                if (collectable.IsInternalUse() || delayedEvaluationLocations.Contains(location))
                 {
                     continue;
                 }
@@ -1425,7 +1468,6 @@ public class Hyrule
                 }
                 //Location is a town
                 else if (location.ActualTown != null
-                    && !delayedEvaluationLocations.Contains(location)
                     && Towns.townSpellAndItemRequirements.ContainsKey(location.ActualTown ?? Town.INVALID))
                 {
                     canGet = CanGet(location) && Towns.townSpellAndItemRequirements[(Town)location.ActualTown!].AreSatisfiedBy(requireables);

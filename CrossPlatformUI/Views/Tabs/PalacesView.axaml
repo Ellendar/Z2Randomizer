@@ -44,7 +44,7 @@
                       IsChecked="{Binding Config.RemoveTBird}" 
                       Content="Remove Thunderbird" />
             <Separator/>
-            <CheckBox IsThreeState="False" IsChecked="{Binding Config.UseCustomRooms}" Content="Use Custom Rooms File" />
+            <!--<CheckBox IsThreeState="False" IsChecked="{Binding Config.UseCustomRooms}" Content="Use Custom Rooms File" />-->
 
         </StackPanel>
         <StackPanel Grid.Column="1">
