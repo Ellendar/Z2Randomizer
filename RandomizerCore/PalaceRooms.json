@@ -15169,7 +15169,7 @@
     "connections": "7FFFFF84",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "05188A190A",
+    "enemies": "096A1F73447C8465DF",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -15182,12 +15182,11 @@
     "linkedRoomName": null,
     "map": 32,
     "memoryAddress": 70462,
-    "name": "aaron jam 4_4 P2_M32",
+    "name": "Crumble Bridge Pyramid Reward (aaron jam 4_4 P2_M32)",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
-    "sideviewData": "27600108F017F8138309A02FF113F41FD400F11F975561533151210F0BF11FA32FFD1FA02F8409"
+    "requirements": [],
+    "sideviewData": "1D600108F01F8A09F61FDC00915561533151F11F200F0BD401FC1F8509"
   },
   {
     "author": "aaron2u2",
