@@ -66,7 +66,6 @@ public partial class MainUI : Form
         upAOnController1Checkbox.Checked = Settings.Default.upac1;
         flashingOffCheckbox.Checked = Settings.Default.noflash;
         useCommunityTextCheckbox.Checked = Settings.Default.useCommunityText;
-        useCustomRoomsBox.Checked = Settings.Default.useCustomRooms;
         beepFrequencyDropdown.SelectedIndex = Settings.Default.beepFrequency;
         beepThresholdDropdown.SelectedIndex = Settings.Default.beepThreshold;
 
@@ -600,7 +599,6 @@ public partial class MainUI : Form
         Settings.Default.sprite = characterSpriteList.SelectedIndex;
         Settings.Default.upac1 = upAOnController1Checkbox.Checked;
         Settings.Default.noflash = flashingOffCheckbox.Checked;
-        Settings.Default.useCustomRooms = useCustomRoomsBox.Checked;
         Settings.Default.lastused = flagsTextBox.Text.Trim();
         Settings.Default.beepFrequency = beepFrequencyDropdown.SelectedIndex;
         Settings.Default.beepThreshold = beepThresholdDropdown.SelectedIndex;
@@ -1047,7 +1045,7 @@ public partial class MainUI : Form
         configuration.ShuffleDripperEnemy = shuffleDripperEnemyCheckbox.Checked;
         configuration.MixLargeAndSmallEnemies = GetTripleCheckState(mixLargeAndSmallCheckbox);
         configuration.GeneratorsAlwaysMatch = generatorsMatchCheckBox.Checked;
-        configuration.ShuffleEnemyHP = shuffleEnemyHPBox.Checked;
+        configuration.ShuffleEnemyHP = shuffleEnemyHPBox.Checked ? RandomizerCore.ShuffleEnemyHPOption.RANDOM : RandomizerCore.ShuffleEnemyHPOption.VANILLA; 
         configuration.ShuffleXPStealers = shuffleXPStealersCheckbox.Checked;
         configuration.ShuffleXPStolenAmount = shuffleStealXPAmountCheckbox.Checked;
         configuration.ShuffleSwordImmunity = shuffleSwordImmunityBox.Checked;
@@ -1113,7 +1111,6 @@ public partial class MainUI : Form
         configuration.PermanmentBeamSword = alwaysBeamCheckbox.Checked;
         configuration.UpAOnController1 = upAOnController1Checkbox.Checked;
         configuration.RemoveFlashing = flashingOffCheckbox.Checked;
-        configuration.UseCustomRooms = useCustomRoomsBox.Checked;
         configuration.DisableHUDLag = disableHUDLag.Checked;
         configuration.Sprite = characterSpriteList.SelectedIndex;
         configuration.BeepFrequency = beepFrequencyDropdown.SelectedIndex switch
@@ -1504,7 +1501,6 @@ public partial class MainUI : Form
             shuffleDripperEnemyCheckbox.Checked = configuration.ShuffleDripperEnemy;
             mixLargeAndSmallCheckbox.CheckState = ToCheckState(configuration.MixLargeAndSmallEnemies);
             generatorsMatchCheckBox.Checked = configuration.GeneratorsAlwaysMatch;
-            shuffleEnemyHPBox.Checked = configuration.ShuffleEnemyHP;
             shuffleXPStealersCheckbox.Checked = configuration.ShuffleXPStealers;
             shuffleStealXPAmountCheckbox.Checked = configuration.ShuffleXPStolenAmount;
             shuffleSwordImmunityBox.Checked = configuration.ShuffleSwordImmunity;

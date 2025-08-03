@@ -213,6 +213,10 @@ public class Palaces
         {
             sizes[6] = r.Next(27, 41);
         }
+        else if (props.GPStyle == PalaceStyle.RECONSTRUCTED_MEDIUM)
+        {
+            sizes[6] = r.Next(34, 49);
+        }
         else
         {
             sizes[6] = r.Next(54, 60);

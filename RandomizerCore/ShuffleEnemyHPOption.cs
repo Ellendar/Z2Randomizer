@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Z2Randomizer.Core;
+namespace RandomizerCore;
 
-public enum StatEffectiveness
+public enum ShuffleEnemyHPOption
 {
-    NONE, LOW, VANILLA, AVERAGE, HIGH, MAX, SGL
+    VANILLA, RANDOM, SGL
 }

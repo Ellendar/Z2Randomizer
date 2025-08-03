@@ -539,8 +539,17 @@ public class Hyrule
         int[] newAttackValues = new int[8];
         for (int i = 0; i < 8; i++)
         {
-            double minAtk = attackValues[i] - attackValues[i] * .333;
-            double maxAtk = attackValues[i] + attackValues[i] * .5;
+            double minAtk, maxAtk;
+            if(attackEffectiveness == StatEffectiveness.SGL)
+            {
+                minAtk = attackValues[i] - attackValues[i] * .25;
+                maxAtk = attackValues[i];
+            }
+            else
+            {
+                minAtk = attackValues[i] - attackValues[i] * .333;
+                maxAtk = attackValues[i] + attackValues[i] * .5;
+            }
 
             double attack;
             if (attackEffectiveness == StatEffectiveness.AVERAGE)
@@ -548,7 +557,14 @@ public class Hyrule
                 attack = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
                 if (i == 0)
                 {
-                    attack = (int)Math.Round(Math.Max(attack, 2));
+                    if (attackEffectiveness == StatEffectiveness.SGL)
+                    {
+                        attack = (int)attack;
+                    }
+                    else
+                    {
+                        attack = (int)Math.Round(Math.Max(attack, 2));
+                    }
                 }
                 else
                 {
@@ -558,7 +574,14 @@ public class Hyrule
                     }
                     else
                     {
-                        attack = (int)Math.Round(attack);
+                        if (attackEffectiveness == StatEffectiveness.SGL)
+                        {
+                            attack = (int)attack;
+                        }
+                        else
+                        {
+                            attack = (int)Math.Round(attack);
+                        }
                     }
                 }
                 attack = (int)Math.Min(attack, maxAtk);
@@ -1188,46 +1211,67 @@ public class Hyrule
 
         StatEffectiveness currentStatEffectiveness = isMag ? props.MagicEffectiveness : props.LifeEffectiveness;
 
-        for (int j = 0; j < 8; j++)
+        for (int level = 0; level < 8; level++)
         {
-            for (int i = 0; i < numBanks; i++)
+            for (int bank = 0; bank < numBanks; bank++)
             {
-                int nextVal = life[i, j];
+                int nextVal = life[bank, level];
                 if (currentStatEffectiveness == StatEffectiveness.AVERAGE)
                 {
-                    int max = (int)(life[i, j] + life[i, j] * .5);
-                    int min = (int)(life[i, j] - life[i, j] * .5);
+                    int max = (int)(life[bank, level] + life[bank, level] * .5);
+                    int min = (int)(life[bank, level] - life[bank, level] * .5);
+                    if(isMag && props.Minimum72ThunderCost && bank == 7)
+                    {
+                        min = int.Max(min, 72);
+                    }
                     if (!isMag)
                     {
-                        min = (int)(life[i, j] - life[i, j] * .25);
+                        min = (int)(life[bank, level] - life[bank, level] * .25);
                     }
-                    if (j == 0)
+                    if (level == 0)
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
                     }
                     else
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
-                        if (nextVal > life[i, j - 1])
+                        if (nextVal > life[bank, level - 1])
                         {
-                            nextVal = life[i, j - 1];
+                            nextVal = life[bank, level - 1];
+                        }
+                    }
+                }
+                if (currentStatEffectiveness == StatEffectiveness.SGL)
+                {
+                    int max = life[bank, level];
+                    int min = (int)(life[bank, level] - life[bank, level] * .25);
+                    if (level == 0)
+                    {
+                        nextVal = RNG.Next(min, Math.Min(max, 120));
+                    }
+                    else
+                    {
+                        nextVal = RNG.Next(min, Math.Min(max, 120));
+                        if (nextVal > life[bank, level - 1])
+                        {
+                            nextVal = life[bank, level - 1];
                         }
                     }
                 }
                 else if (props.MagicEffectiveness == StatEffectiveness.LOW && isMag)
                 {
-                    nextVal = (int)(life[i, j] + (life[i, j] * .5));
+                    nextVal = (int)(life[bank, level] + (life[bank, level] * .5));
                 }
                 else if (props.LifeEffectiveness == StatEffectiveness.HIGH && !isMag || props.MagicEffectiveness == StatEffectiveness.HIGH && isMag)
                 {
-                    nextVal = (int)(life[i, j] * .5);
+                    nextVal = (int)(life[bank, level] * .5);
                 }
 
                 if (isMag && nextVal > 120)
                 {
                     nextVal = 120;
                 }
-                life[i, j] = nextVal;
+                life[bank, level] = nextVal;
             }
         }
 
@@ -1245,19 +1289,19 @@ public class Hyrule
 
     private void RandomizeEnemyStats()
     {
-        if (props.ShuffleEnemyHP)
+        if (props.ShuffleEnemyHP != ShuffleEnemyHPOption.VANILLA)
         {
-            RandomizeHP(0x5434, 0x5453);
-            RandomizeHP(0x9434, 0x944E);
-            RandomizeHP(0x11435, 0x11435);
-            RandomizeHP(0x11437, 0x11454);
-            RandomizeHP(0x13C86, 0x13C87);
-            RandomizeHP(0x15434, 0x15438);
-            RandomizeHP(0x15440, 0x15443);
-            RandomizeHP(0x15445, 0x1544B);
-            RandomizeHP(0x1544E, 0x1544E);
-            RandomizeHP(0x12935, 0x12935);
-            RandomizeHP(0x12937, 0x12954);
+            RandomizeHP(0x5434, 0x5453, props.ShuffleEnemyHP);
+            RandomizeHP(0x9434, 0x944E, props.ShuffleEnemyHP);
+            RandomizeHP(0x11435, 0x11435, props.ShuffleEnemyHP);
+            RandomizeHP(0x11437, 0x11454, props.ShuffleEnemyHP);
+            RandomizeHP(0x13C86, 0x13C87, props.ShuffleEnemyHP);
+            RandomizeHP(0x15434, 0x15438, props.ShuffleEnemyHP);
+            RandomizeHP(0x15440, 0x15443, props.ShuffleEnemyHP);
+            RandomizeHP(0x15445, 0x1544B, props.ShuffleEnemyHP);
+            RandomizeHP(0x1544E, 0x1544E, props.ShuffleEnemyHP);
+            RandomizeHP(0x12935, 0x12935, props.ShuffleEnemyHP);
+            RandomizeHP(0x12937, 0x12954, props.ShuffleEnemyHP);
         }
 
         if (props.AttackEffectiveness == StatEffectiveness.MAX)
@@ -1284,14 +1328,18 @@ public class Hyrule
         }
     }
 
-    private void RandomizeHP(int start, int end)
+    private void RandomizeHP(int start, int end, ShuffleEnemyHPOption option)
     {
         for (int i = start; i <= end; i++)
         {
             int newVal = 0;
             int val = (int)ROMData.GetByte(i);
 
-            newVal = RNG.Next((int)(val * 0.5), (int)(val * 1.5));
+            newVal = option switch {
+                ShuffleEnemyHPOption.RANDOM => RNG.Next((int)(val * 0.5), (int)(val * 1.5)),
+                ShuffleEnemyHPOption.SGL => RNG.Next((int)(val * 1), (int)(val * 1.5)),
+                _ => throw new Exception("Unrecognized shuffle HP option")
+            };
             if (newVal > 255)
             {
                 newVal = 255;
@@ -2114,10 +2162,16 @@ public class Hyrule
                 low = 0;
             }
 
+            if(props.ExpLevel == StatEffectiveness.SGL)
+            {
+                low = RNG.Next(low - 2, low + 1);
+            }
             if (props.ExpLevel != StatEffectiveness.NONE)
             {
                 low = RNG.Next(low - 2, low + 3);
             }
+
+
             if (low < 0)
             {
                 low = 0;

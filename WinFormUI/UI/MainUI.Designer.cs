@@ -1241,7 +1241,6 @@ partial class MainUI
         // 
         // tabPage2
         // 
-        tabPage2.Controls.Add(useCustomRoomsBox);
         tabPage2.Controls.Add(HardBossesCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsByEnemiesCheckbox);
         tabPage2.Controls.Add(gpStyleLabel);
@@ -1272,18 +1271,6 @@ partial class MainUI
         tabPage2.TabIndex = 1;
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
-        // 
-        // useCustomRoomsBox
-        // 
-        useCustomRoomsBox.AutoSize = true;
-        useCustomRoomsBox.Location = new Point(281, 212);
-        useCustomRoomsBox.Margin = new Padding(4, 3, 4, 3);
-        useCustomRoomsBox.Name = "useCustomRoomsBox";
-        useCustomRoomsBox.Size = new Size(130, 19);
-        useCustomRoomsBox.TabIndex = 36;
-        useCustomRoomsBox.Text = "Use Custom Rooms";
-        toolTip1.SetToolTip(useCustomRoomsBox, "When checked, Use CustomRooms.json to create you own room set.");
-        useCustomRoomsBox.UseVisualStyleBackColor = true;
         // 
         // HardBossesCheckbox
         // 
@@ -3491,7 +3478,6 @@ partial class MainUI
     private ComboBox startingLivesBox;
     private CheckBox randomizeKnockbackCheckbox;
     private CheckBox disableHUDLag;
-    private CheckBox useCustomRoomsBox;
     private CheckBox disableUnsafeMusicCheckbox;
     private CheckBox randomizeMusicCheckbox;
     private CheckBox mixCustomAndOriginalMusicCheckbox;

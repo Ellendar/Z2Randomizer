@@ -9,6 +9,7 @@ using Z2Randomizer.Core.Flags;
 using Z2Randomizer.Core.Overworld;
 using System.Text.Json;
 using RandomizerCore.Flags;
+using RandomizerCore;
 
 namespace Z2Randomizer.Core;
 
@@ -147,7 +148,7 @@ public class RandomizerConfiguration
     public bool? ShufflePalaceEnemies { get; set; }
     public bool ShuffleDripperEnemy { get; set; }
     public bool? MixLargeAndSmallEnemies { get; set; }
-    public bool ShuffleEnemyHP { get; set; }
+    public ShuffleEnemyHPOption ShuffleEnemyHP { get; set; }
     public bool ShuffleXPStealers { get; set; }
     public bool ShuffleXPStolenAmount { get; set; }
     public bool ShuffleSwordImmunity { get; set; }
@@ -553,7 +554,7 @@ public class RandomizerConfiguration
         {
             config.FireOption = FireOption.NORMAL;
         }
-        config.ShuffleEnemyHP = bits[3];
+        config.ShuffleEnemyHP = bits[3] ? ShuffleEnemyHPOption.VANILLA : ShuffleEnemyHPOption.RANDOM;
         //ShuffleAllExp = bits[4];
         config.ShufflePalaceEnemies = bits[5];
 

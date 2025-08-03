@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RandomizerCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Z2Randomizer.Core.Overworld;
@@ -108,7 +109,7 @@ public class RandomizerProperties
     public bool HardBosses { get; set; }
 
     //Enemies
-    public bool ShuffleEnemyHP { get; set; }
+    public ShuffleEnemyHPOption ShuffleEnemyHP { get; set; }
     public bool ShuffleEnemyStealExp { get; set; }
     public bool ShuffleStealExpAmt { get; set; }
     public bool ShuffleSwordImmunity { get; set; }
@@ -143,6 +144,7 @@ public class RandomizerProperties
     */
     public StatEffectiveness AttackEffectiveness { get; set; }
     public StatEffectiveness MagicEffectiveness { get; set; }
+    public bool Minimum72ThunderCost { get; set; }
     public StatEffectiveness LifeEffectiveness { get; set; }
     public int AttackCap { get; set; }
     public int MagicCap { get; set; }
