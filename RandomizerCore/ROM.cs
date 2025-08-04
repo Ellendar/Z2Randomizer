@@ -1212,7 +1212,7 @@ CheckController1ForUpAMagic:
             a.Byt(y_lo_arr);
             a.Byt(y_hi_arr);
         }
-        a.Code(Util.ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
     public void AllowForChangingDoorYPosition(Assembler a)
