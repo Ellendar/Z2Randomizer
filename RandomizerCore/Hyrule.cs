@@ -522,6 +522,7 @@ public class Hyrule
 
     private void RandomizeAttackEffectiveness(ROM rom, StatEffectiveness attackEffectiveness)
     {
+        int[] sglAttackValues = [2, 3, 4, 6, 8, 12, 14, 16];
         if (attackEffectiveness == StatEffectiveness.MAX)
         {
             for (int i = 0; i < 8; i++)
@@ -556,7 +557,7 @@ public class Hyrule
             }
 
             double attack;
-            if (attackEffectiveness == StatEffectiveness.AVERAGE || attackEffectiveness == StatEffectiveness.SGL)
+            if (attackEffectiveness == StatEffectiveness.AVERAGE)// || attackEffectiveness == StatEffectiveness.SGL)
             {
                 attack = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
                 if (i == 0)
@@ -608,6 +609,10 @@ public class Hyrule
                 {
                     attack = (int)Math.Round(attackValues[i] - (attackValues[i] * .5), MidpointRounding.ToPositiveInfinity);
                 }
+            }
+            else if (attackEffectiveness == StatEffectiveness.SGL)
+            {
+                attack = sglAttackValues[i];
             }
             else
             {
@@ -2170,7 +2175,7 @@ public class Hyrule
             {
                 low = RNG.Next(low - 2, low + 1);
             }
-            if (props.ExpLevel != StatEffectiveness.NONE)
+            else if (props.ExpLevel != StatEffectiveness.NONE)
             {
                 low = RNG.Next(low - 2, low + 3);
             }
