@@ -198,6 +198,7 @@ public class RandomizerProperties
     public byte BeepThreshold { get; set; }
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
+    public bool AggressiveTbird { get; set; }
     public bool FastCast { get; set; }
     public String BeamSprite { get; set; }
     public bool DisableMusic { get; set; }

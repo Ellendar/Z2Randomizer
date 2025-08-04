@@ -192,6 +192,7 @@ public class RandomizerConfiguration
     public bool? EnableTownNameHints { get; set; }
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
+    public bool AggressiveTbird { get; set; }
     public bool ShuffleSpritePalettes { get; set; }
     public bool PermanmentBeamSword { get; set; }
 
@@ -1500,6 +1501,7 @@ public class RandomizerConfiguration
         properties.BeepFrequency = BeepFrequency;
         properties.JumpAlwaysOn = JumpAlwaysOn;
         properties.DashAlwaysOn = DashAlwaysOn;
+        properties.AggressiveTbird = AggressiveTbird;
         properties.FastCast = FastSpellCasting;
         properties.BeamSprite = BeamSprite;
         properties.DisableMusic = DisableMusic;

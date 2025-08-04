@@ -109,7 +109,7 @@ partial class MainUI
         allowPathEnemiesCheckbox = new CheckBox();
         shuffleEncountersCheckbox = new CheckBox();
         tabPage2 = new TabPage();
-        useCustomRoomsBox = new CheckBox();
+        aggressiveTbirdCheckbox = new CheckBox();
         HardBossesCheckbox = new CheckBox();
         noDuplicateRoomsByEnemiesCheckbox = new CheckBox();
         gpStyleLabel = new Label();
@@ -153,6 +153,7 @@ partial class MainUI
         shuffleAtkExpNeededCheckbox = new CheckBox();
         shuffleAllExpCheckbox = new CheckBox();
         tabPage9 = new TabPage();
+        minThunderCostCheckbox = new CheckBox();
         dashAlwaysOnCheckbox = new CheckBox();
         jumpAlwaysOnCheckbox = new CheckBox();
         FireSpellOptionLabel = new Label();
@@ -163,6 +164,8 @@ partial class MainUI
         shuffleSpellLocationsCheckbox = new CheckBox();
         shuffleLifeRefillCheckbox = new CheckBox();
         tabPage6 = new TabPage();
+        enemyHpBox = new ComboBox();
+        label11 = new Label();
         generatorsMatchCheckBox = new CheckBox();
         enemyExperienceDropsLabel = new Label();
         experienceDropsList = new ComboBox();
@@ -174,7 +177,6 @@ partial class MainUI
         shuffleSwordImmunityBox = new CheckBox();
         shuffleStealXPAmountCheckbox = new CheckBox();
         shuffleXPStealersCheckbox = new CheckBox();
-        shuffleEnemyHPBox = new CheckBox();
         tabPage7 = new TabPage();
         shufflePbagAmountsCheckbox = new CheckBox();
         removeSpellitemsCheckbox = new CheckBox();
@@ -216,6 +218,7 @@ partial class MainUI
         enableSpellItemHintsCheckbox = new CheckBox();
         enableHelpfulHintsCheckbox = new CheckBox();
         CustomTabPage = new TabPage();
+        mixCustomAndOriginalMusicCheckbox = new CheckBox();
         disableUnsafeMusicCheckbox = new CheckBox();
         randomizeMusicCheckbox = new CheckBox();
         disableHUDLag = new CheckBox();
@@ -264,7 +267,6 @@ partial class MainUI
         oldFlagsLabel = new Label();
         batchButton = new Button();
         customisableButtonContextMenu = new ContextMenuStrip(components);
-        mixCustomAndOriginalMusicCheckbox = new CheckBox();
         mainTabControl.SuspendLayout();
         tabPage4.SuspendLayout();
         groupBox1.SuspendLayout();
@@ -1241,6 +1243,7 @@ partial class MainUI
         // 
         // tabPage2
         // 
+        tabPage2.Controls.Add(aggressiveTbirdCheckbox);
         tabPage2.Controls.Add(HardBossesCheckbox);
         tabPage2.Controls.Add(noDuplicateRoomsByEnemiesCheckbox);
         tabPage2.Controls.Add(gpStyleLabel);
@@ -1271,6 +1274,19 @@ partial class MainUI
         tabPage2.TabIndex = 1;
         tabPage2.Text = "Palaces";
         tabPage2.UseVisualStyleBackColor = true;
+        // 
+        // aggressiveTbirdCheckbox
+        // 
+        aggressiveTbirdCheckbox.AutoSize = true;
+        aggressiveTbirdCheckbox.Location = new Point(281, 212);
+        aggressiveTbirdCheckbox.Margin = new Padding(4, 3, 4, 3);
+        aggressiveTbirdCheckbox.Name = "aggressiveTbirdCheckbox";
+        aggressiveTbirdCheckbox.Size = new Size(113, 19);
+        aggressiveTbirdCheckbox.TabIndex = 32;
+        aggressiveTbirdCheckbox.Text = "Aggressive Tbird";
+        aggressiveTbirdCheckbox.ThreeState = true;
+        toolTip1.SetToolTip(aggressiveTbirdCheckbox, "Carock has learned some new tricks. No more crouching in the corner!\r\n");
+        aggressiveTbirdCheckbox.UseVisualStyleBackColor = true;
         // 
         // HardBossesCheckbox
         // 
@@ -1314,7 +1330,7 @@ partial class MainUI
         // 
         gpStyleList.DropDownStyle = ComboBoxStyle.DropDownList;
         gpStyleList.FormattingEnabled = true;
-        gpStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed (Full)", "Reconstructed (Short)", "Reconstructed (Random Length)", "Random" });
+        gpStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed (Full)", "Reconstructed (Medium)", "Reconstructed (Short)", "Reconstructed (Random Length)", "Random" });
         gpStyleList.Location = new Point(7, 82);
         gpStyleList.Margin = new Padding(4, 3, 4, 3);
         gpStyleList.Name = "gpStyleList";
@@ -1576,7 +1592,7 @@ partial class MainUI
         // 
         lifeEffectivenessList.DropDownStyle = ComboBoxStyle.DropDownList;
         lifeEffectivenessList.FormattingEnabled = true;
-        lifeEffectivenessList.Items.AddRange(new object[] { "Random", "OHKO Link", "Vanilla", "High Defense", "Invincible" });
+        lifeEffectivenessList.Items.AddRange(new object[] { "Random", "OHKO Link", "Vanilla", "High Defense", "Invincible", "SGL" });
         lifeEffectivenessList.Location = new Point(392, 111);
         lifeEffectivenessList.Margin = new Padding(4, 3, 4, 3);
         lifeEffectivenessList.Name = "lifeEffectivenessList";
@@ -1600,7 +1616,7 @@ partial class MainUI
         // 
         attackEffectivenessList.DropDownStyle = ComboBoxStyle.DropDownList;
         attackEffectivenessList.FormattingEnabled = true;
-        attackEffectivenessList.Items.AddRange(new object[] { "Random", "Low Attack", "Vanilla", "High Attack", "OHKO Enemies" });
+        attackEffectivenessList.Items.AddRange(new object[] { "Random", "Low Attack", "Vanilla", "High Attack", "OHKO Enemies", "SGL" });
         attackEffectivenessList.Location = new Point(392, 23);
         attackEffectivenessList.Margin = new Padding(4, 3, 4, 3);
         attackEffectivenessList.Name = "attackEffectivenessList";
@@ -1801,6 +1817,7 @@ partial class MainUI
         // 
         // tabPage9
         // 
+        tabPage9.Controls.Add(minThunderCostCheckbox);
         tabPage9.Controls.Add(dashAlwaysOnCheckbox);
         tabPage9.Controls.Add(jumpAlwaysOnCheckbox);
         tabPage9.Controls.Add(FireSpellOptionLabel);
@@ -1818,6 +1835,18 @@ partial class MainUI
         tabPage9.TabIndex = 9;
         tabPage9.Text = "Spells";
         tabPage9.UseVisualStyleBackColor = true;
+        // 
+        // minThunderCostCheckbox
+        // 
+        minThunderCostCheckbox.AutoSize = true;
+        minThunderCostCheckbox.Location = new Point(297, 61);
+        minThunderCostCheckbox.Margin = new Padding(4, 3, 4, 3);
+        minThunderCostCheckbox.Name = "minThunderCostCheckbox";
+        minThunderCostCheckbox.Size = new Size(160, 19);
+        minThunderCostCheckbox.TabIndex = 37;
+        minThunderCostCheckbox.Text = "Thunder Costs at Least 72";
+        toolTip1.SetToolTip(minThunderCostCheckbox, "Thunder cost is at least 72");
+        minThunderCostCheckbox.UseVisualStyleBackColor = true;
         // 
         // dashAlwaysOnCheckbox
         // 
@@ -1932,6 +1961,8 @@ partial class MainUI
         // 
         // tabPage6
         // 
+        tabPage6.Controls.Add(enemyHpBox);
+        tabPage6.Controls.Add(label11);
         tabPage6.Controls.Add(generatorsMatchCheckBox);
         tabPage6.Controls.Add(enemyExperienceDropsLabel);
         tabPage6.Controls.Add(experienceDropsList);
@@ -1943,7 +1974,6 @@ partial class MainUI
         tabPage6.Controls.Add(shuffleSwordImmunityBox);
         tabPage6.Controls.Add(shuffleStealXPAmountCheckbox);
         tabPage6.Controls.Add(shuffleXPStealersCheckbox);
-        tabPage6.Controls.Add(shuffleEnemyHPBox);
         tabPage6.Location = new Point(4, 24);
         tabPage6.Margin = new Padding(4, 3, 4, 3);
         tabPage6.Name = "tabPage6";
@@ -1951,6 +1981,29 @@ partial class MainUI
         tabPage6.TabIndex = 5;
         tabPage6.Text = "Enemies";
         tabPage6.UseVisualStyleBackColor = true;
+        // 
+        // enemyHpBox
+        // 
+        enemyHpBox.DropDownStyle = ComboBoxStyle.DropDownList;
+        enemyHpBox.FormattingEnabled = true;
+        enemyHpBox.Items.AddRange(new object[] { "Vanilla", "Random", "SGL" });
+        enemyHpBox.Location = new Point(374, 3);
+        enemyHpBox.Margin = new Padding(4, 3, 4, 3);
+        enemyHpBox.Name = "enemyHpBox";
+        enemyHpBox.Size = new Size(140, 23);
+        enemyHpBox.TabIndex = 25;
+        toolTip1.SetToolTip(enemyHpBox, "Different modes for how much experience the enemies drop");
+        // 
+        // label11
+        // 
+        label11.AutoSize = true;
+        label11.Location = new Point(226, 7);
+        label11.Margin = new Padding(4, 0, 4, 0);
+        label11.Name = "label11";
+        label11.Size = new Size(102, 15);
+        label11.TabIndex = 24;
+        label11.Text = "Shuffle Enemy HP";
+        toolTip1.SetToolTip(label11, "Different modes for how much experience the enemies drop");
         // 
         // generatorsMatchCheckBox
         // 
@@ -1979,8 +2032,8 @@ partial class MainUI
         // 
         experienceDropsList.DropDownStyle = ComboBoxStyle.DropDownList;
         experienceDropsList.FormattingEnabled = true;
-        experienceDropsList.Items.AddRange(new object[] { "Vanilla", "None", "Low", "Average", "High" });
-        experienceDropsList.Location = new Point(384, 143);
+        experienceDropsList.Items.AddRange(new object[] { "Vanilla", "None", "Low", "Average", "High", "SGL" });
+        experienceDropsList.Location = new Point(374, 144);
         experienceDropsList.Margin = new Padding(4, 3, 4, 3);
         experienceDropsList.Name = "experienceDropsList";
         experienceDropsList.Size = new Size(140, 23);
@@ -2084,18 +2137,6 @@ partial class MainUI
         shuffleXPStealersCheckbox.Text = "Shuffle Which Enemies Steal Exp";
         toolTip1.SetToolTip(shuffleXPStealersCheckbox, "Shuffle which enemies steal experience when doing damage to the player");
         shuffleXPStealersCheckbox.UseVisualStyleBackColor = true;
-        // 
-        // shuffleEnemyHPBox
-        // 
-        shuffleEnemyHPBox.AutoSize = true;
-        shuffleEnemyHPBox.Location = new Point(226, 6);
-        shuffleEnemyHPBox.Margin = new Padding(4, 3, 4, 3);
-        shuffleEnemyHPBox.Name = "shuffleEnemyHPBox";
-        shuffleEnemyHPBox.Size = new Size(121, 19);
-        shuffleEnemyHPBox.TabIndex = 0;
-        shuffleEnemyHPBox.Text = "Shuffle Enemy HP";
-        toolTip1.SetToolTip(shuffleEnemyHPBox, "Each enemy will have +/- 50% of its normal HP");
-        shuffleEnemyHPBox.UseVisualStyleBackColor = true;
         // 
         // tabPage7
         // 
@@ -2659,6 +2700,20 @@ partial class MainUI
         CustomTabPage.Text = "Customize";
         CustomTabPage.UseVisualStyleBackColor = true;
         // 
+        // mixCustomAndOriginalMusicCheckbox
+        // 
+        mixCustomAndOriginalMusicCheckbox.AutoSize = true;
+        mixCustomAndOriginalMusicCheckbox.Checked = true;
+        mixCustomAndOriginalMusicCheckbox.CheckState = CheckState.Checked;
+        mixCustomAndOriginalMusicCheckbox.Location = new Point(4, 51);
+        mixCustomAndOriginalMusicCheckbox.Margin = new Padding(2);
+        mixCustomAndOriginalMusicCheckbox.Name = "mixCustomAndOriginalMusicCheckbox";
+        mixCustomAndOriginalMusicCheckbox.Size = new Size(194, 19);
+        mixCustomAndOriginalMusicCheckbox.TabIndex = 47;
+        mixCustomAndOriginalMusicCheckbox.Text = "Mix Custom and Original Music";
+        toolTip1.SetToolTip(mixCustomAndOriginalMusicCheckbox, "When using custom music also include original tracks in the selection. If disabled, original tracks will only be selected when no custom tracks exist for a given usage.");
+        mixCustomAndOriginalMusicCheckbox.UseVisualStyleBackColor = true;
+        // 
         // disableUnsafeMusicCheckbox
         // 
         disableUnsafeMusicCheckbox.AutoSize = true;
@@ -3171,20 +3226,6 @@ partial class MainUI
         customisableButtonContextMenu.Name = "contextMenuStrip1";
         customisableButtonContextMenu.Size = new Size(61, 4);
         // 
-        // mixCustomAndOriginalMusicCheckbox
-        // 
-        mixCustomAndOriginalMusicCheckbox.AutoSize = true;
-        mixCustomAndOriginalMusicCheckbox.Checked = true;
-        mixCustomAndOriginalMusicCheckbox.CheckState = CheckState.Checked;
-        mixCustomAndOriginalMusicCheckbox.Location = new Point(4, 51);
-        mixCustomAndOriginalMusicCheckbox.Margin = new Padding(2);
-        mixCustomAndOriginalMusicCheckbox.Name = "mixCustomAndOriginalMusicCheckbox";
-        mixCustomAndOriginalMusicCheckbox.Size = new Size(194, 19);
-        mixCustomAndOriginalMusicCheckbox.TabIndex = 47;
-        mixCustomAndOriginalMusicCheckbox.Text = "Mix Custom and Original Music";
-        toolTip1.SetToolTip(mixCustomAndOriginalMusicCheckbox, "When using custom music also include original tracks in the selection. If disabled, original tracks will only be selected when no custom tracks exist for a given usage.");
-        mixCustomAndOriginalMusicCheckbox.UseVisualStyleBackColor = true;
-        // 
         // MainUI
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -3288,7 +3329,6 @@ partial class MainUI
     private Label startingTechsLabel;
     private ComboBox startingTechsList;
     private TabPage tabPage6;
-    private CheckBox shuffleEnemyHPBox;
     private GroupBox expBox;
     private CheckBox lifeExpNeededCheckbox;
     private CheckBox magicExpNeededCheckbox;
@@ -3481,5 +3521,9 @@ partial class MainUI
     private CheckBox disableUnsafeMusicCheckbox;
     private CheckBox randomizeMusicCheckbox;
     private CheckBox mixCustomAndOriginalMusicCheckbox;
+    private ComboBox enemyHpBox;
+    private Label label11;
+    private CheckBox minThunderCostCheckbox;
+    private CheckBox aggressiveTbirdCheckbox;
 }
 

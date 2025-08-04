@@ -187,6 +187,10 @@ public class Hyrule
         {
             kasutoJars = RNG.Next(5, 8);
         }
+        else
+        {
+            kasutoJars = 7;
+        }
 
         bool raftIsRequired = IsRaftAlwaysRequired(props);
         bool passedValidation = false;

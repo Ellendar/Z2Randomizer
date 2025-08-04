@@ -8,6 +8,7 @@ using Z2Randomizer.Core.Flags;
 using Newtonsoft.Json;
 using Z2Randomizer.WinFormUI.Properties;
 using System.Reflection;
+using RandomizerCore;
 
 namespace Z2Randomizer.WinFormUI;
 
@@ -122,7 +123,7 @@ public partial class MainUI : Form
         startingGemsMinList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         startingGemsMaxList.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         startingLivesBox.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
-        shuffleEnemyHPBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        enemyHpBox.SelectedIndexChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleAllExpCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         shuffleAtkExpNeededCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         lifeExpNeededCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -210,6 +211,7 @@ public partial class MainUI : Form
         includev4_0RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         includev4_4RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         HardBossesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        minThunderCostCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(updateFlags);
 
         TryLoadSpriteImageFromFile(romFileTextBox.Text);
@@ -961,9 +963,10 @@ public partial class MainUI : Form
             0 => PalaceStyle.VANILLA,
             1 => PalaceStyle.SHUFFLED,
             2 => PalaceStyle.RECONSTRUCTED,
-            3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
-            4 => PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH,
-            5 => PalaceStyle.RANDOM,
+            3 => PalaceStyle.RECONSTRUCTED_MEDIUM,
+            4 => PalaceStyle.RECONSTRUCTED_SHORTENED,
+            5 => PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH,
+            6 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid GP Style setting")
         };
         configuration.IncludeVanillaRooms = GetTripleCheckState(includeVanillaRoomsCheckbox);
@@ -1003,6 +1006,7 @@ public partial class MainUI : Form
             2 => StatEffectiveness.VANILLA,
             3 => StatEffectiveness.HIGH,
             4 => StatEffectiveness.MAX,
+            5 => StatEffectiveness.SGL,
             _ => throw new Exception("Invalid AttackEffectiveness setting")
         };
         configuration.MagicEffectiveness = magicEffectivenessList.SelectedIndex switch
@@ -1021,6 +1025,7 @@ public partial class MainUI : Form
             2 => StatEffectiveness.VANILLA,
             3 => StatEffectiveness.HIGH,
             4 => StatEffectiveness.MAX,
+            5 => StatEffectiveness.SGL,
             _ => throw new Exception("Invalid LifeEffectiveness setting")
         };
 
@@ -1045,7 +1050,13 @@ public partial class MainUI : Form
         configuration.ShuffleDripperEnemy = shuffleDripperEnemyCheckbox.Checked;
         configuration.MixLargeAndSmallEnemies = GetTripleCheckState(mixLargeAndSmallCheckbox);
         configuration.GeneratorsAlwaysMatch = generatorsMatchCheckBox.Checked;
-        configuration.ShuffleEnemyHP = shuffleEnemyHPBox.Checked ? RandomizerCore.ShuffleEnemyHPOption.RANDOM : RandomizerCore.ShuffleEnemyHPOption.VANILLA; 
+        configuration.ShuffleEnemyHP = enemyHpBox.SelectedIndex switch
+        {
+            0 => ShuffleEnemyHPOption.VANILLA,
+            1 => ShuffleEnemyHPOption.RANDOM,
+            2 => ShuffleEnemyHPOption.SGL,
+            _ => throw new Exception("Unrecognized ShuffleEnemyHP option")
+        };
         configuration.ShuffleXPStealers = shuffleXPStealersCheckbox.Checked;
         configuration.ShuffleXPStolenAmount = shuffleStealXPAmountCheckbox.Checked;
         configuration.ShuffleSwordImmunity = shuffleSwordImmunityBox.Checked;
@@ -1056,6 +1067,7 @@ public partial class MainUI : Form
             2 => StatEffectiveness.LOW,
             3 => StatEffectiveness.AVERAGE,
             4 => StatEffectiveness.HIGH,
+            5 => StatEffectiveness.SGL,
             _ => throw new Exception("Invalid EnemyXPDrops setting")
         };
 
@@ -1105,6 +1117,7 @@ public partial class MainUI : Form
         configuration.DisableUnsafeMusic = disableUnsafeMusicCheckbox.Checked;
         configuration.JumpAlwaysOn = jumpAlwaysOnCheckbox.Checked;
         configuration.DashAlwaysOn = dashAlwaysOnCheckbox.Checked;
+        configuration.AggressiveTbird = aggressiveTbirdCheckbox.Checked;
         configuration.FastSpellCasting = fastSpellCheckbox.Checked;
         configuration.ShuffleSpritePalettes = shuffleEnemyPalettesCheckbox.Checked;
         configuration.RandomizeKnockback = randomizeKnockbackCheckbox.Checked;
@@ -1413,9 +1426,10 @@ public partial class MainUI : Form
                 PalaceStyle.VANILLA => 0,
                 PalaceStyle.SHUFFLED => 1,
                 PalaceStyle.RECONSTRUCTED => 2,
-                PalaceStyle.RECONSTRUCTED_SHORTENED => 3,
-                PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH => 4,
-                PalaceStyle.RANDOM => 5,
+                PalaceStyle.RECONSTRUCTED_MEDIUM => 3,
+                PalaceStyle.RECONSTRUCTED_SHORTENED => 4,
+                PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH => 5,
+                PalaceStyle.RANDOM => 6,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             includeVanillaRoomsCheckbox.CheckState = ToCheckState(configuration.IncludeVanillaRooms);
@@ -1459,6 +1473,7 @@ public partial class MainUI : Form
                 StatEffectiveness.VANILLA => 2,
                 StatEffectiveness.HIGH => 3,
                 StatEffectiveness.MAX => 4,
+                StatEffectiveness.SGL => 5,
                 _ => throw new Exception("Invalid AttackEffectiveness setting")
             };
             magicEffectivenessList.SelectedIndex = configuration.MagicEffectiveness switch
@@ -1477,6 +1492,7 @@ public partial class MainUI : Form
                 StatEffectiveness.VANILLA => 2,
                 StatEffectiveness.HIGH => 3,
                 StatEffectiveness.MAX => 4,
+                StatEffectiveness.SGL => 5,
                 _ => throw new Exception("Invalid LifeEffectiveness setting")
             };
 
@@ -1501,6 +1517,13 @@ public partial class MainUI : Form
             shuffleDripperEnemyCheckbox.Checked = configuration.ShuffleDripperEnemy;
             mixLargeAndSmallCheckbox.CheckState = ToCheckState(configuration.MixLargeAndSmallEnemies);
             generatorsMatchCheckBox.Checked = configuration.GeneratorsAlwaysMatch;
+            enemyHpBox.SelectedIndex = configuration.ShuffleEnemyHP switch
+            {
+                ShuffleEnemyHPOption.VANILLA => 0,
+                ShuffleEnemyHPOption.RANDOM => 1,
+                ShuffleEnemyHPOption.SGL => 2,
+                _ => throw new Exception("Invalid EnemyXPDrops setting")
+            };
             shuffleXPStealersCheckbox.Checked = configuration.ShuffleXPStealers;
             shuffleStealXPAmountCheckbox.Checked = configuration.ShuffleXPStolenAmount;
             shuffleSwordImmunityBox.Checked = configuration.ShuffleSwordImmunity;
@@ -1511,6 +1534,7 @@ public partial class MainUI : Form
                 StatEffectiveness.LOW => 2,
                 StatEffectiveness.AVERAGE => 3,
                 StatEffectiveness.HIGH => 4,
+                StatEffectiveness.SGL => 5,
                 _ => throw new Exception("Invalid EnemyXPDrops setting")
             };
 
@@ -1557,6 +1581,7 @@ public partial class MainUI : Form
             //disableMusicCheckbox.Checked = configuration.DisableMusic;
             jumpAlwaysOnCheckbox.Checked = configuration.JumpAlwaysOn;
             dashAlwaysOnCheckbox.Checked = configuration.DashAlwaysOn;
+            aggressiveTbirdCheckbox.Checked = configuration.AggressiveTbird;
             //fastSpellCheckbox.Checked = configuration.FastSpellCasting;
             shuffleEnemyPalettesCheckbox.Checked = configuration.ShuffleSpritePalettes;
             alwaysBeamCheckbox.Checked = configuration.PermanmentBeamSword;
