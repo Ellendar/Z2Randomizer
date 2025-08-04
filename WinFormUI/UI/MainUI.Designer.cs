@@ -1847,6 +1847,7 @@ partial class MainUI
         minThunderCostCheckbox.Text = "Thunder Costs at Least 72";
         toolTip1.SetToolTip(minThunderCostCheckbox, "Thunder cost is at least 72");
         minThunderCostCheckbox.UseVisualStyleBackColor = true;
+        minThunderCostCheckbox.CheckedChanged += minThunderCostCheckbox_CheckedChanged;
         // 
         // dashAlwaysOnCheckbox
         // 

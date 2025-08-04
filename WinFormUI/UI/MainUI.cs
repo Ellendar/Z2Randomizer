@@ -204,6 +204,7 @@ public partial class MainUI : Form
         bossRoomsExitToPalaceCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         swapUpAndDownstabCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         dashAlwaysOnCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        minThunderCostCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         noDuplicateRoomsByLayoutCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         noDuplicateRoomsByEnemiesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         generatorsMatchCheckBox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -246,7 +247,7 @@ public partial class MainUI : Form
         {
             FlagBox_TextChanged(null!, null!);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             seedTextBox.Text = (string)Settings.Default.Properties["customizableButton1"].DefaultValue;
         }
@@ -1117,6 +1118,7 @@ public partial class MainUI : Form
         configuration.DisableUnsafeMusic = disableUnsafeMusicCheckbox.Checked;
         configuration.JumpAlwaysOn = jumpAlwaysOnCheckbox.Checked;
         configuration.DashAlwaysOn = dashAlwaysOnCheckbox.Checked;
+        configuration.Minimum72ThunderCost = minThunderCostCheckbox.Checked;
         configuration.AggressiveTbird = aggressiveTbirdCheckbox.Checked;
         configuration.FastSpellCasting = fastSpellCheckbox.Checked;
         configuration.ShuffleSpritePalettes = shuffleEnemyPalettesCheckbox.Checked;
@@ -1581,6 +1583,7 @@ public partial class MainUI : Form
             //disableMusicCheckbox.Checked = configuration.DisableMusic;
             jumpAlwaysOnCheckbox.Checked = configuration.JumpAlwaysOn;
             dashAlwaysOnCheckbox.Checked = configuration.DashAlwaysOn;
+            minThunderCostCheckbox.Checked = configuration.Minimum72ThunderCost;
             aggressiveTbirdCheckbox.Checked = configuration.AggressiveTbird;
             //fastSpellCheckbox.Checked = configuration.FastSpellCasting;
             shuffleEnemyPalettesCheckbox.Checked = configuration.ShuffleSpritePalettes;
@@ -2187,5 +2190,10 @@ public partial class MainUI : Form
         {
             ((CheckBox)sender).Checked = true;
         }
+    }
+
+    private void minThunderCostCheckbox_CheckedChanged(object sender, EventArgs e)
+    {
+
     }
 }

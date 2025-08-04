@@ -142,6 +142,7 @@ public class RandomizerConfiguration
     public bool? RandomizeSpellSpellEnemy { get; set; }
     public bool? SwapUpAndDownStab { get; set; }
     public FireOption FireOption { get; set; }
+    public bool Minimum72ThunderCost { get; set; }
 
     //Enemies
     public bool? ShuffleOverworldEnemies { get; set; }
@@ -954,6 +955,7 @@ public class RandomizerConfiguration
 
         //New flags that didn't exist in 4.0.4
         config.SwapUpAndDownStab = false;
+        config.Minimum72ThunderCost = false;
         config.HardBosses = false;
         config.RandomizeKnockback = false;
         config.DisableHUDLag = false;
@@ -1192,6 +1194,7 @@ public class RandomizerConfiguration
             properties.StartWithUpstab = StartWithUpstab == null ? random.Next(7) >= 5 : (bool)StartWithUpstab;
         }
         properties.SwapUpAndDownStab = SwapUpAndDownStab == null ? random.Next(2) == 1 : (bool)SwapUpAndDownStab;
+        properties.Minimum72ThunderCost = Minimum72ThunderCost;
 
 
         properties.StartLives = StartingLives == null ? random.Next(2, 6) : (int)StartingLives;

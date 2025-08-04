@@ -9,6 +9,9 @@ public static class PalaceStyleExtensions
 {
     public static bool IsReconstructed(this PalaceStyle style)
     {
-        return style == PalaceStyle.RECONSTRUCTED || style == PalaceStyle.RECONSTRUCTED_SHORTENED || style == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH;
+        return style == PalaceStyle.RECONSTRUCTED 
+            || style == PalaceStyle.RECONSTRUCTED_SHORTENED 
+            || style == PalaceStyle.RECONSTRUCTED_RANDOM_LENGTH
+            || style == PalaceStyle.RECONSTRUCTED_MEDIUM;
     }
 }

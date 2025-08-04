@@ -556,7 +556,7 @@ public class Hyrule
             }
 
             double attack;
-            if (attackEffectiveness == StatEffectiveness.AVERAGE)
+            if (attackEffectiveness == StatEffectiveness.AVERAGE || attackEffectiveness == StatEffectiveness.SGL)
             {
                 attack = RNG.NextDouble() * (maxAtk - minAtk) + minAtk;
                 if (i == 0)
