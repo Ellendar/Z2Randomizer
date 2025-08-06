@@ -7,46 +7,97 @@
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
              x:DataType="vmt:CustomizeViewModel">
     <Grid ColumnDefinitions="*,2*" Margin="4">
         <StackPanel Orientation="Vertical">
-            
+            <CheckBox
+                IsChecked="{Binding RemoveFlashing}"
+                Content="Remove Flashing"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RemoveFlashingToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+
+            <CheckBox
+                IsChecked="{Binding DisableHUDLag}"
+                Content="Disable HUD Flash on Lag"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableHUDFlashonLagToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+
+            <CheckBox
+                IsChecked="{Binding FastSpellCasting}"
+                Content="Fast Spell Casting"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FastSpellCastingToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+
+            <CheckBox
+                IsChecked="{Binding UpAOnController1}"
+            >
+                <TextBlock>Remap Up+A to Up+Select<LineBreak/>on Controller 1</TextBlock>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RemapUpAtoUpSelectonController1ToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+
             <ComboBox assists:ComboBoxAssist.Label="Beep Threshold" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.BeepThresholdList}}"
-                      SelectedItem="{Binding BeepThreshold, Converter={x:Static ui:Util.EnumConvert}}" />
+                      SelectedItem="{Binding BeepThreshold, Converter={x:Static ui:Util.EnumConvert}}">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BeepThresholdToolTip}"/></ToolTip.Tip>
+            </ComboBox>
             <ComboBox assists:ComboBoxAssist.Label="Beep Frequency" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.BeepFrequencyList}}"
-                      SelectedItem="{Binding BeepFrequency, Converter={x:Static ui:Util.EnumConvert}}" />
-            <CheckBox IsChecked="{Binding DisableMusic}" Content="Disable Music" />
-            <CheckBox 
-              IsEnabled="{Binding !DisableMusic}"
-              IsChecked="{Binding RandomizeMusic}"
-              Content="Use Custom Music If Any" 
-              ToolTip.Tip="Randomize music using any music libraries found in the Music directory"
-            />
+                      SelectedItem="{Binding BeepFrequency, Converter={x:Static ui:Util.EnumConvert}}">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BeepFrequencyToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+
             <CheckBox
-              IsEnabled="{Binding RandomizeMusicEnabled}"
-              IsChecked="{Binding MixCustomAndOriginalMusic}" 
-              Content="Mix Custom and Original Music"
-              ToolTip.Tip="When using custom music also include original tracks in the selection. If disabled, original tracks will only be selected when no custom tracks exist for a given usage."
-            />
-            <CheckBox
-              IsEnabled="{Binding RandomizeMusicEnabled}"
-              IsChecked="{Binding DisableUnsafeMusic}" 
-              Content="Disable Unsafe Music"
-              ToolTip.Tip="Do not use custom tracks that are likely to interfere with streaming"
-            />
-            <CheckBox IsChecked="{Binding FastSpellCasting}" Content="Fast Spell Casting"  />
-            <CheckBox IsChecked="{Binding UpAOnController1}">
-                <TextBlock>
-                    Remap UP+A to UP+Select<LineBreak/>on Controller 1
-                </TextBlock>
+                IsChecked="{Binding UseCommunityText}"
+                Content="Use Community Text"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.UseCommunityTextToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <CheckBox IsChecked="{Binding RemoveFlashing}" Content="Remove Flashing" />
-            <CheckBox IsChecked="{Binding UseCommunityText}" Content="Use Community Text" />
-            <CheckBox IsChecked="{Binding DisableHUDLag}" Content="Disable HUD Flash on Lag" />
+
+            <Separator/>
+
+            <HyperlinkButton
+                Margin="43 0"
+                HorizontalAlignment="Left"
+                Content="[Wiki: Custom Music]"
+                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Custom-Music"
+                FontSize="12"
+                Foreground="#4557c4"
+                Cursor="Hand"
+            />
+
+            <CheckBox
+                IsChecked="{Binding DisableMusic}"
+                Content="Disable Music"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableMusicToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox 
+                IsEnabled="{Binding !DisableMusic}"
+                IsChecked="{Binding RandomizeMusic}"
+                Content="Use Custom Music If Any" 
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.UseCustomMusicIfAnyToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsEnabled="{Binding RandomizeMusicEnabled}"
+                IsChecked="{Binding MixCustomAndOriginalMusic}" 
+                Content="Mix Custom and Original Music"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixCustomandOriginalMusicToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsEnabled="{Binding RandomizeMusicEnabled}"
+                IsChecked="{Binding DisableUnsafeMusic}" 
+                Content="Disable Unsafe Music"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DisableUnsafeMusicToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
         <tabs:SpritePreviewView Grid.Column="1" DataContext="{Binding SpritePreviewViewModel}" />
     </Grid>

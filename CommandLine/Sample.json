@@ -78,7 +78,7 @@
 "PalacesContainExtraKeys": true,
 "PalacesToCompleteMax": 6,
 "PalacesToCompleteMin": 6,
-"PermanmentBeamSword": false,
+"PermanentBeamSword": false,
 "RandomizeBossItemDrop": false,
 "RandomizeDrops": true,
 "RandomizeKnockback": false,
