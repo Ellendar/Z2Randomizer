@@ -1257,8 +1257,9 @@ public class Hyrule
                 }
                 if (currentStatEffectiveness == StatEffectiveness.SGL)
                 {
-                    int max = life[bank, level];
-                    int min = (int)(life[bank, level] + life[bank, level] * .25);
+                    int max = (int)(life[bank, level] + life[bank, level] * .25);
+                    int min = life[bank, level]; 
+
                     if (level == 0)
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
