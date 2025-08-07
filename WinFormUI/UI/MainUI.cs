@@ -212,6 +212,7 @@ public partial class MainUI : Form
         includev4_4RoomsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         HardBossesCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         minThunderCostCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
+        aggressiveTbirdCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
         //townSwap.CheckStateChanged += new System.EventHandler(updateFlags);
 
         TryLoadSpriteImageFromFile(romFileTextBox.Text);
