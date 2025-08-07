@@ -90,8 +90,7 @@ public partial class MainUI : Form
 
         var version = Assembly.GetEntryAssembly().GetName().Version;
         var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
-        Text = "Zelda 2 Randomizer Version "
-            + versionString;
+        Text = "Zelda 2 Randomizer SGL VERSION";
 
         flagsTextBox.DoubleClick += new System.EventHandler(flagBox_Clicked);
         shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);
@@ -956,7 +955,8 @@ public partial class MainUI : Form
             0 => PalaceStyle.VANILLA,
             1 => PalaceStyle.SHUFFLED,
             2 => PalaceStyle.RECONSTRUCTED,
-            3 => PalaceStyle.RANDOM,
+            3 => PalaceStyle.RECONSTRUCTED_SHORTENED,
+            4 => PalaceStyle.RANDOM,
             _ => throw new Exception("Invalid PalaceStyle setting")
         };
         configuration.GPStyle = gpStyleList.SelectedIndex switch
@@ -1420,7 +1420,8 @@ public partial class MainUI : Form
                 PalaceStyle.VANILLA => 0,
                 PalaceStyle.SHUFFLED => 1,
                 PalaceStyle.RECONSTRUCTED => 2,
-                PalaceStyle.RANDOM => 3,
+                PalaceStyle.RECONSTRUCTED_SHORTENED => 3,
+                PalaceStyle.RANDOM => 4,
                 _ => throw new Exception("Invalid PalaceStyle setting")
             };
             gpStyleList.SelectedIndex = configuration.GPStyle switch

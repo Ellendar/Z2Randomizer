@@ -1284,7 +1284,6 @@ partial class MainUI
         aggressiveTbirdCheckbox.Size = new Size(113, 19);
         aggressiveTbirdCheckbox.TabIndex = 32;
         aggressiveTbirdCheckbox.Text = "Aggressive Tbird";
-        aggressiveTbirdCheckbox.ThreeState = true;
         toolTip1.SetToolTip(aggressiveTbirdCheckbox, "Carock has learned some new tricks. No more crouching in the corner!\r\n");
         aggressiveTbirdCheckbox.UseVisualStyleBackColor = true;
         // 
@@ -1431,7 +1430,7 @@ partial class MainUI
         // 
         palaceStyleList.DropDownStyle = ComboBoxStyle.DropDownList;
         palaceStyleList.FormattingEnabled = true;
-        palaceStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed", "Random" });
+        palaceStyleList.Items.AddRange(new object[] { "Vanilla", "Shuffled", "Reconstructed", "Reconstructed (Shorter)", "Random" });
         palaceStyleList.Location = new Point(7, 29);
         palaceStyleList.Margin = new Padding(4, 3, 4, 3);
         palaceStyleList.Name = "palaceStyleList";

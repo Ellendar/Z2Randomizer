@@ -209,6 +209,16 @@ public class Palaces
         sizes[4] = r.Next(23, 63 - sizes[0] - sizes[1]);
         sizes[5] = r.Next(22, 63 - sizes[2] - sizes[3]);
 
+        if(props.NormalPalaceStyle == PalaceStyle.RECONSTRUCTED_SHORTENED)
+        {
+            sizes[0] = r.Next(10, 15);
+            sizes[1] = r.Next(16, 23);
+            sizes[2] = r.Next(11, 16);
+            sizes[3] = r.Next(16, 23);
+            sizes[4] = int.Min(r.Next(23, 63 - sizes[0] - sizes[1]), 28);
+            sizes[5] = int.Min(r.Next(22, 63 - sizes[2] - sizes[3]), 28);
+        }
+
         if (props.GPStyle == PalaceStyle.RECONSTRUCTED_SHORTENED)
         {
             sizes[6] = r.Next(27, 41);
