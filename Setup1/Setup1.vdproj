@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5                              "
+                "FrameworkVersion" = "8:v4.5                               "
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -228,16 +228,16 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{1A325ACB-E431-48CE-B80D-EB4E898D6C74}"
-        "PackageCode" = "8:{1FCEDF66-08E3-436E-A64E-69834F16E67A}"
-        "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
+        "ProductName" = "8:Z2Randomizer Community Fork (SGL VERSION)"
+        "ProductCode" = "8:{E7C8FF20-E7BD-4772-89BD-4B9C53011283}"
+        "PackageCode" = "8:{2C98380A-1EF0-4F50-A265-DD867003A85D}"
+        "UpgradeCode" = "8:{177BD721-7BE9-44CF-98C4-A57E3DEB9B0B}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:4.3.19"
+        "ProductVersion" = "8:1.0"
         "Manufacturer" = "8:Ellendar"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -765,7 +765,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_29F166287F504E1B842D03D78AF85460"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\Debug\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -793,7 +793,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BB3D8193D68E4F149C2157E8828E8077"
             {
-            "SourcePath" = "8:..\\WinFormUI\\obj\\Release\\net8.0-windows7.0\\apphost.exe"
+            "SourcePath" = "8:..\\WinFormUI\\obj\\Debug\\net8.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -821,7 +821,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_BD0C5F40CFE54C4F933C4C6C0856834A"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Debug\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"

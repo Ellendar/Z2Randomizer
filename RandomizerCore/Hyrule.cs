@@ -368,6 +368,10 @@ public class Hyrule
         // startRandomizeStartingValuesTimestamp = DateTime.Now;
         startRandomizeEnemiesTimestamp = DateTime.Now;
         RandomizeEnemyStats();
+        if(props.AggressiveTbird)
+        {
+            AggressiveThunderbird();
+        }
 
         firstProcessOverworldTimestamp = DateTime.Now;
         ProcessOverworld();
@@ -1254,7 +1258,7 @@ public class Hyrule
                 if (currentStatEffectiveness == StatEffectiveness.SGL)
                 {
                     int max = life[bank, level];
-                    int min = (int)(life[bank, level] - life[bank, level] * .25);
+                    int min = (int)(life[bank, level] + life[bank, level] * .25);
                     if (level == 0)
                     {
                         nextVal = RNG.Next(min, Math.Min(max, 120));
@@ -3983,5 +3987,20 @@ FREE_UNTIL $c2ca
         }
 
         return worlds.Any(world => world.PassthroughsIntersectRaftCoordinates(raftCoordinates));
+    }
+
+    public void AggressiveThunderbird()
+    {
+        const byte ThunderBirdHP = 192;
+        // 0x15453 - Starting HP value
+        ROMData.Put(0x15453, ThunderBirdHP);
+        // 0x15ed6 - "face revealed" if HP < this value
+        ROMData.Put(0x15ed6, ThunderBirdHP);
+        // 0x163df - "face revealed" if HP < this value(part 2 ?)
+        ROMData.Put(0x163df, ThunderBirdHP);
+        // 0x163f6 - HP bar divisor(i'll make a patch for this in 4.4 soonish)
+        ROMData.Put(0x16406, ThunderBirdHP / 8);
+        // 0x16403 - Hard Mode if HP < this value (vanilla half HP)
+        ROMData.Put(0x16413, ThunderBirdHP);
     }
 }
