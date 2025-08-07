@@ -630,14 +630,10 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         BeamSprite = BeamSprites.DEFAULT;
         UseCustomRooms = false;
         DisableHUDLag = false;
-        // var previousFlags = Flags;
-        // this.WhenAnyPropertyChanged()
-        //     .Subscribe(a =>
-        //     {
-        //         if (Serialize() == previousFlags) return;
-        //         previousFlags = Serialize();
-        //         this.RaisePropertyChanged(nameof(Flags));
-        //     });
+        this.WhenAnyPropertyChanged()
+            .Throttle(TimeSpan.FromMilliseconds(10))
+            .Select(_ => Serialize())
+            .ToProperty(this, nameof(Flags));
     }
 
     public RandomizerConfiguration(string flagstring) : this()
@@ -1578,23 +1574,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     {
         return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
     }
-
-    // public event PropertyChangedEventHandler? PropertyChanged;
-    //
-    // private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    // {
-    //     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    // }
-    //
-    // private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    // {
-    //     if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-    //     field = value;
-    //     OnPropertyChanged(propertyName);
-    //     // ReSharper disable once ExplicitCallerInfoArgument
-    //     OnPropertyChanged(nameof(Flags));
-    //     return true;
-    // }
 
     private bool GetIndeterminateFlagValue(Random r)
     {
