@@ -61,6 +61,11 @@
     <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" />
     <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" />
     <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" />
+    <PackageReference Include="ReactiveUI" Version="20.1.1" />
+    <PackageReference Include="ReactiveUI.SourceGenerators" Version="2.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
     <PackageReference Include="NLog" Version="5.2.6" />
   </ItemGroup>
