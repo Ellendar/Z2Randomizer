@@ -29,11 +29,6 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         get { return spriteName; }
         set { spriteName = value ?? "Link"; Main.Config.SpriteName = value ?? "Link"; }
     }
-    public bool SanitizeSprite
-    {
-        get => Main.Config.SanitizeSprite;
-        set { Main.Config.SanitizeSprite = value; this.RaisePropertyChanged(); }
-    }
     public bool ChangeItemSprites
     {
         get => Main.Config.ChangeItemSprites;

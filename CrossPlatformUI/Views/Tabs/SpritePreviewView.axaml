@@ -26,8 +26,7 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-			<CheckBox IsChecked="{Binding SanitizeSprite}" Content="Moderate Sprite Access to ROM" />
-			<CheckBox IsEnabled="{Binding SanitizeSprite}" IsChecked="{Binding ChangeItemSprites}" Content="Change Item Sprites" />
+			<CheckBox IsChecked="{Binding ChangeItemSprites}" Content="Change Item Sprites" />
 			<ComboBox assists:ComboBoxAssist.Label="Tunic Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
                       SelectedItem="{Binding TunicColor, Converter={x:Static ui:Util.EnumConvert}}" />

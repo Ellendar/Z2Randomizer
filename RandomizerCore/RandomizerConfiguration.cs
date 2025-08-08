@@ -529,9 +529,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     [property:IgnoreInFlags]
     private string spriteName;
 
-    [Reactive]
-    [property:IgnoreInFlags]
-    private bool sanitizeSprite;
 
     [Reactive]
     [property:IgnoreInFlags]
@@ -1426,7 +1423,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
-        properties.SanitizeSprite = SanitizeSprite;
         properties.ChangeItemSprites = ChangeItemSprites;
         properties.TunicColor = Tunic;
         properties.OutlineColor = TunicOutline;
