@@ -36,11 +36,18 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 
         var currentCoord = Coord.Uninitialized;
 
+        WeightedRandom<int> weightedRandomDirection = new([
+            (0, 90),  // left
+            (1, 40),  // down
+            (2, 35),  // up
+            (3, 95),  // right
+        ]);
+
         //Create graph
         while (walkGraph.Count < roomCount)
         {
             await Task.Yield();
-            int direction = r.Next(4);
+            int direction = weightedRandomDirection.Next(r);
             Coord nextCoord = direction switch
             {
                 0 => currentCoord with { X = currentCoord.X - 1 }, //left
