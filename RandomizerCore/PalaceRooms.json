@@ -3110,8 +3110,7 @@
     "name": "Vanilla P7 M10",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "40600E08D60850015502D10ED20850015502D10ED20850015502D10ED20850015502D10EA1258206F0508106D60850015502D10E80D281D2D10850015502D10E"
   },
   {
@@ -4196,8 +4195,7 @@
     "name": "GP segmented drop/1up room left side",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "UPSTAB"]],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
   },
   {
@@ -4222,8 +4220,7 @@
     "name": "GP segmented drop/1up room right side",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
     "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
   },
@@ -7595,8 +7592,7 @@
     "name": "link7777RoomJam M9",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "4E600F08D20EF5500006B0900106B090D408430044D43131903051D07030A03421328032333150D0913041D445004400440046D43131903051307032A034213282D031315030913041D44400D40E"
   },
   {
@@ -7621,8 +7617,7 @@
     "name": "link7777RoomJam M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE", "FAIRY"],
     "sideviewData": "46600E08D60870015502D10C909FD20850013502D10A7091D20830015502D10C9091D20850017502D10EA125F25080068106D40870015502D10C60C39093D40850017502D10E"
   },
   {
@@ -7647,8 +7642,7 @@
     "name": "link7777RoomJam M11",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "54600D08D200509F709FE10052B370B3D40DD20BD209D200A2339133813371336133A00651339006413780067106610651065106513360066133700671338006813390069133A006A133D609D20BD20D7291D20F"
   },
   {
@@ -7673,8 +7667,7 @@
     "name": "link7777RoomJam M12",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "4E600F08D20EF5500006B0900106B090D408430044D43131903051D07030A03421328032333150D0913041D445004400440046D43131903051307032A034213282D031315030913041D44400D40E"
   },
   {
@@ -7699,8 +7692,7 @@
     "name": "Blue bird and big bubble upstab skip prevention room",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "30600E08E100D008E200D00ED20CD20A9099D2087097529562D461C290C223D5802421D5D10EA521F25080068106D10F"
   },
   {
@@ -7855,8 +7847,7 @@
     "name": "link7777RoomJam M25",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "4E600F08D20EF5500006B0900106B090D408430044D43131903051D07030A03421328032333150D0913041D445004400440046D43131903051307032A034213282D031315030913041D44400D40E"
   },
   {
@@ -7907,8 +7898,7 @@
     "name": "link7777RoomJam M27",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "4E600F08D20EF5500006B0900106B090D408430044D43131903051D07030A03421328032333150D0913041D445004400440046D43131903051307032A034213282D031315030913041D44400D40E"
   },
   {
@@ -7985,8 +7975,7 @@
     "name": "link7777RoomJam M32",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "30600E08E100D008E200D00ED20CD20A9099D2087097529562D461C290C223D5802421D5D10EA521F25080068106D10F"
   },
   {
@@ -8063,8 +8052,7 @@
     "name": "link7777RoomJam M35",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "4E600F08D20EF5500006B0900106B090D408430044D43131903051D07030A03421328032333150D0913041D445004400440046D43131903051307032A034213282D031315030913041D44400D40E"
   },
   {
@@ -8167,8 +8155,7 @@
     "name": "link7777RoomJam M43",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "4E600F08D20EF5500006B0900106B090D408430044D43131903051D07030A03421328032333150D0913041D445004400440046D43131903051307032A034213282D031315030913041D44400D40E"
   },
   {
@@ -8245,8 +8232,7 @@
     "name": "gtmNewgpRooms M2",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "306006083500D40250CC3200D200340055C731002602D10DA5297225F25080068106D400200150CC3400D602D3063200"
   },
   {
@@ -8271,8 +8257,7 @@
     "name": "gtmNewgpRooms M3",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "30600508009F29D3D401F012D385009F23D3D280F012D38527D3019F20D3D800F012D38522D3D380F012009FD38523D3"
   },
   {
@@ -8349,7 +8334,7 @@
     "name": "gtmNewgpRooms M9",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
@@ -8375,8 +8360,7 @@
     "name": "gtmNewgpRooms M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "40600E08D208DA0E80D281D2D10850015502D10ED20850015502D10E80D281D2D10850015502D10EA1250206F0500106D40850015502D10E80D281D2D108DA0F"
   },
   {
@@ -8401,8 +8385,7 @@
     "name": "gtmNewgpRooms M11",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE", "FAIRY"],
     "sideviewData": "3C600008D08000971097202670979097F81D72890393109331D431D40796809FA02B0794D50890958421D280F01D7289D30931D431D4D280D5041099"
   },
   {
@@ -8427,8 +8410,7 @@
     "name": "gtmNewgpRooms M12",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
   {
@@ -8609,8 +8591,7 @@
     "name": "gtmNewgpRooms M25",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
   {
@@ -8661,7 +8642,7 @@
     "name": "gtmNewgpRooms M27",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
@@ -8791,8 +8772,7 @@
     "name": "gtmNewgpRooms M37",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "30600508009F29D3D401F012D385009F23D3D280F012D38527D3019F20D3D800F012D38522D3D380F012009FD38523D3"
   },
   {
@@ -8817,8 +8797,7 @@
     "name": "gtmNewgpRooms M38",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "30600508009F29D3D401F012D385009F23D3D280F012D38527D3019F20D3D800F012D38522D3D380F012009FD38523D3"
   },
   {
@@ -8999,8 +8978,7 @@
     "name": "gtmNewgpRooms 2 M43",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600D08D5088033A035903470326031AA2C23D7F01631306030903021D75130803021D731306030903021D7AC2CF31620D731306030903021D74130803021D76130903021D7A83191C481C371326131D20D"
   },
   {
@@ -9025,8 +9003,7 @@
     "name": "gtmNewgpRooms M47",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "2A600E08D60820D821D85194709690980CB7A0318431A5318531A5318531A531D50EF15080068106D10F"
   },
   {
@@ -9077,8 +9054,7 @@
     "name": "gtmNewgpRooms M51",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "2A600E08D60820D821D85194709690980CB7A0318431A5318531A5318531A531D50EF15080068106D10F"
   },
   {
@@ -9259,8 +9235,7 @@
     "name": "gtmOldgpRooms M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "24600E08D6001001703684D2732BDC16D204D202D2004102D10ED500703684D2732BDC04"
   },
   {
@@ -9597,8 +9572,7 @@
     "name": "winterSolsticeGP M1",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "28600308823E90CE2800893D90CD270089C961C790C742C36093F150800651408006873E90CE2600"
   },
   {
@@ -9649,8 +9623,7 @@
     "name": "winterSolsticeGP M4",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
     "sideviewData": "2A600708D901F01F523613F32500613613F4F21F2200533412F324006236F21F11F42400523613F3D607"
   },
   {
@@ -9675,8 +9648,7 @@
     "name": "winterSolsticeGP M5",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "28600308823E90CE2800893D90CD270089C961C790C742C36093F150800651408006873E90CE2600"
   },
   {
@@ -9701,8 +9673,7 @@
     "name": "winterSolsticeGP M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["KEY", "FAIRY"],
     "sideviewData": "40600F08D20EF5500006B0900106B0908205D10ED200109FD202D200F011D204D200F0187088189FD103D200F01192924100F211D204D200F01D708D1497DA05"
   },
   {
@@ -9727,8 +9698,7 @@
     "name": "winterSolsticeGP M11",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "42600B089093D40010923001132B32003700D301109F8292312FD200F01F40D3803F65D145D11199332341D3D103D301D200102C320037001392320280249094D10B"
   },
   {
@@ -9753,9 +9723,7 @@
     "name": "GP Forced Key Required",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-      "KEY"
-    ],
+    "requirements": [["KEY", "GLOVE"]],
     "sideviewData": "2A600E0886D2D20D7001D40B5001D409D70BD40DD30E8205D30DD30BD409D70B5302D10D7302D10E81D2"
   },
   {
@@ -9780,8 +9748,7 @@
     "name": "winterSolsticeGP M16",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "1C6005081ED4D10053219221732194219821742193215221D50510D4"
   },
   {
@@ -9806,8 +9773,7 @@
     "name": "winterSolsticeGP M17",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "1C6005081ED4D10053219221732194219821742193215221D50510D4"
   },
   {
@@ -9832,8 +9798,7 @@
     "name": "winterSolsticeGP M18",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "1C6005081ED4D10053219221732194219821742193215221D50510D4"
   },
   {
@@ -9884,8 +9849,7 @@
     "name": "winterSolsticeGP M24",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "1C6005081ED4D10053219221732194219821742193215221D50510D4"
   },
   {
@@ -9988,8 +9952,7 @@
     "name": "winterSolsticeGP M34",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "1C6005081ED4D10053219221732194219821742193215221D50510D4"
   },
   {
@@ -10066,8 +10029,7 @@
     "name": "winterSolsticeGP M44",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["FAIRY"],
     "sideviewData": "2E600D08D500940A920A930A940A920A950A920A920A920A940A930A920A129B929772955293D60EF15080068106"
   },
   {
@@ -10144,8 +10106,7 @@
     "name": "winterSolsticeGP M47",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
     "sideviewData": "2A600708D901F01F523613F32500613613F4F21F2200533412F324006236F21F11F42400523613F3D607"
   },
   {
@@ -10170,8 +10131,7 @@
     "name": "winterSolsticeGP M51",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
     "sideviewData": "2A600708D901F01F523613F32500613613F4F21F2200533412F324006236F21F11F42400523613F3D607"
   },
   {
@@ -10512,8 +10472,7 @@
     "name": "triforceOfCourageGP M8",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["FAIRY", "DASH"],
     "sideviewData": "1A6081086B29F51F6B29FA1465255B02D10E8106F0508106D10F"
   },
   {
@@ -12545,8 +12504,7 @@
     "name": "flippedGp M9",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600E08D208430025D831306030903021D821305030803021D841307030A03021D846004400440027D841307030A03021D821305030803021D831306030903021D84500D40EF3500006B0900106B090D60F"
   },
   {
@@ -12571,8 +12529,7 @@
     "name": "flippedGp M10",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "40600E08D40850015502D10E80D281D2D10850015502D10EA325F25080068106D40850015502D10ED20850015502D10ED20850015502D10ED20850015502D10E"
   },
   {
@@ -12597,8 +12554,7 @@
     "name": "flippedGp M11",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "42600F08D40ED70CD20A9133A033723F8031D208B006B106B106B106B106B106B106B106B106B106B106B106D10A80319033A033D40CD20DD60050B3549FE300DE0D"
   },
   {
@@ -12623,8 +12579,7 @@
     "name": "flippedGp M12",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600E08D208430025D831306030903021D821305030803021D841307030A03021D846004400440027D841307030A03021D821305030803021D831306030903021D84500D40EF3500006B0900106B090D60F"
   },
   {
@@ -12649,8 +12604,7 @@
     "name": "flippedGp M13",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "26600F08D70EF05080068106A121D70820D821D8519570979099D80AD20CD20ED208E300D00E"
   },
   {
@@ -12961,8 +12915,7 @@
     "name": "flippedGp M25",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600E08D208430025D831306030903021D821305030803021D841307030A03021D846004400440027D841307030A03021D821305030803021D831306030903021D84500D40EF3500006B0900106B090D60F"
   },
   {
@@ -13013,8 +12966,7 @@
     "name": "flippedGp M27",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600E08D208430025D831306030903021D821305030803021D841307030A03021D846004400440027D841307030A03021D821305030803021D831306030903021D84500D40EF3500006B0900106B090D60F"
   },
   {
@@ -13143,8 +13095,7 @@
     "name": "flippedGp M32",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "sideviewData": "26600F08D70EF05080068106A121D70820D821D8519570979099D80AD20CD20ED208E300D00E"
   },
   {
@@ -13221,8 +13172,7 @@
     "name": "flippedGp M35",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600E08D208430025D831306030903021D821305030803021D841307030A03021D846004400440027D841307030A03021D821305030803021D831306030903021D84500D40EF3500006B0900106B090D60F"
   },
   {
@@ -13332,33 +13282,33 @@
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FC52FFA0",
+    "connections": "00FFFFFF",
     "elevatorScreen": -1,
-    "enabled": true,
+    "enabled": false,
     "enemies": "0717D9334432C4",
     "group": "V4_0",
     "hasBoss": false,
-    "hasDrop": true,
+    "hasDrop": false,
     "hasItem": false,
     "isBossRoom": false,
     "isDropZone": false,
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 83919,
-    "name": "flippedGp 1 M41",
+    "name": "flippedGp M41 segmented room left side",
+    "linkedRoomName": "flippedGp M41 segmented room right side",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["DropTilesInNonDropRoom"],
     "sideviewData": "4B600E08D408980F12D20FD40860C7B006B106B1064100B006B106B106B1064100B00661B3B006B106B1064100B006619380239095430061C94300440063B34100639B410044004400D30E"
   },
   {
     "author": "flippedGp",
     "bitmask": "0F",
-    "connections": "FC52FFA0",
+    "connections": "FF00FF00",
     "elevatorScreen": -1,
     "enabled": true,
     "enemies": "0717D9334432C4",
@@ -13371,14 +13321,13 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
-    "linkedRoomName": null,
     "map": 41,
     "memoryAddress": 83919,
-    "name": "flippedGp 2 M41",
+    "name": "flippedGp M41 segmented room right side",
+    "linkedRoomName": "flippedGp M41 segmented room left side",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [["GLOVE", "UPSTAB"]],
     "sideviewData": "4B600E08D408980F12D20FD40860C7B006B106B1064100B006B106B106B1064100B00661B3B006B106B1064100B006619380239095430061C94300440063B34100639B410044004400D30E"
   },
   {
@@ -13429,8 +13378,7 @@
     "name": "flippedGp M43",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "52600E08D208430025D831306030903021D821305030803021D841307030A03021D846004400440027D841307030A03021D821305030803021D831306030903021D84500D40EF3500006B0900106B090D60F"
   },
   {
@@ -13455,8 +13403,7 @@
     "name": "flippedGp M44",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["FAIRY"],
     "sideviewData": "2E60060810274621D208F014D40DF11FD808D10DF71FD308D10DD908D3061029D8086070223030308070D10E8023"
   },
   {
@@ -13481,8 +13428,7 @@
     "name": "Reverse L7 Bottom Side",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "18600E08E100D080609CA03FBAB1639FD3086D9EDF051023"
   },
   {
@@ -18250,7 +18196,7 @@
     "connections": "FCFF1428",
     "hasDrop": false,
     "elevatorScreen": 0,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "093E5574563B9472D6",
@@ -18326,7 +18272,7 @@
     "connections": "FCFF1428",
     "hasDrop": false,
     "elevatorScreen": 0,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0D21C021557E5D75912AD47B99",
@@ -18401,7 +18347,7 @@
     "connections": "3343FFFC",
     "hasDrop": false,
     "elevatorScreen": 3,
-    "requirements": [],
+    "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "091A995F5268557E14",
@@ -18826,7 +18772,7 @@
     "connections": "2B000300",
     "hasDrop": true,
     "elevatorScreen": 2,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "052F983751",
@@ -18877,7 +18823,7 @@
     "connections": "FC00FF28",
     "hasDrop": false,
     "elevatorScreen": 0,
-    "requirements": [],
+    "requirements": ["GLOVE"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0D8751795170D182D164D16551",
@@ -18927,7 +18873,7 @@
     "connections": "BBFF00FC",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [["GLOVE", "DOWNSTAB"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "075CC057DD5459",
@@ -18952,7 +18898,7 @@
     "connections": "FF00FF00",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [["GLOVE", "DOWNSTAB"]],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "05581D5B99",
@@ -20331,7 +20277,7 @@
     "connections": "8FFCFC94",
     "hasDrop": false,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": [["JUMP", "GLOVE"]],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B1B5537957C1972D92F45",
@@ -20651,8 +20597,7 @@
     "name": "gtmNewgpRooms M10 mirrored",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": ["GLOVE"],
     "sideviewData": "40600F08D208DA0E80D281D2D10850015502D10EA125F25000060106D40850015502D10E80D281D2D10850015502D10ED20850015502D10E80D281D2D108DA0E"
   },
   {
