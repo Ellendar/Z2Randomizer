@@ -24,7 +24,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             IsRoot = true,
             // PalaceGroup = palaceGroup
         };
-        if (props.PalaceItemRoomCountIndicator && palaceNumber != 7) {
+        if (props.UsePalaceItemRoomCountIndicator && palaceNumber != 7) {
             entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
         }
         openCoords.AddRange(entrance.GetOpenExitCoords());
@@ -36,11 +36,12 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 
         var currentCoord = Coord.Uninitialized;
 
+        //Back to even weight for now.
         WeightedRandom<int> weightedRandomDirection = new([
-            (0, 90),  // left
-            (1, 40),  // down
+            (0, 35),  // left
+            (1, 35),  // down
             (2, 35),  // up
-            (3, 95),  // right
+            (3, 35),  // right
         ]);
 
         //Create graph

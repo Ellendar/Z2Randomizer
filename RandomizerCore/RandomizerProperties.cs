@@ -121,7 +121,7 @@ public class RandomizerProperties
     public bool HardBosses { get; set; }
     [NotMapped]
     public int[] PalaceItemRoomCounts { get; set; } = new int[6];
-    public bool PalaceItemRoomCountIndicator { get; set; }
+    public bool UsePalaceItemRoomCountIndicator { get; set; }
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }

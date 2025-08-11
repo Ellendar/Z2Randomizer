@@ -429,7 +429,8 @@ public class Room : IJsonOnDeserialized
         sb.Append(coords + " ");
         sb.Append(CategorizeExits() + " ");
         sb.Append("[" + BitConverter.ToString(SideView).Replace("-", "") + "] ");
-        sb.Append("[" + BitConverter.ToString(Enemies).Replace("-", "") + "]");
+        sb.Append("[" + BitConverter.ToString(Enemies).Replace("-", "") + "] ");
+        sb.Append(Collectable.ToString());
         return sb.ToString();
     }
 

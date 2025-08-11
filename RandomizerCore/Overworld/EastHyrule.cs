@@ -112,10 +112,15 @@ public sealed class EastHyrule : World
 
         connections.Add(GetLocationByMem(0x863A), GetLocationByMem(0x863B));
         connections.Add(GetLocationByMem(0x863B), GetLocationByMem(0x863A));
+
         connections.Add(GetLocationByMem(0x863E), GetLocationByMem(0x863F));
         connections.Add(GetLocationByMem(0x863F), GetLocationByMem(0x863E));
+
+        //valley of death 19-20
         connections.Add(GetLocationByMem(0x8640), GetLocationByMem(0x8641));
         connections.Add(GetLocationByMem(0x8641), GetLocationByMem(0x8640));
+
+        //valley of death 17-18
         connections.Add(GetLocationByMem(0x8642), GetLocationByMem(0x8643));
         connections.Add(GetLocationByMem(0x8643), GetLocationByMem(0x8642));
 

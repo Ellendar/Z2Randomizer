@@ -108,7 +108,7 @@ public class Hyrule
 
     //DEBUG/STATS
     public const bool UNSAFE_DEBUG = true;
-    private static int DEBUG_THRESHOLD = 500;
+    private static int DEBUG_THRESHOLD = 200;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -332,7 +332,7 @@ public class Hyrule
 
             if (props.DashAlwaysOn)
             {
-                ROMData.Put(0x13C3, new byte[] { 0x30, 0xD0 });
+                ROMData.Put(0x13C3, [0x30, 0xD0]);
             }
 
             if (props.PermanentBeam)
@@ -931,7 +931,7 @@ public class Hyrule
                 foreach (Location palaceLocation in itemLocs.Where(i => i.PalaceNumber != null))
                 {
                     shufflableItemLocations.Add(palaceLocation);
-                    itemsToActuallyShuffle.Add(palaceLocation.VanillaCollectable);
+                    itemsToActuallyShuffle.Add(Palace.GetVanillaCollectable(palaceLocation.PalaceNumber));
                     for (int i = 1; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
                     {
                         itemsToActuallyShuffle.Add(minorItems.Sample(RNG));
@@ -943,13 +943,17 @@ public class Hyrule
             {
                 foreach (Location palaceLocation in itemLocs.Where(i => i.PalaceNumber != null && i.PalaceNumber < 7))
                 {
-                    palaceLocation.Collectables = [palaceLocation.VanillaCollectable];
-                    palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[0].Collectable = palaceLocation.VanillaCollectable;
-                    for (int i = 1; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
+                    Collectable vanillaCollectable = Palace.GetVanillaCollectable(palaceLocation.PalaceNumber);
+                    palaceLocation.Collectables = [vanillaCollectable];
+                    palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms.Sample(RNG)!.Collectable = vanillaCollectable;
+                    for (int i = 0; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
                     {
-                        Collectable smallItem = minorItems.Sample(RNG);
-                        palaceLocation.Collectables.Add(smallItem);
-                        palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable = smallItem;
+                        if (palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable == null)
+                        {
+                            Collectable smallItem = minorItems.Sample(RNG);
+                            palaceLocation.Collectables.Add(smallItem);
+                            palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable = smallItem;
+                        }
                     }
                 }  
             }
@@ -1319,7 +1323,7 @@ public class Hyrule
                     PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(westHyrule.GetMapDebug());
                     //XXX: Debug
-                    return false;
+                    return true;
                 }
                 return false;
             }

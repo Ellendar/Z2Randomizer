@@ -1029,6 +1029,8 @@ public partial class Palace
         RequirementType? palaceItemRequirement = palaceItem.AsRequirement();
         if (palaceItemRequirement != null)
         {
+            //We only care if we can reach _an_ item room because if we have more than one but vanilla items
+            //the shuffle will eventually put the item into the reachable place.
             if (CanReachAnItemRoom(requireables))
             {
                 requireables = new List<RequirementType>(requireables);
@@ -1340,6 +1342,24 @@ public partial class Palace
 
         AllRooms.Remove(roomToReplace);
         AllRooms.Add(newRoom);
+    }
+
+
+    public static Collectable GetVanillaCollectable(int? palaceNum)
+    {
+        Collectable[] vanillaCollectables = [
+            Collectable.CANDLE,
+            Collectable.GLOVE,
+            Collectable.RAFT,
+            Collectable.BOOTS,
+            Collectable.FLUTE,
+            Collectable.CROSS
+        ];
+        if (palaceNum == null || (int)palaceNum > 6 || (int)palaceNum < 1)
+        {
+            throw new Exception("Invalid palace number");
+        }
+        return vanillaCollectables[(int)palaceNum - 1];
     }
 
     public string GetLayoutDebug(PalaceStyle style = PalaceStyle.VANILLA, bool includeCoordinateGrid = true)

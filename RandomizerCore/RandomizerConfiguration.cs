@@ -523,6 +523,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private bool removeFlashing;
 
     [Reactive]
+    [property: IgnoreInFlags]
     private CharacterSprite sprite;
 
     [Reactive]
@@ -656,6 +657,11 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             {
                 continue;
             }
+            //Now that the config is a ReactiveObject, some properties get inherited that should be ignored.
+            if (property.DeclaringType!.FullName == "ReactiveUI.ReactiveObject")
+            {
+                continue;
+            }
             LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
             limit = limitAttribute?.Limit ?? 0;
 
@@ -711,7 +717,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             }
             else
             {
-                logger.Error("Unrecognized configuration property type.");
+                logger.Error($"Unrecognized configuration property type: {propertyType}");
             }
             //Debug.WriteLine(property.Name + "\t" + flagReader.index);
         }
@@ -728,6 +734,11 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             bool isNullable = false;
 
             if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
+            {
+                continue;
+            }
+            //Now that the config is a ReactiveObject, some properties get inherited that should be ignored.
+            if(property.DeclaringType!.FullName == "ReactiveUI.ReactiveObject")
             {
                 continue;
             }
@@ -805,7 +816,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             }
             else
             {
-                logger.Error("Unrecognized configuration property type.");
+                logger.Error($"Unrecognized configuration property type: {property.Name}");
             }
             //Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
         }
@@ -904,70 +915,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             properties.ShortenGP = ShortenGP ?? GetIndeterminateFlagValue(r);
             properties.ShortenNormalPalaces = ShortenNormalPalaces ?? GetIndeterminateFlagValue(r);
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
-
-            switch (PalaceItemRoomCount)
-            {
-                case PalaceItemRoomCount.RANDOM:
-                    properties.PalaceItemRoomCounts = Enumerable.Range(0, 6).Select(palaceIndex =>
-                    {
-                        switch (palaceIndex + 1)
-                        {
-                            case 1:
-                            case 3: // Palace 1,3:  0-2 item rooms  (0-1 if shortened)
-                                return properties.ShortenNormalPalaces ? r.Next(2) : r.Next(3);
-                            case 2:
-                            case 4: // Palace 2,4:  0-3 item rooms  (0-2 if shortened)
-                                return properties.ShortenNormalPalaces ? r.Next(3) : r.Next(4);
-                            case 5:
-                            case 6: // Palace 5,6:  0-4 item rooms  (0-2 if shortened)
-                                return properties.ShortenNormalPalaces ? r.Next(3) : r.Next(5);
-                            default:
-                                throw new ImpossibleException();
-                        }
-                    }).ToArray();
-                    for (int i = 0; i < 6; i++)
-                    {
-                        // Limit vanilla palace style to 1 item rooms max
-                        // Rationale:
-                        // The benefit of the vanilla palace style is that you can use vanilla
-                        // knowledge to know exactly where to go. Changing random rooms into
-                        // additonal item rooms ruins this. So, unless the user specifically
-                        // sets two items per, we should not do it.
-                        //
-                        // This way we can combine the fun of having both style and item count
-                        // set to random, for Max Rando players, without the downside of having
-                        // to track down which room was changed in a vanilla palace.
-                        if (properties.PalaceStyles[i] == PalaceStyle.VANILLA)
-                        {
-                            properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
-                        }
-                        // Limit shuffled vanilla palace style to 2 item rooms max
-                        // Technically, non-shortened P4 & P5 can have 3 item rooms,
-                        // but lets keep it simple.
-                        else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
-                        {
-                            properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 2);
-                        }
-                    }
-                    properties.PalaceItemRoomCountIndicator = true;
-                    break;
-                default:
-                    properties.PalaceItemRoomCounts = Enumerable.Repeat((int)PalaceItemRoomCount, 6).ToArray();
-                    properties.PalaceItemRoomCountIndicator = false;
-                    break;
-            }
-
-            //If shuffle palace items is off, the minimum number of palace rooms for a palace must be 1
-            //otherwise it is impossible to place the palace items.
-            properties.ShufflePalaceItems = ShufflePalaceItems ?? GetIndeterminateFlagValue(r);
-            if (!properties.ShufflePalaceItems)
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    properties.PalaceItemRoomCounts[i] = int.Max(properties.PalaceItemRoomCounts[i], 1);
-                }
-            }
-
 
             //Other starting attributes
             int startHeartsMin, startHeartsMax;
@@ -1338,8 +1285,8 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
         //Items
         properties.ShuffleOverworldItems = ShuffleOverworldItems ?? GetIndeterminateFlagValue(r);
-        //shufflePalaceItems needed to be determined earlier.
-        properties.MixOverworldPalaceItems = MixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r); 
+        properties.ShufflePalaceItems = ShufflePalaceItems ?? GetIndeterminateFlagValue(r);
+        properties.MixOverworldPalaceItems = MixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r);
         properties.RandomizeSmallItems = ShuffleSmallItems;
         properties.ExtraKeys = PalacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.RandomizeNewKasutoBasementRequirement = RandomizeNewKasutoJarRequirements;
@@ -1429,7 +1376,8 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.ShieldColor = ShieldTunic;
         properties.UpAC1 = UpAOnController1;
         properties.RemoveFlashing = RemoveFlashing;
-        properties.UseCustomRooms = UseCustomRooms;
+        //Removed the option to select this for now.
+        properties.UseCustomRooms = false;
         properties.DisableHUDLag = DisableHUDLag;
         properties.RandomizeKnockback = RandomizeKnockback;
 
@@ -1509,6 +1457,73 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         if (properties.IncludeSwordTechsInShuffle)
         {
             properties.SwapUpAndDownStab = false;
+        }
+
+        
+        //--This needed to be moved to the bottom because the validation could adjust some properties this relies on.--
+        
+        //I'm not sure whether I like the bias introduced in generating random values and then capping them
+        //vs just determining min/max ranges and fair rolling between them. Keeping it for now.
+        int[] palaceRoomItemsMax = [1, 1, 1, 1, 1, 1];
+        switch (PalaceItemRoomCount)
+        {
+            case PalaceItemRoomCount.RANDOM:
+                palaceRoomItemsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 3, 2, 3, 4, 4];
+                for (int i = 0; i < 6; i++)
+                {
+                    properties.PalaceItemRoomCounts[i] = r.Next(1, palaceRoomItemsMax[i] + 1);
+                    // Limit vanilla palace style to 1 item rooms max
+                    // Rationale:
+                    // The benefit of the vanilla palace style is that you can use vanilla
+                    // knowledge to know exactly where to go. Changing random rooms into
+                    // additonal item rooms ruins this. So, unless the user specifically
+                    // sets two items per, we should not do it.
+                    //
+                    // This way we can combine the fun of having both style and item count
+                    // set to random, for Max Rando players, without the downside of having
+                    // to track down which room was changed in a vanilla palace.
+                    if (properties.PalaceStyles[i] == PalaceStyle.VANILLA)
+                    {
+                        properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
+                    }
+                    // Limit shuffled vanilla palace style to 2 item rooms max
+                    // Technically, non-shortened P4 & P5 can have 3 item rooms,
+                    // but lets keep it simple.
+                    else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
+                    {
+                        properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 2);
+                    }
+                }
+                properties.UsePalaceItemRoomCountIndicator = true;
+                break;
+            default:
+                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)PalaceItemRoomCount, 6).ToArray();
+                properties.UsePalaceItemRoomCountIndicator = false;
+                break;
+        }
+
+        //If shuffle palace items is off, the minimum number of palace rooms for a palace must be 1
+        //otherwise it is impossible to place the palace items.
+
+        if (!properties.ShufflePalaceItems)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                properties.PalaceItemRoomCounts[i] = int.Max(properties.PalaceItemRoomCounts[i], 1);
+            }
+        }
+
+        //If mixed palace/overworld items is off, places must contain at least 6 items total so there is a place to put the items
+        if (!properties.MixOverworldPalaceItems)
+        {
+            while (properties.PalaceItemRoomCounts.Sum() < 6)
+            {
+                int i = r.Next(6);
+                if (properties.PalaceItemRoomCounts[i] < palaceRoomItemsMax[i])
+                {
+                    properties.PalaceItemRoomCounts[i]++;
+                }
+            }
         }
 
         // string debug = JsonSerializer.Serialize(properties);

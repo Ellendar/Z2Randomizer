@@ -26,7 +26,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             IsRoot = true,
             // PalaceGroup = palaceGroup,
         };
-        if (props.PalaceItemRoomCountIndicator && palaceNumber != 7) {
+        if (props.UsePalaceItemRoomCountIndicator && palaceNumber != 7) {
             palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
         }
         palace.AllRooms.Add(palace.Entrance);
