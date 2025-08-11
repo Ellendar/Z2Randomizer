@@ -7,48 +7,122 @@
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:tabs="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
              x:DataType="vm:MainViewModel">
     <Grid ColumnDefinitions="*,*">
-        <StackPanel>
+        <StackPanel Width="414">
+            <HyperlinkButton
+                Margin="178 0 0 0"
+                HorizontalAlignment="Left"
+                Content="[Wiki: Palace Styles]"
+                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Palace-Styles"
+                FontSize="12"
+                Foreground="#4557c4"
+                Cursor="Hand"
+            />
             <StackPanel Orientation="Horizontal" Margin="0 0">
-                <ComboBox Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Normal Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
-                          ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
-                          SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}" />
-                <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenNormalPalaces}" Content="Shorten" />
+                <ComboBox
+                    Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                    assists:ComboBoxAssist.Label="Normal Palace Style"
+                    ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
+                    SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NormalPalaceStyleToolTip}"/></ToolTip.Tip>
+                </ComboBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.ShortenNormalPalaces}"
+                    Content="Shorten"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
+                </CheckBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0 0">
-              <ComboBox Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="GP Palace Style" Theme="{StaticResource MaterialOutlineComboBox}"
-                        ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
-                        SelectedItem="{Binding Config.GPStyle, Converter={x:Static ui:Util.EnumConvert}}" />
-              <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShortenGP}" Content="Shorten" />
+                <ComboBox
+                    Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                    assists:ComboBoxAssist.Label="GP Palace Style"
+                    ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
+                    SelectedItem="{Binding Config.GPStyle, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GPPalaceStyleToolTip}"/></ToolTip.Tip>
+                </ComboBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.ShortenGP}"
+                    Content="Shorten"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
+                </CheckBox>
             </StackPanel>
-            <ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Minimum Path To Dark Link" Theme="{StaticResource MaterialOutlineComboBox}"
-              ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomMinDistanceOptions}}"
-              SelectedItem="{Binding Config.DarkLinkMinDistance, Converter={x:Static ui:Util.EnumConvert}}" />
-            <ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Item Rooms Per Palace" Theme="{StaticResource MaterialOutlineComboBox}"
-              ItemsSource="{Binding Source={x:Static rc:Enums.PalaceItemRoomCountOptions}}"
-              SelectedItem="{Binding Config.PalaceItemRoomCount, Converter={x:Static ui:Util.EnumConvert}}" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeVanillaRooms}" Content="Include Vanilla Rooms" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_0Rooms}" Content="Include 4.0 Rooms" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.Includev4_4Rooms}" Content="Include 4.4 Rooms" />
-            <Separator/>
-            <CheckBox IsThreeState="True" 
-                      IsChecked="{Binding Config.TBirdRequired}"
-                      Checked="TBirdRequiredChecked"
-                      Content="Thunderbird Required" />
-            <CheckBox 
-                      Name="RemoveThunderbirdCheckbox"
-                      IsEnabled="{Binding !Config.TBirdRequired}" 
-                      IsChecked="{Binding Config.RemoveTBird}" 
-                      Content="Remove Thunderbird" />
-            <Separator/>
-            <!--<CheckBox IsThreeState="False" IsChecked="{Binding Config.UseCustomRooms}" Content="Use Custom Rooms File" />-->
+            <ComboBox
+                HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Minimum Path To Dark Link"
+                ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomMinDistanceOptions}}"
+                SelectedItem="{Binding Config.DarkLinkMinDistance, Converter={x:Static ui:Util.EnumConvert}}"
+            ><ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MinimumPathToDarkLinkToolTip}"/></ToolTip.Tip>
 
+            </ComboBox>
+            <ComboBox
+                HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Item Rooms Per Palace"
+                ItemsSource="{Binding Source={x:Static rc:Enums.PalaceItemRoomCountOptions}}"
+                SelectedItem="{Binding Config.PalaceItemRoomCount, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ItemRoomsPerPalaceToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeVanillaRooms}"
+                Content="Include Vanilla Rooms"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeVanillaRoomsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.Includev4_0Rooms}"
+                Content="Include 4.0 Rooms"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.Include40RoomsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.Includev4_4Rooms}"
+                Content="Include 4.4 Rooms"
+            >
+            </CheckBox>
+            <Separator/>
+            <CheckBox
+                IsThreeState="True" 
+                IsChecked="{Binding Config.TBirdRequired}"
+                Checked="TBirdRequiredChecked"
+                Content="Thunderbird Required"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ThunderbirdRequiredToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox 
+                Name="RemoveThunderbirdCheckbox"
+                IsEnabled="{Binding !Config.TBirdRequired}" 
+                IsChecked="{Binding Config.RemoveTBird}" 
+                Content="Remove Thunderbird"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RemoveThunderbirdToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <Separator/>
+            <!--
+            <CheckBox
+              IsThreeState="False"
+              IsChecked="{Binding Config.UseCustomRooms}"
+              Content="Use Custom Rooms File"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.UseCustomRoomsFileToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            -->
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <TextBlock Margin="43 0 0 0">Number of Palaces To Complete</TextBlock>
+            <TextBlock Margin="43 0 0 0">Number of Palaces to Complete</TextBlock>
+            <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NumberofPalacestoCompleteToolTip}"/></ToolTip.Tip>
             <!-- Example of how to scale down elements  -->
             <!-- <Viewbox Stretch="Fill" Width="140" Height="70"> -->
                 <StackPanel Orientation="Horizontal" Margin="41 0 0 0">
@@ -60,24 +134,74 @@
                                    ClipValueToMinMax="True" Minimum="{Binding Config.PalacesToCompleteMin}" Maximum="6" assists:TextFieldAssist.Hints="Max"/>
                 </StackPanel>
             <!-- </Viewbox> -->
-            <CheckBox IsChecked="{Binding Config.RestartAtPalacesOnGameOver}" Content="Restart At Palaces On Game Over" />
-            <CheckBox IsChecked="{Binding Config.Global5050JarDrop}" IsThreeState="True" Content="50/50 Statue Cycles Between Jar and Knight" />
-            <CheckBox IsChecked="{Binding Config.ReduceDripperVariance}" Content="Reduce Dripper Variance" />
-            <CheckBox IsChecked="{Binding Config.ChangePalacePallettes}" Content="Change Palace Palettes" />
-            <CheckBox IsChecked="{Binding Config.RandomizeBossItemDrop}" Content="Randomize Boss Item Drop" />
-            <CheckBox Name="NoDuplicateRoomsByLayoutCheckbox"
-                      IsChecked="{Binding Config.NoDuplicateRoomsByLayout}" 
-                      Checked="NoDuplicateRoomsByLayoutChecked" 
-                      Content="No Duplicate Rooms (By Layout)" />
-            <CheckBox Name="NoDuplicateRoomsByEnemiesCheckbox"
-                      IsChecked="{Binding Config.NoDuplicateRoomsByEnemies}" 
-                      Checked="NoDuplicateRoomsByEnemiesChecked" 
-                      Content="No Duplicate Rooms (By Layout/Enemies)" />
-            <CheckBox IsChecked="{Binding Config.BlockingRoomsInAnyPalace}" Content="Blocking Rooms In Any Palace" />
-			<ComboBox HorizontalAlignment="Left" Margin="0, 0" Width="300" assists:ComboBoxAssist.Label="Boss Rooms Exit To" Theme="{StaticResource MaterialOutlineComboBox}"
-		              ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomsExitTypeList}}"
-		              SelectedItem="{Binding Config.BossRoomsExitType, Converter={x:Static ui:Util.EnumConvert}}" />
-			<CheckBox IsChecked="{Binding Config.HardBosses}" Content="Harder Carock" />
+            <CheckBox
+                IsChecked="{Binding Config.RestartAtPalacesOnGameOver}"
+                Content="Restart at Palaces on Game Over"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RestartatPalacesonGameOverToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.Global5050JarDrop}"
+                IsThreeState="True"
+                Content="50/50 Statue Cycles Between Jar and Knight"
+            >
+                <ToolTip.Tip><TextBlock>If selected, 50/50 statues in palaces that include them will always alternate<LineBreak/>between dropping a red jar or spawning a red Ironknuckle. If unselected, the<LineBreak/>spawning is randomly determined each stab like in vanilla.</TextBlock></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.ReduceDripperVariance}"
+                Content="Reduce Dripper Variance"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ReduceDripperVarianceToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.ChangePalacePallettes}"
+                Content="Change Palace Palettes"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ChangePalacePalettesToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.RandomizeBossItemDrop}"
+                Content="Randomize Boss Item Drop"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeBossItemDropToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                Name="NoDuplicateRoomsByLayoutCheckbox"
+                IsChecked="{Binding Config.NoDuplicateRoomsByLayout}" 
+                Checked="NoDuplicateRoomsByLayoutChecked" 
+                Content="No Duplicate Rooms (By Layout)"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NoDuplicateRoomsByLayoutToolTip}"/></ToolTip.Tip>
+
+            </CheckBox>
+            <CheckBox
+                Name="NoDuplicateRoomsByEnemiesCheckbox"
+                IsChecked="{Binding Config.NoDuplicateRoomsByEnemies}" 
+                Checked="NoDuplicateRoomsByEnemiesChecked" 
+                Content="No Duplicate Rooms (By Layout/Enemies)"
+            >
+                <ToolTip.Tip><TextBlock>Prevents palace generation from creating duplicate rooms. For this setting, all<LineBreak/>different variants of a room (same layout with different enemy sets, Fairy/No<LineBreak/>Fairy, etc.) are *not* considered duplicates of each other. Has no effect on<LineBreak/>vanilla palaces. Does not completely prevent duplicates for Random Walk<LineBreak/>generated palaces.</TextBlock></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.BlockingRoomsInAnyPalace}"
+                Content="Blocking Rooms in Any Palace"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BlockingRoomsinAnyPalaceToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <ComboBox
+                HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Boss Rooms Exit To"
+                ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomsExitTypeList}}"
+                SelectedItem="{Binding Config.BossRoomsExitType, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BossRoomsExitToToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <CheckBox
+                IsChecked="{Binding Config.HardBosses}"
+                Content="Harder Carock"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.HarderCarockToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
     </Grid>
 </UserControl>

@@ -6,17 +6,52 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.HintsView">
     <Grid ColumnDefinitions="*, *">
         <StackPanel>
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.EnableHelpfulHints}" Content="Enable Helpful Hints" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.EnableSpellItemHints}" Content="Enable Spell Item Hints" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.EnableTownNameHints}" Content="Enable Town Name Hints" />
+            <HyperlinkButton
+                Margin="43 0"
+                HorizontalAlignment="Left"
+                Content="[Wiki: Hints]"
+                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Options#hints"
+                FontSize="12"
+                Foreground="#4557c4"
+                Cursor="Hand"
+            />
+
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.EnableHelpfulHints}"
+                Content="Enable Helpful Hints"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableHelpfulHintsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.EnableSpellItemHints}"
+                Content="Enable Spell Item Hints"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableSpellItemHintsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.EnableTownNameHints}"
+                Content="Enable Town Name Hints"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableTownNameHintsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
-          <CheckBox IsThreeState="False" IsChecked="{Binding Config.GenerateSpoiler}" Content="Generate Spoiler" />
+            <CheckBox
+                IsThreeState="False"
+                IsChecked="{Binding Config.GenerateSpoiler}"
+                Content="Generate Spoiler"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateSpoilerToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
     </Grid>
 </UserControl>

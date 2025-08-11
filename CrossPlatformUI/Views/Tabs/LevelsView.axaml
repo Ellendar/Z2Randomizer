@@ -7,65 +7,95 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.LevelsView">
     <Grid ColumnDefinitions="*,*">
         <StackPanel>
-            <CheckBox IsChecked="{Binding ShuffleAllExpState}"
-                      Content="Shuffle All Experience"/>
+            <CheckBox
+                IsChecked="{Binding ShuffleAllExpState}"
+                Content="Shuffle All Experience"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleAllExperienceToolTip}"/></ToolTip.Tip>
+            </CheckBox>
             <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
                 <StackPanel>
-                    <CheckBox Name="AtkExp"
-                              IsEnabled="{Binding !ShuffleAllExpState}"
-                              IsChecked="{Binding Config.ShuffleAttackExperience}"
-                              Content="Shuffle Attack Experience" />
-                    <CheckBox Name="MagExp"
-                              IsEnabled="{Binding !ShuffleAllExpState}"
-                              IsChecked="{Binding Config.ShuffleMagicExperience}"
-                              Content="Shuffle Magic Experience" />
-                    <CheckBox Name="LifExp"
-                              IsEnabled="{Binding !ShuffleAllExpState}"
-                              IsChecked="{Binding Config.ShuffleLifeExperience}"
-                              Content="Shuffle Life Experience" />
+                    <CheckBox
+                        Name="AtkExp"
+                        IsEnabled="{Binding !ShuffleAllExpState}"
+                        IsChecked="{Binding Config.ShuffleAttackExperience}"
+                        Content="Shuffle Attack Experience"
+                    />
+                    <CheckBox
+                        Name="MagExp"
+                        IsEnabled="{Binding !ShuffleAllExpState}"
+                        IsChecked="{Binding Config.ShuffleMagicExperience}"
+                        Content="Shuffle Magic Experience"
+                    />
+                    <CheckBox
+                        Name="LifExp"
+                        IsEnabled="{Binding !ShuffleAllExpState}"
+                        IsChecked="{Binding Config.ShuffleLifeExperience}"
+                        Content="Shuffle Life Experience"
+                    />
                 </StackPanel>
             </Border>
-            
-            <TextBlock HorizontalAlignment="Center">Level Cap</TextBlock>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <NumericUpDown Name="AttackLevelCapSelector" Value="{Binding Config.AttackLevelCap}"
-                               FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
-                <NumericUpDown Name="MagicLevelCapSelector" Value="{Binding Config.MagicLevelCap}"
-                               FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
-                <NumericUpDown Name="LifeLevelCapSelector" Value="{Binding Config.LifeLevelCap}"
-                               FormatString="N0" ParsingNumberStyle="Integer"
-                               ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
+
+            <StackPanel>
+                <TextBlock HorizontalAlignment="Center">Level Cap</TextBlock>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LevelCapToolTip}"/></ToolTip.Tip>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <NumericUpDown Name="AttackLevelCapSelector" Value="{Binding Config.AttackLevelCap}"
+                                FormatString="N0" ParsingNumberStyle="Integer"
+                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
+                    <NumericUpDown Name="MagicLevelCapSelector" Value="{Binding Config.MagicLevelCap}"
+                                FormatString="N0" ParsingNumberStyle="Integer"
+                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
+                    <NumericUpDown Name="LifeLevelCapSelector" Value="{Binding Config.LifeLevelCap}"
+                                FormatString="N0" ParsingNumberStyle="Integer"
+                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
+                </StackPanel>
             </StackPanel>
 
-            <CheckBox Content="Scale Level Requirements To Cap">
-              <CheckBox.IsEnabled>
-                <MultiBinding Converter="{StaticResource SumOfValuesLessThanConverter}" ConverterParameter="24">
-                  <Binding Path="#AttackLevelCapSelector.Value" />
-                  <Binding Path="#MagicLevelCapSelector.Value" />
-                  <Binding Path="#LifeLevelCapSelector.Value" />
-                </MultiBinding>
-              </CheckBox.IsEnabled>
+            <CheckBox
+                Content="Scale Level Requirements to Cap"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ScaleLevelRequirementstoCapToolTip}"/></ToolTip.Tip>
+                <CheckBox.IsEnabled>
+                    <MultiBinding Converter="{StaticResource SumOfValuesLessThanConverter}" ConverterParameter="24">
+                        <Binding Path="#AttackLevelCapSelector.Value" />
+                        <Binding Path="#MagicLevelCapSelector.Value" />
+                        <Binding Path="#LifeLevelCapSelector.Value" />
+                    </MultiBinding>
+                </CheckBox.IsEnabled>
             </CheckBox>
-            
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <ComboBox assists:ComboBoxAssist.Label="Attack Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.AttackEffectivenessList}}"
-					  ToolTip.Tip="{Binding Source={x:Static rc:ToolTips.AttackEffectiveness}}"
-                      SelectedItem="{Binding Config.AttackEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
-            <ComboBox assists:ComboBoxAssist.Label="Magic Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.MagicEffectivenessList}}"
-                      SelectedItem="{Binding Config.MagicEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
-            <ComboBox assists:ComboBoxAssist.Label="Life Effectiveness" Theme="{StaticResource MaterialOutlineComboBox}"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.LifeEffectivenessList}}"
-                      SelectedItem="{Binding Config.LifeEffectiveness, Converter={x:Static ui:Util.EnumConvert}}" />
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Attack Effectiveness"
+                ItemsSource="{Binding Source={x:Static rc:Enums.AttackEffectivenessList}}"
+                SelectedItem="{Binding Config.AttackEffectiveness, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AttackEffectivenessToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Magic Effectiveness"
+                ItemsSource="{Binding Source={x:Static rc:Enums.MagicEffectivenessList}}"
+                SelectedItem="{Binding Config.MagicEffectiveness, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MagicEffectivenessToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Life Effectiveness"
+                ItemsSource="{Binding Source={x:Static rc:Enums.LifeEffectivenessList}}"
+                SelectedItem="{Binding Config.LifeEffectiveness, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LifeEffectivenessToolTip}"/></ToolTip.Tip>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </UserControl>

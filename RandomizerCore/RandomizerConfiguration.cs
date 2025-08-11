@@ -479,7 +479,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private bool shuffleSpritePalettes;
 
     [Reactive]
-    private bool permanmentBeamSword;
+    private bool permanentBeamSword;
 
     //Custom
     [Reactive]
@@ -529,9 +529,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     [property:IgnoreInFlags]
     private string spriteName;
 
-    [Reactive]
-    [property:IgnoreInFlags]
-    private bool sanitizeSprite;
 
     [Reactive]
     [property:IgnoreInFlags]
@@ -615,7 +612,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         DisableUnsafeMusic = true;
         FastSpellCasting = false;
         ShuffleSpritePalettes = false;
-        PermanmentBeamSword = false;
+        PermanentBeamSword = false;
         UpAOnController1 = false;
         RemoveFlashing = false;
         Sprite = CharacterSprite.LINK;
@@ -1096,7 +1093,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             StartingLives.Lives16 => 16,
             _ => r.Next(2, 6)
         };
-        properties.PermanentBeam = PermanmentBeamSword;
+        properties.PermanentBeam = PermanentBeamSword;
         properties.UseCommunityText = UseCommunityText;
         properties.StartAtk = StartingAttackLevel;
         properties.StartMag = StartingMagicLevel;
@@ -1426,7 +1423,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
-        properties.SanitizeSprite = SanitizeSprite;
         properties.ChangeItemSprites = ChangeItemSprites;
         properties.TunicColor = Tunic;
         properties.OutlineColor = TunicOutline;

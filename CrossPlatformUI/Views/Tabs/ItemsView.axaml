@@ -6,48 +6,115 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.ItemsView">
     <Grid ColumnDefinitions="*, *">
         <StackPanel>
-            <CheckBox Name="ShufflePalaceItemsCheckbox"
-                      IsThreeState="True" 
-                      IsChecked="{Binding Config.ShufflePalaceItems}" 
-                      Content="Shuffle Palace Items" />
-            <CheckBox Name="ShuffleOverworldItemsCheckbox"
-                      IsThreeState="True" 
-                      IsChecked="{Binding Config.ShuffleOverworldItems}" 
-                      Content="Shuffle Overworld Items" />
-            <CheckBox Name="MixOverworldAndPalaceItemsCheckbox"
-              IsThreeState="True"
-              IsChecked="{Binding Config.MixOverworldAndPalaceItems}"
-              Content="Mix Overworld And Palace Items">
-              <CheckBox.IsEnabled>
-                <MultiBinding Converter="{x:Static BoolConverters.And}">
-                  <MultiBinding.Bindings>
-                    <Binding Path="#ShufflePalaceItemsCheckbox.IsChecked"/>
-                    <Binding Path="#ShuffleOverworldItemsCheckbox.IsChecked"/>
-                  </MultiBinding.Bindings>
-                </MultiBinding>
-              </CheckBox.IsEnabled>
+            <CheckBox
+                Name="ShufflePalaceItemsCheckbox"
+                IsThreeState="True" 
+                IsChecked="{Binding Config.ShufflePalaceItems}" 
+                Content="Shuffle Palace Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShufflePalaceItemsToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <CheckBox Name="PBagsInShuffleCheckbox"
-              IsEnabled="{Binding Config.ShuffleOverworldItems}"
-              IsThreeState="True" 
-              IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}" 
-              Content="Include PBag Caves In Item Shuffle" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSpellsInShuffle}" Content="Include Spells In Shuffle" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeSwordTechsInShuffle}" Content="Include Sword Techniques In Shuffle" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding Config.IncludeQuestItemsInShuffle}" Content="Include Quest Items In Shuffle" />
+            <CheckBox
+                Name="ShuffleOverworldItemsCheckbox"
+                IsThreeState="True" 
+                IsChecked="{Binding Config.ShuffleOverworldItems}" 
+                Content="Shuffle Overworld Items"
+            ><ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleOverworldItemsToolTip}"/></ToolTip.Tip>
+
+            </CheckBox>
+            <CheckBox
+                Name="MixOverworldAndPalaceItemsCheckbox"
+                IsThreeState="True"
+                IsChecked="{Binding Config.MixOverworldAndPalaceItems}"
+                Content="Mix Overworld and Palace Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixOverworldandPalaceItemsToolTip}"/></ToolTip.Tip>
+                <CheckBox.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="#ShufflePalaceItemsCheckbox.IsChecked"/>
+                            <Binding Path="#ShuffleOverworldItemsCheckbox.IsChecked"/>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </CheckBox.IsEnabled>
+            </CheckBox>
+            <CheckBox
+                Name="PBagsInShuffleCheckbox"
+                IsEnabled="{Binding Config.ShuffleOverworldItems}"
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}"
+                Content="Include P-Bag Caves in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock xml:space="preserve">Adds the 2 caves on the east and 1 cave on the west that normally contain p-bags<LineBreak/>to the shuffle pool. Those locations can contain any item and 3 p-bags (2 medium<LineBreak/>and 1 large) are added to the pool of possible items.</TextBlock></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeSpellsInShuffle}"
+                Content="Include Spells in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeSpellsinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeSwordTechsInShuffle}"
+                Content="Include Sword Techniques in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeSwordTechniquesinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeQuestItemsInShuffle}"
+                Content="Include Quest Items in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeQuestItemsinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
-          <CheckBox IsChecked="{Binding Config.ShuffleSmallItems}" Content="Shuffle Small Items" />
-          <CheckBox IsThreeState="True" IsChecked="{Binding Config.RemoveSpellItems}" Content="Start With Spell Items" />
-          <CheckBox IsThreeState="True" IsChecked="{Binding Config.ShufflePBagAmounts}" Content="Shuffle PBag Amounts" />
-          <CheckBox IsThreeState="True" IsChecked="{Binding Config.PalacesContainExtraKeys}" Content="Palaces Contain Extra Keys" />
-          <CheckBox IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}" Content="Randomize New Kasuto Jar Requirements" />
-          <CheckBox IsChecked="{Binding Config.AllowImportantItemDuplicates}" Content="Allow Duplicates Of Important Items" />
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleSmallItems}"
+                Content="Shuffle Small Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSmallItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.RemoveSpellItems}"
+                Content="Start With Spell Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.StartWithSpellItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.ShufflePBagAmounts}"
+                Content="Shuffle PBag Amounts"
+            >
+                <ToolTip.Tip><TextBlock xml:space="preserve">If selected, each of the 4 PBag sizes is assigned a new experience value between +2 and -2<LineBreak/>levels of the vanilla value.</TextBlock></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.PalacesContainExtraKeys}"
+                Content="Palaces Contain Extra Keys"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.PalacesContainExtraKeysToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}"
+                Content="Randomize New Kasuto Jar Requirements"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeNewKasutoJarRequirementsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.AllowImportantItemDuplicates}"
+                Content="Allow Duplicates of Important Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowDuplicatesofImportantItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
     </Grid>
 </UserControl>

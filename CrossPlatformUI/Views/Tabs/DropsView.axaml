@@ -6,14 +6,30 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.DropsView">
     <Grid ColumnDefinitions="*, *, *">
         <StackPanel>
-          <CheckBox IsChecked="{Binding Config.ShuffleItemDropFrequency}" Content="Shuffle Item Drop Frequency" />
-          <CheckBox IsChecked="{Binding Config.RandomizeDrops}" Content="Randomize Drops" />
-          <CheckBox IsChecked="{Binding Config.StandardizeDrops}" Content="Standardize Drops" />
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleItemDropFrequency}"
+                Content="Shuffle Item Drop Frequency"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleItemDropFrequencyToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.RandomizeDrops}"
+                Content="Randomize Drops"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeDropsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.StandardizeDrops}"
+                Content="Standardize Drops"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.StandardizeDropsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <TextBlock>Small Enemy Pool</TextBlock>

@@ -8,7 +8,6 @@
   "RemoveFlashingUponDeath": true,
   "DisableHUDLag": true,
   "Sprite": "Link",
-  "SanitizeSprite": true,
   "ChangeItemSprites": true,
   "TunicColor": "Default",
   "TunicOutlineColor": "Default",
