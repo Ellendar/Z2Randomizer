@@ -916,6 +916,8 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             properties.ShortenNormalPalaces = ShortenNormalPalaces ?? GetIndeterminateFlagValue(r);
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
+            AssignPalaceItemCounts(properties, r);
+
             //Other starting attributes
             int startHeartsMin, startHeartsMax;
             if (StartingHeartContainersMin == null)
@@ -1382,8 +1384,11 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.RandomizeKnockback = RandomizeKnockback;
 
         //"Server" side validation
-        //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML)
+        //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML?)
         //or indeterminately generated properties still correspond to sanity. Without this you get randomly ungeneratable seeds.
+
+        bool rerollPalaceItemRoomCounts = false;
+
         if (!properties.ShuffleEncounters)
         {
             properties.AllowPathEnemies = false;
@@ -1403,6 +1408,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         if (!properties.ShufflePalaceItems || !properties.ShuffleOverworldItems)
         {
             properties.MixOverworldPalaceItems = false;
+            rerollPalaceItemRoomCounts = true;
         }
 
         if (!properties.ShuffleOverworldItems)
@@ -1458,10 +1464,21 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         {
             properties.SwapUpAndDownStab = false;
         }
+    
+        if(rerollPalaceItemRoomCounts)
+        {
+            do
+            {
+                AssignPalaceItemCounts(properties, r);
+            }
+            while (!properties.HasEnoughSpaceToAllocateItems());
+        }
 
-        
-        //--This needed to be moved to the bottom because the validation could adjust some properties this relies on.--
-        
+        return properties;
+    }
+
+    public void AssignPalaceItemCounts(RandomizerProperties properties, Random r)
+    {
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
         //vs just determining min/max ranges and fair rolling between them. Keeping it for now.
         int[] palaceRoomItemsMax = [1, 1, 1, 1, 1, 1];
@@ -1525,9 +1542,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                 }
             }
         }
-
-        // string debug = JsonSerializer.Serialize(properties);
-        return properties;
     }
 
     /// Let the user know when their combination of flags will not be
