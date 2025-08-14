@@ -107,7 +107,7 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    public const bool UNSAFE_DEBUG = true;
+    public const bool UNSAFE_DEBUG = false;
     private static int DEBUG_THRESHOLD = 200;
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
@@ -1322,8 +1322,7 @@ public class Hyrule
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(westHyrule.GetMapDebug());
-                    //XXX: Debug
-                    return true;
+                    return false;
                 }
                 return false;
             }
