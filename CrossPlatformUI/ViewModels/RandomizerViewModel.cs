@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
+using CrossPlatformUI.Presets;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
@@ -150,7 +151,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     private void OnActivate(CompositeDisposable disposable)
     {
         Flags = string.IsNullOrEmpty(Main.Config.Flags)
-            ? BuiltinPreset.BeginnerPreset.Flags
+            ? BeginnerPreset.Preset.Flags
             : Main.Config.Flags?.Trim() ?? "";
 
         Main.Config.PropertyChanged += (sender, args) =>
