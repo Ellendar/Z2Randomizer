@@ -1757,8 +1757,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             // limiting here based on how long it takes to generate the seeds
             if (GPStyle == PalaceStyle.RECONSTRUCTED) { return 16; }
             if (ShortenGP != false) { return 20; }
-            if (GPStyle == PalaceStyle.SEQUENTIAL) { return 24; }
-            return 28;
+            return 24;
         }
         else
         {
