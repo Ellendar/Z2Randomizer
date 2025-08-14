@@ -15380,7 +15380,7 @@
     "connections": "FF00FF04",
     "elevatorScreen": 0,
     "enabled": true,
-    "enemies": "0B24514D514B51375101CA",
+    "enemies": "094A91004A038A05CA",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -15393,7 +15393,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83056,
-    "name": "island adventure pillar room",
+    "name": "island adventure pillar room v2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -15406,7 +15406,7 @@
         "FAIRY"
       ]
     ],
-    "sideviewData": "54600F08F7507006710691D1D10061F451F573F362F491F1D215D11050F5722380F26120822490F17220722090F162F451F5722080F293F1712080F2832090F1A22082F251F561F464F451F5A220D1028120D104"
+    "sideviewData": "46600F08F7507006710691D1D10061F451F573F393F1D205D100722380F26120822490F17220722090F1752080F2742080F2832090F1A22095F163F451F5A220D1028120D104"
   },
   {
     "author": "miralupa",
@@ -15813,7 +15813,7 @@
     "enemies": "0B08D0071006976B916191",
     "sideviewData": "2C600708240A2C0AD500407F88F2A13435F480F211F9B1065170B006B10611F931F480F2417DA03485F2D907",
     "bitmask": "0F",
-    "requirements": [],
+    "requirements": ["FAIRY"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -17842,7 +17842,7 @@
     "connections": "5F79FF64",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": ["JUMP", "FAIRY"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "097E8B0D0B72D12A85",
