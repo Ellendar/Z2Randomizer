@@ -3,32 +3,41 @@ using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class BeginnerPreset
+public static class HardmodePreset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
         StartWithCandle = true,
-        StartWithLife = true,
-        MaxHeartContainers = MaxHeartsOption.EIGHT,
-        StartingHeartContainersMin = 4,
-        StartingHeartContainersMax = 4,
-        StartingTechniques = StartingTechs.DOWNSTAB,
-        StartingLives = StartingLives.Lives5,
+        StartWithCross = true,
+        ShuffleStartingItems = false,
+        StartWithFire = true,
+        ShuffleStartingSpells = false,
+        MaxHeartContainers = MaxHeartsOption.SIX,
+        StartingHeartContainersMin = 3,
+        StartingHeartContainersMax = 3,
+        StartingTechniques = StartingTechs.NONE,
+        StartingLives = StartingLives.Lives3,
         IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
-        PalacesCanSwapContinents = false,
-        ShuffleGP = false,
+        PalacesCanSwapContinents = true,
+        ShuffleGP = true,
         ShuffleEncounters = false,
+        AllowUnsafePathEncounters = false,
+        IncludeLavaInEncounterShuffle = true,
         EncounterRate = EncounterRate.HALF,
-        EastRocks = false,
-        GenerateBaguWoods = false,
+        RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
+        EastRocks = true,
+        GenerateBaguWoods = true,
         HideLessImportantLocations = true,
         RestrictConnectionCaveShuffle = true,
+        AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
-        HidePalace = false,
-        HideKasuto = false,
+        HidePalace = null,
+        HideKasuto = null,
+        ShuffleWhichLocationIsHidden = false,
+        ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
         Climate = Climates.Classic,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
@@ -39,10 +48,10 @@ public static class BeginnerPreset
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
         GPStyle = PalaceStyle.RANDOM_WALK,
         ShortenNormalPalaces = false,
-        ShortenGP = true,
+        ShortenGP = false,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev4_4Rooms = false,
+        Includev4_4Rooms = true,
         TBirdRequired = true,
         PalacesToCompleteMin = 6,
         PalacesToCompleteMax = 6,
@@ -50,56 +59,73 @@ public static class BeginnerPreset
         Global5050JarDrop = true,
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
+        RandomizeBossItemDrop = false,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
+        BlockingRoomsInAnyPalace = true,
+        HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
-        DarkLinkMinDistance = BossRoomMinDistance.SHORT,
+        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
 
         //Levels
-        AttackLevelCap = 8,
+        ShuffleAttackExperience = true,
+        ShuffleMagicExperience = true,
+        ShuffleLifeExperience = true,
+
+        AttackLevelCap = 7,
         MagicLevelCap = 8,
         LifeLevelCap = 8,
-        AttackEffectiveness = AttackEffectiveness.HIGH,
-        MagicEffectiveness = MagicEffectiveness.LOW_COST,
-        LifeEffectiveness = LifeEffectiveness.HIGH,
+        AttackEffectiveness = AttackEffectiveness.AVERAGE_LOW,
+        MagicEffectiveness = MagicEffectiveness.AVERAGE,
+        LifeEffectiveness = LifeEffectiveness.VANILLA,
 
         //Spells
+        ShuffleLifeRefillAmount = false,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = false,
-        SwapUpAndDownStab = false,
-        FireOption = FireOption.PAIR_WITH_RANDOM,
+        SwapUpAndDownStab = true,
+        FireOption = FireOption.NORMAL,
 
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        MixLargeAndSmallEnemies = false,
+        ShuffleDripperEnemy = false,
+        MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
-        EnemyXPDrops = XPEffectiveness.RANDOM_HIGH,
+
+        ShuffleEnemyHP = true,
+        ShuffleXPStealers = true,
+        ShuffleXPStolenAmount = true,
+        ShuffleSwordImmunity = true,
+        EnemyXPDrops = XPEffectiveness.VANILLA,
 
         //Items
         ShufflePalaceItems = true,
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
-        IncludePBagCavesInItemShuffle = true,
+        IncludePBagCavesInItemShuffle = false,
         IncludeSwordTechsInShuffle = false,
         IncludeQuestItemsInShuffle = false,
-        IncludeSpellsInShuffle = false,
+        IncludeSpellsInShuffle = true,
 
         ShuffleSmallItems = true,
         RemoveSpellItems = false,
         ShufflePBagAmounts = false,
-        PalacesContainExtraKeys = true,
+        PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
         AllowImportantItemDuplicates = false,
 
         //Drops
-        ShuffleItemDropFrequency = true,
-        RandomizeDrops = true,
+        ShuffleItemDropFrequency = false,
+        RandomizeDrops = false,
         StandardizeDrops = true,
+        // Keeping the small drop pool empty for the 1/8 P-Bag chance
+        LargeEnemiesCanDropRedJar = true,
+        LargeEnemiesCanDropLargeBag = true,
 
         //Hints
-        EnableHelpfulHints = true,
+        EnableHelpfulHints = false,
         EnableSpellItemHints = true,
         EnableTownNameHints = true
     };

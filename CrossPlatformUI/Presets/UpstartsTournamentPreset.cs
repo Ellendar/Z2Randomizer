@@ -9,6 +9,8 @@ public static class UpstartsTournamentPreset
     {
         //Start
         StartWithCandle = true,
+        ShuffleStartingItems = false,
+        ShuffleStartingSpells = false,
         MaxHeartContainers = MaxHeartsOption.EIGHT,
         StartingHeartContainersMin = 4,
         StartingHeartContainersMax = 4,

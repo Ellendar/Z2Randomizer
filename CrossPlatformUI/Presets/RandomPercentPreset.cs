@@ -3,7 +3,7 @@ using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class MaxRandoPreset
+public static class RandomPercentPreset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
@@ -11,58 +11,58 @@ public static class MaxRandoPreset
         ShuffleStartingItems = true,
         ShuffleStartingSpells = true,
         MaxHeartContainers = MaxHeartsOption.RANDOM,
-        StartingHeartContainersMin = 1,
+        StartingHeartContainersMin = 3,
         StartingHeartContainersMax = 8,
         StartingTechniques = StartingTechs.RANDOM,
-        StartingLives = StartingLives.Lives3,
+        StartingLives = StartingLives.LivesRandom,
         IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
-        PalacesCanSwapContinents = true,
-        ShuffleGP = true,
-        ShuffleEncounters = true,
-        AllowUnsafePathEncounters = true,
-        IncludeLavaInEncounterShuffle = true,
+        PalacesCanSwapContinents = null,
+        ShuffleGP = null,
+        ShuffleEncounters = null,
+        AllowUnsafePathEncounters = false,
+        IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = null,
-        GenerateBaguWoods = true,
-        HideLessImportantLocations = true,
-        RestrictConnectionCaveShuffle = true,
+        GenerateBaguWoods = null,
+        HideLessImportantLocations = null,
+        RestrictConnectionCaveShuffle = null,
         AllowConnectionCavesToBeBlocked = true,
-        GoodBoots = true,
+        GoodBoots = null,
         HidePalace = null,
         HideKasuto = null,
-        ShuffleWhichLocationIsHidden = true,
+        ShuffleWhichLocationIsHidden = null,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         Climate = Climates.Classic,
-        WestBiome = Biome.RANDOM_NO_VANILLA,
-        EastBiome = Biome.RANDOM_NO_VANILLA,
+        WestBiome = Biome.RANDOM,
+        EastBiome = Biome.RANDOM,
         MazeBiome = Biome.VANILLALIKE,
-        DMBiome = Biome.RANDOM_NO_VANILLA,
+        DMBiome = Biome.RANDOM,
         VanillaShuffleUsesActualTerrain = true,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
-        GPStyle = PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        GPStyle = PalaceStyle.RANDOM,
         ShortenNormalPalaces = false,
         ShortenGP = null,
-        IncludeVanillaRooms = true,
-        Includev4_0Rooms = true,
-        Includev4_4Rooms = true,
-        TBirdRequired = false,
+        IncludeVanillaRooms = null,
+        Includev4_0Rooms = null,
+        Includev4_4Rooms = null,
+        TBirdRequired = null,
         RemoveTBird = false,
         PalacesToCompleteMin = 0,
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
-        Global5050JarDrop = false,
+        Global5050JarDrop = null,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
-        HardBosses = true,
+        HardBosses = false,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
         DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
@@ -80,18 +80,18 @@ public static class MaxRandoPreset
 
         //Spells
         ShuffleLifeRefillAmount = true,
-        ShuffleSpellLocations = true,
-        DisableMagicContainerRequirements = true,
-        RandomizeSpellSpellEnemy = true,
-        SwapUpAndDownStab = false,
+        ShuffleSpellLocations = null,
+        DisableMagicContainerRequirements = null,
+        RandomizeSpellSpellEnemy = null,
+        SwapUpAndDownStab = null,
         FireOption = FireOption.RANDOM,
 
         //Enemies
-        ShuffleOverworldEnemies = true,
-        ShufflePalaceEnemies = true,
+        ShuffleOverworldEnemies = null,
+        ShufflePalaceEnemies = null,
         ShuffleDripperEnemy = true,
-        MixLargeAndSmallEnemies = true,
-        GeneratorsAlwaysMatch = true,
+        MixLargeAndSmallEnemies = null,
+        GeneratorsAlwaysMatch = false,
 
         ShuffleEnemyHP = true,
         ShuffleXPStealers = true,
@@ -100,18 +100,18 @@ public static class MaxRandoPreset
         EnemyXPDrops = XPEffectiveness.RANDOM,
 
         //Items
-        ShufflePalaceItems = true,
-        ShuffleOverworldItems = true,
-        MixOverworldAndPalaceItems = true,
-        IncludePBagCavesInItemShuffle = true,
-        IncludeSwordTechsInShuffle = false,
-        IncludeQuestItemsInShuffle = false,
-        IncludeSpellsInShuffle = false,
+        ShufflePalaceItems = null,
+        ShuffleOverworldItems = null,
+        MixOverworldAndPalaceItems = null,
+        IncludePBagCavesInItemShuffle = null,
+        IncludeSwordTechsInShuffle = null,
+        IncludeQuestItemsInShuffle = null,
+        IncludeSpellsInShuffle = null,
 
         ShuffleSmallItems = true,
-        RemoveSpellItems = false,
-        ShufflePBagAmounts = true,
-        PalacesContainExtraKeys = false,
+        RemoveSpellItems = null,
+        ShufflePBagAmounts = null,
+        PalacesContainExtraKeys = null,
         RandomizeNewKasutoJarRequirements = true,
         AllowImportantItemDuplicates = false,
 
@@ -121,8 +121,8 @@ public static class MaxRandoPreset
         StandardizeDrops = true,
 
         //Hints
-        EnableHelpfulHints = true,
-        EnableSpellItemHints = true,
-        EnableTownNameHints = true
+        EnableHelpfulHints = null,
+        EnableSpellItemHints = null,
+        EnableTownNameHints = null
     };
 }
