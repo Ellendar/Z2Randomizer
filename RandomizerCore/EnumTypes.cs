@@ -583,12 +583,12 @@ public enum BossRoomMinDistance
 {
     [Description("None")]
     NONE = 0,
-    [Description("10 rooms")]
-    SHORT = 10,
-    [Description("16 rooms")]
-    MEDIUM = 16,
+    [Description("8 rooms")]
+    SHORT = 8,
+    [Description("12 rooms")]
+    MEDIUM = 12,
     [Description("Max")]
-    MAX = 30,
+    MAX = 24,
 }
 
 public enum PalaceItemRoomCount
