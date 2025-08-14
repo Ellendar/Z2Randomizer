@@ -108,11 +108,57 @@ public class PalaceEnemyShuffler
             return cachedResult.Value;
         }
 
+        bool PositionDoomknocker(ref bool? cachedResult, Enemy<T> enemy)
+        {
+            // We want to avoid putting Doomknockers where there are low
+            // ceilings. You need a 4 high open space to jump over his maces.
+            // Basically, we're gonna check that there are 4x4 open tiles on
+            // both sides of the Doomknocker. He might be in a staircase or
+            // similar, so it doesn't have to be symmetrical.
+            if (cachedResult == null)
+            {
+                var solidGrid = GetSolidGrid<PalaceObject>();
+                var floorY = SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
+                int leftX = Math.Max(0, enemy.X - 4);
+                int upperY = Math.Max(0, floorY - 4);
+                int height = Math.Min(4, floorY + 1); // require less space if we're at the top of the screen
+                bool acceptableSpace = false;
+                for (int j = upperY; j <= upperY + 4; j++)
+                {
+                    if (SolidGridHelper.AreaIsOpen(solidGrid, leftX, j, 4, height))
+                    {
+                        acceptableSpace = true;
+                        break;
+                    }
+                }
+                if (acceptableSpace)
+                {
+                    acceptableSpace = false;
+                    int rightX = enemy.X + 1;
+                    for (int j = upperY; j <= upperY + 4; j++)
+                    {
+                        if (SolidGridHelper.AreaIsOpen(solidGrid, rightX, j, 4, height))
+                        {
+                            acceptableSpace = true;
+                            break;
+                        }
+                    }
+                    if (acceptableSpace)
+                    {
+                        enemy.Y = floorY;
+                    }
+                }
+                cachedResult = acceptableSpace;
+            }
+            return cachedResult.Value;
+        }
+
         T RerollLargeEnemyIfNeeded(Enemy<T> enemy, T swapToId)
         {
             if (room.PalaceGroup != PalaceGrouping.PalaceGp)
             {
                 bool? roomForStalfos = null;
+                bool? roomForDoomknocker = null;
                 while (true)
                 {
                     bool reroll = false;
@@ -129,8 +175,26 @@ public class PalaceEnemyShuffler
                         case EnemiesPalace125.BLUE_STALFOS:
                         case EnemiesPalace346.RED_STALFOS:
                         case EnemiesPalace346.BLUE_STALFOS:
+                            if (enemy.IdByte == EnemiesRegularPalaceShared.RED_STALFOS || enemy.IdByte == EnemiesRegularPalaceShared.BLUE_STALFOS)
+                            {
+                                reroll = false; // allowed if original enemy was a Stalfos
+                                break;
+                            }
+                            var page = enemy.Page;
+                            if ((page == 0 && room.HasLeftExit) || (page == 3 && room.HasRightExit)) // (ignoring for shortened rooms)
+                            {
+                                reroll = false; // allow it on entering sceens
+                                break;
+                            }
                             // Stalfos will get fully stuck if the ceiling is solid until y=4. If it's solid only until y=3 or y=2, it will slowly slide down.
                             reroll = !AreaIsOpen<PalaceObject>(ref roomForStalfos, enemy.X, 4, 1, Math.Max(enemy.Y - 4, 2));
+                            break;
+
+                        // Re-roll Doomknockers in hallways with low ceiling
+                        case EnemiesPalace346.DOOMKNOCKER:
+                            // Not caring about vanilla enemy positioning here because
+                            // those rooms were not made to be entered from both directions
+                            reroll = !PositionDoomknocker(ref roomForDoomknocker, enemy);
                             break;
                     }
 
