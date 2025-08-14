@@ -58,8 +58,12 @@
                                   CommandParameter="{Binding Source={x:Static presets:BeginnerPreset.Preset}}"/>
                         <MenuItem Header="Standard Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
+                        <MenuItem Header="Full Shuffle Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static presets:FullShufflePreset.Preset}}"/>
                         <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
+                        <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static presets:RandomPercentPreset.Preset}}"/>
                         <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static presets:UpstartsTournamentPreset.Preset}}"/>
                         <MenuItem Header="Load Custom Preset" Classes="SubItems"
