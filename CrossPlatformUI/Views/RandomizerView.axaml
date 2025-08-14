@@ -10,6 +10,7 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:crossPlatformUi="clr-namespace:CrossPlatformUI"
+             xmlns:presets="clr-namespace:CrossPlatformUI.Presets"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="RandomizerViewControl"
              x:DataType="viewModels:RandomizerViewModel"
@@ -54,16 +55,14 @@
                         </MenuItem>
                         <Separator />
                         <MenuItem Header="Beginner Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.BeginnerPreset}}"/>
+                                  CommandParameter="{Binding Source={x:Static presets:BeginnerPreset.Preset}}"/>
                         <MenuItem Header="Standard Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.StandardPreset}}"/>
+                                  CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
                         <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.MaxRandoPreset}}"/>
-                        <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.RandoPercentPreset}}"/>
-						<MenuItem Header="Upstarts Tournament Preset" Command="{Binding LoadPreset}"
-                                  CommandParameter="{Binding Source={x:Static crossPlatformUi:BuiltinPreset.UpstartsTournamentPreset}}"/>
-						<MenuItem Header="Load Custom Preset" Classes="SubItems"
+                                  CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
+                        <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static presets:UpstartsTournamentPreset.Preset}}"/>
+                        <MenuItem Header="Load Custom Preset" Classes="SubItems"
                                   ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="CategoryOutline" Width="24" Height="24" />
