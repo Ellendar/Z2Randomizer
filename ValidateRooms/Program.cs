@@ -233,12 +233,14 @@ void CheckEnemyPlacements<T, U>(Room room, SideviewEditable<T> sv, EnemiesEditab
 
 void CheckForFalseWalls<T>(Room room, SideviewEditable<T> sv) where T : Enum
 {
-    if (room.Group != RoomGroup.V4_4) { return; }
     foreach (var cmd in sv.Commands)
     {
         if (cmd.Id is PalaceObject.WALKTHROUGH_WALL || cmd.Id is GreatPalaceObject.WALKTHROUGH_WALL)
         {
-            Warning(room, "WalkthroughWall", $"Room uses walkthrough walls: {cmd.DebugString()}");
+            if (room.Tags == null || !room.Tags.Contains("WalkthroughWall"))
+            {
+                Warning(room, "WalkthroughWall", $"Room uses walkthrough walls: {cmd.DebugString()}");
+            }
             break;
         }
     }

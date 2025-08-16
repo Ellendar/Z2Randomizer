@@ -47,8 +47,8 @@
     "name": "P1 Left Key Deadend",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1D600F08D208A021509F709F910F08E10072917E9F529D5E937095DE0E"
   },
   {
@@ -281,8 +281,8 @@
     "name": "P1 Right Deadend Key",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600E08E300D208A2239871800F087109D10F"
   },
   {
@@ -411,8 +411,8 @@
     "name": "Vanilla P2 M23",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1D600F08D208A021509F709F910F08E10072917E9F529D5E937095DE0E"
   },
   {
@@ -489,8 +489,8 @@
     "name": "Vanilla P2 M30",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2D600E08E100D000422190217421442190217421442190217421442190217421442190217421D402830F08D10F"
   },
   {
@@ -698,8 +698,8 @@
     "name": "Vanilla P2 M28",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600E08E300D208A2239871800F087109D10F"
   },
   {
@@ -934,8 +934,8 @@
     "name": "Vanilla P3 M6",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1B601E00D6803407620980C21408450828079771810F08D30FB07F"
   },
   {
@@ -1013,8 +1013,8 @@
     "name": "P3 Dig Stairs In Breakable Blocks For Key",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
   {
@@ -1177,8 +1177,8 @@
     "name": "Vanilla P4 M16",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
   {
@@ -1281,8 +1281,8 @@
     "name": "P4 Right Deadend Key Over Lava and Fire Pillars",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "23608310D880F01F622C46B1F81F622C46B1F81F622C46B1F811D2854109520F08D10F"
   },
   {
@@ -1438,8 +1438,8 @@
     "name": "Vanilla P4 M25",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "23608310D880F01F622C46B1F81F622C46B1F81F622C46B1F811D2854109520F08D10F"
   },
   {
@@ -1490,8 +1490,8 @@
     "name": "Vanilla P4 M32",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
   {
@@ -1542,8 +1542,8 @@
     "name": "Vanilla P4 M35",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "23608310D880F01F622C46B1F81F622C46B1F81F622C46B1F811D2854109520F08D10F"
   },
   {
@@ -1725,8 +1725,8 @@
     "name": "Vanilla P5 M45",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600E08E300D208A2239871800F087109D10F"
   },
   {
@@ -1907,8 +1907,8 @@
     "name": "Segmented deadend/key room left side",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600808E2008AC26009D60FD6089071800F08"
   },
   {
@@ -1933,8 +1933,7 @@
     "name": "Segmented deadend/key room right side",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
     "sideviewData": "13600808E2008AC26009D60FD6089071800F08"
   },
   {
@@ -2089,8 +2088,8 @@
     "name": "Vanilla P5 M52",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1D600F08D208A021509F709F910F08E10072917E9F529D5E937095DE0E"
   },
   {
@@ -2115,8 +2114,8 @@
     "name": "Vanilla P5 M59",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1D600F08D208A021509F709F910F08E10072917E9F529D5E937095DE0E"
   },
   {
@@ -2141,8 +2140,8 @@
     "name": "Vanilla P5 M56",
     "palaceGroup": 1,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert", "WalkthroughWall"],
     "sideviewData": "16600808E20082C26009D60DA07F70AF80AFE300D808"
   },
   {
@@ -2271,8 +2270,8 @@
     "name": "Vanilla P6 M37",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
   {
@@ -2536,6 +2535,7 @@
     "requirements": [
       "GLOVE"
     ],
+    "tags": ["Expert", "WalkthroughWall"],
     "sideviewData": "186000106F0980C26B0980C26B0980C2B3A3680980C219B9"
   },
   {
@@ -2589,6 +2589,7 @@
     "requirements": [
       "GLOVE"
     ],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1B600010E10018B91BB9D180DA0010B780709070DC02820F0CD20F"
   },
   {
@@ -2770,8 +2771,8 @@
     "name": "Vanilla P6 M59",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "26600F10D2009699729F529FA60F089295769F529F9097A90F0C9195749B52979299E300DE0E"
   },
   {
@@ -2849,8 +2850,8 @@
     "name": "Vanilla P6 M62",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1A600E10D200605FDE80625FDE00625FE300625566254409D20F"
   },
   {
@@ -2901,8 +2902,8 @@
     "name": "GP Breakable Block Stairs And False Floor",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600F08D2088092A028659F8006F050810681916E9667B1629F80F2E300703180339035A037DE0E"
   },
   {
@@ -2979,8 +2980,8 @@
     "name": "GP Scattered Breakable Blocks Deadend",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2A600E08D200743144319031743144319031743144319031743144319031743144319031D407E300DE0F"
   },
   {
@@ -3005,8 +3006,8 @@
     "name": "Vanilla P7 M5",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600F08D2088092A028659F8006F050810681916E9667B1629F80F2E300703180339035A037DE0E"
   },
   {
@@ -3192,6 +3193,7 @@
     "requirements": [
       "GLOVE"
     ],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "42600D08D200509FE10052B3D40DD60CD20A9033A033723F8031D208B006B106B106B106B106B106B106B106B106B106B106B106D10A80319033A033D40CD20ED80F"
   },
   {
@@ -3247,8 +3249,8 @@
     "name": "Vanilla P7 M14",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600F08D2088092A028659F8006F050810681916E9667B1629F80F2E300703180339035A037DE0E"
   },
   {
@@ -3299,8 +3301,8 @@
     "name": "GP Elevator With Hidden Wall",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1C600F08E100D0087F21500AE200D00EDA0F70BC90BB0D06F0500106"
   },
   {
@@ -3325,8 +3327,8 @@
     "name": "Vanilla P7 M17",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1C600F08E100D0087F21500AE200D00EDA0F70BC90BB0D06F0500106"
   },
   {
@@ -3404,8 +3406,8 @@
     "name": "Vanilla P7 M18",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1C600F08E100D0087F21500AE200D00EDA0F70BC90BB0D06F0500106"
   },
   {
@@ -3456,8 +3458,8 @@
     "name": "Vanilla P7 M24",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1C600F08E100D0087F21500AE200D00EDA0F70BC90BB0D06F0500106"
   },
   {
@@ -3586,8 +3588,8 @@
     "name": "Vanilla P7 M21",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600F08D2088092A028659F8006F050810681916E9667B1629F80F2E300703180339035A037DE0E"
   },
   {
@@ -3792,15 +3794,14 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": true,
+    "name": "L7 Bottom Side",
     "linkedRoomName": "L7 Top Side",
     "map": 45,
     "memoryAddress": 83935,
-    "name": "L7 Bottom Side",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-      "GLOVE"
-    ],
+    "requirements": ["GLOVE"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "166005081023D408609E6F9FDD80A03F639CB1B1DC0E"
   },
   {
@@ -3819,15 +3820,14 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": true,
+    "name": "L7 Top Side",
     "linkedRoomName": "L7 Bottom Side",
     "map": 45,
     "memoryAddress": 83935,
-    "name": "L7 Top Side",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
-    "suppressWarning": ["DropTilesInNonDropRoom"],
+    "requirements": [],
+    "suppressWarning": ["DropTilesInNonDropRoom", "WalkthroughWall"],
     "sideviewData": "166005081023D408609E6F9FDD80A03F639CB1B1DC0E"
   },
   {
@@ -4065,8 +4065,8 @@
     "name": "Vanilla P7 M47",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2A600E08D200743144319031743144319031743144319031743144319031743144319031D407E300DE0F"
   },
   {
@@ -4091,8 +4091,8 @@
     "name": "Vanilla P7 M33",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1C600F08E100D0087F21500AE200D00EDA0F70BC90BB0D06F0500106"
   },
   {
@@ -4117,8 +4117,8 @@
     "name": "Vanilla P7 M34",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1C600F08E100D0087F21500AE200D00EDA0F70BC90BB0D06F0500106"
   },
   {
@@ -4196,6 +4196,7 @@
     "palaceGroup": 3,
     "palaceNumber": 7,
     "requirements": [["GLOVE", "UPSTAB"]],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
   },
   {
@@ -4222,6 +4223,7 @@
     "palaceNumber": 7,
     "requirements": [],
     "suppressWarning": ["DropTilesInNonDropRoom"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "4B600E08D408609B42004400440062B3420062C942004400929542006093802364B34000B006B106B106B106410060C7B006B106B106B1064100B006B106B106B106D10FD408920F12D80E"
   },
   {
@@ -4272,8 +4274,8 @@
     "name": "Vanilla P7 M51",
     "palaceGroup": 3,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2A600E08D200743144319031743144319031743144319031743144319031743144319031D407E300DE0F"
   },
   {
@@ -5520,8 +5522,8 @@
     "name": "roomJamGTM 11",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "21600F08D204610F08D200F01F722F84C2FA1F802F92C19BC1712FF21F89C2D704"
   },
   {
@@ -5546,8 +5548,8 @@
     "name": "roomJamGTM 12",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2B600F08D20010733071600F0870729075555DF11E905FFF1E405C835FFC1D305B7657587170739075DA0E"
   },
   {
@@ -5572,8 +5574,8 @@
     "name": "roomJamGTM 13",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "17600A08DA0BDA0CDB0DD80E8405D4088D0F0C9071D20F"
   },
   {
@@ -5910,8 +5912,8 @@
     "name": "dmInPalaces M16",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "17600E08E200D4004DC642C642C6D301D202820F08D20F"
   },
   {
@@ -6040,8 +6042,8 @@
     "name": "dmInPalaces M28",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1B600E08DE08A42422C7AF2422C7AE2422C7870F0890717109D10F"
   },
   {
@@ -6118,8 +6120,8 @@
     "name": "winterSolstice 1 M2",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600D08DA8096B19FB19EB19F71810F08D10F"
   },
   {
@@ -6144,8 +6146,8 @@
     "name": "winterSolstice 1 M3",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1F600F08D2043001600F08DA00F01F739C2600F71FA246799CF51A2000DB04"
   },
   {
@@ -6353,8 +6355,8 @@
     "name": "winterSolstice M23",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1D600F08D2043001600F08DA02D100729C2600A946799C2500DA02D104"
   },
   {
@@ -6405,8 +6407,8 @@
     "name": "winterSolstice M28",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600D08DA8096B19FB19EB19F71810F08D10F"
   },
   {
@@ -6613,8 +6615,8 @@
     "name": "winterSolstice 1 M45",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "13600D08DA8096B19FB19EB19F71810F08D10F"
   },
   {
@@ -6691,8 +6693,8 @@
     "name": "winterSolstice M52",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1D600F08D2043001600F08DA02D100729C2600A946799C2500DA02D104"
   },
   {
@@ -7461,8 +7463,8 @@
     "name": "dusterRoomJam outdoors key",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "suppressWarning": ["MultipleItemsOnPage"],
     "sideviewData": "33609F00D00EB077D2E04007470713073807362BA02B2208402750C3902757C3650721075C081507A033820F0890317109D10F"
   },
@@ -7488,8 +7490,8 @@
     "name": "dusterRoomJam M3",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "27600F08D2082082A021910F0822C8218B2CC82182A121D20AD402D404D406DC04D202D20ADC0E"
   },
   {
@@ -7643,6 +7645,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": ["GLOVE"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "54600D08D200509F709FE10052B370B3D40DD20BD209D200A2339133813371336133A00651339006413780067106610651065106513360066133700671338006813390069133A006A133D609D20BD20D7291D20F"
   },
   {
@@ -7717,8 +7720,8 @@
     "name": "link7777RoomJam M16",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600F08E200DC0B560A7021D20F90B171B1F25000060106"
   },
   {
@@ -7743,8 +7746,8 @@
     "name": "link7777RoomJam M17",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600F08E200DC0B560A7021D20F90B171B1F25000060106"
   },
   {
@@ -7769,8 +7772,8 @@
     "name": "link7777RoomJam M18",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600F08E200DC0B560A7021D20F90B171B1F25000060106"
   },
   {
@@ -7821,8 +7824,8 @@
     "name": "link7777RoomJam M24",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600F08E200DC0B560A7021D20F90B171B1F25000060106"
   },
   {
@@ -8000,8 +8003,8 @@
     "name": "link7777RoomJam M33",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600F08E200DC0B560A7021D20F90B171B1F25000060106"
   },
   {
@@ -8026,8 +8029,8 @@
     "name": "link7777RoomJam M34",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600F08E200DC0B560A7021D20F90B171B1F25000060106"
   },
   {
@@ -8129,8 +8132,8 @@
     "name": "link7777RoomJam M42",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "5E600A0870939093D208F2115122619080909090F114642271909090F114742281909090F11484229190F1149422A120F112A32BD20EF35000060106D408F11F90318131413C70315131603A913971C175C15231713181319131F110D10F"
   },
   {
@@ -9004,6 +9007,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "2A600E08D60820D821D85194709690980CB7A0318431A5318531A5318531A531D50EF15080068106D10F"
   },
   {
@@ -9055,6 +9059,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [["GLOVE", "DOWNSTAB", "UPSTAB"]],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "2A600E08D60820D821D85194709690980CB7A0318431A5318531A5318531A531D50EF15080068106D10F"
   },
   {
@@ -9874,8 +9879,8 @@
     "name": "winterSolsticeGP M26",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "32600F08D20E83F2D10B600153F5D10820AF23F8D108530024F825AF500025F8550025F821AA530024F8D40B50F5D40E80F2"
   },
   {
@@ -9900,8 +9905,8 @@
     "name": "winterSolsticeGP M28",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "32600F08D20E83F2D10B600153F5D10820AF23F8D108530024F825AF500025F8550025F821AA530024F8D40B50F5D40E80F2"
   },
   {
@@ -9926,8 +9931,8 @@
     "name": "winterSolsticeGP M30",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "32600F08D20E83F2D10B600153F5D10820AF23F8D108530024F825AF500025F8550025F821AA530024F8D40B50F5D40E80F2"
   },
   {
@@ -9977,8 +9982,8 @@
     "name": "winterSolsticeGP M39",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "32600F08D20E83F2D10B600153F5D10820AF23F8D108530024F825AF500025F8550025F821AA530024F8D40B50F5D40E80F2"
   },
   {
@@ -11667,8 +11672,8 @@
     "name": "easternShadow M2",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "1A600E08DB08D10EDB08D10EDB08D10EDE08A22398717109D10F"
   },
   {
@@ -12270,8 +12275,8 @@
     "name": "flippedGp M1",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600E08D208A637923582337231629FE200609686F261B1629F8C91A028F250800681068392D30F"
   },
   {
@@ -12374,8 +12379,8 @@
     "name": "flippedGp M4",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2A600F08D207E100D200423190317431443190317431443190317431443190317431443190317431D60E"
   },
   {
@@ -12400,8 +12405,8 @@
     "name": "flippedGp M5",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600E08D208A637923582337231629FE200609686F261B1629F8C91A028F250800681068392D30F"
   },
   {
@@ -12555,6 +12560,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": ["GLOVE"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "42600F08D40ED70CD20A9133A033723F8031D208B006B106B106B106B106B106B106B106B106B106B106B106D10A80319033A033D40CD20DD60050B3549FE300DE0D"
   },
   {
@@ -12629,8 +12635,8 @@
     "name": "flippedGp M14",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600E08D208A637923582337231629FE200609686F261B1629F8C91A028F250800681068392D30F"
   },
   {
@@ -12681,8 +12687,8 @@
     "name": "flippedGp M16",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1A600F08F7500006010671BC91BBDC0D6921D108400AE300D00F"
   },
   {
@@ -12707,8 +12713,8 @@
     "name": "flippedGp M17",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1A600F08F7500006010671BC91BBDC0D6921D108400AE300D00F"
   },
   {
@@ -12733,8 +12739,8 @@
     "name": "flippedGp M18",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1A600F08F7500006010671BC91BBDC0D6921D108400AE300D00F"
   },
   {
@@ -12811,8 +12817,8 @@
     "name": "flippedGp M21",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "28600E08D208A637923582337231629FE200609686F261B1629F8C91A028F250800681068392D30F"
   },
   {
@@ -13120,8 +13126,8 @@
     "name": "flippedGp M33",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1A600F08F7500006010671BC91BBDC0D6921D108400AE300D00F"
   },
   {
@@ -13146,8 +13152,8 @@
     "name": "flippedGp M34",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "1A600F08F7500006010671BC91BBDC0D6921D108400AE300D00F"
   },
   {
@@ -13303,6 +13309,7 @@
     "palaceNumber": 7,
     "requirements": [],
     "suppressWarning": ["DropTilesInNonDropRoom"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "4B600E08D408980F12D20FD40860C7B006B106B1064100B006B106B106B1064100B00661B3B006B106B1064100B006619380239095430061C94300440063B34100639B410044004400D30E"
   },
   {
@@ -13328,6 +13335,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [["GLOVE", "UPSTAB"]],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "4B600E08D408980F12D20FD40860C7B006B106B1064100B006B106B106B1064100B00661B3B006B106B1064100B006619380239095430061C94300440063B34100639B410044004400D30E"
   },
   {
@@ -13422,13 +13430,14 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
+    "name": "Reverse L7 Bottom Side",
     "linkedRoomName": "Reverse L7 Top Side",
     "map": 45,
     "memoryAddress": 83935,
-    "name": "Reverse L7 Bottom Side",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": ["GLOVE"],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "18600E08E100D080609CA03FBAB1639FD3086D9EDF051023"
   },
   {
@@ -13447,15 +13456,15 @@
     "isEntrance": false,
     "isThunderBirdRoom": false,
     "isUpDownReversed": false,
+    "name": "Reverse L7 Top Side",
     "linkedRoomName": "Reverse L7 Bottom Side",
     "map": 45,
     "memoryAddress": 83935,
-    "name": "Reverse L7 Top Side",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
-    "suppressWarning": ["DropTilesInNonDropRoom"],
+    "requirements": [],
+    "suppressWarning": ["DropTilesInNonDropRoom", "WalkthroughWall"],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "18600E08E100D080609CA03FBAB1639FD3086D9EDF051023"
   },
   {
@@ -13506,8 +13515,8 @@
     "name": "flippedGp M47",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2A600F08D207E100D200423190317431443190317431443190317431443190317431443190317431D60E"
   },
   {
@@ -13610,8 +13619,8 @@
     "name": "flippedGp M51",
     "palaceGroup": null,
     "palaceNumber": 7,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["LongDeadEnd"],
     "sideviewData": "2A600F08D207E100D200423190317431443190317431443190317431443190317431443190317431D60E"
   },
   {
@@ -13856,6 +13865,7 @@
       "GLOVE",
       "FAIRY"
     ],
+    "tags": ["Expert"],
     "sideviewData": "5D600310602570221183D2009109F21F506B26008009A0C2664061511184A140F11F6053B2424230503060423139A2406143520F00A2406142F11F41305030B04261531184A34061516240516B25008009A0C2F115662211839009D205"
   },
   {
@@ -14036,8 +14046,8 @@
     "name": "Royal Lava Item Room",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "4D600F10D20010845044420F0060C4F31FA23121C360505350A0304350A1305350A130F21F21C36052A1301384A1307152F21FA130825221C5A1307352A1309452A030A352148456097021D20E"
   },
   {
@@ -14193,8 +14203,8 @@
     "name": "False Floors",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "tags": ["WalkthroughWall"],
     "sideviewData": "2D600E08D0F84300842390C162734278720166C441A14278497AA10F0C4AA1427860C476026173822393C14400"
   },
   {
@@ -14272,6 +14282,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "41608110008F4300D480F01FA05B833042007233028FA45C6133F21F430080304233048FA23B5153F41F41003253068B5153A03A4500F1144153920F126102D187"
   },
   {
@@ -14560,6 +14571,7 @@
     "palaceGroup": null,
     "palaceNumber": null,
     "requirements": [],
+    "tags": ["Expert"],
     "sideviewData": "37600E08D200A440F11E905EA340A440820F0AA2408481A02172819073628B708D8287613597758481F21E905EA340A440A440A440D50E"
   },
   {
@@ -15564,6 +15576,7 @@
     "palaceNumber": null,
     "requirements": [],
     "suppressWarning": ["WalkthroughWall"],
+    "tags": ["WalkthroughWall", "LongDeadEnd"],
     "sideviewData": "24600F10E100D080A06FC01F342140225023627F81ADA96FC01F542121203071AB6FC01F"
   },
   {
@@ -15839,6 +15852,7 @@
     "sideviewData": "3C600B1080269076D40010701120F21F7251845072545651F21F705082517352122273515350F31C4050625587507150F3149051A52011201170D10E",
     "bitmask": "0B",
     "requirements": [],
+    "tags": ["Expert"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -16665,6 +16679,7 @@
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": [],
+    "tags": ["Expert"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B1D23196315A30F4D034D",
@@ -16690,6 +16705,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["LongDeadEnd"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "094C40194A198A0E07",
@@ -16840,6 +16856,7 @@
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": [],
+    "tags": ["Expert"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B224C735D4F852F4C779D",
@@ -16941,6 +16958,7 @@
     "hasDrop": false,
     "elevatorScreen": 3,
     "requirements": [],
+    "tags": ["LongDeadEnd"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0B3D8A368E79467A9F70CE",
@@ -17291,6 +17309,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "0D7A464F4E404E6D865D1B4B9B",
@@ -17466,6 +17485,7 @@
     "hasDrop": false,
     "elevatorScreen": 2,
     "requirements": [],
+    "tags": ["WalkthroughWall"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "05238E3E86",
@@ -17994,6 +18014,7 @@
     "hasDrop": false,
     "elevatorScreen": 2,
     "requirements": [],
+    "tags": ["Expert"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "050D861646",
@@ -18070,6 +18091,7 @@
     "elevatorScreen": -1,
     "requirements": [],
     "suppressWarning": ["BackgroundPalette"],
+    "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "091D8F124F12DB1C1B",
@@ -18096,6 +18118,7 @@
     "elevatorScreen": -1,
     "requirements": [],
     "suppressWarning": ["BackgroundPalette"],
+    "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0901C7058709470D07",
@@ -18223,6 +18246,7 @@
     "elevatorScreen": 0,
     "requirements": [],
     "suppressWarning": ["WalkthroughWall"],
+    "tags": ["WalkthroughWall"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "050B560496",
@@ -18323,6 +18347,7 @@
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["WalkthroughWall"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0916D8191803CC0C0C",
@@ -18374,6 +18399,7 @@
     "elevatorScreen": 3,
     "requirements": [],
     "suppressWarning": ["WalkthroughWall"],
+    "tags": ["WalkthroughWall"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "033F45",
@@ -19901,6 +19927,7 @@
     "sideviewData": "61600F08D1F1920F08D3F0412043204320D101D200902182210143114020407028614180C21144504421406022210280C221400143604181C21140204081219221D201D200A423D808A22BD10AD108D10AD10CD10AD10D9022D109D10BD30DD20E",
     "bitmask": "0F",
     "requirements": [],
+    "tags": ["LongDeadEnd"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -20177,6 +20204,7 @@
     "hasDrop": false,
     "elevatorScreen": -1,
     "requirements": [],
+    "tags": ["Expert"],
     "isDropZone": true,
     "hasItem": false,
     "enemies": "037A60",
@@ -20304,6 +20332,7 @@
     "sideviewData": "44600E08D208F312510024C89090F11E905E5300A0405400A0405400A04024C890905300550023C89090F11E905E5300A0405400A0405400A04024C89090F3125100D50E",
     "bitmask": "0F",
     "requirements": [],
+    "tags": ["Expert"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -20329,6 +20358,7 @@
     "sideviewData": "21600F08E200DD08F017700F088030907091565300A04024C89090F3125100D50E",
     "bitmask": "0F",
     "requirements": [],
+    "tags": ["Expert"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -20354,6 +20384,7 @@
     "sideviewData": "1F600E08D208F312510024C89090F11790565300A040740F0880309070D10F",
     "bitmask": "0F",
     "requirements": [],
+    "tags": ["Expert"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
