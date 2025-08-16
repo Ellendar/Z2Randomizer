@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Z2Randomizer.RandomizerCore;
@@ -58,7 +59,6 @@ void ValidateRoomsForFile(string filename)
         CheckEnemyPlacements(room, sv, ee);
         CheckForFalseWalls(room, sv);
 
-        if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
         // a lot can probably be rewritten to use this now instead of doing their own checks
         bool[,] solidGrid = sv.CreateSolidGrid();
 
@@ -100,8 +100,6 @@ void ValidateRoomsForFile(string filename)
         CheckDoorsAndItems(room, sv, ee);
         CheckEnemyPlacements(room, sv, ee);
         CheckForFalseWalls(room, sv);
-
-        if (sv.BackgroundMap != 0) { continue; /* Not supporting built-in "background" maps */ }
 
         // a lot can probably be rewritten to use this now instead of doing their own checks
         bool[,] solidGrid = sv.CreateSolidGrid();
@@ -393,6 +391,7 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         // from the default elevator y start position
         int x = o.AbsX;
         int y = 8;
+        Debug.Assert(x < 64);
         for (; y < 13; y++)
         {
             if (solidGrid[x, y]) { break; }
@@ -580,7 +579,10 @@ static string ConvertToRangeString(IEnumerable<int> numbers)
 string FixedOverflowCommandString<T>(SideviewEditable<T> sv, SideviewMapCommand<T> cmd) where T : Enum
 {
     cmd.AbsX = Math.Min(63, cmd.AbsX);
-    cmd.Param = 63 - cmd.AbsX;
+    if (cmd.HasParam())
+    {
+        cmd.Param = 63 - cmd.AbsX;
+    }
     var newBytes = sv.Finalize();
     return $"Fixed bytes:\n{Convert.ToHexString(newBytes)}\n\n";
 }
