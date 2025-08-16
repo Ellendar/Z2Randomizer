@@ -629,6 +629,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         UseCustomRooms = false;
         DisableHUDLag = false;
         this.WhenAnyPropertyChanged()
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Throttle(TimeSpan.FromMilliseconds(10))
             .Select(_ => Serialize())
             .ToProperty(this, nameof(Flags));
