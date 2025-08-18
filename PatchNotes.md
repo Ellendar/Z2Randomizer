@@ -2,40 +2,47 @@
 
 ## Version 5.0 - ???
 
-### BETA SPECIFIC NOTES
-- The 4.4 rooms are still very rough. Please let me know rooms you like/hate so they can be fixed/removed.
-- Some of the changes from very recent versions of 4.3 have not been applied yet. You may see some weirdness from this (like the anti-lag glove being back.) Expect this to be fixed in the next beta releases
-- Batch generation is not in the new UI yet. Should be back next release.
-
-### New Features
+### Major Features
 - Rebuilt the User Interface - This new interface is more customizable than the old one and should allow more improvements in the future.
-- New web version! (BETA: Not yet but it's close) Check it out at (LINK)
-- New palace rooms from the 4.4 Room Jam.
+- New Web Version - Check it out at <link>
+- Added over 100 new palace rooms from the 4.4 Room Jam.
+	-
 - Added options to add additional items to the item pool.
 	- Include spells in shuffle - Wizards can give normal items and spells can be found out in the world
-		- If helpful hints are on, this option adds 1 hint that always contains the location of one of reflect/fairy/thunder spell.
 	- Include Sword Techniques in Shuffle - Up/Down stab can be found in the world and their trainers could hand out other items.
 	- Include Quest Items in Shuffle - Saria's mirror table, the fountain in Nabooru, and bagu all have any item, and their items could be out in the world.
-		- If spell item hints are on, the Nabooru and Saria door ladies will provide a hint where their required items are.
 - New palace styles
 	- Sequential - Like reconstructed, rooms are picked from the pool at random and placed into the palace, except in a way where the geometry of the palace makes sense. If you go up -> right -> down -> left, you will always end up back where you started.
-	- Random walk - Creates a random dungeon shape, and then fills that shape up with rooms that fit. Like sequential this style has sane geometry. Generally creates palaces with fewer dead ends, but more chances for long paths.
+	- Random walk - Creates a random dungeon shape, and then fills that shape up with rooms that fit. Like sequential this style has sane geometry. Generally creates palaces with fewer dead ends, and a more centralized shape.
 	- Chaos - An evil palace style where any exit can lead to any room. You're guaranteed to be able to get to all rooms, but going back the way you came is not guaranteed to lead you to the room you were in before. This style is never selected with any random option.
 	- Random (All Same) - All palaces use the same style, chosen at random.
 	- Random (Per Palace) - Each palace selects its own style randomly.
 - Added an option to generate a spoiler log. If selected a .spoiler file will be generated with the same name as the output ROM. Seeds generated with spoiler log on will be completely different than seeds with spoilers off.
-- Added an option to shorten normal palaces.
-- Re-enabled the ability to shorten vanilla palaces.
+- Palaces can now have more (or fewer) item rooms. Select 0/1/2 or random in the palaces tab.
+- Added an option to add additional copies of important items. These replace minor items as available.
+- Added a statistics screen after the ending.
+
+### More New Features
 - Starting items/spells can now be limited
 	- If the number of selected starting items is greater than the limit, items will be randomly removed down to the limit. 
 	- If shuffle starting items is on and there are fewer selected starting items than the limit, the number of starting items may be less than or equal to the limit.
 - Random flag rate is now configurable. Any ? flags have the indicated percent chance (either 25/50/75/90%) to be turned on.
 - River devil has learned some new tricks! He may now block paths (like vanilla), one of the east caves, or siege one of the towns.
 - Added a setting to allow rock blocks in the east.
+- Added an option to shorten normal palaces.
+- Re-enabled the ability to shorten vanilla palaces.
+- Added an option to have palaces continue after bosses at random. 
+	- All boss rooms now have a statue at the end if the palace exits, and none if it continues.
+- Added an option to limit dripper RNG.
+- Added an option to require a minimum length of the path to dark link.
+- Added options for random(high/low) for attack/magic/life effectiveness.
+- Added an option to change the outline color for player sprites
 - Added new sprites. Thanks to the authors for providing them.
+	- Alex (River City Ransom)
 	- Alucard
 	- Barba
 	- Beard Link
+	- Faxanadu
 	- Garfield
 	- Gooma
 	- Helmethead
@@ -55,7 +62,13 @@
 	
 ### Enhancements / bugfixes
 - Improvements to the command line interface to better support other OSes.
-- Added the ability to load settings via JSON file instead of a flag string (BETA: Not in this release)
+- Added the ability to load settings via JSON file instead of a flag string
+- Adjusted the damage on some enemies that had unintended damage values in GP
+- Innumerable technical improvements to speed up generation time
+- Fixed garbled sprites on horsehead / rebonack appearing outside their palaces.
+- Enemies that are immune to sword are now always vulnerable to fire.
+- Fixed the hitbox on lava so it no longer extends a tile above the lava.
+- Restricted some
 
 ## Version 4.3.19 - April 20, 2025
 
