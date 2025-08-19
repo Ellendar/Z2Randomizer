@@ -361,7 +361,7 @@ public class Location
             return Continent == Continent.WEST ? 4 : 10;
         }
         //king's tomb - Get a better signal for this later
-        if (MemAddress == 0x465B)
+        if (MemAddress == RomMap.WEST_KINGS_TOMB_TILE_LOCATION)
         {
             return 4;
         }
