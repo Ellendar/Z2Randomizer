@@ -265,7 +265,7 @@ public sealed class WestHyrule : World
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
-        if (props.HideLessImportantLocations)
+        if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
         {
             unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_AT_START_LOCATION));
             unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_BY_SARIA_LOCATION));
@@ -711,8 +711,7 @@ public sealed class WestHyrule : World
 
                 BlockCaves(props.BoulderBlockConnections);
                 //Debug.WriteLine(GetMapDebug());
-                PlaceHiddenLocations();
-
+                PlaceHiddenLocations(props.LessImportantLocationsOption);
 
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {

@@ -172,7 +172,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private bool? shuffleWhichLocationIsHidden;
 
     [Reactive]
-    private bool? hideLessImportantLocations;
+    private LessImportantLocationsOption lessImportantLocationsOption;
 
     [Reactive]
     private bool? restrictConnectionCaveShuffle;
@@ -1177,6 +1177,21 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.ShuffleHidden = ShuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
         properties.CanWalkOnWaterWithBoots = GoodBoots ?? GetIndeterminateFlagValue(r);
         properties.BagusWoods = GenerateBaguWoods ?? GetIndeterminateFlagValue(r);
+        if (lessImportantLocationsOption == LessImportantLocationsOption.RANDOM)
+        {
+            properties.LessImportantLocationsOption = r.Next(3) switch
+            {
+                0 => LessImportantLocationsOption.HIDE,
+                1 => LessImportantLocationsOption.ISOLATE,
+                2 => LessImportantLocationsOption.REMOVE,
+                _ => throw new ImpossibleException("Invalid LessImportantLocationsOption random option in Export")
+            };
+        }
+        else
+        {
+            properties.LessImportantLocationsOption = LessImportantLocationsOption;
+        }
+
         if(RiverDevilBlockerOption == RiverDevilBlockerOption.RANDOM)
         {
             properties.RiverDevilBlockerOption = r.Next(3) switch
@@ -1192,6 +1207,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             properties.RiverDevilBlockerOption = RiverDevilBlockerOption;
         }
         properties.EastRocks = EastRocks ?? GetIndeterminateFlagValue(r);
+        properties.SaneCaves = RestrictConnectionCaveShuffle ?? GetIndeterminateFlagValue(r);
 
         properties.StartGems = r.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
         properties.RequireTbird = TBirdRequired ?? GetIndeterminateFlagValue(r);
@@ -1281,8 +1297,6 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.MagicCap = MagicLevelCap;
         properties.LifeCap = LifeLevelCap;
         properties.ScaleLevels = ScaleLevelRequirementsToCap;
-        properties.HideLessImportantLocations = HideLessImportantLocations ?? GetIndeterminateFlagValue(r);
-        properties.SaneCaves = RestrictConnectionCaveShuffle ?? GetIndeterminateFlagValue(r);
         properties.SpellEnemy = RandomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
 
         //Items

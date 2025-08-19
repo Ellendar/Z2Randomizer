@@ -96,13 +96,14 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateBagusWoodsToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.HideLessImportantLocations}"
-                Content="Hide Less Important Locations"
+			<ComboBox
+                Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Less Important Locations"
+                ItemsSource="{Binding Source={x:Static rc:Enums.LessImportantLocationsOptionList}}"
+                SelectedItem="{Binding Config.LessImportantLocationsOption, Converter={x:Static ui:Util.EnumConvert}}"
             >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.HideLessImportantLocationsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LessImportantLocationsToolTip}"/></ToolTip.Tip>
+			</ComboBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox

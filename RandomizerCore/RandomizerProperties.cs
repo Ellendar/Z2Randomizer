@@ -149,7 +149,7 @@ public class RandomizerProperties
     public int MagicCap { get; set; }
     public int LifeCap { get; set; }
     public bool ScaleLevels { get; set; }
-    public bool HideLessImportantLocations { get; set; }
+    public LessImportantLocationsOption LessImportantLocationsOption { get; set; }
     public bool SaneCaves { get; set; }
     public bool SpellEnemy { get; set; }
 

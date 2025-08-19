@@ -27,7 +27,7 @@ public static class MaxRandoPreset
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = null,
         GenerateBaguWoods = false,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,

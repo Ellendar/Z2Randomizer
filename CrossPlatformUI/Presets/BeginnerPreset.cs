@@ -24,7 +24,7 @@ public static class BeginnerPreset
         EncounterRate = EncounterRate.HALF,
         EastRocks = false,
         GenerateBaguWoods = false,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         GoodBoots = true,
         HidePalace = false,

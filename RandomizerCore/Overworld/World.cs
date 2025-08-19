@@ -576,33 +576,52 @@ public abstract class World
         return true;
     }
 
-    public void PlaceHiddenLocations()
+    public void PlaceHiddenLocations(LessImportantLocationsOption lessImportantLocationsOption)
     {
-        foreach (Location location in unimportantLocs)
+        switch (lessImportantLocationsOption)
         {
-            if (location.CanShuffle)
-            {
-                int tries = 0;
-                int x, y;
-                do
+            case LessImportantLocationsOption.REMOVE:
+                foreach (Location location in unimportantLocs)
                 {
-                    x = RNG.Next(MAP_COLS);
-                    y = RNG.Next(MAP_ROWS);
-                    tries++;
-                } while ((map[y, x] != location.TerrainType || GetLocationByCoords((y + 30, x)) != null) && tries < 2000);
+                    if (location.CanShuffle)
+                    {
+                        location.ExternalWorld = 0;
+                        location.Ypos = 0;
+                        location.appear2loweruponexit = 0;
+                        location.Secondpartofcave = 0;
+                        location.Xpos = 0;
+                        location.CanShuffle = false;
+                    }
+                }
+                return;
+            case LessImportantLocationsOption.HIDE:
+                foreach (Location location in unimportantLocs)
+                {
+                    if (location.CanShuffle)
+                    {
+                        int tries = 0;
+                        int x, y;
+                        do
+                        {
+                            x = RNG.Next(MAP_COLS);
+                            y = RNG.Next(MAP_ROWS);
+                            tries++;
+                        } while ((map[y, x] != location.TerrainType || GetLocationByCoords((y + 30, x)) != null) && tries < 2000);
 
-                if (tries < 2000)
-                {
-                    location.Xpos = x;
-                    location.Ypos = y + 30;
+                        if (tries < 2000)
+                        {
+                            location.Xpos = x;
+                            location.Ypos = y + 30;
+                        }
+                        else
+                        {
+                            location.Xpos = 0;
+                            location.Ypos = 0;
+                        }
+                        location.CanShuffle = false;
+                    }
                 }
-                else
-                {
-                    location.Xpos = 0;
-                    location.Ypos = 0;
-                }
-                location.CanShuffle = false;
-            }
+                return;
         }
     }
 

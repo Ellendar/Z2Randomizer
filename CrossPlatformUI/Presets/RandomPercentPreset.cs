@@ -27,7 +27,7 @@ public static class RandomPercentPreset
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = null,
         GenerateBaguWoods = null,
-        HideLessImportantLocations = null,
+        LessImportantLocationsOption = LessImportantLocationsOption.RANDOM,
         RestrictConnectionCaveShuffle = null,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = null,

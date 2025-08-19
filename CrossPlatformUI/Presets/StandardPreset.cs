@@ -27,7 +27,7 @@ public static class StandardPreset
         EncounterRate = EncounterRate.HALF,
         EastRocks = false,
         GenerateBaguWoods = true,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
