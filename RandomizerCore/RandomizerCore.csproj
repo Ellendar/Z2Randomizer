@@ -2,37 +2,16 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <UpdateUrl>https://sites.google.com/site/z2randomizer/</UpdateUrl>
-    <PublisherName>Doug Shook</PublisherName>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.9.0.0</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <PublishWizardCompleted>true</PublishWizardCompleted>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>false</UseWindowsForms>
     <Platforms>AnyCPU;x64</Platforms>
     <Nullable>enable</Nullable>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <ManifestCertificateThumbprint>22CC5DF6B2071FFA83917B5AAC93AE355BED01D9</ManifestCertificateThumbprint>
-    <ManifestKeyFile>Z2Randomizer_1_TemporaryKey.pfx</ManifestKeyFile>
-    <GenerateManifests>true</GenerateManifests>
-    <SignManifests>false</SignManifests>
-    <Version>4.4.8</Version>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Z2Randomizer.RandomizerCore</RootNamespace>
   </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Asm\DashSpell.s" />
     <None Remove="Asm\ExpandedPauseMenu.s" />
@@ -45,43 +24,42 @@
     <None Remove="Asm\MMC5.s" />
     <None Remove="Asm\z2r.inc" />
     <None Remove="Asm\z2rndft.ips" />
+
+    <None Update="Music\README.txt" CopyToOutputDirectory="PreserveNewest" />
+
     <None Update="Sprites\*.ips" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
   <ItemGroup>
     <Content Include="nlog.config" CopyToOutputDirectory="Always" />
-    <Content Include="*.json">
+    <Content Include="PalaceRooms.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Content Include="js65\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
-    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" />
-    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" />
-    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" />
-    <PackageReference Include="ReactiveUI" Version="20.1.1" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Linux'))" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('OSX'))" />
+    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
+    <PackageReference Include="ReactiveUI" Version="20.4.1" />
     <PackageReference Include="ReactiveUI.SourceGenerators" Version="2.3.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
-    <PackageReference Include="NLog" Version="5.2.6" />
+    <PackageReference Include="NLog" Version="6.0.3" />
+    <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="Asm\*.s" />
     <EmbeddedResource Include="Asm\Graphics\item_sprites.chr" />
     <EmbeddedResource Include="Asm\Graphics\randomizer_text.chr" />
     <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Music\README.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>
