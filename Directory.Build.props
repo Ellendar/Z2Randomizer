@@ -9,10 +9,15 @@
 <!--    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>-->
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableWorkloadRestore>true</EnableWorkloadRestore>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
 
     <PublishTrimmed>false</PublishTrimmed>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
-  </PropertyGroup>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Workload Include="wasm-tools" />
+    </ItemGroup>
 </Project>
