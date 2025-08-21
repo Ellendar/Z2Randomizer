@@ -23,9 +23,9 @@
         <WasmExtraFilesToDeploy Include="wwwroot\**" />
     </ItemGroup>
     <ItemGroup>
-        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Sprites\**" />
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Sprites\**" TargetPath="Sprites\%(Filename)%(Extension)" />
         <WasmExtraFilesToDeploy Include="..\RandomizerCore\PalaceRooms.json" />
-        <WasmExtraFilesToDeploy Include="..\RandomizerCore\js65\**" TargetPath="js65\%(RecursiveDir)\%(Filename)%(Extension)" />
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Asm\**" TargetPath="Asm\%(RecursiveDir)\%(Filename)%(Extension)" />
     </ItemGroup>
     <ItemGroup>
       <None Remove="wwwroot\index.html" />

@@ -1,10 +1,12 @@
-﻿using System.Runtime.Versioning;
-using System.Threading.Tasks;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Browser;
 using Avalonia.ReactiveUI;
 using CrossPlatformUI.Services;
+using js65;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Versioning;
+using System.Threading.Tasks;
+using Z2Randomizer.RandomizerCore;
 
 [assembly: SupportedOSPlatform("browser")]
 
@@ -18,8 +20,8 @@ internal sealed partial class Program
         .AfterSetup(_ =>
         {
             App.ServiceContainer ??= new ();
-            //XXX: We broke the web version. We'll fix it later.
-            //App.ServiceContainer.AddSingleton<IAsmEngine>(x => new BrowserJsEngine());
+            // not sure if this will be possible using js65.BrowserJsEngine, but using it for now
+            App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>((opts, debug) => new BrowserJsEngine(opts));
             App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService!);
             App.FileSystemService = new BrowserFileService();
             // App.SyncSuspensionDriver = new LocalStoragePersistenceService();
