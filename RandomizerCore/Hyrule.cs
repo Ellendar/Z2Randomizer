@@ -4129,6 +4129,27 @@ World0:
         {
             ROMData.ApplyIps(
                 Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2rndft.ips"));
+            // really hacky workaround but i don't want to recompile z2ft
+            // z2ft is compiled using an old address for NmiBankShadow8 and NmiBankShadowA so rather than
+            // recompile that, I'm just gonna patch it here...
+            const byte LDA_ABS = 0xAD;
+            const byte STA_ABS = 0x8D;
+
+            void PatchAddress(byte opcode, int before, int after)
+            {
+                var idx = 0;
+                var needle = new ReadOnlySpan<byte>([opcode, (byte)before, (byte)(before >> 8)]);
+                while (ROMData.rawdata.AsSpan(idx).IndexOf(needle) is var di and >= 0)
+                {
+                    ROMData.Put(idx + di, opcode, (byte)after, (byte)(after >> 8));
+                    idx += di + 1;
+                }
+            }
+
+            PatchAddress(LDA_ABS, 0x07b2, 0x6380);
+            PatchAddress(LDA_ABS, 0x07b3, 0x6381);
+            PatchAddress(STA_ABS, 0x07b2, 0x6380);
+            PatchAddress(STA_ABS, 0x07b3, 0x6381);
 
             var asm = engine.Module();
             asm.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.z2ft.s"), "z2ft.s");

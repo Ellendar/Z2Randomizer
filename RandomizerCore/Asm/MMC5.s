@@ -609,11 +609,11 @@ UPDATE_REFS SwapToPRG0 @ $C1CA $C1CE $C256 $C350 $C636 $C68B $C9EF $CCFA $D0FD $
 UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $FF4A
 
 ; z2ft uses this location
-.if !ENABLE_Z2FT
+;.if !ENABLE_Z2FT
 
 UPDATE_REFS SwapToSavedPRG @ $E002
 
-.endif
+;.endif
 
 .segment "PRG0"
 

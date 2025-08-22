@@ -188,12 +188,16 @@ RESV DripperRedCounter
 ; just hardcode the stats only to one file.
 StatTrackingSaveFileClear = $7401
 
+.export NmiBankShadow8, NmiBankShadowA
+; Reserve these in SRAM to prevent issues when clearing ram
+NmiBankShadow8 = $6380
+NmiBankShadowA = $6381
+SoftDisableNmi = $6382
+
+StatTrackingBase = $6383
+SET_RES_BASE StatTrackingBase
 
 ;; The follow stats are NOT checkpointed because they persist between reloads
-
-
-StatTrackingBase = $6380
-SET_RES_BASE StatTrackingBase
 
 ; All Timestamp types listed below for reference
 TS_COUNT .set 0
@@ -258,12 +262,6 @@ CHECKPOINT_LEN = RES_OFFSET - CHECKPOINT_START
 ; Duplicate the timestamp memory here that we'll copy after saving
 RESV Checkpoint, CHECKPOINT_LEN
 STAT_TRACKING_SIZE = RES_OFFSET
-
-.export NmiBankShadow8, NmiBankShadowA
-; Reserve these in SRAM to prevent issues when clearing ram
-RESV NmiBankShadow8, 1
-RESV NmiBankShadowA, 1
-RESV SoftDisableNmi, 1
 
 ; Reserve 256 bytes to store a sideview buffer.
 ; The sideview loading code is patched to quickly bank switch to the extended banks for palace data,
