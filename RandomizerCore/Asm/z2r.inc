@@ -1,3 +1,6 @@
+.ifndef _Z2R_INC
+_Z2R_INC = 1
+
 .macpack common
 
 ; janky macro res till it starts working
@@ -111,6 +114,22 @@ NewSideviewInit = $8cec
 ClearNametables = $d266
 JumpEngine = $d385
 
+; These are new variables that use free memory
+Z2Noise_SfxLenCounter = $07f5
+Z2Squ2_SfxLenCounter = $07f7
+Z2Squ1_SfxLenCounter = $07f9
+Z2NoiseSoundBuffer = $07fd
+Z2Square2SoundBuffer = $07fe
+Z2Square1SoundBuffer = $07ff
+
+Z2NoiseSoundQueue = $ed
+Z2Square2SoundQueue = $ee
+Z2Square1SoundQueue = $ef
+
+NoiseSoundQueue = $f0
+Square2SoundQueue = $f1
+Square1SoundQueue = $f2
+
 ;; Collectable items
 ; Hardcoded list of item ids for the new global item table.
 ; These should match the constants from the Collectables Enum
@@ -156,6 +175,7 @@ ITEM_SPELL_SPELL = $22
 ITEM_THUNDER_SPELL = $23
 ITEM_DASH_SPELL = $24
 
+
 ;; NEW VARIABLE ALLOCATIONS
 ; Stack RAM
 StackRAMBase = $0120
@@ -176,6 +196,228 @@ RESV ScrollPosForIrq
 RESV IrqSetupAlready
 
 .assert RES_BASE + RES_OFFSET < $01ad
+
+.if ENABLE_Z2_MARIO
+
+; New RAM values that aren't from vanilla SMB1 code
+RESV mapMarioIndex
+RESV mapMarioTimer
+RESV mapMarioPrevDirection
+
+;;;
+; MARIO related values that are not directly mapped to vanilla z2 object values
+
+RESV FireballCounter
+; RESV ObjectOffset
+RESV FBall_OffscreenBits
+RESV AltEntranceControl
+RESV PlayerEntranceCtrl
+RESV JoypadOverride
+RESV Vine_Height
+RESV Player_State
+RESV DisableCollisionDet
+RESV GameEngineSubroutine
+RESV AreaType
+; RESV A_B_Buttons
+A_B_Buttons = $741
+RESV PreviousA_B_Buttons
+; RESV Left_Right_Buttons
+Left_Right_Buttons = $742
+; RESV Up_Down_Buttons
+Up_Down_Buttons = $743
+RESV PlayerSize
+RESV DeathMusicLoaded
+RESV EventMusicQueue
+RESV EventMusicBuffer ; TODO use the vanilla music queues
+RESV WarpZoneControl
+; RESV Player_CollisionBits
+RESV HalfwayPage
+RESV SwimmingFlag
+RESV CurrentOAMOffset
+; RESV ObjectMetasprite
+RESV PlayerAnimCtrl
+RESV PlayerChangeSizeFlag
+RESV VerticalForceDown
+RESV VerticalForce
+RESV JumpOrigin_Y_Position
+RESV JumpOrigin_Y_HighPos
+RESV DiffToHaltJump
+RESV PlayerAnimTimerSet
+RESV JumpspringAnimCtrl
+RESV Player_XSpeedAbsolute
+; RESV Whirlpool_Flag
+RESV RunningSpeed
+RESV MaximumLeftSpeed
+RESV MaximumRightSpeed
+RESV FrictionAdderLow
+RESV FrictionAdderHigh
+RESV Player_Pos_ForScroll
+RESV Player_X_Scroll
+RESV Player_X_MoveForce
+RESV PlayerStandingMetatile ; added to keep this for door checks and other metatiles
+
+; Non-timer timer.
+RESV FireballThrowingTimer
+
+RESV TimerControl
+RESV IntervalTimerControl
+
+Timers = PlayerAnimTimer
+RESV PlayerAnimTimer
+RESV ClimbSideTimer
+RESV JumpSwimTimer
+RESV RunningTimer
+RESV SideCollisionTimer
+RESV BlockBounceTimer
+RESV ChangeAreaTimer
+FRAME_TIMER_COUNT = ChangeAreaTimer - Timers
+RESV StarInvincibleTimer
+ALL_TIMER_COUNT = StarInvincibleTimer - Timers
+
+RESV SpriteShuffleOffset
+RESV CurrentCHRBank
+RESV PlayerChrBank
+RESV ReloadCHRBank
+RESV ObjectVerticalFlip
+RESV Local_eb
+
+; Values use for SMB1 sfx audio engine
+
+RESV Sfx_SecondaryCounter
+RESV PauseSoundBuffer
+RESV PauseModeFlag
+RESV PauseSoundQueue
+RESV Square1SoundBuffer
+RESV Square2SoundBuffer
+RESV NoiseSoundBuffer
+RESV Squ1_SfxLenCounter
+RESV Squ2_SfxLenCounter
+RESV Noise_SfxLenCounter
+
+; MARIO SPECIFIC RAM LOCATIONS
+; These are values that are hardcoded to match where Zelda 2 places them
+Player_X_Speed = $70
+SprObject_X_Speed = Player_X_Speed
+Player_X_Position = $4D
+SprObject_X_Position = Player_X_Position
+Player_PageLoc = $3B
+SprObject_PageLoc = Player_PageLoc
+Player_Y_Position = $29
+SprObject_Y_Position = Player_Y_Position
+Player_Y_HighPos = $19
+SprObject_Y_HighPos = Player_Y_HighPos
+
+Player_CollisionBits = $A7
+ScrollAmount = $14
+ObjectMetasprite = $80
+
+ProjectileOffset = 13
+FireballOffset = 13
+FireballMetasprite = ObjectMetasprite + FireballOffset
+Fireball_X_Position = SprObject_X_Position + FireballOffset
+Fireball_Y_Position = SprObject_Y_Position + FireballOffset
+Fireball_Y_HighPos = SprObject_Y_HighPos + FireballOffset
+Fireball_PageLoc = SprObject_PageLoc + FireballOffset
+Fireball_X_Speed = SprObject_X_Speed + FireballOffset
+Fireball_Y_Speed = SprObject_Y_Speed + FireballOffset
+RESV FireballBouncingFlag, 2
+RESV Fireball_State, 2
+
+; For reasons I cannot explain, player_x_moveforce is not the same as sprobject_x_moveforce
+SprObject_X_MoveForce = $03d6 ; Player_X_MoveForce
+Player_Y_MoveForce = $03e6
+SprObject_Y_MoveForce = Player_Y_MoveForce
+
+Player_Y_Speed = $057D
+SprObject_Y_Speed = Player_Y_Speed
+
+FrameCounter = $12
+; CrouchingFlag = $17
+RESV CrouchingFlag
+Player_MovingDir = $5F
+PlayerFacingDir = $9F
+SavedJoypadBits = $F7
+ScreenLeft_PageLoc = $72a
+ScreenRight_PageLoc = $72b
+ScreenEdge_PageLoc = ScreenLeft_PageLoc
+ScreenLeft_X_Pos = $72c
+ScreenRight_X_Pos = $72d
+ScreenEdge_X_Pos = ScreenLeft_X_Pos
+
+InjuryTimer = $510
+NumberofLives = $0700
+; Player_SprAttrib = $0752
+; SprObject_SprAttrib = Player_SprAttrib
+ScrollLock = $0728
+
+MoveObjectHorizontally = $D1CE
+CheckForSolidMTiles = $850C
+CheckSideviewTransition = $E14A
+
+VRAM_Buffer1_Offset = $302
+VRAM_Buffer1 = $303
+
+Sprite_Y_Position = $200
+Sprite_Tilenumber = $201
+Sprite_Attributes = $202
+Sprite_X_Position = $203
+Sprite_Data = Sprite_Y_Position
+
+;; Constants
+
+CHR_BIGMARIO = $6c
+CHR_MARIOACTION = $6d
+CHR_SMALLFIRE = $6e
+CHR_SMALLMARIO = $6f
+
+A_Button              = %10000000
+B_Button              = %01000000
+Select_Button         = %00100000
+Start_Button          = %00010000
+Up_Dir                = %00001000
+Down_Dir              = %00000100
+Left_Dir              = %00000010
+Right_Dir             = %00000001
+
+;sound effects constants
+Sfx_SmallJump         = %10000000
+Sfx_Flagpole          = %01000000
+Sfx_Fireball          = %00100000
+Sfx_PipeDown_Injury   = %00010000
+Sfx_EnemySmack        = %00001000
+Sfx_EnemyStomp        = %00000100
+Sfx_Bump              = %00000010
+Sfx_BigJump           = %00000001
+
+Sfx_BowserFall        = %10000000
+Sfx_ExtraLife         = %01000000
+Sfx_PowerUpGrab       = %00100000
+Sfx_TimerTick         = %00010000
+Sfx_Blast             = %00001000
+Sfx_GrowVine          = %00000100
+Sfx_GrowPowerUp       = %00000010
+Sfx_CoinGrab          = %00000001
+
+;music constants
+Silence               = %10000000
+
+StarPowerMusic        = %01000000
+PipeIntroMusic        = %00100000
+CloudMusic            = %00010000
+CastleMusic           = %00001000
+UndergroundMusic      = %00000100
+WaterMusic            = %00000010
+GroundMusic           = %00000001
+
+TimeRunningOutMusic   = %01000000
+EndOfLevelMusic       = %00100000
+AltGameOverMusic      = %00010000
+EndOfCastleMusic      = %00001000
+VictoryMusic          = %00000100
+GameOverMusic         = %00000010
+DeathMusic            = %00000001
+
+.endif ; ENABLE_Z2_MARIO
 
 ;; Stat tracking variables in SRAM
 
@@ -268,4 +510,57 @@ STAT_TRACKING_SIZE = RES_OFFSET
 ; or load regular sideviews from the usual location
 RESV SideViewBuffer, $0100
 
+ClearSRAMStart = RES_OFFSET
+
+.if ENABLE_Z2_MARIO
+; There isn't a general purpose "attribute" mix so we can make our own
+RESV SprObject_SprAttrib, 16
+Player_SprAttrib = SprObject_SprAttrib
+Fireball_SprAttrib = SprObject_SprAttrib + FireballOffset
+
+RESV Player_YMoveForceFractional, 16
+
+ClearSRAMEnd = RES_OFFSET
+
 .assert RES_OFFSET + StatTrackingBase < $6957
+
+;;; Update a handful of refs to point to the given address.
+;;; Usage:
+;;;   UPDATE_BYTE byte @ refs...
+;;; Where |refs| is a space-separated list of addresses, and
+;;; |byte| is a single literal to insert into each ref.
+.define UPDATE_BYTE {target @ ref refs .eol} \
+.pushseg .eol \
+.if     $00000 <= ref - $10 .and ref - $10 < $04000 .eol \
+    .segment "PRG0" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $04000 <= ref - $10 .and ref - $10 < $08000 .eol \
+    .segment "PRG1" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $08000 <= ref - $10 .and ref - $10 < $0c000 .eol \
+    .segment "PRG2" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $0c000 <= ref - $10 .and ref - $10 < $10000 .eol \
+    .segment "PRG3" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $10000 <= ref - $10 .and ref - $10 < $14000 .eol \
+    .segment "PRG4" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $14000 <= ref - $10 .and ref - $10 < $18000 .eol \
+    .segment "PRG5" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $18000 <= ref - $10 .and ref - $10 < $1c000 .eol \
+    .segment "PRG6" .eol \
+    .org ((ref - $10) .mod $4000) + $8000 .eol \
+.elseif $1c000 <= ref - $10 .and ref - $10 < $20000 .eol \
+    .segment "PRG7" .eol \
+    .org ((ref - $10) .mod $4000) + $c000 .eol \
+.else .eol \
+    .error "bad ref" .eol \
+.endif .eol \
+  .byte target .eol \
+.popseg .eol \
+UPDATE_BYTE target @ refs
+.define UPDATE_BYTE {target @ .eol}
+
+.endif
