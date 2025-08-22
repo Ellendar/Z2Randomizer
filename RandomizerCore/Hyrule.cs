@@ -3778,11 +3778,12 @@ bank5_Pointer_table_for_End_Credits:
 """, "add_credits.s");
     }
 
-    private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
+    private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft, bool enableZ2Mario)
     {
         var a = asm.Module();
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
+        a.Assign("ENABLE_Z2_MARIO", enableZ2Mario ? 1 : 0);
         AssignRealPalaceLocations(a);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
@@ -3791,7 +3792,7 @@ bank5_Pointer_table_for_End_Credits:
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
-        ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic); // will make output vary with customize tab options
+        ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic, props.MarioMode); // will make output vary with customize tab options
         rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
