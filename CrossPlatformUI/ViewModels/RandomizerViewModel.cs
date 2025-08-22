@@ -141,9 +141,14 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
                 .First(x => x.Preset == name)
                 .Config = Main.Config;
         });
-        ClearSavedPresets = ReactiveCommand.Create(() =>
+        ClearSavedPreset = ReactiveCommand.Create((string name) =>
         {
-            Main.SaveNewPresetViewModel.SavedPresets.Clear();
+            var item = Main.SaveNewPresetViewModel.SavedPresets
+                .FirstOrDefault(x => x.Preset == name);
+            if (item != null)
+            {
+                Main.SaveNewPresetViewModel.SavedPresets.Remove(item);
+            }
         });
         this.WhenActivated(OnActivate);
     }
@@ -296,7 +301,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public ReactiveCommand<string, Unit> SaveAsPreset { get; }
     [JsonIgnore]
-    public ReactiveCommand<Unit, Unit> ClearSavedPresets { get; }
+    public ReactiveCommand<string, Unit> ClearSavedPreset { get; }
     [JsonIgnore]
     public ReactiveCommand<RandomizerConfiguration, Unit> LoadPreset { get; }
     [JsonIgnore]

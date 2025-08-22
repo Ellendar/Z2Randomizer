@@ -2,7 +2,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text.Json.Serialization;
+using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
@@ -54,10 +56,20 @@ public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewMod
         {
             PresetName = string.Empty;
         });
+        SavedPresets
+            .ToObservableChangeSet()
+            .Select(_ => SavedPresets.Count > 0)
+            .StartWith(SavedPresets.Count > 0)
+            .ToProperty(this, x => x.HasSavedPresets, out hasSavedPresets);
     }
     
     private ObservableCollection<CustomPreset> savedPresets = new ();
     public ObservableCollection<CustomPreset> SavedPresets { get => savedPresets; set => this.RaiseAndSetIfChanged(ref savedPresets, value); }
+
+    [JsonIgnore]
+    private readonly ObservableAsPropertyHelper<bool> hasSavedPresets;
+    [JsonIgnore]
+    public bool HasSavedPresets => hasSavedPresets.Value;
 
     private string presetName = "";
     [JsonIgnore]
