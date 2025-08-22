@@ -321,10 +321,7 @@ public class Hyrule
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
-            if (props.RandomizeDrops)
-            {
-                shuffler.ShuffleDrops(ROMData, RNG);
-            }
+            shuffler.ShuffleDrops(ROMData, RNG);
             shuffler.ShufflePbagAmounts(ROMData, RNG);
 
             ROMData.DisableTurningPalacesToStone();
