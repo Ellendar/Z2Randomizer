@@ -700,6 +700,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     private bool permanentBeamSword = false;
 
+    [Reactive]
+    private bool marioMode = false;
+
     //Custom
     [Reactive]
     [IgnoreInFlags]
@@ -1057,6 +1060,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
 
         properties.StartLives = ResolveStartingLives(r, includeDifficulty);
         properties.PermanentBeam = permanentBeamSword;
+        properties.MarioMode = marioMode;
         properties.UseCommunityText = useCommunityText;
 
         // If shared difficulty is enabled and we're setting up the shared
