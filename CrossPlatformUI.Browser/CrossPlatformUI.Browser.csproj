@@ -16,7 +16,17 @@
 <!--        <TrimMode>partial</TrimMode>-->
 <!--        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>-->
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
-<!--        <RunAOTCompilation>true</RunAOTCompilation>-->
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <RunAOTCompilation>true</RunAOTCompilation>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DebugType>full</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+        <RunAOTCompilation>false</RunAOTCompilation>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,8 +38,17 @@
         <WasmExtraFilesToDeploy Include="..\RandomizerCore\Asm\**" TargetPath="Asm\%(RecursiveDir)\%(Filename)%(Extension)" />
     </ItemGroup>
     <ItemGroup>
+        <IpsFiles Include="..\RandomizerCore\Sprites\*.ips" />
+    </ItemGroup>
+    <ItemGroup>
       <None Remove="wwwroot\index.html" />
     </ItemGroup>
+    <Target Name="GenerateIpsManifest" AfterTargets="Build">
+        <WriteLinesToFile
+            File="wwwroot\ips-manifest.txt"
+            Lines="@(IpsFiles->'%(Filename)%(Extension)')"
+            Overwrite="true" />
+    </Target>
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />

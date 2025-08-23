@@ -11,8 +11,8 @@ namespace CrossPlatformUI.Browser;
 
 public struct SpriteFile
 {
-    public string Filename;
-    public string Patch;
+    public string Filename { get; set; }
+    public string Patch { get; set; }
 }
 
 [JsonSourceGenerationOptions(WriteIndented = false)]
@@ -49,11 +49,14 @@ public partial class BrowserFileService : IFileSystemService
     private readonly Task<string> preloadedPalaces;
     public BrowserFileService()
     {
-        var tsk  = FetchPreloadedSprites();
+        var tsk = FetchPreloadedSprites();
         preloadedSprites = tsk.ContinueWith(task =>
         {
+            if (task == null) { return []; }
             var res = task.Result;
-            return JsonSerializer.Deserialize(res, SpriteSerializer.Default.SpriteFileArray)!;
+            if (res == null) { return []; }
+            var ls = JsonSerializer.Deserialize(res, SpriteSerializer.Default.SpriteFileArray);
+            return ls ?? [];
         });
 
         preloadedPalaces = FetchPalaces();
@@ -66,6 +69,7 @@ public partial class BrowserFileService : IFileSystemService
         {
         case IFileSystemService.RandomizerPath.Sprites:
             var sprites = await preloadedSprites;
+            if (sprites == null) { return ""; }
             foreach (var spr in sprites)
             {
                 if (spr.Filename == filename)
@@ -117,7 +121,9 @@ public partial class BrowserFileService : IFileSystemService
         if (path == IFileSystemService.RandomizerPath.Sprites)
         {
             var sprites = await preloadedSprites;
-            return sprites.Select(spr => spr.Filename);
+            if (sprites == null) { return []; }
+            var filenames = sprites.Select(spr => spr.Filename).Where(f => f != null);
+            return filenames;
         }
         throw new NotImplementedException();
     }

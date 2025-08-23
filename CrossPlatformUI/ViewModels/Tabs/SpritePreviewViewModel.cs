@@ -120,12 +120,12 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             Options.Clear();
             var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.LINK);
             await link.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-            if (token.IsCancellationRequested)
-                return;
+            if (token.IsCancellationRequested) { return; }
             Options.Add(link);
-            var fileservice = App.Current?.Services?.GetService<IFileSystemService>()!;
-            var files = await fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites);
-            var spriteFiles = files.Where(x => x.EndsWith(".ips")).ToList();
+            var fileservice = App.Current?.Services?.GetService<IFileSystemService>();
+            if (fileservice == null) { return; }
+            var spriteFiles = await fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites);
+            if (spriteFiles == null) { return; }
             foreach (var spriteFile in spriteFiles)
             {
                 var patch = await fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile);
@@ -133,12 +133,10 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
                 var ch = new CharacterSprite(parsedName, patch);
                 var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, ch);
                 await loaded.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-                if (token.IsCancellationRequested)
-                    return;
+                if (token.IsCancellationRequested) { return; }
                 Options.Add(loaded);
             }
-            if (token.IsCancellationRequested)
-                return;
+            if (token.IsCancellationRequested) { return; }
             Options.Add(new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.RANDOM));
             
             // Select the sprite on load based on the name
