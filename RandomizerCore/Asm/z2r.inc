@@ -436,7 +436,9 @@ SoftDisableNmi = $6382
 ; Flag to store if the dialog has ended
 DialogCompleteTmp = $0523
 
-StatTrackingBase = $6383
+COLLISION_TILES = $6390
+
+StatTrackingBase = COLLISION_TILES + $d0 * 4
 SET_RES_BASE StatTrackingBase
 
 ;; The follow stats are NOT checkpointed because they persist between reloads
