@@ -30,10 +30,6 @@ public partial class BrowserJsEngine : Assembler
 {
     public BrowserJsEngine(Js65Options? options) : base(options, null)
     {
-        // var module = JSHost.ImportAsync("js65.js65.js", "../js65/js65.js");
-        //var initmodule = new AsmModule();
-        //initmodule.Code(_assembly.ReadResource("Z2Randomizer.RandomizerCore.Asm.Init.s"), "__init.s");
-
         Callbacks = new();
         Callbacks.OnFileReadText = LoadTextFileCallback;
         Callbacks.OnFileReadBinary = LoadBinaryFileCallback;

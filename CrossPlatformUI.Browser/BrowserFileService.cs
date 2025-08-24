@@ -27,21 +27,23 @@ public partial class BrowserFileService : IFileSystemService
     // [JSImport("globalThis.customFetchBinary")]
     // [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     // private static partial Task<string> FetchBinary(string url);
-    
+
     [JSImport("globalThis.window.localStorage.setItem")]
     private static partial void SetItem(string key, string value);
+
     [JSImport("globalThis.window.localStorage.getItem")]
     private static partial string? GetItem(string key);
+
     [JSImport("globalThis.window.localStorage.clear")]
     private static partial void Clear();
 
     [JSImport("globalThis.window.FetchPalaces")]
     private static partial Task<string> FetchPalaces();
-    
+
     [JSImport("globalThis.window.FetchPreloadedSprites")]
     [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     private static partial Task<string> FetchPreloadedSprites();
-    
+
     [JSImport("globalThis.window.DownloadFile")]
     private static partial void DownloadFile(string data, string name);
 

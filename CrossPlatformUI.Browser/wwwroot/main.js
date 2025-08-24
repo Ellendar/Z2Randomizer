@@ -96,4 +96,8 @@ window.DownloadFile = (data, name) => {
     a.remove();
 };
 
+window.SetTitle = (title) => {
+    document.title = title;
+};
+
 await dotnetRuntime.runMain(config.mainAssemblyName, [window.location.search]);

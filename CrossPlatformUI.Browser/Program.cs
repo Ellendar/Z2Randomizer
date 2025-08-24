@@ -4,6 +4,7 @@ using Avalonia.ReactiveUI;
 using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using Z2Randomizer.RandomizerCore;
@@ -14,6 +15,9 @@ namespace CrossPlatformUI.Browser;
 
 internal sealed partial class Program
 {
+    [JSImport("globalThis.window.SetTitle")]
+    internal static partial void SetTitle(string title);
+
     private static Task Main(string[] args)
     {
 #if DEBUG
@@ -26,11 +30,12 @@ internal sealed partial class Program
             .AfterSetup(_ =>
         {
             App.ServiceContainer ??= new();
-            // not sure if this will be possible using js65.BrowserJsEngine, but using it for now
+
             App.ServiceContainer.AddSingleton<Hyrule.NewAssemblerFn>((opts, debug) => new BrowserJsEngine(opts));
             App.FileSystemService = new BrowserFileService();
             App.ServiceContainer.AddSingleton<IFileSystemService>(x => App.FileSystemService);
-            // App.SyncSuspensionDriver = new LocalStoragePersistenceService();
+
+            SetTitle(App.Title);
         })
         .StartBrowserAppAsync("out");
     }
