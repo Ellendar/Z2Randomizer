@@ -33,7 +33,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 }
             }
             List<RoomExitType> additionalItemRoomExitShapes = roomPool.ItemRoomsByShape.Keys.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i)).ToList();
-            additionalItemRoomExitShapes.FisherYatesShuffle(r);s
+            additionalItemRoomExitShapes.FisherYatesShuffle(r);
             possibleItemRoomExitTypes.AddRange(additionalItemRoomExitShapes);
 
 
