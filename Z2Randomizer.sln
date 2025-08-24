@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FtRandoLib", "FtRandoLib\Ft
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidateRooms", "ValidateRooms\ValidateRooms.csproj", "{27087DD8-40ED-60F9-0765-BA784D146BAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreSourceGenerator", "CoreSourceGenerator\CoreSourceGenerator.csproj", "{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,14 @@ Global
 		{27087DD8-40ED-60F9-0765-BA784D146BAD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{27087DD8-40ED-60F9-0765-BA784D146BAD}.Release|x64.ActiveCfg = Release|x64
 		{27087DD8-40ED-60F9-0765-BA784D146BAD}.Release|x64.Build.0 = Release|x64
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Debug|x64.Build.0 = Debug|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Release|x64.ActiveCfg = Release|Any CPU
+		{BE1657FD-EA4D-4683-8C4B-1B2DA38595AF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

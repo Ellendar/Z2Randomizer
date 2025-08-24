@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DynamicData;
 using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;

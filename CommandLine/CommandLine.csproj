@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <StartupObject>Z2Randomizer.CommandLine.Program</StartupObject>
     <AssemblyName>Z2R</AssemblyName>
     <Platforms>AnyCPU;x64</Platforms>
     <RootNamespace>Z2Randomizer.CommandLine</RootNamespace>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
