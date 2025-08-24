@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData;
 using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
 public abstract class CoordinatePalaceGenerator() : PalaceGenerator
 {
-
+    private static readonly RoomExitType[] PRIORITY_ROOM_SHAPES = [RoomExitType.DROP_STUB, RoomExitType.DROP_T];
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props)
     {
@@ -20,24 +21,43 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             {
                 throw new Exception("No item rooms for generated palace");
             }
-            Direction itemRoomDirection;
-            do
-            {
-                itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-            } while (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection));
-            List<Room> itemRoomCandidates = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList();
-            itemRoomCandidates.FisherYatesShuffle(r);
 
-            for(int itemRoomNumber = 0; itemRoomNumber < props.PalaceItemRoomCounts[palace.Number - 1]; itemRoomNumber++)
-            {  
+            int itemRoomNumber = 0;
+
+            List<RoomExitType> possibleItemRoomExitTypes = [];
+            foreach(RoomExitType shape in PRIORITY_ROOM_SHAPES)
+            {
+                if(roomPool.ItemRoomsByShape.ContainsKey(shape))
+                {
+                    possibleItemRoomExitTypes.Add(shape);
+                }
+            }
+            List<RoomExitType> additionalItemRoomExitShapes = roomPool.ItemRoomsByShape.Keys.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i)).ToList();
+            additionalItemRoomExitShapes.FisherYatesShuffle(r);s
+            possibleItemRoomExitTypes.AddRange(additionalItemRoomExitShapes);
+
+
+            while (itemRoomNumber < props.PalaceItemRoomCounts[palace.Number - 1])
+            {
+                if(possibleItemRoomExitTypes.Count == 0)
+                {
+                    return false;
+                }
+
+                RoomExitType itemRoomExitType = possibleItemRoomExitTypes[0];
+                List<Room> itemRoomCandidates = roomPool.ItemRoomsByShape[itemRoomExitType].ToList();
+                itemRoomCandidates.FisherYatesShuffle(r);
+
+                bool itemRoomPlaced = false;
+
                 foreach (Room itemRoomCandidate in itemRoomCandidates)
                 {
-                    if (palace.ItemRooms.Count > itemRoomNumber)
+                    if (itemRoomPlaced)
                     {
                         break;
                     }
                     List<Room> itemRoomReplacementCandidates =
-                        palace.AllRooms.Where(i => i.CategorizeExits() == itemRoomCandidate.CategorizeExits() && i.IsNormalRoom()).ToList();
+                        palace.AllRooms.Where(i => i.IsNormalRoom() && i.CategorizeExits() == itemRoomExitType).ToList();
 
                     itemRoomReplacementCandidates.FisherYatesShuffle(r);
                     foreach (Room itemRoomReplacementRoom in itemRoomReplacementCandidates)
@@ -55,9 +75,15 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                                 palace.ItemRooms[itemRoomNumber] = palace.ItemRooms[itemRoomNumber].Merge(linkedRoom);
                             }
                             palace.ReplaceRoom(itemRoomReplacementRoom, palace.ItemRooms[itemRoomNumber]);
+                            itemRoomPlaced = true;
+                            itemRoomNumber++;
                             break;
                         }
                     }
+                }
+                if(!itemRoomPlaced)
+                {
+                    possibleItemRoomExitTypes.Remove(itemRoomExitType);
                 }
             }
         }
@@ -147,6 +173,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             return false;
         }
 
+        /*
         foreach(Room room in palace.AllRooms.ToList())
         {
             if(room.MergedPrimary != null)
@@ -199,6 +226,9 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 }
             }
         }
+        */
+
+        UnmergeMergedRooms(palace, roomPool);
 
         //TODO: This is REALLY late to abandon ship on the whole palace, but 
         //refactoring the boss placement to do the check properly without a million stupid room swaps
@@ -215,4 +245,96 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
 
         return true;
     } 
+
+    //Linked rooms were linked ahead of time for the purposes of palace generation, but need to be unlinked for
+    //logical calculation
+    private static void UnmergeMergedRooms(Palace palace, RoomPool roomPool)
+    {
+
+        List<(Room, Room, Room)> replacements = [];
+        //only the primary linked rooms
+        foreach (Room primaryRoom in palace.AllRooms.Where(i => i.LinkedRoomName != null && i.Enabled && i.LinkedRoom == null)) 
+        {
+            Room secondaryRoom = new(roomPool.LinkedRooms[primaryRoom.LinkedRoomName!]);
+            Room newPrimaryRoom = new(roomPool.LinkedRooms[primaryRoom.Name]);
+
+            newPrimaryRoom.coords = primaryRoom.coords;
+            newPrimaryRoom.LinkedRoom = secondaryRoom;
+            secondaryRoom.LinkedRoom = newPrimaryRoom;
+
+            replacements.Add((primaryRoom, newPrimaryRoom, secondaryRoom));
+            if(primaryRoom.Up != null)
+            {
+                if(newPrimaryRoom.HasUpExit)
+                {
+                    newPrimaryRoom.Up = primaryRoom.Up;
+                    primaryRoom.Up.Down = newPrimaryRoom;
+                }
+                else if (secondaryRoom.HasUpExit)
+                {
+                    secondaryRoom.Up = primaryRoom.Up;
+                    primaryRoom.Up.Down = secondaryRoom;
+                }
+            }
+            if (primaryRoom.Down != null)
+            {
+                if (newPrimaryRoom.HasDownExit)
+                {
+                    newPrimaryRoom.Down = primaryRoom.Down;
+                    primaryRoom.Down.Up = newPrimaryRoom;
+                }
+                else if (secondaryRoom.HasDownExit)
+                {
+                    secondaryRoom.Down = primaryRoom.Down;
+                    primaryRoom.Down.Up = secondaryRoom;
+                }
+            }
+            if (primaryRoom.Left != null)
+            {
+                if (newPrimaryRoom.HasLeftExit)
+                {
+                    newPrimaryRoom.Left = primaryRoom.Left;
+                    primaryRoom.Left.Right = newPrimaryRoom;
+                }
+                else if (secondaryRoom.HasLeftExit)
+                {
+                    secondaryRoom.Left = primaryRoom.Left;
+                    primaryRoom.Left.Right = secondaryRoom;
+                }
+            }
+            if (primaryRoom.Right != null)
+            {
+                if (newPrimaryRoom.HasRightExit)
+                {
+                    newPrimaryRoom.Right = primaryRoom.Right;
+                    primaryRoom.Right.Left = newPrimaryRoom;
+                }
+                else if (secondaryRoom.HasRightExit)
+                {
+                    secondaryRoom.Right = primaryRoom.Right;
+                    primaryRoom.Right.Left = secondaryRoom;
+                }
+            }
+            if(primaryRoom.HasItem)
+            {
+                int index = palace.ItemRooms.IndexOf(primaryRoom);
+                palace.ItemRooms[index] = newPrimaryRoom;
+            }
+            if (primaryRoom.IsBossRoom)
+            {
+                palace.BossRoom = newPrimaryRoom;
+            }
+            if (primaryRoom.IsThunderBirdRoom)
+            {
+                palace.TbirdRoom = newPrimaryRoom;
+            }
+        }
+        
+        foreach((Room, Room, Room) replacement in replacements)
+        {
+            palace.AllRooms.Remove(replacement.Item1);
+            palace.AllRooms.Add(replacement.Item2);
+            palace.AllRooms.Add(replacement.Item3);
+        }
+    }
 }

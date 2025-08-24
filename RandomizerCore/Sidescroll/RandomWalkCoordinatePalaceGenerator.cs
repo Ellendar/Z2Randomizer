@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
@@ -9,7 +12,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
     public static int debug = 0;
-    private const float DROP_CHANCE = .10f;
+    private const float DROP_CHANCE = .15f;
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         debug++;
@@ -92,15 +95,15 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         }
 
         //Dropify graph
-        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.OrderByDescending(i => i.Key.X).ThenBy(i => i.Key.Y))
+        foreach (Coord coord in walkGraph.Keys.OrderByDescending(i => i.Y).ThenBy(i => i.X))
         {
             await Task.Yield();
-            var (x, y) = item.Key;
-            RoomExitType exitType = item.Value;
-            if (item.Key == Coord.Uninitialized)
+            if(!walkGraph.TryGetValue(coord, out RoomExitType exitType))
             {
-                continue;
+                throw new ImpossibleException("Walk graph coordinate was explicitly missing");
             }
+            int x = coord.X;
+            int y = coord.Y;
 
             RoomExitType? downExitType = null;
             if (walkGraph.ContainsKey(new Coord(x, y - 1)))
@@ -112,12 +115,11 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 continue;
             }
             double dropChance = DROP_CHANCE;
-            Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
             //if we dropped into this room
-            if (upRoom != null && upRoom.HasDrop)
+            if (walkGraph.TryGetValue(new Coord(x, y + 1), out RoomExitType upRoomType) && upRoomType.ContainsDrop())
             {
-                //There are no drop -> elevator conversion rooms, so if we have to keep going down, it needs to be a drop.
-                if(exitType.ContainsDown())
+                //If There are no drop -> elevator conversion rooms, so if we have to keep going down, it needs to be a drop.
+                if(exitType.ContainsDown() && roomPool.GetNormalRoomsForExitType(RoomExitType.DROP_STUB).Any(i => i.IsDropZone))
                 {
                     dropChance = 1f;
                 } 
@@ -130,17 +132,34 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 
             if (r.NextDouble() < dropChance)
             {
-                walkGraph[item.Key] = item.Value.ConvertToDrop();
+                walkGraph[coord] = exitType.ConvertToDrop();
                 walkGraph[new Coord(x, y - 1)] = walkGraph[new Coord(x, y - 1)].RemoveUp();
             }
         }
 
-        //drop stubs can't / shouldn't exist, so convert them to regular down stubs
+        //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
+
+        //If dropification created a room with no entrance, change it
         foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.Where(i => i.Value == RoomExitType.DROP_STUB))
         {
-            walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_UP;
-            walkGraph[item.Key with { Y = item.Key.Y - 1 }] = item.Value.ConvertFromDropToDown();
+            if(!walkGraph.ContainsKey(new Coord(item.Key.X, item.Key.Y + 1)))
+            {
+                walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_DOWN;
+                RoomExitType downRoomType = walkGraph[new Coord(item.Key.X, item.Key.Y - 1)];
+                walkGraph[new Coord(item.Key.X, item.Key.Y - 1)] = downRoomType.AddUp();
+            }
         }
+
+        //If dropification created a pit, convert it to an elevator.
+        //This should never happen, but it's a good safety
+        foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.Where(i => i.Value == RoomExitType.NO_ESCAPE))
+        {
+            walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_UP;
+            RoomExitType upRoomType = walkGraph[new Coord(item.Key.X, item.Key.Y + 1)];
+            walkGraph[new Coord(item.Key.X, item.Key.Y + 1)] = upRoomType.ConvertFromDropToDown();
+        }
+
+        //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
 
         //Add rooms
         roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
@@ -212,7 +231,6 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 linkedRoom.LinkedRoom = newRoom;
                 linkedRoom.coords = item.Key;
                 palace.AllRooms.Add(linkedRoom);
-                roomCount++;
             }
             newRoom.coords = item.Key;
         }
@@ -281,8 +299,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             return palace;
         }
 
-
-        if (palace.AllRooms.Count != roomCount)
+        if (palace.AllRooms.Count(i => i.Enabled) != roomCount)
         {
             throw new Exception("Generated palace has the incorrect number of rooms");
         }
@@ -292,4 +309,89 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         palace.IsValid = true;
         return palace;
     }
+
+    public string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true)
+    {
+        StringBuilder sb = new();
+        if (includeCoordinateGrid)
+        {
+            sb.Append("   ");
+            for (int headerX = -20; headerX <= 20; headerX++)
+            {
+                sb.Append(headerX.ToString().PadLeft(3, ' '));
+            }
+            sb.Append('\n');
+        }
+        for (int y = 20; y >= -20; y--)
+        {
+            sb.Append("   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(" " + (room.ContainsUp() ? "|" : " ") + " ");
+                }
+            }
+            sb.Append('\n');
+            sb.Append(includeCoordinateGrid ? y.ToString().PadLeft(3, ' ') : "   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(room.ContainsLeft() ? '-' : ' ');
+                    sb.Append('X');
+                    sb.Append(room.ContainsRight() ? '-' : ' ');
+                }
+            }
+            sb.Append('\n');
+            sb.Append("   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    if(room.ContainsDown())
+                    {
+                        sb.Append(" | ");
+                    }
+                    else if (room.ContainsDrop())
+                    {
+                        sb.Append(" v ");
+                    }
+                    else
+                    {
+                        sb.Append("   ");
+                    }
+                }
+            }
+            sb.Append('\n');
+        }
+
+        if (!includeCoordinateGrid)
+        {
+            StringBuilder condensed = new();
+            foreach (string line in sb.ToString().Split('\n'))
+            {
+                if (!BlankLine.IsMatch(line))
+                {
+                    condensed.AppendLine(line);
+                }
+            }
+            return condensed.ToString();
+        }
+        return sb.ToString();
+    }
+
+    private static readonly Regex BlankLine = new(@"^[ \t\f\r\n]+$");
 }

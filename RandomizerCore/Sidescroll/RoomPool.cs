@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SD.Tools.Algorithmia.GeneralDataStructures;
+using System.Collections.Generic;
 using System.Linq;
-using SD.Tools.Algorithmia.GeneralDataStructures;
+using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -13,6 +14,7 @@ public class RoomPool
     public Room VanillaBossRoom { get; set; }
     public Dictionary<string, Room> LinkedRooms { get; } = [];
     public MultiValueDictionary<Direction, Room> ItemRoomsByDirection { get; set; } = [];
+    public MultiValueDictionary<RoomExitType, Room> ItemRoomsByShape { get; set; } = [];
     public Dictionary<RoomExitType, Room> DefaultStubsByDirection { get; set; } = [];
 
     private PalaceRooms palaceRooms;
@@ -36,6 +38,10 @@ public class RoomPool
         foreach (var key in target.ItemRoomsByDirection.Keys)
         {
             ItemRoomsByDirection.AddRange(key, target.ItemRoomsByDirection[key]);
+        }
+        foreach (var key in target.ItemRoomsByShape.Keys)
+        {
+            ItemRoomsByShape.AddRange(key, target.ItemRoomsByShape[key]);
         }
         foreach (var key in target.DefaultStubsByDirection.Keys)
         {
@@ -65,6 +71,10 @@ public class RoomPool
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.VANILLA, direction).ToList());
             }
+            foreach(RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.VANILLA).Select(i => i.CategorizeExits()).Distinct())
+            {
+                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.VANILLA, itemRoomExitType));
+            }
         }
 
         if (props.AllowV4Rooms)
@@ -82,6 +92,10 @@ public class RoomPool
             foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_0, direction).ToList());
+            }
+            foreach (RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.V4_0).Select(i => i.CategorizeExits()).Distinct())
+            {
+                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.V4_0, itemRoomExitType));
             }
         }
 
@@ -101,6 +115,10 @@ public class RoomPool
             {
                 ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_4, direction).ToList());
             }
+            foreach (RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.V4_4).Select(i => i.CategorizeExits()).Distinct())
+            {
+                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.V4_4, itemRoomExitType));
+            }
         }
         else
         {
@@ -110,6 +128,23 @@ public class RoomPool
             DefaultStubsByDirection.Add(RoomExitType.DEADEND_EXIT_UP, palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.STUBS).Where(i => i.HasUpExit).First());
         }
 
+        List<(RoomExitType, Room)> linkedRoomShapes = [];
+        foreach(KeyValuePair<RoomExitType, HashSet<Room>> entry in ItemRoomsByShape)
+        {
+            foreach(Room room in entry.Value)
+            {
+                if(room.LinkedRoomName != null)
+                {
+                    RoomExitType newShape = room.CategorizeExits().Merge(LinkedRooms[room.LinkedRoomName].CategorizeExits());
+                    linkedRoomShapes.Add((newShape, room));
+                }
+            }
+        }
+        foreach((RoomExitType, Room) linkedRoom in linkedRoomShapes)
+        {
+            ItemRoomsByShape[linkedRoom.Item2.CategorizeExits()].Remove(linkedRoom.Item2);
+            ItemRoomsByShape.Add(linkedRoom.Item1, linkedRoom.Item2);
+        }
 
 
         //If we're using a room set that has no entraces, we still need to have something, so add the vanilla entrances.

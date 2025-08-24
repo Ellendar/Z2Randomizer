@@ -44,6 +44,8 @@ public class Palaces
         VANILLA_P7_ALLOWED_BLOCKERS
     ];
 
+    static Dictionary<RoomExitType, int> itemRoomCounts = [];
+
     public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
     {
         if (props.UseCustomRooms && !File.Exists("CustomRooms.json"))
@@ -234,6 +236,22 @@ public class Palaces
             .Union(palaces[5].AllRooms.Where(i => i.HasDrop))
             .Union(palaces[6].AllRooms.Where(i => i.HasDrop))
             .ToList();
+
+        foreach(Palace palace in palaces)
+        {
+            foreach(Room itemRoom in palace.ItemRooms)
+            {
+                RoomExitType exitType = itemRoom.CategorizeExits();
+                if (itemRoomCounts.TryGetValue(exitType, out int count))
+                {
+                    itemRoomCounts[exitType] = count + 1;
+                }
+                else
+                {
+                    itemRoomCounts.Add(exitType, 1);
+                }
+            }
+        }
         return palaces;
     }
 

@@ -676,6 +676,8 @@ public class Room : IJsonOnDeserialized
         mergedRoom.HasDrop = HasDrop | otherRoom.HasDrop;
         mergedRoom.MergedPrimary = this;
         mergedRoom.MergedSecondary = otherRoom;
+        mergedRoom.LinkedRoom = null;
+        mergedRoom.LinkedRoomName = otherRoom.Name;
 
         return mergedRoom;
     }

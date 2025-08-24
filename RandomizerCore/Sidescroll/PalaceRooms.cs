@@ -150,6 +150,11 @@ public partial class PalaceRooms
         };
     }
 
+    public IEnumerable<Room> ItemRoomsByShape(RoomGroup group, RoomExitType shape)
+    {
+        return roomsByGroup[group].Where(i => i.HasItem && i.CategorizeExits() == shape);
+    }
+
     public IEnumerable<Room> ItemRooms(RoomGroup group)
     {
         return roomsByGroup[group].Where(i => i.HasItem);
@@ -193,6 +198,7 @@ public partial class PalaceRooms
             if(room.Enabled && room.LinkedRoomName != null)
             {
                 linkedRooms.Add(room.LinkedRoomName, GetRoomByName(room.LinkedRoomName));
+                linkedRooms.Add(room.Name, GetRoomByName(room.Name));
             }
         }
         return linkedRooms;

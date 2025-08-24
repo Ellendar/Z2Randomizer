@@ -86,10 +86,6 @@
 
 - Fixed a bug with hidden palace caused by the previous fix to hidden palace.
 
-## Version 4.3.16 - April 5, 2025
-
-- Fixed a bug with hidden palace caused by the previous fix to hidden palace.
-
 ## Version 4.3.15 - April 2, 2025
 
 - Fixed a bug that sometimes causes hidden kasuto/palace to not work properly.
