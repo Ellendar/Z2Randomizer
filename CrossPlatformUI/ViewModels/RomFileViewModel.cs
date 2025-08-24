@@ -67,7 +67,7 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
                     // This part crashes if run in the browser build
                     if ((Main.OutputFilePath ?? "") == "")
                     {
-                        Main.OutputFilePath = new Uri(fileTask.Path, ".").LocalPath;
+                        Main.OutputFilePath = new Uri(file.Path, ".").LocalPath;
                     }
                 }
                 HostScreen.Router.NavigateBack.Execute();
