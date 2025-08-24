@@ -254,10 +254,10 @@ ClearCollisionRAM:
   ldy #$d0
   lda #0
 @loop:
-    sta $6340-1,y
-    sta $6340-1+$d0,y
-    sta $6340-1+$d0*2,y
-    sta $6340-1+$d0*3,y
+    sta COLLISION_TILES-1,y
+    sta COLLISION_TILES-1+$d0,y
+    sta COLLISION_TILES-1+$d0*2,y
+    sta COLLISION_TILES-1+$d0*3,y
     dey
     bne @loop
   rts
@@ -272,22 +272,22 @@ UpdateCollisionFromMap:
     lda $6000-1,x
     jsr CheckForSolidMTiles
     bcc @skip1
-      sta $6340-1,x
+      sta COLLISION_TILES-1,x
 @skip1:
     lda $6000-1+$d0,x
     jsr CheckForSolidMTiles
     bcc @skip2
-      sta $6340-1+$d0,x
+      sta COLLISION_TILES-1+$d0,x
 @skip2:
     lda $6000-1+$d0*2,x
     jsr CheckForSolidMTiles
     bcc @skip3
-      sta $6340-1+$d0*2,x
+      sta COLLISION_TILES-1+$d0*2,x
 @skip3:
     lda $6000-1+$d0*3,x
     jsr CheckForSolidMTiles
     bcc @skip4
-      sta $6340-1+$d0*3,x
+      sta COLLISION_TILES-1+$d0*3,x
 @skip4:
     dex
     bne @loop
