@@ -1099,8 +1099,8 @@
     "name": "Vanilla P4 M18",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["MultipleExitElevators"],
     "sideviewData": "10608013E1008205E20007F1B071F050"
   },
   {
@@ -1203,8 +1203,8 @@
     "name": "Vanilla P4 M21",
     "palaceGroup": 2,
     "palaceNumber": null,
-    "requirements": [
-    ],
+    "requirements": [],
+    "suppressWarning": ["MultipleExitElevators"],
     "sideviewData": "10608013E1008205E20007F1B071F050"
   },
   {

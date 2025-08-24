@@ -33,25 +33,25 @@
         </StackPanel>
         <StackPanel Grid.Column="1">
             <TextBlock>Small Enemy Pool</TextBlock>
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropBlueJar}" Content="Blue Jar" IsEnabled="{Binding Config.RandomizeDrops}" />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropRedJar}" Content="Red Jar" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropSmallBag}" Content="50 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropMediumBag}" Content="100 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropLargeBag}" Content="200 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropXLBag}" Content="500 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDrop1up}" Content="1 UP" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropKey}" Content="Key" IsEnabled="{Binding Config.RandomizeDrops}"  />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropBlueJar}" Content="Blue Jar" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropRedJar}" Content="Red Jar" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropSmallBag}" Content="50 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropMediumBag}" Content="100 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropLargeBag}" Content="200 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropXLBag}" Content="500 Bag" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDrop1up}" Content="1 Up" />
+            <CheckBox IsChecked="{Binding Config.SmallEnemiesCanDropKey}" Content="Key" />
         </StackPanel>
         <StackPanel Grid.Column="2">
             <TextBlock>Large Enemy Pool</TextBlock>
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropBlueJar}" Content="Blue Jar" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropRedJar}" Content="Red Jar" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropSmallBag}" Content="50 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropMediumBag}" Content="100 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropLargeBag}" Content="200 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropXLBag}" Content="500 Bag" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDrop1up}" Content="1 UP" IsEnabled="{Binding Config.RandomizeDrops}"  />
-            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropKey}" Content="Key" IsEnabled="{Binding Config.RandomizeDrops}"  />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropBlueJar}" Content="Blue Jar" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropRedJar}" Content="Red Jar" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropSmallBag}" Content="50 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropMediumBag}" Content="100 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropLargeBag}" Content="200 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropXLBag}" Content="500 Bag" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDrop1up}" Content="1 Up" />
+            <CheckBox IsChecked="{Binding Config.LargeEnemiesCanDropKey}" Content="Key" />
         </StackPanel>
     </Grid>
 </UserControl>

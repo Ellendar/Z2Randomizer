@@ -142,23 +142,16 @@ public class Shuffler
             large.Add(0x88);
         }
 
-        if (small.Count + large.Count > 0)
+        // drops are kept vanilla if nothing is selected & RandomizeDrops is off
+        if (small.Count > 0)
         {
-            for (int i = 0; i < small.Count(); i++)
+            // shuffle order
+            for (int i = 0; i < small.Count; i++)
             {
-                int swap = r.Next(small.Count());
-                int temp = small[i];
-                small[i] = small[swap];
-                small[swap] = temp;
+                int swap = r.Next(small.Count);
+                (small[i], small[swap]) = (small[swap], small[i]);
             }
-
-            for (int i = 0; i < large.Count(); i++)
-            {
-                int swap = r.Next(large.Count());
-                int temp = large[i];
-                large[i] = large[swap];
-                large[swap] = temp;
-            }
+            // the game uses 8 drop items, fill the rest with copies at random
             for (int i = 0; i < 8; i++)
             {
                 if (i < small.Count())
@@ -169,6 +162,19 @@ public class Shuffler
                 {
                     ROMData.Put(0x1E880 + i, (byte)small[r.Next(small.Count())]);
                 }
+            }
+        }
+        if (large.Count > 0)
+        {
+            // shuffle order
+            for (int i = 0; i < large.Count; i++)
+            {
+                int swap = r.Next(large.Count);
+                (large[i], large[swap]) = (large[swap], large[i]);
+            }
+            // the game uses 8 drop items, fill the rest with copies at random
+            for (int i = 0; i < 8; i++)
+            {
                 if (i < large.Count())
                 {
                     ROMData.Put(0x1E888 + i, (byte)large[i]);

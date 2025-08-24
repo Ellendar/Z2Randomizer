@@ -31,9 +31,43 @@ public class SideviewEditable<T> where T : Enum
     {
         if(bytes.Length < 4) { throw new ArgumentException("Sideview data has no header."); }
         Header = bytes[0..4];
-        if (bytes.Length != Length)
-        {
-            throw new ArgumentException("Sideview data has no header.");
+        if (bytes.Length != Length) { throw new ArgumentException("Sideview data has bad length in header."); }
+        var bgMap = BackgroundMap;
+        // (bg maps in the overworld are never solid)
+        if (bgMap != 0 && this is SideviewEditable<PalaceObject>) {
+            byte[] bgMapBytes = [];
+            switch (bgMap)
+            {
+                case 1: // from 0x1062f
+                    bgMapBytes = [
+                        0x1A, 0x60, 0x0F, 0x08, 0xD6, 0x08, 0xA2, 0x45,
+                        0x84, 0xC1, 0xD4, 0x0E, 0xD4, 0x08, 0xE3, 0x00,
+                        0xA8, 0x77, 0x94, 0x73, 0x50, 0x21, 0x30, 0x09,
+                        0xD2, 0x0C
+                    ];
+                    break;
+                case 2: // from 0x1210c
+                    bgMapBytes = [
+                        0x18, 0x60, 0x0E, 0x10, 0xE1, 0x00, 0xD0, 0x00,
+                        0x5F, 0x09, 0x70, 0x20, 0xD1, 0x0E, 0xE3, 0x00,
+                        0xD0, 0x00, 0xA2, 0x45, 0x81, 0xC1, 0xD7, 0x0F
+                    ];
+                    break;
+                case 3: // from 0x12173
+                    bgMapBytes = [
+                        0x18, 0x60, 0x00, 0x10, 0xDD, 0x0E, 0xDC, 0x00,
+                        0x6A, 0x02, 0xD1, 0x0E, 0x03, 0xF1, 0xB0, 0x71,
+                        0xF0, 0x50, 0x84, 0x05, 0xD1, 0x00, 0x60, 0x01
+                    ];
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            byte[] xSkip = [0xE0, 0]; // insert after bgmap to set x cursor back to 0
+            bytes = [(byte)(bytes[0] + bgMapBytes[0] - 2), ..bgMapBytes[1..], ..xSkip, ..bytes[4..]];
+            Header = bytes[0..4];
+            if (bytes.Length != Length) { throw new ArgumentException("Sideview background map has bad length in header."); }
+            BackgroundMap = 0;
         }
         Commands = new List<SideviewMapCommand<T>>();
         int i = 4; // start after header
