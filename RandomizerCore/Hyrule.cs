@@ -10,9 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FtRandoLib.Importer;
 using js65;
-using Microsoft.ClearScript;
 using NLog;
-using NLog.Targets;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
@@ -501,10 +499,7 @@ public class Hyrule
 
     private string AsmFileReadTextCallback(string basePath, string path)
     {
-        if (basePath == "")
-            return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
-
-        throw new FileNotFoundException();
+        return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
     }
 
     private static byte[] ConvertHash(byte[] hash)
@@ -1225,9 +1220,10 @@ public class Hyrule
             validationEngine.Add(sideviewModule);
             await testRom.ApplyAsm(validationEngine); //.Wait(ct);
         }
-        catch (ScriptEngineException e)
+        catch (Exception e)
         {
-            if (e.ErrorDetails.Contains("Could not find space for"))
+            // Microsoft.ClearScript.ScriptEngine needs to be abstracted for browser
+            if (e.Message.Contains("Could not find space for"))
             {
                 logger.Debug(e, "Room packing failed. Retrying.");
                 return false;

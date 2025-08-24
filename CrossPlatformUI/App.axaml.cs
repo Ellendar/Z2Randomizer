@@ -20,12 +20,20 @@ public sealed partial class App : Application // , IDisposable
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        Title = $"Zelda II Randomizer v{version?.Major}.{version?.Minor} Beta{version?.Build}";
+#if DEBUG
+        Title += " (Debug build)";
+#endif
     }
 
     public static ServiceCollection? ServiceContainer;
 
     public static IFileSystemService? FileSystemService;
     public static ICheckUpdateService? CheckUpdateService;
+
+    public static string Title = "";
 
     public static TopLevel? TopLevel { get; private set; }
 
@@ -64,18 +72,14 @@ public sealed partial class App : Application // , IDisposable
                 };
                 // isLaunchingNew.OnNext(Unit.Default);
                 var context = main;
-                var version = Assembly.GetExecutingAssembly().GetName().Version;
                 desktop.MainWindow = new MainWindow
                 {
                     DataContext = context,
                     Position = new PixelPoint(context!.WindowPosition.X, context!.WindowPosition.Y),
                     Width = context.WindowSize.Width,
                     Height = context.WindowSize.Height,
-                    Title = $"Zelda II Randomizer v{version?.Major}.{version?.Minor} Beta{version?.Build}",
+                    Title = Title,
                 };
-#if DEBUG
-                desktop.MainWindow.Title += " (Debug build)";
-#endif
                 TopLevel = TopLevel.GetTopLevel(desktop.MainWindow)!;
                 break;
             case ISingleViewApplicationLifetime singleViewPlatform:

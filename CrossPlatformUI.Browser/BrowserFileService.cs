@@ -11,8 +11,8 @@ namespace CrossPlatformUI.Browser;
 
 public struct SpriteFile
 {
-    public string Filename;
-    public string Patch;
+    public string Filename { get; set; }
+    public string Patch { get; set; }
 }
 
 [JsonSourceGenerationOptions(WriteIndented = false)]
@@ -27,21 +27,23 @@ public partial class BrowserFileService : IFileSystemService
     // [JSImport("globalThis.customFetchBinary")]
     // [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     // private static partial Task<string> FetchBinary(string url);
-    
+
     [JSImport("globalThis.window.localStorage.setItem")]
     private static partial void SetItem(string key, string value);
+
     [JSImport("globalThis.window.localStorage.getItem")]
     private static partial string? GetItem(string key);
+
     [JSImport("globalThis.window.localStorage.clear")]
     private static partial void Clear();
 
     [JSImport("globalThis.window.FetchPalaces")]
     private static partial Task<string> FetchPalaces();
-    
+
     [JSImport("globalThis.window.FetchPreloadedSprites")]
     [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     private static partial Task<string> FetchPreloadedSprites();
-    
+
     [JSImport("globalThis.window.DownloadFile")]
     private static partial void DownloadFile(string data, string name);
 
@@ -49,11 +51,14 @@ public partial class BrowserFileService : IFileSystemService
     private readonly Task<string> preloadedPalaces;
     public BrowserFileService()
     {
-        var tsk  = FetchPreloadedSprites();
+        var tsk = FetchPreloadedSprites();
         preloadedSprites = tsk.ContinueWith(task =>
         {
+            if (task == null) { return []; }
             var res = task.Result;
-            return JsonSerializer.Deserialize(res, SpriteSerializer.Default.SpriteFileArray)!;
+            if (res == null) { return []; }
+            var ls = JsonSerializer.Deserialize(res, SpriteSerializer.Default.SpriteFileArray);
+            return ls ?? [];
         });
 
         preloadedPalaces = FetchPalaces();
@@ -66,6 +71,7 @@ public partial class BrowserFileService : IFileSystemService
         {
         case IFileSystemService.RandomizerPath.Sprites:
             var sprites = await preloadedSprites;
+            if (sprites == null) { return ""; }
             foreach (var spr in sprites)
             {
                 if (spr.Filename == filename)
@@ -117,7 +123,9 @@ public partial class BrowserFileService : IFileSystemService
         if (path == IFileSystemService.RandomizerPath.Sprites)
         {
             var sprites = await preloadedSprites;
-            return sprites.Select(spr => spr.Filename);
+            if (sprites == null) { return []; }
+            var filenames = sprites.Select(spr => spr.Filename).Where(f => f != null);
+            return filenames;
         }
         throw new NotImplementedException();
     }

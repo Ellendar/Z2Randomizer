@@ -1,12 +1,18 @@
+using js65;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.Versioning;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
 namespace CrossPlatformUI.Browser;
 
 [JsonSourceGenerationOptions(WriteIndented = false)]
-// [JsonSerializable(typeof(Assembler))]
-// [JsonSerializable(typeof(AsmModule[]))]
-// [JsonSerializable(typeof(AsmModule))]
 [JsonSerializable(typeof(List<List<ExpandoObject>>))]
 [JsonSerializable(typeof(List<object>))]
 [JsonSerializable(typeof(string[]))]
@@ -14,41 +20,54 @@ namespace CrossPlatformUI.Browser;
 [JsonSerializable(typeof(byte))]
 [JsonSerializable(typeof(ushort))]
 [JsonSerializable(typeof(int))]
-// [JsonSerializable(typeof(List<AsmModule>))]
 [JsonSerializable(typeof(Dictionary<string, object>[]))]
-// [JsonSerializable(typeof(Dictionary<string, string>))]
-internal partial class AssmeblerContext : JsonSerializerContext;
+[JsonSerializable(typeof(Js65Options))]
+[JsonSerializable(typeof(Js65Callbacks))]
+internal partial class AssemblerContext : JsonSerializerContext;
 
-//XXX: We broke the web version. We'll fix it later
-/*
-public partial class BrowserJsEngine : IAsmEngine
+[SupportedOSPlatform("browser")]
+public partial class BrowserJsEngine : Assembler
 {
-    [JSImport("compile", "js65.js65.js")]
-    [return: JSMarshalAs<JSType.Promise<JSType.String>>]
-    private static partial Task<string> Compile(string asm, string rom);
-
-    private readonly Task<JSObject> module;
-
-    private readonly AsmModule initmodule;
-
-    public BrowserJsEngine()
+    public BrowserJsEngine(Js65Options? options) : base(options, null)
     {
-        module = JSHost.ImportAsync("js65.js65.js", "../js65/js65.js");
-        
-        var assembly = Assembly.Load("RandomizerCore");
-        initmodule = new AsmModule();
-        initmodule.Code(assembly.ReadResource("Z2Randomizer.RandomizerCore.Asm.Init.s"), "__init.s");
+        Callbacks = new();
+        Callbacks.OnFileReadText = LoadTextFileCallback;
+        Callbacks.OnFileReadBinary = LoadBinaryFileCallback;
     }
-    
-    public async Task<byte[]?> Apply(byte[] rom, Assembler asmModule)
+
+    [JSImport("compile", "js65.libassembler.js")]
+    [return: JSMarshalAs<JSType.Promise<JSType.String>>]
+    private static partial Task<string> Compile(string asm, string rom, string options,
+        [JSMarshalAs<JSType.Function<JSType.String,JSType.String,JSType.String>>]
+        Func<string, string, string> textCallback,
+        [JSMarshalAs<JSType.Function<JSType.String,JSType.String,JSType.String>>]
+        Func<string, string, string> binaryCallback
+    );
+
+    private readonly Task<JSObject> _module = JSHost.ImportAsync("js65.libassembler.js", "js65/libassembler.js");
+    private readonly Assembly _assembly = Assembly.Load("RandomizerCore");
+
+    public override async Task<byte[]?> Apply(byte[] rom)
     {
-        _ = await module;
-        asmModule.Modules.Insert(0, initmodule);
-        var expando = asmModule.AsExpando();
-        var json = JsonSerializer.Serialize(expando, AssmeblerContext.Default.ListListExpandoObject);
+        // Import the module and wait for it to finish
+        _ = await _module;
+        var expando = IntoExpandoObject();
+        var modulesJson = JsonSerializer.Serialize(expando, AssemblerContext.Default.ListListExpandoObject);
+        var optsJson = JsonSerializer.Serialize(Options, AssemblerContext.Default.Js65Options);
         var b64Bytes = Convert.ToBase64String(rom);
-        var output = await Compile(json, b64Bytes);
+        var output = await Compile(modulesJson, b64Bytes, optsJson,
+            (basePath, filePath) => Callbacks?.OnFileReadText?.Invoke(basePath, filePath) ?? "",
+            (basePath, filePath) => Convert.ToBase64String(Callbacks?.OnFileReadBinary?.Invoke(basePath, filePath) ?? []));
         return Convert.FromBase64String(output);
+    }
+
+    private string LoadTextFileCallback(string basePath, string relPath)
+    {
+        return _assembly.ReadResource(relPath);
+    }
+    private byte[] LoadBinaryFileCallback(string basePath, string relPath)
+    {
+        return _assembly.ReadBinaryResource(relPath);
     }
 }
 
@@ -76,4 +95,3 @@ internal static class AssemblyExtensions
         return reader.ReadBytes((int)stream.Length);
     }
 }
-*/

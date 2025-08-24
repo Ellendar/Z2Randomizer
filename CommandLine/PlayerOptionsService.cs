@@ -31,9 +31,9 @@ namespace Z2Randomizer.CommandLine
         public PlayerOptionsService()
         {
             var fileservice = new DesktopFileService();
-            var files = fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites).Result;
+            IEnumerable<string> spriteFiles = fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites)?.Result ?? [];
             spriteOptions.Add(CharacterSprite.LINK);
-            foreach (var spriteFile in files)
+            foreach (var spriteFile in spriteFiles)
             {
                 var patch = fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile).Result;
                 var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");

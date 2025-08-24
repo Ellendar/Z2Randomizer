@@ -1,5 +1,5 @@
 ﻿import { dotnet } from './_framework/dotnet.js'
-import { compile } from './js65/js65.js'
+import { compile } from 'js65/libassembler.js'
 
 const is_browser = typeof window != "undefined";
 if (!is_browser) throw new Error(`Expected to be running in a browser`);
@@ -57,24 +57,21 @@ window.base64ToArrayBuffer = function (base64) {
     return bytes.buffer;
 }
 
-const PreloadedSprites = (async function() {
-    return Promise.all(
-        ["Aneru.ips", "Barba_Link.ips", "Black_Mage.ips",
-            "Brian64.ips", "BrianGBC.ips", "Cheese_Link.ips", "Crystalis.ips",
-            "Dragonlord.ips", "Error.ips", "Fighter.ips", "Glitch_Witch.ips",
-            "Hoodie_Link.ips", "Horsehead.ips", "Iron_Knuckle.ips", "JANKY.ips",
-            "Lady_Link.ips", "Midna.ips", "Olympia.ips", "Pyramid.ips", "Ruto.ips",
-            "Samus.ips", "Simon.ips", "Stalfos.ips", "Taco.ips", "Vase_Lady.ips",
-            "White_Air_Knight.ips", "White_Mage.ips", "Yoshi.ips", "Zelda.ips"]
-            .map(async (value) => {
-                return await fetch(value).then(
+const PreloadedSprites = (async function () {
+    const ipsManifest = await fetch("ips-manifest.txt");
+    const text = await ipsManifest.text();
+    const filenames = text.split(/\n/).map(line => line.trim()).filter(line => line.length > 0);
+
+    return Promise.all(filenames
+            .map(async (filename) => {
+                return await fetch("Sprites/" + filename).then(
                     (res) => res.arrayBuffer()
                 ).then(
-                    (buf) => new Object({"Filename": value, "Patch": arrayBufferToBase64(buf)})
+                    (buf) => new Object({"Filename": filename, "Patch": arrayBufferToBase64(buf)})
                 );
             })
-    ).then((loadedfiles) => {
-        return JSON.stringify(loadedfiles)
+    ).then((loadedFiles) => {
+        return JSON.stringify(loadedFiles)
     });
 })();
 
@@ -97,6 +94,10 @@ window.DownloadFile = (data, name) => {
     a.click();
     window.URL.revokeObjectURL(url);
     a.remove();
+};
+
+window.SetTitle = (title) => {
+    document.title = title;
 };
 
 await dotnetRuntime.runMain(config.mainAssemblyName, [window.location.search]);
