@@ -15380,7 +15380,7 @@
     "connections": "FF00FF04",
     "elevatorScreen": 0,
     "enabled": true,
-    "enemies": "0B24514D514B51375101CA",
+    "enemies": "094A91004A038A05CA",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -15393,7 +15393,7 @@
     "linkedRoomName": null,
     "map": 4,
     "memoryAddress": 83056,
-    "name": "island adventure pillar room",
+    "name": "island adventure pillar room v2",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [
@@ -15406,7 +15406,7 @@
         "FAIRY"
       ]
     ],
-    "sideviewData": "54600F08F7507006710691D1D10061F451F573F362F491F1D215D11050F5722380F26120822490F17220722090F162F451F5722080F293F1712080F2832090F1A22082F251F561F464F451F5A220D1028120D104"
+    "sideviewData": "46600F08F7507006710691D1D10061F451F573F393F1D205D100722380F26120822490F17220722090F1752080F2742080F2832090F1A22095F163F451F5A220D1028120D104"
   },
   {
     "author": "miralupa",
@@ -15810,10 +15810,10 @@
     "map": 7,
     "enabled": true,
     "connections": "1BFC2200",
-    "enemies": "0B08D0071006976B916191",
+    "enemies": "0908D007106B916191",
     "sideviewData": "2C600708240A2C0AD500407F88F2A13435F480F211F9B1065170B006B10611F931F480F2417DA03485F2D907",
     "bitmask": "0F",
-    "requirements": [],
+    "requirements": ["FAIRY"],
     "hasItem": false,
     "hasBoss": false,
     "isBossRoom": false,
@@ -16618,7 +16618,7 @@
     "isDropZone": false,
     "hasItem": false,
     "enemies": "051D997804",
-    "sideviewData": "2F600D08A029D2006531F31F92355130513F9633420F0BF41F903576319233523F9435F21B96335432A229F252D60D",
+    "sideviewData": "2F600D08A029D2006531F31F92355130513F9633420F0BF41F903576319233523F9435F21B96335432A229F252D30D",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "The Lost Elevator (aaron jam 4_4 P5_M49)",
@@ -17842,7 +17842,7 @@
     "connections": "5F79FF64",
     "hasDrop": true,
     "elevatorScreen": -1,
-    "requirements": [],
+    "requirements": ["JUMP", "FAIRY"],
     "isDropZone": false,
     "hasItem": false,
     "enemies": "097E8B0D0B72D12A85",
@@ -18700,8 +18700,8 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "0500453C97",
-    "sideviewData": "26600F08E100D080200A4021B106B106B1066276B006B106B206B1068276FC50A840F110D10F",
+    "enemies": "0520453C97",
+    "sideviewData": "33600F086F22D184400AD181A006A106A106A2065176A006A206A1067376FB500006A090C0200106A090C020F311920F10D20F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Elevator to pit with bridge",
