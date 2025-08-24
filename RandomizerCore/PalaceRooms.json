@@ -15810,7 +15810,7 @@
     "map": 7,
     "enabled": true,
     "connections": "1BFC2200",
-    "enemies": "0B08D0071006976B916191",
+    "enemies": "0908D007106B916191",
     "sideviewData": "2C600708240A2C0AD500407F88F2A13435F480F211F9B1065170B006B10611F931F480F2417DA03485F2D907",
     "bitmask": "0F",
     "requirements": ["FAIRY"],
