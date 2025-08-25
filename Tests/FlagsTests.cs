@@ -29,7 +29,7 @@ public class FlagsTests
     public void TestBlankEncodeCycle()
     {
         RandomizerConfiguration config = new();
-        String flags = config.Flags;
+        string flags = config.Flags;
         RandomizerConfiguration config2 = new(flags);
         foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
         {

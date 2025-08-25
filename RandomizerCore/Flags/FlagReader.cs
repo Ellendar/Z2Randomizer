@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace Z2Randomizer.RandomizerCore.Flags;
 
@@ -113,7 +114,6 @@ public class FlagReader
 
         bool[] bitRange = bits.GetRange(index, count).ToArray();
         Array.Reverse(bitRange);
-        bitRange.Reverse();
         BitArray bitArray = new BitArray(bitRange);
         int[] ints = new int[1];
         bitArray.CopyTo(ints, 0);
@@ -140,11 +140,11 @@ public class FlagReader
     }
     public byte ReadByte(int extent)
     {
-        return (byte)Take((int)Math.Log(extent - 1, 2) + 1);
+        return (byte)Take(BitOperations.Log2((uint)extent - 1) + 1);
     }
     public byte? ReadNullableByte(int extent)
     {
-        int result = (byte)Take((int)Math.Log(extent, 2) + 1);
+        int result = (byte)Take(BitOperations.Log2((uint)extent) + 1);
         if (result == extent)
         {
             return null;
@@ -153,11 +153,11 @@ public class FlagReader
     }
     public int ReadInt(int extent)
     {
-        return Take((int)Math.Log(extent - 1, 2) + 1);
+        return Take(BitOperations.Log2((uint)extent - 1) + 1);
     }
     public int? ReadNullableInt(int extent)
     {
-        int result = (byte)Take((int)Math.Log(extent, 2) + 1);
+        int result = (byte)Take(BitOperations.Log2((uint)extent) + 1);
         if (result == extent)
         {
             return null;
@@ -174,7 +174,7 @@ public class FlagReader
 
         int limit = Enum.GetValues(typeof(T)).Length - 1;
 
-        int take = (byte)Take((int)Math.Log(limit, 2) + 1);
+        int take = (byte)Take(BitOperations.Log2((uint)limit) + 1);
         return (T)Enum.GetValues<T>().GetValue(take)!;
     }
 
@@ -187,7 +187,7 @@ public class FlagReader
 
         int limit = Enum.GetValues(typeof(T)).Length;
 
-        int take = (byte)Take((int)Math.Log(limit, 2) + 1);
+        int take = (byte)Take(BitOperations.Log2((uint)limit) + 1);
         if(take == limit)
         {
             return null;

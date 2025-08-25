@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace Z2Randomizer.RandomizerCore.Flags;
@@ -17,6 +18,7 @@ public class FlagBuilder
     public FlagBuilder()
     {
         bits = new List<bool>();
+        bits.EnsureCapacity(300);
     }
 
     public FlagBuilder Append(bool value)
@@ -55,8 +57,8 @@ public class FlagBuilder
         {
             throw new ArgumentException("Value is greater than extent in FlagBuilder.Append(int, int)");
         }
-        BitArray argBits = new BitArray(new int[] {value});
-        for (int i = (int)Math.Log(extent - 1, 2); i >= 0; i--)
+        BitArray argBits = new BitArray([value]);
+        for (int i = BitOperations.Log2((uint)extent - 1); i >= 0; i--)
         {
             bits.Add(argBits[i]);
         }

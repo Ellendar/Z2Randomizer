@@ -12,12 +12,29 @@ using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 
+[AttributeUsage(AttributeTargets.Class)]
+public class FlagSerializeAttribute : Attribute
+{
+}
+
+/**
+ * We don't need to bring in ReactiveUI to the base RandomizerCore if we just make our own source generator.
+ * To keep the usage similar to the original ReactiveUI SourceGenerator, I kept the name `Reactive` for the attribute
+ * in case we bail on this idea later.
+ */
+public class ReactiveAttribute : Attribute
+{
+
+}
+
 
 [FlagSerialize]
 public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 {
+    [IgnoreInFlags]
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_ITEMS = [
         Collectable.CANDLE,
         Collectable.GLOVE,
@@ -29,6 +46,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         Collectable.MAGIC_KEY
     ];
 
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_SPELLS = [
         Collectable.SHIELD_SPELL,
         Collectable.JUMP_SPELL,
@@ -586,44 +604,44 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     public string Flags
     {
         get => Serialize();
-        set => ConvertFlags(value?.Trim() ?? "", this);
+        set => Deserialize(value?.Trim() ?? "");
     }
 
     public RandomizerConfiguration()
     {
-        StartingAttackLevel = 1;
-        StartingMagicLevel = 1;
-        StartingLifeLevel = 1;
+        startingAttackLevel = 1;
+        startingMagicLevel = 1;
+        startingLifeLevel = 1;
 
-        MaxHeartContainers = MaxHeartsOption.EIGHT;
-        StartingHeartContainersMin = 8;
-        StartingHeartContainersMax = 8;
+        maxHeartContainers = MaxHeartsOption.EIGHT;
+        startingHeartContainersMin = 8;
+        startingHeartContainersMax = 8;
 
-        AttackLevelCap = 8;
-        MagicLevelCap = 8;
-        LifeLevelCap = 8;
+        attackLevelCap = 8;
+        magicLevelCap = 8;
+        lifeLevelCap = 8;
 
-        DisableMusic = false;
-        RandomizeMusic = false;
-        MixCustomAndOriginalMusic = true;
-        DisableUnsafeMusic = true;
-        FastSpellCasting = false;
-        ShuffleSpritePalettes = false;
-        PermanentBeamSword = false;
-        UpAOnController1 = false;
-        RemoveFlashing = false;
-        Sprite = CharacterSprite.LINK;
-        Climate = Climates.Classic;
+        disableMusic = false;
+        randomizeMusic = false;
+        mixCustomAndOriginalMusic = true;
+        disableUnsafeMusic = true;
+        fastSpellCasting = false;
+        shuffleSpritePalettes = false;
+        permanentBeamSword = false;
+        upAOnController1 = false;
+        removeFlashing = false;
+        sprite = CharacterSprite.LINK;
+        climate = Climates.Classic;
         if (Sprite == null || Climate == null)
         {
             throw new ImpossibleException();
         }
-        Tunic = CharacterColor.Default;
-        TunicOutline = CharacterColor.Default;
-        ShieldTunic = CharacterColor.Default;
-        BeamSprite = BeamSprites.DEFAULT;
-        UseCustomRooms = false;
-        DisableHUDLag = false;
+        tunic = CharacterColor.Default;
+        tunicOutline = CharacterColor.Default;
+        shieldTunic = CharacterColor.Default;
+        beamSprite = BeamSprites.DEFAULT;
+        useCustomRooms = false;
+        disableHUDLag = false;
         // this.WhenAnyPropertyChanged()
         //     .ObserveOn(RxApp.MainThreadScheduler)
         //     .Throttle(TimeSpan.FromMilliseconds(10))
@@ -633,12 +651,12 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     public RandomizerConfiguration(string flagstring) : this()
     {
-        ConvertFlags(flagstring, this);
+        Deserialize(flagstring);
     }
     
     // [method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(RandomizerConfiguration))]
-    private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
-    {
+    // private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
+    // {
         //seed - climate - sprite
 //         var config = newThis ?? new RandomizerConfiguration();
 //         FlagReader flagReader = new FlagReader(flagstring);
@@ -718,6 +736,44 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 //             }
             //Debug.WriteLine(property.Name + "\t" + flagReader.index);
         // }
+    // }
+    private bool DeserializeBool(FlagReader flags, string name)
+    {
+        return flags.ReadBool();
+    }
+    private bool? DeserializeNullableBool(FlagReader flags, string name)
+    {
+        return flags.ReadNullableBool();
+    }
+    private int DeserializeInt(FlagReader flags, string name, int limit, int? minimum)
+    {
+        int min = minimum ?? 0;
+        return flags.ReadInt(limit) + min;
+    }
+    private int? DeserializeNullableInt(FlagReader flags, string name, int limit, int? minimum)
+    {
+        int? val = flags.ReadNullableInt(limit);
+        val += minimum;
+        return val;
+    }
+
+    private T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
+    {
+        var limit = GetEnumCount<T>();
+        var index = flags.ReadInt(limit);
+        return GetEnumFromIndex<T>(index)!;
+    }
+    private T? DeserializeNullableEnum<T>(FlagReader flags, string name) where T: Enum
+    {
+        var limit = GetEnumCount<T>();
+        var index = flags.ReadNullableInt(limit);
+        return index == null ? default : GetEnumFromIndex<T>(index.Value)!;
+    }
+
+    private T DeserializeCustom<Serializer, T>(FlagReader flags, string name) where Serializer : IFlagSerializer where T : class
+    {
+        IFlagSerializer serializer = GetSerializer<Serializer>();
+        return (T)serializer.Deserialize(flags.ReadInt(serializer.GetLimit()))!;
     }
 
 //     public string Serialize()
@@ -820,6 +876,58 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 //
 //         return flags.ToString();
 //     }
+
+    private void SerializeBool(FlagBuilder flags, string name, bool? val, bool isNullable)
+    {
+        if (isNullable)
+        {
+            flags.Append(val);
+        }
+        else
+        {
+            bool v = val!.Value;
+            flags.Append(v);
+        }
+    }
+
+    private void SerializeInt(FlagBuilder flags, string name, int? val, bool isNullable, int limit, int? minimum)
+    {
+        // limit is checked for null in the flags source generator
+        var min = minimum ?? 0;
+        if (isNullable)
+        {
+            if (val != null && (val < minimum || val > minimum + limit))
+            {
+                logger.Warn($"Property ({name}) was out of range.");
+                val = minimum;
+            }
+            flags.Append(val - minimum, limit);
+        }
+        else
+        {
+            var value = val!.Value;
+            if (value < minimum || value > minimum + limit)
+            {
+                logger.Warn($"Property ({name}) was out of range.");
+                value = min;
+            }
+            flags.Append(value - minimum, limit);
+        }
+    }
+
+    private void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
+    {
+        var index = GetEnumIndex<T>(val);
+        var limit = GetEnumCount<T>();
+        flags.Append(index, limit);
+    }
+
+    private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class
+    {
+        IFlagSerializer serializer = Activator.CreateInstance<Serializer>();
+        flags.Append(serializer.Serialize(val), serializer.GetLimit());
+    }
+
     public RandomizerProperties Export(Random r)
     {
         RandomizerProperties properties = new()
