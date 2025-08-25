@@ -12,7 +12,7 @@
     <RootNamespace>Z2Randomizer.RandomizerCore</RootNamespace>
     <LangVersion>default</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-      <DefineConstants Condition="'$(Configuration)' == 'Debug'">UNSAFE_DEBUG;$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition="'$(Configuration)' == 'Debug'">UNSAFE_DEBUG;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
