@@ -12,7 +12,7 @@ namespace Z2Randomizer.WinFormUI.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.12.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.14.0.0")]
     public sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -205,8 +205,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RChN6GAABRFJUNmCsyX5t+@KChsAjtZdAAFRA\", \"Name\": \"Beginner\", \"Tooltip" +
-            "\": \"This is great for people looking for a casual experience\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh\", \"Name\": \"SGL\", \"Tooltip\": \"\"" +
+            "}")]
         public string customizableButton1 {
             get {
                 return ((string)(this["customizableButton1"]));
@@ -218,8 +218,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RAAN6BABYbFs2NmCs3Y5c+!59qtgbtJdAAFRA\", \"Name\": \"Standard\", \"Tooltip" +
-            "\": \"Standard Flags commonly used for races.\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh\", \"Name\": \"SGL\", \"Tooltip\": \"\"" +
+            "}")]
         public string customizableButton2 {
             get {
                 return ((string)(this["customizableButton2"]));
@@ -231,8 +231,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAB0thBYbWs4WELs4HGD+!59rMgbtJ!AAFRA\", \"Name\": \"Max Rando\", \"Toolti" +
-            "p\": \"Flags for the 2023 Max Rando Tournament\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh\", \"Name\": \"SGL\", \"Tooltip\": \"\"" +
+            "}")]
         public string customizableButton3 {
             get {
                 return ((string)(this["customizableButton3"]));
@@ -293,8 +293,8 @@ namespace Z2Randomizer.WinFormUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"hEAK0thCqbs36emL4XpGU+!5@W4xeWvdAALhA\", \"Name\": \"Random%\", \"Tooltip\"" +
-            ": \"Is it randomized? Who knows?\"}")]
+        [global::System.Configuration.DefaultSettingValueAttribute("{\"Flagset\": \"RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh\", \"Name\": \"SGL\", \"Tooltip\": \"\"" +
+            "}")]
         public string customizableButton4 {
             get {
                 return ((string)(this["customizableButton4"]));

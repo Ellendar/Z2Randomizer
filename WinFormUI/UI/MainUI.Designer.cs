@@ -1843,8 +1843,8 @@ partial class MainUI
         minThunderCostCheckbox.Name = "minThunderCostCheckbox";
         minThunderCostCheckbox.Size = new Size(160, 19);
         minThunderCostCheckbox.TabIndex = 37;
-        minThunderCostCheckbox.Text = "Thunder Costs at Least 72";
-        toolTip1.SetToolTip(minThunderCostCheckbox, "Thunder cost is at least 72");
+        minThunderCostCheckbox.Text = "Expensive Thunder";
+        toolTip1.SetToolTip(minThunderCostCheckbox, "Expensive Thunder");
         minThunderCostCheckbox.UseVisualStyleBackColor = true;
         minThunderCostCheckbox.CheckedChanged += minThunderCostCheckbox_CheckedChanged;
         // 

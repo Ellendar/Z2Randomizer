@@ -152,6 +152,11 @@ public class Hyrule
 
         World.ResetStats();
         RNG = new Random(config.Seed);
+        //To prevent the original SGL and updated from rolling similarly
+        for(int i = 0; i < 32; i++)
+        {
+            RNG.Next(64);
+        }
         props = config.Export(RNG);
         props.saveRom = saveRom;
         if(UNSAFE_DEBUG) 
@@ -2179,7 +2184,7 @@ public class Hyrule
 
             if(props.ExpLevel == StatEffectiveness.SGL)
             {
-                low = RNG.Next(low - 2, low + 1);
+                low = RNG.Next(low - 0, low + 2);
             }
             else if (props.ExpLevel != StatEffectiveness.NONE)
             {
