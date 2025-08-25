@@ -30,6 +30,7 @@
         <PackageReference Include="Aigamo.ResXGenerator" Version="4.2.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.2" />
     </ItemGroup>
 
     <ItemGroup>
