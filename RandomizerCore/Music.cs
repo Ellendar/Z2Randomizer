@@ -132,9 +132,11 @@ internal class MusicRandomizer
     IShuffler _shuffler;
     byte[] _rom;
     SimpleRomAccess _romAccess;
-    List<string> _libPaths;
+    List<string> _jsonLibPaths;
+    List<string> _yamlLibPaths;
     List<int> _freeBanks;
     bool _includeBuiltin;
+    bool _includeDiverse;
 
     Z2Importer _imptr;
 
@@ -148,18 +150,22 @@ internal class MusicRandomizer
     public MusicRandomizer(
         Hyrule hyrule,
         int seed,
-        IEnumerable<string> libPaths,
+        IEnumerable<string> jsonLibPaths,
+        IEnumerable<string> yamlLibPaths,
         IEnumerable<int> freeBanks,
         bool includeBuiltin,
+        bool includeDiverse,
         bool safeOnly)
     {
         _hyrule = hyrule;
         _shuffler = new RandomShuffler(new Random(seed));
         _rom = _hyrule.ROMData.GetBytes(0, ROM.RomSize);
         _romAccess = new(_rom);
-        _libPaths = new(libPaths);
+        _jsonLibPaths = new(jsonLibPaths);
+        _yamlLibPaths = new(yamlLibPaths);
         _freeBanks = new(freeBanks);
         _includeBuiltin = includeBuiltin;
+        _includeDiverse = includeDiverse;
 
         _imptr = new(_romAccess, _freeBanks);
         _imptr.DefaultParserOptions.SafeOnly = safeOnly;
@@ -172,13 +178,13 @@ internal class MusicRandomizer
 
         _spoilerSb.Clear();
 
-        if (_libPaths.Count == 0)
+        if (_jsonLibPaths.Count == 0 && _yamlLibPaths.Count == 0)
             return; // Nothing to do
 
         // Testing songs is to help in making libraries. As libraries will be something that the average user can make, it can't be limited to debug builds like in MM2R. However, if people end up using libraries so large that this ends up taking a lot of time, it may be necessary to remove it. It's also entirely possible that the optimizer will notice that this function doesn't actually do anything that affects the rest of the program and eliminate it completely...
         TestSongs();
 
-        var songs = LoadSongs(_includeBuiltin);
+        var songs = LoadSongs(_includeBuiltin, _includeDiverse);
         var usesSongs = _imptr.SplitSongsByUsage<Usage>(songs);
 
         Dictionary<Usage, int> numUsageSongs = new()
@@ -234,16 +240,43 @@ internal class MusicRandomizer
 
     List<ISong> LoadSongs(
         bool includeBuiltin,
+        bool includeDiverse,
         LibraryParserOptions? opts = null)
     {
         List<FtSong> ftSongs = new();
-        foreach (var libPath in _libPaths)
+        LoadLibrariesSongs(
+            _jsonLibPaths, 
+            d => _imptr.LoadFtJsonLibrarySongs(d, opts), 
+            includeDiverse,
+            ftSongs);
+        LoadLibrariesSongs(
+            _yamlLibPaths,
+            d => _imptr.LoadFtYamlLibrarySongs(d, opts),
+            includeDiverse,
+            ftSongs);
+
+        List<ISong> songs = new();
+        if (includeBuiltin)
+            songs.AddRange(_imptr.CreateBuiltinSongs());
+
+        songs.AddRange(ftSongs);
+
+        return songs;
+    }
+
+    void LoadLibrariesSongs(
+        IEnumerable<string> libPaths, 
+        Func<string, IEnumerable<FtSong>> loader,
+        bool includeDiverse,
+        List<FtSong> songs)
+    {
+        foreach (var libPath in libPaths)
         {
             string libData = File.ReadAllText(libPath, Encoding.UTF8);
 
             try
             {
-                ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData, opts));
+                songs.AddRange(loader(libData).Where(song => includeDiverse || !song.Tags.Contains("diverse")));
             }
             catch (ParsingError ex)
             {
@@ -263,14 +296,6 @@ internal class MusicRandomizer
                 throw new Exception(sb.ToString(), ex);
             }
         }
-
-        List<ISong> songs = new();
-        if (includeBuiltin)
-            songs.AddRange(_imptr.CreateBuiltinSongs());
-
-        songs.AddRange(ftSongs);
-
-        return songs;
     }
 
     SongMap CreateSongMap(UsesSongs usesSongs)
@@ -391,7 +416,7 @@ internal class MusicRandomizer
     {
         LibraryParserOptions opts = new() { EnabledOnly = false, SafeOnly = false };
 
-        var songs = LoadSongs(false, opts);
+        var songs = LoadSongs(false, true, opts);
         _imptr.TestRebase(songs);
     }
 }
