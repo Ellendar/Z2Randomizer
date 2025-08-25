@@ -254,11 +254,11 @@ public abstract class World
     {
         return PlaceLocations(riverTerrain, saneCaves, null, -1);
     }
-    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location hiddenKasutoLocation, int hiddenPalaceX)
+    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
     {
         //return true;
         int i = 0;
-        foreach (Location location in AllLocations.Where(i => i.AppearsOnMap))
+        foreach (Location location in AllLocations.Where(loc => loc.AppearsOnMap))
         {
             i++;
             if ((location.TerrainType != Terrain.BRIDGE
@@ -359,7 +359,7 @@ public abstract class World
             if(location!.TerrainType == Terrain.TOWN)
             {
                 foreach (Location linkedLocation in AllLocations.Where(
-                    i => !i.AppearsOnMap && i?.ActualTown?.GetMasterTown() == location.ActualTown))
+                    loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
                 {
                     linkedLocation.Coords = location.Coords;
                 }

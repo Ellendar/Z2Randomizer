@@ -48,6 +48,7 @@ public partial class Palace
         Entrance = null;
         rooms = [];
         AllRooms = [];
+        ItemRooms = [];
     }
 
     /*
@@ -670,7 +671,7 @@ public partial class Palace
             //Up + Down
             else if (hasUp && hasDown)
             {
-                if (remove.Up.HasDrop != remove.HasDrop)
+                if (remove.Up == null || remove.Up.HasDrop != remove.HasDrop)
                 {
                     tries++;
                     continue;
@@ -784,7 +785,7 @@ public partial class Palace
                         && remove.Left!.Down != null
                         && remove.Left.CountExits() == 2
                         && remove.Left.HasDrop == remove.Up!.HasDrop
-                        && !AllRooms.Any(i => i.Up == remove.Left))
+                        && AllRooms.All(i => i.Up != remove.Left))
                     {
                         remove.Left!.Down!.Up = remove.Up;
                         remove.Up!.Down = remove.Left.Down;
@@ -799,11 +800,11 @@ public partial class Palace
                     //Also remove up
                     else if (removeVerticalRoom
                         && remove.Up!.Right != null
-                        && !AllRooms.Any(i => i.Up == remove)
+                        && AllRooms.All(i => i.Up != remove)
                         && remove.Up.CountExits() == 2)
                     {
                         remove.Up.Right.Left = remove.Left;
-                        remove.Left.Right = remove.Up.Right;
+                        remove.Left!.Right = remove.Up.Right;
 
                         AllRooms.Remove(remove);
                         AllRooms.Remove(remove.Up);
@@ -825,7 +826,7 @@ public partial class Palace
                         && remove.Right!.Down != null
                         && remove.Right.CountExits() == 2
                         && remove.Right.HasDrop == remove.Up!.HasDrop
-                        && !AllRooms.Any(i => i.Up == remove.Right))
+                        && AllRooms.All(i => i.Up != remove.Right))
                     {
                         remove.Right!.Down!.Up = remove.Up;
                         remove.Up!.Down = remove.Right.Down;
@@ -840,11 +841,11 @@ public partial class Palace
                     //Also remove up
                     else if(removeVerticalRoom 
                         && remove.Up!.Left != null
-                        && !AllRooms.Any(i => i.Up == remove)
+                        && AllRooms.All(i => i.Up != remove)
                         && remove.Up.CountExits() == 2)
                     {
                         remove.Up.Left.Right = remove.Right;
-                        remove.Right.Left = remove.Up.Left;
+                        remove.Right!.Left = remove.Up.Left;
 
                         AllRooms.Remove(remove);
                         AllRooms.Remove(remove.Up);

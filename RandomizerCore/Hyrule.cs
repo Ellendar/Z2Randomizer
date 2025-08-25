@@ -105,8 +105,9 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    public const bool UNSAFE_DEBUG = false;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
     private static int DEBUG_THRESHOLD = 200;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -202,7 +203,7 @@ public class Hyrule
         {
             Hash = "";
             World.ResetStats();
-            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
+            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
             RNG = new Random(SeedHash);
 
             config.CheckForFlagConflicts();
@@ -212,11 +213,10 @@ public class Hyrule
             {
                 RNG.NextBytes(new byte[64]);
             }
-            if (UNSAFE_DEBUG)
-            {
-                string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
-                Debug.WriteLine(export);
-            }
+#if UNSAFE_DEBUG
+            string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
+            Debug.WriteLine(export);
+#endif
             Flags = config.Flags;
 
             Assembler assembler = CreateAssemblyEngine();
@@ -1316,13 +1316,15 @@ public class Hyrule
             if (ItemGet[item] == false && item.IsItemGetItem())
             {
                 itemGetReachableFailures++;
-                if (UNSAFE_DEBUG && reachableLocationsCount >= DEBUG_THRESHOLD)
+#if UNSAFE_DEBUG
+                if (reachableLocationsCount >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(westHyrule.GetMapDebug());
                     return false;
                 }
+#endif
                 return false;
             }
         }
@@ -1351,28 +1353,30 @@ public class Hyrule
         if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
-            if(UNSAFE_DEBUG)
-            {
-                List<Location> missingLocations =
-                [
-                    .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                    .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                    .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                ];
+#if UNSAFE_DEBUG
+            List<Location> missingLocations =
+            [
+                .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
+                .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
+                .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
+            ];
 
-                List<Location> nonDmLocations = new(missingLocations);
-                missingLocations.AddRange(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
+            List<Location> nonDmLocations = new(missingLocations);
+            missingLocations.AddRange(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
 
-                Debug.WriteLine("Unreachable locations:");
-                Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
+            Debug.WriteLine("Unreachable locations:");
+            Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
 
-                return false;
-            }
+            return false;
+#endif
         }
-        if (UNSAFE_DEBUG && retval)
+
+#if UNSAFE_DEBUG
+        if (retval)
         {
             //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
         }
+#endif
         return retval;
     }
 
@@ -3412,12 +3416,11 @@ public class Hyrule
                     int item = ROMData.GetByte(addr);
                     if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
                     {
-                        if (UNSAFE_DEBUG)
-                        {
-                            logger.Debug("Map: " + map);
-                            logger.Debug("Item: " + item);
-                            logger.Debug($"Address: {addr:X}");
-                        }
+#if UNSAFE_DEBUG
+                        logger.Debug("Map: " + map);
+                        logger.Debug("Item: " + item);
+                        logger.Debug($"Address: {addr:X}");
+#endif
                         addresses.Add(addr);
                         items.Add(item);
                     }

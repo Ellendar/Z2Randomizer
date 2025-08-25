@@ -31,7 +31,7 @@ public static class Program
                 // App.ServiceContainer.AddSingleton<IPersistenceService>(x => new LocalFilePersistenceService());
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    var version = Assembly.GetEntryAssembly().GetName().Version;
+                    var version = Assembly.GetEntryAssembly()!.GetName().Version!;
                     var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
                     WinSparkle.win_sparkle_set_appcast_url(
                         "https://github.com/Ellendar/Z2Randomizer/raw/refs/heads/4.4/appcast.xml");

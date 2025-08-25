@@ -2065,16 +2065,17 @@ public sealed class EastHyrule : World
             }
         } while (pendingCoordinates.Count > 0);
 
-
-        if(unreachedLocations.Count == 2 && Hyrule.UNSAFE_DEBUG) 
+#if UNSAFE_DEBUG
+        if(unreachedLocations.Count == 2)
         {
             //Debug.WriteLine(unreachedLocations.First().Name);
             //Debug.WriteLine(GetMapDebug());
         }
-        else if (unreachedLocations.Count <= 3 && Hyrule.UNSAFE_DEBUG)
+        else if (unreachedLocations.Count <= 3)
         {
             //unreachedLocations.ForEach(i => Debug.WriteLine(i.Name));
         }
+#endif
 
         return !unreachedLocations.Any();
     }

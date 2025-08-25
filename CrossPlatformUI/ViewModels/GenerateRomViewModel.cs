@@ -77,7 +77,7 @@ Seed: {config.Seed}
             var customJson = config.UseCustomRooms ? await files.OpenFile(IFileSystemService.RandomizerPath.Palaces, "CustomRooms.json") : null;
             var rooms = config.UseCustomRooms ? customJson : roomsJson;
             var palaceRooms = new PalaceRooms(rooms!, config.UseCustomRooms);
-            var randomizer = new Hyrule(createAsm, palaceRooms);
+            var randomizer = new Hyrule(createAsm!, palaceRooms);
             Dispatcher.UIThread.Post(GenerateSeed, DispatcherPriority.Background);
             return;
             

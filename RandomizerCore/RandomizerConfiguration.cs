@@ -631,6 +631,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         upAOnController1 = false;
         removeFlashing = false;
         sprite = CharacterSprite.LINK;
+        spriteName = CharacterSprite.LINK.DisplayName!;
         climate = Climates.Classic;
         if (Sprite == null || Climate == null)
         {
@@ -729,7 +730,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class
     {
-        IFlagSerializer serializer = Activator.CreateInstance<Serializer>();
+        var serializer = GetSerializer<Serializer>();
         flags.Append(serializer.Serialize(val), serializer.GetLimit());
     }
 

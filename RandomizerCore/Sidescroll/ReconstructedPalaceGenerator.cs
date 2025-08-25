@@ -59,24 +59,23 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                 if (palaceNumber < 7) //Not GP
                 {
-                    for(int i = 0; i < props.PalaceItemRoomCounts[palaceNumber - 1]; i++)
+                    for (int i = 0; i < props.PalaceItemRoomCounts[palaceNumber - 1]; i++)
                     {
                         if (roomPool.ItemRoomsByDirection.Values.Sum(i => i.Count) == 0)
                         {
                             throw new Exception("No item rooms for reconstructed palace");
                         }
                         Direction itemRoomDirection = Direction.NONE;
-                        Room itemRoom = null;
-                        Room? itemRoomCandidate = null;
+                        Room? itemRoom = null;
                         while (itemRoom == null)
                         {
                             itemRoomDirection = DirectionExtensions.RandomItemRoomOrientation(r);
-                            if (!roomPool.ItemRoomsByDirection.ContainsKey(itemRoomDirection))
+                            if (!roomPool.ItemRoomsByDirection.TryGetValue(itemRoomDirection, out var value))
                             {
                                 continue;
                             }
-                            itemRoomCandidate = roomPool.ItemRoomsByDirection[itemRoomDirection].ToList().Sample(r)!;
-                            if(itemRoomCandidate == null)
+                            var itemRoomCandidate = value.ToList().Sample(r);
+                            if (itemRoomCandidate == null)
                             {
                                 palace.IsValid = false;
                                 return palace;

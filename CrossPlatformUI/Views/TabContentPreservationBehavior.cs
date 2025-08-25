@@ -7,7 +7,7 @@ namespace CrossPlatformUI.Views;
 
 public class TabContentPreservationBehavior : Behavior<TabControl>
 {
-    private readonly Dictionary<TabItem, object> _contentCache = new();
+    private readonly Dictionary<TabItem, object> contentCache = new();
 
     protected override void OnAttached()
     {
@@ -27,21 +27,21 @@ public class TabContentPreservationBehavior : Behavior<TabControl>
         base.OnDetaching();
     }
 
-    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         // Cache content from tabs being deselected
         foreach (TabItem item in e.RemovedItems.OfType<TabItem>())
         {
             if (item.Content != null)
             {
-                _contentCache[item] = item.Content;
+                contentCache[item] = item.Content;
             }
         }
 
         // Restore content for newly selected tab
         foreach (TabItem item in e.AddedItems.OfType<TabItem>())
         {
-            if (_contentCache.TryGetValue(item, out var cachedContent))
+            if (contentCache.TryGetValue(item, out var cachedContent))
             {
                 item.Content = cachedContent;
             }
