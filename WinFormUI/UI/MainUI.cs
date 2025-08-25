@@ -90,7 +90,7 @@ public partial class MainUI : Form
 
         var version = Assembly.GetEntryAssembly().GetName().Version;
         var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
-        Text = "Zelda 2 Randomizer SGL VERSION";
+        Text = "Zelda 2 Randomizer SGL VERSION 2";
 
         flagsTextBox.DoubleClick += new System.EventHandler(flagBox_Clicked);
         shuffleStartingItemsCheckbox.CheckStateChanged += new System.EventHandler(UpdateFlagsTextbox);

@@ -48,13 +48,13 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="customizableButton1" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "RChN6GAABRFJUNmCsyX5t+@KChsAjtZdAAFRA", "Name": "Beginner", "Tooltip": "This is great for people looking for a casual experience"}</Value>
+      <Value Profile="(Default)">{"Flagset": "RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh", "Name": "SGL", "Tooltip": ""}</Value>
     </Setting>
     <Setting Name="customizableButton2" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "RAAN6BABYbFs2NmCs3Y5c+!59qtgbtJdAAFRA", "Name": "Standard", "Tooltip": "Standard Flags commonly used for races."}</Value>
+      <Value Profile="(Default)">{"Flagset": "RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh", "Name": "SGL", "Tooltip": ""}</Value>
     </Setting>
     <Setting Name="customizableButton3" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "hEAB0thBYbWs4WELs4HGD+!59rMgbtJ!AAFRA", "Name": "Max Rando", "Tooltip": "Flags for the 2023 Max Rando Tournament"}</Value>
+      <Value Profile="(Default)">{"Flagset": "RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh", "Name": "SGL", "Tooltip": ""}</Value>
     </Setting>
     <Setting Name="beepFrequency" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -69,7 +69,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="customizableButton4" Type="System.String" Scope="User">
-      <Value Profile="(Default)">{"Flagset": "hEAK0thCqbs36emL4XpGU+!5@W4xeWvdAALhA", "Name": "Random%", "Tooltip": "Is it randomized? Who knows?"}</Value>
+      <Value Profile="(Default)">{"Flagset": "RhJJnBABRbFt2NmF13X5g6@ojjWOusABhEhVh", "Name": "SGL", "Tooltip": ""}</Value>
     </Setting>
     <Setting Name="customizableButton5" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
