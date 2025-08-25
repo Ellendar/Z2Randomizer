@@ -7,6 +7,11 @@
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <LangVersion>default</LangVersion>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Configurations>Debug;Release;Unsafe Debug</Configurations>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+    <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+    <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />

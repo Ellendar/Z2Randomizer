@@ -9,6 +9,12 @@
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
         <RootNamespace>Z2Randomizer.CrossPlatformUI</RootNamespace>
+        <Configurations>Debug;Release;Unsafe Debug</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
     </PropertyGroup>
 
     <ItemGroup>
