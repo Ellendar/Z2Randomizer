@@ -251,12 +251,11 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             GenerateReactiveProperty(sb, field, indent);
         }
 
-        GenerateSerializerList(sb, classInfo.SerializedFields, indent);
-
         GenerateSerializeMethod(sb, classInfo.SerializedFields, indent);
         GenerateDeserializeMethod(sb, classInfo.SerializedFields, indent);
 
         // Generate helper methods for enum serialization
+        GenerateSerializerList(sb, classInfo.SerializedFields, indent);
         GenerateEnumHelperMethods(sb, classInfo.EnumArrays, indent);
 
         sb.AppendLine($"{indent}}}");
@@ -338,7 +337,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     private static void GenerateSerializerList(StringBuilder sb, List<SerializedFieldInfo> fields, string indent)
     {
         sb.AppendLine();
-        sb.AppendLine($"{indent}    public global::Z2Randomizer.RandomizerCore.Flags.IFlagSerializer GetSerializer<T>()");
+        sb.AppendLine($"{indent}    public static global::Z2Randomizer.RandomizerCore.Flags.IFlagSerializer GetSerializer<T>()");
         sb.AppendLine($"{indent}    {{");
         sb.AppendLine($"{indent}        var type =  typeof(T);");
         sb.AppendLine($"{indent}        switch (type)");
@@ -440,7 +439,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             var arrayName = GetEnumArrayName(enumType);
             var shortTypeName = GetShortTypeName(enumType);
 
-            sb.AppendLine($"{indent}            \"{shortTypeName}\" => Array.IndexOf({arrayName}, ({enumType})(object)enumValue),");
+            sb.AppendLine($"{indent}            \"{shortTypeName}\" => Array.IndexOf<{enumType}>({arrayName}, ({enumType})(object)enumValue),");
         }
 
         sb.AppendLine($"{indent}            _ => -1 // Unknown enum type");

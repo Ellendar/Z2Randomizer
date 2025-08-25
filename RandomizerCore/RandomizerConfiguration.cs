@@ -752,9 +752,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     }
     private int? DeserializeNullableInt(FlagReader flags, string name, int limit, int? minimum)
     {
-        int? val = flags.ReadNullableInt(limit);
-        val += minimum;
-        return val;
+        return flags.ReadNullableInt(limit, minimum);
     }
 
     private T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
@@ -893,15 +891,13 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private void SerializeInt(FlagBuilder flags, string name, int? val, bool isNullable, int limit, int? minimum)
     {
         // limit is checked for null in the flags source generator
-        var min = minimum ?? 0;
         if (isNullable)
         {
             if (val != null && (val < minimum || val > minimum + limit))
             {
                 logger.Warn($"Property ({name}) was out of range.");
-                val = minimum;
             }
-            flags.Append(val - minimum, limit);
+            flags.Append(val, limit, minimum);
         }
         else
         {
@@ -909,9 +905,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             if (value < minimum || value > minimum + limit)
             {
                 logger.Warn($"Property ({name}) was out of range.");
-                value = min;
             }
-            flags.Append(value - minimum, limit);
+            flags.Append(value, limit, minimum);
         }
     }
 
