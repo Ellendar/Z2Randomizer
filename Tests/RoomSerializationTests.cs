@@ -9,7 +9,31 @@ public class RoomSerializationTests
     [TestMethod]
     public void TestSerialization()
     {
-        string roomJson = "{\"name\": \"testName\", \"enabled\": true, \"group\": \"palace1vanilla\", \"map\": 4, \"connections\": \"0F000214\", \"enemies\": \"050F0B00CB\", \"sideviewData\": \"3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E\", \"bitmask\": \"0F\", \"isFairyBlocked\": false, \"isGloveBlocked\": false, \"isDownstabBlocked\": false, \"isUpstabBlocked\": false, \"isJumpBlocked\": false, \"hasItem\": false, \"hasBoss\": false, \"hasDrop\": false, \"elevatorScreen\": 2, \"memoryAddress\": \"01073B\", \"IsUpDownReversed\": false, \"isDropZone\": false}";
+        string roomJson = """
+{
+    "name": "testName",
+    "enabled": true,
+    "group": "vanilla",
+    "author": "palace1vanilla",
+    "map": 4,
+    "connections": "0F000214",
+    "enemies": "050F0B00CB",
+    "sideviewData": "3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E",
+    "bitmask": "0F",
+    "isFairyBlocked": false,
+    "isGloveBlocked": false,
+    "isDownstabBlocked": false,
+    "isUpstabBlocked": false,
+    "isJumpBlocked": false,
+    "hasItem": false,
+    "hasBoss": false,
+    "hasDrop": false,
+    "elevatorScreen": 2,
+    "memoryAddress": 67387,
+    "IsUpDownReversed": false,
+    "isDropZone": false
+}
+""";
 
         Room room = new Room(roomJson);
         String serialized = room.Serialize();

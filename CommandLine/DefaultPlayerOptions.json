@@ -2,6 +2,7 @@
   "DisableMusic": false,
   "RandomizeMusic": false,
   "MixCustomAndOriginalMusic":  true,
+  "IncludeDiverseMusic": false,
   "DisableUnsafeMusic":  true,
   "FastSpellCasting": true,
   "RemapUpAToUpSelect": true,

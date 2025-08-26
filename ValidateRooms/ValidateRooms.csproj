@@ -7,6 +7,13 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
     <RootNamespace>Z2Randomizer.ValidateRooms</RootNamespace>
+    <LangVersion>default</LangVersion>
+    <Configurations>Debug;Release;Unsafe Debug</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+    <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+    <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

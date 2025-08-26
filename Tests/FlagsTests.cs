@@ -1,12 +1,32 @@
 using System.Reflection;
+using CrossPlatformUI.Presets;
+using FluentAssertions.Execution;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Flags;
+using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Tests;
 
 [TestClass]
 public class FlagsTests
 {
+    [TestMethod]
+    public void TestBoolEncodeCycle()
+    {
+        FlagBuilder flagBuilder = new FlagBuilder();
+        flagBuilder.Append(false);
+        String flags = flagBuilder.ToString();
+        FlagReader flagReader = new FlagReader(flags);
+        Assert.AreEqual(false, flagReader.ReadBool());
+
+        flagBuilder.Append(false);
+        flagBuilder.Append(true);
+        flags = flagBuilder.ToString();
+        flagReader = new FlagReader(flags);
+        Assert.AreEqual(false, flagReader.ReadBool());
+        Assert.AreEqual(false, flagReader.ReadBool());
+        Assert.AreEqual(true, flagReader.ReadBool());
+    }
     [TestMethod]
     public void TestNullableBoolEncodeCycle()
     {
@@ -26,47 +46,108 @@ public class FlagsTests
         Assert.AreEqual((bool?)true, flagReader.ReadNullableBool());
     }
     [TestMethod]
+    public void TestIntEncodeCycle()
+    {
+        var limit = 8;
+        var minimum = 1;
+        FlagBuilder flagBuilder = new FlagBuilder();
+        flagBuilder.Append(1, limit, minimum);
+        String flags = flagBuilder.ToString();
+        FlagReader flagReader = new FlagReader(flags);
+        Assert.AreEqual(1, flagReader.ReadInt(limit, minimum));
+
+        flagBuilder.Append(8, limit, minimum);
+        flagBuilder.Append(3, limit, minimum);
+        flags = flagBuilder.ToString();
+        flagReader = new FlagReader(flags);
+        Assert.AreEqual(1, flagReader.ReadInt(limit, minimum));
+        Assert.AreEqual(8, flagReader.ReadInt(limit, minimum));
+        Assert.AreEqual(3, flagReader.ReadInt(limit, minimum));
+    }
+    [TestMethod]
+    public void TestEnumEncodeCycle()
+    {
+        var index = RandomizerConfiguration.GetEnumIndex<StartingResourceLimit>(StartingResourceLimit.NO_LIMIT);
+        var count = RandomizerConfiguration.GetEnumCount<StartingResourceLimit>();
+        FlagBuilder flagBuilder = new FlagBuilder();
+        flagBuilder.Append(index, count);
+        String flags = flagBuilder.ToString();
+        FlagReader flagReader = new FlagReader(flags);
+        Assert.AreEqual(StartingResourceLimit.NO_LIMIT, flagReader.ReadEnum<StartingResourceLimit>());
+
+        index = RandomizerConfiguration.GetEnumIndex<StartingResourceLimit>(StartingResourceLimit.FOUR);
+        flagBuilder.Append(index, count);
+        flags = flagBuilder.ToString();
+        flagReader = new FlagReader(flags);
+        Assert.AreEqual(StartingResourceLimit.NO_LIMIT, flagReader.ReadEnum<StartingResourceLimit>());
+        Assert.AreEqual(StartingResourceLimit.FOUR, flagReader.ReadEnum<StartingResourceLimit>());
+    }
+    [TestMethod]
+    public void TestCustomEncodeCycle()
+    {
+        var climate = Climates.Chaos;
+        var serializer = RandomizerConfiguration.GetSerializer<ClimateFlagSerializer>();
+        FlagBuilder flagBuilder = new FlagBuilder();
+        flagBuilder.Append(serializer.Serialize(climate), serializer.GetLimit());
+        String flags = flagBuilder.ToString();
+        FlagReader flagReader = new FlagReader(flags);
+        Assert.AreEqual(climate, serializer.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
+    }
+    [TestMethod]
+    public void TestNullableIntEncodeCycle()
+    {
+        int? nullInt = null;
+        var limit = 8;
+        var minimum = 1;
+        FlagBuilder flagBuilder = new FlagBuilder();
+        flagBuilder.Append(nullInt, limit, minimum);
+        String flags = flagBuilder.ToString();
+        FlagReader flagReader = new FlagReader(flags);
+        Assert.AreEqual(nullInt, flagReader.ReadNullableInt(limit, minimum));
+
+        flagBuilder.Append((int?)8, limit, minimum);
+        flagBuilder.Append((int?)3,  limit, minimum);
+        flags = flagBuilder.ToString();
+        flagReader = new FlagReader(flags);
+        Assert.AreEqual(nullInt, flagReader.ReadNullableInt(limit, minimum));
+        Assert.AreEqual((int?)8, flagReader.ReadNullableInt(limit, minimum));
+        Assert.AreEqual((int?)3, flagReader.ReadNullableInt(limit, minimum));
+    }
+    [TestMethod]
     public void TestBlankEncodeCycle()
     {
         RandomizerConfiguration config = new();
-        String flags = config.Flags;
+        string flags = config.Flags;
         RandomizerConfiguration config2 = new(flags);
+        var failures = new List<string>();
         foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
         {
             if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
             {
                 continue;
             }
-            Assert.AreEqual(property.GetValue(config), property.GetValue(config2), 
-                property.Name + " did not match. Config: " + property.GetValue(config) + " Config2: " + property.GetValue(config2));
+            var v1 = property.GetValue(config) == null ? "<null>" : property.GetValue(config)!.ToString();
+            var v2 = property.GetValue(config2) == null ? "<null>" : property.GetValue(config2)!.ToString();
+            if (v1 != v2)
+                failures.Add($"{property.Name} did not match. Config: {v1} Config2: {v2}");
         }
-        String flags2 = config2.Flags;
-        Assert.AreEqual(flags, flags2);
+        Assert.IsTrue(failures.Count == 0,
+            $"The following assertions failed: {Environment.NewLine}{string.Join(Environment.NewLine, failures)}");
     }
 
     [TestMethod]
     public void TestStandardFlagsEncodeCycle()
     {
-        //TODO: Restore these without using legacy flags
-        /*
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("hAhhD0j9$78$Jp5$$gAhOAdEScuA");
-        String flags = config.Flags;
-        RandomizerConfiguration config2 = new(flags);
-        String flags2 = config2.Flags;
-        Assert.AreEqual(flags, flags2);
-        */
+        RandomizerConfiguration config = StandardPreset.Preset;
+        RandomizerConfiguration config2 = new RandomizerConfiguration(StandardPreset.Preset.Flags);
+        Assert.AreEqual(config.Flags, config2.Flags);
     }
 
     [TestMethod]
     public void TestMaxRandoEncodeCycle()
     {
-        //TODO: Restore these without using legacy flags
-        /*
-        RandomizerConfiguration config = RandomizerConfiguration.FromLegacyFlags("iyAqh$j#g7z$ZqTBT!BhOA!0P@@A");
-        String flags = config.Flags;
-        RandomizerConfiguration config2 = new(flags);
-        String flags2 = config2.Flags;
-        Assert.AreEqual(flags, flags2);
-        */
+        RandomizerConfiguration config = MaxRandoPreset.Preset;
+        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRandoPreset.Preset.Flags);
+        Assert.AreEqual(config.Flags, config2.Flags);
     }
 }

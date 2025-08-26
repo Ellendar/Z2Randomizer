@@ -69,7 +69,7 @@ public class Program
             var r = new Random();
             Seed = r.Next(1000000000);
         } 
-        configuration.Seed = Seed.Value.ToString();
+        configuration!.Seed = Seed.Value.ToString();
 
         if (string.IsNullOrEmpty(Rom))
         {
@@ -128,7 +128,7 @@ public class Program
         Hyrule.NewAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
         var roomsJson = RandomizerCore.Util.ReadAllTextFromFile("PalaceRooms.json");
         var customJson = configuration!.UseCustomRooms ? RandomizerCore.Util.ReadAllTextFromFile("CustomRooms.json") : null;
-        var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson : roomsJson, configuration!.UseCustomRooms);
+        var palaceRooms = new PalaceRooms(configuration!.UseCustomRooms ? customJson! : roomsJson, configuration!.UseCustomRooms);
         var randomizer = new Hyrule(createAsm,palaceRooms);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 
@@ -170,7 +170,7 @@ public class Program
                 LogManager.SuspendLogging();
             }
 
-            foreach (var rule in LogManager.Configuration.LoggingRules)
+            foreach (var rule in LogManager.Configuration!.LoggingRules)
             {
                 // Iterate over all levels up to and including the target, (re)enabling them.
                 for (int i = level.Ordinal; i <= 5; i++)

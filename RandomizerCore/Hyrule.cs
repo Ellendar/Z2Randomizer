@@ -31,7 +31,7 @@ public class Hyrule
     //This was originally set to 10, but increasing it to 100 massively reduces the number of extremely degenerate caldera and mountain generation times
     private const int NON_TERRAIN_SHUFFLE_ATTEMPT_LIMIT = 200;
 
-    //This controls how many times 
+    //This controls how many times
     private const int NON_CONTINENT_SHUFFLE_ATTEMPT_LIMIT = 10;
 
     //private readonly Item[] SHUFFLABLE_STARTING_ITEMS = new Item[] { Item.CANDLE, Item.GLOVE, Item.RAFT, Item.BOOTS, Item.FLUTE, Item.CROSS, Item.HAMMER, Item.MAGIC_KEY };
@@ -106,8 +106,9 @@ public class Hyrule
     public List<Room> rooms;
 
     //DEBUG/STATS
-    public const bool UNSAFE_DEBUG = false;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
     private static int DEBUG_THRESHOLD = 200;
+#pragma warning restore CS0414 // Field is assigned but its value is never used
     public DateTime startTime = DateTime.Now;
     public DateTime startRandomizeStartingValuesTimestamp;
     public DateTime startRandomizeEnemiesTimestamp;
@@ -184,15 +185,15 @@ public class Hyrule
 
     private readonly NewAssemblerFn NewAssembler;
     private readonly PalaceRooms palaceRooms;
-    
+
     public string Hash { get; private set; }
 
     //This entire class structure is hot fucking garbage, but refactoring it such that it makes sense is
     //going to be a massive project, so for now we're just ignoring the fact that basically every property
     //is not guaranteed to initialize to the analyzer
-#pragma warning disable CS8618 
+#pragma warning disable CS8618
     public Hyrule(NewAssemblerFn createAsm, PalaceRooms rooms)
-#pragma warning restore CS8618 
+#pragma warning restore CS8618
     {
         NewAssembler = createAsm;
         palaceRooms = rooms;
@@ -203,6 +204,7 @@ public class Hyrule
         {
             Hash = "";
             World.ResetStats();
+
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
             r = new Random(SeedHash);
 
@@ -213,11 +215,10 @@ public class Hyrule
             {
                 r.NextBytes(new byte[64]);
             }
-            if (UNSAFE_DEBUG)
-            {
-                string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
-                Debug.WriteLine(export);
-            }
+#if UNSAFE_DEBUG
+            string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
+            Debug.WriteLine(export);
+#endif
             Flags = config.Flags;
 
             Assembler assembler = CreateAssemblyEngine();
@@ -299,7 +300,7 @@ public class Hyrule
                 AsmModule sideviewModule = new();
                 passedValidation = await FillPalaceRooms(sideviewModule);
 
-                
+
                 assembler.Add(sideviewModule);
             }
 
@@ -320,6 +321,7 @@ public class Hyrule
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
+			
             shuffler.ShuffleDrops(ROMData, r);
             shuffler.ShufflePbagAmounts(ROMData, r);
 
@@ -398,11 +400,21 @@ public class Hyrule
             if (randomizeMusic)
             {
                 string musicDir = "Music";
-                List<string> musicLibPaths = new();
+                List<string> jsonLibPaths = new(),
+                    yamlLibPaths = new();
                 if (Directory.Exists(musicDir))
                 {
-                    musicLibPaths.AddRange(
-                        Directory.EnumerateFiles(musicDir).Where(path => StringComparer.InvariantCultureIgnoreCase.Equals(Path.GetExtension(path), ".json5")));
+                    var jsonExts = Z2Importer.JsonExtensions();
+                    var yamlExts = Z2Importer.YamlExtensions();
+
+                    foreach (string path in Directory.EnumerateFiles(musicDir))
+                    {
+                        string ext = Path.GetExtension(path);
+                        if (jsonExts.Contains(ext))
+                            jsonLibPaths.Add(path);
+                        else if (yamlExts.Contains(ext))
+                            yamlLibPaths.Add(path);
+                    }
                 }
 
                 Random musicRng = new(SeedHash);
@@ -415,9 +427,11 @@ public class Hyrule
                         MusicRandomizer musicRnd = new(
                             this,
                             musicRng.Next(),
-                            musicLibPaths,
+                            jsonLibPaths,
+                            yamlLibPaths,
                             freeBanks,
                             props.MixCustomAndOriginalMusic,
+                            props.IncludeDiverseMusic,
                             props.DisableUnsafeMusic);
                         musicRnd.ImportSongs();
 
@@ -437,6 +451,7 @@ public class Hyrule
             }
 
             byte[] finalRNGState = new byte[32];
+
             r.NextBytes(finalRNGState);
             var version = (Assembly.GetEntryAssembly()?.GetName()?.Version) 
                 ?? throw new Exception("Invalid entry assembly version information");
@@ -497,7 +512,10 @@ public class Hyrule
 
     private string AsmFileReadTextCallback(string basePath, string path)
     {
-        return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
+        if (basePath == "")
+            return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
+
+        throw new FileNotFoundException();
     }
 
     private static byte[] ConvertHash(byte[] hash)
@@ -520,7 +538,7 @@ public class Hyrule
 
     /*
         Text Notes:
-        
+
         Community Text Changes
         ----------------------
         Shield Spell    15  43
@@ -536,7 +554,7 @@ public class Hyrule
         Reflect         81  37
         Upstab          82  32
         Spell           93  25
-        Thunder         96  36 
+        Thunder         96  36
     */
 
 
@@ -575,7 +593,7 @@ public class Hyrule
             switch (attackEffectiveness)
             {
                 case AttackEffectiveness.LOW:
-                    //the naieve approach here gives a curve of 1,2,2,4,5,6 which is weird, or a different 
+                    //the naieve approach here gives a curve of 1,2,2,4,5,6 which is weird, or a different
                     //irregular curve in digshake's old approach. Just use a linear increase for the first 6 levels on low
                     if(i < 6)
                     {
@@ -626,12 +644,12 @@ public class Hyrule
     private void ShuffleItems()
     {
         List<Collectable> shufflableItems = [
-            Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, Collectable.BOOTS, 
-            Collectable.FLUTE, Collectable.CROSS, Collectable.HEART_CONTAINER, Collectable.HEART_CONTAINER, 
-            Collectable.MAGIC_CONTAINER, Collectable.MEDICINE, Collectable.TROPHY, Collectable.HEART_CONTAINER, 
-            Collectable.HEART_CONTAINER, Collectable.MAGIC_CONTAINER, Collectable.MAGIC_KEY, Collectable.MAGIC_CONTAINER, 
+            Collectable.CANDLE, Collectable.GLOVE, Collectable.RAFT, Collectable.BOOTS,
+            Collectable.FLUTE, Collectable.CROSS, Collectable.HEART_CONTAINER, Collectable.HEART_CONTAINER,
+            Collectable.MAGIC_CONTAINER, Collectable.MEDICINE, Collectable.TROPHY, Collectable.HEART_CONTAINER,
+            Collectable.HEART_CONTAINER, Collectable.MAGIC_CONTAINER, Collectable.MAGIC_KEY, Collectable.MAGIC_CONTAINER,
             Collectable.HAMMER, Collectable.CHILD, Collectable.MAGIC_CONTAINER];
-        List<Collectable> minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG, 
+        List<Collectable> minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
             Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP, Collectable.KEY];
 
         if (props.PbagItemShuffle)
@@ -782,14 +800,14 @@ public class Hyrule
             Collectable.HAMMER,
             Collectable.MAGIC_KEY];
         List<Collectable> possibleStartSpells = [
-            Collectable.SHIELD_SPELL, 
-            Collectable.JUMP_SPELL, 
-            Collectable.LIFE_SPELL, 
-            Collectable.FAIRY_SPELL, 
+            Collectable.SHIELD_SPELL,
+            Collectable.JUMP_SPELL,
+            Collectable.LIFE_SPELL,
+            Collectable.FAIRY_SPELL,
             Collectable.FIRE_SPELL,
             Collectable.DASH_SPELL,
-            Collectable.REFLECT_SPELL, 
-            Collectable.SPELL_SPELL, 
+            Collectable.REFLECT_SPELL,
+            Collectable.SPELL_SPELL,
             Collectable.THUNDER_SPELL];
 
         foreach(Collectable item in possibleStartItems)
@@ -874,7 +892,7 @@ public class Hyrule
 
         //Add the auto pbag cave promotion
         List<Location> overflowLocations = [];
-        if (!props.PbagItemShuffle) 
+        if (!props.PbagItemShuffle)
         {
             overflowLocations.AddRange([westHyrule.pbagCave, eastHyrule.pbagCave1, eastHyrule.pbagCave2]);
         }
@@ -953,7 +971,7 @@ public class Hyrule
                             palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable = smallItem;
                         }
                     }
-                }  
+                }
             }
 
             if (props.ShuffleOverworldItems)
@@ -1066,7 +1084,7 @@ public class Hyrule
         int itemShuffleLocationsCount = itemShuffleLocations.Count;
         if(itemShuffleLocations.Any(i => i.PalaceNumber != null))
         {
-            itemShuffleLocationsCount = itemShuffleLocationsCount 
+            itemShuffleLocationsCount = itemShuffleLocationsCount
                 - itemShuffleLocations.Count(i => i.PalaceNumber != null)
                 + props.PalaceItemRoomCounts.Sum(i => i);
                 //- props.PalaceItemRoomCounts.Where(i => i == 0).Count();
@@ -1080,7 +1098,7 @@ public class Hyrule
 
         //Clear all locations, then set them to the newly shuffled items
         itemShuffleLocations.ForEach(i => i.Collectables.Clear());
-        
+
         using var itemLocsIterator = itemShuffleLocations.GetEnumerator();
         Location? location = null;
         int subIndex = 0;
@@ -1116,7 +1134,7 @@ public class Hyrule
         //but there is (at present) no way to test whether that is possible without rendering the entire engine into an irrecoverably
         //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
         //guaranteed to succeed iff running on the original engine would succeed.
-        //Jrowe feel free to engineer a less insane fix here. 
+        //Jrowe feel free to engineer a less insane fix here.
         Assembler validationEngine = CreateAssemblyEngine();
 
         int i = 0;
@@ -1207,7 +1225,7 @@ public class Hyrule
                 room.UpdateConnectionStartAddress();
             }
         }
-        
+
         // Add the palace item bits to the assembler
         sideviewModule.Segment("PRG5");
         foreach (var (palaceGroup, itemBits) in palaceItemBits)
@@ -1319,13 +1337,15 @@ public class Hyrule
             if (ItemGet[item] == false && item.IsItemGetItem())
             {
                 itemGetReachableFailures++;
-                if (UNSAFE_DEBUG && reachableLocationsCount >= DEBUG_THRESHOLD)
+#if UNSAFE_DEBUG
+                if (reachableLocationsCount >= DEBUG_THRESHOLD)
                 {
                     Debug.WriteLine("Failed on collectables");
                     PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
                     //Debug.WriteLine(westHyrule.GetMapDebug());
                     return false;
                 }
+#endif
                 return false;
             }
         }
@@ -1354,28 +1374,30 @@ public class Hyrule
         if (retval == false)
         {
             logicallyRequiredLocationsReachableFailures++;
-            if(UNSAFE_DEBUG)
-            {
-                List<Location> missingLocations =
-                [
-                    .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                    .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                    .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
-                ];
+#if UNSAFE_DEBUG
+            List<Location> missingLocations =
+            [
+                .. westHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
+                .. eastHyrule.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
+                .. mazeIsland.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable),
+            ];
 
-                List<Location> nonDmLocations = new(missingLocations);
-                missingLocations.AddRange(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
+            List<Location> nonDmLocations = new(missingLocations);
+            missingLocations.AddRange(deathMountain.RequiredLocations(props.HiddenPalace, props.HiddenKasuto).Where(i => !i.Reachable));
 
-                Debug.WriteLine("Unreachable locations:");
-                Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
+            Debug.WriteLine("Unreachable locations:");
+            Debug.WriteLine(string.Join("\n", missingLocations.Select(i => i.GetDebuggerDisplay())));
 
-                return false;
-            }
+            return false;
+#endif
         }
-        if (UNSAFE_DEBUG && retval)
+
+#if UNSAFE_DEBUG
+        if (retval)
         {
             //PrintRoutingDebug(reachableLocationsCount, wh, eh, dm, mi);
         }
+#endif
         return retval;
     }
 
@@ -3415,12 +3437,11 @@ public class Hyrule
                     int item = ROMData.GetByte(addr);
                     if (item == 8 || (item > 9 && item < 14) || (item > 15 && item < 19) && !addresses.Contains(addr))
                     {
-                        if (UNSAFE_DEBUG)
-                        {
-                            logger.Debug("Map: " + map);
-                            logger.Debug("Item: " + item);
-                            logger.Debug($"Address: {addr:X}");
-                        }
+#if UNSAFE_DEBUG
+                        logger.Debug("Map: " + map);
+                        logger.Debug("Item: " + item);
+                        logger.Debug($"Address: {addr:X}");
+#endif
                         addresses.Add(addr);
                         items.Add(item);
                     }

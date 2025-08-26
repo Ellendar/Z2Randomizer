@@ -3,25 +3,38 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using DynamicData.Binding;
-using ReactiveUI;
-using ReactiveUI.SourceGenerators;
 using Z2Randomizer.RandomizerCore.Flags;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 
-public sealed partial class RandomizerConfiguration : ReactiveObject
+[AttributeUsage(AttributeTargets.Class)]
+public class FlagSerializeAttribute : Attribute
 {
+}
+
+/**
+ * We don't need to bring in ReactiveUI to the base RandomizerCore if we just make our own source generator.
+ * To keep the usage similar to the original ReactiveUI SourceGenerator, I kept the name `Reactive` for the attribute
+ * in case we bail on this idea later.
+ */
+public class ReactiveAttribute : Attribute
+{
+
+}
+
+
+[FlagSerialize]
+public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
+{
+    [IgnoreInFlags]
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_ITEMS = [
         Collectable.CANDLE,
         Collectable.GLOVE,
@@ -33,6 +46,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         Collectable.MAGIC_KEY
     ];
 
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_SPELLS = [
         Collectable.SHIELD_SPELL,
         Collectable.JUMP_SPELL,
@@ -107,13 +121,13 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private StartingResourceLimit startSpellsLimit;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int? startingHeartContainersMin;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int? startingHeartContainersMax;
 
     [Reactive]
@@ -126,18 +140,18 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private StartingLives startingLives;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int startingAttackLevel;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int startingMagicLevel;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int startingLifeLevel;
 
     [Reactive]
@@ -196,13 +210,13 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private Biome eastBiome;
 
     [Reactive]
-    private Biome dMBiome;
+    private Biome dmBiome;
 
     [Reactive]
     private Biome mazeBiome;
 
     [Reactive]
-    [property:CustomFlagSerializer(typeof(ClimateFlagSerializer))]
+    [CustomFlagSerializer(typeof(ClimateFlagSerializer))]
     private Climate climate;
 
     [Reactive]
@@ -213,7 +227,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private PalaceStyle normalPalaceStyle;
 
     [Reactive]
-    private PalaceStyle gPStyle;
+    private PalaceStyle gpStyle;
 
     [Reactive]
     private bool? includeVanillaRooms;
@@ -258,11 +272,11 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private PalaceItemRoomCount palaceItemRoomCount;
 
     [Reactive]
-    [property:Limit(7)]
+    [Limit(7)]
     private int palacesToCompleteMin;
 
     [Reactive]
-    [property:Limit(7)]
+    [Limit(7)]
     private int palacesToCompleteMax;
 
     [Reactive]
@@ -288,18 +302,18 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private bool shuffleLifeExperience;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int attackLevelCap;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int magicLevelCap;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int lifeLevelCap;
 
     [Reactive]
@@ -483,80 +497,84 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
     //Custom
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool useCommunityText;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private BeepFrequency beepFrequency;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private BeepThreshold beepThreshold;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool disableMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool randomizeMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool mixCustomAndOriginalMusic;
+    
+    [Reactive]
+    [IgnoreInFlags]
+    private bool includeDiverseMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool disableUnsafeMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool fastSpellCasting;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool upAOnController1;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool removeFlashing;
 
     [Reactive]
-    [property: IgnoreInFlags]
+    [ IgnoreInFlags]
     private CharacterSprite sprite;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private string spriteName;
 
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool changeItemSprites;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterColor tunic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterColor tunicOutline;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterColor shieldTunic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private BeamSprites beamSprite;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool useCustomRooms;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool disableHUDLag;
 
     [Reactive]
@@ -580,8 +598,8 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
     //Meta
     [Reactive]
-    [property:Required]
-    [property:IgnoreInFlags]
+    [Required]
+    [IgnoreInFlags]
     private string? seed;
     // public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
 
@@ -590,240 +608,136 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     public string Flags
     {
         get => Serialize();
-        set => ConvertFlags(value?.Trim() ?? "", this);
+        set => Deserialize(value?.Trim() ?? "");
     }
 
     public RandomizerConfiguration()
     {
-        StartingAttackLevel = 1;
-        StartingMagicLevel = 1;
-        StartingLifeLevel = 1;
+        startingAttackLevel = 1;
+        startingMagicLevel = 1;
+        startingLifeLevel = 1;
 
-        MaxHeartContainers = MaxHeartsOption.EIGHT;
-        StartingHeartContainersMin = 8;
-        StartingHeartContainersMax = 8;
+        maxHeartContainers = MaxHeartsOption.EIGHT;
+        startingHeartContainersMin = 8;
+        startingHeartContainersMax = 8;
 
-        AttackLevelCap = 8;
-        MagicLevelCap = 8;
-        LifeLevelCap = 8;
+        attackLevelCap = 8;
+        magicLevelCap = 8;
+        lifeLevelCap = 8;
 
-        DisableMusic = false;
-        RandomizeMusic = false;
-        MixCustomAndOriginalMusic = true;
-        DisableUnsafeMusic = true;
-        FastSpellCasting = false;
-        ShuffleSpritePalettes = false;
-        PermanentBeamSword = false;
-        UpAOnController1 = false;
-        RemoveFlashing = false;
-        Sprite = CharacterSprite.LINK;
-        Climate = Climates.Classic;
-        if (Sprite == null || Climate == null)
+        disableMusic = false;
+        randomizeMusic = false;
+        mixCustomAndOriginalMusic = true;
+        disableUnsafeMusic = true;
+        fastSpellCasting = false;
+        shuffleSpritePalettes = false;
+        permanentBeamSword = false;
+        upAOnController1 = false;
+        removeFlashing = false;
+        sprite = CharacterSprite.LINK;
+        spriteName = CharacterSprite.LINK.DisplayName!;
+        climate = Climates.Classic;
+        if (sprite == null || climate == null)
         {
             throw new ImpossibleException();
         }
-        Tunic = CharacterColor.Default;
-        TunicOutline = CharacterColor.Default;
-        ShieldTunic = CharacterColor.Default;
-        BeamSprite = BeamSprites.DEFAULT;
-        UseCustomRooms = false;
-        DisableHUDLag = false;
-        this.WhenAnyPropertyChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Throttle(TimeSpan.FromMilliseconds(10))
-            .Select(_ => Serialize())
-            .ToProperty(this, nameof(Flags));
+        tunic = CharacterColor.Default;
+        tunicOutline = CharacterColor.Default;
+        shieldTunic = CharacterColor.Default;
+        beamSprite = BeamSprites.DEFAULT;
+        useCustomRooms = false;
+        disableHUDLag = false;
     }
 
     public RandomizerConfiguration(string flagstring) : this()
     {
-        ConvertFlags(flagstring, this);
+        Deserialize(flagstring);
     }
-    
-    [method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(RandomizerConfiguration))]
-    private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
+    private bool DeserializeBool(FlagReader flags, string name)
     {
-        //seed - climate - sprite
-        var config = newThis ?? new RandomizerConfiguration();
-        FlagReader flagReader = new FlagReader(flagstring);
-        PropertyInfo[] properties = GetType().GetProperties();
-        Type thisType = typeof(RandomizerConfiguration);
-        foreach (PropertyInfo property in properties)
+        return flags.ReadBool();
+    }
+    private bool? DeserializeNullableBool(FlagReader flags, string name)
+    {
+        return flags.ReadNullableBool();
+    }
+    private int DeserializeInt(FlagReader flags, string name, int limit, int? minimum)
+    {
+        int min = minimum ?? 0;
+        return flags.ReadInt(limit) + min;
+    }
+    private int? DeserializeNullableInt(FlagReader flags, string name, int limit, int? minimum)
+    {
+        return flags.ReadNullableInt(limit, minimum);
+    }
+
+    private T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
+    {
+        var limit = GetEnumCount<T>();
+        var index = flags.ReadInt(limit);
+        return GetEnumFromIndex<T>(index)!;
+    }
+    private T? DeserializeNullableEnum<T>(FlagReader flags, string name) where T: Enum
+    {
+        var limit = GetEnumCount<T>();
+        var index = flags.ReadNullableInt(limit);
+        return index == null ? default : GetEnumFromIndex<T>(index.Value)!;
+    }
+
+    private T DeserializeCustom<Serializer, T>(FlagReader flags, string name) where Serializer : IFlagSerializer where T : class
+    {
+        IFlagSerializer serializer = GetSerializer<Serializer>();
+        return (T)serializer.Deserialize(flags.ReadInt(serializer.GetLimit()))!;
+    }
+
+    private void SerializeBool(FlagBuilder flags, string name, bool? val, bool isNullable)
+    {
+        if (isNullable)
         {
-            Type propertyType = property.PropertyType;
-            int limit;
-            bool isNullable = false;
-
-            if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
-            {
-                continue;
-            }
-            //Now that the config is a ReactiveObject, some properties get inherited that should be ignored.
-            if (property.DeclaringType!.FullName == "ReactiveUI.ReactiveObject")
-            {
-                continue;
-            }
-            LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
-            limit = limitAttribute?.Limit ?? 0;
-
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                propertyType = propertyType.GetGenericArguments()[0];
-                isNullable = true;
-            }
-//The analyzer simultaneously complains about this warning that doesn't matter,
-//and then complains about the warning suppression being unnecessary once it's suppressed.
-#pragma warning disable IL2072
-            CustomFlagSerializerAttribute? attribute = 
-                (CustomFlagSerializerAttribute?)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
-            if (attribute != null)
-            {
-                IFlagSerializer? serializer = (IFlagSerializer?)Activator.CreateInstance(attribute.Type);
-                property.SetValue(config, serializer?.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
-            }
-#pragma warning restore IL2072 
-            else if (propertyType == typeof(bool))
-            {
-                property.SetValue(config, isNullable ? flagReader.ReadNullableBool() : flagReader.ReadBool());
-            }
-            else if (propertyType.IsEnum)
-            {
-                var methodType = isNullable ? "ReadNullableEnum" : "ReadEnum";
-                MethodInfo method = typeof(FlagReader).GetMethod(methodType)!
-                    .MakeGenericMethod([propertyType]);
-                var methodResult = method.Invoke(flagReader, []);
-                property.SetValue(config, methodResult);
-            }
-            else if (IsIntegerType(propertyType))
-            {
-                if (Attribute.IsDefined(property, typeof(LimitAttribute)))
-                {
-                    int minimum = ((MinimumAttribute?)property.GetCustomAttribute(typeof(MinimumAttribute)))?.Minimum ?? 0;
-
-                    if (isNullable)
-                    {
-                        int? value = flagReader.ReadNullableInt(limit);
-                        value += minimum;
-                        property.SetValue(config, value);
-                    }
-                    else
-                    {
-                        property.SetValue(config, flagReader.ReadInt(limit) + minimum);
-                    }
-                }
-                else
-                {
-                    logger.Error("Numeric Property " + property.Name + " is missing a limit!");
-                }
-            }
-            else
-            {
-                logger.Error($"Unrecognized configuration property type: {propertyType}");
-            }
-            //Debug.WriteLine(property.Name + "\t" + flagReader.index);
+            flags.Append(val);
+        }
+        else
+        {
+            bool v = val!.Value;
+            flags.Append(v);
         }
     }
 
-    public string Serialize()
+    private void SerializeInt(FlagBuilder flags, string name, int? val, bool isNullable, int limit, int? minimum)
     {
-        FlagBuilder flags = new FlagBuilder();
-        PropertyInfo[] properties = this.GetType().GetProperties();
-        Type thisType = typeof(RandomizerConfiguration);
-        foreach (PropertyInfo property in properties)
+        // limit is checked for null in the flags source generator
+        if (isNullable)
         {
-            Type propertyType = property.PropertyType;
-            bool isNullable = false;
-
-            if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
+            if (val != null && (val < minimum || val > minimum + limit))
             {
-                continue;
+                logger.Warn($"Property ({name}) was out of range.");
             }
-            //Now that the config is a ReactiveObject, some properties get inherited that should be ignored.
-            if(property.DeclaringType!.FullName == "ReactiveUI.ReactiveObject")
-            {
-                continue;
-            }
-            LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
-            int limit = limitAttribute?.Limit ?? 0;
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                propertyType = propertyType.GetGenericArguments()[0];
-                isNullable = true;
-            }
-#pragma warning disable IL2072
-            CustomFlagSerializerAttribute? attribute = 
-                (CustomFlagSerializerAttribute?)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
-            if(attribute != null)
-            {
-                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type)!;
-                if(serializer?.GetLimit() == null)
-                {
-                    throw new Exception("Missing limit on serializer");
-                }
-                flags.Append(serializer?.Serialize(property.GetValue(this, null)), serializer!.GetLimit());
-            }
-#pragma warning restore IL2072
-            else if (propertyType == typeof(bool))
-            {
-                if (isNullable)
-                {
-                    flags.Append((bool?)property.GetValue(this, null));
-                }
-                else
-                {
-                    flags.Append((bool)property.GetValue(this, null)!);
-                }
-            }
-            else if (propertyType.IsEnum)
-            {
-                limit = Enum.GetValues(propertyType).Length;
-                int index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
-                if (isNullable)
-                {
-                    flags.Append(index == -1 ? null : index, limit + 1);
-                }
-                else
-                {
-                    flags.Append(index, limit);
-                }
-            }
-            else if (IsIntegerType(propertyType))
-            {
-                if (limit == 0)
-                {
-                    logger.Error("Numeric Property " + property.Name + " is missing a limit!");
-                }
-                int minimum = ((MinimumAttribute?)property.GetCustomAttribute(typeof(MinimumAttribute)))?.Minimum ?? 0;
-                if (isNullable)
-                {
-                    int? value = (int?)property.GetValue(this, null);
-                    if (value != null && (value < minimum || value > minimum + limit))
-                    {
-                        logger.Warn("Property (" + property.Name + " was out of range.");
-                        value = minimum;
-                    }
-                    flags.Append(value - minimum, limit);
-                }
-                else
-                {
-                    int value = (int)property.GetValue(this, null)!;
-                    if (value < minimum || value > minimum + limit)
-                    {
-                        logger.Warn("Property (" + property.Name + " was out of range.");
-                        value = minimum;
-                    }
-                    flags.Append(value - minimum, limit);
-                }
-            }
-            else
-            {
-                logger.Error($"Unrecognized configuration property type: {property.Name}");
-            }
-            //Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
+            flags.Append(val, limit, minimum);
         }
-
-        return flags.ToString();
+        else
+        {
+            var value = val!.Value;
+            if (value < minimum || value > minimum + limit)
+            {
+                logger.Warn($"Property ({name}) was out of range.");
+            }
+            flags.Append(value, limit, minimum);
+        }
     }
+
+    private void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
+    {
+        var index = GetEnumIndex<T>(val);
+        var limit = GetEnumCount<T>();
+        flags.Append(index, limit);
+    }
+
+    private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class
+    {
+        var serializer = GetSerializer<Serializer>();
+        flags.Append(serializer.Serialize(val), serializer.GetLimit());
+    }
+
     public RandomizerProperties Export(Random r)
     {
         RandomizerProperties properties = new()
@@ -836,17 +750,17 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             EastRockIsPath = r.Next(2) == 1,
 
             //ROM Info
-            Seed = Seed
+            Seed = seed
         };
 
         //Properties that can affect available minor item replacements
         do // while (!properties.HasEnoughSpaceToAllocateItems())
         {
             //Start Configuration
-            ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, StartItemsLimit, ShuffleStartingItems, properties, r);
-            ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, StartSpellsLimit, ShuffleStartingSpells, properties, r);
+            ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, startItemsLimit, shuffleStartingItems, properties, r);
+            ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
 
-            if (GPStyle == PalaceStyle.RANDOM)
+            if (gpStyle == PalaceStyle.RANDOM)
             {
                 properties.PalaceStyles[6] = r.Next(5) switch
                 {
@@ -858,7 +772,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                     _ => throw new Exception("Invalid PalaceStyle")
                 };
             }
-            else if (GPStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
+            else if (gpStyle == PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE)
             {
                 properties.PalaceStyles[6] = r.Next(3) switch
                 {
@@ -870,10 +784,10 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             }
             else
             {
-                properties.PalaceStyles[6] = GPStyle;
+                properties.PalaceStyles[6] = gpStyle;
             }
 
-            if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
+            if (normalPalaceStyle == PalaceStyle.RANDOM_ALL)
             {
                 PalaceStyle style = r.Next(5) switch
                 {
@@ -889,7 +803,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                     properties.PalaceStyles[i] = style;
                 }
             }
-            else if (NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
+            else if (normalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
             {
                 for (int i = 0; i < 6; i++)
                 {
@@ -909,48 +823,48 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    properties.PalaceStyles[i] = NormalPalaceStyle;
+                    properties.PalaceStyles[i] = normalPalaceStyle;
                 }
             }
 
-            properties.ShortenGP = ShortenGP ?? GetIndeterminateFlagValue(r);
-            properties.ShortenNormalPalaces = ShortenNormalPalaces ?? GetIndeterminateFlagValue(r);
+            properties.ShortenGP = shortenGP ?? GetIndeterminateFlagValue(r);
+            properties.ShortenNormalPalaces = shortenNormalPalaces ?? GetIndeterminateFlagValue(r);
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
             AssignPalaceItemCounts(properties, r);
 
             //Other starting attributes
             int startHeartsMin, startHeartsMax;
-            if (StartingHeartContainersMin == null)
+            if (startingHeartContainersMin == null)
             {
                 startHeartsMin = r.Next(1, 9);
             }
             else
             {
-                startHeartsMin = (int)StartingHeartContainersMin;
+                startHeartsMin = (int)startingHeartContainersMin;
             }
-            if (StartingHeartContainersMax == null)
+            if (startingHeartContainersMax == null)
             {
                 startHeartsMax = r.Next(startHeartsMin, 9);
             }
             else
             {
-                startHeartsMax = (int)StartingHeartContainersMax;
+                startHeartsMax = (int)startingHeartContainersMax;
             }
             properties.StartHearts = r.Next(startHeartsMin, startHeartsMax + 1);
 
             //+1/+2/+3
-            if (MaxHeartContainers == MaxHeartsOption.RANDOM)
+            if (maxHeartContainers == MaxHeartsOption.RANDOM)
             {
                 properties.MaxHearts = r.Next(properties.StartHearts, 9);
             }
-            else if ((int)MaxHeartContainers <= 8)
+            else if ((int)maxHeartContainers <= 8)
             {
-                properties.MaxHearts = (int)MaxHeartContainers;
+                properties.MaxHearts = (int)maxHeartContainers;
             }
             else
             {
-                int additionalHearts = MaxHeartContainers switch
+                int additionalHearts = maxHeartContainers switch
                 {
                     MaxHeartsOption.PLUS_ONE => 1,
                     MaxHeartsOption.PLUS_TWO => 2,
@@ -964,7 +878,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         } while (!properties.HasEnoughSpaceToAllocateItems());
 
         //Handle Fire
-        switch (FireOption)
+        switch (fireOption)
         {
             case FireOption.NORMAL:
                 properties.CombineFire = false;
@@ -999,7 +913,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         }
 
         //If both stabs are random, use the classic weightings
-        if (StartingTechniques == StartingTechs.RANDOM)
+        if (startingTechniques == StartingTechs.RANDOM)
         {
             switch (r.Next(7))
             {
@@ -1026,13 +940,13 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         }
         else
         {
-            properties.StartWithDownstab = StartingTechniques.StartWithDownstab();
-            properties.StartWithUpstab = StartingTechniques.StartWithUpstab();
+            properties.StartWithDownstab = startingTechniques.StartWithDownstab();
+            properties.StartWithUpstab = startingTechniques.StartWithUpstab();
         }
-        properties.SwapUpAndDownStab = SwapUpAndDownStab ?? GetIndeterminateFlagValue(r);
+        properties.SwapUpAndDownStab = swapUpAndDownStab ?? GetIndeterminateFlagValue(r);
 
 
-        properties.StartLives = StartingLives switch
+        properties.StartLives = startingLives switch
         {
             StartingLives.Lives1 => 1,
             StartingLives.Lives2 => 2,
@@ -1043,27 +957,27 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             StartingLives.Lives16 => 16,
             _ => r.Next(2, 6)
         };
-        properties.PermanentBeam = PermanentBeamSword;
-        properties.UseCommunityText = UseCommunityText;
-        properties.StartAtk = StartingAttackLevel;
-        properties.StartMag = StartingMagicLevel;
-        properties.StartLifeLvl = StartingLifeLevel;
+        properties.PermanentBeam = permanentBeamSword;
+        properties.UseCommunityText = useCommunityText;
+        properties.StartAtk = startingAttackLevel;
+        properties.StartMag = startingMagicLevel;
+        properties.StartLifeLvl = startingLifeLevel;
 
         //Overworld
-        properties.ShuffleEncounters = ShuffleEncounters ?? GetIndeterminateFlagValue(r);
-        properties.AllowPathEnemies = AllowUnsafePathEncounters;
-        properties.IncludeLavaInEncounterShuffle = IncludeLavaInEncounterShuffle;
-        properties.PalacesCanSwapContinent = PalacesCanSwapContinents ?? GetIndeterminateFlagValue(r);
-        properties.P7shuffle = ShuffleGP ?? GetIndeterminateFlagValue(r);
-        properties.HiddenPalace = HidePalace ?? GetIndeterminateFlagValue(r);
-        properties.HiddenKasuto = HideKasuto ?? GetIndeterminateFlagValue(r);
+        properties.ShuffleEncounters = shuffleEncounters ?? GetIndeterminateFlagValue(r);
+        properties.AllowPathEnemies = allowUnsafePathEncounters;
+        properties.IncludeLavaInEncounterShuffle = includeLavaInEncounterShuffle;
+        properties.PalacesCanSwapContinent = palacesCanSwapContinents ?? GetIndeterminateFlagValue(r);
+        properties.P7shuffle = shuffleGP ?? GetIndeterminateFlagValue(r);
+        properties.HiddenPalace = hidePalace ?? GetIndeterminateFlagValue(r);
+        properties.HiddenKasuto = hideKasuto ?? GetIndeterminateFlagValue(r);
 
-        properties.EncounterRates = EncounterRate;
-        properties.ContinentConnections = ContinentConnectionType;
-        properties.BoulderBlockConnections = AllowConnectionCavesToBeBlocked;
-        if (WestBiome == Biome.RANDOM || WestBiome == Biome.RANDOM_NO_VANILLA || WestBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
+        properties.EncounterRates = encounterRate;
+        properties.ContinentConnections = continentConnectionType;
+        properties.BoulderBlockConnections = allowConnectionCavesToBeBlocked;
+        if (westBiome == Biome.RANDOM || westBiome == Biome.RANDOM_NO_VANILLA || westBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = WestBiome switch {
+            int shuffleLimit = westBiome switch {
                 Biome.RANDOM => 7,
                 Biome.RANDOM_NO_VANILLA => 6,
                 Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
@@ -1081,16 +995,16 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                 _ => throw new Exception("Invalid Biome")
             };
         }
-        else if(WestBiome == Biome.CANYON)
+        else if(westBiome == Biome.CANYON)
         {
             properties.WestBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
         }
         else {
-            properties.WestBiome = WestBiome;
+            properties.WestBiome = westBiome;
         }
-        if (EastBiome == Biome.RANDOM || EastBiome == Biome.RANDOM_NO_VANILLA || EastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
+        if (eastBiome == Biome.RANDOM || eastBiome == Biome.RANDOM_NO_VANILLA || eastBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = EastBiome switch { 
+            int shuffleLimit = eastBiome switch { 
                 Biome.RANDOM => 7, 
                 Biome.RANDOM_NO_VANILLA => 6, 
                 Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
@@ -1108,17 +1022,17 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                 _ => throw new Exception("Invalid Biome")
             };
         }
-        else if (EastBiome == Biome.CANYON)
+        else if (eastBiome == Biome.CANYON)
         {
             properties.EastBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
         }
         else
         {
-            properties.EastBiome = EastBiome;
+            properties.EastBiome = eastBiome;
         }
-        if (DMBiome == Biome.RANDOM || DMBiome == Biome.RANDOM_NO_VANILLA || DMBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
+        if (dmBiome == Biome.RANDOM || dmBiome == Biome.RANDOM_NO_VANILLA || dmBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {
-            int shuffleLimit = DMBiome switch {
+            int shuffleLimit = dmBiome switch {
                 Biome.RANDOM => 7,
                 Biome.RANDOM_NO_VANILLA => 6,
                 Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => 5,
@@ -1136,15 +1050,15 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                 _ => throw new Exception("Invalid Biome")
             };
         }
-        else if (DMBiome == Biome.CANYON)
+        else if (dmBiome == Biome.CANYON)
         {
             properties.DmBiome = r.Next(2) == 0 ? Biome.CANYON : Biome.DRY_CANYON;
         }
         else
         {
-            properties.DmBiome = DMBiome;
+            properties.DmBiome = dmBiome;
         }
-        if (MazeBiome == Biome.RANDOM)
+        if (mazeBiome == Biome.RANDOM)
         {
             properties.MazeBiome = r.Next(3) switch
             {
@@ -1156,9 +1070,9 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         }
         else
         {
-            properties.MazeBiome = MazeBiome;
+            properties.MazeBiome = mazeBiome;
         }
-        if (Climate == null)
+        if (climate == null)
         {
             properties.Climate = r.Next(5) switch
             {
@@ -1172,13 +1086,13 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         }
         else
         {
-            properties.Climate = Climate;
+            properties.Climate = climate;
         }
-        properties.VanillaShuffleUsesActualTerrain = VanillaShuffleUsesActualTerrain;
-        properties.ShuffleHidden = ShuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
-        properties.CanWalkOnWaterWithBoots = GoodBoots ?? GetIndeterminateFlagValue(r);
-        properties.BagusWoods = GenerateBaguWoods ?? GetIndeterminateFlagValue(r);
-        if(RiverDevilBlockerOption == RiverDevilBlockerOption.RANDOM)
+        properties.VanillaShuffleUsesActualTerrain = vanillaShuffleUsesActualTerrain;
+        properties.ShuffleHidden = shuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
+        properties.CanWalkOnWaterWithBoots = goodBoots ?? GetIndeterminateFlagValue(r);
+        properties.BagusWoods = generateBaguWoods ?? GetIndeterminateFlagValue(r);
+        if(riverDevilBlockerOption == RiverDevilBlockerOption.RANDOM)
         {
             properties.RiverDevilBlockerOption = r.Next(3) switch
             {
@@ -1190,34 +1104,34 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         }
         else
         {
-            properties.RiverDevilBlockerOption = RiverDevilBlockerOption;
+            properties.RiverDevilBlockerOption = riverDevilBlockerOption;
         }
-        properties.EastRocks = EastRocks ?? GetIndeterminateFlagValue(r);
+        properties.EastRocks = eastRocks ?? GetIndeterminateFlagValue(r);
 
-        properties.StartGems = r.Next(PalacesToCompleteMin, PalacesToCompleteMax + 1);
-        properties.RequireTbird = TBirdRequired ?? GetIndeterminateFlagValue(r);
-        properties.ShufflePalacePalettes = ChangePalacePallettes;
-        properties.UpARestartsAtPalaces = RestartAtPalacesOnGameOver;
-        properties.Global5050JarDrop = Global5050JarDrop ?? GetIndeterminateFlagValue(r);
-        properties.ReduceDripperVariance = ReduceDripperVariance;
-        properties.RemoveTbird = RemoveTBird;
-        properties.BossItem = RandomizeBossItemDrop;
+        properties.StartGems = r.Next(palacesToCompleteMin, palacesToCompleteMax + 1);
+        properties.RequireTbird = tBirdRequired ?? GetIndeterminateFlagValue(r);
+        properties.ShufflePalacePalettes = changePalacePallettes;
+        properties.UpARestartsAtPalaces = restartAtPalacesOnGameOver;
+        properties.Global5050JarDrop = global5050JarDrop ?? GetIndeterminateFlagValue(r);
+        properties.ReduceDripperVariance = reduceDripperVariance;
+        properties.RemoveTbird = removeTBird;
+        properties.BossItem = randomizeBossItemDrop;
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms
-        if(!((IncludeVanillaRooms ?? true) || (Includev4_0Rooms ?? true) || (Includev4_4Rooms ?? true)))
+        if(!((includeVanillaRooms ?? true) || (includev4_0Rooms ?? true) || (includev4_4Rooms ?? true)))
         {
             properties.AllowVanillaRooms = true;
         }
         while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV4_4Rooms)) {
-            properties.AllowVanillaRooms = IncludeVanillaRooms ?? GetIndeterminateFlagValue(r); ;
-            properties.AllowV4Rooms = Includev4_0Rooms ?? GetIndeterminateFlagValue(r); ;
-            properties.AllowV4_4Rooms = Includev4_4Rooms ?? GetIndeterminateFlagValue(r); ;
+            properties.AllowVanillaRooms = includeVanillaRooms ?? GetIndeterminateFlagValue(r); ;
+            properties.AllowV4Rooms = includev4_0Rooms ?? GetIndeterminateFlagValue(r); ;
+            properties.AllowV4_4Rooms = includev4_4Rooms ?? GetIndeterminateFlagValue(r); ;
         }
 
-        properties.BlockersAnywhere = BlockingRoomsInAnyPalace;
+        properties.BlockersAnywhere = blockingRoomsInAnyPalace;
 
-        if (BossRoomsExitType == BossRoomsExitType.RANDOM_ALL)
+        if (bossRoomsExitType == BossRoomsExitType.RANDOM_ALL)
         {
             BossRoomsExitType option = r.Next(2) switch
             {
@@ -1230,7 +1144,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                 properties.BossRoomsExits[i] = option;
             }
         }
-        else if (BossRoomsExitType == BossRoomsExitType.RANDOM_PER_PALACE)
+        else if (bossRoomsExitType == BossRoomsExitType.RANDOM_PER_PALACE)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -1247,100 +1161,100 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         {
             for (int i = 0; i < 6; i++)
             {
-                properties.BossRoomsExits[i] = BossRoomsExitType;
+                properties.BossRoomsExits[i] = bossRoomsExitType;
             }
         }
 
-        properties.NoDuplicateRooms = NoDuplicateRoomsByEnemies;
-        properties.NoDuplicateRoomsBySideview = NoDuplicateRoomsByLayout;
-        properties.GeneratorsAlwaysMatch = GeneratorsAlwaysMatch;
-        properties.HardBosses = HardBosses;
+        properties.NoDuplicateRooms = noDuplicateRoomsByEnemies;
+        properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;
+        properties.GeneratorsAlwaysMatch = generatorsAlwaysMatch;
+        properties.HardBosses = hardBosses;
 
         //Enemies
-        properties.ShuffleEnemyHP = ShuffleEnemyHP;
-        properties.ShuffleEnemyStealExp = ShuffleXPStealers;
-        properties.ShuffleStealExpAmt = ShuffleXPStolenAmount;
-        properties.ShuffleSwordImmunity = ShuffleSwordImmunity;
-        properties.ShuffleOverworldEnemies = ShuffleOverworldEnemies ?? GetIndeterminateFlagValue(r); ;
-        properties.ShufflePalaceEnemies = ShufflePalaceEnemies ?? GetIndeterminateFlagValue(r); ;
-        properties.MixLargeAndSmallEnemies = MixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r); ;
-        properties.ShuffleDripper = ShuffleDripperEnemy;
-        properties.ShuffleEnemyPalettes = ShuffleSpritePalettes;
-        properties.EnemyXPDrops = EnemyXPDrops;
+        properties.ShuffleEnemyHP = shuffleEnemyHP;
+        properties.ShuffleEnemyStealExp = shuffleXPStealers;
+        properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
+        properties.ShuffleSwordImmunity = shuffleSwordImmunity;
+        properties.ShuffleOverworldEnemies = shuffleOverworldEnemies ?? GetIndeterminateFlagValue(r); ;
+        properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r); ;
+        properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r); ;
+        properties.ShuffleDripper = shuffleDripperEnemy;
+        properties.ShuffleEnemyPalettes = shuffleSpritePalettes;
+        properties.EnemyXPDrops = enemyXPDrops;
 
         //Levels
-        properties.ShuffleAtkExp = ShuffleAttackExperience;
-        properties.ShuffleMagicExp = ShuffleMagicExperience;
-        properties.ShuffleLifeExp = ShuffleLifeExperience;
-        properties.AttackEffectiveness = AttackEffectiveness;
-        properties.MagicEffectiveness = MagicEffectiveness;
-        properties.LifeEffectiveness = LifeEffectiveness;
-        properties.ShuffleLifeRefill = ShuffleLifeRefillAmount;
-        properties.ShuffleSpellLocations = ShuffleSpellLocations ?? GetIndeterminateFlagValue(r);
-        properties.DisableMagicRecs = DisableMagicContainerRequirements ?? GetIndeterminateFlagValue(r);
-        properties.AttackCap = AttackLevelCap;
-        properties.MagicCap = MagicLevelCap;
-        properties.LifeCap = LifeLevelCap;
-        properties.ScaleLevels = ScaleLevelRequirementsToCap;
-        properties.HideLessImportantLocations = HideLessImportantLocations ?? GetIndeterminateFlagValue(r);
-        properties.SaneCaves = RestrictConnectionCaveShuffle ?? GetIndeterminateFlagValue(r);
-        properties.SpellEnemy = RandomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
+        properties.ShuffleAtkExp = shuffleAttackExperience;
+        properties.ShuffleMagicExp = shuffleMagicExperience;
+        properties.ShuffleLifeExp = shuffleLifeExperience;
+        properties.AttackEffectiveness = attackEffectiveness;
+        properties.MagicEffectiveness = magicEffectiveness;
+        properties.LifeEffectiveness = lifeEffectiveness;
+        properties.ShuffleLifeRefill = shuffleLifeRefillAmount;
+        properties.ShuffleSpellLocations = shuffleSpellLocations ?? GetIndeterminateFlagValue(r);
+        properties.DisableMagicRecs = disableMagicContainerRequirements ?? GetIndeterminateFlagValue(r);
+        properties.AttackCap = attackLevelCap;
+        properties.MagicCap = magicLevelCap;
+        properties.LifeCap = lifeLevelCap;
+        properties.ScaleLevels = scaleLevelRequirementsToCap;
+        properties.HideLessImportantLocations = hideLessImportantLocations ?? GetIndeterminateFlagValue(r);
+        properties.SaneCaves = restrictConnectionCaveShuffle ?? GetIndeterminateFlagValue(r);
+        properties.SpellEnemy = randomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
 
         //Items
-        properties.ShuffleOverworldItems = ShuffleOverworldItems ?? GetIndeterminateFlagValue(r);
-        properties.ShufflePalaceItems = ShufflePalaceItems ?? GetIndeterminateFlagValue(r);
-        properties.MixOverworldPalaceItems = MixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r);
-        properties.RandomizeSmallItems = ShuffleSmallItems;
-        properties.ExtraKeys = PalacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
-        properties.RandomizeNewKasutoBasementRequirement = RandomizeNewKasutoJarRequirements;
-        properties.AllowImportantItemDuplicates = AllowImportantItemDuplicates;
-        properties.PbagItemShuffle = IncludePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
-        properties.StartWithSpellItems = RemoveSpellItems ?? GetIndeterminateFlagValue(r);
-        properties.ShufflePbagXp = ShufflePBagAmounts ?? GetIndeterminateFlagValue(r);
-        properties.IncludeQuestItemsInShuffle = IncludeQuestItemsInShuffle ?? GetIndeterminateFlagValue(r);
-        properties.IncludeSpellsInShuffle = IncludeSpellsInShuffle ?? GetIndeterminateFlagValue(r);
-        properties.IncludeSwordTechsInShuffle = IncludeSwordTechsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.ShuffleOverworldItems = shuffleOverworldItems ?? GetIndeterminateFlagValue(r);
+        properties.ShufflePalaceItems = shufflePalaceItems ?? GetIndeterminateFlagValue(r);
+        properties.MixOverworldPalaceItems = mixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r);
+        properties.RandomizeSmallItems = shuffleSmallItems;
+        properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
+        properties.RandomizeNewKasutoBasementRequirement = randomizeNewKasutoJarRequirements;
+        properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
+        properties.PbagItemShuffle = includePBagCavesInItemShuffle ?? GetIndeterminateFlagValue(r);
+        properties.StartWithSpellItems = removeSpellItems ?? GetIndeterminateFlagValue(r);
+        properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
+        properties.IncludeQuestItemsInShuffle = includeQuestItemsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.IncludeSpellsInShuffle = includeSpellsInShuffle ?? GetIndeterminateFlagValue(r);
+        properties.IncludeSwordTechsInShuffle = includeSwordTechsInShuffle ?? GetIndeterminateFlagValue(r);
 
         //Drops
-        properties.ShuffleItemDropFrequency = ShuffleItemDropFrequency;
+        properties.ShuffleItemDropFrequency = shuffleItemDropFrequency;
         if (randomizeDrops)
         {
             do
             {
-                properties.Smallbluejar = !SmallEnemiesCanDropBlueJar && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropBlueJar;
-                properties.Smallredjar = !SmallEnemiesCanDropRedJar && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropRedJar;
-                properties.Small50 = !SmallEnemiesCanDropSmallBag && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropSmallBag;
-                properties.Small100 = !SmallEnemiesCanDropMediumBag && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropMediumBag;
-                properties.Small200 = !SmallEnemiesCanDropLargeBag && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropLargeBag;
-                properties.Small500 = !SmallEnemiesCanDropXLBag && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropXLBag;
-                properties.Small1up = !SmallEnemiesCanDrop1up && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDrop1up;
-                properties.Smallkey = !SmallEnemiesCanDropKey && RandomizeDrops ? r.Next(2) == 1 : SmallEnemiesCanDropKey;
+                properties.Smallbluejar = !smallEnemiesCanDropBlueJar && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropBlueJar;
+                properties.Smallredjar = !smallEnemiesCanDropRedJar && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropRedJar;
+                properties.Small50 = !smallEnemiesCanDropSmallBag && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropSmallBag;
+                properties.Small100 = !smallEnemiesCanDropMediumBag && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropMediumBag;
+                properties.Small200 = !smallEnemiesCanDropLargeBag && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropLargeBag;
+                properties.Small500 = !smallEnemiesCanDropXLBag && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropXLBag;
+                properties.Small1up = !smallEnemiesCanDrop1up && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDrop1up;
+                properties.Smallkey = !smallEnemiesCanDropKey && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropKey;
             } while (properties is { Smallbluejar: false, Smallredjar: false, Small50: false, Small100: false, Small200: false, Small500: false, Small1up: false, Smallkey: false });
         }
         if (randomizeDrops)
         {
             do
             {
-                properties.Largebluejar = !LargeEnemiesCanDropBlueJar && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropBlueJar;
-                properties.Largeredjar = !LargeEnemiesCanDropRedJar && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropRedJar;
-                properties.Large50 = !LargeEnemiesCanDropSmallBag && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropSmallBag;
-                properties.Large100 = !LargeEnemiesCanDropMediumBag && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropMediumBag;
-                properties.Large200 = !LargeEnemiesCanDropLargeBag && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropLargeBag;
-                properties.Large500 = !LargeEnemiesCanDropXLBag && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropXLBag;
-                properties.Large1up = !LargeEnemiesCanDrop1up && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDrop1up;
-                properties.Largekey = !LargeEnemiesCanDropKey && RandomizeDrops ? r.Next(2) == 1 : LargeEnemiesCanDropKey;
+                properties.Largebluejar = !largeEnemiesCanDropBlueJar && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropBlueJar;
+                properties.Largeredjar = !largeEnemiesCanDropRedJar && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropRedJar;
+                properties.Large50 = !largeEnemiesCanDropSmallBag && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropSmallBag;
+                properties.Large100 = !largeEnemiesCanDropMediumBag && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropMediumBag;
+                properties.Large200 = !largeEnemiesCanDropLargeBag && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropLargeBag;
+                properties.Large500 = !largeEnemiesCanDropXLBag && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropXLBag;
+                properties.Large1up = !largeEnemiesCanDrop1up && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDrop1up;
+                properties.Largekey = !largeEnemiesCanDropKey && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropKey;
             } while (properties is { Largebluejar: false, Largeredjar: false, Large50: false, Large100: false, Large200: false, Large500: false, Large1up: false, Largekey: false });
         }
-        properties.StandardizeDrops = StandardizeDrops;
+        properties.StandardizeDrops = standardizeDrops;
         properties.RandomizeDrops = randomizeDrops;
 
         //Hints
-        properties.SpellItemHints = EnableSpellItemHints ?? GetIndeterminateFlagValue(r);
-        properties.HelpfulHints = EnableHelpfulHints ?? GetIndeterminateFlagValue(r);
-        properties.TownNameHints = EnableTownNameHints ?? GetIndeterminateFlagValue(r);
+        properties.SpellItemHints = enableSpellItemHints ?? GetIndeterminateFlagValue(r);
+        properties.HelpfulHints = enableHelpfulHints ?? GetIndeterminateFlagValue(r);
+        properties.TownNameHints = enableTownNameHints ?? GetIndeterminateFlagValue(r);
 
         //Misc.
-        properties.BeepThreshold = BeepThreshold switch
+        properties.BeepThreshold = beepThreshold switch
         {
             //Normal
             BeepThreshold.Normal => 0x20,
@@ -1352,7 +1266,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             BeepThreshold.TwoBars => 0x40,
             _ => 0x20
         };
-        properties.BeepFrequency = BeepFrequency switch
+        properties.BeepFrequency = beepFrequency switch
         {
             //Normal
             BeepFrequency.Normal => 0x30,
@@ -1364,25 +1278,26 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             BeepFrequency.Off => 0,
             _ => 0x30
         };
-        properties.JumpAlwaysOn = JumpAlwaysOn;
-        properties.DashAlwaysOn = DashAlwaysOn;
-        properties.FastCast = FastSpellCasting;
-        properties.BeamSprite = BeamSprite;
-        properties.DisableMusic = DisableMusic;
-        properties.RandomizeMusic = RandomizeMusic;
-        properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
-        properties.DisableUnsafeMusic = DisableUnsafeMusic;
-        properties.CharSprite = Sprite;
-        properties.ChangeItemSprites = ChangeItemSprites;
-        properties.TunicColor = Tunic;
-        properties.OutlineColor = TunicOutline;
-        properties.ShieldColor = ShieldTunic;
-        properties.UpAC1 = UpAOnController1;
-        properties.RemoveFlashing = RemoveFlashing;
+        properties.JumpAlwaysOn = jumpAlwaysOn;
+        properties.DashAlwaysOn = dashAlwaysOn;
+        properties.FastCast = fastSpellCasting;
+        properties.BeamSprite = beamSprite;
+        properties.DisableMusic = disableMusic;
+        properties.RandomizeMusic = randomizeMusic;
+        properties.MixCustomAndOriginalMusic = mixCustomAndOriginalMusic;
+        properties.IncludeDiverseMusic = includeDiverseMusic;
+        properties.DisableUnsafeMusic = disableUnsafeMusic;
+        properties.CharSprite = sprite;
+        properties.ChangeItemSprites = changeItemSprites;
+        properties.TunicColor = tunic;
+        properties.OutlineColor = tunicOutline;
+        properties.ShieldColor = shieldTunic;
+        properties.UpAC1 = upAOnController1;
+        properties.RemoveFlashing = removeFlashing;
         //Removed the option to select this for now.
         properties.UseCustomRooms = false;
-        properties.DisableHUDLag = DisableHUDLag;
-        properties.RandomizeKnockback = RandomizeKnockback;
+        properties.DisableHUDLag = disableHUDLag;
+        properties.RandomizeKnockback = randomizeKnockback;
 
         //"Server" side validation
         //This is a replication of a bunch of logic from the UI so that configurations from sources other than the UI (YAML?)
@@ -1483,7 +1398,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
         //vs just determining min/max ranges and fair rolling between them. Keeping it for now.
         int[] palaceRoomItemsMax = [1, 1, 1, 1, 1, 1];
-        switch (PalaceItemRoomCount)
+        switch (palaceItemRoomCount)
         {
             case PalaceItemRoomCount.RANDOM:
                 palaceRoomItemsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 3, 2, 3, 4, 4];
@@ -1515,7 +1430,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
                 properties.UsePalaceItemRoomCountIndicator = true;
                 break;
             default:
-                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)PalaceItemRoomCount, 6).ToArray();
+                properties.PalaceItemRoomCounts = Enumerable.Repeat((int)palaceItemRoomCount, 6).ToArray();
                 properties.UsePalaceItemRoomCountIndicator = false;
                 break;
         }
@@ -1553,11 +1468,11 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     public void CheckForFlagConflicts()
     {
         int requiredMinorItemReplacements = 0;
-        if ((StartingHeartContainersMax ?? 8) < 4)
+        if ((startingHeartContainersMax ?? 8) < 4)
         {
-            requiredMinorItemReplacements = 4 - (StartingHeartContainersMax ?? 4);
+            requiredMinorItemReplacements = 4 - (startingHeartContainersMax ?? 4);
         }
-        if (PalaceItemRoomCount == PalaceItemRoomCount.ZERO)
+        if (palaceItemRoomCount == PalaceItemRoomCount.ZERO)
         {
             requiredMinorItemReplacements += 6;
         }
@@ -1566,13 +1481,13 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             throw new UserFacingException("Impossible Item Flags", "Not enough possible item locations for removed palace items.\n\nAdd more starting items or more palace items.");
         }
 
-        if (NoDuplicateRoomsByLayout || NoDuplicateRoomsByEnemies)
+        if (noDuplicateRoomsByLayout || noDuplicateRoomsByEnemies)
         {
             // if current palace generation logic changes, this should be updated
             int potentialRoomPools = 0;
-            if (IncludeVanillaRooms != false) { potentialRoomPools++; }
-            if (Includev4_0Rooms != false) { potentialRoomPools++; }
-            if (Includev4_4Rooms != false) { potentialRoomPools++; }
+            if (includeVanillaRooms != false) { potentialRoomPools++; }
+            if (includev4_0Rooms != false) { potentialRoomPools++; }
+            if (includev4_4Rooms != false) { potentialRoomPools++; }
             if (potentialRoomPools < 2)
             {
                 throw new UserFacingException("Incompatible Palace Flags", "Not enough palace rooms in the pool.\n\nUnder the Palaces tab, include more room groups or disable No Duplicate Rooms.");
@@ -1598,12 +1513,12 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
     public string GetRoomsFile()
     {
-        return UseCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
+        return useCustomRooms ? "CustomRooms.json" : "PalaceRooms.json";
     }
 
     private bool GetIndeterminateFlagValue(Random r)
     {
-        return r.NextDouble() < IndeterminateOptionRate switch
+        return r.NextDouble() < indeterminateOptionRate switch
         {
             IndeterminateOptionRate.QUARTER => .25,
             IndeterminateOptionRate.HALF => .50,
@@ -1617,23 +1532,23 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     {
         return collectable switch
         {
-            Collectable.SHIELD_SPELL => StartWithShield,
-            Collectable.JUMP_SPELL => StartWithJump,
-            Collectable.LIFE_SPELL => StartWithLife,
-            Collectable.FAIRY_SPELL => StartWithFairy,
-            Collectable.FIRE_SPELL => StartWithFire,
-            Collectable.DASH_SPELL => StartWithFire,
-            Collectable.REFLECT_SPELL => StartWithReflect,
-            Collectable.SPELL_SPELL => StartWithSpellSpell,
-            Collectable.THUNDER_SPELL => StartWithThunder,
-            Collectable.CANDLE => StartWithCandle,
-            Collectable.GLOVE => StartWithGlove,
-            Collectable.RAFT => StartWithRaft,
-            Collectable.BOOTS => StartWithBoots,
-            Collectable.FLUTE => StartWithFlute,
-            Collectable.CROSS => StartWithCross,
-            Collectable.HAMMER => StartWithHammer,
-            Collectable.MAGIC_KEY => StartWithMagicKey,
+            Collectable.SHIELD_SPELL => startWithShield,
+            Collectable.JUMP_SPELL => startWithJump,
+            Collectable.LIFE_SPELL => startWithLife,
+            Collectable.FAIRY_SPELL => startWithFairy,
+            Collectable.FIRE_SPELL => startWithFire,
+            Collectable.DASH_SPELL => startWithFire,
+            Collectable.REFLECT_SPELL => startWithReflect,
+            Collectable.SPELL_SPELL => startWithSpellSpell,
+            Collectable.THUNDER_SPELL => startWithThunder,
+            Collectable.CANDLE => startWithCandle,
+            Collectable.GLOVE => startWithGlove,
+            Collectable.RAFT => startWithRaft,
+            Collectable.BOOTS => startWithBoots,
+            Collectable.FLUTE => startWithFlute,
+            Collectable.CROSS => startWithCross,
+            Collectable.HAMMER => startWithHammer,
+            Collectable.MAGIC_KEY => startWithMagicKey,
             _ => throw new ImpossibleException("Unrecognized collectable")
         };
     }
@@ -1688,35 +1603,35 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     {
         int count = 3, hardStartItemsCount = 0;
 
-        hardStartItemsCount += ShuffleStartingItems || StartWithCandle ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithBoots ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithCross ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithFlute ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithGlove ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithHammer ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithMagicKey ? 1 : 0;
-        hardStartItemsCount += ShuffleStartingItems || StartWithRaft ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithCandle ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithBoots ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithCross ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithFlute ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithGlove ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithHammer ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithMagicKey ? 1 : 0;
+        hardStartItemsCount += shuffleStartingItems || startWithRaft ? 1 : 0;
 
-        count += Math.Max(hardStartItemsCount, ShuffleStartingItems ? StartItemsLimit.AsInt() : 0);
+        count += Math.Max(hardStartItemsCount, shuffleStartingItems ? startItemsLimit.AsInt() : 0);
 
-        if(IncludeSpellsInShuffle ?? true)
+        if(includeSpellsInShuffle ?? true)
         {
             hardStartItemsCount = 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithShield ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithJump ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithLife ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithFairy ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithFire ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithReflect ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithSpellSpell ? 1 : 0;
-            hardStartItemsCount += ShuffleStartingSpells || StartWithThunder ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithShield ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithJump ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithLife ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithFairy ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithFire ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithReflect ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithSpellSpell ? 1 : 0;
+            hardStartItemsCount += shuffleStartingSpells || startWithThunder ? 1 : 0;
 
-            count += Math.Max(hardStartItemsCount, ShuffleStartingItems ? StartItemsLimit.AsInt() : 0);
+            count += Math.Max(hardStartItemsCount, shuffleStartingItems ? startItemsLimit.AsInt() : 0);
         }
 
-        if(IncludeSwordTechsInShuffle ?? true)
+        if(includeSwordTechsInShuffle ?? true)
         {
-            hardStartItemsCount += StartingTechniques switch
+            hardStartItemsCount += startingTechniques switch
             {
                 StartingTechs.DOWNSTAB => 1,
                 StartingTechs.UPSTAB => 1,
@@ -1727,21 +1642,21 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
             };
         }
 
-        int containerReplacementSmallItemsCount = MaxHeartContainers switch
+        int containerReplacementSmallItemsCount = maxHeartContainers switch
         {
-            MaxHeartsOption.EIGHT => 4 - (8 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.SEVEN => 4 - (7 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.SIX => 4 - (6 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.FIVE => 4 - (5 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.FOUR => 4 - (4 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.THREE => 4 - (3 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.TWO => 4 - (2 - (StartingHeartContainersMax ?? 8)),
-            MaxHeartsOption.ONE => 4 - (1 - (StartingHeartContainersMax ?? 8)),
+            MaxHeartsOption.EIGHT => 4 - (8 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.SEVEN => 4 - (7 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.SIX => 4 - (6 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.FIVE => 4 - (5 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.FOUR => 4 - (4 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.THREE => 4 - (3 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.TWO => 4 - (2 - (startingHeartContainersMax ?? 8)),
+            MaxHeartsOption.ONE => 4 - (1 - (startingHeartContainersMax ?? 8)),
             MaxHeartsOption.PLUS_ONE => 3,
             MaxHeartsOption.PLUS_TWO => 2,
             MaxHeartsOption.PLUS_THREE => 1,
             MaxHeartsOption.PLUS_FOUR => 0,
-            MaxHeartsOption.RANDOM => 4 - (StartingHeartContainersMax ?? 1),
+            MaxHeartsOption.RANDOM => 4 - (startingHeartContainersMax ?? 1),
             _ => throw new Exception("Unrecognized Max Hearts in CountPossibleMinorItems")
         };
 
@@ -1752,16 +1667,23 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
     private int GetDarkLinkMinDistance()
     {
-        if (DarkLinkMinDistance == BossRoomMinDistance.MAX)
+        if (darkLinkMinDistance == BossRoomMinDistance.MAX)
         {
             // limiting here based on how long it takes to generate the seeds
-            if (GPStyle == PalaceStyle.RECONSTRUCTED) { return 16; }
-            if (ShortenGP != false) { return 20; }
+            if (gpStyle == PalaceStyle.RECONSTRUCTED) { return 16; }
+            if (shortenGP != false) { return 20; }
             return 24;
         }
         else
         {
-            return (int)DarkLinkMinDistance;
+            return (int)darkLinkMinDistance;
         }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

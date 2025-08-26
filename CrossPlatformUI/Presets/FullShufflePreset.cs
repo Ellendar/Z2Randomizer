@@ -41,11 +41,11 @@ public static class FullShufflePreset
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
-        DMBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
-        GPStyle = PalaceStyle.RANDOM_WALK,
+        GpStyle = PalaceStyle.RANDOM_WALK,
         ShortenNormalPalaces = false,
         ShortenGP = true,
         IncludeVanillaRooms = true,

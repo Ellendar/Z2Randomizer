@@ -13,6 +13,10 @@
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
 
         <RootNamespace>Z2Randomizer.CrossPlatformUI.Browser</RootNamespace>
+
+        <Configurations>Debug;Release;Unsafe Debug</Configurations>
+
+        <Platforms>AnyCPU</Platforms>
 <!--        <TrimMode>partial</TrimMode>-->
 <!--        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>-->
 <!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
@@ -27,6 +31,15 @@
         <DebugSymbols>true</DebugSymbols>
         <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
         <RunAOTCompilation>false</RunAOTCompilation>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+      <DebugType>full</DebugType>
+      <DebugSymbols>true</DebugSymbols>
+      <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+      <RunAOTCompilation>false</RunAOTCompilation>
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
     </PropertyGroup>
 
     <ItemGroup>

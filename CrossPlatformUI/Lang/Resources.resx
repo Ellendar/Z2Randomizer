@@ -141,6 +141,9 @@ up.</value>
 <value>Also include original tracks in the selection when using custom music. If disabled,
 original tracks will only be selected when no custom tracks exist for a given usage.</value>
 	</data>
+	<data name="IncludeDiverseMusicToolTip" xml:space="preserve">
+<value>Include music tracks that do not fit the fantasy setting of the game (tracks with the "diverse" tag). This can potentially increase the number of tracks in libraries that may be selected.</value>
+	</data>
 	<data name="DisableUnsafeMusicToolTip" xml:space="preserve">
 <value>Disable songs in the library that are marked as being potentially unsafe for streaming.</value>
 	</data>

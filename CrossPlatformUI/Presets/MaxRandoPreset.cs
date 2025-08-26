@@ -40,12 +40,12 @@ public static class MaxRandoPreset
         WestBiome = Biome.RANDOM_NO_VANILLA,
         EastBiome = Biome.RANDOM_NO_VANILLA,
         MazeBiome = Biome.VANILLALIKE,
-        DMBiome = Biome.RANDOM_NO_VANILLA,
+        DmBiome = Biome.RANDOM_NO_VANILLA,
         VanillaShuffleUsesActualTerrain = true,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
-        GPStyle = PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        GpStyle = PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE,
         ShortenNormalPalaces = false,
         ShortenGP = null,
         IncludeVanillaRooms = true,

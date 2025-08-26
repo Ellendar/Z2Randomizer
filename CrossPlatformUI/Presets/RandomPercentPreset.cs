@@ -40,12 +40,12 @@ public static class RandomPercentPreset
         WestBiome = Biome.RANDOM,
         EastBiome = Biome.RANDOM,
         MazeBiome = Biome.VANILLALIKE,
-        DMBiome = Biome.RANDOM,
+        DmBiome = Biome.RANDOM,
         VanillaShuffleUsesActualTerrain = true,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_PER_PALACE,
-        GPStyle = PalaceStyle.RANDOM,
+        GpStyle = PalaceStyle.RANDOM,
         ShortenNormalPalaces = false,
         ShortenGP = null,
         IncludeVanillaRooms = null,

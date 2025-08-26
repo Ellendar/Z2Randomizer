@@ -10,6 +10,9 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Z2Randomizer.RandomizerCore</RootNamespace>
+    <LangVersion>default</LangVersion>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <DefineConstants Condition="'$(Configuration)' == 'Unsafe Debug'">UNSAFE_DEBUG;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,17 +44,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DynamicData" Version="8.4.1" />
     <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
-    <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Linux')) and '$(TargetFramework)' != 'net8.0-browser'" />
-    <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('OSX')) and '$(TargetFramework)' != 'net8.0-browser'" />
-    <PackageReference Include="Microsoft.ClearScript.V8.Native.win-x64" Version="7.4.5" Condition="$([MSBuild]::IsOsPlatform('Windows')) and '$(TargetFramework)' != 'net8.0-browser'" />
-    <PackageReference Include="ReactiveUI" Version="20.4.1" />
-    <PackageReference Include="ReactiveUI.SourceGenerators" Version="2.3.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
     <PackageReference Include="NLog" Version="6.0.3" />
+    <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
   </ItemGroup>
 

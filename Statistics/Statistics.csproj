@@ -1,10 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <OutputType>Exe</OutputType>
     <RootNamespace>Z2Randomizer.Statistics</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <LangVersion>default</LangVersion>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Configurations>Debug;Release;Unsafe Debug</Configurations>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+    <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+    <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />

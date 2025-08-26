@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
-public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
+public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGenerator
 {
     public static int[] dropFailureCounts = [0, 0, 0, 0, 0, 0, 0];
     public static int[] stallFailureCounts = [0, 0, 0, 0, 0, 0, 0];
@@ -15,20 +15,18 @@ public class SequentialPlacementCoordinatePalaceGenerator() : CoordinatePalaceGe
     static int debug = 0;
     
     private Room? newRoom;
-    private HashSet<Coord> openCoords;
-    private Dictionary<Coord, Room> allRooms;
-    private RandomizerProperties props;
+    private HashSet<Coord> openCoords = new();
+    private Dictionary<Coord, Room> allRooms = new();
     private int stallCount;
     private int openJunctionsCount;
     private int roomCount;
     private int palaceNumber;
-    private RoomPool roomPool;
+    private RoomPool? roomPool;
     
-    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCnt, int palaceNum)
     {
-        this.props = props;
-        this.roomCount = roomCount;
-        this.palaceNumber = palaceNumber;
+        this.roomCount = roomCnt;
+        this.palaceNumber = palaceNum;
 
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);

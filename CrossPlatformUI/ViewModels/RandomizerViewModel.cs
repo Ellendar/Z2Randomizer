@@ -33,7 +33,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public string Seed
     {
-        get => Main.Config.Seed;
+        get => Main.Config.Seed ?? "";
         set
         {
             Main.Config.Seed = value.Trim();
@@ -106,7 +106,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             await checkUpdateService.CheckUpdate();
         });
 
-        ToggleTheme = ReactiveCommand.CreateFromTask(async () =>
+        ToggleTheme = ReactiveCommand.Create(() =>
         {
             if(App.Current!.ActualThemeVariant == ThemeVariant.Dark)
             {
@@ -116,7 +116,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             {
                 App.Current!.RequestedThemeVariant = ThemeVariant.Dark;
             }
-            ThemeVariantName = App.Current.RequestedThemeVariant.Key.ToString();
+            ThemeVariantName = App.Current.RequestedThemeVariant?.Key.ToString() ?? "Default";
         });
 
         CanGenerate = this.WhenAnyValue(

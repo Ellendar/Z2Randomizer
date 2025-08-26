@@ -165,7 +165,7 @@
                     Grid.Row="2" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
                     assists:ComboBoxAssist.Label="Death Mountain Biome"
                     ItemsSource="{Binding Source={x:Static rc:Enums.DMBiomeList}}"
-                    SelectedItem="{Binding Config.DMBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                    SelectedItem="{Binding Config.DmBiome, Converter={x:Static ui:Util.EnumConvert}}"
                 >
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DeathMountainBiomeToolTip}"/></ToolTip.Tip>
                 </ComboBox>

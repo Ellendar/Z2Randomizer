@@ -40,11 +40,11 @@ public static class UpstartsTournamentPreset
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
-        DMBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RECONSTRUCTED,
-        GPStyle = PalaceStyle.RECONSTRUCTED,
+        GpStyle = PalaceStyle.RECONSTRUCTED,
         ShortenNormalPalaces = false,
         ShortenGP = true,
         IncludeVanillaRooms = true,
