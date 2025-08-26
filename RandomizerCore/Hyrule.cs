@@ -1,4 +1,8 @@
-﻿using System;
+﻿using DynamicData;
+using FtRandoLib.Importer;
+using js65;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,9 +12,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using FtRandoLib.Importer;
-using js65;
-using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
@@ -159,7 +160,7 @@ public class Hyrule
     */
 
     public ROM ROMData { get; set; }
-    public Random RNG { get; set; }
+    public Random r { get; set; }
     public string Flags { get; private set; }
     public int SeedHash { get; private set; }
     public RandomizerProperties Props
@@ -203,14 +204,14 @@ public class Hyrule
             Hash = "";
             World.ResetStats();
             SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
-            RNG = new Random(SeedHash);
+            r = new Random(SeedHash);
 
             config.CheckForFlagConflicts();
-            props = config.Export(RNG);
+            props = config.Export(r);
             //To make sure there isn't any similarity between the spoiler and non-spoiler versions of the seed, spin the RNG a bit.
             if(config.GenerateSpoiler)
             {
-                RNG.NextBytes(new byte[64]);
+                r.NextBytes(new byte[64]);
             }
             if (UNSAFE_DEBUG)
             {
@@ -250,7 +251,7 @@ public class Hyrule
 
             if (props.RandomizeNewKasutoBasementRequirement)
             {
-                kasutoJars = RNG.Next(5, 8);
+                kasutoJars = r.Next(5, 8);
             }
             else
             {
@@ -270,7 +271,7 @@ public class Hyrule
             {
                 freeBanks = new(ROM.FreeRomBanks);
                 var palaceGenerator = new Palaces();
-                palaces = await palaceGenerator.CreatePalaces(RNG, props, palaceRooms, raftIsRequired, ct);
+                palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, raftIsRequired, ct);
                 if (palaces.Count == 0)
                 {
                     continue;
@@ -279,17 +280,17 @@ public class Hyrule
                 //Randomize Enemies
                 if (props.ShufflePalaceEnemies)
                 {
-                    palaces.ForEach(i => i.RandomizeEnemies(props, RNG));
+                    palaces.ForEach(i => i.RandomizeEnemies(props, r));
                 }
 
                 if (props.RandomizeSmallItems || props.ExtraKeys)
                 {
-                    palaces[0].RandomizeSmallItems(RNG, props.ExtraKeys);
-                    palaces[1].RandomizeSmallItems(RNG, props.ExtraKeys);
-                    palaces[2].RandomizeSmallItems(RNG, props.ExtraKeys);
-                    palaces[3].RandomizeSmallItems(RNG, props.ExtraKeys);
-                    palaces[4].RandomizeSmallItems(RNG, props.ExtraKeys);
-                    palaces[5].RandomizeSmallItems(RNG, props.ExtraKeys);
+                    palaces[0].RandomizeSmallItems(r, props.ExtraKeys);
+                    palaces[1].RandomizeSmallItems(r, props.ExtraKeys);
+                    palaces[2].RandomizeSmallItems(r, props.ExtraKeys);
+                    palaces[3].RandomizeSmallItems(r, props.ExtraKeys);
+                    palaces[4].RandomizeSmallItems(r, props.ExtraKeys);
+                    palaces[5].RandomizeSmallItems(r, props.ExtraKeys);
                     //Small items in GP shouldn't be randomized. This is intentional to keep
                     //the randomization in line with the original "shuffle" behavior
                     //palaces[6].RandomizeSmallItems(RNG, props.ExtraKeys);
@@ -319,8 +320,8 @@ public class Hyrule
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
-            shuffler.ShuffleDrops(ROMData, RNG);
-            shuffler.ShufflePbagAmounts(ROMData, RNG);
+            shuffler.ShuffleDrops(ROMData, r);
+            shuffler.ShufflePbagAmounts(ROMData, r);
 
             ROMData.DisableTurningPalacesToStone();
             ROMData.UpdateMapPointers();
@@ -354,7 +355,7 @@ public class Hyrule
             {
                 // move a PRG1 background map to make space for more enemy data
                 ROMData.RelocateData(assembler, 1, 0x8000);
-                OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, RNG);
+                OverworldEnemyShuffler.Shuffle(worlds, assembler, ROMData, props.MixLargeAndSmallEnemies, props.GeneratorsAlwaysMatch, r);
             }
 
             if (props.CombineFire)
@@ -366,7 +367,7 @@ public class Hyrule
                         //This makes the assumption that is currently true that each "town" has exactly one item.
                         //If we later restructure towns to be omni-towns to get rid of fake towns, this will be untrue
                         .Select(l => l.Collectables[0]).ToList();
-                ROMData.CombineFireSpell(assembler, customSpellOrder, RNG);
+                ROMData.CombineFireSpell(assembler, customSpellOrder, r);
             }
 
             Dictionary<Town, Collectable> spellMap = new()
@@ -386,8 +387,8 @@ public class Hyrule
                 return null;
             }
 
-            List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, RNG);
-            ApplyAsmPatches(props, assembler, RNG, texts, ROMData);
+            List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
+            ApplyAsmPatches(props, assembler, r, texts, ROMData);
 
             var rom = await ROMData.ApplyAsm(assembler);
             // await assemblerTask; // .Wait(ct);
@@ -436,7 +437,7 @@ public class Hyrule
             }
 
             byte[] finalRNGState = new byte[32];
-            RNG.NextBytes(finalRNGState);
+            r.NextBytes(finalRNGState);
             var version = (Assembly.GetEntryAssembly()?.GetName()?.Version) 
                 ?? throw new Exception("Invalid entry assembly version information");
             var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
@@ -542,7 +543,7 @@ public class Hyrule
     private void RandomizeAttackEffectiveness(ROM rom, AttackEffectiveness attackEffectiveness)
     {
         byte[] attackValues = rom.GetBytes(0x1E67D, 8);
-        byte[] newAttackValueBytes = RandomizeAttackEffectiveness(RNG, attackValues, attackEffectiveness);
+        byte[] newAttackValueBytes = RandomizeAttackEffectiveness(r, attackValues, attackEffectiveness);
         rom.Put(0x1E67D, newAttackValueBytes);
     }
 
@@ -670,8 +671,8 @@ public class Hyrule
             shufflableItems.Add(Collectable.BAGUS_NOTE);
             if (props.StartWithSpellItems)
             {
-                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
-                shufflableItems.Add(minorItems[RNG.Next(minorItems.Count)]);
+                shufflableItems.Add(minorItems[r.Next(minorItems.Count)]);
+                shufflableItems.Add(minorItems[r.Next(minorItems.Count)]);
             }
             else
             {
@@ -720,10 +721,10 @@ public class Hyrule
             int heartContainersToRemove = 4 - heartContainersInItemPool;
             while (heartContainersToRemove > 0)
             {
-                int remove = RNG.Next(shufflableItems.Count);
+                int remove = r.Next(shufflableItems.Count);
                 if (shufflableItems[remove] == Collectable.HEART_CONTAINER)
                 {
-                    shufflableItems[remove] = minorItems[RNG.Next(minorItems.Count)];
+                    shufflableItems[remove] = minorItems[r.Next(minorItems.Count)];
                     heartContainersToRemove--;
                 }
             }
@@ -734,9 +735,9 @@ public class Hyrule
             Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
             Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
             Debug.Assert(shufflableItems[17] == Collectable.CHILD);
-            shufflableItems[9] = minorItems[RNG.Next(minorItems.Count)];
-            shufflableItems[10] = minorItems[RNG.Next(minorItems.Count)];
-            shufflableItems[17] = minorItems[RNG.Next(minorItems.Count)];
+            shufflableItems[9] = minorItems[r.Next(minorItems.Count)];
+            shufflableItems[10] = minorItems[r.Next(minorItems.Count)];
+            shufflableItems[17] = minorItems[r.Next(minorItems.Count)];
             ItemGet[Collectable.TROPHY] = true;
             ItemGet[Collectable.MEDICINE] = true;
             ItemGet[Collectable.CHILD] = true;
@@ -750,7 +751,7 @@ public class Hyrule
             if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
-                shufflableItems[10] = minorItems[RNG.Next(minorItems.Count)];
+                shufflableItems[10] = minorItems[r.Next(minorItems.Count)];
                 ItemGet[Collectable.TROPHY] = true;
             }
 
@@ -758,7 +759,7 @@ public class Hyrule
             if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
-                shufflableItems[9] = minorItems[RNG.Next(minorItems.Count)];
+                shufflableItems[9] = minorItems[r.Next(minorItems.Count)];
                 ItemGet[Collectable.MEDICINE] = true;
             }
 
@@ -766,7 +767,7 @@ public class Hyrule
             if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
             {
                 Debug.Assert(shufflableItems[17] == Collectable.CHILD);
-                shufflableItems[17] = minorItems[RNG.Next(minorItems.Count)];
+                shufflableItems[17] = minorItems[r.Next(minorItems.Count)];
                 ItemGet[Collectable.CHILD] = true;
             }
         }
@@ -795,7 +796,7 @@ public class Hyrule
         {
             if(props.StartsWithCollectable(item))
             {
-                shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(RNG);
+                shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(r);
             }
         }
 
@@ -805,7 +806,7 @@ public class Hyrule
             {
                 if (props.StartsWithCollectable(item) && shufflableItems.Contains(item))
                 {
-                    shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(RNG);
+                    shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(r);
                 }
             }
         }
@@ -814,11 +815,11 @@ public class Hyrule
         {
             if (props.StartWithDownstab)
             {
-                shufflableItems[shufflableItems.IndexOf(Collectable.DOWNSTAB)] = minorItems.Sample(RNG);
+                shufflableItems[shufflableItems.IndexOf(Collectable.DOWNSTAB)] = minorItems.Sample(r);
             }
             if (props.StartWithUpstab)
             {
-                shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = minorItems.Sample(RNG);
+                shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = minorItems.Sample(r);
             }
         }
 
@@ -835,7 +836,7 @@ public class Hyrule
         int extraPalaceItemCount = props.PalaceItemRoomCounts.Select(c => Math.Max(c - 1, 0)).Sum();
         for (int i = 0; i < extraPalaceItemCount; i++)
         {
-            shufflableItems.Add(minorItems.Sample(RNG));
+            shufflableItems.Add(minorItems.Sample(r));
         }
 
 
@@ -887,7 +888,7 @@ public class Hyrule
 
         for(int i = 0; i < overflowLocationsRequired; i++)
         {
-            Location overflowLocation = overflowLocations.Sample(RNG)!;
+            Location overflowLocation = overflowLocations.Sample(r)!;
             itemLocs.Add(overflowLocation);
             shufflableItems.Add(Collectable.SMALL_BAG);
             minorItemIndexes.Add(shufflableItems.Count - 1);
@@ -896,9 +897,9 @@ public class Hyrule
 
         while(excessItems.Count > 0)
         {
-            int minorItemIndexIndex = RNG.Next(0, minorItemIndexes.Count);
+            int minorItemIndexIndex = r.Next(0, minorItemIndexes.Count);
             int minorItemIndex = minorItemIndexes[minorItemIndexIndex];
-            int excessItemIndex = RNG.Next(0, excessItems.Count);
+            int excessItemIndex = r.Next(0, excessItems.Count);
 
             shufflableItems[minorItemIndex] = excessItems[excessItemIndex];
             minorItemIndexes.RemoveAt(minorItemIndexIndex);
@@ -906,9 +907,11 @@ public class Hyrule
         }
 
         //Do the actual shuffling
+        List<Location> duplicateItemPlacementCandidates = [];
         palaces.ForEach(i => i.ItemRooms.ForEach(j => j.Collectable = null));
         if (props.MixOverworldPalaceItems)
         {
+            duplicateItemPlacementCandidates.AddRange(itemLocs);
             DoShuffle(shufflableItems, itemLocs);
         }
         else
@@ -923,12 +926,15 @@ public class Hyrule
                 foreach (Location palaceLocation in itemLocs.Where(i => i.PalaceNumber != null))
                 {
                     shufflableItemLocations.Add(palaceLocation);
-                    itemsToActuallyShuffle.Add(Palace.GetVanillaCollectable(palaceLocation.PalaceNumber));
+                    Collectable vanillaCollectable = Palace.GetVanillaCollectable(palaceLocation.PalaceNumber);
+                    itemsToActuallyShuffle.Add(shufflableItems.Contains(vanillaCollectable) ? vanillaCollectable : minorItems.Sample(r));
+
                     for (int i = 1; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
                     {
-                        itemsToActuallyShuffle.Add(minorItems.Sample(RNG));
+                        itemsToActuallyShuffle.Add(minorItems.Sample(r));
                     }
                 }
+                duplicateItemPlacementCandidates.AddRange(shufflableItemLocations);
                 DoShuffle(itemsToActuallyShuffle, shufflableItemLocations);
             }
             else
@@ -936,13 +942,13 @@ public class Hyrule
                 foreach (Location palaceLocation in itemLocs.Where(i => i.PalaceNumber != null && i.PalaceNumber < 7))
                 {
                     Collectable vanillaCollectable = Palace.GetVanillaCollectable(palaceLocation.PalaceNumber);
-                    palaceLocation.Collectables = [vanillaCollectable];
-                    palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms.Sample(RNG)!.Collectable = vanillaCollectable;
+                    palaceLocation.Collectables = [shufflableItems.Contains(vanillaCollectable) ? vanillaCollectable : minorItems.Sample(r)];
+                    palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms.Sample(r)!.Collectable = vanillaCollectable;
                     for (int i = 0; i < props.PalaceItemRoomCounts[(int)palaceLocation.PalaceNumber! - 1]; i++)
                     {
                         if (palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable == null)
                         {
-                            Collectable smallItem = minorItems.Sample(RNG);
+                            Collectable smallItem = minorItems.Sample(r);
                             palaceLocation.Collectables.Add(smallItem);
                             palaces[(int)palaceLocation.PalaceNumber! - 1].ItemRooms[i].Collectable = smallItem;
                         }
@@ -957,8 +963,10 @@ public class Hyrule
                 foreach (Location nonPalaceLocation in itemLocs.Where(i => i.PalaceNumber == null))
                 {
                     shufflableItemLocations.Add(nonPalaceLocation);
-                    itemsToActuallyShuffle.Add(nonPalaceLocation.VanillaCollectable);
+                    itemsToActuallyShuffle.Add(shufflableItems.Contains(nonPalaceLocation.VanillaCollectable) 
+                        ? nonPalaceLocation.VanillaCollectable : minorItems.Sample(r));
                 }
+                duplicateItemPlacementCandidates.AddRange(shufflableItemLocations);
                 DoShuffle(itemsToActuallyShuffle, shufflableItemLocations);
             }
             else
@@ -966,8 +974,7 @@ public class Hyrule
                 foreach (Location nonPalaceLocation in itemLocs.Where(i => i.PalaceNumber == null))
                 {
                     Collectable vanillaCollectable = nonPalaceLocation.VanillaCollectable;
-                    nonPalaceLocation.Collectables = props.StartsWithCollectable(vanillaCollectable) ?
-                        [minorItems.Sample(RNG)] : [vanillaCollectable];
+                    nonPalaceLocation.Collectables = [shufflableItems.Contains(vanillaCollectable) ? vanillaCollectable : minorItems.Sample(r)];
                 }
             }
         }
@@ -977,11 +984,11 @@ public class Hyrule
         int heartContainerCount = itemLocs.SelectMany(i => i.Collectables).Count(i => i == Collectable.HEART_CONTAINER);
         while(heartContainerCount > heartContainersInItemPool)
         {
-            Location location = heartContainerLocations.Sample(RNG)!;
-            int index = RNG.Next(location.Collectables.Count);
+            Location location = heartContainerLocations.Sample(r)!;
+            int index = r.Next(location.Collectables.Count);
             if (location.Collectables[index] == Collectable.HEART_CONTAINER)
             {
-                location.Collectables[index] = minorItems.Sample(RNG);
+                location.Collectables[index] = minorItems.Sample(r);
                 heartContainerCount--;
                 if (!location.Collectables.Any(i => i == Collectable.HEART_CONTAINER))
                 {
@@ -994,8 +1001,8 @@ public class Hyrule
         {
             List<Location> minorItemLocations = itemLocs.Where(i => i.Collectables.Any(j => j.IsMinorItem())).ToList();
 
-            Location location = minorItemLocations.Sample(RNG)!;
-            int index = RNG.Next(location.Collectables.Count);
+            Location location = minorItemLocations.Sample(r)!;
+            int index = r.Next(location.Collectables.Count);
             if (location.Collectables[index].IsMinorItem())
             {
                 location.Collectables[index] = Collectable.HEART_CONTAINER;
@@ -1016,34 +1023,36 @@ public class Hyrule
                 Collectable.THUNDER_SPELL,
                 Collectable.REFLECT_SPELL,
                 Collectable.MAGIC_KEY,
-                Collectable.HAMMER,
                 Collectable.RAFT,
-                Collectable.FLUTE,
-                Collectable.JUMP_SPELL,
-                Collectable.UPSTAB,
                 Collectable.BOOTS,
+                Collectable.HAMMER,
+                Collectable.FLUTE,
+                Collectable.UPSTAB,
+                Collectable.JUMP_SPELL,
             ];
-            var shufflableImportantItems = importantItemsToDuplicate.Where(c => shufflableItems.Contains(c)).ToList();
-            // re-do the minor item indexes post-shuffle
-            minorItemIndexes = Enumerable.Range(0, shufflableItems.Count)
-                                         .Where(i => shufflableItems[i].IsMinorItem())
-                                         .ToList();
-            minorItemIndexes.FisherYatesShuffle(RNG);
 
-            for (int i = 0; i < shufflableImportantItems.Count; i++)
+            importantItemsToDuplicate = importantItemsToDuplicate.Where(shufflableItems.Contains).ToList();
+
+            List<Location> minorItemLocations = duplicateItemPlacementCandidates.Where(i => i.Collectables.Any(c => c.IsMinorItem())).ToList();
+            int replaceableMinorItemCount = duplicateItemPlacementCandidates.Sum(l => l.Collectables.Count(c => c.IsMinorItem()));
+            importantItemsToDuplicate = importantItemsToDuplicate.GetRange(0, int.Min(replaceableMinorItemCount, importantItemsToDuplicate.Count));
+
+            importantItemsToDuplicate.FisherYatesShuffle(r);
+            minorItemLocations.FisherYatesShuffle(r);
+
+            for (int itemIndex = 0; itemIndex < importantItemsToDuplicate.Count; itemIndex++)
             {
-                if (minorItemIndexes.Count == 0) { break; }
-                var collectable = shufflableImportantItems[i];
-                int originalItemIndex = shufflableItems.IndexOf(collectable);
-                for (int j = minorItemIndexes.Count - 1; j >= 0; j--)
+                Location minorItemLocation = minorItemLocations.Sample(r);
+                minorItemLocation.Collectables.FisherYatesShuffle(r);
+                for(int collectableIndex = 0; collectableIndex < minorItemLocation.Collectables.Count; collectableIndex++) 
                 {
-                    int minorItemIndex = minorItemIndexes[j];
-                    // make sure duplicate items are not right next to each other
-                    // (Both Maze Island drops etc.)
-                    if (Math.Abs(originalItemIndex - minorItemIndex) >= 4)
+                    if(minorItemLocation.Collectables[collectableIndex].IsMinorItem())
                     {
-                        shufflableItems[minorItemIndex] = collectable;
-                        minorItemIndexes.RemoveAt(j);
+                        minorItemLocation.Collectables[collectableIndex] = importantItemsToDuplicate[itemIndex];
+                        if(!minorItemLocation.Collectables.Any(c => c.IsMinorItem()))
+                        {
+                            minorItemLocations.Remove(minorItemLocation);
+                        }
                         break;
                     }
                 }
@@ -1067,7 +1076,7 @@ public class Hyrule
             throw new Exception("Item locations must match number of items");
         }
 
-        itemsToShuffle.FisherYatesShuffle(RNG);
+        itemsToShuffle.FisherYatesShuffle(r);
 
         //Clear all locations, then set them to the newly shuffled items
         itemShuffleLocations.ForEach(i => i.Collectables.Clear());
@@ -1213,7 +1222,7 @@ public class Hyrule
             //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
             //be tested here, but we don't actually know what they will be until later, for now i'm just
             //testing with the vanilla text, but this could be an issue down the line.
-            ApplyAsmPatches(props, validationEngine, RNG, ROMData.GetGameText(), testRom);
+            ApplyAsmPatches(props, validationEngine, r, ROMData.GetGameText(), testRom);
             validationEngine.Add(sideviewModule);
             await testRom.ApplyAsm(validationEngine); //.Wait(ct);
         }
@@ -1541,7 +1550,7 @@ public class Hyrule
         //Each of those 7 categories has 8 values coresponding to each life level
         //Damage values that do not scale with life levels are currently not randomized.
         byte[] life = rom.GetBytes(start, numBanks * 8);
-        byte[] newLifeBytes = RandomizeLifeEffectiveness(RNG, life, props.LifeEffectiveness);
+        byte[] newLifeBytes = RandomizeLifeEffectiveness(r, life, props.LifeEffectiveness);
         rom.Put(start, newLifeBytes);
     }
 
@@ -1611,7 +1620,7 @@ public class Hyrule
         int numBanks = 8;
         int start = 0xD8B;
         byte[] magicCosts = rom.GetBytes(start, numBanks * 8);
-        byte[] newMagicCostBytes = RandomizeMagicEffectiveness(RNG, magicCosts, props.MagicEffectiveness);
+        byte[] newMagicCostBytes = RandomizeMagicEffectiveness(r, magicCosts, props.MagicEffectiveness);
         rom.Put(start, newMagicCostBytes);
     }
 
@@ -1729,7 +1738,7 @@ public class Hyrule
             int newVal = 0;
             int val = (int)ROMData.GetByte(i);
 
-            newVal = RNG.Next((int)(val * 0.5), (int)(val * 1.5));
+            newVal = r.Next((int)(val * 0.5), (int)(val * 1.5));
             if (newVal > 255)
             {
                 newVal = 255;
@@ -1795,10 +1804,10 @@ public class Hyrule
             {
                 totalContinentConnectionOverworldAttempts++;
                 worlds = new List<World>();
-                westHyrule = new WestHyrule(props, RNG, ROMData);
-                deathMountain = new DeathMountain(props, RNG, ROMData);
-                eastHyrule = new EastHyrule(props, RNG, ROMData);
-                mazeIsland = new MazeIsland(props, RNG, ROMData);
+                westHyrule = new WestHyrule(props, r, ROMData);
+                deathMountain = new DeathMountain(props, r, ROMData);
+                eastHyrule = new EastHyrule(props, r, ROMData);
+                mazeIsland = new MazeIsland(props, r, ROMData);
                 worlds.Add(westHyrule);
                 worlds.Add(deathMountain);
                 worlds.Add(eastHyrule);
@@ -1817,7 +1826,7 @@ public class Hyrule
                 else if (props.ContinentConnections == ContinentConnectionType.TRANSPORTATION_SHUFFLE)
                 {
                     List<int> chosen = new List<int>();
-                    int type = RNG.Next(4);
+                    int type = r.Next(4);
                     if (props.WestBiome == Biome.VANILLA
                         || props.WestBiome == Biome.VANILLA_SHUFFLE
                         || props.DmBiome == Biome.VANILLA
@@ -1839,7 +1848,7 @@ public class Hyrule
                     {
                         do
                         {
-                            type = RNG.Next(4);
+                            type = r.Next(4);
                         } while (chosen.Contains(type));
                     }
                     SetTransportation(0, 1, type);
@@ -1855,7 +1864,7 @@ public class Hyrule
                     {
                         do
                         {
-                            type = RNG.Next(4);
+                            type = r.Next(4);
                         } while (chosen.Contains(type));
                     }
                     SetTransportation(0, 2, type);
@@ -1871,7 +1880,7 @@ public class Hyrule
                     {
                         do
                         {
-                            type = RNG.Next(4);
+                            type = r.Next(4);
                         } while (chosen.Contains(type));
                     }
                     SetTransportation(2, 3, type);
@@ -1897,7 +1906,7 @@ public class Hyrule
                         doNotPick.Add(3);
                     }
 
-                    int raftw1 = RNG.Next(worlds.Count);
+                    int raftw1 = r.Next(worlds.Count);
 
                     if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
@@ -1907,11 +1916,11 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(raftw1))
                         {
-                            raftw1 = RNG.Next(worlds.Count);
+                            raftw1 = r.Next(worlds.Count);
                         }
                     }
 
-                    int raftw2 = RNG.Next(worlds.Count);
+                    int raftw2 = r.Next(worlds.Count);
                     if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         raftw2 = 2;
@@ -1920,7 +1929,7 @@ public class Hyrule
                     {
                         do
                         {
-                            raftw2 = RNG.Next(worlds.Count);
+                            raftw2 = r.Next(worlds.Count);
                         } while (raftw1 == raftw2 || doNotPick.Contains(raftw2));
                     }
 
@@ -1928,7 +1937,7 @@ public class Hyrule
                     l2 = worlds[raftw2].LoadRaft(ROMData, (Continent)raftw2, (Continent)raftw1);
                     connections[0] = (l1, l2);
 
-                    int bridgew1 = RNG.Next(worlds.Count);
+                    int bridgew1 = r.Next(worlds.Count);
                     if (props.EastBiome == Biome.VANILLA || props.EastBiome == Biome.VANILLA_SHUFFLE)
                     {
                         bridgew1 = 2;
@@ -1937,10 +1946,10 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(bridgew1))
                         {
-                            bridgew1 = RNG.Next(worlds.Count);
+                            bridgew1 = r.Next(worlds.Count);
                         }
                     }
-                    int bridgew2 = RNG.Next(worlds.Count);
+                    int bridgew2 = r.Next(worlds.Count);
                     if (props.MazeBiome == Biome.VANILLA || props.MazeBiome == Biome.VANILLA_SHUFFLE)
                     {
                         bridgew2 = 3;
@@ -1949,7 +1958,7 @@ public class Hyrule
                     {
                         do
                         {
-                            bridgew2 = RNG.Next(worlds.Count);
+                            bridgew2 = r.Next(worlds.Count);
                         } while (bridgew1 == bridgew2 || doNotPick.Contains(bridgew2));
                     }
 
@@ -1957,7 +1966,7 @@ public class Hyrule
                     l2 = worlds[bridgew2].LoadBridge(ROMData, (Continent)bridgew2, (Continent)bridgew1);
                     connections[1] = (l1, l2);
 
-                    int c1w1 = RNG.Next(worlds.Count);
+                    int c1w1 = r.Next(worlds.Count);
                     if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c1w1 = 0;
@@ -1966,10 +1975,10 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(c1w1))
                         {
-                            c1w1 = RNG.Next(worlds.Count);
+                            c1w1 = r.Next(worlds.Count);
                         }
                     }
-                    int c1w2 = RNG.Next(worlds.Count);
+                    int c1w2 = r.Next(worlds.Count);
                     if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c1w2 = 1;
@@ -1978,7 +1987,7 @@ public class Hyrule
                     {
                         do
                         {
-                            c1w2 = RNG.Next(worlds.Count);
+                            c1w2 = r.Next(worlds.Count);
                         } while (c1w1 == c1w2 || doNotPick.Contains(c1w2));
                     }
 
@@ -1986,7 +1995,7 @@ public class Hyrule
                     l2 = worlds[c1w2].LoadCave1(ROMData, (Continent)c1w2, (Continent)c1w1);
                     connections[2] = (l1, l2);
 
-                    int c2w1 = RNG.Next(worlds.Count);
+                    int c2w1 = r.Next(worlds.Count);
                     if (props.WestBiome == Biome.VANILLA || props.WestBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c2w1 = 0;
@@ -1995,10 +2004,10 @@ public class Hyrule
                     {
                         while (doNotPick.Contains(c2w1))
                         {
-                            c2w1 = RNG.Next(worlds.Count);
+                            c2w1 = r.Next(worlds.Count);
                         }
                     }
-                    int c2w2 = RNG.Next(worlds.Count);
+                    int c2w2 = r.Next(worlds.Count);
                     if (props.DmBiome == Biome.VANILLA || props.DmBiome == Biome.VANILLA_SHUFFLE)
                     {
                         c2w2 = 1;
@@ -2007,7 +2016,7 @@ public class Hyrule
                     {
                         do
                         {
-                            c2w2 = RNG.Next(worlds.Count);
+                            c2w2 = r.Next(worlds.Count);
                         } while (c2w1 == c2w2 || doNotPick.Contains(c2w2));
                     }
 
@@ -2269,7 +2278,7 @@ public class Hyrule
 
         for (int i = pals.Count - 1; i > 0; i--)
         {
-            int swap = RNG.Next(i + 1);
+            int swap = r.Next(i + 1);
             Util.Swap(pals[i], pals[swap]);
         }
 
@@ -2402,7 +2411,7 @@ public class Hyrule
             {
                 continue;
             }
-            Town town = unallocatedTowns[RNG.Next(unallocatedTowns.Count)];
+            Town town = unallocatedTowns[r.Next(unallocatedTowns.Count)];
             Location townLocation = GetTownLocation(town);
             townLocation.Collectables = [spell];
             unallocatedTowns.Remove(town);
@@ -2430,7 +2439,7 @@ public class Hyrule
             vanillaExp[i] = rom.GetShort(startAddr + i, startAddr + 24 + i);
         }
 
-        int[] randomizedExp = RandomizeExperience(RNG, vanillaExp, shuffleStat, levelCap, props.ScaleLevels);
+        int[] randomizedExp = RandomizeExperience(r, vanillaExp, shuffleStat, levelCap, props.ScaleLevels);
 
         for (int i = 0; i < randomizedExp.Length; i++)
         {
@@ -2606,7 +2615,7 @@ public class Hyrule
     {
         for (int i = addr.Count - 1; i > 0; --i)
         {
-            int swap = RNG.Next(i + 1);
+            int swap = r.Next(i + 1);
 
             byte temp = rom.GetByte(addr[i]);
             rom.Put(addr[i], rom.GetByte(addr[swap]));
@@ -2629,11 +2638,11 @@ public class Hyrule
         {
             //3, 4, 6, 7, 14, 16, 17, 18, 24, 25, 26
             List<int> enemies = new List<int> { 3, 4, 6, 7, 0x0E, 0x10, 0x11, 0x12, 0x18, 0x19, 0x1A };
-            rom.Put(0x11ef, (byte)enemies[RNG.Next(enemies.Count)]);
+            rom.Put(0x11ef, (byte)enemies[r.Next(enemies.Count)]);
         }
         if (props.BossItem)
         {
-            shuffler.ShuffleBossDrop(rom, RNG, a);
+            shuffler.ShuffleBossDrop(rom, r, a);
         }
 
         if (props.StartWithSpellItems)
@@ -2706,7 +2715,7 @@ public class Hyrule
 
         if (props.ShuffleLifeRefill)
         {
-            int lifeRefill = RNG.Next(1, 6);
+            int lifeRefill = r.Next(1, 6);
             rom.Put(0xE7A, (byte)(lifeRefill * 16));
         }
 
@@ -2714,8 +2723,8 @@ public class Hyrule
         {
             int small = rom.GetByte(0x1E30E);
             int big = rom.GetByte(0x1E314);
-            small = RNG.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
-            big = RNG.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
+            small = r.Next((int)(small - small * .5), (int)(small + small * .5) + 1);
+            big = r.Next((int)(big - big * .5), (int)(big + big * .5) + 1);
             rom.Put(0x1E30E, (byte)small);
             rom.Put(0x1E314, (byte)big);
         }
@@ -2738,7 +2747,7 @@ public class Hyrule
             addrs.Add(0x12A07); // Carock
             addrs.Add(0x15507); // Thunderbird
             byte[] enemyBytes = addrs.Select(a => rom.GetByte(a)).ToArray();
-            RandomizeEnemyExp(RNG, enemyBytes, props.EnemyXPDrops);
+            RandomizeEnemyExp(r, enemyBytes, props.EnemyXPDrops);
             for (int i = 0; i < addrs.Count; i++) { rom.Put(addrs[i], enemyBytes[i]); };
         }
 
@@ -2840,12 +2849,12 @@ public class Hyrule
 
         if (props.ShufflePalacePalettes)
         {
-            shuffler.ShufflePalacePalettes(rom, RNG);
+            shuffler.ShufflePalacePalettes(rom, r);
         }
 
         if (props.ShuffleItemDropFrequency)
         {
-            int drop = RNG.Next(5) + 4;
+            int drop = r.Next(5) + 4;
             rom.Put(0x1E8B0, (byte)drop);
         }
 
@@ -2871,15 +2880,15 @@ public class Hyrule
 
         if (props.ShuffleSwordImmunity)
         {
-            RandomizeBits(RNG, enemyBytes1, SWORD_IMMUNE_BIT);
+            RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
         }
         if (props.ShuffleEnemyStealExp)
         {
-            RandomizeBits(RNG, enemyBytes1, XP_STEAL_BIT);
+            RandomizeBits(r, enemyBytes1, XP_STEAL_BIT);
         }
         if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
         {
-            RandomizeEnemyExp(RNG, enemyBytes1, props.EnemyXPDrops);
+            RandomizeEnemyExp(r, enemyBytes1, props.EnemyXPDrops);
         }
 
         // enemy attributes byte2
@@ -3079,7 +3088,7 @@ public class Hyrule
 
         if (props.ShuffleDripper)
         {
-            ROMData.Put(0x11927, (byte)Enemies.Palace125GroundEnemies[RNG.Next(Enemies.Palace125GroundEnemies.Length)]);
+            ROMData.Put(0x11927, (byte)Enemies.Palace125GroundEnemies[r.Next(Enemies.Palace125GroundEnemies.Length)]);
         }
 
         if (props.ShuffleEnemyPalettes)
@@ -3089,8 +3098,8 @@ public class Hyrule
 
             foreach (int i in doubleLocs)
             {
-                int low = RNG.Next(12) + 1;
-                int high = (RNG.Next(2) + 1) * 16;
+                int low = r.Next(12) + 1;
+                int high = (r.Next(2) + 1) * 16;
                 int color = high + low;
                 ROMData.Put(i, (byte)color);
                 ROMData.Put(i + 16, (byte)color);
@@ -3099,8 +3108,8 @@ public class Hyrule
             }
             foreach (int i in singleLocs)
             {
-                int low = RNG.Next(13);
-                int high = (RNG.Next(3)) * 16;
+                int low = r.Next(13);
+                int high = (r.Next(3)) * 16;
                 int color = high + low;
                 ROMData.Put(i, (byte)color);
                 ROMData.Put(i + 16, (byte)color);
@@ -3113,7 +3122,7 @@ public class Hyrule
                 {
                     int b = ROMData.GetByte(i);
                     int p = b & 0x3F;
-                    int n = RNG.Next(4);
+                    int n = r.Next(4);
                     n = n << 6;
                     ROMData.Put(i, (byte)(n + p));
                 }
@@ -3125,7 +3134,7 @@ public class Hyrule
                 {
                     int b = ROMData.GetByte(i);
                     int p = b & 0x3F;
-                    int n = RNG.Next(4);
+                    int n = r.Next(4);
                     n = n << 6;
                     ROMData.Put(i, (byte)(n + p));
                 }
@@ -3136,7 +3145,7 @@ public class Hyrule
                 {
                     int b = ROMData.GetByte(i);
                     int p = b & 0x3F;
-                    int n = RNG.Next(4);
+                    int n = r.Next(4);
                     n = n << 6;
                     ROMData.Put(i, (byte)(n + p));
                 }
@@ -3147,7 +3156,7 @@ public class Hyrule
                 {
                     int b = ROMData.GetByte(i);
                     int p = b & 0x3F;
-                    int n = RNG.Next(4);
+                    int n = r.Next(4);
                     n = n << 6;
                     ROMData.Put(i, (byte)(n + p));
                 }
@@ -3158,7 +3167,7 @@ public class Hyrule
                 {
                     int b = ROMData.GetByte(i);
                     int p = b & 0x3F;
-                    int n = RNG.Next(4);
+                    int n = r.Next(4);
                     n = n << 6;
                     ROMData.Put(i, (byte)(n + p));
                 }
@@ -3422,7 +3431,7 @@ public class Hyrule
 
         for (int i = 0; i < items.Count; i++)
         {
-            int swap = RNG.Next(i, items.Count);
+            int swap = r.Next(i, items.Count);
             (items[swap], items[i]) = (items[i], items[swap]);
         }
         for (int i = 0; i < addresses.Count; i++)
