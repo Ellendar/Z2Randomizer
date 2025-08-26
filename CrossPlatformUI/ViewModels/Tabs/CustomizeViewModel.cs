@@ -53,6 +53,15 @@ public class CustomizeViewModel : ReactiveObject
             this.RaisePropertyChanged();
         }
     }
+    public bool IncludeDiverseMusic
+    {
+        get => Main.Config.IncludeDiverseMusic;
+        set
+        {
+            Main.Config.IncludeDiverseMusic = value;
+            this.RaisePropertyChanged();
+        }
+    }
     public bool DisableUnsafeMusic
     {
         get => Main.Config.DisableUnsafeMusic;

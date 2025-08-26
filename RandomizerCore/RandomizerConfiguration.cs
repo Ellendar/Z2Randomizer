@@ -507,6 +507,10 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private bool mixCustomAndOriginalMusic;
 
     [Reactive]
+    [property: IgnoreInFlags]
+    private bool includeDiverseMusic;
+
+    [Reactive]
     [property:IgnoreInFlags]
     private bool disableUnsafeMusic;
 
@@ -610,6 +614,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         DisableMusic = false;
         RandomizeMusic = false;
         MixCustomAndOriginalMusic = true;
+        IncludeDiverseMusic = false;
         DisableUnsafeMusic = true;
         FastSpellCasting = false;
         ShuffleSpritePalettes = false;
@@ -1371,6 +1376,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         properties.DisableMusic = DisableMusic;
         properties.RandomizeMusic = RandomizeMusic;
         properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
+        properties.IncludeDiverseMusic = IncludeDiverseMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
         properties.ChangeItemSprites = ChangeItemSprites;

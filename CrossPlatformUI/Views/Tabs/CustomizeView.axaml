@@ -92,6 +92,13 @@
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixCustomandOriginalMusicToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
+              IsEnabled="{Binding RandomizeMusicEnabled}"
+              IsChecked="{Binding IncludeDiverseMusic}"
+              Content="Include Diverse Music"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeDiverseMusicToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
                 IsEnabled="{Binding RandomizeMusicEnabled}"
                 IsChecked="{Binding DisableUnsafeMusic}" 
                 Content="Disable Unsafe Music"

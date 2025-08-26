@@ -79,6 +79,7 @@ namespace Z2Randomizer.CommandLine
             configuration.DisableMusic = playerOptions.DisableMusic;
             configuration.RandomizeMusic = playerOptions.RandomizeMusic;
             configuration.MixCustomAndOriginalMusic = playerOptions.MixCustomAndOriginalMusic;
+            configuration.IncludeDiverseMusic = playerOptions.IncludeDiverseMusic;
             configuration.DisableUnsafeMusic = playerOptions.DisableUnsafeMusic;
             configuration.DisableHUDLag = playerOptions.DisableHUDLag;
             configuration.FastSpellCasting = playerOptions.FastSpellCasting;
