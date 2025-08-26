@@ -400,11 +400,21 @@ public class Hyrule
             if (randomizeMusic)
             {
                 string musicDir = "Music";
-                List<string> musicLibPaths = new();
+                List<string> jsonLibPaths = new(),
+                    yamlLibPaths = new();
                 if (Directory.Exists(musicDir))
                 {
-                    musicLibPaths.AddRange(
-                        Directory.EnumerateFiles(musicDir).Where(path => StringComparer.InvariantCultureIgnoreCase.Equals(Path.GetExtension(path), ".json5")));
+                    var jsonExts = Z2Importer.JsonExtensions();
+                    var yamlExts = Z2Importer.YamlExtensions();
+
+                    foreach (string path in Directory.EnumerateFiles(musicDir))
+                    {
+                        string ext = Path.GetExtension(path);
+                        if (jsonExts.Contains(ext))
+                            jsonLibPaths.Add(path);
+                        else if (yamlExts.Contains(ext))
+                            yamlLibPaths.Add(path);
+                    }
                 }
 
                 Random musicRng = new(SeedHash);
@@ -417,9 +427,11 @@ public class Hyrule
                         MusicRandomizer musicRnd = new(
                             this,
                             musicRng.Next(),
-                            musicLibPaths,
+                            jsonLibPaths,
+                            yamlLibPaths,
                             freeBanks,
                             props.MixCustomAndOriginalMusic,
+                            props.IncludeDiverseMusic,
                             props.DisableUnsafeMusic);
                         musicRnd.ImportSongs();
 

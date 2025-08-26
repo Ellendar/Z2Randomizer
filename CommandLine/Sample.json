@@ -19,6 +19,7 @@
 "DisableHUDLag": true,
 "DisableMagicContainerRequirements": true,
 "DisableMusic": false,
+"IncludeDiverseMusic": false,
 "DisableUnsafeMusic": true,
 "DMBiome": "RANDOM_NO_VANILLA_OR_SHUFFLE",
 "EastBiome": "RANDOM_NO_VANILLA_OR_SHUFFLE",

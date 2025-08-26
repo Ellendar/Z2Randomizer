@@ -519,6 +519,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     [IgnoreInFlags]
     private bool mixCustomAndOriginalMusic;
+    
+    [Reactive]
+    [IgnoreInFlags]
+    private bool includeDiverseMusic;
 
     [Reactive]
     [IgnoreInFlags]
@@ -1281,6 +1285,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.DisableMusic = DisableMusic;
         properties.RandomizeMusic = RandomizeMusic;
         properties.MixCustomAndOriginalMusic = MixCustomAndOriginalMusic;
+        properties.IncludeDiverseMusic = IncludeDiverseMusic;
         properties.DisableUnsafeMusic = DisableUnsafeMusic;
         properties.CharSprite = Sprite;
         properties.ChangeItemSprites = ChangeItemSprites;
