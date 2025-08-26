@@ -1999,48 +1999,33 @@ ResetRedPalettePayload:
         List<Location> locations = [];
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = [
-                GetByte(startAddr + i),
-                GetByte(startAddr + RomMap.overworldXOffset + i),
-                GetByte(startAddr + RomMap.overworldMapOffset + i),
-                GetByte(startAddr + RomMap.overworldWorldOffset + i)
-            ];
-            Location location = new Location(bytes[0] & 127, bytes[1] & 63, startAddr + i, bytes[2] & 63, continent)
-            {
-                ExternalWorld = bytes[0] & 128,
-                appear2loweruponexit = bytes[1] & 128,
-                Secondpartofcave = bytes[1] & 64,
-                MapPage = bytes[2] & 192,
-                FallInHole = bytes[3] & 128,
-                PassThrough = bytes[3] & 64,
-                ForceEnterRight = bytes[3] & 32,
-                TerrainType = Terrains[startAddr + i],
-                AppearsOnMap = true
-            };
+            int addr = startAddr + i;
+            Terrain terrain = Terrains[addr];
+            var location = LoadLocation(addr, terrain, continent);
             locations.Add(location);
         }
         return locations;
     }
 
-    //Why does this and LoadLocations not share any code. Eliminate one of them.
-    public Location LoadLocation(int addr, Terrain t, Continent c)
+    public Location LoadLocation(int addr, Terrain terrain, Continent continent)
     {
-        byte[] bytes = [
-            GetByte(addr),
-            GetByte(addr + RomMap.overworldXOffset),
-            GetByte(addr + RomMap.overworldMapOffset),
-            GetByte(addr + RomMap.overworldWorldOffset)
-        ];
-        return new Location(bytes[0] & 127, bytes[1] & 63, addr, bytes[2] & 63, c)
+        byte yByte = GetByte(addr);
+        byte xByte = GetByte(addr + RomMap.overworldXOffset);
+        byte mapByte = GetByte(addr + RomMap.overworldMapOffset);
+        byte worldByte = GetByte(addr + RomMap.overworldWorldOffset);
+        int yPos = yByte & 0x7f;
+        int xPos = xByte & 0x3f;
+        int map = mapByte & 0x3f;
+        return new Location(yPos, xPos, addr, map, continent)
         {
-            ExternalWorld = bytes[0] & 128,
-            appear2loweruponexit = bytes[1] & 128,
-            Secondpartofcave = bytes[1] & 64,
-            MapPage = bytes[2] & 192,
-            FallInHole = bytes[3] & 128,
-            PassThrough = bytes[3] & 64,
-            ForceEnterRight = bytes[3] & 32,
-            TerrainType = t,
+            ExternalWorld = yByte & 0x80,
+            appear2loweruponexit = xByte & 0x80,
+            Secondpartofcave = xByte & 0x40,
+            MapPage = mapByte & 0xC0,
+            FallInHole = worldByte & 0x80,
+            PassThrough = worldByte & 0x40,
+            ForceEnterRight = worldByte & 0x20,
+            TerrainType = terrain,
             AppearsOnMap = true
         };
     }
