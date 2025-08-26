@@ -3,25 +3,38 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using DynamicData.Binding;
-using ReactiveUI;
-using ReactiveUI.SourceGenerators;
 using Z2Randomizer.RandomizerCore.Flags;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 
-public sealed partial class RandomizerConfiguration : ReactiveObject
+[AttributeUsage(AttributeTargets.Class)]
+public class FlagSerializeAttribute : Attribute
 {
+}
+
+/**
+ * We don't need to bring in ReactiveUI to the base RandomizerCore if we just make our own source generator.
+ * To keep the usage similar to the original ReactiveUI SourceGenerator, I kept the name `Reactive` for the attribute
+ * in case we bail on this idea later.
+ */
+public class ReactiveAttribute : Attribute
+{
+
+}
+
+
+[FlagSerialize]
+public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
+{
+    [IgnoreInFlags]
     private readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_ITEMS = [
         Collectable.CANDLE,
         Collectable.GLOVE,
@@ -33,6 +46,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         Collectable.MAGIC_KEY
     ];
 
+    [IgnoreInFlags]
     private readonly static Collectable[] POSSIBLE_STARTING_SPELLS = [
         Collectable.SHIELD_SPELL,
         Collectable.JUMP_SPELL,
@@ -107,13 +121,13 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private StartingResourceLimit startSpellsLimit;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int? startingHeartContainersMin;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int? startingHeartContainersMax;
 
     [Reactive]
@@ -126,18 +140,18 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private StartingLives startingLives;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int startingAttackLevel;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int startingMagicLevel;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int startingLifeLevel;
 
     [Reactive]
@@ -202,7 +216,7 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private Biome mazeBiome;
 
     [Reactive]
-    [property:CustomFlagSerializer(typeof(ClimateFlagSerializer))]
+    [CustomFlagSerializer(typeof(ClimateFlagSerializer))]
     private Climate climate;
 
     [Reactive]
@@ -258,11 +272,11 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private PalaceItemRoomCount palaceItemRoomCount;
 
     [Reactive]
-    [property:Limit(7)]
+    [Limit(7)]
     private int palacesToCompleteMin;
 
     [Reactive]
-    [property:Limit(7)]
+    [Limit(7)]
     private int palacesToCompleteMax;
 
     [Reactive]
@@ -288,18 +302,18 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     private bool shuffleLifeExperience;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int attackLevelCap;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int magicLevelCap;
 
     [Reactive]
-    [property:Limit(8)]
-    [property:Minimum(1)]
+    [Limit(8)]
+    [Minimum(1)]
     private int lifeLevelCap;
 
     [Reactive]
@@ -483,84 +497,84 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
     //Custom
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool useCommunityText;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private BeepFrequency beepFrequency;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private BeepThreshold beepThreshold;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool disableMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool randomizeMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool mixCustomAndOriginalMusic;
-
+    
     [Reactive]
-    [property: IgnoreInFlags]
+    [IgnoreInFlags]
     private bool includeDiverseMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool disableUnsafeMusic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool fastSpellCasting;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool upAOnController1;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool removeFlashing;
 
     [Reactive]
-    [property: IgnoreInFlags]
+    [ IgnoreInFlags]
     private CharacterSprite sprite;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private string spriteName;
 
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool changeItemSprites;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterColor tunic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterColor tunicOutline;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterColor shieldTunic;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private BeamSprites beamSprite;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool useCustomRooms;
 
     [Reactive]
-    [property:IgnoreInFlags]
+    [IgnoreInFlags]
     private bool disableHUDLag;
 
     [Reactive]
@@ -584,8 +598,8 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
 
     //Meta
     [Reactive]
-    [property:Required]
-    [property:IgnoreInFlags]
+    [Required]
+    [IgnoreInFlags]
     private string? seed;
     // public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
 
@@ -594,241 +608,136 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
     public string Flags
     {
         get => Serialize();
-        set => ConvertFlags(value?.Trim() ?? "", this);
+        set => Deserialize(value?.Trim() ?? "");
     }
 
     public RandomizerConfiguration()
     {
-        StartingAttackLevel = 1;
-        StartingMagicLevel = 1;
-        StartingLifeLevel = 1;
+        startingAttackLevel = 1;
+        startingMagicLevel = 1;
+        startingLifeLevel = 1;
 
-        MaxHeartContainers = MaxHeartsOption.EIGHT;
-        StartingHeartContainersMin = 8;
-        StartingHeartContainersMax = 8;
+        maxHeartContainers = MaxHeartsOption.EIGHT;
+        startingHeartContainersMin = 8;
+        startingHeartContainersMax = 8;
 
-        AttackLevelCap = 8;
-        MagicLevelCap = 8;
-        LifeLevelCap = 8;
+        attackLevelCap = 8;
+        magicLevelCap = 8;
+        lifeLevelCap = 8;
 
-        DisableMusic = false;
-        RandomizeMusic = false;
-        MixCustomAndOriginalMusic = true;
-        IncludeDiverseMusic = false;
-        DisableUnsafeMusic = true;
-        FastSpellCasting = false;
-        ShuffleSpritePalettes = false;
-        PermanentBeamSword = false;
-        UpAOnController1 = false;
-        RemoveFlashing = false;
-        Sprite = CharacterSprite.LINK;
-        Climate = Climates.Classic;
+        disableMusic = false;
+        randomizeMusic = false;
+        mixCustomAndOriginalMusic = true;
+        disableUnsafeMusic = true;
+        fastSpellCasting = false;
+        shuffleSpritePalettes = false;
+        permanentBeamSword = false;
+        upAOnController1 = false;
+        removeFlashing = false;
+        sprite = CharacterSprite.LINK;
+        spriteName = CharacterSprite.LINK.DisplayName!;
+        climate = Climates.Classic;
         if (Sprite == null || Climate == null)
         {
             throw new ImpossibleException();
         }
-        Tunic = CharacterColor.Default;
-        TunicOutline = CharacterColor.Default;
-        ShieldTunic = CharacterColor.Default;
-        BeamSprite = BeamSprites.DEFAULT;
-        UseCustomRooms = false;
-        DisableHUDLag = false;
-        this.WhenAnyPropertyChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Throttle(TimeSpan.FromMilliseconds(10))
-            .Select(_ => Serialize())
-            .ToProperty(this, nameof(Flags));
+        tunic = CharacterColor.Default;
+        tunicOutline = CharacterColor.Default;
+        shieldTunic = CharacterColor.Default;
+        beamSprite = BeamSprites.DEFAULT;
+        useCustomRooms = false;
+        disableHUDLag = false;
     }
 
     public RandomizerConfiguration(string flagstring) : this()
     {
-        ConvertFlags(flagstring, this);
+        Deserialize(flagstring);
     }
-    
-    [method: DynamicDependency(DynamicallyAccessedMemberTypes.PublicProperties, typeof(RandomizerConfiguration))]
-    private void ConvertFlags(string flagstring, RandomizerConfiguration? newThis = null)
+    private bool DeserializeBool(FlagReader flags, string name)
     {
-        //seed - climate - sprite
-        var config = newThis ?? new RandomizerConfiguration();
-        FlagReader flagReader = new FlagReader(flagstring);
-        PropertyInfo[] properties = GetType().GetProperties();
-        Type thisType = typeof(RandomizerConfiguration);
-        foreach (PropertyInfo property in properties)
+        return flags.ReadBool();
+    }
+    private bool? DeserializeNullableBool(FlagReader flags, string name)
+    {
+        return flags.ReadNullableBool();
+    }
+    private int DeserializeInt(FlagReader flags, string name, int limit, int? minimum)
+    {
+        int min = minimum ?? 0;
+        return flags.ReadInt(limit) + min;
+    }
+    private int? DeserializeNullableInt(FlagReader flags, string name, int limit, int? minimum)
+    {
+        return flags.ReadNullableInt(limit, minimum);
+    }
+
+    private T DeserializeEnum<T>(FlagReader flags, string name) where T: Enum
+    {
+        var limit = GetEnumCount<T>();
+        var index = flags.ReadInt(limit);
+        return GetEnumFromIndex<T>(index)!;
+    }
+    private T? DeserializeNullableEnum<T>(FlagReader flags, string name) where T: Enum
+    {
+        var limit = GetEnumCount<T>();
+        var index = flags.ReadNullableInt(limit);
+        return index == null ? default : GetEnumFromIndex<T>(index.Value)!;
+    }
+
+    private T DeserializeCustom<Serializer, T>(FlagReader flags, string name) where Serializer : IFlagSerializer where T : class
+    {
+        IFlagSerializer serializer = GetSerializer<Serializer>();
+        return (T)serializer.Deserialize(flags.ReadInt(serializer.GetLimit()))!;
+    }
+
+    private void SerializeBool(FlagBuilder flags, string name, bool? val, bool isNullable)
+    {
+        if (isNullable)
         {
-            Type propertyType = property.PropertyType;
-            int limit;
-            bool isNullable = false;
-
-            if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
-            {
-                continue;
-            }
-            //Now that the config is a ReactiveObject, some properties get inherited that should be ignored.
-            if (property.DeclaringType!.FullName == "ReactiveUI.ReactiveObject")
-            {
-                continue;
-            }
-            LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
-            limit = limitAttribute?.Limit ?? 0;
-
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                propertyType = propertyType.GetGenericArguments()[0];
-                isNullable = true;
-            }
-//The analyzer simultaneously complains about this warning that doesn't matter,
-//and then complains about the warning suppression being unnecessary once it's suppressed.
-#pragma warning disable IL2072
-            CustomFlagSerializerAttribute? attribute = 
-                (CustomFlagSerializerAttribute?)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
-            if (attribute != null)
-            {
-                IFlagSerializer? serializer = (IFlagSerializer?)Activator.CreateInstance(attribute.Type);
-                property.SetValue(config, serializer?.Deserialize(flagReader.ReadInt(serializer.GetLimit())));
-            }
-#pragma warning restore IL2072 
-            else if (propertyType == typeof(bool))
-            {
-                property.SetValue(config, isNullable ? flagReader.ReadNullableBool() : flagReader.ReadBool());
-            }
-            else if (propertyType.IsEnum)
-            {
-                var methodType = isNullable ? "ReadNullableEnum" : "ReadEnum";
-                MethodInfo method = typeof(FlagReader).GetMethod(methodType)!
-                    .MakeGenericMethod([propertyType]);
-                var methodResult = method.Invoke(flagReader, []);
-                property.SetValue(config, methodResult);
-            }
-            else if (IsIntegerType(propertyType))
-            {
-                if (Attribute.IsDefined(property, typeof(LimitAttribute)))
-                {
-                    int minimum = ((MinimumAttribute?)property.GetCustomAttribute(typeof(MinimumAttribute)))?.Minimum ?? 0;
-
-                    if (isNullable)
-                    {
-                        int? value = flagReader.ReadNullableInt(limit);
-                        value += minimum;
-                        property.SetValue(config, value);
-                    }
-                    else
-                    {
-                        property.SetValue(config, flagReader.ReadInt(limit) + minimum);
-                    }
-                }
-                else
-                {
-                    logger.Error("Numeric Property " + property.Name + " is missing a limit!");
-                }
-            }
-            else
-            {
-                logger.Error($"Unrecognized configuration property type: {propertyType}");
-            }
-            //Debug.WriteLine(property.Name + "\t" + flagReader.index);
+            flags.Append(val);
+        }
+        else
+        {
+            bool v = val!.Value;
+            flags.Append(v);
         }
     }
 
-    public string Serialize()
+    private void SerializeInt(FlagBuilder flags, string name, int? val, bool isNullable, int limit, int? minimum)
     {
-        FlagBuilder flags = new FlagBuilder();
-        PropertyInfo[] properties = this.GetType().GetProperties();
-        Type thisType = typeof(RandomizerConfiguration);
-        foreach (PropertyInfo property in properties)
+        // limit is checked for null in the flags source generator
+        if (isNullable)
         {
-            Type propertyType = property.PropertyType;
-            bool isNullable = false;
-
-            if (Attribute.IsDefined(property, typeof(IgnoreInFlagsAttribute)))
+            if (val != null && (val < minimum || val > minimum + limit))
             {
-                continue;
+                logger.Warn($"Property ({name}) was out of range.");
             }
-            //Now that the config is a ReactiveObject, some properties get inherited that should be ignored.
-            if(property.DeclaringType!.FullName == "ReactiveUI.ReactiveObject")
-            {
-                continue;
-            }
-            LimitAttribute? limitAttribute = (LimitAttribute?)property.GetCustomAttribute(typeof(LimitAttribute));
-            int limit = limitAttribute?.Limit ?? 0;
-            if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                propertyType = propertyType.GetGenericArguments()[0];
-                isNullable = true;
-            }
-#pragma warning disable IL2072
-            CustomFlagSerializerAttribute? attribute = 
-                (CustomFlagSerializerAttribute?)property.GetCustomAttribute(typeof(CustomFlagSerializerAttribute));
-            if(attribute != null)
-            {
-                IFlagSerializer serializer = (IFlagSerializer)Activator.CreateInstance(attribute.Type)!;
-                if(serializer?.GetLimit() == null)
-                {
-                    throw new Exception("Missing limit on serializer");
-                }
-                flags.Append(serializer?.Serialize(property.GetValue(this, null)), serializer!.GetLimit());
-            }
-#pragma warning restore IL2072
-            else if (propertyType == typeof(bool))
-            {
-                if (isNullable)
-                {
-                    flags.Append((bool?)property.GetValue(this, null));
-                }
-                else
-                {
-                    flags.Append((bool)property.GetValue(this, null)!);
-                }
-            }
-            else if (propertyType.IsEnum)
-            {
-                limit = Enum.GetValues(propertyType).Length;
-                int index = Array.IndexOf(Enum.GetValues(propertyType), property.GetValue(this, null));
-                if (isNullable)
-                {
-                    flags.Append(index == -1 ? null : index, limit + 1);
-                }
-                else
-                {
-                    flags.Append(index, limit);
-                }
-            }
-            else if (IsIntegerType(propertyType))
-            {
-                if (limit == 0)
-                {
-                    logger.Error("Numeric Property " + property.Name + " is missing a limit!");
-                }
-                int minimum = ((MinimumAttribute?)property.GetCustomAttribute(typeof(MinimumAttribute)))?.Minimum ?? 0;
-                if (isNullable)
-                {
-                    int? value = (int?)property.GetValue(this, null);
-                    if (value != null && (value < minimum || value > minimum + limit))
-                    {
-                        logger.Warn("Property (" + property.Name + " was out of range.");
-                        value = minimum;
-                    }
-                    flags.Append(value - minimum, limit);
-                }
-                else
-                {
-                    int value = (int)property.GetValue(this, null)!;
-                    if (value < minimum || value > minimum + limit)
-                    {
-                        logger.Warn("Property (" + property.Name + " was out of range.");
-                        value = minimum;
-                    }
-                    flags.Append(value - minimum, limit);
-                }
-            }
-            else
-            {
-                logger.Error($"Unrecognized configuration property type: {property.Name}");
-            }
-            //Debug.WriteLine(property.Name + "\t" + flags.bits.Count);
+            flags.Append(val, limit, minimum);
         }
-
-        return flags.ToString();
+        else
+        {
+            var value = val!.Value;
+            if (value < minimum || value > minimum + limit)
+            {
+                logger.Warn($"Property ({name}) was out of range.");
+            }
+            flags.Append(value, limit, minimum);
+        }
     }
+
+    private void SerializeEnum<T>(FlagBuilder flags, string name, T? val) where T: Enum
+    {
+        var index = GetEnumIndex<T>(val);
+        var limit = GetEnumCount<T>();
+        flags.Append(index, limit);
+    }
+
+    private void SerializeCustom<Serializer, T>(FlagBuilder flags, string name, T? val) where Serializer : IFlagSerializer where T : class
+    {
+        var serializer = GetSerializer<Serializer>();
+        flags.Append(serializer.Serialize(val), serializer.GetLimit());
+    }
+
     public RandomizerProperties Export(Random r)
     {
         RandomizerProperties properties = new()
@@ -1769,5 +1678,12 @@ public sealed partial class RandomizerConfiguration : ReactiveObject
         {
             return (int)DarkLinkMinDistance;
         }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

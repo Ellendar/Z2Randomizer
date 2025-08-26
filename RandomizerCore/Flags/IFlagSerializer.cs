@@ -1,6 +1,6 @@
 ﻿namespace Z2Randomizer.RandomizerCore.Flags;
 
-internal interface IFlagSerializer
+public interface IFlagSerializer
 {
     public int GetLimit();
     public int Serialize(object? obj);

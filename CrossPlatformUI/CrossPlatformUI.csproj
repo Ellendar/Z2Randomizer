@@ -2,13 +2,19 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>default</LangVersion>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <AssemblyName>$(MSBuildProjectName)</AssemblyName>
         <RootNamespace>Z2Randomizer.CrossPlatformUI</RootNamespace>
+        <Configurations>Debug;Release;Unsafe Debug</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,6 +36,7 @@
         <PackageReference Include="Aigamo.ResXGenerator" Version="4.2.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.2" />
     </ItemGroup>
 
     <ItemGroup>

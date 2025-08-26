@@ -48,7 +48,7 @@ public sealed partial class App : Application // , IDisposable
         try
         {
             var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
-            main = JsonSerializer.Deserialize(json, new SerializationContext(true).MainViewModel);
+            main = JsonSerializer.Deserialize(json, new SerializationContext(true).MainViewModel)!;
             main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.SpriteName = main.Config.SpriteName;
             if (main.Config.SpriteName != "Link")
             {

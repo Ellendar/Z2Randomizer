@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace Z2Randomizer.RandomizerCore.Flags;
@@ -17,6 +18,7 @@ public class FlagBuilder
     public FlagBuilder()
     {
         bits = new List<bool>();
+        bits.EnsureCapacity(300);
     }
 
     public FlagBuilder Append(bool value)
@@ -49,22 +51,27 @@ public class FlagBuilder
     {
         return Append(value ?? extent, extent + 1);
     }
-    public FlagBuilder Append(int value, int extent)
+    public FlagBuilder Append(int val, int extent, int? minimum = null)
     {
-        if(value >= extent)
+        var min = minimum ?? 0;
+        // Subtract value - min to rebase the value to zero.
+        // We add min when extracting the bit when converting back to the value
+        int value = val - min;
+        if (value >= extent)
         {
             throw new ArgumentException("Value is greater than extent in FlagBuilder.Append(int, int)");
         }
-        BitArray argBits = new BitArray(new int[] {value});
-        for (int i = (int)Math.Log(extent - 1, 2); i >= 0; i--)
+
+        BitArray argBits = new BitArray([value]);
+        for (int i = BitOperations.Log2((uint)extent - 1); i >= 0; i--)
         {
             bits.Add(argBits[i]);
         }
         return this;
     }
-    public FlagBuilder Append(int? value, int extent)
+    public FlagBuilder Append(int? value, int extent, int? minimum = null)
     {
-        return Append(value ?? extent, extent + 1);
+        return Append((value - minimum) ?? extent, extent + 1);
     }
     //There is 100% a more elegant way to do this, but I gave up and hit it with a hammer.
     public override string ToString()

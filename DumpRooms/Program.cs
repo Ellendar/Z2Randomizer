@@ -63,7 +63,7 @@ for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
             var elevator = sideviewEditable.Find(o => o.IsElevator());
             if (elevator != null) { elevatorScreen = elevator.AbsX / 16; }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             Console.WriteLine("Malformed room breaks parsing. Group: " + palaceGroup + " Map: " + map);
         }

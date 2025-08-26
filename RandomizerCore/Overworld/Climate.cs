@@ -82,6 +82,27 @@ public class Climate
             SeedTerrainCount, providedDistancesAreInverted: true);
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (obj is Climate climate)
+            return Equals(climate);
+        return false;
+    }
+
+    protected bool Equals(Climate other)
+    {
+        return TerrainWeights.SequenceEqual(other.TerrainWeights)
+               && terrainWeightTable.SequenceEqual(other.terrainWeightTable)
+               && DistanceCoefficients.SequenceEqual(other.DistanceCoefficients)
+               && SeedTerrainCount == other.SeedTerrainCount
+               && Name == other.Name;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TerrainWeights, terrainWeightTable, DistanceCoefficients, SeedTerrainCount, Name);
+    }
+
     /// <summary>
     /// If death mountain has distance coefficients that are too small relative to the growth of mountains,
     /// there isn't ever enough open space to walk around between caves and it never properly generates.

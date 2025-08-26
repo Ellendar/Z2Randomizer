@@ -106,10 +106,11 @@ public class CustomTexts
         { Collectable.THUNDER_SPELL, 96 },
     };
 
-    private static readonly int[][] hintIndexes = { rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint };
+    private static readonly int[][] hintIndexes = [rauruHints, rutoHints, sariaHints, kingsTomb, midoHints, nabooruHints, daruniaHints, newkasutoHints, oldkasutoHint
+    ];
 
     public static readonly string[] GENERIC_WIZARD_TEXTS =
-    {
+    [
         "do you know$why we$stopped$the car?",
         "link...$i am your$father",
         "I like big$bots and i$cannot lie",
@@ -159,10 +160,10 @@ public class CustomTexts
         "Let me$read my$Vogon$Poetry",
         "somebody$set up us$the bomb",
         "boat$league$confirmed"
-    };
+    ];
 
-    public static readonly string[] RIVER_MAN_TEXTS = 
-    {
+    public static readonly string[] RIVER_MAN_TEXTS =
+    [
         "bagu said$what? that$jerk!",
         "try not$to drown",
         "who is$bagu? i$dont know$any bagu",
@@ -177,11 +178,11 @@ public class CustomTexts
         "Can we$fix it?",
         "What?$You cant$swim?",
         "Link.exe$has$stopped$working",
-        "No running$by$the pool",
-    };
+        "No running$by$the pool"
+    ];
 
     public static readonly string[] BAGU_TEXTS =
-    {
+    [
         "have you$seen error$around?",
         "tell the$riverman$i said hes$an idiot",
         "wanna see$a corpse?",
@@ -203,8 +204,8 @@ public class CustomTexts
         "Tingle$Tingle$Kooloo$Limpah!",
         "Is this a$pedestal$seed?",
         "Does$Spec rock$wear$glasses?",
-        "Everyone$gets a$bridge",
-    };
+        "Everyone$gets a$bridge"
+    ];
 
     public static readonly string[] DOWNSTAB_TEXTS =
     [
@@ -281,29 +282,29 @@ public class CustomTexts
 
     public static readonly Dictionary<Town, string[]> WIZARD_SPELL_TEXTS_BY_TOWN = new()
     {
-        { Town.RAURU, new string[] { } },
-        { Town.RUTO, new string[] { "A winner$is you"} },
-        { Town.SARIA_NORTH, new string[] { "Water$you$doing?" } },
-        { Town.MIDO_WEST, new string[] { } },
-        { Town.MIDO_CHURCH, new string[] { } },
-        { Town.NABOORU, new string[] { } },
-        { Town.DARUNIA_ROOF, new string[] { } },
-        { Town.DARUNIA_WEST, new string[] { "You saved$a kid$for this?", "Dont$forget to$get upstab" } },
-        { Town.NEW_KASUTO, new string[] { } },
-        { Town.OLD_KASUTO, new string[] { "Sorry$about the$moas" } }
+        { Town.RAURU, [] },
+        { Town.RUTO, ["A winner$is you"] },
+        { Town.SARIA_NORTH, ["Water$you$doing?"] },
+        { Town.MIDO_WEST, [] },
+        { Town.MIDO_CHURCH, [] },
+        { Town.NABOORU, [] },
+        { Town.DARUNIA_ROOF, [] },
+        { Town.DARUNIA_WEST, ["You saved$a kid$for this?", "Dont$forget to$get upstab"] },
+        { Town.NEW_KASUTO, [] },
+        { Town.OLD_KASUTO, ["Sorry$about the$moas"] }
     };
 
     public static readonly Dictionary<Collectable, string[]> WIZARD_SPELL_TEXTS_BY_COLLECTABLE = new()
     {
-        { Collectable.SHIELD_SPELL, new string[] { "Have you$tried not$dying?", "I Already$Have One", "Is This$A Red$Ring?" } },
-        { Collectable.JUMP_SPELL, new string[] { "I get up$and nothin$gets me$down", "Kris Kross$will make$you..." } },
-        { Collectable.LIFE_SPELL, new string[] { "have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal" } },
-        { Collectable.FAIRY_SPELL, new string[] { "HEY!$LISTEN", "Just$don't say$Hey$listen!", "Watch Out$For Iron" } },
-        { Collectable.FIRE_SPELL, new string[] { "this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love" } },
-        { Collectable.DASH_SPELL, new string[] { "Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through!"  } },
-        { Collectable.REFLECT_SPELL, new string[] { "I am not$Mirror$Shield", "Crysta$was$here", "You're$rubber,$They're$glue", "Send$Carock my$regards", "Is This$Hera$Basement?" } },
-        { Collectable.SPELL_SPELL, new string[] { "Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy" } },
-        { Collectable.THUNDER_SPELL, new string[] { "With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage", "he's dead$jim" } },
+        { Collectable.SHIELD_SPELL, ["Have you$tried not$dying?", "I Already$Have One", "Is This$A Red$Ring?"] },
+        { Collectable.JUMP_SPELL, ["I get up$and nothin$gets me$down", "Kris Kross$will make$you..."] },
+        { Collectable.LIFE_SPELL, ["have you$tried the$Healmore$spell?", "Dont$blame me$if this is$1 bar", "How Many$Bars Will$I Heal"] },
+        { Collectable.FAIRY_SPELL, ["HEY!$LISTEN", "Just$dont say$Hey$listen!", "Watch Out$For Iron"] },
+        { Collectable.FIRE_SPELL, ["this is$fine", "use this$to burn$gems", "This spell$is$worthless", "Goodness$Gracious!", "This one$goes out$to the one$I love"]},
+        { Collectable.DASH_SPELL, ["Rolling$around at$the speed$of sound", "Gotta$Go$Fast", "Use the$boost to$get through"]},
+        { Collectable.REFLECT_SPELL, ["I am not$Mirror$Shield", "Crysta$was$here", "Youre$rubber,$Theyre$glue", "Send$Carock my$regards", "Is This$Hera$Basement?"]},
+        { Collectable.SPELL_SPELL, ["Titular$redundancy$included", "Wait?$which$spell?", "you should$rescue me$instead of$Zelda", "Can you$use it$in a$sentence?", "Metamorph$Thy Enemy"]},
+        { Collectable.THUNDER_SPELL, ["With this$you can$now beat$the game", "Ultrazord$Power Up!", "Terrible$terrible$damage", "hes dead$jim"]},
         { Collectable.UPSTAB, UPSTAB_TEXTS },
         { Collectable.DOWNSTAB, DOWNSTAB_TEXTS }
     };

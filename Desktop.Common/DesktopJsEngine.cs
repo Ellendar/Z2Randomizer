@@ -1,11 +1,10 @@
-﻿using js65;
+﻿using System.Runtime.Versioning;
+using js65;
 
 namespace Desktop.Common;
 
-public class DesktopJsEngine : ClearScriptEngine
-{
-    public DesktopJsEngine(Js65Options? options = null, bool debugJavascript = false)
-        : base(options, true, debugJavascript)
-    {
-    }
-}
+[UnsupportedOSPlatform("browser")]
+public class DesktopJsEngine(Js65Options? options = null, bool debugJavascript = false)
+#pragma warning disable CA1416
+    : ClearScriptEngine(options, true, debugJavascript);
+#pragma warning restore CA1416

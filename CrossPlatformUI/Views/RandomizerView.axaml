@@ -11,6 +11,7 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:crossPlatformUi="clr-namespace:CrossPlatformUI"
              xmlns:presets="clr-namespace:CrossPlatformUI.Presets"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="RandomizerViewControl"
              x:DataType="viewModels:RandomizerViewModel"
@@ -154,6 +155,9 @@
             </StackPanel>
         </Grid>
         <TabControl Margin="5" SelectedIndex="{Binding CurrentTabIndex}">
+            <Interaction.Behaviors>
+                <views:TabContentPreservationBehavior />
+            </Interaction.Behaviors>
             <TabItem Header="Start">
                 <tabs:StartView DataContext="{Binding Main}"/>
             </TabItem>
