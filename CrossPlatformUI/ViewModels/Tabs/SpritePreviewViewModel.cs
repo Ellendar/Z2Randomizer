@@ -190,8 +190,7 @@ public class LoadedCharacterSprite : ReactiveObject
             fixed (byte* b = data)
             {
                 var bmp = new Bitmap(PixelFormat.Rgba8888, AlphaFormat.Premul, (nint)b, new PixelSize(16, 32), Vector.One, 16*4);
-                SmallPreview = bmp.CreateScaledBitmap(new PixelSize(16, 32), BitmapInterpolationMode.None);
-                LargePreview = bmp.CreateScaledBitmap(new PixelSize(16 * 6, 32 * 6), BitmapInterpolationMode.None);
+                Preview = bmp.CreateScaledBitmap(new PixelSize(16, 32), BitmapInterpolationMode.None);
             }
         }
         // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
@@ -204,11 +203,8 @@ public class LoadedCharacterSprite : ReactiveObject
         AuthorName = creditRaw;
     }
 
-    private Bitmap? largePreview;
-    public Bitmap? LargePreview { get => largePreview; set => this.RaiseAndSetIfChanged(ref largePreview, value); }
-    
-    private Bitmap? smallPreview;
-    public Bitmap? SmallPreview { get => smallPreview; set => this.RaiseAndSetIfChanged(ref smallPreview, value); }
+    private Bitmap? preview;
+    public Bitmap? Preview { get => preview; set => this.RaiseAndSetIfChanged(ref preview, value); }
     
     private string? authorName;
     public string? AuthorName { get => authorName; set => this.RaiseAndSetIfChanged(ref authorName, value); }

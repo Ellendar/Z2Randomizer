@@ -11,7 +11,7 @@
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.SpellsView">
     <Grid ColumnDefinitions="*, *">
-        <StackPanel>
+        <StackPanel Grid.Column="0">
             <CheckBox
                 IsChecked="{Binding Config.ShuffleLifeRefillAmount}"
                 Content="Shuffle Life Refill Amount"

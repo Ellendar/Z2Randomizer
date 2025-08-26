@@ -12,7 +12,7 @@
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
              x:DataType="vmt:CustomizeViewModel">
     <Grid ColumnDefinitions="*,2*" Margin="4">
-        <StackPanel Orientation="Vertical">
+        <StackPanel Grid.Column="0" Orientation="Vertical">
             <CheckBox
                 IsChecked="{Binding RemoveFlashing}"
                 Content="Remove Flashing"

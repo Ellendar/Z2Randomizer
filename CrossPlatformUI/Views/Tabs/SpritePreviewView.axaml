@@ -18,13 +18,18 @@
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.CharacterSpriteToolTip}"/></ToolTip.Tip>
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding SmallPreview}" />
-                            <StackPanel>
-                                <TextBlock MaxHeight="12" Text="{Binding Name}" />
-                                <TextBlock MaxHeight="12" Text="{Binding AuthorName}" />
-                            </StackPanel>
-                        </StackPanel>
+                        <Grid ColumnDefinitions="32, *">
+                            <Image Grid.Column="0"
+                                   Margin="4 4"
+                                   Width="32"
+                                   Height="64"
+                                   Source="{Binding Preview}"
+                                   RenderOptions.BitmapInterpolationMode="None" />
+                            <TextBlock Grid.Column="1"
+                                       Margin="16 0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding Name}" />
+                        </Grid>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
@@ -54,7 +59,9 @@
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Vertical">
             <TextBlock>Sprite Preview</TextBlock>
-            <Image Source="{Binding Path=Sprite.LargePreview}" MaxHeight="200"/>
+            <Image MaxHeight="200"
+                   Source="{Binding Path=Sprite.Preview}"
+                   RenderOptions.BitmapInterpolationMode="None" />
             <TextBlock Text="{Binding Sprite.Credit}" />
         </StackPanel>
     </Grid>
