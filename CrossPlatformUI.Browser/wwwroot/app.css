@@ -5,6 +5,21 @@
     --sal: env(safe-area-inset-left);
 }
 
+body {
+    height: 100vh;
+    margin: 0;
+    background: #303030;
+}
+
+#out {
+    width: 980px;
+    height: 790px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 /* HTML styles for the splash screen */
 
 .highlight {
@@ -49,7 +64,6 @@
     height: 100%;
     width: 100%;
     color: whitesmoke;
-    background: #1b2a4e;
     font-family: 'Nunito', sans-serif;
     background-position: center;
     background-size: cover;
