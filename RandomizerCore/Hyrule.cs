@@ -205,7 +205,7 @@ public class Hyrule
             Hash = "";
             World.ResetStats();
 
-            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed)).AsSpan()[..4]);
+            SeedHash = BitConverter.ToInt32(MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(config.Seed!)).AsSpan()[..4]);
             r = new Random(SeedHash);
 
             config.CheckForFlagConflicts();
@@ -1060,7 +1060,7 @@ public class Hyrule
 
             for (int itemIndex = 0; itemIndex < importantItemsToDuplicate.Count; itemIndex++)
             {
-                Location minorItemLocation = minorItemLocations.Sample(r);
+                Location minorItemLocation = minorItemLocations.Sample(r)!;
                 minorItemLocation.Collectables.FisherYatesShuffle(r);
                 for(int collectableIndex = 0; collectableIndex < minorItemLocation.Collectables.Count; collectableIndex++) 
                 {
