@@ -19,19 +19,19 @@
     <link rel="stylesheet" href="./app.css" />
 </head>
 
-<body style="margin: 0px; overflow: hidden">
+<body>
     <div id="out">
         <div id="avalonia-splash">
-            <div class="center">
-                <h2 class="purple">
-                    Powered by
-                    <a class="highlight" href="https://www.avaloniaui.net/" target="_blank">Avalonia UI</a>
-                </h2>
+            <img class="splash-logo" src="z2r-logo.png" alt="Z2R Logo" />
+            <div id="loading-status">Loading...</div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
             </div>
-            <img class="icon" src="Logo.svg" alt="Avalonia Logo" />
+            <div id="error-message" style="display:none;"></div>
         </div>
     </div>
-    <script type='module' src="./main.js"></script>
+
+    <script type="module" src="./main.js"></script>
 </body>
 
 </html>
