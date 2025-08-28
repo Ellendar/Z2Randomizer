@@ -12,15 +12,14 @@
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.LevelsView">
     <Grid ColumnDefinitions="*,*">
-        <StackPanel>
-            <CheckBox
-                IsChecked="{Binding ShuffleAllExpState}"
-                Content="Shuffle All Experience"
-            >
+        <StackPanel Grid.Column="0">
+            <CheckBox IsChecked="{Binding ShuffleAllExpState}"
+                      Content="Shuffle All Experience">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleAllExperienceToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}" CornerRadius="4" BorderThickness="1">
-                <StackPanel>
+            <Border BorderBrush="{DynamicResource MaterialPrimaryForegroundBrush}"
+                    BorderThickness="1" Padding="20 8" CornerRadius="4">
+                <UniformGrid Rows="0" Columns="1" RowSpacing="8">
                     <CheckBox
                         Name="AtkExp"
                         IsEnabled="{Binding !ShuffleAllExpState}"
@@ -39,23 +38,29 @@
                         IsChecked="{Binding Config.ShuffleLifeExperience}"
                         Content="Shuffle Life Experience"
                     />
-                </StackPanel>
+                </UniformGrid>
             </Border>
 
-            <StackPanel>
-                <TextBlock HorizontalAlignment="Center">Level Cap</TextBlock>
+            <StackPanel Margin="0 16" HorizontalAlignment="Left">
+                <TextBlock>Level Cap</TextBlock>
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LevelCapToolTip}"/></ToolTip.Tip>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <NumericUpDown Name="AttackLevelCapSelector" Value="{Binding Config.AttackLevelCap}"
-                                FormatString="N0" ParsingNumberStyle="Integer"
-                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
-                    <NumericUpDown Name="MagicLevelCapSelector" Value="{Binding Config.MagicLevelCap}"
-                                FormatString="N0" ParsingNumberStyle="Integer"
-                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
-                    <NumericUpDown Name="LifeLevelCapSelector" Value="{Binding Config.LifeLevelCap}"
-                                FormatString="N0" ParsingNumberStyle="Integer"
-                                ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
-                </StackPanel>
+                <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <NumericUpDown Grid.Column="0"
+                                   Height="72"
+                                   Name="AttackLevelCapSelector" Value="{Binding Config.AttackLevelCap}"
+                                   FormatString="N0" ParsingNumberStyle="Integer"
+                                   ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Attack"/>
+                    <NumericUpDown Grid.Column="1"
+                                   Height="72"
+                                   Name="MagicLevelCapSelector" Value="{Binding Config.MagicLevelCap}"
+                                   FormatString="N0" ParsingNumberStyle="Integer"
+                                   ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Magic"/>
+                    <NumericUpDown Grid.Column="2"
+                                   Height="72"
+                                   Name="LifeLevelCapSelector" Value="{Binding Config.LifeLevelCap}"
+                                   FormatString="N0" ParsingNumberStyle="Integer"
+                                   ClipValueToMinMax="True" Minimum="1" Maximum="8" assists:TextFieldAssist.Hints="Life"/>
+                </Grid>
             </StackPanel>
 
             <CheckBox

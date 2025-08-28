@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -22,6 +23,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 {
     private CancellationTokenSource backgroundUpdateTask = new ();
     private CancellationTokenSource backgroundLoadTask = new ();
+    private bool spritesLoaded;
 
     private string spriteName = "Link";
 
@@ -64,10 +66,11 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         Main = main;
         SpriteName = main.Config.SpriteName;
         Activator = new();
+        spritesLoaded = false;
         this.WhenActivated(OnActivate);
     }
 
-    internal void OnActivate(CompositeDisposable disposable)
+    internal void OnActivate(CompositeDisposable disposables)
     {
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,
@@ -76,29 +79,39 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             // x => x.Main.Config.ShieldTunic,
             // x => x.Main.Config.BeamSprite,
             x => x.Main.RomFileViewModel.HasRomData
-        ).Subscribe(tuple => {
-            var (_, _, _, hasRom) = tuple;
-            if (hasRom)
-            {
+        )
+            .Where(tuple => tuple.Item4) // filter emits that don't have rom data
+            .Select(tuple => (
+                tuple.Item1?.DisplayName,
+                tuple.Item2,
+                tuple.Item3,
+                tuple.Item4
+            ))
+            .DistinctUntilChanged() // filter emits where nothing has changed
+            .Subscribe(tuple => {
                 backgroundUpdateTask.CancelAsync().ToObservable().Subscribe(_ =>
                 {
                     backgroundUpdateTask = new CancellationTokenSource();
                     Dispatcher.UIThread.Post(() => UpdateCharacterSprites(backgroundUpdateTask.Token), DispatcherPriority.Background);
                 });
-            }
-        });
+            })
+            .DisposeWith(disposables);
 
-        Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false).Subscribe(x =>
-        {
-            if (x.Value)
-            {
-                backgroundLoadTask.CancelAsync().ToObservable().Subscribe(_ =>
+        Main.RomFileViewModel
+            .ObservableForProperty(x => x.HasRomData, false, false)
+            .Where(x => x.Value)
+            .Subscribe(x =>
                 {
-                    backgroundLoadTask = new CancellationTokenSource();
-                    Dispatcher.UIThread.Post(() => LoadCharacterSprites(backgroundLoadTask.Token), DispatcherPriority.Background);
-                });
-            }
-        });
+                    // this will be called every time you switch to the tab, but
+                    // it only needs to be done once in the object life cycle
+                    if (spritesLoaded) { return; }
+                    backgroundLoadTask.CancelAsync().ToObservable().Subscribe(_ =>
+                    {
+                        backgroundLoadTask = new();
+                        Dispatcher.UIThread.Post(() => LoadCharacterSprites(backgroundLoadTask.Token), DispatcherPriority.Background);
+                    });
+                })
+            .DisposeWith(disposables);
         return;
 
         async void UpdateCharacterSprites(CancellationToken token)
@@ -141,6 +154,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             
             // Select the sprite on load based on the name
             Sprite = Options.FirstOrDefault(loaded => loaded.Name == SpriteName, link);
+            spritesLoaded = true;
         }
     }
 
@@ -190,8 +204,7 @@ public class LoadedCharacterSprite : ReactiveObject
             fixed (byte* b = data)
             {
                 var bmp = new Bitmap(PixelFormat.Rgba8888, AlphaFormat.Premul, (nint)b, new PixelSize(16, 32), Vector.One, 16*4);
-                SmallPreview = bmp.CreateScaledBitmap(new PixelSize(16, 32), BitmapInterpolationMode.None);
-                LargePreview = bmp.CreateScaledBitmap(new PixelSize(16 * 6, 32 * 6), BitmapInterpolationMode.None);
+                Preview = bmp.CreateScaledBitmap(new PixelSize(16, 32), BitmapInterpolationMode.None);
             }
         }
         // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
@@ -204,11 +217,8 @@ public class LoadedCharacterSprite : ReactiveObject
         AuthorName = creditRaw;
     }
 
-    private Bitmap? largePreview;
-    public Bitmap? LargePreview { get => largePreview; set => this.RaiseAndSetIfChanged(ref largePreview, value); }
-    
-    private Bitmap? smallPreview;
-    public Bitmap? SmallPreview { get => smallPreview; set => this.RaiseAndSetIfChanged(ref smallPreview, value); }
+    private Bitmap? preview;
+    public Bitmap? Preview { get => preview; set => this.RaiseAndSetIfChanged(ref preview, value); }
     
     private string? authorName;
     public string? AuthorName { get => authorName; set => this.RaiseAndSetIfChanged(ref authorName, value); }

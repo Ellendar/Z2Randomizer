@@ -11,7 +11,7 @@
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.EnemiesView">
     <Grid ColumnDefinitions="*, *">
-        <StackPanel>
+        <StackPanel Grid.Column="0">
             <CheckBox
                   Name="ShuffleOverworldEnemiesCheckbox" 
                   IsThreeState="True"

@@ -82,13 +82,26 @@ const PreloadedPalaces = (async function() {
 window.FetchPreloadedSprites = () => PreloadedSprites;
 window.FetchPalaces = () => PreloadedPalaces;
 
-window.DownloadFile = (data, name) => {
+window.DownloadBinaryFile = (data, name) => {
     const a = document.createElement('a');
     document.body.appendChild(a);
     a.style = 'display: none';
     const bindata = base64ToArrayBuffer(data);
-    const blob = new Blob([bindata], {type: 'octet/stream'}),
-        url = window.URL.createObjectURL(blob);
+    const blob = new Blob([bindata], { type: 'octet/stream' });
+    const url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+};
+
+window.DownloadTextFile = (text, name) => {
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
     a.href = url;
     a.download = name;
     a.click();

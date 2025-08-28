@@ -44,8 +44,11 @@ public partial class BrowserFileService : IFileSystemService
     [return: JSMarshalAs<JSType.Promise<JSType.String>>]
     private static partial Task<string> FetchPreloadedSprites();
 
-    [JSImport("globalThis.window.DownloadFile")]
-    private static partial void DownloadFile(string data, string name);
+    [JSImport("globalThis.window.DownloadBinaryFile")]
+    private static partial void DownloadBinaryFile(string data, string name);
+
+    [JSImport("globalThis.window.DownloadTextFile")]
+    private static partial void DownloadTextFile(string text, string name);
 
     private readonly Task<SpriteFile[]> preloadedSprites;
     private readonly Task<string> preloadedPalaces;
@@ -135,12 +138,15 @@ public partial class BrowserFileService : IFileSystemService
         return Task.Run(() =>
         {
             var data = Convert.ToBase64String(filedata);
-            DownloadFile(data, filename);
+            DownloadBinaryFile(data, filename);
         });
     }
 
     public Task SaveSpoilerFile(string filename, string data, string? path = null)
     {
-        throw new NotImplementedException();
+        return Task.Run(() =>
+        {
+            DownloadTextFile(data, filename);
+        });
     }
 }

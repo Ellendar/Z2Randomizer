@@ -11,8 +11,8 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
              x:DataType="vm:MainViewModel">
-    <Grid ColumnDefinitions="*,*">
-        <StackPanel Width="414">
+    <Grid ColumnDefinitions="440,*" ColumnSpacing="16">
+        <StackPanel Grid.Column="0">
             <HyperlinkButton
                 Margin="178 0 0 0"
                 HorizontalAlignment="Left"
@@ -22,40 +22,36 @@
                 Foreground="#4557c4"
                 Cursor="Hand"
             />
-            <StackPanel Orientation="Horizontal" Margin="0 0">
-                <ComboBox
-                    Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="Normal Palace Style"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
-                    SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}"
-                >
+            <Grid ColumnDefinitions="300,*">
+                <ComboBox Grid.Column="0"
+                          Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                          assists:ComboBoxAssist.Label="Normal Palace Style"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
+                          SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NormalPalaceStyleToolTip}"/></ToolTip.Tip>
                 </ComboBox>
-                <CheckBox
-                    IsThreeState="True"
-                    IsChecked="{Binding Config.ShortenNormalPalaces}"
-                    Content="Shorten"
-                >
+                <CheckBox Grid.Column="1"
+                          IsThreeState="True"
+                          IsChecked="{Binding Config.ShortenNormalPalaces}"
+                          Content="Shorten">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
                 </CheckBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0 0">
-                <ComboBox
-                    Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="GP Palace Style"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
-                    SelectedItem="{Binding Config.GpStyle, Converter={x:Static ui:Util.EnumConvert}}"
-                >
+            </Grid>
+			<Grid ColumnDefinitions="300,*">
+				<ComboBox Grid.Column="0"
+                          Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                          assists:ComboBoxAssist.Label="GP Palace Style"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
+                          SelectedItem="{Binding Config.GpStyle, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GPPalaceStyleToolTip}"/></ToolTip.Tip>
                 </ComboBox>
-                <CheckBox
-                    IsThreeState="True"
-                    IsChecked="{Binding Config.ShortenGP}"
-                    Content="Shorten"
-                >
+				<CheckBox Grid.Column="1"
+                          IsThreeState="True"
+                          IsChecked="{Binding Config.ShortenGP}"
+                          Content="Shorten">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
                 </CheckBox>
-            </StackPanel>
+            </Grid>
             <ComboBox
                 HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Minimum Path To Dark Link"
@@ -125,14 +121,18 @@
             <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NumberofPalacestoCompleteToolTip}"/></ToolTip.Tip>
             <!-- Example of how to scale down elements  -->
             <!-- <Viewbox Stretch="Fill" Width="140" Height="70"> -->
-                <StackPanel Orientation="Horizontal" Margin="41 0 0 0">
-                    <NumericUpDown Value="{Binding Config.PalacesToCompleteMin}"
-                                   FormatString="N0" ParsingNumberStyle="Integer"
-                                   ClipValueToMinMax="True" Minimum="0" Maximum="{Binding Config.PalacesToCompleteMax}" assists:TextFieldAssist.Hints="Min"/>
-                    <NumericUpDown Value="{Binding Config.PalacesToCompleteMax}"
-                                   FormatString="N0" ParsingNumberStyle="Integer"
-                                   ClipValueToMinMax="True" Minimum="{Binding Config.PalacesToCompleteMin}" Maximum="6" assists:TextFieldAssist.Hints="Max"/>
-                </StackPanel>
+            <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" VerticalAlignment="Top" Margin="43 0 0 0">
+                <NumericUpDown Grid.Column="0"
+                               Height="72"
+                               Value="{Binding Config.PalacesToCompleteMin}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="0" Maximum="{Binding Config.PalacesToCompleteMax}" assists:TextFieldAssist.Hints="Min"/>
+                <NumericUpDown Grid.Column="1"
+                               Height="72"
+                               Value="{Binding Config.PalacesToCompleteMax}"
+                               FormatString="N0" ParsingNumberStyle="Integer"
+                               ClipValueToMinMax="True" Minimum="{Binding Config.PalacesToCompleteMin}" Maximum="6" assists:TextFieldAssist.Hints="Max"/>
+            </Grid>
             <!-- </Viewbox> -->
             <CheckBox
                 IsChecked="{Binding Config.RestartAtPalacesOnGameOver}"

@@ -11,7 +11,7 @@
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.HintsView">
     <Grid ColumnDefinitions="*, *">
-        <StackPanel>
+        <StackPanel Grid.Column="0">
             <HyperlinkButton
                 Margin="43 0"
                 HorizontalAlignment="Left"

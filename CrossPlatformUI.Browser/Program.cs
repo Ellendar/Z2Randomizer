@@ -41,5 +41,12 @@ internal sealed partial class Program
     }
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>();
+        => AppBuilder.Configure<App>()
+#if DEBUG
+             .LogToTrace()
+#endif
+             .With(new SkiaOptions
+             {
+                 MaxGpuResourceSizeBytes = 64 * 1024 * 1024, // Default is 28 MB
+             });
 }

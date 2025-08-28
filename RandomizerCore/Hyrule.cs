@@ -512,10 +512,7 @@ public class Hyrule
 
     private string AsmFileReadTextCallback(string basePath, string path)
     {
-        if (basePath == "")
-            return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
-
-        throw new FileNotFoundException();
+        return Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.{path.Replace('/', '.').Replace('\\', '.')}");
     }
 
     private static byte[] ConvertHash(byte[] hash)
