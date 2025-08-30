@@ -3242,14 +3242,14 @@ public class Hyrule
             {
                 if (!firstRaft)
                 {
-                    ROMData.Put(0x538, (byte)w.raft.Xpos);
-                    ROMData.Put(0x53A, (byte)w.raft.Ypos);
+                    // ROMData.Put(0x538, (byte)w.raft.Xpos); // Not used anymore
+                    // ROMData.Put(0x53A, (byte)w.raft.Ypos); // Not used anymore
                     firstRaft = true;
                 }
                 else
                 {
-                    ROMData.Put(0x539, (byte)w.raft.Xpos);
-                    ROMData.Put(0x53B, (byte)w.raft.Ypos);
+                    // ROMData.Put(0x539, (byte)w.raft.Xpos); // Not used anymore
+                    // ROMData.Put(0x53B, (byte)w.raft.Ypos); // Not used anymore
                 }
             }
         }
@@ -3893,24 +3893,26 @@ RaftWorldMappingTable:
 .export RaftWorldMappingTable
 
 .org $C265
+FREE_UNTIL $C285
 ; Change the pointer table for Item presence to include only the low byte
 ; Since the high byte is always $06.
 ;
 ; Also breaking it up into two tables, one for World == 0,
 ; where RegionNumber is used to determine the overworld we're in, and
 ; one for World != 0, where the RegionNumber does not actually matter.
+.reloc
 bank7_Pointer_table_for_Item_Presence_World0_ByRegion:
     .byte .lobyte($0600)  ; West Caves                           (Region 0)
     .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 1)
     .byte .lobyte($0640)  ; East Caves                           (Region 2)
     .byte .lobyte($0620)  ; Death Mountain / Maze Island Caves   (Region 3)
+.reloc
 bank7_Pointer_table_for_Item_Presence_ByWorld: ; this is referenced as -1, as index 0 would use the table above
     .byte .lobyte($0660)  ; Towns         (World 1)
     .byte .lobyte($0660)  ; Towns         (World 2)
     .byte .lobyte($0680)  ; Palace 125    (World 3)
     .byte .lobyte($06A0)  ; Palace 346    (World 4)
     .byte .lobyte($06C0)  ; Great Palace  (World 5)
-FREE_UNTIL $C285
 
 .org $c2b3
 ; The vanilla index calculation was 5 * RegionNumber + WorldNumber, and was
@@ -3943,11 +3945,38 @@ World0:
     lda bank7_Pointer_table_for_Item_Presence_World0_ByRegion,y
     rts
 
-; Remove vanilla check to see if you are in east hyrule when using the raft
+
 .segment "PRG0"
-.org $85a2
-    nop
-    nop
+; ** Raft tile must have index 0x29 (41) in every world **
+; No other type of tile trigger should use this index
+; This is currently true for vanilla and Z2R
+RAFT_TILE_INDEX = $29
+
+PLAYER_X = $74
+AREA_LOCATION_INDEX = $0748
+PLAYER_HAS_RAFT = $0787
+
+.org $8528 ; we don't use this data anymore
+FREE_UNTIL $8553 ; remove unused data here
+; bridge connector coordinates are at $8553
+
+.org $8599
+    stx AREA_LOCATION_INDEX  ; X stashed away like in the original code
+    cpx #RAFT_TILE_INDEX
+    bne NotRaftTileProceed
+    lda PLAYER_HAS_RAFT
+    beq EndTileComparisons  ; It's a raft tile and we don't have the raft
+    ; Determine raft exit direction from our overworld position instead of the vanilla table
+    lda PLAYER_X
+    ldx #1       ; raft going right
+    cmp #20
+    bcs SetVariablesForRaftTravel
+    ldx #2       ; raft going left
+    bpl SetVariablesForRaftTravel
+FREE_UNTIL $85BD
+SetVariablesForRaftTravel = $85BD
+NotRaftTileProceed = $85D5
+EndTileComparisons = $8601
 
 """, "fix_continent_transitions.s");
     }
