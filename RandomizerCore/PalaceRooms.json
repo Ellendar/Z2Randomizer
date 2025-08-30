@@ -20581,7 +20581,7 @@
     "connections": "FF4AB758",
     "elevatorScreen": 1,
     "enabled": true,
-    "enemies": "09261A318527942F94",
+    "enemies": "07318527942F94",
     "group": "V4_4",
     "hasBoss": false,
     "hasDrop": false,
@@ -20594,11 +20594,11 @@
     "linkedRoomName": null,
     "map": 10,
     "memoryAddress": 83795,
-    "name": "gtmNewgpRooms M10 mirrored",
+    "name": "gtmNewgpRooms M10 modified mirror",
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": ["GLOVE"],
-    "sideviewData": "40600F08D208DA0E80D281D2D10850015502D10EA125F25000060106D40850015502D10E80D281D2D10850015502D10ED20850015502D10E80D281D2D108DA0E"
+    "sideviewData": "34600F08E100F75000060106D10EA021D30850015502D10E80D281D2D10850015502D10ED20850015502D10E80D281D2D108DA0E"
   },
   {
     "author": "initsu",
