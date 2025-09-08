@@ -633,7 +633,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         shuffleSpritePalettes = false;
         permanentBeamSword = false;
         upAOnController1 = false;
-        removeFlashing = false;
+        removeFlashing = true;
         sprite = CharacterSprite.LINK;
         spriteName = CharacterSprite.LINK.DisplayName!;
         climate = Climates.Classic;
