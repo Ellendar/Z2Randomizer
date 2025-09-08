@@ -1401,7 +1401,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         switch (palaceItemRoomCount)
         {
             case PalaceItemRoomCount.RANDOM:
-                palaceRoomItemsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 3, 2, 3, 4, 4];
+                palaceRoomItemsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 2, 2, 2, 3, 3];
                 for (int i = 0; i < 6; i++)
                 {
                     properties.PalaceItemRoomCounts[i] = r.Next(1, palaceRoomItemsMax[i] + 1);
@@ -1419,7 +1419,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                     {
                         properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
                     }
-                    // Limit shuffled vanilla palace style to 2 item rooms max
+                    // Limit shuffled vanilla palace style to 2 item rooms max.
+                    // More than that often caused errors when generating.
                     // Technically, non-shortened P4 & P5 can have 3 item rooms,
                     // but lets keep it simple.
                     else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
