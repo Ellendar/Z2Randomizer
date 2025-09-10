@@ -101,6 +101,7 @@ static class DirectionExtensions
     }
 
     public static readonly Direction[] ITEM_ROOM_ORIENTATIONS = [Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST];
+    public static readonly Direction[] CARDINAL_DIRECTIONS = [Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST];
 
     public static Direction RandomItemRoomOrientation(Random r)
     {

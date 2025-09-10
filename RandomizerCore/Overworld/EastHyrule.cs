@@ -879,6 +879,7 @@ public sealed class EastHyrule : World
 
     public bool MakeValleyOfDeath()
     {
+        //Pick a spot for the center of the GP hole
         int xmin = 21;
         int xmax = 41;
         int ymin = 22;
@@ -893,6 +894,8 @@ public sealed class EastHyrule : World
         int palacex = RNG.Next(xmin, xmax);
         int palacey = RNG.Next(ymin, ymax);
 
+        //Ensure there is enough unallocated space to draw the whole opening
+        //Why does this happen only for caldera-shaped biomes
         if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
         {
             bool placeable;
@@ -914,6 +917,7 @@ public sealed class EastHyrule : World
             } while (!placeable);
         }
 
+        //Actually draw the center of the GP pocket
         for (int i = 0; i < 7; i++)
         {
             for (int j = 0; j < 7; j++)
@@ -958,6 +962,8 @@ public sealed class EastHyrule : World
         int deltay = 0;
         int starty = palacey;
         int startx = palacex + 4;
+
+
         if (biome != Biome.CANYON && biome != Biome.DRY_CANYON)
         {
             if (palacex > MAP_COLS / 2)
@@ -1026,7 +1032,7 @@ public sealed class EastHyrule : World
 
         int forced = 0;
         int vodRoutes = RNG.Next(1, 3);
-        //bool horizontalPath = (isHorizontal && biome != Biome.CANYON) || (!isHorizontal && biome == Biome.CANYON);
+
         bool horizontalPath = isHorizontal ^ (biome == Biome.CANYON || biome == Biome.DRY_CANYON);
 
         if (biome != Biome.VOLCANO)
@@ -1513,6 +1519,23 @@ public sealed class EastHyrule : World
             cavePlaced = false;
         }
 
+        //Safety to ensure you can't enter a DM passthrough from the wrong direction, ending up in a mountain
+        List<Location> passthroughLocations = [
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION1),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION2),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION3),
+        ];
+        foreach (Location passthroughLocation in passthroughLocations)
+        {
+            foreach(Direction direction in DirectionExtensions.CARDINAL_DIRECTIONS)
+            {
+                if (map[passthroughLocation.Ypos - 30 + direction.DeltaY(), passthroughLocation.Xpos + direction.DeltaX()] == Terrain.MOUNTAIN
+                    && map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] != Terrain.MOUNTAIN)
+                {
+                    map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
+                }
+            }
+        }
         return true;
     }
 
@@ -2065,18 +2088,6 @@ public sealed class EastHyrule : World
                 pendingCoordinates.Add((y + 1, x));
             }
         } while (pendingCoordinates.Count > 0);
-
-#if UNSAFE_DEBUG
-        if(unreachedLocations.Count == 2)
-        {
-            //Debug.WriteLine(unreachedLocations.First().Name);
-            //Debug.WriteLine(GetMapDebug());
-        }
-        else if (unreachedLocations.Count <= 3)
-        {
-            //unreachedLocations.ForEach(i => Debug.WriteLine(i.Name));
-        }
-#endif
 
         return !unreachedLocations.Any();
     }
