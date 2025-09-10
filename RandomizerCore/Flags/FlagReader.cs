@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 
@@ -134,7 +135,7 @@ public class FlagReader
             0 => false,
             1 => true,
             2 => null,
-            _ => throw new Exception("Invalid nullable bool value")
+            _ => throw new InvalidDataException("Invalid nullable bool value")
         };
     }
     public byte ReadByte(int extent)
