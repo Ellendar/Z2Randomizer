@@ -143,9 +143,9 @@ public sealed class WestHyrule : World
         locationAtSariaSouth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_SOUTH_TILE_LOCATION); //0x0000465f
         locationAtSariaNorth.NeedBagu = true;
         locationAtSariaSouth.NeedBagu = true;
-        locationAtSariaNorth.Collectables = [Collectable.FAIRY_SPELL];
+        locationAtSariaNorth.Collectables = [Collectable.LIFE_SPELL];
         locationAtMido = GetLocationByMem(RomMap.WEST_TOWN_MIDO_TILE_LOCATION); //0x00004662
-        locationAtMido.Collectables = [Collectable.LIFE_SPELL];
+        locationAtMido.Collectables = [Collectable.FAIRY_SPELL];
 
         trophyCave = GetLocationByMem(RomMap.WEST_CAVE_TROPHY_TILE_LOCATION); //0x00004630
         //raft = GetLocationByMem(0x4658);

@@ -112,6 +112,9 @@ Seed: {config.Seed}
                     }
                     else
                     {
+#if DEBUG
+                        if (System.Diagnostics.Debugger.IsAttached) { throw; }
+#endif
                         errorHeading = "Error Generating Seed";
                         errorBody = "Please report this on the discord";
                     }

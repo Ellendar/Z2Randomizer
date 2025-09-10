@@ -99,6 +99,7 @@ public abstract class PalaceGenerator
             for (int i = 0; i < palace.AllRooms.Count; i++)
             {
                 var room = palace.AllRooms[i];
+                if (room.Group == RoomGroup.STUBS) { continue; }
                 if (room.HasItem) { continue; }
                 if (room.LinkedRoom != null) { continue; }
                 var sideviewBytes = room.SideView;
