@@ -1053,27 +1053,33 @@ public class Hyrule
             importantItemsToDuplicate = importantItemsToDuplicate.GetRange(0, int.Min(replaceableMinorItemCount, importantItemsToDuplicate.Count));
 
             importantItemsToDuplicate.FisherYatesShuffle(r);
-            minorItemLocations.FisherYatesShuffle(r);
 
             for (int itemIndex = 0; itemIndex < importantItemsToDuplicate.Count; itemIndex++)
             {
-                Location minorItemLocation = minorItemLocations.Sample(r)!;
-                minorItemLocation.Collectables.FisherYatesShuffle(r);
-                for(int collectableIndex = 0; collectableIndex < minorItemLocation.Collectables.Count; collectableIndex++) 
-                {
-                    if(minorItemLocation.Collectables[collectableIndex].IsMinorItem())
+                var originalItem = importantItemsToDuplicate[itemIndex];
+                int globalOriginalLocationIndex = itemLocs.FindIndex(l => l.Collectables.Contains(originalItem));
+                Debug.Assert(globalOriginalLocationIndex != -1);
+                minorItemLocations.FisherYatesShuffle(r);
+                foreach (var minorItemLocation in minorItemLocations) {
+                    if (minorItemLocation != minorItemLocations.Last())
                     {
-                        minorItemLocation.Collectables[collectableIndex] = importantItemsToDuplicate[itemIndex];
-                        if(!minorItemLocation.Collectables.Any(c => c.IsMinorItem()))
-                        {
-                            minorItemLocations.Remove(minorItemLocation);
-                        }
-                        break;
+                        // make sure duplicate items are not right next to each other
+                        // (Both Maze Island drops, both in New Kasuto etc.)
+                        int globalMinorLocationIndex = itemLocs.IndexOf(minorItemLocation);
+                        if (Math.Abs(globalOriginalLocationIndex - globalMinorLocationIndex) < 3) { continue; }
                     }
+                    minorItemLocation.Collectables.FisherYatesShuffle(r);
+                    int minorIndex = minorItemLocation.Collectables.FindIndex(c => c.IsMinorItem());
+                    Debug.Assert(minorIndex != -1);
+                    minorItemLocation.Collectables[minorIndex] = originalItem;
+                    if (!minorItemLocation.Collectables.Any(c => c.IsMinorItem()))
+                    {
+                        minorItemLocations.Remove(minorItemLocation);
+                    }
+                    break;
                 }
             }
         }
-
     }
 
     private void DoShuffle(List<Collectable> itemsToShuffle, List<Location> itemShuffleLocations)
