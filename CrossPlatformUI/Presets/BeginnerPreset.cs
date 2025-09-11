@@ -29,7 +29,7 @@ public static class BeginnerPreset
         RiverDevilBlockerOption = RiverDevilBlockerOption.PATH,
         EastRocks = false,
         GenerateBaguWoods = false,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = false,
         GoodBoots = true,
