@@ -11,51 +11,53 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="CrossPlatformUI.Views.Tabs.PalacesView"
              x:DataType="vm:MainViewModel">
-    <Grid ColumnDefinitions="440,*" ColumnSpacing="16">
+    <Grid ColumnDefinitions="480,*">
         <StackPanel Grid.Column="0">
             <HyperlinkButton
-                Margin="178 0 0 0"
-                HorizontalAlignment="Left"
+                Margin="16 0 16 0"
+                HorizontalAlignment="Right"
                 Content="[Wiki: Palace Styles]"
                 NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Palace-Styles"
                 FontSize="12"
                 Foreground="#4557c4"
                 Cursor="Hand"
             />
-            <Grid ColumnDefinitions="300,*">
+            <Grid ColumnDefinitions="260,*">
                 <ComboBox Grid.Column="0"
-                          Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                          Margin="0, 0" Theme="{StaticResource MaterialOutlineComboBox}"
                           assists:ComboBoxAssist.Label="Normal Palace Style"
 						  Name="NormalPalaceStyleSelector"
                           ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
                           SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NormalPalaceStyleToolTip}"/></ToolTip.Tip>
                 </ComboBox>
-                <CheckBox Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Config.ShortenNormalPalaces}"
-                          Content="Shorten">
+                <ComboBox Grid.Column="1"
+                          Margin="0, 0" Theme="{StaticResource MaterialOutlineComboBox}"
+                          assists:ComboBoxAssist.Label="Normal Length"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.PalaceLengthOptionList}}"
+                          SelectedItem="{Binding Config.NormalPalaceLength, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+                </ComboBox>
             </Grid>
-			<Grid ColumnDefinitions="300,*">
+			<Grid ColumnDefinitions="260,*">
 				<ComboBox Grid.Column="0"
-                          Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                          Margin="0, 0" Theme="{StaticResource MaterialOutlineComboBox}"
                           assists:ComboBoxAssist.Label="GP Palace Style"
 						  Name="GPPalaceStyleSelector"
                           ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
                           SelectedItem="{Binding Config.GpStyle, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GPPalaceStyleToolTip}"/></ToolTip.Tip>
                 </ComboBox>
-				<CheckBox Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Config.ShortenGP}"
-                          Content="Shorten">
+                <ComboBox Grid.Column="1"
+                          Margin="0, 0" Theme="{StaticResource MaterialOutlineComboBox}"
+                          assists:ComboBoxAssist.Label="GP Length"
+                          ItemsSource="{Binding Source={x:Static rc:Enums.PalaceLengthOptionList}}"
+                          SelectedItem="{Binding Config.GpLength, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
-                </CheckBox>
+                </ComboBox>
             </Grid>
             <ComboBox
-                HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                HorizontalAlignment="Left" Margin="0, 0" Width="260" Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Minimum Path To Dark Link"
                 ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomMinDistanceOptions}}"
                 SelectedItem="{Binding Config.DarkLinkMinDistance, Converter={x:Static ui:Util.EnumConvert}}"
@@ -63,7 +65,7 @@
 
             </ComboBox>
             <ComboBox
-                HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
+                HorizontalAlignment="Left" Margin="0, 0" Width="260" Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Item Rooms Per Palace"
                 ItemsSource="{Binding Source={x:Static rc:Enums.PalaceItemRoomCountOptions}}"
                 SelectedItem="{Binding Config.PalaceItemRoomCount, Converter={x:Static ui:Util.EnumConvert}}"

@@ -107,9 +107,9 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
         }
 
-        if(props.ShortenNormalPalaces && palaceNumber < 7 || props.ShortenGP && palaceNumber == 7)
+        if (roomCount < Palace.VANILLA_PALACE_LENGTHS[palaceNumber - 1])
         {
-            palace.Shorten(r);
+            palace.Shorten(r, roomCount);
         }
 
         palace.IsValid = true;

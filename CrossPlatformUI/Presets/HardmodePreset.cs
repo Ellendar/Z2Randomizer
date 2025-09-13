@@ -47,8 +47,8 @@ public static class HardmodePreset
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
         GpStyle = PalaceStyle.RANDOM_WALK,
-        ShortenNormalPalaces = false,
-        ShortenGP = false,
+        NormalPalaceLength = PalaceLengthOption.FULL,
+        GpLength = PalaceLengthOption.MEDIUM,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,

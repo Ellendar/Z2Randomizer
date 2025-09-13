@@ -46,8 +46,8 @@ public static class NormalPreset
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
         GpStyle = PalaceStyle.RANDOM_WALK,
-        ShortenNormalPalaces = false,
-        ShortenGP = true,
+        NormalPalaceLength = PalaceLengthOption.MEDIUM,
+        GpLength = PalaceLengthOption.SHORT,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
         Includev5_0Rooms = true,

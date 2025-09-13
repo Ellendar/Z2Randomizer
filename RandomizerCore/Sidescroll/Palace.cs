@@ -1,10 +1,11 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
 using static Z2Randomizer.RandomizerCore.Util;
 
@@ -19,7 +20,7 @@ public partial class Palace
     private readonly SortedDictionary<int, List<Room>> rooms;
     internal bool IsValid { get; set; } = false;
 
-    public static readonly Collectable[] SHUFFLABLE_SMALL_ITEMS = [
+    public static readonly ReadOnlyCollection<Collectable> SHUFFLABLE_SMALL_ITEMS = [
         Collectable.KEY,
         Collectable.SMALL_BAG,
         Collectable.MEDIUM_BAG,
@@ -29,6 +30,8 @@ public partial class Palace
         Collectable.RED_JAR,
         Collectable.ONEUP
     ];
+    public static readonly ReadOnlyCollection<int> VANILLA_PALACE_LENGTHS =     [14, 21, 15, 21, 28, 27, 55];
+    public static readonly ReadOnlyCollection<int> VANILLA_MIN_PALACE_LENGTHS = [11, 16, 10, 19, 23, 20, 31];
 
     internal List<Room> AllRooms { get; private set; }
 
@@ -626,15 +629,139 @@ public partial class Palace
         }
     }
 
-    public void Shorten(Random random)
+    public static int[] RollPalaceLengths(Random r, RandomizerProperties props, RandomizerConfiguration conf)
+    {
+        int[] sizes = [.. VANILLA_PALACE_LENGTHS];
+
+        bool ShouldRollForNormalPalace(int i) => conf.NormalPalaceLength != PalaceLengthOption.FULL || !props.PalaceStyles[i].UsesVanillaRoomPool();
+        int GetHardMin(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 2;
+        int GetHardMax(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_PALACE_LENGTHS[i] : 63;
+
+        //1-4 first, then 5-6 because they're dependant
+        for (int i = 0; i < 4; i++)
+        {
+            if (ShouldRollForNormalPalace(i))
+            {
+                sizes[i] = RollPalaceLength(r, sizes[i], conf.NormalPalaceLength, GetHardMin(i), GetHardMax(i));
+            }
+        }
+        if (ShouldRollForNormalPalace(4))
+        {
+            int hardMax = Math.Min(63 - sizes[0] - sizes[1], GetHardMax(4));
+            sizes[4] = RollPalaceLength(r, sizes[4], conf.NormalPalaceLength, GetHardMin(4), hardMax);
+        }
+        if (ShouldRollForNormalPalace(5))
+        {
+            int hardMax = Math.Min(63 - sizes[2] - sizes[3], GetHardMax(5));
+            sizes[5] = RollPalaceLength(r, sizes[5], conf.NormalPalaceLength, GetHardMin(5), hardMax);
+        }
+
+        if (conf.GpLength != PalaceLengthOption.FULL || !props.PalaceStyles[6].UsesVanillaRoomPool())
+        {
+            sizes[6] = RollPalaceLength(r, sizes[6], conf.GpLength, GetHardMin(6), GetHardMax(6));
+        }
+
+        //If P5/6 is vanilla, it's possible the previous palace(s) rolled up and the vanilla palace took us beyond the limit
+        //if so, subtract the difference in rooms between the number and max proportionally between the non-vanilla palaces
+        //There is almost certainly a more elegant solution for this but I don't care.
+        int groupPalaceRoomCount = sizes[0] + sizes[1] + sizes[4];
+        if (groupPalaceRoomCount > 63)
+        {
+            if (props.PalaceStyles[0].UsesVanillaRoomPool())
+            {
+                if (props.PalaceStyles[1].UsesVanillaRoomPool())
+                {
+                    throw new ImpossibleException("Palace room pool count was impossibly high");
+                }
+                else
+                {
+                    sizes[1] -= groupPalaceRoomCount - 63;
+                }
+            }
+            else
+            {
+                if (props.PalaceStyles[1].UsesVanillaRoomPool())
+                {
+                    sizes[0] -= groupPalaceRoomCount - 63;
+                }
+                else
+                {
+                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
+                    sizes[0] -= (groupPalaceRoomCount - 63) / 2;
+                    sizes[1] = 63 - sizes[0] - sizes[4];
+                }
+            }
+        }
+        groupPalaceRoomCount = sizes[2] + sizes[3] + sizes[5];
+        if (groupPalaceRoomCount > 63)
+        {
+            if (props.PalaceStyles[2].UsesVanillaRoomPool())
+            {
+                if (props.PalaceStyles[3].UsesVanillaRoomPool())
+                {
+                    throw new ImpossibleException("Palace room pool count was impossibly high");
+                }
+                else
+                {
+                    sizes[3] -= groupPalaceRoomCount - 63;
+                }
+            }
+            else
+            {
+                if (props.PalaceStyles[3].UsesVanillaRoomPool())
+                {
+                    sizes[2] -= groupPalaceRoomCount - 63;
+                }
+                else
+                {
+                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P4
+                    sizes[2] -= (groupPalaceRoomCount - 63) / 2;
+                    sizes[3] = 63 - sizes[2] - sizes[5];
+                }
+            }
+        }
+
+        return sizes;
+    }
+
+    public static int RollPalaceLength(Random random, int vanillaLength, PalaceLengthOption length, int hardMin=2, int hardMax=63)
+    {
+        double min, max;
+        switch (length)
+        {
+            case PalaceLengthOption.SHORT:
+                min = 0.5;
+                max = 0.75;
+                break;
+            case PalaceLengthOption.MEDIUM:
+                min = 0.65;
+                max = 0.85;
+                break;
+            case PalaceLengthOption.FULL:
+                min = 0.85;
+                max = 1.15;
+                break;
+            case PalaceLengthOption.RANDOM:
+                min = 0.5;
+                max = 1.15;
+                break;
+            default:
+                throw new NotImplementedException();
+        }
+        int intMin = (int)Math.Round(min * vanillaLength);
+        int intMax = (int)(Math.Round(max * vanillaLength) + 1);
+        return Math.Min(Math.Max(random.Next(intMin, intMax), hardMin), hardMax);
+    }
+
+    /// Only used by Vanilla & Vanilla Shuffled generators
+    public void Shorten(Random random, int roomCount)
     {
         ValidateRoomConnections();
         int numRooms = AllRooms.Count;
 
-        int target = random.Next(numRooms / 2, (numRooms * 3) / 4) + 1;
         int rooms = numRooms;
         int tries = 0;
-        while (rooms > target && tries < 1000)
+        while (rooms > roomCount && tries < 1000)
         {
             //remove rooms without bias
             //don't remove important rooms
@@ -864,7 +991,7 @@ public partial class Palace
                 }
             }
         }
-        logger.Debug("Target: " + target + " Rooms: " + rooms);
+        logger.Debug("Target: " + roomCount + " Rooms: " + rooms);
     }
 
     public void RandomizeSmallItems(Random r, bool extraKeys)
@@ -1270,7 +1397,7 @@ public partial class Palace
         }
     }
 
-    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla)
+    public byte AssignMapNumbers(byte currentMap, bool isGP, bool isVanilla, int roomCount)
     {
         //I have no idea why this was here and it breaks stuff. For future removal.
         /*
@@ -1338,6 +1465,7 @@ public partial class Palace
         {
             room.Map = room.LinkedRoom!.Map;
         }
+        Debug.Assert(currentMap - Entrance!.Map <= roomCount);
         if(currentMap > 63)
         {
             throw new Exception("Map number has exceeded maximum");
