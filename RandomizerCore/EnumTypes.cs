@@ -723,6 +723,18 @@ public enum BossRoomMinDistance
     MAX = 24,
 }
 
+public enum PalaceLengthOption
+{
+    [Description("Short  (50%-75%)")]
+    SHORT = 0,
+    [Description("Medium (65%-85%)")]
+    MEDIUM = 1,
+    [Description("Full")]
+    FULL = 2,
+    [Description("Random (50%-115%)")]
+    RANDOM = 3
+}
+
 public enum PalaceItemRoomCount
 {
     [Description("Zero")]
@@ -806,6 +818,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> BossLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
+    public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
         = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM && i != PalaceStyle.RANDOM_NO_VANILLA_OR_SHUFFLE);

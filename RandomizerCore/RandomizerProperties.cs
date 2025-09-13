@@ -100,8 +100,8 @@ public class RandomizerProperties
     //Palaces
     [NotMapped]
     public PalaceStyle[] PalaceStyles { get; set; } = new PalaceStyle[7];
-    public bool ShortenNormalPalaces { get; set; }
-    public bool ShortenGP { get; set; }
+    [NotMapped]
+    public int[] PalaceLengths { get; set; } = new int[7];
     public int StartGems { get; set; }
     public bool RequireTbird { get; set; }
     public int DarkLinkMinDistance { get; set; }
