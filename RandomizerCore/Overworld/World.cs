@@ -2691,6 +2691,23 @@ public abstract class World
         return false;
     }
 
+    //Short term fix, right now linked locations aren't shuffled, and they are counted as reachable when
+    //their parent location is reachable, but the original location remains in the location list, creating
+    //a phantom reachability spot at the vanilla location.
+    //What _should_ happen is there should be a unified interface for updating locations that automicatically
+    //updates the coordinates, map, linked locations, etc. But that's more work than I want to do, so here's this lazy hack
+    public void SynchronizeLinkedLocations()
+    {
+        foreach (Location parent in AllLocations)
+        {
+            foreach (Location child in parent.Children)
+            {
+                child.Xpos = parent.Xpos;
+                child.Ypos = parent.Ypos;
+            }
+        }
+    }
+
     public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);

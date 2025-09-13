@@ -879,6 +879,15 @@ public sealed class EastHyrule : World
 
     public bool MakeValleyOfDeath()
     {
+        //DM passthrough locations
+        List<Location> passthroughLocations = [
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION1),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION2),
+            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION3),
+        ];
+        //Clean them up in case of data leakage (this is not hypothetical)
+        passthroughLocations.ForEach(i => i.Ypos = 0);
+
         //Pick a spot for the center of the GP hole
         int xmin = 21;
         int xmax = 41;
@@ -1520,19 +1529,18 @@ public sealed class EastHyrule : World
         }
 
         //Safety to ensure you can't enter a DM passthrough from the wrong direction, ending up in a mountain
-        List<Location> passthroughLocations = [
-            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION1),
-            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION2),
-            GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION3),
-        ];
         foreach (Location passthroughLocation in passthroughLocations)
         {
+            if(passthroughLocation.Ypos == 0 || passthroughLocation.Xpos == 0)
+            {
+                continue;
+            }
             foreach(Direction direction in DirectionExtensions.CARDINAL_DIRECTIONS)
             {
                 if (map[passthroughLocation.Ypos - 30 + direction.DeltaY(), passthroughLocation.Xpos + direction.DeltaX()] == Terrain.MOUNTAIN
                     && map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] != Terrain.MOUNTAIN)
                 {
-                    map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
+                    //map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
                 }
             }
         }

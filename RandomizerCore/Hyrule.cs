@@ -2122,6 +2122,7 @@ public class Hyrule
                     return;
                 }
 
+                worlds.ForEach(i => i.SynchronizeLinkedLocations());
 
                 //Then perform non-terrain shuffles looking for one that works.
                 nonTerrainShuffleAttempt = 0;
