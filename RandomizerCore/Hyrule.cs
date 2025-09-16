@@ -3092,6 +3092,7 @@ public class Hyrule
 
         foreach (Palace palace in palaces)
         {
+            palace.AssertItemRoomsAreUnique(ROMData);
             palace.ValidateRoomConnections();
             palace.WriteConnections(ROMData);
         }

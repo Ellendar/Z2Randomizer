@@ -7,7 +7,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using js65;
 using NLog;
-using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -37,9 +36,6 @@ public class Room : IJsonOnDeserialized
 
     internal Coord coords;
 
-    private const int sideview1 = 0x10533;
-    private const int sideview2 = 0x12010;
-    private const int sideview3 = 0x14533;
     public const int Group1ItemGetStartAddress = 0x17ba5;
     public const int Group2ItemGetStartAddress = 0x17bc5;
     public const int Group3ItemGetStartAddress = 0x17be5;
@@ -209,9 +205,9 @@ public class Room : IJsonOnDeserialized
         // var tableAddr = (ushort)(0x8000 + (byte)PalaceGroup * 0x40 * 2 + Map * 2);
         var tableAddr = PalaceGroup switch
         {
-            PalaceGrouping.Palace125 => sideview1,
-            PalaceGrouping.Palace346 => sideview2,
-            PalaceGrouping.PalaceGp => sideview3,
+            PalaceGrouping.Palace125 => RomMap.SIDEVIEW_PTR_TABLE_P125,
+            PalaceGrouping.Palace346 => RomMap.SIDEVIEW_PTR_TABLE_P346,
+            PalaceGrouping.PalaceGp => RomMap.SIDEVIEW_PTR_TABLE_GP,
             _ => throw new NotImplementedException(),
         };
         tableAddr += Map * 2;
@@ -731,6 +727,19 @@ public class Room : IJsonOnDeserialized
                 sideviewIndex++;
             }
         }
+    }
+
+    /// Get the ROM address for the room's sideview NES pointer
+    public int GetSideviewPtrRomAddr()
+    {
+        int basePtr = PalaceGroup switch
+        {
+            PalaceGrouping.Palace125 => RomMap.SIDEVIEW_PTR_TABLE_P125,
+            PalaceGrouping.Palace346 => RomMap.SIDEVIEW_PTR_TABLE_P346,
+            PalaceGrouping.PalaceGp => RomMap.SIDEVIEW_PTR_TABLE_GP,
+            _ => throw new NotImplementedException(),
+        };
+        return basePtr + Map * 2;
     }
 }
 

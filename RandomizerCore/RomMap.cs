@@ -7,6 +7,10 @@
 /// </summary>
 class RomMap
 {
+    public const int SIDEVIEW_PTR_TABLE_P125 = 0x10533;
+    public const int SIDEVIEW_PTR_TABLE_P346 = 0x12010;
+    public const int SIDEVIEW_PTR_TABLE_GP = 0x14533;
+
     //Start with item bytes
     public const int START_CANDLE = 0x17B01;
     public const int START_GLOVE = 0x17B02;
