@@ -383,6 +383,28 @@ public class Hyrule
                 { (Town)eastHyrule.townAtNewKasuto.ActualTown!, eastHyrule.townAtNewKasuto.Collectables[0] },
                 { (Town)eastHyrule.townAtOldKasuto.ActualTown!, eastHyrule.townAtOldKasuto.Collectables[0] },
             };
+
+            if (props.StartsWithCollectable(spellMap[Town.RUTO]))
+            {
+                ROMData.Put(0x17b14, 0x10); //Trophy
+            }
+            if (props.StartsWithCollectable(spellMap[Town.SARIA_NORTH]))
+            {
+                ROMData.Put(0x17b15, 0x01); //Mirror
+            }
+            if (props.StartsWithCollectable(spellMap[Town.MIDO_WEST]))
+            {
+                ROMData.Put(0x17b16, 0x40); //Medicine
+            }
+            if (props.StartsWithCollectable(spellMap[Town.NABOORU]))
+            {
+                ROMData.Put(0x17b17, 0x01); //Water
+            }
+            if (props.StartsWithCollectable(spellMap[Town.DARUNIA_WEST]))
+            {
+                ROMData.Put(0x17b18, 0x20); //Child
+            }
+
             f = await UpdateProgress(progress, ct, 9);
             if (!f)
             {
@@ -2989,106 +3011,6 @@ public class Hyrule
             ROMData.Put(ROM.ChrRomOffset + 0x17800 + i, heartByte);
             ROMData.Put(ROM.ChrRomOffset + 0x19800 + i, heartByte);
         }
-
-        /*
-        //If medicine/trophy/child are in a bank they usually aren't, the graphics are missing/wrong
-        //so we need to correct that
-
-        //ATTENTION: I ended up just adding the 3 spell items to the custom CHR at F3/F5/FD because
-        //none of this worked anymore now that the assembler is relocating the item tile table
-        //likely to be removed later
-
-        Location? medicineLoc = itemLocs.FirstOrDefault(i => i.Collectable == Collectable.MEDICINE);
-        Location? trophyLoc = itemLocs.FirstOrDefault(i => i.Collectable == Collectable.TROPHY);
-        Location? kidLoc = itemLocs.FirstOrDefault(i => i.Collectable == Collectable.CHILD);
-
-        byte[] medicineSprite = ROMData.GetBytes(ROM.ChrRomOffs + 0x3300, 32);
-        byte[] trophySprite = ROMData.GetBytes(ROM.ChrRomOffs + 0x32e0, 32);
-        byte[] kidSprite = ROMData.GetBytes(ROM.ChrRomOffs + 0x5300, 32);
-
-        //This should be possible O(1) by referencing location.World, but it has issues so for now we deal with
-        //the minor inefficency
-        bool medicineEast = medicineLoc != null && (eastHyrule.AllLocations.Contains(medicineLoc) || mazeIsland.AllLocations.Contains(medicineLoc));
-        bool trophyEast = trophyLoc != null && (eastHyrule.AllLocations.Contains(trophyLoc) || mazeIsland.AllLocations.Contains(trophyLoc));
-        bool kidWest = kidLoc != null && (westHyrule.AllLocations.Contains(kidLoc) || deathMountain.AllLocations.Contains(kidLoc));
-
-        //medicine east and not an east palace
-        if (medicineEast
-            && eastHyrule.locationAtPalace5.Collectable != Collectable.MEDICINE
-            && eastHyrule.locationAtPalace6.Collectable != Collectable.MEDICINE
-            && mazeIsland.locationAtPalace4.Collectable != Collectable.MEDICINE)
-        {
-            ROMData.Put(ROM.ChrRomOffs + 0x5420, medicineSprite);
-            ROMData.Put(0x1eeb9, 0x43);
-            ROMData.Put(0x1eeba, 0x43);
-        }
-        //trophy east
-        if (trophyEast)
-        {
-            ROMData.Put(ROM.ChrRomOffs + 0x5400, trophySprite);
-            ROMData.Put(0x1eeb7, 0x41);
-            ROMData.Put(0x1eeb8, 0x41);
-        }
-        //kidwest and not a west palace
-        if (kidWest
-            && westHyrule.locationAtPalace1.Collectable != Collectable.CHILD
-            && westHyrule.locationAtPalace2.Collectable != Collectable.CHILD
-            && westHyrule.locationAtPalace3.Collectable != Collectable.CHILD)
-        {
-            ROMData.Put(ROM.ChrRomOffs + 0x3560, kidSprite);
-            ROMData.Put(0x1eeb5, 0x57);
-            ROMData.Put(0x1eeb6, 0x57);
-        }
-
-        //trophy in town bank
-        if (eastHyrule.townAtNewKasuto.Collectable == Collectable.TROPHY || eastHyrule.spellTower.Collectable == Collectable.TROPHY)
-        {
-            ROMData.Put(ROM.ChrRomOffs + 0x7200, trophySprite);
-            ROMData.Put(0x1eeb7, 0x21);
-            ROMData.Put(0x1eeb8, 0x21);
-        }
-        //medicine in town bank
-        if (eastHyrule.townAtNewKasuto.Collectable == Collectable.MEDICINE || eastHyrule.spellTower.Collectable == Collectable.MEDICINE)
-        {
-            ROMData.Put(ROM.ChrRomOffs + 0x7220, medicineSprite);
-            ROMData.Put(0x1eeb9, 0x23);
-            ROMData.Put(0x1eeba, 0x23);
-        }
-        //kid in town bank
-        if (eastHyrule.townAtNewKasuto.Collectable == Collectable.CHILD || eastHyrule.spellTower.Collectable == Collectable.CHILD)
-        {
-            ROMData.Put(ROM.ChrRomOffs + 0x7240, kidSprite);
-            ROMData.Put(0x1eeb5, 0x25);
-            ROMData.Put(0x1eeb6, 0x25);
-        }
-
-        Location[] allPalaces = [
-            westHyrule.locationAtPalace1,
-            westHyrule.locationAtPalace2,
-            westHyrule.locationAtPalace3,
-            mazeIsland.locationAtPalace4,
-            eastHyrule.locationAtPalace5,
-            eastHyrule.locationAtPalace6,
-            eastHyrule.locationAtGP
-        ];
-
-        int palaceMemBase = ROM.ChrRomOffs + 0x7AC0;
-        Dictionary<Collectable, (byte[], int)> spritesByCollectable = new()
-        {
-            [Collectable.TROPHY] = (trophySprite, 0x1eeb7),
-            [Collectable.MEDICINE] = (medicineSprite, 0x1eeb9),
-            [Collectable.CHILD] = (kidSprite, 0x1eeb5)
-        };
-
-        foreach (Location palace in allPalaces)
-        {
-            if (spritesByCollectable.ContainsKey(palace.Collectable))
-            {
-                ROMData.Put(palaceMemBase + 0x2000 * palace.PalaceNumber, spritesByCollectable[palace.Collectable].Item1) ;
-                ROMData.Put(spritesByCollectable[palace.Collectable].Item2, [0xAD, 0xAD]);
-            }
-        }
-        */
 
         foreach (Palace palace in palaces)
         {
