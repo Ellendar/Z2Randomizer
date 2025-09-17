@@ -130,11 +130,6 @@ public class ROM
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
-    //TODO: rename these to be sensible
-    private const int sideview1 = 0x10533;
-    private const int sideview2 = 0x12010;
-    private const int sideview3 = 0x14533;
-
     //On second thought, all text processing should be moved to customTexts.
     /*
     private readonly Dictionary<Town, int> spellTextPointers = new()
@@ -273,13 +268,24 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
     public static int ConvertNesPtrToPrgRomAddr(int bank, int nesPtr)
     {
         Debug.Assert(nesPtr >= 0x8000, "Non-PRG pointers (like SRAM) are not supported here");
-        if (bank < 0x10)
+        switch (bank)
         {
-            return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
-        }
-        else
-        {
-            return nesPtr - 0x8000 + bank * 0x2000 + RomHdrSize;
+            case < 0x07:
+                return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
+            case 0x07:
+                return nesPtr - 0xC000 + bank * 0x4000 + RomHdrSize;
+            case < 0x10:
+                throw new NotImplementedException();
+            case < 0x1d:
+                return nesPtr - 0x8000 + bank * 0x2000 + RomHdrSize;
+            case 0x1d:
+                return nesPtr - 0xA000 + bank * 0x2000 + RomHdrSize;
+            case 0x1e:
+                return nesPtr - 0xC000 + bank * 0x2000 + RomHdrSize;
+            case 0x1f:
+                return nesPtr - 0xE000 + bank * 0x2000 + RomHdrSize;
+            default:
+                throw new NotImplementedException();
         }
     }
 
@@ -2295,43 +2301,35 @@ ResetRedPalettePayload:
             }
         }
     }
+
     public void UpdateItem(Collectable item, Room room)
     {
+        int sideviewPtrAddr = room.GetSideviewPtrRomAddr();
+        int sideviewNesPtr = GetShort(sideviewPtrAddr + 1, sideviewPtrAddr);
         // Sideview data is moved to the expanded banks at $1c/$1d
-        var baseAddr = sideview1;
-        if (room.PalaceGroup == PalaceGrouping.Palace346)
-        {
-            baseAddr = sideview2;
-        }
+        // Currently no palace rooms are added to bank 7 but keeping this anyway.
+        // Using $1c for both works because $1d address range is directly followed by $1c.
+        int sideviewBank = sideviewNesPtr >= 0xC000 ? 0x7 : 0x1c;
+        int sideviewRomPtr = ConvertNesPtrToPrgRomAddr(sideviewBank, sideviewNesPtr);
 
-        int sideViewPtr = GetByte(baseAddr + room.Map * 2) | (GetByte(baseAddr + 1 + room.Map * 2) << 8);
-
-        // Start of the segment memory address is $8000, so offset for that
-        sideViewPtr -= 0x8000;
-        // If the address is is >= 0xc000 then its in the fixed bank so we want to add 0x1c010 to get the fixed bank
-        // otherwise we want to use the bank offset for PRG4 (0x10000)
-        // sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x10000;
-        sideViewPtr += sideViewPtr >= 0x4000 ? (0x1c000 - 0x4000) : 0x38000;
-        sideViewPtr += 0x10; // Add the offset for the iNES header
-        byte sideviewLength = GetByte(sideViewPtr);
+        byte sideviewLength = GetByte(sideviewRomPtr);
         int offset = 4;
 
         do
         {
-            int yPos = GetByte(sideViewPtr + offset++);
+            int yPos = GetByte(sideviewRomPtr + offset++);
             yPos = (byte)(yPos & 0xF0);
             yPos = (byte)(yPos >> 4);
-            int byte2 = GetByte(sideViewPtr + offset++);
+            int byte2 = GetByte(sideviewRomPtr + offset++);
 
             if (yPos >= 13 || byte2 != 0x0F) continue;
-            int byte3 = GetByte(sideViewPtr + offset++);
+            int byte3 = GetByte(sideviewRomPtr + offset++);
 
             if (((Collectable)byte3).IsMinorItem()) continue;
-            Put(sideViewPtr + offset - 1, (byte)item);
+            Put(sideviewRomPtr + offset - 1, (byte)item);
             return;
         } while (offset < sideviewLength);
         logger.Warn($"Could not write Collectable {item} to Item room {room.GetDebuggerDisplay()} in palace {room.PalaceNumber}");
         //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
 }
-

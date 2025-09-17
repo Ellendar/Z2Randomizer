@@ -1155,7 +1155,7 @@ public class Hyrule
         // int enemyAddr = Enemies.NormalPalaceEnemyAddr;
         Dictionary<byte[], List<Room>> sideviews = new(new Util.StandardByteArrayEqualityComparer());
         Dictionary<byte[], List<Room>> sideviewsgp = new(new Util.StandardByteArrayEqualityComparer());
-        foreach (Room room in palaces.Where(palace => palace.Number < 7).SelectMany(palace => palace.AllRooms))
+        foreach (Room room in palaces.Where(palace => palace.Number < 7).SelectMany(palace => palace.AllRooms).Where(room => room.Enabled))
         {
             if (sideviews.TryGetValue(room.SideView, out var value))
             {
@@ -1166,7 +1166,7 @@ public class Hyrule
                 sideviews.Add(room.SideView, [room]);
             }
         }
-        foreach (Room room in palaces.Where(palace => palace.Number == 7).SelectMany(palace => palace.AllRooms))
+        foreach (Room room in palaces.Where(palace => palace.Number == 7).SelectMany(palace => palace.AllRooms).Where(room => room.Enabled))
         {
             if (sideviewsgp.TryGetValue(room.SideView, out var value))
             {
@@ -3092,6 +3092,7 @@ public class Hyrule
 
         foreach (Palace palace in palaces)
         {
+            palace.AssertItemRoomsAreUnique(ROMData);
             palace.ValidateRoomConnections();
             palace.WriteConnections(ROMData);
         }
