@@ -57,7 +57,9 @@
                         <Separator />
                         <MenuItem Header="Beginner Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static presets:BeginnerPreset.Preset}}"/>
-                        <MenuItem Header="Standard Preset" Command="{Binding LoadPreset}"
+                        <MenuItem Header="Normal Preset" Command="{Binding LoadPreset}"
+                                  CommandParameter="{Binding Source={x:Static presets:NormalPreset.Preset}}"/>
+                        <MenuItem Header="Standard Tournament Preset (TBD)" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
                         <MenuItem Header="Full Shuffle Preset" Command="{Binding LoadPreset}"
                                   CommandParameter="{Binding Source={x:Static presets:FullShufflePreset.Preset}}"/>

@@ -3,38 +3,40 @@ using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class BeginnerPreset
+public static class NormalPreset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
         StartWithCandle = true,
-        StartWithLife = true,
         ShuffleStartingItems = false,
         ShuffleStartingSpells = false,
         MaxHeartContainers = MaxHeartsOption.EIGHT,
         StartingHeartContainersMin = 4,
         StartingHeartContainersMax = 4,
-        StartingTechniques = StartingTechs.DOWNSTAB,
-        StartingLives = StartingLives.Lives5,
+        StartingTechniques = StartingTechs.NONE,
+        StartingLives = StartingLives.Lives3,
         IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
-        PalacesCanSwapContinents = false,
-        ShuffleGP = false,
+        PalacesCanSwapContinents = true,
+        ShuffleGP = true,
         ShuffleEncounters = false,
         AllowUnsafePathEncounters = false,
         IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
-        RiverDevilBlockerOption = RiverDevilBlockerOption.PATH,
-        EastRocks = false,
+        RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
+        EastRocks = true,
         GenerateBaguWoods = false,
         HideLessImportantLocations = true,
         RestrictConnectionCaveShuffle = true,
-        AllowConnectionCavesToBeBlocked = false,
+        AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
-        HidePalace = false,
-        HideKasuto = false,
+        HidePalace = null,
+        HideKasuto = null,
+        ShuffleWhichLocationIsHidden = false,
+        ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
+
         Climate = Climates.Classic,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
@@ -48,7 +50,7 @@ public static class BeginnerPreset
         ShortenGP = true,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev4_4Rooms = false,
+        Includev4_4Rooms = true,
         TBirdRequired = true,
         RemoveTBird = false,
         PalacesToCompleteMin = 6,
@@ -60,20 +62,25 @@ public static class BeginnerPreset
         RandomizeBossItemDrop = false,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
-        BlockingRoomsInAnyPalace = false,
+        BlockingRoomsInAnyPalace = true,
         HardBosses = false,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
         DarkLinkMinDistance = BossRoomMinDistance.SHORT,
 
         //Levels
+        ShuffleAttackExperience = true,
+        ShuffleMagicExperience = true,
+        ShuffleLifeExperience = true,
+
         AttackLevelCap = 8,
         MagicLevelCap = 8,
         LifeLevelCap = 8,
-        AttackEffectiveness = AttackEffectiveness.HIGH,
-        MagicEffectiveness = MagicEffectiveness.LOW_COST,
-        LifeEffectiveness = LifeEffectiveness.HIGH,
+        AttackEffectiveness = AttackEffectiveness.AVERAGE,
+        MagicEffectiveness = MagicEffectiveness.AVERAGE,
+        LifeEffectiveness = LifeEffectiveness.AVERAGE,
 
         //Spells
+        ShuffleLifeRefillAmount = false,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = false,
@@ -87,7 +94,11 @@ public static class BeginnerPreset
         MixLargeAndSmallEnemies = false,
         GeneratorsAlwaysMatch = true,
 
-        EnemyXPDrops = XPEffectiveness.RANDOM_HIGH,
+        ShuffleEnemyHP = true,
+        ShuffleXPStealers = true,
+        ShuffleXPStolenAmount = true,
+        ShuffleSwordImmunity = true,
+        EnemyXPDrops = XPEffectiveness.RANDOM,
 
         //Items
         ShufflePalaceItems = true,
@@ -95,13 +106,13 @@ public static class BeginnerPreset
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
         IncludeSwordTechsInShuffle = false,
-        IncludeQuestItemsInShuffle = false,
+        IncludeQuestItemsInShuffle = true,
         IncludeSpellsInShuffle = false,
 
         ShuffleSmallItems = true,
         RemoveSpellItems = false,
         ShufflePBagAmounts = false,
-        PalacesContainExtraKeys = true,
+        PalacesContainExtraKeys = false,
         RandomizeNewKasutoJarRequirements = true,
         AllowImportantItemDuplicates = false,
 

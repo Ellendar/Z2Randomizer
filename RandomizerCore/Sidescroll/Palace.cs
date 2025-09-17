@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
+using static Z2Randomizer.RandomizerCore.Util;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -1205,6 +1206,31 @@ public partial class Palace
         } while (gettableItems.Count != previousGettableItems.Count);
 
         return gettableItems;
+    }
+
+    [Conditional("DEBUG")]
+    public void AssertItemRoomsAreUnique(ROM rom)
+    {
+        var sideviewComparer = new StandardByteArrayEqualityComparer();
+        HashSet<byte[]> usedBytes = new(sideviewComparer);
+        foreach (var room in ItemRooms)
+        {
+            if (!usedBytes.Add(room.SideView))
+            {
+                Debug.Assert(false, "Item rooms share sideview bytes");
+            }
+        }
+
+        HashSet<int> usedPtrs = new();
+        foreach (var room in ItemRooms)
+        {
+            int sideviewPtrAddr = room.GetSideviewPtrRomAddr();
+            int sideviewNesPtr = rom.GetShort(sideviewPtrAddr + 1, sideviewPtrAddr);
+            if (!usedPtrs.Add(sideviewNesPtr))
+            {
+                Debug.Assert(false, "Item rooms share pointer");
+            }
+        }
     }
 
     public void ValidateRoomConnections()
