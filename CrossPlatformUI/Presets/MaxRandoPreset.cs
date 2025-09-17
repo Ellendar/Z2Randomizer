@@ -56,7 +56,7 @@ public static class MaxRandoPreset
         PalacesToCompleteMin = 0,
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
-        Global5050JarDrop = false,
+        Global5050JarDrop = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,

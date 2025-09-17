@@ -65,7 +65,7 @@ public static class StandardPreset
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.ONE,
-        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
+        DarkLinkMinDistance = BossRoomMinDistance.SHORT,
 
         //Levels
         ShuffleAttackExperience = true,

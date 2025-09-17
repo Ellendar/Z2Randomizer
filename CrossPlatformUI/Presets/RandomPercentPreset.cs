@@ -57,6 +57,7 @@ public static class RandomPercentPreset
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = null,
+        ReduceDripperVariance = false,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
