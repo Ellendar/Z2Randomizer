@@ -24,9 +24,9 @@ public abstract class World
     public IReadOnlyList<int> overworldEncounterMapDuplicate { get; protected set; } = [];
     public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
-    protected Terrain[,] map;
-    protected int MAP_ROWS;
-    protected int MAP_COLS;
+    public Terrain[,] map;
+    public int MAP_ROWS;
+    public int MAP_COLS;
     protected List<Terrain> randomTerrainFilter;
     protected List<Terrain> walkableTerrains;
     protected bool[,] visitation;
