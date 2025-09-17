@@ -115,10 +115,6 @@ WorldNumber = $0707
 ClearNametables = $d266
 JumpEngine = $d385
 
-; These are new variables that use free memory
-PpuCtrlForIrq = $06c7
-ScrollPosForIrq = $06c8
-
 ;; Collectable items
 ; Hardcoded list of item ids for the new global item table.
 ; These should match the constants from the Collectables Enum
@@ -179,6 +175,10 @@ RESV InternalState
 RESV GameComplete ; set when you beat the game to stop the timers
 RESV ElevatorYStart
 RESV DripperRedCounter
+RESV PpuCtrlForIrq
+RESV ScrollPosForIrq
+
+.assert RES_BASE + RES_OFFSET < $01ad
 
 ;; Stat tracking variables in SRAM
 
