@@ -241,7 +241,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             return palace;
         }
 
-        if (allRooms.Count - allRooms.Count(i => i.Value.LinkedRoomName != null && i.Value.Enabled) != roomCount)
+        if (allRooms.Count - allRooms.Count(i => i.Value.LinkedRoomName != null && !i.Value.Enabled) != roomCount)
         {
             throw new Exception("Generated palace has the incorrect number of rooms");
         }

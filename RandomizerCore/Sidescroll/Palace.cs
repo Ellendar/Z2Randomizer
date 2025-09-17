@@ -1227,8 +1227,13 @@ public partial class Palace
             }
             if (room.Up != null && (!AllRooms.Contains(room.Up) || !room.HasUpExit))
             {
+                //This should have been fixed by the palace generation, but it's not going to break anything
+                //so don't bother warning
+                if (!(room.Up.HasDrop && room.IsDropZone))
+                {
+                    logger.Warn("Invalid Room connection removed");
+                }
                 room.Up = null;
-                logger.Warn("Invalid Room connection removed");
             }
             if (room.Down != null && (!AllRooms.Contains(room.Down) || !room.HasDownExit))
             {
