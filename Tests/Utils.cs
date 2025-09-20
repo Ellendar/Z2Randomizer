@@ -76,28 +76,13 @@ public class Utils
     [TestMethod]
     public void GameText()
     {
-        List<char> text = Util.ToGameText("saved", false);
-        byte[] bytes = new byte[text.Count];
-        for(int i = 0; i < bytes.Length; i++) 
-        {
-            bytes[i] = (byte)text[i];
-        }
+        byte[] bytes = Util.ToGameText("saved", false);
         Debug.WriteLine(Util.ByteArrayToHexString(bytes));
-        text = Util.ToGameText("hyrule", false);
-        bytes = new byte[text.Count];
-        for (int i = 0; i < bytes.Length; i++)
-        {
-            bytes[i] = (byte)text[i];
-        }
+        bytes = Util.ToGameText("hyrule", false);
         Debug.WriteLine(Util.ByteArrayToHexString(bytes));
 
         byte[] fromRom = [0x60, 0xF2, 0xE8, 0xEE, 0x00, 0xEC, 0xDA, 0xEF, 0xDE, 0xDD, 0x00, 0xE1, 0xF2, 0xEB, 0xEE, 0xE5];
-        char[] chars = new char[text.Count];
-        for (int i = 0; i < bytes.Length; i++)
-        {
-            chars[i] = (char)text[i];
-        }
-        Debug.WriteLine(Util.FromGameText(chars));
+        Debug.WriteLine(Util.FromGameText(bytes));
     }
 
     [TestMethod]

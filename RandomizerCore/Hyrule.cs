@@ -491,7 +491,7 @@ public class Hyrule
 
             var z2Hash = ConvertHash(hash);
             ROMData.Put(0x17C2C, z2Hash);
-            Hash = Util.FromGameText(z2Hash.Select(x => (char)x));
+            Hash = Util.FromGameText(z2Hash);
 
             /*
             if (UNSAFE_DEBUG)
@@ -3948,7 +3948,7 @@ EndTileComparisons = $8601
             var hint = hints[i];
             a.Reloc();
             a.Label($"HintText{i}");
-            a.Byt(hint.EncodedText.Select(c => (byte)c).ToArray());
+            a.Byt(hint.EncodedText);
         }
 
         a.Reloc();

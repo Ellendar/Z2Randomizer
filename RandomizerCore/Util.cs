@@ -18,67 +18,84 @@ public class Util
         return (byte)(((b * 0x80200802ul) & 0x0884422110ul) * 0x0101010101ul >> 32);
     }
 
-    public static List<char> ToGameText(string rawText, bool endByte = false)
+    public static byte[] ToGameText(string rawText, bool endByte = false)
     {
-        List<char> rawTextChars = rawText.ToUpper().ToCharArray().ToList();
-        StringBuilder output = new StringBuilder();
-        for (int i = 0; i < rawTextChars.Count; i++)
+        char[] rawTextChars = rawText.ToUpper().ToCharArray();
+        List<byte> output = new List<byte>();
+
+        for (int i = 0; i < rawTextChars.Length; i++)
         {
-            if (rawTextChars[i] >= '0' && rawTextChars[i] <= '9')
-                output.Append((char)(rawTextChars[i] + 0xA0));
-            else if (rawTextChars[i] >= 'A' && rawTextChars[i] <= 'Z')
-                output.Append((char)(rawTextChars[i] + 0x99));
-            else output.Append(rawTextChars[i] switch
+            char c = rawTextChars[i];
+            if (c >= '0' && c <= '9')
+            { 
+                output.Add((byte)(c + 0xA0));
+            }
+            else if (c >= 'A' && c <= 'Z')
+            { 
+                output.Add((byte)(c + 0x99));
+            }
+            else
             {
-                '.' => (char)0xcf,
-                '/' => (char)0xce,
-                ',' => (char)0x9c,
-                '!' => (char)0x36,
-                '?' => (char)0x34,
-                '*' => (char)0x32,
-                ' ' => (char)0xf4,
-                '\n' => (char)0xfd,
-                '$' => (char)0xfd,
-                '-' => (char)0xf6,
-                '_' => (char)0xc5,
-                _ => ""
-            });
+                switch (c)
+                {
+                    case '.': output.Add(0xcf); break;
+                    case '/': output.Add(0xce); break;
+                    case ',': output.Add(0x9c); break;
+                    case '!': output.Add(0x36); break;
+                    case '?': output.Add(0x34); break;
+                    case '*': output.Add(0x32); break;
+                    case ' ': output.Add(0xf4); break;
+                    case '\n': output.Add(0xfd); break;
+                    case '$': output.Add(0xfd); break;
+                    case '-': output.Add(0xf6); break;
+                    case '_': output.Add(0xc5); break;
+                    default: break; // ignore unknown characters
+                }
+            }
         }
         if (endByte)
         {
-            output.Append((char)textEndByte);
+            output.Add((byte)textEndByte);
         }
 
-        return output.ToString().ToCharArray().ToList();
+        return output.ToArray();
     }
 
-    public static string FromGameText(IEnumerable<char> rawText)
+    public static string FromGameText(IEnumerable<byte> bytes)
     {
         StringBuilder output = new StringBuilder();
-        foreach(char rawChar in rawText)
+        foreach (byte b in bytes)
         {
-            if (rawChar >= 0xD0 && rawChar <= 0xD9)
-                output.Append((char)(rawChar - 0xA0));
-            else if (rawChar >= 0xda && rawChar <= 0xF3)
-                output.Append((char)(rawChar - 0x99));
-            else output.Append((int)rawChar switch
+            if (b >= 0xD0 && b <= 0xD9)
             {
-                0xcf => '.',
-                0xce => '/',
-                0x9c => ',',
-                0x36 => '!',
-                0x34 => '?',
-                0x32 => '*',
-                0xf4 => ' ',
-                0xfd => '$',
-                0xf6 => '-',
-                0xc5 => '_',
-                _ => ""
-            });
+                output.Append((char)(b - 0xA0));
+            }
+            else if (b >= 0xDA && b <= 0xF3)
+            {
+                output.Append((char)(b - 0x99));
+            }
+            else
+            {
+                switch (b)
+                {
+                    case 0xcf: output.Append('.'); break;
+                    case 0xce: output.Append('/'); break;
+                    case 0x9c: output.Append(','); break;
+                    case 0x36: output.Append('!'); break;
+                    case 0x34: output.Append('?'); break;
+                    case 0x32: output.Append('*'); break;
+                    case 0xf4: output.Append(' '); break;
+                    case 0xfd: output.Append('$'); break;
+                    case 0xf6: output.Append('-'); break;
+                    case 0xc5: output.Append('_'); break;
+                    default: break; // ignore unknown bytes
+                }
+            }
         }
 
         return output.ToString();
     }
+
     public static void Swap(Location p1, Location p2)
     {
         //(p2.Continent, p1.Continent) = (p1.Continent, p2.Continent);

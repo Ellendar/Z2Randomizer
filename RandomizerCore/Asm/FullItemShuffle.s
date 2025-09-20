@@ -169,15 +169,16 @@ TownToItemTable:
 ; inside the houses which use the sign object in vanilla. For consistency sake, we change the signs in the
 ; houses to the "invisible dialog" object $0c
 
-.org $89a8
-    .byte $0c | $80 ; Update Darunia hint sign to an invis dialog object (at Y=8)
-.org $a2e5
-    .byte $19 ; And use the original "sign" hint text that we moved
+.org $88fd          ; This is inside town map 10 (Mido middle) sideview
+    .byte $40 | $0c ; Change *closed* Mido Church door to an invis dialog object (=$0c) ($40 = on page 1)
 
-.org $89a8
-    .byte $0c | $80 ; Update Old kasuto hint sign to an invis dialog object (at Y=9)
+; On the East continent, invisible dialog objects read from
+; $a2dc + Y where Y = 8 + (town_code & 0x3)
+
+.org $89bf          ; This is inside town map 35 (A house inside Old Kasuto) sideview
+    .byte $c0 | $0c ; Change hint sign to an invis dialog object (=$0c) ($c0 = on page 3)
 .org $a2e7
-    .byte $16 ; And use the original "sign" hint text that we moved
+    .byte $16       ; Use the original Old Kasuto "sign" hint text that we moved
 
 
 .segment "PRG7"

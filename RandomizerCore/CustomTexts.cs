@@ -10,18 +10,28 @@ public class CustomTexts
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private static readonly int[] rauruHints = [32, 12, 30]; //Three houses, first screen
-    private static readonly int[] rutoHints = [18, 33, 25, 26]; //error is 25 and 26, two houses, outside left
-    private static readonly int[] sariaHints = [50, 28];//moving middle screen, sleeping thing, stationary right
-    private static readonly int[] kingsTomb = [51];
-    private static readonly int[] midoHints = [45];//moving old lady left, moving kid middle, inside house right
-    private static readonly int[] nabooruHints = [67, 64, 97];//inside house right, moving bagu middle, stationary left, moving left, persistent left
-    private static readonly int[] daruniaHints = [77, 73]; //wall first screen, outside last screen
-    private static readonly int[] newkasutoHints = [83, 68, 92]; //outside first screen, wall first screen
-    private static readonly int[] oldkasutoHint = [74];
+    private const int errorTextIndex1 = 25; // Error inside house on 1st screen in Ruto, 1st message
+    private const int errorTextIndex2 = 26; // Error 2nd message
 
-    private static readonly int[] rauruMoving = [9, 10,];
-    private static readonly int[] rutoMoving = [19, 17];
+    private const int talkingBotIndexSleeping = 49; // Sleeping Bot in Saria inside house on 2nd screen, Zzz... message the first 3 talks
+    private const int talkingBotIndexTalking = 50; // Sleeping Bot final message
+
+    private const int talkingAcheIndexSleeping = 85; // Ache in Nabooru inside house on 3rd screen, ***** message the first 3 talks
+    private const int talkingAcheIndexTalking = 97; // Ache final message
+
+    private static readonly int[] rauruHints = [32 /* lady outside on 1st screen */, 30 /* man inside house on 1st screen */, 12 /* kid inside house on 2nd screen */];
+    private static readonly int[] rutoHints = [errorTextIndex1, 18 /* lady outside on 2nd screen */, 33 /* woman inside on 2nd screen */];
+    private static readonly int[] sariaHints = [28 /* greeting man at town entrance */, talkingBotIndexTalking];
+    private static readonly int[] midoHints = [45 /* man inside house on 1st screen */];
+    private static readonly int[] kingsTomb = [51];
+
+    private static readonly int[] nabooruHints = [67 /* man inside house on 1st screen */, 64 /* lady outside on 3rd screen */, talkingAcheIndexTalking];
+    private static readonly int[] daruniaHints = [/* 77 text on wall inside house on 1st screen (removed), */ 73 /* kid outside on 3rd screen */];
+    private static readonly int[] newkasutoHints = [83 /* greeting lady at town entrance */, 68 /* text on wall inside house on 1st screen */, /*92 unreachable Lady in Magic Container house (removed) */];
+    private static readonly int[] oldkasutoHint = [74 /* readable wall inside last house on 2nd screen */];
+
+    private static readonly int[] rauruMoving = [9, 10];
+    private static readonly int[] rutoMoving = [17, 19];
     private static readonly int[] sariaMoving = [27];
     private static readonly int[] movingMido = [40, 39];
     private static readonly int[] movingNabooru = [61, 60];
@@ -57,10 +67,14 @@ public class CustomTexts
     private const int MAX_TEXT_LENGTH = 3134;
     private const int numberOfTextEntries = 98;
     //TODO: This should just be a listing of every text index by continent, but for now it's a pile.
+    private const int westAlreadyGotItemTextIndex = 16;
+    private const int eastAlreadyGotItemTextIndex = 71;
     private const int bridgeTextIndex = 37;
     private const int riverManTextIndex = 36;
-    //private const int downstabTextIndex = 47;
-    //private const int upstabTextIndex = 82;
+    private const int downstabClosedDoorTextIndex = 42;
+    private const int downstabGuyGotItemTextIndex = 47;
+    private const int upstabClosedDoorTextIndex = 78;
+    private const int upstabGuyGotItemTextIndex = 82;
     private const int trophySpellHintIndex = 13;
     private const int medicineSpellHintIndex = 43;
     private const int childSpellHintIndex = 79;
@@ -73,9 +87,6 @@ public class CustomTexts
 
     private const int HELPFUL_HINTS_COUNT = 4;
 
-    private const int errorTextIndex1 = 25;
-    private const int errorTextIndex2 = 26;
-
     //private static readonly Dictionary<Town, int> spellTextIndexes = { 15, 24, 35, 46, 70, 81, 93, 96 };
     private static readonly Dictionary<Town, int> townWizardTextIndexes = new()
     {
@@ -83,9 +94,9 @@ public class CustomTexts
         { Town.RUTO, 24 },
         { Town.SARIA_NORTH, 35 },
         { Town.MIDO_WEST, 46 },
-        { Town.MIDO_CHURCH, 47 },
+        { Town.MIDO_CHURCH, downstabGuyGotItemTextIndex },
         { Town.NABOORU, 70 },
-        { Town.DARUNIA_ROOF, 82 },
+        { Town.DARUNIA_ROOF, upstabGuyGotItemTextIndex },
         { Town.DARUNIA_WEST, 81 },
         { Town.NEW_KASUTO, 93 },
         { Town.OLD_KASUTO, 96 },
@@ -97,10 +108,10 @@ public class CustomTexts
         { Collectable.JUMP_SPELL, 24 },
         { Collectable.LIFE_SPELL, 35 },
         { Collectable.FAIRY_SPELL, 46 },
-        { Collectable.DOWNSTAB, 47 },
+        { Collectable.DOWNSTAB, downstabGuyGotItemTextIndex },
         { Collectable.FIRE_SPELL, 70 },
         { Collectable.DASH_SPELL, 70 },
-        { Collectable.UPSTAB, 82 },
+        { Collectable.UPSTAB, upstabGuyGotItemTextIndex },
         { Collectable.REFLECT_SPELL, 81 },
         { Collectable.SPELL_SPELL, 93 },
         { Collectable.THUNDER_SPELL, 96 },
@@ -373,12 +384,11 @@ public class CustomTexts
         {
             if (props.ReplaceFireWithDash)
             {
-                texts[70] = new Text(Util.ToGameText("USE THIS$TO GO$FAST", true));
+                texts[70] = new Text("USE THIS$TO GO$FAST");
             }
             if (props.SwapUpAndDownStab)
             {
-                (texts[townWizardTextIndexes[Town.DARUNIA_ROOF]], texts[townWizardTextIndexes[Town.MIDO_CHURCH]]) =
-                    (texts[townWizardTextIndexes[Town.MIDO_CHURCH]], texts[townWizardTextIndexes[Town.DARUNIA_ROOF]]);
+                (texts[upstabGuyGotItemTextIndex], texts[downstabGuyGotItemTextIndex]) = (texts[downstabGuyGotItemTextIndex], texts[upstabGuyGotItemTextIndex]);
             }
             GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
 
@@ -420,6 +430,27 @@ public class CustomTexts
             {
                 texts[riverManTextIndex] = GenerateRiverManText(nonhashRNG);
             }
+
+            if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
+            {
+                var downstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.DOWNSTAB));
+                var upstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.UPSTAB));
+                if (downstabLoc != null)
+                {
+                    Text hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB);
+                    texts[downstabClosedDoorTextIndex] = hint;
+                }
+                if (upstabLoc != null)
+                {
+                    Text hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB);
+                    texts[upstabClosedDoorTextIndex] = hint;
+                }
+                if (props.SwapUpAndDownStab)
+                {
+                    (texts[upstabClosedDoorTextIndex], texts[downstabClosedDoorTextIndex]) = (texts[downstabClosedDoorTextIndex], texts[upstabClosedDoorTextIndex]);
+                }
+            }
+
             if (props.HelpfulHints)
             {
                 List<int> placedIndexes = GenerateHelpfulHints(texts, itemLocations, hashRNG, props);
@@ -494,7 +525,7 @@ public class CustomTexts
             }
         }
         hint += "WOODS";
-        Text baguHint = new Text(Util.ToGameText(hint, true));
+        Text baguHint = new Text(hint);
         return baguHint;
     }
 
@@ -636,6 +667,12 @@ public class CustomTexts
         List<Collectable> items = locations.SelectMany(i => i.Collectables).ToList();
         items = items.Where(i => !i.IsInternalUse()).ToList();
 
+        if (props.SpellItemHints && props.IncludeSwordTechsInShuffle)
+        {
+            items.Remove(Collectable.DOWNSTAB);
+            items.Remove(Collectable.UPSTAB);
+        }
+
         if (props.StartWithSpellItems || props.SpellItemHints)
         {
             items.Remove(Collectable.TROPHY);
@@ -656,7 +693,6 @@ public class CustomTexts
         }
         List<Collectable> hintCollectables = items.Where(i => !smallItems.Contains(i)).ToList();
         hintCollectables.FisherYatesShuffle(r);
-        hintsCount = Math.Min(hintsCount, hintCollectables.Count);
 
         if (props.IncludeSpellsInShuffle)
         {
@@ -664,10 +700,14 @@ public class CustomTexts
             criticalSpells = criticalSpells.Where(i => hintCollectables.Contains(i)).ToArray();
             if(criticalSpells.Length > 0)
             {
-                hintCollectables.Add(criticalSpells.Sample(r));
+                var collectableSpell = criticalSpells.Sample(r);
+                hintCollectables.Remove(collectableSpell);
+                hintCollectables.Insert(0, collectableSpell); // move important spell to the front
+                hintsCount++;
             }
         }
 
+        hintsCount = Math.Min(hintsCount, hintCollectables.Count);
         if (hintsCount > 0)
         {
             hintCollectables = hintCollectables.Take(hintsCount - 1).ToList();
@@ -686,17 +726,30 @@ public class CustomTexts
                 town = r.Next(9);
             }
             int index = hintIndexes[town][r.Next(hintIndexes[town].Length)];
-            if (index == errorTextIndex1 || index == errorTextIndex2)
+            switch (index)
             {
-                hints[errorTextIndex1] = hint;
-                hints[errorTextIndex2] = hint;
-                placedIndex.Add(errorTextIndex1);
-                placedIndex.Add(errorTextIndex2);
-            }
-            else
-            {
-                hints[index] = hint;
-                placedIndex.Add(index);
+                case errorTextIndex1:
+                    hints[errorTextIndex1] = hint;
+                    hints[errorTextIndex2] = hint;
+                    placedIndex.Add(errorTextIndex1);
+                    placedIndex.Add(errorTextIndex2);
+                    break;
+                case talkingBotIndexTalking:
+                    hints[talkingBotIndexSleeping] = hint;
+                    hints[talkingBotIndexTalking] = hint;
+                    placedIndex.Add(talkingBotIndexSleeping);
+                    placedIndex.Add(talkingBotIndexTalking);
+                    break;
+                case talkingAcheIndexTalking:
+                    hints[talkingAcheIndexSleeping] = hint;
+                    hints[talkingAcheIndexTalking] = hint;
+                    placedIndex.Add(talkingAcheIndexSleeping);
+                    placedIndex.Add(talkingAcheIndexTalking);
+                    break;
+                default:
+                    hints[index] = hint;
+                    placedIndex.Add(index);
+                    break;
             }
 
             placedTowns.Add(town);
@@ -757,10 +810,11 @@ public class CustomTexts
                 throw new Exception("Invalid town that is not a town");
             }
             Text wizardHint;
+            int tries = 0;
             do
             {
                 wizardHint = GenerateWizardText(vanillaText, r, location, useCommunityText);
-            } while (usedWizardTexts.Contains(wizardHint));
+            } while (useCommunityText && usedWizardTexts.Contains(wizardHint) && tries++ < 100);
             usedWizardTexts.Add(wizardHint);
             texts[townWizardTextIndexes[(Town)location.ActualTown]] = wizardHint;
         }
@@ -784,10 +838,17 @@ public class CustomTexts
 
     private static int TextLength(List<Text> texts)
     {
+        // assume js65 will optimize texts if they are the same, so ignore duplicates here
+        HashSet<Text> uniqueTexts = new();
+
         int sum = 0;
         for (int i = 0; i < texts.Count(); i++)
         {
-            sum += texts[i].EncodedText.Count;
+            var t = texts[i];
+            if (uniqueTexts.Add(t))
+            {
+                sum += t.EncodedText.Length;
+            }
         }
         return sum;
     }
