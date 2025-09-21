@@ -3453,17 +3453,17 @@ public class Hyrule
             //sb.AppendLine();
         }
 
-        sb.AppendLine("West:\n");
-        sb.AppendLine(westHyrule.GetReadableMap());
+        //sb.AppendLine("West:\n");
+        //sb.AppendLine(westHyrule.GetReadableMap());
 
-        sb.AppendLine("\nEast:\n");
-        sb.AppendLine(eastHyrule.GetReadableMap());
+        //sb.AppendLine("\nEast:\n");
+        //sb.AppendLine(eastHyrule.GetReadableMap());
 
-        sb.AppendLine("\nDeath Mountain:\n");
-        sb.AppendLine(deathMountain.GetReadableMap());
+        //sb.AppendLine("\nDeath Mountain:\n");
+        //sb.AppendLine(deathMountain.GetReadableMap());
 
-        sb.AppendLine("\nMaze Island:\n");
-        sb.AppendLine(mazeIsland.GetReadableMap());
+        //sb.AppendLine("\nMaze Island:\n");
+        //sb.AppendLine(mazeIsland.GetReadableMap());
 
         for(int i = 0; i < 6; i++)
         {

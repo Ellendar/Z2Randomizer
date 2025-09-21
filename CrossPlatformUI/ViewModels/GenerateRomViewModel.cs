@@ -91,8 +91,10 @@ Seed: {config.Seed}
                     await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
                     if (config.GenerateSpoiler)
                     {
-                        var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}.spoiler";
+                        var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.txt";
                         await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
+                        var spoilerMapFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.png";
+                        await files.SaveGeneratedBinaryFile(spoilerMapFilename, new Spoiler(randomizer.ROMData).CreateSpoilerImage(randomizer.worlds), Main.OutputFilePath);
                     }
                     ProgressHeading = "Generation Complete";
                     ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";

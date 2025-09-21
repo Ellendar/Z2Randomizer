@@ -50,6 +50,7 @@
     <PackageReference Include="NLog" Version="6.0.3" />
     <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
+    <PackageReference Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
   </ItemGroup>
 
   <ItemGroup>
