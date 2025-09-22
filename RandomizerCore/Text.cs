@@ -11,8 +11,10 @@ public class Text : IEquatable<Text>
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
+    protected static readonly IEqualityComparer<byte[]> byteArrayEqualityComparer = new Util.StandardByteArrayEqualityComparer();
+
     public string RawText { get; private set; }
-    public List<char> EncodedText { get; private set; }
+    public byte[] EncodedText { get; private set; }
 
     public Text()
     {
@@ -20,11 +22,12 @@ public class Text : IEquatable<Text>
         EncodedText = Util.ToGameText("I know$nothing", true);
     }
 
-    public Text(List<char> text)
+    public Text(byte[] bytes)
     {
-        RawText = Util.FromGameText(text);
-        EncodedText = text;
+        RawText = Util.FromGameText(bytes);
+        EncodedText = bytes;
     }
+
     public Text(string text)
     {
         RawText = text;
@@ -109,8 +112,7 @@ public class Text : IEquatable<Text>
 
     public bool Equals(Text? other)
     {
-        return other is not null &&
-               EqualityComparer<List<char>>.Default.Equals(EncodedText, other.EncodedText);
+        return other is not null && byteArrayEqualityComparer.Equals(EncodedText, other.EncodedText);
     }
 
     public override int GetHashCode()

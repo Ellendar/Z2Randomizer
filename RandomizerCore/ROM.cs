@@ -10,7 +10,6 @@ using js65;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -236,6 +235,19 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         return (GetByte(indexMsb) << 8) + GetByte(indexLsb);
     }
 
+    public byte[] GetTerminatedString(int index)
+    {
+        List<byte> bytes = new();
+        byte b;
+        do
+        {
+            b = GetByte(index++);
+            bytes.Add(b);
+        }
+        while (b != STRING_TERMINATOR);
+        return bytes.ToArray();
+    }
+
     public void Put(int index, byte data)
     {
         rawdata[index] = data;
@@ -407,24 +419,15 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
         List<Text> texts = [];
         for (int i = textPointerTableStart; i <= textAddrEndinROM; i += 2)
         {
-            List<char> t = [];
-            int addr = GetByte(i);
-            addr += (GetByte(i + 1) << 8);
+            int addr = GetShort(i + 1, i);
             addr += textAddrOffset;
-            int c = GetByte(addr);
-            while (c != STRING_TERMINATOR)
-            {
-                addr++;
-                t.Add((char)c);
-                c = GetByte(addr);
-            }
-            t.Add((char)0xFF);
+            var t = GetTerminatedString(addr);
             texts.Add(new Text(t));
-
         }
         return texts;
     }
 
+/*
     public void WriteHints(List<Text> texts)
     {
         int textptr = 0xE390;
@@ -446,6 +449,7 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
             }
         }
     }
+*/
 
     public void WritePalacePalettes(List<int[]> bricks, List<int[]> curtains, List<int> bRows, List<int> binRows)
     {
@@ -482,17 +486,11 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
 
     public void AddCredits()
     {
-        List<char> randoby = Util.ToGameText("RANDO BY  ", false);
-        for (int i = 0; i < randoby.Count; i++)
-        {
-            Put(creditsLineOneAddr + i, (byte)randoby[i]);
-        }
+        var randoby = Util.ToGameText("RANDO BY  ", false);
+        Put(creditsLineOneAddr, randoby);
 
-        List<char> digshake = Util.ToGameText("DIGSHAKE ", true);
-        for (int i = 0; i < digshake.Count; i++)
-        {
-            Put(creditsLineTwoAddr + i, (byte)digshake[i]);
-        }
+        var digshake = Util.ToGameText("DIGSHAKE ", true);
+        Put(creditsLineTwoAddr, digshake);
     }
 
     public void AddRandomizerToTitle(Assembler asm)
@@ -841,6 +839,14 @@ TitleEnd:
         // as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
         // keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5)
         Put(0x13ec1, [0xaa, 0xea]); // tax nop
+
+        // In vanilla Darunia there is written text on a wall inside one
+        // of the houses. With the changes for FullItemShuffle and changes
+        // to town signs, and there already being an invisible dialog hint at
+        // the Upstab closed door, there aren't any bytes left to put a
+        // text ID for this. Lets switch it to a person to talk to.
+        Put(0xC9b7, [0x7d, 0x91]); // Replace sign with purple kid at (45,9)
+        Put(0xE309, 0x19); // Put the old readable wall hint ID here
     }
 
     public void WriteKasutoJarAmount(int kasutoJars)
