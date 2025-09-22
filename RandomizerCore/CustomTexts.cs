@@ -26,7 +26,7 @@ public class CustomTexts
     private static readonly int[] kingsTomb = [51];
 
     private static readonly int[] nabooruHints = [67 /* man inside house on 1st screen */, 64 /* lady outside on 3rd screen */, talkingAcheIndexTalking];
-    private static readonly int[] daruniaHints = [/* 77 text on wall inside house on 1st screen (removed), */ 73 /* kid outside on 3rd screen */];
+    private static readonly int[] daruniaHints = [77 /* text on wall inside house on 1st screen */, 73 /* kid outside on 3rd screen */];
     private static readonly int[] newkasutoHints = [83 /* greeting lady at town entrance */, 68 /* text on wall inside house on 1st screen */, /*92 unreachable Lady in Magic Container house (removed) */];
     private static readonly int[] oldkasutoHint = [74 /* readable wall inside last house on 2nd screen */];
 
@@ -643,9 +643,21 @@ public class CustomTexts
         Text defaultKnowNothing = new();
         for (int i = 0; i < stationary.Count; i++)
         {
-            if (!placedIndexes.Contains(stationary[i]))
+            int textIndex = stationary[i];
+            if (!placedIndexes.Contains(textIndex))
             {
-                hints[stationary[i]] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
+                if (textIndex == 12)
+                {
+                    hints[textIndex] = new Text("I am just$a kid"); // default new line for kid in Rauro (for testing purposes)
+                }
+                else if (textIndex == 77)
+                {
+                    hints[textIndex] = new Text("Who were$you$expecting?"); // default line for new purple kid in Darunia (for testing purposes)
+                }
+                else
+                {
+                    hints[textIndex] = useCommunityText ? new Text(KNOW_NOTHING_TEXTS.Sample(r)!) : defaultKnowNothing;
+                }
             }
         }
 

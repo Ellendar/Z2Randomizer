@@ -844,9 +844,9 @@ TitleEnd:
         // of the houses. With the changes for FullItemShuffle and changes
         // to town signs, and there already being an invisible dialog hint at
         // the Upstab closed door, there aren't any bytes left to put a
-        // text ID for this. I'm instead just closing the door to the
-        // readable wall, and removing the hint location.
-        Put(ConvertNesPtrToPrgRomAddr(3, 0xA137), 0x00); // Change open door to closed door
+        // text ID for this. Lets switch it to a person to talk to.
+        Put(0xC9b7, [0x7d, 0x91]); // Replace sign with purple kid at (45,9)
+        Put(0xE309, 0x19); // Put the old readable wall hint ID here
     }
 
     public void WriteKasutoJarAmount(int kasutoJars)
