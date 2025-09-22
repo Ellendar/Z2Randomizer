@@ -171,5 +171,6 @@
 "UseCommunityText": true,
 "UseCustomRooms": false,
 "VanillaShuffleUsesActualTerrain": true,
-"WestBiome": "RANDOM_NO_VANILLA_OR_SHUFFLE"
+"WestBiome": "RANDOM_NO_VANILLA_OR_SHUFFLE",
+"MarioMode": true
 }
