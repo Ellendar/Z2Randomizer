@@ -208,13 +208,13 @@ public class LoadedCharacterSprite : ReactiveObject
             }
         }
         // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
-        var creditRaw = tmp.Z2BytesToString(tmp.GetBytes(0x10 + 0x16AAB, 0x1C)).Trim();
-        Credit = creditRaw;
+        var creditRaw = ROM.Z2BytesToString(tmp.GetBytes(0x10 + 0x16AAB, 0x1C)).Trim();
         if (creditRaw.StartsWith("SPRITE BY"))
         {
             creditRaw = creditRaw["SPRITE BY".Length ..].Trim();
         }
         AuthorName = creditRaw;
+        Credit = creditRaw.Length > 0 ? $"Sprite by {AuthorName}" : "";
     }
 
     private Bitmap? preview;
