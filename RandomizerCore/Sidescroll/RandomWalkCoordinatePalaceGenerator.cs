@@ -40,11 +40,11 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         var currentCoord = Coord.Uninitialized;
 
         //Back to even weight for now.
-        WeightedRandom<int> weightedRandomDirection = new([
-            (0, 35),  // left
-            (1, 35),  // down
-            (2, 35),  // up
-            (3, 35),  // right
+        TableWeightedRandom<int> weightedRandomDirection = new([
+            (0, 1),  // left
+            (1, 1),  // down
+            (2, 1),  // up
+            (3, 1),  // right
         ]);
 
         //Create graph
