@@ -1739,7 +1739,7 @@ public sealed class EastHyrule : World
             }while(cave == hiddenKasutoLocation 
                 || cave == hiddenPalaceLocation
                 || (firstPlacedLocation != null 
-                    && int.Abs(firstPlacedLocation.Ypos - cave.Ypos) < 4 
+                    && int.Abs(firstPlacedLocation.Xpos - cave.Xpos) < 4 
                     && int.Abs(firstPlacedLocation.Ypos - cave.Ypos) < 4
                    )
             );
