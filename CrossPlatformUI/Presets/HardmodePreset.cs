@@ -127,6 +127,8 @@ public static class HardmodePreset
         //Hints
         EnableHelpfulHints = false,
         EnableSpellItemHints = true,
-        EnableTownNameHints = true
+        EnableTownNameHints = true,
+
+        RevealWalkthroughWalls = false,
     };
 }

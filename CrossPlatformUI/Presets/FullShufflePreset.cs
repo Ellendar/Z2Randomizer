@@ -124,6 +124,8 @@ public static class FullShufflePreset
         //Hints
         EnableHelpfulHints = true,
         EnableSpellItemHints = true,
-        EnableTownNameHints = true
+        EnableTownNameHints = true,
+
+        RevealWalkthroughWalls = false,
     };
 }

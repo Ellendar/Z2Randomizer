@@ -123,6 +123,8 @@ public static class MaxRandoPreset
         //Hints
         EnableHelpfulHints = true,
         EnableSpellItemHints = true,
-        EnableTownNameHints = true
+        EnableTownNameHints = true,
+
+        RevealWalkthroughWalls = false,
     };
 }

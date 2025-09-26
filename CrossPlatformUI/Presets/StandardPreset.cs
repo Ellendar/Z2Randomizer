@@ -124,6 +124,8 @@ public static class StandardPreset
         //Hints
         EnableHelpfulHints = true,
         EnableSpellItemHints = true,
-        EnableTownNameHints = true
+        EnableTownNameHints = true,
+
+        RevealWalkthroughWalls = false,
     };
 }

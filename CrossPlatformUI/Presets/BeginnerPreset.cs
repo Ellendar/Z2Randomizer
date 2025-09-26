@@ -113,6 +113,8 @@ public static class BeginnerPreset
         //Hints
         EnableHelpfulHints = true,
         EnableSpellItemHints = true,
-        EnableTownNameHints = true
+        EnableTownNameHints = true,
+
+        RevealWalkthroughWalls = true,
     };
 }

@@ -1913,6 +1913,16 @@ ResetRedPalettePayload:
         }
     }
 
+    /// Rewrite the graphic tiles for walkthrough walls to be something else
+    public void RevealWalkthroughWalls()
+    {
+        // 0x02 is the background tiles in a different color
+        // another option could be: 0x00 for just fully black
+        // or curtains: 0xCF 0xD0 (regular palaces) and 0xC0 0xC1 (GP)
+        Put(0x1019d, [0x02, 0x02]); // regular palaces
+        Put(0x141b3, [0x02, 0x02]); // GP
+    }
+
     public string Z2BytesToString(byte[] data)
     {
         return new string(data.Select(letter => {

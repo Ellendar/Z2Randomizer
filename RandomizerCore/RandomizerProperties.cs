@@ -122,6 +122,7 @@ public class RandomizerProperties
     [NotMapped]
     public int[] PalaceItemRoomCounts { get; set; } = new int[6];
     public bool UsePalaceItemRoomCountIndicator { get; set; }
+    public bool RevealWalkthroughWalls { get; set; }
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }

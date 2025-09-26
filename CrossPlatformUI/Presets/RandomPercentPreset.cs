@@ -124,6 +124,8 @@ public static class RandomPercentPreset
         //Hints
         EnableHelpfulHints = null,
         EnableSpellItemHints = null,
-        EnableTownNameHints = null
+        EnableTownNameHints = null,
+
+        RevealWalkthroughWalls = false,
     };
 }
