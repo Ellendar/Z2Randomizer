@@ -803,7 +803,6 @@ public sealed class EastHyrule : World
                             continue;
                         }
                         //if the town has walkable space in all 4 cardinal directions
-                        //TODO: a little bit of bounds safety.
                         //It is currently impossible to put towns on the edge of the map but don't trust that
                         if (map[location.Ypos - 29, location.Xpos].IsWalkable() && map[location.Ypos - 30, location.Xpos - 1].IsWalkable() &&
                             map[location.Ypos - 31, location.Xpos].IsWalkable() && map[location.Ypos - 30, location.Xpos + 1].IsWalkable())

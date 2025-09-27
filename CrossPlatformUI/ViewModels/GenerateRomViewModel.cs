@@ -87,17 +87,20 @@ Seed: {config.Seed}
                 {
                     var romdata = host.RomFileViewModel.RomData!.ToArray();
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
-                    var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
-                    await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
-                    if (config.GenerateSpoiler)
+                    if(!tokenSource.IsCancellationRequested)
                     {
-                        var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.txt";
-                        await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
-                        var spoilerMapFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.png";
-                        await files.SaveGeneratedBinaryFile(spoilerMapFilename, new Spoiler(randomizer.ROMData).CreateSpoilerImage(randomizer.worlds), Main.OutputFilePath);
+                        var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
+                        await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
+                        if (config.GenerateSpoiler)
+                        {
+                            var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.txt";
+                            await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
+                            var spoilerMapFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.png";
+                            await files.SaveGeneratedBinaryFile(spoilerMapFilename, new Spoiler(randomizer.ROMData).CreateSpoilerImage(randomizer.worlds), Main.OutputFilePath);
+                        }
+                        ProgressHeading = "Generation Complete";
+                        ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
                     }
-                    ProgressHeading = "Generation Complete";
-                    ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
                     IsComplete = true;
                 }
                 catch (Exception e)
