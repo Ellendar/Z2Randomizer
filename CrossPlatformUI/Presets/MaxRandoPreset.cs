@@ -14,7 +14,7 @@ public static class MaxRandoPreset
         StartingHeartContainersMin = 1,
         StartingHeartContainersMax = 8,
         StartingTechniques = StartingTechs.RANDOM,
-        StartingLives = StartingLives.Lives3,
+        StartingLives = StartingLives.LivesRandom,
         IndeterminateOptionRate = IndeterminateOptionRate.HALF,
 
         //Overworld
@@ -25,7 +25,7 @@ public static class MaxRandoPreset
         IncludeLavaInEncounterShuffle = true,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
-        EastRocks = null,
+        EastRocks = true,
         GenerateBaguWoods = true,
         HideLessImportantLocations = true,
         RestrictConnectionCaveShuffle = true,
@@ -57,13 +57,14 @@ public static class MaxRandoPreset
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
+        ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
         BossRoomsExitType = BossRoomsExitType.RANDOM_PER_PALACE,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
-        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
+        PalaceItemRoomCount = PalaceItemRoomCount.RANDOM,
         DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
         //Levels
@@ -104,9 +105,9 @@ public static class MaxRandoPreset
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
-        IncludeSwordTechsInShuffle = false,
-        IncludeQuestItemsInShuffle = false,
-        IncludeSpellsInShuffle = false,
+        IncludeSwordTechsInShuffle = true,
+        IncludeQuestItemsInShuffle = true,
+        IncludeSpellsInShuffle = true,
 
         ShuffleSmallItems = true,
         RemoveSpellItems = false,
