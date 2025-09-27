@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -761,20 +762,10 @@ public sealed class EastHyrule : World
                     }
                 }
 
-                /*
-                if (biome == Biome.VOLCANO || biome == Biome.CANYON)
-                {
-                    bool f = MakeVolcano();
-                    if (!f)
-                    {
-                        return false;
-                    }
-                }
-                */
                 bool riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.CAVE;
                 bool rockBlock = props.EastRocks && !props.EastRockIsPath;
-                BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock);
                 PlaceHiddenLocations();
+                BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock, hiddenPalaceLocation, hiddenKasutoLocation);
                 riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH;
                 rockBlock = props.EastRocks && props.EastRockIsPath;
                 if (biome == Biome.VANILLALIKE)
@@ -1724,7 +1715,8 @@ public sealed class EastHyrule : World
         return Math.Sqrt(Math.Pow(l.Xpos - l2.Xpos, 2) + Math.Pow(l.Ypos - l2.Ypos, 2));
     }
 
-    private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock)
+    private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock, 
+        Location? hiddenPalaceLocation, Location? hiddenKasutoLocation)
     {
         //Blockers are on, but there are no block types 
         if(!riverDevilBlocks && !rockBlock)
@@ -1734,12 +1726,24 @@ public sealed class EastHyrule : World
         int cavePicked = 0;
         bool riverDevilPlaced = !riverDevilBlocks;
         bool rockPlaced = !rockBlock;
+        Location? firstPlacedLocation = null;
         while (!riverDevilPlaced || !rockPlaced)
         {
             bool placed = false;
             Terrain blockerTerrain = riverDevilPlaced ? Terrain.ROCK : Terrain.RIVER_DEVIL;
             List<Location> Caves = Locations[Terrain.CAVE];
-            Location cave = Caves[RNG.Next(Caves.Count)];
+            Location cave;
+            do
+            {
+                cave = Caves[RNG.Next(Caves.Count)];
+            }while(cave == hiddenKasutoLocation 
+                || cave == hiddenPalaceLocation
+                || (firstPlacedLocation != null 
+                    && int.Abs(firstPlacedLocation.Xpos - cave.Xpos) < 4 
+                    && int.Abs(firstPlacedLocation.Ypos - cave.Ypos) < 4
+                   )
+            );
+
             int caveConn = 0;
             if (caveConn != 0 && connections.ContainsKey(GetLocationByMem(cavePicked)))
             {
@@ -1845,6 +1849,7 @@ public sealed class EastHyrule : World
                 {
                     rockPlaced = true;
                 }
+                firstPlacedLocation = cave;
             }
         }
     }

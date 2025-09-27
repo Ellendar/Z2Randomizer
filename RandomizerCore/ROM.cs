@@ -1923,14 +1923,14 @@ ResetRedPalettePayload:
         Put(0x141b3, [0x02, 0x02]); // GP
     }
 
-    public string Z2BytesToString(byte[] data)
+    public static string Z2BytesToString(byte[] data)
     {
         return new string(data.Select(letter => {
             return ReverseCharMap.TryGetValue(letter, out var chr) ? chr : ' ';
         }).ToArray());
     }
 
-    public byte[] StringToZ2Bytes(string text)
+    public static byte[] StringToZ2Bytes(string text)
     {
         return text.Select(letter => {
             return CharMap.TryGetValue(letter, out var byt) ? byt : (byte)0xfc;
