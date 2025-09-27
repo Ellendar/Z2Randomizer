@@ -258,6 +258,9 @@ summary of what is at each location. Seeds generated with this flag will be tota
 different than the corresponding non-spoiler seed, so there is no way to retroactively
 generate a spoiler for a non-spoiler seed.</value>
 	</data>
+	<data name="RevealWalkthroughWallsToolTip" xml:space="preserve">
+<value>Replaces false wall and floor graphics with background tiles.</value>
+	</data>
 	<data name="ShufflePalaceItemsToolTip" xml:space="preserve">
 <value>Each normal palace contains exactly one item room. When selected, this shuffles which item
 is available in this palace with a different palace item, or with a general item if &quot;Mix

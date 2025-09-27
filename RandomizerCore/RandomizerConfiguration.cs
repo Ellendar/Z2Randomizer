@@ -596,6 +596,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool generateSpoiler;
 
+    [Reactive]
+    private bool revealWalkthroughWalls;
+
     //Meta
     [Reactive]
     [Required]
@@ -1169,6 +1172,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;
         properties.GeneratorsAlwaysMatch = generatorsAlwaysMatch;
         properties.HardBosses = hardBosses;
+        properties.RevealWalkthroughWalls = revealWalkthroughWalls;
 
         //Enemies
         properties.ShuffleEnemyHP = shuffleEnemyHP;

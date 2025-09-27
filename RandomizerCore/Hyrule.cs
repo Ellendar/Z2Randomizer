@@ -4084,6 +4084,11 @@ EndTileComparisons = $8601
             RestartWithPalaceUpA(engine);
         }
 
+        if (props.RevealWalkthroughWalls)
+        {
+            rom.RevealWalkthroughWalls();
+        }
+
         if (props.StandardizeDrops)
         {
             StandardizeDrops(engine);

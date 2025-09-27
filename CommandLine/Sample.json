@@ -34,6 +34,7 @@
 "Flags": "RAJA2dyAJAiJiCamhRjVCnvR+95nBVA4XyA7AALhA",
 "GenerateBaguWoods": false,
 "GenerateSpoiler": false,
+"RevealWalkthroughWall": false,
 "GeneratorsAlwaysMatch": true,
 "Global5050JarDrop": false,
 "ReduceDripperVariance": false,
