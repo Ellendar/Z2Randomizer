@@ -797,6 +797,11 @@ public sealed class EastHyrule : World
                     bool placed = false;
                     foreach (Location location in towns)
                     {
+                        //don't pick a town behind hidden kasuto or hidden palace
+                        if (location == hiddenKasutoLocation || location == hiddenPalaceLocation)
+                        {
+                            continue;
+                        }
                         //if the town has walkable space in all 4 cardinal directions
                         //TODO: a little bit of bounds safety.
                         //It is currently impossible to put towns on the edge of the map but don't trust that
@@ -814,6 +819,7 @@ public sealed class EastHyrule : World
                     }
                     if(!placed)
                     {
+                        logger.Trace("No valid candidate towns for river devil siege.");
                         return false;
                     }
                 }
