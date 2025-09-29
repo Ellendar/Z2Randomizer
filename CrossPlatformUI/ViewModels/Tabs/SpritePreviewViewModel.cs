@@ -209,19 +209,19 @@ public class LoadedCharacterSprite : ReactiveObject
         }
         // 0x10 iNES header, 0x16AAB = first empty line after the intro text scroll
         var creditRaw = ROM.Z2BytesToString(tmp.GetBytes(0x10 + 0x16AAB, 0x1C)).Trim();
-        if (creditRaw.StartsWith("SPRITE BY"))
+        var credit2Raw = ROM.Z2BytesToString(tmp.GetBytes(0x10 + 0x16AC8, 0x1C)).Trim();
+        if (creditRaw.Length > 0 && !creditRaw.StartsWith("SPRITE BY"))
         {
-            creditRaw = creditRaw["SPRITE BY".Length ..].Trim();
+            creditRaw = $"SPRITE BY {creditRaw}";
         }
-        AuthorName = creditRaw;
-        Credit = creditRaw.Length > 0 ? $"Sprite by {AuthorName}" : "";
+        creditRaw = creditRaw.Trim();
+        credit2Raw = credit2Raw.Trim();
+        Credit = (creditRaw + "\n" + credit2Raw).Trim();
     }
 
     private Bitmap? preview;
     public Bitmap? Preview { get => preview; set => this.RaiseAndSetIfChanged(ref preview, value); }
     
-    private string? authorName;
-    public string? AuthorName { get => authorName; set => this.RaiseAndSetIfChanged(ref authorName, value); }
     private string? credit;
     public string? Credit { get => credit; set => this.RaiseAndSetIfChanged(ref credit, value); }
     
