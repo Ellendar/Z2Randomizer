@@ -834,6 +834,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.ShortenNormalPalaces = shortenNormalPalaces ?? GetIndeterminateFlagValue(r);
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
+            //Palace item counts and prerequisites.
+            properties.ShufflePalaceItems = shufflePalaceItems ?? GetIndeterminateFlagValue(r);
+            properties.MixOverworldPalaceItems = mixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r);
             AssignPalaceItemCounts(properties, r);
 
             //Other starting attributes
@@ -1206,8 +1209,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         //Items
         properties.ShuffleOverworldItems = shuffleOverworldItems ?? GetIndeterminateFlagValue(r);
-        properties.ShufflePalaceItems = shufflePalaceItems ?? GetIndeterminateFlagValue(r);
-        properties.MixOverworldPalaceItems = mixOverworldAndPalaceItems ?? GetIndeterminateFlagValue(r);
+        //ShufflePalaceItems and MixOverworldPalaceItems moved up so they can be calculated before item room counts
         properties.RandomizeSmallItems = shuffleSmallItems;
         properties.ExtraKeys = palacesContainExtraKeys ?? GetIndeterminateFlagValue(r);
         properties.RandomizeNewKasutoBasementRequirement = randomizeNewKasutoJarRequirements;
@@ -1401,14 +1403,16 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     {
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
         //vs just determining min/max ranges and fair rolling between them. Keeping it for now.
-        int[] palaceRoomItemsMax = [1, 1, 1, 1, 1, 1];
+        int[] palaceItemRoomsMax = [1, 1, 1, 1, 1, 1];
+        int[] palaceItemRoomsMin = palaceItemRoomCount == PalaceItemRoomCount.RANDOM_INCLUDE_ZERO ? [0, 0, 0, 0, 0, 0] : [1, 1, 1, 1, 1, 1];
         switch (palaceItemRoomCount)
         {
-            case PalaceItemRoomCount.RANDOM:
-                palaceRoomItemsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 2, 2, 2, 3, 3];
+            case PalaceItemRoomCount.RANDOM_INCLUDE_ZERO:
+            case PalaceItemRoomCount.RANDOM_NOT_ZERO:
+                palaceItemRoomsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 2, 2, 2, 3, 3];
                 for (int i = 0; i < 6; i++)
                 {
-                    properties.PalaceItemRoomCounts[i] = r.Next(1, palaceRoomItemsMax[i] + 1);
+                    properties.PalaceItemRoomCounts[i] = r.Next(palaceItemRoomsMin[i], palaceItemRoomsMax[i] + 1);
                     // Limit vanilla palace style to 1 item rooms max
                     // Rationale:
                     // The benefit of the vanilla palace style is that you can use vanilla
@@ -1457,7 +1461,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             while (properties.PalaceItemRoomCounts.Sum() < 6)
             {
                 int i = r.Next(6);
-                if (properties.PalaceItemRoomCounts[i] < palaceRoomItemsMax[i])
+                if (properties.PalaceItemRoomCounts[i] < palaceItemRoomsMax[i])
                 {
                     properties.PalaceItemRoomCounts[i]++;
                 }

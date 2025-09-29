@@ -64,7 +64,7 @@ public static class MaxRandoPreset
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
-        PalaceItemRoomCount = PalaceItemRoomCount.RANDOM,
+        PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
         DarkLinkMinDistance = BossRoomMinDistance.NONE,
 
         //Levels

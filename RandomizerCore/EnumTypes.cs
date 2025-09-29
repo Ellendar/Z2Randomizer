@@ -600,7 +600,9 @@ public enum PalaceItemRoomCount
     [Description("Two")]
     TWO = 2,
     [Description("Random")]
-    RANDOM = 3
+    RANDOM_NOT_ZERO = 3,
+    [Description("Random (Include Zero)")]
+    RANDOM_INCLUDE_ZERO = 4
 }
 
 public class StringValueAttribute(string v) : Attribute
