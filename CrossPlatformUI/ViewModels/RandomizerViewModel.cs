@@ -10,6 +10,7 @@ using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
+using Avalonia.Controls;
 using Avalonia.Styling;
 using Z2Randomizer.RandomizerCore;
 
@@ -61,7 +62,13 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     }
     private int currentTabIndex;
     public int CurrentTabIndex { get => currentTabIndex; set => this.RaiseAndSetIfChanged(ref currentTabIndex, value); }
-    
+
+    [JsonIgnore]
+    public string AppVersion
+    {
+        get => $"Z2R v{App.Version}";
+    }
+
     [JsonConstructor]
 #pragma warning disable CS8618 
     public RandomizerViewModel() {}
@@ -130,6 +137,24 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         {
             Main.GenerateRomDialogOpen = true;
         }, CanGenerate);
+
+        VisitDiscord = ReactiveCommand.CreateFromTask<Control>(async control =>
+        {
+            var topLevel = TopLevel.GetTopLevel(control);
+            if (topLevel is not null)
+            {
+                await topLevel.Launcher.LaunchUriAsync(new Uri("https://discord.com/invite/BsK47Nsrde"));
+            }
+        });
+
+        VisitWiki = ReactiveCommand.CreateFromTask<Control>(async control =>
+        {
+            var topLevel = TopLevel.GetTopLevel(control);
+            if (topLevel is not null)
+            {
+                await topLevel.Launcher.LaunchUriAsync(new Uri("https://github.com/Ellendar/Z2Randomizer/wiki"));
+            }
+        });
 
         SaveNewPreset = ReactiveCommand.Create(() =>
         {
@@ -296,6 +321,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public ReactiveCommand<Unit, Unit> CheckForUpdates { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> ToggleTheme { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Control, Unit> VisitDiscord { get; }
+    [JsonIgnore]
+    public ReactiveCommand<Control, Unit> VisitWiki { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> SaveNewPreset { get; }
     [JsonIgnore]
