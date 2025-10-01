@@ -15731,8 +15731,7 @@
     "palaceGroup": null,
     "palaceNumber": 7,
     "requirements": [[
-      "GLOVE",
-      "KEY"
+      "GLOVE"
     ]],
     "sideviewData": "32600D08D4089491F217808728D6909121D6A822810A29D6909121D6F11780879891D50E8105F2500006B0900106B090D10F"
   },
