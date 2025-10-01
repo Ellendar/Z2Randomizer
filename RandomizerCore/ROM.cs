@@ -762,39 +762,57 @@ TitleEnd:
             Put(LinkShieldPaletteAddr, (byte)shieldColorInt);
         }
 
-        if(beamSprite == BeamSprites.RANDOM)
-        {
-            Random r2 = new Random();
-            beamSprite = (BeamSprites)r2.Next(Enum.GetNames(typeof(BeamSprites)).Length - 1);
-        }
-       
-        byte[] newSprite = new byte[32];
+        UpdateProjectileSprite(beamSprite);
+    }
 
-        if (beamSprite == BeamSprites.FIRE || beamSprite == BeamSprites.AXE || beamSprite == BeamSprites.HAMMER)
+    public void UpdateProjectileSprite(BeamSprites beamSprite)
+    {
+        if (beamSprite == BeamSprites.RANDOM)
         {
-            Put(0x18f5, [0xa9, 0x00, 0xea]);
+            Random r2 = new();
+            beamSprite = (BeamSprites)r2.Next(Enum.GetValues(typeof(BeamSprites)).Length - 1);
+        }
+
+        var meta = beamSprite.GetMeta();
+
+        var beamPalette = meta.BeamPalette;
+        var firePalette = meta.FirePalette == BeamPalette.Unspecified ? (beamPalette == BeamPalette.Flashing ? BeamPalette.Orange : beamPalette) : meta.FirePalette;
+
+        Debug.Assert(!(beamPalette == BeamPalette.Flashing && firePalette != BeamPalette.Orange)); // does not currently work because of how the asm function sets the bits
+        Debug.Assert(!(beamPalette == BeamPalette.Red && firePalette == BeamPalette.Orange));      // does not currently work because of how the asm function sets the bits
+
+        if (meta.BeamPalette != BeamPalette.Flashing)
+        {
+            Put(0x18ec, (byte)firePalette); // or projectile bits with our desired Fire color
+            Put(0x18ff, [0xa9, (byte)meta.BeamPalette]); // replace frame counter with constant value since projectile is not flashing
+        }
+
+        if (meta.Rotate != BeamRotation.None)
+        {
+            Put(0x1906, [0xea, 0xea]); // allow rotate projectile (unlike vanilla beams)
+            if (meta.Rotate == BeamRotation.Rotate90)
+            {
+                Put(0x18e6, [0xea]);       // we switch shifting operations on the frame byte to NOPs to halve rotation speed
+                Put(0x18e7, [0x29, 0xc0]); // keep horizontal direction from frame counter byte
+                Put(0x18e9, [0xea, 0xea]); // ignore projectile's own horizontal direction
+            }
         }
         else if (beamSprite != BeamSprites.DEFAULT)
         {
-            Put(0X18FB, 0x84);
+            Put(0x18e7, [0x29, 0x00]); // do not rotate sprite at all (we still keep the projectile's own horizontal direction)
+        }
+        if (beamSprite != BeamSprites.DEFAULT)
+        {
+            Put(0x18fb, 0x84); // set non-rotated custom projectiles to also use the Fire sprite tile
         }
 
-        int beamSpriteOffset = beamSprite switch
+        if (meta.ChrAddress != 0)
         {
-            BeamSprites.FIRE => 0,
-            BeamSprites.BUBBLE => 0xaa0,
-            BeamSprites.ROCK => 0x2ae0,
-            BeamSprites.AXE => 0x2fa0,
-            BeamSprites.HAMMER => 0x12ee0,
-            BeamSprites.WIZZROBE_BEAM => 0x14dc0,
-            BeamSprites.DEFAULT => 0,
-            _ => throw new Exception("Invalid beam sprite")
-        };
-        if(beamSpriteOffset != 0)
-        {
+            byte[] newSprite = new byte[32];
+
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(ChrRomOffset + beamSpriteOffset + i);
+                byte next = GetByte(ChrRomOffset + meta.ChrAddress + i);
                 newSprite[i] = next;
             }
             foreach (int loc in fireLocs)
