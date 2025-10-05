@@ -910,6 +910,63 @@ TitleEnd:
         Put(0x1a975, 0);
     }
 
+    /// The vanilla game sets up all 3 save slots from PRG in the
+    /// title screen.  If there is already valid data in a save slot,
+    /// it will keep it.  Note: this includes keeping save slots
+    /// without a name, and when you register your name it only
+    /// updates the name. It does not re-read the starting data from
+    /// PRG. This means having old data in SRAM, with no names
+    /// registered can lead to unexpected behavior. Emulators,
+    /// Everdrives etc. may remember some save data from another
+    /// randomized ROM, with different starting values, but you, the
+    /// player will see no indication of this, since there are no
+    /// names registered. This could lead to the player not being able
+    /// to beat the game, since they are missing items they were
+    /// expected to start with.
+    ///
+    /// This fixes the problem by always reloading the save slot data in the
+    /// title screen for save slots that do not have a name set.
+    public void FixStaleSaveSlotData(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code("""
+.include "z2r.inc"
+
+CreateSaveSlotFromPrg = $B976
+CreateSaveSlotFromPrgWithYSet = $B978
+KeepExistingSaveSlot = $B99D
+
+.segment "PRG5"
+.org $B96a
+    cmp #$69                           ; recovering from reset mid-save (maybe?)
+    beq $B9A7                          ; keeping the vanilla branch for this
+    cmp #$A5                           ; save slot status byte can be both A5 or 5A depending on when the player reset
+    jmp ExtendedSaveCheck
+FREE_UNTIL $B976
+
+.reloc
+ExtendedSaveCheck:
+    beq HasExistingDataCheckName
+    cmp #$5A
+    beq HasExistingDataCheckName
+    jmp CreateSaveSlotFromPrg          ; unusable save slot status byte (probably fresh SRAM)
+
+HasExistingDataCheckName:
+    ldy #$31
+@loop:
+        lda ($00),y
+        cmp #$F4
+        bne NameNotEmpty
+        dey
+        cpy #$29
+        bne @loop
+    jmp CreateSaveSlotFromPrgWithYSet  ; name is empty (small optimization to not re-write the empty name)
+
+NameNotEmpty:
+    jmp KeepExistingSaveSlot
+""");
+    }
+
     public void SetLevelCap(Assembler asm, int atkMax, int magicMax, int lifeMax)
     {
         var a = asm.Module();
