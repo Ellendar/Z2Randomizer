@@ -4097,6 +4097,7 @@ EndTileComparisons = $8601
         
         RandomizeStartingValues(engine, rom);
         rom.FixRebonackHorseKillBug();
+        rom.FixStaleSaveSlotData(engine);
         rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
