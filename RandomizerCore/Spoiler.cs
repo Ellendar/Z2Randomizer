@@ -138,19 +138,23 @@ public class Spoiler
         return returnData;
     }
 
-    private void DrawWorld(SKCanvas canvas, World world, int startX, int startY)
+    private void DrawWorld(SKCanvas canvas, World world, int startDrawX, int startDrawY)
     {
+        int offsetX = (world is MazeIsland && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 32 : 0;
+        int width = ((world is DeathMountain || world is MazeIsland) && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 32 : world.MAP_COLS;
+        int height = ((world is DeathMountain || world is MazeIsland) && (world.biome == Biome.VANILLA || world.biome == Biome.VANILLA_SHUFFLE)) ? 48 : world.MAP_ROWS;
+
         var background = new SKPaint();
         background.Color = SKColors.Black;
-        canvas.DrawRect(startX * 16, startY * 16, world.MAP_COLS * 16, world.MAP_ROWS * 16, background);
-        for (int y = 0; y < world.MAP_ROWS; y++)
+        canvas.DrawRect(startDrawX * 16, startDrawY * 16, width * 16, height * 16, background);
+        for (int y = 0; y < height; y++)
         {
-            for (int x = 0; x < world.MAP_COLS; x++)
+            for (int x = offsetX; x < offsetX + width; x++)
             {
                 Terrain t = world.map[y, x];
                 var tile = terrainTiles[t];
                 Debug.Assert(tile != null);
-                canvas.DrawBitmap(tile, startX * 16 + x * 16, startY * 16 + y * 16);
+                canvas.DrawBitmap(tile, (startDrawX - offsetX) * 16 + x * 16, startDrawY * 16 + y * 16);
             }
         }
     }

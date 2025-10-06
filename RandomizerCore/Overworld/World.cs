@@ -32,7 +32,7 @@ public abstract class World
     protected bool[,] visitation;
     protected const int MAP_SIZE_BYTES = 1400;
     protected List<Location> unimportantLocs;
-    protected Biome biome;
+    public Biome biome { get; protected set; }
     protected bool isHorizontal;
     protected int VANILLA_MAP_ADDR;
     protected SortedDictionary<(int, int), string> section;
