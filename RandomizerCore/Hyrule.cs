@@ -2273,6 +2273,11 @@ public class Hyrule
         {
             throw new ImpossibleException("Too many connections!");
         }
+        foreach (var connection in connections)
+        {
+            if (connection.Item1 == null) { return false; }
+            if (connection.Item2 == null) { return false; }
+        }
         HashSet<Continent> continentsFound = [Continent.WEST];
         bool progress = true;
         while(progress == true)

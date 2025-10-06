@@ -49,9 +49,9 @@
                 IsEnabled="{Binding Config.ShuffleOverworldItems}"
                 IsThreeState="True"
                 IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}"
-                Content="Include P-Bag Caves in Shuffle"
+                Content="Include P-Bag Caves in Item Shuffle"
             >
-                <ToolTip.Tip><TextBlock xml:space="preserve">Adds the 2 caves on the east and 1 cave on the west that normally contain p-bags<LineBreak/>to the shuffle pool. Those locations can contain any item and 3 p-bags (2 medium<LineBreak/>and 1 large) are added to the pool of possible items.</TextBlock></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludePBagCavesinItemShuffleToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
@@ -92,9 +92,9 @@
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.ShufflePBagAmounts}"
-                Content="Shuffle PBag Amounts"
+                Content="Shuffle P-Bag Amounts"
             >
-                <ToolTip.Tip><TextBlock xml:space="preserve">If selected, each of the 4 PBag sizes is assigned a new experience value between +2 and -2<LineBreak/>levels of the vanilla value.</TextBlock></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShufflePBagAmountsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"

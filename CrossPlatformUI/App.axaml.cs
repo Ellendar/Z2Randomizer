@@ -22,10 +22,12 @@ public sealed partial class App : Application // , IDisposable
         AvaloniaXamlLoader.Load(this);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        Title = $"Zelda II Randomizer v{version?.Major}.{version?.Minor} Beta{version?.Build}";
+        Version = $"{version?.ToString(version.Revision > 0 ? 4 : 3)}";
 #if DEBUG
-        Title += " (Debug build)";
+        Version += " (Debug)";
 #endif
+
+        Title = $"Zelda II Randomizer v{Version}";
     }
 
     public static ServiceCollection? ServiceContainer;
@@ -33,6 +35,7 @@ public sealed partial class App : Application // , IDisposable
     public static IFileSystemService? FileSystemService;
     public static ICheckUpdateService? CheckUpdateService;
 
+    public static string Version = "";
     public static string Title = "";
 
     public static TopLevel? TopLevel { get; private set; }

@@ -145,7 +145,7 @@
                 IsThreeState="True"
                 Content="50/50 Statue Cycles Between Jar and Knight"
             >
-                <ToolTip.Tip><TextBlock>If selected, 50/50 statues in palaces that include them will always alternate<LineBreak/>between dropping a red jar or spawning a red Ironknuckle. If unselected, the<LineBreak/>spawning is randomly determined each stab like in vanilla.</TextBlock></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.FiftyFiftyStatueCyclesBetweenJarandKnightToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsChecked="{Binding Config.ReduceDripperVariance}"
@@ -180,13 +180,18 @@
                 Checked="NoDuplicateRoomsByEnemiesChecked" 
                 Content="No Duplicate Rooms (By Layout/Enemies)"
             >
-                <ToolTip.Tip><TextBlock>Prevents palace generation from creating duplicate rooms. For this setting, all<LineBreak/>different variants of a room (same layout with different enemy sets, Fairy/No<LineBreak/>Fairy, etc.) are *not* considered duplicates of each other. Has no effect on<LineBreak/>vanilla palaces. Does not completely prevent duplicates for Random Walk<LineBreak/>generated palaces.</TextBlock></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NoDuplicateRoomsByLayoutEnemiesToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsChecked="{Binding Config.BlockingRoomsInAnyPalace}"
                 Content="Blocking Rooms in Any Palace"
             >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BlockingRoomsinAnyPalaceToolTip}"/></ToolTip.Tip>
+                <ToolTip.Tip>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Static lang:Resources.BlockingRoomsinAnyPalaceToolTip}"/>
+                        <Image Margin="2 16 0 0" Source="/Assets/palace-blockers.png" Stretch="None" />
+                    </StackPanel>
+                </ToolTip.Tip>
             </CheckBox>
             <ComboBox
                 HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
