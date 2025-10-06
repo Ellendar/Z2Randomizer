@@ -16,7 +16,7 @@
                 Margin="43 0"
                 HorizontalAlignment="Left"
                 Content="[Wiki: Hints]"
-                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Options#hints"
+                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Hints"
                 FontSize="12"
                 Foreground="#4557c4"
                 Cursor="Hand"

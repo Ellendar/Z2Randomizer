@@ -235,31 +235,37 @@ in the dark to change.</value>
   • High: Each enemy gives a random XP level between -1 and +3 levels of vanilla.</value>
 	</data>
 	<data name="EnableHelpfulHintsToolTip" xml:space="preserve">
-<value>Four randomly selected townsfolk will be given a helpful hint explaining where to find an
-item. The possible hint givers are any townsperson who is standing still, or any wall that
-contains text in vanilla. 3/4 of these will be guaranteed not to be a small item.
-
-If &quot;Include Spells in Shuffle&quot;, &quot;Include Sword Techniques in Shuffle&quot; and &quot;Include Quest
-Items in Shuffle&quot; are all enabled, an extra hint is added.</value>
+<value>When enabled, helpful hints are scattered throughout the world. These hints are provided
+either by townspeople (stationary NPCs only) or by written text on walls. All hint
+locations correspond to places where readable text appears in the vanilla game. See the
+Wiki for more details.</value>
 	</data>
 	<data name="EnableSpellItemHintsToolTip" xml:space="preserve">
-<value>If visiting a spell location without the required item, the lady blocking the door in
-Ruto, Mido, and Darunia will give a hint about the location of the required item. If
-&quot;Shuffle Quest Items&quot; is on, this also includes the spells in Saria and Nabooru, where you
-will get hints about where to find the mirror and water.</value>
+<value>When enabled, if visiting a spell location without the required quest item:
+
+  • The blocking lady in Ruto, Mido, and Darunia will give a hint to the required item&apos;s
+    location (Trophy, Medicine, and Child).
+  • With Include Quest Items in Shuffle enabled, this also applies to Saria (Mirror) and
+    Nabooru (Water).
+  • With Include Sword Techniques in Shuffle enabled, you can get hints about the
+    locations of Downstab and Upstab by talking to the closed door of the Mido Church and
+    the Upstab knight&apos;s house in Darunia.</value>
 	</data>
 	<data name="EnableTownNameHintsToolTip" xml:space="preserve">
-<value>Changes the text on the sign at the entrance of town to display the item or spell given by
-that town&apos;s wizard.</value>
+<value>The town entrance sign for each town will display the item or spell given by that town&apos;s
+wizard.</value>
 	</data>
 	<data name="GenerateSpoilerToolTip" xml:space="preserve">
-<value>Generates a .spoiler file in the same directory as the randomized ROM that contains a
-summary of what is at each location. Seeds generated with this flag will be totally
-different than the corresponding non-spoiler seed, so there is no way to retroactively
-generate a spoiler for a non-spoiler seed.</value>
+<value>Generates two files alongside the randomized ROM:
+
+  • spoiler.txt - summary of all item locations and ASCII-drawn palace maps.
+  • spoiler.png - map of the generated world.
+
+⚠️ A spoiler seed is generated differently from a non-spoiler seed. It is not possible to
+retroactively generate a spoiler file for a non-spoiler seed.</value>
 	</data>
 	<data name="RevealWalkthroughWallsToolTip" xml:space="preserve">
-<value>Replaces false wall and floor graphics with background tiles.</value>
+<value>Replaces all false wall and floor tiles with background tiles.</value>
 	</data>
 	<data name="ShufflePalaceItemsToolTip" xml:space="preserve">
 <value>Each normal palace contains exactly one item room. When selected, this shuffles which item
@@ -278,13 +284,18 @@ general item if &quot;Mix Overworld and Palace Items&quot; is selected). This in
 <value>Normally palace items will only appear in palaces and non-palace items only outside of
 palaces. This setting allows all items to be found anywhere.</value>
 	</data>
+	<data name="IncludePBagCavesinItemShuffleToolTip" xml:space="preserve">
+<value>Adds the 1 cave in the west and the 2 caves on the east that normally contain P-Bags to
+the item pool. Those locations can contain any item and 3 P-Bags (2 medium and 1 large)
+are added to the pool of possible items.</value>
+	</data>
 	<data name="IncludeSpellsinShuffleToolTip" xml:space="preserve">
 <value>Allows the 8 wizards in town who grant spells to instead grant any item, and adds all 8
 spells to the pool of items that can appear in general locations.</value>
 	</data>
 	<data name="IncludeSwordTechniquesinShuffleToolTip" xml:space="preserve">
-<value>Allows the 2 teachers in Mido and Darunia who teach sword techniques to instead grant any
-item, and adds the Up and Down stabs to the general item pool.</value>
+<value>Allows the sword technique teachers in Mido and Darunia to instead grant any item, and
+adds the Up and Down stabs to the general item pool.</value>
 	</data>
 	<data name="IncludeQuestItemsinShuffleToolTip" xml:space="preserve">
 <value>Adds Bagu&apos;s letter (allowing passage of the Saria moat), the mirror (allowing the spell in
@@ -300,6 +311,10 @@ that contain small items.</value>
 	<data name="StartWithSpellItemsToolTip" xml:space="preserve">
 <value>Link starts with the Trophy, Medicine, Child, Water, and Mirror and random small items are
 added to the item pool to replace the number of those items that were in the shuffle pool.</value>
+	</data>
+	<data name="ShufflePBagAmountsToolTip" xml:space="preserve">
+<value>If selected, each of the 4 P-Bag sizes is assigned a new experience value between
++2 and -2 levels of the vanilla value.</value>
 	</data>
 	<data name="PalacesContainExtraKeysToolTip" xml:space="preserve">
 <value>If selected, all small items in palaces are replaced by keys.</value>
@@ -478,14 +493,17 @@ is also restricted, such that you can often see the exit before entering the cav
 continents can be blocked by rocks. Otherwise, rocks can only block item caves.</value>
 	</data>
 	<data name="GenerateBagusWoodsToolTip" xml:space="preserve">
-<value>If selected, one of the woods in the west will have a cluster of encounters and Bagu&apos;s
-cabin similar to vanilla. Otherwise, Bagu&apos;s cabin is an isolated forest tile surrounded on
-all sides by other terrain.</value>
+<value>If enabled, one of the woods in the west will have a cluster of encounters and Bagu&apos;s
+cabin similar to vanilla.
+
+If disabled, Bagu&apos;s cabin is an isolated forest tile surrounded on all sides by other
+terrain.</value>
 	</data>
 	<data name="HideLessImportantLocationsToolTip" xml:space="preserve">
-<value>If selected, locations that only contain minor items or have no value will be hidden
-within more of the same terrain. Otherwise all such tiles will be surrounded on all sides
-by other terrain.</value>
+<value>If enabled, locations that only contain minor items or have no value will be hidden within
+more of the same terrain.
+
+If disabled, all such tiles will be surrounded on all sides by other terrain.</value>
 	</data>
 	<data name="AllWaterIsWalkableWithBootsToolTip" xml:space="preserve">
 <value>If enabled, all water tiles can be walked on with boots. If unselected, the only walkable
@@ -615,13 +633,14 @@ vanilla shuffle styles.</value>
 available. Has no effect on vanilla or vanilla shuffle styles.</value>
 	</data>
 	<data name="ThunderbirdRequiredToolTip" xml:space="preserve">
-<value>If selected, the path to Dark Link in GP _must_ go through Thunderbird&apos;s room. The thunder
-spell will be required to beat the game. When unselected, Thunderbird still appears in GP,
-and may be required anyway if the palace style or randomized layout requires it.</value>
+<value>If selected, the path to Dark Link in Great Palace must go through Thunderbird&apos;s room.
+The thunder spell will be required to beat the game. When unselected, Thunderbird still
+appears in GP, and may be required anyway if the palace style or randomized layout
+requires it.</value>
 	</data>
 	<data name="RemoveThunderbirdToolTip" xml:space="preserve">
-<value>If selected, Thunderbird will not appear in GP. For vanilla styles, his room will be
-removed and bypassed. For generated styles, one additional normal room will appear
+<value>If selected, Thunderbird will not appear in Great Palace. For vanilla styles, his room
+will be removed and bypassed. For generated styles, one additional normal room will appear
 instead.</value>
 	</data>
 	<data name="UseCustomRoomsFileToolTip" xml:space="preserve">
@@ -630,13 +649,18 @@ instead.</value>
 that can appear. For more details, contact Ellendar or ask on the Discord.</value>
 	</data>
 	<data name="NumberofPalacestoCompleteToolTip" xml:space="preserve">
-<value>The number of palaces that must be completed to drop the barrier and enter Gannon&apos;s
-Palace. The number of required palaces is a random value between Min and Max (inclusive of
-both endpoints).</value>
+<value>This is the number of gems you start the game with and therefor the number of palaces that
+must be completed before being able to enter the Great Palace. The number of required
+palaces is a random value between Min and Max (inclusive of both endpoints).</value>
 	</data>
 	<data name="RestartatPalacesonGameOverToolTip" xml:space="preserve">
 <value>If selected, on Game Over (or Up+A) you will restart at the beginning of the palace. If
 unselected, this will happen only in GP (like in vanilla)</value>
+	</data>
+	<data name="FiftyFiftyStatueCyclesBetweenJarandKnightToolTip" xml:space="preserve">
+<value>If selected, 50/50 statues in palaces that include them will always alternate between
+dropping a red jar or spawning a red Ironknuckle. If unselected, the spawning is randomly
+determined each stab like in vanilla.</value>
 	</data>
 	<data name="ReduceDripperVarianceToolTip" xml:space="preserve">
 <value>Tired of waiting for drippers to drop an enemy? After 7 red drips, this forces the 8th
@@ -646,8 +670,8 @@ drip to be blue. (The count is shared between all drippers.)</value>
 <value>Changes the color palette of each palace to a new random one.</value>
 	</data>
 	<data name="RandomizeBossItemDropToolTip" xml:space="preserve">
-<value>Changes the small item received from defeating a boss from a small key to any small item
-at random (red jar, blue jar, small key, 1up, or any of the 4 p-bags)</value>
+<value>Changes the item received from defeating a boss from a key to any small item at random
+(red jar, blue jar, key, 1-up, or any of the 4 p-bags)</value>
 	</data>
 	<data name="NoDuplicateRoomsByLayoutToolTip" xml:space="preserve">
 <value>Prevents palace generation from creating duplicate rooms. For this setting, a room is
@@ -657,17 +681,24 @@ small (like when using only one room group), duplicate rooms may be included any
 would otherwise likely be impossible to produce a palace. Does not completely prevent
 duplicates for Random Walk generated palaces.</value>
 	</data>
+	<data name="NoDuplicateRoomsByLayoutEnemiesToolTip" xml:space="preserve">
+<value>Prevents palace generation from creating duplicate rooms. For this setting, all different
+variants of a room (same layout with different enemy sets, Fairy/No Fairy, etc.) are *not*
+considered duplicates of each other. Has no effect on vanilla palaces. Does not completely
+prevent duplicates for Random Walk generated palaces.</value>
+	</data>
 	<data name="BlockingRoomsinAnyPalaceToolTip" xml:space="preserve">
-<value>Allows rooms that require some spell or item to appear in any palace. Otherwise, palaces
-can only contain blocks of types that appear in that palace in vanilla. For example a room
-requiring glove could appear in P2, but not in P1.</value>
+<value>Allows rooms that require an item or spell to traverse to appear in any palace. Otherwise,
+palaces can only contain blocks according to the following table.</value>
 	</data>
 	<data name="BossRoomsExitToToolTip" xml:space="preserve">
 <value>Selects whether the boss room exits into the overworld (like in vanilla), or more palace
 rooms. This can be selected for all palaces, Randomly per palace, or Random but the same
 selection for all palaces. When a palace continues outside, there will always be an
 Ironknuckle statue right before the exit like in vanilla. When the palace continues, that
-statue will be removed.</value>
+statue will be removed.
+
+If the palace continues after the boss, palace item rooms may be behind the boss room.</value>
 	</data>
 	<data name="HarderCarockToolTip" xml:space="preserve">
 <value>Tired of just ducking in the corner and blocking? This option enables carock shooting
@@ -720,34 +751,42 @@ dash, the Dash spell will still appear, but do nothing.</value>
 <value>Link will always shoot beams from his sword, regardless of life.</value>
 	</data>
 	<data name="ShuffleStartingItemsToolTip" xml:space="preserve">
-<value>If enabled, your starting items will be random.
+<value>When enabled, your starting items will be randomized.
 
-  • Checked starting items are guaranteed (regardless of this setting).
-  • Unchecked items have a 25% chance each to be a starting item.</value>
+  • Checked items are always included (unless you&apos;ve checked more than the limit below).
+  • Unchecked items each have a 25% chance to be included.</value>
 	</data>
 	<data name="StartingItemLimitToolTip" xml:space="preserve">
 <value>Sets an upper limit on the number of starting items.
 
-All checked items are guaranteed starting items. Additional items have a 25% chance of
-being included, in no particular order, up to this limit.
+  • If you check fewer or equal to the limit, all checked items are guaranteed.
+  • If you check more than the limit, a random selection (equal to the limit) will be
+    chosen from your checked items.
+  • With Shuffle Starting Items enabled, unchecked items may be added with a 25% chance
+    each, but the total number of items will never exceed the limit.
 
-(Note that the total number of starting items may be below the limit, depending on the
-results of the random rolls.)</value>
+(Note that the total number of starting items may still be below the limit, depending on
+the results of the random rolls.)
+</value>
 	</data>
 	<data name="ShuffleStartingSpellsToolTip" xml:space="preserve">
-<value>If enabled, your starting spells will be random.
+<value>When enabled, your starting spells will be randomized.
 
-  • Checked starting spells are guaranteed (regardless of this setting).
-  • Unchecked spells have a 25% chance to be a starting spell.</value>
+  • Checked spells are always included (unless you&apos;ve checked more than the limit below).
+  • Unchecked spells each have a 25% chance to be included.</value>
 	</data>
 	<data name="StartingSpellLimitToolTip" xml:space="preserve">
 <value>Sets an upper limit on the number of starting spells.
 
-All checked spells are guaranteed starting spells. Additional spells have a 25% chance of
-being included, in no particular order, up to this limit.
+  • If you check fewer or equal to the limit, all checked spells are guaranteed.
+  • If you check more than the limit, a random selection (equal to the limit) will be
+    chosen from your checked spells.
+  • With Shuffle Starting Spells enabled, unchecked spells may be added with a 25% chance
+    each, but the total number of spells will never exceed the limit.
 
-(Note that the total number of starting spell may be below the limit, depending on the
-results of the random rolls.)</value>
+(Note that the total number of starting spells may still be below the limit, depending on
+the results of the random rolls.)
+</value>
 	</data>
 	<data name="HeartContainersToolTip" xml:space="preserve">
 <value>Start Min / Max:
