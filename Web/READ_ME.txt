@@ -1,0 +1,2 @@
+In 4.X versions, the appcast in this folder is used to check for updates. In 5.0 it was moved up to root, but this copy needs to continue to exist to handle post 4.0.4, pre 5.0 migrations to 5.X.
+It does not need to be updated. Having users upgrade 4.1 -> 5.0 -> latest version is acceptable.

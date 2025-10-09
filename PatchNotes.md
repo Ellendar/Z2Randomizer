@@ -1,12 +1,12 @@
 # Z2Randomizer Changelog
 
-## Version 5.0 - ???
+## Version 5.0 - October 9, 2025
 
 ### Major Features
 - Rebuilt the User Interface - This new interface is more customizable than the old one and should allow more improvements in the future.
-- New Web Version - Check it out at <link>
+- New Web Version - Check it out at Z2
 - Added over 100 new palace rooms from the 4.4 Room Jam.
-	-
+	- A searchable visual reference for all the new rooms is available at https://initsu.github.io/Z2R-Rooms/
 - Added options to add additional items to the item pool.
 	- Include spells in shuffle - Wizards can give normal items and spells can be found out in the world
 	- Include Sword Techniques in Shuffle - Up/Down stab can be found in the world and their trainers could hand out other items.
@@ -44,6 +44,7 @@
 	- Beard Link
 	- Faxanadu
 	- Garfield
+	- Geru
 	- Gooma
 	- Helmethead
 	- LittleMagic
@@ -68,7 +69,6 @@
 - Fixed garbled sprites on horsehead / rebonack appearing outside their palaces.
 - Enemies that are immune to sword are now always vulnerable to fire.
 - Fixed the hitbox on lava so it no longer extends a tile above the lava.
-- Restricted some
 
 ## Version 4.3.19 - April 20, 2025
 

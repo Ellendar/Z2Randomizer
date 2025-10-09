@@ -28,6 +28,7 @@
         <SignAssembly>False</SignAssembly>
         <StartupObject>CrossPlatformUI.Desktop.Program</StartupObject>
         <RootNamespace>Z2Randomizer.CrossPlatformUI.Desktop</RootNamespace>
+        <ApplicationIcon>1st.ico</ApplicationIcon>
     </PropertyGroup>
 
 
@@ -35,6 +36,11 @@
       <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
       <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
     </PropertyGroup>
+
+
+    <ItemGroup>
+      <Content Include="1st.ico" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
