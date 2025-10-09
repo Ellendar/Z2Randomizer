@@ -1,7 +1,6 @@
 ﻿using System;
-using Z2Randomizer.Core.Overworld;
 
-namespace RandomizerCore.Flags;
+namespace Z2Randomizer.RandomizerCore.Flags;
 
 internal class CustomFlagSerializerAttribute : Attribute
 {

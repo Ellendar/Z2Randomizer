@@ -1,23 +1,23 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Assembler;
-using RandomizerCore.Sidescroll;
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
+
 using System.Text;
 using System.Text.Json;
-using Z2Randomizer.Core;
-using Z2Randomizer.Core.Sidescroll;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-var engine = new Engine();
-ROM ROMData = new ROM(args[0]);
+ROM ROMData = new ROM(args[0], true);
+
 int[] connAddr = [0x1072B, 0x12208, 0x1472B];
 int[] side = [0x10533, 0x12010, 0x14533];
 int[] enemy = [0x105b1, 0x1208E, 0x145b1];
 int[] bit = [0x17ba5, 0x17bc5, 0x17be5];
 StringBuilder sb = new StringBuilder("[");
-for (int j = 0; j < 3; j++)
+for (int palaceGroup = 0; palaceGroup < 3; palaceGroup++)
 {
-    for (int i = 0; i < 63; i++)
+    for (int map = 0; map < 63; map++)
     {
-        int addr = connAddr[j] + i * 4;
+        int addr = connAddr[palaceGroup] + map * 4;
         byte[] connectBytes = new byte[4];
         for (int k = 0; k < 4; k++)
         {
@@ -25,26 +25,26 @@ for (int j = 0; j < 3; j++)
 
         }
         Room r;
-        int sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0x8010;
-        if (j == 2)
+        int sideViewPtr = (ROMData.GetByte(side[palaceGroup] + map * 2) + (ROMData.GetByte(side[palaceGroup] + 1 + map * 2) << 8)) + 0x8010;
+        if (palaceGroup == 2)
         {
-            sideViewPtr = (ROMData.GetByte(side[j] + i * 2) + (ROMData.GetByte(side[j] + 1 + i * 2) << 8)) + 0xC010;
+            sideViewPtr = (ROMData.GetByte(side[palaceGroup] + map * 2) + (ROMData.GetByte(side[palaceGroup] + 1 + map * 2) << 8)) + 0xC010;
         }
         int sideViewLength = ROMData.GetByte(sideViewPtr);
         byte[] sideView = ROMData.GetBytes(sideViewPtr, sideViewLength);
 
-        int enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0x98b0;
-        if (j == 2)
+        int enemyPtr = ROMData.GetByte(enemy[palaceGroup] + map * 2) + (ROMData.GetByte(enemy[palaceGroup] + 1 + map * 2) << 8) + 0x98b0;
+        if (palaceGroup == 2)
         {
-            enemyPtr = ROMData.GetByte(enemy[j] + i * 2) + (ROMData.GetByte(enemy[j] + 1 + i * 2) << 8) + 0xd8b0;
+            enemyPtr = ROMData.GetByte(enemy[palaceGroup] + map * 2) + (ROMData.GetByte(enemy[palaceGroup] + 1 + map * 2) << 8) + 0xd8b0;
         }
 
         int enemyLength = ROMData.GetByte(enemyPtr);
         byte[] enemies = ROMData.GetBytes(enemyPtr, enemyLength);
 
-        byte bitmask = ROMData.GetByte(bit[j] + i / 2);
+        byte bitmask = ROMData.GetByte(bit[palaceGroup] + map / 2);
 
-        if (i % 2 == 0)
+        if (map % 2 == 0)
         {
             bitmask = (byte)(bitmask & 0xF0);
             bitmask = (byte)(bitmask >> 4);
@@ -55,34 +55,22 @@ for (int j = 0; j < 3; j++)
         }
 
         bool hasItem = false;
-        int currentX = 0;
         int elevatorScreen = -1;
-        for (int sideviewIndex = 4; sideviewIndex < sideView.Length; sideviewIndex += 2)
+        try
         {
-            int xAdvance = sideView[sideviewIndex] & 0x0F;
-            int yPos = sideView[sideviewIndex] & 0xF0;
-            yPos >>= 4;
-            //item
-            if (yPos < 13 && sideView[sideviewIndex + 1] == 0x0F)
-            {
-                int collectableIndex = sideView[sideviewIndex + 2];
-                sideviewIndex++;
-                if (collectableIndex <= 0x07)
-                {
-                    hasItem = true;
-                }
-            }
-            //elevator
-            else if (sideView[sideviewIndex + 1] == 0x50)
-            {
-               elevatorScreen = currentX >> 4;
-            }
-            currentX += xAdvance;
+            SideviewEditable<PalaceObject> sideviewEditable = new(sideView);
+            hasItem = sideviewEditable.HasItem();
+            var elevator = sideviewEditable.Find(o => o.IsElevator());
+            if (elevator != null) { elevatorScreen = elevator.AbsX / 16; }
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Malformed room breaks parsing. Group: " + palaceGroup + " Map: " + map);
         }
 
         r = new Room
         {
-            itemGetBits = bitmask,
+            ItemGetBits = [bitmask],
             Connections = connectBytes,
             ElevatorScreen = elevatorScreen,
             Enabled = true,
@@ -95,22 +83,25 @@ for (int j = 0; j < 3; j++)
             HasItem = hasItem,
             IsThunderBirdRoom = false,
             PalaceNumber = null,
-            PalaceGroup = j,
+            // PalaceGroup = (PalaceGrouping)palaceGroup,
             LinkedRoomName = null,
             IsDropZone = false,
             IsEntrance = false,
-            isUpDownReversed = false,
-            Map = i,
+            //IsUpDownReversed = false,
+            Map = (byte)map,
             ConnectionStartAddress = sideViewPtr,
             Name = "",
             Requirements = new Requirements(),
             SideView = sideView,
         };
-        r.PalaceGroup = (j + 1);
+        // r.PalaceGroup = (PalaceGrouping)palaceGroup;
         sb.Append(r.Serialize() + ",");
     }
 }
 sb[sb.Length - 1] = ']';
 var jsonElement = JsonSerializer.Deserialize<JsonElement>(sb.ToString());
-string prettyPrintedJson = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions() { WriteIndented = true, });
+JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true, };
+string prettyPrintedJson = JsonSerializer.Serialize(jsonElement, options);
 File.WriteAllText("Rooms.dump", prettyPrintedJson);
+
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code

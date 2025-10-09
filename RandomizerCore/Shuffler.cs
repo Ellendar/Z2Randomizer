@@ -1,10 +1,11 @@
-﻿using Assembler;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using js65;
+using NLog;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// --Ellendar
@@ -49,15 +50,15 @@ public class Shuffler
         List<int> binRows = new List<int>();
         for (int i = 0; i < 7; i++)
         {
-            int brickRow = r.Next(Sidescroll.PalaceColors.bricks.GetLength(0));
-            int curtainRow = r.Next(Sidescroll.PalaceColors.curtains.GetLength(0));
+            int brickRow = r.Next(PalaceColors.bricks.GetLength(0));
+            int curtainRow = r.Next(PalaceColors.curtains.GetLength(0));
 
             int[] bricks = new int[3];
             int[] curtains = new int[3];
             for (int j = 0; j < 3; j++)
             {
-                bricks[j] = Sidescroll.PalaceColors.bricks[brickRow, j];
-                curtains[j] = Sidescroll.PalaceColors.curtains[curtainRow, j];
+                bricks[j] = PalaceColors.bricks[brickRow, j];
+                curtains[j] = PalaceColors.curtains[curtainRow, j];
             }
 
             brickList.Add(bricks);
@@ -72,8 +73,9 @@ public class Shuffler
 
     public void ShuffleDrops(ROM ROMData, Random r)
     {
-        List<int> small = new List<int>();
-        List<int> large = new List<int>();
+        List<int> small = [];
+        List<int> large = [];
+
 
         if (props.Smallbluejar)
         {
@@ -140,23 +142,16 @@ public class Shuffler
             large.Add(0x88);
         }
 
-        if (small.Count + large.Count > 0)
+        // drops are kept vanilla if nothing is selected & RandomizeDrops is off
+        if (small.Count > 0)
         {
-            for (int i = 0; i < small.Count(); i++)
+            // shuffle order
+            for (int i = 0; i < small.Count; i++)
             {
-                int swap = r.Next(small.Count());
-                int temp = small[i];
-                small[i] = small[swap];
-                small[swap] = temp;
+                int swap = r.Next(small.Count);
+                (small[i], small[swap]) = (small[swap], small[i]);
             }
-
-            for (int i = 0; i < large.Count(); i++)
-            {
-                int swap = r.Next(large.Count());
-                int temp = large[i];
-                large[i] = large[swap];
-                large[swap] = temp;
-            }
+            // the game uses 8 drop items, fill the rest with copies at random
             for (int i = 0; i < 8; i++)
             {
                 if (i < small.Count())
@@ -167,6 +162,19 @@ public class Shuffler
                 {
                     ROMData.Put(0x1E880 + i, (byte)small[r.Next(small.Count())]);
                 }
+            }
+        }
+        if (large.Count > 0)
+        {
+            // shuffle order
+            for (int i = 0; i < large.Count; i++)
+            {
+                int swap = r.Next(large.Count);
+                (large[i], large[swap]) = (large[swap], large[i]);
+            }
+            // the game uses 8 drop items, fill the rest with copies at random
+            for (int i = 0; i < 8; i++)
+            {
                 if (i < large.Count())
                 {
                     ROMData.Put(0x1E888 + i, (byte)large[i]);
@@ -208,13 +216,12 @@ public class Shuffler
         }
     }
 
-    public void ShuffleBossDrop(ROM ROMData, Random r, Engine engine)
+    public void ShuffleBossDrop(ROM ROMData, Random r, Assembler a)
     {
         int drop = drops[r.Next(drops.Count())];
         ROMData.Put(0x1de29, (byte)(drop - 0x80));
 
-        Assembler.Assembler a = new();
-        a.Code("""
+        a.Module().Code("""
 .segment "PRG7"
 .org $E79A
     ; Branch if scroll frozen
@@ -229,7 +236,7 @@ public class Shuffler
             ; otherwise resume the previous track (palace theme)
             lda #2
             sta $eb
-    + 
+    +
     ; Write the "grab item" sound effect to the sfx queue
     lda #8
     sta $ef
@@ -271,6 +278,5 @@ DontSwitchMusicIfInPalace2:
         sta $eb
 +   rts
 """);
-        engine.Modules.Add(a.Actions);
     }
 }

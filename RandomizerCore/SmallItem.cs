@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Speech.Synthesis;
-using System.Text;
-using System.Threading.Tasks;
-using Z2Randomizer;
 
-namespace Z2Randomizer.Core
+namespace Z2Randomizer.RandomizerCore
 {
     //private readonly int[] drops = { 0x8a, 0x8b, 0x8c, 0x8d, 0x90, 0x91, 0x92, 0x88 }
     public enum SmallItem

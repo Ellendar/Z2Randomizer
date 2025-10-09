@@ -1,14 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using Z2Randomizer.Core.Overworld;
-using static System.Net.Mime.MediaTypeNames;
+using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 public class Util
 {
@@ -18,67 +18,84 @@ public class Util
         return (byte)(((b * 0x80200802ul) & 0x0884422110ul) * 0x0101010101ul >> 32);
     }
 
-    public static byte[] ToGameText(string rawText, bool endByte)
+    public static byte[] ToGameText(string rawText, bool endByte = false)
     {
-        List<char> rawTextChars = rawText.ToUpper().ToCharArray().ToList();
-        List<byte> encodedText = [];
-        for (int i = 0; i < rawTextChars.Count; i++)
+        char[] rawTextChars = rawText.ToUpper().ToCharArray();
+        List<byte> output = new List<byte>();
+
+        for (int i = 0; i < rawTextChars.Length; i++)
         {
-            if (rawTextChars[i] >= '0' && rawTextChars[i] <= '9')
-                encodedText.Add((byte)((byte)rawTextChars[i] + 0xA0));
-            else if (rawTextChars[i] >= 'A' && rawTextChars[i] <= 'Z')
-                encodedText.Add((byte)((byte)rawTextChars[i] + 0x99));
-            else encodedText.Add(rawTextChars[i] switch
+            char c = rawTextChars[i];
+            if (c >= '0' && c <= '9')
+            { 
+                output.Add((byte)(c + 0xA0));
+            }
+            else if (c >= 'A' && c <= 'Z')
+            { 
+                output.Add((byte)(c + 0x99));
+            }
+            else
             {
-                '.' => 0xcf,
-                '/' => 0xce,
-                ',' => 0x9c,
-                '!' => 0x36,
-                '?' => 0x34,
-                '*' => 0x32,
-                ' ' => 0xf4,
-                '\n' => 0xfd,
-                '$' => 0xfd,
-                '-' => 0xf6,
-                '_' => 0xc5,
-                _ => 0xf4
-            });
+                switch (c)
+                {
+                    case '.': output.Add(0xcf); break;
+                    case '/': output.Add(0xce); break;
+                    case ',': output.Add(0x9c); break;
+                    case '!': output.Add(0x36); break;
+                    case '?': output.Add(0x34); break;
+                    case '*': output.Add(0x32); break;
+                    case ' ': output.Add(0xf4); break;
+                    case '\n': output.Add(0xfd); break;
+                    case '$': output.Add(0xfd); break;
+                    case '-': output.Add(0xf6); break;
+                    case '_': output.Add(0xc5); break;
+                    default: break; // ignore unknown characters
+                }
+            }
         }
         if (endByte)
         {
-            encodedText.Add(textEndByte);
+            output.Add((byte)textEndByte);
         }
 
-        return encodedText.ToArray();
+        return output.ToArray();
     }
 
-    public static string FromGameText(byte[] rawText)
+    public static string FromGameText(IEnumerable<byte> bytes)
     {
-        StringBuilder output = new();
-        foreach(char rawChar in rawText)
+        StringBuilder output = new StringBuilder();
+        foreach (byte b in bytes)
         {
-            if (rawChar >= 0xD0 && rawChar <= 0xD9)
-                output.Append((char)(rawChar - 0xA0));
-            else if (rawChar >= 0xda && rawChar <= 0xF3)
-                output.Append((char)(rawChar - 0x99));
-            else output.Append((int)rawChar switch
+            if (b >= 0xD0 && b <= 0xD9)
             {
-                0xcf => '.',
-                0xce => '/',
-                0x9c => ',',
-                0x36 => '!',
-                0x34 => '?',
-                0x32 => '*',
-                0xf4 => ' ',
-                0xfd => '$',
-                0xf6 => '-',
-                0xc5 => '_',
-                _ => ""
-            });
+                output.Append((char)(b - 0xA0));
+            }
+            else if (b >= 0xDA && b <= 0xF3)
+            {
+                output.Append((char)(b - 0x99));
+            }
+            else
+            {
+                switch (b)
+                {
+                    case 0xcf: output.Append('.'); break;
+                    case 0xce: output.Append('/'); break;
+                    case 0x9c: output.Append(','); break;
+                    case 0x36: output.Append('!'); break;
+                    case 0x34: output.Append('?'); break;
+                    case 0x32: output.Append('*'); break;
+                    case 0xf4: output.Append(' '); break;
+                    case 0xfd: output.Append('$'); break;
+                    case 0xf6: output.Append('-'); break;
+                    case 0xc5: output.Append('_'); break;
+                    default: break; // ignore unknown bytes
+                }
+            }
         }
 
         return output.ToString();
     }
+
     public static void Swap(Location p1, Location p2)
     {
         //(p2.Continent, p1.Continent) = (p1.Continent, p2.Continent);
@@ -86,7 +103,7 @@ public class Util
         (p2.PalaceNumber, p1.PalaceNumber) = (p1.PalaceNumber, p2.PalaceNumber);
 
         (p2.ActualTown, p1.ActualTown) = (p1.ActualTown, p2.ActualTown);
-        (p2.Item, p1.Item) = (p1.Item, p2.Item);
+        (p2.Collectables, p1.Collectables) = (p1.Collectables, p2.Collectables);
         (p2.Name, p1.Name) = (p1.Name, p2.Name);
     }
 
@@ -127,7 +144,8 @@ public class Util
 
     private static string FilePathFromAssemblyLocation(string fileName)
     {
-        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string executingDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
+            ?? throw new ImpossibleException("Invalid executing assembly directory");
 
         return Path.Combine(executingDirectory, fileName);
     }
@@ -137,30 +155,27 @@ public class Util
     /// </summary>
     public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
-        public bool Equals(byte[] x, byte[] y)
+        public bool Equals(byte[]? x, byte[]? y)
         {
-            if (x.Length != y.Length)
+            if(x == null)
+            {
+                return y == null;
+            }
+            if(y == null)
             {
                 return false;
             }
-            for (int i = 0; i < x.Length; i++)
-            {
-                if (x[i] != y[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return x.Length == y.Length && x.SequenceEqual(y);
         }
 
         public int GetHashCode(byte[] obj)
         {
             int result = 17;
-            for (int i = 0; i < obj.Length; i++)
+            foreach (var t in obj)
             {
                 unchecked
                 {
-                    result = result * 23 + obj[i];
+                    result = result * 23 + t;
                 }
             }
             return result;
@@ -168,14 +183,66 @@ public class Util
     }
 
     public static IEqualityComparer<byte[]> byteArrayEqualityComparer = new StandardByteArrayEqualityComparer();
+
+    public static string ReadResource(string path)
+    {
+        return Assembly.GetExecutingAssembly().ReadResource(path);
+    }
+
+    public static byte[] ReadBinaryResource(string path)
+    {
+        return Assembly.GetExecutingAssembly().ReadBinaryResource(path);
+    }
+
+    public static PalaceGrouping? AsPalaceGrouping(int? palaceNumber)
+    {
+        return palaceNumber switch
+        {
+            1 => PalaceGrouping.Palace125,
+            2 => PalaceGrouping.Palace125,
+            3 => PalaceGrouping.Palace346,
+            4 => PalaceGrouping.Palace346,
+            5 => PalaceGrouping.Palace125,
+            6 => PalaceGrouping.Palace346,
+            7 => PalaceGrouping.PalaceGp,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Gets a PalaceGrouping based on the vanilla memory address of a room. Should only be used for actual vanilla rooms.
+    /// </summary>
+    /// <param name="address"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public static PalaceGrouping GetPalaceGroupingByMemoryAddress(int address)
+    {
+        if(address >= 67371 && address <= 67619)
+        {
+            return PalaceGrouping.Palace125;
+        }
+        if (address >= 74248 && address <= 74496)
+        {
+            return PalaceGrouping.Palace346;
+        }
+        if (address >= 83755 && address <= 83971)
+        {
+            return PalaceGrouping.PalaceGp;
+        }
+        throw new Exception("Unrecognized memory range for PalaceGrouping assignment");
+    }
 }
 
-internal static class AssemblyExtensions
+public static class AssemblyExtensions
 {
     public static string ReadResource(this Assembly assembly, string name)
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
+        if(stream == null)
+        {
+            throw new Exception("Unable to read ManifestResourceStream: " + name);
+        }
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
     }
@@ -190,6 +257,10 @@ internal static class AssemblyExtensions
     {
         // Format: "{Namespace}.{Folder}.{filename}.{Extension}"
         using var stream = assembly.GetManifestResourceStream(name);
+        if(stream == null)
+        {
+            throw new Exception("Unable to read binary resource: " + name);
+        }
         using var reader = new BinaryReader(stream);
         return reader.ReadBytes((int)stream.Length);
     }

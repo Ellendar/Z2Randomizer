@@ -1,72 +1,51 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using NLog;
-using RandomizerCore;
-using Z2Randomizer.Core.Sidescroll;
+using Z2Randomizer.RandomizerCore.Enemy;
+
 //using System.Runtime.InteropServices.WindowsRuntime;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public abstract class World
 {
     protected readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected SortedDictionary<string, List<Location>> areasByLocation;
-    /*private List<Location> caves;
-    private List<Location> towns;
-    private List<Location> palaces;
-    private List<Location> grasses;
-    private List<Location> swamps;
-    private List<Location> bridges;
-    private List<Location> deserts;
-    private List<Location> forests;
-    private List<Location> graves;
-    private List<Location> lavas;
-    private List<Location> roads;
-    private List<Location> allLocations;
-    */
+
     public Dictionary<Location, Location> connections;
-    //protected HashSet<String> reachableAreas;
-    protected int enemyAddr;
-    protected List<int> enemies;
-    protected List<int> flyingEnemies;
-    protected List<int> generators;
-    protected List<int> smallEnemies;
-    protected List<int> largeEnemies;
-    protected int enemyPtr;
-    protected List<int> overworldMaps;
+    public int sideviewPtrTable { get; protected set; }
+    public int sideviewBank { get; protected set; }
+    public int enemyPtr { get; protected set; }
+    public GroupedEnemiesBase groupedEnemies { get; protected set; }
+    public IReadOnlyList<int> overworldEncounterMaps { get; protected set; }
+    public IReadOnlyList<int> overworldEncounterMapDuplicate { get; protected set; } = [];
+    public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
-    //protected Hyrule hyrule;
-    protected Terrain[,] map;
-    //private List<int> visitedEnemies;
-    protected int MAP_ROWS;
-    protected int MAP_COLS;
-    //protected int bytesWritten;
+    public Terrain[,] map;
+    public int MAP_ROWS;
+    public int MAP_COLS;
     protected List<Terrain> randomTerrainFilter;
     protected List<Terrain> walkableTerrains;
     protected bool[,] visitation;
     protected const int MAP_SIZE_BYTES = 1400;
     protected List<Location> unimportantLocs;
-    protected Biome biome;
+    public Biome biome { get; protected set; }
     protected bool isHorizontal;
     protected int VANILLA_MAP_ADDR;
     protected SortedDictionary<(int, int), string> section;
-    public Location raft;
-    public Location bridge;
-    public Location cave1;
-    public Location cave2;
-    //private bool allreached;
+    public Location? raft;
+    public Location? bridge;
+    public Location? cave1;
+    public Location? cave2;
 
     public int baseAddr;
     protected Climate climate;
 
     protected Random RNG;
 
-    //private const int MAXIMUM_BRIDGE_LENGTH = 10;
     private const int MINIMUM_BRIDGE_LENGTH = 2;
 
     private static readonly Dictionary<Biome, int> MAXIMUM_BRIDGE_LENGTH = new()
@@ -135,7 +114,11 @@ public abstract class World
 
     public bool AllReached { get; set; }
 
-    public World(Random r)
+    //The analyzer doesn't understand the design pattern of an inaccessable constructor as a forced inheritance anchor
+    //maybe that's just a javaism it doesn't like. In either case, I don't care.
+#pragma warning disable CS8618
+    protected World(Random r)
+#pragma warning restore CS8618 
     {
         RNG = r;
 
@@ -145,12 +128,10 @@ public abstract class World
         {
             Locations.Add(Terrain, new List<Location>());
         }
-        //Locations = new List<Location>[11] { Towns, Caves, Palaces, Bridges, Deserts, Grasses, Forests, Swamps, Graves, Roads, Lavas };
-        AllLocations = new List<Location>();
-        locsByCoords = new SortedDictionary<(int, int), Location>();
-        //reachableAreas = new HashSet<string>();
-        unimportantLocs = new List<Location>();
-        areasByLocation = new SortedDictionary<string, List<Location>>();
+        AllLocations = [];
+        locsByCoords = [];
+        unimportantLocs = [];
+        areasByLocation = [];
         AllReached = false;
     }
 
@@ -177,13 +158,12 @@ public abstract class World
             Locations[location.TerrainType].Add(location);
         }
         AllLocations.Add(location);
-        //locsByCoords.Add(l.Coords, l);
     }
 
     protected void ShuffleLocations(List<Location> locationsToShuffle)
     {
         List<Location> shufflableLocations = locationsToShuffle.Where(i => i.CanShuffle && i.AppearsOnMap).ToList();
-        for (int i = shufflableLocations.Count() - 1; i > 0; i--)
+        for (int i = shufflableLocations.Count - 1; i > 0; i--)
         {
             int n = RNG.Next(i + 1);
             Swap(shufflableLocations[i], shufflableLocations[n]);
@@ -191,120 +171,24 @@ public abstract class World
     }
 
 
-    protected static void Swap(Location l1, Location l2)
+    protected void Swap(Location l1, Location l2)
     {
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
         (l2.Ypos, l1.Ypos) = (l1.Ypos, l2.Ypos);
         (l2.PassThrough, l1.PassThrough) = (l1.PassThrough, l2.PassThrough);
-    }
 
-    //TODO: This should work like the new palace enemy shuffle. Shuffle should set what enemies are where into
-    //enemies arrays for the different encouter types, and then there should be a separate write step.
-    public void ShuffleEnemies(ROM romData, int addr, bool generatorsAlwaysMatch, bool mixLargeAndSmallEnemies)
-    {
-        int? firstGenerator = null;
-        if (addr != 0x95A4)
+        foreach (Location child in l1.Children)
         {
-            int numBytes = romData.GetByte(addr);
-            for (int j = addr + 2; j < addr + numBytes; j += 2)
-            {
-                int enemy = romData.GetByte(j) & 0x3F;
-                int highPart = romData.GetByte(j) & 0xC0;
-                if (mixLargeAndSmallEnemies)
-                {
-                    if (enemies.Contains(enemy))
-                    {
-                        int swap = enemies[RNG.Next(0, enemies.Count)];
-                        romData.Put(j, (byte)(swap + highPart));
-                        if (smallEnemies.Contains(enemy) && largeEnemies.Contains(swap) && swap != 0x20)
-                        {
-                            int ypos = romData.GetByte(j - 1) & 0xF0;
-                            int xpos = romData.GetByte(j - 1) & 0x0F;
-                            ypos -= 32;
-                            romData.Put(j - 1, (byte)(ypos + xpos));
-                        }
-                        else if (swap == 0x20 && swap != enemy)
-                        {
-                            int ypos = romData.GetByte(j - 1) & 0xF0;
-                            int xpos = romData.GetByte(j - 1) & 0x0F;
-                            ypos -= 48;
-                            romData.Put(j - 1, (byte)(ypos + xpos));
-                        }
-                        else if (enemy == 0x1F && swap != enemy)
-                        {
-                            int ypos = romData.GetByte(j - 1) & 0xF0;
-                            int xpos = romData.GetByte(j - 1) & 0x0F;
-                            ypos -= 16;
-                            romData.Put(j - 1, (byte)(ypos + xpos));
-                        }
-                    }
-                }
-                else
-                {
+            child.Xpos = l1.Xpos;
+            child.Ypos = l1.Ypos;
+            child.PassThrough = l1.PassThrough;
+        }
 
-                    if (largeEnemies.Contains(enemy))
-                    {
-                        int swap = RNG.Next(0, largeEnemies.Count);
-                        if (largeEnemies[swap] == 0x20 && largeEnemies[swap] != enemy)
-                        {
-                            int ypos = romData.GetByte(j - 1) & 0xF0;
-                            int xpos = romData.GetByte(j - 1) & 0x0F;
-                            ypos -= 48;
-                            romData.Put(j - 1, (byte)(ypos + xpos));
-                        }
-                        romData.Put(j, (byte)(largeEnemies[swap] + highPart));
-                    }
-
-                    if (smallEnemies.Contains(enemy))
-                    {
-                        int swap = RNG.Next(0, smallEnemies.Count);
-                        romData.Put(j, (byte)(smallEnemies[swap] + highPart));
-                    }
-                }
-
-                if (flyingEnemies.Contains(enemy))
-                {
-                    int swap = RNG.Next(0, flyingEnemies.Count);
-                    romData.Put(j, (byte)(flyingEnemies[swap] + highPart));
-
-                    if (flyingEnemies[swap] == 0x07 || flyingEnemies[swap] == 0x0a || flyingEnemies[swap] == 0x0d || flyingEnemies[swap] == 0x0e)
-                    {
-                        int ypos = 0x00;
-                        int xpos = romData.GetByte(j - 1) & 0x0F;
-                        romData.Put(j - 1, (byte)(ypos + xpos));
-                    }
-                }
-
-                if (generators.Contains(enemy))
-                {
-                    int swap = RNG.Next(0, generators.Count);
-                    firstGenerator ??= generators[swap];
-                    if (generatorsAlwaysMatch)
-                    {
-                        romData.Put(j, (byte)(firstGenerator + highPart));
-                    }
-                    else
-                    {
-                        romData.Put(j, (byte)(generators[swap] + highPart));
-                    }
-                }
-
-                //Moblin generators can become things, but things can't become moblin generators.
-                //Why? I assume it causes some kind of issue, but I've never investigated.
-                if (enemy == 0x21)
-                {
-                    int swap = RNG.Next(0, generators.Count + 1);
-                    firstGenerator ??= swap == generators.Count ? 0x21 : generators[swap];
-                    if (generatorsAlwaysMatch)
-                    {
-                        romData.Put(j, (byte)(firstGenerator + highPart));
-                    }
-                    else if (swap != generators.Count)
-                    {
-                        romData.Put(j, (byte)(generators[swap] + highPart));
-                    }
-                }
-            }
+        foreach (Location child in l2.Children)
+        {
+            child.Xpos = l2.Xpos;
+            child.Ypos = l2.Ypos;
+            child.PassThrough = l2.PassThrough;
         }
     }
 
@@ -341,7 +225,10 @@ public abstract class World
             AllReached = true;
             foreach (Location location in AllLocations)
             {
-                if (location.TerrainType == Terrain.PALACE || location.TerrainType == Terrain.TOWN || location.Item != Item.DO_NOT_USE)
+                //TODO: Doing this off terrain type is a very bad idea for stuff like vanilla shuffle no actual terrain.
+                if (location.TerrainType == Terrain.PALACE 
+                    || location.TerrainType == Terrain.TOWN 
+                    || location.Collectables.Any(i => !i.IsInternalUse()))
                 {
                     if (!location.Reachable)
                     {
@@ -352,90 +239,26 @@ public abstract class World
         }
     }
 
-    protected Location GetLocationByCoords((int, int)coords)
+    protected Location? GetLocationByCoords((int, int)coords)
     {
-        Location location = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.Coords.Equals(coords))
-            {
-                location = loc;
-                break;
-            }
-        }
-        if (location == null)
-        {
-            //Console.Write(coords);
-        }
-        return location;
+        return AllLocations.FirstOrDefault(i => i.Coords.Equals(coords));
     }
 
     protected Location GetLocationByMem(int mem)
     {
-        Location location = null;
-        foreach (Location loc in AllLocations)
-        {
-            if (loc.MemAddress == mem)
-            {
-                location = loc;
-                break;
-            }
-        }
-        return location;
-    }
-
-    public void ShuffleOverworldEnemies(ROM romData, bool generatorsAlwaysMatch, bool mixLargeAndSmallEnemies)
-    {
-        List<int> shuffledEncounters = new List<int>();
-        //0x4581
-        for (int i = enemyPtr; i < enemyPtr + 126; i += 2)
-        {
-            int low = romData.GetByte(i);
-            int high = romData.GetByte(i + 1);
-            high <<= 8;
-            high &= 0x0FFF;
-            int addr = high + low + enemyAddr;
-            if(shuffledEncounters.Contains(addr))
-            {
-                logger.Debug("Duplicate encounter");
-            }
-            else
-            {
-                shuffledEncounters.Add(addr);
-                ShuffleEnemies(romData, addr, generatorsAlwaysMatch, mixLargeAndSmallEnemies);
-            }
-        }
-        //{ 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
-        foreach (int map in overworldMaps)
-        {
-            int ptrAddr = enemyPtr + map * 2;
-            int low = romData.GetByte(ptrAddr);
-            int high = romData.GetByte(ptrAddr + 1);
-            high <<= 8;
-            high &= 0x0FFF;
-            int addr = high + low + enemyAddr;
-            addr += romData.GetByte(addr);
-            if (shuffledEncounters.Contains(addr))
-            {
-                logger.Debug("Duplicate encounter");
-            }
-            else
-            {
-                shuffledEncounters.Add(addr);
-                ShuffleEnemies(romData, addr, generatorsAlwaysMatch, mixLargeAndSmallEnemies);
-            }
-        }
+        return AllLocations.FirstOrDefault(i => i.MemAddress.Equals(mem)) 
+            ?? throw new Exception("Failed to find Location at address: " + mem);
     }
 
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves)
     {
         return PlaceLocations(riverTerrain, saneCaves, null, -1);
     }
-    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location hiddenKasutoLocation, int hiddenPalaceX)
+    protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
     {
         //return true;
         int i = 0;
-        foreach (Location location in AllLocations)
+        foreach (Location location in AllLocations.Where(loc => loc.AppearsOnMap))
         {
             i++;
             if ((location.TerrainType != Terrain.BRIDGE
@@ -511,7 +334,8 @@ public abstract class World
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
                 }
-                else if (location.TerrainType != Terrain.TOWN || location.ActualTown.AppearsOnMap())
+                else if (location.TerrainType != Terrain.TOWN || 
+                    (location.ActualTown > 0 && (location?.ActualTown?.AppearsOnMap() ?? false)))
                 {
                     Terrain t;
                     do
@@ -529,6 +353,15 @@ public abstract class World
                     location.Xpos = x;
                     location.Ypos = y + 30;
                     location.CanShuffle = false;
+                }
+            }
+
+            if(location!.TerrainType == Terrain.TOWN)
+            {
+                foreach (Location linkedLocation in AllLocations.Where(
+                    loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
+                {
+                    linkedLocation.Coords = location.Coords;
                 }
             }
         }
@@ -667,17 +500,20 @@ public abstract class World
         bool crossing;
         do
         {
+            //6-18
             int range = 12;
             int offset = 6;
             if (biome == Biome.ISLANDS || biome == Biome.MOUNTAINOUS)
             {
+                //10-20
                 range = 10;
                 offset = 10;
             }
             else if (biome == Biome.VOLCANO || biome == Biome.CALDERA)
             {
-                range = 10;
-                offset = 15;
+                //5-20
+                range = 15;
+                offset = 5;
             }
             crossing = true;
             if (direction == Direction.NORTH)
@@ -780,7 +616,8 @@ public abstract class World
     /// <param name="placeLongBridge">If true, one of the bridges is the bridge from vanilla west connecting DM to the SE desert with encounters at both ends</param>
     /// <param name="placeDarunia">If true, one of the bridges is a desert road with the two encounters that lead to darunia in vanilla</param>
     /// <returns>False if greater than 2000 total attempts were made in placement of all of the bridges. Else true.</returns>
-    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, bool placeLongBridge, bool placeDarunia, 
+    protected bool ConnectIslands(int maxBridges, bool placeTown, Terrain riverTerrain, bool riverDevil, 
+        bool rockBlock, bool placeLongBridge, bool placeDarunia, 
         bool canWalkOnWater, Biome biome, int? deadZoneMinX = null, int? deadZoneMaxX = null, int? deadZoneMinY = null, int? deadZoneMaxY = null)
     {
         int maxBridgeLength = MAXIMUM_BRIDGE_LENGTH[biome];
@@ -1175,6 +1012,12 @@ public abstract class World
                                         riverDevil = false;
                                         placed = true;
                                     }
+                                    else if (rockBlock)
+                                    {
+                                        map[y, x] = Terrain.ROCK;
+                                        rockBlock = false;
+                                        placed = true;
+                                    }
                                     foreach (Location location in locs)
                                     {
                                         if (location.CanShuffle && !placed)
@@ -1203,6 +1046,12 @@ public abstract class World
                                             riverDevil = false;
                                             placed = true;
                                         }
+                                        else if (rockBlock)
+                                        {
+                                            map[y, x] = Terrain.ROCK;
+                                            rockBlock = false;
+                                            placed = true;
+                                        }
                                         foreach (Location location in Locations[Terrain.ROAD])
                                         {
                                             if (location.CanShuffle && !placed)
@@ -1229,6 +1078,12 @@ public abstract class World
                                         {
                                             map[y, x] = Terrain.RIVER_DEVIL;
                                             riverDevil = false;
+                                            placed = true;
+                                        }
+                                        else if (rockBlock)
+                                        {
+                                            map[y, x] = Terrain.ROCK;
+                                            rockBlock = false;
                                             placed = true;
                                         }
                                         foreach (Location location in Locations[Terrain.BRIDGE])
@@ -1470,28 +1325,6 @@ public abstract class World
         return true;
     }
 
-    /*
-    //Keeping this around for vanilla DM support, but probably this gets removed in the future
-    protected void PlaceRandomTerrain(int numberOfTerrainsToPlace, Climate climate)
-    {
-        //randomly place remaining Terrain
-        int placed = 0;
-        while (placed < numberOfTerrainsToPlace)
-        {
-            int x = 0;
-            int y = 0;
-            Terrain t = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-            do
-            {
-                x = RNG.Next(MAP_COLS);
-                y = RNG.Next(MAP_ROWS);
-            } while (map[y, x] != Terrain.NONE);
-            map[y, x] = t;
-            placed++;
-        }
-    }
-    */
-
     protected void PlaceRandomTerrain(Climate climate, int seedCountMaximum = 500)
     {
         //If we fail to place terrain more than a certain number of times in a row, we're probably at/near the limit of the number of 
@@ -1720,30 +1553,8 @@ public abstract class World
         }
     }
   
-    protected void UpdateReachable(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    protected void UpdateReachable(Dictionary<Collectable, bool> itemGet)
     {
-        //Setup
-        bool needJump = false;
-        Location location = GetLocationByMem(0x8646);
-        int jumpBlockY = -1;
-        int jumpBlockX = -1;
-        if (location != null)
-        {
-            needJump = location.NeedJump;
-            jumpBlockY = location.Ypos - 30;
-            jumpBlockX = location.Xpos;
-        }
-
-        bool needFairy = false;
-        location = GetLocationByMem(0x8644);
-        int fairyBlockY = -1;
-        int fairyBlockX = -1;
-        if (location != null)
-        {
-            needFairy = location.NeedFairy;
-            fairyBlockY = location.Ypos - 30;
-            fairyBlockX = location.Xpos;
-        }
 
         List<Location> starts = GetPathingStarts();
 
@@ -1761,7 +1572,7 @@ public abstract class World
         {
             if (start.Ypos >= 30 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet, spellGet, jumpBlockY, jumpBlockX, fairyBlockY, fairyBlockX, needJump, needFairy);
+                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet);
             }
         }
 
@@ -1774,8 +1585,7 @@ public abstract class World
     }
 
     //This signature has gotten out of control, consider a refactor
-    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet, 
-        int jumpBlockY, int jumpBlockX, int fairyBlockY, int fairyBlockX, bool needJump, bool needFairy)
+    protected void UpdateReachable(ref bool[,] covered, int start_y, int start_x, Dictionary<Collectable, bool> itemGet)
     {
         Stack<(int, int)> to_visit = new();
         // push the initial coord to the visitation stack
@@ -1791,6 +1601,8 @@ public abstract class World
                     continue;
                 }
                 covered[y, x] = true;
+                Location? location = GetLocationByCoords((y + 30, x));
+
 
                 Terrain terrain = map[y, x];
                 if ((terrain == Terrain.LAVA
@@ -1800,18 +1612,22 @@ public abstract class World
                     || terrain == Terrain.PALACE
                     || terrain == Terrain.TOWN
                     || walkableTerrains.Contains(terrain)
-                    || (terrain == Terrain.WALKABLEWATER && itemGet[Item.BOOTS])
-                    || (terrain == Terrain.ROCK && itemGet[Item.HAMMER])
-                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Item.FLUTE]))
+                    || (terrain == Terrain.WALKABLEWATER && itemGet[Collectable.BOOTS])
+                    || (terrain == Terrain.ROCK && itemGet[Collectable.HAMMER])
+                    || (terrain == Terrain.RIVER_DEVIL && itemGet[Collectable.FLUTE]))
+
                     //East desert jump blocker
                     && !(
-                        needJump
-                        && jumpBlockY == y
-                        && jumpBlockX == x
-                        && (!spellGet[Spell.JUMP] && !spellGet[Spell.FAIRY])
+                        location != null
+                        && location.NeedJump
+                        && (!itemGet[Collectable.JUMP_SPELL] && !itemGet[Collectable.FAIRY_SPELL])
                     )
                     //Fairy cave is traversable
-                    && !(needFairy && fairyBlockY == y && fairyBlockX == x && !spellGet[Spell.FAIRY])
+                    && !(
+                        location != null
+                        && location.NeedFairy 
+                        && !itemGet[Collectable.FAIRY_SPELL]
+                    )
                 )
                 {
                     visitation[y, x] = true;
@@ -1855,11 +1671,10 @@ public abstract class World
         {
             location.CanShuffle = true;
             location.Reachable = false;
-            location.ItemGet = false;
         }
     }
 
-    protected bool DrawRaft(bool bridge, Direction direction)
+    protected bool DrawRaft(bool drawBridgeInstead, Direction direction)
     {
         int raftx = 0;
         int deltax = 1;
@@ -1951,25 +1766,22 @@ public abstract class World
                 raftx += deltax;
                 length++;
             }
-        } while (rafty < 0 || rafty >= MAP_ROWS || raftx < 0 || raftx >= MAP_COLS || !walkableTerrains.Contains(map[rafty, raftx]) || (bridge && length > 10) || (bridge && length <= 1));
+        } while (rafty < 0 || rafty >= MAP_ROWS || raftx < 0 || raftx >= MAP_COLS || !walkableTerrains.Contains(map[rafty, raftx]) || (drawBridgeInstead && length > 10) || (drawBridgeInstead && length <= 1));
 
 
         rafty -= deltay;
         raftx -= deltax;
-        if (!bridge)
+        if (drawBridgeInstead)
         {
+            if(bridge == null)
+            {
+                throw new Exception("Unable to draw unloaded bridge");
+            }
             map[rafty, raftx] = Terrain.BRIDGE;
-            raft.Xpos = raftx;
-            raft.Ypos = rafty + 30;
-            raft.CanShuffle = false;
-        }
-        else
-        {
-            map[rafty, raftx] = Terrain.BRIDGE;
-            this.bridge.Xpos = raftx;
-            this.bridge.Ypos = rafty + 30;
-            this.bridge.PassThrough = 0;
-            this.bridge.CanShuffle = false;
+            bridge.Xpos = raftx;
+            bridge.Ypos = rafty + 30;
+            bridge.PassThrough = 0;
+            bridge.CanShuffle = false;
             if (direction == Direction.EAST)
             {
                 for (int i = raftx + 1; i < MAP_COLS; i++)
@@ -1999,14 +1811,26 @@ public abstract class World
                 }
             }
         }
+        else
+        {
+            if (raft == null)
+            {
+                throw new Exception("Unable to draw unloaded raft");
+            }
+            map[rafty, raftx] = Terrain.BRIDGE;
+            raft.Xpos = raftx;
+            raft.Ypos = rafty + 30;
+            raft.CanShuffle = false;
+        }
         return true;
 
     }
 
-    public Location LoadRaft(ROM rom, Continent continent, Continent connectedContinent)
+    public Location LoadRaft(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, continent));
+        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, world));
         raft = GetLocationByMem(baseAddr + 41);
+        raft.Continent = world;
         raft.ConnectedContinent = connectedContinent;
         raft.ExternalWorld = 0x80;
         raft.Map = 41;
@@ -2014,10 +1838,11 @@ public abstract class World
         return raft;
     }
 
-    public Location LoadBridge(ROM rom, Continent continent, Continent connectedContinent)
+    public Location LoadBridge(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, continent));
+        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, world));
         bridge = GetLocationByMem(baseAddr + 40);
+        bridge.Continent = world;
         bridge.ConnectedContinent = connectedContinent;
         bridge.ExternalWorld = 0x80;
         bridge.Map = 40;
@@ -2025,10 +1850,11 @@ public abstract class World
         return bridge;
     }
 
-    public Location LoadCave1(ROM rom, Continent continent, Continent connectedContinent)
+    public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, continent));
+        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, world));
         cave1 = GetLocationByMem(baseAddr + 42);
+        cave1.Continent = world;
         cave1.ConnectedContinent = connectedContinent;
         cave1.ExternalWorld = 0x80;
         cave1.Map = 42;
@@ -2036,12 +1862,13 @@ public abstract class World
         return cave1;
     }
 
-    public Location LoadCave2(ROM rom, Continent continent, Continent connectedContinent)
+    public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, continent));
+        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, world));
         cave2 = GetLocationByMem(baseAddr + 43);
         cave2.ConnectedContinent = connectedContinent;
         cave2.ExternalWorld = 0x80;
+        cave2.Continent = world;
         cave2.Map = 43;
         cave2.TerrainType = Terrain.CAVE;
         cave2.CanShuffle = true;
@@ -2087,7 +1914,7 @@ public abstract class World
 
     public List<Location> GetContinentConnections()
     {
-        return new List<Location>() { cave1, cave2, bridge, raft }.Where(i => i != null).ToList();
+        return new List<Location>() { cave1!, cave2!, bridge!, raft! }.Where(i => i != null).ToList();
     }
 
     protected void DrawRiver(bool canWalkOnWaterWithBoots)
@@ -2755,6 +2582,40 @@ public abstract class World
         return debug.ToString();
     }
 
+    public string GetReadableMap()
+    {
+        StringBuilder debug = new();
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                debug.Append(map[y, x] switch
+                {
+                    Terrain.TOWN => 'T',
+                    Terrain.CAVE => 'C',
+                    Terrain.PALACE => 'P',
+                    Terrain.BRIDGE => "=",
+                    Terrain.DESERT => '_',
+                    Terrain.GRASS => '_',
+                    Terrain.FOREST => '_',
+                    Terrain.SWAMP => '_',
+                    Terrain.GRAVE => '_',
+                    Terrain.ROAD => '_',
+                    Terrain.LAVA => '_',
+                    Terrain.MOUNTAIN => 'X',
+                    Terrain.WATER => 'w',
+                    Terrain.WALKABLEWATER => 'w',
+                    Terrain.ROCK => 'X',
+                    Terrain.RIVER_DEVIL => 'X',
+                    Terrain.NONE => ' ',
+                    _ => throw new Exception("Invalid Terrain")
+                });
+            }
+            debug.Append('\n');
+        }
+        return debug.ToString();
+    }
+
     public bool ValidateCaves()
     {
         for(int y = 0; y < MAP_ROWS; y++)
@@ -2830,8 +2691,28 @@ public abstract class World
         return false;
     }
 
-    public abstract void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet);
+    //Short term fix, right now linked locations aren't shuffled, and they are counted as reachable when
+    //their parent location is reachable, but the original location remains in the location list, creating
+    //a phantom reachability spot at the vanilla location.
+    //What _should_ happen is there should be a unified interface for updating locations that automicatically
+    //updates the coordinates, map, linked locations, etc. But that's more work than I want to do, so here's this lazy hack
+    public void SynchronizeLinkedLocations()
+    {
+        foreach (Location parent in AllLocations)
+        {
+            foreach (Location child in parent.Children)
+            {
+                child.Xpos = parent.Xpos;
+                child.Ypos = parent.Ypos;
+            }
+        }
+    }
+
+    public abstract void UpdateVisit(Dictionary<Collectable, bool> itemGet);
 
     public abstract IEnumerable<Location> RequiredLocations(bool hiddenPalace, bool hiddenKasuto);
 
+    protected abstract void SetVanillaCollectables(bool useDash);
+
+    public abstract string GenerateSpoiler();
 }

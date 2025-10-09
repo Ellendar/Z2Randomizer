@@ -1,0 +1,50 @@
+name: Package and Upload Z2Randomizer
+
+on: [push, pull_request]
+
+env:
+  # I'm not a fan of the telemetry as-is, but this also suppresses some lines in the build log.
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  # This removes even more spurious lines.
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [
+          { os: windows-latest, arch: x64 },
+#          { os: windows-latest, arch: browser-wasm },
+          { os: macos-14, arch: arm64 },
+          { os: ubuntu-latest, arch: x64 },
+        ]
+        dotnet-version: [ '8.0.x' ]
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - if: ${{ ! startsWith(matrix.platform.arch, 'browser-wasm') }}
+        name: Publish Desktop
+        run: dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
+
+      - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
+        name: Publish Browser
+        run: |
+          dotnet workload install wasm-tools-net8
+          dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
+
+      - name: Upload To Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z2Randomizer ${{ matrix.platform.os }} - ${{ matrix.platform.arch }}
+          compression-level: 9
+          path: |
+            CrossPlatformUI/bin/publish
+            !**/*.pdb

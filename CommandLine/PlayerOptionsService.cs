@@ -1,10 +1,12 @@
-﻿using CommandLine.Models;
+﻿using Z2Randomizer.CommandLine.Models;
 using Newtonsoft.Json;
 using NLog;
 using System.Reflection;
-using Z2Randomizer.Core;
+using CrossPlatformUI.Services;
+using Desktop.Common;
+using Z2Randomizer.RandomizerCore;
 
-namespace CommandLine
+namespace Z2Randomizer.CommandLine
 {
     public class PlayerOptionsService
     {
@@ -24,11 +26,20 @@ namespace CommandLine
             "Random"
         };
 
-        private CharacterSprite[] spriteOptions;
+        private IList<CharacterSprite> spriteOptions = new List<CharacterSprite>();
 
         public PlayerOptionsService()
         {
-            this.spriteOptions = CharacterSprite.Options();
+            var fileservice = new DesktopFileService();
+            IEnumerable<string> spriteFiles = fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites)?.Result ?? [];
+            spriteOptions.Add(CharacterSprite.LINK);
+            foreach (var spriteFile in spriteFiles)
+            {
+                var patch = fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile).Result;
+                var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
+                spriteOptions.Add(new CharacterSprite(parsedName, patch));
+            }
+            spriteOptions.Add(CharacterSprite.RANDOM);
         }
 
         public PlayerOptions? LoadFromFile(string? path)
@@ -56,38 +67,27 @@ namespace CommandLine
 
         public void ApplyOptionsToConfiguration(PlayerOptions playerOptions, RandomizerConfiguration configuration)
         {
-            configuration.BeepFrequency = playerOptions.BeepFrequency switch
-            {
-                BeepFrequency.Normal => 0x30,
-                BeepFrequency.HalfSpeed => 0x60,
-                BeepFrequency.QuarterSpeed => 0xC0,
-                BeepFrequency.Off => 0,
-                _ => 0x30
-            };
-
-            configuration.BeepThreshold = playerOptions.BeepThreshold switch
-            {
-                BeepThreshold.Normal => 0x20,
-                BeepThreshold.HalfBar => 0x10,
-                BeepThreshold.QuarterBar => 0x08,
-                BeepThreshold.TwoBars => 0x40,
-                _ => 0x20
-            };
+            configuration.BeepFrequency = playerOptions.BeepFrequency;
+            configuration.BeepThreshold = playerOptions.BeepThreshold;
 
             configuration.RemoveFlashing = playerOptions.RemoveFlashingUponDeath;
             configuration.UpAOnController1 = playerOptions.RemapUpAToUpSelect;
+            configuration.ChangeItemSprites = playerOptions.ChangeItemSprites;
             configuration.Tunic = playerOptions.TunicColor;
+            configuration.TunicOutline = playerOptions.TunicOutlineColor;
             configuration.ShieldTunic = playerOptions.ShieldTunicColor;
             configuration.DisableMusic = playerOptions.DisableMusic;
             configuration.RandomizeMusic = playerOptions.RandomizeMusic;
             configuration.MixCustomAndOriginalMusic = playerOptions.MixCustomAndOriginalMusic;
+            configuration.IncludeDiverseMusic = playerOptions.IncludeDiverseMusic;
             configuration.DisableUnsafeMusic = playerOptions.DisableUnsafeMusic;
             configuration.DisableHUDLag = playerOptions.DisableHUDLag;
             configuration.FastSpellCasting = playerOptions.FastSpellCasting;
 
             var sprite = GetSprite(playerOptions.Sprite);
             // If somehow sprite is null, default to Link
-            configuration.Sprite = sprite?.SelectionIndex ?? 0;
+            configuration.Sprite = sprite ?? CharacterSprite.LINK;
+            // configuration.Sprite = CharacterSprite.LINK;
         }
 
         private void ValidateTunicColor(string? color)
@@ -104,8 +104,8 @@ namespace CommandLine
             CharacterSprite? selectedSprite = null;
             if (playerOptions != null)
             {
-                ValidateTunicColor(playerOptions.TunicColor);
-                ValidateTunicColor(playerOptions.ShieldTunicColor);
+                // ValidateTunicColor(playerOptions.TunicColor);
+                // ValidateTunicColor(playerOptions.ShieldTunicColor);
 
                 selectedSprite = GetSprite(playerOptions.Sprite);
             }
@@ -120,7 +120,7 @@ namespace CommandLine
 
         public CharacterSprite? GetSprite(string? name)
         {
-            return this.spriteOptions.FirstOrDefault(sprite => string.Equals(
+            return spriteOptions.FirstOrDefault(sprite => string.Equals(
                 sprite.DisplayName, name, StringComparison.CurrentCultureIgnoreCase));
         }
     }

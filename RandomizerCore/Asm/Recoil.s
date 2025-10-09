@@ -1,11 +1,9 @@
-
+.include "z2r.inc"
 
 .segment "PRG7"
 
-.macpack common
-
-.define LinkXVelocity $70
-.define EnemyID $a1
+LinkXVelocity = $70
+EnemyID = $a1
 LinkYVelocityLo = $03E6
 LinkYVelocityHi = $057D
 

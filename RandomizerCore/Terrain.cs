@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Z2Randomizer.Core;
+﻿namespace Z2Randomizer.RandomizerCore;
 
 //These indexes correspond to the 4bit representation used in the rom. Do not change them.
 public enum Terrain
@@ -47,6 +45,7 @@ static class TerrainExtensions
             Terrain.ROCK => true,
             Terrain.RIVER_DEVIL => true,
             Terrain.NONE => false,
+            _ => throw new ImpossibleException("Unrecognized Terrain")
         };
     }
 }

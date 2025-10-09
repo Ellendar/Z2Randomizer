@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+		<title>Z2Randomizer Changelog</title>
+		<link>https://raw.githubusercontent.com/Ellendar/Z2Randomizer/main/Web/appcast.xml</link>
+		<description>Most recent changes.</description>
+		<language>en</language>
+		<item>
+			<title>Version 5.0 Beta 17</title>
+			<description>
+			</description>
+			<pubDate>2025-09-27</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta17/Z2Randomizer_4_4_Beta17.msi" sparkle:version="4.4.17" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 16</title>
+			<description>
+			</description>
+			<pubDate>2025-09-22</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta16/Z2Randomizer_4_4_Beta16.msi" sparkle:version="4.4.16" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 15</title>
+			<description>
+			</description>
+			<pubDate>2025-08-24</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta15/Z2Randomizer_4_4_Beta15.msi" sparkle:version="4.4.15" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 14</title>
+			<description>
+			</description>
+			<pubDate>2025-08-14</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta14/Z2Randomizer_4_4_Beta14.msi" sparkle:version="4.4.14" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 13</title>
+			<description>
+			</description>
+			<pubDate>2025-07-29</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta13/Z2Randomizer_4_4_Beta13.msi" sparkle:version="4.4.13" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 12</title>
+			<description>
+			</description>
+			<pubDate>2025-07-20</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta12/Z2Randomizer_4_4_Beta12.msi" sparkle:version="4.4.12" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 11</title>
+			<description>
+			</description>
+			<pubDate>2025-07-06</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta11/Z2Randomizer_4_4_Beta11.msi" sparkle:version="4.4.11" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 10</title>
+			<description>
+			</description>
+			<pubDate>2025-07-06</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta10/Z2Randomizer_4_4_Beta10.msi" sparkle:version="4.4.10" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 9</title>
+			<description>
+			</description>
+			<pubDate>2025-06-22</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta9/Z2Randomizer_4_4_Beta9.msi" sparkle:version="4.4.9" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 8</title>
+			<description>
+			</description>
+			<pubDate>2025-04-21</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta8/Z2Randomizer_4_4_Beta8.msi" sparkle:version="4.4.8" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 7</title>
+			<description>
+			</description>
+			<pubDate>2025-03-30</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta7/Z2Randomizer_4_4_Beta7.msi" sparkle:version="4.4.7" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 6</title>
+			<description>
+			</description>
+			<pubDate>2025-03-30</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta6/Z2Randomizer_4_4_Beta6.msi" sparkle:version="4.4.6" />
+		</item>
+		<item>
+			<title>Version 5.0 Beta 5</title>
+			<description>
+				<![CDATA[
+			Cleared out the appcast for just new stuff.
+			]]>
+			</description>
+			<pubDate>2025-03-15</pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/4.4_beta5/Z2Randomizer_4_4_Beta5_1.msi" sparkle:version="4.4.5" />
+		</item>
+	</channel>
+</rss>

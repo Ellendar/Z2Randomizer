@@ -1,7 +1,11 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
-using System.ComponentModel;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Desktop.Common;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Statistics;
 
@@ -16,48 +20,53 @@ namespace Z2Randomizer.Statistics;
 class Statistics
 {
     //private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
-    //private static readonly string FLAGS = "hEAK0thCqbs36emL4XpGU+!5@W4xeWvdAALhA"; //Random%
-    private static readonly string FLAGS = "g0+N6BABXbWqh7ALs3X5g+!ojhsebtJ!AAFRA";
-    
-    //"hEAK0sALirpUe5RLkbgZQ+2c4YX@4X4yAASA" v4 only Random%
+    //private static readonly string FLAGS = "hEAAp1dAOR4YXs0uhjGs371g+hBswv9svsthABVA"; //Random%
+    private static readonly string FLAGS = "RAAA2dJALw3tToaJDKXLvet++OwsL63s1BHhAAsBOA"; //test
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
-    private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer\\Statistics\\db\\stats.sqlite";
-    private static readonly int LIMIT = 1000;
+    private static readonly string DB_PATH = "C:\\Workspace\\Z2Randomizer_4_4\\Statistics\\db\\stats.sqlite";
+    private static readonly int LIMIT = 100;
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
     static void Main()
     {
         StatisticsDbContext dbContext = new StatisticsDbContext(DB_PATH);
 
+        RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
         Random random = new Random();
+        Hyrule.NewAssemblerFn createAsm = (opts, debug) => new DesktopJsEngine(opts, debug);
+        var roomsJson = Util.ReadAllTextFromFile("PalaceRooms.json");
+        var customJson = config.UseCustomRooms ? Util.ReadAllTextFromFile("CustomRooms.json") : null;
+        var palaceRooms = new PalaceRooms(roomsJson, false);
+        var randomizer = new Hyrule(createAsm,palaceRooms);
         logger.Info("Started statistics generation with limit: " + LIMIT);
         try
         {
             for (int i = 0; i < LIMIT; i++)
             {
-                RandomizerConfiguration config = new RandomizerConfiguration(FLAGS);
                 int seed = random.Next(1000000000);
-                //int seed = 38955385;
-                config.Seed = seed;
-                config.FileName = VANILLA_ROM_PATH;
-                BackgroundWorker backgroundWorker = new BackgroundWorker()
-                {
-                    WorkerReportsProgress = true,
-                    WorkerSupportsCancellation = true
-                };
+                //int seed = 704113586;
+                config.Seed = seed.ToString();
+                var vanillaRomData = File.ReadAllBytes(VANILLA_ROM_PATH);
                 DateTime startTime = DateTime.Now;
                 logger.Info("Starting seed# " + i + " at: " + startTime);
-                Hyrule hyrule = new Hyrule(config, backgroundWorker, false);
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+                randomizer.Randomize(vanillaRomData, config, UpdateProgress, tokenSource.Token).Wait(tokenSource.Token);
                 DateTime endTime = DateTime.Now;
-                Result result = new Result(hyrule);
+                Result result = new Result(randomizer);
                 result.GenerationTime = (int)(endTime - startTime).TotalMilliseconds;
                 dbContext.Add(result);
-                dbContext.Add(hyrule.Props);
+                dbContext.Add(randomizer.Props);
                 logger.Info("Finished seed# " + i + " in: " + result.GenerationTime + "ms");
                 //dbContext.SaveChanges();
             }
+            
             dbContext.SaveChanges();
         }
         catch(Exception e) { logger.Error(e); }
+    }
+    
+    private static async Task UpdateProgress(string str)
+    {
+        await Task.Run(() => logger.Trace(str));
     }
 }

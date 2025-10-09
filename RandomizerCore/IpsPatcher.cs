@@ -1,13 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// Applies IPS Patches
@@ -17,7 +15,7 @@ internal class IpsPatcher
     static readonly IReadOnlyList<byte> PatchSig = Encoding.ASCII.GetBytes("PATCH");
     static readonly IReadOnlyList<byte> EofSig = Encoding.ASCII.GetBytes("EOF");
 
-    public void Patch(byte[] romData, byte[] ipsData, bool expandRom = false)
+    public static void Patch(byte[] romData, byte[] ipsData, bool expandRom = false)
     {
         Debug.Assert(PatchSig.SequenceEqual(new ArraySegment<byte>(ipsData, 0, PatchSig.Count)));
 
@@ -58,7 +56,7 @@ internal class IpsPatcher
                     size -= segSize;
                 }
 
-                tgtOffs += ROM.ChrRomOffs - ROM.VanillaChrRomOffs;
+                tgtOffs += ROM.ChrRomOffset - ROM.VanillaChrRomOffs;
             }
 
             if (fillValue is not null)
@@ -71,7 +69,7 @@ internal class IpsPatcher
         }
     }
 
-    public void Patch(byte[] romData, string patchName, bool expandRom = false)
+    public static void Patch(byte[] romData, string patchName, bool expandRom = false)
     {
         byte[]? ipsData = null;
         using (var ipsStream = new FileStream(patchName, FileMode.Open, FileAccess.Read))

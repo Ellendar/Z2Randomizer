@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:GenerateRomViewModel"
+             x:Class="CrossPlatformUI.Views.GenerateRomView">
+    <Grid RowDefinitions="*, *, Auto">
+        <TextBlock Grid.Row="0" Margin="16 16 16 0" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProgressHeading}" FontSize="24" FontWeight="Bold" />
+		<TextBlock Grid.Row="1" Margin="16 0 16 16" TextAlignment="Left" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ProgressBody}" TextWrapping="WrapWithOverflow" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Copy Error" IsVisible="{Binding HasError}" Command="{Binding CopyError}" />
+            <Button Content="Cancel" Classes="accent" IsVisible="{Binding !IsComplete}" Command="{Binding CancelGeneration}" />
+            <Button Content="Close" IsVisible="{Binding IsComplete}" Command="{Binding CancelGeneration}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

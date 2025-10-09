@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Z2Randomizer.Core;
-using Z2Randomizer.Core.Overworld;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Statistics;
 
@@ -51,20 +51,16 @@ class Result
     public int WestFailedOnMakeCaldera { get; set; }
     public int WestFailedOnConnectIslands { get; set; }
 
-
-
-    //Spell costs
-    //XP thresholds
-    //Which items are required (is this cleanly saved?)
+#pragma warning disable CS8618 
     public Result()
+#pragma warning restore CS8618 
     {
 
     }
-
     public Result(Hyrule hyrule)
     {
         Flags = hyrule.Flags;
-        Seed = hyrule.Seed;
+        Seed = hyrule.SeedHash;
 
         //Palace Generation Attempts
         P1GenerationAttempts = hyrule.palaces[0].Generations;

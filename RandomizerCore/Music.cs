@@ -1,21 +1,17 @@
 ﻿#nullable enable
 
-using Assembler;
 using FtRandoLib.Importer;
 using FtRandoLib.Library;
 using FtRandoLib.Utility;
-using NLog;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Z2Randomizer.Core;
-using Z2Randomizer.Core.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore;
+namespace Z2Randomizer.RandomizerCore;
 
 using UsesSongs = Dictionary<Usage, List<ISong>>;
 using SongMap = Dictionary<int, ISong?>;
@@ -132,62 +128,63 @@ internal class Z2Importer : Importer
 
 internal class MusicRandomizer
 {
-    /// <summary>
-    /// Randomly select and import songs from the specified libraries.
-    /// </summary>
-    /// <returns>The list of free banks remaining after importing the songs.</returns>
-    public static IEnumerable<int> ImportSongs(
+    Hyrule _hyrule;
+    IShuffler _shuffler;
+    byte[] _rom;
+    SimpleRomAccess _romAccess;
+    List<string> _jsonLibPaths;
+    List<string> _yamlLibPaths;
+    List<int> _freeBanks;
+    bool _includeBuiltin;
+    bool _includeDiverse;
+
+    Z2Importer _imptr;
+
+    bool _done = false;
+    HashSet<int> _resFreeBanks = new();
+    StringBuilder _spoilerSb = new();
+
+    public IEnumerable<int> FreeBanks => _resFreeBanks;
+    public string SpoilerLog => _spoilerSb.ToString();
+
+    public MusicRandomizer(
         Hyrule hyrule,
         int seed,
-        IEnumerable<string> libPaths,
+        IEnumerable<string> jsonLibPaths,
+        IEnumerable<string> yamlLibPaths,
         IEnumerable<int> freeBanks,
         bool includeBuiltin,
-        bool safeOnly)
-    {
-        MusicRandomizer randomizer = new(hyrule, seed, libPaths, freeBanks, includeBuiltin, safeOnly);
-
-        return randomizer.ImportSongs();
-    }
-
-    internal Hyrule _hyrule;
-    internal IShuffler _shuffler;
-    internal byte[] _rom;
-    internal SimpleRomAccess _romAccess;
-    internal List<string> _libPaths;
-    internal List<int> _freeBanks;
-    internal bool _includeBuiltin;
-
-    internal Z2Importer _imptr;
-
-    MusicRandomizer(
-        Hyrule hyrule,
-        int seed,
-        IEnumerable<string> libPaths,
-        IEnumerable<int> freeBanks,
-        bool includeBuiltin,
+        bool includeDiverse,
         bool safeOnly)
     {
         _hyrule = hyrule;
         _shuffler = new RandomShuffler(new Random(seed));
         _rom = _hyrule.ROMData.GetBytes(0, ROM.RomSize);
         _romAccess = new(_rom);
-        _libPaths = new(libPaths);
+        _jsonLibPaths = new(jsonLibPaths);
+        _yamlLibPaths = new(yamlLibPaths);
         _freeBanks = new(freeBanks);
         _includeBuiltin = includeBuiltin;
+        _includeDiverse = includeDiverse;
 
         _imptr = new(_romAccess, _freeBanks);
         _imptr.DefaultParserOptions.SafeOnly = safeOnly;
     }
 
-    IEnumerable<int> ImportSongs()
+    public void ImportSongs()
     {
-        if (_libPaths.Count == 0)
-            return _freeBanks; // Nothing to do
+        if (_done)
+            throw new InvalidOperationException("Attempt to import custom music twice");
+
+        _spoilerSb.Clear();
+
+        if (_jsonLibPaths.Count == 0 && _yamlLibPaths.Count == 0)
+            return; // Nothing to do
 
         // Testing songs is to help in making libraries. As libraries will be something that the average user can make, it can't be limited to debug builds like in MM2R. However, if people end up using libraries so large that this ends up taking a lot of time, it may be necessary to remove it. It's also entirely possible that the optimizer will notice that this function doesn't actually do anything that affects the rest of the program and eliminate it completely...
         TestSongs();
 
-        var songs = LoadSongs(_includeBuiltin);
+        var songs = LoadSongs(_includeBuiltin, _includeDiverse);
         var usesSongs = _imptr.SplitSongsByUsage<Usage>(songs);
 
         Dictionary<Usage, int> numUsageSongs = new()
@@ -206,11 +203,11 @@ internal class MusicRandomizer
             usesSongs, numUsageSongs, _shuffler);
 
         WriteLogLine(null);
-        WriteLogLine("Selected songs:");
+        WriteLogLine("SELECTED SONGS:");
         foreach (var (usage, usageSongs) in selUsesSongs)
         {
             string songNames = string.Join("}, {", usageSongs);
-            WriteLogLine($"{usage}: {{{songNames}}}");
+            WriteLogLine($"\t{usage}: {{{songNames}}}");
         }
 
         WriteLogLine(null);
@@ -225,35 +222,61 @@ internal class MusicRandomizer
             { Z2Importer.EnemySongMapName, enemySongMap },
         };
 
-        HashSet<int> freeBanks = new(_freeBanks);
         _imptr.Import(
             songMap,
             songMaps,
-            out freeBanks);
+            out _resFreeBanks);
 
         _hyrule.ROMData.Put(0, _rom);
 
-        return freeBanks;
+        _done = true;
     }
 
     void WriteLogLine(string? line)
     {
         Trace.WriteLine(line);
-        //// TODO: Write to spoiler log
+        _spoilerSb.AppendLine(line);
     }
 
     List<ISong> LoadSongs(
         bool includeBuiltin,
+        bool includeDiverse,
         LibraryParserOptions? opts = null)
     {
         List<FtSong> ftSongs = new();
-        foreach (var libPath in _libPaths)
+        LoadLibrariesSongs(
+            _jsonLibPaths, 
+            d => _imptr.LoadFtJsonLibrarySongs(d, opts), 
+            includeDiverse,
+            ftSongs);
+        LoadLibrariesSongs(
+            _yamlLibPaths,
+            d => _imptr.LoadFtYamlLibrarySongs(d, opts),
+            includeDiverse,
+            ftSongs);
+
+        List<ISong> songs = new();
+        if (includeBuiltin)
+            songs.AddRange(_imptr.CreateBuiltinSongs());
+
+        songs.AddRange(ftSongs);
+
+        return songs;
+    }
+
+    void LoadLibrariesSongs(
+        IEnumerable<string> libPaths, 
+        Func<string, IEnumerable<FtSong>> loader,
+        bool includeDiverse,
+        List<FtSong> songs)
+    {
+        foreach (var libPath in libPaths)
         {
             string libData = File.ReadAllText(libPath, Encoding.UTF8);
 
             try
             {
-                ftSongs.AddRange(_imptr.LoadFtJsonLibrarySongs(libData, opts));
+                songs.AddRange(loader(libData).Where(song => includeDiverse || !song.Tags.Contains("diverse")));
             }
             catch (ParsingError ex)
             {
@@ -273,14 +296,6 @@ internal class MusicRandomizer
                 throw new Exception(sb.ToString(), ex);
             }
         }
-
-        List<ISong> songs = new();
-        if (includeBuiltin)
-            songs.AddRange(_imptr.CreateBuiltinSongs());
-
-        songs.AddRange(ftSongs);
-
-        return songs;
     }
 
     SongMap CreateSongMap(UsesSongs usesSongs)
@@ -311,12 +326,12 @@ internal class MusicRandomizer
     SongMap CreateAreaSongMap(UsesSongs usesSongs)
     {
         // Find all the relevant locations
-        var usesLocs = new Usage[] 
-        { 
-            Usage.Town, 
-            Usage.Palace, 
-            Usage.GreatPalace, 
-            Usage.Cave, 
+        var usesLocs = new Usage[]
+        {
+            Usage.Town,
+            Usage.Palace,
+            Usage.GreatPalace,
+            Usage.Cave,
             Usage.Encounter,
         }.ToDictionary(k => k, k => new List<Location>());
 
@@ -365,15 +380,15 @@ internal class MusicRandomizer
             Func<Location, int> GetSongIdx = usage switch
             {
                 // One song per palace
-                Usage.Palace => (loc => loc.PalaceNumber - 1),
+                Usage.Palace => (loc => (int)loc.PalaceNumber! - 1),
                 Usage.GreatPalace => (loc => 0),
                 // One song per continent
-                _ => (loc => (int)loc.Continent),
+                _ => (loc => (int)(loc.VanillaContinent ?? loc.Continent)),
             };
 
             foreach (var loc in usageLocs)
             {
-                int contIdx = (int)loc.Continent,
+                int contIdx = (int)(loc.VanillaContinent ?? loc.Continent),
                     areaIdx = loc.MemAddress - _hyrule.worlds[contIdx].baseAddr,
                     areaId = contIdx * 0x40 + areaIdx;
 
@@ -401,7 +416,7 @@ internal class MusicRandomizer
     {
         LibraryParserOptions opts = new() { EnabledOnly = false, SafeOnly = false };
 
-        var songs = LoadSongs(false, opts);
+        var songs = LoadSongs(false, true, opts);
         _imptr.TestRebase(songs);
     }
 }

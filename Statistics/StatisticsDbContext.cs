@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using Z2Randomizer.Core;
-using Z2Randomizer.Core.Overworld;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace Z2Randomizer.Statistics;
 
@@ -13,6 +14,9 @@ internal class StatisticsDbContext : DbContext
 
     private string dbPath;
 
+    [UnconditionalSuppressMessage("Trimming", 
+        "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", 
+        Justification = "Statistics Doesn't ship with the trimmed package")]
     public StatisticsDbContext(string dbPath) : base()
     {
         this.dbPath = dbPath;
@@ -26,13 +30,21 @@ internal class StatisticsDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={dbPath}");
 
+    [SuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        JsonSerializerOptions options = new JsonSerializerOptions();
+
         modelBuilder
         .Entity<RandomizerProperties>()
         .Property(e => e.Climate)
         .HasConversion(
             v => v.Name,
             v => Climates.ByName(v));
+
+        modelBuilder.Entity<RandomizerProperties>()
+            .Property(e => e.PalaceStyles)
+            .HasConversion(v => JsonSerializer.Serialize(v, options),
+            v => JsonSerializer.Deserialize<PalaceStyle[]>(v, options) ?? new PalaceStyle[7]);
     }
 }

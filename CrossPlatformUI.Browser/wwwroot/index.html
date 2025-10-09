@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Z2Randomizer Web</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="importmap">
+        {
+          "imports": {
+            "js65/": "./"
+          }
+        }
+    </script>
+    <link rel="modulepreload" href="./main.js" />
+    <link rel="modulepreload" href="./_framework/dotnet.js" />
+    <link rel="modulepreload" href="./_framework/avalonia.js" />
+<!--    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>-->
+    <link rel="stylesheet" href="./app.css" />
+</head>
+
+<body>
+    <div id="out">
+        <div id="avalonia-splash">
+            <img class="splash-logo" src="z2r-logo.png" alt="Z2R Logo" />
+            <div id="loading-status">Loading...</div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="error-message" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+</body>
+
+</html>

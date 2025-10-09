@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.ItemsView">
+    <Grid ColumnDefinitions="*, *">
+        <StackPanel Grid.Column="0">
+            <CheckBox
+                Name="ShufflePalaceItemsCheckbox"
+                IsThreeState="True" 
+                IsChecked="{Binding Config.ShufflePalaceItems}" 
+                Content="Shuffle Palace Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShufflePalaceItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                Name="ShuffleOverworldItemsCheckbox"
+                IsThreeState="True" 
+                IsChecked="{Binding Config.ShuffleOverworldItems}" 
+                Content="Shuffle Overworld Items"
+            ><ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleOverworldItemsToolTip}"/></ToolTip.Tip>
+
+            </CheckBox>
+            <CheckBox
+                Name="MixOverworldAndPalaceItemsCheckbox"
+                IsThreeState="True"
+                IsChecked="{Binding Config.MixOverworldAndPalaceItems}"
+                Content="Mix Overworld and Palace Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixOverworldandPalaceItemsToolTip}"/></ToolTip.Tip>
+                <CheckBox.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="#ShufflePalaceItemsCheckbox.IsChecked"/>
+                            <Binding Path="#ShuffleOverworldItemsCheckbox.IsChecked"/>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </CheckBox.IsEnabled>
+            </CheckBox>
+            <CheckBox
+                Name="PBagsInShuffleCheckbox"
+                IsEnabled="{Binding Config.ShuffleOverworldItems}"
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludePBagCavesInItemShuffle}"
+                Content="Include P-Bag Caves in Item Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludePBagCavesinItemShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeSpellsInShuffle}"
+                Content="Include Spells in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeSpellsinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeSwordTechsInShuffle}"
+                Content="Include Sword Techniques in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeSwordTechniquesinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.IncludeQuestItemsInShuffle}"
+                Content="Include Quest Items in Shuffle"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeQuestItemsinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleSmallItems}"
+                Content="Shuffle Small Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSmallItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.RemoveSpellItems}"
+                Content="Start With Spell Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.StartWithSpellItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.ShufflePBagAmounts}"
+                Content="Shuffle P-Bag Amounts"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShufflePBagAmountsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsThreeState="True"
+                IsChecked="{Binding Config.PalacesContainExtraKeys}"
+                Content="Palaces Contain Extra Keys"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.PalacesContainExtraKeysToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.RandomizeNewKasutoJarRequirements}"
+                Content="Randomize New Kasuto Jar Requirements"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeNewKasutoJarRequirementsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.AllowImportantItemDuplicates}"
+                Content="Allow Duplicates of Important Items"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowDuplicatesofImportantItemsToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

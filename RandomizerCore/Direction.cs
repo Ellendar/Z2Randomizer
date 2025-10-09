@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 public enum Direction { 
     NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3, HORIZONTAL_PASSTHROUGH = 4, VERTICAL_PASSTHROUGH = 5, NONE = 6
@@ -102,6 +101,7 @@ static class DirectionExtensions
     }
 
     public static readonly Direction[] ITEM_ROOM_ORIENTATIONS = [Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST];
+    public static readonly Direction[] CARDINAL_DIRECTIONS = [Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST];
 
     public static Direction RandomItemRoomOrientation(Random r)
     {

@@ -1,4 +1,3 @@
-
 .macpack common
 
 ; Summary of the bug

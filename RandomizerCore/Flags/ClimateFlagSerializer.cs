@@ -1,7 +1,7 @@
 ﻿using System;
-using Z2Randomizer.Core.Overworld;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace RandomizerCore.Flags;
+namespace Z2Randomizer.RandomizerCore.Flags;
 
 public class ClimateFlagSerializer : IFlagSerializer
 {
@@ -23,7 +23,7 @@ public class ClimateFlagSerializer : IFlagSerializer
         return 5;
     }
 
-    public int Serialize(Object climate)
+    public int Serialize(object? climate)
     {
         if(climate == null)
         {

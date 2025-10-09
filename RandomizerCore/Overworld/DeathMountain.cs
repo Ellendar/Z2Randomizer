@@ -1,12 +1,13 @@
-﻿using SD.Tools.BCLExtensions.CollectionsRelated;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using SD.Tools.BCLExtensions.CollectionsRelated;
+using Z2Randomizer.RandomizerCore.Enemy;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
-class DeathMountain : World
+sealed class DeathMountain : World
 {
 
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
@@ -116,15 +117,30 @@ class DeathMountain : World
             { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
         };
 
-        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1F, 0x20 };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        generators = new List<int> { 0x0B, 0x0C, 0x0F, 0x1D };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x1C, 0x1F };
-        largeEnemies = new List<int> { 0x20, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B };
-        enemyAddr = 0x48B0;
+        sideviewPtrTable = 0x6010;
+        sideviewBank = 1;
         enemyPtr = 0x608E;
+        groupedEnemies = Enemies.GroupedWestEnemies;
+        overworldEncounterMaps = [
+            29,     // Desert    - in vanilla 29-30 use the same table
+            34, 35, // Grass     - not used in Vanilla
+            39,     // Forest    - in vanilla 39-40 use the same table
+            47, 48, // Swamp     - not used in Vanilla
+            52,     // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            30, 40, 53, 58,
+        ];
+        nonEncounterMaps = [
+            1, 2, 3, 4, 5, 6, 7, 8, // Caves
+            9, 10, 11, 12, 13, 14,  // Caves
+            15, 16, 17,             // Hammer Cave floor 1
+            18, 19, 20, 21,         // Hammer Cave floor 2
+            22, 23, 24, 25,         // Caves with elevators
+            26,                     // Spectacle Rock
+        ];
 
-        overworldMaps = new List<int>();
         MAP_ROWS = 45;
         MAP_COLS = 64;
 
@@ -143,6 +159,7 @@ class DeathMountain : World
         climate = props.Climate.Clone();
 
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -741,7 +758,7 @@ class DeathMountain : World
 
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON || biome == Biome.ISLANDS)
                 {
-                    ConnectIslands(25, false, riverT, false, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(25, false, riverT, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                 }
 
                 if (!ValidateCaves())
@@ -1046,9 +1063,9 @@ class DeathMountain : World
     /// <summary>
     /// Updates the visitation matrix and location reachability 
     /// </summary>
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
-        UpdateReachable(itemGet, spellGet);
+        UpdateReachable(itemGet);
 
         foreach (Location location in AllLocations)
         {
@@ -1103,7 +1120,7 @@ class DeathMountain : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable
@@ -1153,5 +1170,22 @@ class DeathMountain : World
         requiredLocations.AddRange(GetContinentConnections());
 
         return requiredLocations.Where(i => i != null);
+    }
+
+    protected override void SetVanillaCollectables(bool useDash)
+    {
+        hammerCave.VanillaCollectable = Collectable.HAMMER;
+        specRock.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+    }
+
+    public override string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("DEATH MOUNTAIN: ");
+        sb.AppendLine("\tHammer Cave: " + hammerCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tSpec Rock: " + specRock.Collectables[0].EnglishText());
+
+        sb.AppendLine();
+        return sb.ToString();
     }
 }

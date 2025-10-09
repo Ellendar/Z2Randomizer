@@ -1,0 +1,205 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:p1="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:tabs="clr-namespace:CrossPlatformUI.Views.Tabs"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:crossPlatformUi="clr-namespace:CrossPlatformUI"
+             xmlns:presets="clr-namespace:CrossPlatformUI.Presets"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="RandomizerViewControl"
+             x:DataType="viewModels:RandomizerViewModel"
+             x:Class="CrossPlatformUI.Views.RandomizerView">
+    <StackPanel Orientation="Vertical">
+        <Grid ColumnDefinitions="2*, *, 196" RowDefinitions="Auto" Margin="0">
+            <StackPanel Grid.Column="0" Margin="4 8 0 8">
+                <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}">
+                    <TextBox.InnerRightContent>
+                        <Button ToolTip.Tip="Presets" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}">
+                            <Button.Content>
+                                <avalonia:MaterialIconExt Kind="OrderBoolAscendingVariant" Size="32"/>
+                            </Button.Content>
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="Beginner Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:BeginnerPreset.Preset}}"/>
+                                    <MenuItem Header="Normal Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:NormalPreset.Preset}}"/>
+                                    <MenuItem Header="Standard Tournament Preset (TBD)" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
+                                    <MenuItem Header="Full Shuffle Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:FullShufflePreset.Preset}}"/>
+                                    <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
+
+                                    <MenuItem Header="More Presets">
+                                        <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:UpstartsTournamentPreset.Preset}}"/>
+                                        <MenuItem Header="Modified SGL Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:HardmodePreset.Preset}}"/>
+                                        <MenuItem Header="Random% Preset" Command="{Binding LoadPreset}"
+                                                  CommandParameter="{Binding Source={x:Static presets:RandomPercentPreset.Preset}}"/>
+                                    </MenuItem>
+
+                                    <Separator />
+
+                                    <MenuItem Header="Load Custom Preset" Classes="SubItems"
+                                              IsVisible="{Binding Main.SaveNewPresetViewModel.HasSavedPresets}"
+                                              ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="CategoryOutline" Width="24" Height="24" />
+                                        </MenuItem.Icon>
+                                        <MenuItem.Styles>
+                                            <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
+                                                <Setter Property="Header" Value="{Binding Preset}"/>
+                                                <Setter Property="CommandParameter" Value="{Binding Config}" />
+                                                <Setter Property="Command"
+                                                        Value="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).LoadPreset}"/>
+                                            </Style>
+                                            <Style Selector="MenuItem.SubItems MenuItem MenuItem.Icon avalonia|MaterialIcon">
+                                                <Setter Property="Kind" Value="ContentSave"/>
+                                            </Style>
+                                        </MenuItem.Styles>
+                                    </MenuItem>
+                                    <Separator IsVisible="{Binding Main.SaveNewPresetViewModel.HasSavedPresets}" />
+                                    <MenuItem Header="Save Flags as ..." Classes="SubItems"
+                                              IsVisible="{Binding Main.SaveNewPresetViewModel.HasSavedPresets}"
+                                              ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
+                                        </MenuItem.Icon>
+                                        <MenuItem.Styles>
+                                            <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
+                                                <Setter Property="Header" Value="{Binding Preset}"/>
+                                                <Setter Property="CommandParameter" Value="{Binding Preset}" />
+                                                <Setter Property="Command"
+                                                        Value="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).SaveAsPreset}"/>
+                                            </Style>
+                                            <Style Selector="MenuItem.SubItems MenuItem MenuItem.Icon avalonia|MaterialIcon">
+                                                <Setter Property="Kind" Value="ContentSave"/>
+                                            </Style>
+                                        </MenuItem.Styles>
+                                    </MenuItem>
+                                    <MenuItem Header="Save Flags as New Preset" Command="{Binding SaveNewPreset}">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="ContentSaveAddOutline" Width="24" Height="24" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator IsVisible="{Binding Main.SaveNewPresetViewModel.HasSavedPresets}" />
+                                    <MenuItem Header="Remove Custom Preset ..." Classes="SubItems"
+                                              IsVisible="{Binding Main.SaveNewPresetViewModel.HasSavedPresets}"
+                                              ItemsSource="{Binding Main.SaveNewPresetViewModel.SavedPresets}">
+                                        <MenuItem.Icon>
+                                            <avalonia:MaterialIcon Kind="TrashCanOutline" Width="24" Height="24" />
+                                        </MenuItem.Icon>
+                                        <MenuItem.Styles>
+                                            <Style Selector="MenuItem.SubItems MenuItem" x:DataType="viewModels:CustomPreset">
+                                                <Setter Property="Header" Value="{Binding Preset}"/>
+                                                <Setter Property="CommandParameter" Value="{Binding Preset}" />
+                                                <Setter Property="Command"
+                                                        Value="{Binding $parent[UserControl].((viewModels:RandomizerViewModel)DataContext).ClearSavedPreset}"/>
+                                            </Style>
+                                            <Style Selector="MenuItem.SubItems MenuItem MenuItem.Icon avalonia|MaterialIcon">
+                                                <Setter Property="Kind" Value="TrashCan"/>
+                                            </Style>
+                                        </MenuItem.Styles>
+                                    </MenuItem>
+                                </MenuFlyout>
+                            </Button.Flyout>
+                        </Button>
+                    </TextBox.InnerRightContent>
+                </TextBox>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
+                    <TextBox.InnerRightContent>
+                        <Button ToolTip.Tip="Generate a random number as your Seed" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}"
+                                Content="{avalonia:MaterialIconExt DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
+                    </TextBox.InnerRightContent>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button HorizontalAlignment="Right" Width="128" Content="Generate" IsEnabled="{Binding CanGenerate^}"
+                        Command="{Binding Generate}" />
+                <Menu Padding="0" Margin="0" Width="64" ToolTip.Tip="Menu">
+                    <MenuItem Height="48" Width="48" Header="{avalonia:MaterialIconExt Cog, Size=32}" Cursor="Hand">
+                        <MenuItem Header="{Binding AppVersion}" IsEnabled="false">
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Reload ROM" Command="{Binding LoadRom}" >
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="ReloadAlert" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Choose ROM Save Folder" IsVisible="{Binding IsDesktop}" Command="{Binding SaveFolder}" >
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Check For Updates" IsVisible="{Binding IsDesktop}" Command="{Binding CheckForUpdates}" >
+                          <MenuItem.Icon>
+                            <avalonia:MaterialIcon Kind="Update" Width="24" Height="24" />
+                          </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Toggle Light/Dark Mode" Command="{Binding ToggleTheme}" >
+                          <MenuItem.Icon>
+                            <avalonia:MaterialIcon Kind="LightbulbNight" Width="24" Height="24" />
+                          </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Visit Discord"
+                                  Command="{Binding VisitDiscord}"
+                                  CommandParameter="{Binding $self}">
+                        </MenuItem>
+                        <MenuItem Header="Visit Wiki"
+                                  Command="{Binding VisitWiki}"
+                                  CommandParameter="{Binding $self}">
+                        </MenuItem>
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
+        </Grid>
+        <TabControl Margin="5" SelectedIndex="{Binding CurrentTabIndex}">
+            <Interaction.Behaviors>
+                <views:TabContentPreservationBehavior />
+            </Interaction.Behaviors>
+            <TabItem Header="Start">
+                <tabs:StartView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Overworld">
+                <tabs:OverworldView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Palaces">
+                <tabs:PalacesView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Levels">
+                <tabs:LevelsView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Spells">
+                <tabs:SpellsView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Enemies">
+                <tabs:EnemiesView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Items">
+                <tabs:ItemsView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Drops">
+                <tabs:DropsView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Hints">
+                <tabs:HintsView DataContext="{Binding Main}"/>
+            </TabItem>
+            <TabItem Header="Customize">
+                <tabs:CustomizeView DataContext="{Binding CustomizeViewModel}" />
+            </TabItem>
+        </TabControl>
+    </StackPanel>
+</UserControl>

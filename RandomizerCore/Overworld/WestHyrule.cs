@@ -1,19 +1,21 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using NLog;
+using Z2Randomizer.RandomizerCore.Enemy;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
-public class WestHyrule : World
+public sealed class WestHyrule : World
 {
     private readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
     public Location northPalace;
     public Location locationAtMido;
     public Location bagu;
+    public Location mirrorTable;
+    public Location midoChurch;
     public Location locationAtRuto;
     public Location medicineCave;
     public Location trophyCave;
@@ -30,6 +32,7 @@ public class WestHyrule : World
     private Location bridge1;
     private Location bridge2;
     public Location pbagCave;
+	
     private Location jumpCave;
     private Location heartCave;
     private Location fairyCave;
@@ -38,7 +41,8 @@ public class WestHyrule : World
     private Location parapaCave2;
     private Location jumpCave2;
     private Location fairyCave2;
-    private int bridgeCount;
+    //private int bridgeCount;
+
     private int calderaCenterX, calderaCenterY;
 
     private const int CALDERA_DEAD_ZONE_X = 7;
@@ -55,52 +59,51 @@ public class WestHyrule : World
 
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
         {
-            { 0x462F, Terrain.PALACE},
-            { 0x4630, Terrain.CAVE },
-            { 0x4631, Terrain.FOREST},
-            { 0x4632, Terrain.CAVE },
-            { 0x4633, Terrain.FOREST },
-            { 0x4634, Terrain.GRASS },
-            { 0x4635, Terrain.FOREST },
-            { 0x4636, Terrain.ROAD },
-            { 0x4637, Terrain.SWAMP },
-            { 0x4638, Terrain.GRAVE },
-            { 0x4639, Terrain.CAVE },
-            { 0x463A, Terrain.CAVE },
-            { 0x463B, Terrain.CAVE },
-            { 0x463C, Terrain.CAVE },
-            { 0x463D, Terrain.CAVE },
-            { 0x463E, Terrain.CAVE },
-            { 0x463F, Terrain.CAVE },
-            { 0x4640, Terrain.GRAVE },
-            { 0x4641, Terrain.CAVE },
-            { 0x4642, Terrain.BRIDGE },
-            { 0x4643, Terrain.BRIDGE },
-            { 0x4644, Terrain.BRIDGE },
-            { 0x4645, Terrain.BRIDGE },
-            { 0x4646, Terrain.FOREST },
-            { 0x4647, Terrain.SWAMP },
-            { 0x4648, Terrain.FOREST },
-            { 0x4649, Terrain.FOREST },
-            { 0x464A, Terrain.FOREST },
-            { 0x464B, Terrain.FOREST },
-            { 0x464C, Terrain.FOREST },
-            { 0x464D, Terrain.ROAD },
-            //{ 0x464E, terrain.desert },
-            { 0x464F, Terrain.DESERT },
-            //{ 0x4658, terrain.bridge },
-            //{ 0x4659, terrain.cave },
-            //{ 0x465A, terrain.cave },
-            { 0x465B, Terrain.GRAVE },
-            { 0x465C, Terrain.TOWN },
-            { 0x465E, Terrain.TOWN },
-            { 0x465F, Terrain.TOWN },
-            { 0x4660, Terrain.TOWN },
-            { 0x4661, Terrain.FOREST },
-            { 0x4662, Terrain.TOWN },
-            { 0x4663, Terrain.PALACE },
-            { 0x4664, Terrain.PALACE },
-            { 0x4665, Terrain.PALACE }
+            { RomMap.WEST_NORTH_PALACE_TILE_LOCATION, Terrain.PALACE},
+            { RomMap.WEST_CAVE_TROPHY_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_MINOR_FOREST_TILE_AT_START_LOCATION, Terrain.FOREST},
+            { RomMap.WEST_CAVE_MAGIC_CONTAINER_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_MINOR_FOREST_TILE_BY_SARIA_LOCATION, Terrain.FOREST },
+            { RomMap.WEST_GRASS_TILE_LOCATION, Terrain.GRASS },
+            { RomMap.WEST_BAGU_WOODS_TILE_LOCATION1, Terrain.FOREST },
+            { RomMap.WEST_TRAP_ROAD_TILE_LOCATION, Terrain.ROAD },
+            { RomMap.WEST_MINOR_SWAMP_TILE_LOCATION1, Terrain.SWAMP },
+            { RomMap.WEST_MINOR_GRAVE_TILE_LOCATION1, Terrain.GRAVE },
+            { RomMap.WEST_CAVE_PARAPA_NORTH_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_CAVE_PARAPA_SOUTH_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_CAVE_JUMP_NORTH_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_CAVE_JUMP_SOUTH_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_CAVE_PBAG_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_CAVE_MEDICINE_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_CAVE_HEART_CONTAINER_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_FAIRY_CAVE_DROP_TILE_LOCATION, Terrain.GRAVE },
+            { RomMap.WEST_FAIRY_CAVE_EXIT_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.WEST_BRIDGE_TILE_NORTH_OF_SARIA_LOCATION, Terrain.BRIDGE },
+            { RomMap.WEST_BRIDGE_TILE_EAST_OF_SARIA_LOCATION, Terrain.BRIDGE },
+            { RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION, Terrain.BRIDGE },
+            { RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION, Terrain.BRIDGE },
+            { RomMap.WEST_MINOR_FOREST_TILE_BY_JUMP_CAVE_LOCATION, Terrain.FOREST },
+            { RomMap.WEST_MINOR_SWAMP_TILE_LOCATION2, Terrain.SWAMP },
+            { RomMap.WEST_MINOR_FOREST_TILE_EAST_OF_SARIA_LOCATION, Terrain.FOREST },
+            { RomMap.WEST_BAGU_WOODS_TILE_LOCATION2, Terrain.FOREST },
+            { RomMap.WEST_BAGU_WOODS_TILE_LOCATION3, Terrain.FOREST },
+            { RomMap.WEST_BAGU_WOODS_TILE_LOCATION4, Terrain.FOREST },
+            { RomMap.WEST_BAGU_WOODS_TILE_LOCATION5, Terrain.FOREST },
+            { RomMap.WEST_MINOR_ROAD_TILE_LOCATION, Terrain.ROAD },
+            { RomMap.WEST_MINOR_DESERT_TILE_LOCATION, Terrain.DESERT },
+            //{ 0x4658, terrain.bridge }, // Raft to the east
+            //{ 0x4659, terrain.cave }, // Cave to DM
+            //{ 0x465A, terrain.cave }, // Cave from DM
+            { RomMap.WEST_KINGS_TOMB_TILE_LOCATION, Terrain.GRAVE }, //44: King's tomb
+            { RomMap.WEST_TOWN_RAURO_TILE_LOCATION, Terrain.TOWN },
+            { RomMap.WEST_TOWN_RUTO_TILE_LOCATION, Terrain.TOWN },
+            { RomMap.WEST_TOWN_SARIA_SOUTH_TILE_LOCATION, Terrain.TOWN },
+            { RomMap.WEST_TOWN_SARIA_NORTH_TILE_LOCATION, Terrain.TOWN },
+            { RomMap.WEST_BAGU_HOUSE_TILE_LOCATION, Terrain.FOREST },
+            { RomMap.WEST_TOWN_MIDO_TILE_LOCATION, Terrain.TOWN },
+            { RomMap.WEST_PALACE1_TILE_LOCATION, Terrain.PALACE },
+            { RomMap.WEST_PALACE2_TILE_LOCATION, Terrain.PALACE },
+            { RomMap.WEST_PALACE3_TILE_LOCATION, Terrain.PALACE }
     };
 
     private const int MAP_ADDR = 0x7480;
@@ -110,54 +113,78 @@ public class WestHyrule : World
         isHorizontal = props.WestIsHorizontal;
         List<Location> locations =
         [
-            .. rom.LoadLocations(0x4639, 4, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x4640, 2, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x462F, 10, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x463D, 3, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x4642, 12, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x464F, 1, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x465B, 2, terrains, Continent.WEST),
-            .. rom.LoadLocations(0x465E, 8, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_CAVE_PARAPA_NORTH_TILE_LOCATION, 4, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_FAIRY_CAVE_DROP_TILE_LOCATION, 2, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_NORTH_PALACE_TILE_LOCATION, 10, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_CAVE_PBAG_TILE_LOCATION, 3, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_BRIDGE_TILE_NORTH_OF_SARIA_LOCATION, 12, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_MINOR_DESERT_TILE_LOCATION, 1, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_KINGS_TOMB_TILE_LOCATION, 2, terrains, Continent.WEST),
+            .. rom.LoadLocations(RomMap.WEST_TOWN_RUTO_TILE_LOCATION, 8, terrains, Continent.WEST),
         ];
         locations.ForEach(AddLocation);
 
-        northPalace = GetLocationByMem(0x462f); //0x462f
-        //reachableAreas = new HashSet<string>();
-        jumpCave = GetLocationByMem(0x463b); //0x463b
+        northPalace = GetLocationByMem(RomMap.WEST_NORTH_PALACE_TILE_LOCATION); //0x462f
+        jumpCave = GetLocationByMem(RomMap.WEST_CAVE_JUMP_NORTH_TILE_LOCATION); //0x463b
         jumpCave.NeedJump = true;
-        medicineCave = GetLocationByMem(0x463e); //0x463e
-        heartCave = GetLocationByMem(0x463f); //0x463f
-        fairyCave = GetLocationByMem(0x4640); //0x4640
+        medicineCave = GetLocationByMem(RomMap.WEST_CAVE_MEDICINE_TILE_LOCATION); //0x463e
+        heartCave = GetLocationByMem(RomMap.WEST_CAVE_HEART_CONTAINER_TILE_LOCATION); //0x463f
+        fairyCave = GetLocationByMem(RomMap.WEST_FAIRY_CAVE_DROP_TILE_LOCATION); //0x4640
         fairyCave.NeedFairy = true;
-        locationAtRuto = GetLocationByMem(0x465e); //0x465e
-        bagu = GetLocationByMem(0x4661); //0x4661
-        locationAtMido = GetLocationByMem(0x4662); //0x00004662
-        locationAtSariaNorth = GetLocationByMem(0x4660); //0x00004660
-        locationAtSariaSouth = GetLocationByMem(0x465f); //0x0000465f
+        bagu = GetLocationByMem(RomMap.WEST_BAGU_HOUSE_TILE_LOCATION); //0x4661
+        bagu.ActualTown = Town.BAGU;
+        bagu.Collectables = [Collectable.BAGUS_NOTE];
+
+        locationAtRauru = GetLocationByMem(RomMap.WEST_TOWN_RAURO_TILE_LOCATION);
+        locationAtRauru.Collectables = [Collectable.SHIELD_SPELL];
+        locationAtRuto = GetLocationByMem(RomMap.WEST_TOWN_RUTO_TILE_LOCATION); //0x465e
+        locationAtRuto.Collectables = [Collectable.JUMP_SPELL];
+        locationAtSariaNorth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_NORTH_TILE_LOCATION); //0x00004660
+        locationAtSariaSouth = GetLocationByMem(RomMap.WEST_TOWN_SARIA_SOUTH_TILE_LOCATION); //0x0000465f
         locationAtSariaNorth.NeedBagu = true;
         locationAtSariaSouth.NeedBagu = true;
-        trophyCave = GetLocationByMem(0x4630); //0x00004630
-        raft = GetLocationByMem(0x4658);
-        locationAtPalace1 = GetLocationByMem(0x4663);
+        locationAtSariaNorth.Collectables = [Collectable.LIFE_SPELL];
+        locationAtMido = GetLocationByMem(RomMap.WEST_TOWN_MIDO_TILE_LOCATION); //0x00004662
+        locationAtMido.Collectables = [Collectable.FAIRY_SPELL];
+
+        trophyCave = GetLocationByMem(RomMap.WEST_CAVE_TROPHY_TILE_LOCATION); //0x00004630
+        //raft = GetLocationByMem(0x4658);
+
+        locationAtPalace1 = GetLocationByMem(RomMap.WEST_PALACE1_TILE_LOCATION);
         locationAtPalace1.PalaceNumber = 1;
-        locationAtPalace2 = GetLocationByMem(0x4664);
+        locationAtPalace2 = GetLocationByMem(RomMap.WEST_PALACE2_TILE_LOCATION);
         locationAtPalace2.PalaceNumber = 2;
-        locationAtPalace3 = GetLocationByMem(0x4665);
+        locationAtPalace3 = GetLocationByMem(RomMap.WEST_PALACE3_TILE_LOCATION);
         locationAtPalace3.PalaceNumber = 3;
-        magicContainerCave = GetLocationByMem(0x4632);
-        grassTile = GetLocationByMem(0x463F);
-        heartContainerCave = GetLocationByMem(0x4634);
-        locationAtRauru = GetLocationByMem(0x465C);
-        locationAtRauru.Name = "Rauru";
-        pbagCave = GetLocationByMem(0x463D);
 
+        magicContainerCave = GetLocationByMem(RomMap.WEST_CAVE_MAGIC_CONTAINER_TILE_LOCATION);
+        grassTile = GetLocationByMem(RomMap.WEST_GRASS_TILE_LOCATION);
+        heartContainerCave = GetLocationByMem(RomMap.WEST_CAVE_HEART_CONTAINER_TILE_LOCATION);
+        pbagCave = GetLocationByMem(RomMap.WEST_CAVE_PBAG_TILE_LOCATION);
 
-        parapaCave1 = GetLocationByMem(0x4639); //0x4639
-        parapaCave2 = GetLocationByMem(0x463a); //0x463a
-        jumpCave2 = GetLocationByMem(0x463c); //0x463c
-        fairyCave2 = GetLocationByMem(0x4641); //0x4641
-        bridge1 = GetLocationByMem(0x4644); //0x4644
-        bridge2 = GetLocationByMem(0x4645); //0x4645
+        parapaCave1 = GetLocationByMem(RomMap.WEST_CAVE_PARAPA_NORTH_TILE_LOCATION); //0x4639
+        parapaCave2 = GetLocationByMem(RomMap.WEST_CAVE_PARAPA_SOUTH_TILE_LOCATION); //0x463a
+        jumpCave2 = GetLocationByMem(RomMap.WEST_CAVE_JUMP_SOUTH_TILE_LOCATION); //0x463c
+        fairyCave2 = GetLocationByMem(RomMap.WEST_FAIRY_CAVE_EXIT_TILE_LOCATION); //0x4641
+        bridge1 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_WEST_LOCATION); //0x4644
+        bridge2 = GetLocationByMem(RomMap.WEST_BRIDGE_AFTER_DM_EAST_LOCATION); //0x4645
+
+        //Fake locations that dont correspond to anywhere on the map, but still hold logic and items
+        mirrorTable = new Location(locationAtSariaNorth);
+        mirrorTable.Collectables = [Collectable.MIRROR];
+        mirrorTable.ActualTown = Town.SARIA_TABLE;
+        mirrorTable.Name = "Saria Mirror Table";
+        mirrorTable.CanShuffle = false;
+        locationAtSariaNorth.Children.Add(mirrorTable);
+        AddLocation(mirrorTable);
+
+        midoChurch = new Location(locationAtMido);
+        midoChurch.Collectables = [Collectable.DOWNSTAB];
+        midoChurch.ActualTown = Town.MIDO_CHURCH;
+        midoChurch.Name = "Mido Church";
+        midoChurch.CanShuffle = false;
+        locationAtMido.Children.Add(midoChurch);
+        AddLocation(midoChurch);
 
         if (props.SaneCaves)
         {
@@ -194,42 +221,69 @@ public class WestHyrule : World
         bridgeConn.Add(bridge1, bridge2);
         bridgeConn.Add(bridge2, bridge1);
 
-        enemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1F, 0x20 };
-        flyingEnemies = new List<int> { 0x06, 0x07, 0x0A, 0x0D, 0x0E };
-        generators = new List<int> { 0x0B, 0x0C, 0x0F, 0x1D };
-        smallEnemies = new List<int> { 0x03, 0x04, 0x05, 0x11, 0x12, 0x1C, 0x1F };
-        largeEnemies = new List<int> { 0x20, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B };
-        enemyAddr = 0x48B0;
+        sideviewPtrTable = 0x4533;
+        sideviewBank = 1;
         enemyPtr = 0x45B1;
+        groupedEnemies = Enemies.GroupedWestEnemies;
+        overworldEncounterMaps = [
+            29, 30, // Desert
+            34, 35, // Grass
+            39, 40, // Forest
+            47, 48, // Swamp     - in vanilla 47-48 use the same table
+            52, 53, // Graveyard - in vanilla 52-53 use the same table
+            57,     // Road      - in vanilla 57-58 use the same table
+        ];
+        overworldEncounterMapDuplicate = [
+            58,
+        ];
+        nonEncounterMaps = [
+            00,             // NORTH_PALACE (start of game)
+            01, 02, 04, 05, // Bridges
+            06,             // BUBBLE_CLIFF
+            07,             // Parapa passthrough
+            09, 10, 11,     // Jump Cave passthrough
+            12, 13,         // PILLAR_PBAG_CAVE
+            14, 15,         // MEDICINE_CAVE
+            16, 17,         // HEART_CONTAINER_CAVE
+            18, 19,         // Fairy Cave passthrough
+            20,             // SARIA_FAIRY
+            21, 22, 23,     // LOST_WOODS
+            33,             // TROPHY_CAVE
+            38,             // GRASS_TILE
+            43,             // FOREST_50P
+            44,             // LOST_WOODS_1
+            45,             // MAGIC_CAVE
+            46,             // FOREST_100P
+            51,             // EX_LIFE_SWAMP_1
+            56,             // RED_JAR_CEM
+        ];
 
-        //34 29 39 48 35 58 30 53 40
-        overworldMaps = new List<int>() { 0x22, 0x1D, 0x27, 0x30, 0x23, 0x3A, 0x1E, 0x35, 0x28 };
         MAP_ROWS = 75;
         MAP_COLS = 64;
-        baseAddr = 0x462F;
+        baseAddr = RomMap.WEST_NORTH_PALACE_TILE_LOCATION;
         VANILLA_MAP_ADDR = 0x506C;
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
         if (props.HideLessImportantLocations)
         {
-            unimportantLocs.Add(GetLocationByMem(0x4631));
-            unimportantLocs.Add(GetLocationByMem(0x4633));
-            unimportantLocs.Add(GetLocationByMem(0x4635));
-            unimportantLocs.Add(GetLocationByMem(0x4637));
-            unimportantLocs.Add(GetLocationByMem(0x4638));
-            unimportantLocs.Add(GetLocationByMem(0x4646));
-            unimportantLocs.Add(GetLocationByMem(0x4647));
-            unimportantLocs.Add(GetLocationByMem(0x4648));
-            unimportantLocs.Add(GetLocationByMem(0x4649));
-            unimportantLocs.Add(GetLocationByMem(0x464A));
-            unimportantLocs.Add(GetLocationByMem(0x464B));
-            unimportantLocs.Add(GetLocationByMem(0x464C));
-            unimportantLocs.Add(GetLocationByMem(0x464D));
-            unimportantLocs.Add(GetLocationByMem(0x464F));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_AT_START_LOCATION));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_BY_SARIA_LOCATION));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION1));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_SWAMP_TILE_LOCATION1));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_GRAVE_TILE_LOCATION1));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_BY_JUMP_CAVE_LOCATION));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_SWAMP_TILE_LOCATION2));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_EAST_OF_SARIA_LOCATION));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION2));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION3));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION4));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION5));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_ROAD_TILE_LOCATION));
+            unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_DESERT_TILE_LOCATION));
             if(!props.HelpfulHints)
             {
-                unimportantLocs.Add(GetLocationByMem(0x465B));
+                unimportantLocs.Add(GetLocationByMem(RomMap.WEST_KINGS_TOMB_TILE_LOCATION));
             }
         }
         biome = props.WestBiome;
@@ -287,7 +341,14 @@ public class WestHyrule : World
             { (0x40, 0x0B), "mid" },
             { (0x62, 0x39), "island" }
         };
-        lostWoods = new List<Location> { GetLocationByMem(0x4649), GetLocationByMem(0x464A), GetLocationByMem(0x464B), GetLocationByMem(0x464C), GetLocationByMem(0x4635) };
+        lostWoods = [
+            GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION2), 
+            GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION3), 
+            GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION4), 
+            GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION5), 
+            GetLocationByMem(RomMap.WEST_BAGU_WOODS_TILE_LOCATION1)
+        ];
+        SetVanillaCollectables(props.ReplaceFireWithDash);
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -317,7 +378,7 @@ public class WestHyrule : World
                 };
                 foreach (Location location in AllLocations)
                 {
-                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords));
+                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords)!);
                 }
                 ChooseConn("parapa", connections, true);
                 ChooseConn("lifesouth", connections, true);
@@ -344,9 +405,13 @@ public class WestHyrule : World
                 {
                     location.PassThrough = 0;
                 }
-                raft.PassThrough = 0;
+                if(raft != null)
+                {
+                    raft.PassThrough = 0;
+                }
                 bridge1.PassThrough = 0;
                 bridge2.PassThrough = 0;
+
                 fairyCave.PassThrough = 0; //fairy cave
 
             }
@@ -634,7 +699,7 @@ public class WestHyrule : World
                 {
                     //debug++;
                     //Debug.WriteLine(debug);
-                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, props.CanWalkOnWaterWithBoots, biome,
+                    bool f = ConnectIslands(1, true, fillerWater, false, false, false, false, props.CanWalkOnWaterWithBoots, biome,
                         calderaCenterX - CALDERA_DEAD_ZONE_X, calderaCenterX + CALDERA_DEAD_ZONE_X, 
                         calderaCenterY - CALDERA_DEAD_ZONE_Y, calderaCenterY + CALDERA_DEAD_ZONE_Y);
                     if (!f)
@@ -644,7 +709,7 @@ public class WestHyrule : World
                     }
                 }
 
-                PlaceRocks(props.BoulderBlockConnections);
+                BlockCaves(props.BoulderBlockConnections);
                 //Debug.WriteLine(GetMapDebug());
                 PlaceHiddenLocations();
 
@@ -652,7 +717,7 @@ public class WestHyrule : World
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
                     //Debug.WriteLine(GetMapDebug());
-                    bool f = ConnectIslands(100, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool f = ConnectIslands(100, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         //Debug.WriteLine(GetMapDebug());
@@ -662,7 +727,7 @@ public class WestHyrule : World
                 }
                 if (biome == Biome.ISLANDS)
                 {
-                    bool f = ConnectIslands(25, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool f = ConnectIslands(25, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -673,7 +738,7 @@ public class WestHyrule : World
                 {
                     walkableTerrains.Add(Terrain.ROAD);
 
-                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool h = ConnectIslands(15, true, riverTerrain, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!h)
                     {
                         failedOnConnectIslands++;
@@ -684,9 +749,9 @@ public class WestHyrule : World
                 {
                     riverTerrain = fillerWater;
                     //2 bridges over the mountains
-                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, props.CanWalkOnWaterWithBoots, biome);
+                    ConnectIslands(2, false, Terrain.MOUNTAIN, false, false, false, false, props.CanWalkOnWaterWithBoots, biome);
                     //4 bridges including saria and the double bridge across arbitrary water
-                    bool f = ConnectIslands(4, true, riverTerrain, false, true, false, props.CanWalkOnWaterWithBoots, biome);
+                    bool f = ConnectIslands(4, true, riverTerrain, false, false, true, false, props.CanWalkOnWaterWithBoots, biome);
                     if (!f)
                     {
                         failedOnConnectIslands++;
@@ -985,7 +1050,8 @@ public class WestHyrule : World
             starty += deltay;
         }
         int caveCount = RNG.Next(2) + 1;
-        Location cave1l, cave1r, cave2l = null, cave2r = null;
+        Location cave1l, cave1r;
+        Location? cave2l = null, cave2r = null;
         int availableConnectorCount = 2;
         if(useSaneCaves)
         {
@@ -1034,7 +1100,6 @@ public class WestHyrule : World
             map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
             map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
         }
-        //
         int caveOrientation = RNG.Next(2);
         if (isHorizontal)
         {
@@ -1055,7 +1120,11 @@ public class WestHyrule : World
 
             if (caveCount > 1)
             {
-                if(caveOrientation == 0)
+                if (cave2l == null || cave2r == null)
+                {
+                    throw new Exception("Failed to find connection caves while constructing caldera");
+                }
+                if (caveOrientation == 0)
                 {
                     caveOrientation = 1;
                 }
@@ -1140,6 +1209,10 @@ public class WestHyrule : World
 
             if (caveCount > 1)
             {
+                if (cave2l == null || cave2r == null)
+                {
+                    throw new Exception("Failed to find connection caves while constructing caldera");
+                }
                 if (caveOrientation == 0)
                 {
                     caveOrientation = 1;
@@ -1207,7 +1280,7 @@ public class WestHyrule : World
         }
         return true;
     }
-    private void PlaceRocks(bool boulderBlockConnections)
+    private void BlockCaves(bool boulderBlockConnections)
     {
         int rockNum = RNG.Next(3);
         int cavePicked = 0;
@@ -1220,6 +1293,7 @@ public class WestHyrule : World
             {
                 caveConn = connections[GetLocationByMem(cavePicked)].MemAddress;
             }
+            //Item caves
             if (boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
                 if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null)
@@ -1275,6 +1349,7 @@ public class WestHyrule : World
                     cavePicked = cave.MemAddress;
                 }
             }
+            //Connector caves
             else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
             {
                 if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN)
@@ -1354,7 +1429,7 @@ public class WestHyrule : World
                     {
                         if (RNG.NextDouble() > .5 && (x2 > 0 && map[y2, x2 - 1] != Terrain.ROCK) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] != Terrain.ROCK) && (((y2 > 0 && map[y2 - 1, x2] == Terrain.ROAD) && (y2 < MAP_ROWS - 1 && map[y2 + 1, x2] == Terrain.ROAD)) || ((x2 > 0 && map[y2, x2 - 0] == Terrain.ROAD) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] == Terrain.ROAD))))
                         {
-                            Location roadEnc = GetLocationByMem(0x4636);
+                            Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
                             roadEnc.Xpos = x2;
                             roadEnc.Ypos = y2 + 30;
                             roadEnc.CanShuffle = false;
@@ -1363,7 +1438,7 @@ public class WestHyrule : World
                         }
                         else if (placedRocks < 1)
                         {
-                            Location roadEnc = GetLocationByMem(0x4636);
+                            Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
                             if ((roadEnc.Ypos - 30 != y2 && roadEnc.Xpos - 1 != x2) && (roadEnc.Ypos - 30 + 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Ypos - 30 - 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Ypos - 30 != y2 && roadEnc.Xpos + 1 != x2))
                             {
                                 map[y2, x2] = Terrain.ROCK;
@@ -1383,7 +1458,7 @@ public class WestHyrule : World
 
         if (!placedRoad)
         {
-            Location roadEnc = GetLocationByMem(0x4636);
+            Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
             roadEnc.Xpos = 0;
             roadEnc.Ypos = 0;
             roadEnc.CanShuffle = false;
@@ -1391,10 +1466,10 @@ public class WestHyrule : World
     }
 
 
-    public override void UpdateVisit(Dictionary<Item, bool> itemGet, Dictionary<Spell, bool> spellGet)
+    public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
         visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
-        UpdateReachable(itemGet, spellGet);
+        UpdateReachable(itemGet);
 
         foreach (Location location in AllLocations)
         {
@@ -1408,21 +1483,21 @@ public class WestHyrule : World
                         Location l2 = connections[location];
                         if (
                             location.NeedBagu 
-                            && (bagu.Reachable
-                                || spellGet[Spell.FAIRY]
-                                || (spellGet.ContainsKey(Spell.DASH) && spellGet[Spell.DASH] && spellGet[Spell.JUMP])))
+                            && (itemGet[Collectable.BAGUS_NOTE]
+                                || itemGet[Collectable.FAIRY_SPELL]
+                                || (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL])))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
-                        if (location.NeedFairy && spellGet[Spell.FAIRY])
+                        if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;
                         }
 
-                        if (location.NeedJump && (spellGet[Spell.JUMP] || spellGet[Spell.FAIRY]))
+                        if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
                         {
                             l2.Reachable = true;
                             visitation[l2.Ypos - 30, l2.Xpos] = true;
@@ -1437,9 +1512,23 @@ public class WestHyrule : World
                 }
             }
         }
-        if (locationAtSariaNorth.Reachable && locationAtSariaNorth.ActualTown == Town.NEW_KASUTO)
+        Location actualSariaNorth = AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH);
+        Location actualSariaSouth = AllLocations.First(i => i.ActualTown == Town.SARIA_SOUTH);
+        if(actualSariaNorth.Reachable && 
+            (itemGet[Collectable.FAIRY_SPELL] ||
+            itemGet[Collectable.BAGUS_NOTE] ||
+            (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
+        )    
         {
-            locationAtSariaSouth.Reachable = true;
+            actualSariaSouth.Reachable = true;
+        }
+        if (actualSariaSouth.Reachable &&
+            (itemGet[Collectable.FAIRY_SPELL] ||
+            itemGet[Collectable.BAGUS_NOTE] ||
+            (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL]))
+)
+        {
+            actualSariaNorth.Reachable = true;
         }
     }
 
@@ -1480,7 +1569,7 @@ public class WestHyrule : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable
@@ -1551,5 +1640,67 @@ public class WestHyrule : World
             }
         }
         return requiredLocations.Where(i => i != null);
+    }
+
+    protected override void SetVanillaCollectables(bool useFire)
+    {
+        locationAtPalace1.VanillaCollectable = Collectable.CANDLE;
+        locationAtPalace2.VanillaCollectable = Collectable.GLOVE;
+        locationAtPalace3.VanillaCollectable = Collectable.RAFT;
+
+        locationAtRauru.VanillaCollectable = Collectable.SHIELD_SPELL;
+        locationAtRuto.VanillaCollectable = Collectable.JUMP_SPELL;
+        locationAtSariaNorth.VanillaCollectable = Collectable.LIFE_SPELL;
+        locationAtMido.VanillaCollectable = Collectable.FAIRY_SPELL;
+        midoChurch.VanillaCollectable = Collectable.DOWNSTAB;
+        bagu.VanillaCollectable = Collectable.BAGUS_NOTE;
+        mirrorTable.VanillaCollectable = Collectable.MIRROR;
+
+        grassTile.VanillaCollectable = Collectable.HEART_CONTAINER;
+        pbagCave.VanillaCollectable = Collectable.LARGE_BAG;
+        heartContainerCave.VanillaCollectable = Collectable.HEART_CONTAINER;
+        magicContainerCave.VanillaCollectable = Collectable.MAGIC_CONTAINER;
+        trophyCave.VanillaCollectable = Collectable.TROPHY;
+        medicineCave.VanillaCollectable = Collectable.MEDICINE;
+    }
+
+    public override string GenerateSpoiler()
+    {
+        StringBuilder sb = new();
+        sb.AppendLine("WEST: ");
+        sb.AppendLine("\tRauru: " + AllLocations.First(i => i.ActualTown == Town.RAURU).Collectables[0].EnglishText());
+        sb.AppendLine("\tRuto: " + AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0].EnglishText());
+        sb.AppendLine("\tMirror Table: " + mirrorTable.Collectables[0].EnglishText());
+        sb.AppendLine("\tSaria: " + AllLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Collectables[0].EnglishText());
+        sb.AppendLine("\tDownstab Guy: " + midoChurch.Collectables[0].EnglishText());
+        sb.AppendLine("\tMido: " + AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0].EnglishText());
+        sb.AppendLine("\tBagu: " + bagu.Collectables[0].EnglishText());
+
+        sb.AppendLine("\tMagic Container Cave: " + magicContainerCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tTrophy Cave: " + trophyCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tGrass Tile: " + grassTile.Collectables[0].EnglishText());
+        sb.AppendLine("\tHeart Container Cave: " + heartContainerCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tPillar Pbag Cave: " + pbagCave.Collectables[0].EnglishText());
+        sb.AppendLine("\tMedicine Cave: " + medicineCave.Collectables[0].EnglishText());
+
+        sb.Append("\tPalace 1 (" + locationAtPalace1.PalaceNumber + "): ");
+        sb.AppendLine(locationAtPalace1.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace1.Collectables.Select(c => c.EnglishText())));
+
+        sb.Append("\tPalace 2 (" + locationAtPalace2.PalaceNumber + "): ");
+        sb.AppendLine(locationAtPalace2.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace2.Collectables.Select(c => c.EnglishText())));
+
+        sb.Append("\tPalace 3 (" + locationAtPalace3.PalaceNumber + "): ");
+        sb.AppendLine(locationAtPalace3.Collectables.Count == 0 ? "No Items" : string.Join(", ", locationAtPalace3.Collectables.Select(c => c.EnglishText())));
+
+        sb.AppendLine();
+        return sb.ToString();
+    }
+
+    protected override void OnUpdateReachableTrigger()
+    {
+        if (AllLocations.Where(i => i.ActualTown == Town.SARIA_NORTH).FirstOrDefault()?.Reachable ?? false)
+        {
+            mirrorTable.Reachable = true;
+        }
     }
 }

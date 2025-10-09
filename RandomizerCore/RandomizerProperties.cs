@@ -1,9 +1,10 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Z2Randomizer.Core.Overworld;
+using System.Linq;
+using System.Text.Json.Serialization;
+using Z2Randomizer.RandomizerCore.Overworld;
 
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// Originally this class corresponded to the flags and controlled the logic, with all the actual configuration randomization
@@ -11,17 +12,19 @@ namespace Z2Randomizer.Core;
 /// was, and RandomizerConfiguration should represent the flags/interface, with the configuration randomization done entirly
 /// in the interface between them.
 /// </summary>
+
+[JsonSourceGenerationOptions(WriteIndented = false)]
+[JsonSerializable(typeof(RandomizerProperties))]
+[JsonSerializable(typeof(Climate))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
+}
 public class RandomizerProperties
 {
-    public RandomizerProperties()
-    {
-    }
 
     //ROM Info
-    public string Filename { get; set; }
-    public int Seed { get; set; }
-    public string Flags { get; set; }
-    public bool saveRom = true;
+    public string? Seed { get; set; }
+    public string? Flags { get; set; }
 
     //Items
     //public bool shuffleItems;
@@ -33,6 +36,7 @@ public class RandomizerProperties
     public bool StartCross { get; set; }
     public bool StartHammer { get; set; }
     public bool StartKey { get; set; }
+    public StartingResourceLimit StartItemsLimit { get; set; }
 
     //Spells
     //public bool shuffleSpells;
@@ -46,6 +50,7 @@ public class RandomizerProperties
     public bool StartThunder { get; set; }
     public bool CombineFire { get; set; }
     public bool ReplaceFireWithDash { get; set; }
+    public StartingResourceLimit StartSpellsLimit { get; set; }
 
     //Other starting attributes
     public int StartHearts { get; set; }
@@ -69,7 +74,7 @@ public class RandomizerProperties
     public bool HiddenPalace { get; set; }
     public bool HiddenKasuto { get; set; }
     public bool TownSwap { get; set; }
-    public EncounterRate EncounterRate { get; set; }
+    public EncounterRate EncounterRates { get; set; }
     public ContinentConnectionType ContinentConnections { get; set; }
     public bool BoulderBlockConnections { get; set; }
     public Biome WestBiome { get; set; }
@@ -79,26 +84,34 @@ public class RandomizerProperties
     public bool DmIsHorizontal { get; set; }
     public bool WestIsHorizontal { get; set; }
     public bool EastIsHorizontal { get; set; }
-
+    public bool EastRockIsPath { get; set; }
+#pragma warning disable CS8618
     public Climate Climate { get; set; }
+#pragma warning restore CS8618 
     public bool VanillaShuffleUsesActualTerrain { get; set; }
     public bool ShuffleHidden { get; set; }
     public bool CanWalkOnWaterWithBoots { get; set; }
     public bool BagusWoods { get; set; }
+    public RiverDevilBlockerOption RiverDevilBlockerOption { get; set; }
+    public bool EastRocks { get; set; }
 
     //Palaces
-    //public bool shufflePalaceRooms { get; set; }
-    public PalaceStyle NormalPalaceStyle { get; set; }
-    public PalaceStyle GPStyle { get; set; }
+    [NotMapped]
+    public PalaceStyle[] PalaceStyles { get; set; } = new PalaceStyle[7];
+    public bool ShortenNormalPalaces { get; set; }
+    public bool ShortenGP { get; set; }
     public int StartGems { get; set; }
     public bool RequireTbird { get; set; }
+    public int DarkLinkMinDistance { get; set; }
     public bool ShufflePalacePalettes { get; set; }
     public bool UpARestartsAtPalaces { get; set; }
+    public bool Global5050JarDrop { get; set; }
+    public bool ReduceDripperVariance { get; set; }
     public bool RemoveTbird { get; set; }
     public bool BossItem { get; set; }
-    //public bool createPalaces { get; set; }
     public bool BlockersAnywhere { get; set; }
-    public bool BossRoomConnect { get; set; }
+    [NotMapped]
+    public BossRoomsExitType[] BossRoomsExits { get; set; } = new BossRoomsExitType[6];
     public bool NoDuplicateRooms { get; set; }
     public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
@@ -106,6 +119,10 @@ public class RandomizerProperties
     public bool AllowV4Rooms { get; set; }
     public bool AllowV4_4Rooms { get; set; }
     public bool HardBosses { get; set; }
+    [NotMapped]
+    public int[] PalaceItemRoomCounts { get; set; } = new int[6];
+    public bool UsePalaceItemRoomCountIndicator { get; set; }
+    public bool RevealWalkthroughWalls { get; set; }
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }
@@ -117,33 +134,18 @@ public class RandomizerProperties
     public bool MixLargeAndSmallEnemies { get; set; }
     public bool ShuffleDripper { get; set; }
     public bool ShuffleEnemyPalettes { get; set; }
-    public StatEffectiveness ExpLevel { get; set; }
+    public XPEffectiveness EnemyXPDrops { get; set; }
 
     //Levels
-    //public bool shuffleAllExp { get; set; }
     public bool ShuffleAtkExp { get; set; }
     public bool ShuffleMagicExp { get; set; }
     public bool ShuffleLifeExp { get; set; }
-    //public bool shuffleAtkEff { get; set; }
-    //public bool shuffleMagEff { get; set; }
-    //public bool shuffleLifeEff { get; set; }
     public bool ShuffleLifeRefill { get; set; }
     public bool ShuffleSpellLocations { get; set; }
     public bool DisableMagicRecs { get; set; }
-    /*
-    public bool ohkoEnemies { get; set; }
-    public bool tankMode { get; set; }
-    public bool ohkoLink { get; set; }
-    public bool wizardMode { get; set; }
-    public bool highAtk { get; set; }
-    public bool lowAtk { get; set; }
-    public bool highDef { get; set; }
-    public bool highMag { get; set; }
-    public bool lowMag { get; set; }
-    */
-    public StatEffectiveness AttackEffectiveness { get; set; }
-    public StatEffectiveness MagicEffectiveness { get; set; }
-    public StatEffectiveness LifeEffectiveness { get; set; }
+    public AttackEffectiveness AttackEffectiveness { get; set; }
+    public MagicEffectiveness MagicEffectiveness { get; set; }
+    public LifeEffectiveness LifeEffectiveness { get; set; }
     public int AttackCap { get; set; }
     public int MagicCap { get; set; }
     public int LifeCap { get; set; }
@@ -156,9 +158,14 @@ public class RandomizerProperties
     public bool ShuffleOverworldItems { get; set; }
     public bool ShufflePalaceItems { get; set; }
     public bool MixOverworldPalaceItems { get; set; }
-    public bool ShuffleSmallItems { get; set; }
+    public bool IncludeSpellsInShuffle { get; set; }
+    public bool IncludeSwordTechsInShuffle { get; set; }
+    //Bagu's note / fountain water / saria mirror
+    public bool IncludeQuestItemsInShuffle { get; set; }
+    public bool RandomizeSmallItems { get; set; }
     public bool ExtraKeys { get; set; }
-    public bool KasutoJars { get; set; }
+    public bool AllowImportantItemDuplicates { get; set; }
+    public bool RandomizeNewKasutoBasementRequirement { get; set; }
     //Include PBag caves in item shuffle
     public bool PbagItemShuffle { get; set; }
     public bool StartWithSpellItems { get; set; }
@@ -185,6 +192,7 @@ public class RandomizerProperties
     public bool Large1up { get; set; }
     public bool Largekey { get; set; }
     public bool StandardizeDrops { get; set; }
+    public bool RandomizeDrops { get; set; }
 
     //Hints
     public bool SpellItemHints { get; set; }
@@ -197,15 +205,20 @@ public class RandomizerProperties
     public bool JumpAlwaysOn { get; set; }
     public bool DashAlwaysOn { get; set; }
     public bool FastCast { get; set; }
-    public String BeamSprite { get; set; }
+    public BeamSprites BeamSprite { get; set; }
     public bool DisableMusic { get; set; }
     public bool RandomizeMusic { get; set; }
     public bool MixCustomAndOriginalMusic { get; set; }
+    public bool IncludeDiverseMusic { get; set; }
     public bool DisableUnsafeMusic { get; set; }
     [NotMapped]
+#pragma warning disable CS8618 
     public CharacterSprite CharSprite { get; set; }
-    public String TunicColor { get; set; }
-    public String ShieldColor { get; set; }
+#pragma warning restore CS8618
+    public bool ChangeItemSprites { get; set; }
+    public CharacterColor TunicColor { get; set; }
+    public CharacterColor OutlineColor { get; set; }
+    public CharacterColor ShieldColor { get; set; }
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }
@@ -216,22 +229,142 @@ public class RandomizerProperties
     [Key]
     public int Id { get; set; }
 
-    public bool StartWithSpell(Spell spell)
+    public bool StartsWithCollectable(Collectable collectable)
     {
-        return spell switch
+        return collectable switch
         {
-            Spell.SHIELD => StartShield,
-            Spell.JUMP => StartJump,
-            Spell.LIFE => StartLife,
-            Spell.FAIRY => StartFairy,
-            Spell.FIRE => StartFire,
-            Spell.DASH => StartFire,
-            Spell.REFLECT => StartReflect,
-            Spell.SPELL => StartSpell,
-            Spell.THUNDER => StartThunder,
-            Spell.UPSTAB => StartWithUpstab,
-            Spell.DOWNSTAB => StartWithDownstab,
-            _ => throw new ImpossibleException("Unrecognized spell")
+            Collectable.SHIELD_SPELL => StartShield,
+            Collectable.JUMP_SPELL => StartJump,
+            Collectable.LIFE_SPELL => StartLife,
+            Collectable.FAIRY_SPELL => StartFairy,
+            Collectable.FIRE_SPELL => StartFire,
+            Collectable.DASH_SPELL => StartFire,
+            Collectable.REFLECT_SPELL => StartReflect,
+            Collectable.SPELL_SPELL => StartSpell,
+            Collectable.THUNDER_SPELL => StartThunder,
+            Collectable.UPSTAB => StartWithUpstab,
+            Collectable.DOWNSTAB => StartWithDownstab,
+            Collectable.CANDLE => StartCandle,
+            Collectable.GLOVE => StartGlove,
+            Collectable.RAFT => StartRaft,
+            Collectable.BOOTS => StartBoots,
+            Collectable.FLUTE => StartFlute,
+            Collectable.CROSS => StartCross,
+            Collectable.HAMMER => StartHammer,
+            Collectable.MAGIC_KEY => StartKey,
+            _ => false
         };
+    }
+
+    public void SetStartingCollectable(Collectable collectable, bool starts = true)
+    {
+        if(collectable == Collectable.SHIELD_SPELL)
+        {
+            StartShield = starts;
+        }
+        else if (collectable == Collectable.JUMP_SPELL)
+        {
+            StartJump = starts;
+        }
+        else if (collectable == Collectable.LIFE_SPELL)
+        {
+            StartLife = starts;
+        }
+        else if (collectable == Collectable.FAIRY_SPELL)
+        {
+            StartFairy = starts;
+        }
+        else if (collectable == Collectable.FIRE_SPELL)
+        {
+            StartFire = starts;
+        }
+        else if (collectable == Collectable.REFLECT_SPELL)
+        {
+            StartReflect = starts;
+        }
+        else if (collectable == Collectable.SPELL_SPELL)
+        {
+            StartSpell = starts;
+        }
+        else if (collectable == Collectable.THUNDER_SPELL)
+        {
+            StartThunder = starts;
+        }
+        else if (collectable == Collectable.CANDLE)
+        {
+            StartCandle = starts;
+        }
+        else if (collectable == Collectable.GLOVE)
+        {
+            StartGlove = starts;
+        }
+        else if (collectable == Collectable.RAFT)
+        {
+            StartRaft = starts;
+        }
+        else if (collectable == Collectable.BOOTS)
+        {
+            StartBoots = starts;
+        }
+        else if (collectable == Collectable.FLUTE)
+        {
+            StartFlute = starts;
+        }
+        else if (collectable == Collectable.CROSS)
+        {
+            StartCross = starts;
+        }
+        else if (collectable == Collectable.HAMMER)
+        {
+            StartHammer = starts;
+        }
+        else if (collectable == Collectable.MAGIC_KEY)
+        {
+            StartKey = starts;
+        }
+    }
+
+    public bool HasEnoughSpaceToAllocateItems()
+    {
+        //The 3 pbag caves are either explicitly minor items or allowable as overflow locations
+        //so they are counted either way.
+        int minorItemCount = 3;
+
+        //more or less than 4 containers in the seed adds/removes minor items
+        minorItemCount -= MaxHearts - StartHearts - 4;
+
+        //palace items other than 1 adjusts the count
+        minorItemCount += PalaceItemRoomCounts.Select(c => c - 1).Sum();
+
+        //Start items add 1 to the count
+        minorItemCount += StartCandle ? 1 : 0;
+        minorItemCount += StartBoots ? 1 : 0;
+        minorItemCount += StartCross ? 1 : 0;
+        minorItemCount += StartFlute ? 1 : 0;
+        minorItemCount += StartGlove ? 1 : 0;
+        minorItemCount += StartHammer ? 1 : 0;
+        minorItemCount += StartKey ? 1 : 0;
+        minorItemCount += StartRaft ? 1 : 0;
+
+        if(IncludeSpellsInShuffle)
+        {
+            minorItemCount += StartShield ? 1 : 0;
+            minorItemCount += StartJump ? 1 : 0;
+            minorItemCount += StartLife ? 1 : 0;
+            minorItemCount += StartFairy ? 1 : 0;
+            minorItemCount += StartFire ? 1 : 0;
+            minorItemCount += StartReflect ? 1 : 0;
+            minorItemCount += StartSpell ? 1 : 0;
+            minorItemCount += StartThunder ? 1 : 0;
+        }
+
+        if(IncludeSwordTechsInShuffle)
+        {
+            minorItemCount += StartWithDownstab ? 1 : 0;
+            minorItemCount += StartWithUpstab ? 1 : 0;
+        }
+
+
+        return minorItemCount >= 0;
     }
 }

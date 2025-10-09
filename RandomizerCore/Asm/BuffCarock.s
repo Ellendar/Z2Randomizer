@@ -1,15 +1,16 @@
-﻿.macpack common
+.include "z2r.inc"
+
 .segment "PRG4"
 
-.define ProjectileYPosition $30
-.define ProjectileXVelocity $77
-.define ProjectileType      $87
-.define EnemyType           $a1
-.define LinkXPosition       $4d
-.define EnemyXPositionLo    $4e
-.define EnemyXPositionHi    $3c
-.define RNG                 $051b
-.define ProjectileEnemyData $07c0
+ProjectileYPosition = $30
+ProjectileXVelocity = $77
+ProjectileType      = $87
+EnemyType           = $a1
+LinkXPosition       = $4d
+EnemyXPositionLo    = $4e
+EnemyXPositionHi    = $3c
+RNG                 = $051b
+ProjectileEnemyData = $07c0
 
 EnemyYVelocity = $057e
 ; SinWaveVelocityIncrement = $ba1c
@@ -17,7 +18,7 @@ EnemyYVelocity = $057e
 ; Hook into carrock's update code to add the new position calculation
 .org $aec4
     jmp ChooseNewCarrockXPosition
-.free $aed3 - *
+FREE_UNTIL $aed3
 
 ; Force Carrock to teleport only on the side opposite of the player
 .reloc
@@ -153,35 +154,20 @@ RandomizeWifiShotType:
 @Exit:
     rts
 
-.segment "PRG7"
-
-.org $d29c
-; Update the general RAM clear routine that runs when transitioning between rooms (among other things)
-; to also clear out the new object ram we added. In the future if we find space in $300 or $400 to fit
-; the carock extra data, we can slip it in there
-ClearCommonEnemyRAM:
-    ldx #0
-    txa
-@ClearPageLoop:
-    sta $300,x
-    sta $400,x
-    dex
-    bne @ClearPageLoop
-; A and X are 0
-; we want to clear [$00, $e0)
-@ClearZPLoop:
-    sta $00,x
-    inx
-    cpx #$e0
-    bne @ClearZPLoop
-; TODO: make this new clear code the default and add an `if` for the carock part
-; Now clear out the extra ram used for carock wifi beams
-    ldx #5
-@ClearCarockBeam:
-    sta ProjectileEnemyData,x
-    dex
-    bpl @ClearCarockBeam
-    stx $0302 ; Clear VRAM pointers by setting them to #$ff
-    stx $0363
+; Trying to hook other places for clearing the extra sin wave data didn't work well
+; So just hook into carock's death routine that starts the explosion. This means the beams
+; will stop "sin waving" at this point but whatever.
+.org $b231
+    jsr ClearProjectilesOnCarockDeath
+    nop
+.reloc
+; Its fine to scratch both A and Y as they are reloaded before use
+ClearProjectilesOnCarockDeath:
+    inc $b6,x
+    lda #0
+    ldy #5
+    @loop:
+        sta ProjectileEnemyData,y
+        dey
+        bpl @loop
     rts
-FREE_UNTIL $d2be

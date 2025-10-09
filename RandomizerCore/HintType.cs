@@ -1,5 +1,5 @@
 ﻿
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 public enum HintType
 {

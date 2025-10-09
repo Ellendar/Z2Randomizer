@@ -1,26 +1,28 @@
 ﻿using NLog;
-using Z2Randomizer.Core;
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
 
 [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
 public class Location
 {
     Logger logger = LogManager.GetCurrentClassLogger();
     public int appear2loweruponexit;
-    public Item Item { get; set; }
-    public bool ItemGet { get; set; }
+    public List<Collectable> Collectables { get; set; }
+    public Collectable VanillaCollectable { get; set; }
     public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
     public int Ypos { get; set; }
     public int Xpos { get; set; }
     //public byte[] LocationBytes { get; set; }
+    public List<Location> Children { get; set; } = [];
 
     public int MemAddress { get; set; }
-    
+	
     //This is really stupidly implemented. It _should_ be a boolean, which then gets written to the appropriate bit on the
     //encounter data when it's written to the ROM. Instead, this has the value 0 if the area is not a passthrough
     //and 64 if the area is a passthrough. This shouldn't be too hard to refactor, but I am lazy right now.
@@ -59,6 +61,7 @@ public class Location
     //which causes a bunch of bugs. That said, tracking 100 references and reworking it everywhere is beyond what I want to mess with
     //so for now i'm going to keep this crap design but I am mad about it.
     public bool CanShuffle { get; set; }
+	
     /// <summary>
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
     /// that many pages total or midscren on other areas.
@@ -69,10 +72,11 @@ public class Location
 
     public bool Reachable { get; set; }
 
-    public int PalaceNumber { get; set; }
+    public int? PalaceNumber { get; set; }
 
-    public Town ActualTown { get; set; }
+    public Town? ActualTown { get; set; }
     public Continent Continent { get; set; }
+    public Continent? VanillaContinent { get; set; }
     public Continent? ConnectedContinent { get; set; }
     public int FallInHole { get; set; }
     public int ForceEnterRight { get; set; }
@@ -128,12 +132,11 @@ public class Location
         Xpos = xPos;
         MemAddress = memoryAddress;
         CanShuffle = true;
-        Item = Item.DO_NOT_USE;
-        ItemGet = false;
+        Collectables = [];
         Reachable = false;
-        PalaceNumber = 0;
-        ActualTown = 0;
+        PalaceNumber = null;
         Continent = continent;
+        VanillaContinent = continent;
         ConnectedContinent = null;
 
         //Shoutouts to thetruekingofspace for datamining this
@@ -172,7 +175,6 @@ public class Location
             (Continent.WEST, 68, 37, 57) => "P2_RED_JAR",
             (Continent.WEST, 0, 0, 57) => "RED_JAR_BEACH",
             (Continent.WEST, 102, 38, 57) => "EX_LIFE_BEACH",
-            (Continent.WEST, 77, 61, 41) => "RAFT_DOCK",
             (Continent.WEST, 95, 10, 42) => "DM_ENTRANCE",
             (Continent.WEST, 96, 21, 43) => "DM_EXIT",
             (Continent.WEST, 88, 50, 60) => "KINGS_TOMB",
@@ -196,8 +198,8 @@ public class Location
             (Continent.EAST, 36, 9, 6) => "REFLECT_TOWN_CLIFF_1",
             (Continent.EAST, 38, 10, 23) => "REFLECT_TOWN_CLIFF_2",
             (Continent.EAST, 56, 63, 7) => "WATER_TILE",
-            (Continent.EAST, 52, 24, 8) => "FIRE_TOWN_CAVE_EXIT",
-            (Continent.EAST, 48, 27, 8) => "FIRE_TOWN_CAVE_ENTRACE",
+            (Continent.EAST, 52, 24, 8) => "FIRE_TOWN_CAVE_SOUTH",
+            (Continent.EAST, 48, 27, 8) => "FIRE_TOWN_CAVE_NORTH",
             (Continent.EAST, 71, 25, 9) => "SUNKEN_PBAG_CAVE",
             (Continent.EAST, 78, 31, 11) => "RISEN_PBAG_CAVE",
             (Continent.EAST, 78, 49, 13) => "NEW_KASUTO_CAVE_ENTRANCE",
@@ -219,7 +221,6 @@ public class Location
             (Continent.EAST, 86, 8, 24) => "DEATH_VALLEY_BATTLE_2",
             (Continent.EAST, 99, 8, 26) => "DEATH_VALLEY_BATTLE_1",
             (Continent.EAST, 40, 52, 40) => "MAZE_ISLAND_BRIDGE",
-            (Continent.EAST, 52, 7, 41) => "RAFT_DOCK",
             (Continent.EAST, 60, 23, 14) => "NABOORU",
             (Continent.EAST, 33, 3, 17) => "DARUNIA",
             (Continent.EAST, 81, 61, 18) => "NEW_KASUTO",
@@ -267,23 +268,44 @@ public class Location
             (Continent.MAZE, 62, 45, 34) => "MAZE_ISLAND_FORCED_BATTLE_2",
             (Continent.MAZE, 68, 48, 35) => "MAZE_ISLAND_FORCED_BATTLE_1",
             (Continent.MAZE, 58, 41, 36) => "MAZE_ISLAND_MAGIC",
-            (Continent.DM, 67, 40, 40) => "EAST_HYRULE_BRIDGE",
-            (Continent.DM, 37, 7, 42) => "CAVE_A",
-            (Continent.DM, 37, 23, 43) => "CAVE_K",
             (Continent.MAZE, 58, 60, 15) => "P4",
             (Continent.MAZE, 60, 57, 37) => "MAZE_ISLAND_CHILD",
-            (Continent.DM, 64, 8, 26) => "DM_MAGIC",
+            (Continent.DM, 64, 8, 26) => "SPEC_ROCK",
             (Continent.MAZE, 58, 48, 47) => "MAZE_ISLAND_FORCED_BATTLE_3",
             (Continent.MAZE, 49, 51, 48) => "MAZE_ISLAND_FORCED_BATTLE_7",
             (Continent.MAZE, 50, 46, 49) => "MAZE_ISLAND_FORCED_BATTLE_4",
             (Continent.MAZE, 46, 48, 50) => "MAZE_ISLAND_FORCED_BATTLE_5",
             (Continent.MAZE, 42, 50, 51) => "MAZE_ISLAND_FORCED_BATTLE_6",
-
+            (_, 67, 40, 40) => "BRIDGE",
+            (_, 77, 61, 41) => "RAFT_TILE",
+            (_, 52, 7, 41) => "RAFT_TILE",
+            (_, 37, 7, 42) => "DM_ENTRANCE_CAVE",
+            (_, 37, 23, 43) => "DM_EXIT_CAVE",
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
-        if(Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
+
+        ActualTown = (Continent, Ypos, Xpos, Map) switch
         {
-            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Xpos + ", " + Ypos + ") Map: " + Map);
+            (Continent.WEST, 54, 46, 2) => Town.RAURU,
+            (Continent.WEST, 36, 2, 5) => Town.RUTO,
+            (Continent.WEST, 91, 8, 6) => Town.SARIA_SOUTH,
+            (Continent.WEST, 89, 8, 8) => Town.SARIA_NORTH,
+            (Continent.WEST, 76, 21, 24) => Town.BAGU,
+            (Continent.WEST, 75, 60, 11) => Town.MIDO_WEST,
+            (Continent.EAST, 60, 23, 14) => Town.NABOORU,
+            (Continent.EAST, 33, 3, 17) => Town.DARUNIA_WEST,
+            (Continent.EAST, 81, 61, 18) => Town.NEW_KASUTO,
+            (Continent.EAST, 99, 34, 23) => Town.OLD_KASUTO,
+            _ => null
+        };
+
+        if (Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
+        {
+            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Ypos + ", " + Xpos + ") Map: " + Map);
+        }
+        if (Name.Contains("FAKE"))
+        {
+            logger.Debug("Fake location encountered");
         }
         if(Name.Contains("FAKE"))
         {
@@ -302,12 +324,6 @@ public class Location
         PassThrough = clone.PassThrough;
         ForceEnterRight = clone.ForceEnterRight;
         TerrainType = clone.TerrainType;
-    }
-
-    //Why does this empty constructor exist. Don't want to delete it if it's needed for serialization magic of some kind.
-    public Location()
-    {
-
     }
 
     public byte[] GetLocationBytes()
@@ -334,29 +350,21 @@ public class Location
             + " " + Name
             + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
-            + (Item == Item.DO_NOT_USE ? "" : Item.ToString());
+            + '[' + string.Join(", ", Collectables.Select(i => i.ToString())) + ']';
     }
 
     public int GetWorld()
     {
         //Towns reference their banks
-        if (ActualTown != 0)
+        if (ActualTown != null)
         {
             return Continent == Continent.WEST ? 4 : 10;
         }
         //king's tomb - Get a better signal for this later
-        if (MemAddress == 0x465B)
+        if (MemAddress == RomMap.WEST_KINGS_TOMB_TILE_LOCATION)
         {
             return 4;
         }
-
-        //Bagu is 4. This should be a check based on ActualTown, but bagu isn't a town until 4.4
-        //so for now this hack.
-        if (MemAddress == 0x4661)
-        {
-            return 4;
-        }
-
         //Connectors use the world bits to indicate which continent they take you to
         if (ConnectedContinent != null)
         {
@@ -371,12 +379,12 @@ public class Location
         }
         //Palaces... have world numbers that kind... of... make sense?
         //This is what they are.
-        if (PalaceNumber != 0)
+        if (PalaceNumber != null)
         {
             return PalaceNumber switch
             {
                 //North palace
-                0 => 0,
+                null => 0,
                 1 => 0b00001100 + (int)Continent, //12,
                 2 => 0b00001100 + (int)Continent, //12,
                 3 => 0b00010000 + (int)Continent, //16,

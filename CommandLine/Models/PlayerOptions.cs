@@ -1,14 +1,16 @@
 ﻿
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Z2Randomizer.RandomizerCore;
 
-namespace CommandLine.Models
+namespace Z2Randomizer.CommandLine.Models
 {
     public class PlayerOptions
     {
         public bool DisableMusic { get; set; }
         public bool RandomizeMusic { get; set; }
         public bool MixCustomAndOriginalMusic { get; set; }
+        public bool IncludeDiverseMusic { get; set; }
         public bool DisableUnsafeMusic { get; set; }
 
         public bool FastSpellCasting { get; set; }
@@ -21,12 +23,19 @@ namespace CommandLine.Models
 
         public string? Sprite { get; set; }
 
-        public string? TunicColor { get; set; }
-
-        public string? ShieldTunicColor { get; set; }
+        public bool ChangeItemSprites { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public BeamSprite BeamSprite { get; set; }
+        public CharacterColor TunicColor { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public CharacterColor TunicOutlineColor { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public CharacterColor ShieldTunicColor { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public BeamSprites BeamSprite { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public BeepThreshold BeepThreshold { get; set; }

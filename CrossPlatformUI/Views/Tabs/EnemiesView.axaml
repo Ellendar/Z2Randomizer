@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
+             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             x:DataType="vm:MainViewModel"
+             x:Class="CrossPlatformUI.Views.Tabs.EnemiesView">
+    <Grid ColumnDefinitions="*, *">
+        <StackPanel Grid.Column="0">
+            <CheckBox
+                  Name="ShuffleOverworldEnemiesCheckbox" 
+                  IsThreeState="True"
+                  IsChecked="{Binding Config.ShuffleOverworldEnemies}" 
+                  Content="Shuffle Overworld Enemies"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleOverworldEnemiesToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                  Name="ShufflePalaceEnemiesCheckbox"
+                  IsThreeState="True" 
+                  IsChecked="{Binding Config.ShufflePalaceEnemies}" 
+                  Content="Shuffle Palace Enemies"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShufflePalaceEnemiesToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                  Name="ShuffleDripperCheckbox" 
+                  IsEnabled="{Binding Config.ShufflePalaceEnemies}"
+                  IsChecked="{Binding Config.ShuffleDripperEnemy}" 
+                  Content="Shuffle Dripper Enemy"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleDripperEnemyToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                  Name="MixLargeAndSmallEnemiesCheckbox"
+                  IsThreeState="True"
+                  IsChecked="{Binding Config.MixLargeAndSmallEnemies}"
+                  Content="Mix Large and Small Enemies"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MixLargeandSmallEnemiesToolTip}"/></ToolTip.Tip>
+                <CheckBox.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.Or}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="#ShuffleOverworldEnemiesCheckbox.IsChecked"/>
+                            <Binding Path="#ShufflePalaceEnemiesCheckbox.IsChecked"/>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </CheckBox.IsEnabled>
+            </CheckBox>
+            <CheckBox
+                Name="GeneratorsMatchCheckbox"
+                IsEnabled="{Binding Config.ShufflePalaceEnemies}"
+                IsChecked="{Binding Config.GeneratorsAlwaysMatch}" 
+                Content="Generators Always Match"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GeneratorsAlwaysMatchToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <Separator></Separator>
+            <CheckBox
+                IsChecked="{Binding Config.RandomizeKnockback}"
+                Content="Randomize Knockback"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RandomizeKnockbackToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleEnemyHP}"
+                Content="Shuffle Enemy HP"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleEnemyHPToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleXPStealers}"
+                Content="Shuffle Which Enemies Steal EXP"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleWhichEnemiesStealEXPToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleXPStolenAmount}"
+                Content="Shuffle Amount of EXP Stolen"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleAmountofEXPStolenToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                  IsChecked="{Binding Config.ShuffleSwordImmunity}"
+                  Content="Shuffle Sword Immunity"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSwordImmunityToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox
+                IsChecked="{Binding Config.ShuffleSpritePalettes}"
+                Content="Shuffle Sprite Palettes"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleSpritePalettesToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Enemy Experience Drops"
+                ItemsSource="{Binding Source={x:Static rc:Enums.XPEffectivenessList}}"
+                SelectedItem="{Binding Config.EnemyXPDrops, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnemyExperienceDropsToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

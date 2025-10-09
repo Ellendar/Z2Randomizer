@@ -1,7 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Diagnostics;
-using Z2Randomizer.Core.Sidescroll;
-using RandomizerCore.Sidescroll;
+﻿using System.Diagnostics;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.Tests;
 
@@ -11,7 +9,31 @@ public class RoomSerializationTests
     [TestMethod]
     public void TestSerialization()
     {
-        string roomJson = "{\"name\": \"testName\", \"enabled\": true, \"group\": \"palace1vanilla\", \"map\": 4, \"connections\": \"0F000214\", \"enemies\": \"050F0B00CB\", \"sideviewData\": \"3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E\", \"bitmask\": \"0F\", \"isFairyBlocked\": false, \"isGloveBlocked\": false, \"isDownstabBlocked\": false, \"isUpstabBlocked\": false, \"isJumpBlocked\": false, \"hasItem\": false, \"hasBoss\": false, \"hasDrop\": false, \"elevatorScreen\": 2, \"memoryAddress\": \"01073B\", \"isUpDownReversed\": false, \"isDropZone\": false}";
+        string roomJson = """
+{
+    "name": "testName",
+    "enabled": true,
+    "group": "vanilla",
+    "author": "palace1vanilla",
+    "map": 4,
+    "connections": "0F000214",
+    "enemies": "050F0B00CB",
+    "sideviewData": "3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E",
+    "bitmask": "0F",
+    "isFairyBlocked": false,
+    "isGloveBlocked": false,
+    "isDownstabBlocked": false,
+    "isUpstabBlocked": false,
+    "isJumpBlocked": false,
+    "hasItem": false,
+    "hasBoss": false,
+    "hasDrop": false,
+    "elevatorScreen": 2,
+    "memoryAddress": 67387,
+    "IsUpDownReversed": false,
+    "isDropZone": false
+}
+""";
 
         Room room = new Room(roomJson);
         String serialized = room.Serialize();
@@ -22,7 +44,7 @@ public class RoomSerializationTests
     [TestMethod]
     public void TestDeserialization()
     {
-        //string roomJson = "{\"name\": \"testName\", \"enabled\": true, \"group\": \"palace1vanilla\", \"map\": 4, \"connections\": \"0F000214\", \"enemies\": \"050F0B00CB\", \"sideviewData\": \"3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E\", \"bitmask\": \"0F\", \"isFairyBlocked\": false, \"isGloveBlocked\": false, \"isDownstabBlocked\": false, \"isUpstabBlocked\": false, \"isJumpBlocked\": false, \"hasItem\": false, \"hasBoss\": false, \"hasDrop\": false, \"elevatorScreen\": 2, \"memoryAddress\": \"01073B\", \"isUpDownReversed\": false, \"isDropZone\": false}";
+        //string roomJson = "{\"name\": \"testName\", \"enabled\": true, \"group\": \"palace1vanilla\", \"map\": 4, \"connections\": \"0F000214\", \"enemies\": \"050F0B00CB\", \"sideviewData\": \"3A600E08D208420022C8420022C8420022C8420022C8420022C8420022C84200D40E07F1F050B071D708420022C8420022C8420022C84200D20E\", \"bitmask\": \"0F\", \"isFairyBlocked\": false, \"isGloveBlocked\": false, \"isDownstabBlocked\": false, \"isUpstabBlocked\": false, \"isJumpBlocked\": false, \"hasItem\": false, \"hasBoss\": false, \"hasDrop\": false, \"elevatorScreen\": 2, \"memoryAddress\": \"01073B\", \"IsUpDownReversed\": false, \"isDropZone\": false}";
         string roomJson = """
             {
             "bitmask": "0F",
@@ -41,7 +63,7 @@ public class RoomSerializationTests
             "linkedRoomName": null,
             "isDropZone": false,
             "isEntrance": false,
-            "isUpDownReversed": false,
+            "IsUpDownReversed": false,
             "map": 4,
             "memoryAddress": 67387,
             "name": "testName",
@@ -60,24 +82,36 @@ public class RoomSerializationTests
     [TestMethod]
     public void TestBulkDeserialization()
     {
+        //Deserialization has changed and so this test is now outdated.
+        //TODO: Replace this with a proper test.
+        /*
         Dictionary<RoomGroup, List<Room>> roomsByGroup = new();
         string roomsJson = File.ReadAllText("PalaceRooms.json");
-        dynamic rooms = JsonConvert.DeserializeObject(roomsJson);
+        dynamic rooms = JsonConvert.DeserializeObject(roomsJson)!;
         foreach (var obj in rooms)
         {
-            Room room = new Room(obj.ToString());
+            Room room = new(obj.ToString());
             if (!roomsByGroup.ContainsKey(room.Group))
             {
                 roomsByGroup.Add(room.Group, new List<Room>());
             }
             roomsByGroup[room.Group].Add(room);
         }
+        */
     }
 
     public class StandardByteArrayEqualityComparer : IEqualityComparer<byte[]>
     {
-        public bool Equals(byte[] x, byte[] y)
+        public bool Equals(byte[]? x, byte[]? y)
         {
+            if(x == null)
+            {
+                return y == null;
+            }
+            if(y == null)
+            {
+                return false;
+            }
             if (x.Length != y.Length)
             {
                 return false;

@@ -1,0 +1,82 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0-browser</TargetFramework>
+        <RuntimeIdentifier>browser-wasm</RuntimeIdentifier>
+        <WasmMainJSPath>wwwroot\main.js</WasmMainJSPath>
+        <WasmRuntimeAssetsLocation>./_framework</WasmRuntimeAssetsLocation>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <InvariantGlobalization>true</InvariantGlobalization>
+
+        <PublishTrimmed>false</PublishTrimmed>
+
+        <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+
+        <RootNamespace>Z2Randomizer.CrossPlatformUI.Browser</RootNamespace>
+
+        <Configurations>Debug;Release;Unsafe Debug</Configurations>
+
+        <Platforms>AnyCPU</Platforms>
+<!--        <TrimMode>partial</TrimMode>-->
+<!--        <WasmEmitSymbolMap>false</WasmEmitSymbolMap>-->
+<!--        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>-->
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <RunAOTCompilation>true</RunAOTCompilation>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DebugType>full</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+        <RunAOTCompilation>false</RunAOTCompilation>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
+      <DebugType>full</DebugType>
+      <DebugSymbols>true</DebugSymbols>
+      <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
+      <RunAOTCompilation>false</RunAOTCompilation>
+      <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
+      <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <WasmExtraFilesToDeploy Include="wwwroot\**" />
+    </ItemGroup>
+    <ItemGroup>
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Sprites\**" TargetPath="Sprites\%(Filename)%(Extension)" />
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\PalaceRooms.json" />
+        <WasmExtraFilesToDeploy Include="..\RandomizerCore\Asm\**" TargetPath="Asm\%(RecursiveDir)\%(Filename)%(Extension)" />
+    </ItemGroup>
+    <ItemGroup>
+        <IpsFiles Include="..\RandomizerCore\Sprites\*.ips" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="wwwroot\index.html" />
+    </ItemGroup>
+    <Target Name="GenerateIpsManifest" AfterTargets="Build">
+        <WriteLinesToFile
+            File="wwwroot\ips-manifest.txt"
+            Lines="@(IpsFiles->'%(Filename)%(Extension)')"
+            Overwrite="true" />
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Browser" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Include="wwwroot\index.html" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <TrimmerRootAssembly Include="RandomizerCore" />
+    </ItemGroup>
+</Project>

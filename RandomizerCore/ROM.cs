@@ -1,17 +1,17 @@
-﻿using Assembler;
-using NLog;
-using RandomizerCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using Z2Randomizer.Core.Overworld;
+using System.Threading.Tasks;
+using js65;
+using NLog;
+using Z2Randomizer.RandomizerCore.Overworld;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 
-namespace Z2Randomizer.Core;
+namespace Z2Randomizer.RandomizerCore;
 
 /*
 Classes Needed:
@@ -51,19 +51,19 @@ public class ROM
     public const int RomHdrSize = 0x10;
     public const int PrgRomOffs = RomHdrSize;
     public const int PrgRomSize = 0x40000;
-    public const int ChrRomOffs = RomHdrSize + PrgRomSize;
+    public const int ChrRomOffset = RomHdrSize + PrgRomSize;
     public const int ChrRomSize = 0x20000;
-    public const int RomSize = ChrRomOffs + ChrRomSize;
+    public const int RomSize = ChrRomOffset + ChrRomSize;
 
     public const int VanillaPrgRomSize = 0x20000;
     public const int VanillaChrRomOffs = RomHdrSize + VanillaPrgRomSize;
     public const int VanillaRomSize = VanillaChrRomOffs + ChrRomSize;
 
-    public static readonly IReadOnlyList<int> FreeRomBanks = new List<int>(Enumerable.Range(0x10, 0xf));
+    public static readonly IReadOnlyList<int> FreeRomBanks = Enumerable.Range(0x10, 0xc).ToList();
 
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-    private const int textAddrStartinROM = 0xEFCE;
+    private const int textPointerTableStart = 0xEFCE;
     private const int textAddrEndinROM = 0xF090;
     private const int textAddrOffset = 0x4010;
 
@@ -74,51 +74,51 @@ public class ROM
     private readonly int[] inCurtains = { 0x13F1D, 0x13F2D, 0x13F3D, 0x13F4D, 0x13F5D, 0x13F6D, 0x1402B };
 
     private readonly int[] brickSprites = {
-        ChrRomOffs + 0x9640, 
-        ChrRomOffs + 0xB640, 
-        ChrRomOffs + 0xD640, 
-        ChrRomOffs + 0x13640, 
-        ChrRomOffs + 0x15640, 
-        ChrRomOffs + 0x17640, 
-        ChrRomOffs + 0x19640
+        ChrRomOffset + 0x9640, 
+        ChrRomOffset + 0xB640, 
+        ChrRomOffset + 0xD640, 
+        ChrRomOffset + 0x13640, 
+        ChrRomOffset + 0x15640, 
+        ChrRomOffset + 0x17640, 
+        ChrRomOffset + 0x19640
     };
     private readonly int[] inBrickSprites = { 
-        ChrRomOffs + 0x9680, 
-        ChrRomOffs + 0xB680, 
-        ChrRomOffs + 0xD680, 
-        ChrRomOffs + 0x13680, 
-        ChrRomOffs + 0x15680, 
-        ChrRomOffs + 0x17680,
-        ChrRomOffs + 0x19680
+        ChrRomOffset + 0x9680, 
+        ChrRomOffset + 0xB680, 
+        ChrRomOffset + 0xD680, 
+        ChrRomOffset + 0x13680, 
+        ChrRomOffset + 0x15680, 
+        ChrRomOffset + 0x17680,
+        ChrRomOffset + 0x19680
     };
 
-    private const int textEndByte = 0xFF;
+    private const int STRING_TERMINATOR = 0xFF;
     private const int creditsLineOneAddr = 0x15377;
     private const int creditsLineTwoAddr = 0x15384;
 
     //sprite addresses for reading sprites from a ROM:
-    private const int titleSpriteStartAddr = ChrRomOffs + 0xD00;
-    private const int titleSpriteEndAddr = ChrRomOffs + 0xD20;
-    private const int beamSpriteStartAddr = ChrRomOffs + 0x840;
-    private const int beamSpriteEndAddr = ChrRomOffs + 0x860;
-    private const int raftSpriteStartAddr = ChrRomOffs + 0x11440;
-    private const int raftSpriteEndAddr = ChrRomOffs + 0x11480;
-    private const int OWSpriteStartAddr = ChrRomOffs + 0x11740;
-    private const int OWSpriteEndAddr = ChrRomOffs + 0x117c0;
-    private const int sleeperSpriteStartAddr = ChrRomOffs + 0x1000;
-    private const int sleeperSpriteEndAddr = ChrRomOffs + 0x1060;
-    private const int oneUpSpriteStartAddr = ChrRomOffs + 0xa80;
-    private const int oneUpSpriteEndAddr = ChrRomOffs + 0xaa0;
-    private const int endSprite1StartAddr = ChrRomOffs + 0xed80;
-    private const int endSprite1EndAddr = ChrRomOffs + 0xee80;
-    private const int endSprite2StartAddr = ChrRomOffs + 0xf000;
-    private const int endSprite2EndAddr = ChrRomOffs + 0xf0e0;
-    private const int endSprite3StartAddr = ChrRomOffs + 0xd000;
-    private const int endSprite3EndAddr = ChrRomOffs + 0xd040;
-    private const int headSpriteStartAddr = ChrRomOffs + 0x1960;
-    private const int headSpriteEndAddr = ChrRomOffs + 0x1970;
-    private const int playerSpriteStartAddr = ChrRomOffs + 0x2000;
-    private const int playerSpriteEndAddr = ChrRomOffs + 0x3000;
+    private const int titleSpriteStartAddr = ChrRomOffset + 0xD00;
+    private const int titleSpriteEndAddr = ChrRomOffset + 0xD20;
+    private const int beamSpriteStartAddr = ChrRomOffset + 0x840;
+    private const int beamSpriteEndAddr = ChrRomOffset + 0x860;
+    private const int raftSpriteStartAddr = ChrRomOffset + 0x11440;
+    private const int raftSpriteEndAddr = ChrRomOffset + 0x11480;
+    private const int OWSpriteStartAddr = ChrRomOffset + 0x11740;
+    private const int OWSpriteEndAddr = ChrRomOffset + 0x117c0;
+    private const int sleeperSpriteStartAddr = ChrRomOffset + 0x1000;
+    private const int sleeperSpriteEndAddr = ChrRomOffset + 0x1060;
+    private const int oneUpSpriteStartAddr = ChrRomOffset + 0xa80;
+    private const int oneUpSpriteEndAddr = ChrRomOffset + 0xaa0;
+    private const int endSprite1StartAddr = ChrRomOffset + 0xed80;
+    private const int endSprite1EndAddr = ChrRomOffset + 0xee80;
+    private const int endSprite2StartAddr = ChrRomOffset + 0xf000;
+    private const int endSprite2EndAddr = ChrRomOffset + 0xf0e0;
+    private const int endSprite3StartAddr = ChrRomOffset + 0xd000;
+    private const int endSprite3EndAddr = ChrRomOffset + 0xd040;
+    private const int headSpriteStartAddr = ChrRomOffset + 0x1960;
+    private const int headSpriteEndAddr = ChrRomOffset + 0x1970;
+    private const int playerSpriteStartAddr = ChrRomOffset + 0x2000;
+    private const int playerSpriteEndAddr = ChrRomOffset + 0x3000;
 
     //kasuto jars
     private const int kasutoJarTextAddr = 0xEEC9;
@@ -129,7 +129,44 @@ public class ROM
     private readonly int[] palPalettes = { 0, 0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60 };
     private readonly int[] palGraphics = { 0, 0x04, 0x05, 0x09, 0x0A, 0x0B, 0x0C, 0x06 };
 
-    private byte[] ROMData;
+    //On second thought, all text processing should be moved to customTexts.
+    /*
+    private readonly Dictionary<Town, int> spellTextPointers = new()
+    {
+        {Town.RAURU, 0xEFEC },
+        {Town.RUTO, 0xEFFE },
+        {Town.SARIA_NORTH, 0xF014 },
+        {Town.MIDO_WEST, 0xF02A },
+        {Town.NABOORU_WIZARD, 0xF05A },
+        {Town.DARUNIA_WEST, 0xf070 },
+        {Town.NEW_KASUTO, 0xf088 },
+        {Town.OLD_KASUTO, 0xf08e },
+        {Town.MIDO_CHURCH, textPointerTableStart + 47 * 2 },
+        {Town.DARUNIA_ROOF, textPointerTableStart + 82 * 2 },
+        {Town.BAGU, textPointerTableStart + 48 * 2 },
+        {Town.SARIA_TABLE, textPointerTableStart + 21 * 2 },
+        {Town.NABOORU_FOUNTAIN, textPointerTableStart + 63 * 2 },
+    };*/
+
+    // Basic look up table to convert from the original NES palette value to RGB
+    public static readonly Color[] BaseColors = new Color[]
+    {
+Color.FromArgb( 84,  84,  84), Color.FromArgb(  0,  30, 116), Color.FromArgb(  8,  16, 144), Color.FromArgb( 48,   0, 136), Color.FromArgb( 68,   0, 100), Color.FromArgb( 92,   0,  48), Color.FromArgb( 84,   4,   0), Color.FromArgb( 60,  24,   0), Color.FromArgb( 32,  42,   0), Color.FromArgb(  8,  58,   0), Color.FromArgb(  0,  64,   0), Color.FromArgb(  0,  60,   0), Color.FromArgb(  0,  50,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+Color.FromArgb(152, 150, 152), Color.FromArgb(  8,  76, 196), Color.FromArgb( 48,  50, 236), Color.FromArgb( 92,  30, 228), Color.FromArgb(136,  20, 176), Color.FromArgb(160,  20, 100), Color.FromArgb(152,  34,  32), Color.FromArgb(120,  60,   0), Color.FromArgb( 84,  90,   0), Color.FromArgb( 40, 114,   0), Color.FromArgb(  8, 124,   0), Color.FromArgb(  0, 118,  40), Color.FromArgb(  0, 102, 120), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+Color.FromArgb(236, 238, 236), Color.FromArgb( 76, 154, 236), Color.FromArgb(120, 124, 236), Color.FromArgb(176,  98, 236), Color.FromArgb(228,  84, 236), Color.FromArgb(236,  88, 180), Color.FromArgb(236, 106, 100), Color.FromArgb(212, 136,  32), Color.FromArgb(160, 170,   0), Color.FromArgb(116, 196,   0), Color.FromArgb( 76, 208,  32), Color.FromArgb( 56, 204, 108), Color.FromArgb( 56, 180, 204), Color.FromArgb( 60,  60,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188, 188, 236), Color.FromArgb(212, 178, 236), Color.FromArgb(236, 174, 236), Color.FromArgb(236, 174, 212), Color.FromArgb(236, 180, 176), Color.FromArgb(228, 196, 144), Color.FromArgb(204, 210, 120), Color.FromArgb(180, 222, 120), Color.FromArgb(168, 226, 144), Color.FromArgb(152, 226, 180), Color.FromArgb(160, 214, 228), Color.FromArgb(160, 162, 160), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
+    };
+
+    public static readonly int[] LinkOutlinePaletteAddr = {         0x285a, 0x2a0a, 0x40af, 0x40bf, 0x40cf, 0x40df, 0x80af, 0x80bf, 0x80cf, 0x80df, 0xc0af, 0xc0bf, 0xc0cf, 0xc0df, 0xc0ef, 0x100af, 0x100bf, 0x100cf, 0x100df, 0x140af, 0x140bf, 0x140cf, 0x140df, 0x17c19, 0x1c464, 0x1c47c };
+    public static readonly int[] LinkFacePaletteAddr =    {         0x285b, 0x2a10, 0x40b0, 0x40c0, 0x40d0, 0x40e0, 0x80b0, 0x80c0, 0x80d0, 0x80e0, 0xc0b0, 0xc0c0, 0xc0d0, 0xc0e0, 0xc0f0, 0x100b0, 0x100c0, 0x100d0, 0x100e0, 0x140b0, 0x140c0, 0x140d0, 0x140e0, 0x17c1a, 0x1c465, 0x1c47d };
+    public static readonly int[] LinkTunicPaletteAddr =   { 0x10ea, 0x285c, 0x2a16, 0x40b1, 0x40c1, 0x40d1, 0x40e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0xc0f1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
+    public const int LinkShieldPaletteAddr = 0xe9e;
+    public static readonly int[] ZeldaOutlinePaletteAddr = { 0x4025, 0x8025, 0x14049, 0x140c7 };
+    public static readonly int[] ZeldaFacePaletteAddr =    { 0x4023, 0x8023, 0x14047, 0x140c9 };
+    public static readonly int[] ZeldaDressPaletteAddr =   { 0x4024, 0x8024, 0x14048, 0x140c8 };
+
+
+    public byte[] rawdata { get; }
 
     public ROM(string filename, bool expandRom = false)
     {
@@ -140,7 +177,7 @@ public class ROM
             fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
 
             BinaryReader br = new BinaryReader(fs, new ASCIIEncoding());
-            ROMData = ConvertData(br.ReadBytes(VanillaRomSize), expandRom);
+            rawdata = ConvertData(br.ReadBytes(VanillaRomSize), expandRom);
 
         }
         catch (Exception err)
@@ -151,12 +188,12 @@ public class ROM
 
     public ROM(ROM clone, bool expandRom = false)
     {
-        ROMData = ConvertData(clone.ROMData.ToArray(), expandRom);
+        rawdata = ConvertData(clone.rawdata.ToArray(), expandRom);
     }
 
     public ROM(byte[] data, bool expandRom = false)
     {
-        ROMData = ConvertData(data, expandRom);
+        rawdata = ConvertData(data, expandRom);
     }
 
     private static byte[] ConvertData(byte[] data, bool expandRom)
@@ -170,29 +207,50 @@ public class ROM
         var newdata = new byte[RomSize];
 
         Array.Copy(data, newdata, VanillaChrRomOffs);
-        Array.Copy(data, VanillaChrRomOffs, newdata, ChrRomOffs, ChrRomSize);
+        Array.Copy(data, VanillaChrRomOffs, newdata, ChrRomOffset, ChrRomSize);
 
         return newdata;
     }
 
     public byte GetByte(int index)
     {
-        return ROMData[index];
+        return rawdata[index];
     }
 
+    
+    //This used to be [start, end), but that's both awkward and not idiomatic, so I replaced it
+    //with a more conventional start + lengh implementation
     public byte[] GetBytes(int start, int length)
     {
         byte[] bytes = new byte[length];
-        for(int i = start; i < start + length; i++)
+        for (int i = 0; i < length; i++)
         {
-            bytes[i - start] = GetByte(i);
+            bytes[i] = GetByte(i + start);
         }
         return bytes;
     }
 
+    public int GetShort(int indexMsb, int indexLsb)
+    {
+        return (GetByte(indexMsb) << 8) + GetByte(indexLsb);
+    }
+
+    public byte[] GetTerminatedString(int index)
+    {
+        List<byte> bytes = new();
+        byte b;
+        do
+        {
+            b = GetByte(index++);
+            bytes.Add(b);
+        }
+        while (b != STRING_TERMINATOR);
+        return bytes.ToArray();
+    }
+
     public void Put(int index, byte data)
     {
-        ROMData[index] = data;
+        rawdata[index] = data;
     }
 
     public void Put(int index, string data)
@@ -204,38 +262,172 @@ public class ROM
     {
         for (int i = 0; i < data.Length; i++)
         {
-            ROMData[index + i] = data[i];
+            rawdata[index + i] = data[i];
         }
+    }
+
+    public void PutShort(int indexMsb, int indexLsb, int data)
+    {
+        Put(indexMsb, (byte)(data / 256));
+        Put(indexLsb, (byte)(data % 256));
     }
 
     public void Dump(string filename)
     {
-        File.WriteAllBytes(filename, ROMData);
+        File.WriteAllBytes(filename, rawdata);
+    }
+
+    public static int ConvertNesPtrToPrgRomAddr(int bank, int nesPtr)
+    {
+        Debug.Assert(nesPtr >= 0x8000, "Non-PRG pointers (like SRAM) are not supported here");
+        switch (bank)
+        {
+            case < 0x07:
+                return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
+            case 0x07:
+                return nesPtr - 0xC000 + bank * 0x4000 + RomHdrSize;
+            case < 0x10:
+                throw new NotImplementedException();
+            case < 0x1d:
+                return nesPtr - 0x8000 + bank * 0x2000 + RomHdrSize;
+            case 0x1d:
+                return nesPtr - 0xA000 + bank * 0x2000 + RomHdrSize;
+            case 0x1e:
+                return nesPtr - 0xC000 + bank * 0x2000 + RomHdrSize;
+            case 0x1f:
+                return nesPtr - 0xE000 + bank * 0x2000 + RomHdrSize;
+            default:
+                throw new NotImplementedException();
+        }
+    }
+
+    public static int ConvertPrgRomAddrToAsmAddr(int romAddr)
+    {
+        int minusHeader = romAddr - RomHdrSize;
+        // refer to Asm/Init.s for these values
+        if      (minusHeader < 0x1c000)
+        {
+            return 0x8000 + (minusHeader & 0x3fff);
+        }
+        else if (minusHeader < 0x20000)
+        {
+            return 0xc000 + (minusHeader & 0x3fff);
+        }
+        else if (minusHeader < 0x3a000)
+        {
+            return 0x8000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x3c000)
+        {
+            return 0xa000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x3e000)
+        {
+            return 0xc000 + (minusHeader & 0x1fff);
+        }
+        else if (minusHeader < 0x40000)
+        {
+            return 0xe000 + (minusHeader & 0x1fff);
+        }
+        else
+        {
+            throw new ArgumentException("This is not a PRG address");
+        }
+    }
+
+    /// Read pointer at `nesPtr`. Then read the data it points to.
+    /// Relocate that data to a new address using js65. Write the
+    /// new pointer to `nesPtr`. This will be done at link time.
+    /// The rom data is not modified directly, only through js65.
+    public void RelocateData(Assembler asm, int bank, int nesPtr)
+    {
+        var romPtr = ConvertNesPtrToPrgRomAddr(bank, nesPtr);
+        var nesAddr = GetShort(romPtr + 1, romPtr);
+        var romAddr = ConvertNesPtrToPrgRomAddr(bank, nesAddr);
+        var length = GetByte(romAddr);
+        var bytes = GetBytes(romAddr, length);
+        const string label = "RelocateBytes";
+        var a = asm.Module();
+        a.Segment($"PRG{bank}");
+        a.Reloc();
+        a.Label(label);
+        a.Byt(bytes);
+        a.Org((ushort)nesPtr);
+        a.Word(a.Symbol(label));
+    }
+
+    public byte[] ReadSprite(int spriteAddr, int tilesWide, int tilesHigh, byte[] palette)
+    {
+        // Each byte specifies 1 color bit for an 8 pixel column
+        const int pixelsPerByte = 8;
+        // These bytes are arranged in groups of 8
+        const int bytesPerTile = 8;
+
+        // We only have one palette to read from, but should there be multipalette sprites someday
+        // this could come in handy
+        const int paletteIdx = 0;
+        int width = tilesWide * 8;
+        int height = tilesHigh * 8;
+        const int colorDepth = 4;
+        int tileCount = tilesWide * tilesHigh;
+
+        var buffer = new byte[colorDepth * width * height];
+        for (var tile = 0; tile < tileCount; ++tile)
+        {
+            var offset = tile * 16;
+            int tilex, tiley;
+            if (tilesHigh % 2 == 1)
+            {
+                // If a sprite is only 1 tile (8 pixels) high, it is read horizontally
+                tilex = (tile % tilesWide) * 8;
+                tiley = (tile / tilesWide) * 8;
+            }
+            else
+            {
+                // In all other cases, 2 tiles (16 pixels) is read vertically at a time
+                int halfTile = tile >> 1;
+                tilex = (halfTile % tilesWide) * 8;
+                tiley = (2 * (halfTile / tilesWide) + (tile & 1)) * 8;
+            }
+            for (var j = 0; j < bytesPerTile; ++j)
+            {
+                // The color bits for a single pixel is defined 8 bytes apart
+                var colorByte0 = GetByte(spriteAddr + offset + j);
+                var colorByte1 = GetByte(spriteAddr + offset + j + 8);
+                for (var i = 0; i < pixelsPerByte; ++i)
+                {
+                    var pixelShift = 7 - i;
+                    var bit0 = (colorByte0 >> pixelShift) & 1;
+                    var bit1 = ((colorByte1 >> pixelShift) & 1) << 1;
+                    var color = (bit0 | bit1) + (paletteIdx * 4);
+                    var appliedColor = BaseColors[palette[color]];
+
+                    var x = tilex + i;
+                    var y = tiley + j;
+                    buffer[0 + 4 * (x + width * y)] = appliedColor.R;
+                    buffer[1 + 4 * (x + width * y)] = appliedColor.G;
+                    buffer[2 + 4 * (x + width * y)] = appliedColor.B;
+                    buffer[3 + 4 * (x + width * y)] = (byte)((color == 0) ? 0 : 255);
+                }
+            }
+        }
+        return buffer;
     }
 
     public List<Text> GetGameText()
     {
-        List<Text> texts = new List<Text>();
-        for (int i = textAddrStartinROM; i <= textAddrEndinROM; i += 2)
+        List<Text> texts = [];
+        for (int i = textPointerTableStart; i <= textAddrEndinROM; i += 2)
         {
-            List<byte> encodedText = new List<byte>();
-            int addr = GetByte(i);
-            addr += (GetByte(i + 1) << 8);
+            int addr = GetShort(i + 1, i);
             addr += textAddrOffset;
-            byte c = GetByte(addr);
-            while (c != textEndByte)
-            {
-                addr++;
-                encodedText.Add(c);
-                c = GetByte(addr);
-            }
-            encodedText.Add(0xFF);
-            texts.Add(new Text(encodedText.ToArray()));
-
+            var t = GetTerminatedString(addr);
+            texts.Add(new Text(t));
         }
         return texts;
     }
 
+/*
     public void WriteHints(List<Text> texts)
     {
         int textptr = 0xE390;
@@ -249,14 +441,15 @@ public class ROM
             Put(ptrptr, (byte)low);
             Put(ptrptr + 1, (byte)high);
             ptrptr = ptrptr + 2;
-            for (int j = 0; j < texts[i].EncodedText.Length; j++)
+            for (int j = 0; j < texts[i].EncodedText.Count; j++)
             {
-                Put(textptr, texts[i].EncodedText[j]);
+                Put(textptr, (byte)texts[i].EncodedText[j]);
                 textptr++;
                 ptr++;
             }
         }
     }
+*/
 
     public void WritePalacePalettes(List<int[]> bricks, List<int[]> curtains, List<int> bRows, List<int> binRows)
     {
@@ -293,40 +486,149 @@ public class ROM
 
     public void AddCredits()
     {
-        byte[] randoby = Util.ToGameText("RANDO BY  ", false);
-        for (int i = 0; i < randoby.Length; i++)
-        {
-            Put(creditsLineOneAddr + i, randoby[i]);
-        }
+        var randoby = Util.ToGameText("RANDO BY  ", false);
+        Put(creditsLineOneAddr, randoby);
 
-        byte[] digshake = Util.ToGameText("DIGSHAKE ", true);
-        for (int i = 0; i < digshake.Length; i++)
-        {
-            Put(creditsLineTwoAddr + i, digshake[i]);
-        }
+        var digshake = Util.ToGameText("DIGSHAKE ", true);
+        Put(creditsLineTwoAddr, digshake);
+    }
+
+    public void AddRandomizerToTitle(Assembler asm)
+    {
+        // This is just updating the macro commands used to draw the title screen tiles
+        // The actual tile data will be imported into the rom data later
+        asm.Module().Code("""
+.macpack common
+.segment "PRG5"
+
+VERTICAL = $80
+REPEAT = $40
+
+; When looping the title screen, the game will draw this part in 7 different chunks
+; so we need to update the hardcoded sizes of the chunks here and fit in one more line
+
+; Free the locations of the vanilla table and relocate them to fit the extra line
+FREE "PRG5" [$AEE7, $AEEE)
+FREE "PRG5" [$AB5F, $AB6D)
+
+; Update the vanilla table pointers
+.org $AE76
+    lda TitleLineTable,x
+    sta $00
+    lda TitleLineTable+1,x
+
+.org $AEF0
+    ldy TitleLineLenTable,x
+
+.org $AE9F
+    lda $34
+    cmp #$08
+
+.reloc
+TitleLineLenTable:
+.byte Line1 - Line0
+.byte Line2 - Line1
+.byte Line3 - Line2
+.byte Line4 - Line3
+.byte Line5 - Line4
+.byte Line6 - Line5
+.byte Line7 - Line6
+.byte TitleEnd - Line7
+
+.reloc
+TitleLineTable:
+.word (Line0)
+.word (Line1)
+.word (Line2)
+.word (Line3)
+.word (Line4)
+.word (Line5)
+.word (Line6)
+.word (Line7)
+
+.org $af69
+
+Line0:
+; ZELDA II
+.byte $22, $4c, 8 ; Write 8 bytes to $224c
+.byte $00, $01, $02, $03, $04, $05, $06, $07
+; setup the attributes for the right hand size
+.byte $23,$E0,REPEAT | 16,$00
+.byte $23,$E7,1,$cc
+; .byte $23,$E8,REPEAT | 7,$00
+.byte $23,$EF,1,$cc
+.byte $23,$f0,REPEAT | 16,$00
+.byte $23,$f7,1,$cc
+;.byte $23,$f8,REPEAT | 7,$00
+.byte $23,$ff,1,$cc
+
+
+Line1:
+; RANDOMIZER
+.byte $22, $6a, 12 ; Write 12 bytes to $226a
+; skipping over $0e since its the copyright symbol used at the end
+.byte $08, $09, $0a, $0b, $0c, $0d, $0f, $10, $11, $12, $13, $14
+
+Line2:
+; THE ADVENTURE OF TOP
+.byte $22, $88, 17 ; Write 17 bytes to $2288
+.byte $15, $16, $17, $18, $19, $1a, $1b, $1c, $1d, $1e, $1f, $20, $21, $22, $23, $24, $25 ; Top
+
+
+Line3:
+; THE ADVENTURE OF BOT
+.byte $22, $a7, 18 ; Write 18 bytes to $22a7
+.byte $26, $27, $28, $29, $2a, $2b, $2c, $2d, $2e, $2f, $30, $31, $32, $33, $34, $35, $36, $37 ; Bot
+
+Line4:
+; LINK(TM)
+.byte $22, $ca, 14 ; Write 14 bytes to $22a7
+.byte $38, $39, $3a, $f4, $3b, $3c, $39, $3d, $39, $3e, $3f, $40, $41, $42
+
+Line5:
+.byte $22, $ea, 13 ; Write 13 bytes to $22ea
+.byte $43, $44, $45, $f4, $46, $47, $48, $49, $4a, $4b, $4c, $4d, $4e
+Line6:
+.byte $23, $09, 15 ; Write 15 bytes to $2309
+.byte $4f, $50, $51, $52, $53, $54, $55, $56, $57, $54, $58, $59, $5a, $5b, $5c
+Line7:
+.byte $23, $29, 15 ; Write 15 bytes to $2329
+.byte $5d, $5e, $5e, $5e, $5f, $5e, $60, $5e, $61, $62, $63, $64, $65, $66, $67
+TitleEnd:
+
+; Add some filler commands to take up the rest of the space
+.byte $23, $40, $b02e - TitleEnd-3-4
+.repeat $b02e - TitleEnd-3-4
+    .byte $f4
+.endrepeat
+
+.byte $20,$1F,VERTICAL | REPEAT | $1f,$FD
+
+.assert * = $b02e
+""", "randomizer_title_text.s");
     }
 
     public void ApplyIps(byte[] patch, bool expandRom = false)
     {
-        new IpsPatcher().Patch(ROMData, patch, expandRom);
+        IpsPatcher.Patch(rawdata, patch, expandRom);
     }
 
     private readonly int[] fireLocs = { 
-        ChrRomOffs + 0x00840, 
-        ChrRomOffs + 0x02840, 
-        ChrRomOffs + 0x04840, 
-        ChrRomOffs + 0x06840, 
-        ChrRomOffs + 0x08840, 
-        ChrRomOffs + 0x0a840, 
-        ChrRomOffs + 0x0c840, 
-        ChrRomOffs + 0x0e840, 
-        ChrRomOffs + 0x16840, 
-        ChrRomOffs + 0x12840, 
-        ChrRomOffs + 0x14840, 
-        ChrRomOffs + 0x18840 
+        ChrRomOffset + 0x00840, 
+        ChrRomOffset + 0x02840, 
+        ChrRomOffset + 0x04840, 
+        ChrRomOffset + 0x06840, 
+        ChrRomOffset + 0x08840, 
+        ChrRomOffset + 0x0a840, 
+        ChrRomOffset + 0x0c840, 
+        ChrRomOffset + 0x0e840, 
+        ChrRomOffset + 0x16840, 
+        ChrRomOffset + 0x12840, 
+        ChrRomOffset + 0x14840, 
+        ChrRomOffset + 0x18840 
     };
 
-    public void UpdateSprites(CharacterSprite charSprite, string tunicColor, string shieldColor, string beamSprite)
+    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite, bool sanitize, bool changeItems)
     {
         /*
          * Dear future digshake,
@@ -351,197 +653,149 @@ public class ROM
          * the cosmetics.
          */
 
-        if (charSprite.Equals(CharacterSprite.LINK))
-        {
-            //Do nothing now.
-        }
-        else
-        {
-            new IpsPatcher().Patch(ROMData, charSprite.Path, true);
+        if (charSprite.Patch != null) {
+            if (sanitize)
+            {
+                SpritePatcher.PatchSpriteSanitized(rawdata, charSprite.Patch, true, changeItems);
+            }
+            else
+            {
+                IpsPatcher.Patch(rawdata, charSprite.Patch, true);
+            }
         }
 
-        Dictionary<string, int> colorMap = new Dictionary<string, int> { { "Green", 0x2A }, { "Dark Green", 0x0A }, { "Aqua", 0x3C }, { "Dark Blue", 0x02 }, { "Purple", 0x04 }, { "Pink", 0x24 }, { "Red", 0x16 }, { "Orange", 0x27 }, { "Turd", 0x18 } };
+        var colorMap = new Dictionary<CharacterColor, int>()
+        {
+            { CharacterColor.Green, 0x2A },
+            { CharacterColor.DarkGreen, 0x0A },
+            { CharacterColor.Aqua, 0x3C },
+            { CharacterColor.LightBlue, 0x11 },
+            { CharacterColor.DarkBlue, 0x02 },
+            { CharacterColor.Purple, 0x04 },
+            { CharacterColor.Pink, 0x24 },
+            { CharacterColor.Red, 0x16 },
+            { CharacterColor.Orange, 0x27 },
+            { CharacterColor.Turd, 0x18 },
+            { CharacterColor.White, 0x30 },
+            { CharacterColor.LightGray, 0x10 },
+            { CharacterColor.DarkGray, 0x2d },
+            { CharacterColor.Black, 0x0d },
+        };
 
-        /*colors to include
-            Green (2A)
-            Dark Green (0A)
-            Aqua (3C)
-            Dark Blue (02)
-            Purple (04)
-            Pink (24)
-            Red (16)
-            Orange (27)
-            Turd (08)
-        */
-        int? c2 = null;
-        int? c1 = null;
-        if (tunicColor == "Random")
+        int? tunicColorInt = null;
+        int? outlineColorInt = null;
+        int? shieldColorInt = null;
+        // We won't write the default color to the ROM, but we set it
+        // to avoid another random color rolling the same value.
+        if (tunicColor != CharacterColor.Random)
+        {
+            tunicColorInt = colorMap[tunicColor != CharacterColor.Default ? tunicColor : CharacterColor.Green];
+        }
+        if (outlineColor != CharacterColor.Random)
+        {
+            outlineColorInt = colorMap[outlineColor != CharacterColor.Default ? outlineColor : CharacterColor.Turd];
+        }
+        if (shieldColor != CharacterColor.Random)
+        {
+            shieldColorInt = colorMap[shieldColor != CharacterColor.Default ? shieldColor : CharacterColor.Red];
+        }
+        if (tunicColor == CharacterColor.Random)
         {
             Random r2 = new Random();
-
             int c2p1 = r2.Next(3);
             int c2p2 = r2.Next(1, 13);
-            c2 = c2p1 * 16 + c2p2;
+            tunicColorInt = c2p1 * 16 + c2p2;
 
-            while (c1 == c2)
+            while (tunicColorInt == outlineColorInt || tunicColorInt == shieldColorInt)
             {
                 c2p1 = r2.Next(3);
                 c2p2 = r2.Next(1, 13);
-                c2 = c2p1 * 16 + c2p2;
+                tunicColorInt = c2p1 * 16 + c2p2;
             }
-        } else if (tunicColor != "Default")
-        {
-            c2 = colorMap[tunicColor];
         }
-
-        if (shieldColor == "Random")
+        if (outlineColor == CharacterColor.Random)
         {
             Random r2 = new Random();
+            int c2p1 = r2.Next(3);
+            int c2p2 = r2.Next(1, 13);
+            outlineColorInt = c2p1 * 16 + c2p2;
 
-            int c1p1 = r2.Next(3);
-            int c1p2 = r2.Next(1, 13);
-
-            c1 = c1p1 * 16 + c1p2;
-
-            while (c1 == c2)
+            while (outlineColorInt == tunicColorInt || outlineColorInt == shieldColorInt)
             {
-                c1p1 = r2.Next(3);
-                c1p2 = r2.Next(1, 13);
-                c1 = c1p1 * 16 + c1p2;
-            }
-        } else if (shieldColor != "Default")
-        {
-            c1 = colorMap[shieldColor];
-        }
-
-        int[] tunicLocs = { 0x285C, 0x40b1, 0x40c1, 0x40d1, 0x80e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
-
-        foreach (int l in tunicLocs)
-        {
-            if (c2 != null)
-            {
-                Put(0x10ea, (byte)c2);
-                if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy))
-                {
-                    if (tunicColor != "Default")
-                    {
-                        Put(0x10ea, (byte)c2);
-                        Put(l, (byte)c2);
-                    }
-                    //Don't overwrite for null 
-                }
-                else
-                {
-                    Put(0x10ea, (byte)c2);
-                    Put(l, (byte)c2);
-                }
+                c2p1 = r2.Next(3);
+                c2p2 = r2.Next(1, 13);
+                outlineColorInt = c2p1 * 16 + c2p2;
             }
         }
-
-        if ((charSprite == CharacterSprite.LINK || !charSprite.IsLegacy) && shieldColor == "Default")
+        if(shieldColor == CharacterColor.Random)
         {
-            //Don't overwrite default shield. For custom sprite IPS base
-        }
-        else
-        {
-            if(c1 != null)
-            {
-                Put(0xe9e, (byte)c1);
-            }
-        }
-
-        int beamType = -1;
-        if (beamSprite.Equals("Random"))
-        {
-
             Random r2 = new Random();
-            beamType = r2.Next(6);
+            int c2p1 = r2.Next(3);
+            int c2p2 = r2.Next(1, 13);
+            shieldColorInt = c2p1 * 16 + c2p2;
+
+            while(shieldColorInt == tunicColorInt || shieldColorInt == outlineColorInt)
+            {
+                c2p1 = r2.Next(3);
+                c2p2 = r2.Next(1, 13);
+                shieldColorInt = c2p1 * 16 + c2p2;
+            }
         }
-        else if (beamSprite.Equals("Fire"))
+
+        if(tunicColor != CharacterColor.Default && tunicColorInt != null)
+        { 
+            foreach(int l in LinkTunicPaletteAddr)
+            {
+                Put(l, (byte)tunicColorInt);
+            }
+        }
+        if(outlineColor != CharacterColor.Default && outlineColorInt != null)
         {
-            beamType = 0;
+            foreach(int l in LinkOutlinePaletteAddr)
+            {
+                Put(l, (byte)outlineColorInt);
+            }
         }
-        else if (beamSprite.Equals("Bubble"))
+        if(shieldColor != CharacterColor.Default && shieldColorInt != null)
         {
-            beamType = 1;
+            Put(LinkShieldPaletteAddr, (byte)shieldColorInt);
         }
-        else if (beamSprite.Equals("Rock"))
+
+        if(beamSprite == BeamSprites.RANDOM)
         {
-            beamType = 2;
+            Random r2 = new Random();
+            beamSprite = (BeamSprites)r2.Next(Enum.GetNames(typeof(BeamSprites)).Length - 1);
         }
-        else if (beamSprite.Equals("Axe"))
-        {
-            beamType = 3;
-        }
-        else if (beamSprite.Equals("Hammer"))
-        {
-            beamType = 4;
-        }
-        else if (beamSprite.Equals("Wizzrobe Beam"))
-        {
-            beamType = 5;
-        }
+       
         byte[] newSprite = new byte[32];
 
-        if (beamType == 0 || beamType == 3 || beamType == 4)
+        if (beamSprite == BeamSprites.FIRE || beamSprite == BeamSprites.AXE || beamSprite == BeamSprites.HAMMER)
         {
-            Put(0x18f5, 0xa9);
-            Put(0x18f6, 0x00);
-            Put(0x18f7, 0xea);
+            Put(0x18f5, [0xa9, 0x00, 0xea]);
         }
-        else if (beamType != -1)
+        else if (beamSprite != BeamSprites.DEFAULT)
         {
             Put(0X18FB, 0x84);
         }
 
-        if (beamType == 1)//bubbles
+        int beamSpriteOffset = beamSprite switch
+        {
+            BeamSprites.FIRE => 0,
+            BeamSprites.BUBBLE => 0xaa0,
+            BeamSprites.ROCK => 0x2ae0,
+            BeamSprites.AXE => 0x2fa0,
+            BeamSprites.HAMMER => 0x12ee0,
+            BeamSprites.WIZZROBE_BEAM => 0x14dc0,
+            BeamSprites.DEFAULT => 0,
+            _ => throw new Exception("Invalid beam sprite")
+        };
+        if(beamSpriteOffset != 0)
         {
             for (int i = 0; i < 32; i++)
             {
-                byte next = GetByte(ChrRomOffs + 0xaa0 + i);
+                byte next = GetByte(ChrRomOffset + beamSpriteOffset + i);
                 newSprite[i] = next;
             }
-        }
-
-        if (beamType == 2)//rocks
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x2ae0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-        if (beamType == 3)//axes
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x2fa0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-        if (beamType == 4)//hammers
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x12ee0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-        if (beamType == 5)//wizzrobe beam
-        {
-            for (int i = 0; i < 32; i++)
-            {
-                byte next = GetByte(ChrRomOffs + 0x14dc0 + i);
-                newSprite[i] = next;
-            }
-        }
-
-
-        if (beamType != 0 && beamType != -1)
-        {
             foreach (int loc in fireLocs)
             {
                 for (int i = 0; i < 32; i++)
@@ -570,9 +824,6 @@ public class ROM
         //Fix for extra battle scene
         Put(0x8645, 0x00);
 
-        //Disable hold over head animation
-        Put(0x1E54C, 0);
-
         //Make text go fast
         Put(0xF75E, 0x00);
         Put(0xF625, 0x00);
@@ -587,7 +838,15 @@ public class ROM
         // The patch simply changes a hardcoded `ldx #5` which is used to loop through all object slots to `tax nop`
         // as `a` holds the current object ID (horsehead) and we want to just run the death code from horsehead to 0
         // keeping the item (pbag etc) in the room alive since it spawns in a later slot (#5)
-        Put(0x13ec1, new byte[2] { 0xaa, 0xea, }); // tax nop
+        Put(0x13ec1, [0xaa, 0xea]); // tax nop
+
+        // In vanilla Darunia there is written text on a wall inside one
+        // of the houses. With the changes for FullItemShuffle and changes
+        // to town signs, and there already being an invisible dialog hint at
+        // the Upstab closed door, there aren't any bytes left to put a
+        // text ID for this. Lets switch it to a person to talk to.
+        Put(0xC9b7, [0x7d, 0x91]); // Replace sign with purple kid at (45,9)
+        Put(0xE309, 0x19); // Put the old readable wall hint ID here
     }
 
     public void WriteKasutoJarAmount(int kasutoJars)
@@ -651,48 +910,240 @@ public class ROM
         Put(0x1a975, 0);
     }
 
-    public void SetLevelCap(int atkMax, int magicMax, int lifeMax)
+    /// The vanilla game sets up all 3 save slots from PRG in the
+    /// title screen.  If there is already valid data in a save slot,
+    /// it will keep it.  Note: this includes keeping save slots
+    /// without a name, and when you register your name it only
+    /// updates the name. It does not re-read the starting data from
+    /// PRG. This means having old data in SRAM, with no names
+    /// registered can lead to unexpected behavior. Emulators,
+    /// Everdrives etc. may remember some save data from another
+    /// randomized ROM, with different starting values, but you, the
+    /// player will see no indication of this, since there are no
+    /// names registered. This could lead to the player not being able
+    /// to beat the game, since they are missing items they were
+    /// expected to start with.
+    ///
+    /// This fixes the problem by always reloading the save slot data in the
+    /// title screen for save slots that do not have a name set.
+    public void FixStaleSaveSlotData(Assembler asm)
     {
+        var a = asm.Module();
+        a.Code("""
+.include "z2r.inc"
 
-        //jump to check which attribute is levelling up
-        Put(0x1f8a, 0x4C);
-        Put(0x1f8b, 0x9e);
-        Put(0x1f8c, 0xa8);
+CreateSaveSlotFromPrg = $B976
+CreateSaveSlotFromPrgWithYSet = $B978
+KeepExistingSaveSlot = $B99D
 
-        ////x = 2 life, x = 1 magic, x = 0 attack
-        //load current level for (attack, magic, life)
-        //compare to address of cap
-        //go back to $9f7f
+.segment "PRG5"
+.org $B96a
+    cmp #$69                           ; recovering from reset mid-save (maybe?)
+    beq $B9A7                          ; keeping the vanilla branch for this
+    cmp #$A5                           ; save slot status byte can be both A5 or 5A depending on when the player reset
+    jmp ExtendedSaveCheck
+FREE_UNTIL $B976
 
-        //BD 77 07 (load level)
-        //DD A7 A8
-        //4C 7F 9F
+.reloc
+ExtendedSaveCheck:
+    beq HasExistingDataCheckName
+    cmp #$5A
+    beq HasExistingDataCheckName
+    jmp CreateSaveSlotFromPrg          ; unusable save slot status byte (probably fresh SRAM)
 
-        Put(0x28AE, 0xBD);
-        Put(0x28AF, 0x77);
-        Put(0x28B0, 0x07);
-        Put(0x28B1, 0xDD);
-        Put(0x28B2, 0xA7);
-        Put(0x28B3, 0xA8);
-        Put(0x28B4, 0x4C);
-        Put(0x28B5, 0x7F);
-        Put(0x28B6, 0x9F);
+HasExistingDataCheckName:
+    ldy #$31
+@loop:
+        lda ($00),y
+        cmp #$F4
+        bne NameNotEmpty
+        dey
+        cpy #$29
+        bne @loop
+    jmp CreateSaveSlotFromPrgWithYSet  ; name is empty (small optimization to not re-write the empty name)
 
-        //these are the actual caps
-        Put(0x28B7, (byte)atkMax);
-        Put(0x28B8, (byte)magicMax);
-        Put(0x28B9, (byte)lifeMax);
-
-
+NameNotEmpty:
+    jmp KeepExistingSaveSlot
+""");
     }
 
-    public void ExtendMapSize(Engine engine)
+    public void SetLevelCap(Assembler asm, int atkMax, int magicMax, int lifeMax)
+    {
+        var a = asm.Module();
+        a.Code("""
+.segment "PRG0"
+.org $9F7A
+    jmp LoadNewLevelCap
+    nop
+    nop
+LoadNewLevelCapReturn:        ; $9F7F
+
+.org $A89E
+LoadNewLevelCap:
+    lda $0777,X               ; the instruction we overwrote with jmp
+    cmp LevelCaps,X
+    jmp LoadNewLevelCapReturn
+""");
+        a.Org(0xa8a7);
+        a.Label("LevelCaps");
+        a.Byt((byte)atkMax);
+        a.Byt((byte)magicMax);
+        a.Byt((byte)lifeMax);
+    }
+
+    /// <summary>
+    /// If the level cap for a stat is less than 8, we do not want to allow
+    /// the player to cancel out of the level up screen to continue chasing
+    /// the experience for that stat once it is maxed. To stay true to vanilla,
+    /// this is still allowed if the level cap is 8.
+    /// 
+    /// The point of this is to be able to have lower max stat levels, but
+    /// not have this be abusable to reach high amounts of exp quickly using
+    /// crystals.
+    /// </summary>
+    public void ChangeLevelUpCancelling(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code("""
+; This is called when the game checks if it should skip the cancel option
+; in the level up menu or not. It runs once for each stat (X).
+.segment "PRG0"
+.org $A0D4
+    jmp CheckIfStatMaxed
+CheckStatNormally:           ;  $A0D7
+
+.org $A0ED
+SkipNormalStatCheck:
+
+.segment "PRG0"
+.reloc
+CheckIfStatMaxed:
+    lda LevelCaps,X
+    cmp #$08
+    bcs ReturnNormally       ; if level cap >= 8
+    cmp $0777,X              ; current level for stat X
+    bne ReturnNormally       ; if current level != level cap
+    jmp SkipNormalStatCheck
+ReturnNormally:
+    txa                      ; things we overwrote to do jmp
+    asl a
+    asl a
+    jmp CheckStatNormally
+""");
+        a.Org(0xa8a7);
+        a.Label("LevelCaps");
+    }
+
+    public void UseExtendedBanksForPalaceRooms(Assembler a)
+    {
+        a.Module().Code("""
+.include "z2r.inc"
+
+.import SwapPRG, SwapToSavedPRG, PalaceMappingTable
+
+; move the pointers for the data for the sideviews to load from RAM instead.
+.segment "PRG7"
+.org $C50C ; patch where the pointer for sideview data is loaded
+    jsr CopySideviewIntoRAMAndLoadPointer
+    jmp $C53A
+FREE_UNTIL $C53A
+
+.reloc
+CopySideviewIntoRAMAndLoadPointer:
+    ; y is the offset for the type to load from.
+    ; 0 = encounter
+    ; 1 = west hyrule town
+    ; 2 = easy hyrule town
+    ; 3 = palace group 1,2,5
+    ; 4 = palace group 3,4,6 AND death mountain/maze island encounters
+    ; 5 = palace GP
+    ; So if Y >= 3 we need to change banks when loading the sideview data
+
+    ; Save the sideview type into X for use later
+    tya
+    tax
+
+    ; And setup the read pointer address to read the sideview from ROM
+    ldy $C4BD, x
+    lda $C4C3, y ; Area pointer table lo word
+    sta $00
+    lda $C4C3 + 1, y ; Area pointer table hi word
+    sta $01
+    ; And the enemy pointer address
+    lda $C4C3 + 4, y ; Enemy pointer table lo word
+    sta $02
+    lda $C4C3 + 4 + 1, y ; Enemy pointer table hi word
+    sta $03
+    
+    ; Now we have the pointer to the sideview address, load that so we can read the data
+    ; and also load the enemy pointer into $d6 as well
+    lda $0561
+    asl
+    tay
+    lda ($00),y
+    sta $d4
+    lda ($02),y
+    sta $d6
+    iny
+    lda ($00),y
+    sta $d5
+    lda ($02),y
+    sta $d7
+
+    ; if its not a palace area, skip switching banks
+    lda WorldNumber
+    cmp #3
+    bcc @skipswap
+        lda RegionNumber
+        asl
+        asl
+        adc PalaceNumber
+        tay
+        lda PalaceMappingTable,y
+        cmp #$ff
+        beq @skipswap
+        ; Prevent bank swapping during the end game cutscene
+        lda $076c ; Game mode
+        cmp #3 ; 03=wake up zelda, 04=roll credits, 06=show the lives then restart the scene
+        bcs @skipswap
+            ; Loading a palace sideview so use the data from extended banks instead
+            lda #$0e
+            jsr SwapPRG
+@skipswap:
+
+    ; Read from wherever the vanilla table to the sideview data takes us.
+    ; (if its a palace, its using the extended banks now)
+    ldy #0
+    lda ($d4),y
+    sta SideViewBuffer
+    tay ; Read the sideview length byte
+    ; And start reading all of the data into the buffer
+-
+        lda ($d4),y
+        sta SideViewBuffer,y ; don't need to use indirect addressing since its a fixed buffer
+        dey
+        bne -
+
+    ; If we switched banks to load the sideview, switch it back
+    ; the conditional is kinda heavy, so just always switch
+    jsr SwapToSavedPRG
+
+    ; Now reload the pointers that the game expects
+    ; Load the Sideview RAM buffer pointer
+    lda #.lobyte(SideViewBuffer)
+    sta $d4
+    lda #.hibyte(SideViewBuffer)
+    sta $d5
+    rts
+""");
+    }
+
+    public void ExtendMapSize(Assembler a)
     {
         //Implements CF's map size hack:
         //https://github.com/cfrantz/z2doc/wiki/bigger-overworlds
-        Assembler.Assembler a = new();
-        a.Code("""
-.macpack common
+        a.Module().Code("""
+.include "z2r.inc"
 
 .segment "PRG0"
 ; Update the pointer to the overworld data
@@ -751,28 +1202,26 @@ LoadMapData:
     jmp LoadDataThroughPointers
 
 """, "extend_map_size.s");
-        engine.Modules.Add(a.Actions);
     }
 
     public void DisableTurningPalacesToStone()
     {
-        Put(0x87b3, [0xea, 0xea, 0xea]);
-        Put(0x47ba, [0xea, 0xea, 0xea]);
-        Put(0x1e02e, [0xea, 0xea, 0xea]);
+        Put(0x87b3, new byte[] { 0xea, 0xea, 0xea });
+        Put(0x47ba, new byte[] { 0xea, 0xea, 0xea });
+        Put(0x1e02e, new byte[] { 0xea, 0xea, 0xea });
     }
 
     public void UpdateMapPointers()
     {
-        Put(0x4518, [0x70, 0xb4]); //west
-        Put(0x451a, [0xf0, 0xb9]); //dm
-        Put(0x8518, [0x70, 0xb4]); //east
-        Put(0x851a, [0xf0, 0xb9]); //maze island
+        Put(0x4518, new byte[] { 0x70, 0xb4 }); //west
+        Put(0x451a, new byte[] { 0xf0, 0xb9 }); //dm
+        Put(0x8518, new byte[] { 0x70, 0xb4 }); //east
+        Put(0x851a, new byte[] { 0xf0, 0xb9 }); //maze island
     }
 
-    public void UpAController1(Engine engine)
+    public void UpAController1(Assembler a)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code("""
+        a.Module().Code("""
 .segment "PRG0"
 .org $a19f
 CheckController1ForUpAUnknown:
@@ -784,7 +1233,6 @@ CheckController1ForUpAMagic:
   lda $f7
   cmp #$28
 """, "UpAController1.s");
-        engine.Modules.Add(assembler.Actions);
         //Put(0x21B0, 0xF7);
         //Put(0x21B2, 0x28);
         //Put(0x21EE, 0xF7);
@@ -800,23 +1248,13 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
-    public void ChangeMapperToMMC5(Engine engine, bool enableZ2ft)
+    public async Task<byte[]?> ApplyAsm(Assembler engine)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Assign("ENABLE_Z2FT", enableZ2ft ? 1 : 0);
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
-
-        engine.Modules.Add(assembler.Actions);
+        return await engine.Apply(rawdata);
     }
-
-    public void ApplyAsm(Engine engine)
+    public void RandomizeKnockback(Assembler asm, Random RNG)
     {
-        engine.Apply(ROMData);
-    }
-    public void RandomizeKnockback(Engine engine, Random RNG)
-    {
-        Assembler.Assembler a = new();
-
+        var a = asm.Module();
         // 0x23 is the max enemy id and we have 3 tables for each randomized value
         byte enemy_count = 0x24;
         byte[] x_arr = new byte[enemy_count];
@@ -826,7 +1264,7 @@ CheckController1ForUpAMagic:
         a.Set("RecoilTableX", recoilTableXAddr);
         a.Set("RecoilTableYLo", recoilTableXAddr + enemy_count);
         a.Set("RecoilTableYHi", recoilTableXAddr + enemy_count * 2);
-        for (int i = 0; i < 7; i++)
+        for (var i = 0; i < 7; i++)
         {
             // this is heavily biased towards higher than default knockback... muhahahaha
             a.Segment($"PRG{i}");
@@ -843,16 +1281,175 @@ CheckController1ForUpAMagic:
             a.Byt(y_lo_arr);
             a.Byt(y_hi_arr);
         }
-        a.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.Recoil.s"), "recoil.s");
-        engine.Modules.Add(a.Actions);
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.Recoil.s"), "recoil.s");
     }
 
-
-    public void DontCountExpDuringTalking(Engine engine)
+    public void AllowForChangingDoorYPosition(Assembler a)
     {
-        Assembler.Assembler a = new();
+        a.Module().Code("""
+ObjectYPositionData = $0730
+KeyDoorYPosition = $075e ; just a piece of unused ram afaict
 
-        a.Code("""
+.segment "PRG4"
+.org $813D
+.word KeyDoorCustomPositionPRG4
+.word KeyDoorCustomPositionPRG4 ; its in the item table twice for reasons i don't know
+
+.segment "PRG4", "PRG7"
+.reloc
+KeyDoorCustomPositionPRG4:
+    lda ObjectYPositionData
+    and #$f0
+    clc
+    adc #$20
+    sta KeyDoorYPosition
+    jmp $8245 ; finish with original door code
+
+.segment "PRG5"
+.org $813D
+.word KeyDoorCustomPositionPRG5
+
+.segment "PRG5", "PRG7"
+.reloc
+KeyDoorCustomPositionPRG5:
+    lda ObjectYPositionData
+    and #$f0
+    clc
+    adc #$20
+    sta KeyDoorYPosition
+    jmp $8256 ; finish with original doorcode
+
+.segment "PRG0"
+.org $9118
+    jsr LoadDoorYPos
+    nop
+
+.reloc
+LoadDoorYPos:
+    lda KeyDoorYPosition
+    sta $2b
+    rts
+
+; Fix up the key door sparkle "poof" animation to not use a fixed position
+.segment "PRG7"
+.org $D9AA
+    jsr LoadDoorYPosition
+    nop
+
+.reloc
+LoadDoorYPosition:
+    lda $2a,x
+    clc
+    adc #$0c
+    sta $30
+    rts
+""", "change_door_position.s");
+    }
+
+    public void AllowForChangingElevatorYPosition(Assembler a)
+    {
+        a.Module().Code("""
+.include "z2r.inc"
+
+.segment "PRG1"
+.org $82BA ; death mountain
+    jsr StoreElevatorParamDM
+
+.segment "PRG1", "PRG7"
+.reloc
+StoreElevatorParamDM:
+    lda $0731 ; load the current elevator command
+    and #$0f ; the last 4 bits are the param
+    sta ElevatorYStart
+    lda $010A ; re-do the command JSR overwrote
+    rts
+
+.segment "PRG4"
+.org $823E ; palace 1-6
+    jsr StoreElevatorParam
+
+.segment "PRG4", "PRG7"
+.reloc
+StoreElevatorParam:
+    lda $0731 ; load the current elevator command
+    and #$0f ; the last 4 bits are the param
+    sta ElevatorYStart
+    lda $010A ; re-do the command JSR overwrote
+    rts
+
+.segment "PRG5"
+.org $824F ; palace 7
+    jsr StoreElevatorParamGP
+
+.segment "PRG5", "PRG7"
+.reloc
+StoreElevatorParamGP:
+    lda $0731 ; load the current elevator command
+    and #$0f ; the last 4 bits are the param
+    sta ElevatorYStart
+    lda $010A ; re-do the command JSR overwrote
+    rts
+
+.segment "PRG0", "PRG7"
+.org $9169
+    lda ElevatorYStart ; load param here to utilize the bytes
+    jsr SetElevatorYPosition
+
+.segment "PRG7"
+.reloc
+SetElevatorYPosition:
+    ; we will do: A = 0x98 - (ElevatorParam * 8)
+    asl
+    asl
+    asl
+    ; optimized way to do A = 0x98 - A
+    ; carry is 0 from asl, which makes sbc subtract 1 more
+    sbc #$98 ; A = A - (0x98 + 1)
+    eor #$FF ; invert bits (two's complement negation)
+    sta $2A ; store the elevator y position. was originally always 0x98
+    lda #$98
+    sta $BC ; keeping this at 0x98 - changing it lead to weird bugs!
+    rts
+""", "change_elevator_y_position.s");
+    }
+
+    public void FixElevatorPositionInFallRooms(Assembler a)
+    {
+        // When falling into a fallroom, it will also run the elevator enemy setup code
+        // which causes the elevator to try and position at link's height. But in a fall
+        // room when you fall into it, then we want the elevator to spawn at the default
+        // position. We pull this off by setting $0705 to `2` instead of `1` when falling
+        // and checking for exactly 1 when updating the elevator position
+        a.Module().Code("""
+.segment "PRG0", "PRG7"
+
+.org $C68D
+    ; This is the entry point for the "falling down" game mode
+    jmp SetFlagForFalling
+
+.reloc
+SetFlagForFalling:
+    ; The next code block will also inc this value, so this sets it to two.
+    inc $0705
+    ; instead of returning, jump to where the original code was planning on going
+    jmp $C67C
+
+.org $916F
+; Patch the check to just check for the elevator falling
+jsr CheckIfElevatorEntrance
+bne $9188
+
+.reloc
+CheckIfElevatorEntrance:
+    lda $0705
+    cmp #1
+    rts
+""", "fix_elevator_position_in_fall_rooms.s");
+    }
+
+    public void DontCountExpDuringTalking(Assembler a)
+    {
+        a.Module().Code("""
 .segment "PRG7"
 ; Patch the count up code and check to see if we are in a dialog
 .org $d433
@@ -866,18 +1463,71 @@ CheckForDialog:
         pla
         pla
         jmp $d477
-OriginalPatchedCode:
+OriginalPatchedCode: 
     lda $756 ; Low byte of EXP to add
     rts
 """, "dont_count_during_talking.s");
-        engine.Modules.Add(a.Actions);
     }
 
-    public void InstantText(Engine engine)
+    public void Global5050Jar(Assembler a)
     {
-        Assembler.Assembler a = new();
+        a.Module().Code("""
+.include "z2r.inc"
 
-        a.Code("""
+.segment "PRG4"
+; Patch the count up code and check to see if we are in a dialog
+.org $AF78
+    jsr IncreaseGlobal5050JarDropPRG4
+    beq *+8
+.reloc
+IncreaseGlobal5050JarDropPRG4:
+    inc Global5050JarDrop
+    lda Global5050JarDrop
+    and #1
+    rts
+
+.segment "PRG5"
+; Patch the count up code and check to see if we are in a dialog
+.org $A536
+    jsr IncreaseGlobal5050JarDropPRG5
+    beq *+8
+.reloc
+IncreaseGlobal5050JarDropPRG5:
+    inc Global5050JarDrop
+    lda Global5050JarDrop
+    and #1
+    rts
+""", "global5050jar.s");
+    }
+
+    public void ReduceDripperVariance(Assembler a)
+    {
+        a.Module().Code("""
+.include "z2r.inc"
+
+.segment "PRG4"
+.org $B9F0
+jmp NextDripColor
+
+.reloc
+NextDripColor:
+    beq DripReturn            ; regular RNG hits (A == 0 here)
+    lda DripperRedCounter
+    clc
+    adc #$01
+    cmp #$08
+    bcc DripReturn            ; less than 8 red drips in a row (A != 0 here)
+    lda #$00                  ; force 8th red drip to be blue
+DripReturn:
+    sta DripperRedCounter
+    sta $044C,y
+    rts
+""", "reduce_dripper_variance.s");
+    }
+
+    public void InstantText(Assembler a)
+    {
+        a.Module().Code("""
 .segment "PRG3"
 
 DialogActionLoadTextPtr = $b480
@@ -973,93 +1623,230 @@ Exit:
     ldy $362
     rts
 """, "instant_text.s");
-        engine.Modules.Add(a.Actions);
     }
 
-    public void PreventLR(Engine engine)
+    public void ChangeLavaKillPosition(Assembler asm)
     {
-        Assembler.Assembler a = new();
+        // Don't grab the player at the top pixels of the lava block.
+        // This way we can have "floor level" lava without being sucked into it when we are close.
+        var a = asm.Module();
         a.Code("""
-.macpack common
+.include "z2r.inc"
+.segment "PRG7"
 
-PollPadInput = $d367
+closest_rts = $E0E5
 
-.define buttons $f5
-.define last_frame_buttons $f7
+.org $E0A4
+HandleLavaTileCollision:
+    lda $29                          ; load Link's y pos
+    and #$0f                         ; mask the last 4 bits, to get the Link's pixel position inside the tile
+    cmp #$06                         ; check that we are deep into the lava tile
+    bcc closest_rts                  ; Link's position is not low enough, return
+    jmp ActualLavaDeath
+FREE_UNTIL $E0B0
 
-.segment "PRG5"
-; Patch the title screen call to the read routine
-.org $A68A
-  jsr ControllerReading
+.reloc
+ActualLavaDeath:                     ; original code that we replaced
+    lda #$01
+    sta $e9                          ; $e9 = 01
+    lda #$10
+    sta $050c                        ; timer for Link being in injured state = 10
+    inc $b5                          ; increase Link's state to 2, meaning Link will die
+    rts
+""");
+    }
 
+    public void FixItemPickup(Assembler asm)
+    {
+        // In Z2R, Link never holds items above his head. So,
+        // we don't set the hold item over head timer ($0x49c), and
+        // we don't set the hold item over head ID ($0x49d).
+        // (If we wanted we could remove all code using these)
+        //
+        // Instead, we clear out $a8,x to fix the item pickup phantom damage,
+        // caused by generator code that interprets it as collision data.
+        //
+        // Also, since 1-ups can drop anywhere, if we're picking up a 1-up
+        // we don't reset the velocity.
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.segment "PRG7"
+.org $e53b
+SetPostItemPickupVars:
+    lda $af,x                          ; this byte has the item ID we picked up
+    and #$7f                           ; keep bits .xxx xxxx
+    cmp #$12                           ; check if item is 1-up
+    beq SetPostItemPickupKeepVelocity  ; skip resetting velocity if 1-up
+    lda #$00
+    sta $70                            ; set Link's X velocity to zero
+    sta $57d                           ; set Link's Y velocity to zero
+SetPostItemPickupKeepVelocity:
+    lda #$00
+    sta $a8,x                          ; clear item/enemy collision byte to prevent phantom damage
+    rts
+
+FREE_UNTIL $e54f
+
+""");
+    }
+
+    public void FixMinibossGlitchyAppearance(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.import SwapCHR
+
+SideViewInit = $8CE1
+EnemyFacingDirection = $DC91
+CurrentPRGBank = $0769
+CurrentCHRBank = $076E
 
 .segment "PRG7"
-; Clear the space for the vanilla controller reading code
-.org $d346
-FREE_UNTIL PollPadInput
 
-; Patch the main places that users the controller read routine
-.org $c137
-  jsr ControllerReading
-.org $cd9e
-  jsr ControllerReading
+; Patch the start of the sideview initialization to check if the enemy is loaded in the first screen
+; This is after switching the CHR banks for the sideview
+.org $C638
+    jmp CheckToOverwriteChrBank
 
-; Make a new controller read routine that prevents L+R inputs
 .reloc
-ControllerReading:
-    jsr PollPadInput
-    lda $f5
-    sta $00
-    jsr PollPadInput
-    lda $f5
-    cmp $00
-    bne ControllerReading
-    ; for both player 1 and player 2 controller inputs
-    ldx #$01
-controller_process_loop:
-        ; Prevent L/R inputs
-        lda buttons, x
-        and #%00001010    ; Compare Up and Left...
-        lsr a
-        and buttons, x    ; to Down and Right
-        beq not_opposing
-            ; Use previous frame's directions
-            lda buttons, x
-            eor last_frame_buttons, x
-            and #%11110000
-            eor last_frame_buttons, x
-            sta buttons, x
-not_opposing:
-        ; and Calculate which buttons were pressed this frame
-        lda buttons,x
-        tay
-        eor last_frame_buttons,x
-        and buttons,x
-        sta buttons,x
-        sty last_frame_buttons,x
+CheckToOverwriteChrBank:
+; If A = $20 then we are horsehead/rebo
+    ldx #6
+@loop:
+        lda $a1 - 1,x
+        cmp #$20
+        bne @NotHorsehead
+            jsr OverwriteSpriteCHRBank
+@NotHorsehead:
         dex
-        bpl controller_process_loop
+        bne @loop
+    jmp SideViewInit
+
+.reloc
+OverwriteSpriteCHRBank:
+    ; We are loading that enemy, so switch the sprite banks based on which palace we are in
+    lda WorldNumber ; 3 = palace group 1,2,5 ; 4 = palace group 3,4,6
+    cmp #$03 ; we are fighting a Horsehead since this is palace set 4
+    beq @LoadHorsehead
+        cmp #4
+        bne @Exit
+        lda #$18 * 4 + 4 ; CHR bank for rebo as mini boss
+        bne @WriteCHRBanks ; unconditional (we can't use BIT $abs here safely)
+@LoadHorsehead:
+    lda #$0a * 4 + 4 ; CHR bank for horsehead as mini boss
+@WriteCHRBanks:
+    ; switch two banks which is enough for both mini bosses
+    sta SpChrBank4Reg
+    clc
+    adc #1
+    sta SpChrBank5Reg
+    ; due to an MMC5 issue, we need to write a bg bank as well.
+    lda CurrentCHRBank
+    asl
+    asl
+    ; clc ; carry is clear here
+    adc #4
+    sta BgChrBank0Reg
+@Exit:
     rts
-""", "prevent_lr.s");
-        engine.Modules.Add(a.Actions);
+
+; Patch the enemy loading routine to check if the enemy is horsehead/rebo
+.org $D68B
+    jsr CheckIfHorseheadReboshark
+.reloc
+CheckIfHorseheadReboshark:
+    ; If A = $20 then we are horsehead/rebo
+    cmp #$20
+    bne @Exit
+        jsr OverwriteSpriteCHRBank
+@Exit:
+    jmp EnemyFacingDirection
+
+""");
     }
 
-    public void BuffCarrock(Engine engine)
+    public void FixBossKillPaletteGlitch(Assembler asm)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
-        engine.Modules.Add(assembler.Actions);
+        // Restore red palette color that is set to black for Link's shadow during boss explosions
+        var a = asm.Module();
+        a.Code(/* lang=s */"""
+.segment "PRG7"
+.org $DE1A
+HookIntoSpawnBossItem:
+    jmp RestorePaletteAfterBossKill
+
+.reloc
+RestorePaletteAfterBossKill:
+    sta $af,x ; command overwritten by jmp
+    ldx #$00
+    ldy $362
+@CopyLoop:
+    lda ResetRedPalettePayload,x
+    sta $0363,y
+    inx
+    iny
+    cpx #$08
+    bne @CopyLoop
+    lda #$02
+    sta $0725 ; setting PPU macro 2
+    dey
+    sty $362
+    ldx $10
+    rts
+
+.reloc
+ResetRedPalettePayload:
+    ; 8 byte palette payload for PPU macro
+    .byte $3f, $18, $04, $0f, $06, $16, $30, $ff
+""");
     }
 
-    public void DashSpell(Engine engine)
+    public void BuffCarrock(Assembler a)
     {
-        Assembler.Assembler assembler = new();
-        assembler.Code(Assembly.GetExecutingAssembly().ReadResource("RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
+        a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.BuffCarock.s"), "buff_carock.s");
+    }
+
+    public void DashSpell(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.DashSpell.s"), "dash_spell.s");
 
         byte[] dash = Util.ToGameText("DASH", false).Select(x => (byte)x).ToArray();
-        assembler.Org(0x9c62);
-        assembler.Byt(dash);
-        engine.Modules.Add(assembler.Actions);
+        a.Org(0x9c62);
+        a.Byt(dash);
+    }
+
+    public void CombineFireSpell(Assembler asm, List<Collectable>? customSpellOrder, Random RNG)
+    {
+        // These are the bit flags for each spell.  The old implementation
+        // changed this table directly. However as this table is also used in
+        // the BIT comparison operation when determining if a spell should be
+        // cast, it lead to inconsistent behavior where some spells would be
+        // two-way linked and some would not.
+        byte[] spellBytes = GetBytes(0xdcb, 8);
+
+        int fireSpellIndex = 4;
+        int r = RNG.Next(7);
+        int linkedSpellIndex = r > 3 ? r + 1 : r;
+
+        byte combinedSpellBits = (byte)(spellBytes[linkedSpellIndex] | spellBytes[fireSpellIndex]);
+        spellBytes[fireSpellIndex] = combinedSpellBits;
+        spellBytes[linkedSpellIndex] = combinedSpellBits;
+
+        byte[] finalSpellBytes = customSpellOrder != null
+            ? customSpellOrder.Select(s => spellBytes[s.VanillaSpellOrder()]).ToArray()
+            : spellBytes;
+
+        var a = asm.Module();
+        a.Segment("PRG0");
+        a.Reloc();
+        a.Label("CombinedSpellTable");
+        a.Byt(finalSpellBytes);
+        // When a spell is cast, load from our new table instead
+        a.Org(0x8dfb);
+        a.Code("lda CombinedSpellTable,Y");
     }
 
     public void MoveAfterGem()
@@ -1132,14 +1919,75 @@ not_opposing:
         Put(0x1F350, new byte[] { 0xa9, 0x01, 0x4d, 0x28, 0x07, 0x8d, 0x28, 0x07, 0xa9, 0x13, 0xc5, 0xa1, 0xd0, 0x0a, 0xa9, 0x01, 0x45, 0xb6, 0x85, 0xb6, 0xa9, 0xa0, 0x85, 0x2a, 0x60 });
     }
 
-    public string Z2BytesToString(byte[] data)
+    public void AdjustGpProjectileDamage()
+    {
+        // We are using some enemies that are not present in vanilla
+        // Great Palace, some of which use bytes that are not set
+        // properly in bank 5 (the GP bank) as they never got used.
+
+        // ACHEMAN projectile
+        // West damage class: 1 (0x81)
+        // GP vanilla damage class: 6 (0x86)
+        //
+        // The damage class byte in bank 5 is likely from copying
+        // bank 4 where it is used for Barba's projectile damage.
+        // Lets lower it a bit, but not all the way to 1.
+        Put(0x1542b, 0x83);
+
+        // BUBBLE_GENERATOR
+        // West damage class: 0 (0x80)
+        // East damage class: 0 (0x80)
+        // Vanilla GP damage class: 3 (0x03)
+        //
+        // The damage class byte in bank 5 is likely from copying
+        // bank 4 where it is used for Helmethead's main projectile.
+        Put(0x15429, 0x80);
+
+        // ROCK_GENERATOR
+        // West damage class: 0 (0x00)
+        // Vanilla GP damage class: 0 (0x00)
+        //Put(0x15428, 0x00); // already at 0
+    }
+
+    /// When Rebonack's HP is set to exactly 2 * your damage, it will
+    /// trigger a bug where you kill Rebo's horse while de-horsing him.
+    /// This causes an additional key to drop, as well as softlocking
+    /// the player if they die before killing Rebo. It seems to also
+    /// trigger if you have exactly damage == Rebo HP (very high damage).
+    /// 
+    /// This has to be called after RandomizeEnemyStats and
+    /// RandomizeAttackEffectiveness.
+    ///
+    /// (In Vanilla Zelda 2, your sword damage is never this high.)
+    public void FixRebonackHorseKillBug()
+    {
+        byte[] attackValues = GetBytes(0x1E67D, 8);
+        byte reboHp = GetByte(0x12951);
+        while (attackValues.Any(v => v * 2 == reboHp || v == reboHp))
+        {
+            reboHp++;
+            Put(0x12951, reboHp);
+        }
+    }
+
+    /// Rewrite the graphic tiles for walkthrough walls to be something else
+    public void RevealWalkthroughWalls()
+    {
+        // 0x02 is the background tiles in a different color
+        // another option could be: 0x00 for just fully black
+        // or curtains: 0xCF 0xD0 (regular palaces) and 0xC0 0xC1 (GP)
+        Put(0x1019d, [0x02, 0x02]); // regular palaces
+        Put(0x141b3, [0x02, 0x02]); // GP
+    }
+
+    public static string Z2BytesToString(byte[] data)
     {
         return new string(data.Select(letter => {
             return ReverseCharMap.TryGetValue(letter, out var chr) ? chr : ' ';
         }).ToArray());
     }
 
-    public byte[] StringToZ2Bytes(string text)
+    public static byte[] StringToZ2Bytes(string text)
     {
         return text.Select(letter => {
             return CharMap.TryGetValue(letter, out var byt) ? byt : (byte)0xfc;
@@ -1227,51 +2075,36 @@ not_opposing:
 
     public List<Location> LoadLocations(int startAddr, int locNum, SortedDictionary<int, Terrain> Terrains, Continent continent)
     {
-        List<Location> locations = new List<Location>();
+        List<Location> locations = [];
         for (int i = 0; i < locNum; i++)
         {
-            byte[] bytes = [ 
-                GetByte(startAddr + i), 
-                GetByte(startAddr + RomMap.overworldXOffset + i), 
-                GetByte(startAddr + RomMap.overworldMapOffset + i), 
-                GetByte(startAddr + RomMap.overworldWorldOffset + i) 
-            ];
-            Location location = new Location(bytes[0] & 127, bytes[1] & 63, startAddr + i, bytes[2] & 63, continent)
-            {
-                ExternalWorld = bytes[0] & 128,
-                appear2loweruponexit = bytes[1] & 128,
-                Secondpartofcave = bytes[1] & 64,
-                MapPage = bytes[2] & 192,
-                FallInHole = bytes[3] & 128,
-                PassThrough = bytes[3] & 64,
-                ForceEnterRight = bytes[3] & 32,
-                TerrainType = Terrains[startAddr + i],
-                AppearsOnMap = true
-            };
+            int addr = startAddr + i;
+            Terrain terrain = Terrains[addr];
+            var location = LoadLocation(addr, terrain, continent);
             locations.Add(location);
         }
         return locations;
     }
 
-    //Why does this and LoadLocations not share any code. Eliminate one of them.
-    public Location LoadLocation(int addr, Terrain t, Continent c)
+    public Location LoadLocation(int addr, Terrain terrain, Continent continent)
     {
-        byte[] bytes = [ 
-            GetByte(addr), 
-            GetByte(addr + RomMap.overworldXOffset), 
-            GetByte(addr + RomMap.overworldMapOffset), 
-            GetByte(addr + RomMap.overworldWorldOffset) 
-        ];
-        return new Location(bytes[0] & 127, bytes[1] & 63, addr, bytes[2] & 63, c)
+        byte yByte = GetByte(addr);
+        byte xByte = GetByte(addr + RomMap.overworldXOffset);
+        byte mapByte = GetByte(addr + RomMap.overworldMapOffset);
+        byte worldByte = GetByte(addr + RomMap.overworldWorldOffset);
+        int yPos = yByte & 0x7f;
+        int xPos = xByte & 0x3f;
+        int map = mapByte & 0x3f;
+        return new Location(yPos, xPos, addr, map, continent)
         {
-            ExternalWorld = bytes[0] & 128,
-            appear2loweruponexit = bytes[1] & 128,
-            Secondpartofcave = bytes[1] & 64,
-            MapPage = bytes[2] & 192,
-            FallInHole = bytes[3] & 128,
-            PassThrough = bytes[3] & 64,
-            ForceEnterRight = bytes[3] & 32,
-            TerrainType = t,
+            ExternalWorld = yByte & 0x80,
+            appear2loweruponexit = xByte & 0x80,
+            Secondpartofcave = xByte & 0x40,
+            MapPage = mapByte & 0xC0,
+            FallInHole = worldByte & 0x80,
+            PassThrough = worldByte & 0x40,
+            ForceEnterRight = worldByte & 0x20,
+            TerrainType = terrain,
             AppearsOnMap = true
         };
     }
@@ -1300,7 +2133,7 @@ not_opposing:
     }
 
     //This was refactored out of EastHyrule. The signature/timing/structure needs work.
-    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation,
+    public void UpdateHiddenPalaceSpot(Biome biome, (int, int) hiddenPalaceCoords, Location hiddenPalaceLocation, 
         Location townAtNewKasuto, Location spellTower, bool vanillaShuffleUsesActualTerrain)
     {
         if (biome != Biome.VANILLA && biome != Biome.VANILLA_SHUFFLE)
@@ -1540,5 +2373,36 @@ not_opposing:
                 Put(0x1dfc5, 0x5F);
             }
         }
+    }
+
+    public void UpdateItem(Collectable item, Room room)
+    {
+        int sideviewPtrAddr = room.GetSideviewPtrRomAddr();
+        int sideviewNesPtr = GetShort(sideviewPtrAddr + 1, sideviewPtrAddr);
+        // Sideview data is moved to the expanded banks at $1c/$1d
+        // Currently no palace rooms are added to bank 7 but keeping this anyway.
+        // Using $1c for both works because $1d address range is directly followed by $1c.
+        int sideviewBank = sideviewNesPtr >= 0xC000 ? 0x7 : 0x1c;
+        int sideviewRomPtr = ConvertNesPtrToPrgRomAddr(sideviewBank, sideviewNesPtr);
+
+        byte sideviewLength = GetByte(sideviewRomPtr);
+        int offset = 4;
+
+        do
+        {
+            int yPos = GetByte(sideviewRomPtr + offset++);
+            yPos = (byte)(yPos & 0xF0);
+            yPos = (byte)(yPos >> 4);
+            int byte2 = GetByte(sideviewRomPtr + offset++);
+
+            if (yPos >= 13 || byte2 != 0x0F) continue;
+            int byte3 = GetByte(sideviewRomPtr + offset++);
+
+            if (((Collectable)byte3).IsMinorItem()) continue;
+            Put(sideviewRomPtr + offset - 1, (byte)item);
+            return;
+        } while (offset < sideviewLength);
+        logger.Warn($"Could not write Collectable {item} to Item room {room.GetDebuggerDisplay()} in palace {room.PalaceNumber}");
+        //throw new Exception("Could not write Collectable to Item room in palace " + PalaceNumber);
     }
 }

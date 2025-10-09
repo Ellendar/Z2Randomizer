@@ -1,12 +1,9 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using NLog.Filters;
-using RandomizerCore.Flags;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Z2Randomizer.Core;
 
-namespace Z2Randomizer.Core.Overworld;
+namespace Z2Randomizer.RandomizerCore.Overworld;
+
 public class Climate
 {
     public float[] DistanceCoefficients { get; }
@@ -75,14 +72,35 @@ public class Climate
 
     public Climate Clone()
     {
-        return new(Name, 
+        return new(Name,
             new Dictionary<Terrain, float>(DistanceCoefficients
                 .Select((value, index) => new { value, index })
                 .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
             new Dictionary<Terrain, int>(TerrainWeights
                 .Select((value, index) => new { value, index })
-                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)), 
+                .ToDictionary(pair => (Terrain)pair.index, pair => pair.value)),
             SeedTerrainCount, providedDistancesAreInverted: true);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is Climate climate)
+            return Equals(climate);
+        return false;
+    }
+
+    protected bool Equals(Climate other)
+    {
+        return TerrainWeights.SequenceEqual(other.TerrainWeights)
+               && terrainWeightTable.SequenceEqual(other.terrainWeightTable)
+               && DistanceCoefficients.SequenceEqual(other.DistanceCoefficients)
+               && SeedTerrainCount == other.SeedTerrainCount
+               && Name == other.Name;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TerrainWeights, terrainWeightTable, DistanceCoefficients, SeedTerrainCount, Name);
     }
 
     /// <summary>

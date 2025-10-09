@@ -1,4 +1,4 @@
-.macpack common
+.include "z2r.inc"
 
 .segment "PRG0"
 
@@ -12,10 +12,11 @@ CheckIfLevelingUp:
     lda $074c ; When 74c is 0 we are doing the normal pause screen
     lsr       ; so set the carry if 74c is 1
     lda $0525 ; Then reload the row draw count
-    bcc +
+    bcc @skip
     cmp #$0a
     rts
-+   cmp #$0b ; extend the menu just a little bit
+@skip:
+    cmp #$0b ; extend the menu just a little bit
     rts
 
 .org $a5e8
@@ -71,6 +72,7 @@ PauseMenuRow2Tiles:
 DrawPauseMenuRowOfItems = $9B19
 
 .reloc
+.export AddExtraRowOfItems
 AddExtraRowOfItems:
     jsr DrawPauseMenuRowOfItems
     ; $01 is the base X offset for the items
@@ -111,14 +113,14 @@ AddExtraRowOfItems:
 
 .reloc
 PresenceTableForExtraItems:
-    .byte <$796 ; Upstab
-    .byte <$796 ; Downstab
-    .byte <$798 ; Trophy
-    .byte <$799 ; Mirror
-    .byte <$79a ; Bagu
-    .byte <$79a ; Medicine
-    .byte <$79b ; Water
-    .byte <$79c ; Child
+    .byte <$0796 ; Upstab
+    .byte <$0796 ; Downstab
+    .byte <$0798 ; Trophy
+    .byte <$0799 ; Mirror
+    .byte <$079a ; Bagu
+    .byte <$079a ; Medicine
+    .byte <$079b ; Water
+    .byte <$079c ; Child
 
 BitMaskForExtraItems:
     .byte $04 ; Upstab
