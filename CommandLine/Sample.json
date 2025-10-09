@@ -164,6 +164,7 @@
 "TBirdRequired": true,
 "ChangeItemSprites": true,
 "Tunic": "Pink",
+"SkinTone": "Default",
 "TunicOutline": "Default",
 "UpAOnController1": false,
 "UseCommunityText": true,

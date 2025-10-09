@@ -217,6 +217,7 @@ public class RandomizerProperties
 #pragma warning restore CS8618
     public bool ChangeItemSprites { get; set; }
     public CharacterColor TunicColor { get; set; }
+    public CharacterColor SkinTone { get; set; }
     public CharacterColor OutlineColor { get; set; }
     public CharacterColor ShieldColor { get; set; }
     public bool UpAC1 { get; set; }

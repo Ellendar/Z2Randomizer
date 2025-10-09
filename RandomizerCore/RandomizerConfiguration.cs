@@ -559,6 +559,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
+    private CharacterColor skinTone;
+
+    [Reactive]
+    [IgnoreInFlags]
     private CharacterColor tunicOutline;
 
     [Reactive]
@@ -1297,6 +1301,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.CharSprite = sprite;
         properties.ChangeItemSprites = changeItemSprites;
         properties.TunicColor = tunic;
+        properties.SkinTone = skinTone;
         properties.OutlineColor = tunicOutline;
         properties.ShieldColor = shieldTunic;
         properties.UpAC1 = upAOnController1;

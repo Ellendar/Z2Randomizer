@@ -42,6 +42,11 @@
                       SelectedItem="{Binding TunicColor, Converter={x:Static ui:Util.EnumConvert}}">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TunicColorToolTip}"/></ToolTip.Tip>
             </ComboBox>
+            <ComboBox assists:ComboBoxAssist.Label="Skin Tone" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
+                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
+                      SelectedItem="{Binding SkinTone, Converter={x:Static ui:Util.EnumConvert}}">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.SkinToneToolTip}"/></ToolTip.Tip>
+            </ComboBox>
             <ComboBox assists:ComboBoxAssist.Label="Tunic Outline Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
                       SelectedItem="{Binding OutlineColor, Converter={x:Static ui:Util.EnumConvert}}">

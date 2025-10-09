@@ -628,7 +628,7 @@ TitleEnd:
         ChrRomOffset + 0x18840 
     };
 
-    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite, bool sanitize, bool changeItems)
+    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor skinTone, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite, bool sanitize, bool changeItems)
     {
         /*
          * Dear future digshake,
@@ -683,63 +683,61 @@ TitleEnd:
         };
 
         int? tunicColorInt = null;
+        int? skinToneInt = null;
         int? outlineColorInt = null;
         int? shieldColorInt = null;
         // We won't write the default color to the ROM, but we set it
         // to avoid another random color rolling the same value.
+        // Note: For custom sprites that change the default colors, the
+        // Default color is *not* taken into consideration for Random.
+        // Meaning:
+        // Custom Sprite + 1 Default color + 1 Random color may roll the same.
         if (tunicColor != CharacterColor.Random)
         {
-            tunicColorInt = colorMap[tunicColor != CharacterColor.Default ? tunicColor : CharacterColor.Green];
+            tunicColorInt = tunicColor != CharacterColor.Default ? colorMap[tunicColor] : 0x2a;
+        }
+        if (skinTone != CharacterColor.Random)
+        {
+            skinToneInt = skinTone != CharacterColor.Default ? colorMap[skinTone] : 0x36;
         }
         if (outlineColor != CharacterColor.Random)
         {
-            outlineColorInt = colorMap[outlineColor != CharacterColor.Default ? outlineColor : CharacterColor.Turd];
+            outlineColorInt = outlineColor != CharacterColor.Default ? colorMap[outlineColor] : 0x18;
         }
         if (shieldColor != CharacterColor.Random)
         {
-            shieldColorInt = colorMap[shieldColor != CharacterColor.Default ? shieldColor : CharacterColor.Red];
+            shieldColorInt = shieldColor != CharacterColor.Default ? colorMap[shieldColor] : 0x16;
+        }
+
+        static int RandomUniqueColor(params int?[] forbiddenColors)
+        {
+            Random random = new Random();
+            int color;
+            do
+            {
+                int firstHex = random.Next(4);
+                int secondHex = random.Next(0, 14);
+                color = firstHex * 16 + secondHex;
+                if (color == 0x0d) { continue; }
+            }
+            while (forbiddenColors.Contains(color));
+            return color;
         }
         if (tunicColor == CharacterColor.Random)
         {
-            Random r2 = new Random();
-            int c2p1 = r2.Next(3);
-            int c2p2 = r2.Next(1, 13);
-            tunicColorInt = c2p1 * 16 + c2p2;
-
-            while (tunicColorInt == outlineColorInt || tunicColorInt == shieldColorInt)
-            {
-                c2p1 = r2.Next(3);
-                c2p2 = r2.Next(1, 13);
-                tunicColorInt = c2p1 * 16 + c2p2;
-            }
+            tunicColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
+        }
+        if (skinTone == CharacterColor.Random)
+        {
+            skinToneInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
         if (outlineColor == CharacterColor.Random)
         {
-            Random r2 = new Random();
-            int c2p1 = r2.Next(3);
-            int c2p2 = r2.Next(1, 13);
-            outlineColorInt = c2p1 * 16 + c2p2;
-
-            while (outlineColorInt == tunicColorInt || outlineColorInt == shieldColorInt)
-            {
-                c2p1 = r2.Next(3);
-                c2p2 = r2.Next(1, 13);
-                outlineColorInt = c2p1 * 16 + c2p2;
-            }
+            outlineColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
         if(shieldColor == CharacterColor.Random)
         {
-            Random r2 = new Random();
-            int c2p1 = r2.Next(3);
-            int c2p2 = r2.Next(1, 13);
-            shieldColorInt = c2p1 * 16 + c2p2;
-
-            while(shieldColorInt == tunicColorInt || shieldColorInt == outlineColorInt)
-            {
-                c2p1 = r2.Next(3);
-                c2p2 = r2.Next(1, 13);
-                shieldColorInt = c2p1 * 16 + c2p2;
-            }
+            shieldColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
 
         if(tunicColor != CharacterColor.Default && tunicColorInt != null)
@@ -749,7 +747,14 @@ TitleEnd:
                 Put(l, (byte)tunicColorInt);
             }
         }
-        if(outlineColor != CharacterColor.Default && outlineColorInt != null)
+        if (skinTone != CharacterColor.Default && skinToneInt != null)
+        {
+            foreach (int l in LinkFacePaletteAddr)
+            {
+                Put(l, (byte)skinToneInt);
+            }
+        }
+        if (outlineColor != CharacterColor.Default && outlineColorInt != null)
         {
             foreach(int l in LinkOutlinePaletteAddr)
             {

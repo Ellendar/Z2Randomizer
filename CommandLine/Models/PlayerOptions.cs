@@ -29,6 +29,9 @@ namespace Z2Randomizer.CommandLine.Models
         public CharacterColor TunicColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
+        public CharacterColor SkinTone { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public CharacterColor TunicOutlineColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]

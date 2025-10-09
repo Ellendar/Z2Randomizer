@@ -11,6 +11,7 @@
   "Sprite": "Link",
   "ChangeItemSprites": true,
   "TunicColor": "Default",
+  "SkinTone": "Default",
   "TunicOutlineColor": "Default",
   "ShieldTunicColor": "Default",
   "BeamSprite": "Default",
