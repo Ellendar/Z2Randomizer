@@ -21,3 +21,12 @@ Thanks to thetruekingofspace for providing names for all the overworld locations
 Thanks to jroweboy for numerous assembly updates and some code refactoring.
 Thanks to nelyom for doing some UI work.
 Thanks to everyone in #z2-sprite-workshop for submitting sprites.
+
+## Version 5.0 - Ellendar
+
+Thanks to everyone who submitted new rooms and provided feedback to improve them as much as we can. Especially aaron2u2 for making just way too many rooms.
+Thanks to everyone in #z2-sprite-workshop for submitting new sprites (yet again).
+Thanks to TheAlanHeffley for coordinating the community and putting up with me constantly shipping a new beta right after he posts the SOTW
+Thanks to cfrantz for creating and bentglasstube and initsu for modifications to z2edit, which has been an invaluable development / debugging tool.
+
+Special thanks to initsu and jroweboy, without whose programming contrubutions this release would not be nearly as great.
