@@ -148,14 +148,28 @@ public class ROM
         {Town.NABOORU_FOUNTAIN, textPointerTableStart + 63 * 2 },
     };*/
 
-    // Basic look up table to convert from the original NES palette value to RGB
-    public static readonly Color[] BaseColors = new Color[]
-    {
-Color.FromArgb( 84,  84,  84), Color.FromArgb(  0,  30, 116), Color.FromArgb(  8,  16, 144), Color.FromArgb( 48,   0, 136), Color.FromArgb( 68,   0, 100), Color.FromArgb( 92,   0,  48), Color.FromArgb( 84,   4,   0), Color.FromArgb( 60,  24,   0), Color.FromArgb( 32,  42,   0), Color.FromArgb(  8,  58,   0), Color.FromArgb(  0,  64,   0), Color.FromArgb(  0,  60,   0), Color.FromArgb(  0,  50,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-Color.FromArgb(152, 150, 152), Color.FromArgb(  8,  76, 196), Color.FromArgb( 48,  50, 236), Color.FromArgb( 92,  30, 228), Color.FromArgb(136,  20, 176), Color.FromArgb(160,  20, 100), Color.FromArgb(152,  34,  32), Color.FromArgb(120,  60,   0), Color.FromArgb( 84,  90,   0), Color.FromArgb( 40, 114,   0), Color.FromArgb(  8, 124,   0), Color.FromArgb(  0, 118,  40), Color.FromArgb(  0, 102, 120), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-Color.FromArgb(236, 238, 236), Color.FromArgb( 76, 154, 236), Color.FromArgb(120, 124, 236), Color.FromArgb(176,  98, 236), Color.FromArgb(228,  84, 236), Color.FromArgb(236,  88, 180), Color.FromArgb(236, 106, 100), Color.FromArgb(212, 136,  32), Color.FromArgb(160, 170,   0), Color.FromArgb(116, 196,   0), Color.FromArgb( 76, 208,  32), Color.FromArgb( 56, 204, 108), Color.FromArgb( 56, 180, 204), Color.FromArgb( 60,  60,  60), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188, 188, 236), Color.FromArgb(212, 178, 236), Color.FromArgb(236, 174, 236), Color.FromArgb(236, 174, 212), Color.FromArgb(236, 180, 176), Color.FromArgb(228, 196, 144), Color.FromArgb(204, 210, 120), Color.FromArgb(180, 222, 120), Color.FromArgb(168, 226, 144), Color.FromArgb(152, 226, 180), Color.FromArgb(160, 214, 228), Color.FromArgb(160, 162, 160), Color.FromArgb(  0,   0,   0), Color.FromArgb(  0,   0,   0),
-    };
+    /// Basic look up table to convert from the original NES palette value to RGB
+    public static readonly Color[] NesColors = [
+        Color.FromArgb(101, 101, 101), Color.FromArgb(0, 18, 125),    Color.FromArgb(24, 0, 142),    Color.FromArgb(54, 0, 130),
+        Color.FromArgb(86, 0, 93),     Color.FromArgb(90, 0, 24),     Color.FromArgb(79, 5, 0),      Color.FromArgb(56, 25, 0),
+        Color.FromArgb(29, 49, 0),     Color.FromArgb(0, 61, 0),      Color.FromArgb(0, 65, 0),      Color.FromArgb(0, 59, 23),
+        Color.FromArgb(0, 46, 85),     Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
+
+        Color.FromArgb(175, 175, 175), Color.FromArgb(25, 78, 200),   Color.FromArgb(71, 47, 227),   Color.FromArgb(107, 31, 215),
+        Color.FromArgb(147, 27, 174),  Color.FromArgb(158, 26, 94),   Color.FromArgb(153, 50, 0),    Color.FromArgb(123, 75, 0),
+        Color.FromArgb(91, 103, 0),    Color.FromArgb(38, 122, 0),    Color.FromArgb(0, 130, 0),     Color.FromArgb(0, 122, 62),
+        Color.FromArgb(0, 110, 138),   Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
+
+        Color.FromArgb(255, 255, 255), Color.FromArgb(100, 169, 255), Color.FromArgb(142, 137, 255), Color.FromArgb(182, 118, 255),
+        Color.FromArgb(224, 111, 255), Color.FromArgb(239, 108, 196), Color.FromArgb(240, 128, 106), Color.FromArgb(216, 152, 44),
+        Color.FromArgb(185, 180, 10),  Color.FromArgb(131, 203, 12),  Color.FromArgb(91, 214, 63),   Color.FromArgb(74, 209, 126),
+        Color.FromArgb(77, 199, 203),  Color.FromArgb(76, 76, 76),    Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
+
+        Color.FromArgb(255, 255, 255), Color.FromArgb(199, 229, 255), Color.FromArgb(217, 217, 255), Color.FromArgb(233, 209, 255),
+        Color.FromArgb(249, 206, 255), Color.FromArgb(255, 204, 241), Color.FromArgb(255, 212, 203), Color.FromArgb(248, 223, 177),
+        Color.FromArgb(237, 234, 164), Color.FromArgb(214, 244, 164), Color.FromArgb(197, 248, 184), Color.FromArgb(190, 246, 211),
+        Color.FromArgb(191, 241, 241), Color.FromArgb(185, 185, 185), Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
+    ];
 
     public static readonly int[] LinkOutlinePaletteAddr = {         0x285a, 0x2a0a, 0x40af, 0x40bf, 0x40cf, 0x40df, 0x80af, 0x80bf, 0x80cf, 0x80df, 0xc0af, 0xc0bf, 0xc0cf, 0xc0df, 0xc0ef, 0x100af, 0x100bf, 0x100cf, 0x100df, 0x140af, 0x140bf, 0x140cf, 0x140df, 0x17c19, 0x1c464, 0x1c47c };
     public static readonly int[] LinkFacePaletteAddr =    {         0x285b, 0x2a10, 0x40b0, 0x40c0, 0x40d0, 0x40e0, 0x80b0, 0x80c0, 0x80d0, 0x80e0, 0xc0b0, 0xc0c0, 0xc0d0, 0xc0e0, 0xc0f0, 0x100b0, 0x100c0, 0x100d0, 0x100e0, 0x140b0, 0x140c0, 0x140d0, 0x140e0, 0x17c1a, 0x1c465, 0x1c47d };
@@ -400,7 +414,7 @@ Color.FromArgb(236, 238, 236), Color.FromArgb(168, 204, 236), Color.FromArgb(188
                     var bit0 = (colorByte0 >> pixelShift) & 1;
                     var bit1 = ((colorByte1 >> pixelShift) & 1) << 1;
                     var color = (bit0 | bit1) + (paletteIdx * 4);
-                    var appliedColor = BaseColors[palette[color]];
+                    var appliedColor = NesColors[palette[color]];
 
                     var x = tilex + i;
                     var y = tiley + j;
