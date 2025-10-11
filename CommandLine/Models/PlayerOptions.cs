@@ -26,16 +26,16 @@ namespace Z2Randomizer.CommandLine.Models
         public bool ChangeItemSprites { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public CharacterColor TunicColor { get; set; }
+        public NesColor TunicColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public CharacterColor SkinTone { get; set; }
+        public NesColor SkinTone { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public CharacterColor TunicOutlineColor { get; set; }
+        public NesColor TunicOutlineColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public CharacterColor ShieldTunicColor { get; set; }
+        public NesColor ShieldTunicColor { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public BeamSprites BeamSprite { get; set; }

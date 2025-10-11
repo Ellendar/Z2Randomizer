@@ -470,40 +470,69 @@ public enum StartingLives
 }
 
 [DefaultValue(Default)]
-public enum CharacterColor
+public enum NesColor
 {
-    [Description("Default")]
-    Default,
-    [Description("Green")]
-    Green,
-    [Description("Dark Green")]
-    DarkGreen,
-    [Description("Aqua")]
-    Aqua,
-    [Description("Light Blue")]
-    LightBlue,
-    [Description("Dark Blue")]
-    DarkBlue,
-    [Description("Purple")]
-    Purple,
-    [Description("Pink")]
-    Pink,
-    [Description("Orange")]
-    Orange,
-    [Description("Red")]
-    Red,
-    [Description("Turd")]
-    Turd,
-    [Description("White")]
-    White,
-    [Description("Light Gray")]
-    LightGray,
-    [Description("Dark Gray")]
-    DarkGray,
-    [Description("Black")]
-    Black,
-    [Description("Random")]
-    Random,
+    [Description("Default")] Default = -1,
+    [Description("Random")] Random = -2,
+
+    [Description("Dark Gray")] DarkGray = 0x00,
+    [Description("Deep Blue")] DeepBlue = 0x01,
+    [Description("Indigo Blue")] IndigoBlue = 0x02,
+    [Description("Indigo")] Indigo = 0x03,
+    [Description("Violet")] Violet = 0x04,
+    [Description("Deep Magenta")] DeepMagenta = 0x05,
+    [Description("Rust Red")] RustRed = 0x06,
+    [Description("Brown")] Brown = 0x07,
+    [Description("Olive Green")] OliveGreen = 0x08,
+    [Description("Forest Green")] ForestGreen = 0x09,
+    [Description("Dark Green")] DarkGreen = 0x0A,
+    [Description("Green-Teal")] GreenTeal = 0x0B,
+    [Description("Teal")] Teal = 0x0C,
+
+    [Description("Light Gray")] LightGray = 0x10,
+    [Description("Azure Blue")] AzureBlue = 0x11,
+    [Description("Violet Blue")] VioletBlue = 0x12,
+    [Description("Vivid Purple")] VividPurple = 0x13,
+    [Description("Magenta")] Magenta = 0x14,
+    [Description("Fuchsia Pink")] FuchsiaPink = 0x15,
+    [Description("Rust Orange")] RustOrange = 0x16,
+    [Description("Burnt Orange")] BurntOrange = 0x17,
+    [Description("Mustard Brown")] MustardBrown = 0x18,
+    [Description("Olive")] Olive = 0x19,
+    [Description("Green")] Green = 0x1A,
+    [Description("Emerald Green")] EmeraldGreen = 0x1B,
+    [Description("Sea Blue")] SeaBlue = 0x1C,
+    [Description("Black")] Black = 0x1D,
+
+    [Description("White")] White20 = 0x20,
+    [Description("Sky Blue")] SkyBlue = 0x21,
+    [Description("Baby Blue")] BabyBlue = 0x22,
+    [Description("Orchid Purple")] OrchidPurple = 0x23,
+    [Description("Bubblegum Pink")] BubblegumPink = 0x24,
+    [Description("Rose Pink")] RosePink = 0x25,
+    [Description("Coral")] Coral = 0x26,
+    [Description("Goldenrod")] Goldenrod = 0x27,
+    [Description("Chartreuse")] Chartreuse = 0x28,
+    [Description("Lime Green")] LimeGreen = 0x29,
+    [Description("Bright Green")] BrightGreen = 0x2A,
+    [Description("Mint Green")] MintGreen = 0x2B,
+    [Description("Cyan Blue")] CyanBlue = 0x2C,
+    [Description("Medium Gray")] MediumGray = 0x2D,
+
+    [Description("White")] White = 0x30,
+    [Description("Pale Sky Blue")] PaleSkyBlue = 0x31,
+    [Description("Light Lavender")] LightLavender = 0x32,
+    [Description("Lilac")] Lilac = 0x33,
+    [Description("Light Pink")] LightPink = 0x34,
+    [Description("Pale Rose")] PaleRose = 0x35,
+    [Description("Peach")] Peach = 0x36,
+    [Description("Tan")] Tan = 0x37,
+    [Description("Light Olive")] LightOlive = 0x38,
+    [Description("Pale Green")] PaleGreen = 0x39,
+    [Description("Light Green")] LightGreen = 0x3A,
+    [Description("Seafoam Green")] SeafoamGreen = 0x3B,
+    [Description("Light Cyan")] LightCyan = 0x3C,
+    [Description("Silver Gray")] SilverGray = 0x3D,
 }
 
 [DefaultValue(DEFAULT)]
@@ -654,7 +683,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();
-    public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions<CharacterColor>();
+    public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions<NesColor>();
     public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();
     public static IEnumerable<EnumDescription> BeepThresholdList { get; } = ToDescriptions<BeepThreshold>();
     public static IEnumerable<EnumDescription> BeepFrequencyList { get; } = ToDescriptions<BeepFrequency>();

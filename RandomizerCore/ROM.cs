@@ -642,7 +642,7 @@ TitleEnd:
         ChrRomOffset + 0x18840 
     };
 
-    public void UpdateSprites(CharacterSprite charSprite, CharacterColor tunicColor, CharacterColor skinTone, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite, bool sanitize, bool changeItems)
+    public void UpdateSprite(CharacterSprite charSprite, bool sanitize, bool changeItems)
     {
         /*
          * Dear future digshake,
@@ -677,50 +677,32 @@ TitleEnd:
                 IpsPatcher.Patch(rawdata, charSprite.Patch, true);
             }
         }
+    }
 
-        var colorMap = new Dictionary<CharacterColor, int>()
-        {
-            { CharacterColor.Green, 0x2A },
-            { CharacterColor.DarkGreen, 0x0A },
-            { CharacterColor.Aqua, 0x3C },
-            { CharacterColor.LightBlue, 0x11 },
-            { CharacterColor.DarkBlue, 0x02 },
-            { CharacterColor.Purple, 0x04 },
-            { CharacterColor.Pink, 0x24 },
-            { CharacterColor.Red, 0x16 },
-            { CharacterColor.Orange, 0x27 },
-            { CharacterColor.Turd, 0x18 },
-            { CharacterColor.White, 0x30 },
-            { CharacterColor.LightGray, 0x10 },
-            { CharacterColor.DarkGray, 0x2d },
-            { CharacterColor.Black, 0x0d },
-        };
-
+    public void UpdateSpritePalette(NesColor tunicColor, NesColor skinTone, NesColor outlineColor, NesColor shieldColor, BeamSprites beamSprite)
+    {
         int? tunicColorInt = null;
         int? skinToneInt = null;
         int? outlineColorInt = null;
         int? shieldColorInt = null;
+
         // We won't write the default color to the ROM, but we set it
         // to avoid another random color rolling the same value.
-        // Note: For custom sprites that change the default colors, the
-        // Default color is *not* taken into consideration for Random.
-        // Meaning:
-        // Custom Sprite + 1 Default color + 1 Random color may roll the same.
-        if (tunicColor != CharacterColor.Random)
+        if (tunicColor != NesColor.Random)
         {
-            tunicColorInt = tunicColor != CharacterColor.Default ? colorMap[tunicColor] : 0x2a;
+            tunicColorInt = tunicColor != NesColor.Default ? (int)tunicColor : GetByte(LinkTunicPaletteAddr[0]);
         }
-        if (skinTone != CharacterColor.Random)
+        if (skinTone != NesColor.Random)
         {
-            skinToneInt = skinTone != CharacterColor.Default ? colorMap[skinTone] : 0x36;
+            skinToneInt = skinTone != NesColor.Default ? (int)skinTone : GetByte(LinkFacePaletteAddr[0]);
         }
-        if (outlineColor != CharacterColor.Random)
+        if (outlineColor != NesColor.Random)
         {
-            outlineColorInt = outlineColor != CharacterColor.Default ? colorMap[outlineColor] : 0x18;
+            outlineColorInt = outlineColor != NesColor.Default ? (int)outlineColor : GetByte(LinkOutlinePaletteAddr[0]);
         }
-        if (shieldColor != CharacterColor.Random)
+        if (shieldColor != NesColor.Random)
         {
-            shieldColorInt = shieldColor != CharacterColor.Default ? colorMap[shieldColor] : 0x16;
+            shieldColorInt = shieldColor != NesColor.Default ? (int)shieldColor : GetByte(LinkShieldPaletteAddr);
         }
 
         static int RandomUniqueColor(params int?[] forbiddenColors)
@@ -737,45 +719,45 @@ TitleEnd:
             while (forbiddenColors.Contains(color));
             return color;
         }
-        if (tunicColor == CharacterColor.Random)
+        if (tunicColor == NesColor.Random)
         {
             tunicColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
-        if (skinTone == CharacterColor.Random)
+        if (skinTone == NesColor.Random)
         {
             skinToneInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
-        if (outlineColor == CharacterColor.Random)
+        if (outlineColor == NesColor.Random)
         {
             outlineColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
-        if(shieldColor == CharacterColor.Random)
+        if(shieldColor == NesColor.Random)
         {
             shieldColorInt = RandomUniqueColor([0x0d, tunicColorInt, skinToneInt, outlineColorInt, shieldColorInt]);
         }
 
-        if(tunicColor != CharacterColor.Default && tunicColorInt != null)
+        if(tunicColor != NesColor.Default && tunicColorInt != null)
         { 
             foreach(int l in LinkTunicPaletteAddr)
             {
                 Put(l, (byte)tunicColorInt);
             }
         }
-        if (skinTone != CharacterColor.Default && skinToneInt != null)
+        if (skinTone != NesColor.Default && skinToneInt != null)
         {
             foreach (int l in LinkFacePaletteAddr)
             {
                 Put(l, (byte)skinToneInt);
             }
         }
-        if (outlineColor != CharacterColor.Default && outlineColorInt != null)
+        if (outlineColor != NesColor.Default && outlineColorInt != null)
         {
             foreach(int l in LinkOutlinePaletteAddr)
             {
                 Put(l, (byte)outlineColorInt);
             }
         }
-        if(shieldColor != CharacterColor.Default && shieldColorInt != null)
+        if(shieldColor != NesColor.Default && shieldColorInt != null)
         {
             Put(LinkShieldPaletteAddr, (byte)shieldColorInt);
         }
