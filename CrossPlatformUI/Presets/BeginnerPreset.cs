@@ -48,7 +48,7 @@ public static class BeginnerPreset
         ShortenGP = true,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev4_4Rooms = false,
+        Includev5_0Rooms = false,
         TBirdRequired = true,
         RemoveTBird = false,
         PalacesToCompleteMin = 6,

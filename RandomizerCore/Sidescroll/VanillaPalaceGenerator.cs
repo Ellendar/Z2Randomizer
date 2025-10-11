@@ -100,7 +100,9 @@ public class VanillaPalaceGenerator() : PalaceGenerator
             }
         }
 
-        if(!palace.AllReachable() || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) || palace.HasDeadEnd())
+        if(!palace.AllReachable() 
+            || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird()) 
+            || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1]))
         {
             throw new Exception("Vanilla palace (" + palaceNumber + ") was not all reachable. This should be impossible.");
         }

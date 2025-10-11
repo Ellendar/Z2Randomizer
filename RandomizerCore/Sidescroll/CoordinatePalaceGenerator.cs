@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NLog;
 
@@ -11,6 +12,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props)
     {
+        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
         palace.ItemRooms ??= [];
 
         //ItemRoom
@@ -135,7 +137,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 break;
             }
             RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
-            if (palace.Number < 7 && props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
+            if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
             {
                 bossRoomExitType = bossRoomExitType.AddRight();
             }
@@ -152,7 +154,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 {
                     palace.BossRoom = new(bossRoomCandidate);
                     palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
-                    if (palace.Number < 7 && props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
+                    if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
                     {
                         palace.BossRoom.HasRightExit = true;
                         palace.BossRoom.AdjustContinuingBossRoom();
@@ -172,61 +174,6 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             return false;
         }
 
-        /*
-        foreach(Room room in palace.AllRooms.ToList())
-        {
-            if(room.MergedPrimary != null)
-            {
-                palace.AllRooms.Remove(room);
-                Room primary = room.MergedPrimary;
-                Room secondary = room.MergedSecondary;
-                palace.AllRooms.Add(primary);
-                palace.AllRooms.Add(secondary);
-                if(palace.ItemRooms.Contains(room))
-                {
-                    palace.ItemRooms.Remove(room);
-                    palace.ItemRooms.Add(room.MergedPrimary);
-                }
-                primary.coords = room.coords;
-                secondary.coords = room.coords;
-
-                if (primary.HasLeftExit && room.Left != null)
-                {
-                    primary.Left = room.Left;
-                }
-                if (primary.HasRightExit && room.Right != null)
-                {
-                    primary.Right = room.Right;
-                }
-                if (primary.HasUpExit && room.Up != null)
-                {
-                    primary.Up = room.Up;
-                }
-                if (primary.HasDownExit && room.Down != null)
-                {
-                    primary.Down = room.Down;
-                }
-
-                if (secondary.HasLeftExit && room.Left != null)
-                {
-                    secondary.Left = room.Left;
-                }
-                if (secondary.HasRightExit && room.Right != null)
-                {
-                    secondary.Right = room.Right;
-                }
-                if (secondary.HasUpExit && room.Up != null)
-                {
-                    secondary.Up = room.Up;
-                }
-                if (secondary.HasDownExit && room.Down != null)
-                {
-                    secondary.Down = room.Down;
-                }
-            }
-        }
-        */
-
         UnmergeMergedRooms(palace, roomPool);
 
         //TODO: This is REALLY late to abandon ship on the whole palace, but 
@@ -239,6 +186,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             || (palace.Number == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
         )
         {
+            //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
             return false;
         }
 

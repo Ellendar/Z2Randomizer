@@ -65,6 +65,7 @@ public partial class Palace
         return !BossRoom!.IsBeforeTbird;
     }
 
+    [Obsolete("This was redundant with HasInescapableDrop, which worked more correctly.")]
     public bool HasDeadEnd()
     {
 
@@ -1044,7 +1045,7 @@ public partial class Palace
         return unclearableRooms.Count == 0;
     }
 
-    public bool HasInescapableDrop(int palaceNumber)
+    public bool HasInescapableDrop(bool palacesContinueAfterBoss)
     {
         //get a list of effective drop zones in the palace
         List<Room> dropZonesToCheck = [];
@@ -1068,7 +1069,7 @@ public partial class Palace
             {
                 Room room = pendingRooms.Pop();
                 //if you find the entrance, remove and continue
-                if (room == Entrance || (room.IsBossRoom && palaceNumber == 7))
+                if (room == Entrance || (room.IsBossRoom && !palacesContinueAfterBoss))
                 {
                     found = true;
                     break;
@@ -1393,6 +1394,34 @@ public partial class Palace
         return vanillaCollectables[(int)palaceNum - 1];
     }
 
+    public RoomExitType GetCoordinateRoomShape(int x, int y)
+    {
+        return GetMergedCoordinteRoom(x, y)?.CategorizeExits() ?? RoomExitType.NO_ESCAPE;
+    }
+
+    public Room? GetMergedCoordinteRoom(int x, int y)
+    {
+        List<Room> coordinateRooms = AllRooms.Where(i => i.coords == new Coord(x, y)).ToList();
+        if (coordinateRooms.Count == 0)
+        {
+            return null;
+        }
+        Room room = coordinateRooms[0];
+        if (room.LinkedRoom != null)
+        {
+            room = room.Merge(room.LinkedRoom);
+        }
+        for (int i = 1; i < coordinateRooms.Count; i++)
+        {
+            room = room.Merge(coordinateRooms[i]);
+            if(room.LinkedRoom != null)
+            {
+                room = room.Merge(room.LinkedRoom);
+            }
+        } 
+        return room;
+    }
+
     public string GetLayoutDebug(PalaceStyle style = PalaceStyle.VANILLA, bool includeCoordinateGrid = true)
     {
         StringBuilder sb = new();
@@ -1413,21 +1442,21 @@ public partial class Palace
                 sb.Append("   ");
                 for (int x = -20; x <= 20; x++)
                 {
-                    Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
-                    if (room == null)
+                    RoomExitType room = GetCoordinateRoomShape(x, y);
+                    if (room == RoomExitType.NO_ESCAPE)
                     {
                         sb.Append("   ");
                     }
                     else
                     {
-                        sb.Append(" " + (room.HasUpExit ? "|" : " ") + " ");
+                        sb.Append(" " + (room.ContainsUp() ? "|" : " ") + " ");
                     }
                 }
                 sb.Append('\n');
                 sb.Append(includeCoordinateGrid ? y.ToString().PadLeft(3, ' ') : "   ");
                 for (int x = -20; x <= 20; x++)
                 {
-                    Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
+                    Room? room = GetMergedCoordinteRoom(x, y);
                     if (room == null)
                     {
                         sb.Append("   ");
@@ -1462,14 +1491,14 @@ public partial class Palace
                 sb.Append("   ");
                 for (int x = -20; x <= 20; x++)
                 {
-                    Room? room = AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y));
-                    if (room == null)
+                    RoomExitType room = GetCoordinateRoomShape(x, y);
+                    if (room == RoomExitType.NO_ESCAPE)
                     {
                         sb.Append("   ");
                     }
                     else
                     {
-                        sb.Append(" " + (room.HasDownExit ? (room.HasDrop ? "v" : "|") : " ") + " ");
+                        sb.Append(" " + (room.ContainsDown() ? "|" : (room.ContainsDrop() ? "v" : " ")) + " ");
                     }
                 }
                 sb.Append('\n');

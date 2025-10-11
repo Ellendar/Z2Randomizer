@@ -55,7 +55,7 @@ public class RoomPool
         if (props.AllowVanillaRooms
             //4.4 GP room pool is too shallow to create proper palaces from right now, so if you pick 4.4 only,
             //GP also has vanilla rooms added.
-            || (palaceNumber == 7 && !props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV4_4Rooms))
+            || (palaceNumber == 7 && !props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV5_0Rooms))
         {
             Entrances.AddRange(palaceRooms.Entrances(RoomGroup.VANILLA)
                 .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
@@ -99,25 +99,25 @@ public class RoomPool
             }
         }
 
-        if (props.AllowV4_4Rooms)
+        if (props.AllowV5_0Rooms)
         {
-            Entrances.AddRange(palaceRooms.Entrances(RoomGroup.V4_4)
+            Entrances.AddRange(palaceRooms.Entrances(RoomGroup.V5_0)
                 .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            BossRooms.AddRange(palaceRooms.BossRooms(RoomGroup.V4_4)
+            BossRooms.AddRange(palaceRooms.BossRooms(RoomGroup.V5_0)
                 .Where(i => (i.PalaceNumber == null && palaceNumber < 6) || i.PalaceNumber == palaceNumber).ToList());
-            TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V4_4)
+            TbirdRooms.AddRange(palaceRooms.ThunderBirdRooms(RoomGroup.V5_0)
                 .Where(i => i.PalaceNumber == null || i.PalaceNumber == palaceNumber).ToList());
-            foreach (var room in palaceRooms.LinkedRooms(RoomGroup.V4_4))
+            foreach (var room in palaceRooms.LinkedRooms(RoomGroup.V5_0))
             {
                 LinkedRooms.Add(room.Key, room.Value);
             }
             foreach (var direction in DirectionExtensions.ITEM_ROOM_ORIENTATIONS)
             {
-                ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V4_4, direction).ToList());
+                ItemRoomsByDirection.AddRange(direction, palaceRooms.ItemRoomsByDirection(RoomGroup.V5_0, direction).ToList());
             }
-            foreach (RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.V4_4).Select(i => i.CategorizeExits()).Distinct())
+            foreach (RoomExitType itemRoomExitType in palaceRooms.ItemRooms(RoomGroup.V5_0).Select(i => i.CategorizeExits()).Distinct())
             {
-                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.V4_4, itemRoomExitType));
+                ItemRoomsByShape.AddRange(itemRoomExitType, palaceRooms.ItemRoomsByShape(RoomGroup.V5_0, itemRoomExitType));
             }
         }
         else
@@ -165,7 +165,7 @@ public class RoomPool
             if (props.AllowVanillaRooms
             //4.4 GP room pool is too shallow to create proper palaces from right now, so if you pick 4.4 only,
             //GP also has vanilla rooms added.
-            || (!props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV4_4Rooms))
+            || (!props.AllowVanillaRooms && !props.AllowV4Rooms && props.AllowV5_0Rooms))
             {
                 NormalRooms.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.VANILLA));
             }
@@ -175,9 +175,9 @@ public class RoomPool
                 NormalRooms.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.V4_0));
             }
 
-            if (props.AllowV4_4Rooms)
+            if (props.AllowV5_0Rooms)
             {
-                NormalRooms.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.V4_4));
+                NormalRooms.AddRange(palaceRooms.GpRoomsByGroup(RoomGroup.V5_0));
             }
         }
         else
@@ -192,9 +192,9 @@ public class RoomPool
                 NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0));
             }
 
-            if (props.AllowV4_4Rooms)
+            if (props.AllowV5_0Rooms)
             {
-                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4));
+                NormalRooms.AddRange(palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V5_0));
             }
         }
     }

@@ -50,7 +50,7 @@ public static class StandardPreset
         ShortenGP = true,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev4_4Rooms = true,
+        Includev5_0Rooms = true,
         TBirdRequired = true,
         RemoveTBird = false,
         PalacesToCompleteMin = 6,

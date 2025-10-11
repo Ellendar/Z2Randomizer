@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,9 +15,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
     private const int STALL_LIMIT = 5000;
     static int debug = 0;
     
-    private Room? newRoom;
     private HashSet<Coord> openCoords = new();
-    private Dictionary<Coord, Room> allRooms = new();
+    private Dictionary<Coord, Room> roomsByCoordinate = new();
     private int stallCount;
     private int openJunctionsCount;
     private int roomCount;
@@ -42,15 +42,16 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         };
         openCoords.UnionWith(entrance.GetOpenExitCoords());
         
-        allRooms= new() { { Coord.Uninitialized, entrance } };
+        roomsByCoordinate= new() { { Coord.Uninitialized, entrance } };
         if (props.UsePalaceItemRoomCountIndicator && palaceNumber != 7) {
             entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
         }
         palace.Entrance = entrance;
+        palace.AllRooms.Add(entrance);
 
         stallCount = 0;
         openJunctionsCount = 0;
-        while (allRooms.Count + openCoords.Count < roomCount || openJunctionsCount > 0)
+        while (roomsByCoordinate.Count + openCoords.Count < roomCount || openJunctionsCount > 0)
         {
             //Stalled out, try again from the start
             if(openCoords.Count == 0 || stallCount++ >= STALL_LIMIT)
@@ -64,44 +65,57 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                 }
                 return palace;
             }
-            newRoom = roomPool.NormalRooms.Sample(r);
-            if (newRoom == null)
+            Room? baseRoom = roomPool.NormalRooms.Sample(r);
+            List<Room> newRooms = [];
+            if (baseRoom == null)
             {
                 palace.IsValid = false;
                 return palace;
             }
 
-            newRoom = new(newRoom);
-            if (newRoom.LinkedRoomName != null)
+            baseRoom = new(baseRoom);
+            newRooms.Add(baseRoom);
+            Room mergedRoom = baseRoom;
+            if (baseRoom.LinkedRoomName != null)
             {
-                Room linkedRoom = rooms.LinkedRooms[newRoom.LinkedRoomName];
-                newRoom = newRoom.Merge(new(linkedRoom));
+                Room linkedRoom = new(rooms.LinkedRooms[baseRoom.LinkedRoomName]);
+                newRooms.Add(linkedRoom);
+                mergedRoom = baseRoom.Merge(linkedRoom);
             }
 
-            var openCoordsIter = openCoords.ToArray();
-            r.Shuffle(openCoordsIter);
-            Coord bestFit = Coord.Uninitialized;
+            var openCoordsIterator = openCoords.ToArray();
+            r.Shuffle(openCoordsIterator);
+            Coord bestFitCoordinate = Coord.Uninitialized;
             int bestFitExitCount = 0;
-            foreach(Coord openCoord in openCoordsIter) 
+            foreach(Coord openCoord in openCoordsIterator) 
             {
-                newRoom.coords = openCoord;
                 var (x, y) = openCoord;
-                int fitExitCount = newRoom.FitsWithLeft(allRooms.GetValueOrDefault(new Coord(x - 1, y)))
-                    + newRoom.FitsWithDown(allRooms.GetValueOrDefault(new Coord(x, y - 1)))
-                    + newRoom.FitsWithUp(allRooms.GetValueOrDefault(new Coord(x, y + 1)))
-                    + newRoom.FitsWithRight(allRooms.GetValueOrDefault(new Coord(x + 1, y)));
+                int fitExitCount = mergedRoom.FitsWithLeft(roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y)))
+                    + mergedRoom.FitsWithDown(roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1)))
+                    + mergedRoom.FitsWithUp(roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1)))
+                    + mergedRoom.FitsWithRight(roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y)));
 
                 if(fitExitCount > bestFitExitCount)
                 {
                     bestFitExitCount = fitExitCount;
-                    bestFit = openCoord;
+                    bestFitCoordinate = openCoord;
                 }
             }
 
-            if (bestFitExitCount <= 0 || bestFit == Coord.Uninitialized) continue;
-            UpdateRoom(bestFit);
-            if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, newRoom); }
+            if (bestFitExitCount <= 0 || bestFitCoordinate == Coord.Uninitialized)
+            {
+                continue;
+            }
+            mergedRoom.coords = bestFitCoordinate;
+            UpdateRoom(newRooms, mergedRoom);
+            palace.AllRooms.AddRange(newRooms);
+            //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL, false));
+            if (duplicateProtection)
+            { 
+                RemoveDuplicatesFromPool(props, roomPool.NormalRooms, baseRoom); 
+            }
         }
+        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
         //close stubs
         if (openCoords.Count > 0)
         {
@@ -111,10 +125,10 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             foreach (var openCoord in openCoordsIter)
             {
                 var (x, y) = openCoord;
-                Room? left = allRooms.GetValueOrDefault(new Coord(x - 1, y));
-                Room? right = allRooms.GetValueOrDefault(new Coord(x + 1, y));
-                Room? up = allRooms.GetValueOrDefault(new Coord(x, y + 1));
-                Room? down = allRooms.GetValueOrDefault(new Coord(x, y - 1));
+                Room? left = roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y));
+                Room? right = roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y));
+                Room? up = roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1));
+                Room? down = roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1));
                 if ((left is { HasRightExit: true } ? 1 : 0)
                     + (right is { HasLeftExit: true } ? 1 : 0)
                     + (up != null && (up.HasDownExit || up.HasDrop) ? 1 : 0)
@@ -180,7 +194,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                         newRoom.IsDropZone = false;
                     }
                     newRoom.coords = openCoord;
-                    allRooms.Add(newRoom.coords, newRoom);
+                    roomsByCoordinate.Add(newRoom.coords, newRoom);
+                    palace.AllRooms.Add(newRoom);
                     openCoords.Remove(openCoord);
                     placed = true;
 
@@ -212,8 +227,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
                 } while (placed == false);
             }
         }
-
-        if (allRooms.Count > roomCount)
+        //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
+        if (roomsByCoordinate.Count > roomCount)
         {
             throw new ImpossibleException("Palace Room count exceeds maximum room count.");
         }
@@ -224,11 +239,8 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
 
         //Recategorize the remaining rooms after stubbing out.
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
-        
-        // AddSpecialRoomsByReplacement below relies on palace.AllRooms, so fill it in now
-        palace.AllRooms.AddRange(allRooms.Values);
 
-        if (palace.HasDeadEnd())
+        if (palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1]))
         {
             palace.IsValid = false;
             return palace;
@@ -241,7 +253,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
             return palace;
         }
 
-        if (allRooms.Count - allRooms.Count(i => i.Value.LinkedRoomName != null && !i.Value.Enabled) != roomCount)
+        if (roomsByCoordinate.Count - roomsByCoordinate.Count(i => i.Value.LinkedRoomName != null && !i.Value.Enabled) != roomCount)
         {
             throw new Exception("Generated palace has the incorrect number of rooms");
         }
@@ -251,62 +263,63 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         return palace;
     }
 
-    private void UpdateRoom(Coord bestFit)
+    private void UpdateRoom(List<Room> newRooms, Room mergedRoom)
     {
-        newRoom!.coords = bestFit;
+        Coord bestFit = mergedRoom.coords;
         
-        HashSet<Coord> newOpenCoords = newRoom.GetOpenExitCoords();
+        HashSet<Coord> newOpenCoords = mergedRoom.GetOpenExitCoords();
         foreach (Coord coord in newOpenCoords)
         {
-            if (openCoords.Contains(coord) || allRooms.Keys.Any(c => c == coord))
+            if (openCoords.Contains(coord) || roomsByCoordinate.Keys.Any(c => c == coord))
             {
                 newOpenCoords.Remove(coord);
             }
         }
         //If adding this room would cause the number of open coordinates to be too large,
         //keep searching for a room that more precisely fits the available space.
-        if (newOpenCoords.Count + openCoords.Count + allRooms.Count > roomCount)
+        if (newOpenCoords.Count + openCoords.Count + roomsByCoordinate.Count > roomCount)
         {
             return;
         }
         var (x, y) = bestFit;
-        Room left = allRooms.GetValueOrDefault(new Coord(x - 1, y))!;
-        Room down = allRooms.GetValueOrDefault(new Coord(x, y - 1))!;
-        Room up = allRooms.GetValueOrDefault(new Coord(x, y + 1))!;
-        Room right = allRooms.GetValueOrDefault(new Coord(x + 1, y))!;
-        if(newRoom.FitsWithLeft(left) > 0)
+        Room left = roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y))!;
+        Room down = roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1))!;
+        Room up = roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1))!;
+        Room right = roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y))!;
+        foreach(Room newRoom in newRooms)
         {
-            newRoom.Left = left;
-            left.Right = newRoom;
-        }
-        if (newRoom.FitsWithDown(down) > 0)
-        {
-            newRoom.Down = down;
-            if(!newRoom.HasDrop)
+            if (newRoom.FitsWithLeft(left) > 0)
             {
-                down.Up = newRoom;
+                newRoom.Left = left;
+                left.Right = newRoom;
+            }
+            if (newRoom.FitsWithDown(down) > 0)
+            {
+                newRoom.Down = down;
+                if (!newRoom.HasDrop)
+                {
+                    down.Up = newRoom;
+                }
+            }
+            if (newRoom.FitsWithUp(up) > 0)
+            {
+                if (!up.HasDrop)
+                {
+                    newRoom.Up = up;
+                }
+                up.Down = newRoom;
+            }
+            if (newRoom.FitsWithRight(right) > 0)
+            {
+                newRoom.Right = right;
+                right.Left = newRoom;
             }
         }
-        if (newRoom.FitsWithUp(up) > 0)
-        {
-            if(!up.HasDrop)
-            {
-                newRoom.Up = up;
-            }
-            up.Down = newRoom;
-        }
-        if (newRoom.FitsWithRight(right) > 0)
-        {
-            newRoom.Right = right;
-            right.Left = newRoom;
-        }
+       
         openCoords.UnionWith(newOpenCoords);
         openCoords.Remove(bestFit);
-        if(newRoom.Name.Contains("Central Complex drop fourway"))
-        {
-            //debug++;
-        }
-        allRooms.Add(newRoom.coords, newRoom);
+
+        roomsByCoordinate.Add(mergedRoom.coords, mergedRoom);
         stallCount = 0;
 
         //Count the number of open coordinates that are junction coordinates, i.e. they have
@@ -319,10 +332,10 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         {
             //debug++;
             (x, y) = coord;
-            Room? coordLeft = allRooms.GetValueOrDefault(new Coord(x - 1, y));
-            Room? coordRight = allRooms.GetValueOrDefault(new Coord(x + 1, y));
-            Room? coordUp = allRooms.GetValueOrDefault(new Coord(x, y + 1));
-            Room? coordDown = allRooms.GetValueOrDefault(new Coord(x, y - 1));
+            Room? coordLeft = roomsByCoordinate.GetValueOrDefault(new Coord(x - 1, y));
+            Room? coordRight = roomsByCoordinate.GetValueOrDefault(new Coord(x + 1, y));
+            Room? coordUp = roomsByCoordinate.GetValueOrDefault(new Coord(x, y + 1));
+            Room? coordDown = roomsByCoordinate.GetValueOrDefault(new Coord(x, y - 1));
 
             if((coordLeft is { HasRightExit: true } ? 1 : 0)
                + (coordRight is { HasLeftExit: true } ? 1 : 0)

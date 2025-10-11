@@ -273,6 +273,10 @@ public class Hyrule
                 freeBanks = new(ROM.FreeRomBanks);
                 var palaceGenerator = new Palaces();
                 palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, raftIsRequired, ct);
+                if(palaces.SelectMany(i => i.AllRooms).Any(i => i.LinkedRoomName != null && i.LinkedRoomName.Contains("L7")))
+                {
+                    int i = 2;
+                }
                 if (palaces.Count == 0)
                 {
                     continue;

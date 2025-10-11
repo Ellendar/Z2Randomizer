@@ -111,13 +111,13 @@ public class RandomizerProperties
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
     [NotMapped]
-    public BossRoomsExitType[] BossRoomsExits { get; set; } = new BossRoomsExitType[6];
+    public bool[] BossRoomsExitToPalace { get; set; } = new bool[7];
     public bool NoDuplicateRooms { get; set; }
     public bool NoDuplicateRoomsBySideview { get; set; }
     public bool GeneratorsAlwaysMatch { get; set; }
     public bool AllowVanillaRooms { get; set; }
     public bool AllowV4Rooms { get; set; }
-    public bool AllowV4_4Rooms { get; set; }
+    public bool AllowV5_0Rooms { get; set; }
     public bool HardBosses { get; set; }
     [NotMapped]
     public int[] PalaceItemRoomCounts { get; set; } = new int[6];

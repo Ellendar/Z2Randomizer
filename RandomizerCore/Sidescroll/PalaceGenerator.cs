@@ -28,7 +28,7 @@ public abstract class PalaceGenerator
                 return true;
             }
             //Vanilla only is too small for full palaces probably (and maybe some vanilla only groups)
-            if (!props.AllowV4Rooms && !props.AllowV4_4Rooms)
+            if (!props.AllowV4Rooms && !props.AllowV5_0Rooms)
             {
                 return false;
             }
@@ -39,8 +39,8 @@ public abstract class PalaceGenerator
             //Short GP is ok with any 2 groups
             if (props.ShortenGP)
             {
-                if(props.AllowV4Rooms && props.AllowV4_4Rooms
-                    || props.AllowV4_4Rooms && props.AllowVanillaRooms
+                if(props.AllowV4Rooms && props.AllowV5_0Rooms
+                    || props.AllowV5_0Rooms && props.AllowVanillaRooms
                     || props.AllowV4Rooms && props.AllowVanillaRooms)
                 {
                     return true;
@@ -50,8 +50,8 @@ public abstract class PalaceGenerator
             //Right now same logic with long GP, but this is likely wrong
             else
             {
-                if (props.AllowV4Rooms && props.AllowV4_4Rooms
-                    || props.AllowV4_4Rooms && props.AllowVanillaRooms
+                if (props.AllowV4Rooms && props.AllowV5_0Rooms
+                    || props.AllowV5_0Rooms && props.AllowVanillaRooms
                     || props.AllowV4Rooms && props.AllowVanillaRooms)
                 {
                     return true;

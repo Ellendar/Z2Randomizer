@@ -236,7 +236,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? includev4_0Rooms;
 
     [Reactive]
-    private bool? includev4_4Rooms;
+    private bool? includev5_0Rooms;
 
     [Reactive]
     private bool blockingRoomsInAnyPalace;
@@ -1125,14 +1125,14 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         //if all 3 room options are hard false, the seed can't generate. The UI tries to prevent this, but as a safety
         //if we get to this point, use vanilla rooms
-        if(!((includeVanillaRooms ?? true) || (includev4_0Rooms ?? true) || (includev4_4Rooms ?? true)))
+        if(!((includeVanillaRooms ?? true) || (includev4_0Rooms ?? true) || (includev5_0Rooms ?? true)))
         {
             properties.AllowVanillaRooms = true;
         }
-        while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV4_4Rooms)) {
-            properties.AllowVanillaRooms = includeVanillaRooms ?? GetIndeterminateFlagValue(r); ;
-            properties.AllowV4Rooms = includev4_0Rooms ?? GetIndeterminateFlagValue(r); ;
-            properties.AllowV4_4Rooms = includev4_4Rooms ?? GetIndeterminateFlagValue(r); ;
+        while (!(properties.AllowVanillaRooms || properties.AllowV4Rooms || properties.AllowV5_0Rooms)) {
+            properties.AllowVanillaRooms = includeVanillaRooms ?? GetIndeterminateFlagValue(r);
+            properties.AllowV4Rooms = includev4_0Rooms ?? GetIndeterminateFlagValue(r);
+            properties.AllowV5_0Rooms = includev5_0Rooms ?? GetIndeterminateFlagValue(r);
         }
 
         properties.BlockersAnywhere = blockingRoomsInAnyPalace;
@@ -1147,7 +1147,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             };
             for (int i = 0; i < 6; i++)
             {
-                properties.BossRoomsExits[i] = option;
+                properties.BossRoomsExitToPalace[i] = option == BossRoomsExitType.PALACE;
             }
         }
         else if (bossRoomsExitType == BossRoomsExitType.RANDOM_PER_PALACE)
@@ -1160,16 +1160,17 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                     1 => BossRoomsExitType.PALACE,
                     _ => throw new Exception("Invalid BossRoomsExit")
                 };
-                properties.BossRoomsExits[i] = option;
+                properties.BossRoomsExitToPalace[i] = option == BossRoomsExitType.PALACE;
             }
         }
         else
         {
             for (int i = 0; i < 6; i++)
             {
-                properties.BossRoomsExits[i] = bossRoomsExitType;
+                properties.BossRoomsExitToPalace[i] = bossRoomsExitType == BossRoomsExitType.PALACE;
             }
         }
+        properties.BossRoomsExitToPalace[6] = false;
 
         properties.NoDuplicateRooms = noDuplicateRoomsByEnemies;
         properties.NoDuplicateRoomsBySideview = noDuplicateRoomsByLayout;
@@ -1182,9 +1183,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShuffleEnemyStealExp = shuffleXPStealers;
         properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
         properties.ShuffleSwordImmunity = shuffleSwordImmunity;
-        properties.ShuffleOverworldEnemies = shuffleOverworldEnemies ?? GetIndeterminateFlagValue(r); ;
-        properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r); ;
-        properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r); ;
+        properties.ShuffleOverworldEnemies = shuffleOverworldEnemies ?? GetIndeterminateFlagValue(r);
+        properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r);
+        properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r);
         properties.ShuffleDripper = shuffleDripperEnemy;
         properties.ShuffleEnemyPalettes = shuffleSpritePalettes;
         properties.EnemyXPDrops = enemyXPDrops;
@@ -1496,7 +1497,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             int potentialRoomPools = 0;
             if (includeVanillaRooms != false) { potentialRoomPools++; }
             if (includev4_0Rooms != false) { potentialRoomPools++; }
-            if (includev4_4Rooms != false) { potentialRoomPools++; }
+            if (includev5_0Rooms != false) { potentialRoomPools++; }
             if (potentialRoomPools < 2)
             {
                 throw new UserFacingException("Incompatible Palace Flags", "Not enough palace rooms in the pool.\n\nUnder the Palaces tab, include more room groups or disable No Duplicate Rooms.");

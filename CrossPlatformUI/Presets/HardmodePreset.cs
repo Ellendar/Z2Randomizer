@@ -51,7 +51,7 @@ public static class HardmodePreset
         ShortenGP = false,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev4_4Rooms = true,
+        Includev5_0Rooms = true,
         TBirdRequired = true,
         PalacesToCompleteMin = 6,
         PalacesToCompleteMax = 6,

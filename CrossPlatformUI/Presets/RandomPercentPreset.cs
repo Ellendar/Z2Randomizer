@@ -50,7 +50,7 @@ public static class RandomPercentPreset
         ShortenGP = null,
         IncludeVanillaRooms = null,
         Includev4_0Rooms = null,
-        Includev4_4Rooms = null,
+        Includev5_0Rooms = null,
         TBirdRequired = null,
         RemoveTBird = false,
         PalacesToCompleteMin = 0,

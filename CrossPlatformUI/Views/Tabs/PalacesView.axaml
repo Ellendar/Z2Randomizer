@@ -84,8 +84,8 @@
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.Includev4_4Rooms}"
-                Content="Include 4.4 Rooms"
+                IsChecked="{Binding Config.Includev5_0Rooms}"
+                Content="Include 5.0 Rooms"
             >
             </CheckBox>
             <Separator/>

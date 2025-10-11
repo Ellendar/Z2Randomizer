@@ -49,7 +49,7 @@ public static class UpstartsTournamentPreset
         ShortenGP = true,
         IncludeVanillaRooms = true,
         Includev4_0Rooms = true,
-        Includev4_4Rooms = false,
+        Includev5_0Rooms = false,
         TBirdRequired = true,
         PalacesToCompleteMin = 6,
         PalacesToCompleteMax = 6,

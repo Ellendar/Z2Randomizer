@@ -103,7 +103,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
 
                     }
 
-                    if (props.BossRoomsExits[palace.Number - 1] == BossRoomsExitType.PALACE)
+                    if (props.BossRoomsExitToPalace[palace.Number - 1])
                     {
                         palace.BossRoom.HasRightExit = true;
                         palace.BossRoom.AdjustContinuingBossRoom();
@@ -238,7 +238,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                 (!reachable
                  || (palaceNumber == 7 && props.RequireTbird && !palace.RequiresThunderbird())
                  || (palaceNumber == 7 && !palace.BossRoomMinDistance(props.DarkLinkMinDistance))
-                 || palace.HasDeadEnd()
+                 || palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1])
                 ) && (tries < ROOM_SHUFFLE_ATTEMPT_LIMIT)
             );
         } while (tries >= ROOM_SHUFFLE_ATTEMPT_LIMIT);
