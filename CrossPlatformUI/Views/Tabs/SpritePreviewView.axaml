@@ -6,11 +6,12 @@
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="tabs:SpritePreviewViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.SpritePreviewView">
-    <Grid ColumnDefinitions="*, *">
+    <Grid ColumnDefinitions="340, *">
         <StackPanel Grid.Column="0" Orientation="Vertical">
             <ComboBox Name="SelectedSprite" assists:ComboBoxAssist.Label="Character Sprite" Theme="{StaticResource MaterialOutlineComboBox}"
 					  MaxDropDownHeight="500"
@@ -34,24 +35,30 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <CheckBox IsChecked="{Binding ChangeItemSprites}" Content="Change Item Sprites">
+            <CheckBox Margin="16" IsChecked="{Binding ChangeItemSprites}" Content="Change Item Sprites">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ChangeItemSpritesToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <ComboBox assists:ComboBoxAssist.Label="Tunic Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
-                      SelectedItem="{Binding TunicColor, Converter={x:Static ui:Util.EnumConvert}}">
+            <views:NesColorDropdown Label="Tunic Color"
+                                    SelectedColorIndex="{Binding TunicColor}"
+                                    DefaultColorIndex="{Binding SpriteTunicColor}">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TunicColorToolTip}"/></ToolTip.Tip>
-            </ComboBox>
-            <ComboBox assists:ComboBoxAssist.Label="Tunic Outline Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
-                      SelectedItem="{Binding OutlineColor, Converter={x:Static ui:Util.EnumConvert}}">
+            </views:NesColorDropdown>
+            <views:NesColorDropdown Label="Skin Tone"
+                                    SelectedColorIndex="{Binding SkinTone}"
+                                    DefaultColorIndex="{Binding SpriteSkinTone}">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.SkinToneToolTip}"/></ToolTip.Tip>
+            </views:NesColorDropdown>
+            <views:NesColorDropdown Label="Tunic Outline"
+                                    SelectedColorIndex="{Binding OutlineColor}"
+                                    DefaultColorIndex="{Binding SpriteOutlineColor}">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TunicOutlineColorToolTip}"/></ToolTip.Tip>
-            </ComboBox>
-            <ComboBox assists:ComboBoxAssist.Label="Shield Color" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
-                      ItemsSource="{Binding Source={x:Static rc:Enums.CharacterColorList}}"
-                      SelectedItem="{Binding ShieldColor, Converter={x:Static ui:Util.EnumConvert}}">
+            </views:NesColorDropdown>
+            <views:NesColorDropdown Label="Shield Color"
+                                    SelectedColorIndex="{Binding ShieldColor}"
+                                    DefaultColorIndex="{Binding SpriteShieldColor}">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShieldColorToolTip}"/></ToolTip.Tip>
-            </ComboBox>
+            </views:NesColorDropdown>
+
             <ComboBox assists:ComboBoxAssist.Label="Beam Sprite" Theme="{StaticResource MaterialOutlineComboBox}" SelectedIndex="0"
                       ItemsSource="{Binding Source={x:Static rc:Enums.BeamSpritesList}}"
                       SelectedItem="{Binding BeamSprite, Converter={x:Static ui:Util.EnumConvert}}">

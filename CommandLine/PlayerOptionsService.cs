@@ -74,6 +74,7 @@ namespace Z2Randomizer.CommandLine
             configuration.UpAOnController1 = playerOptions.RemapUpAToUpSelect;
             configuration.ChangeItemSprites = playerOptions.ChangeItemSprites;
             configuration.Tunic = playerOptions.TunicColor;
+            configuration.SkinTone = playerOptions.SkinTone;
             configuration.TunicOutline = playerOptions.TunicOutlineColor;
             configuration.ShieldTunic = playerOptions.ShieldTunicColor;
             configuration.DisableMusic = playerOptions.DisableMusic;

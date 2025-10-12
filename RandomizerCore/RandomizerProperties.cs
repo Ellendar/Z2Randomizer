@@ -216,9 +216,10 @@ public class RandomizerProperties
     public CharacterSprite CharSprite { get; set; }
 #pragma warning restore CS8618
     public bool ChangeItemSprites { get; set; }
-    public CharacterColor TunicColor { get; set; }
-    public CharacterColor OutlineColor { get; set; }
-    public CharacterColor ShieldColor { get; set; }
+    public NesColor TunicColor { get; set; }
+    public NesColor SkinTone { get; set; }
+    public NesColor OutlineColor { get; set; }
+    public NesColor ShieldColor { get; set; }
     public bool UpAC1 { get; set; }
     public bool RemoveFlashing { get; set; }
     public bool UseCustomRooms { get; set; }

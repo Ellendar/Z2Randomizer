@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -55,13 +56,18 @@ public sealed partial class App : Application // , IDisposable
             main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.SpriteName = main.Config.SpriteName;
             if (main.Config.SpriteName != "Link")
             {
-                main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.OnActivate(null!);
+                var disposables = new CompositeDisposable();
+                // this is a bit bad, `disposables` should be freed somewhere, but this is better than passing null.
+                main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.OnActivate(disposables);
             }
         }
         catch (Exception)
         {
             // Could not load settings, so just use the default instead
             // TODO: We need to do something to try and recover if the settings failed so we don't lose the rom data
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached) { throw; }
+#endif
         }
 
         main ??= new MainViewModel();

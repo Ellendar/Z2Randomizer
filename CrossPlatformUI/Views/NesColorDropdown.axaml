@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             x:Class="CrossPlatformUI.Views.NesColorDropdown"
+             Width="340" Height="40">
+    <Grid ColumnDefinitions="108,222">
+        <TextBlock Grid.Column="0" Margin="32, 0, 8, 0" Width="98" x:Name="ControlLabel" VerticalAlignment="Center" />
+
+        <Button Grid.Column="1" x:Name="SelectedButton" BorderBrush="Gray" BorderThickness="1" Width="170" Height="32" HorizontalAlignment="Left">
+            <TextBlock x:Name="SelectedLabel" Width="170" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Default"/>
+        </Button>
+
+        <Popup x:Name="Popup"
+               PlacementTarget="{Binding #SelectedButton}"
+               Placement="Bottom"
+               IsLightDismissEnabled="true">
+            <Border Background="{DynamicResource MaterialPaperBrush}" BorderBrush="Gray" BorderThickness="1" Padding="8">
+                <StackPanel>
+                    <Grid x:Name="PaletteGrid"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0, 8, 0, 0" Spacing="6">
+                        <Button x:Name="DefaultButton" Content="Default" Width="100" Height="32"/>
+                        <Button x:Name="RandomButton" Content="Random" Width="100" Height="32"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>

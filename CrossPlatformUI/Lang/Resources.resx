@@ -157,12 +157,15 @@ folder and it will automatically be added to the list on restart.</value>
 or undesirable, you can disable it here.</value>
 	</data>
 	<data name="TunicColorToolTip" xml:space="preserve">
-<value>Changes the base color of the sprite.</value>
+<value>Changes the base color of the sprite. This is the color the Shield spell will replace.</value>
+	</data>
+    <data name="SkinToneToolTip" xml:space="preserve">
+<value>Changes the skin tone in Link's sprite.</value>
 	</data>
 	<data name="TunicOutlineColorToolTip" xml:space="preserve">
-<value>Changes the color used in the sprite outline.</value>
+<value>Changes the tunic outline color in Link's sprite.</value>
 	</data>
-	<data name="ShieldColorToolTip" xml:space="preserve">
+    <data name="ShieldColorToolTip" xml:space="preserve">
 <value>Changes the base color of the character sprite when the shield spell is cast.</value>
 	</data>
 	<data name="BeamSpriteToolTip" xml:space="preserve">

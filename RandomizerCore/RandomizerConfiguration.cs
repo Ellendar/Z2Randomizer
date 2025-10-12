@@ -541,7 +541,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool removeFlashing;
 
     [Reactive]
-    [ IgnoreInFlags]
+    [IgnoreInFlags]
     private CharacterSprite sprite;
 
     [Reactive]
@@ -555,15 +555,19 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [IgnoreInFlags]
-    private CharacterColor tunic;
+    private NesColor tunic;
 
     [Reactive]
     [IgnoreInFlags]
-    private CharacterColor tunicOutline;
+    private NesColor skinTone;
 
     [Reactive]
     [IgnoreInFlags]
-    private CharacterColor shieldTunic;
+    private NesColor tunicOutline;
+
+    [Reactive]
+    [IgnoreInFlags]
+    private NesColor shieldTunic;
 
     [Reactive]
     [IgnoreInFlags]
@@ -644,9 +648,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         {
             throw new ImpossibleException();
         }
-        tunic = CharacterColor.Default;
-        tunicOutline = CharacterColor.Default;
-        shieldTunic = CharacterColor.Default;
+        tunic = NesColor.Default;
+        skinTone = NesColor.Default;
+        tunicOutline = NesColor.Default;
+        shieldTunic = NesColor.Default;
         beamSprite = BeamSprites.DEFAULT;
         useCustomRooms = false;
         disableHUDLag = false;
@@ -1297,6 +1302,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.CharSprite = sprite;
         properties.ChangeItemSprites = changeItemSprites;
         properties.TunicColor = tunic;
+        properties.SkinTone = skinTone;
         properties.OutlineColor = tunicOutline;
         properties.ShieldColor = shieldTunic;
         properties.UpAC1 = upAOnController1;

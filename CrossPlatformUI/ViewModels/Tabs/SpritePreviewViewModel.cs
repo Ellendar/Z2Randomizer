@@ -36,17 +36,22 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         get => Main.Config.ChangeItemSprites;
         set { Main.Config.ChangeItemSprites = value; this.RaisePropertyChanged(); }
     }
-    public CharacterColor TunicColor
+    public NesColor TunicColor
     {
         get => Main.Config.Tunic;
         set { Main.Config.Tunic = value; this.RaisePropertyChanged(); }
     }
-    public CharacterColor OutlineColor
+    public NesColor SkinTone
+    {
+        get => Main.Config.SkinTone;
+        set { Main.Config.SkinTone = value; this.RaisePropertyChanged(); }
+    }
+    public NesColor OutlineColor
     {
         get => Main.Config.TunicOutline;
         set { Main.Config.TunicOutline = value; this.RaisePropertyChanged(); }
     }
-    public CharacterColor ShieldColor
+    public NesColor ShieldColor
     {
         get => Main.Config.ShieldTunic;
         set { Main.Config.ShieldTunic = value; this.RaisePropertyChanged(); }
@@ -56,7 +61,59 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         get => Main.Config.BeamSprite;
         set { Main.Config.BeamSprite = value; this.RaisePropertyChanged(); }
     }
-    
+
+    public byte spriteTunicColor { get; private set; }
+    public byte spriteSkinTone { get; private set; }
+    public byte spriteOutlineColor { get; private set; }
+    public byte spriteShieldColor { get; private set; }
+    public byte SpriteTunicColor
+    {
+        get => spriteTunicColor;
+        set { spriteTunicColor = value; this.RaisePropertyChanged(); }
+    }
+    public byte SpriteSkinTone
+    {
+        get => spriteSkinTone;
+        set { spriteSkinTone = value; this.RaisePropertyChanged(); }
+    }
+    public byte SpriteOutlineColor
+    {
+        get => spriteOutlineColor;
+        set { spriteOutlineColor = value; this.RaisePropertyChanged(); }
+    }
+    public byte SpriteShieldColor
+    {
+        get => spriteShieldColor;
+        set { spriteShieldColor = value; this.RaisePropertyChanged(); }
+    }
+
+    [JsonIgnore]
+    public MainViewModel Main { get; }
+
+    private LoadedCharacterSprite? sprite;
+    [JsonIgnore]
+    public LoadedCharacterSprite? Sprite
+    {
+        get => sprite;
+        set
+        {
+            this.RaiseAndSetIfChanged(ref sprite, value);
+            if (sprite == null) return;
+            Main.Config.Sprite = sprite.Sprite;
+            SpriteName = sprite.Name;
+            SpriteTunicColor = sprite.palette[3];
+            SpriteSkinTone = sprite.palette[2];
+            SpriteOutlineColor = sprite.palette[1];
+            SpriteShieldColor = sprite.palette[0];
+        }
+    }
+
+    private readonly ObservableCollection<LoadedCharacterSprite> options = [];
+    [JsonIgnore]
+    public ObservableCollection<LoadedCharacterSprite> Options => options;
+    [JsonIgnore]
+    public ViewModelActivator Activator { get; }
+
     [JsonConstructor]
 #pragma warning disable CS8618
     public SpritePreviewViewModel() {}
@@ -75,12 +132,13 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,
             x => x.Main.Config.Tunic,
+            x => x.Main.Config.SkinTone,
             x => x.Main.Config.TunicOutline,
             // x => x.Main.Config.ShieldTunic,
             // x => x.Main.Config.BeamSprite,
             x => x.Main.RomFileViewModel.HasRomData
         )
-            .Where(tuple => tuple.Item4) // filter emits that don't have rom data
+            .Where(tuple => tuple.Item5) // filter emits that don't have rom data
             .Select(tuple => (
                 tuple.Item1?.DisplayName,
                 tuple.Item2,
@@ -119,12 +177,14 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             // Load the selected sprite first so that one updates fastest
             var current = Options.FirstOrDefault(loaded => loaded.Name == Main.Config.Sprite.DisplayName);
             if (current != null)
-                await current.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-            foreach (var loaded in Options)
             {
-                if (token.IsCancellationRequested)
-                    return;
-                await loaded.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+                await current.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+            }
+            LoadedCharacterSprite[] optionsCopy = Options.ToArray(); // don't crash if list is mutated during loop
+            foreach (var loaded in optionsCopy)
+            {
+                if (token.IsCancellationRequested) { return; }
+                await loaded.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             }
         }
 
@@ -132,7 +192,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         {
             Options.Clear();
             var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.LINK);
-            await link.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+            await link.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             if (token.IsCancellationRequested) { return; }
             Options.Add(link);
             var fileservice = App.Current?.Services?.GetService<IFileSystemService>();
@@ -145,7 +205,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
                 var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
                 var ch = new CharacterSprite(parsedName, patch);
                 var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, ch);
-                await loaded.Update(Main.Config.Tunic, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+                await loaded.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
                 if (token.IsCancellationRequested) { return; }
                 Options.Add(loaded);
             }
@@ -157,35 +217,15 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             spritesLoaded = true;
         }
     }
-
-    [JsonIgnore]
-    public MainViewModel Main { get; }
-
-    private LoadedCharacterSprite? sprite;
-    [JsonIgnore]
-    public LoadedCharacterSprite? Sprite
-    {
-        get => sprite;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref sprite, value);
-            if (sprite == null) return;
-            Main.Config.Sprite = sprite.Sprite;
-            SpriteName = sprite.Name;
-        }
-    }
-
-    private readonly ObservableCollection<LoadedCharacterSprite> options = [];
-    [JsonIgnore]
-    public ObservableCollection<LoadedCharacterSprite> Options => options;
-    [JsonIgnore]
-    public ViewModelActivator Activator { get; }
 }
 
 public class LoadedCharacterSprite : ReactiveObject
 {
+    static int charPaletteAddr = 0x10 + 0x1c46b;
+
     private readonly byte[] rom;
     public CharacterSprite Sprite { get; }
+    public byte[] palette = [0, 0, 0, 0];
     public LoadedCharacterSprite(byte[] raw, CharacterSprite spr)
     {
         rom = raw.ToArray();
@@ -193,11 +233,15 @@ public class LoadedCharacterSprite : ReactiveObject
         Name = spr.DisplayName;
     }
 
-    public async Task Update(CharacterColor tunicColor, CharacterColor outlineColor, CharacterColor shieldColor, BeamSprites beamSprite)
+    public async Task Update(NesColor tunicColor, NesColor skinTone, NesColor outlineColor, NesColor shieldColor, BeamSprites beamSprite)
     {
         var tmp = new ROM(rom, true);
         // sanitizing will be slower, we don't need to do it for every sprite in the dropdown
-        tmp.UpdateSprites(Sprite, tunicColor, outlineColor, shieldColor, beamSprite, false, false);
+        tmp.UpdateSprite(Sprite, false, false);
+        palette = tmp.GetBytes(charPaletteAddr, 4);
+        palette[0] = tmp.GetByte(ROM.LinkShieldPaletteAddr);
+        tmp.UpdateSpritePalette(tunicColor, skinTone, outlineColor, shieldColor, beamSprite);
+
         var data = await LoadPreviewFromRom(tmp);
         unsafe
         {
@@ -236,7 +280,6 @@ public class LoadedCharacterSprite : ReactiveObject
             // var img = new WriteableBitmap(new PixelSize(16, 32), Vector.One, PixelFormat.Rgba8888);
 
             // Load the new palette for the sprite from the ROM
-            const int charPaletteAddr = 0x10 + 0x1c46b;
             var palette = tmp.GetBytes(charPaletteAddr, 4);
 
             // Location in the ROM where the sprite starts
