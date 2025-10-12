@@ -1,10 +1,19 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.1 - October 12, 2025
+
+- Added a sprite color picker with more colors.
+- Added a 3rd editable sprite color
+- Fixed a bug that caused the logic for segmented rooms to be incorrect.
+- Fixed a bug that sometimes caused drops to incorrectly be marked as inescapable.
+- Fixed the 5.0 GP up elevator entrance, which inadvertently went down.
+- Corrected the palace room groups to be labeled 5.0 instead of 4.4
+
 ## Version 5.0 - October 9, 2025
 
 ### Major Features
 - Rebuilt the User Interface - This new interface is more customizable than the old one and should allow more improvements in the future.
-- New Web Version - Check it out at Z2
+- New Web Version - Check it out at https://z2r.app/
 - Added over 100 new palace rooms from the 4.4 Room Jam.
 	- A searchable visual reference for all the new rooms is available at https://initsu.github.io/Z2R-Rooms/
 - Added options to add additional items to the item pool.
