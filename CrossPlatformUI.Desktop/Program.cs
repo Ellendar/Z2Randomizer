@@ -34,7 +34,7 @@ public static class Program
                     var version = Assembly.GetEntryAssembly()!.GetName().Version!;
                     var versionString = $"{version.Major}.{version.Minor}.{version.Build}";
                     WinSparkle.win_sparkle_set_appcast_url(
-                        "https://github.com/Ellendar/Z2Randomizer/raw/refs/heads/4.4/appcast.xml");
+                        "https://raw.githubusercontent.com/Ellendar/Z2Randomizer/refs/heads/main/appcast.xml");
                     WinSparkle.win_sparkle_set_app_details("Z2Randomizer", "Z2Randomizer",
                         versionString); // THIS CALL NOT IMPLEMENTED YET
                     WinSparkle.win_sparkle_init();
