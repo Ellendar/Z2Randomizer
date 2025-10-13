@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
+using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using Z2Randomizer.RandomizerCore;
@@ -108,9 +110,9 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         }
     }
 
-    private readonly ObservableCollection<LoadedCharacterSprite> options = [];
+    private readonly SourceList<LoadedCharacterSprite> options = new();
     [JsonIgnore]
-    public ObservableCollection<LoadedCharacterSprite> Options => options;
+    public ReadOnlyObservableCollection<LoadedCharacterSprite>? Options { get; private set; }
     [JsonIgnore]
     public ViewModelActivator Activator { get; }
 
@@ -129,6 +131,13 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 
     internal void OnActivate(CompositeDisposable disposables)
     {
+        options
+            .Connect()
+            .Bind(out var newSpriteList)
+            .Subscribe()
+            .DisposeWith(disposables);
+        Options = newSpriteList;
+
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,
             x => x.Main.Config.Tunic,
@@ -174,13 +183,13 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 
         async void UpdateCharacterSprites(CancellationToken token)
         {
+            LoadedCharacterSprite[] optionsCopy = Options.ToArray(); // don't crash if list is mutated during loop
             // Load the selected sprite first so that one updates fastest
-            var current = Options.FirstOrDefault(loaded => loaded.Name == Main.Config.Sprite.DisplayName);
+            var current = optionsCopy.FirstOrDefault(loaded => loaded.Name == Main.Config.Sprite.DisplayName);
             if (current != null)
             {
                 await current.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             }
-            LoadedCharacterSprite[] optionsCopy = Options.ToArray(); // don't crash if list is mutated during loop
             foreach (var loaded in optionsCopy)
             {
                 if (token.IsCancellationRequested) { return; }
@@ -190,11 +199,11 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 
         async void LoadCharacterSprites(CancellationToken token)
         {
-            Options.Clear();
+            List<LoadedCharacterSprite> optionsNew = new();
             var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.LINK);
             await link.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
             if (token.IsCancellationRequested) { return; }
-            Options.Add(link);
+            optionsNew.Add(link);
             var fileservice = App.Current?.Services?.GetService<IFileSystemService>();
             if (fileservice == null) { return; }
             var spriteFiles = await fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites);
@@ -207,13 +216,19 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
                 var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, ch);
                 await loaded.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
                 if (token.IsCancellationRequested) { return; }
-                Options.Add(loaded);
+                optionsNew.Add(loaded);
             }
             if (token.IsCancellationRequested) { return; }
-            Options.Add(new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.RANDOM));
-            
+            optionsNew.Add(new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.RANDOM));
+
+            // Set sprite list atomically to avoid two threads populating it at once
+            options.Edit(inner =>
+            {
+                inner.Clear();
+                inner.AddRange(optionsNew);
+            });
             // Select the sprite on load based on the name
-            Sprite = Options.FirstOrDefault(loaded => loaded.Name == SpriteName, link);
+            Sprite = optionsNew.FirstOrDefault(loaded => loaded.Name == SpriteName, link);
             spritesLoaded = true;
         }
     }
