@@ -13,9 +13,12 @@ using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
 
 namespace CrossPlatformUI.ViewModels;
 
+[RequiresUnreferencedCode("")]
 public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
 

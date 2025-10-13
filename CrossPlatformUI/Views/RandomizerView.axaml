@@ -121,7 +121,7 @@
                 <TextBox UseFloatingWatermark="True" Watermark="Paste Seed Here" p1:TextFieldAssist.Label="Seed" Text="{Binding Seed}">
                     <TextBox.InnerRightContent>
                         <Button ToolTip.Tip="Generate a random number as your Seed" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}"
-                                Content="{avalonia:MaterialIconExt DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
+                                Content="{avalonia:MaterialIconExt Kind=DiceMultiple, Size=32}" Command="{Binding RerollSeed}" />
                     </TextBox.InnerRightContent>
                 </TextBox>
             </StackPanel>
@@ -129,7 +129,7 @@
                 <Button HorizontalAlignment="Right" Width="128" Content="Generate" IsEnabled="{Binding CanGenerate^}"
                         Command="{Binding Generate}" />
                 <Menu Padding="0" Margin="0" Width="64" ToolTip.Tip="Menu">
-                    <MenuItem Height="48" Width="48" Header="{avalonia:MaterialIconExt Cog, Size=32}" Cursor="Hand">
+                    <MenuItem Height="48" Width="48" Header="{avalonia:MaterialIconExt Kind=Cog, Size=32}" Cursor="Hand">
                         <MenuItem Header="{Binding AppVersion}" IsEnabled="false">
                         </MenuItem>
                         <Separator />

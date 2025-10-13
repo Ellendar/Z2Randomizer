@@ -1,9 +1,9 @@
 using System;
 using Avalonia;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using CrossPlatformUI.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace CrossPlatformUI.Views;
 
