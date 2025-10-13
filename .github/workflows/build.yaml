@@ -14,8 +14,8 @@ jobs:
       matrix:
         platform: [
           { os: windows-latest, arch: x64 },
-#          { os: windows-latest, arch: browser-wasm },
           { os: macos-14, arch: arm64 },
+          { os: ubuntu-latest, arch: browser-wasm },
           { os: ubuntu-latest, arch: x64 },
         ]
         dotnet-version: [ '10.0.x' ]
@@ -44,7 +44,7 @@ jobs:
           cd CrossPlatformUI.Browser
           dotnet workload restore
           cd ..
-          dotnet publish --no-restore -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
+          dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload To Artifacts
         uses: actions/upload-artifact@v4
