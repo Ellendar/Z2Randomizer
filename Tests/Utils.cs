@@ -1,11 +1,10 @@
-﻿using DynamicData;
+﻿
 using SD.Tools.Algorithmia.GeneralDataStructures;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Sidescroll;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Z2Randomizer.Tests;
 
@@ -104,14 +103,14 @@ public class Utils
         [
             //.. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.VANILLA),
             //.. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_0),
-            .. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V4_4),
+            .. palaceRooms.NormalPalaceRoomsByGroup(RoomGroup.V5_0),
         ];
 
         List<Room> gpRooms =
         [
             //.. palaceRooms.GpRoomsByGroup(RoomGroup.VANILLA),
             //.. palaceRooms.GpRoomsByGroup(RoomGroup.V4_0),
-            .. palaceRooms.GpRoomsByGroup(RoomGroup.V4_4),
+            .. palaceRooms.GpRoomsByGroup(RoomGroup.V5_0),
         ];
 
         //This copypasta is lazy as fuck, I don't care.
@@ -212,7 +211,7 @@ public class Utils
         Debug.WriteLine("\nItem Rooms");
         categorizedRooms.Clear();
         normalRooms = [
-            .. palaceRooms.ItemRooms(RoomGroup.V4_4)
+            .. palaceRooms.ItemRooms(RoomGroup.V5_0)
         ];
         foreach (Room room in normalRooms.Where(i => i.HasItem))
         {
