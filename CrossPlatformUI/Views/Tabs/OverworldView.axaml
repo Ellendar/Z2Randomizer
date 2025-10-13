@@ -115,20 +115,23 @@
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.HidePalace}"
-                Content="Hide Palace"
+                Name="GenerateThreeEyedRock"
+                Content="Generate Three-Eyed Rock"
             >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.HidePalaceToolTip}"/></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateThreeEyedRockToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.HideKasuto}"
-                Content="Hide Kasuto"
+                Name="GenerateHiddenKasutoTile"
+                Content="Generate Hidden Kasuto Tile"
             >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.HideKasutoToolTip}"/></ToolTip.Tip>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateHiddenKasutoTileToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.ShuffleWhichLocationIsHidden}"
+                Name="ShuffleWhichLocationsAreHidden"
                 Content="Shuffle Which Locations Are Hidden"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleWhichLocationsAreHiddenToolTip}"/></ToolTip.Tip>
