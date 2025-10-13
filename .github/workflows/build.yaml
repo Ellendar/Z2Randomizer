@@ -46,11 +46,22 @@ jobs:
           cd ..
           dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
-      - name: Upload To Artifacts
+      - if: ${{ ! startsWith(matrix.platform.arch, 'browser-wasm') }}
+        name: Upload To Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Z2Randomizer ${{ matrix.platform.os }} - ${{ matrix.platform.arch }}
           compression-level: 9
           path: |
             CrossPlatformUI/bin/publish
+            !**/*.pdb
+
+      - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
+        name: Upload To Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z2Randomizer ${{ matrix.platform.os }} - ${{ matrix.platform.arch }}
+          compression-level: 9
+          path: |
+            CrossPlatformUI.Browser/bin/Release/net10.0-browser/browser-wasm/AppBundle/
             !**/*.pdb
