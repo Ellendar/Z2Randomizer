@@ -8,6 +8,7 @@
     <LangVersion>default</LangVersion>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Configurations>Debug;Release;Unsafe Debug</Configurations>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
     <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>

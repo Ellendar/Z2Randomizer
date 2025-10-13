@@ -10,6 +10,7 @@
     <RootNamespace>Z2Randomizer.DumpRooms</RootNamespace>
     <LangVersion>default</LangVersion>
     <Configurations>Debug;Release;Unsafe Debug</Configurations>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">

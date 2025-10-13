@@ -12,7 +12,8 @@
     <EnableWorkloadRestore>true</EnableWorkloadRestore>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
 
-    <PublishTrimmed>false</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
     </PropertyGroup>

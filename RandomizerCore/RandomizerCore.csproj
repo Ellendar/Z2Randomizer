@@ -13,6 +13,7 @@
     <LangVersion>default</LangVersion>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <DefineConstants Condition="'$(Configuration)' == 'Unsafe Debug'">UNSAFE_DEBUG;$(DefineConstants)</DefineConstants>
+    <PublishTrimmed>true</PublishTrimmed>
   </PropertyGroup>
 
   <ItemGroup>
@@ -50,6 +51,7 @@
     <PackageReference Include="NLog" Version="6.0.3" />
     <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
+    <TrimmerRootAssembly Include="CoreSourceGenerator" />
     <PackageReference Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
   </ItemGroup>
 
