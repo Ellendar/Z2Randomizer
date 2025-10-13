@@ -14,11 +14,11 @@ jobs:
       matrix:
         platform: [
           { os: windows-latest, arch: x64 },
-#          { os: windows-latest, arch: browser-wasm },
           { os: macos-14, arch: arm64 },
+          { os: ubuntu-latest, arch: browser-wasm },
           { os: ubuntu-latest, arch: x64 },
         ]
-        dotnet-version: [ '8.0.x' ]
+        dotnet-version: [ '10.0.x' ]
 
     runs-on: ${{ matrix.platform.os }}
     steps:
@@ -32,19 +32,36 @@ jobs:
 
       - if: ${{ ! startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Desktop
-        run: dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
+        run: |
+          cd CrossPlatformUI.Browser
+          dotnet workload restore
+          cd ..
+          dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
 
       - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Browser
         run: |
-          dotnet workload install wasm-tools-net8
+          cd CrossPlatformUI.Browser
+          dotnet workload restore
+          cd ..
           dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
-      - name: Upload To Artifacts
+      - if: ${{ ! startsWith(matrix.platform.arch, 'browser-wasm') }}
+        name: Upload To Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Z2Randomizer ${{ matrix.platform.os }} - ${{ matrix.platform.arch }}
           compression-level: 9
           path: |
             CrossPlatformUI/bin/publish
+            !**/*.pdb
+
+      - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
+        name: Upload To Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z2Randomizer ${{ matrix.platform.os }} - ${{ matrix.platform.arch }}
+          compression-level: 9
+          path: |
+            CrossPlatformUI.Browser/bin/Release/net10.0-browser/browser-wasm/AppBundle/
             !**/*.pdb

@@ -1,7 +1,7 @@
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using CrossPlatformUI.ViewModels.Tabs;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace CrossPlatformUI.Views.Tabs;
 

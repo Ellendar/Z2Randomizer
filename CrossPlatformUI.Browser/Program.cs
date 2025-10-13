@@ -1,8 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Browser;
-using Avalonia.ReactiveUI;
 using CrossPlatformUI.Services;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI.Avalonia;
 using System;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
