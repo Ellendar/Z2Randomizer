@@ -13,7 +13,6 @@
     <EnableWorkloadRestore>true</EnableWorkloadRestore>
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
 
-    <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>partial</TrimMode>
     <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->

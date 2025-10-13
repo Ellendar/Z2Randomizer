@@ -32,13 +32,19 @@ jobs:
 
       - if: ${{ ! startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Desktop
-        run: dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
+        run: |
+          cd CrossPlatformUI.Browser
+          dotnet workload restore
+          cd ..
+          dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
 
       - if: ${{ startsWith(matrix.platform.arch, 'browser-wasm') }}
         name: Publish Browser
         run: |
-          dotnet workload install wasm-tools-net8
-          dotnet publish -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
+          cd CrossPlatformUI.Browser
+          dotnet workload restore
+          cd ..
+          dotnet publish --no-restore -c Release -o CrossPlatformUI/bin/publish CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
 
       - name: Upload To Artifacts
         uses: actions/upload-artifact@v4
