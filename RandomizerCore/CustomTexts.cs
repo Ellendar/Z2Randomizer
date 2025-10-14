@@ -627,6 +627,9 @@ public class CustomTexts
             .. newkasutoHints,
             .. kingsTomb,
             .. oldkasutoHint,
+            errorTextIndex2,
+            talkingBotIndexSleeping,
+            talkingAcheIndexSleeping,
         ];
 
         List<int> moving =
