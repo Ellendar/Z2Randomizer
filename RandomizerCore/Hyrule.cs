@@ -1727,6 +1727,33 @@ public class Hyrule
         return newMagicCosts;
     }
 
+    /**
+     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
+     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
+     * Inputs - A = divisor; X = enemy slot
+     *
+     * This function updates all the call sites to these two functions to match the HP for the boss.
+     */
+    private void UpdateAllBossHpDivisor()
+    {
+        List<(int, int)> bossMap = [
+            (0x11451, 0x13b80), // Horsehead
+            (0x13C86, 0x13ae2), // Helmethead
+            (0x12951, 0x12fd2), // Rebonack
+            (0x1293b, 0x1325c), // Unhorsed Rebonack
+            (0x12953, 0x12e92), // Carock
+            (0x13C87, 0x13ae9), // Gooma
+            (0x12952, 0x13138), // Barba
+            // (0x15453, 0x16406), // Thunderbird enable these when we start randomizing their hp
+            // (0x15454, 0x158aa), // Dark Link
+        ];
+        foreach (var (hpaddr, divisoraddr) in bossMap)
+        {
+            int hp = ROMData.GetByte(hpaddr);
+            ROMData.Put(divisoraddr, (byte)(hp / 8));
+        }
+    }
+
     private void RandomizeEnemyStats()
     {
         if (props.ShuffleEnemyHP)
@@ -1750,6 +1777,7 @@ public class Hyrule
             RandomizeHP(0x15440, 0x15443); // Bago Bagos, Ropes
             RandomizeHP(0x15445, 0x1544B); // Bubbles, Dragon Head, Fokkas
             RandomizeHP(0x1544E, 0x1544E); // Fokkeru
+            UpdateAllBossHpDivisor();
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)

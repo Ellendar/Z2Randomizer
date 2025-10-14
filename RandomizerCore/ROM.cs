@@ -1801,6 +1801,7 @@ RestorePaletteAfterBossKill:
 ResetRedPalettePayload:
     ; 8 byte palette payload for PPU macro
     .byte $3f, $18, $04, $0f, $06, $16, $30, $ff
+
 """);
     }
 
