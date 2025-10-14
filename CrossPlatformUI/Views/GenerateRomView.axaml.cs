@@ -1,5 +1,5 @@
-using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using static System.ObservableExtensions;
 using CrossPlatformUI.ViewModels;
 using ReactiveUI;
 
@@ -9,7 +9,23 @@ public partial class GenerateRomView : ReactiveUserControl<GenerateRomViewModel>
 {
     public GenerateRomView()
     {
-        this.WhenActivated(disposables => { });
-        AvaloniaXamlLoader.Load(this);
+        InitializeComponent();
+        this.WhenActivated(disposables =>
+        {
+            CancelGen.WhenAnyValue(x => x.IsVisible).Subscribe(_ =>
+            {
+                if (CancelGen?.IsVisible ?? false)
+                {
+                    CancelGen.Focus();
+                }
+            });
+            CloseGen.WhenAnyValue(x => x.IsVisible).Subscribe(_ =>
+            {
+                if (CloseGen?.IsVisible ?? false)
+                {
+                    CloseGen.Focus();
+                }
+            });
+        });
     }
 }
