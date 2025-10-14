@@ -87,6 +87,7 @@
                 IsChecked="{Binding Config.Includev5_0Rooms}"
                 Content="Include 5.0 Rooms"
             >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.Include50RoomsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <Separator/>
             <CheckBox

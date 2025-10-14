@@ -1942,7 +1942,10 @@ ResetRedPalettePayload:
         //
         // The damage class byte in bank 5 is likely from copying
         // bank 4 where it is used for Helmethead's main projectile.
-        Put(0x15429, 0x80);
+        // The 0x80 bit determines if Reflect is necessary to block.
+        // Since the GP sprite is an Energy Ball it makes sense to not
+        // require Reflect, so setting it to 0.
+        Put(0x15429, 0x00);
 
         // ROCK_GENERATOR
         // West damage class: 0 (0x00)

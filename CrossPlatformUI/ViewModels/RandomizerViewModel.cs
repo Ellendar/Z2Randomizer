@@ -270,7 +270,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             Main.Config.AllowUnsafePathEncounters = false;
         });
 
-        // If shuffle encounters is off, then don't allow shuffling GP
+        // If shuffle palaces is off, then don't allow shuffling GP
         Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents)
             .Subscribe(x =>
             {
