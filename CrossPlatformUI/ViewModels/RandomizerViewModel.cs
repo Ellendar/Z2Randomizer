@@ -180,9 +180,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
     private void OnActivate(CompositeDisposable disposable)
     {
-        Flags = string.IsNullOrEmpty(Main.Config.Flags)
+        // If the Flags are entirely default, use the beginner preset
+        Flags = Main.Config.Flags == new RandomizerConfiguration().Flags
             ? BeginnerPreset.Preset.Flags
-            : Main.Config.Flags?.Trim() ?? "";
+            : Main.Config.Flags.Trim() ?? "";
 
         Main.Config.PropertyChanged += (sender, args) =>
         {
