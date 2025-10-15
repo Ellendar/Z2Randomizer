@@ -34,6 +34,16 @@
             <Setter Property="Margin" Value="0 10" />
         </Style>
         
+        <Style Selector="CheckBox">
+            <!-- Force the entire checkbox to be "clickable" and not just the pixels that the text covers -->
+            <Setter Property="Background" Value="Transparent"/>
+            <!-- By default the checkbox stretched to fill the container, which made way too much clickable, so
+                 No more stretching! Stick to left aligned content by default for checkboxes. -->
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Padding" Value="0,8"/>
+            <Setter Property="Margin" Value="5, 0"/>
+        </Style>
+        
         <!-- Indeterminate state -->
         <Style Selector="CheckBox">
             <Style Selector="^:indeterminate /template/ Path#Graphic">
