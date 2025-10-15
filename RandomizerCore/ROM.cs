@@ -1657,6 +1657,183 @@ ActualLavaDeath:                     ; original code that we replaced
 """);
     }
 
+    /**
+     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
+     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
+     * Inputs - A = divisor; X = enemy slot
+     *
+     * This function updates all the call sites to these two functions to match the HP for the boss.
+     */
+    private static readonly List<int> bossHpAddresses = [
+        0x11451, // Horsehead
+        0x13C86, // Helmethead
+        0x12951, // Rebonack
+        0x13041, // Unhorsed Rebonack
+        0x12953, // Carock
+        0x13C87, // Gooma
+        0x12952, // Barba
+        // These are bank 5 enemies so we should make a separate table for them
+        // but we can deal with these when we start randomizing their hp
+        // 0x15453, // Thunderbird
+        // 0x15454, // Dark Link
+    ];
+    private static readonly List<(int, int)> bossMap = [
+        (bossHpAddresses[0], 0x13b80), // Horsehead
+        (bossHpAddresses[1], 0x13ae2), // Helmethead
+        (bossHpAddresses[2], 0x12fd2), // Rebonack
+        (bossHpAddresses[3], 0x1325c), // Unhorsed Rebonack
+        (bossHpAddresses[4], 0x12e92), // Carock
+        (bossHpAddresses[5], 0x134cf), // Gooma
+        (bossHpAddresses[6], 0x13136), // Barba
+        // 0x13ae9 - unknown; who is this? I'm guessing its a rebonack mini boss thing?
+        // (0x15453, 0x16406), // Thunderbird
+        // (0x15454, 0x158aa), // Dark Link
+    ];
+    private void UpdateAllBossHpDivisor(AsmModule a)
+    {
+        a.Code(/* lang=s */$"""
+.include "z2r.inc"
+.segment "PRG4"
+.reloc
+Bank4BossHpDivisorLo:
+    .byte BOSS_0_HP_DIVISOR_LO, BOSS_1_HP_DIVISOR_LO, BOSS_2_HP_DIVISOR_LO
+    .byte BOSS_3_HP_DIVISOR_LO, BOSS_4_HP_DIVISOR_LO, BOSS_5_HP_DIVISOR_LO
+    .byte BOSS_6_HP_DIVISOR_LO
+
+.reloc
+Bank4BossHpDivisorHi:
+    .byte BOSS_0_HP_DIVISOR_HI, BOSS_1_HP_DIVISOR_HI, BOSS_2_HP_DIVISOR_HI
+    .byte BOSS_3_HP_DIVISOR_HI, BOSS_4_HP_DIVISOR_HI, BOSS_5_HP_DIVISOR_HI
+    .byte BOSS_6_HP_DIVISOR_HI
+
+.define BossHpLo $00
+.define BossHpHi $01
+.define DivisorLo $02
+.define DivisorHi $03
+
+.org $9C45
+    tay
+    lda $C2,x ; Boss HP
+    sta BossHpHi
+    lda Bank4BossHpDivisorLo,y
+    jsr DoDivisionByRepeatedSubtraction
+    nop
+.assert * = $9C51
+
+.reloc
+DoDivisionByRepeatedSubtraction:
+    sta DivisorLo
+    lda Bank4BossHpDivisorHi,y
+    sta DivisorHi
+    ldy #0
+    sty BossHpLo
+    sec
+    @loop:
+        lda BossHpLo
+        sbc DivisorLo
+        sta BossHpLo
+        lda BossHpHi
+        sbc DivisorHi
+        sta BossHpHi
+        iny
+        bcs @loop
+    rts
+
+""");
+        foreach (var (hpaddr, divisoraddr) in bossMap)
+        {
+            int hp = GetByte(hpaddr);
+            Put(divisoraddr, (byte)(hp / 8));
+        }
+    }
+
+    public void RandomizeEnemyStats(Assembler asm, Random RNG)
+    {
+        var a = asm.Module();
+        // bank1_Enemy_Hit_Points at 0x5431 + Enemy ID (Overworld West)
+        RandomizeHP(a, RNG, 0x5434, 0x5453);
+        // bank2_Enemy_Hit_Points at 0x9431 + Enemy ID (Overworld East)
+        RandomizeHP(a, RNG, 0x9434, 0x944E);
+        // bank4_Enemy_Hit_Points0 at 0x11431 + Enemy ID (Palace 125)
+        RandomizeHP(a, RNG, 0x11434, 0x11435); // Myu, Bot
+        RandomizeHP(a, RNG, 0x11437, 0x11454); // Remaining palace enemies
+        // bank4_Enemy_Hit_Points1 at 0x12931 + Enemy ID (Palace 346)
+        RandomizeHP(a, RNG, 0x12934, 0x12935); // Myu, Bot
+        RandomizeHP(a, RNG, 0x12937, 0x12954); // Remaining palace enemies
+        // bank4_Table_for_Helmethead_Gooma
+        RandomizeHP(a, RNG, 0x13C86, 0x13C87); // Helmethead, Gooma
+        // bank5_Enemy_Hit_Points at 0x15431 + Enemy ID (Great Palace)
+        RandomizeHP(a, RNG, 0x15434, 0x15435); // Myu, Bot
+        RandomizeHP(a, RNG, 0x15437, 0x15438); // Moa, Ache
+        RandomizeHP(a, RNG, 0x1543B, 0x1543B); // Acheman
+        RandomizeHP(a, RNG, 0x15440, 0x15443); // Bago Bagos, Ropes
+        RandomizeHP(a, RNG, 0x15445, 0x1544B); // Bubbles, Dragon Head, Fokkas
+        RandomizeHP(a, RNG, 0x1544E, 0x1544E); // Fokkeru
+        RandomizeHP(a, RNG, 0x13041,  0x13041); // Unhorsed Rebo
+
+        // Add the new HP divisors for the bosses
+        UpdateAllBossHpDivisor(a);
+    }
+
+    public void UseOHKOMode(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Segment("PRG7");
+        var WriteHPValue = (int romorg, byte byt) =>
+        {
+            var segment = (romorg - 0x10) / 0x4000;
+            a.Segment($"PRG{segment}");
+            a.RomOrg(romorg);
+            a.Byt(byt);
+        };
+        for (var i = 0; i < 8; i++)
+        {
+            WriteHPValue(0x1E67D + i, 192);
+        }
+        WriteHPValue(0x05432, 193);
+        WriteHPValue(0x09432, 193);
+        WriteHPValue(0x11436, 193);
+        WriteHPValue(0x12936, 193);
+        WriteHPValue(0x15532, 193);
+        WriteHPValue(0x11437, 192);
+        WriteHPValue(0x1143F, 192);
+        WriteHPValue(0x12937, 192);
+        WriteHPValue(0x1293F, 192);
+        WriteHPValue(0x15445, 192);
+        WriteHPValue(0x15446, 192);
+        WriteHPValue(0x15448, 192);
+        WriteHPValue(0x15453, 193);
+        WriteHPValue(0x12951, 227); // Rebonack HP
+    }
+
+    private void RandomizeHP(AsmModule a, Random RNG, int start, int end)
+    {
+        var segment = (start - 0x10) / 0x4000;
+        a.Segment($"PRG{segment}");
+        a.RomOrg(start);
+        for (var i = start; i <= end; i++)
+        {
+            int val = GetByte(i);
+
+            var newVal = Math.Min(RNG.Next((int)(val * 0.5), (int)(val * 1.5)), 255);
+
+            a.Byt((byte)newVal);
+            var idx = bossHpAddresses.IndexOf(i);
+            if (idx > -1)
+            {
+                var (_, addr) = bossMap[idx];
+                a.RomOrg(addr);
+                a.Byt((byte)idx); // Write the index of the boss to the old HP spot
+                // write the new 16bit divisor into some values that we will generate tables with later
+                a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", newVal / 8);
+                // Take the remainder, and convert it into a fractional value out of 256 values
+                a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % 8) << 5);
+                // restore the previous ORG for writing the next byte in the list
+                a.RomOrg(i+1);
+            }
+        }
+    }
+
     public void FixItemPickup(Assembler asm)
     {
         // In Z2R, Link never holds items above his head. So,
@@ -1801,6 +1978,7 @@ RestorePaletteAfterBossKill:
 ResetRedPalettePayload:
     ; 8 byte palette payload for PPU macro
     .byte $3f, $18, $04, $0f, $06, $16, $30, $ff
+
 """);
     }
 
