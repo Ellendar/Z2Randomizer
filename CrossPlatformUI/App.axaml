@@ -6,6 +6,7 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:behaviors="clr-namespace:CrossPlatformUI.Behaviors"
              x:Class="CrossPlatformUI.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -48,6 +49,17 @@
                         " />
                 <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(assists:SelectionControlAssist.InnerForeground)}" />
             </Style>
+        </Style>
+        
+        <!-- Add a default behavior to all of the comboboxes to let the scroll with the mouse wheel -->
+        <Style Selector="ComboBox">
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                    <BehaviorCollection>
+                        <behaviors:ScrollSelectBehavior />
+                    </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
         </Style>
     </Application.Styles>
   <Application.Resources>
