@@ -1536,7 +1536,7 @@ public sealed class EastHyrule : World
                 if (map[passthroughLocation.Ypos - 30 + direction.DeltaY(), passthroughLocation.Xpos + direction.DeltaX()] == Terrain.MOUNTAIN
                     && map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] != Terrain.MOUNTAIN)
                 {
-                    //map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
+                    map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
                 }
             }
         }
