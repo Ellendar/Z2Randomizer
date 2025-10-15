@@ -162,9 +162,24 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
         SaveAsPreset = ReactiveCommand.Create((string name) =>
         {
-            Main.SaveNewPresetViewModel.SavedPresets
-                .First(x => x.Preset == name)
-                .Config = Main.Config;
+            var updatedPreset = new CustomPreset
+            {
+                Preset = name,
+                Config =
+                {
+                    Flags = Main.Config.Flags
+                }
+            };
+            var collection = Main.SaveNewPresetViewModel.SavedPresets;
+            // makeshift FindIndex since ObservableCollection doesn't have one
+            int presetIndex = -1;
+            for (int i = 0; i < collection.Count; i++)
+            {
+                if (collection[i].Preset == name) { presetIndex = i; break; }
+            }
+            if (presetIndex == -1) { throw new Exception("Trying to overwrite preset that does not exist"); }
+            // the entire item has to be set so the ObservableCollection works correctly
+            collection[presetIndex] = updatedPreset;
         });
         ClearSavedPreset = ReactiveCommand.Create((string name) =>
         {

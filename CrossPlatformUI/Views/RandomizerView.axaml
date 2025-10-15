@@ -21,7 +21,7 @@
             <StackPanel Grid.Column="0" Margin="4 8 0 8">
                 <TextBox UseFloatingWatermark="True" Watermark="Paste Flags Here" p1:TextFieldAssist.Label="Flag String" Text="{Binding Flags}">
                     <TextBox.InnerRightContent>
-                        <Button ToolTip.Tip="Presets" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}">
+                        <Button Name="PresetsButton" ToolTip.Tip="Presets" Classes="Flat" Padding="4" Width="{Binding $self.Bounds.Height}">
                             <Button.Content>
                                 <avalonia:MaterialIconExt Kind="OrderBoolAscendingVariant" Size="32"/>
                             </Button.Content>
