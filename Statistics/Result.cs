@@ -29,9 +29,9 @@ class Result
     public int TimeBuildingDM { get; set; }
     public int TimeBuildingMI { get; set; }
 
-    public int ProgressStartToGenerateStartingValues { get; set; }
-    public int ProgressStartingValuesToGenerateEnemies { get; set; }
-    public int ProgressGenerateEnemiesToProcessOverworld { get; set; }
+    // public int ProgressStartToGenerateStartingValues { get; set; }
+    // public int ProgressStartingValuesToGenerateEnemies { get; set; }
+    // public int ProgressGenerateEnemiesToProcessOverworld { get; set; }
 
     public int TotalReachabilityOverworldAttempts { get; set; }
     public int TotalContinentConnectionOverworldAttempts { get; set; }
@@ -77,9 +77,9 @@ class Result
         TimeBuildingMI = hyrule.timeSpentBuildingMI;
         TimeBuildingWest = hyrule.timeSpentBuildingWest;
 
-        ProgressStartToGenerateStartingValues = (int)hyrule.startRandomizeStartingValuesTimestamp.Subtract(hyrule.startTime).TotalMilliseconds;
-        ProgressStartingValuesToGenerateEnemies = (int)hyrule.startRandomizeEnemiesTimestamp.Subtract(hyrule.startRandomizeStartingValuesTimestamp).TotalMilliseconds;
-        ProgressGenerateEnemiesToProcessOverworld = (int)hyrule.firstProcessOverworldTimestamp.Subtract(hyrule.startRandomizeEnemiesTimestamp).TotalMilliseconds;
+        // ProgressStartToGenerateStartingValues = (int)hyrule.startRandomizeStartingValuesTimestamp.Subtract(hyrule.startTime).TotalMilliseconds;
+        // ProgressStartingValuesToGenerateEnemies = (int)hyrule.startRandomizeEnemiesTimestamp.Subtract(hyrule.startRandomizeStartingValuesTimestamp).TotalMilliseconds;
+        // ProgressGenerateEnemiesToProcessOverworld = (int)hyrule.firstProcessOverworldTimestamp.Subtract(hyrule.startRandomizeEnemiesTimestamp).TotalMilliseconds;
 
         TotalReachabilityOverworldAttempts = hyrule.totalReachabilityOverworldAttempts;
         TotalContinentConnectionOverworldAttempts = hyrule.totalContinentConnectionOverworldAttempts;
