@@ -11,6 +11,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
 {
     public MainWindow()
     {
+        InitializeComponent();
         // Prevent the previewer's DataContext from being set when the application is run.
         this.WhenActivated(disposables => {
             var context = DataContext as MainViewModel;
@@ -32,7 +33,7 @@ public partial class MainWindow : ReactiveWindow<MainViewModel>
                 };
             };
         });
-        AvaloniaXamlLoader.Load(this);
+        // AvaloniaXamlLoader.Load(this);
         // var prevSize = ClientSize;
         
         // newPosition = new(WindowX, WindowY);
