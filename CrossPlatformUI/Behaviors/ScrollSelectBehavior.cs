@@ -9,7 +9,7 @@ using Avalonia.Xaml.Interactivity;
 
 namespace CrossPlatformUI.Behaviors;
 
-public class ScrollSelectBehavior : Behavior<ComboBox>
+public class ScrollSelectBehavior : Behavior<Control>
 {
     // Accumulated delta for smooth / throttled scrolling
     private double _scrollAccumulator = 0;
@@ -54,39 +54,58 @@ public class ScrollSelectBehavior : Behavior<ComboBox>
         base.OnDetaching();
     }
 
-    // Scroll through the list of items when rolling the mousewheel over an element.
+    // Scroll through the list of items or increment/decrement a number when rolling the mousewheel over an element.
     private void OnPointerWheelChanged(object? sender, PointerWheelEventArgs e)
     {
-        if (AssociatedObject?.Items is not IEnumerable itemsEnum)
+        if (AssociatedObject == null)
             return;
 
+        var delta = UseNaturalScroll ? -e.Delta.Y : e.Delta.Y;
+        _scrollAccumulator += delta;
+
+        // Only act when threshold exceeded
+        if (Math.Abs(_scrollAccumulator) < ScrollThreshold)
+            return;
+
+        var steps = (int)Math.Floor(Math.Abs(_scrollAccumulator) / ScrollThreshold);
+        var direction = Math.Sign(_scrollAccumulator);
+        _scrollAccumulator %= ScrollThreshold;
+
+        switch (AssociatedObject)
+        {
+            case ComboBox combo:
+                HandleComboBoxScroll(combo, direction * steps);
+                break;
+
+            case NumericUpDown numeric:
+                HandleNumericUpDownScroll(numeric, direction * steps);
+                break;
+        }
+
+        e.Handled = true;
+    }
+
+    private void HandleComboBoxScroll(ComboBox combo, int step)
+    {
+        if (combo.Items is not IEnumerable itemsEnum)
+            return;
+
+        if (combo.IsDropDownOpen)
+            return;
+        
         var items = itemsEnum.Cast<object>().ToList();
         if (items.Count == 0)
             return;
 
-        // Adjust for natural scroll direction
-        var delta = UseNaturalScroll ? -e.Delta.Y : e.Delta.Y;
+        var newIndex = combo.SelectedIndex - step;
+        newIndex = Math.Clamp(newIndex, 0, items.Count - 1);
+        combo.SelectedIndex = newIndex;
+    }
 
-        // Accumulate the delta
-        _scrollAccumulator += delta;
-
-        // Only move when we exceed threshold
-        if (Math.Abs(_scrollAccumulator) >= ScrollThreshold)
-        {
-            int stepCount = (int)Math.Floor(Math.Abs(_scrollAccumulator) / ScrollThreshold);
-            int direction = Math.Sign(_scrollAccumulator);
-
-            var newIndex = AssociatedObject.SelectedIndex - (direction * stepCount);
-
-            // Clamp to valid range
-            newIndex = Math.Clamp(newIndex, 0, items.Count - 1);
-
-            AssociatedObject.SelectedIndex = newIndex;
-
-            // Retain leftover delta (for smoothness)
-            _scrollAccumulator %= ScrollThreshold;
-        }
-
-        e.Handled = true;
+    private void HandleNumericUpDownScroll(NumericUpDown numeric, int step)
+    {
+        var newValue = numeric.Value - (step * numeric.Increment);
+        newValue = Math.Clamp(newValue ?? 0, numeric.Minimum, numeric.Maximum);
+        numeric.Value = newValue;
     }
 }

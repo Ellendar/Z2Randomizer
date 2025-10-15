@@ -71,6 +71,15 @@
                 </BehaviorCollectionTemplate>
             </Setter>
         </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                    <BehaviorCollection>
+                        <behaviors:ScrollSelectBehavior />
+                    </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+        </Style>
     </Application.Styles>
   <Application.Resources>
     <converters:SumOfValuesLessThanConverter x:Key="SumOfValuesLessThanConverter"/>
