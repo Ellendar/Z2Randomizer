@@ -25,7 +25,14 @@ public partial class OverworldView : ReactiveUserControl<MainViewModel>
             var forestObservable = generateHiddenKasutoTile.GetObservable(CheckBox.IsCheckedProperty);
 
             rockObservable.CombineLatest(forestObservable, (rock, forest) => (rock ?? true) || (forest ?? true))
-                .Subscribe(possibleHiddenEastTile => { shuffleWhichLocationsAreHidden.IsEnabled = possibleHiddenEastTile; })
+                .Subscribe(possibleHiddenEastTile =>
+                { 
+                    shuffleWhichLocationsAreHidden.IsEnabled = possibleHiddenEastTile;
+                    if (!possibleHiddenEastTile)
+                    {
+                        shuffleWhichLocationsAreHidden.IsChecked = false;
+                    }
+                })
                 .DisposeWith(disposables);
         });
     }
