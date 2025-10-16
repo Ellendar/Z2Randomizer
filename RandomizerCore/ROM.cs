@@ -1748,7 +1748,7 @@ DoDivisionByRepeatedSubtraction:
     sta DivisorHi
     ldy #0
     sty BossHpLo
-    sec
+    clc ; intentionally subtract an extra 1 which makes the math line up better
     @loop:
         lda BossHpLo
         sbc DivisorLo
@@ -1850,8 +1850,7 @@ DoDivisionByRepeatedSubtraction:
             // This way the boss can accurately represent over and under HP values
             a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", originalDivisor);
             // Take the remainder, and convert it into a fractional value out of 256 values
-            // The +1 works around an issue when the boss HP is exactly a multiple of the divisor
-            a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor) + 1);
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor));
             // restore the previous ORG for writing the next byte in the list
             a.RomOrg(i+1);
         }
