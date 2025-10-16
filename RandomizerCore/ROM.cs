@@ -1719,6 +1719,27 @@ Bank4BossHpDivisorHi:
     jsr DoDivisionByRepeatedSubtraction
     nop
 .assert * = $9C51
+.org $9C7A
+    jmp HandleOverHP 
+.reloc
+HandleOverHP:
+    dey ; 1 or below means that the boss is 100% or less HP, so no over health
+    bmi @Exit
+        ; Change the tile ID to represent over health on a boss.
+        ldx #$1c
+        lda #$c5
+@overhp:
+        sta $02c1, x
+        dex
+        dex
+        dex
+        dex
+        dey
+        bpl @overhp  
+@Exit:
+    ; Do the original code
+    ldx $10
+    rts
 
 .reloc
 DoDivisionByRepeatedSubtraction:
@@ -1819,18 +1840,20 @@ DoDivisionByRepeatedSubtraction:
 
             a.Byt((byte)newVal);
             var idx = bossHpAddresses.IndexOf(i);
-            if (idx > -1)
-            {
-                var (_, addr) = bossMap[idx];
-                a.RomOrg(addr);
-                a.Byt((byte)idx); // Write the index of the boss to the old HP spot
-                // write the new 16bit divisor into some values that we will generate tables with later
-                a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", newVal / 8);
-                // Take the remainder, and convert it into a fractional value out of 256 values
-                a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % 8) << 5);
-                // restore the previous ORG for writing the next byte in the list
-                a.RomOrg(i+1);
-            }
+            // If this isn't a boss skip adding it to the boss HP table
+            if (idx <= -1) continue;
+            var (_, addr) = bossMap[idx];
+            var originalDivisor = GetByte(addr);
+            a.RomOrg(addr);
+            a.Byt((byte)idx); // Write the index of the boss to the old HP spot
+            // we keep the original divisor, but add a remainder value.
+            // This way the boss can accurately represent over and under HP values
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", originalDivisor);
+            // Take the remainder, and convert it into a fractional value out of 256 values
+            // The +1 works around an issue when the boss HP is exactly a multiple of the divisor
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor) + 1);
+            // restore the previous ORG for writing the next byte in the list
+            a.RomOrg(i+1);
         }
     }
 
@@ -1876,7 +1899,6 @@ FREE_UNTIL $e54f
 .include "z2r.inc"
 .import SwapCHR
 
-SideViewInit = $8CE1
 EnemyFacingDirection = $DC91
 CurrentPRGBank = $0769
 CurrentCHRBank = $076E
