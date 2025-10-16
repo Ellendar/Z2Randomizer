@@ -5,6 +5,9 @@
 ;.import REFLECT_SPELL_ITEMLOC, FIRE_SPELL_ITEMLOC, SPELL_SPELL_ITEMLOC, THUNDER_SPELL_ITEMLOC
 ;.import UPSTAB_ITEMLOC, DOWNSTAB_ITEMLOC, MIRROR_ITEMLOC, BAGU_ITEMLOC, WATER_ITEMLOC
 
+; $05 ; Chooses which dialog table to use (ie: which dialog state you are in)
+; $048c ; Changes which "person" you are, affects the offset
+
 ; These are two unused locations in the save game that we can use for custom item get flags
 LocationTableMisc = $0795
 LocationTableWizard = $077a
@@ -193,6 +196,8 @@ TownToItemTable:
 ; we call the get item for this spot
 AlreadyHaveItemAtLocationExit:
     pla
+    inc $05 ; Chooses which dialog table to use (ie: which dialog state you are in)
+    inc $048c ; Changes which "person" you are, affects the offset
     jmp DialogConditionsDefault
 CheckGetItemCustomLocationMisc:
     ; Y contains the location id 0 - 4
