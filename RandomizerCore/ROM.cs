@@ -1532,9 +1532,18 @@ DripReturn:
 .include "z2r.inc"
 .segment "PRG3"
 
-; expand the number of rows for the dialog boxes
 
-.org $B0D7
+DialogActionLoadTextPtr = $b480
+DialogActionDrawBox = $b0d2
+DrawTwoRowsOfTiles = $b2f2
+
+DialogPtr = $569
+
+; expand the number of rows for the dialog boxes
+.org $B0D2
+    jsr CheckForDialogEnd
+    asl
+    tay
     lda DialogMenuRow1Tiles,y
     sta $02
     lda DialogMenuRow1Tiles+1,y
@@ -1544,8 +1553,27 @@ DripReturn:
     lda DialogMenuRow2Tiles+1,y
     sta $05
 
-.org $B103
-    cmp #7 ; draw 2 extra sets of rows
+.org $B100
+    jsr LoadCurrentLineNumber
+    cmp #7 ; draw up to 6 rows of text instead of the vanilla 4
+
+.reloc
+CheckForDialogEnd:
+    lda $0525
+    bne @skipResettingDialog
+        ; First line of text, so reset dialog complete flag
+        sta DialogCompleteTmp
+@skipResettingDialog:
+    rts
+
+.reloc
+LoadCurrentLineNumber:
+    lda $0525 ; load the original line number
+    bit DialogCompleteTmp
+    bpl @keepdrawing
+        lda #7
+@keepdrawing:
+    rts
 
 LineWithCorners = $B407
 BlankLine = $B415
@@ -1574,12 +1602,6 @@ DialogMenuRow2Tiles:
     .word LineWithCorners
 
 
-DialogActionLoadTextPtr = $b480
-DialogActionDrawBox = $b0d2
-DrawTwoRowsOfTiles = $b2f2
-
-DialogPtr = $569
-
 ; Swap the dialog action pointers for loading the text pointer and the dialog draw box
 .org $b0b9 ; actions 4 and 5
     .word DialogActionLoadTextPtr
@@ -1590,10 +1612,9 @@ DialogPtr = $569
     jsr InstantDialog
 .reloc
 InstantDialog:
-    ; Run the original code to draw two rows of tiles
-    jsr DrawTwoRowsOfTiles
-    ; save the Draw Macro current write offset since the later code uses y
-    sty $362
+    ; Check the current line, no text on lines 0-1 so skip it
+    lda $0525
+    beq Exit
 
     ; Save the values in $00 which is used later for calculating the attribute offset
     ; We could use any other unused zp temp (i originally used $09-0a) but this is just
@@ -1603,21 +1624,10 @@ InstantDialog:
     lda $01
     pha
 
-    ; Check the current line, no text on lines 0-1 so skip it
-    lda $525
-    beq Exit
-
     lda #$60 ; 60 = typewriter sound
     sta $ec  ; Sound Effects Type 1
-    ; If the current offset isn't on a $f4 tile, then move ahead until we get to it
-    ; This will happen if the text box is split across multiple nametables
     ldx #0
-FindNextF4:
-    lda $368,x
-    cmp #$f4
-    beq StartReadingLetters
-        inx
-        bne FindNextF4
+    lda $053E+2,x ; + 2 to skip the left edge and space
 StartReadingLetters:
     ldy #0
     ; Load the current pointer for the text and see if we reached the end.
@@ -1629,21 +1639,22 @@ StartReadingLetters:
 ReadLetterLoop:
     ; if its FF then its end of string so just exit
     cmp #$ff
-    beq ExitUpdatePtr
+    bne NotDialogEnd
+        lda $0525 ; current line
+        cmp #4 ; give at least 4 lines of text so vanilla lovers don't complain
+        bmi ExitUpdatePtr
+            ; Dialog is complete, so lets shut this puppy down.
+            ; Signal to the code to stop drawing the text box early
+            dec DialogCompleteTmp
+            bne ExitUpdatePtr ; unconditional
+NotDialogEnd:
     ; Read each letter until the end of the line
     cmp #$fc
     bcs NextLine
     ; Draw the current letter over the blank space that we are rendering
-    sta $368,x
+    sta $053E+2,x
     ; Move to the next spot in ram and check that its a blank space before writing.
     inx
-FindNextF4Again:
-    lda $368,x
-    cmp #$f4
-    beq F4Found
-        inx
-        bne FindNextF4Again
-F4Found:
     iny
     lda ($00),y
     jmp ReadLetterLoop
@@ -1656,16 +1667,33 @@ ExitUpdatePtr:
     clc
     adc DialogPtr+0
     sta DialogPtr+0
-    bcc Exit
+    bcc ExitPop
         inc DialogPtr+1
-Exit:
+ExitPop:
     ; restore the saved values in $00 and $01
     pla
     sta $01
     pla
     sta $00
-    ldy $362
-    rts
+
+    lda DialogCompleteTmp
+    beq @notcomplete
+        ; Done drawing the string, so just copy over the final closing tiles
+        ldy #13
+        lda #<LineWithCorners
+        sta $04
+        lda #>LineWithCorners
+        sta $05
+        @copyline:
+            lda ($04),y
+            sta $054C,y
+            dey
+            bpl @copyline
+@notcomplete:
+Exit:
+    ; Run the original code to draw two rows of tiles
+    jmp DrawTwoRowsOfTiles
+
 """, "instant_text.s");
     }
 
