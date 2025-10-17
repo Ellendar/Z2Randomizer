@@ -28,11 +28,41 @@ FREE "PRG7" [$FEAA, $FFE8)
 bank7_code0 = $c000
 
 
+; Use the HP tile instead of the original sprite zero sliver tile
+; This frees up tile $c5
+.segment "PRG0"
+.org $8CDD
+    .byte $0f, $6e, $21, $68
+
+.segment "PRG7"
 ; Replace the code to wait for sprite 0 with code to set up the scanline IRQ
 .org $d4b2
     jsr SetupScanlineIRQ
     jmp $D4CE
 FREE_UNTIL $D4CE
+
+; Do this for the other places that also wait for sprite zero like opening the menu
+.segment "PRG0"
+.org $9D59
+    jsr SetupScanlineIRQ
+    jmp $9D75
+FREE_UNTIL $9D75
+.segment "PRG0"
+.org $9DB0
+    jmp SetupScanlineIRQ
+FREE_UNTIL $9DCC
+.segment "PRG0"
+.org $A7AB
+    jsr SetupScanlineIRQ
+    jmp $A7CD
+FREE_UNTIL $A7CD
+.segment "PRG3"
+.org $B089
+    jsr SetupScanlineIRQ
+    jmp $B0AB
+FREE_UNTIL $B0AB
+
+.segment "PRG7"
 
 .reloc
 SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weird issues on double lags
