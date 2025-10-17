@@ -71,41 +71,44 @@ public class ScrollSelectBehavior : Behavior<Control>
         var direction = Math.Sign(_scrollAccumulator);
         _scrollAccumulator %= ScrollThreshold;
 
+        var handled = false;
         switch (AssociatedObject)
         {
             case ComboBox combo:
-                HandleComboBoxScroll(combo, direction * steps);
+                handled = HandleComboBoxScroll(combo, direction * steps);
                 break;
 
             case NumericUpDown numeric:
-                HandleNumericUpDownScroll(numeric, direction * steps);
+                handled = HandleNumericUpDownScroll(numeric, direction * steps);
                 break;
         }
 
-        e.Handled = true;
+        e.Handled = handled;
     }
 
-    private void HandleComboBoxScroll(ComboBox combo, int step)
+    private bool HandleComboBoxScroll(ComboBox combo, int step)
     {
         if (combo.Items is not IEnumerable itemsEnum)
-            return;
+            return false;
 
         if (combo.IsDropDownOpen)
-            return;
+            return false;
         
         var items = itemsEnum.Cast<object>().ToList();
         if (items.Count == 0)
-            return;
+            return false;
 
         var newIndex = combo.SelectedIndex - step;
         newIndex = Math.Clamp(newIndex, 0, items.Count - 1);
         combo.SelectedIndex = newIndex;
+        return true;
     }
 
-    private void HandleNumericUpDownScroll(NumericUpDown numeric, int step)
+    private bool HandleNumericUpDownScroll(NumericUpDown numeric, int step)
     {
-        var newValue = numeric.Value - (step * numeric.Increment);
+        var newValue = numeric.Value + (step * numeric.Increment);
         newValue = Math.Clamp(newValue ?? 0, numeric.Minimum, numeric.Maximum);
         numeric.Value = newValue;
+        return true;
     }
 }
