@@ -15,6 +15,7 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
 using DynamicData;
+using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using Z2Randomizer.RandomizerCore;
@@ -112,7 +113,7 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 
     private readonly SourceList<LoadedCharacterSprite> options = new();
     [JsonIgnore]
-    public ReadOnlyObservableCollection<LoadedCharacterSprite>? Options { get; private set; }
+    public ObservableCollectionExtended<LoadedCharacterSprite> Options { get; } = new();
     [JsonIgnore]
     public ViewModelActivator Activator { get; }
 
@@ -133,28 +134,30 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
     {
         options
             .Connect()
-            .Bind(out var newSpriteList)
+            .Bind(Options)
             .Subscribe()
             .DisposeWith(disposables);
-        Options = newSpriteList;
+
+        var hasRomObservable = Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false);
 
         this.WhenAnyValue(
             x => x.Main.Config.Sprite,
             x => x.Main.Config.Tunic,
             x => x.Main.Config.SkinTone,
-            x => x.Main.Config.TunicOutline,
+            x => x.Main.Config.TunicOutline
             // x => x.Main.Config.ShieldTunic,
             // x => x.Main.Config.BeamSprite,
-            x => x.Main.RomFileViewModel.HasRomData
         )
-            .Where(tuple => tuple.Item5) // filter emits that don't have rom data
-            .Select(tuple => (
-                tuple.Item1?.DisplayName,
-                tuple.Item2,
-                tuple.Item3,
-                tuple.Item4
+            .WithLatestFrom(hasRomObservable)
+            .Where(t => t.Second.Value)
+            .Select(t => (
+                t.First.Item1?.DisplayName, // making selected Sprite a string compare instead of an object compare
+                t.First.Item2,
+                t.First.Item3,
+                t.First.Item4
             ))
             .DistinctUntilChanged() // filter emits where nothing has changed
+            .Throttle(TimeSpan.FromMilliseconds(20))
             .Subscribe(tuple => {
                 backgroundUpdateTask.CancelAsync().ToObservable().Subscribe(_ =>
                 {
@@ -164,9 +167,8 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
             })
             .DisposeWith(disposables);
 
-        Main.RomFileViewModel
-            .ObservableForProperty(x => x.HasRomData, false, false)
-            .Where(x => x.Value)
+        hasRomObservable
+            .Where(hasRom => hasRom.Value)
             .Subscribe(x =>
                 {
                     // this will be called every time you switch to the tab, but
