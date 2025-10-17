@@ -186,7 +186,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? shuffleWhichLocationIsHidden;
 
     [Reactive]
-    private bool? hideLessImportantLocations;
+    private LessImportantLocationsOption lessImportantLocationsOption;
 
     [Reactive]
     private bool? restrictConnectionCaveShuffle;
@@ -1103,6 +1103,20 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShuffleHidden = shuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
         properties.CanWalkOnWaterWithBoots = goodBoots ?? GetIndeterminateFlagValue(r);
         properties.BagusWoods = generateBaguWoods ?? GetIndeterminateFlagValue(r);
+        if (lessImportantLocationsOption == LessImportantLocationsOption.RANDOM)
+        {
+            properties.LessImportantLocationsOption = r.Next(3) switch
+            {
+                0 => LessImportantLocationsOption.HIDE,
+                1 => LessImportantLocationsOption.ISOLATE,
+                2 => LessImportantLocationsOption.REMOVE,
+                _ => throw new ImpossibleException("Invalid LessImportantLocationsOption random option in Export")
+            };
+        }
+        else
+        {
+            properties.LessImportantLocationsOption = LessImportantLocationsOption;
+        }
         if(riverDevilBlockerOption == RiverDevilBlockerOption.RANDOM)
         {
             properties.RiverDevilBlockerOption = r.Next(3) switch
@@ -1118,6 +1132,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.RiverDevilBlockerOption = riverDevilBlockerOption;
         }
         properties.EastRocks = eastRocks ?? GetIndeterminateFlagValue(r);
+        properties.SaneCaves = RestrictConnectionCaveShuffle ?? GetIndeterminateFlagValue(r);
 
         properties.StartGems = r.Next(palacesToCompleteMin, palacesToCompleteMax + 1);
         properties.RequireTbird = tBirdRequired ?? GetIndeterminateFlagValue(r);
@@ -1192,6 +1207,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r);
         properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r);
         properties.ShuffleDripper = shuffleDripperEnemy;
+        properties.SpellEnemy = randomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
         properties.ShuffleEnemyPalettes = shuffleSpritePalettes;
         properties.EnemyXPDrops = enemyXPDrops;
 
@@ -1209,9 +1225,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.MagicCap = magicLevelCap;
         properties.LifeCap = lifeLevelCap;
         properties.ScaleLevels = scaleLevelRequirementsToCap;
-        properties.HideLessImportantLocations = hideLessImportantLocations ?? GetIndeterminateFlagValue(r);
-        properties.SaneCaves = restrictConnectionCaveShuffle ?? GetIndeterminateFlagValue(r);
-        properties.SpellEnemy = randomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
 
         //Items
         properties.ShuffleOverworldItems = shuffleOverworldItems ?? GetIndeterminateFlagValue(r);

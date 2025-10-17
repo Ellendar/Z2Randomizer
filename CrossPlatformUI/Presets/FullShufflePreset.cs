@@ -28,7 +28,7 @@ public static class FullShufflePreset
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = true,
         GenerateBaguWoods = false,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,

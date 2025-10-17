@@ -504,11 +504,21 @@ cabin similar to vanilla.
 If disabled, Bagu&apos;s cabin is an isolated forest tile surrounded on all sides by other
 terrain.</value>
 	</data>
-	<data name="HideLessImportantLocationsToolTip" xml:space="preserve">
-<value>If enabled, locations that only contain minor items or have no value will be hidden within
-more of the same terrain.
+	<data name="LessImportantLocationsToolTip" xml:space="preserve">
+<value>How to handle overworld tiles that contain minor things like red jars, fairies or P-bags.
 
-If disabled, all such tiles will be surrounded on all sides by other terrain.</value>
+Blend In:
+These tiles will be hidden among other tiles of the same terrain.
+
+Isolate:
+These tiles will be surrounded on all sides by other terrain, just like major item
+location tiles.
+
+Remove:
+Remove these tiles from the game.
+
+Random:
+Pick one of the above at random.</value>
 	</data>
 	<data name="AllWaterIsWalkableWithBootsToolTip" xml:space="preserve">
 <value>If enabled, all water tiles can be walked on with boots. If unselected, the only walkable
