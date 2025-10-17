@@ -2,7 +2,7 @@
   "profiles": {
     "CommandLine": {
       "commandName": "Project",
-      "commandLineArgs": "-c C:\\Workspace\\Z2Randomizer_4_4\\CommandLine\\Sample.json -r C:\\emu\\nes\\roms\\Zelda2.nes -s 12345678"
+      "commandLineArgs": "-c ../../../Sample.json -r ../../../../Zelda2.nes -s 12345678 -o ../../../.."
     }
   }
 }
