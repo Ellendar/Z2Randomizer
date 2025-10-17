@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DynamicData.Kernel;
 using NLog;
 using Z2Randomizer.RandomizerCore.Overworld;
 
@@ -385,11 +386,11 @@ public class CustomTexts
             {
                 texts[70] = new Text("USE THIS$TO GO$FAST");
             }
-            if (props.SwapUpAndDownStab)
+            GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
+            if (props.SwapUpAndDownStab && !props.IncludeSwordTechsInShuffle)
             {
                 (texts[upstabGuyGotItemTextIndex], texts[downstabGuyGotItemTextIndex]) = (texts[downstabGuyGotItemTextIndex], texts[upstabGuyGotItemTextIndex]);
             }
-            GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
 
             if (props.SpellItemHints)
             {
@@ -554,7 +555,9 @@ public class CustomTexts
         }
         Town town = (Town)location.ActualTown;
         Collectable collectable = location.Collectables[0];
-        if (collectable.IsSpell())
+        if (collectable.IsSpell() 
+            || collectable == Collectable.DOWNSTAB 
+            || collectable == Collectable.UPSTAB)
         {
             //If it's a spell, use the old behavior
             if(useCommunityText)
