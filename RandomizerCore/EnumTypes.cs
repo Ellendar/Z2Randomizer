@@ -595,6 +595,19 @@ public enum IndeterminateOptionRate
     NINETY_PERCENT
 }
 
+[DefaultValue(HIDE)]
+public enum LessImportantLocationsOption
+{
+    [Description("Blend In")]
+    HIDE,
+    [Description("Isolate")]
+    ISOLATE,
+    [Description("Remove")]
+    REMOVE,
+    [Description("Random")]
+    RANDOM,
+}
+
 [DefaultValue(PATH)]
 public enum RiverDevilBlockerOption
 {
@@ -682,6 +695,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
     public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
+    public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
+
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();
     public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions<NesColor>();
     public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();

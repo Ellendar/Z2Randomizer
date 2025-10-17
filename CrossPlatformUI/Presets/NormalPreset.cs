@@ -28,7 +28,7 @@ public static class NormalPreset
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = true,
         GenerateBaguWoods = false,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.REMOVE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,

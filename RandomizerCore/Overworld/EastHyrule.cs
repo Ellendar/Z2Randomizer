@@ -320,7 +320,7 @@ public sealed class EastHyrule : World
                 location.TerrainType = terrains[location.MemAddress];
             }
         }
-        if (props.HideLessImportantLocations)
+        if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
         {
             unimportantLocs =
             [
@@ -481,7 +481,7 @@ public sealed class EastHyrule : World
                         location.TerrainType = terrains[location.MemAddress];
                     }
                 }
-                if (props.HideLessImportantLocations)
+                if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
                 {
                     unimportantLocs = new List<Location>
                     {
@@ -764,7 +764,7 @@ public sealed class EastHyrule : World
 
                 bool riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.CAVE;
                 bool rockBlock = props.EastRocks && !props.EastRockIsPath;
-                PlaceHiddenLocations();
+                PlaceHiddenLocations(props.LessImportantLocationsOption);
                 BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock, hiddenPalaceLocation, hiddenKasutoLocation);
                 riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH;
                 rockBlock = props.EastRocks && props.EastRockIsPath;
