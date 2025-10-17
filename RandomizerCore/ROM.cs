@@ -1528,8 +1528,51 @@ DripReturn:
 
     public void InstantText(Assembler a)
     {
-        a.Module().Code("""
+        a.Module().Code(/* lang=s */"""
+.include "z2r.inc"
 .segment "PRG3"
+
+; expand the number of rows for the dialog boxes
+
+.org $B0D7
+    lda DialogMenuRow1Tiles,y
+    sta $02
+    lda DialogMenuRow1Tiles+1,y
+    sta $03
+    lda DialogMenuRow2Tiles,y
+    sta $04
+    lda DialogMenuRow2Tiles+1,y
+    sta $05
+
+.org $B103
+    cmp #7 ; draw 2 extra sets of rows
+
+LineWithCorners = $B407
+BlankLine = $B415
+
+.org $B3F3 ; Clear the original table for the dialog boxes
+    FREE_UNTIL LineWithCorners
+
+.reloc
+DialogMenuRow1Tiles:
+    .word LineWithCorners
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine ; Add two extra lines
+    .word BlankLine
+
+.reloc
+DialogMenuRow2Tiles:
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine ; And the matching two extra lines
+    .word BlankLine
+    .word LineWithCorners
+
 
 DialogActionLoadTextPtr = $b480
 DialogActionDrawBox = $b0d2
