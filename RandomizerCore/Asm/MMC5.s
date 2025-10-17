@@ -154,6 +154,9 @@ HandleLagFrame:
     sta $2005
 
 
+    ; Disabled the "glove in hud" for now. Keeping the code here cause i like it still.
+    ; delete this code if you hate fun.
+
     ; Here be dragons :) Write directly to OAM through OAMDATA to set a "lag sprite"
     ; There's two sources of corruptions when doing this that we need to avoid.
     ; The first is when you write to OAMADDR, it will corrupt the 8 bytes at that address
@@ -163,27 +166,27 @@ HandleLagFrame:
 
     ; But theres one hold up, the sprites at $f8 and $fc are the life bar sprites, so instead
     ; we can start the write from $f4 and write to the end still
-    lda #$f4
-    sta $2003 ; OAMADDR
+;    lda #$f4
+;    sta $2003 ; OAMADDR
     ; and write a Hand sprite
     
-    lda #$0e  ; y = 14
-    sta $2004 ; OAMDATA
-    lda #$8E  ; tile = hand sprite
-    sta $2004 ; OAMDATA
-    lda #1    ; attr = palette 1
-    sta $2004 ; OAMDATA
-    lda #248  ; x = 248
-    sta $2004 ; OAMDATA
+;    lda #$0e  ; y = 14
+;    sta $2004 ; OAMDATA
+;    lda #$8E  ; tile = hand sprite
+;    sta $2004 ; OAMDATA
+;    lda #1    ; attr = palette 1
+;    sta $2004 ; OAMDATA
+;    lda #248  ; x = 248
+;    sta $2004 ; OAMDATA
 
     ; Load the current health/magic bar into here
     ; That should prevent sprite corruption since the internal OAM ADDR ends at #0
-    ldx #$f8
-    @loop:
-        lda $200,x
-        sta $2004
-        inx
-        bne @loop
+;    ldx #$f8
+;    @loop:
+;        lda $200,x
+;        sta $2004
+;        inx
+;        bne @loop
     jsr SetupScanlineIRQ
 @HandleAudio:
     ; Skip processing audio during a real lag frame since thats what
