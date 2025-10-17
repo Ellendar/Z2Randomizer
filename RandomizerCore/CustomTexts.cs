@@ -387,10 +387,6 @@ public class CustomTexts
                 texts[70] = new Text("USE THIS$TO GO$FAST");
             }
             GenerateWizardTexts(texts, locations, nonhashRNG, props.UseCommunityText);
-            if (props.SwapUpAndDownStab && !props.IncludeSwordTechsInShuffle)
-            {
-                (texts[upstabGuyGotItemTextIndex], texts[downstabGuyGotItemTextIndex]) = (texts[downstabGuyGotItemTextIndex], texts[upstabGuyGotItemTextIndex]);
-            }
 
             if (props.SpellItemHints)
             {

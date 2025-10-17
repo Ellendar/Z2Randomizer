@@ -1256,6 +1256,17 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 properties.Smallkey = !smallEnemiesCanDropKey && randomizeDrops ? r.Next(2) == 1 : smallEnemiesCanDropKey;
             } while (properties is { Smallbluejar: false, Smallredjar: false, Small50: false, Small100: false, Small200: false, Small500: false, Small1up: false, Smallkey: false });
         }
+        else
+        {
+            properties.Smallbluejar = smallEnemiesCanDropBlueJar;
+            properties.Smallredjar = smallEnemiesCanDropRedJar;
+            properties.Small50 = smallEnemiesCanDropSmallBag;
+            properties.Small100 = smallEnemiesCanDropMediumBag;
+            properties.Small200 = smallEnemiesCanDropLargeBag;
+            properties.Small500 = smallEnemiesCanDropXLBag;
+            properties.Small1up = smallEnemiesCanDrop1up;
+            properties.Smallkey = smallEnemiesCanDropKey;
+        }
         if (randomizeDrops)
         {
             do
@@ -1269,6 +1280,17 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 properties.Large1up = !largeEnemiesCanDrop1up && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDrop1up;
                 properties.Largekey = !largeEnemiesCanDropKey && randomizeDrops ? r.Next(2) == 1 : largeEnemiesCanDropKey;
             } while (properties is { Largebluejar: false, Largeredjar: false, Large50: false, Large100: false, Large200: false, Large500: false, Large1up: false, Largekey: false });
+        }
+        else
+        {
+            properties.Largebluejar = largeEnemiesCanDropBlueJar;
+            properties.Largeredjar = largeEnemiesCanDropRedJar;
+            properties.Large50 = largeEnemiesCanDropSmallBag;
+            properties.Large100 = largeEnemiesCanDropMediumBag;
+            properties.Large200 = largeEnemiesCanDropLargeBag;
+            properties.Large500 = largeEnemiesCanDropXLBag;
+            properties.Large1up = largeEnemiesCanDrop1up;
+            properties.Largekey = largeEnemiesCanDropKey;
         }
         properties.StandardizeDrops = standardizeDrops;
         properties.RandomizeDrops = randomizeDrops;
