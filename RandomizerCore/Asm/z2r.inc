@@ -195,6 +195,9 @@ NmiBankShadow8 = $6380
 NmiBankShadowA = $6381
 SoftDisableNmi = $6382
 
+; Flag to store if the dialog has ended
+DialogCompleteTmp = $0523
+
 StatTrackingBase = $6383
 SET_RES_BASE StatTrackingBase
 
