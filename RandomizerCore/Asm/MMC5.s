@@ -43,7 +43,7 @@ FREE_UNTIL $D4CE
 
 ; Do this for the other places that also wait for sprite zero like opening the menu
 .segment "PRG0"
-.org $9D59
+.org $9D56
     jsr SetupScanlineIRQ
     jmp $9D75
 FREE_UNTIL $9D75
