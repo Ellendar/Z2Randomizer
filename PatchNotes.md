@@ -1,5 +1,30 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.2 - October 17, 2025
+
+### New stuff
+- Added additional options for handling less important overworld locations
+- Updated town text boxes to 6 lines.
+	- All shortened item names in text are now full names
+- Boss HP bar now shows differently colored boxes for health beyond the vanilla amount.
+- Boss HP bars are now more consistent amounts of HP.
+- Updated Maze Island river generation
+	- River opening can no longer be wide on one end.
+	- River forks are now equally likely to appear at all X values
+	- River can now open from either end of the maze (or both)
+- Added Guma sprite
+- Slightly updated the name of some flags to be more accurate.
+
+### Bug fixes
+- Fixed several UI bugs and made some minor improvements.
+- Fixed vanilla text for stab trainers.
+- Fixed a bug preventing overwriting custom flag presets.
+- Fixed a bug with the command line version.
+- Fixed a bug where valley of death encounters could allow users to walk into the mountain. (For real this time)
+- Disabled a new room that was inadvertently set as a 4.0 room.
+- Fixed a bug where vertical bubbles in GP could not be blocked.
+- Fixed "I know nothing" text for some townsfolk.
+
 ## Version 5.0.1 - October 12, 2025
 
 - Added a sprite color picker with more colors.
