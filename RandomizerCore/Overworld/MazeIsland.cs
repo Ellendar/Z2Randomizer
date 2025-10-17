@@ -204,7 +204,6 @@ sealed class MazeIsland : World
                 }
 
 
-
                 //generate maze
                 int currx = 2;
                 int curry = starty;
@@ -304,24 +303,21 @@ sealed class MazeIsland : World
                 map[palace4y + 1, palace4x - 1] = Terrain.ROAD;
 
                 //draw a river
-                int riverStartY = starty;
-                while (riverStartY == starty)
+                int riverStartY;
+                do
                 {
                     riverStartY = RNG.Next(10) * 2 + 1;
                 }
+                while (riverStartY == starty);
 
                 int riverEndY = RNG.Next(10) * 2 + 1;
-
-                /*
-                Location riverStart = new Location();
-                riverStart.Xpos = 1;
-                riverStart.Ypos = riverStartY + 30;
-
-                Location riverEnd = new Location();
-                riverEnd.Xpos = 21;
-                riverEnd.Ypos = riverEndY + 30;
-                */
-                DrawLine(riverStartY, 1, riverEndY, 21, Terrain.WALKABLEWATER);
+                bool openWest, openEast;
+                do
+                {
+                    openWest = RNG.Next(2) == 1;
+                    openEast = RNG.Next(2) == 1;
+                } while (!openWest && !openEast);
+                DrawRiver(riverStartY, 1, riverEndY, 21, openWest, openEast);
 
                 //Place raft
                 Direction raftDirection = Direction.EAST;
@@ -777,32 +773,33 @@ sealed class MazeIsland : World
         return x;
     }
 
-    private void DrawLine((int, int) from, (int, int) to, Terrain t)
+    private void DrawRiver(int fromY, int fromX, int toY, int toX, bool openWest, bool openEast)
     {
-        DrawLine(from.Item1, from.Item2, to.Item1, to.Item2, t);
-    }
-
-    private void DrawLine(int fromY, int fromX, int toY, int toX, Terrain terrain)
-    {
+        //3,5,7,9,11,13,15,17,19
+        int xPivot = 1 + RNG.Next(fromX, toX / 2) * 2;
+        Terrain terrain = Terrain.WALKABLEWATER;
+        int startX = fromX;
+        int startY = fromY;
         while (fromX != toX)
         {
-            if (fromX == 21 || (RNG.NextDouble() > .5 && fromX != toX))
+            if (fromX == 21 || (fromX != xPivot || fromY == toY) && fromX != toX)
             {
-                int diff = toX - fromX;
-                int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
+                int deltaX = toX - fromX;
+                int move = (RNG.Next(Math.Abs(deltaX / 2)) + 1) * 2;
 
- 
-                while (Math.Abs(move) > 0 && !(fromX == toX && fromY == toY))
+
+                while (Math.Abs(move) > 0 && !(fromX == xPivot && fromY != toY) && !(fromX == toX && fromY == toY))
                 {
+                    //Move 2 tiles at a time
                     for (int i = 0; i < 2; i++)
                     {
-                        if ((fromX != toX || fromY != (toY)) && GetLocationByCoords((fromY, fromX)) == null)
+                        if ((fromX != toX || fromY != toY) && GetLocationByCoords((fromY, fromX)) == null)
                         {
-                            if(map[fromY, fromX] == Terrain.MOUNTAIN)
+                            if (map[fromY, fromX] == Terrain.MOUNTAIN)
                             {
                                 map[fromY, fromX] = terrain;
                             }
-                            else if (map[fromY, fromX] == Terrain.ROAD && ((diff > 0 && (map[fromY, fromX + 1] == Terrain.MOUNTAIN)) || (diff < 0 && map[fromY, fromX - 1] == Terrain.MOUNTAIN)))
+                            else if (map[fromY, fromX] == Terrain.ROAD && ((deltaX > 0 && (map[fromY, fromX + 1] == Terrain.MOUNTAIN)) || (deltaX < 0 && map[fromY, fromX - 1] == Terrain.MOUNTAIN)))
                             {
                                 map[fromY, fromX] = Terrain.BRIDGE;
                             }
@@ -812,22 +809,22 @@ sealed class MazeIsland : World
                             }
 
                         }
-                        if (diff > 0 && fromX < MAP_COLS - 1)
+                        if (deltaX > 0 && fromX < MAP_COLS)
                         {
                             fromX++;
-                            
+
                         }
                         else if (fromX > 0)
                         {
                             fromX--;
-                            
+
                         }
-                        
+
                         move--;
                     }
                 }
             }
-            else if(fromY != toY)
+            else if (fromY != toY)
             {
                 int diff = toY - fromY;
                 int move = (RNG.Next(Math.Abs(diff / 2)) + 1) * 2;
@@ -864,6 +861,12 @@ sealed class MazeIsland : World
                     }
                 }
             }
+            else
+            {
+                throw new ImpossibleException("Logic error drawing Maze Island River");
+            }
+            map[startY, startX] = openWest ? Terrain.WALKABLEWATER : Terrain.MOUNTAIN;
+            map[toY, toX] = openEast ? Terrain.WALKABLEWATER : Terrain.MOUNTAIN;
         }
     }
     public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)

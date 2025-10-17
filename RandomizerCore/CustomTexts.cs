@@ -379,7 +379,6 @@ public class CustomTexts
     {
         // Make a new RNG for community text so that it doesn't affect the final hash.
         var nonhashRNG = new Random(hashRNG.Next());
-
         do
         {
             if (props.ReplaceFireWithDash)
@@ -437,12 +436,12 @@ public class CustomTexts
                 var upstabLoc = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.UPSTAB));
                 if (downstabLoc != null)
                 {
-                    Text hint = Text.GenerateHelpfulHint(downstabLoc, Collectable.DOWNSTAB);
+                    Text hint = Text.GenerateHelpfulHint(locations.ToList(), downstabLoc, Collectable.DOWNSTAB, props.IncludeSpellsInShuffle);
                     texts[downstabClosedDoorTextIndex] = hint;
                 }
                 if (upstabLoc != null)
                 {
-                    Text hint = Text.GenerateHelpfulHint(upstabLoc, Collectable.UPSTAB);
+                    Text hint = Text.GenerateHelpfulHint(locations.ToList(), upstabLoc, Collectable.UPSTAB, props.IncludeSpellsInShuffle);
                     texts[upstabClosedDoorTextIndex] = hint;
                 }
                 if (props.SwapUpAndDownStab)
@@ -734,7 +733,7 @@ public class CustomTexts
         {
             List<Location> possibleHintLocations = locations.Where(i => i.Collectables.Contains(hintCollectable)).ToList();
             Location hintLocation = possibleHintLocations.Sample(r) ?? throw new ImpossibleException("Error generating hint for unplaced item");
-            Text hint = Text.GenerateHelpfulHint(hintLocation, hintCollectable);
+            Text hint = Text.GenerateHelpfulHint(locations.ToList(), hintLocation, hintCollectable, props.IncludeSpellsInShuffle);
             int town = r.Next(9);
             while (placedTowns.Contains(town))
             {
@@ -782,32 +781,32 @@ public class CustomTexts
             itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.TROPHY))!;
             if(itemLocation != null)
             {
-                Text trophyHint = Text.GenerateHelpfulHint(itemLocation, Collectable.TROPHY);
+                Text trophyHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.TROPHY, props.IncludeSpellsInShuffle);
                 hints[trophySpellHintIndex] = trophyHint;
             }
 
             itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MEDICINE))!;
             if (itemLocation != null)
             {
-                Text medHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MEDICINE);
+                Text medHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MEDICINE, props.IncludeSpellsInShuffle);
                 hints[medicineSpellHintIndex] = medHint;
             }   
 
             itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.CHILD))!;
             if (itemLocation != null)
             {
-                Text kidHint = Text.GenerateHelpfulHint(itemLocation, Collectable.CHILD);
+                Text kidHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.CHILD, props.IncludeSpellsInShuffle);
                 hints[childSpellHintIndex] = kidHint;
             }
 
             if(props.IncludeQuestItemsInShuffle)
             {
                 itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.MIRROR))!;
-                Text mirrorHint = Text.GenerateHelpfulHint(itemLocation, Collectable.MIRROR);
+                Text mirrorHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.MIRROR, props.IncludeSpellsInShuffle);
                 hints[mirrorSpellHintIndex] = mirrorHint;
 
                 itemLocation = locations.FirstOrDefault(i => i.Collectables.Contains(Collectable.WATER))!;
-                Text waterHint = Text.GenerateHelpfulHint(itemLocation, Collectable.WATER);
+                Text waterHint = Text.GenerateHelpfulHint(locations.ToList(), itemLocation, Collectable.WATER, props.IncludeSpellsInShuffle);
                 hints[waterSpellHintIndex] = waterHint;
             }
         }
