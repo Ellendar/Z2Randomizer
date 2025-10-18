@@ -1,5 +1,15 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.3 - October 18, 2025
+
+- Fixed a bug that could cause glitching backgrounds on level up on some hardware/emulators.
+- Fixed some graphical glitchyness with spell tower.
+- Fixed a bug where non-random, non-vanilla drop pools didn't work
+- Removed 2 untended variants of an item Room
+- Fixed Up/Down stab text when reversed and not in the item pool
+- Removed the glove that displayed when hud lag glitching triggered (again)
+- Fixed another bug that could cause the sprite list to duplicate
+
 ## Version 5.0.2 - October 17, 2025
 
 ### New stuff
