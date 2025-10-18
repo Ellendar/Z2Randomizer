@@ -769,3 +769,18 @@ LoadAreaBGMetatile:
 ; link's overworld sprite has an invisible half that needs moved outta the new sprite bank as well
 .org $8739
     lda #$73
+
+; So here's a fun z2 moment. The vanilla routine that loads the metatiles for the spell spell tower
+; causes the game to miss the sprite zero hit. Which just means a small amount of visual glitching
+; in the corner of the screen, but in z2r, it causes much worse glitching now that we use IRQ for the
+; scroll split. For a quick fix, we can set the IRQ early, and since we have double split protection
+; in the setup scanline routine, it should be fine.
+
+.org $8ED8
+    jsr SetScrollSplitDuringSpellSpellTower
+
+.reloc
+SetScrollSplitDuringSpellSpellTower:
+    jsr SetupScanlineIRQ
+    lda $0763
+    rts
