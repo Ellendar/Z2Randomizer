@@ -99,9 +99,9 @@ public class Text : IEquatable<Text>
                 hint = "NABOORU$has the$%%";
             }
             //Spell Tower / Granny's Basement
-            if (allLocations.First(i => i.ActualTown == Town.NABOORU).Children.Contains(location))
+            if (allLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Children.Contains(location))
             {
-                hint = "NEW_KASUTO$has the$%%";
+                hint = "NEW KASUTO$has the$%%";
             }
         }
         if(hint == null)

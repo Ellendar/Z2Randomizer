@@ -69,7 +69,7 @@ public static class TownExtensions
             Town.NABOORU => "NABOORU",
             Town.DARUNIA_WEST => "DARUNIA",
             Town.NEW_KASUTO => "NEW KASUTO",
-            Town.OLD_KASUTO => "OLD_KASUTO",
+            Town.OLD_KASUTO => "OLD KASUTO",
             Town.MIDO_CHURCH => "MIDO",
             Town.DARUNIA_ROOF => "DARUNIA",
             _ => "UNKNOWN"

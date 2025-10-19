@@ -700,10 +700,13 @@ public class CustomTexts
         }
 
         int hintsCount = HELPFUL_HINTS_COUNT;
+        //trying without the bonus hint now that spell shuffle has town hints.
+        /*
         if(props.IncludeSwordTechsInShuffle && props.IncludeQuestItemsInShuffle)
         {
             hintsCount++;
         }
+        */
         List<Collectable> hintCollectables = items.Where(i => !smallItems.Contains(i)).ToList();
         hintCollectables.FisherYatesShuffle(r);
 
