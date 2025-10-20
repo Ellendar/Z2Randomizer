@@ -1,6 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -49,19 +50,16 @@ public sealed partial class App : Application // , IDisposable
     public override void OnFrameworkInitializationCompleted()
     {
         ServiceContainer ??= new();
+        ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
+        ServiceContainer.AddSingleton<SpriteLoaderService>();
+        Services = ServiceContainer.BuildServiceProvider();
         var files = FileSystemService!;
         try
         {
             var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
             main = JsonSerializer.Deserialize(json, new SerializationContext(true).MainViewModel)!;
-            main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.SpriteName = main.Config.SpriteName;
-            if (main.Config.SpriteName != "Link")
-            {
-                var disposables = new CompositeDisposable();
-                // this is a bit bad, `disposables` should be freed somewhere, but this is better than passing null.
-                main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.OnActivate(disposables);
-            }
         }
+        catch (System.IO.FileNotFoundException) { /* No settings file exists */ }
         catch (Exception)
         {
             // Could not load settings, so just use the default instead
@@ -72,6 +70,24 @@ public sealed partial class App : Application // , IDisposable
         }
 
         main ??= new MainViewModel();
+
+        if (main.Config.SpriteName != "Link")
+        {
+            var spriteLoaderService = App.Current?.Services?.GetService<SpriteLoaderService>();
+            Debug.Assert(spriteLoaderService != null);
+
+            spriteLoaderService.Sprites
+                .Where(sprites => sprites.Count > 0)
+                .Take(1)
+                .Subscribe(sprites =>
+                {
+                    var sprite = sprites.First(loaded => loaded.DisplayName == main.Config.SpriteName);
+                    if (sprite != null)
+                    {
+                        main.Config.Sprite = sprite;
+                    }
+                });
+        }
 
         switch (ApplicationLifetime)
         {
@@ -105,8 +121,6 @@ public sealed partial class App : Application // , IDisposable
         // Turn of window animations that were making the comboboxes glitch out when changing tabs.
         var state = !TransitionAssist.GetDisableTransitions(TopLevel!);
         TransitionAssist.SetDisableTransitions(TopLevel!, state);
-        ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
-        Services = ServiceContainer.BuildServiceProvider();
 
         base.OnFrameworkInitializationCompleted();
     }
