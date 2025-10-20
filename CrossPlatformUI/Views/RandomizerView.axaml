@@ -31,12 +31,14 @@
                                               CommandParameter="{Binding Source={x:Static presets:BeginnerPreset.Preset}}"/>
                                     <MenuItem Header="Normal Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:NormalPreset.Preset}}"/>
-                                    <MenuItem Header="Standard Tournament Preset (TBD)" Command="{Binding LoadPreset}"
-                                              CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
                                     <MenuItem Header="Full Shuffle Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:FullShufflePreset.Preset}}"/>
                                     <MenuItem Header="Max Rando Preset" Command="{Binding LoadPreset}"
                                               CommandParameter="{Binding Source={x:Static presets:MaxRandoPreset.Preset}}"/>
+                                    <MenuItem Header="Standard Tournament Swiss Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:StandardSwissPreset.Preset}}"/>
+                                    <MenuItem Header="Standard Tournament Brackets Preset" Command="{Binding LoadPreset}"
+                                              CommandParameter="{Binding Source={x:Static presets:StandardPreset.Preset}}"/>
 
                                     <MenuItem Header="More Presets">
                                         <MenuItem Header="Upstarts Tournament 2025 Preset" Command="{Binding LoadPreset}"

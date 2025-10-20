@@ -3,12 +3,12 @@ using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class StandardPreset
+public static class StandardSwissPreset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
-        StartWithCandle = false,
+        StartWithCandle = true,
         ShuffleStartingItems = false,
         ShuffleStartingSpells = false,
         MaxHeartContainers = MaxHeartsOption.EIGHT,
@@ -23,7 +23,7 @@ public static class StandardPreset
         ShuffleGP = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
-        IncludeLavaInEncounterShuffle = true,
+        IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = true,
@@ -59,13 +59,13 @@ public static class StandardPreset
         Global5050JarDrop = true,
         ReduceDripperVariance = true,
         ChangePalacePallettes = true,
-        RandomizeBossItemDrop = true,
+        RandomizeBossItemDrop = false,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
         PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
-        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
+        DarkLinkMinDistance = BossRoomMinDistance.SHORT,
 
         //Levels
         ShuffleAttackExperience = true,
@@ -80,7 +80,7 @@ public static class StandardPreset
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
 
         //Spells
-        ShuffleLifeRefillAmount = true,
+        ShuffleLifeRefillAmount = false,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = true,
@@ -90,7 +90,7 @@ public static class StandardPreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = false,
+        ShuffleDripperEnemy = true,
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 
@@ -127,6 +127,6 @@ public static class StandardPreset
         EnableTownNameHints = true,
 
         GenerateSpoiler = false,
-        RevealWalkthroughWalls = false,
+        RevealWalkthroughWalls = true,
     };
 }
