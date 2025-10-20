@@ -91,17 +91,17 @@ public class Text : IEquatable<Text>
             //Saria table
             if(allLocations.First(i => i.ActualTown == Town.SARIA_NORTH).Children.Contains(location))
             {
-                hint = "SARIA$has the$%%";
+                hint = $"{Town.SARIA_NORTH.HintName()}$has the$%%";
             }
             //Nabooru fountain
             if (allLocations.First(i => i.ActualTown == Town.NABOORU).Children.Contains(location))
             {
-                hint = "NABOORU$has the$%%";
+                hint = $"{Town.NABOORU.HintName()}$has the$%%";
             }
             //Spell Tower / Granny's Basement
             if (allLocations.First(i => i.ActualTown == Town.NEW_KASUTO).Children.Contains(location))
             {
-                hint = "NEW KASUTO$has the$%%";
+                hint = $"{Town.NEW_KASUTO.HintName()}$has the$%%";
             }
         }
         if(hint == null)
@@ -118,9 +118,13 @@ public class Text : IEquatable<Text>
             {
                 hint = "death$mountain$holds the$%%";
             }
-            else
+            else if(location.Continent == Continent.MAZE)
             {
                 hint = "in a maze$lies the$%%";
+            }
+            else
+            {
+                throw new ImpossibleException("Unknown continent generating hints");
             }
         }
 
