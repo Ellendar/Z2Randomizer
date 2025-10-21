@@ -685,8 +685,9 @@ dropping a red jar or spawning a red Ironknuckle. If unselected, the spawning is
 determined each stab like in vanilla.</value>
 	</data>
 	<data name="ReduceDripperVarianceToolTip" xml:space="preserve">
-<value>Tired of waiting for drippers to drop an enemy? After 7 red drips, this forces the 8th
-drip to be blue. (The count is shared between all drippers.)</value>
+<value>Guarantees a blue drip after 8 consecutive red drips.
+After a blue drip, the next 4 are guaranteed red.
+(All drippers share the same count.)</value>
 	</data>
 	<data name="ChangePalacePalettesToolTip" xml:space="preserve">
 <value>Changes the color palette of each palace to a new random one.</value>

@@ -1506,22 +1506,37 @@ IncreaseGlobal5050JarDropPRG5:
         a.Module().Code("""
 .include "z2r.inc"
 
-.segment "PRG4"
-.org $B9F0
-jmp NextDripColor
+LowerCap = $04
+UpperCap = $09
 
-.reloc
-NextDripColor:
-    beq DripReturn            ; regular RNG hits (A == 0 here)
+RngOut = $051B
+
+.segment "PRG4"
+.org $B9EB
     lda DripperRedCounter
     clc
+    jmp CheckDripperBounds
+FREE_UNTIL $B9F3
+
+.reloc
+CheckDripperBounds:
     adc #$01
-    cmp #$08
-    bcc DripReturn            ; less than 8 red drips in a row (A != 0 here)
-    lda #$00                  ; force 8th red drip to be blue
+    cmp #LowerCap+1
+    bcc DripReturn            ; less than LowerCap red drips in a row -> always red (0 < A <= LowerCap)
+    cmp #UpperCap
+    bcs ForceBlue             ; UpperCap has been hit - force a blue drip
+    sta DripperRedCounter     ; store updated counter so we can use A
+    lda RngOut,x
+    and #$07
+    beq DripReturn            ; RNG hits (A == 0)
+    bne RngMissReturn         ; jmp to different label to not change counter (A != 0)
+
+ForceBlue:
+    lda #$00
 DripReturn:
     sta DripperRedCounter
-    sta $044C,y
+RngMissReturn:
+    sta $044C,y               ; setting 0 means blue drip
     rts
 """, "reduce_dripper_variance.s");
     }
