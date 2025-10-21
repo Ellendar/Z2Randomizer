@@ -65,7 +65,8 @@ FREE_UNTIL $B0AB
 .segment "PRG7"
 
 .reloc
-SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weird issues on double lags
+SetupScanlineIRQ:
+    ; but only set these the first time it lags to prevent weird issues on double lags
     lda PreventDoubleLag
     bne @DontSetScrollTwice
         ; Can clobber all registers
@@ -77,17 +78,19 @@ SetupScanlineIRQ:    ; but only set these the first time it lags to prevent weir
         sta ScrollPosForIrq
         inc PreventDoubleLag
 @DontSetScrollTwice:
-
-	lda #31
-	sta LineIrqTgtReg
-	
-	lda #ENABLE_SCANLINE_IRQ
-	sta LineIrqStatusReg
-    ; We have to CLI here to allow IRQ to interrupt NMI
-    ; and we have to CLI on the main thread during reset
-    ; to allow IRQ to fire even after NMI ends (otherwise rti will
-    ; restore the I flag from the initial sei)
-    cli
+    lda IrqSetupAlready
+    bne @SkipSettingIrq
+        lda #31
+        sta LineIrqTgtReg
+        lda #ENABLE_SCANLINE_IRQ
+        sta LineIrqStatusReg
+        sta IrqSetupAlready
+        ; We have to CLI here to allow IRQ to interrupt NMI
+        ; and we have to CLI on the main thread during reset
+        ; to allow IRQ to fire even after NMI ends (otherwise rti will
+        ; restore the I flag from the initial sei)
+        cli
+@SkipSettingIrq:
     rts
 
 .reloc
@@ -152,7 +155,7 @@ HandleLagFrame:
     lda #0
     sta $2005
     sta $2005
-
+    sta IrqSetupAlready
 
     ; Disabled the "glove in hud" for now. Keeping the code here cause i like it still.
     ; delete this code if you hate fun.
@@ -236,7 +239,7 @@ RunAudioFrameOrLagFrame:
 .org $C1B1
     jmp *+3
 .org $C060
-FREE_UNTIL $C06a
+FREE_UNTIL $C067
 DisabledNmi:
 ;    jsr IncStatTimer
 ;    rti
@@ -254,6 +257,7 @@ Nmi:
     jsr IncStatTimer
     lda #0
     sta PreventDoubleLag
+    sta IrqSetupAlready ; Reset the IRQ flags that prevent
 .assert * = $C085
 
 ; Also run the stat timers during the title/menu in case they push the reset button
@@ -638,7 +642,7 @@ UPDATE_REFS SwapCHR @ $C342 $C3B9 $C633 $CA10 $D045 $D050
 UPDATE_REFS SwapPRG @ $C00B $C035 $C1C4 $C33F $C38B $CD5D $CF24
 UPDATE_REFS SwapToSavedPRG @ $C1DB $C24A $C250 $C4D6 $C63C $C645 $CB36 $CF2A $CF3D $CF50
 UPDATE_REFS SwapToSavedPRG @ $CFFD $D127 $D502 $DFD3 $DFDC $DFF0 $DFF9 $E01C $E025 $E071 $E1DE
-UPDATE_REFS SwapToPRG0 @ $C1CA $C1CE $C256 $C350 $C636 $C68B $C9EF $CCFA $D0FD $D121 $D3EA $D508
+UPDATE_REFS SwapToPRG0 @ $C1CA $C1CE $C256 $C350 $C636 $C68B $C9EF $CCFA $D0FD $D121 $D508
 UPDATE_REFS SwapToPRG0 @ $DFD9 $DFE2 $DFF6 $DFFF $E017 $E022 $E02B $E077 $E1E4 $FF4A
 
 ; z2ft uses this location
@@ -776,11 +780,10 @@ LoadAreaBGMetatile:
 ; scroll split. For a quick fix, we can set the IRQ early, and since we have double split protection
 ; in the setup scanline routine, it should be fine.
 
-.org $8ED8
-    jsr SetScrollSplitDuringSpellSpellTower
-
+.segment "PRG7"
+.org $D3E9
+    jsr SetupScrollSplitEarly
 .reloc
-SetScrollSplitDuringSpellSpellTower:
+SetupScrollSplitEarly:
     jsr SetupScanlineIRQ
-    lda $0763
-    rts
+    jmp SwapToPRG0
