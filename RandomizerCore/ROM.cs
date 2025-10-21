@@ -1756,7 +1756,7 @@ ActualLavaDeath:                     ; original code that we replaced
         (bossHpAddresses[4], 0x12e92), // Carock
         (bossHpAddresses[5], 0x134cf), // Gooma
         (bossHpAddresses[6], 0x13136), // Barba
-        // 0x13ae9 - unknown; who is this? I'm guessing its a rebonack mini boss thing?
+        // 0x13ae9 - unknown; who is this? I'm guessing its a helmet mini boss thing?
         // (0x15453, 0x16406), // Thunderbird
         // (0x15454, 0x158aa), // Dark Link
     ];
@@ -1830,6 +1830,11 @@ DoDivisionByRepeatedSubtraction:
         iny
         bcs @loop
     rts
+
+.org $BAD3
+FixHelmetHeadHpDivisorOnNonWest:
+    ; Skip over a vanilla check for gooma/helmethead split which breaks the HP divisor update
+    jmp $BADA
 
 """);
         foreach (var (hpaddr, divisoraddr) in bossMap)

@@ -178,6 +178,7 @@ RESV ElevatorYStart
 RESV DripperRedCounter
 RESV PpuCtrlForIrq
 RESV ScrollPosForIrq
+RESV IrqSetupAlready
 
 .assert RES_BASE + RES_OFFSET < $01ad
 
