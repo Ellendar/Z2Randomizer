@@ -66,7 +66,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public string AppVersion
     {
-        get => $"Z2R v{App.Version}";
+        get => $"Z2R {App.Version}";
     }
 
     [JsonConstructor]
