@@ -24,12 +24,19 @@ public sealed partial class App : Application // , IDisposable
         AvaloniaXamlLoader.Load(this);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        Version = $"{version?.ToString(version.Revision > 0 ? 4 : 3)}";
+        if (Z2Randomizer.GitInfo.Branch == "main")
+        {
+            Version = $"v{version?.ToString(version.Revision > 0 ? 4 : 3)}";
+        }
+        else
+        {
+            Version = $"[{Z2Randomizer.GitInfo.Branch}:{Z2Randomizer.GitInfo.Commit}]";
+        }
 #if DEBUG
         Version += " (Debug)";
 #endif
 
-        Title = $"Zelda II Randomizer v{Version}";
+        Title = $"Zelda II Randomizer {Version}";
     }
 
     public static ServiceCollection? ServiceContainer;
