@@ -1052,7 +1052,7 @@ public partial class Palace
         foreach (Room room in AllRooms.Where(i => i.HasDrop))
         {
             if(room.Down == null) { return true; }
-            if(room.Down!.IsDropZone)
+            if(!room.Down.HasDrop)
             {
                 dropZonesToCheck.Add(room.Down);
             }
@@ -1081,19 +1081,19 @@ public partial class Palace
                 }
 
                 //explore rooms
-                if (room.Left != null)
+                if (room.Left != null && !coveredRooms.Contains(room.Left))
                 {
                     pendingRooms.Push(room.Left);
                 }
-                if (room.Right != null)
+                if (room.Right != null && !coveredRooms.Contains(room.Right))
                 {
                     pendingRooms.Push(room.Right);
                 }
-                if (room.Up != null)
+                if (room.Up != null && !coveredRooms.Contains(room.Up))
                 {
                     pendingRooms.Push(room.Up);
                 }
-                if (room.Down != null)
+                if (room.Down != null && !coveredRooms.Contains(room.Down))
                 {
                     pendingRooms.Push(room.Down);
                 }
