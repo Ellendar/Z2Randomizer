@@ -261,6 +261,7 @@ public sealed class WestHyrule : World
         MAP_ROWS = 75;
         MAP_COLS = 64;
         baseAddr = RomMap.WEST_NORTH_PALACE_TILE_LOCATION;
+        continentId = Continent.WEST;
         VANILLA_MAP_ADDR = 0x506C;
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
@@ -680,7 +681,8 @@ public sealed class WestHyrule : World
                 //continents so it's a later thing.
                 if (raft != null)
                 {
-                    if (!DrawRaft(false, raftDirection))
+                    bool r = DrawRaft(raftDirection);
+                    if (!r)
                     {
                         failedOnRaftPlacement++;
                         return false;
@@ -689,7 +691,8 @@ public sealed class WestHyrule : World
 
                 if (bridge != null)
                 {
-                    if (!DrawRaft(true, bridgeDirection))
+                    bool br = DrawBridge(bridgeDirection);
+                    if (!br)
                     {
                         failedOnBridgePlacement++;
                         return false;

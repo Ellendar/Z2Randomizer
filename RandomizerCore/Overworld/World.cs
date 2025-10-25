@@ -42,6 +42,7 @@ public abstract class World
     public Location? cave2;
 
     public int baseAddr;
+    public Continent continentId;
     protected Climate climate;
 
     protected Random RNG;
@@ -1704,203 +1705,74 @@ public abstract class World
         }
     }
 
-    protected bool DrawRaft(bool drawBridgeInstead, Direction direction)
+    protected bool DrawBridge(Direction direction)
     {
-        int raftx = 0;
-        int deltax = 1;
-        int deltay = 0;
-        int rafty = RNG.Next(0, MAP_ROWS);
+        return Terraforming.DrawBridge(RNG, map, bridge, walkableTerrains, direction);
+    }
 
-        int tries = 0;
-        int length = 0;
-        //Debug.WriteLine(GetMapDebug());
-
-        do
-        {
-            length = 0;
-            tries++;
-            if (tries > 100)
-            {
-                return false;
-            }
-            if (direction == Direction.WEST)
-            {
-                raftx = 0;
-                int rtries = 0;
-                do
-                {
-                    rafty = RNG.Next(0, MAP_ROWS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                deltax = 1;
-            }
-            else if (direction == Direction.NORTH)
-            {
-                rafty = 0;
-                int rtries = 0;
-
-                do
-                {
-                    raftx = RNG.Next(0, MAP_COLS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                deltax = 0;
-                deltay = 1;
-            }
-            else if (direction == Direction.SOUTH)
-            {
-                rafty = MAP_ROWS - 1;
-                int rtries = 0;
-
-                do
-                {
-                    raftx = RNG.Next(0, MAP_COLS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-                deltax = 0;
-                deltay = -1;
-            }
-            else //EAST
-            {
-                raftx = MAP_COLS - 1;
-                int rtries = 0;
-
-                do
-                {
-                    rafty = RNG.Next(0, MAP_ROWS);
-                    rtries++;
-                    if (rtries > 100)
-                    {
-                        return false;
-                    }
-                } while (map[rafty, raftx] != Terrain.WALKABLEWATER && map[rafty, raftx] != Terrain.WATER);
-
-                deltax = -1;
-                deltay = 0;
-            }
-            while (rafty >= 0 && rafty < MAP_ROWS && raftx >= 0 && raftx < MAP_COLS && (map[rafty, raftx] == Terrain.WALKABLEWATER || map[rafty, raftx] == Terrain.WATER))
-            {
-                rafty += deltay;
-                raftx += deltax;
-                length++;
-            }
-        } while (rafty < 0 || rafty >= MAP_ROWS || raftx < 0 || raftx >= MAP_COLS || !walkableTerrains.Contains(map[rafty, raftx]) || (drawBridgeInstead && length > 10) || (drawBridgeInstead && length <= 1));
-
-
-        rafty -= deltay;
-        raftx -= deltax;
-        if (drawBridgeInstead)
-        {
-            if(bridge == null)
-            {
-                throw new Exception("Unable to draw unloaded bridge");
-            }
-            map[rafty, raftx] = Terrain.BRIDGE;
-            bridge.Xpos = raftx;
-            bridge.Y = rafty;
-            bridge.PassThrough = 0;
-            bridge.CanShuffle = false;
-            if (direction == Direction.EAST)
-            {
-                for (int i = raftx + 1; i < MAP_COLS; i++)
-                {
-                    map[rafty, i] = Terrain.BRIDGE;
-                }
-            }
-            else if (direction == Direction.WEST)
-            {
-                for (int i = raftx - 1; i >= 0; i--)
-                {
-                    map[rafty, i] = Terrain.BRIDGE;
-                }
-            }
-            else if (direction == Direction.SOUTH)
-            {
-                for (int i = rafty + 1; i < MAP_ROWS; i++)
-                {
-                    map[i, raftx] = Terrain.BRIDGE;
-                }
-            }
-            else if (direction == Direction.NORTH)
-            {
-                for (int i = rafty - 1; i >= 0; i--)
-                {
-                    map[i, raftx] = Terrain.BRIDGE;
-                }
-            }
-        }
-        else
-        {
-            if (raft == null)
-            {
-                throw new Exception("Unable to draw unloaded raft");
-            }
-            map[rafty, raftx] = Terrain.BRIDGE;
-            raft.Xpos = raftx;
-            raft.Y = rafty;
-            raft.CanShuffle = false;
-        }
-        return true;
-
+    protected bool DrawRaft(Direction direction)
+    {
+        return Terraforming.DrawRaft(RNG, map, raft, walkableTerrains, direction);
     }
 
     public Location LoadRaft(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 41, Terrain.BRIDGE, world));
-        raft = GetLocationByMem(baseAddr + 41);
-        raft.Continent = world;
+        Debug.Assert(world == continentId); // we can remove param if this is always true
+        var newRaft = rom.LoadLocation(baseAddr + Location.CONNECTOR_RAFT_ID, Terrain.BRIDGE, world);
+        AddLocation(newRaft);
+        raft = GetLocationByMem(baseAddr + Location.CONNECTOR_RAFT_ID);
+        Debug.Assert(newRaft == raft);
+        Debug.Assert(raft.Continent == world);
         raft.ConnectedContinent = connectedContinent;
         raft.ExternalWorld = 0x80;
-        raft.Map = 41;
-        raft.TerrainType = Terrain.BRIDGE;
+        raft.Map = Location.CONNECTOR_RAFT_ID;
+        Debug.Assert(raft.TerrainType == Terrain.BRIDGE);
         return raft;
     }
 
     public Location LoadBridge(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 40, Terrain.BRIDGE, world));
-        bridge = GetLocationByMem(baseAddr + 40);
-        bridge.Continent = world;
+        Debug.Assert(world == continentId); // we can remove param if this is always true
+        var newBridge = rom.LoadLocation(baseAddr + Location.CONNECTOR_BRIDGE_ID, Terrain.BRIDGE, world);
+        AddLocation(newBridge);
+        bridge = GetLocationByMem(baseAddr + Location.CONNECTOR_BRIDGE_ID);
+        Debug.Assert(newBridge == bridge);
+        Debug.Assert(bridge.Continent == world);
         bridge.ConnectedContinent = connectedContinent;
         bridge.ExternalWorld = 0x80;
-        bridge.Map = 40;
+        bridge.Map = Location.CONNECTOR_BRIDGE_ID;
         bridge.PassThrough = 0;
         return bridge;
     }
 
     public Location LoadCave1(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 42, Terrain.CAVE, world));
-        cave1 = GetLocationByMem(baseAddr + 42);
-        cave1.Continent = world;
+        Debug.Assert(world == continentId); // we can remove param if this is always true
+        var newCave = rom.LoadLocation(baseAddr + Location.CONNECTOR_CAVE1_ID, Terrain.CAVE, world);
+        AddLocation(newCave);
+        cave1 = GetLocationByMem(baseAddr + Location.CONNECTOR_CAVE1_ID);
+        Debug.Assert(newCave == cave1);
+        Debug.Assert(cave1.Continent == world);
         cave1.ConnectedContinent = connectedContinent;
         cave1.ExternalWorld = 0x80;
-        cave1.Map = 42;
+        cave1.Map = Location.CONNECTOR_CAVE1_ID;
         cave1.CanShuffle = true;
         return cave1;
     }
 
     public Location LoadCave2(ROM rom, Continent world, Continent connectedContinent)
     {
-        AddLocation(rom.LoadLocation(baseAddr + 43, Terrain.CAVE, world));
-        cave2 = GetLocationByMem(baseAddr + 43);
+        Debug.Assert(world == continentId); // we can remove param if this is always true
+        var newCave = rom.LoadLocation(baseAddr + Location.CONNECTOR_CAVE2_ID, Terrain.CAVE, world);
+        AddLocation(newCave);
+        cave2 = GetLocationByMem(baseAddr + Location.CONNECTOR_CAVE2_ID);
+        Debug.Assert(newCave == cave2);
+        Debug.Assert(cave2.Continent == world);
         cave2.ConnectedContinent = connectedContinent;
         cave2.ExternalWorld = 0x80;
         cave2.Continent = world;
-        cave2.Map = 43;
-        cave2.TerrainType = Terrain.CAVE;
+        cave2.Map = Location.CONNECTOR_CAVE2_ID;
+        Debug.Assert(cave2.TerrainType == Terrain.CAVE);
         cave2.CanShuffle = true;
         return cave2;
     }
@@ -2709,6 +2581,8 @@ public abstract class World
 
         return true;
     }
+
+    /*
     public bool PassthroughsIntersectRaftCoordinates(IEnumerable<(int, int)> raftCoordinates)
     {
         foreach (Location location in AllLocations.Where(i => i.PassThrough != 0))
@@ -2720,6 +2594,7 @@ public abstract class World
         }
         return false;
     }
+    */
 
     //Short term fix, right now linked locations aren't shuffled, and they are counted as reachable when
     //their parent location is reachable, but the original location remains in the location list, creating

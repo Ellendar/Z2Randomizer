@@ -1953,6 +1953,7 @@ public class Hyrule
         }
     }
 
+    /// <param name="type">1 = raft, 2 = bridge, 3 = cave1, 4/other = cave2</param>
     private void SetTransportation(int w1, int w2, int type)
     {
         Location l1, l2;
