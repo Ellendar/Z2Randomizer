@@ -16,7 +16,8 @@ public class Location
     public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
-    public int Ypos { get; set; }
+    public int Y { get; set; }
+    public int YRaw { get => Y + 30; set => Y = value - 30; }
     public int Xpos { get; set; }
     //public byte[] LocationBytes { get; set; }
     public List<Location> Children { get; set; } = [];
@@ -36,12 +37,12 @@ public class Location
     {
         get
         {
-            return (Ypos, Xpos);
+            return (YRaw, Xpos);
         }
 
         set
         {
-            Ypos = value.Item1;
+            YRaw = value.Item1;
             Xpos = value.Item2;
         }
     }
@@ -128,7 +129,7 @@ public class Location
         TerrainType = t;
         */
         Map = map;
-        Ypos = yPos;
+        YRaw = yPos;
         Xpos = xPos;
         MemAddress = memoryAddress;
         CanShuffle = true;
@@ -140,7 +141,7 @@ public class Location
         ConnectedContinent = null;
 
         //Shoutouts to thetruekingofspace for datamining this
-        Name = (Continent, Ypos, Xpos, Map) switch
+        Name = (Continent, YRaw, Xpos, Map) switch
         {
             (Continent.WEST, 52, 23, 0) => "NORTH_PALACE",
             (Continent.WEST, 32, 29, 33) => "TROPHY_CAVE",
@@ -284,7 +285,7 @@ public class Location
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
 
-        ActualTown = (Continent, Ypos, Xpos, Map) switch
+        ActualTown = (Continent, YRaw, Xpos, Map) switch
         {
             (Continent.WEST, 54, 46, 2) => Town.RAURU,
             (Continent.WEST, 36, 2, 5) => Town.RUTO,
@@ -299,9 +300,9 @@ public class Location
             _ => null
         };
 
-        if (Name.StartsWith("Unknown") && Xpos != 0 && Ypos != 0)
+        if (Name.StartsWith("Unknown") && Xpos != 0 && YRaw != 0)
         {
-            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Ypos + ", " + Xpos + ") Map: " + Map);
+            logger.Info("Missing location name on " + Continent.GetName(Continent) + " (" + Y + ", " + Xpos + ") Map: " + Map);
         }
         if (Name.Contains("FAKE"))
         {
@@ -313,7 +314,7 @@ public class Location
         }
     }
 
-    public Location(Location clone) : this(clone.Ypos, clone.Xpos, clone.MemAddress, clone.Map, clone.Continent)
+    public Location(Location clone) : this(clone.YRaw, clone.Xpos, clone.MemAddress, clone.Map, clone.Continent)
     {
         ExternalWorld = clone.ExternalWorld;
         appear2loweruponexit = clone.appear2loweruponexit;
@@ -335,7 +336,7 @@ public class Location
         }
         else
         {
-            bytes[0] = (byte)(ExternalWorld + Ypos);
+            bytes[0] = (byte)(ExternalWorld + YRaw);
         }
         bytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
         bytes[2] = (byte)(MapPage + Map);
@@ -348,7 +349,7 @@ public class Location
         return Continent.ToString()
             + " " + TerrainType.ToString()
             + " " + Name
-            + " (" + (Ypos - 30) + "," + (Xpos) + ") _"
+            + " (" + (Y) + "," + (Xpos) + ") _"
             + (Reachable ? "Reachable " : "Unreachable ")
             + '[' + string.Join(", ", Collectables.Select(i => i.ToString())) + ']';
     }

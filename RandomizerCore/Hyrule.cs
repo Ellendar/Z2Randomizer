@@ -3153,13 +3153,13 @@ public class Hyrule
                 if (!firstRaft)
                 {
                     ROMData.Put(0x565, (byte)w.bridge.Xpos);
-                    ROMData.Put(0x567, (byte)w.bridge.Ypos);
+                    ROMData.Put(0x567, (byte)w.bridge.YRaw);
                     firstRaft = true;
                 }
                 else
                 {
                     ROMData.Put(0x564, (byte)w.bridge.Xpos);
-                    ROMData.Put(0x566, (byte)w.bridge.Ypos);
+                    ROMData.Put(0x566, (byte)w.bridge.YRaw);
                 }
             }
         }

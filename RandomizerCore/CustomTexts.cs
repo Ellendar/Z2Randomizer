@@ -472,7 +472,7 @@ public class CustomTexts
     }
     private static Text GenerateBaguWoodsHint(Location bagu)
     {
-        int baguy = bagu.Ypos - 30;
+        int baguy = bagu.Y;
         int bagux = bagu.Xpos;
         string hint = "BAGU IN$";
         if (baguy < 25)

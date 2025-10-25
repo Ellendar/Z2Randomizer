@@ -2435,7 +2435,7 @@ ResetRedPalettePayload:
             Put(0x8382, (byte)hiddenPalaceCoords.Item1);
             Put(0x8388, (byte)hiddenPalaceCoords.Item2);
         }
-        int pos = hiddenPalaceLocation.Ypos;
+        int pos = hiddenPalaceLocation.YRaw;
 
         Put(0x1df78, (byte)(pos + hiddenPalaceLocation.ExternalWorld));
         Put(0x1df84, 0xff);
@@ -2543,7 +2543,7 @@ ResetRedPalettePayload:
             }
         }
 
-        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.Ypos % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.Ypos % 30 / 15);
+        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.YRaw % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.YRaw % 30 / 15);
         int ppu_addr2 = ppu_addr1 + 32;
         int ppu1low = ppu_addr1 & 0x00ff;
         int ppu1high = (ppu_addr1 >> 8) & 0xff;
@@ -2559,11 +2559,11 @@ ResetRedPalettePayload:
     public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
         int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
-        Put(0x1df79, (byte)(hiddenKasutoLocation.Ypos + hiddenKasutoLocation.ExternalWorld));
-        Put(0x1dfac, (byte)(hiddenKasutoLocation.Ypos - 30));
+        Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + hiddenKasutoLocation.ExternalWorld));
+        Put(0x1dfac, (byte)(hiddenKasutoLocation.Y));
         Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
         Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + hiddenKasutoLocation.Secondpartofcave));
-        Put(0x1ccdb, (byte)(hiddenKasutoLocation.Ypos));
+        Put(0x1ccdb, (byte)(hiddenKasutoLocation.YRaw));
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
         hiddenKasutoLocation.NeedHammer = true;

@@ -174,20 +174,20 @@ public abstract class World
     protected void Swap(Location l1, Location l2)
     {
         (l2.Xpos, l1.Xpos) = (l1.Xpos, l2.Xpos);
-        (l2.Ypos, l1.Ypos) = (l1.Ypos, l2.Ypos);
+        (l2.Y, l1.Y) = (l1.Y, l2.Y);
         (l2.PassThrough, l1.PassThrough) = (l1.PassThrough, l2.PassThrough);
 
         foreach (Location child in l1.Children)
         {
             child.Xpos = l1.Xpos;
-            child.Ypos = l1.Ypos;
+            child.Y = l1.Y;
             child.PassThrough = l1.PassThrough;
         }
 
         foreach (Location child in l2.Children)
         {
             child.Xpos = l2.Xpos;
-            child.Ypos = l2.Ypos;
+            child.Y = l2.Y;
             child.PassThrough = l2.PassThrough;
         }
     }
@@ -315,7 +315,7 @@ public abstract class World
                         PlaceCaveCount++;
                         PlaceCave(x, y, direction, entranceTerrain);
                         location.Xpos = x;
-                        location.Ypos = y + 30;
+                        location.Y = y;
                         location.CanShuffle = false;
                     }
                 }
@@ -331,7 +331,7 @@ public abstract class World
                     map[y - 1, x] = s;
                     map[y - 1, x + 1] = s;
                     location.Xpos = x;
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.CanShuffle = false;
                 }
                 else if (location.TerrainType != Terrain.TOWN || 
@@ -351,7 +351,7 @@ public abstract class World
                     map[y - 1, x] = t;
                     map[y - 1, x + 1] = t;
                     location.Xpos = x;
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.CanShuffle = false;
                 }
             }
@@ -567,10 +567,10 @@ public abstract class World
         Location location2 = connections[location];
         location.CanShuffle = false;
         location.Xpos = x;
-        location.Ypos = y + 30;
+        location.Y = y;
         location2.CanShuffle = false;
         location2.Xpos = otherx;
-        location2.Ypos = othery + 30;
+        location2.Y = othery;
         PlaceCave(x, y, direction, climate.GetRandomTerrain(RNG, walkableTerrains));
         PlaceCave(otherx, othery, direction.Reverse(), climate.GetRandomTerrain(RNG, walkableTerrains));
         return true;
@@ -586,7 +586,7 @@ public abstract class World
                     if (location.CanShuffle)
                     {
                         location.ExternalWorld = 0;
-                        location.Ypos = 0;
+                        location.YRaw = 0;
                         location.appear2loweruponexit = 0;
                         location.Secondpartofcave = 0;
                         location.Xpos = 0;
@@ -611,12 +611,12 @@ public abstract class World
                         if (tries < 2000)
                         {
                             location.Xpos = x;
-                            location.Ypos = y + 30;
+                            location.Y = y;
                         }
                         else
                         {
                             location.Xpos = 0;
-                            location.Ypos = 0;
+                            location.YRaw = 0;
                         }
                         location.CanShuffle = false;
                     }
@@ -861,7 +861,7 @@ public abstract class World
 
                     map[y, x] = Terrain.TOWN;
                     Location location = GetLocationByMem(0x465F);
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.Xpos = x;
                     x -= deltaX;
                     y -= deltaY;
@@ -876,7 +876,7 @@ public abstract class World
                     }
                     map[y, x] = Terrain.TOWN;
                     location = GetLocationByMem(0x4660);
-                    location.Ypos = y + 30;
+                    location.Y = y;
                     location.Xpos = x;
                     placeTown = false;
                 }
@@ -889,12 +889,12 @@ public abstract class World
                     if (deltaX > 0 || deltaY > 0)
                     {
                         bridge2.Xpos = x;
-                        bridge2.Ypos = y + 30;
+                        bridge2.Y = y;
                     }
                     else
                     {
                         bridge1.Xpos = x;
-                        bridge1.Ypos = y + 30;
+                        bridge1.Y = y;
                     }
 
                     while (map[y, x] == riverTerrain)
@@ -914,12 +914,12 @@ public abstract class World
                     if (deltaX > 0 || deltaY > 0)
                     {
                         bridge1.Xpos = x;
-                        bridge1.Ypos = y + 30;
+                        bridge1.Y = y;
                     }
                     else
                     {
                         bridge2.Xpos = x;
-                        bridge2.Ypos = y + 30;
+                        bridge2.Y = y;
                     }
                     placeLongBridge = false;
                     bridge1.CanShuffle = false;
@@ -936,12 +936,12 @@ public abstract class World
                         if (deltaX > 0 || deltaY > 0)
                         {
                             bridge2.Xpos = x;
-                            bridge2.Ypos = y + 30;
+                            bridge2.Y = y;
                         }
                         else
                         {
                             bridge1.Xpos = x;
-                            bridge1.Ypos = y + 30;
+                            bridge1.Y = y;
                         }
 
                         while (map[y, x] == riverTerrain)
@@ -961,12 +961,12 @@ public abstract class World
                         if (deltaX > 0 || deltaY > 0)
                         {
                             bridge1.Xpos = x;
-                            bridge1.Ypos = y + 30;
+                            bridge1.Y = y;
                         }
                         else
                         {
                             bridge2.Xpos = x;
-                            bridge2.Ypos = y + 30;
+                            bridge2.Y = y;
                         }
                         bridge1.CanShuffle = false;
                         bridge2.CanShuffle = false;
@@ -1041,7 +1041,7 @@ public abstract class World
                                     {
                                         if (location.CanShuffle && !placed)
                                         {
-                                            location.Ypos = y + 30;
+                                            location.Y = y;
                                             location.Xpos = x;
                                             location.CanShuffle = false;
                                             break;
@@ -1075,7 +1075,7 @@ public abstract class World
                                         {
                                             if (location.CanShuffle && !placed)
                                             {
-                                                location.Ypos = y + 30;
+                                                location.Y = y;
                                                 location.Xpos = x;
                                                 location.CanShuffle = false;
                                                 break;
@@ -1109,7 +1109,7 @@ public abstract class World
                                         {
                                             if (location.CanShuffle && !placed)
                                             {
-                                                location.Ypos = y + 30;
+                                                location.Y = y;
                                                 location.Xpos = x;
                                                 location.CanShuffle = false;
                                                 break;
@@ -1589,9 +1589,9 @@ public abstract class World
         //Run the initial steps
         foreach (Location start in starts)
         {
-            if (start.Ypos >= 30 && start.Xpos >= 0)
+            if (start.Y >= 0 && start.Xpos >= 0)
             {
-                UpdateReachable(ref covered, start.Ypos - 30, start.Xpos, itemGet);
+                UpdateReachable(ref covered, start.Y, start.Xpos, itemGet);
             }
         }
 
@@ -1798,7 +1798,7 @@ public abstract class World
             }
             map[rafty, raftx] = Terrain.BRIDGE;
             bridge.Xpos = raftx;
-            bridge.Ypos = rafty + 30;
+            bridge.Y = rafty;
             bridge.PassThrough = 0;
             bridge.CanShuffle = false;
             if (direction == Direction.EAST)
@@ -1838,7 +1838,7 @@ public abstract class World
             }
             map[rafty, raftx] = Terrain.BRIDGE;
             raft.Xpos = raftx;
-            raft.Ypos = rafty + 30;
+            raft.Y = rafty;
             raft.CanShuffle = false;
         }
         return true;
@@ -1903,7 +1903,7 @@ public abstract class World
     {
         if (raft != null)
         {
-            visitation[raft.Ypos - 30, raft.Xpos] = true;
+            visitation[raft.Y, raft.Xpos] = true;
         }
     }
 
@@ -1911,7 +1911,7 @@ public abstract class World
     {
         if (bridge != null)
         {
-            visitation[bridge.Ypos - 30, bridge.Xpos] = true;
+            visitation[bridge.Y, bridge.Xpos] = true;
         }
     }
 
@@ -1919,7 +1919,7 @@ public abstract class World
     {
         if (cave1 != null)
         {
-            visitation[cave1.Ypos - 30, cave1.Xpos] = true;
+            visitation[cave1.Y, cave1.Xpos] = true;
         }
     }
 
@@ -1927,7 +1927,7 @@ public abstract class World
     {
         if (cave2 != null)
         {
-            visitation[cave2.Ypos - 30, cave2.Xpos] = true;
+            visitation[cave2.Y, cave2.Xpos] = true;
         }
     }
 
@@ -2355,7 +2355,7 @@ public abstract class World
                 cavey++;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
+            cave1r.Y = cavey;
             cave1r.Xpos = cavex;
             cavex--;
             int curr = 0;
@@ -2379,7 +2379,7 @@ public abstract class World
                 return false;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
+            cave1l.Y = cavey;
             cave1l.Xpos = cavex;
             map[cavey + 1, cavex] = Terrain.MOUNTAIN;
             map[cavey - 1, cavex] = Terrain.MOUNTAIN;
@@ -2401,7 +2401,7 @@ public abstract class World
                 cavey++;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
+            cave1l.Y = cavey;
             cave1l.Xpos = cavex;
             cavex++;
             int curr = 0;
@@ -2424,7 +2424,7 @@ public abstract class World
                 return false;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
+            cave1r.Y = cavey;
             cave1r.Xpos = cavex;
             map[cavey + 1, cavex] = Terrain.MOUNTAIN;
             map[cavey - 1, cavex] = Terrain.MOUNTAIN;
@@ -2460,7 +2460,7 @@ public abstract class World
                 cavex++;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
+            cave1r.Y = cavey;
             cave1r.Xpos = cavex;
             cavey--;
             int curr = 0;
@@ -2483,7 +2483,7 @@ public abstract class World
                 return false;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
+            cave1l.Y = cavey;
             cave1l.Xpos = cavex;
             map[cavey, cavex + 1] = Terrain.MOUNTAIN;
             map[cavey, cavex - 1] = Terrain.MOUNTAIN;
@@ -2506,7 +2506,7 @@ public abstract class World
                 cavex++;
             }
             map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Ypos = cavey + 30;
+            cave1l.Y = cavey;
             cave1l.Xpos = cavex;
             cavey++;
             int curr = 0;
@@ -2530,7 +2530,7 @@ public abstract class World
             }
 
             map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Ypos = cavey + 30;
+            cave1r.Y = cavey;
             cave1r.Xpos = cavex;
             map[cavey, cavex + 1] = Terrain.MOUNTAIN;
             map[cavey, cavex - 1] = Terrain.MOUNTAIN;
@@ -2702,7 +2702,7 @@ public abstract class World
     {
         foreach (Location location in AllLocations.Where(i => i.PassThrough != 0))
         {
-            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.Ypos == i.Item1))
+            if (raftCoordinates.Any(i => location.Xpos == i.Item2 && location.YRaw == i.Item1))
             {
                 return true;
             }
@@ -2722,7 +2722,7 @@ public abstract class World
             foreach (Location child in parent.Children)
             {
                 child.Xpos = parent.Xpos;
-                child.Ypos = parent.Ypos;
+                child.Y = parent.Y;
             }
         }
     }
