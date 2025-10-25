@@ -144,6 +144,7 @@ sealed class DeathMountain : World
         MAP_COLS = 64;
 
         baseAddr = RomMap.DM_CAVE1A_TILE_LOCATION;
+        continentId = Continent.DM;
         VANILLA_MAP_ADDR = 0x665c;
 
         biome = props.DmBiome switch
@@ -721,7 +722,7 @@ sealed class DeathMountain : World
                     {
                         MAP_COLS = 29;
                     }
-                    bool r = DrawRaft(false, raftDirection);
+                    bool r = DrawRaft(raftDirection);
                     MAP_COLS = 64;
                     if (!r)
                     {
@@ -735,7 +736,7 @@ sealed class DeathMountain : World
                     {
                         MAP_COLS = 29;
                     }
-                    bool b = DrawRaft(true, bridgeDirection);
+                    bool b = DrawBridge(bridgeDirection);
                     MAP_COLS = 64;
                     if (!b)
                     {
