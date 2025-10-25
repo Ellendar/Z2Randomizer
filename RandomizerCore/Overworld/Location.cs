@@ -112,6 +112,11 @@ public class Location
 
     public string Name { get; set; }
 
+    public const int CONNECTOR_BRIDGE_ID = 40;
+    public const int CONNECTOR_RAFT_ID = 41;
+    public const int CONNECTOR_CAVE1_ID = 42;
+    public const int CONNECTOR_CAVE2_ID = 43;
+
     /*
     Byte 0
 
@@ -203,8 +208,8 @@ public class Location
             (Continent.WEST, 68, 37, 57) => "P2_RED_JAR",
             (Continent.WEST, 0, 0, 57) => "RED_JAR_BEACH",
             (Continent.WEST, 102, 38, 57) => "EX_LIFE_BEACH",
-            (Continent.WEST, 95, 10, 42) => "DM_ENTRANCE",
-            (Continent.WEST, 96, 21, 43) => "DM_EXIT",
+            (Continent.WEST, 95, 10, CONNECTOR_CAVE1_ID) => "DM_ENTRANCE",
+            (Continent.WEST, 96, 21, CONNECTOR_CAVE2_ID) => "DM_EXIT",
             (Continent.WEST, 88, 50, 60) => "KINGS_TOMB",
             (Continent.WEST, 54, 46, 2) => "RAURU",
             (Continent.WEST, 36, 2, 5) => "RUTO",
@@ -248,7 +253,7 @@ public class Location
             (Continent.EAST, 83, 3, 25) => "DEATH_VALLEY_BATTLE_3",
             (Continent.EAST, 86, 8, 24) => "DEATH_VALLEY_BATTLE_2",
             (Continent.EAST, 99, 8, 26) => "DEATH_VALLEY_BATTLE_1",
-            (Continent.EAST, 40, 52, 40) => "MAZE_ISLAND_BRIDGE",
+            (Continent.EAST, 40, 52, CONNECTOR_BRIDGE_ID) => "MAZE_ISLAND_BRIDGE",
             (Continent.EAST, 60, 23, 14) => "NABOORU",
             (Continent.EAST, 33, 3, 17) => "DARUNIA",
             (Continent.EAST, 81, 61, 18) => "NEW_KASUTO",
@@ -304,11 +309,11 @@ public class Location
             (Continent.MAZE, 50, 46, 49) => "MAZE_ISLAND_FORCED_BATTLE_4",
             (Continent.MAZE, 46, 48, 50) => "MAZE_ISLAND_FORCED_BATTLE_5",
             (Continent.MAZE, 42, 50, 51) => "MAZE_ISLAND_FORCED_BATTLE_6",
-            (_, 67, 40, 40) => "BRIDGE",
-            (_, 77, 61, 41) => "RAFT_TILE",
-            (_, 52, 7, 41) => "RAFT_TILE",
-            (_, 37, 7, 42) => "DM_ENTRANCE_CAVE",
-            (_, 37, 23, 43) => "DM_EXIT_CAVE",
+            (_, 67, 40, CONNECTOR_BRIDGE_ID) => "BRIDGE",
+            (_, 77, 61, CONNECTOR_RAFT_ID) => "RAFT_TILE",
+            (_, 52, 7, CONNECTOR_RAFT_ID) => "RAFT_TILE",
+            (_, 37, 7, CONNECTOR_CAVE1_ID) => "DM_ENTRANCE_CAVE",
+            (_, 37, 23, CONNECTOR_CAVE2_ID) => "DM_EXIT_CAVE",
             (_, _, _, _) => "Unknown (" + Continent.GetName(Continent) + ")"
         };
 

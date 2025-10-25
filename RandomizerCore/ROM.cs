@@ -2279,6 +2279,11 @@ ResetRedPalettePayload:
         return locations;
     }
 
+    /// <summary>
+    /// Loads location bytes from a ROM address, parses it, and
+    /// returns a Location object with the parsed data as well as
+    /// `terrain` and `continent` set.
+    /// </summary>
     public Location LoadLocation(int addr, Terrain terrain, Continent continent)
     {
         byte yByte = GetByte(addr);

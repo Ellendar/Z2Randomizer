@@ -95,6 +95,7 @@ public sealed class EastHyrule : World
         logger.Trace("Initializing EastHyrule");
         isHorizontal = props.EastIsHorizontal;
         baseAddr = RomMap.EAST_MINOR_FOREST_TILE_BY_NABOORU_LOCATION;
+        continentId = Continent.EAST;
         List<Location> locations =
         [
             .. rom.LoadLocations(RomMap.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST_LOCATION, 6, terrains, Continent.EAST),
@@ -760,7 +761,7 @@ public sealed class EastHyrule : World
                 randomTerrainFilter.Remove(Terrain.LAVA);
                 if (raft != null)
                 {
-                    bool r = DrawRaft(false, raftDirection);
+                    bool r = DrawRaft(raftDirection);
                     if (!r)
                     {
                         return false;
@@ -769,8 +770,8 @@ public sealed class EastHyrule : World
 
                 if (bridge != null)
                 {
-                    bool b2 = DrawRaft(true, bridgeDirection);
-                    if (!b2)
+                    bool b = DrawBridge(bridgeDirection);
+                    if (!b)
                     {
                         return false;
                     }

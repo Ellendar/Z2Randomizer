@@ -79,6 +79,7 @@ sealed class MazeIsland : World
         MAP_COLS = 23;
 
         baseAddr = 0xA10c;
+        continentId = Continent.MAZE;
         VANILLA_MAP_ADDR = 0xa65c;
 
         biome = props.MazeBiome;
