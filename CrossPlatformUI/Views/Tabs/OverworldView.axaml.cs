@@ -3,10 +3,9 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using CrossPlatformUI.ViewModels;
 using ReactiveUI;
-using Avalonia;
+using ReactiveUI.Avalonia;
 
 namespace CrossPlatformUI.Views.Tabs;
 

@@ -7,6 +7,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
@@ -22,6 +24,7 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels.Tabs;
 
+[RequiresUnreferencedCode("")]
 public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 {
     private CancellationTokenSource backgroundUpdateTask = new ();

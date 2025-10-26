@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>default</LangVersion>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -26,18 +25,18 @@
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="DialogHost.Avalonia" Version="$(DialogHostAvaloniaVersion)" />
         <PackageReference Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />
         <PackageReference Include="Material.Icons.Avalonia" Version="$(MaterialIconsAvaloniaVersion)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
-        <PackageReference Include="ReactiveUI.Validation" Version="3.1.7" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+        <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.0" />
+        <PackageReference Include="ReactiveUI.Validation" Version="6.0.5" />
         <PackageReference Include="Aigamo.ResXGenerator" Version="4.2.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.2" />
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.6.5" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,12 +2,15 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
+[RequiresUnreferencedCode("")]
 public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableViewModel
 {
     public string? OutputFilePath { get; set; }

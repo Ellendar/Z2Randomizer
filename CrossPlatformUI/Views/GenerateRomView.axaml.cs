@@ -1,7 +1,8 @@
-using Avalonia.ReactiveUI;
+using Avalonia.Markup.Xaml;
 using static System.ObservableExtensions;
 using CrossPlatformUI.ViewModels;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace CrossPlatformUI.Views;
 
