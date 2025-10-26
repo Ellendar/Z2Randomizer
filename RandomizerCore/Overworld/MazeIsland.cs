@@ -94,7 +94,7 @@ sealed class MazeIsland : World
                 {
                     foreach (Location location in AllLocations)
                     {
-                        map[location.Ypos - 30, location.Xpos] = location.TerrainType;
+                        map[location.Y, location.Xpos] = location.TerrainType;
                         location.PassThrough = 64;
                     }
                 }
@@ -242,7 +242,7 @@ sealed class MazeIsland : World
                         if (cave1 != null && cave1.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null)
                         {
                             map[curry, currx] = Terrain.CAVE;
-                            cave1.Ypos = curry + 30;
+                            cave1.Y = curry;
                             cave1.Xpos = currx;
                             cave1.CanShuffle = false;
                             canPlaceCave = false;
@@ -251,7 +251,7 @@ sealed class MazeIsland : World
                         else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null && canPlaceCave)
                         {
                             map[curry, currx] = Terrain.CAVE;
-                            cave2.Ypos = curry + 30;
+                            cave2.Y = curry;
                             cave2.Xpos = currx;
                             cave2.CanShuffle = false;
                             SealDeadEnd(curry, currx);
@@ -291,7 +291,7 @@ sealed class MazeIsland : World
                     }
                 }
                 locationAtPalace4.Xpos = palace4x;
-                locationAtPalace4.Ypos = palace4y + 30;
+                locationAtPalace4.Y = palace4y;
                 map[palace4y, palace4x] = Terrain.PALACE;
                 map[palace4y + 1, palace4x] = Terrain.ROAD;
                 map[palace4y - 1, palace4x] = Terrain.ROAD;
@@ -343,7 +343,7 @@ sealed class MazeIsland : World
                         }
                         raftY--;
                         map[raftY, raftX] = Terrain.BRIDGE;
-                        raft.Ypos = raftY + 30;
+                        raft.Y = raftY;
                         raft.Xpos = raftX;
                         raftY--;
 
@@ -372,7 +372,7 @@ sealed class MazeIsland : World
                         }
                         raftY++;
                         map[raftY, raftX] = Terrain.BRIDGE;
-                        raft.Ypos = raftY + 30;
+                        raft.Y = raftY;
                         raft.Xpos = raftX;
                         raftY++;
 
@@ -400,7 +400,7 @@ sealed class MazeIsland : World
 
                         raftX--;
                         map[raftY, raftX] = Terrain.BRIDGE;
-                        raft.Ypos = raftY + 30;
+                        raft.Y = raftY;
                         raft.Xpos = raftX;
                         raftX--;
 
@@ -427,7 +427,7 @@ sealed class MazeIsland : World
                         }
                         raftX++;
                         map[raftY, raftX] = Terrain.BRIDGE;
-                        raft.Ypos = raftY + 30;
+                        raft.Y = raftY;
                         raft.Xpos = raftX;
                         raftX++;
                         while (raftX < MAP_COLS)
@@ -479,15 +479,15 @@ sealed class MazeIsland : World
                         bridgeY--;
 
                         map[bridgeY, bridgeX] = Terrain.BRIDGE;
-                        bridge.Ypos = bridgeY + 30;
+                        bridge.Y = bridgeY;
                         bridge.Xpos = bridgeX;
                         while (bridgeY >= 0)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.PALACE
                                 || map[bridgeY, bridgeX] == Terrain.CAVE
-                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
-                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
-                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Y == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Y == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Y == bridgeY)
                             {
                                 return false;
                             }
@@ -518,16 +518,16 @@ sealed class MazeIsland : World
 
                         bridgeY++;
                         map[bridgeY, bridgeX] = Terrain.BRIDGE;
-                        bridge.Ypos = bridgeY + 30;
+                        bridge.Y = bridgeY;
                         bridge.Xpos = bridgeX;
 
                         while (bridgeY < MAP_ROWS)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.PALACE
                                 || map[bridgeY, bridgeX] == Terrain.CAVE
-                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
-                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
-                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Y == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Y == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Y == bridgeY)
                             {
                                 return false;
                             }
@@ -560,16 +560,16 @@ sealed class MazeIsland : World
 
                         bridgeX--;
                         map[bridgeY, bridgeX] = Terrain.BRIDGE;
-                        bridge.Ypos = bridgeY + 30;
+                        bridge.Y = bridgeY;
                         bridge.Xpos = bridgeX;
 
                         while (bridgeX >= 0)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.PALACE 
                                 || map[bridgeY, bridgeX] == Terrain.CAVE
-                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
-                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
-                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Y == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Y == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Y == bridgeY)
                             {
                                 return false;
                             }
@@ -603,16 +603,16 @@ sealed class MazeIsland : World
 
                         bridgeX++;
                         map[bridgeY, bridgeX] = Terrain.BRIDGE;
-                        bridge.Ypos = bridgeY + 30;
+                        bridge.Y = bridgeY;
                         bridge.Xpos = bridgeX;
 
                         while (bridgeX < MAP_COLS)
                         {
                             if (map[bridgeY, bridgeX] == Terrain.PALACE
                                 || map[bridgeY, bridgeX] == Terrain.CAVE
-                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Ypos - 30 == bridgeY
-                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Ypos - 30 == bridgeY
-                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Ypos - 30 == bridgeY)
+                                || locationAtPalace4.Xpos == bridgeX && locationAtPalace4.Y == bridgeY
+                                || cave1 != null && cave1.Xpos == bridgeX && cave1.Y == bridgeY
+                                || cave2 != null && cave2.Xpos == bridgeX && cave2.Y == bridgeY)
                             {
                                 return false;
                             }
@@ -650,7 +650,7 @@ sealed class MazeIsland : World
                         }
 
                         location.Xpos = x;
-                        location.Ypos = y + 30;
+                        location.Y = y;
                     }
                 }
 
@@ -935,7 +935,7 @@ sealed class MazeIsland : World
 
         foreach (Location location in AllLocations)
         {
-            if (visitation[location.Ypos - 30, location.Xpos])
+            if (visitation[location.Y, location.Xpos])
             {
                 location.Reachable = true;
             }

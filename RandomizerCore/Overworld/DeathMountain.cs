@@ -189,7 +189,7 @@ sealed class DeathMountain : World
                     specRock.TerrainType = Terrain.ROCK;
                     foreach (Location location in AllLocations)
                     {
-                        map[location.Ypos - 30, location.Xpos] = location.TerrainType;
+                        map[location.Y, location.Xpos] = location.TerrainType;
                     }
                 }
                 foreach (Location location in Locations[Terrain.CAVE])
@@ -440,7 +440,7 @@ sealed class DeathMountain : World
 
                         map[y, x] = location.TerrainType;
                         location.Xpos = x;
-                        location.Ypos = y + 30;
+                        location.Y = y;
                         if (location.TerrainType == Terrain.CAVE)
                         {
 
@@ -547,10 +547,10 @@ sealed class DeathMountain : World
                                     List<Location> l2 = connectionsDM[location];
                                     location.CanShuffle = false;
                                     location.Xpos = x;
-                                    location.Ypos = y + 30;
+                                    location.Y = y;
                                     l2[0].CanShuffle = false;
                                     l2[0].Xpos = otherx;
-                                    l2[0].Ypos = othery + 30;
+                                    l2[0].Y = othery;
                                     PlaceCave(x, y, direction, s);
                                     PlaceCave(otherx, othery, direction.Reverse(), s);
                                 }
@@ -604,10 +604,10 @@ sealed class DeathMountain : World
                                     List<Location> caveExits = connectionsDM[location];
                                     location.CanShuffle = false;
                                     location.Xpos = x;
-                                    location.Ypos = y + 30;
+                                    location.Y = y;
                                     caveExits[0].CanShuffle = false;
                                     caveExits[0].Xpos = otherx;
-                                    caveExits[0].Ypos = othery + 30;
+                                    caveExits[0].Y = othery;
                                     PlaceCave(x, y, direction, s);
                                     PlaceCave(otherx, othery, direction.Reverse(), s);
                                     int newx = 0;
@@ -624,7 +624,7 @@ sealed class DeathMountain : World
                                         return false;
                                     }
                                     caveExits[1].Xpos = newx;
-                                    caveExits[1].Ypos = newy + 30;
+                                    caveExits[1].Y = newy;
                                     caveExits[1].CanShuffle = false;
                                     PlaceCave(newx, newy, direction, s);
                                     y = newy;
@@ -676,7 +676,7 @@ sealed class DeathMountain : World
                                     location.CanShuffle = false;
                                     caveExits[2].CanShuffle = false;
                                     caveExits[2].Xpos = otherx;
-                                    caveExits[2].Ypos = othery + 30;
+                                    caveExits[2].Y = othery;
                                     PlaceCave(otherx, othery, direction.Reverse(), s);
                                 }
                             }
@@ -752,7 +752,7 @@ sealed class DeathMountain : World
                 } while (!walkableTerrains.Contains(map[y, x]) || map[y + 1, x] == Terrain.CAVE || map[y - 1, x] == Terrain.CAVE || map[y, x + 1] == Terrain.CAVE || map[y, x - 1] == Terrain.CAVE);
 
                 map[y, x] = Terrain.ROCK;
-                specRock.Ypos = y + 30;
+                specRock.Y = y;
                 specRock.Xpos = x;
 
 
@@ -1004,12 +1004,12 @@ sealed class DeathMountain : World
         cave1r.CanShuffle = false;
         cave2l.CanShuffle = false;
         cave2r.CanShuffle = false;
-        map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
-        map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
+        map[cave1l.Y, cave1l.Xpos] = Terrain.MOUNTAIN;
+        map[cave2l.Y, cave2l.Xpos] = Terrain.MOUNTAIN;
 
-        map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
+        map[cave1r.Y, cave1r.Xpos] = Terrain.MOUNTAIN;
 
-        map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
+        map[cave2r.Y, cave2r.Xpos] = Terrain.MOUNTAIN;
 
 
         int caveType = RNG.Next(2);
@@ -1069,7 +1069,7 @@ sealed class DeathMountain : World
 
         foreach (Location location in AllLocations)
         {
-            if (visitation[location.Ypos - 30, location.Xpos])
+            if (visitation[location.Y, location.Xpos])
             {
                 location.Reachable = true;
                 if (connectionsDM.Keys.Contains(location))
@@ -1077,7 +1077,7 @@ sealed class DeathMountain : World
                     foreach(Location l3 in connectionsDM[location])
                     { 
                         l3.Reachable = true;
-                        visitation[l3.Ypos - 30, l3.Xpos] = true;
+                        visitation[l3.Y, l3.Xpos] = true;
                     }
                 }
             }
@@ -1105,7 +1105,7 @@ sealed class DeathMountain : World
         List<(int, int)> pendingCoordinates = new();
         foreach(Location location in GetContinentConnections())
         {
-            pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
+            pendingCoordinates.Add((location.Y, location.Xpos));
         }
         int y, x;
         do
@@ -1120,7 +1120,7 @@ sealed class DeathMountain : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Y == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable
@@ -1128,7 +1128,7 @@ sealed class DeathMountain : World
                 //if it's a connection cave, add the exit(s) to the pending locations
                 if(connectionsDM.ContainsKey(here))
                 {
-                    connectionsDM[here].ForEach(i => pendingCoordinates.Add((i.Ypos - 30, i.Xpos)));
+                    connectionsDM[here].ForEach(i => pendingCoordinates.Add((i.Y, i.Xpos)));
                 }
             }
 
