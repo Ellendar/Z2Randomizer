@@ -475,48 +475,48 @@ public enum NesColor
     [Description("Default")] Default = -1,
     [Description("Random")] Random = -2,
 
-    [Description("Dark Gray")] DarkGray = 0x00,
-    [Description("Deep Blue")] DeepBlue = 0x01,
-    [Description("Indigo Blue")] IndigoBlue = 0x02,
-    [Description("Indigo")] Indigo = 0x03,
+    [Description("Granite Gray")] GraniteGray = 0x00, // #656565
+    [Description("Navy Blue")] NavyBlue = 0x01, // #00127d
+    [Description("Neon Blue")] NeonBlue = 0x02, // #18008e
+    [Description("Indigo")] Indigo = 0x03, // #360082
     [Description("Violet")] Violet = 0x04,
-    [Description("Deep Magenta")] DeepMagenta = 0x05,
-    [Description("Rust Red")] RustRed = 0x06,
+    [Description("Dark Scarlet")] DarkScarlet = 0x05, // #5a0018
+    [Description("Dark Rust")] DarkRust = 0x06, // #4f0500
     [Description("Brown")] Brown = 0x07,
-    [Description("Olive Green")] OliveGreen = 0x08,
-    [Description("Forest Green")] ForestGreen = 0x09,
-    [Description("Dark Green")] DarkGreen = 0x0A,
-    [Description("Green-Teal")] GreenTeal = 0x0B,
-    [Description("Teal")] Teal = 0x0C,
+    [Description("Dark Olive")] DarkOlive = 0x08, // #1d3100
+    [Description("Dark Green")] DarkGreen = 0x09, // #003d00
+    [Description("Forest Green")] ForestGreen = 0x0A, // #004100
+    [Description("Pond")] Pond = 0x0B, // #003b17
+    [Description("Lagoon")] Lagoon = 0x0C, // #002e55
 
     [Description("Light Gray")] LightGray = 0x10,
-    [Description("Azure Blue")] AzureBlue = 0x11,
+    [Description("Lake")] Lake = 0x11, // #194ec8
     [Description("Violet Blue")] VioletBlue = 0x12,
     [Description("Vivid Purple")] VividPurple = 0x13,
-    [Description("Magenta")] Magenta = 0x14,
-    [Description("Fuchsia Pink")] FuchsiaPink = 0x15,
-    [Description("Rust Orange")] RustOrange = 0x16,
-    [Description("Burnt Orange")] BurntOrange = 0x17,
-    [Description("Mustard Brown")] MustardBrown = 0x18,
-    [Description("Olive")] Olive = 0x19,
+    [Description("Deep Violet")] DeepViolet = 0x14, // #931bae
+    [Description("Jazzberry Jam")] JazzberryJam = 0x15, // #9e1a5e
+    [Description("Burnt Sienna")] BurntSienna = 0x16, // #993200
+    [Description("Dark Bronze")] DarkBronze = 0x17, // #7b4b00
+    [Description("Mud Green")] MudGreen = 0x18, // #5b6700
+    [Description("Grass")] Grass = 0x19, // #267a00
     [Description("Green")] Green = 0x1A,
     [Description("Emerald Green")] EmeraldGreen = 0x1B,
-    [Description("Sea Blue")] SeaBlue = 0x1C,
+    [Description("Sea Blue")] SeaBlue = 0x1C, // #006e8a
     [Description("Black")] Black = 0x1D,
 
     [Description("White")] White20 = 0x20,
     [Description("Sky Blue")] SkyBlue = 0x21,
-    [Description("Baby Blue")] BabyBlue = 0x22,
+    [Description("Periwinkle")] Periwinkle = 0x22, // #8e89ff
     [Description("Orchid Purple")] OrchidPurple = 0x23,
     [Description("Bubblegum Pink")] BubblegumPink = 0x24,
     [Description("Rose Pink")] RosePink = 0x25,
     [Description("Coral")] Coral = 0x26,
     [Description("Goldenrod")] Goldenrod = 0x27,
-    [Description("Chartreuse")] Chartreuse = 0x28,
+    [Description("Olive Yellow")] OliveYellow = 0x28, // #b9b40a
     [Description("Lime Green")] LimeGreen = 0x29,
     [Description("Bright Green")] BrightGreen = 0x2A,
     [Description("Mint Green")] MintGreen = 0x2B,
-    [Description("Cyan Blue")] CyanBlue = 0x2C,
+    [Description("Turquoise")] Turquoise = 0x2C,
     [Description("Medium Gray")] MediumGray = 0x2D,
 
     [Description("White")] White = 0x30,
@@ -526,8 +526,8 @@ public enum NesColor
     [Description("Light Pink")] LightPink = 0x34,
     [Description("Pale Rose")] PaleRose = 0x35,
     [Description("Peach")] Peach = 0x36,
-    [Description("Tan")] Tan = 0x37,
-    [Description("Light Olive")] LightOlive = 0x38,
+    [Description("Tan")] Tan = 0x37, // #f8dfb1
+    [Description("Medium Champagne")] MediumChampagne = 0x38, // #edeaa4
     [Description("Pale Green")] PaleGreen = 0x39,
     [Description("Light Green")] LightGreen = 0x3A,
     [Description("Seafoam Green")] SeafoamGreen = 0x3B,
@@ -593,6 +593,19 @@ public enum IndeterminateOptionRate
     THREE_QUARTERS,
     [Description("90%")]
     NINETY_PERCENT
+}
+
+[DefaultValue(HIDE)]
+public enum LessImportantLocationsOption
+{
+    [Description("Blend In")]
+    HIDE,
+    [Description("Isolate")]
+    ISOLATE,
+    [Description("Remove")]
+    REMOVE,
+    [Description("Random")]
+    RANDOM,
 }
 
 [DefaultValue(PATH)]
@@ -682,6 +695,8 @@ public static class Enums
     public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
     public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
+    public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
+
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();
     public static IEnumerable<EnumDescription> CharacterColorList { get; } = ToDescriptions<NesColor>();
     public static IEnumerable<EnumDescription> BeamSpritesList { get; } = ToDescriptions<BeamSprites>();

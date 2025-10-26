@@ -30,7 +30,7 @@ public static class HardmodePreset
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = true,
         GenerateBaguWoods = true,
-        HideLessImportantLocations = true,
+        LessImportantLocationsOption = LessImportantLocationsOption.REMOVE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,

@@ -50,8 +50,8 @@
     <PackageReference Include="NLog" Version="6.0.5" />
     <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" />
-	<TrimmerRootAssembly Include="FtRandoLib" />
-	<TrimmerRootAssembly Include="CoreSourceGenerator" />
+    <TrimmerRootAssembly Include="FtRandoLib" />
+    <TrimmerRootAssembly Include="CoreSourceGenerator" />
     <PackageReference Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
   </ItemGroup>
 

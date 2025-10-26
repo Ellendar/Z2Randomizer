@@ -265,7 +265,7 @@ public sealed class WestHyrule : World
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN };
-        if (props.HideLessImportantLocations)
+        if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
         {
             unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_AT_START_LOCATION));
             unimportantLocs.Add(GetLocationByMem(RomMap.WEST_MINOR_FOREST_TILE_BY_SARIA_LOCATION));
@@ -390,7 +390,7 @@ public sealed class WestHyrule : World
                 {
                     foreach (Location location in AllLocations)
                     {
-                        map[location.Ypos - 30, location.Xpos] = location.TerrainType;
+                        map[location.Y, location.Xpos] = location.TerrainType;
                     }
                 }
                 foreach(Location location in Locations[Terrain.CAVE])
@@ -519,9 +519,9 @@ public sealed class WestHyrule : World
                         {
                             riverTerrain = Terrain.DESERT;
                             bridge1.CanShuffle = false;
-                            bridge1.Ypos = 0;
+                            bridge1.YRaw = 0;
                             bridge2.CanShuffle = false;
-                            bridge2.Ypos = 0;
+                            bridge2.YRaw = 0;
                         }
                         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN };
                         randomTerrainFilter = new List<Terrain> { Terrain.DESERT, Terrain.GRASS, Terrain.FOREST,  Terrain.GRAVE, Terrain.MOUNTAIN, fillerWater };
@@ -711,8 +711,7 @@ public sealed class WestHyrule : World
 
                 BlockCaves(props.BoulderBlockConnections);
                 //Debug.WriteLine(GetMapDebug());
-                PlaceHiddenLocations();
-
+                PlaceHiddenLocations(props.LessImportantLocationsOption);
 
                 if (biome == Biome.CANYON || biome == Biome.DRY_CANYON)
                 {
@@ -763,7 +762,7 @@ public sealed class WestHyrule : World
                 {
                     if (location.CanShuffle)
                     {
-                        location.Ypos = 0;
+                        location.YRaw = 0;
                         location.CanShuffle = false;
                     }
                 }
@@ -772,7 +771,7 @@ public sealed class WestHyrule : World
                 {
                     if (location.CanShuffle)
                     {
-                        location.Ypos = 0;
+                        location.YRaw = 0;
                         location.CanShuffle = false;
                     }
                 }
@@ -803,13 +802,13 @@ public sealed class WestHyrule : World
             }
         }
 
-        visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
+        visitation[northPalace.Y, northPalace.Xpos] = true;
         return true;
     }
 
     public void SetStart()
     {
-        visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
+        visitation[northPalace.Y, northPalace.Xpos] = true;
         northPalace.Reachable = true;
     }
 
@@ -829,7 +828,7 @@ public sealed class WestHyrule : World
         {
             return false;
         }
-        bagu.Ypos = y + 30;
+        bagu.Y = y;
         bagu.Xpos = x;
         bagu.CanShuffle = false;
         map[y, x] = Terrain.FOREST;
@@ -846,7 +845,7 @@ public sealed class WestHyrule : World
                 newy = RNG.Next(y - 3, y + 4);
                 tries++;
             }
-            lostWoods[placed].Ypos = newy + 30;
+            lostWoods[placed].Y = newy;
             lostWoods[placed].Xpos = newx;
             map[newy, newx] = Terrain.FOREST;
             lostWoods[placed].CanShuffle = false;
@@ -858,7 +857,7 @@ public sealed class WestHyrule : World
         }
         for(int i = placed; i < lostWoods.Count; i++)
         {
-            lostWoods[placed].Ypos = 0;
+            lostWoods[placed].YRaw = 0;
         }
         return true;
     }
@@ -1073,8 +1072,8 @@ public sealed class WestHyrule : World
             cave1l = fairyCave; //fairy cave
             cave1r = fairyCave2;
         }
-        map[cave1l.Ypos - 30, cave1l.Xpos] = Terrain.MOUNTAIN;
-        map[cave1r.Ypos - 30, cave1r.Xpos] = Terrain.MOUNTAIN;
+        map[cave1l.Y, cave1l.Xpos] = Terrain.MOUNTAIN;
+        map[cave1r.Y, cave1r.Xpos] = Terrain.MOUNTAIN;
         if (caveCount > 1)
         {
             int cavenum2 = RNG.Next(availableConnectorCount);
@@ -1097,8 +1096,8 @@ public sealed class WestHyrule : World
                 cave2l = fairyCave; //fairy cave
                 cave2r = fairyCave2;
             }
-            map[cave2l.Ypos - 30, cave2l.Xpos] = Terrain.MOUNTAIN;
-            map[cave2r.Ypos - 30, cave2r.Xpos] = Terrain.MOUNTAIN;
+            map[cave2l.Y, cave2l.Xpos] = Terrain.MOUNTAIN;
+            map[cave2r.Y, cave2r.Xpos] = Terrain.MOUNTAIN;
         }
         int caveOrientation = RNG.Next(2);
         if (isHorizontal)
@@ -1111,12 +1110,12 @@ public sealed class WestHyrule : World
             cave1l.CanShuffle = false;
             cave1r.CanShuffle = false;
             Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-            map[cave1l.Ypos - 30, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Ypos - 29, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1r.Ypos - 30, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Ypos - 31, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1l.Y, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Y + 1, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Y - 1, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1r.Y, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Y + 1, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Y - 1, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
 
             if (caveCount > 1)
             {
@@ -1140,12 +1139,12 @@ public sealed class WestHyrule : World
                 cave2l.CanShuffle = false;
                 cave2r.CanShuffle = false;
                 caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Ypos - 30, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Ypos - 29, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2r.Ypos - 30, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Ypos - 31, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2l.Y, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Y + 1, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Y - 1, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2r.Y, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Y + 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Y - 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             }
             
             if(caveCount == 1)
@@ -1162,7 +1161,7 @@ public sealed class WestHyrule : World
                     palacex += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Y = palacey;
                 locationAtPalace3.Xpos = palacex;
                 map[palacey, palacex + delta] = Terrain.MOUNTAIN;
 
@@ -1182,7 +1181,7 @@ public sealed class WestHyrule : World
                     palacey += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Y = palacey;
                 locationAtPalace3.Xpos = palacex;
                 map[palacey + delta, palacex] = Terrain.MOUNTAIN;
 
@@ -1200,12 +1199,12 @@ public sealed class WestHyrule : World
             cave1r.CanShuffle = false;
             Terrain caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
 
-            map[cave1l.Ypos - 31, cave1l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Ypos - 31, cave1l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1l.Ypos - 31, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-            map[cave1r.Ypos - 29, cave1r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-            map[cave1r.Ypos - 29, cave1r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1l.Y - 1, cave1l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Y - 1, cave1l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1l.Y - 1, cave1l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+            map[cave1r.Y + 1, cave1r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Y + 1, cave1r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+            map[cave1r.Y + 1, cave1r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
 
             if (caveCount > 1)
             {
@@ -1229,12 +1228,12 @@ public sealed class WestHyrule : World
                 cave2l.CanShuffle = false;
                 cave2r.CanShuffle = false;
                 caveExitTerrain = climate.GetRandomTerrain(RNG, randomTerrainFilter);
-                map[cave2l.Ypos - 31, cave2l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Ypos - 31, cave2l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2l.Ypos - 31, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
-                map[cave2r.Ypos - 29, cave2r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
-                map[cave2r.Ypos - 29, cave2r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2l.Y - 1, cave2l.Xpos] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Y - 1, cave2l.Xpos + 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2l.Y - 1, cave2l.Xpos - 1] = caveOrientation == 0 ? caveExitTerrain : Terrain.FOREST;
+                map[cave2r.Y + 1, cave2r.Xpos] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Y + 1, cave2r.Xpos + 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
+                map[cave2r.Y + 1, cave2r.Xpos - 1] = caveOrientation == 0 ? Terrain.FOREST : caveExitTerrain;
             }
 
             if (caveCount == 1)
@@ -1251,7 +1250,7 @@ public sealed class WestHyrule : World
                     palacey += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Y = palacey;
                 locationAtPalace3.Xpos = palacex;
                 map[palacey + delta, palacex] = Terrain.MOUNTAIN;
 
@@ -1272,7 +1271,7 @@ public sealed class WestHyrule : World
                     palacex += delta;
                 }
                 map[palacey, palacex] = Terrain.PALACE;
-                locationAtPalace3.Ypos = palacey + 30;
+                locationAtPalace3.Y = palacey;
                 locationAtPalace3.Xpos = palacex;
                 map[palacey, palacex + delta] = Terrain.MOUNTAIN;
 
@@ -1296,55 +1295,55 @@ public sealed class WestHyrule : World
             //Item caves
             if (boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
-                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null)
+                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Y, cave.Xpos + 2)) == null)
                 {
-                    map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.ROCK;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.CAVE;
+                    map[cave.Y, cave.Xpos - 1] = Terrain.ROCK;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y, cave.Xpos + 1] = Terrain.CAVE;
                     if (cave.Xpos + 2 < MAP_COLS)
                     {
-                        map[cave.Ypos - 30, cave.Xpos + 2] = Terrain.MOUNTAIN;
+                        map[cave.Y, cave.Xpos + 2] = Terrain.MOUNTAIN;
                     }
                     cave.Xpos++;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null)
+                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Y, cave.Xpos - 2)) == null)
                 {
-                    map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.ROCK;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.CAVE;
+                    map[cave.Y, cave.Xpos + 1] = Terrain.ROCK;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y, cave.Xpos - 1] = Terrain.CAVE;
                     if (cave.Xpos - 2 >= 0)
                     {
-                        map[cave.Ypos - 30, cave.Xpos - 2] = Terrain.MOUNTAIN;
+                        map[cave.Y, cave.Xpos - 2] = Terrain.MOUNTAIN;
                     }
                     cave.Xpos--;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null)
+                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y - 2 < MAP_COLS && GetLocationByCoords((cave.Y - 2, cave.Xpos)) == null)
                 {
-                    map[cave.Ypos - 29, cave.Xpos] = Terrain.ROCK;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 31, cave.Xpos] = Terrain.CAVE;
-                    if (cave.Ypos - 32 >= 0)
+                    map[cave.Y + 1, cave.Xpos] = Terrain.ROCK;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y - 1, cave.Xpos] = Terrain.CAVE;
+                    if (cave.Y - 2 >= 0)
                     {
-                        map[cave.Ypos - 32, cave.Xpos] = Terrain.MOUNTAIN;
+                        map[cave.Y - 2, cave.Xpos] = Terrain.MOUNTAIN;
                     }
-                    cave.Ypos--;
+                    cave.Y--;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null)
+                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y + 2 < MAP_COLS && GetLocationByCoords((cave.Y + 2, cave.Xpos)) == null)
                 {
-                    map[cave.Ypos - 31, cave.Xpos] = Terrain.ROCK;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 29, cave.Xpos] = Terrain.CAVE;
-                    if (cave.Ypos - 28 < MAP_ROWS)
+                    map[cave.Y - 1, cave.Xpos] = Terrain.ROCK;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y + 1, cave.Xpos] = Terrain.CAVE;
+                    if (cave.Y + 2 < MAP_ROWS)
                     {
-                        map[cave.Ypos - 28, cave.Xpos] = Terrain.MOUNTAIN;
+                        map[cave.Y + 2, cave.Xpos] = Terrain.MOUNTAIN;
                     }
-                    cave.Ypos++;
+                    cave.Y++;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
@@ -1352,27 +1351,27 @@ public sealed class WestHyrule : World
             //Connector caves
             else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
             {
-                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN)
+                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.ROCK;
+                    map[cave.Y, cave.Xpos - 1] = Terrain.ROCK;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN)
+                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.ROCK;
+                    map[cave.Y, cave.Xpos + 1] = Terrain.ROCK;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN)
+                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 29, cave.Xpos] = Terrain.ROCK;
+                    map[cave.Y + 1, cave.Xpos] = Terrain.ROCK;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN)
+                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 31, cave.Xpos] = Terrain.ROCK;
+                    map[cave.Y - 1, cave.Xpos] = Terrain.ROCK;
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
@@ -1431,7 +1430,7 @@ public sealed class WestHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEnc.Reachable = true;
                             placedRoad = true;
@@ -1439,7 +1438,7 @@ public sealed class WestHyrule : World
                         else if (placedRocks < 1)
                         {
                             Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
-                            if ((roadEnc.Ypos - 30 != y2 && roadEnc.Xpos - 1 != x2) && (roadEnc.Ypos - 30 + 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Ypos - 30 - 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Ypos - 30 != y2 && roadEnc.Xpos + 1 != x2))
+                            if ((roadEnc.Y != y2 && roadEnc.Xpos - 1 != x2) && (roadEnc.Y + 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Y - 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Y != y2 && roadEnc.Xpos + 1 != x2))
                             {
                                 map[y2, x2] = Terrain.ROCK;
                                 placedRocks++;
@@ -1460,7 +1459,7 @@ public sealed class WestHyrule : World
         {
             Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
             roadEnc.Xpos = 0;
-            roadEnc.Ypos = 0;
+            roadEnc.YRaw = 0;
             roadEnc.CanShuffle = false;
         }
     }
@@ -1468,14 +1467,14 @@ public sealed class WestHyrule : World
 
     public override void UpdateVisit(Dictionary<Collectable, bool> itemGet)
     {
-        visitation[northPalace.Ypos - 30, northPalace.Xpos] = true;
+        visitation[northPalace.Y, northPalace.Xpos] = true;
         UpdateReachable(itemGet);
 
         foreach (Location location in AllLocations)
         {
-            if (location.Ypos > 30)
+            if (location.Y > 0)
             {
-                if (visitation[location.Ypos - 30, location.Xpos])
+                if (visitation[location.Y, location.Xpos])
                 {
                     location.Reachable = true;
                     if (connections.Keys.Contains(location))
@@ -1488,25 +1487,25 @@ public sealed class WestHyrule : World
                                 || (itemGet.ContainsKey(Collectable.DASH_SPELL) && itemGet[Collectable.DASH_SPELL] && itemGet[Collectable.JUMP_SPELL])))
                         {
                             l2.Reachable = true;
-                            visitation[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Y, l2.Xpos] = true;
                         }
 
                         if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
                         {
                             l2.Reachable = true;
-                            visitation[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Y, l2.Xpos] = true;
                         }
 
                         if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
                         {
                             l2.Reachable = true;
-                            visitation[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Y, l2.Xpos] = true;
                         }
 
                         if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
                         {
                             l2.Reachable = true;
-                            visitation[l2.Ypos - 30, l2.Xpos] = true;
+                            visitation[l2.Y, l2.Xpos] = true;
                         }
                     }
                 }
@@ -1553,9 +1552,9 @@ public sealed class WestHyrule : World
         List<(int, int)> pendingCoordinates = new();
         foreach (Location location in GetContinentConnections())
         {
-            pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
+            pendingCoordinates.Add((location.Y, location.Xpos));
         }
-        pendingCoordinates.Add((northPalace.Ypos - 30, northPalace.Xpos));
+        pendingCoordinates.Add((northPalace.Y, northPalace.Xpos));
         int y, x;
         do
         {
@@ -1569,7 +1568,7 @@ public sealed class WestHyrule : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Y == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable
@@ -1577,7 +1576,7 @@ public sealed class WestHyrule : World
                 //if it's a connection cave, add the exit(s) to the pending locations
                 if (connections.ContainsKey(here))
                 {
-                    pendingCoordinates.Add((connections[here].Ypos - 30, connections[here].Xpos));
+                    pendingCoordinates.Add((connections[here].Y, connections[here].Xpos));
                 }
             }
 
@@ -1634,7 +1633,7 @@ public sealed class WestHyrule : World
 
         foreach (Location location in connections.Keys)
         {
-            if (!requiredLocations.Contains(location) && location.Ypos != 0)
+            if (!requiredLocations.Contains(location) && location.YRaw != 0)
             {
                 requiredLocations.Add(location);
             }

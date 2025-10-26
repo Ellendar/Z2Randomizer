@@ -12,6 +12,7 @@ using Avalonia.Markup.Xaml;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.Views;
+using Material.Styles.Assists;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CrossPlatformUI;
@@ -101,6 +102,9 @@ public sealed partial class App : Application // , IDisposable
                 break;
         }
 
+        // Turn of window animations that were making the comboboxes glitch out when changing tabs.
+        var state = !TransitionAssist.GetDisableTransitions(TopLevel!);
+        TransitionAssist.SetDisableTransitions(TopLevel!, state);
         ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
         Services = ServiceContainer.BuildServiceProvider();
 

@@ -320,7 +320,7 @@ public sealed class EastHyrule : World
                 location.TerrainType = terrains[location.MemAddress];
             }
         }
-        if (props.HideLessImportantLocations)
+        if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
         {
             unimportantLocs =
             [
@@ -376,7 +376,7 @@ public sealed class EastHyrule : World
                 {
                     foreach (Location location in AllLocations)
                     {
-                        map[location.Ypos - 30, location.Xpos] = location.TerrainType;
+                        map[location.Y, location.Xpos] = location.TerrainType;
                     }
                 }
                 foreach (Location location in Locations[Terrain.CAVE])
@@ -481,7 +481,7 @@ public sealed class EastHyrule : World
                         location.TerrainType = terrains[location.MemAddress];
                     }
                 }
-                if (props.HideLessImportantLocations)
+                if (props.LessImportantLocationsOption != LessImportantLocationsOption.ISOLATE)
                 {
                     unimportantLocs = new List<Location>
                     {
@@ -764,7 +764,7 @@ public sealed class EastHyrule : World
 
                 bool riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.CAVE;
                 bool rockBlock = props.EastRocks && !props.EastRockIsPath;
-                PlaceHiddenLocations();
+                PlaceHiddenLocations(props.LessImportantLocationsOption);
                 BlockCaves(props.BoulderBlockConnections, riverDevil, rockBlock, hiddenPalaceLocation, hiddenKasutoLocation);
                 riverDevil = props.RiverDevilBlockerOption == RiverDevilBlockerOption.PATH;
                 rockBlock = props.EastRocks && props.EastRockIsPath;
@@ -804,14 +804,14 @@ public sealed class EastHyrule : World
                         }
                         //if the town has walkable space in all 4 cardinal directions
                         //It is currently impossible to put towns on the edge of the map but don't trust that
-                        if (map[location.Ypos - 29, location.Xpos].IsWalkable() && map[location.Ypos - 30, location.Xpos - 1].IsWalkable() &&
-                            map[location.Ypos - 31, location.Xpos].IsWalkable() && map[location.Ypos - 30, location.Xpos + 1].IsWalkable())
+                        if (map[location.Y + 1, location.Xpos].IsWalkable() && map[location.Y, location.Xpos - 1].IsWalkable() &&
+                            map[location.Y - 1, location.Xpos].IsWalkable() && map[location.Y, location.Xpos + 1].IsWalkable())
                         {
                             //replace each cardinal adjacency with a river devil
-                            map[location.Ypos - 29, location.Xpos] = Terrain.RIVER_DEVIL;
-                            map[location.Ypos - 31, location.Xpos] = Terrain.RIVER_DEVIL;
-                            map[location.Ypos - 30, location.Xpos - 1] = Terrain.RIVER_DEVIL;
-                            map[location.Ypos - 30, location.Xpos + 1] = Terrain.RIVER_DEVIL;
+                            map[location.Y + 1, location.Xpos] = Terrain.RIVER_DEVIL;
+                            map[location.Y - 1, location.Xpos] = Terrain.RIVER_DEVIL;
+                            map[location.Y, location.Xpos - 1] = Terrain.RIVER_DEVIL;
+                            map[location.Y, location.Xpos + 1] = Terrain.RIVER_DEVIL;
                             placed = true;
                             break;
                         }
@@ -827,11 +827,11 @@ public sealed class EastHyrule : World
                 {
                     if (location.CanShuffle && location.AppearsOnMap)
                     {
-                        location.Ypos = 0;
+                        location.YRaw = 0;
                         location.CanShuffle = false;
                     }
                 }
-                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
+                bytesWritten = WriteMapToRom(rom, false, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
                 //logger.Debug("East:" + bytesWritten);
             }
         }
@@ -857,7 +857,7 @@ public sealed class EastHyrule : World
                 baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
         }
 
-        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
+        WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Y, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
 
 
         visitation = new bool[MAP_ROWS, MAP_COLS];
@@ -882,7 +882,7 @@ public sealed class EastHyrule : World
             GetLocationByMem(RomMap.EAST_TRAP_LAVA_TILE_LOCATION3),
         ];
         //Clean them up in case of data leakage (this is not hypothetical)
-        passthroughLocations.ForEach(i => i.Ypos = 0);
+        passthroughLocations.ForEach(i => i.YRaw = 0);
 
         //Pick a spot for the center of the GP hole
         int xmin = 21;
@@ -955,7 +955,7 @@ public sealed class EastHyrule : World
         }
         map[palacey, palacex] = Terrain.PALACE;
         locationAtGP.Xpos = palacex;
-        locationAtGP.Ypos = palacey + 30;
+        locationAtGP.Y = palacey;
         locationAtGP.CanShuffle = false;
 
         int length = 20;
@@ -1273,7 +1273,7 @@ public sealed class EastHyrule : World
                             if (GetLocationByCoords((starty + 30, startx - 1)) == null && GetLocationByCoords((starty + 30, startx + 1)) == null)
                             {
                                 f.Xpos = startx;
-                                f.Ypos = starty + 30;
+                                f.Y = starty;
                                 f.CanShuffle = false;
                                 forcedPlaced--;
                                 forced++;
@@ -1284,7 +1284,7 @@ public sealed class EastHyrule : World
                             if (GetLocationByCoords((starty + 30 - 1, startx)) == null && GetLocationByCoords((starty + 30 + 1, startx)) == null)
                             {
                                 f.Xpos = startx;
-                                f.Ypos = starty + 30;
+                                f.Y = starty;
                                 f.CanShuffle = false;
                                 forcedPlaced--;
                                 forced++;
@@ -1300,7 +1300,7 @@ public sealed class EastHyrule : World
                             if (map[starty - 1, startx - 1] == Terrain.MOUNTAIN && map[starty - 1, startx + 1] == Terrain.MOUNTAIN)
                             {
                                 f.Xpos = startx;
-                                f.Ypos = starty - 1 + 30;
+                                f.Y = starty - 1;
                                 f.CanShuffle = false;
                                 forcedPlaced--;
                                 forced++;
@@ -1312,7 +1312,7 @@ public sealed class EastHyrule : World
                             if (map[starty - 1, startx - 1] == Terrain.MOUNTAIN && map[starty + 1, startx - 1] == Terrain.MOUNTAIN)
                             {
                                 f.Xpos = startx - 1;
-                                f.Ypos = starty + 30;
+                                f.Y = starty;
                                 f.CanShuffle = false;
                                 forcedPlaced--;
                                 forced++;
@@ -1329,7 +1329,7 @@ public sealed class EastHyrule : World
                             if (map[starty + 1, startx - 1] == Terrain.MOUNTAIN && map[starty + 1, startx + 1] == Terrain.MOUNTAIN)
                             {
                                 f.Xpos = startx;
-                                f.Ypos = starty + 1 + 30;
+                                f.Y = starty + 1;
                                 f.CanShuffle = false;
                                 forcedPlaced--;
                                 forced++;
@@ -1341,7 +1341,7 @@ public sealed class EastHyrule : World
                             if (map[starty - 1, startx + 1] == Terrain.MOUNTAIN && map[starty + 1, startx + 1] == Terrain.MOUNTAIN)
                             {
                                 f.Xpos = startx + 1;
-                                f.Ypos = starty + 30;
+                                f.Y = starty;
                                 f.CanShuffle = false;
                                 forcedPlaced--;
                                 forced++;
@@ -1363,7 +1363,7 @@ public sealed class EastHyrule : World
                         vodcave1 = vodcave3;
                         vodcave2 = vodcave4;
                     }
-                    map[vodcave1.Ypos - 30, vodcave1.Xpos] = Terrain.MOUNTAIN;
+                    map[vodcave1.Y, vodcave1.Xpos] = Terrain.MOUNTAIN;
                     map[starty, startx] = Terrain.CAVE;
                     map[starty + deltay, startx + deltax] = Terrain.MOUNTAIN;
                     if (deltax != 0)
@@ -1377,7 +1377,7 @@ public sealed class EastHyrule : World
                         map[starty, startx - 1] = Terrain.MOUNTAIN;
                     }
                     vodcave1.Xpos = startx;
-                    vodcave1.Ypos = starty + 30;
+                    vodcave1.Y = starty;
 
                     if (RNG.NextDouble() > .5 && vodRoutes != 2 && biome == Biome.VOLCANO)
                     {
@@ -1417,7 +1417,7 @@ public sealed class EastHyrule : World
                     {
                         return false;
                     }
-                    map[vodcave2.Ypos - 30, vodcave2.Xpos] = Terrain.MOUNTAIN;
+                    map[vodcave2.Y, vodcave2.Xpos] = Terrain.MOUNTAIN;
                     map[starty - deltay, startx - deltax] = Terrain.MOUNTAIN;
                     map[starty, startx] = Terrain.CAVE;
                     if (deltax != 0)
@@ -1431,7 +1431,7 @@ public sealed class EastHyrule : World
                         map[starty, startx - 1] = Terrain.MOUNTAIN;
                     }
                     vodcave2.Xpos = startx;
-                    vodcave2.Ypos = starty + 30;
+                    vodcave2.Y = starty;
                     cavePlaced = true;
                     vodcave1.CanShuffle = false;
                     vodcave2.CanShuffle = false;
@@ -1527,16 +1527,16 @@ public sealed class EastHyrule : World
         //Safety to ensure you can't enter a DM passthrough from the wrong direction, ending up in a mountain
         foreach (Location passthroughLocation in passthroughLocations)
         {
-            if(passthroughLocation.Ypos == 0 || passthroughLocation.Xpos == 0)
+            if(passthroughLocation.YRaw == 0 || passthroughLocation.Xpos == 0)
             {
                 continue;
             }
             foreach(Direction direction in DirectionExtensions.CARDINAL_DIRECTIONS)
             {
-                if (map[passthroughLocation.Ypos - 30 + direction.DeltaY(), passthroughLocation.Xpos + direction.DeltaX()] == Terrain.MOUNTAIN
-                    && map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] != Terrain.MOUNTAIN)
+                if (map[passthroughLocation.Y + direction.DeltaY(), passthroughLocation.Xpos + direction.DeltaX()] == Terrain.MOUNTAIN
+                    && map[passthroughLocation.Y - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] != Terrain.MOUNTAIN)
                 {
-                    //map[passthroughLocation.Ypos - 30 - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
+                    map[passthroughLocation.Y - direction.DeltaY(), passthroughLocation.Xpos - direction.DeltaX()] = Terrain.MOUNTAIN;
                 }
             }
         }
@@ -1569,7 +1569,7 @@ public sealed class EastHyrule : World
         hiddenKasutoLocation.NeedHammer = true;
         unimportantLocs.Remove(hiddenKasutoLocation);
         //hkLoc.CanShuffle = false;
-        //map[hkLoc.Ypos - 30, hkLoc.Xpos] = terrain.forest;
+        //map[hkLoc.Y, hkLoc.Xpos] = terrain.forest;
     }
 
     private bool RandomizeHiddenPalace(ROM rom, bool shuffleHidden, bool hiddenKasuto)
@@ -1653,9 +1653,9 @@ public sealed class EastHyrule : World
                 }
             }
         }
-        //map[hpLoc.Ypos - 30, hpLoc.Xpos] = map[hpLoc.Ypos - 29, hpLoc.Xpos];
+        //map[hpLoc.Y, hpLoc.Xpos] = map[hpLoc.Y + 1, hpLoc.Xpos];
         hiddenPalaceLocation.Xpos = xpos;
-        hiddenPalaceLocation.Ypos = ypos + 2 + 30;
+        hiddenPalaceLocation.Y = ypos + 2;
         hiddenPalaceCoords = (ypos + 30, xpos);
         //This is the only thing requiring a reference to the rom here and I have no idea what the fuck it is doing.
         rom.Put(0x1df70, (byte)t);
@@ -1681,7 +1681,7 @@ public sealed class EastHyrule : World
 
         foreach (Location location in AllLocations)
         {
-            if (location.Ypos > 30 && visitation[location.Ypos - 30, location.Xpos])
+            if (location.Y > 0 && visitation[location.Y, location.Xpos])
             {
                 if ((!location.NeedRecorder || (location.NeedRecorder && itemGet[Collectable.FLUTE]))
                     && (!location.NeedHammer || (location.NeedHammer && itemGet[Collectable.HAMMER]))
@@ -1695,19 +1695,19 @@ public sealed class EastHyrule : World
                         if (location.NeedFairy && itemGet[Collectable.FAIRY_SPELL])
                         {
                             connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
+                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
                         }
 
                         if (location.NeedJump && (itemGet[Collectable.JUMP_SPELL] || itemGet[Collectable.FAIRY_SPELL]))
                         {
                             connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
+                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
                         }
 
                         if (!location.NeedFairy && !location.NeedBagu && !location.NeedJump)
                         {
                             connectedLocation.Reachable = true;
-                            visitation[connectedLocation.Ypos - 30, connectedLocation.Xpos] = true;
+                            visitation[connectedLocation.Y, connectedLocation.Xpos] = true;
                         }
                     }
                 }
@@ -1717,7 +1717,7 @@ public sealed class EastHyrule : World
 
     private double ComputeDistance(Location l, Location l2)
     {
-        return Math.Sqrt(Math.Pow(l.Xpos - l2.Xpos, 2) + Math.Pow(l.Ypos - l2.Ypos, 2));
+        return Math.Sqrt(Math.Pow(l.Xpos - l2.Xpos, 2) + Math.Pow(l.Y - l2.Y, 2));
     }
 
     private void BlockCaves(bool connectionsCanBeBlocked, bool riverDevilBlocks, bool rockBlock, 
@@ -1745,7 +1745,7 @@ public sealed class EastHyrule : World
                 || cave == hiddenPalaceLocation
                 || (firstPlacedLocation != null 
                     && int.Abs(firstPlacedLocation.Xpos - cave.Xpos) < 4 
-                    && int.Abs(firstPlacedLocation.Ypos - cave.Ypos) < 4
+                    && int.Abs(firstPlacedLocation.Y - cave.Y) < 4
                    )
             );
 
@@ -1758,88 +1758,88 @@ public sealed class EastHyrule : World
             {
                 //Von's bug from discord: When moving back the mountain, check both the space the mountain will be placed
                 //and the space 1 past it so the possible border on isolated tiles is retained.
-                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS 
-                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 2)) == null
-                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos + 3)) == null
+                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS 
+                    && GetLocationByCoords((cave.Y, cave.Xpos + 2)) == null
+                    && GetLocationByCoords((cave.Y, cave.Xpos + 3)) == null
                 )
                 {
-                    map[cave.Ypos - 30, cave.Xpos - 1] = blockerTerrain;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 30, cave.Xpos + 1] = Terrain.CAVE;
+                    map[cave.Y, cave.Xpos - 1] = blockerTerrain;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y, cave.Xpos + 1] = Terrain.CAVE;
                     if (cave.Xpos + 2 < MAP_COLS)
                     {
-                        map[cave.Ypos - 30, cave.Xpos + 2] = Terrain.MOUNTAIN;
+                        map[cave.Y, cave.Xpos + 2] = Terrain.MOUNTAIN;
                     }
                     cave.Xpos++;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 
-                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 2)) == null
-                    && GetLocationByCoords((cave.Ypos - 30, cave.Xpos - 3)) == null
+                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 
+                    && GetLocationByCoords((cave.Y, cave.Xpos - 2)) == null
+                    && GetLocationByCoords((cave.Y, cave.Xpos - 3)) == null
                 )
                 {
-                    map[cave.Ypos - 30, cave.Xpos + 1] = blockerTerrain;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 30, cave.Xpos - 1] = Terrain.CAVE;
+                    map[cave.Y, cave.Xpos + 1] = blockerTerrain;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y, cave.Xpos - 1] = Terrain.CAVE;
                     if (cave.Xpos - 2 >= 0)
                     {
-                        map[cave.Ypos - 30, cave.Xpos - 2] = Terrain.MOUNTAIN;
+                        map[cave.Y, cave.Xpos - 2] = Terrain.MOUNTAIN;
                     }
                     cave.Xpos--;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 32 < MAP_COLS 
-                    && GetLocationByCoords((cave.Ypos - 32, cave.Xpos)) == null
-                    && GetLocationByCoords((cave.Ypos - 33, cave.Xpos)) == null
+                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y - 2 < MAP_COLS 
+                    && GetLocationByCoords((cave.Y - 2, cave.Xpos)) == null
+                    && GetLocationByCoords((cave.Y - 3, cave.Xpos)) == null
                 )
                 {
-                    map[cave.Ypos - 29, cave.Xpos] = blockerTerrain;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 31, cave.Xpos] = Terrain.CAVE;
-                    if (cave.Ypos - 32 >= 0)
+                    map[cave.Y + 1, cave.Xpos] = blockerTerrain;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y - 1, cave.Xpos] = Terrain.CAVE;
+                    if (cave.Y - 2 >= 0)
                     {
-                        map[cave.Ypos - 32, cave.Xpos] = Terrain.MOUNTAIN;
+                        map[cave.Y - 2, cave.Xpos] = Terrain.MOUNTAIN;
                     }
-                    cave.Ypos--;
+                    cave.Y--;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN && cave.Ypos - 28 < MAP_COLS 
-                    && GetLocationByCoords((cave.Ypos - 28, cave.Xpos)) == null
-                    && GetLocationByCoords((cave.Ypos - 27, cave.Xpos)) == null
+                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y + 2 < MAP_COLS 
+                    && GetLocationByCoords((cave.Y + 2, cave.Xpos)) == null
+                    && GetLocationByCoords((cave.Y + 3, cave.Xpos)) == null
                 )
                 {
-                    map[cave.Ypos - 31, cave.Xpos] = blockerTerrain;
-                    map[cave.Ypos - 30, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Ypos - 29, cave.Xpos] = Terrain.CAVE;
-                    if (cave.Ypos - 28 < MAP_ROWS)
+                    map[cave.Y - 1, cave.Xpos] = blockerTerrain;
+                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
+                    map[cave.Y + 1, cave.Xpos] = Terrain.CAVE;
+                    if (cave.Y + 2 < MAP_ROWS)
                     {
-                        map[cave.Ypos - 28, cave.Xpos] = Terrain.MOUNTAIN;
+                        map[cave.Y + 2, cave.Xpos] = Terrain.MOUNTAIN;
                     }
-                    cave.Ypos++;
+                    cave.Y++;
                     placed = true;
                 }
                 cavePicked = cave.MemAddress;
             }
             else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
             {
-                if (map[cave.Ypos - 30, cave.Xpos - 1] != Terrain.MOUNTAIN)
+                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 30, cave.Xpos - 1] = blockerTerrain;
+                    map[cave.Y, cave.Xpos - 1] = blockerTerrain;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 30, cave.Xpos + 1] != Terrain.MOUNTAIN)
+                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 30, cave.Xpos + 1] = blockerTerrain;
+                    map[cave.Y, cave.Xpos + 1] = blockerTerrain;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 29, cave.Xpos] != Terrain.MOUNTAIN)
+                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 29, cave.Xpos] = blockerTerrain;
+                    map[cave.Y + 1, cave.Xpos] = blockerTerrain;
                     placed = true;
                 }
-                else if (map[cave.Ypos - 31, cave.Xpos] != Terrain.MOUNTAIN)
+                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN)
                 {
-                    map[cave.Ypos - 31, cave.Xpos] = blockerTerrain;
+                    map[cave.Y - 1, cave.Xpos] = blockerTerrain;
                     placed = true;
                 }
                 cavePicked = cave.MemAddress;
@@ -1915,7 +1915,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION1);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -1923,7 +1923,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION2);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -1931,7 +1931,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION3);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -1939,7 +1939,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_TO_VOD_LOCATION);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -1998,7 +1998,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION1);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -2006,7 +2006,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION2);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -2014,7 +2014,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION3);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -2022,7 +2022,7 @@ public sealed class EastHyrule : World
                         {
                             Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_TO_VOD_LOCATION);
                             roadEnc.Xpos = x2;
-                            roadEnc.Ypos = y2 + 30;
+                            roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
@@ -2061,7 +2061,7 @@ public sealed class EastHyrule : World
         List<(int, int)> pendingCoordinates = new();
         foreach (Location location in GetContinentConnections())
         {
-            pendingCoordinates.Add((location.Ypos - 30, location.Xpos));
+            pendingCoordinates.Add((location.Y, location.Xpos));
         }
         int y, x;
         do
@@ -2076,7 +2076,7 @@ public sealed class EastHyrule : World
             }
             visitedCoordinates[y, x] = true;
             //if there is a location at this coordinate
-            Location? here = unreachedLocations.FirstOrDefault(location => location.Ypos - 30 == y && location.Xpos == x);
+            Location? here = unreachedLocations.FirstOrDefault(location => location.Y == y && location.Xpos == x);
             if (here != null)
             {
                 //it's reachable
@@ -2084,7 +2084,7 @@ public sealed class EastHyrule : World
                 //if it's a connection cave, add the exit(s) to the pending locations
                 if (connections.ContainsKey(here))
                 {
-                    pendingCoordinates.Add((connections[here].Ypos - 30, connections[here].Xpos));
+                    pendingCoordinates.Add((connections[here].Y, connections[here].Xpos));
                 }
             }
 
@@ -2158,7 +2158,7 @@ public sealed class EastHyrule : World
 
         foreach (Location location in connections.Keys)
         {
-            if (!requiredLocations.Contains(location) && location.Ypos != 0)
+            if (!requiredLocations.Contains(location) && location.YRaw != 0)
             {
                 requiredLocations.Add(location);
             }

@@ -16,7 +16,7 @@ public class Program
         => CommandLineApplication.Execute<Program>(args);
 
     [Option(ShortName = "f", Description = "Flag string")]
-    public string? Flags { get; }
+    public string? Flags { get; set; }
 
     [Option(ShortName = "r", Description = "Path to the base ROM file")]
     public string? Rom { get; }
@@ -85,10 +85,6 @@ public class Program
 
         vanillaRomData = File.ReadAllBytes(Rom);
 
-        logger.Info($"Flags: {Flags}");
-        logger.Info($"Rom: {Rom}");
-        logger.Info($"Seed: {Seed}");
-
         try
         {
             var playerOptionsService = new PlayerOptionsService();
@@ -105,6 +101,14 @@ public class Program
             logger.Fatal(exception);
             return -4;
         }
+
+        if (Flags == null)
+        {
+            Flags = configuration.Flags;
+        }
+        logger.Info($"Flags: {Flags}");
+        logger.Info($"Rom: {Rom}");
+        logger.Info($"Seed: {Seed}");
 
         Randomize().Wait();
 
@@ -137,10 +141,17 @@ public class Program
             
             char os_sep = Path.DirectorySeparatorChar;
             var filename = Rom!;
-            var outpath = OutputPath ?? filename[..filename.LastIndexOf(os_sep)];
+            var outpath = OutputPath;
+            if (outpath == null)
+            {
+                // Try to get the file path of the input rom, if that fails, then just use the current dir.
+                outpath = filename.LastIndexOf(os_sep) != -1
+                    ? filename[..filename.LastIndexOf(os_sep)]
+                    : Directory.GetCurrentDirectory();
+            }
             string newFileName =  $"{outpath}/Z2_{Seed}_{Flags}.nes";
             File.WriteAllBytes(newFileName, rom);
-            logger.Info("File " + "Z2_" + this.Seed + "_" + this.Flags + ".nes" + " has been created!");
+            logger.Info($"File {newFileName} has been created!");
         }
         else
         {

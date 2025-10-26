@@ -162,9 +162,24 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
         SaveAsPreset = ReactiveCommand.Create((string name) =>
         {
-            Main.SaveNewPresetViewModel.SavedPresets
-                .First(x => x.Preset == name)
-                .Config = Main.Config;
+            var updatedPreset = new CustomPreset
+            {
+                Preset = name,
+                Config =
+                {
+                    Flags = Main.Config.Flags
+                }
+            };
+            var collection = Main.SaveNewPresetViewModel.SavedPresets;
+            // makeshift FindIndex since ObservableCollection doesn't have one
+            int presetIndex = -1;
+            for (int i = 0; i < collection.Count; i++)
+            {
+                if (collection[i].Preset == name) { presetIndex = i; break; }
+            }
+            if (presetIndex == -1) { throw new Exception("Trying to overwrite preset that does not exist"); }
+            // the entire item has to be set so the ObservableCollection works correctly
+            collection[presetIndex] = updatedPreset;
         });
         ClearSavedPreset = ReactiveCommand.Create((string name) =>
         {
@@ -180,9 +195,10 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
 
     private void OnActivate(CompositeDisposable disposable)
     {
-        Flags = string.IsNullOrEmpty(Main.Config.Flags)
+        // If the Flags are entirely default, use the beginner preset
+        Flags = Main.Config.Flags == new RandomizerConfiguration().Flags
             ? BeginnerPreset.Preset.Flags
-            : Main.Config.Flags?.Trim() ?? "";
+            : Main.Config.Flags.Trim() ?? "";
 
         Main.Config.PropertyChanged += (sender, args) =>
         {
@@ -270,7 +286,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             Main.Config.AllowUnsafePathEncounters = false;
         });
 
-        // If shuffle encounters is off, then don't allow shuffling GP
+        // If shuffle palaces is off, then don't allow shuffling GP
         Main.Config.ObservableForProperty(x => x.PalacesCanSwapContinents)
             .Subscribe(x =>
             {

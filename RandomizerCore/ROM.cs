@@ -1506,36 +1506,116 @@ IncreaseGlobal5050JarDropPRG5:
         a.Module().Code("""
 .include "z2r.inc"
 
-.segment "PRG4"
-.org $B9F0
-jmp NextDripColor
+LowerCap = $04
+UpperCap = $09
 
-.reloc
-NextDripColor:
-    beq DripReturn            ; regular RNG hits (A == 0 here)
+RngOut = $051B
+
+.segment "PRG4"
+.org $B9EB
     lda DripperRedCounter
     clc
+    jmp CheckDripperBounds
+FREE_UNTIL $B9F3
+
+.reloc
+CheckDripperBounds:
     adc #$01
-    cmp #$08
-    bcc DripReturn            ; less than 8 red drips in a row (A != 0 here)
-    lda #$00                  ; force 8th red drip to be blue
+    cmp #LowerCap+1
+    bcc DripReturn            ; less than LowerCap red drips in a row -> always red (0 < A <= LowerCap)
+    cmp #UpperCap
+    bcs ForceBlue             ; UpperCap has been hit - force a blue drip
+    sta DripperRedCounter     ; store updated counter so we can use A
+    lda RngOut,x
+    and #$07
+    beq DripReturn            ; RNG hits (A == 0)
+    bne RngMissReturn         ; jmp to different label to not change counter (A != 0)
+
+ForceBlue:
+    lda #$00
 DripReturn:
     sta DripperRedCounter
-    sta $044C,y
+RngMissReturn:
+    sta $044C,y               ; setting 0 means blue drip
     rts
 """, "reduce_dripper_variance.s");
     }
 
     public void InstantText(Assembler a)
     {
-        a.Module().Code("""
+        a.Module().Code(/* lang=s */"""
+.include "z2r.inc"
 .segment "PRG3"
+
 
 DialogActionLoadTextPtr = $b480
 DialogActionDrawBox = $b0d2
 DrawTwoRowsOfTiles = $b2f2
 
 DialogPtr = $569
+
+; expand the number of rows for the dialog boxes
+.org $B0D2
+    jsr CheckForDialogEnd
+    asl
+    tay
+    lda DialogMenuRow1Tiles,y
+    sta $02
+    lda DialogMenuRow1Tiles+1,y
+    sta $03
+    lda DialogMenuRow2Tiles,y
+    sta $04
+    lda DialogMenuRow2Tiles+1,y
+    sta $05
+
+.org $B100
+    jsr LoadCurrentLineNumber
+    cmp #7 ; draw up to 6 rows of text instead of the vanilla 4
+
+.reloc
+CheckForDialogEnd:
+    lda $0525
+    bne @skipResettingDialog
+        ; First line of text, so reset dialog complete flag
+        sta DialogCompleteTmp
+@skipResettingDialog:
+    rts
+
+.reloc
+LoadCurrentLineNumber:
+    lda $0525 ; load the original line number
+    bit DialogCompleteTmp
+    bpl @keepdrawing
+        lda #7
+@keepdrawing:
+    rts
+
+LineWithCorners = $B407
+BlankLine = $B415
+
+.org $B3F3 ; Clear the original table for the dialog boxes
+    FREE_UNTIL LineWithCorners
+
+.reloc
+DialogMenuRow1Tiles:
+    .word LineWithCorners
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine ; Add two extra lines
+    .word BlankLine
+
+.reloc
+DialogMenuRow2Tiles:
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine
+    .word BlankLine ; And the matching two extra lines
+    .word BlankLine
+    .word LineWithCorners
+
 
 ; Swap the dialog action pointers for loading the text pointer and the dialog draw box
 .org $b0b9 ; actions 4 and 5
@@ -1547,10 +1627,9 @@ DialogPtr = $569
     jsr InstantDialog
 .reloc
 InstantDialog:
-    ; Run the original code to draw two rows of tiles
-    jsr DrawTwoRowsOfTiles
-    ; save the Draw Macro current write offset since the later code uses y
-    sty $362
+    ; Check the current line, no text on lines 0-1 so skip it
+    lda $0525
+    beq Exit
 
     ; Save the values in $00 which is used later for calculating the attribute offset
     ; We could use any other unused zp temp (i originally used $09-0a) but this is just
@@ -1560,21 +1639,10 @@ InstantDialog:
     lda $01
     pha
 
-    ; Check the current line, no text on lines 0-1 so skip it
-    lda $525
-    beq Exit
-
     lda #$60 ; 60 = typewriter sound
     sta $ec  ; Sound Effects Type 1
-    ; If the current offset isn't on a $f4 tile, then move ahead until we get to it
-    ; This will happen if the text box is split across multiple nametables
     ldx #0
-FindNextF4:
-    lda $368,x
-    cmp #$f4
-    beq StartReadingLetters
-        inx
-        bne FindNextF4
+    lda $053E+2,x ; + 2 to skip the left edge and space
 StartReadingLetters:
     ldy #0
     ; Load the current pointer for the text and see if we reached the end.
@@ -1586,21 +1654,22 @@ StartReadingLetters:
 ReadLetterLoop:
     ; if its FF then its end of string so just exit
     cmp #$ff
-    beq ExitUpdatePtr
+    bne NotDialogEnd
+        lda $0525 ; current line
+        cmp #4 ; give at least 4 lines of text so vanilla lovers don't complain
+        bmi ExitUpdatePtr
+            ; Dialog is complete, so lets shut this puppy down.
+            ; Signal to the code to stop drawing the text box early
+            dec DialogCompleteTmp
+            bne ExitUpdatePtr ; unconditional
+NotDialogEnd:
     ; Read each letter until the end of the line
     cmp #$fc
     bcs NextLine
     ; Draw the current letter over the blank space that we are rendering
-    sta $368,x
+    sta $053E+2,x
     ; Move to the next spot in ram and check that its a blank space before writing.
     inx
-FindNextF4Again:
-    lda $368,x
-    cmp #$f4
-    beq F4Found
-        inx
-        bne FindNextF4Again
-F4Found:
     iny
     lda ($00),y
     jmp ReadLetterLoop
@@ -1613,16 +1682,33 @@ ExitUpdatePtr:
     clc
     adc DialogPtr+0
     sta DialogPtr+0
-    bcc Exit
+    bcc ExitPop
         inc DialogPtr+1
-Exit:
+ExitPop:
     ; restore the saved values in $00 and $01
     pla
     sta $01
     pla
     sta $00
-    ldy $362
-    rts
+
+    lda DialogCompleteTmp
+    beq @notcomplete
+        ; Done drawing the string, so just copy over the final closing tiles
+        ldy #13
+        lda #<LineWithCorners
+        sta $04
+        lda #>LineWithCorners
+        sta $05
+        @copyline:
+            lda ($04),y
+            sta $054C,y
+            dey
+            bpl @copyline
+@notcomplete:
+Exit:
+    ; Run the original code to draw two rows of tiles
+    jmp DrawTwoRowsOfTiles
+
 """, "instant_text.s");
     }
 
@@ -1655,6 +1741,210 @@ ActualLavaDeath:                     ; original code that we replaced
     inc $b5                          ; increase Link's state to 2, meaning Link will die
     rts
 """);
+    }
+
+    /**
+     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
+     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
+     * Inputs - A = divisor; X = enemy slot
+     *
+     * This function updates all the call sites to these two functions to match the HP for the boss.
+     */
+    private static readonly List<int> bossHpAddresses = [
+        0x11451, // Horsehead
+        0x13C86, // Helmethead
+        0x12951, // Rebonack
+        0x13041, // Unhorsed Rebonack
+        0x12953, // Carock
+        0x13C87, // Gooma
+        0x12952, // Barba
+        // These are bank 5 enemies so we should make a separate table for them
+        // but we can deal with these when we start randomizing their hp
+        // 0x15453, // Thunderbird
+        // 0x15454, // Dark Link
+    ];
+    private static readonly List<(int, int)> bossMap = [
+        (bossHpAddresses[0], 0x13b80), // Horsehead
+        (bossHpAddresses[1], 0x13ae2), // Helmethead
+        (bossHpAddresses[2], 0x12fd2), // Rebonack
+        (bossHpAddresses[3], 0x1325c), // Unhorsed Rebonack
+        (bossHpAddresses[4], 0x12e92), // Carock
+        (bossHpAddresses[5], 0x134cf), // Gooma
+        (bossHpAddresses[6], 0x13136), // Barba
+        // 0x13ae9 - unknown; who is this? I'm guessing its a helmet mini boss thing?
+        // (0x15453, 0x16406), // Thunderbird
+        // (0x15454, 0x158aa), // Dark Link
+    ];
+    private void UpdateAllBossHpDivisor(AsmModule a)
+    {
+        a.Code(/* lang=s */$"""
+.include "z2r.inc"
+.segment "PRG4"
+.reloc
+Bank4BossHpDivisorLo:
+    .byte BOSS_0_HP_DIVISOR_LO, BOSS_1_HP_DIVISOR_LO, BOSS_2_HP_DIVISOR_LO
+    .byte BOSS_3_HP_DIVISOR_LO, BOSS_4_HP_DIVISOR_LO, BOSS_5_HP_DIVISOR_LO
+    .byte BOSS_6_HP_DIVISOR_LO
+
+.reloc
+Bank4BossHpDivisorHi:
+    .byte BOSS_0_HP_DIVISOR_HI, BOSS_1_HP_DIVISOR_HI, BOSS_2_HP_DIVISOR_HI
+    .byte BOSS_3_HP_DIVISOR_HI, BOSS_4_HP_DIVISOR_HI, BOSS_5_HP_DIVISOR_HI
+    .byte BOSS_6_HP_DIVISOR_HI
+
+.define BossHpLo $00
+.define BossHpHi $01
+.define DivisorLo $02
+.define DivisorHi $03
+
+.org $9C45
+    tay
+    lda $C2,x ; Boss HP
+    sta BossHpHi
+    lda Bank4BossHpDivisorLo,y
+    jsr DoDivisionByRepeatedSubtraction
+    nop
+.assert * = $9C51
+.org $9C7A
+    jmp HandleOverHP 
+.reloc
+HandleOverHP:
+    dey ; 1 or below means that the boss is 100% or less HP, so no over health
+    bmi @Exit
+        ; Change the tile ID to represent over health on a boss.
+        ldx #$1c
+        lda #$c5
+@overhp:
+        sta $02c1, x
+        dex
+        dex
+        dex
+        dex
+        dey
+        bpl @overhp  
+@Exit:
+    ; Do the original code
+    ldx $10
+    rts
+
+.reloc
+DoDivisionByRepeatedSubtraction:
+    sta DivisorLo
+    lda Bank4BossHpDivisorHi,y
+    sta DivisorHi
+    ldy #0
+    sty BossHpLo
+    clc ; intentionally subtract an extra 1 which makes the math line up better
+    @loop:
+        lda BossHpLo
+        sbc DivisorLo
+        sta BossHpLo
+        lda BossHpHi
+        sbc DivisorHi
+        sta BossHpHi
+        iny
+        bcs @loop
+    rts
+
+.org $BAD3
+FixHelmetHeadHpDivisorOnNonWest:
+    ; Skip over a vanilla check for gooma/helmethead split which breaks the HP divisor update
+    jmp $BADA
+
+""");
+        foreach (var (hpaddr, divisoraddr) in bossMap)
+        {
+            int hp = GetByte(hpaddr);
+            Put(divisoraddr, (byte)(hp / 8));
+        }
+    }
+
+    public void RandomizeEnemyStats(Assembler asm, Random RNG)
+    {
+        var a = asm.Module();
+        // bank1_Enemy_Hit_Points at 0x5431 + Enemy ID (Overworld West)
+        RandomizeHP(a, RNG, 0x5434, 0x5453);
+        // bank2_Enemy_Hit_Points at 0x9431 + Enemy ID (Overworld East)
+        RandomizeHP(a, RNG, 0x9434, 0x944E);
+        // bank4_Enemy_Hit_Points0 at 0x11431 + Enemy ID (Palace 125)
+        RandomizeHP(a, RNG, 0x11434, 0x11435); // Myu, Bot
+        RandomizeHP(a, RNG, 0x11437, 0x11454); // Remaining palace enemies
+        // bank4_Enemy_Hit_Points1 at 0x12931 + Enemy ID (Palace 346)
+        RandomizeHP(a, RNG, 0x12934, 0x12935); // Myu, Bot
+        RandomizeHP(a, RNG, 0x12937, 0x12954); // Remaining palace enemies
+        // bank4_Table_for_Helmethead_Gooma
+        RandomizeHP(a, RNG, 0x13C86, 0x13C87); // Helmethead, Gooma
+        // bank5_Enemy_Hit_Points at 0x15431 + Enemy ID (Great Palace)
+        RandomizeHP(a, RNG, 0x15434, 0x15435); // Myu, Bot
+        RandomizeHP(a, RNG, 0x15437, 0x15438); // Moa, Ache
+        RandomizeHP(a, RNG, 0x1543B, 0x1543B); // Acheman
+        RandomizeHP(a, RNG, 0x15440, 0x15443); // Bago Bagos, Ropes
+        RandomizeHP(a, RNG, 0x15445, 0x1544B); // Bubbles, Dragon Head, Fokkas
+        RandomizeHP(a, RNG, 0x1544E, 0x1544E); // Fokkeru
+        RandomizeHP(a, RNG, 0x13041,  0x13041); // Unhorsed Rebo
+
+        // Add the new HP divisors for the bosses
+        UpdateAllBossHpDivisor(a);
+    }
+
+    public void UseOHKOMode(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Segment("PRG7");
+        var WriteHPValue = (int romorg, byte byt) =>
+        {
+            var segment = (romorg - 0x10) / 0x4000;
+            a.Segment($"PRG{segment}");
+            a.RomOrg(romorg);
+            a.Byt(byt);
+        };
+        for (var i = 0; i < 8; i++)
+        {
+            WriteHPValue(0x1E67D + i, 192);
+        }
+        WriteHPValue(0x05432, 193);
+        WriteHPValue(0x09432, 193);
+        WriteHPValue(0x11436, 193);
+        WriteHPValue(0x12936, 193);
+        WriteHPValue(0x15532, 193);
+        WriteHPValue(0x11437, 192);
+        WriteHPValue(0x1143F, 192);
+        WriteHPValue(0x12937, 192);
+        WriteHPValue(0x1293F, 192);
+        WriteHPValue(0x15445, 192);
+        WriteHPValue(0x15446, 192);
+        WriteHPValue(0x15448, 192);
+        WriteHPValue(0x15453, 193);
+        WriteHPValue(0x12951, 227); // Rebonack HP
+    }
+
+    private void RandomizeHP(AsmModule a, Random RNG, int start, int end)
+    {
+        var segment = (start - 0x10) / 0x4000;
+        a.Segment($"PRG{segment}");
+        a.RomOrg(start);
+        for (var i = start; i <= end; i++)
+        {
+            int val = GetByte(i);
+
+            var newVal = Math.Min(RNG.Next((int)(val * 0.5), (int)(val * 1.5)), 255);
+
+            a.Byt((byte)newVal);
+            var idx = bossHpAddresses.IndexOf(i);
+            // If this isn't a boss skip adding it to the boss HP table
+            if (idx <= -1) continue;
+            var (_, addr) = bossMap[idx];
+            var originalDivisor = GetByte(addr);
+            a.RomOrg(addr);
+            a.Byt((byte)idx); // Write the index of the boss to the old HP spot
+            // we keep the original divisor, but add a remainder value.
+            // This way the boss can accurately represent over and under HP values
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", originalDivisor);
+            // Take the remainder, and convert it into a fractional value out of 256 values
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor));
+            // restore the previous ORG for writing the next byte in the list
+            a.RomOrg(i+1);
+        }
     }
 
     public void FixItemPickup(Assembler asm)
@@ -1699,7 +1989,6 @@ FREE_UNTIL $e54f
 .include "z2r.inc"
 .import SwapCHR
 
-SideViewInit = $8CE1
 EnemyFacingDirection = $DC91
 CurrentPRGBank = $0769
 CurrentCHRBank = $076E
@@ -1801,6 +2090,7 @@ RestorePaletteAfterBossKill:
 ResetRedPalettePayload:
     ; 8 byte palette payload for PPU macro
     .byte $3f, $18, $04, $0f, $06, $16, $30, $ff
+
 """);
     }
 
@@ -1942,7 +2232,10 @@ ResetRedPalettePayload:
         //
         // The damage class byte in bank 5 is likely from copying
         // bank 4 where it is used for Helmethead's main projectile.
-        Put(0x15429, 0x80);
+        // The 0x80 bit determines if Reflect is necessary to block.
+        // Since the GP sprite is an Energy Ball it makes sense to not
+        // require Reflect, so setting it to 0.
+        Put(0x15429, 0x00);
 
         // ROCK_GENERATOR
         // West damage class: 0 (0x00)
@@ -2142,7 +2435,7 @@ ResetRedPalettePayload:
             Put(0x8382, (byte)hiddenPalaceCoords.Item1);
             Put(0x8388, (byte)hiddenPalaceCoords.Item2);
         }
-        int pos = hiddenPalaceLocation.Ypos;
+        int pos = hiddenPalaceLocation.YRaw;
 
         Put(0x1df78, (byte)(pos + hiddenPalaceLocation.ExternalWorld));
         Put(0x1df84, 0xff);
@@ -2250,7 +2543,7 @@ ResetRedPalettePayload:
             }
         }
 
-        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.Ypos % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.Ypos % 30 / 15);
+        int ppu_addr1 = 0x2000 + 2 * (32 * (hiddenPalaceLocation.YRaw % 15) + (hiddenPalaceLocation.Xpos % 16)) + 2048 * (hiddenPalaceLocation.YRaw % 30 / 15);
         int ppu_addr2 = ppu_addr1 + 32;
         int ppu1low = ppu_addr1 & 0x00ff;
         int ppu1high = (ppu_addr1 >> 8) & 0xff;
@@ -2266,11 +2559,11 @@ ResetRedPalettePayload:
     public void UpdateKasuto(Location hiddenKasutoLocation, Location townAtNewKasuto, Location spellTower, Biome biome,
         int baseAddr, Terrain hiddenKasutoTerrain, bool vanillaShuffleUsesActualTerrain)
     {
-        Put(0x1df79, (byte)(hiddenKasutoLocation.Ypos + hiddenKasutoLocation.ExternalWorld));
-        Put(0x1dfac, (byte)(hiddenKasutoLocation.Ypos - 30));
+        Put(0x1df79, (byte)(hiddenKasutoLocation.YRaw + hiddenKasutoLocation.ExternalWorld));
+        Put(0x1dfac, (byte)(hiddenKasutoLocation.Y));
         Put(0x1dfb2, (byte)(hiddenKasutoLocation.Xpos + 1));
         Put(0x1ccd4, (byte)(hiddenKasutoLocation.Xpos + hiddenKasutoLocation.Secondpartofcave));
-        Put(0x1ccdb, (byte)(hiddenKasutoLocation.Ypos));
+        Put(0x1ccdb, (byte)(hiddenKasutoLocation.YRaw));
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
         hiddenKasutoLocation.NeedHammer = true;

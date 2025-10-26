@@ -8,7 +8,7 @@ public static class StandardPreset
     public static readonly RandomizerConfiguration Preset = new()
     {
         //Start
-        StartWithCandle = true,
+        StartWithCandle = false,
         ShuffleStartingItems = false,
         ShuffleStartingSpells = false,
         MaxHeartContainers = MaxHeartsOption.EIGHT,
@@ -25,16 +25,16 @@ public static class StandardPreset
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,
         EncounterRate = EncounterRate.HALF,
-        RiverDevilBlockerOption = RiverDevilBlockerOption.PATH,
-        EastRocks = false,
-        GenerateBaguWoods = true,
-        HideLessImportantLocations = true,
+        RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
+        EastRocks = true,
+        GenerateBaguWoods = false,
+        LessImportantLocationsOption = LessImportantLocationsOption.HIDE,
         RestrictConnectionCaveShuffle = true,
         AllowConnectionCavesToBeBlocked = true,
         GoodBoots = true,
         HidePalace = null,
         HideKasuto = null,
-        ShuffleWhichLocationIsHidden = false,
+        ShuffleWhichLocationIsHidden = true,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         Climate = Climates.Classic,
@@ -57,15 +57,15 @@ public static class StandardPreset
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
-        ReduceDripperVariance = false,
+        ReduceDripperVariance = true,
         ChangePalacePallettes = true,
         RandomizeBossItemDrop = true,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
-        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
-        DarkLinkMinDistance = BossRoomMinDistance.SHORT,
+        PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
+        DarkLinkMinDistance = BossRoomMinDistance.MEDIUM,
 
         //Levels
         ShuffleAttackExperience = true,
@@ -90,7 +90,7 @@ public static class StandardPreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = true,
+        ShuffleDripperEnemy = false,
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 
@@ -106,8 +106,8 @@ public static class StandardPreset
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
         IncludeSwordTechsInShuffle = false,
-        IncludeQuestItemsInShuffle = false,
-        IncludeSpellsInShuffle = false,
+        IncludeQuestItemsInShuffle = true,
+        IncludeSpellsInShuffle = true,
 
         ShuffleSmallItems = true,
         RemoveSpellItems = false,
@@ -126,6 +126,7 @@ public static class StandardPreset
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 
+        GenerateSpoiler = false,
         RevealWalkthroughWalls = false,
     };
 }

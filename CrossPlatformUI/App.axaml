@@ -6,6 +6,7 @@
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:behaviors="clr-namespace:CrossPlatformUI.Behaviors"
              x:Class="CrossPlatformUI.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -34,6 +35,16 @@
             <Setter Property="Margin" Value="0 10" />
         </Style>
         
+        <Style Selector="CheckBox">
+            <!-- Force the entire checkbox to be "clickable" and not just the pixels that the text covers -->
+            <Setter Property="Background" Value="Transparent"/>
+            <!-- By default the checkbox stretched to fill the container, which made way too much clickable, so
+                 No more stretching! Stick to left aligned content by default for checkboxes. -->
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Padding" Value="0,8"/>
+            <Setter Property="Margin" Value="5, 0"/>
+        </Style>
+        
         <!-- Indeterminate state -->
         <Style Selector="CheckBox">
             <Style Selector="^:indeterminate /template/ Path#Graphic">
@@ -48,6 +59,26 @@
                         " />
                 <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(assists:SelectionControlAssist.InnerForeground)}" />
             </Style>
+        </Style>
+        
+        <!-- Add a default behavior to all of the comboboxes to let the scroll with the mouse wheel -->
+        <Style Selector="ComboBox">
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                    <BehaviorCollection>
+                        <behaviors:ScrollSelectBehavior />
+                    </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="(Interaction.Behaviors)">
+                <BehaviorCollectionTemplate>
+                    <BehaviorCollection>
+                        <behaviors:ScrollSelectBehavior />
+                    </BehaviorCollection>
+                </BehaviorCollectionTemplate>
+            </Setter>
         </Style>
     </Application.Styles>
   <Application.Resources>

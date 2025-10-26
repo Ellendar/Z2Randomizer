@@ -3,7 +3,7 @@ using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
-public static class FullShufflePreset
+public static class StandardSwissPreset
 {
     public static readonly RandomizerConfiguration Preset = new()
     {
@@ -23,7 +23,7 @@ public static class FullShufflePreset
         ShuffleGP = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
-        IncludeLavaInEncounterShuffle = true,
+        IncludeLavaInEncounterShuffle = false,
         EncounterRate = EncounterRate.HALF,
         RiverDevilBlockerOption = RiverDevilBlockerOption.RANDOM,
         EastRocks = true,
@@ -57,14 +57,14 @@ public static class FullShufflePreset
         PalacesToCompleteMax = 6,
         RestartAtPalacesOnGameOver = true,
         Global5050JarDrop = true,
-        ReduceDripperVariance = false,
+        ReduceDripperVariance = true,
         ChangePalacePallettes = true,
-        RandomizeBossItemDrop = true,
+        RandomizeBossItemDrop = false,
         BossRoomsExitType = BossRoomsExitType.OVERWORLD,
         NoDuplicateRoomsByLayout = true,
         BlockingRoomsInAnyPalace = true,
         HardBosses = true,
-        PalaceItemRoomCount = PalaceItemRoomCount.ONE,
+        PalaceItemRoomCount = PalaceItemRoomCount.RANDOM_INCLUDE_ZERO,
         DarkLinkMinDistance = BossRoomMinDistance.SHORT,
 
         //Levels
@@ -80,7 +80,7 @@ public static class FullShufflePreset
         LifeEffectiveness = LifeEffectiveness.AVERAGE,
 
         //Spells
-        ShuffleLifeRefillAmount = true,
+        ShuffleLifeRefillAmount = false,
         ShuffleSpellLocations = true,
         DisableMagicContainerRequirements = true,
         RandomizeSpellSpellEnemy = true,
@@ -105,7 +105,7 @@ public static class FullShufflePreset
         ShuffleOverworldItems = true,
         MixOverworldAndPalaceItems = true,
         IncludePBagCavesInItemShuffle = true,
-        IncludeSwordTechsInShuffle = true,
+        IncludeSwordTechsInShuffle = false,
         IncludeQuestItemsInShuffle = true,
         IncludeSpellsInShuffle = true,
 
@@ -126,6 +126,7 @@ public static class FullShufflePreset
         EnableSpellItemHints = true,
         EnableTownNameHints = true,
 
-        RevealWalkthroughWalls = false,
+        GenerateSpoiler = false,
+        RevealWalkthroughWalls = true,
     };
 }

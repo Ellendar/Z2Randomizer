@@ -58,6 +58,24 @@ public static class TownExtensions
         };
     }
 
+    public static string HintName(this Town town)
+    {
+        return town switch
+        {
+            Town.RAURU => "RAURU",
+            Town.RUTO => "RUTO",
+            Town.SARIA_NORTH => "SARIA",
+            Town.MIDO_WEST => "MIDO",
+            Town.NABOORU => "NABOORU",
+            Town.DARUNIA_WEST => "DARUNIA",
+            Town.NEW_KASUTO => "NEW KASUTO",
+            Town.OLD_KASUTO => "OLD KASUTO",
+            Town.MIDO_CHURCH => "MIDO",
+            Town.DARUNIA_ROOF => "DARUNIA",
+            _ => "UNKNOWN"
+        };
+    }
+
     public static bool AppearsOnMap(this Town town)
     {
         return town switch

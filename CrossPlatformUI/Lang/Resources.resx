@@ -142,7 +142,9 @@ up.</value>
 original tracks will only be selected when no custom tracks exist for a given usage.</value>
 	</data>
 	<data name="IncludeDiverseMusicToolTip" xml:space="preserve">
-<value>Include music tracks that do not fit the fantasy setting of the game (tracks with the "diverse" tag). This can potentially increase the number of tracks in libraries that may be selected.</value>
+<value>Include music tracks that do not fit the fantasy setting of the game (tracks with the
+&quot;diverse&quot; tag). This can potentially increase the number of tracks in libraries that may
+be selected.</value>
 	</data>
 	<data name="DisableUnsafeMusicToolTip" xml:space="preserve">
 <value>Disable songs in the library that are marked as being potentially unsafe for streaming.</value>
@@ -248,8 +250,8 @@ Wiki for more details.</value>
 
   • The blocking lady in Ruto, Mido, and Darunia will give a hint to the required item&apos;s
     location (Trophy, Medicine, and Child).
-  • With Include Quest Items in Shuffle enabled, this also applies to Saria (Mirror) and
-    Nabooru (Water).
+  • With Include Town Quest Items in Shuffle enabled, this also applies to Saria (Mirror)
+    and Nabooru (Water).
   • With Include Sword Techniques in Shuffle enabled, you can get hints about the
     locations of Downstab and Upstab by talking to the closed door of the Mido Church and
     the Upstab knight&apos;s house in Darunia.</value>
@@ -300,7 +302,7 @@ spells to the pool of items that can appear in general locations.</value>
 <value>Allows the sword technique teachers in Mido and Darunia to instead grant any item, and
 adds the Up and Down stabs to the general item pool.</value>
 	</data>
-	<data name="IncludeQuestItemsinShuffleToolTip" xml:space="preserve">
+	<data name="IncludeTownQuestItemsinShuffleToolTip" xml:space="preserve">
 <value>Adds Bagu&apos;s letter (allowing passage of the Saria moat), the mirror (allowing the spell in
 Saria), and the water (allowing the spell in Nabooru) to be added to the general pool. An
 item from the general pool will replace them when you talk to Bagu, check under the table,
@@ -502,29 +504,43 @@ cabin similar to vanilla.
 If disabled, Bagu&apos;s cabin is an isolated forest tile surrounded on all sides by other
 terrain.</value>
 	</data>
-	<data name="HideLessImportantLocationsToolTip" xml:space="preserve">
-<value>If enabled, locations that only contain minor items or have no value will be hidden within
-more of the same terrain.
+	<data name="LessImportantLocationsToolTip" xml:space="preserve">
+<value>How to handle overworld tiles that contain minor things like red jars, fairies or P-bags.
 
-If disabled, all such tiles will be surrounded on all sides by other terrain.</value>
+Blend In:
+These tiles will be hidden among other tiles of the same terrain.
+
+Isolate:
+These tiles will be surrounded on all sides by other terrain, just like major item
+location tiles.
+
+Remove:
+Remove these tiles from the game.
+
+Random:
+Pick one of the above at random.</value>
 	</data>
 	<data name="AllWaterIsWalkableWithBootsToolTip" xml:space="preserve">
 <value>If enabled, all water tiles can be walked on with boots. If unselected, the only walkable
 water will be on water paths marked with a road tile on either end.
 This flag has no effect on the Vanilla or Vanilla(shuffle) biomes.</value>
 	</data>
-	<data name="HidePalaceToolTip" xml:space="preserve">
-<value>If enabled, one palace will be hidden under Three-Eyed Rock and require the flute. Look
-for the same formation of rocks as in vanilla.</value>
+	<data name="GenerateThreeEyedRockToolTip" xml:space="preserve">
+<value>If enabled, one palace will be hidden beneath Three-Eyed Rock and will require the flute
+to access. Look for the same rock formation as in the vanilla game.
+
+Which location is hidden beneath may change if Shuffle Which Locations Are Hidden is enabled.</value>
 	</data>
-	<data name="HideKasutoToolTip" xml:space="preserve">
-<value>If enabled, New Kasuto will be hidden under a forest tile somewhere in the east and
-require the hammer. It will always be a single forest tile surrounded on all sides by
-other terrain.</value>
+	<data name="GenerateHiddenKasutoTileToolTip" xml:space="preserve">
+<value>If enabled, New Kasuto will be hidden beneath a forest tile somewhere in the east and will
+require the hammer to access. The hidden tile will always be a single forest tile
+surrounded by other terrain.
+
+Which location is hidden beneath may change if Shuffle Which Locations Are Hidden is enabled.</value>
 	</data>
 	<data name="ShuffleWhichLocationsAreHiddenToolTip" xml:space="preserve">
 <value>If enabled, what is hidden under Three-Eyed Rock and the New Kasuto forest tile can be any
-random location in the east. This only has an effect if the previous flags are enabled.</value>
+random location in the east.</value>
 	</data>
 	<data name="WestContinentBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
@@ -607,24 +623,23 @@ linear.</value>
 	<data name="ItemRoomsPerPalaceToolTip" xml:space="preserve">
 <value>Lets you select the number of item rooms per palace: 0-2 or Random.
 
-  • Extra palace items (beyond the first) default to 200 P-Bags, but can be replaced or
-    shuffled depending on other settings.
+ • Extra palace items (beyond the first) default to 200 P-Bags, but can be replaced or
+   shuffled depending on other settings.
+ • Vanilla palaces: Extra item rooms replace random dead ends.
 
-  • 0 Item Rooms:
-    ◦ Palace items move to minor item locations.
-      • If there aren&apos;t enough minor items to replace (based on the number of starting
-        items and heart containers), you will get a popup saying the flags are
-        incompatible.
-      • If the item count depends on indeterminate flags, those flags will be re-rolled
-        until valid.
-      • If needed, the &quot;Include P-Bag Caves in Item Shuffle&quot; setting will be overriden to
-        make room.
+0 Item Rooms Per Palace:
+ • Palace items move to minor item locations.
+ • If there aren&apos;t enough minor items to replace (based on the number of starting
+   items and heart containers), you will get a popup saying the flags are incompatible.
+ • If the item count depends on indeterminate flags, those flags will be re-rolled
+   until valid.
+ • If needed, the &quot;Include P-Bag Caves in Item Shuffle&quot; setting will be overriden to
+   make room.
 
-  • Vanilla palaces: Extra item rooms replace random dead ends.
-
-  • Random Item Rooms: Each palace gets 0–4 item rooms (varies by palace length/style).
-    ◦ Clouds in the entrance screen and Ironknuckle statues by the entrance elevator
-      indicate how many items there are in the palace.</value>
+Random Item Rooms Per Palace:
+ • Clouds in the entrance screen and Ironknuckle statues by the entrance elevator
+   indicate how many items there are in the palace.</value>
+ • Each palace gets 0–3 item rooms (varies by palace length/style).
 	</data>
 	<data name="IncludeVanillaRoomsToolTip" xml:space="preserve">
 <value>If selected, the normal zelda 2 rooms will be available for palace generation. Note that
@@ -633,6 +648,10 @@ vanilla shuffle styles.</value>
 	</data>
 	<data name="Include40RoomsToolTip" xml:space="preserve">
 <value>If selected, the first batch of community-designed custom rooms from version 4.0 will be
+available. Has no effect on vanilla or vanilla shuffle styles.</value>
+	</data>
+	<data name="Include50RoomsToolTip" xml:space="preserve">
+<value>If selected, the second batch of community-designed custom rooms from version 5.0 will be
 available. Has no effect on vanilla or vanilla shuffle styles.</value>
 	</data>
 	<data name="ThunderbirdRequiredToolTip" xml:space="preserve">
@@ -666,8 +685,9 @@ dropping a red jar or spawning a red Ironknuckle. If unselected, the spawning is
 determined each stab like in vanilla.</value>
 	</data>
 	<data name="ReduceDripperVarianceToolTip" xml:space="preserve">
-<value>Tired of waiting for drippers to drop an enemy? After 7 red drips, this forces the 8th
-drip to be blue. (The count is shared between all drippers.)</value>
+<value>Guarantees a blue drip after 8 consecutive red drips.
+After a blue drip, the next 4 are guaranteed red.
+(All drippers share the same count.)</value>
 	</data>
 	<data name="ChangePalacePalettesToolTip" xml:space="preserve">
 <value>Changes the color palette of each palace to a new random one.</value>
