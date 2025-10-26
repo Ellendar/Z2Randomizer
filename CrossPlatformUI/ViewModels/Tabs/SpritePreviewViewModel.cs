@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -25,14 +24,10 @@ namespace CrossPlatformUI.ViewModels.Tabs;
 public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
 {
     private CancellationTokenSource backgroundUpdateTask = new ();
-    private CancellationTokenSource backgroundLoadTask = new ();
-    private bool spritesLoaded;
 
-    private string spriteName = "Link";
-
-    public string? SpriteName { 
-        get { return spriteName; }
-        set { spriteName = value ?? "Link"; Main.Config.SpriteName = value ?? "Link"; }
+    public string? SpriteName {
+        get => Main.Config.SpriteName ?? "Link";
+        set { Main.Config.SpriteName = value ?? "Link"; this.RaisePropertyChanged(); }
     }
     public bool ChangeItemSprites
     {
@@ -114,10 +109,11 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
     private readonly SourceList<LoadedCharacterSprite> options = new();
     [JsonIgnore]
     public ObservableCollectionExtended<LoadedCharacterSprite> Options { get; } = new();
+
+    private CompositeDisposable _disposables = new();
+
     [JsonIgnore]
     public ViewModelActivator Activator { get; }
-
-    private bool alreadySetup = false;
 
     [JsonConstructor]
 #pragma warning disable CS8618
@@ -128,121 +124,101 @@ public class SpritePreviewViewModel : ReactiveObject, IActivatableViewModel
         Main = main;
         SpriteName = main.Config.SpriteName;
         Activator = new();
-        spritesLoaded = false;
         this.WhenActivated(OnActivate);
-    }
-
-    internal void OnActivate(CompositeDisposable disposables)
-    {
-        // we need to do some extra checks since OnActivate gets called multiple times
-        // we should refactor things so there is a service that loads the sprites and stuff
-        // and the main app does not need to instantiate this method directly.
-        lock (this)
-        {
-            if (alreadySetup) { return; }
-            alreadySetup = true;
-        }
 
         options
             .Connect()
             .Bind(Options)
             .Subscribe()
-            .DisposeWith(disposables);
+            .DisposeWith(_disposables);
 
-        var hasRomObservable = Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false);
+        var spriteLoaderService = App.Current?.Services?.GetService<SpriteLoaderService>();
+        Debug.Assert(spriteLoaderService != null);
 
-        this.WhenAnyValue(
-            x => x.Main.Config.Sprite,
-            x => x.Main.Config.Tunic,
-            x => x.Main.Config.SkinTone,
-            x => x.Main.Config.TunicOutline
-            // x => x.Main.Config.ShieldTunic,
-            // x => x.Main.Config.BeamSprite,
-        )
-            .WithLatestFrom(hasRomObservable)
-            .Where(t => t.Second.Value)
+        spriteLoaderService.Sprites
+            .Where(sprites => sprites.Count > 0)
+            .Take(1)
+            .Subscribe(sprites =>
+            {
+                Dispatcher.UIThread.Post(() => LoadCharacterSprites(sprites), DispatcherPriority.Background);
+            })
+            .DisposeWith(_disposables);
+    }
+
+    ~SpritePreviewViewModel()
+    {
+        _disposables.Dispose();
+    }
+
+    internal void OnActivate(CompositeDisposable disposables)
+    {
+        IObservable<(string? DisplayName, NesColor, NesColor, NesColor)> settingsObservable = this.WhenAnyValue(
+                x => x.Main.Config.Sprite,
+                x => x.Main.Config.Tunic,
+                x => x.Main.Config.SkinTone,
+                x => x.Main.Config.TunicOutline
+                // x => x.Main.Config.ShieldTunic,
+                // x => x.Main.Config.BeamSprite,
+            )
             .Select(t => (
-                t.First.Item1?.DisplayName, // making selected Sprite a string compare instead of an object compare
-                t.First.Item2,
-                t.First.Item3,
-                t.First.Item4
+                t.Item1?.DisplayName, // making selected Sprite a string compare instead of an object compare
+                t.Item2,
+                t.Item3,
+                t.Item4
             ))
             .DistinctUntilChanged() // filter emits where nothing has changed
-            .Throttle(TimeSpan.FromMilliseconds(20))
-            .Subscribe(tuple => {
+            .Throttle(TimeSpan.FromMilliseconds(20));
+
+        var hasRomObservable = Main.RomFileViewModel.ObservableForProperty(x => x.HasRomData, false, false);
+        var optionsObservable = options.Connect().ToCollection();
+
+        Observable.CombineLatest(
+            settingsObservable,
+            hasRomObservable,
+            optionsObservable,
+            (settings, hasRom, options) => (settings, hasRom, options)
+        )
+            .Where(t => t.hasRom.Value && t.options.Count > 0)
+            .Subscribe(t => {
                 backgroundUpdateTask.CancelAsync().ToObservable().Subscribe(_ =>
                 {
                     backgroundUpdateTask = new CancellationTokenSource();
-                    Dispatcher.UIThread.Post(() => UpdateCharacterSprites(backgroundUpdateTask.Token), DispatcherPriority.Background);
-                });
-            })
-            .DisposeWith(disposables);
-
-        hasRomObservable
-            .Where(hasRom => hasRom.Value)
-            .Subscribe(x =>
-            {
-                // this will be called every time you switch to the tab, but
-                // it only needs to be done once in the object life cycle
-                if (spritesLoaded) { return; }
-                backgroundLoadTask.CancelAsync().ToObservable().Subscribe(_ =>
-                {
-                    backgroundLoadTask = new();
-                    Dispatcher.UIThread.Post(() => LoadCharacterSprites(backgroundLoadTask.Token), DispatcherPriority.Background);
+                    Dispatcher.UIThread.Post(() => UpdateCharacterSprites(Main.RomFileViewModel.RomData, backgroundUpdateTask.Token), DispatcherPriority.Background);
                 });
             })
             .DisposeWith(disposables);
     }
 
-    async void UpdateCharacterSprites(CancellationToken token)
-    {
-        LoadedCharacterSprite[] optionsCopy = Options.ToArray(); // don't crash if list is mutated during loop
-                                                                 // Load the selected sprite first so that one updates fastest
-        var current = optionsCopy.FirstOrDefault(loaded => loaded.Name == Main.Config.Sprite.DisplayName);
-        if (current != null)
-        {
-            await current.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-        }
-        foreach (var loaded in optionsCopy)
-        {
-            if (token.IsCancellationRequested) { return; }
-            await loaded.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-        }
-    }
-
-    async void LoadCharacterSprites(CancellationToken token)
+    void LoadCharacterSprites(IReadOnlyList<CharacterSprite> sprites)
     {
         List<LoadedCharacterSprite> optionsNew = new();
-        var link = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.LINK);
-        await link.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-        if (token.IsCancellationRequested) { return; }
-        optionsNew.Add(link);
-        var fileservice = App.Current?.Services?.GetService<IFileSystemService>();
-        if (fileservice == null) { return; }
-        var spriteFiles = await fileservice.ListLocalFiles(IFileSystemService.RandomizerPath.Sprites);
-        if (spriteFiles == null) { return; }
-        foreach (var spriteFile in spriteFiles)
-        {
-            var patch = await fileservice.OpenBinaryFile(IFileSystemService.RandomizerPath.Sprites, spriteFile);
-            var parsedName = Path.GetFileNameWithoutExtension(spriteFile).Replace("_", " ");
-            var ch = new CharacterSprite(parsedName, patch);
-            var loaded = new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, ch);
-            await loaded.Update(Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
-            if (token.IsCancellationRequested) { return; }
-            optionsNew.Add(loaded);
-        }
-        if (token.IsCancellationRequested) { return; }
-        optionsNew.Add(new LoadedCharacterSprite(Main.RomFileViewModel.RomData!, CharacterSprite.RANDOM));
 
-        // Set sprite list atomically to avoid two threads populating it at once
+        foreach (var sprite in sprites)
+        {
+            var s = new LoadedCharacterSprite(sprite);
+            optionsNew.Add(s);
+        }
         options.Edit(inner =>
         {
             inner.Clear();
             inner.AddRange(optionsNew);
         });
-        // Select the sprite on load based on the name
-        Sprite = optionsNew.FirstOrDefault(loaded => loaded.Name == SpriteName, link);
-        spritesLoaded = true;
+    }
+
+    async void UpdateCharacterSprites(byte[] romData, CancellationToken token)
+    {
+        var current = Options.FirstOrDefault(s => s.Name == Main.Config.Sprite.DisplayName);
+        if (current != null)
+        {
+            await current.Update(romData, Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+        }
+        foreach (var sprite in Options)
+        {
+            if (sprite == current) { continue; }
+            if (token.IsCancellationRequested) { return; }
+            await sprite.Update(romData, Main.Config.Tunic, Main.Config.SkinTone, Main.Config.TunicOutline, Main.Config.ShieldTunic, Main.Config.BeamSprite);
+        }
+        Sprite = Options.FirstOrDefault(loaded => loaded.Name == SpriteName, Options[0]);
     }
 }
 
@@ -250,19 +226,17 @@ public class LoadedCharacterSprite : ReactiveObject
 {
     static int charPaletteAddr = 0x10 + 0x1c46b;
 
-    private readonly byte[] rom;
     public CharacterSprite Sprite { get; }
     public byte[] palette = [0, 0, 0, 0];
-    public LoadedCharacterSprite(byte[] raw, CharacterSprite spr)
+    public LoadedCharacterSprite(CharacterSprite spr)
     {
-        rom = raw.ToArray();
         Sprite = spr;
         Name = spr.DisplayName;
     }
 
-    public async Task Update(NesColor tunicColor, NesColor skinTone, NesColor outlineColor, NesColor shieldColor, BeamSprites beamSprite)
+    public async Task Update(byte[] romData, NesColor tunicColor, NesColor skinTone, NesColor outlineColor, NesColor shieldColor, BeamSprites beamSprite)
     {
-        var tmp = new ROM(rom, true);
+        var tmp = new ROM(romData, true);
         // sanitizing will be slower, we don't need to do it for every sprite in the dropdown
         tmp.UpdateSprite(Sprite, false, false);
         palette = tmp.GetBytes(charPaletteAddr, 4);
