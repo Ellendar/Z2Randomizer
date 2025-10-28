@@ -678,6 +678,8 @@ public class Room : IJsonOnDeserialized
         mergedRoom.LinkedRoom = null;
         mergedRoom.LinkedRoomName = otherRoom.Name;
 
+        mergedRoom.coords = this.coords;
+
         return mergedRoom;
     }
 
