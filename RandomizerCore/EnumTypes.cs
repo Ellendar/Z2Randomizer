@@ -566,7 +566,7 @@ public class BeamSpriteMetaAttribute : Attribute
     public BeamPalette BeamPalette { get; init; } = BeamPalette.Flashing;
 
     /// <summary>
-    /// Optional secondary palette for the fire projectile.
+    /// Optional secondary palette, used when this sprite replaces a fire sprite.
     /// If not explicitly set, falls back to BeamPalette, or Orange if BeamPalette is Flashing.
     /// </summary>
     public BeamPalette FirePalette { get; init; } = BeamPalette.Unspecified;

@@ -93,7 +93,6 @@
             <CheckBox
                 IsThreeState="True" 
                 IsChecked="{Binding Config.TBirdRequired}"
-                Checked="TBirdRequiredChecked"
                 Content="Thunderbird Required"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ThunderbirdRequiredToolTip}"/></ToolTip.Tip>
@@ -169,7 +168,6 @@
             <CheckBox
                 Name="NoDuplicateRoomsByLayoutCheckbox"
                 IsChecked="{Binding Config.NoDuplicateRoomsByLayout}" 
-                Checked="NoDuplicateRoomsByLayoutChecked" 
                 Content="No Duplicate Rooms (By Layout)"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NoDuplicateRoomsByLayoutToolTip}"/></ToolTip.Tip>
@@ -178,7 +176,6 @@
             <CheckBox
                 Name="NoDuplicateRoomsByEnemiesCheckbox"
                 IsChecked="{Binding Config.NoDuplicateRoomsByEnemies}" 
-                Checked="NoDuplicateRoomsByEnemiesChecked" 
                 Content="No Duplicate Rooms (By Layout/Enemies)"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NoDuplicateRoomsByLayoutEnemiesToolTip}"/></ToolTip.Tip>
