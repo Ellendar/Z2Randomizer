@@ -26,6 +26,7 @@
                 <ComboBox Grid.Column="0"
                           Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
                           assists:ComboBoxAssist.Label="Normal Palace Style"
+						  Name="NormalPalaceStyleSelector"
                           ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
                           SelectedItem="{Binding Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NormalPalaceStyleToolTip}"/></ToolTip.Tip>
@@ -41,6 +42,7 @@
 				<ComboBox Grid.Column="0"
                           Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
                           assists:ComboBoxAssist.Label="GP Palace Style"
+						  Name="GPPalaceStyleSelector"
                           ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
                           SelectedItem="{Binding Config.GpStyle, Converter={x:Static ui:Util.EnumConvert}}">
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GPPalaceStyleToolTip}"/></ToolTip.Tip>
@@ -71,6 +73,7 @@
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.IncludeVanillaRooms}"
+				Name="IncludeVanillaRoomsCheckbox"
                 Content="Include Vanilla Rooms"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeVanillaRoomsToolTip}"/></ToolTip.Tip>
@@ -78,6 +81,7 @@
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.Includev4_0Rooms}"
+				Name="Include4_0RoomsCheckbox"
                 Content="Include 4.0 Rooms"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.Include40RoomsToolTip}"/></ToolTip.Tip>
@@ -85,6 +89,7 @@
             <CheckBox
                 IsThreeState="True"
                 IsChecked="{Binding Config.Includev5_0Rooms}"
+				Name="Include5_0RoomsCheckbox"
                 Content="Include 5.0 Rooms"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.Include50RoomsToolTip}"/></ToolTip.Tip>
@@ -93,6 +98,7 @@
             <CheckBox
                 IsThreeState="True" 
                 IsChecked="{Binding Config.TBirdRequired}"
+				Name="TbirdRequiredCheckbox"
                 Content="Thunderbird Required"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ThunderbirdRequiredToolTip}"/></ToolTip.Tip>
@@ -182,6 +188,7 @@
             </CheckBox>
             <CheckBox
                 IsChecked="{Binding Config.BlockingRoomsInAnyPalace}"
+				Name="BlockingRoomsInAnyPalaceCheckbox"
                 Content="Blocking Rooms in Any Palace"
             >
                 <ToolTip.Tip>
@@ -195,6 +202,7 @@
                 HorizontalAlignment="Left" Margin="0, 0" Width="300" Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Boss Rooms Exit To"
                 ItemsSource="{Binding Source={x:Static rc:Enums.BossRoomsExitTypeList}}"
+				Name="BossRoomsExitTypeSelector"
                 SelectedItem="{Binding Config.BossRoomsExitType, Converter={x:Static ui:Util.EnumConvert}}"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.BossRoomsExitToToolTip}"/></ToolTip.Tip>

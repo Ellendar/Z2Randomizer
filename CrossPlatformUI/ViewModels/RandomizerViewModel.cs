@@ -268,7 +268,6 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
         });
 
-
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
         Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems)
         .Subscribe(x =>
