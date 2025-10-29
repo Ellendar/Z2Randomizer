@@ -294,7 +294,7 @@ public static class EnemiesRegularPalaceShared
     public const int LOCKED_DOOR = 0x02;
     public const int MYU = 0x03;
     public const int BOT = 0x04;
-    public const int STRIKE_FOR_RED_JAR = 0x05; // close enough
+    public const int STRIKE_FOR_RED_JAR = 0x05;
     public const int SLOW_BUBBLE = 0x06;
     public const int ORANGE_MOA = 0x07;
     public const int FALLING_BLOCK_GENERATOR = 0x08;
@@ -332,6 +332,7 @@ public static class EnemiesPalaceShared
     public const int LOCKED_DOOR = 0x02;
     public const int MYU = 0x03;
     public const int BOT = 0x04;
+    public const int STRIKE_FOR_RED_JAR = 0x05;
     public const int ELEVATOR = 0x13;
 }
 
