@@ -18143,14 +18143,14 @@
     "map": 31,
     "palaceGroup": null,
     "memoryAddress": 73527,
-    "connections": "FFFF80FC",
+    "connections": "FF80FFFC",
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
     "isDropZone": true,
     "hasItem": true,
     "enemies": "033F5F",
-    "sideviewData": "23600F10DF80F0147064A72275268005A14581C1930F0E72709070A3227564B0F4D50F",
+    "sideviewData": "29600F10E100D1807064B0F4A622757090707126A045A045A045910F0E83C18205A322F4147064D50F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Drop-through Item Room (aaron jam 4_4 P4_M31)",
@@ -18161,7 +18161,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": true
+    "isUpDownReversed": false
   },
   {
     "bitmask": "0D",
