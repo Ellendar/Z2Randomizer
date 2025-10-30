@@ -23,10 +23,12 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
         Palace palace = new(palaceNumber);
+        ILookup<string, Room>? duplicateRoomLookup = CreateRoomVariantsLookupOrNull(props, palaceNumber, rooms);
         do // while (tries >= PALACE_SHUFFLE_ATTEMPT_LIMIT);
         {
             await Task.Yield();
             RoomPool roomPool = new(rooms);
+            DetermineRoomVariants(r, duplicateRoomLookup, roomPool.NormalRooms);
             if (ct.IsCancellationRequested)
             {
                 palace.IsValid = false;
@@ -86,7 +88,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                         palace.ItemRooms.Add(itemRoom);
                         palace.AllRooms.Add(itemRoom);
 
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.ItemRoomsByDirection[itemRoomDirection], itemRoom); }
+                        if (duplicateProtection) { RemoveDuplicatesFromPool(roomPool.ItemRoomsByDirection[itemRoomDirection], itemRoom); }
 
                         if (itemRoom.LinkedRoomName != null)
                         {
@@ -150,7 +152,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                     }
                     if (added)
                     {
-                        if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, roomToAdd); }
+                        if (duplicateProtection) { RemoveDuplicatesFromPool(roomPool.NormalRooms, roomToAdd); }
                         if (roomToAdd.LinkedRoom?.HasDrop ?? false)
                         {
                             roomToAdd = roomToAdd.LinkedRoom;
@@ -175,7 +177,7 @@ public class ReconstructedPalaceGenerator(CancellationToken ct) : PalaceGenerato
                                 bool added2 = AddRoom(palace, dropZoneRoom, props.BlockersAnywhere);
                                 if (added2)
                                 {
-                                    if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, dropZoneRoom); }
+                                    if (duplicateProtection) { RemoveDuplicatesFromPool(roomPool.NormalRooms, dropZoneRoom); }
                                     continueDropping = dropZoneRoom.HasDrop;
                                     if (dropZoneRoom.LinkedRoomName != null)
                                     {

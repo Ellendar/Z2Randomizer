@@ -18,6 +18,8 @@ internal class ChaosPalaceGenerator : PalaceGenerator
         debug++;
         bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
         RoomPool roomPool = new(rooms);
+        ILookup<string, Room>? duplicateRoomLookup = CreateRoomVariantsLookupOrNull(props, palaceNumber, roomPool);
+        DetermineRoomVariants(r, duplicateRoomLookup, roomPool.NormalRooms);
         Palace palace = new(palaceNumber);
         var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
@@ -93,7 +95,7 @@ internal class ChaosPalaceGenerator : PalaceGenerator
             int roomIndex = r.Next(roomPool.NormalRooms.Count);
             Room newRoom = new(roomPool.NormalRooms[roomIndex]);
             palace.AllRooms.Add(newRoom);
-            if (duplicateProtection) { RemoveDuplicatesFromPool(props, roomPool.NormalRooms, newRoom); }
+            if (duplicateProtection) { RemoveDuplicatesFromPool(roomPool.NormalRooms, newRoom); }
         }
 
         Dictionary<Room, RoomExitType> roomExits = [];
