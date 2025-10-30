@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
@@ -61,25 +61,56 @@ public abstract class PalaceGenerator
         return true;
     }
 
-    protected static void RemoveDuplicatesFromPool(RandomizerProperties props, ICollection<Room> rooms, Room roomThatWasUsed)
+    /// <summary>
+    /// If full duplicate protection by sideview is enabled, this will return a lookup map of DuplicateGroupId -> collection of rooms.
+    /// Otherwise it will return null. The lookup being null can safely be passed to DetermineRoomVariants and nothing will be done.
+    /// </summary>
+    protected static ILookup<string, Room>? CreateRoomVariantsLookupOrNull(RandomizerProperties props, int palaceNumber, RoomPool roomPool)
     {
-        if (props.NoDuplicateRoomsBySideview)
+        if (props.NoDuplicateRoomsBySideview && AllowDuplicatePrevention(props, palaceNumber))
         {
-            var sideviewBytes = roomThatWasUsed.SideView;
-            if (rooms is List<Room> list)
-            {
-                list.RemoveAll(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else if (rooms is HashSet<Room> set)
-            {
-                set.RemoveWhere(r => byteArrayEqualityComparer.Equals(r.SideView, sideviewBytes));
-            }
-            else { throw new NotImplementedException(); }
+            return roomPool.NormalRooms.Where(r => r.DuplicateGroup != null && r.DuplicateGroup != "").ToLookup(r => r.DuplicateGroup);
         }
-        else if (props.NoDuplicateRooms)
+        else
         {
-            rooms.Remove(roomThatWasUsed);
+            return null;
         }
+    }
+
+    /// <summary>
+    /// With full duplicate protection enabled (meaning duplicateRoomLookup is non-null), 
+    /// this will remove all but one rooms of each duplicate group, at random.
+    /// </summary>
+    protected static void DetermineRoomVariants(Random r, ILookup<string, Room>? duplicateRoomLookup, List<Room> rooms)
+    {
+        if (duplicateRoomLookup == null) { return; }
+        HashSet<Room> toRemove = new();
+        foreach (IGrouping<string, Room> group in duplicateRoomLookup)
+        {
+            // randomly pick one room from the duplicate group to keep
+            int keepIndex = r.Next(group.Count());
+            Room keep = group.ElementAt(keepIndex);
+            foreach (var room in group)
+            {
+                if (!ReferenceEquals(room, keep)) { toRemove.Add(room); }
+            }
+        }
+        rooms.RemoveAll(toRemove.Contains);
+    }
+
+    protected static void RemoveDuplicatesFromPool(ICollection<Room> rooms, Room roomThatWasUsed)
+    {
+        if (rooms is List<Room> list)
+        {
+            var removed = list.RemoveAll(r => r.Name == roomThatWasUsed.Name);
+            Debug.Assert(removed == 1);
+        }
+        else if (rooms is HashSet<Room> set)
+        {
+            var removed = set.RemoveWhere(r => r.Name == roomThatWasUsed.Name);
+            Debug.Assert(removed == 1);
+        }
+        else { throw new NotImplementedException(); }
     }
 
     [Conditional("DEBUG")]
