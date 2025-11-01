@@ -15,6 +15,8 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         //Debug.WriteLine(palace.GetLayoutDebug(PalaceStyle.SEQUENTIAL));
         palace.ItemRooms ??= [];
 
+        int itemRoomTotal = palace.Number < 7 ? props.PalaceItemRoomCounts[palace.Number - 1] : 0;
+
         //ItemRoom
         if (palace.Number < 7)
         {
@@ -37,8 +39,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             additionalItemRoomExitShapes.FisherYatesShuffle(r);
             possibleItemRoomExitTypes.AddRange(additionalItemRoomExitShapes);
 
-
-            while (itemRoomNumber < props.PalaceItemRoomCounts[palace.Number - 1])
+            while (itemRoomNumber < itemRoomTotal)
             {
                 if(possibleItemRoomExitTypes.Count == 0)
                 {
@@ -82,7 +83,15 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                         }
                     }
                 }
-                if(!itemRoomPlaced)
+                if(itemRoomPlaced)
+                {
+                    // shuffle item room shape priority if we have more item rooms to place
+                    if (itemRoomNumber < itemRoomTotal)
+                    {
+                        possibleItemRoomExitTypes.FisherYatesShuffle(r);
+                    }
+                }
+                else
                 {
                     possibleItemRoomExitTypes.Remove(itemRoomExitType);
                 }
@@ -168,7 +177,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         if (palace.BossRoom == null
             || palace.Entrance == null
             || (palace.Number == 7 && palace.TbirdRoom == null)
-            || (palace.Number < 7 && palace.ItemRooms.Count != props.PalaceItemRoomCounts[palace.Number - 1]))
+            || palace.ItemRooms.Count != itemRoomTotal)
         {
             logger.Debug("Failed to place critical room in palace");
             return false;
