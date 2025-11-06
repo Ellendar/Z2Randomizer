@@ -44,7 +44,7 @@ public class Palaces
         VANILLA_P7_ALLOWED_BLOCKERS
     ];
 
-    static Dictionary<RoomExitType, int> itemRoomCounts = [];
+    public static Dictionary<RoomExitType, int> itemRoomCounts = [];
 
     public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
     {

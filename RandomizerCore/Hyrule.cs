@@ -278,10 +278,12 @@ public class Hyrule
                     continue;
                 }
 
+                /*
                 if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name == "gtmOldgpRooms M10"))
                 {
                     continue;
                 }
+                */
 
                 //Randomize Enemies
                 if (props.ShufflePalaceEnemies)

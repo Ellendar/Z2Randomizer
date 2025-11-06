@@ -27,17 +27,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
 
             int itemRoomNumber = 0;
 
-            List<RoomExitType> possibleItemRoomExitTypes = [];
-            foreach(RoomExitType shape in PRIORITY_ROOM_SHAPES)
-            {
-                if(roomPool.ItemRoomsByShape.ContainsKey(shape))
-                {
-                    possibleItemRoomExitTypes.Add(shape);
-                }
-            }
-            List<RoomExitType> additionalItemRoomExitShapes = roomPool.ItemRoomsByShape.Keys.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i)).ToList();
-            additionalItemRoomExitShapes.FisherYatesShuffle(r);
-            possibleItemRoomExitTypes.AddRange(additionalItemRoomExitShapes);
+            List<RoomExitType> possibleItemRoomExitTypes = ShuffleItemRoomShapes(roomPool.ItemRoomsByShape.Keys.ToList(), r);
 
             while (itemRoomNumber < itemRoomTotal)
             {
@@ -88,7 +78,7 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                     // shuffle item room shape priority if we have more item rooms to place
                     if (itemRoomNumber < itemRoomTotal)
                     {
-                        possibleItemRoomExitTypes.FisherYatesShuffle(r);
+                        possibleItemRoomExitTypes = ShuffleItemRoomShapes(possibleItemRoomExitTypes, r);
                     }
                 }
                 else
@@ -219,17 +209,25 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             secondaryRoom.LinkedRoom = newPrimaryRoom;
 
             replacements.Add((primaryRoom, newPrimaryRoom, secondaryRoom));
-            if(primaryRoom.Up != null)
+            //Handle this one differently to account for drops
+            if(palace.AllRooms.Any(i => i.Down == primaryRoom))
             {
+                Room upRoom = palace.AllRooms.First(i => i.Down == primaryRoom);
                 if(newPrimaryRoom.HasUpExit)
                 {
                     newPrimaryRoom.Up = primaryRoom.Up;
-                    primaryRoom.Up.Down = newPrimaryRoom;
                 }
                 else if (secondaryRoom.HasUpExit)
                 {
                     secondaryRoom.Up = primaryRoom.Up;
-                    primaryRoom.Up.Down = secondaryRoom;
+                }
+                if(newPrimaryRoom.IsDropZone)
+                {
+                    upRoom.Down = newPrimaryRoom;
+                }
+                else if (secondaryRoom.IsDropZone)
+                {
+                    upRoom.Down = secondaryRoom;
                 }
             }
             if (primaryRoom.Down != null)
@@ -292,5 +290,14 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             palace.AllRooms.Add(replacement.Item2);
             palace.AllRooms.Add(replacement.Item3);
         }
+    }
+
+    public static List<RoomExitType> ShuffleItemRoomShapes(List<RoomExitType> possibleItemRoomExitTypes, Random r)
+    {
+        List<RoomExitType> priorityShapes = [.. possibleItemRoomExitTypes.Where(i => PRIORITY_ROOM_SHAPES.Contains(i))];
+        List<RoomExitType> nonPriorityShapes = [.. possibleItemRoomExitTypes.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i))];
+        priorityShapes.FisherYatesShuffle(r);
+        nonPriorityShapes.FisherYatesShuffle(r);
+        return [.. priorityShapes, .. nonPriorityShapes];
     }
 }

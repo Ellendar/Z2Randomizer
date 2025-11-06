@@ -194,7 +194,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                     roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
                     Debug.Assert(roomCandidates.Count() > 0);
                     roomsByExitType[roomExitType] = roomCandidates;
-                    logger.Info($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
+                    logger.Debug($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
                 }
                 roomCandidates!.FisherYatesShuffle(r);
                 Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
