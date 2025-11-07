@@ -1,5 +1,10 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.5 - November 06, 2025
+- Re-Fixed a bug that caused palaces with multiple item rooms to always use the same room shape for it's item rooms.
+- Fixed a bug where drops into segmented rooms could cause invalid exits that take you outside.
+- Updated Alucard sprite
+
 ## Version 5.0.4 - October 29, 2025
 
 ### Bug Fixes
