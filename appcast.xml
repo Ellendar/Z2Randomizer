@@ -6,6 +6,17 @@
 		<description>Most recent changes.</description>
 		<language>en</language>
 		<item>
+			<title>Version 5.0.6</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Saturday, 11 November 2025 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/5.0.6/Z2Randomizer_5_0_6.msi" sparkle:version="5.0.6" />
+		</item>
+		<item>
+		<item>
 			<title>Version 5.0.5</title>
 			<description>
 				<![CDATA[

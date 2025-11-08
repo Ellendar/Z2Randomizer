@@ -1,5 +1,9 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.5 - November 11, 2025
+- Fixed an issue where the UI gets confused about what version it is.
+- Removed a wall statue from a room to avoid confusion
+
 ## Version 5.0.5 - November 06, 2025
 - Re-Fixed a bug that caused palaces with multiple item rooms to always use the same room shape for it's item rooms.
 - Fixed a bug where drops into segmented rooms could cause invalid exits that take you outside.
