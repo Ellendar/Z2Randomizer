@@ -1,6 +1,10 @@
 # Z2Randomizer Changelog
 
-## Version 5.0.5 - November 11, 2025
+## Version 5.0.7 - November 9, 2025
+- Fixed another bug related to segmented room connections.
+- Slightly increased the default window height to avoid options not being visible.
+
+## Version 5.0.6 - November 8, 2025
 - Fixed an issue where the UI gets confused about what version it is.
 - Removed a wall statue from a room to avoid confusion
 

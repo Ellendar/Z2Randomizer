@@ -213,19 +213,29 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
             if(palace.AllRooms.Any(i => i.Down == primaryRoom))
             {
                 Room upRoom = palace.AllRooms.First(i => i.Down == primaryRoom);
+                //This specifically handles the case where the room above is connected by elevator to another linked room
+                //AllRooms will still have a reference to the merged room, but we need to make sure the up reference is to
+                //the new room not the old room.
+                //This doesn't matter for drops because the Up reference should be null, so it will continue to be
+                if(primaryRoom.Up != null && primaryRoom.Up != upRoom)
+                {
+                    upRoom = primaryRoom.Up;
+                }
                 if(newPrimaryRoom.HasUpExit)
                 {
                     newPrimaryRoom.Up = primaryRoom.Up;
+                    upRoom.Down = newPrimaryRoom;
                 }
                 else if (secondaryRoom.HasUpExit)
                 {
                     secondaryRoom.Up = primaryRoom.Up;
+                    upRoom.Down = secondaryRoom;
                 }
-                if(newPrimaryRoom.IsDropZone)
+                if(newPrimaryRoom.IsDropZone && upRoom.HasDrop)
                 {
                     upRoom.Down = newPrimaryRoom;
                 }
-                else if (secondaryRoom.IsDropZone)
+                else if (secondaryRoom.IsDropZone && upRoom.HasDrop)
                 {
                     upRoom.Down = secondaryRoom;
                 }
