@@ -6,6 +6,46 @@
 		<description>Most recent changes.</description>
 		<language>en</language>
 		<item>
+			<title>Version 5.0.7</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Sunday, 12 November 2025 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/5.0.7/Z2Randomizer_5_0_7.msi" sparkle:version="5.0.7" />
+		</item>
+		<item>
+			<title>Version 5.0.6</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Saturday, 11 November 2025 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/5.0.6/Z2Randomizer_5_0_6.msi" sparkle:version="5.0.6" />
+		</item>
+		<item>
+			<title>Version 5.0.5</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Thursday, 06 November 2025 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/5.0.5/Z2Randomizer_5_0_5.msi" sparkle:version="5.0.5" />
+		</item>
+		<item>
+			<title>Version 5.0.4</title>
+			<description>
+				<![CDATA[
+			See the <a href="https://github.com/Ellendar/Z2Randomizer/blob/main/PatchNotes.md">changelog</a> for details about new features.
+			]]>
+			</description>
+			<pubDate>Wednesday, 29 October 2025 </pubDate>
+			<enclosure url="https://github.com/Ellendar/Z2Randomizer/releases/download/5.0.4/Z2Randomizer_5_0_4.msi" sparkle:version="5.0.4" />
+		</item>
+		<item>
 			<title>Version 5.0.3</title>
 			<description>
 				<![CDATA[

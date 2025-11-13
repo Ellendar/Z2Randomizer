@@ -272,10 +272,18 @@ public class Hyrule
                 freeBanks = new(ROM.FreeRomBanks);
                 var palaceGenerator = new Palaces();
                 palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, raftIsRequired, ct);
+
                 if (palaces.Count == 0)
                 {
                     continue;
                 }
+
+                /*
+                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name == "gtmOldgpRooms M10"))
+                {
+                    continue;
+                }
+                */
 
                 //Randomize Enemies
                 if (props.ShufflePalaceEnemies)

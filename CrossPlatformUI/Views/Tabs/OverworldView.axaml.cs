@@ -25,7 +25,7 @@ public partial class OverworldView : ReactiveUserControl<MainViewModel>
 
             rockObservable.CombineLatest(forestObservable, (rock, forest) => (rock ?? true) || (forest ?? true))
                 .Subscribe(possibleHiddenEastTile =>
-                { 
+                {
                     shuffleWhichLocationsAreHidden.IsEnabled = possibleHiddenEastTile;
                     if (!possibleHiddenEastTile)
                     {

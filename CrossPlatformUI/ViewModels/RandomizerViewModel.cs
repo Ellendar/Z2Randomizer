@@ -66,7 +66,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     [JsonIgnore]
     public string AppVersion
     {
-        get => $"Z2R v{App.Version}";
+        get => $"Z2R {App.Version}";
     }
 
     [JsonConstructor]
@@ -267,7 +267,6 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
                 Main.Config.MixOverworldAndPalaceItems = false;
             }
         });
-
 
         // If shuffle overworld items is off, turn off pbag cave item shuffle too
         Main.Config.ObservableForProperty(x => x.ShuffleOverworldItems)

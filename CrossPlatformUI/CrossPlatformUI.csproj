@@ -40,6 +40,42 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
+        <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
     </ItemGroup>
+
+    <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
+        <MakeDir Directories="$(IntermediateOutputPath)" />
+        <Exec Command="git rev-parse --short HEAD > $(IntermediateOutputPath)git-hash.txt" />
+        <Exec Command="git rev-parse --abbrev-ref HEAD > $(IntermediateOutputPath)git-branch.txt" />
+        <Exec Command="git diff --quiet || echo dirty > $(IntermediateOutputPath)git-dirty.txt" IgnoreExitCode="true" />
+
+        <ReadLinesFromFile File="$(IntermediateOutputPath)git-hash.txt"><Output TaskParameter="Lines" PropertyName="GitHash" /></ReadLinesFromFile>
+        <ReadLinesFromFile File="$(IntermediateOutputPath)git-branch.txt"><Output TaskParameter="Lines" PropertyName="GitBranch" /></ReadLinesFromFile>
+        <ReadLinesFromFile File="$(IntermediateOutputPath)git-dirty.txt" Condition="Exists('$(IntermediateOutputPath)gitdirty.txt')"><Output TaskParameter="Lines" PropertyName="GitDirty" /></ReadLinesFromFile>
+        <PropertyGroup><IsDirtyValue>false</IsDirtyValue></PropertyGroup>
+        <PropertyGroup Condition="'$(GitDirty)' != ''"><IsDirtyValue>true</IsDirtyValue></PropertyGroup>
+    </Target>
+
+    <Target Name="WriteGitInfoFile" DependsOnTargets="GenerateGitInfo" BeforeTargets="BeforeBuild">
+
+      <PropertyGroup>
+        <GitInfoText>// (auto-generated from .csproj)
+    namespace Z2Randomizer;
+    public static class GitInfo {
+        public const string Commit = &quot;$(GitHash)&quot;;
+        public const string Branch = &quot;$(GitBranch)&quot;;
+        public const bool IsDirty = $(IsDirtyValue);
+    }
+    </GitInfoText>
+      </PropertyGroup>
+
+      <WriteLinesToFile
+          File="$(IntermediateOutputPath)GitInfo.cs"
+          Overwrite="true"
+          Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
+
+      <ItemGroup>
+          <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
+      </ItemGroup>
+    </Target>
 </Project>

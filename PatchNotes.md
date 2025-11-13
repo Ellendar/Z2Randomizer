@@ -1,5 +1,43 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.7 - November 9, 2025
+- Fixed another bug related to segmented room connections.
+- Slightly increased the default window height to avoid options not being visible.
+
+## Version 5.0.6 - November 8, 2025
+- Fixed an issue where the UI gets confused about what version it is.
+- Removed a wall statue from a room to avoid confusion
+
+## Version 5.0.5 - November 06, 2025
+- Re-Fixed a bug that caused palaces with multiple item rooms to always use the same room shape for it's item rooms.
+- Fixed a bug where drops into segmented rooms could cause invalid exits that take you outside.
+- Updated Alucard sprite
+
+## Version 5.0.4 - October 29, 2025
+
+### Bug Fixes
+- Improved enemy handling to reduce the likelyhood generators despawn other room elements
+- Updated validation on the overworld tab to be more consistent with previous versions.
+- Fixed an issue with segmented normal rooms on random walk
+- Fixed an issue preventing drop zones from being placed directly below non-drop rooms on reconstructed.
+- Blocking rooms can no longer appear in palaces they shouldn't in sequential and reconstructed.
+- Fixed an issue that could cause inescapable drops from appearing when they should not, and vice versa.
+- Fixed yet further bugs that could cause the sprite preview to not work properly.
+- Fixed some issues that could cause screen glitches.
+- Fixed helmethead's HP bar to display correctly. His actual health remains unchanged.
+- Fixed a bug that could cause hints for items in new kasuto / nabooru to incorrectly display the wrong location name.
+
+### Improvements
+- Updated the default flag presets to include the swiss and bracket flags for the 2025 Standard tournament
+- Added 2 new sprites (Doomknocker and Moblin)
+- Slighly modified drippers when dripper variance is reduced.
+- Added some new options for link's projectile and improved some projectile animations when link uses them.
+- Moderate performance increase to reconstructed generation times, especially in limited room pools.
+- Slightly adjusted the edges of some drop zones to avoid potentially getting stuck in the ceiling.
+- Flipped the drop column item room in 5.0 rooms to avoid a potential bug. Please don't jump in the lava.
+- Removed floor-level lava from a couple rooms.
+- Slightly moved an enemy in a GP room that could instantly hit link on respawn.
+
 ## Version 5.0.3 - October 18, 2025
 
 - Fixed a bug that could cause glitching backgrounds on level up on some hardware/emulators.
