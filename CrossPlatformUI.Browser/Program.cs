@@ -1,18 +1,20 @@
-﻿using Avalonia;
-using Avalonia.Browser;
-using CrossPlatformUI.Services;
-using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI.Avalonia;
-using System;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Avalonia;
+using Avalonia.Browser;
+using ReactiveUI.Avalonia;
+using CrossPlatformUI.Services;
 using Z2Randomizer.RandomizerCore;
 
 [assembly: SupportedOSPlatform("browser")]
 
 namespace CrossPlatformUI.Browser;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 internal sealed partial class Program
 {
     [JSImport("globalThis.window.SetTitle")]

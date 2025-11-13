@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -21,6 +22,7 @@ public class CustomPreset : ReactiveObject
     public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
 }
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
 

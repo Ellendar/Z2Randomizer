@@ -1,10 +1,12 @@
 using Avalonia.Markup.Xaml;
-using CrossPlatformUI.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using System.Diagnostics.CodeAnalysis;
+using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RomFileView : ReactiveUserControl<RomFileViewModel>
 {
     public RomFileView()

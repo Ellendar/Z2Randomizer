@@ -9,6 +9,7 @@ using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.CommandLine;
 
+[RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
 public class Program
 {
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Program))]

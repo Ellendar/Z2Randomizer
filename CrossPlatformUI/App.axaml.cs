@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
@@ -10,14 +11,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Material.Styles.Assists;
+using Microsoft.Extensions.DependencyInjection;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.Views;
-using Material.Styles.Assists;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CrossPlatformUI;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public sealed partial class App : Application // , IDisposable
 {
     public override void Initialize()
@@ -201,9 +203,9 @@ public partial class SerializationContext : JsonSerializerContext
         {
             try
             {
-#pragma warning disable IL2075 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
+#pragma warning disable IL2076 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
                 var converterType = typeof(SafeStringEnumConverter<>).MakeGenericType(enumType);
-#pragma warning restore IL2075
+#pragma warning restore IL2076
                 var converter = (JsonConverter)Activator.CreateInstance(converterType)!;
                 options.Converters.Add(converter);
             }

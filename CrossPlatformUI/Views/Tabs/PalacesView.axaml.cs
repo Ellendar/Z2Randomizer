@@ -1,16 +1,18 @@
 using System;
-using System.Reactive.Disposables;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using CrossPlatformUI.ViewModels;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.Views.Tabs;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class PalacesView : ReactiveUserControl<MainViewModel>
 {
     public PalacesView()
@@ -19,7 +21,7 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
         AvaloniaXamlLoader.Load(this);
 
         this.WhenActivated(disposables =>
-    {
+        {
             CheckBox noDuplicateRoomsByLayoutCheckbox = this.FindControl<CheckBox>("NoDuplicateRoomsByEnemiesCheckbox") ?? throw new System.Exception("Missing Required Validation Element");
             CheckBox noDuplicateRoomsByEnemiesCheckbox = this.FindControl<CheckBox>("NoDuplicateRoomsByLayoutCheckbox") ?? throw new System.Exception("Missing Required Validation Element");
 
@@ -31,16 +33,16 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
                 if (byLayoutValue ?? false)
                 {
                     noDuplicateRoomsByEnemiesCheckbox.IsChecked = false;
-    }
+                }
             })
             .DisposeWith(disposables);
 
             byEnemiesObservable.Subscribe(byEnemiesValue =>
-    {
+            {
                 if (byEnemiesValue ?? false)
                 {
-        noDuplicateRoomsByLayoutCheckbox.IsChecked = false;
-    }
+                    noDuplicateRoomsByLayoutCheckbox.IsChecked = false;
+                }
             })
             .DisposeWith(disposables);
 
@@ -55,11 +57,11 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
             ComboBox bossRoomsExitTypeSelector = this.FindControl<ComboBox>("BossRoomsExitTypeSelector") ?? throw new System.Exception("Missing Required Validation Element");
 
 
-            IObservable<object> normalStyleObservable = normalPalaceStyleSelector.GetObservable(ComboBox.SelectedItemProperty);
+            var normalStyleObservable = normalPalaceStyleSelector.GetObservable(ComboBox.SelectedItemProperty);
             var gpStyleObservable = gpStyleSelector.GetObservable(ComboBox.SelectedItemProperty);
 
             gpStyleObservable.Subscribe(selectedItem =>
-    {
+            {
                 EnumDescription? selectedDescription = selectedItem as EnumDescription;
                 if(selectedDescription != null)
                 {
@@ -68,13 +70,14 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
                     {
                         thunderbirdRequiredCheckbox.IsChecked = true;
                         thunderbirdRequiredCheckbox.IsEnabled = false;
-    }
+                    }
                     else
                     {
                         thunderbirdRequiredCheckbox.IsEnabled = true;
-}
+                    }
                 }
-            });
+            })
+            .DisposeWith(disposables);
 
             normalStyleObservable.CombineLatest(gpStyleObservable, (normal, gp) =>
             {
@@ -105,8 +108,8 @@ public partial class PalacesView : ReactiveUserControl<MainViewModel>
                     blockingRoomsAnywhereCheckbox.IsChecked = enableRoomSelection;
                     bossRoomsExitTypeSelector.SelectedIndex = 0;
                 }
-            });
+            })
+            .DisposeWith(disposables);
         });
     }
-
 }

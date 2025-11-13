@@ -1,10 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Markup.Xaml;
-using CrossPlatformUI.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class MainView : ReactiveUserControl<MainViewModel>
 {
     public MainView()

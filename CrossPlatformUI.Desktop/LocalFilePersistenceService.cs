@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CrossPlatformUI.Desktop;
 
+[RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
 public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionDriver
 {
     // TODO put this in appdata

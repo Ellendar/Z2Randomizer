@@ -12,6 +12,12 @@
         <Platforms>AnyCPU</Platforms>
         <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- ReactiveUserControl<T> ViewModel references cause IL2026 -->
+        <NoWarn>$(NoWarn);IL2026</NoWarn>
+    </PropertyGroup>
+    
     <PropertyGroup Condition=" '$(Configuration)' == 'Unsafe Debug' ">
       <DebugSymbols Condition=" '$(DebugSymbols)' == '' ">true</DebugSymbols>
       <Optimize Condition=" '$(Optimize)' == '' ">false</Optimize>
@@ -30,13 +36,13 @@
         <PackageReference Include="DialogHost.Avalonia" Version="$(DialogHostAvaloniaVersion)" />
         <PackageReference Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />
         <PackageReference Include="Material.Icons.Avalonia" Version="$(MaterialIconsAvaloniaVersion)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
-        <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.8" />
         <PackageReference Include="ReactiveUI.Validation" Version="6.0.5" />
-        <PackageReference Include="Aigamo.ResXGenerator" Version="4.2.0">
+        <PackageReference Include="Aigamo.ResXGenerator" Version="4.3.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.6.5" />
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.6.6" />
     </ItemGroup>
 
     <ItemGroup>
@@ -67,8 +73,8 @@
         <GitInfoText>// (auto-generated from .csproj)
     namespace Z2Randomizer;
     public static class GitInfo {
-        public const string Commit = &quot;$(GitHash)&quot;;
-        public const string Branch = &quot;$(GitBranch)&quot;;
+        public const string Commit = "$(GitHash)";
+        public const string Branch = "$(GitBranch)";
         public const bool IsDirty = $(IsDirtyValue);
     }
     </GitInfoText>

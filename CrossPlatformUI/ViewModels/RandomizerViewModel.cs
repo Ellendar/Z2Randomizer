@@ -1,21 +1,23 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Text.Json.Serialization;
-using CrossPlatformUI.Presets;
-using CrossPlatformUI.Services;
-using CrossPlatformUI.ViewModels.Tabs;
-using ReactiveUI;
-using ReactiveUI.Validation.Extensions;
-using ReactiveUI.Validation.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
 using Avalonia.Styling;
+using ReactiveUI;
+using ReactiveUI.Validation.Extensions;
+using ReactiveUI.Validation.Helpers;
+using CrossPlatformUI.Presets;
+using CrossPlatformUI.Services;
+using CrossPlatformUI.ViewModels.Tabs;
 using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
     private bool IsFlagStringValid(string flags)
