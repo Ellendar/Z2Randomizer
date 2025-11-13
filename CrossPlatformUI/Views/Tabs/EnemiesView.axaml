@@ -28,14 +28,17 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShufflePalaceEnemiesToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <CheckBox
-                  Name="ShuffleDripperCheckbox" 
-                  IsEnabled="{Binding Config.ShufflePalaceEnemies}"
-                  IsChecked="{Binding Config.ShuffleDripperEnemy}" 
-                  Content="Shuffle Dripper Enemy"
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Shuffle Dripper Enemy"
+                ItemsSource="{Binding Source={x:Static rc:Enums.DripperEnemyOptionList}}"
+                SelectedItem="{Binding Config.DripperEnemyOption, Converter={x:Static ui:Util.EnumConvert}}"
+                IsEnabled="{Binding Config.ShufflePalaceEnemies}"
             >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleDripperEnemyToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+                <ToolTip.Tip>
+                    <TextBlock Text="{x:Static lang:Resources.ShuffleDripperEnemyToolTip}"/>
+                </ToolTip.Tip>
+            </ComboBox>
             <CheckBox
                   Name="MixLargeAndSmallEnemiesCheckbox"
                   IsThreeState="True"

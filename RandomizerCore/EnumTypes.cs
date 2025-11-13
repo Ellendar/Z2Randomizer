@@ -165,6 +165,18 @@ public static class XPEffectivenessExtensions
     }
 }
 
+[DefaultValue(ONLY_BOTS)]
+public enum DripperEnemyOption
+{
+    [Description("Only Bots")]
+    ONLY_BOTS,
+    [Description("All Ground Enemies")]
+    ANY_GROUND_ENEMY,
+    [Description("Easier Ground Enemies")]
+    EASIER_GROUND_ENEMIES,
+    [Description("Easier Ground Enemies, Full HP")]
+    EASIER_GROUND_ENEMIES_FULL_HP,
+}
 
 [DefaultValue(NORMAL)]
 public enum FireOption
@@ -760,6 +772,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
+    public static IEnumerable<EnumDescription> DripperEnemyOptionList { get; } = ToDescriptions<DripperEnemyOption>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();

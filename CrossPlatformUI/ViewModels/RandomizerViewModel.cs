@@ -251,7 +251,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             }
             if (!palaceEnemyShuffle)
             {
-                Main.Config.ShuffleDripperEnemy = false;
+                Main.Config.DripperEnemyOption = DripperEnemyOption.ONLY_BOTS;
                 Main.Config.GeneratorsAlwaysMatch = false;
             }
         });

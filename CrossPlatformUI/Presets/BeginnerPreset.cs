@@ -83,7 +83,7 @@ public static class BeginnerPreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = false,
+        DripperEnemyOption = DripperEnemyOption.ONLY_BOTS,
         MixLargeAndSmallEnemies = false,
         GeneratorsAlwaysMatch = true,
 

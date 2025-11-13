@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -148,29 +147,6 @@ public class ROM
         {Town.NABOORU_FOUNTAIN, textPointerTableStart + 63 * 2 },
     };*/
 
-    /// Basic look up table to convert from the original NES palette value to RGB
-    public static readonly Color[] NesColors = [
-        Color.FromArgb(101, 101, 101), Color.FromArgb(0, 18, 125),    Color.FromArgb(24, 0, 142),    Color.FromArgb(54, 0, 130),
-        Color.FromArgb(86, 0, 93),     Color.FromArgb(90, 0, 24),     Color.FromArgb(79, 5, 0),      Color.FromArgb(56, 25, 0),
-        Color.FromArgb(29, 49, 0),     Color.FromArgb(0, 61, 0),      Color.FromArgb(0, 65, 0),      Color.FromArgb(0, 59, 23),
-        Color.FromArgb(0, 46, 85),     Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
-
-        Color.FromArgb(175, 175, 175), Color.FromArgb(25, 78, 200),   Color.FromArgb(71, 47, 227),   Color.FromArgb(107, 31, 215),
-        Color.FromArgb(147, 27, 174),  Color.FromArgb(158, 26, 94),   Color.FromArgb(153, 50, 0),    Color.FromArgb(123, 75, 0),
-        Color.FromArgb(91, 103, 0),    Color.FromArgb(38, 122, 0),    Color.FromArgb(0, 130, 0),     Color.FromArgb(0, 122, 62),
-        Color.FromArgb(0, 110, 138),   Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
-
-        Color.FromArgb(255, 255, 255), Color.FromArgb(100, 169, 255), Color.FromArgb(142, 137, 255), Color.FromArgb(182, 118, 255),
-        Color.FromArgb(224, 111, 255), Color.FromArgb(239, 108, 196), Color.FromArgb(240, 128, 106), Color.FromArgb(216, 152, 44),
-        Color.FromArgb(185, 180, 10),  Color.FromArgb(131, 203, 12),  Color.FromArgb(91, 214, 63),   Color.FromArgb(74, 209, 126),
-        Color.FromArgb(77, 199, 203),  Color.FromArgb(76, 76, 76),    Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
-
-        Color.FromArgb(255, 255, 255), Color.FromArgb(199, 229, 255), Color.FromArgb(217, 217, 255), Color.FromArgb(233, 209, 255),
-        Color.FromArgb(249, 206, 255), Color.FromArgb(255, 204, 241), Color.FromArgb(255, 212, 203), Color.FromArgb(248, 223, 177),
-        Color.FromArgb(237, 234, 164), Color.FromArgb(214, 244, 164), Color.FromArgb(197, 248, 184), Color.FromArgb(190, 246, 211),
-        Color.FromArgb(191, 241, 241), Color.FromArgb(185, 185, 185), Color.FromArgb(0, 0, 0),       Color.FromArgb(0, 0, 0),
-    ];
-
     public static readonly int[] LinkOutlinePaletteAddr = {         0x285a, 0x2a0a, 0x40af, 0x40bf, 0x40cf, 0x40df, 0x80af, 0x80bf, 0x80cf, 0x80df, 0xc0af, 0xc0bf, 0xc0cf, 0xc0df, 0xc0ef, 0x100af, 0x100bf, 0x100cf, 0x100df, 0x140af, 0x140bf, 0x140cf, 0x140df, 0x17c19, 0x1c464, 0x1c47c };
     public static readonly int[] LinkFacePaletteAddr =    {         0x285b, 0x2a10, 0x40b0, 0x40c0, 0x40d0, 0x40e0, 0x80b0, 0x80c0, 0x80d0, 0x80e0, 0xc0b0, 0xc0c0, 0xc0d0, 0xc0e0, 0xc0f0, 0x100b0, 0x100c0, 0x100d0, 0x100e0, 0x140b0, 0x140c0, 0x140d0, 0x140e0, 0x17c1a, 0x1c465, 0x1c47d };
     public static readonly int[] LinkTunicPaletteAddr =   { 0x10ea, 0x285c, 0x2a16, 0x40b1, 0x40c1, 0x40d1, 0x40e1, 0x80b1, 0x80c1, 0x80d1, 0x80e1, 0xc0b1, 0xc0c1, 0xc0d1, 0xc0e1, 0xc0f1, 0x100b1, 0x100c1, 0x100d1, 0x100e1, 0x140b1, 0x140c1, 0x140d1, 0x140e1, 0x17c1b, 0x1c466, 0x1c47e };
@@ -291,73 +267,15 @@ public class ROM
         File.WriteAllBytes(filename, rawdata);
     }
 
-    public static int ConvertNesPtrToPrgRomAddr(int bank, int nesPtr)
-    {
-        Debug.Assert(nesPtr >= 0x8000, "Non-PRG pointers (like SRAM) are not supported here");
-        switch (bank)
-        {
-            case < 0x07:
-                return nesPtr - 0x8000 + bank * 0x4000 + RomHdrSize;
-            case 0x07:
-                return nesPtr - 0xC000 + bank * 0x4000 + RomHdrSize;
-            case < 0x10:
-                throw new NotImplementedException();
-            case < 0x1d:
-                return nesPtr - 0x8000 + bank * 0x2000 + RomHdrSize;
-            case 0x1d:
-                return nesPtr - 0xA000 + bank * 0x2000 + RomHdrSize;
-            case 0x1e:
-                return nesPtr - 0xC000 + bank * 0x2000 + RomHdrSize;
-            case 0x1f:
-                return nesPtr - 0xE000 + bank * 0x2000 + RomHdrSize;
-            default:
-                throw new NotImplementedException();
-        }
-    }
-
-    public static int ConvertPrgRomAddrToAsmAddr(int romAddr)
-    {
-        int minusHeader = romAddr - RomHdrSize;
-        // refer to Asm/Init.s for these values
-        if      (minusHeader < 0x1c000)
-        {
-            return 0x8000 + (minusHeader & 0x3fff);
-        }
-        else if (minusHeader < 0x20000)
-        {
-            return 0xc000 + (minusHeader & 0x3fff);
-        }
-        else if (minusHeader < 0x3a000)
-        {
-            return 0x8000 + (minusHeader & 0x1fff);
-        }
-        else if (minusHeader < 0x3c000)
-        {
-            return 0xa000 + (minusHeader & 0x1fff);
-        }
-        else if (minusHeader < 0x3e000)
-        {
-            return 0xc000 + (minusHeader & 0x1fff);
-        }
-        else if (minusHeader < 0x40000)
-        {
-            return 0xe000 + (minusHeader & 0x1fff);
-        }
-        else
-        {
-            throw new ArgumentException("This is not a PRG address");
-        }
-    }
-
     /// Read pointer at `nesPtr`. Then read the data it points to.
     /// Relocate that data to a new address using js65. Write the
     /// new pointer to `nesPtr`. This will be done at link time.
     /// The rom data is not modified directly, only through js65.
     public void RelocateData(Assembler asm, int bank, int nesPtr)
     {
-        var romPtr = ConvertNesPtrToPrgRomAddr(bank, nesPtr);
+        var romPtr = NesPointer.ConvertNesPtrToPrgRomAddr(bank, nesPtr);
         var nesAddr = GetShort(romPtr + 1, romPtr);
-        var romAddr = ConvertNesPtrToPrgRomAddr(bank, nesAddr);
+        var romAddr = NesPointer.ConvertNesPtrToPrgRomAddr(bank, nesAddr);
         var length = GetByte(romAddr);
         var bytes = GetBytes(romAddr, length);
         const string label = "RelocateBytes";
@@ -414,7 +332,7 @@ public class ROM
                     var bit0 = (colorByte0 >> pixelShift) & 1;
                     var bit1 = ((colorByte1 >> pixelShift) & 1) << 1;
                     var color = (bit0 | bit1) + (paletteIdx * 4);
-                    var appliedColor = NesColors[palette[color]];
+                    var appliedColor = NES.NesColors[palette[color]];
 
                     var x = tilex + i;
                     var y = tiley + j;
@@ -1761,38 +1679,6 @@ ActualLavaDeath:                     ; original code that we replaced
 """);
     }
 
-    /**
-     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
-     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
-     * Inputs - A = divisor; X = enemy slot
-     *
-     * This function updates all the call sites to these two functions to match the HP for the boss.
-     */
-    private static readonly List<int> bossHpAddresses = [
-        0x11451, // Horsehead
-        0x13C86, // Helmethead
-        0x12951, // Rebonack
-        0x13041, // Unhorsed Rebonack
-        0x12953, // Carock
-        0x13C87, // Gooma
-        0x12952, // Barba
-        // These are bank 5 enemies so we should make a separate table for them
-        // but we can deal with these when we start randomizing their hp
-        // 0x15453, // Thunderbird
-        // 0x15454, // Dark Link
-    ];
-    private static readonly List<(int, int)> bossMap = [
-        (bossHpAddresses[0], 0x13b80), // Horsehead
-        (bossHpAddresses[1], 0x13ae2), // Helmethead
-        (bossHpAddresses[2], 0x12fd2), // Rebonack
-        (bossHpAddresses[3], 0x1325c), // Unhorsed Rebonack
-        (bossHpAddresses[4], 0x12e92), // Carock
-        (bossHpAddresses[5], 0x134cf), // Gooma
-        (bossHpAddresses[6], 0x13136), // Barba
-        // 0x13ae9 - unknown; who is this? I'm guessing its a helmet mini boss thing?
-        // (0x15453, 0x16406), // Thunderbird
-        // (0x15454, 0x158aa), // Dark Link
-    ];
     private void UpdateAllBossHpDivisor(AsmModule a)
     {
         a.Code(/* lang=s */$"""
@@ -1870,36 +1756,33 @@ FixHelmetHeadHpDivisorOnNonWest:
     jmp $BADA
 
 """);
-        foreach (var (hpaddr, divisoraddr) in bossMap)
+        foreach (var (hpaddr, divisoraddr) in RomMap.bossMap)
         {
             int hp = GetByte(hpaddr);
             Put(divisoraddr, (byte)(hp / 8));
         }
     }
 
-    public void RandomizeEnemyStats(Assembler asm, Random RNG)
+    public void SetBossHpBarDivisors(Assembler asm, StatRandomizer enemyStats)
     {
         var a = asm.Module();
-        // bank1_Enemy_Hit_Points at 0x5431 + Enemy ID (Overworld West)
-        RandomizeHP(a, RNG, 0x5434, 0x5453);
-        // bank2_Enemy_Hit_Points at 0x9431 + Enemy ID (Overworld East)
-        RandomizeHP(a, RNG, 0x9434, 0x944E);
-        // bank4_Enemy_Hit_Points0 at 0x11431 + Enemy ID (Palace 125)
-        RandomizeHP(a, RNG, 0x11434, 0x11435); // Myu, Bot
-        RandomizeHP(a, RNG, 0x11437, 0x11454); // Remaining palace enemies
-        // bank4_Enemy_Hit_Points1 at 0x12931 + Enemy ID (Palace 346)
-        RandomizeHP(a, RNG, 0x12934, 0x12935); // Myu, Bot
-        RandomizeHP(a, RNG, 0x12937, 0x12954); // Remaining palace enemies
-        // bank4_Table_for_Helmethead_Gooma
-        RandomizeHP(a, RNG, 0x13C86, 0x13C87); // Helmethead, Gooma
-        // bank5_Enemy_Hit_Points at 0x15431 + Enemy ID (Great Palace)
-        RandomizeHP(a, RNG, 0x15434, 0x15435); // Myu, Bot
-        RandomizeHP(a, RNG, 0x15437, 0x15438); // Moa, Ache
-        RandomizeHP(a, RNG, 0x1543B, 0x1543B); // Acheman
-        RandomizeHP(a, RNG, 0x15440, 0x15443); // Bago Bagos, Ropes
-        RandomizeHP(a, RNG, 0x15445, 0x1544B); // Bubbles, Dragon Head, Fokkas
-        RandomizeHP(a, RNG, 0x1544E, 0x1544E); // Fokkeru
-        RandomizeHP(a, RNG, 0x13041,  0x13041); // Unhorsed Rebo
+
+        for (int idx = 0; idx < RomMap.bossHpAddresses.Count; idx++)
+        {
+            var bossHpAddr = RomMap.bossHpAddresses[idx];
+            var newVal = enemyStats.BossHpTable[idx];
+            var (_, bossHpBarAddr) = RomMap.bossMap[idx];
+            var originalDivisor = GetByte(bossHpBarAddr);
+            var p = new NesPointer(bossHpBarAddr);
+            a.Segment($"PRG{p.Bank}");
+            a.Org(p.PrgAddr);
+            a.Byt((byte)idx); // Write the index of the boss to the old HP spot
+                              // we keep the original divisor, but add a remainder value.
+                              // This way the boss can accurately represent over and under HP values
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", originalDivisor);
+            // Take the remainder, and convert it into a fractional value out of 256 values
+            a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor));
+        }
 
         // Add the new HP divisors for the bosses
         UpdateAllBossHpDivisor(a);
@@ -1936,33 +1819,25 @@ FixHelmetHeadHpDivisorOnNonWest:
         WriteHPValue(0x12951, 227); // Rebonack HP
     }
 
-    private void RandomizeHP(AsmModule a, Random RNG, int start, int end)
+    public void SetDripperHp(Assembler asm, byte dripperHp)
     {
-        var segment = (start - 0x10) / 0x4000;
-        a.Segment($"PRG{segment}");
-        a.RomOrg(start);
-        for (var i = start; i <= end; i++)
-        {
-            int val = GetByte(i);
+        var a = asm.Module();
+        a.Assign("DripperHp", dripperHp);
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.segment "PRG4"
+.org $9912
+    jsr SetDripperHp
+    nop
+FREE_UNTIL $9916
 
-            var newVal = Math.Min(RNG.Next((int)(val * 0.5), (int)(val * 1.5)), 255);
-
-            a.Byt((byte)newVal);
-            var idx = bossHpAddresses.IndexOf(i);
-            // If this isn't a boss skip adding it to the boss HP table
-            if (idx <= -1) continue;
-            var (_, addr) = bossMap[idx];
-            var originalDivisor = GetByte(addr);
-            a.RomOrg(addr);
-            a.Byt((byte)idx); // Write the index of the boss to the old HP spot
-            // we keep the original divisor, but add a remainder value.
-            // This way the boss can accurately represent over and under HP values
-            a.Assign($"BOSS_{idx}_HP_DIVISOR_HI", originalDivisor);
-            // Take the remainder, and convert it into a fractional value out of 256 values
-            a.Assign($"BOSS_{idx}_HP_DIVISOR_LO", (newVal % originalDivisor) * (256 / originalDivisor));
-            // restore the previous ORG for writing the next byte in the list
-            a.RomOrg(i+1);
-        }
+.reloc
+SetDripperHp:
+    lda #DripperHp
+    sta $c2,x
+    ldy $10  ; command overwritten by jsr
+    rts
+""");
     }
 
     public void FixItemPickup(Assembler asm)
@@ -2693,9 +2568,9 @@ ResetRedPalettePayload:
         int sideviewNesPtr = GetShort(sideviewPtrAddr + 1, sideviewPtrAddr);
         // Sideview data is moved to the expanded banks at $1c/$1d
         // Currently no palace rooms are added to bank 7 but keeping this anyway.
-        // Using $1c for both works because $1d address range is directly followed by $1c.
+        // Using $1c for both works because $1c address range is directly followed by $1d.
         int sideviewBank = sideviewNesPtr >= 0xC000 ? 0x7 : 0x1c;
-        int sideviewRomPtr = ConvertNesPtrToPrgRomAddr(sideviewBank, sideviewNesPtr);
+        int sideviewRomPtr = NesPointer.ConvertNesPtrToPrgRomAddr(sideviewBank, sideviewNesPtr);
 
         byte sideviewLength = GetByte(sideviewRomPtr);
         int offset = 4;

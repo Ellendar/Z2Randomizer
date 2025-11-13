@@ -195,8 +195,12 @@ on the continents they normally appear on.</value>
 the palace group they normally appear in (1/2/5, 3/4/6, and GP)</value>
 	</data>
 	<data name="ShuffleDripperEnemyToolTip" xml:space="preserve">
-<value>Shuffles which enemy can spwan from drippers in palaces. The dripped enemy always has the
-HP of a bot.</value>
+<value>Randomizes which enemies can spawn from drippers in palaces.
+
+The enemy that appears normally has the HP of a Bot, unless you enable the Full HP option.
+
+Easier Ground Enemies include: small enemies, Tinsuits, orange Iron Knuckles, and both Stalfos.
+(With Full HP enabled, armored Stalfos from drippers will use the unarmored HP value.)</value>
 	</data>
 	<data name="MixLargeandSmallEnemiesToolTip" xml:space="preserve">
 <value>Normally, when shuffling enemies small enemies are replaced by small and large enemies are
