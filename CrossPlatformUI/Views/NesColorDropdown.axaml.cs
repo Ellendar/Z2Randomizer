@@ -91,7 +91,7 @@ public partial class NesColorDropdown : UserControl
             for (int col = 0; col < cols; col++)
             {
                 int index = (row * 0x10) + col;
-                if (index >= ROM.NesColors.Length) { continue; }
+                if (index >= NES.NesColors.Length) { continue; }
 
                 if (index == 0x0D) // Leave color $0D slot empty
                 {
@@ -132,7 +132,7 @@ public partial class NesColorDropdown : UserControl
 
     private static SolidColorBrush GetBrushFromNesColor(int index)
     {
-        var color = ROM.NesColors[index];
+        var color = NES.NesColors[index];
         return new SolidColorBrush(Color.FromRgb(color.R, color.G, color.B));
     }
 
