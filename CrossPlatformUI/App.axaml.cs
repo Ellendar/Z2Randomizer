@@ -25,6 +25,8 @@ public sealed partial class App : Application // , IDisposable
         AvaloniaXamlLoader.Load(this);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
+
+#pragma warning disable CS0162 // Unreachable code detected
         if (Z2Randomizer.GitInfo.Branch == "main")
         {
             Version = $"v{version?.ToString(version.Revision > 0 ? 4 : 3)}";
@@ -33,6 +35,7 @@ public sealed partial class App : Application // , IDisposable
         {
             Version = $"[{Z2Randomizer.GitInfo.Branch}:{Z2Randomizer.GitInfo.Commit}]";
         }
+#pragma warning restore CS0162 // Unreachable code detected
 #if DEBUG
         Version += " (Debug)";
 #endif
