@@ -49,11 +49,6 @@
         <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Include="$(IntermediateOutputPath)GitInfo.cs"
-                 Condition="Exists('$(IntermediateOutputPath)GitInfo.cs') Or '$(DesignTimeBuild)' == 'true'" />
-    </ItemGroup>
-
     <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
         <MakeDir Directories="$(IntermediateOutputPath)" />
         <Exec Command="git rev-parse --short HEAD > $(IntermediateOutputPath)git-hash.txt" />
@@ -68,21 +63,30 @@
     </Target>
 
     <Target Name="WriteGitInfoFile" DependsOnTargets="GenerateGitInfo" BeforeTargets="BeforeBuild">
+        <PropertyGroup>
+            <GitInfoText>
+                // (auto-generated from .csproj)
+                namespace Z2Randomizer;
 
-      <PropertyGroup>
-        <GitInfoText>// (auto-generated from .csproj)
-    namespace Z2Randomizer;
-    public static class GitInfo {
-        public const string Commit = "$(GitHash)";
-        public const string Branch = "$(GitBranch)";
-        public const bool IsDirty = $(IsDirtyValue);
-    }
-    </GitInfoText>
-      </PropertyGroup>
+                public static partial class GitInfo
+                {
+                    static GitInfo()
+                    {
+                        Commit = "$(GitHash)";
+                        Branch = "$(GitBranch)";
+                        IsDirty = $(IsDirtyValue);
+                    }
+                }
+            </GitInfoText>
+        </PropertyGroup>
 
-      <WriteLinesToFile
-          File="$(IntermediateOutputPath)GitInfo.cs"
-          Overwrite="true"
-          Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
+        <WriteLinesToFile
+            File="$(IntermediateOutputPath)GitInfo.cs"
+            Overwrite="true"
+            Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
+
+        <ItemGroup>
+            <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
+        </ItemGroup>
     </Target>
 </Project>
