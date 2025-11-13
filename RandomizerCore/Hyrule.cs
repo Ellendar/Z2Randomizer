@@ -418,7 +418,10 @@ public class Hyrule
             }
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
-            ApplyAsmPatches(props, assembler, r, texts, ROMData);
+            StatRandomizer randomizedStats = new(ROMData, props);
+            randomizedStats.Randomize(r);
+            randomizedStats.Write(ROMData);
+            ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
 
             var rom = await ROMData.ApplyAsm(assembler);
             // await assemblerTask; // .Wait(ct);
@@ -1265,7 +1268,7 @@ public class Hyrule
             //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
             //be tested here, but we don't actually know what they will be until later, for now i'm just
             //testing with the vanilla text, but this could be an issue down the line.
-            ApplyAsmPatches(props, validationEngine, r, ROMData.GetGameText(), testRom);
+            ApplyAsmPatches(props, validationEngine, r, ROMData.GetGameText(), testRom, new StatRandomizer(testRom, props));
             validationEngine.Add(sideviewModule);
             await testRom.ApplyAsm(validationEngine); //.Wait(ct);
         }
@@ -3975,7 +3978,7 @@ EndTileComparisons = $8601
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
@@ -3997,7 +4000,7 @@ EndTileComparisons = $8601
 
         if (props.ShuffleEnemyHP)
         {
-            rom.RandomizeEnemyStats(engine, RNG);
+            rom.SetBossHpBarDivisors(engine, randomizedStats);
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)
