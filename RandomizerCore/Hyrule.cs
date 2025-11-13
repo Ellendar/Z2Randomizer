@@ -2978,11 +2978,6 @@ public class Hyrule
         ROMData.Put(0x1CD43, (byte)palGraphics[(int)eastHyrule.locationAtPalace6.PalaceNumber!]);
         ROMData.Put(0x1CD44, (byte)palGraphics[(int)eastHyrule.locationAtGP.PalaceNumber!]);
 
-        if (props.ShuffleDripper)
-        {
-            ROMData.Put(0x11927, (byte)Enemies.Palace125GroundEnemies[r.Next(Enemies.Palace125GroundEnemies.Length)]);
-        }
-
         if (props.ShuffleEnemyPalettes)
         {
             List<int> doubleLocs = [0x40b4, 0x80b4, 0x100b4, 0x100b8, 0x100bc, 0x140b4, 0x140b8, 0x140bc];
@@ -4001,6 +3996,37 @@ EndTileComparisons = $8601
         if (props.ShuffleEnemyHP)
         {
             rom.SetBossHpBarDivisors(engine, randomizedStats);
+        }
+
+        if (props.DripperEnemyOption != DripperEnemyOption.ONLY_BOTS)
+        {
+            EnemiesPalace125[] dripperEnemies;
+            switch (props.DripperEnemyOption)
+            {
+                case DripperEnemyOption.ANY_GROUND_ENEMY:
+                    dripperEnemies = Enemies.Palace125GroundEnemies;
+                    break;
+                case DripperEnemyOption.EASIER_GROUND_ENEMIES:
+                case DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP:
+                    dripperEnemies = [
+                        ..Enemies.Palace125SmallEnemies,
+                        EnemiesPalace125.TINSUIT,
+                        EnemiesPalace125.ORANGE_IRON_KNUCKLE,
+                        EnemiesPalace125.RED_STALFOS,
+                        EnemiesPalace125.BLUE_STALFOS, // will use non-armored variant HP
+                    ];
+                    break;
+                default:
+                    throw new ImpossibleException();
+            }
+            byte dripperId = (byte)dripperEnemies[r.Next(dripperEnemies.Length)];
+            ROMData.Put(RomMap.DRIPPER_ID, dripperId);
+
+            if (props.DripperEnemyOption == DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP)
+            {
+                var dripperHp = randomizedStats.Palace125EnemyHpTable[dripperId];
+                rom.SetDripperHp(engine, dripperHp);
+            }
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)

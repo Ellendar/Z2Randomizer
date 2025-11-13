@@ -1819,6 +1819,27 @@ FixHelmetHeadHpDivisorOnNonWest:
         WriteHPValue(0x12951, 227); // Rebonack HP
     }
 
+    public void SetDripperHp(Assembler asm, byte dripperHp)
+    {
+        var a = asm.Module();
+        a.Assign("DripperHp", dripperHp);
+        a.Code(/* lang=s */"""
+.include "z2r.inc"
+.segment "PRG4"
+.org $9912
+    jsr SetDripperHp
+    nop
+FREE_UNTIL $9916
+
+.reloc
+SetDripperHp:
+    lda #DripperHp
+    sta $c2,x
+    ldy $10  ; command overwritten by jsr
+    rts
+""");
+    }
+
     public void FixItemPickup(Assembler asm)
     {
         // In Z2R, Link never holds items above his head. So,

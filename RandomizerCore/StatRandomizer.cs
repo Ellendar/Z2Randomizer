@@ -23,7 +23,7 @@ public class StatRandomizer
     protected RandomizerProperties props { get; }
 
 #if DEBUG
-    private bool HasRandomizedHp = false;
+    private bool AlreadyRandomized = false;
 #endif
 
     public StatRandomizer(ROM rom, RandomizerProperties props)
@@ -34,6 +34,11 @@ public class StatRandomizer
 
     public void Randomize(Random r)
     {
+#if DEBUG
+        Debug.Assert(!AlreadyRandomized);
+        AlreadyRandomized = true;
+#endif
+
         if (props.ShuffleEnemyHP)
         {
             RandomizeHp(r);
@@ -92,11 +97,6 @@ public class StatRandomizer
         for (i = (int)EnemiesGreatPalace.FOKKERU; i < (int)EnemiesGreatPalace.KING_BOT; i++) { RollHpValue(r, GpEnemyHpTable, i); }
 
         for (i = 0; i < BossHpTable.Length; i++) { RollHpValue(r, BossHpTable, i); }
-
-#if DEBUG
-        Debug.Assert(!HasRandomizedHp);
-        HasRandomizedHp = true;
-#endif
     }
 
     protected void RollHpValue(Random r, byte[] array, int index)
