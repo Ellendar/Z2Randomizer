@@ -2,7 +2,7 @@
 
 public static partial class GitInfo
 {
-    public static partial string Commit { get; }
-    public static partial string Branch { get; }
-    public static partial bool IsDirty { get; }
+    public static string Commit { get; } = "n/a";
+    public static string Branch { get; } = "n/a";
+    public static bool IsDirty { get; }
 }

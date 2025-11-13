@@ -58,25 +58,30 @@
     </Target>
 
     <Target Name="WriteGitInfoFile" DependsOnTargets="GenerateGitInfo" BeforeTargets="BeforeBuild">
+        <PropertyGroup>
+            <GitInfoText>
+                // (auto-generated from .csproj)
+                namespace Z2Randomizer;
 
-      <PropertyGroup>
-        <GitInfoText>// (auto-generated from .csproj)
-    namespace Z2Randomizer;
-    public static class GitInfo {
-        public static partial string Commit = &quot;$(GitHash)&quot;;
-        public static partial string Branch = &quot;$(GitBranch)&quot;;
-        public static partial bool IsDirty = $(IsDirtyValue);
-    }
-    </GitInfoText>
-      </PropertyGroup>
+                public static partial class GitInfo
+                {
+                    static GitInfo()
+                    {
+                        Commit = "$(GitHash)";
+                        Branch = "$(GitBranch)";
+                        IsDirty = $(IsDirtyValue);
+                    }
+                }
+            </GitInfoText>
+        </PropertyGroup>
 
-      <WriteLinesToFile
-          File="$(IntermediateOutputPath)GitInfo.cs"
-          Overwrite="true"
-          Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
+        <WriteLinesToFile
+            File="$(IntermediateOutputPath)GitInfo.cs"
+            Overwrite="true"
+            Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
 
-      <ItemGroup>
-          <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
-      </ItemGroup>
+        <ItemGroup>
+            <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
+        </ItemGroup>
     </Target>
 </Project>
