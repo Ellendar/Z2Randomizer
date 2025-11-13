@@ -44,6 +44,11 @@
         <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Include="$(IntermediateOutputPath)GitInfo.cs"
+                 Condition="Exists('$(IntermediateOutputPath)GitInfo.cs') Or '$(DesignTimeBuild)' == 'true'" />
+    </ItemGroup>
+
     <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
         <MakeDir Directories="$(IntermediateOutputPath)" />
         <Exec Command="git rev-parse --short HEAD > $(IntermediateOutputPath)git-hash.txt" />
@@ -74,9 +79,5 @@
           File="$(IntermediateOutputPath)GitInfo.cs"
           Overwrite="true"
           Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
-
-      <ItemGroup>
-          <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />
-      </ItemGroup>
     </Target>
 </Project>
