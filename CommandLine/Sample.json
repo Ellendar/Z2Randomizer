@@ -103,6 +103,7 @@
 "ShuffleDripperEnemy": false,
 "ShuffleEncounters": false,
 "ShuffleEnemyHP": false,
+"ShuffleBossHP": "VANILLA",
 "ShuffleGP": false,
 "ShuffleItemDropFrequency": true,
 "ShuffleLifeExperience": false,

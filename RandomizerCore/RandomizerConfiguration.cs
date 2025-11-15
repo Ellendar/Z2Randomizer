@@ -364,6 +364,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleEnemyHP;
 
     [Reactive]
+    private EnemyLifeOption shuffleBossHP;
+
+    [Reactive]
     private bool shuffleXPStealers;
 
     [Reactive]
@@ -1200,6 +1203,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         //Enemies
         properties.ShuffleEnemyHP = shuffleEnemyHP;
+        properties.ShuffleBossHP = shuffleBossHP;
         properties.ShuffleEnemyStealExp = shuffleXPStealers;
         properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
         properties.ShuffleSwordImmunity = shuffleSwordImmunity;

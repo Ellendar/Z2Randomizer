@@ -218,6 +218,11 @@ taking damage. Play at your own risk.</value>
 	<data name="ShuffleEnemyHPToolTip" xml:space="preserve">
 <value>If selected, each enemy type will have between 50% and 150% of its vanilla HP value.</value>
 	</data>
+	<data name="ShuffleBossHPToolTip" xml:space="preserve">
+<value>Choose how boss HP is randomized. HP will always be capped at 255.
+
+Great Palace bosses are not included.</value>
+	</data>
 	<data name="ShuffleWhichEnemiesStealEXPToolTip" xml:space="preserve">
 <value>Randomly reassigns which enemies steal EXP. The number of enemies that steal EXP in each
 group is the same as the number in that group that steal EXP in vanilla.</value>
