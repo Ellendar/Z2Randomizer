@@ -74,10 +74,20 @@
         <StackPanel Grid.Column="1">
             <CheckBox
                 IsChecked="{Binding Config.ShuffleEnemyHP}"
-                Content="Shuffle Enemy HP"
+                Content="Shuffle Regular Enemy HP"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleEnemyHPToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Boss Enemy HP"
+                ItemsSource="{Binding Source={x:Static rc:Enums.EnemyLifeOptionList}}"
+                SelectedItem="{Binding Config.ShuffleBossHP, Converter={x:Static ui:Util.EnumConvert}}"
+            >
+                <ToolTip.Tip>
+                    <TextBlock Text="{x:Static lang:Resources.ShuffleBossHPToolTip}"/>
+                </ToolTip.Tip>
+            </ComboBox>
             <CheckBox
                 IsChecked="{Binding Config.ShuffleXPStealers}"
                 Content="Shuffle Which Enemies Steal EXP"

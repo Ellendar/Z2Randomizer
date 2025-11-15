@@ -165,6 +165,16 @@ public static class XPEffectivenessExtensions
     }
 }
 
+public enum EnemyLifeOption
+{
+    [Description("Vanilla")]
+    VANILLA,
+    [Description("Randomized (-50% to +50%)")]
+    RANDOM,
+    [Description("Randomized (+0% to +100%)")]
+    RANDOM_HIGH,
+}
+
 [DefaultValue(ONLY_BOTS)]
 public enum DripperEnemyOption
 {
@@ -773,6 +783,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> DripperEnemyOptionList { get; } = ToDescriptions<DripperEnemyOption>();
+    public static IEnumerable<EnumDescription> EnemyLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();

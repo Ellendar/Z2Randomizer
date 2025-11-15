@@ -3993,7 +3993,7 @@ EndTileComparisons = $8601
         rom.FixBossKillPaletteGlitch(engine);
         StatTracking(engine);
 
-        if (props.ShuffleEnemyHP)
+        if (props.ShuffleBossHP != EnemyLifeOption.VANILLA)
         {
             rom.SetBossHpBarDivisors(engine, randomizedStats);
         }

@@ -89,6 +89,7 @@ public static class UpstartsTournamentPreset
         GeneratorsAlwaysMatch = true,
 
         ShuffleEnemyHP = true,
+        ShuffleBossHP = EnemyLifeOption.RANDOM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
         ShuffleSwordImmunity = true,
