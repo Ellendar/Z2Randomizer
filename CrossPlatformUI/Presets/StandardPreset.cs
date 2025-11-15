@@ -95,6 +95,7 @@ public static class StandardPreset
         GeneratorsAlwaysMatch = true,
 
         ShuffleEnemyHP = true,
+        ShuffleBossHP = EnemyLifeOption.RANDOM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
         ShuffleSwordImmunity = true,

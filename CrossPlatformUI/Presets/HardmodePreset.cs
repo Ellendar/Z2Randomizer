@@ -95,6 +95,7 @@ public static class HardmodePreset
         GeneratorsAlwaysMatch = true,
 
         ShuffleEnemyHP = true,
+        ShuffleBossHP = EnemyLifeOption.VANILLA,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
         ShuffleSwordImmunity = true,

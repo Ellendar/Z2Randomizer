@@ -43,6 +43,15 @@ public class StatRandomizer
         {
             RandomizeHp(r);
         }
+        switch (props.ShuffleBossHP)
+        {
+            case EnemyLifeOption.RANDOM:
+                for (int i = 0; i < BossHpTable.Length; i++) { RollHpValue(r, BossHpTable, i); }
+                break;
+            case EnemyLifeOption.RANDOM_HIGH:
+                for (int i = 0; i < BossHpTable.Length; i++) { RollHpValue(r, BossHpTable, i, 1.0, 2.0); }
+                break;
+        }
     }
 
     public void Write(ROM rom)
@@ -95,14 +104,14 @@ public class StatRandomizer
         for (i = (int)EnemiesGreatPalace.RED_DEELER; i < (int)EnemiesGreatPalace.ELEVATOR; i++) { RollHpValue(r, GpEnemyHpTable, i); }
         for (i = (int)EnemiesGreatPalace.SLOW_BUBBLE; i < 0x1b; i++) { RollHpValue(r, GpEnemyHpTable, i); }
         for (i = (int)EnemiesGreatPalace.FOKKERU; i < (int)EnemiesGreatPalace.KING_BOT; i++) { RollHpValue(r, GpEnemyHpTable, i); }
-
-        for (i = 0; i < BossHpTable.Length; i++) { RollHpValue(r, BossHpTable, i); }
     }
 
-    protected void RollHpValue(Random r, byte[] array, int index)
+    protected void RollHpValue(Random r, byte[] array, int index, double lower=0.5, double upper=1.5)
     {
         var vanillaHp = array[index];
-        var newHp = (byte)Math.Min(r.Next((int)(vanillaHp * 0.5), (int)(vanillaHp * 1.5)), 255);
+        int minVal = (int)(vanillaHp * lower);
+        int maxVal = (int)(vanillaHp * upper);
+        var newHp = (byte)Math.Min(r.Next(minVal, maxVal), 255);
         array[index] = newHp;
     }
 }
