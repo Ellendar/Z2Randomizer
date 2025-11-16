@@ -14,19 +14,19 @@ sealed class MazeIsland : World
     public static readonly int[] OverworldSmallEnemies = new int[] { 0x03, 0x04, 0x05, 0x11, 0x12, 0x16 };
     public static readonly int[] OverworldLargeEnemies = new int[] { 0x14, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
 
-    private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
+    private readonly SortedDictionary<int, Terrain> terrains = new()
     {
-        { 0xA131, Terrain.ROAD },
-            { 0xA132, Terrain.ROAD },
-            { 0xA133, Terrain.ROAD },
-            { 0xA134, Terrain.BRIDGE },
-            { 0xA140, Terrain.PALACE },
-            { 0xA143, Terrain.ROAD },
-            { 0xA145, Terrain.ROAD },
-            { 0xA146, Terrain.ROAD },
-            { 0xA147, Terrain.ROAD },
-            { 0xA148, Terrain.ROAD },
-            { 0xA149, Terrain.ROAD }
+        { RomMap.MI_TRAP_TILE1, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE2, Terrain.ROAD },
+        { RomMap.MI_MAGIC_CONTAINER_DROP_TILE, Terrain.ROAD },
+        { RomMap.MI_CONNECTOR_BRIDGE_TILE, Terrain.BRIDGE },
+        { RomMap.MI_PALACE_TILE, Terrain.PALACE },
+        { RomMap.MI_CHILD_DROP_TILE, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE3, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE4, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE5, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE6, Terrain.ROAD },
+        { RomMap.MI_TRAP_TILE7, Terrain.ROAD },
     };
 
     public Location childDrop;
@@ -38,12 +38,17 @@ sealed class MazeIsland : World
 
     public MazeIsland(RandomizerProperties props, Random r, ROM rom) : base(r)
     {
-        List<Location> locations =
+        List<Location> trapLocations = [
+            .. rom.LoadLocations(RomMap.MI_TRAP_TILE1, 2, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_TRAP_TILE3, 5, terrains, Continent.MAZE),
+        ];
+
+        List < Location> locations =
         [
-            .. rom.LoadLocations(0xA131, 3, terrains, Continent.MAZE),
-            .. rom.LoadLocations(0xA140, 1, terrains, Continent.MAZE),
-            .. rom.LoadLocations(0xA143, 1, terrains, Continent.MAZE),
-            .. rom.LoadLocations(0xA145, 5, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_MAGIC_CONTAINER_DROP_TILE, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_PALACE_TILE, 1, terrains, Continent.MAZE),
+            .. rom.LoadLocations(RomMap.MI_CHILD_DROP_TILE, 1, terrains, Continent.MAZE),
+            .. trapLocations,
         ];
         locations.ForEach(AddLocation);
 
@@ -66,9 +71,9 @@ sealed class MazeIsland : World
             51, // MAZE_ISLAND_FORCED_BATTLE_6
         ];
 
-        childDrop = GetLocationByMem(0xA143);
-        magicContainerDrop = GetLocationByMem(0xA133);
-        locationAtPalace4 = GetLocationByMem(0xA140);
+        childDrop = GetLocationByMem(RomMap.MI_CHILD_DROP_TILE);
+        magicContainerDrop = GetLocationByMem(RomMap.MI_MAGIC_CONTAINER_DROP_TILE);
+        locationAtPalace4 = GetLocationByMem(RomMap.MI_PALACE_TILE);
         locationAtPalace4.PalaceNumber = 4;
         MAP_ROWS = 23;
         MAP_COLS = 23;
@@ -680,7 +685,7 @@ sealed class MazeIsland : World
         }
         MAP_COLS = 64;
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, 0, 0, props.HiddenPalace, props.HiddenKasuto);
-        for (int i = 0xA10C; i < 0xA149; i++)
+        for (int i = RomMap.MI_UNUSED_INDEX0_TILE; i < RomMap.MI_TRAP_TILE7; i++)
         {
             if(!terrains.Keys.Contains(i))
             {
