@@ -9,49 +9,48 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 
 sealed class DeathMountain : World
 {
-
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
         {
-            { 0x610C, Terrain.CAVE },
-            { 0x610D, Terrain.CAVE },
-            { 0x610E, Terrain.CAVE },
-            { 0x610F, Terrain.CAVE },
-            { 0x6110, Terrain.CAVE },
-            { 0x6111, Terrain.CAVE },
-            { 0x6112, Terrain.CAVE },
-            { 0x6113, Terrain.CAVE },
-            { 0x6114, Terrain.CAVE },
-            { 0x6115, Terrain.CAVE },
-            { 0x6116, Terrain.CAVE },
-            { 0x6117, Terrain.CAVE },
-            { 0x6118, Terrain.CAVE },
-            { 0x6119, Terrain.CAVE },
-            { 0x611A, Terrain.CAVE },
-            { 0x611B, Terrain.CAVE },
-            { 0x611C, Terrain.CAVE },
-            { 0x611D, Terrain.CAVE },
-            { 0x611E, Terrain.CAVE },
-            { 0x611F, Terrain.CAVE },
-            { 0x6120, Terrain.CAVE },
-            { 0x6121, Terrain.CAVE },
-            { 0x6122, Terrain.CAVE },
-            { 0x6123, Terrain.CAVE },
-            { 0x6124, Terrain.CAVE },
-            { 0x6125, Terrain.CAVE },
-            { 0x6126, Terrain.CAVE },
-            { 0x6127, Terrain.CAVE },
-            { 0x6128, Terrain.CAVE },
-            { 0x6129, Terrain.CAVE },
-            { 0x612A, Terrain.CAVE },
-            { 0x612B, Terrain.CAVE },
-            { 0x612C, Terrain.CAVE },
-            { 0x612D, Terrain.CAVE },
-            { 0x612E, Terrain.CAVE },
-            { 0x612F, Terrain.CAVE },
-            { 0x6130, Terrain.CAVE },
-            { 0x6136, Terrain.CAVE },
-            { 0x6137, Terrain.CAVE },
-            { 0x6144, Terrain.CAVE }
+            { RomMap.DM_CAVE1A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE1B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE2A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE2B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE3A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE3B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE5A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE5B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE6A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE6B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE7A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE7B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE8A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE8B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE9A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE9B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE10A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE10B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE11A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE11B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE12A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE12B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE13A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE13B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE14A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE14B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_HAMMER_CAVE_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1C_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY1D_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2A_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2B_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2C_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CAVE4WAY2D_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CONTINENT_CONNECTOR1_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_CONTINENT_CONNECTOR2_TILE_LOCATION, Terrain.CAVE },
+            { RomMap.DM_SPEC_ROCK_TILE_LOCATION, Terrain.CAVE }
     };
 
     public Dictionary<Location, List<Location>> connectionsDM;
@@ -64,57 +63,57 @@ sealed class DeathMountain : World
     {
         List<Location> locations =
         [
-            .. rom.LoadLocations(0x610C, 37, terrains, Continent.DM),
-            //loadLocations(0x6136, 2, terrains, continent.dm);
-            .. rom.LoadLocations(0x6144, 1, terrains, Continent.DM),
+            .. rom.LoadLocations(RomMap.DM_CAVE1A_TILE_LOCATION, 37, terrains, Continent.DM),
+            // loadLocations(RomMap.DM_CONTINENT_CONNECTOR1_TILE_LOCATION, 2, terrains, Continent.DM);
+            .. rom.LoadLocations(RomMap.DM_SPEC_ROCK_TILE_LOCATION, 1, terrains, Continent.DM),
         ];
         locations.ForEach(AddLocation);
 
         isHorizontal = props.DmIsHorizontal;
-        hammerCave = GetLocationByMem(0x6128);
-        specRock = GetLocationByMem(0x6144);
+        hammerCave = GetLocationByMem(RomMap.DM_HAMMER_CAVE_TILE_LOCATION);
+        specRock = GetLocationByMem(RomMap.DM_SPEC_ROCK_TILE_LOCATION);
 
         //reachableAreas = new HashSet<string>();
         connectionsDM = new Dictionary<Location, List<Location>>
         {
-            { GetLocationByMem(0x610C), new List<Location>() { GetLocationByMem(0x610D) } },
-            { GetLocationByMem(0x610D), new List<Location>() { GetLocationByMem(0x610C) } },
-            { GetLocationByMem(0x610E), new List<Location>() { GetLocationByMem(0x610F) } },
-            { GetLocationByMem(0x610F), new List<Location>() { GetLocationByMem(0x610E) } },
-            { GetLocationByMem(0x6110), new List<Location>() { GetLocationByMem(0x6111) } },
-            { GetLocationByMem(0x6111), new List<Location>() { GetLocationByMem(0x6110) } },
-            { GetLocationByMem(0x6112), new List<Location>() { GetLocationByMem(0x6113) } },
-            { GetLocationByMem(0x6113), new List<Location>() { GetLocationByMem(0x6112) } },
-            { GetLocationByMem(0x6114), new List<Location>() { GetLocationByMem(0x6115) } },
-            { GetLocationByMem(0x6115), new List<Location>() { GetLocationByMem(0x6114) } },
-            { GetLocationByMem(0x6116), new List<Location>() { GetLocationByMem(0x6117) } },
-            { GetLocationByMem(0x6117), new List<Location>() { GetLocationByMem(0x6116) } },
-            { GetLocationByMem(0x6118), new List<Location>() { GetLocationByMem(0x6119) } },
-            { GetLocationByMem(0x6119), new List<Location>() { GetLocationByMem(0x6118) } },
-            { GetLocationByMem(0x611A), new List<Location>() { GetLocationByMem(0x611B) } },
-            { GetLocationByMem(0x611B), new List<Location>() { GetLocationByMem(0x611A) } },
-            { GetLocationByMem(0x611C), new List<Location>() { GetLocationByMem(0x611D) } },
-            { GetLocationByMem(0x611D), new List<Location>() { GetLocationByMem(0x611C) } },
-            { GetLocationByMem(0x611E), new List<Location>() { GetLocationByMem(0x611F) } },
-            { GetLocationByMem(0x611F), new List<Location>() { GetLocationByMem(0x611E) } },
-            { GetLocationByMem(0x6120), new List<Location>() { GetLocationByMem(0x6121) } },
-            { GetLocationByMem(0x6121), new List<Location>() { GetLocationByMem(0x6120) } },
-            { GetLocationByMem(0x6122), new List<Location>() { GetLocationByMem(0x6123) } },
-            { GetLocationByMem(0x6123), new List<Location>() { GetLocationByMem(0x6122) } },
-            { GetLocationByMem(0x6124), new List<Location>() { GetLocationByMem(0x6125) } },
-            { GetLocationByMem(0x6125), new List<Location>() { GetLocationByMem(0x6124) } },
-            { GetLocationByMem(0x6126), new List<Location>() { GetLocationByMem(0x6127) } },
-            { GetLocationByMem(0x6127), new List<Location>() { GetLocationByMem(0x6126) } },
+            { GetLocationByMem(RomMap.DM_CAVE1A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE1B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE1B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE1A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE2A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE2B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE2B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE2A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE3A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE3B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE3B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE3A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE5A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE5B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE5B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE5A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE6A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE6B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE6B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE6A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE7A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE7B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE7B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE7A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE8A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE8B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE8B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE8A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE9A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE9B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE9B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE9A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE10A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE10B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE10B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE10A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE11A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE11B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE11B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE11A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE12A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE12B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE12B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE12A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE13A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE13B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE13B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE13A_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE14A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE14B_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE14B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE14A_TILE_LOCATION) } },
 
-            { GetLocationByMem(0x6129), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x612C) } },
-            { GetLocationByMem(0x612A), new List<Location>() { GetLocationByMem(0x6129), GetLocationByMem(0x612B), GetLocationByMem(0x612C) } },
-            { GetLocationByMem(0x612B), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x6129), GetLocationByMem(0x612C) } },
-            { GetLocationByMem(0x612C), new List<Location>() { GetLocationByMem(0x612A), GetLocationByMem(0x612B), GetLocationByMem(0x6129) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY1D_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY1B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY1A_TILE_LOCATION) } },
 
-            { GetLocationByMem(0x612D), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x6130) } },
-            { GetLocationByMem(0x612E), new List<Location>() { GetLocationByMem(0x612D), GetLocationByMem(0x612F), GetLocationByMem(0x6130) } },
-            { GetLocationByMem(0x612F), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612D), GetLocationByMem(0x6130) } },
-            { GetLocationByMem(0x6130), new List<Location>() { GetLocationByMem(0x612E), GetLocationByMem(0x612F), GetLocationByMem(0x612D) } }
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION) } },
+            { GetLocationByMem(RomMap.DM_CAVE4WAY2D_TILE_LOCATION), new List<Location>() { GetLocationByMem(RomMap.DM_CAVE4WAY2B_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2C_TILE_LOCATION), GetLocationByMem(RomMap.DM_CAVE4WAY2A_TILE_LOCATION) } }
         };
 
         sideviewPtrTable = 0x6010;
@@ -144,7 +143,7 @@ sealed class DeathMountain : World
         MAP_ROWS = 45;
         MAP_COLS = 64;
 
-        baseAddr = 0x610C;
+        baseAddr = RomMap.DM_CAVE1A_TILE_LOCATION;
         VANILLA_MAP_ADDR = 0x665c;
 
         biome = props.DmBiome switch
@@ -787,7 +786,7 @@ sealed class DeathMountain : World
             }
         }
 
-        for (int i = 0x610C; i < 0x614B; i++)
+        for (int i = RomMap.DM_CAVE1A_TILE_LOCATION; i < 0x614B; i++)
         {
             if (!terrains.Keys.Contains(i))
             {
