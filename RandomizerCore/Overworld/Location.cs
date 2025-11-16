@@ -94,7 +94,8 @@ public class Location
     /// Page you enter this location from, 0 means left. 1/2/3 will enter from the right on areas that have
     /// that many pages total or midscren on other areas.
     /// </summary>
-    public int MapPage { get; set; }
+    public int MapPageRaw { get; set; }
+    public int MapPage { get => MapPageRaw >> 6; set => MapPageRaw = value << 6; }
 
     public int ExternalWorld { get; set; }
 
@@ -352,7 +353,7 @@ public class Location
         appear2loweruponexit = clone.appear2loweruponexit;
         Secondpartofcave = clone.Secondpartofcave;
         Xpos = clone.Xpos;
-        MapPage = clone.MapPage;
+        MapPageRaw = clone.MapPageRaw;
         FallInHole = clone.FallInHole;
         PassThrough = clone.PassThrough;
         ForceEnterRight = clone.ForceEnterRight;
@@ -371,7 +372,7 @@ public class Location
             bytes[0] = (byte)(ExternalWorld + YRaw);
         }
         bytes[1] = (byte)(appear2loweruponexit + Secondpartofcave + Xpos);
-        bytes[2] = (byte)(MapPage + Map);
+        bytes[2] = (byte)(MapPageRaw + Map);
         bytes[3] = (byte)(FallInHole + PassThrough + ForceEnterRight + GetWorld());
         return bytes;
     }
@@ -430,5 +431,18 @@ public class Location
         }
         //Otherwise the world doesn't matter, so 0
         return 0;
+    }
+
+    /// <summary>
+    /// Zero out some bytes for this Location, which makes it an unused location in-game.
+    /// </summary>
+    public void Clear()
+    {
+        ExternalWorld = 0;
+        YRaw = 0;
+        Xpos = 0;
+        appear2loweruponexit = 0;
+        Secondpartofcave = 0;
+        CanShuffle = false;
     }
 }

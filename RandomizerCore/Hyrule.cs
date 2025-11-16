@@ -2416,6 +2416,10 @@ public class Hyrule
                 ROMData.Put(location.MemAddress + overworldMapOff, locationBytes[2]);
                 ROMData.Put(location.MemAddress + overworldWorldOff, locationBytes[3]);
             }
+            foreach (Location location in world.RemovedLocations)
+            {
+                ROMData.Put(location.MemAddress, 0x00);
+            }
             ROMData.RemoveUnusedConnectors(world);
         }
 

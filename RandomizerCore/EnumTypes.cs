@@ -485,6 +485,65 @@ public enum ContinentConnectionType
     ANYTHING_GOES
 }
 
+[AttributeUsage(AttributeTargets.Field)]
+public class OverworldSizeMetaAttribute : Attribute
+{
+    public int Width { get; init; }
+    public int Height { get; init; }
+}
+[DefaultValue(LARGE)]
+public enum OverworldSizeOption
+{
+    [Description("Large (75x60)"), OverworldSizeMeta(Width = 75, Height = 60)]
+    LARGE,
+    [Description("Medium (52x52)"), OverworldSizeMeta(Width = 52, Height = 52)]
+    MEDIUM,
+    [Description("Small (44x44)"), OverworldSizeMeta(Width = 44, Height = 44)]
+    SMALL,
+}
+[DefaultValue(LARGE)]
+public enum DmSizeOption
+{
+    [Description("Large  (64x45 ~37 caves)"), OverworldSizeMeta(Width = 64, Height = 45)]
+    LARGE,
+    [Description("Medium (40x40 ~27 caves)"), OverworldSizeMeta(Width = 52, Height = 52)]
+    MEDIUM,
+    [Description("Small  (34x34 ~17 caves)"), OverworldSizeMeta(Width = 34, Height = 34)]
+    SMALL,
+    [Description("Tiny   (26x26  ~9 caves)"), OverworldSizeMeta(Width = 26, Height = 26)]
+    TINY,
+}
+[DefaultValue(LARGE)]
+public enum MazeSizeOption
+{
+    [Description("Large  (23x23)"), OverworldSizeMeta(Width = 23, Height = 23)]
+    LARGE,
+    [Description("Medium (19x19)"), OverworldSizeMeta(Width = 19, Height = 19)]
+    MEDIUM,
+    [Description("Small  (15x15)"), OverworldSizeMeta(Width = 15, Height = 15)]
+    SMALL,
+}
+public static class OverworldSizeExtensions
+{
+    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size)
+    {
+        var member = typeof(OverworldSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
+
+    public static OverworldSizeMetaAttribute GetMeta(this DmSizeOption size)
+    {
+        var member = typeof(DmSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
+
+    public static OverworldSizeMetaAttribute GetMeta(this MazeSizeOption size)
+    {
+        var member = typeof(MazeSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
+}
+
 [DefaultValue(NO_LIMIT)]
 public enum StartingResourceLimit
 {
@@ -899,6 +958,9 @@ public static class Enums
     public static IEnumerable<EnumDescription> DmClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsDmClimate());
     public static IEnumerable<EnumDescription> MazeClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsMazeClimate());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
+    public static IEnumerable<EnumDescription> OverworldSizeList { get; } = ToDescriptions<OverworldSizeOption>();
+    public static IEnumerable<EnumDescription> DmSizeList { get; } = ToDescriptions<DmSizeOption>();
+    public static IEnumerable<EnumDescription> MazeSizeList { get; } = ToDescriptions<MazeSizeOption>();
     public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
 
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();
