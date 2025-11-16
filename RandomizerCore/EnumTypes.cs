@@ -429,6 +429,29 @@ public enum ContinentConnectionType
     ANYTHING_GOES
 }
 
+[AttributeUsage(AttributeTargets.Field)]
+public class OverworldSizeMetaAttribute : Attribute
+{
+    public int Width { get; init; }
+    public int Height { get; init; }
+}
+public static class OverworldSizeExtensions
+{
+    public static OverworldSizeMetaAttribute GetMeta(this OverworldSizeOption size)
+    {
+        var member = typeof(OverworldSizeOption).GetMember(size.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<OverworldSizeMetaAttribute>() ?? new OverworldSizeMetaAttribute();
+    }
+}
+[DefaultValue(LARGE)]
+public enum OverworldSizeOption
+{
+    [Description("Large (75x60)"), OverworldSizeMeta(Width = 75, Height = 60)]
+    LARGE,
+    [Description("Small (44x44)"), OverworldSizeMeta(Width = 44, Height = 44)]
+    SMALL1,
+}
+
 [DefaultValue(NO_LIMIT)]
 public enum StartingResourceLimit
 {
@@ -795,6 +818,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
     public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
+    public static IEnumerable<EnumDescription> OverworldSizeList { get; } = ToDescriptions<OverworldSizeOption>();
     public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
 
     public static IEnumerable<EnumDescription> EncounterRateList { get; } = ToDescriptions<EncounterRate>();

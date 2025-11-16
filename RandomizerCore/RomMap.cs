@@ -152,6 +152,19 @@ class RomMap
     public const int EAST_PALACE6_TILE_LOCATION = 0x8664;
     public const int EAST_GREAT_PALACE_TILE_LOCATION = 0x8665;
 
+    public const int MI_UNUSED_INDEX0_TILE = 0xA10c;
+    public const int MI_TRAP_TILE1 = 0xA131;
+    public const int MI_TRAP_TILE2 = 0xA132;
+    public const int MI_MAGIC_CONTAINER_DROP_TILE = 0xA133;
+    public const int MI_CONNECTOR_BRIDGE_TILE = 0xA134;
+    public const int MI_PALACE_TILE = 0xA140;
+    public const int MI_CHILD_DROP_TILE = 0xA143;
+    public const int MI_TRAP_TILE3 = 0xA145;
+    public const int MI_TRAP_TILE4 = 0xA146;
+    public const int MI_TRAP_TILE5 = 0xA147;
+    public const int MI_TRAP_TILE6 = 0xA148;
+    public const int MI_TRAP_TILE7 = 0xA149;
+
     //Overworld data
     public const int overworldXOffset = 0x3F;
     public const int overworldMapOffset = 0x7E;

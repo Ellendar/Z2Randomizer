@@ -204,6 +204,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private ContinentConnectionType continentConnectionType;
 
     [Reactive]
+    private OverworldSizeOption overworldSize;
+
+    [Reactive]
     private Biome westBiome;
 
     [Reactive]
@@ -988,6 +991,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         properties.EncounterRates = encounterRate;
         properties.ContinentConnections = continentConnectionType;
+        properties.OverworldSize = overworldSize;
         properties.BoulderBlockConnections = allowConnectionCavesToBeBlocked;
         if (westBiome == Biome.RANDOM || westBiome == Biome.RANDOM_NO_VANILLA || westBiome == Biome.RANDOM_NO_VANILLA_OR_SHUFFLE)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,14 +26,16 @@ public abstract class World
     public IReadOnlyList<int> nonEncounterMaps { get; protected set; }
     protected SortedDictionary<(int, int), Location> locsByCoords;
     public Terrain[,] map;
-    public int MAP_ROWS;
-    public int MAP_COLS;
+    public const int MAP_ROWS_FULL = 75;
+    public const int MAP_COLS_FULL = 64;
+    public int MAP_ROWS { get; init; }
+    public int MAP_COLS { get; init; }
     protected List<Terrain> randomTerrainFilter;
     protected List<Terrain> walkableTerrains;
     protected bool[,] visitation;
     protected const int MAP_SIZE_BYTES = 1400;
     protected List<Location> unimportantLocs;
-    public Biome biome { get; protected set; }
+    public Biome biome { get; init; }
     protected bool isHorizontal;
     protected int VANILLA_MAP_ADDR;
     protected SortedDictionary<(int, int), string> section;
@@ -111,6 +114,7 @@ public abstract class World
 
 
     public List<Location> AllLocations { get; }
+    public List<Location> RemovedLocations { get; }
     public Dictionary<Terrain, List<Location>> Locations { get; set; }
 
     public bool AllReached { get; set; }
@@ -130,6 +134,7 @@ public abstract class World
             Locations.Add(Terrain, new List<Location>());
         }
         AllLocations = [];
+        RemovedLocations = [];
         locsByCoords = [];
         unimportantLocs = [];
         areasByLocation = [];
@@ -190,6 +195,22 @@ public abstract class World
             child.Xpos = l2.Xpos;
             child.Y = l2.Y;
             child.PassThrough = l2.PassThrough;
+        }
+    }
+
+    protected void RemoveLocations(ICollection<Location> locationsToRemove)
+    {
+        foreach (var loc in locationsToRemove)
+        {
+            loc.Clear();
+
+            AllLocations.Remove(loc);
+            RemovedLocations.Add(loc);
+            foreach (List<Location> ls in Locations.Values)
+            {
+                ls.Remove(loc);
+            }
+            connections.Remove(loc);
         }
     }
 
@@ -262,7 +283,6 @@ public abstract class World
     }
     protected bool PlaceLocations(Terrain riverTerrain, bool saneCaves, Location? hiddenKasutoLocation, int hiddenPalaceX)
     {
-        //return true;
         int i = 0;
         foreach (Location location in AllLocations.Where(loc => loc.AppearsOnMap))
         {
@@ -497,7 +517,9 @@ public abstract class World
             y = RNG.Next(MAP_ROWS - 2) + 1;
         } while (x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE);
 
-        while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
+        int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
+        int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
+        while ((direction == Direction.NORTH && y < minDistY) || (direction == Direction.EAST && x > MAP_COLS - minDistX) || (direction == Direction.SOUTH && y > MAP_ROWS - minDistY) || (direction == Direction.WEST && x < minDistX))
         {
             direction = (Direction)RNG.Next(4);
         }
@@ -591,12 +613,7 @@ public abstract class World
                 {
                     if (location.CanShuffle)
                     {
-                        location.ExternalWorld = 0;
-                        location.YRaw = 0;
-                        location.appear2loweruponexit = 0;
-                        location.Secondpartofcave = 0;
-                        location.Xpos = 0;
-                        location.CanShuffle = false;
+                        location.Clear();
                     }
                 }
                 break;
@@ -1395,7 +1412,7 @@ public abstract class World
         int currentTerrainCount = 0;
         for (int y = 0; y < MAP_ROWS; y++)
         {
-            for (int x = 0; x < MAP_COLS; x++)
+            for (int x = 0; x < MAP_COLS_FULL; x++)
             {
                 //These two conditionals ABSOLUTELY should not be processed here.
                 //Refactor them and remove the excess boolean parameters.
@@ -1430,26 +1447,25 @@ public abstract class World
                     continue;
                 }
 
-                if (map[y, x] == currentTerrain && currentTerrainCount < 16)
+                Terrain nextTerrain = x < MAP_COLS ? map[y, x] : currentTerrain == Terrain.MOUNTAIN ? Terrain.MOUNTAIN : Terrain.WATER;
+                if (currentTerrainCount == 16 || currentTerrain != nextTerrain)
                 {
-                    currentTerrainCount++;
-                }
-                else
-                {
-                    currentTerrainCount--;
-                    //First 4 bits are the number of tiles to draw with that Terrain type. Last 4 are the Terrain type.
-                    int b = currentTerrainCount * 16 + (int)currentTerrain;
+                    // First 4 bits are the number of tiles to draw with that Terrain type. Last 4 are the Terrain type.
+                    int b = ((currentTerrainCount - 1) << 4) | (int)currentTerrain;
                     //logger.WriteLine("Hex: {0:X}", b);
                     if (doWrite)
                     {
                         romData.Put(loc, (byte)b);
                     }
-
-                    currentTerrain = map[y, x];
-                    //This is almost certainly an off by one error, but very very unlikely to matter
+                    currentTerrain = nextTerrain;
+                    // This is almost certainly an off by one error, but very very unlikely to matter
                     currentTerrainCount = 1;
                     loc++;
                     bytesWritten++;
+                }
+                else
+                {
+                    currentTerrainCount++;
                 }
             }
             //Write the last Terrain segment for this row
@@ -1484,6 +1500,7 @@ public abstract class World
 
     protected void DrawOcean(Direction direction, bool walkableWater)
     {
+        int limitedCols = (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA) ? MAP_COLS : Math.Min(MAP_COLS, 29);
         Terrain water = Terrain.WATER;
         if (walkableWater)
         {
@@ -1501,21 +1518,21 @@ public abstract class World
         }
         else if (direction == Direction.EAST)
         {
-            x = MAP_COLS - 1;
+            x = limitedCols - 1;
             y = RNG.Next(MAP_ROWS);
             olength = RNG.Next(Math.Max(y, MAP_ROWS - y));
         }
         else if (direction == Direction.NORTH)
         {
-            x = RNG.Next(MAP_COLS);
+            x = RNG.Next(limitedCols);
             y = 0;
-            olength = RNG.Next(Math.Max(x, MAP_COLS - x));
+            olength = RNG.Next(Math.Max(x, limitedCols - x));
         }
         else //south
         {
-            x = RNG.Next(MAP_COLS);
+            x = RNG.Next(limitedCols);
             y = MAP_ROWS - 1;
-            olength = RNG.Next(Math.Max(x, MAP_COLS - x));
+            olength = RNG.Next(Math.Max(x, limitedCols - x));
         }
         //draw ocean on right side
 
@@ -1553,7 +1570,7 @@ public abstract class World
         }
         else // north or south
         {
-            if (x < MAP_COLS / 2)
+            if (x < limitedCols / 2)
             {
                 for (int i = 0; i < olength; i++)
                 {
@@ -1978,8 +1995,8 @@ public abstract class World
 
         if (isHorizontal)
         {
-
-            int rivery = RNG.Next(15, MAP_ROWS - 15);
+            int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
+            int rivery = RNG.Next(minDistY, MAP_ROWS - minDistY);
             for (int x = 0; x < MAP_COLS; x++)
             {
                 drawLeft++;
@@ -2016,7 +2033,7 @@ public abstract class World
                 {
                     map[i, x] = Terrain.MOUNTAIN;
                 }
-                while (rivery + adjust + 1 > MAP_ROWS - 15 || rivery + adjust < 15)
+                while (rivery + adjust + 1 > MAP_ROWS - minDistY || rivery + adjust < minDistY)
                 {
                     adjust = RNG.Next(-1, 2);
                 }
@@ -2044,7 +2061,8 @@ public abstract class World
         }
         else
         {
-            int riverx = RNG.Next(15, MAP_COLS - 15);
+            int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
+            int riverx = RNG.Next(minDistX, MAP_COLS - minDistX);
             for (int y = 0; y < MAP_ROWS; y++)
             {
                 drawLeft++;
@@ -2081,7 +2099,7 @@ public abstract class World
                 {
                     map[y, i] = Terrain.MOUNTAIN;
                 }
-                while (riverx + adjust + 1 > MAP_COLS - 15 || riverx + adjust < 15)
+                while (riverx + adjust + 1 > MAP_COLS - minDistX || riverx + adjust < minDistX)
                 {
                     adjust = RNG.Next(-1, 2);
                 }
@@ -2136,7 +2154,6 @@ public abstract class World
                 //map[20 + i, jend] = Terrain.lava;
                 for (int x = xstart; x < xend; x++)
                 {
-
                     map[top + y, x] = Terrain.MOUNTAIN;
                 }
             }
@@ -2327,6 +2344,7 @@ public abstract class World
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
             {
                 cavey--;
+                if (cavey < 0) { return false; }
             }
             if (map[cavey, cavex + 1] != Terrain.MOUNTAIN)
             {
@@ -2373,6 +2391,7 @@ public abstract class World
             while (map[cavey, cavex] != Terrain.MOUNTAIN)
             {
                 cavey++;
+                if (cavey == MAP_ROWS) { return false; }
             }
             if (map[cavey, cavex + 1] != Terrain.MOUNTAIN)
             {

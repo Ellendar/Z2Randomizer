@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SD.Tools.BCLExtensions.CollectionsRelated;
@@ -140,9 +141,6 @@ sealed class DeathMountain : World
             26,                     // Spectacle Rock
         ];
 
-        MAP_ROWS = 45;
-        MAP_COLS = 64;
-
         baseAddr = RomMap.DM_CAVE1A_TILE_LOCATION;
         continentId = Continent.DM;
         VANILLA_MAP_ADDR = 0x665c;
@@ -152,6 +150,43 @@ sealed class DeathMountain : World
             Biome.DRY_CANYON => Biome.CANYON,
             _ => props.DmBiome
         };
+        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
+        {
+            MAP_ROWS = 75;
+            MAP_COLS = 64;
+        }
+        else if (props.OverworldSize == OverworldSizeOption.LARGE)
+        {
+            // TODO: add DmOverworldSize property
+            MAP_ROWS = 45;
+            MAP_COLS = 64;
+        }
+        else
+        {
+            if (biome == Biome.CALDERA)
+            {
+                MAP_ROWS = 35;
+                MAP_COLS = 35;
+            }
+            else
+            {
+                MAP_ROWS = 26;
+                MAP_COLS = 26;
+            }
+            int connectorPairsToRemove = 13;
+            int maxElevatorConnectorsToRemove = 1;
+            int elevatorConnectorsRemoved = 0;
+            for (int i = 0; i < connectorPairsToRemove; i++)
+            {
+                KeyValuePair<Location, List<Location>> removeLocPair;
+                do
+                {
+                    var j = r.Next(connectionsDM.Count);
+                    removeLocPair = connectionsDM.ElementAt(j);
+                } while (removeLocPair.Value.Count > 1 && elevatorConnectorsRemoved++ >= maxElevatorConnectorsToRemove);
+                RemoveLocationsDM([removeLocPair.Key, .. removeLocPair.Value]);
+            }
+        }
 
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
@@ -160,6 +195,15 @@ sealed class DeathMountain : World
 
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
+    }
+
+    private void RemoveLocationsDM(ICollection<Location> locations)
+    {
+        RemoveLocations(locations);
+        foreach (var loc in locations)
+        {
+            connectionsDM.Remove(loc);
+        }
     }
 
     public override bool Terraform(RandomizerProperties props, ROM rom)
@@ -178,8 +222,8 @@ sealed class DeathMountain : World
         }
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
-            MAP_ROWS = 75;
-            MAP_COLS = 64;
+            Debug.Assert(MAP_ROWS == 75);
+            Debug.Assert(MAP_COLS == 64);
             map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
             if (biome == Biome.VANILLA_SHUFFLE)
             {
@@ -215,9 +259,10 @@ sealed class DeathMountain : World
                 Terrain riverT = Terrain.MOUNTAIN;
                 if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA && biome != Biome.ISLANDS)
                 {
+                    int colsBeforeWater = Math.Min(MAP_COLS, 29);
                     for (int i = 0; i < MAP_ROWS; i++)
                     {
-                        for (int j = 0; j < 29; j++)
+                        for (int j = 0; j < colsBeforeWater; j++)
                         {
                             map[i, j] = Terrain.NONE;
                         }
@@ -391,12 +436,7 @@ sealed class DeathMountain : World
                 }
                 if (raft != null)
                 {
-                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
-                    {
-                        MAP_COLS = 29;
-                    }
                     DrawOcean(raftDirection, props.CanWalkOnWaterWithBoots);
-                    MAP_COLS = 64;
                 }
 
                 Direction bridgeDirection;
@@ -413,12 +453,7 @@ sealed class DeathMountain : World
                 } while (bridgeDirection == raftDirection);
                 if (bridge != null)
                 {
-                    if (biome != Biome.CANYON && biome != Biome.DRY_CANYON && biome != Biome.CALDERA)
-                    {
-                        MAP_COLS = 29;
-                    }
                     DrawOcean(bridgeDirection, props.CanWalkOnWaterWithBoots);
-                    MAP_COLS = 64;
                 }
                 int x = 0;
                 int y = 0;
@@ -492,7 +527,9 @@ sealed class DeathMountain : World
                                     return false;
                                 }
 
-                                while ((direction == Direction.NORTH && y < 15) || (direction == Direction.EAST && x > MAP_COLS - 15) || (direction == Direction.SOUTH && y > MAP_ROWS - 15) || (direction == Direction.WEST && x < 15))
+                                int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
+                                int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
+                                while ((direction == Direction.NORTH && y < minDistY) || (direction == Direction.EAST && x > MAP_COLS - minDistX) || (direction == Direction.SOUTH && y > MAP_ROWS - minDistY) || (direction == Direction.WEST && x < minDistX))
                                 {
                                     direction = (Direction)RNG.Next(4);
                                 }
@@ -718,12 +755,7 @@ sealed class DeathMountain : World
                 walkableTerrains.Add(Terrain.ROAD);
                 if (raft != null)
                 {
-                    if (biome != Biome.CALDERA && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        MAP_COLS = 29;
-                    }
                     bool r = DrawRaft(raftDirection);
-                    MAP_COLS = 64;
                     if (!r)
                     {
                         return false;
@@ -732,12 +764,7 @@ sealed class DeathMountain : World
 
                 if (bridge != null)
                 {
-                    if (biome != Biome.CALDERA && biome != Biome.CANYON && biome != Biome.DRY_CANYON)
-                    {
-                        MAP_COLS = 29;
-                    }
                     bool b = DrawBridge(bridgeDirection);
-                    MAP_COLS = 64;
                     if (!b)
                     {
                         return false;
@@ -803,42 +830,62 @@ sealed class DeathMountain : World
         {
             water = Terrain.WALKABLEWATER;
         }
-        int centerx, centery;
+        int mapCenterX = MAP_COLS / 2; // 32
+        int mapCenterY = MAP_ROWS / 2; // 22
+        int calderaCenterX, calderaCenterY;
 
+        int tries = 0;
         bool placeable;
         do
         {
             if (isHorizontal)
             {
-                centerx = RNG.Next(27, 37);
-                centery = RNG.Next(17, 27);
+                int minX = mapCenterX - 5;
+                int maxX = mapCenterX + 5;
+                calderaCenterX = RNG.Next(minX, maxX);
+                int minY = Math.Max(7, mapCenterY - 5);
+                int maxY = Math.Min(mapCenterY + 5, MAP_ROWS - 8);
+                calderaCenterY = RNG.Next(minY, maxY);
             }
             else
             {
-                centerx = RNG.Next(21, 41);
-                centery = RNG.Next(17, 27);
+                int minX = Math.Max(7, mapCenterX - 11);
+                int maxX = Math.Min(mapCenterX + 9, MAP_COLS - 8);
+                calderaCenterX = RNG.Next(minX, maxX);
+                int minY = mapCenterY - 5;
+                int maxY = mapCenterY + 5;
+                calderaCenterY = RNG.Next(minY, maxY);
             }
             placeable = true;
-            for (int i = centery - 7; i < centery + 8; i++)
+            for (int i = calderaCenterY - 7; i < calderaCenterY + 8; i++)
             {
-                for (int j = centerx - 7; j < centerx + 8; j++)
+                for (int j = calderaCenterX - 7; j < calderaCenterX + 8; j++)
                 {
                     if (map[i, j] != Terrain.MOUNTAIN)
                     {
                         placeable = false;
+                        break; // end inner for
                     }
                 }
+                if (!placeable)
+                {
+                    break; // end outer for
+                }
+            }
+            if (++tries == 1000)
+            {
+                return false;
             }
         } while (!placeable);
 
-        int startx = centerx - 5;
-        int starty = centery;
+        int startx = calderaCenterX - 5;
+        int starty = calderaCenterY;
         int deltax = 1;
         int deltay = 0;
         if (!isHorizontal)
         {
-            startx = centerx;
-            starty = centery - 5;
+            startx = calderaCenterX;
+            starty = calderaCenterY - 5;
             deltax = 0;
             deltay = 1;
         }
@@ -1015,7 +1062,7 @@ sealed class DeathMountain : World
         int caveType = RNG.Next(2);
         if (isHorizontal)
         {
-            bool f = HorizontalCave(caveType, centerx, centery, cave1l, cave1r);
+            bool f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
@@ -1029,7 +1076,7 @@ sealed class DeathMountain : World
             {
                 caveType = 0;
             }
-            f = HorizontalCave(caveType, centerx, centery, cave2l, cave2r);
+            f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
             if (!f)
             {
                 return false;
@@ -1037,7 +1084,7 @@ sealed class DeathMountain : World
         }
         else
         {
-            bool f = VerticalCave(caveType, centerx, centery, cave1l, cave1r);
+            bool f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
@@ -1050,7 +1097,7 @@ sealed class DeathMountain : World
             {
                 caveType = 0;
             }
-            f = VerticalCave(caveType, centerx, centery, cave2l, cave2r);
+            f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
             if (!f)
             {
                 return false;
