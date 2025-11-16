@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
@@ -62,6 +61,7 @@ public sealed class EastHyrule : World
         { RomMap.EAST_PALACE6_TILE_LOCATION, Terrain.PALACE },
         { RomMap.EAST_GREAT_PALACE_TILE_LOCATION, Terrain.PALACE },
     };
+    private List<Location> roadTrapLocations;
 
     public Location locationAtPalace5;
     public Location locationAtPalace6;
@@ -85,7 +85,6 @@ public sealed class EastHyrule : World
     public Location hiddenPalaceLocation;
     public Location hiddenKasutoLocation;
     public (int, int) hiddenPalaceCoords;
-
     private const int MAP_ADDR = 0xb480;
 
     private readonly List<Location> valleyOfDeathLocations;
@@ -96,11 +95,30 @@ public sealed class EastHyrule : World
         isHorizontal = props.EastIsHorizontal;
         baseAddr = RomMap.EAST_MINOR_FOREST_TILE_BY_NABOORU_LOCATION;
         continentId = Continent.EAST;
+
+        List<Location> passthroughCaveLocations = [
+            .. rom.LoadLocations(RomMap.EAST_CAVE_NABOORU_PASSTHROUGH_SOUTH_LOCATION, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(RomMap.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST_LOCATION, 2, terrains, Continent.EAST),
+        ];
+        List<Location> passthroughVodLocations = [
+            .. rom.LoadLocations(RomMap.EAST_CAVE_VOD_PASSTHROUGH2_START_LOCATION, 4, terrains, Continent.EAST),
+        ];
+        roadTrapLocations = [
+            .. rom.LoadLocations(RomMap.EAST_TRAP_ROAD_TILE_LOCATION1, 4, terrains, Continent.EAST),
+        ];
+        List<Location> desertTrapLocations = [
+            .. rom.LoadLocations(RomMap.EAST_TRAP_DESERT_TILE_LOCATION1, 2, terrains, Continent.EAST),
+        ];
+
         List<Location> locations =
         [
-            .. rom.LoadLocations(RomMap.EAST_CAVE_NEW_KASUTO_PASSTHROUGH_WEST_LOCATION, 6, terrains, Continent.EAST),
-            .. rom.LoadLocations(RomMap.EAST_CAVE_NABOORU_PASSTHROUGH_SOUTH_LOCATION, 2, terrains, Continent.EAST),
-            .. rom.LoadLocations(RomMap.EAST_MINOR_FOREST_TILE_BY_NABOORU_LOCATION, 11, terrains, Continent.EAST),
+            .. passthroughCaveLocations,
+            .. passthroughVodLocations,
+            .. roadTrapLocations,
+            .. desertTrapLocations,
+            .. rom.LoadLocations(RomMap.EAST_MINOR_FOREST_TILE_BY_NABOORU_LOCATION, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(RomMap.EAST_BRIDGE_TILE_TO_P6_LOCATION, 2, terrains, Continent.EAST),
+            .. rom.LoadLocations(RomMap.EAST_WATER_TILE_LOCATION, 1, terrains, Continent.EAST),
             .. rom.LoadLocations(RomMap.EAST_MINOR_SWAMP_TILE_LOCATION, 1, terrains, Continent.EAST),
             .. rom.LoadLocations(RomMap.EAST_CAVE_PBAG1_LOCATION, 2, terrains, Continent.EAST),
             .. rom.LoadLocations(RomMap.EAST_MINOR_DESERT_TILE_LOCATION1, 10, terrains, Continent.EAST),
@@ -256,13 +274,43 @@ public sealed class EastHyrule : World
         townAtDarunia.Children.Add(daruniaRoof);
         AddLocation(daruniaRoof);
 
-        MAP_ROWS = 75;
-        MAP_COLS = 64;
-
         walkableTerrains = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE];
         randomTerrainFilter = [Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER];
 
         biome = props.EastBiome;
+        if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE || props.EastSize == OverworldSizeOption.LARGE)
+        {
+            MAP_ROWS = 75;
+            MAP_COLS = 64;
+        }
+        else
+        {
+            var meta = props.EastSize.GetMeta();
+            MAP_ROWS = meta.Width;
+            MAP_COLS = meta.Height;
+            // TODO: use metadata for num trap tiles etc. to remove for small continents
+            int trapTilesToRemove = 0; // must be even
+            for (int i = 0; i < trapTilesToRemove; i++)
+            {
+                var j = r.Next(roadTrapLocations.Count);
+                var removeLoc = roadTrapLocations[j];
+                RemoveLocations([removeLoc]);
+                roadTrapLocations.Remove(removeLoc);
+            }
+
+            int passthroughsToRemove = 0;
+            for (int i = 0; i < passthroughsToRemove; i++)
+            {
+                var j = r.Next(passthroughCaveLocations.Count);
+                var removeLoc = passthroughCaveLocations[j];
+                var removeLocConnected = connections[removeLoc];
+
+                RemoveLocations([removeLoc, removeLocConnected]);
+                passthroughCaveLocations.Remove(removeLoc);
+                passthroughCaveLocations.Remove(removeLocConnected);
+            }
+        }
+
         section = new SortedDictionary<(int, int), string>()
         {
             { (0x3A, 0x0A), "mid2" },
@@ -350,8 +398,8 @@ public sealed class EastHyrule : World
 
         if (biome == Biome.VANILLA || biome == Biome.VANILLA_SHUFFLE)
         {
-            MAP_ROWS = 75;
-            MAP_COLS = 64;
+            Debug.Assert(MAP_ROWS == 75);
+            Debug.Assert(MAP_COLS == 64);
             map = rom.ReadVanillaMap(rom, VANILLA_MAP_ADDR, MAP_ROWS, MAP_COLS);
 
             if (biome == Biome.VANILLA_SHUFFLE)
@@ -415,7 +463,7 @@ public sealed class EastHyrule : World
                 //Issue #2: Desert tile passthrough causes the wrong screen to load, making the item unobtainable.
                 desertTile.PassThrough = 0;
 
-                desertTile.MapPage = 64;
+                desertTile.MapPage = 1;
 
                 Location? desert = GetLocationByMem(RomMap.EAST_MINOR_DESERT_TILE_LOCATION1);
                 Location? swamp = GetLocationByMem(RomMap.EAST_MINOR_SWAMP_TILE_LOCATION);
@@ -904,11 +952,17 @@ public sealed class EastHyrule : World
         passthroughLocations.ForEach(i => i.YRaw = 0);
 
         //Pick a spot for the center of the GP hole
-        int xmin = 21;
-        int xmax = 41;
-        int ymin = 22;
-        int ymax = 52;
-        if (biome != Biome.VOLCANO)
+        int xmin, xmax, ymin, ymax;
+        if (biome == Biome.VOLCANO)
+        {
+            int mapCenterX = MAP_COLS / 2; // 32
+            int mapCenterY = MAP_ROWS / 2; // 37
+            xmin = mapCenterX - 11;
+            xmax = mapCenterX + 9;
+            ymin = Math.Max(5, mapCenterY - 15);
+            ymax = Math.Min(mapCenterY + 15, MAP_ROWS - 6);
+        }
+        else
         {
             xmin = 5;
             ymin = 5;
@@ -922,6 +976,7 @@ public sealed class EastHyrule : World
         //Why does this happen only for caldera-shaped biomes?
         if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
         {
+            int tries = 0;
             bool placeable;
             do
             {
@@ -935,8 +990,16 @@ public sealed class EastHyrule : World
                         if (map[i, j] != Terrain.MOUNTAIN)
                         {
                             placeable = false;
+                            break; // end inner for
+                        }
+                        if (!placeable) {
+                            break; // end outer for
                         }
                     }
+                }
+                if (++tries == 1000)
+                {
+                    return false;
                 }
             } while (!placeable);
         }
@@ -1382,7 +1445,10 @@ public sealed class EastHyrule : World
                         vodcave1 = vodcave3;
                         vodcave2 = vodcave4;
                     }
-                    map[vodcave1.Y, vodcave1.Xpos] = Terrain.MOUNTAIN;
+                    if (vodcave1.Y < MAP_ROWS && vodcave1.Xpos < MAP_COLS)
+                    {
+                        map[vodcave1.Y, vodcave1.Xpos] = Terrain.MOUNTAIN;
+                    }
                     map[starty, startx] = Terrain.CAVE;
                     map[starty + deltay, startx + deltax] = Terrain.MOUNTAIN;
                     if (deltax != 0)
@@ -1436,7 +1502,10 @@ public sealed class EastHyrule : World
                     {
                         return false;
                     }
-                    map[vodcave2.Y, vodcave2.Xpos] = Terrain.MOUNTAIN;
+                    if (vodcave2.Y < MAP_ROWS && vodcave2.Xpos < MAP_COLS)
+                    {
+                        map[vodcave2.Y, vodcave2.Xpos] = Terrain.MOUNTAIN;
+                    }
                     map[starty - deltay, startx - deltax] = Terrain.MOUNTAIN;
                     map[starty, startx] = Terrain.CAVE;
                     if (deltax != 0)
@@ -1934,33 +2003,33 @@ public sealed class EastHyrule : World
                     }
                     else if (map[y2, x2 + 1] == Terrain.NONE && (((y2 > 0 && map[y2 - 1, x2] == Terrain.ROAD) && (y2 < MAP_ROWS - 1 && map[y2 + 1, x2] == Terrain.ROAD)) || ((x2 > 0 && map[y2, x2 - 0] == Terrain.ROAD) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] == Terrain.ROAD))))
                     {
-                        if (roadEncounters == 0)
+                        if (roadEncounters == 0 && roadTrapLocations.Count > 0)
                         {
-                            Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION1);
+                            Location roadEnc = roadTrapLocations[0];
                             roadEnc.Xpos = x2;
                             roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
-                        else if (roadEncounters == 1)
+                        else if (roadEncounters == 1 && roadTrapLocations.Count > 1)
                         {
-                            Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION2);
+                            Location roadEnc = roadTrapLocations[1];
                             roadEnc.Xpos = x2;
                             roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
-                        else if (roadEncounters == 2)
+                        else if (roadEncounters == 2 && roadTrapLocations.Count > 2)
                         {
-                            Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_LOCATION3);
+                            Location roadEnc = roadTrapLocations[2];
                             roadEnc.Xpos = x2;
                             roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;
                             roadEncounters++;
                         }
-                        else if (roadEncounters == 3)
+                        else if (roadEncounters == 3 && roadTrapLocations.Count > 3)
                         {
-                            Location roadEnc = GetLocationByMem(RomMap.EAST_TRAP_ROAD_TILE_TO_VOD_LOCATION);
+                            Location roadEnc = roadTrapLocations[3];
                             roadEnc.Xpos = x2;
                             roadEnc.Y = y2;
                             roadEnc.CanShuffle = false;

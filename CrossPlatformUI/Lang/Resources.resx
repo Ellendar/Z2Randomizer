@@ -557,6 +557,11 @@ Which location is hidden beneath may change if Shuffle Which Locations Are Hidde
 <value>If enabled, what is hidden under Three-Eyed Rock and the New Kasuto forest tile can be any
 random location in the east.</value>
 	</data>
+	<data name="OverworldSizeToolTip" xml:space="preserve">
+<value>Set the size of a continent. With smaller sizes, some non-item tiles may be removed.
+
+Note: The cave count does not include continent connector caves.</value>
+	</data>
 	<data name="WestContinentBiomeToolTip" xml:space="preserve">
 <value>See the Wiki for a description of what each biome does.</value>
 	</data>

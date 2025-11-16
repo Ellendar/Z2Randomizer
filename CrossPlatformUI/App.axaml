@@ -41,7 +41,7 @@
             <!-- By default the checkbox stretched to fill the container, which made way too much clickable, so
                  No more stretching! Stick to left aligned content by default for checkboxes. -->
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="Padding" Value="0,8"/>
+            <Setter Property="Padding" Value="0, 8"/>
             <Setter Property="Margin" Value="5, 0"/>
         </Style>
         
@@ -60,7 +60,12 @@
                 <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(assists:SelectionControlAssist.InnerForeground)}" />
             </Style>
         </Style>
-        
+
+        <Style Selector="ComboBox">
+            <Setter Property="Height" Value="72"/>
+            <Setter Property="Padding" Value="16,0"/>
+        </Style>
+
         <!-- Add a default behavior to all of the comboboxes to let the scroll with the mouse wheel -->
         <Style Selector="ComboBox">
             <Setter Property="(Interaction.Behaviors)">

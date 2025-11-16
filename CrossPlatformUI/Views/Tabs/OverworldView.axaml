@@ -11,218 +11,225 @@
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
              x:Class="CrossPlatformUI.Views.Tabs.OverworldView"
              x:DataType="vm:MainViewModel">
-    <Grid ColumnDefinitions="*, *">
-        <StackPanel>
-            <CheckBox
-                IsThreeState="True" 
-                IsChecked="{Binding Config.PalacesCanSwapContinents}" 
-                Content="Allow Palaces to Swap Continents"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowPalacestoSwapContinentsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                Name="IncludeGPInShuffleCheckbox"
-                IsThreeState="True" 
-                IsChecked="{Binding Config.ShuffleGP}" 
-                IsEnabled="{Binding Config.PalacesCanSwapContinents}"
-                Content="Include Great Palace in Shuffle"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeGreatPalaceinShuffleToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <Separator />
-            <CheckBox
-                IsThreeState="True" 
-                IsChecked="{Binding Config.ShuffleEncounters}" 
-                Content="Shuffle Encounters"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleEncountersToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                Name="AllowUnsafePathEncountersCheckbox"
-                IsEnabled="{Binding Config.ShuffleEncounters}" 
-                IsChecked="{Binding Config.AllowUnsafePathEncounters}" 
-                Content="Allow Unsafe Path Encounters"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowUnsafePathEncountersToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                Name="AllowLavaInShuffleCheckbox"
-                IsEnabled="{Binding Config.ShuffleEncounters}" 
-                IsChecked="{Binding Config.IncludeLavaInEncounterShuffle}" 
-                Content="Include Lava in Shuffle"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeLavainShuffleToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <ComboBox
-                Theme="{StaticResource MaterialOutlineComboBox}"
-                assists:ComboBoxAssist.Label="Encounter Rate"
-                ItemsSource="{Binding Source={x:Static rc:Enums.EncounterRateList}}"
-                SelectedItem="{Binding Config.EncounterRate, Converter={x:Static ui:Util.EnumConvert}}"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EncounterRateToolTip}"/></ToolTip.Tip>
-            </ComboBox>
-            <Separator />
+    <Grid RowDefinitions="*, *">
+        <HyperlinkButton
+            Margin="24 7 24 7"
+            HorizontalAlignment="Right"
+            Content="[Wiki: Biomes]"
+            NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Biomes"
+            FontSize="12"
+            Foreground="#4557c4"
+            Cursor="Hand"
+            />
+
+        <Grid Grid.Row="0" Margin="0 12 0 0" ColumnDefinitions="*, *, *" RowDefinitions="*, *, *, *, *">
             <ComboBox
                 Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                assists:ComboBoxAssist.Label="River Devil Blocks"
-                ItemsSource="{Binding Source={x:Static rc:Enums.RiverDevilBlockerOptionList}}"
-                SelectedItem="{Binding Config.RiverDevilBlockerOption, Converter={x:Static ui:Util.EnumConvert}}"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RiverDevilBlocksToolTip}"/></ToolTip.Tip>
+                assists:ComboBoxAssist.Label="West Continent Size"
+                ItemsSource="{Binding Source={x:Static rc:Enums.OverworldSizeList}}"
+                SelectedItem="{Binding Config.WestSize, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.OverworldSizeToolTip}"/></ToolTip.Tip>
             </ComboBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.EastRocks}"
-                Content="Allow Rock Blocks on the East"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowRockBlocksontheEastToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.RestrictConnectionCaveShuffle}"
-                Content="Restrict Connection Cave Shuffle"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RestrictConnectionCaveShuffleToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsChecked="{Binding Config.AllowConnectionCavesToBeBlocked}"
-                Content="Allow Connection Caves to Be Blocked"
-                ><ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowConnectionCavestoBeBlockedToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.GenerateBaguWoods}"
-                Content="Generate Bagu's Woods"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateBagusWoodsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
             <ComboBox
-                Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
+                Grid.Row="1" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="East Continent Size"
+                ItemsSource="{Binding Source={x:Static rc:Enums.OverworldSizeList}}"
+                SelectedItem="{Binding Config.EastSize, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.OverworldSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="2" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Death Mountain Size"
+                ItemsSource="{Binding Source={x:Static rc:Enums.DmSizeList}}"
+                SelectedItem="{Binding Config.DmSize, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.OverworldSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="3" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Maze Island Size"
+                ItemsSource="{Binding Source={x:Static rc:Enums.MazeSizeList}}"
+                SelectedItem="{Binding Config.MazeSize, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.OverworldSizeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+
+            <ComboBox
+                Grid.Row="0" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="West Continent Biome"
+                ItemsSource="{Binding Source={x:Static rc:Enums.WestBiomeList}}"
+                SelectedItem="{Binding Config.WestBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.WestContinentBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="1" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="East Continent Biome"
+                ItemsSource="{Binding Source={x:Static rc:Enums.EastBiomeList}}"
+                SelectedItem="{Binding Config.EastBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EastContinentBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="2" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Death Mountain Biome"
+                ItemsSource="{Binding Source={x:Static rc:Enums.DMBiomeList}}"
+                SelectedItem="{Binding Config.DmBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DeathMountainBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="3" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Maze Island Biome"
+                ItemsSource="{Binding Source={x:Static rc:Enums.MazeBiomeList}}"
+                SelectedItem="{Binding Config.MazeBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MazeIslandBiomeToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+
+            <ComboBox
+                Grid.Row="0" Grid.Column="2" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="West Continent Climate"
+                ItemsSource="{Binding Source={x:Static rc:Enums.WestClimateList}}"
+                SelectedItem="{Binding Config.WestClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="1" Grid.Column="2" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="East Continent Climate"
+                ItemsSource="{Binding Source={x:Static rc:Enums.EastClimateList}}"
+                SelectedItem="{Binding Config.EastClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="2" Grid.Column="2" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Death Mountain Climate"
+                ItemsSource="{Binding Source={x:Static rc:Enums.DmClimateList}}"
+                SelectedItem="{Binding Config.DmClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+            </ComboBox>
+
+            <ComboBox
+                Grid.Row="4" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Continent Connectors"
+                ItemsSource="{Binding Source={x:Static rc:Enums.ContinentConnectionTypeList}}"
+                SelectedItem="{Binding Config.ContinentConnectionType, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                <ToolTip.Tip>
+                    <TextBlock Text="{x:Static lang:Resources.ContinentConnectorsToolTip}"/>
+                </ToolTip.Tip>
+            </ComboBox>
+            <ComboBox
+                Grid.Row="4" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Less Important Locations"
                 ItemsSource="{Binding Source={x:Static rc:Enums.LessImportantLocationsOptionList}}"
                 SelectedItem="{Binding Config.LessImportantLocationsOption, Converter={x:Static ui:Util.EnumConvert}}"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.LessImportantLocationsToolTip}"/></ToolTip.Tip>
+                >
+                <ToolTip.Tip>
+                    <TextBlock Text="{x:Static lang:Resources.LessImportantLocationsToolTip}"/>
+                </ToolTip.Tip>
             </ComboBox>
-        </StackPanel>
-        <StackPanel Grid.Column="1">
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.GoodBoots}"
-                Content="All Water Is Walkable With Boots"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllWaterIsWalkableWithBootsToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.HidePalace}"
-                Name="GenerateThreeEyedRock"
-                Content="Generate Three-Eyed Rock"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateThreeEyedRockToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.HideKasuto}"
-                Name="GenerateHiddenKasutoTile"
-                Content="Generate Hidden Kasuto Tile"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateHiddenKasutoTileToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Config.ShuffleWhichLocationIsHidden}"
-                Name="ShuffleWhichLocationsAreHidden"
-                Content="Shuffle Which Locations Are Hidden"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleWhichLocationsAreHiddenToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+        </Grid>
 
-            <HyperlinkButton
-                Margin="214 0 0 0"
-                HorizontalAlignment="Left"
-                Content="[Wiki: Biomes]"
-                NavigateUri="https://github.com/Ellendar/Z2Randomizer/wiki/Biomes"
-                FontSize="12"
-                Foreground="#4557c4"
-                Cursor="Hand"
-            />
-
-            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *, *">
+        <Grid Grid.Row="1" ColumnDefinitions="*, *">
+            <StackPanel>
+                <CheckBox
+                    IsThreeState="False"
+                    IsChecked="{Binding Config.VanillaShuffleUsesActualTerrain}"
+                    Content="Vanilla Shuffle Shows Actual Terrain"
+                    >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.VanillaShuffleShowsActualTerrainToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsThreeState="True" 
+                    IsChecked="{Binding Config.PalacesCanSwapContinents}" 
+                    Content="Allow Palaces to Swap Continents"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowPalacestoSwapContinentsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    Name="IncludeGPInShuffleCheckbox"
+                    IsThreeState="True" 
+                    IsChecked="{Binding Config.ShuffleGP}" 
+                    IsEnabled="{Binding Config.PalacesCanSwapContinents}"
+                    Content="Include Great Palace in Shuffle"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeGreatPalaceinShuffleToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <Separator />
                 <ComboBox
                     Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="West Continent Biome"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.WestBiomeList}}"
-                    SelectedItem="{Binding Config.WestBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                    assists:ComboBoxAssist.Label="River Devil Blocks"
+                    ItemsSource="{Binding Source={x:Static rc:Enums.RiverDevilBlockerOptionList}}"
+                    SelectedItem="{Binding Config.RiverDevilBlockerOption, Converter={x:Static ui:Util.EnumConvert}}"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.WestContinentBiomeToolTip}"/></ToolTip.Tip>
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RiverDevilBlocksToolTip}"/></ToolTip.Tip>
                 </ComboBox>
-                <ComboBox
-                    Grid.Row="1" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="East Continent Biome"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.EastBiomeList}}"
-                    SelectedItem="{Binding Config.EastBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.EastRocks}"
+                    Content="Allow Rock Blocks on the East"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EastContinentBiomeToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <ComboBox
-                    Grid.Row="2" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="Death Mountain Biome"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.DMBiomeList}}"
-                    SelectedItem="{Binding Config.DmBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowRockBlocksontheEastToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.RestrictConnectionCaveShuffle}"
+                    Content="Restrict Connection Cave Shuffle"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.DeathMountainBiomeToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <ComboBox
-                    Grid.Row="3" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="Maze Island Biome"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.MazeBiomeList}}"
-                    SelectedItem="{Binding Config.MazeBiome, Converter={x:Static ui:Util.EnumConvert}}"
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RestrictConnectionCaveShuffleToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsChecked="{Binding Config.AllowConnectionCavesToBeBlocked}"
+                    Content="Allow Connection Caves to Be Blocked"
+                    ><ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllowConnectionCavestoBeBlockedToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.GenerateBaguWoods}"
+                    Content="Generate Bagu's Woods"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MazeIslandBiomeToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-
-                <ComboBox
-                    Grid.Row="0" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="West Continent Climate"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.WestClimateList}}"
-                    SelectedItem="{Binding Config.WestClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateBagusWoodsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.GoodBoots}"
+                    Content="All Water Is Walkable With Boots"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <ComboBox
-                    Grid.Row="1" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="East Continent Climate"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.EastClimateList}}"
-                    SelectedItem="{Binding Config.EastClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.AllWaterIsWalkableWithBootsToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.HidePalace}"
+                    Name="GenerateThreeEyedRock"
+                    Content="Generate Three-Eyed Rock"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-                <ComboBox
-                    Grid.Row="2" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="Death Mountain Climate"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.DmClimateList}}"
-                    SelectedItem="{Binding Config.DmClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateThreeEyedRockToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.HideKasuto}"
+                    Name="GenerateHiddenKasutoTile"
+                    Content="Generate Hidden Kasuto Tile"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-
-                <ComboBox
-                    Grid.Row="4" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="Continent Connectors"
-                    ItemsSource="{Binding Source={x:Static rc:Enums.ContinentConnectionTypeList}}"
-                    SelectedItem="{Binding Config.ContinentConnectionType, Converter={x:Static ui:Util.EnumConvert}}"
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateHiddenKasutoTileToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+                <CheckBox
+                    IsThreeState="True"
+                    IsChecked="{Binding Config.ShuffleWhichLocationIsHidden}"
+                    Name="ShuffleWhichLocationsAreHidden"
+                    Content="Shuffle Which Locations Are Hidden"
                 >
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ContinentConnectorsToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-            </Grid>
-            <CheckBox
-                IsThreeState="False"
-                IsChecked="{Binding Config.VanillaShuffleUsesActualTerrain}"
-                Content="Vanilla Shuffle Shows Actual Terrain"
-            >
-                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.VanillaShuffleShowsActualTerrainToolTip}"/></ToolTip.Tip>
-            </CheckBox>
-        </StackPanel>
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleWhichLocationsAreHiddenToolTip}"/></ToolTip.Tip>
+                </CheckBox>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

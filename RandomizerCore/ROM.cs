@@ -2298,7 +2298,7 @@ ResetRedPalettePayload:
             ExternalWorld = yByte & 0x80,
             appear2loweruponexit = xByte & 0x80,
             Secondpartofcave = xByte & 0x40,
-            MapPage = mapByte & 0xC0,
+            MapPageRaw = mapByte & 0xC0,
             FallInHole = worldByte & 0x80,
             PassThrough = worldByte & 0x40,
             ForceEnterRight = worldByte & 0x20,

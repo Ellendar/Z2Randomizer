@@ -76,6 +76,10 @@ public class RandomizerProperties
     public bool TownSwap { get; set; }
     public EncounterRate EncounterRates { get; set; }
     public ContinentConnectionType ContinentConnections { get; set; }
+    public OverworldSizeOption WestSize { get; set; }
+    public OverworldSizeOption EastSize { get; set; }
+    public DmSizeOption DmSize { get; set; }
+    public MazeSizeOption MazeSize { get; set; }
     public bool BoulderBlockConnections { get; set; }
     public Biome WestBiome { get; set; }
     public Biome EastBiome { get; set; }
