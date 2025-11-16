@@ -20213,13 +20213,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 1,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 14,
     "palaceGroup": null,
@@ -20238,13 +20238,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 2,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 35,
     "palaceGroup": null,
@@ -20263,13 +20263,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 5,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 0,
     "palaceGroup": null,
@@ -20288,13 +20288,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 3,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 15,
     "palaceGroup": null,
@@ -20313,7 +20313,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 4,
     "linkedRoomName": null,
@@ -20345,7 +20345,7 @@
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 36,
     "palaceGroup": null,
@@ -20364,7 +20364,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 6,
     "linkedRoomName": null,

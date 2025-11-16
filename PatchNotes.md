@@ -1,5 +1,8 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.8 - November 15, 2025
+- Removed dripper entrances from the 5.0 room pool.
+
 ## Version 5.0.7 - November 9, 2025
 - Fixed another bug related to segmented room connections.
 - Slightly increased the default window height to avoid options not being visible.
