@@ -541,8 +541,8 @@ public enum BeamPalette
     Flashing = -1,
     Link = 0,
     Orange = 1,
-    Red = 2,
-    Blue = 3,
+    Red = 2,  // bad idea to use since this palette is not visible in caves without the candle
+    Blue = 3, // ^
 }
 
 public enum BeamRotation
@@ -588,38 +588,35 @@ public enum BeamSprites
     [Description("Fire"), BeamSpriteMeta(BeamPalette = BeamPalette.Orange, Rotate = BeamRotation.FlipVertical)]
     FIRE,
 
-    [Description("Blue Fire"), BeamSpriteMeta(BeamPalette = BeamPalette.Blue, FirePalette = BeamPalette.Red, Rotate = BeamRotation.FlipVertical)]
-    BLUE_FIRE,
-
-    [Description("Bubble"), BeamSpriteMeta(ChrAddress = 0xaa0, BeamPalette = BeamPalette.Flashing)]
+    [Description("Bubble"), BeamSpriteMeta(ChrAddress = 0xaa0)]
     BUBBLE,
 
-    [Description("Rock"), BeamSpriteMeta(ChrAddress = 0x2ae0, BeamPalette = BeamPalette.Red)]
+    [Description("Rock"), BeamSpriteMeta(ChrAddress = 0x2ae0)]
     ROCK,
 
-    [Description("Energy Ball"), BeamSpriteMeta(ChrAddress = 0x0ce0, BeamPalette = BeamPalette.Flashing)]
+    [Description("Energy Ball"), BeamSpriteMeta(ChrAddress = 0x0ce0)]
     ENERGY_BALL,
 
-    [Description("Wizard Beam"), BeamSpriteMeta(ChrAddress = 0x14dc0, BeamPalette = BeamPalette.Flashing)]
+    [Description("Wizard Beam"), BeamSpriteMeta(ChrAddress = 0x14dc0)]
     WIZARD_BEAM,
 
     // (Red Daira's axe projectile switches between sprite f6 and fa for smoother rotation, we can't emulate that)
-    [Description("Daira Axe"), BeamSpriteMeta(ChrAddress = 0x2f60, BeamPalette = BeamPalette.Red, Rotate = BeamRotation.Rotate90)]
+    [Description("Daira Axe"), BeamSpriteMeta(ChrAddress = 0x2f60, BeamPalette = BeamPalette.Orange, Rotate = BeamRotation.Rotate90)]
     AXE,
 
-    [Description("Doomknocker Mace"), BeamSpriteMeta(ChrAddress = 0x12ee0, BeamPalette = BeamPalette.Blue, FirePalette = BeamPalette.Red, Rotate = BeamRotation.Rotate90)]
+    [Description("Doomknocker Mace"), BeamSpriteMeta(ChrAddress = 0x12ee0, Rotate = BeamRotation.Rotate90)]
     HAMMER,
 
-    [Description("Geru Mace"), BeamSpriteMeta(ChrAddress = 0x5260, BeamPalette = BeamPalette.Blue, FirePalette = BeamPalette.Red, Rotate = BeamRotation.Rotate90)]
+    [Description("Geru Mace"), BeamSpriteMeta(ChrAddress = 0x5260, Rotate = BeamRotation.Rotate90)]
     GERU_MACE,
 
-    [Description("Guma Mace"), BeamSpriteMeta(ChrAddress = 0xaee0, BeamPalette = BeamPalette.Red, Rotate = BeamRotation.Rotate90)]
+    [Description("Guma Mace"), BeamSpriteMeta(ChrAddress = 0xaee0, Rotate = BeamRotation.Rotate90)]
     GUMA_MACE,
 
     [Description("Boomerang"), BeamSpriteMeta(ChrAddress = 0x30c0, Rotate = BeamRotation.Rotate90)]
     BOOMERANG,
 
-    [Description("Spicy Chicken Fire"), BeamSpriteMeta(ChrAddress = 0xd3e0, BeamPalette =BeamPalette.Red, Rotate = BeamRotation.Rotate90)]
+    [Description("Spicy Chicken Fire"), BeamSpriteMeta(ChrAddress = 0xd3e0, BeamPalette = BeamPalette.Orange, Rotate = BeamRotation.Rotate90)]
     SPICY_CHICKEN,
 
     [Description("Random")]
