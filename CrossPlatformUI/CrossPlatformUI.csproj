@@ -48,17 +48,20 @@
         <MakeDir Directories="$(IntermediateOutputPath)" />
         <Exec Command="git rev-parse --short HEAD > $(IntermediateOutputPath)git-hash.txt" />
         <Exec Command="git rev-parse --abbrev-ref HEAD > $(IntermediateOutputPath)git-branch.txt" />
+        <Exec Command="git tag --points-at HEAD > $(IntermediateOutputPath)git-tag.txt" />
         <Exec Command="git diff --quiet || echo dirty > $(IntermediateOutputPath)git-dirty.txt" IgnoreExitCode="true" />
 
         <ReadLinesFromFile File="$(IntermediateOutputPath)git-hash.txt"><Output TaskParameter="Lines" PropertyName="GitHash" /></ReadLinesFromFile>
         <ReadLinesFromFile File="$(IntermediateOutputPath)git-branch.txt"><Output TaskParameter="Lines" PropertyName="GitBranch" /></ReadLinesFromFile>
-        <ReadLinesFromFile File="$(IntermediateOutputPath)git-dirty.txt" Condition="Exists('$(IntermediateOutputPath)gitdirty.txt')"><Output TaskParameter="Lines" PropertyName="GitDirty" /></ReadLinesFromFile>
+        <ReadLinesFromFile File="$(IntermediateOutputPath)git-tag.txt"><Output TaskParameter="Lines" ItemName="GitTag" /></ReadLinesFromFile>
+        <ReadLinesFromFile File="$(IntermediateOutputPath)git-dirty.txt" Condition="Exists('$(IntermediateOutputPath)git-dirty.txt')"><Output TaskParameter="Lines" PropertyName="GitDirty" /></ReadLinesFromFile>
         <PropertyGroup><IsDirtyValue>false</IsDirtyValue></PropertyGroup>
         <PropertyGroup Condition="'$(GitDirty)' != ''"><IsDirtyValue>true</IsDirtyValue></PropertyGroup>
     </Target>
 
     <Target Name="WriteGitInfoFile" DependsOnTargets="GenerateGitInfo" BeforeTargets="BeforeBuild">
         <PropertyGroup>
+            <GitTagsJoined>@(GitTag->'%(Identity)', ',')</GitTagsJoined>
             <GitInfoText>
                 // (auto-generated from .csproj)
                 namespace Z2Randomizer;
@@ -69,6 +72,7 @@
                     {
                         Commit = "$(GitHash)";
                         Branch = "$(GitBranch)";
+                        Tag = "$(GitTagsJoined)";
                         IsDirty = $(IsDirtyValue);
                     }
                 }
