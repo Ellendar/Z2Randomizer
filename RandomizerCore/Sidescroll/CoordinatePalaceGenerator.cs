@@ -245,12 +245,18 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
                 if (newPrimaryRoom.HasDownExit)
                 {
                     newPrimaryRoom.Down = primaryRoom.Down;
-                    primaryRoom.Down.Up = newPrimaryRoom;
+                    if (primaryRoom.Down.HasUpExit)
+                    {
+                        primaryRoom.Down.Up = newPrimaryRoom;
+                    }
                 }
                 else if (secondaryRoom.HasDownExit)
                 {
                     secondaryRoom.Down = primaryRoom.Down;
-                    primaryRoom.Down.Up = secondaryRoom;
+                    if (primaryRoom.Down.HasUpExit)
+                    {
+                        primaryRoom.Down.Up = secondaryRoom;
+                    }
                 }
             }
             if (primaryRoom.Left != null)

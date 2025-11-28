@@ -29,7 +29,15 @@ public class DesktopFileService : IFileSystemService
         {
             throw new NotImplementedException();
         }
-        SettingsBasePath = Path.Combine(OSBasePath, "Z2Randomizer");
+        var portableFile = Path.Combine(AppContext.BaseDirectory, "portable_mode.txt");
+        if (File.Exists(portableFile))
+        {
+            SettingsBasePath = Path.Combine(AppContext.BaseDirectory, "Settings");
+        }
+        else
+        {
+            SettingsBasePath = Path.Combine(OSBasePath, "Z2Randomizer");
+        }
         SpriteBasePath = Path.Combine(AppContext.BaseDirectory, "Sprites");
         PalacesBasePath = Path.GetDirectoryName(AppContext.BaseDirectory)! + Path.DirectorySeparatorChar;
         Directory.CreateDirectory(SpriteBasePath);
