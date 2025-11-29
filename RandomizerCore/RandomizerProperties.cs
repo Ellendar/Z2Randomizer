@@ -134,7 +134,7 @@ public class RandomizerProperties
     public bool ShuffleOverworldEnemies { get; set; }
     public bool ShufflePalaceEnemies { get; set; }
     public bool MixLargeAndSmallEnemies { get; set; }
-    public bool ShuffleDripper { get; set; }
+    public DripperEnemyOption DripperEnemyOption { get; set; }
     public bool ShuffleEnemyPalettes { get; set; }
     public XPEffectiveness EnemyXPDrops { get; set; }
 

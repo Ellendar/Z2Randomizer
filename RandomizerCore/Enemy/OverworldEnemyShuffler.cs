@@ -36,7 +36,7 @@ public class OverworldEnemyShuffler
             foreach (World world in worldsInBank)
             {
                 int[] newPointers = new int[64];
-                int tableRomAddrBase = ROM.ConvertNesPtrToPrgRomAddr(bank, tablePrgBaseAddr);
+                int tableRomAddrBase = NesPointer.ConvertNesPtrToPrgRomAddr(bank, tablePrgBaseAddr);
 
                 // encounters have a second enemy list (small & large encounter)
                 foreach (int map in world.overworldEncounterMaps)
@@ -58,7 +58,7 @@ public class OverworldEnemyShuffler
 
                     int j = world.sideviewPtrTable + map * 2;
                     int sideviewNesPtr = romData.GetShort(j + 1, j);
-                    int sideviewAddr = ROM.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
+                    int sideviewAddr = NesPointer.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
                     byte[] sideviewBytes = romData.GetBytes(sideviewAddr, romData.GetByte(sideviewAddr));
 
                     byte[] enemiesBytes1 = romData.GetBytes(addr1, enemiesLength1);
@@ -88,7 +88,7 @@ public class OverworldEnemyShuffler
 
                     int j = world.sideviewPtrTable + map * 2;
                     int sideviewNesPtr = romData.GetShort(j + 1, j);
-                    int sideviewAddr = ROM.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
+                    int sideviewAddr = NesPointer.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
                     byte[] sideviewBytes = romData.GetBytes(sideviewAddr, romData.GetByte(sideviewAddr));
 
                     int enemiesLength = romData.GetByte(addr);

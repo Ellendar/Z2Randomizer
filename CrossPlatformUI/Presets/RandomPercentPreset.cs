@@ -90,7 +90,7 @@ public static class RandomPercentPreset
         //Enemies
         ShuffleOverworldEnemies = null,
         ShufflePalaceEnemies = null,
-        ShuffleDripperEnemy = true,
+        DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         MixLargeAndSmallEnemies = null,
         GeneratorsAlwaysMatch = false,
 

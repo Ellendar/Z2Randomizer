@@ -90,7 +90,7 @@ public static class NormalPreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = false,
+        DripperEnemyOption = DripperEnemyOption.EASIER_GROUND_ENEMIES,
         MixLargeAndSmallEnemies = false,
         GeneratorsAlwaysMatch = true,
 
