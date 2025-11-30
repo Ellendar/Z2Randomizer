@@ -45,10 +45,13 @@ $file = "README.md"
 git add $file
 
 $file = "Setup1/Setup1.vdproj"
-(Get-Content $file) |
-    ForEach-Object {
-        $_ -replace '"ProductVersion"\s*=\s*"8:.*?"', "`"ProductVersion`" = `"8:$version`""
-    } | Set-Content $file
+$newProductCode = [guid]::NewGuid().ToString("B").ToUpper()
+$newPackageCode = [guid]::NewGuid().ToString("B").ToUpper()
+$content = Get-Content $file
+$content = $content -replace '"ProductVersion"\s*=\s*"8:[\d\.]+"', "`"ProductVersion`" = `"8:$version`""
+$content = $content -replace '"ProductCode"\s*=\s*"8:{[\da-fA-F-]+}"', "`"ProductCode`" = `"8:$newProductCode`""
+$content = $content -replace '"PackageCode"\s*=\s*"8:{[\da-fA-F-]+}"', "`"PackageCode`" = `"8:$newPackageCode`""
+Set-Content $file $content
 git add $file
 
 # Only commit if some change was actually staged (to prevent setting error level)
