@@ -132,7 +132,7 @@ jobs:
         run: |
           & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" Z2Randomizer.sln /build 'Release|x64' /project Z2RandomizerSetup
           cd Setup1/Release
-          ren Setup.msi Z2Randomizer_${{ inputs.version }}-${{ matrix.platform.name }}.msi
+          ren Setup.msi Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}.msi
 
       - name: Build Browser
         if: ${{ matrix.platform.type == 'browser' }}

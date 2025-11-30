@@ -3,7 +3,7 @@ param(
 )
 
 $setup_link = "https://github.com/Ellendar/Z2Randomizer/releases/download/$version/Z2Randomizer-$version-Windows-Installer.msi"
-$pub_date = Get-Date -Format "dddd, dd MMMM yyyy"
+$pub_date = [System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date), "Eastern Standard Time").ToString("dddd, dd MMMM yyyy")
 
 $file = "appcast.xml"
 $content = Get-Content $file
