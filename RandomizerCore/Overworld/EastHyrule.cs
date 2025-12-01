@@ -14,7 +14,7 @@ namespace Z2Randomizer.RandomizerCore.Overworld;
 public sealed class EastHyrule : World
 {
     //private int bridgeCount;
-
+    int debug = 0;
     private static readonly new Logger logger = LogManager.GetCurrentClassLogger();
 
     private readonly SortedDictionary<int, Terrain> terrains = new SortedDictionary<int, Terrain>
@@ -671,6 +671,8 @@ public sealed class EastHyrule : World
                         return false;
                     }
                 }
+                //Debug.WriteLine(GetMapDebug());
+                debug++;
                 if (props.HiddenPalace)
                 {
                     bool hp = RandomizeHiddenPalace(rom, props.ShuffleHidden, props.HiddenKasuto);
@@ -900,7 +902,7 @@ public sealed class EastHyrule : World
         int palacey = RNG.Next(ymin, ymax);
 
         //Ensure there is enough unallocated space to draw the whole opening
-        //Why does this happen only for caldera-shaped biomes
+        //Why does this happen only for caldera-shaped biomes?
         if (biome == Biome.VOLCANO || biome == Biome.CANYON || biome == Biome.DRY_CANYON)
         {
             bool placeable;
@@ -1607,12 +1609,12 @@ public sealed class EastHyrule : World
         {
             xpos = RNG.Next(6, MAP_COLS - 6);
             ypos = RNG.Next(6, MAP_ROWS - 6);
-            done = true;
-            //#124
+            //#124 - Hidden palace and hidden kasuto on the same X-coordinate causes a wrong warp when leaving hidden palace
             if (hiddenKasuto && xpos == hiddenKasutoLocation.Xpos)
             {
                 continue;
             }
+            done = true;
             for (int i = ypos - 3; i < ypos + 4; i++)
             {
                 for (int j = xpos - 3; j < xpos + 4; j++)

@@ -1,5 +1,21 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.9 - November 29, 2025
+
+### Bug Fixes
+- Fixed a bug in the Random Walk palace generator where it believed segmented rooms had more connections than they did.
+- Fixed a bug that could cause 3-eye rock to spawn in invalid locations.
+- Fixed default window size being too small.
+- Fixed or removed some projectile options that were not visible in the dark.
+
+### Improvements
+- Geldarms can no longer spawn in the air, and will rerolled into a new enemy if this isn't possible.
+- Allow portable mode for settings if portable_mode.txt is found. This means your settings will be saved in a Settings folder inside the program folder.
+- Add a portable Windows build and Linux (Ubuntu) & Mac versions to the release assets.
+- Added 3 new sprites (Thanks valence)
+- Removed swordsman sprite (It was the same as river man).
+
+
 ## Version 5.0.8 - November 15, 2025
 - Removed dripper entrances from the 5.0 room pool.
 

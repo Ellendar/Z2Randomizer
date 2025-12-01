@@ -1,0 +1,198 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to release from'
+        default: main
+        required: true
+        type: string
+      version:
+        description: 'Version [Format: x.x.x]'
+        required: true
+        type: string
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  create_version_tag:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check if user is allowed
+      run: |
+        allowed_users=(
+          "ellendar"
+          "jroweboy"
+          "initsu"
+        )
+
+        actor="${{ github.triggering_actor }}"
+        actor="${actor,,}" # make lowercase
+        if [[ ! " ${allowed_users[*]} " =~ " ${actor} " ]]; then
+          echo "User '$actor' is not allowed to run this action!"
+          exit 1
+        fi
+        echo "User is allowed: $actor"
+
+    - name: Checkout codebase
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.branch }}
+        fetch-depth: 0 # required to push tags
+
+    - name: Setup git user
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@users.noreply.github.com"
+
+    - name: Create and push tag
+      shell: pwsh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        .github/scripts/UpdateVersion.ps1 ${{ inputs.version }}
+        $tag = '${{ inputs.version }}'
+        $tagExists = git tag --list $tag
+        if ($tagExists) {
+          $hasChanges = git diff $tag --cached --name-only
+          if ($hasChanges) {
+            Write-Error "Tag '$tag' already exists and it is not identical"
+            exit 1
+          }
+        } else {
+          git tag $tag
+          git push origin $tag
+        }
+
+
+  create_draft_release:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ inputs.version }}
+    steps:
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          draft: true
+          files: ""
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  build:
+    needs:
+      - create_version_tag
+      - create_draft_release
+    strategy:
+      matrix:
+        platform: [
+          { name: Windows-Portable, os: windows-latest, arch: x64, type: portable },
+          { name: Windows-Installer, os: windows-latest, arch: x64, type: installer },
+          { name: Ubuntu, os: ubuntu-latest, arch: x64 },
+          { name: macOS, os: macos-14, arch: arm64 },
+          { name: Browser, os: ubuntu-latest, arch: wasm, type: browser },
+        ]
+        dotnet-version: [ '8.0.x' ]
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.version }}
+          submodules: recursive
+
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Build Desktop
+        if: ${{ matrix.platform.type != 'browser' }}
+        run: dotnet publish -c Release -o CrossPlatformUI.Desktop/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
+
+      - name: Create portable_mode.txt
+        if: ${{ matrix.platform.type == 'portable' }}
+        run: echo "The presence of this file enables portable mode" > CrossPlatformUI.Desktop/bin/publish/portable_mode.txt
+
+      - name: Package regular build
+        if: ${{ matrix.platform.type == 'portable' || matrix.platform.type == null }}
+        working-directory: CrossPlatformUI.Desktop/bin/publish
+        run: |
+          rm *.pdb
+          7z a -tzip -mx=9 Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}-${{ matrix.platform.arch }}.zip .
+
+      - name: Build Installer
+        if: ${{ matrix.platform.type == 'installer' }}
+        shell: pwsh
+        run: |
+          & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" Z2Randomizer.sln /build 'Release|x64' /project Z2RandomizerSetup
+          cd Setup1/Release
+          ren Setup.msi Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}.msi
+
+      - name: Build Browser
+        if: ${{ matrix.platform.type == 'browser' }}
+        run: |
+          cd CrossPlatformUI.Browser
+          dotnet workload restore
+          cd ..
+          dotnet publish -c Release CrossPlatformUI.Browser/CrossPlatformUI.Browser.csproj
+
+      - name: Upload regular build to GitHub release
+        if: ${{ matrix.platform.type == 'portable' || matrix.platform.type == null }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          files: CrossPlatformUI.Desktop/bin/publish/Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}-${{ matrix.platform.arch }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Installer to GitHub release
+        if: ${{ matrix.platform.type == 'installer' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          files: Setup1/Release/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Browser build to artifacts
+        if: ${{ matrix.platform.type == 'browser' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}
+          path: |
+            CrossPlatformUI.Browser/bin/Release/net8.0-browser/browser-wasm/AppBundle/
+            !**/*.pdb
+
+
+  publish_release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  merge_release:
+    needs: publish_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.version }}
+          fetch-depth: 0 # required to merge tag into main
+
+      - name: Push release to main branch
+        run: |
+          git push origin ${{ inputs.version }}:${{ inputs.branch }}
