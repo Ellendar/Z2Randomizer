@@ -1,15 +1,15 @@
-name: Create Release
+name: Create Release 5.1
 
 on:
   workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to release from'
-        default: main
+        default: 5.1
         required: true
         type: string
       version:
-        description: 'Version [Format: x.x.x]'
+        description: 'Version [Format: 5.1.x]'
         required: true
         type: string
 
@@ -48,6 +48,26 @@ jobs:
         git config user.name "github-actions"
         git config user.email "github-actions@users.noreply.github.com"
 
+    - name: Check version
+      run: |
+        version="${{ inputs.version }}"
+        if [[ "$version" =~ ^5\.1\.([0-9]+)$ ]]; then
+          revision="${BASH_REMATCH[1]}"
+        else
+          echo "Error: version '$version' does not match required format: 5.1.x"
+          exit 1
+        fi
+        if [[ "$revision" != "0" ]]; then
+          revisionMinusOne=$((revision - 1))
+          versionMinusOne="5.1.${revisionMinusOne}"
+          tagExists=$(git tag --list "$versionMinusOne")
+          if [[ -z "$tagExists" ]]; then
+            echo "Error: previous version '$versionMinusOne' does not exist. Skipping a revision is not allowed."
+            exit 1
+          fi
+        fi
+        echo "Version set to: $version"
+
     - name: Create and push tag
       shell: pwsh
       env:
@@ -69,6 +89,7 @@ jobs:
 
 
   create_draft_release:
+    needs: create_version_tag
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ inputs.version }}
@@ -84,9 +105,7 @@ jobs:
 
 
   build:
-    needs:
-      - create_version_tag
-      - create_draft_release
+    needs: create_draft_release
     strategy:
       matrix:
         platform: [
@@ -96,7 +115,7 @@ jobs:
           { name: macOS, os: macos-14, arch: arm64 },
           { name: Browser, os: ubuntu-latest, arch: wasm, type: browser },
         ]
-        dotnet-version: [ '8.0.x' ]
+        dotnet-version: [ '10.0.x' ]
 
     runs-on: ${{ matrix.platform.os }}
     steps:
@@ -166,7 +185,7 @@ jobs:
         with:
           name: Z2Randomizer-${{ inputs.version }}-${{ matrix.platform.name }}
           path: |
-            CrossPlatformUI.Browser/bin/Release/net8.0-browser/browser-wasm/AppBundle/
+            CrossPlatformUI.Browser/bin/Release/net10.0-browser/browser-wasm/AppBundle/
             !**/*.pdb
 
 
@@ -179,6 +198,8 @@ jobs:
         with:
           tag_name: ${{ inputs.version }}
           draft: false
+          prerelease: true
+          make_latest: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
