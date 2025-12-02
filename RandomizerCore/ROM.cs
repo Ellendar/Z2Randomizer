@@ -2146,6 +2146,35 @@ ResetRedPalettePayload:
         Put(0x141b3, [0x02, 0x02]); // GP
     }
 
+    public static byte DigitToZ2TextByte(int digit)
+    {
+        switch (digit)
+        {
+            case 0:
+                return 0xD0;
+            case 1:
+                return 0xD1;
+            case 2:
+                return 0xD2;
+            case 3:
+                return 0xD3;
+            case 4:
+                return 0xD4;
+            case 5:
+                return 0xD5;
+            case 6:
+                return 0xD6;
+            case 7:
+                return 0xD7;
+            case 8:
+                return 0xD8;
+            case 9:
+                return 0xD9;
+            default:
+                throw new ArgumentException("Value out of range (0-9)");
+        }
+    }
+
     public static string Z2BytesToString(byte[] data)
     {
         return new string(data.Select(letter => {
