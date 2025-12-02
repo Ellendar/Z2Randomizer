@@ -18,6 +18,8 @@ public class StatRandomizer
     public byte[] LifeEffectivenessTable { get; private set; } = null!;
     public byte[] MagicEffectivenessTable { get; private set; } = null!;
 
+    public int[] ExperienceToLevelTable { get; private set; } = null!;
+
     public byte[] WestEnemyHpTable { get; private set; } = null!;
     public byte[] EastEnemyHpTable { get; private set; } = null!;
     public byte[] Palace125EnemyHpTable { get; private set; } = null!;
@@ -34,9 +36,12 @@ public class StatRandomizer
     public StatRandomizer(ROM rom, RandomizerProperties props)
     {
         this.props = props;
+        ReadExperienceToLevel(rom);
+
         ReadAttackEffectiveness(rom);
         ReadLifeEffectiveness(rom);
         ReadMagicEffectiveness(rom);
+
         ReadEnemyHp(rom);
     }
 
@@ -46,6 +51,8 @@ public class StatRandomizer
         Debug.Assert(!hasRandomized);
         hasRandomized = true;
 #endif
+        RandomizeExperienceToLevel(r, [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp],
+                                      [props.AttackCap, props.MagicCap, props.LifeCap], props.ScaleLevels);
 
         RandomizeAttackEffectiveness(r, props.AttackEffectiveness);
         RandomizeLifeEffectiveness(r, props.LifeEffectiveness);
@@ -63,9 +70,12 @@ public class StatRandomizer
         hasWritten = true;
 #endif
 
+        WriteExperienceToLevel(rom);
+
         WriteAttackEffectiveness(rom);
         WriteLifeEffectiveness(rom);
         WriteMagicEffectiveness(rom);
+
         WriteEnemyHp(rom);
     }
 
@@ -82,6 +92,38 @@ public class StatRandomizer
 #if DEBUG
         Debug.Assert(hasWritten == value);
 #endif
+    }
+
+    protected void ReadExperienceToLevel(ROM rom)
+    {
+        const int startAddr = RomMap.EXPERIENCE_TO_LEVEL_TABLE;
+        ExperienceToLevelTable = new int[24];
+        for (int i = 0; i < 24; i++)
+        {
+            ExperienceToLevelTable[i] = rom.GetShort(startAddr + i, startAddr + 24 + i);
+        }
+    }
+
+    protected void WriteExperienceToLevel(ROM rom)
+    {
+        const int startAddr = RomMap.EXPERIENCE_TO_LEVEL_TABLE;
+        for (int i = 0; i < ExperienceToLevelTable.Length; i++)
+        {
+            rom.PutShort(startAddr + i, startAddr + 24 + i, ExperienceToLevelTable[i]);
+        }
+
+        for (int i = 0; i < ExperienceToLevelTable.Length; i++)
+        {
+            int n = ExperienceToLevelTable[i];
+            var digit1 = ROM.DigitToZ2TextByte(n / 1000);
+            n %= 1000;
+            var digit2 = ROM.DigitToZ2TextByte(n / 100);
+            n %= 100;
+            var digit3 = ROM.DigitToZ2TextByte(n / 10);
+            rom.Put(RomMap.EXPERIENCE_TO_LEVEL_TEXT_TABLE + 48 + i, digit1);
+            rom.Put(RomMap.EXPERIENCE_TO_LEVEL_TEXT_TABLE + 24 + i, digit2);
+            rom.Put(RomMap.EXPERIENCE_TO_LEVEL_TEXT_TABLE + 0 + i, digit3);
+        }
     }
 
     protected void ReadAttackEffectiveness(ROM rom)
@@ -139,6 +181,99 @@ public class StatRandomizer
         for (int i = 0; i < RomMap.bossHpAddresses.Count; i++) {
             rom.Put(RomMap.bossHpAddresses[i], BossHpTable[i]);
         }
+    }
+
+    protected void RandomizeExperienceToLevel(Random r, bool[] shuffleStat, int[] levelCap, bool scaleLevels)
+    {
+        int[] newTable = new int[24];
+        Span<int> randomizedSpan = newTable;
+        ReadOnlySpan<int> vanillaSpan = ExperienceToLevelTable;
+
+        for (int stat = 0; stat < 3; stat++)
+        {
+            var statStartIndex = stat * 8;
+            if (!shuffleStat[stat])
+            {
+                vanillaSpan.Slice(statStartIndex, 8).CopyTo(randomizedSpan.Slice(statStartIndex, 8));
+                continue;
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                var vanilla = ExperienceToLevelTable[statStartIndex + i];
+                int nextMin = (int)(vanilla - vanilla * 0.25);
+                int nextMax = (int)(vanilla + vanilla * 0.25);
+                if (i == 0)
+                {
+                    newTable[statStartIndex + i] = r.Next(Math.Max(10, nextMin), nextMax);
+                }
+                else
+                {
+                    newTable[statStartIndex + i] = r.Next(Math.Max(newTable[statStartIndex + i - 1], nextMin), Math.Min(nextMax, 9990));
+                }
+            }
+        }
+
+        for (int i = 0; i < newTable.Length; i++)
+        {
+            newTable[i] = newTable[i] / 10 * 10; //wtf is this line of code? -digshake, 2020
+        }
+
+        if (scaleLevels)
+        {
+            int[] cappedExp = new int[24];
+
+            for (int stat = 0; stat < 3; stat++)
+            {
+                var statStartIndex = stat * 8;
+                var cap = levelCap[stat];
+
+                for (int i = 0; i < 8; i++)
+                {
+                    if (i >= cap)
+                    {
+                        cappedExp[statStartIndex + i] = newTable[statStartIndex + i]; //shouldn't matter, just wanna put something here
+                    }
+                    else if (i == cap - 1)
+                    {
+                        cappedExp[statStartIndex + i] = newTable[7]; //exp to get a 1up
+                    }
+                    else
+                    {
+                        cappedExp[statStartIndex + i] = newTable[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
+                    }
+                }
+            }
+
+            newTable = cappedExp;
+        }
+
+        // Make sure all 1-up levels are higher cost than regular levels
+        int highestRegularLevelExp = 0;
+        for (int stat = 0; stat < 3; stat++)
+        {
+            var cap = levelCap[stat];
+            if (cap < 2) { continue; }
+            var statStartIndex = stat * 8;
+            int statMaxLevelIndex = statStartIndex + cap - 2;
+            var maxExp = newTable[statMaxLevelIndex];
+            if (highestRegularLevelExp < maxExp) { highestRegularLevelExp = maxExp; }
+        }
+
+        int min1upExp = Math.Min(highestRegularLevelExp + 10, 9990);
+        for (int stat = 0; stat < 3; stat++)
+        {
+            var cap = levelCap[stat];
+            Debug.Assert(cap >= 1);
+            var statStartIndex = stat * 8;
+            int stat1upLevelIndex = statStartIndex + cap - 1;
+            var exp1up = newTable[stat1upLevelIndex];
+            if (exp1up < min1upExp)
+            {
+                newTable[stat1upLevelIndex] = r.Next(min1upExp, 9990) / 10 * 10;
+            }
+        }
+
+        ExperienceToLevelTable = newTable;
     }
 
     protected void RandomizeAttackEffectiveness(Random r, AttackEffectiveness attackEffectiveness)

@@ -2158,133 +2158,6 @@ public class Hyrule
         westHyrule.midoChurch.Collectables = [Collectable.UPSTAB];
     }
 
-    private void RandomizeExperience(ROM rom)
-    {
-        bool[] shuffleStat = [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp];
-        int[] levelCap = [props.AttackCap, props.MagicCap, props.LifeCap];
-
-        var startAddr = 0x1669;
-        var startAddrText = 0x1e42;
-
-        int[] vanillaExp = new int[24];
-
-        for (int i = 0; i < vanillaExp.Length; i++)
-        {
-            vanillaExp[i] = rom.GetShort(startAddr + i, startAddr + 24 + i);
-        }
-
-        int[] randomizedExp = RandomizeExperience(r, vanillaExp, shuffleStat, levelCap, props.ScaleLevels);
-
-        for (int i = 0; i < randomizedExp.Length; i++)
-        {
-            rom.PutShort(startAddr + i, startAddr + 24 + i, randomizedExp[i]);
-        }
-
-        for (int i = 0; i < randomizedExp.Length; i++)
-        {
-            var n = randomizedExp[i];
-            var digit1 = IntToText(n / 1000);
-            n %= 1000;
-            var digit2 = IntToText(n / 100);
-            n %= 100;
-            var digit3 = IntToText(n / 10);
-            rom.Put(startAddrText + 48 + i, digit1);
-            rom.Put(startAddrText + 24 + i, digit2);
-            rom.Put(startAddrText + 0 + i, digit3);
-        }
-    }
-
-    private static int[] RandomizeExperience(Random RNG, int[] vanillaExp, bool[] shuffleStat, int[] levelCap, bool scaleLevels)
-    {
-        int[] randomized = new int[24];
-        Span<int> randomizedSpan = randomized;
-        ReadOnlySpan<int> vanillaSpan = vanillaExp;
-
-        for (int stat = 0; stat < 3; stat++)
-        {
-            var statStartIndex = stat * 8;
-            if (!shuffleStat[stat]) {
-                vanillaSpan.Slice(statStartIndex, 8).CopyTo(randomizedSpan.Slice(statStartIndex, 8));
-                continue;
-            }
-            for (int i = 0; i < 8; i++)
-            {
-                var vanilla = vanillaExp[statStartIndex + i];
-                int nextMin = (int)(vanilla - vanilla * 0.25);
-                int nextMax = (int)(vanilla + vanilla * 0.25);
-                if (i == 0)
-                {
-                    randomized[statStartIndex + i] = RNG.Next(Math.Max(10, nextMin), nextMax);
-                }
-                else
-                {
-                    randomized[statStartIndex + i] = RNG.Next(Math.Max(randomized[statStartIndex + i - 1], nextMin), Math.Min(nextMax, 9990));
-                }
-            }
-        }
-
-        for (int i = 0; i < randomized.Length; i++)
-        {
-            randomized[i] = randomized[i] / 10 * 10; //wtf is this line of code? -digshake, 2020
-        }
-
-        if (scaleLevels)
-        {
-            int[] cappedExp = new int[24];
-
-            for (int stat = 0; stat < 3; stat++)
-            {
-                var statStartIndex = stat * 8;
-                var cap = levelCap[stat];
-
-                for (int i = 0; i < 8; i++)
-                {
-                    if (i >= cap)
-                    {
-                        cappedExp[statStartIndex + i] = randomized[statStartIndex + i]; //shouldn't matter, just wanna put something here
-                    }
-                    else if (i == cap - 1)
-                    {
-                        cappedExp[statStartIndex + i] = randomized[7]; //exp to get a 1up
-                    }
-                    else
-                    {
-                        cappedExp[statStartIndex + i] = randomized[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
-                    }
-                }
-            }
-
-            randomized = cappedExp;
-        }
-
-        // Make sure all 1-up levels are higher cost than regular levels
-        int highestRegularLevelExp = 0;
-        for (int stat = 0; stat < 3; stat++)
-        {
-            var cap = levelCap[stat];
-            if (cap < 2) { continue; }
-            var statStartIndex = stat * 8;
-            int statMaxLevelIndex = statStartIndex + cap - 2;
-            var maxExp = randomized[statMaxLevelIndex];
-            if (highestRegularLevelExp < maxExp) { highestRegularLevelExp = maxExp; }
-        }
-
-        int min1upExp = Math.Min(highestRegularLevelExp + 10, 9990);
-        for (int stat = 0; stat < 3; stat++)
-        {
-            var cap = levelCap[stat];
-            Debug.Assert(cap >= 1);
-            var statStartIndex = stat * 8;
-            int stat1upLevelIndex = statStartIndex + cap - 1;
-            var exp1up = randomized[stat1upLevelIndex];
-            if (exp1up < min1upExp) {
-                randomized[stat1upLevelIndex] = RNG.Next(min1upExp, 9990) / 10 * 10;
-            }
-        }
-
-        return randomized;
-    }
-
     /// <summary>
     /// For a given set of bytes, set a masked portion of the value of each byte on or off (all 1's or all 0's) at a rate
     /// equal to the proportion of values at the addresses that have that masked portion set to a nonzero value.
@@ -2543,8 +2416,6 @@ public class Hyrule
             rom.Put(0xF53A, (byte)0);
         }
 
-        RandomizeExperience(rom);
-
         rom.SetLevelCap(a, props.AttackCap, props.MagicCap, props.LifeCap);
 
         rom.ChangeLevelUpCancelling(a);
@@ -2641,33 +2512,6 @@ public class Hyrule
 
         for (int i = 0; i < addrsByte1.Count; i++) { rom.Put(addrsByte1[i], enemyBytes1[i]); }
         for (int i = 0; i < addrsByte2.Count; i++) { rom.Put(addrsByte2[i], enemyBytes2[i]); }
-    }
-
-    private byte IntToText(int x)
-    {
-        switch (x)
-        {
-            case 0:
-                return (byte)0xD0;
-            case 1:
-                return (byte)0xD1;
-            case 2:
-                return (byte)0xD2;
-            case 3:
-                return (byte)0xD3;
-            case 4:
-                return (byte)0xD4;
-            case 5:
-                return (byte)0xD5;
-            case 6:
-                return (byte)0xD6;
-            case 7:
-                return (byte)0xD7;
-            case 8:
-                return (byte)0xD8;
-            default:
-                return (byte)0xD9;
-        }
     }
 
     private void UpdateRom()
