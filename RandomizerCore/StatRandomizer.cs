@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Z2Randomizer.RandomizerCore.Enemy;
@@ -26,6 +27,13 @@ public class StatRandomizer
     public byte[] Palace346EnemyHpTable { get; private set; } = null!;
     public byte[] GpEnemyHpTable { get; private set; } = null!;
     public byte[] BossHpTable { get; private set; } = null!;
+    public byte[] WestEnemyStatsTable { get; private set; } = null!;
+    public byte[] EastEnemyStatsTable { get; private set; } = null!;
+    public byte[] Palace125EnemyStatsTable { get; private set; } = null!;
+    public byte[] Palace346EnemyStatsTable { get; private set; } = null!;
+    public byte[] GpEnemyStatsTable { get; private set; } = null!;
+    public byte[] BossExpTable { get; private set; } = null!;
+
     protected RandomizerProperties props { get; }
 
 #if DEBUG
@@ -43,6 +51,7 @@ public class StatRandomizer
         ReadMagicEffectiveness(rom);
 
         ReadEnemyHp(rom);
+        ReadEnemyStats(rom);
     }
 
     public void Randomize(Random r)
@@ -61,6 +70,7 @@ public class StatRandomizer
         RandomizeRegularEnemyHp(r);
         RandomizeBossHp(r);
         FixRebonackHorseKillBug();
+        RandomizeEnemyStats(r);
     }
 
     public void Write(ROM rom)
@@ -77,6 +87,7 @@ public class StatRandomizer
         WriteMagicEffectiveness(rom);
 
         WriteEnemyHp(rom);
+        WriteEnemyStats(rom);
     }
 
     [Conditional("DEBUG")]
@@ -176,10 +187,32 @@ public class StatRandomizer
         rom.Put(RomMap.EAST_ENEMY_HP_TABLE, EastEnemyHpTable);
         rom.Put(RomMap.PALACE125_ENEMY_HP_TABLE, Palace125EnemyHpTable);
         rom.Put(RomMap.PALACE346_ENEMY_HP_TABLE, Palace346EnemyHpTable);
-        rom.Put(RomMap.WEST_ENEMY_HP_TABLE, WestEnemyHpTable);
         rom.Put(RomMap.GP_ENEMY_HP_TABLE, GpEnemyHpTable);
         for (int i = 0; i < RomMap.bossHpAddresses.Count; i++) {
             rom.Put(RomMap.bossHpAddresses[i], BossHpTable[i]);
+        }
+    }
+
+    protected void ReadEnemyStats(ROM rom)
+    {
+        WestEnemyStatsTable = rom.GetBytes(RomMap.WEST_ENEMY_STATS_TABLE, 0x48);
+        EastEnemyStatsTable = rom.GetBytes(RomMap.EAST_ENEMY_STATS_TABLE, 0x48);
+        Palace125EnemyStatsTable = rom.GetBytes(RomMap.PALACE125_ENEMY_STATS_TABLE, 0x48);
+        Palace346EnemyStatsTable = rom.GetBytes(RomMap.PALACE346_ENEMY_STATS_TABLE, 0x48);
+        GpEnemyStatsTable = rom.GetBytes(RomMap.GP_ENEMY_STATS_TABLE, 0x48);
+        BossExpTable = [.. RomMap.bossExpAddresses.Select(rom.GetByte)]; // we only have exp byte here
+    }
+
+    protected void WriteEnemyStats(ROM rom)
+    {
+        rom.Put(RomMap.WEST_ENEMY_STATS_TABLE, WestEnemyStatsTable);
+        rom.Put(RomMap.EAST_ENEMY_STATS_TABLE, EastEnemyStatsTable);
+        rom.Put(RomMap.PALACE125_ENEMY_STATS_TABLE, Palace125EnemyStatsTable);
+        rom.Put(RomMap.PALACE346_ENEMY_STATS_TABLE, Palace346EnemyStatsTable);
+        rom.Put(RomMap.GP_ENEMY_STATS_TABLE, GpEnemyStatsTable);
+        for (int i = 0; i < RomMap.bossExpAddresses.Count; i++)
+        {
+            rom.Put(RomMap.bossExpAddresses[i], BossExpTable[i]);
         }
     }
 
@@ -510,7 +543,110 @@ public class StatRandomizer
     }
 }
 
-    protected int RandomInRange(Random r, double minVal, double maxVal)
+    protected void RandomizeEnemyStats(Random r)
+    {
+        RandomizeEnemyAttributes(r, WestEnemyStatsTable, Enemies.WestGroundEnemies, Enemies.WestFlyingEnemies, Enemies.WestGenerators);
+        RandomizeEnemyAttributes(r, EastEnemyStatsTable, Enemies.EastGroundEnemies, Enemies.EastFlyingEnemies, Enemies.EastGenerators);
+        RandomizeEnemyAttributes(r, Palace125EnemyStatsTable, Enemies.Palace125GroundEnemies, Enemies.Palace125FlyingEnemies, Enemies.Palace125Generators);
+        RandomizeEnemyAttributes(r, Palace346EnemyStatsTable, Enemies.Palace346GroundEnemies, Enemies.Palace346FlyingEnemies, Enemies.Palace346Generators);
+        RandomizeEnemyAttributes(r, GpEnemyStatsTable, Enemies.GPGroundEnemies, Enemies.GPFlyingEnemies, Enemies.GPGenerators);
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
+        {
+            RandomizeEnemyExp(r, BossExpTable, props.EnemyXPDrops);
+        }
+    }
+
+    protected void RandomizeEnemyAttributes<T>(Random r, byte[] bytes, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
+    {
+        List<T> allEnemies = [.. groundEnemies, .. flyingEnemies, .. generators];
+        var vanillaEnemyBytes1 = allEnemies.Select(n => bytes[(int)(object)n]).ToArray();
+        var vanillaEnemyBytes2 = allEnemies.Select(n => bytes[(int)(object)n + 0x24]).ToArray();
+
+        byte[] enemyBytes1 = vanillaEnemyBytes1.ToArray();
+        byte[] enemyBytes2 = vanillaEnemyBytes2.ToArray();
+
+        // enemy attributes byte1
+        // ..x. .... sword immune
+        // ...x .... steals exp
+        // .... xxxx exp
+        const int SWORD_IMMUNE_BIT = 0b00100000;
+        const int XP_STEAL_BIT = 0b00010000;
+
+        if (props.ShuffleSwordImmunity)
+        {
+            RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
+        }
+        if (props.ShuffleEnemyStealExp)
+        {
+            RandomizeBits(r, enemyBytes1, XP_STEAL_BIT);
+        }
+        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
+        {
+            RandomizeEnemyExp(r, enemyBytes1, props.EnemyXPDrops);
+        }
+
+        // enemy attributes byte2
+        // ..x. .... immune to projectiles
+        const int PROJECTILE_IMMUNE_BIT = 0b00100000;
+
+        for (int i = 0; i < allEnemies.Count; i++)
+        {
+            if ((enemyBytes1[i] & SWORD_IMMUNE_BIT) != 0)
+            {
+                // if an enemy is becoming sword immune, make it not fire immune
+                if ((vanillaEnemyBytes1[i] & SWORD_IMMUNE_BIT) == 0)
+                {
+                    enemyBytes2[i] &= PROJECTILE_IMMUNE_BIT ^ 0xFF;
+                }
+            }
+        }
+
+        // For future reference:
+        // byte4 could be used to randomize thunder immunity
+        // (then we must probably exclude generators so thunder doesn't destroy them)
+        // x... .... immune to thunder
+
+
+        for (int i = 0; i < allEnemies.Count; i++)
+        {
+            int index = (int)(object)allEnemies[i];
+            bytes[index] = enemyBytes1[i];
+            bytes[index + 0x24] = enemyBytes2[i];
+        }
+    }
+
+    protected static void RandomizeEnemyExp(Random r, byte[] bytes, XPEffectiveness effectiveness)
+    {
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            int b = bytes[i];
+            int low = b & 0x0f;
+
+            if (effectiveness == XPEffectiveness.RANDOM_HIGH)
+            {
+                low++;
+            }
+            else if (effectiveness == XPEffectiveness.RANDOM_LOW)
+            {
+                low--;
+            }
+            else if (effectiveness == XPEffectiveness.NONE)
+            {
+                low = 0;
+            }
+
+            if (effectiveness.IsRandom())
+            {
+                low = r.Next(low - 2, low + 3);
+            }
+
+            low = Math.Min(Math.Max(low, 0), 15);
+
+            bytes[i] = (byte)((b & 0xf0) | low);
+        }
+    }
+
+    protected static int RandomInRange(Random r, double minVal, double maxVal)
     {
         int nextVal = (int)Math.Round(r.NextDouble() * (maxVal - minVal) + minVal);
         nextVal = (int)Math.Min(nextVal, maxVal);
@@ -518,13 +654,41 @@ public class StatRandomizer
         return nextVal;
     }
 
-    protected void RandomizeInsideArray(Random r, byte[] array, int index, double lower=0.5, double upper=1.5)
+    protected static void RandomizeInsideArray(Random r, byte[] array, int index, double lower=0.5, double upper=1.5)
     {
         var vanillaVal = array[index];
         int minVal = (int)(vanillaVal * lower);
         int maxVal = (int)(vanillaVal * upper);
         var newVal = (byte)Math.Min(r.Next(minVal, maxVal), 255);
         array[index] = newVal;
+    }
+
+    /// <summary>
+    /// For a given set of bytes, set a masked portion of the value of each byte on or off (all 1's or all 0's) at a rate
+    /// equal to the proportion of values at the addresses that have that masked portion set to a nonzero value.
+    /// In effect, turn some values in a range on or off randomly in the proportion of the number of such values that are on in vanilla.
+    /// </summary>
+    /// <param name="bytes">Bytes to randomize.</param>
+    /// <param name="mask">What part of the byte value at each address contains the configuration bit(s) we care about.</param>
+    public static void RandomizeBits(Random r, byte[] bytes, int mask)
+    {
+        if (bytes.Length == 0) { return; }
+
+        int notMask = mask ^ 0xFF;
+        double vanillaBitSetCount = bytes.Where(b => (b & mask) != 0).Count();
+
+        //proportion of the bytes that have nonzero values in the masked portion
+        double fraction = vanillaBitSetCount / bytes.Length;
+
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            int v = bytes[i] & notMask;
+            if (r.NextDouble() <= fraction)
+            {
+                v |= mask;
+            }
+            bytes[i] = (byte)v;
+        }
     }
 
     /// When Rebonack's HP is set to exactly 2 * your damage, it will

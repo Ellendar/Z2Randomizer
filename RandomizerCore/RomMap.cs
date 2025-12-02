@@ -141,6 +141,11 @@ class RomMap
     public const int PALACE346_ENEMY_HP_TABLE = 0x12931;
     public const int GP_ENEMY_HP_TABLE = 0x15431;
     public const int DRIPPER_ID = 0x11927;
+    public const int WEST_ENEMY_STATS_TABLE = 0x54e5;
+    public const int EAST_ENEMY_STATS_TABLE = 0x94e5;
+    public const int PALACE125_ENEMY_STATS_TABLE = 0x114e5;
+    public const int PALACE346_ENEMY_STATS_TABLE = 0x129e5;
+    public const int GP_ENEMY_STATS_TABLE = 0x154e5;
 
     public const int ATTACK_EFFECTIVENESS_TABLE = 0x1E67D;
     public const int LIFE_EFFECTIVENESS_TABLE = 0x1E2BF;
@@ -149,27 +154,30 @@ class RomMap
     public const int EXPERIENCE_TO_LEVEL_TABLE = 0x1669;
     public const int EXPERIENCE_TO_LEVEL_TEXT_TABLE = 0x1e42;
 
-    /**
-     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
-     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
-     * Inputs - A = divisor; X = enemy slot
-     *
-     * This function updates all the call sites to these two functions to match the HP for the boss.
-     */
     public static readonly List<int> bossHpAddresses = [
-        0x11451, // Horsehead
-        0x13C86, // Helmethead
-        0x12951, // Rebonack
-        0x13041, // Unhorsed Rebonack
-        0x12953, // Carock
-        0x13C87, // Gooma
-        0x12952, // Barba
+        0x11451, // Horsehead          (regular Palace 125 enemy table)
+        0x13C86, // Helmethead         ("bank4_Table_for_Helmethead_Gooma")
+        0x12951, // Rebonack           (regular Palace 346 enemy table)
+        0x13041, // Unhorsed Rebonack  (hardcoded, not in a table)
+        0x12953, // Carock             (regular Palace 346 enemy table)
+        0x13C87, // Gooma              ("bank4_Table_for_Helmethead_Gooma")
+        0x12952, // Barba              (regular Palace 346 enemy table)
         // These are bank 5 enemies so we should make a separate table for them
         // but we can deal with these when we start randomizing their hp
         // 0x15453, // Thunderbird
         // 0x15454, // Dark Link
     ];
-    public static readonly List<(int, int)> bossMap = [
+    public static readonly List<int> bossExpAddresses = [
+        0x11505, // Horsehead          (regular Palace 125 enemy table)
+        0x13C88, // Helmethead         ("bank4_Table_for_Helmethead_Gooma")
+        0x12A05, // Rebonack           (regular Palace 346 enemy table)
+        0x129EF, // Unhorsed Rebonack  (regular Palace 346 enemy table)
+        0x12A07, // Carock             (regular Palace 346 enemy table)
+        0x13C89, // Gooma              ("bank4_Table_for_Helmethead_Gooma")
+        0x12A06, // Barba              (regular Palace 346 enemy table)
+        0x15507, // Thunderbird        (regular GP enemy table)
+    ];
+    public static readonly List<(int, int)> bossHpDivisorMap = [
         (bossHpAddresses[0], 0x13b80), // Horsehead
         (bossHpAddresses[1], 0x13ae2), // Helmethead
         (bossHpAddresses[2], 0x12fd2), // Rebonack

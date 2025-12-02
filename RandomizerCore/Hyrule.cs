@@ -2158,65 +2158,6 @@ public class Hyrule
         westHyrule.midoChurch.Collectables = [Collectable.UPSTAB];
     }
 
-    /// <summary>
-    /// For a given set of bytes, set a masked portion of the value of each byte on or off (all 1's or all 0's) at a rate
-    /// equal to the proportion of values at the addresses that have that masked portion set to a nonzero value.
-    /// In effect, turn some values in a range on or off randomly in the proportion of the number of such values that are on in vanilla.
-    /// </summary>
-    /// <param name="bytes">Bytes to randomize.</param>
-    /// <param name="mask">What part of the byte value at each address contains the configuration bit(s) we care about.</param>
-    private static void RandomizeBits(Random RNG, byte[] bytes, int mask)
-    {
-        if (bytes.Length == 0) { return; }
-
-        int notMask = mask ^ 0xFF;
-        double vanillaBitSetCount = bytes.Where(b => (b & mask) != 0).Count();
-
-        //proportion of the bytes that have nonzero values in the masked portion
-        double fraction = vanillaBitSetCount / bytes.Length;
-
-        for (int i = 0; i < bytes.Length; i++)
-        {
-            int v = bytes[i] & notMask;
-            if (RNG.NextDouble() <= fraction)
-            {
-                v |= mask;
-            }
-            bytes[i] = (byte)v;
-        }
-    }
-
-    private static void RandomizeEnemyExp(Random RNG, byte[] bytes, XPEffectiveness effectiveness)
-    {
-        for (int i = 0; i < bytes.Length; i++)
-        {
-            int b = bytes[i];
-            int low = b & 0x0f;
-
-            if (effectiveness == XPEffectiveness.RANDOM_HIGH)
-            {
-                low++;
-            }
-            else if (effectiveness == XPEffectiveness.RANDOM_LOW)
-            {
-                low--;
-            }
-            else if (effectiveness == XPEffectiveness.NONE)
-            {
-                low = 0;
-            }
-
-            if (effectiveness.IsRandom())
-            {
-                low = RNG.Next(low - 2, low + 3);
-            }
-
-            low = Math.Min(Math.Max(low, 0), 15);
-
-            bytes[i] = (byte)((b & 0xf0) | low);
-        }
-    }
-
     //Updated to use fisher-yates. Eventually i'll catch all of these. N is small enough here it REALLY makes a difference
     private void ShuffleEncounters(ROM rom, List<int> addr)
     {
@@ -2337,28 +2278,6 @@ public class Hyrule
             rom.Put(0x1E314, (byte)big);
         }
 
-        RandomizeEnemyAttributes(rom, 0x54e5, Enemies.WestGroundEnemies, Enemies.WestFlyingEnemies, Enemies.WestGenerators);
-        RandomizeEnemyAttributes(rom, 0x94e5, Enemies.EastGroundEnemies, Enemies.EastFlyingEnemies, Enemies.EastGenerators);
-        RandomizeEnemyAttributes(rom, 0x114e5, Enemies.Palace125GroundEnemies, Enemies.Palace125FlyingEnemies, Enemies.Palace125Generators);
-        RandomizeEnemyAttributes(rom, 0x129e5, Enemies.Palace346GroundEnemies, Enemies.Palace346FlyingEnemies, Enemies.Palace346Generators);
-        RandomizeEnemyAttributes(rom, 0x154e5, Enemies.GPGroundEnemies, Enemies.GPFlyingEnemies, Enemies.GPGenerators);
-
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            List<int> addrs = new List<int>();
-            addrs.Add(0x11505); // Horsehead
-            addrs.Add(0x13C88); // Helmethead
-            addrs.Add(0x13C89); // Gooma
-            addrs.Add(0x129EF); // Rebonak unhorsed
-            addrs.Add(0x12A05); // Rebonak
-            addrs.Add(0x12A06); // Barba
-            addrs.Add(0x12A07); // Carock
-            addrs.Add(0x15507); // Thunderbird
-            byte[] enemyBytes = addrs.Select(a => rom.GetByte(a)).ToArray();
-            RandomizeEnemyExp(r, enemyBytes, props.EnemyXPDrops);
-            for (int i = 0; i < addrs.Count; i++) { rom.Put(addrs[i], enemyBytes[i]); };
-        }
-
         List<int> addr = new List<int>();
         if (props.ShuffleEncounters)
         {
@@ -2458,60 +2377,6 @@ public class Hyrule
             rom.Put(0x1E8B0, (byte)drop);
         }
 
-    }
-
-    private void RandomizeEnemyAttributes<T>(ROM rom, int baseAddr, T[] groundEnemies, T[] flyingEnemies, T[] generators) where T : Enum
-    {
-        List<T> allEnemies = [.. groundEnemies, .. flyingEnemies, .. generators];
-        var addrsByte1 = allEnemies.Select(n => baseAddr + (int)(object)n).ToList();
-        var addrsByte2 = allEnemies.Select(n => baseAddr + 0x24 + (int)(object)n).ToList();
-        var vanillaEnemyBytes1 = addrsByte1.Select(a => rom.GetByte(a)).ToArray();
-        var vanillaEnemyBytes2 = addrsByte2.Select(a => rom.GetByte(a)).ToArray();
-
-        byte[] enemyBytes1 = vanillaEnemyBytes1.ToArray();
-        byte[] enemyBytes2 = vanillaEnemyBytes2.ToArray();
-
-        // enemy attributes byte1
-        // ..x. .... sword immune
-        // ...x .... steals exp
-        // .... xxxx exp
-        const int SWORD_IMMUNE_BIT = 0b00100000;
-        const int XP_STEAL_BIT =     0b00010000;
-
-        if (props.ShuffleSwordImmunity)
-        {
-            RandomizeBits(r, enemyBytes1, SWORD_IMMUNE_BIT);
-        }
-        if (props.ShuffleEnemyStealExp)
-        {
-            RandomizeBits(r, enemyBytes1, XP_STEAL_BIT);
-        }
-        if (props.EnemyXPDrops != XPEffectiveness.VANILLA)
-        {
-            RandomizeEnemyExp(r, enemyBytes1, props.EnemyXPDrops);
-        }
-
-        // enemy attributes byte2
-        // ..x. .... immune to projectiles
-        const int PROJECTILE_IMMUNE_BIT = 0b00100000;
-
-        for (int i = 0; i < allEnemies.Count; i++) {
-            if ((enemyBytes1[i] & SWORD_IMMUNE_BIT) != 0)
-            {
-                // if an enemy is becoming sword immune, make it not fire immune
-                if ((vanillaEnemyBytes1[i] & SWORD_IMMUNE_BIT) == 0)
-                {
-                    enemyBytes2[i] &= PROJECTILE_IMMUNE_BIT ^ 0xFF;
-                }
-            }
-        }
-
-        // byte4 could be used to randomize thunder immunity
-        // (then we must probably exclude generators so thunder doesn't destroy them)
-        // x... .... immune to thunder
-
-        for (int i = 0; i < addrsByte1.Count; i++) { rom.Put(addrsByte1[i], enemyBytes1[i]); }
-        for (int i = 0; i < addrsByte2.Count; i++) { rom.Put(addrsByte2[i], enemyBytes2[i]); }
     }
 
     private void UpdateRom()
