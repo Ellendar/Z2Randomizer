@@ -1763,14 +1763,14 @@ FixHelmetHeadHpDivisorOnNonWest:
         }
     }
 
-    public void SetBossHpBarDivisors(Assembler asm, StatRandomizer enemyStats)
+    public void SetBossHpBarDivisors(Assembler asm, StatRandomizer randomizedStats)
     {
         var a = asm.Module();
 
         for (int idx = 0; idx < RomMap.bossHpAddresses.Count; idx++)
         {
             var bossHpAddr = RomMap.bossHpAddresses[idx];
-            var newVal = enemyStats.BossHpTable[idx];
+            var newVal = randomizedStats.BossHpTable[idx];
             var (_, bossHpBarAddr) = RomMap.bossMap[idx];
             var originalDivisor = GetByte(bossHpBarAddr);
             var p = new NesPointer(bossHpBarAddr);
@@ -2134,27 +2134,6 @@ ResetRedPalettePayload:
         // West damage class: 0 (0x00)
         // Vanilla GP damage class: 0 (0x00)
         //Put(0x15428, 0x00); // already at 0
-    }
-
-    /// When Rebonack's HP is set to exactly 2 * your damage, it will
-    /// trigger a bug where you kill Rebo's horse while de-horsing him.
-    /// This causes an additional key to drop, as well as softlocking
-    /// the player if they die before killing Rebo. It seems to also
-    /// trigger if you have exactly damage == Rebo HP (very high damage).
-    /// 
-    /// This has to be called after RandomizeEnemyStats and
-    /// RandomizeAttackEffectiveness.
-    ///
-    /// (In Vanilla Zelda 2, your sword damage is never this high.)
-    public void FixRebonackHorseKillBug()
-    {
-        byte[] attackValues = GetBytes(0x1E67D, 8);
-        byte reboHp = GetByte(0x12951);
-        while (attackValues.Any(v => v * 2 == reboHp || v == reboHp))
-        {
-            reboHp++;
-            Put(0x12951, reboHp);
-        }
     }
 
     /// Rewrite the graphic tiles for walkthrough walls to be something else
