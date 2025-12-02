@@ -1679,6 +1679,13 @@ ActualLavaDeath:                     ; original code that we replaced
 """);
     }
 
+    /**
+     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
+     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
+     * Inputs - A = divisor; X = enemy slot
+     *
+     * This function updates all the call sites to these two functions to match the HP for the boss.
+     */
     private void UpdateAllBossHpDivisor(AsmModule a)
     {
         a.Code(/* lang=s */$"""
@@ -1756,7 +1763,7 @@ FixHelmetHeadHpDivisorOnNonWest:
     jmp $BADA
 
 """);
-        foreach (var (hpaddr, divisoraddr) in RomMap.bossMap)
+        foreach (var (hpaddr, divisoraddr) in RomMap.bossHpDivisorMap)
         {
             int hp = GetByte(hpaddr);
             Put(divisoraddr, (byte)(hp / 8));
@@ -1771,7 +1778,7 @@ FixHelmetHeadHpDivisorOnNonWest:
         {
             var bossHpAddr = RomMap.bossHpAddresses[idx];
             var newVal = randomizedStats.BossHpTable[idx];
-            var (_, bossHpBarAddr) = RomMap.bossMap[idx];
+            var (_, bossHpBarAddr) = RomMap.bossHpDivisorMap[idx];
             var originalDivisor = GetByte(bossHpBarAddr);
             var p = new NesPointer(bossHpBarAddr);
             a.Segment($"PRG{p.Bank}");
