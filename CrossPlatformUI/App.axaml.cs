@@ -96,7 +96,7 @@ public sealed partial class App : Application // , IDisposable
                 .Take(1)
                 .Subscribe(sprites =>
                 {
-                    var sprite = sprites.First(loaded => loaded.DisplayName == main.Config.SpriteName);
+                    var sprite = sprites.FirstOrDefault(loaded => loaded.DisplayName == main.Config.SpriteName);
                     if (sprite != null)
                     {
                         main.Config.Sprite = sprite;
