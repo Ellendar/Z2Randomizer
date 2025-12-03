@@ -280,7 +280,8 @@ public class StatRandomizer
             newTable = cappedExp;
         }
 
-        // Make sure all 1-up levels are higher cost than regular levels
+        // Make sure all 1-up levels are the same value,
+        // one that is higher than any regular level
         int highestRegularLevelExp = 0;
         for (int stat = 0; stat < 3; stat++)
         {
@@ -292,17 +293,16 @@ public class StatRandomizer
             if (highestRegularLevelExp < maxExp) { highestRegularLevelExp = maxExp; }
         }
 
-        int min1upExp = Math.Min(highestRegularLevelExp + 10, 9990);
+        int exp1upMin = Math.Min(highestRegularLevelExp + 10, 9990);
+        int exp1up = r.Next(exp1upMin, 9999) / 10 * 10;
         for (int stat = 0; stat < 3; stat++)
         {
             var cap = levelCap[stat];
-            Debug.Assert(cap >= 1);
+            Debug.Assert(cap >= 1 && cap < 9);
             var statStartIndex = stat * 8;
-            int stat1upLevelIndex = statStartIndex + cap - 1;
-            var exp1up = newTable[stat1upLevelIndex];
-            if (exp1up < min1upExp)
+            for (int i = cap - 1; i < 8; i++)
             {
-                newTable[stat1upLevelIndex] = r.Next(min1upExp, 9990) / 10 * 10;
+                newTable[statStartIndex + i] = exp1up;
             }
         }
 
