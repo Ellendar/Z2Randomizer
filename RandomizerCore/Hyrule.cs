@@ -261,11 +261,8 @@ public class Hyrule
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
-            bool f = await UpdateProgress(progress, ct, 1);
-            if (!f)
-            {
-                return null;
-            }
+            if (ct.IsCancellationRequested) { return null; }
+            UpdateProgress(progress, 1);
 
             while (palaces.Count != 7 || passedValidation == false)
             {
@@ -353,11 +350,8 @@ public class Hyrule
 
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
-            f = await UpdateProgress(progress, ct, 8);
-            if (!f)
-            {
-                return null;
-            }
+            if (ct.IsCancellationRequested) { return null; }
+            UpdateProgress(progress, 8);
 
             if (props.ShuffleOverworldEnemies)
             {
@@ -411,11 +405,8 @@ public class Hyrule
                 ROMData.Put(0x17b18, 0x20); //Child
             }
 
-            f = await UpdateProgress(progress, ct, 9);
-            if (!f)
-            {
-                return null;
-            }
+            if (ct.IsCancellationRequested) { return null; }
+            UpdateProgress(progress, 9);
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
             ApplyAsmPatches(props, assembler, r, texts, ROMData);
@@ -2018,11 +2009,8 @@ public class Hyrule
             do //while (wtries < 10 && !EverythingReachable());
             {
                 //GENERATE WEST
-                bool shouldContinue = await UpdateProgress(progress, ct, 2);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 2);
                 nonContinentGenerationAttempts++;
                 timestamp = DateTime.Now;
                 if (!westHyrule.AllReached)
@@ -2034,11 +2022,8 @@ public class Hyrule
                 timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
-                shouldContinue = await UpdateProgress(progress, ct, 3);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 3);
                 timestamp = DateTime.Now;
                 if (!deathMountain.AllReached)
                 {
@@ -2049,11 +2034,8 @@ public class Hyrule
                 timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
-                shouldContinue = await UpdateProgress(progress, ct, 4);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 4);
                 timestamp = DateTime.Now;
                 if (!eastHyrule.AllReached)
                 {
@@ -2064,11 +2046,8 @@ public class Hyrule
                 timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
-                shouldContinue = await UpdateProgress(progress, ct, 5);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 5);
                 timestamp = DateTime.Now;
                 if (!mazeIsland.AllReached)
                 {
@@ -2078,13 +2057,10 @@ public class Hyrule
                 mazeIsland.ResetVisitabilityState();
                 timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
-                shouldContinue = await UpdateProgress(progress, ct, 6);
-                if (!shouldContinue)
-                {
-                    return;
-                }
-
                 worlds.ForEach(i => i.SynchronizeLinkedLocations());
+
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 6);
 
                 //Then perform non-terrain shuffles looking for one that works.
                 nonTerrainShuffleAttempt = 0;
@@ -2139,12 +2115,8 @@ public class Hyrule
         } while (!IsEverythingReachable(ItemGet));
     }
 
-    private async Task<bool> UpdateProgress(Func<string, Task> progress, CancellationToken ct, int v)
+    private async void UpdateProgress(Func<string, Task> progress, int v)
     {
-        if (ct.IsCancellationRequested)
-        {
-            return false;
-        }
         switch (v)
         {
             case 1:
@@ -2175,7 +2147,6 @@ public class Hyrule
                 await progress.Invoke("Finishing up");
                 break;
         }
-        return true;
     }
 
     private void SetTransportation(int w1, int w2, int type)
