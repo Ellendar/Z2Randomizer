@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text.Json.Serialization;
 using CrossPlatformUI.Presets;
 using CrossPlatformUI.Services;
@@ -132,7 +133,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             x => x.Main.RomFileViewModel.HasRomData,
             (flags, seed, hasRomData) =>
                 IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData
-        );
+        ).CombineLatest(this.Main.GenerateRomViewModel.IsRunning,
+                        (validInput, alreadyRunning) => validInput && !alreadyRunning);
         Generate = ReactiveCommand.Create(() =>
         {
             Main.GenerateRomDialogOpen = true;
