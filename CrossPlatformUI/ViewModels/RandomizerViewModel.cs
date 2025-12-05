@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
@@ -134,7 +135,8 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             x => x.Main.RomFileViewModel.HasRomData,
             (flags, seed, hasRomData) =>
                 IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData
-        );
+        ).CombineLatest(this.Main.GenerateRomViewModel.IsRunning,
+                        (validInput, alreadyRunning) => validInput && !alreadyRunning);
         Generate = ReactiveCommand.Create(() =>
         {
             Main.GenerateRomDialogOpen = true;
