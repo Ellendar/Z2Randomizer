@@ -378,7 +378,8 @@ public sealed class WestHyrule : World
                 };
                 foreach (Location location in AllLocations)
                 {
-                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords)!);
+                    // section uses tuples with the Y+30 offset
+                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByCoordsNoOffset(location.CoordsY30Offset)!);
                 }
                 ChooseConn("parapa", connections, true);
                 ChooseConn("lifesouth", connections, true);
@@ -819,7 +820,7 @@ public sealed class WestHyrule : World
         int y = RNG.Next(6, MAP_ROWS - 7);
         int x = RNG.Next(6, MAP_COLS - 7);
         int tries = 0;
-        while((map[y, x] != Terrain.NONE || GetLocationByCoords((y + 30, x)) != null) && tries < 1000)
+        while((map[y, x] != Terrain.NONE || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 1000)
         {
             y = RNG.Next(6, MAP_ROWS - 7);
             x = RNG.Next(6, MAP_COLS - 7);
@@ -839,7 +840,7 @@ public sealed class WestHyrule : World
         {
             int newx = RNG.Next(x - 3, x + 4);
             int newy = RNG.Next(y - 3, y + 4);
-            while((map[newy, newx] != Terrain.NONE || GetLocationByCoords((newy + 30, newx)) != null) && tries < 100)
+            while((map[newy, newx] != Terrain.NONE || GetLocationByCoordsNoOffset((newy, newx)) != null) && tries < 100)
             {
                 newx = RNG.Next(x - 3, x + 4);
                 newy = RNG.Next(y - 3, y + 4);
@@ -1295,7 +1296,7 @@ public sealed class WestHyrule : World
             //Item caves
             if (boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
             {
-                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoords((cave.Y, cave.Xpos + 2)) == null)
+                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos + 2)) == null)
                 {
                     map[cave.Y, cave.Xpos - 1] = Terrain.ROCK;
                     map[cave.Y, cave.Xpos] = Terrain.ROAD;
@@ -1308,7 +1309,7 @@ public sealed class WestHyrule : World
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoords((cave.Y, cave.Xpos - 2)) == null)
+                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos - 2)) == null)
                 {
                     map[cave.Y, cave.Xpos + 1] = Terrain.ROCK;
                     map[cave.Y, cave.Xpos] = Terrain.ROAD;
@@ -1321,7 +1322,7 @@ public sealed class WestHyrule : World
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y - 2 < MAP_COLS && GetLocationByCoords((cave.Y - 2, cave.Xpos)) == null)
+                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y - 2 < MAP_COLS && GetLocationByCoordsNoOffset((cave.Y - 2, cave.Xpos)) == null)
                 {
                     map[cave.Y + 1, cave.Xpos] = Terrain.ROCK;
                     map[cave.Y, cave.Xpos] = Terrain.ROAD;
@@ -1334,7 +1335,7 @@ public sealed class WestHyrule : World
                     rockNum--;
                     cavePicked = cave.MemAddress;
                 }
-                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y + 2 < MAP_COLS && GetLocationByCoords((cave.Y + 2, cave.Xpos)) == null)
+                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y + 2 < MAP_COLS && GetLocationByCoordsNoOffset((cave.Y + 2, cave.Xpos)) == null)
                 {
                     map[cave.Y - 1, cave.Xpos] = Terrain.ROCK;
                     map[cave.Y, cave.Xpos] = Terrain.ROAD;

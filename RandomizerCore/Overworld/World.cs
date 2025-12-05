@@ -239,9 +239,14 @@ public abstract class World
         }
     }
 
-    protected Location? GetLocationByCoords((int, int)coords)
+    protected Location? GetLocationByCoordsNoOffset((int, int) coords)
     {
-        return AllLocations.FirstOrDefault(i => i.Coords.Equals(coords));
+        return AllLocations.FirstOrDefault(i => i.CoordsNoOffset.Equals(coords));
+    }
+
+    protected Location? GetLocationByCoordsY30Offset((int, int)coords)
+    {
+        return AllLocations.FirstOrDefault(i => i.CoordsY30Offset.Equals(coords));
     }
 
     protected Location GetLocationByMem(int mem)
@@ -361,7 +366,7 @@ public abstract class World
                 foreach (Location linkedLocation in AllLocations.Where(
                     loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
                 {
-                    linkedLocation.Coords = location.Coords;
+                    linkedLocation.CoordsNoOffset = location.CoordsNoOffset;
                 }
             }
         }
@@ -606,7 +611,7 @@ public abstract class World
                             x = RNG.Next(MAP_COLS);
                             y = RNG.Next(MAP_ROWS);
                             tries++;
-                        } while ((map[y, x] != location.TerrainType || GetLocationByCoords((y + 30, x)) != null) && tries < 2000);
+                        } while ((map[y, x] != location.TerrainType || GetLocationByCoordsNoOffset((y, x)) != null) && tries < 2000);
 
                         if (tries < 2000)
                         {
@@ -690,11 +695,11 @@ public abstract class World
             int startMass = globs[y, x];
 
             //if there is a location at or 1 tile adjacent to the bridge start, it's no good.
-            if (GetLocationByCoords((y + 30, x)) != null
-                || GetLocationByCoords((y + 30, x + 1)) != null
-                || GetLocationByCoords((y + 30, x - 1)) != null
-                || GetLocationByCoords((y + 31, x)) != null
-                || GetLocationByCoords((y + 29, x)) != null)
+            if (GetLocationByCoordsNoOffset((y, x)) != null
+                || GetLocationByCoordsNoOffset((y, x + 1)) != null
+                || GetLocationByCoordsNoOffset((y, x - 1)) != null
+                || GetLocationByCoordsNoOffset((y + 1, x)) != null
+                || GetLocationByCoordsNoOffset((y - 1, x)) != null)
             {
                 length = 100;
             }
@@ -706,20 +711,20 @@ public abstract class World
             while (x > 0 && x < MAP_COLS && y > 0 && y < MAP_ROWS && map[y, x] == riverTerrain)
             {
                 //if we hit the edge of the map or too close to a location, give up
-                if (x + 1 < MAP_COLS && GetLocationByCoords((y + 30, x + 1)) != null)
+                if (x + 1 < MAP_COLS && GetLocationByCoordsNoOffset((y, x + 1)) != null)
                 {
                     length = 100;
                 }
-                if (x - 1 > 0 && GetLocationByCoords((y + 30, x - 1)) != null)
+                if (x - 1 > 0 && GetLocationByCoordsNoOffset((y, x - 1)) != null)
                 {
                     length = 100;
                 }
 
-                if (y + 1 < MAP_ROWS && GetLocationByCoords((y + 31, x)) != null)
+                if (y + 1 < MAP_ROWS && GetLocationByCoordsNoOffset((y + 1, x)) != null)
                 {
                     length = 100;
                 }
-                if (y - 1 > 0 && GetLocationByCoords((y + 29, x)) != null)
+                if (y - 1 > 0 && GetLocationByCoordsNoOffset((y - 1, x)) != null)
                 {
                     length = 100;
                 }
@@ -800,11 +805,11 @@ public abstract class World
             int endMass = 0;
             if (y > 0 && x > 0 && y < MAP_ROWS - 1 && x < MAP_COLS - 1)
             {
-                if (GetLocationByCoords((y + 30, x)) != null
-                    || GetLocationByCoords((y + 30, x + 1)) != null
-                    || GetLocationByCoords((y + 30, x - 1)) != null
-                    || GetLocationByCoords((y + 31, x)) != null
-                    || GetLocationByCoords((y + 29, x)) != null)
+                if (GetLocationByCoordsNoOffset((y, x)) != null
+                    || GetLocationByCoordsNoOffset((y, x + 1)) != null
+                    || GetLocationByCoordsNoOffset((y, x - 1)) != null
+                    || GetLocationByCoordsNoOffset((y + 1, x)) != null
+                    || GetLocationByCoordsNoOffset((y - 1, x)) != null)
                 {
                     length = 100;
                     //Debug.WriteLine(GetGlobDebug(globs));
@@ -1620,7 +1625,7 @@ public abstract class World
                     continue;
                 }
                 covered[y, x] = true;
-                Location? location = GetLocationByCoords((y + 30, x));
+                Location? location = GetLocationByCoordsNoOffset((y, x));
 
 
                 Terrain terrain = map[y, x];
