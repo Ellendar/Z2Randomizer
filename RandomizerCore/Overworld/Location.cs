@@ -16,9 +16,7 @@ public class Location
     public bool AppearsOnMap { get; set; }
 
     public Terrain TerrainType { get; set; }
-    public int Y { get; set; }
-    public int YRaw { get => Y + 30; set => Y = value - 30; }
-    public int Xpos { get; set; }
+
     //public byte[] LocationBytes { get; set; }
     public List<Location> Children { get; set; } = [];
 
@@ -33,7 +31,28 @@ public class Location
 
     public int Map { get; set; }
 
+    private (int y, int x) _coords;
+    public int Y
+    {
+        get => _coords.y;
+        set { _coords.y = value; }
+    }
+    public int YRaw
+    {
+        get => _coords.y + 30;
+        set { _coords.y = value - 30; }
+    }
+    public int Xpos
+    {
+        get => _coords.x;
+        set { _coords.x = value; }
+    }
     public (int, int) Coords
+    {
+        get => _coords;
+        set => _coords = value;
+    }
+    public (int, int) CoordsRaw
     {
         get
         {
