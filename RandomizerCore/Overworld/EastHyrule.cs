@@ -370,7 +370,8 @@ public sealed class EastHyrule : World
                 //areasByLocation.Add("horn", new List<Location>());
                 foreach (Location location in AllLocations)
                 {
-                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords)!);
+                    // section uses tuples with the Y+30 offset
+                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByCoordsY30Offset(location.CoordsY30Offset)!);
                 }
 
                 ChooseConn("kasuto", connections, true);
@@ -444,8 +445,8 @@ public sealed class EastHyrule : World
 			
             //in vanilla shuffle, post location shuffling, the locations have moved, but the hidden palace spot doesn't
             //so reset the reference
-            hiddenKasutoLocation = GetLocationByCoords((81, 61))!;
-            hiddenPalaceLocation = GetLocationByCoords((102, 45))!;
+            hiddenKasutoLocation = GetLocationByCoordsY30Offset((81, 61))!;
+            hiddenPalaceLocation = GetLocationByCoordsY30Offset((102, 45))!;
             if (props.HiddenKasuto)
             {
                 if (connections.ContainsKey(hiddenKasutoLocation) || hiddenKasutoLocation == raft || hiddenKasutoLocation == bridge)
@@ -1123,7 +1124,7 @@ public sealed class EastHyrule : World
                                     map[starty + i, startx + 1] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location? location = GetLocationByCoords((starty + i + 30, startx));
+                            Location? location = GetLocationByCoordsNoOffset((starty + i, startx));
                             if (location != null && !location.CanShuffle)
                             {
                                 return false;
@@ -1143,7 +1144,7 @@ public sealed class EastHyrule : World
                                     map[starty + 1, startx + i] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location? location = GetLocationByCoords((starty + 30, startx + i));
+                            Location? location = GetLocationByCoordsNoOffset((starty, startx + i));
                             if (location != null && !location.CanShuffle)
                             {
                                 return false;
@@ -1194,7 +1195,7 @@ public sealed class EastHyrule : World
                                     map[starty - i, startx + 1] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location? l = GetLocationByCoords((starty - i + 30, startx));
+                            Location? l = GetLocationByCoordsNoOffset((starty - i, startx));
                             if (l != null && !l.CanShuffle)
                             {
                                 return false;
@@ -1218,7 +1219,7 @@ public sealed class EastHyrule : World
                                     map[starty + 1, startx - i] = Terrain.MOUNTAIN;
                                 }
                             }
-                            Location? l = GetLocationByCoords((starty + 30, startx - i));
+                            Location? l = GetLocationByCoordsNoOffset((starty, startx - i));
                             if (l != null && !l.CanShuffle)
                             {
                                 return false;
@@ -1256,7 +1257,7 @@ public sealed class EastHyrule : World
                     if (map[starty, startx] != Terrain.CAVE)
                     {
                         map[starty, startx] = Terrain.LAVA;
-                        if (GetLocationByCoords((starty + 30 + deltay, startx + deltax)) != null)
+                        if (GetLocationByCoordsNoOffset((starty + deltay, startx + deltax)) != null)
                         {
                             return false;
                         }
@@ -1287,7 +1288,7 @@ public sealed class EastHyrule : World
                     {
                         if (horizontalPath)
                         {
-                            if (GetLocationByCoords((starty + 30, startx - 1)) == null && GetLocationByCoords((starty + 30, startx + 1)) == null)
+                            if (GetLocationByCoordsNoOffset((starty, startx - 1)) == null && GetLocationByCoordsNoOffset((starty, startx + 1)) == null)
                             {
                                 f.Xpos = startx;
                                 f.Y = starty;
@@ -1298,7 +1299,7 @@ public sealed class EastHyrule : World
                         }
                         else
                         {
-                            if (GetLocationByCoords((starty + 30 - 1, startx)) == null && GetLocationByCoords((starty + 30 + 1, startx)) == null)
+                            if (GetLocationByCoordsNoOffset((starty - 1, startx)) == null && GetLocationByCoordsNoOffset((starty + 1, startx)) == null)
                             {
                                 f.Xpos = startx;
                                 f.Y = starty;
@@ -1461,7 +1462,7 @@ public sealed class EastHyrule : World
                 }
                 if (horizontalPath)
                 {
-                    if (GetLocationByCoords((starty + 30, startx + deltax)) != null)
+                    if (GetLocationByCoordsNoOffset((starty, startx + deltax)) != null)
                     {
                         map[starty, startx] = Terrain.MOUNTAIN;
                         startx -= deltax;
@@ -1473,7 +1474,7 @@ public sealed class EastHyrule : World
                 }
                 else
                 {
-                    if (GetLocationByCoords((starty + 30 + deltay, startx)) != null)
+                    if (GetLocationByCoordsNoOffset((starty + deltay, startx)) != null)
                     {
                         map[starty, startx] = Terrain.MOUNTAIN;
                         starty -= deltay;
@@ -1780,8 +1781,8 @@ public sealed class EastHyrule : World
                 //Von's bug from discord: When moving back the mountain, check both the space the mountain will be placed
                 //and the space 1 past it so the possible border on isolated tiles is retained.
                 if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS 
-                    && GetLocationByCoords((cave.Y, cave.Xpos + 2)) == null
-                    && GetLocationByCoords((cave.Y, cave.Xpos + 3)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos + 2)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos + 3)) == null
                 )
                 {
                     map[cave.Y, cave.Xpos - 1] = blockerTerrain;
@@ -1795,8 +1796,8 @@ public sealed class EastHyrule : World
                     placed = true;
                 }
                 else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 
-                    && GetLocationByCoords((cave.Y, cave.Xpos - 2)) == null
-                    && GetLocationByCoords((cave.Y, cave.Xpos - 3)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos - 2)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos - 3)) == null
                 )
                 {
                     map[cave.Y, cave.Xpos + 1] = blockerTerrain;
@@ -1810,8 +1811,8 @@ public sealed class EastHyrule : World
                     placed = true;
                 }
                 else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y - 2 < MAP_COLS 
-                    && GetLocationByCoords((cave.Y - 2, cave.Xpos)) == null
-                    && GetLocationByCoords((cave.Y - 3, cave.Xpos)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y - 2, cave.Xpos)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y - 3, cave.Xpos)) == null
                 )
                 {
                     map[cave.Y + 1, cave.Xpos] = blockerTerrain;
@@ -1825,8 +1826,8 @@ public sealed class EastHyrule : World
                     placed = true;
                 }
                 else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y + 2 < MAP_COLS 
-                    && GetLocationByCoords((cave.Y + 2, cave.Xpos)) == null
-                    && GetLocationByCoords((cave.Y + 3, cave.Xpos)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y + 2, cave.Xpos)) == null
+                    && GetLocationByCoordsNoOffset((cave.Y + 3, cave.Xpos)) == null
                 )
                 {
                     map[cave.Y - 1, cave.Xpos] = blockerTerrain;
