@@ -378,7 +378,7 @@ public sealed class WestHyrule : World
                 };
                 foreach (Location location in AllLocations)
                 {
-                    areasByLocation[section[location.Coords]].Add(GetLocationByCoords(location.Coords)!);
+                    areasByLocation[section[location.CoordsRaw]].Add(GetLocationByCoords(location.Coords)!);
                 }
                 ChooseConn("parapa", connections, true);
                 ChooseConn("lifesouth", connections, true);
@@ -819,7 +819,7 @@ public sealed class WestHyrule : World
         int y = RNG.Next(6, MAP_ROWS - 7);
         int x = RNG.Next(6, MAP_COLS - 7);
         int tries = 0;
-        while((map[y, x] != Terrain.NONE || GetLocationByCoords((y + 30, x)) != null) && tries < 1000)
+        while((map[y, x] != Terrain.NONE || GetLocationByCoords((y, x)) != null) && tries < 1000)
         {
             y = RNG.Next(6, MAP_ROWS - 7);
             x = RNG.Next(6, MAP_COLS - 7);
@@ -839,7 +839,7 @@ public sealed class WestHyrule : World
         {
             int newx = RNG.Next(x - 3, x + 4);
             int newy = RNG.Next(y - 3, y + 4);
-            while((map[newy, newx] != Terrain.NONE || GetLocationByCoords((newy + 30, newx)) != null) && tries < 100)
+            while((map[newy, newx] != Terrain.NONE || GetLocationByCoords((newy, newx)) != null) && tries < 100)
             {
                 newx = RNG.Next(x - 3, x + 4);
                 newy = RNG.Next(y - 3, y + 4);

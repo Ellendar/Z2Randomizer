@@ -239,7 +239,7 @@ sealed class MazeIsland : World
                     }
                     else if (stack.Count > 0)
                     {
-                        if (cave1 != null && cave1.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null)
+                        if (cave1 != null && cave1.CanShuffle && GetLocationByCoords((curry, currx)) == null)
                         {
                             map[curry, currx] = Terrain.CAVE;
                             cave1.Y = curry;
@@ -248,7 +248,7 @@ sealed class MazeIsland : World
                             canPlaceCave = false;
                             SealDeadEnd(curry, currx);
                         }
-                        else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords((curry + 30, currx)) == null && canPlaceCave)
+                        else if (cave2 != null && cave2.CanShuffle && GetLocationByCoords((curry, currx)) == null && canPlaceCave)
                         {
                             map[curry, currx] = Terrain.CAVE;
                             cave2.Y = curry;
@@ -283,7 +283,7 @@ sealed class MazeIsland : World
                     {
                         for (int j = -1; j < 2; j++)
                         {
-                            if (GetLocationByCoords((palace4y + i + 30, palace4x + j)) != null)
+                            if (GetLocationByCoords((palace4y + i, palace4x + j)) != null)
                             {
                                 canPlace = false;
                             }
@@ -638,7 +638,7 @@ sealed class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) || GetLocationByCoords((y + 30, x + 1)) != null || GetLocationByCoords((y + 30, x - 1)) != null || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) || GetLocationByCoords((y, x + 1)) != null || GetLocationByCoords((y, x - 1)) != null || GetLocationByCoords((y + 1, x)) != null || GetLocationByCoords((y - 1, x)) != null || GetLocationByCoords((y, x)) != null);
                         }
                         else
                         {
@@ -646,7 +646,7 @@ sealed class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD || GetLocationByCoords((y + 30, x + 1)) != null || GetLocationByCoords((y + 30, x - 1)) != null || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD || GetLocationByCoords((y, x + 1)) != null || GetLocationByCoords((y, x - 1)) != null || GetLocationByCoords((y + 1, x)) != null || GetLocationByCoords((y - 1, x)) != null || GetLocationByCoords((y, x)) != null);
                         }
 
                         location.Xpos = x;
