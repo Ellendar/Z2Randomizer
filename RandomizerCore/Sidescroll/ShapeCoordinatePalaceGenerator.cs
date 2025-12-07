@@ -1,0 +1,306 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace Z2Randomizer.RandomizerCore.Sidescroll;
+
+public struct PalaceShape
+{
+    public Dictionary<Coord, RoomExitType> Grid;
+
+    public PalaceShape(Dictionary<Coord, RoomExitType> grid) : this()
+    {
+        Grid = grid;
+    }
+}
+
+public abstract class ShapeCoordinatePalaceGenerator : CoordinatePalaceGenerator
+{
+    public static int debug = 0;
+
+    protected abstract Task<PalaceShape> CreateShape(Random r, Room entrance, int roomCount, int palaceNumber);
+
+    internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
+    {
+        debug++;
+        Palace palace = new(palaceNumber);
+        RoomPool roomPool = new(rooms);
+        Room entrance = new(roomPool.Entrances[r.Next(roomPool.Entrances.Count)])
+        {
+            IsRoot = true,
+        };
+        if (props.UsePalaceItemRoomCountIndicator && palaceNumber != 7) {
+            entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
+        }
+        palace.AllRooms.Add(entrance);
+        palace.Entrance = entrance;
+
+        PalaceShape shape = await CreateShape(r, entrance, roomCount, palaceNumber);
+
+        bool success = await FillShapeWithRooms(props, roomPool, r, palace, palaceNumber, shape);
+        if (!success) {
+            palace.IsValid = false;
+            return palace;
+        }
+
+        if (palace.AllRooms.Count(i => i.Enabled) != roomCount)
+        {
+            throw new Exception("Generated palace has the incorrect number of rooms");
+        }
+
+        palace.IsValid = true;
+        return palace;
+    }
+
+    private async Task<bool> FillShapeWithRooms(RandomizerProperties props, RoomPool roomPool, Random r, Palace palace, int palaceNumber, PalaceShape shape)
+    {
+        bool duplicateProtection = (props.NoDuplicateRooms || props.NoDuplicateRoomsBySideview) && AllowDuplicatePrevention(props, palaceNumber);
+        ILookup<string, Room>? duplicateRoomLookup = CreateRoomVariantsLookupOrNull(props, palaceNumber, roomPool);
+        Dictionary<RoomExitType, List<Room>> roomsByExitType;
+        //Add rooms
+        roomsByExitType = roomPool.CategorizeNormalRoomExits(true);
+        foreach (var roomsForExitType in roomsByExitType.Values)
+        {
+            DetermineRoomVariants(r, duplicateRoomLookup, roomsForExitType);
+        }
+        Dictionary<RoomExitType, bool> stubOnlyExitTypes = new();
+        foreach (KeyValuePair<Coord, RoomExitType> item in shape.Grid.OrderBy(i => i.Key.X).ThenByDescending(i => i.Key.Y))
+        {
+            if (item.Key == Coord.Uninitialized)
+            {
+                continue;
+            }
+            var (x, y) = item.Key;
+            RoomExitType roomExitType = item.Value;
+
+            bool stubOnly;
+            List<Room>? roomCandidates;
+            Room? newRoom = null;
+            if (!stubOnlyExitTypes.TryGetValue(roomExitType, out stubOnly))
+            {
+                roomsByExitType.TryGetValue(roomExitType, out roomCandidates);
+                stubOnly = roomCandidates == null || roomCandidates.Count == 0;
+                stubOnlyExitTypes[roomExitType] = stubOnly;
+            }
+            else
+            {
+                roomCandidates = stubOnly ? null : roomsByExitType.GetValueOrDefault(roomExitType);
+            }
+            if (!stubOnly)
+            {
+                Debug.Assert(roomCandidates != null);
+                if (duplicateProtection && roomCandidates!.Count == 0)
+                {
+                    roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
+                    // as the pool is re-used for this shape, determine variants to include again
+                    DetermineRoomVariants(r, duplicateRoomLookup, roomCandidates);
+                    Debug.Assert(roomCandidates.Count() > 0);
+                    roomsByExitType[roomExitType] = roomCandidates;
+                    logger.Debug($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
+                }
+                roomCandidates!.FisherYatesShuffle(r);
+                Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
+                foreach (Room roomCandidate in roomCandidates!)
+                {
+                    if (upRoom == null || !upRoom.HasDrop || roomCandidate.IsDropZone)
+                    {
+                        Debug.Assert(roomCandidate.IsNormalRoom());
+                        newRoom = roomCandidate;
+                        break;
+                    }
+                }
+                if (newRoom != null && duplicateProtection) { RemoveDuplicatesFromPool(roomCandidates!, newRoom); }
+            }
+
+            if (newRoom == null)
+            {
+                Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
+                roomPool.DefaultStubsByDirection.TryGetValue(roomExitType, out newRoom);
+                if (newRoom != null && upRoom != null && upRoom.HasDrop && !newRoom.IsDropZone)
+                {
+                    //We need to use a drop zone stub but one does not (and cannot) exist so this graph is doomed.
+                    //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
+                    return false;
+                }
+            }
+            if (newRoom == null)
+            {
+                return false;
+            }
+            else
+            {
+                newRoom = new(newRoom);
+            }
+
+            newRoom.coords = item.Key;
+            if (newRoom.LinkedRoomName == null)
+            {
+                palace.AllRooms.Add(newRoom);
+            }
+            else
+            {
+                Room linkedRoom = new(roomPool.LinkedRooms[newRoom.LinkedRoomName]);
+                newRoom.LinkedRoom = linkedRoom;
+                linkedRoom.LinkedRoom = newRoom;
+                linkedRoom.coords = item.Key;
+                Room mergedRoom = newRoom.Merge(linkedRoom);
+                palace.AllRooms.Add(mergedRoom);
+            }
+        }
+
+        //Connect adjacent rooms if they exist
+        foreach (Room room in palace.AllRooms)
+        {
+            await Task.Yield();
+            Room[] leftRooms = palace.AllRooms.Where(i => i.coords == room.coords with { X = room.coords.X - 1 }).ToArray();
+            Room[] downRooms = palace.AllRooms.Where(i => i.coords == room.coords with { Y = room.coords.Y - 1 }).ToArray();
+            Room[] upRooms = palace.AllRooms.Where(i => i.coords == room.coords with { Y = room.coords.Y + 1 }).ToArray();
+            Room[] rightRooms = palace.AllRooms.Where(i => i.coords == room.coords with { X = room.coords.X + 1 }).ToArray();
+
+            foreach (Room left in leftRooms)
+            {
+                if (left != null && room.FitsWithLeft(left) > 0)
+                {
+                    room.Left = left;
+                    left.Right = room;
+                }
+            }
+
+            foreach (Room down in downRooms)
+            {
+                if (down != null && room.FitsWithDown(down) > 0)
+                {
+                    room.Down = down;
+                    if (!room.HasDrop)
+                    {
+                        down.Up = room;
+                    }
+                }
+            }
+            foreach (Room up in upRooms)
+            {
+                if (up != null && room.FitsWithUp(up) > 0)
+                {
+                    if (!up.HasDrop)
+                    {
+                        room.Up = up;
+                    }
+                    up.Down = room;
+                }
+            }
+            foreach (Room right in rightRooms)
+            {
+                if (right != null && room.FitsWithRight(right) > 0)
+                {
+                    room.Right = right;
+                    right.Left = room;
+                }
+            }
+        }
+
+        //Some percentage of the time, dropifying some rooms causes part of the palace to become
+        //unreachable because up was the only way to get there.
+        if (!palace.AllReachable())
+        {
+            return false;
+        }
+
+
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
+        {
+            return false;
+        }
+
+        palace.AllRooms.ForEach(i => i.PalaceNumber = palaceNumber);
+        return true;
+    }
+
+    public string GetLayoutDebug(Dictionary<Coord, RoomExitType> walkGraph, bool includeCoordinateGrid = true)
+    {
+        StringBuilder sb = new();
+        if (includeCoordinateGrid)
+        {
+            sb.Append("   ");
+            for (int headerX = -20; headerX <= 20; headerX++)
+            {
+                sb.Append(headerX.ToString().PadLeft(3, ' '));
+            }
+            sb.Append('\n');
+        }
+        for (int y = 20; y >= -20; y--)
+        {
+            sb.Append("   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(" " + (room.ContainsUp() ? "|" : " ") + " ");
+                }
+            }
+            sb.Append('\n');
+            sb.Append(includeCoordinateGrid ? y.ToString().PadLeft(3, ' ') : "   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    sb.Append(room.ContainsLeft() ? '-' : ' ');
+                    sb.Append('X');
+                    sb.Append(room.ContainsRight() ? '-' : ' ');
+                }
+            }
+            sb.Append('\n');
+            sb.Append("   ");
+            for (int x = -20; x <= 20; x++)
+            {
+                if (!walkGraph.TryGetValue(new Coord(x, y), out RoomExitType room))
+                {
+                    sb.Append("   ");
+                }
+                else
+                {
+                    if (room.ContainsDown())
+                    {
+                        sb.Append(" | ");
+                    }
+                    else if (room.ContainsDrop())
+                    {
+                        sb.Append(" v ");
+                    }
+                    else
+                    {
+                        sb.Append("   ");
+                    }
+                }
+            }
+            sb.Append('\n');
+        }
+
+        if (!includeCoordinateGrid)
+        {
+            StringBuilder condensed = new();
+            foreach (string line in sb.ToString().Split('\n'))
+            {
+                if (!BlankLine.IsMatch(line))
+                {
+                    condensed.AppendLine(line);
+                }
+            }
+            return condensed.ToString();
+        }
+        return sb.ToString();
+    }
+
+    private static readonly Regex BlankLine = new(@"^[ \t\f\r\n]+$");
+}
