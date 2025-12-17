@@ -192,17 +192,22 @@ public static class Climates
         };
     }
     
-    public static IEnumerable<Climate> ClimateList =
-    [
-        CLASSIC,
-        CHAOS,
-        WETLANDS,
-        GREAT_LAKES,
-        SCRUBLAND,
-    ];
-
-    public static IEnumerable<string> ClimateNameList = ClimateList.Select(i => i.Name);
+    public static Climate Create(ClimateEnum climate)
+    {
+        switch (climate)
+        {
+            case ClimateEnum.CLASSIC:
+                return Classic.Clone();
+            case ClimateEnum.CHAOS:
+                return Chaos.Clone();
+            case ClimateEnum.WETLANDS:
+                return Wetlands.Clone();
+            case ClimateEnum.GREAT_LAKES:
+                return GreatLakes.Clone();
+            case ClimateEnum.SCRUBLAND:
+                return Scrubland.Clone();
+            default:
+                throw new NotImplementedException();
+        }
+    }
 }
-
-
-//Terrain.DESERT, Terrain.GRASS, Terrain.FOREST, Terrain.SWAMP, Terrain.GRAVE, Terrain.MOUNTAIN

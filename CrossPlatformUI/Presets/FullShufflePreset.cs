@@ -35,13 +35,15 @@ public static class FullShufflePreset
         HidePalace = null,
         HideKasuto = null,
         ShuffleWhichLocationIsHidden = true,
-        ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
-
-        Climate = Climates.Classic,
         WestBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         EastBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
         MazeBiome = Biome.VANILLALIKE,
         DmBiome = Biome.RANDOM_NO_VANILLA_OR_SHUFFLE,
+        WestClimate = ClimateEnum.VANILLA_WEIGHTED_WEST,
+        EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
+        DmClimate = ClimateEnum.CLASSIC,
+        MazeClimate = ClimateEnum.CLASSIC,
+        ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
