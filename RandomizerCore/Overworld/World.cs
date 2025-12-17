@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -1290,7 +1291,7 @@ public abstract class World
     }
     protected bool GrowTerrain(Climate climate)
     {
-        List<Terrain> randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToList();
+        var randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToFrozenSet();
         TerrainGrowthAttempts++;
         Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
         List<(int, int)> placed = new();
