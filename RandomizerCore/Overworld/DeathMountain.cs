@@ -694,7 +694,7 @@ sealed class DeathMountain : World
                 }
                 randomTerrainFilter.Add(Terrain.ROAD);
                 //Debug.WriteLine(GetMapDebug());
-                Climate growthClimate = climate.Clone();
+                Climate growthClimate = climate.CloneWithInvertedDistances();
                 float dmOpennessFactor = biome switch
                 {
                     Biome.CANYON => (float)(RNG.NextDouble() * .75 + 1),
