@@ -578,6 +578,9 @@ Classic:
 Each terrain type will appear at equal size / frequency. Just like older versions of the
 randomizer.
 
+Vanilla-Weighted:
+Each terrain type will appear at the frequency they appear in the vanilla continent.
+
 Chaos:
 The number of seed terrain tiles is massively increased, resulting in a more chaotic
 appearance. This option may cause seeds to take longer to generate.

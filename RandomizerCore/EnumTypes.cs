@@ -382,18 +382,6 @@ static class BiomeExtensions
         };
     }
 
-    public static bool IsMazeBiome(this Biome biome)
-    {
-        return biome switch
-        {
-            Biome.VANILLA => true,
-            Biome.VANILLA_SHUFFLE => true,
-            Biome.VANILLALIKE => true,
-            Biome.RANDOM => true,
-            _ => false
-        };
-    }
-
     public static bool IsDMBiome(this Biome biome)
     {
         return biome switch
@@ -409,6 +397,82 @@ static class BiomeExtensions
             Biome.RANDOM_NO_VANILLA => true,
             Biome.RANDOM_NO_VANILLA_OR_SHUFFLE => true,
             _ => false
+        };
+    }
+
+    public static bool IsMazeBiome(this Biome biome)
+    {
+        return biome switch
+        {
+            Biome.VANILLA => true,
+            Biome.VANILLA_SHUFFLE => true,
+            Biome.VANILLALIKE => true,
+            Biome.RANDOM => true,
+            _ => false
+        };
+    }
+}
+
+[DefaultValue(CLASSIC)]
+public enum ClimateEnum
+{
+    [Description("Classic")]
+    CLASSIC,
+    [Description("Vanilla-Weighted")]
+    VANILLA_WEIGHTED_WEST,
+    [Description("Vanilla-Weighted")]
+    VANILLA_WEIGHTED_EAST,
+    [Description("Chaos")]
+    CHAOS,
+    [Description("Wetlands")]
+    WETLANDS,
+    [Description("Great Lakes")]
+    GREAT_LAKES,
+    [Description("Scrubland")]
+    SCRUBLAND,
+    [Description("Random")]
+    RANDOM
+}
+
+static class ClimateExtensions
+{
+    public static bool IsWestClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => true,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            _ => true,
+        };
+    }
+
+    public static bool IsEastClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => true,
+            _ => true,
+        };
+    }
+
+    public static bool IsDmClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            _ => true,
+        };
+    }
+
+    public static bool IsMazeClimate(this ClimateEnum climate)
+    {
+        return climate switch
+        {
+            ClimateEnum.VANILLA_WEIGHTED_WEST => false,
+            ClimateEnum.VANILLA_WEIGHTED_EAST => false,
+            _ => true,
         };
     }
 }
@@ -831,8 +895,12 @@ public static class Enums
 
     public static IEnumerable<EnumDescription> WestBiomeList { get; } = ToDescriptions<Biome>(i => i.IsWestBiome());
     public static IEnumerable<EnumDescription> EastBiomeList { get; } = ToDescriptions<Biome>(i => i.IsEastBiome());
-    public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
     public static IEnumerable<EnumDescription> DMBiomeList { get; } = ToDescriptions<Biome>(i => i.IsDMBiome());
+    public static IEnumerable<EnumDescription> MazeBiomeList { get; } = ToDescriptions<Biome>(i => i.IsMazeBiome());
+    public static IEnumerable<EnumDescription> WestClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsWestClimate());
+    public static IEnumerable<EnumDescription> EastClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsEastClimate());
+    public static IEnumerable<EnumDescription> DmClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsDmClimate());
+    public static IEnumerable<EnumDescription> MazeClimateList { get; } = ToDescriptions<ClimateEnum>(i => i.IsMazeClimate());
     public static IEnumerable<EnumDescription> ContinentConnectionTypeList { get; } = ToDescriptions<ContinentConnectionType>();
     public static IEnumerable<EnumDescription> LessImportantLocationsOptionList { get; } = ToDescriptions<LessImportantLocationsOption>();
 

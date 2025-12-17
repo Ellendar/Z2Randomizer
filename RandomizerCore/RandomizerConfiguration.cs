@@ -216,8 +216,16 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private Biome mazeBiome;
 
     [Reactive]
-    [CustomFlagSerializer(typeof(ClimateFlagSerializer))]
-    private Climate climate;
+    private ClimateEnum westClimate;
+
+    [Reactive]
+    private ClimateEnum eastClimate;
+
+    [Reactive]
+    private ClimateEnum dmClimate;
+
+    [Reactive]
+    private ClimateEnum mazeClimate;
 
     [Reactive]
     private bool vanillaShuffleUsesActualTerrain;
@@ -647,8 +655,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         removeFlashing = true;
         sprite = CharacterSprite.LINK;
         spriteName = CharacterSprite.LINK.DisplayName!;
-        climate = Climates.Classic;
-        if (sprite == null || climate == null)
+        westClimate = ClimateEnum.CLASSIC;
+        eastClimate = ClimateEnum.CLASSIC;
+        dmClimate = ClimateEnum.CLASSIC;
+        mazeClimate = ClimateEnum.CLASSIC;
+        if (sprite == null)
         {
             throw new ImpossibleException();
         }
@@ -1087,22 +1098,56 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         {
             properties.MazeBiome = mazeBiome;
         }
-        if (climate == null)
+
+        if (westClimate == ClimateEnum.RANDOM)
         {
-            properties.Climate = r.Next(5) switch
+            properties.WestClimate = r.Next(5) switch
             {
-                0 => Climates.Classic,
-                1 => Climates.Chaos,
-                2 => Climates.Wetlands,
-                3 => Climates.GreatLakes,
-                4 => Climates.Scrubland,
+                0 => ClimateEnum.CLASSIC,
+                1 => ClimateEnum.CHAOS,
+                2 => ClimateEnum.WETLANDS,
+                3 => ClimateEnum.GREAT_LAKES,
+                4 => ClimateEnum.SCRUBLAND,
                 _ => throw new Exception("Unrecognized climate")
             };
         }
         else
         {
-            properties.Climate = climate;
+            properties.WestClimate = westClimate;
         }
+        if (eastClimate == ClimateEnum.RANDOM)
+        {
+            properties.EastClimate = r.Next(5) switch
+            {
+                0 => ClimateEnum.CLASSIC,
+                1 => ClimateEnum.CHAOS,
+                2 => ClimateEnum.WETLANDS,
+                3 => ClimateEnum.GREAT_LAKES,
+                4 => ClimateEnum.SCRUBLAND,
+                _ => throw new Exception("Unrecognized climate")
+            };
+        }
+        else
+        {
+            properties.EastClimate = eastClimate;
+        }
+        if (dmClimate == ClimateEnum.RANDOM)
+        {
+            properties.DmClimate = r.Next(5) switch
+            {
+                0 => ClimateEnum.CLASSIC,
+                1 => ClimateEnum.CHAOS,
+                2 => ClimateEnum.WETLANDS,
+                3 => ClimateEnum.GREAT_LAKES,
+                4 => ClimateEnum.SCRUBLAND,
+                _ => throw new Exception("Unrecognized climate")
+            };
+        }
+        else
+        {
+            properties.DmClimate = dmClimate;
+        }
+
         properties.VanillaShuffleUsesActualTerrain = vanillaShuffleUsesActualTerrain;
         properties.ShuffleHidden = shuffleWhichLocationIsHidden ?? GetIndeterminateFlagValue(r);
         properties.CanWalkOnWaterWithBoots = goodBoots ?? GetIndeterminateFlagValue(r);

@@ -156,8 +156,7 @@ sealed class DeathMountain : World
         walkableTerrains = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE };
         randomTerrainFilter = new List<Terrain>() { Terrain.DESERT, Terrain.FOREST, Terrain.GRAVE, Terrain.MOUNTAIN, Terrain.WALKABLEWATER, Terrain.WATER };
 
-        climate = props.Climate.Clone();
-
+        climate = Climates.Create(props.DmClimate);
         climate.SeedTerrainCount = Math.Min(climate.SeedTerrainCount, biome.SeedTerrainLimit());
         SetVanillaCollectables(props.ReplaceFireWithDash);
     }

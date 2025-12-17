@@ -148,7 +148,7 @@
                 Cursor="Hand"
             />
 
-            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *">
+            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *, *, *, *">
                 <ComboBox
                     Grid.Row="0" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
                     assists:ComboBoxAssist.Label="West Continent Biome"
@@ -181,16 +181,34 @@
                 >
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.MazeIslandBiomeToolTip}"/></ToolTip.Tip>
                 </ComboBox>
+
                 <ComboBox
                     Grid.Row="0" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
-                    assists:ComboBoxAssist.Label="Climate"
-                    ItemsSource="{Binding Source={x:Static overworld:Climates.ClimateNameList}}"
-                    SelectedItem="{Binding Config.Climate, Converter={x:Static ui:Util.ClimateConvert}}"
+                    assists:ComboBoxAssist.Label="West Continent Climate"
+                    ItemsSource="{Binding Source={x:Static rc:Enums.WestClimateList}}"
+                    SelectedItem="{Binding Config.WestClimate, Converter={x:Static ui:Util.EnumConvert}}"
                 >
                     <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
                 </ComboBox>
                 <ComboBox
                     Grid.Row="1" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                    assists:ComboBoxAssist.Label="East Continent Climate"
+                    ItemsSource="{Binding Source={x:Static rc:Enums.EastClimateList}}"
+                    SelectedItem="{Binding Config.EastClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+                </ComboBox>
+                <ComboBox
+                    Grid.Row="2" Grid.Column="1" Theme="{StaticResource MaterialOutlineComboBox}"
+                    assists:ComboBoxAssist.Label="Death Mountain Climate"
+                    ItemsSource="{Binding Source={x:Static rc:Enums.DmClimateList}}"
+                    SelectedItem="{Binding Config.DmClimate, Converter={x:Static ui:Util.EnumConvert}}"
+                >
+                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ClimateToolTip}"/></ToolTip.Tip>
+                </ComboBox>
+
+                <ComboBox
+                    Grid.Row="4" Grid.Column="0" Theme="{StaticResource MaterialOutlineComboBox}"
                     assists:ComboBoxAssist.Label="Continent Connectors"
                     ItemsSource="{Binding Source={x:Static rc:Enums.ContinentConnectionTypeList}}"
                     SelectedItem="{Binding Config.ContinentConnectionType, Converter={x:Static ui:Util.EnumConvert}}"
