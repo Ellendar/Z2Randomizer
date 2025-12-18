@@ -134,6 +134,17 @@
                     <MenuItem Height="48" Width="48" Header="{avalonia:MaterialIconExt Kind=Cog, Size=32}" Cursor="Hand">
                         <MenuItem Header="{Binding AppVersion}" IsEnabled="false">
                         </MenuItem>
+                        <MenuItem Header="Check For Updates" IsVisible="{Binding IsDesktop}" Command="{Binding CheckForUpdates}" >
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="Update" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Header="Toggle Light/Dark Mode" Command="{Binding ToggleTheme}" >
+                            <MenuItem.Icon>
+                                <avalonia:MaterialIcon Kind="LightbulbNight" Width="24" Height="24" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <Separator />
                         <MenuItem Header="Reload ROM" Command="{Binding LoadRom}" >
                             <MenuItem.Icon>
@@ -144,16 +155,6 @@
                             <MenuItem.Icon>
                                 <avalonia:MaterialIcon Kind="ContentSaveOutline" Width="24" Height="24" />
                             </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Check For Updates" IsVisible="{Binding IsDesktop}" Command="{Binding CheckForUpdates}" >
-                          <MenuItem.Icon>
-                            <avalonia:MaterialIcon Kind="Update" Width="24" Height="24" />
-                          </MenuItem.Icon>
-                        </MenuItem>
-                        <MenuItem Header="Toggle Light/Dark Mode" Command="{Binding ToggleTheme}" >
-                          <MenuItem.Icon>
-                            <avalonia:MaterialIcon Kind="LightbulbNight" Width="24" Height="24" />
-                          </MenuItem.Icon>
                         </MenuItem>
                         <Separator />
                         <MenuItem Header="Visit Discord"
