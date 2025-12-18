@@ -125,11 +125,11 @@
             -->
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <TextBlock Margin="43 0 0 0">Number of Palaces to Complete</TextBlock>
+            <TextBlock Margin="17 0 0 4">Number of Palaces to Complete</TextBlock>
             <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NumberofPalacestoCompleteToolTip}"/></ToolTip.Tip>
             <!-- Example of how to scale down elements  -->
             <!-- <Viewbox Stretch="Fill" Width="140" Height="70"> -->
-            <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" VerticalAlignment="Top" Margin="43 0 0 0">
+            <Grid ColumnDefinitions="72,72,72" ColumnSpacing="8" VerticalAlignment="Top" Margin="17 0 0 16">
                 <NumericUpDown Grid.Column="0"
                                Height="72"
                                Value="{Binding Config.PalacesToCompleteMin}"
