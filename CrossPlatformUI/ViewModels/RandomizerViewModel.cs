@@ -166,14 +166,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
         SaveAsPreset = ReactiveCommand.Create((string name) =>
         {
-            var updatedPreset = new CustomPreset
-            {
-                Preset = name,
-                Config =
-                {
-                    Flags = Main.Config.Flags
-                }
-            };
+            var updatedPreset = new CustomPreset(name, new RandomizerConfiguration { Flags = Main.Config.Flags });
             var collection = Main.SaveNewPresetViewModel.SavedPresets;
             // makeshift FindIndex since ObservableCollection doesn't have one
             int presetIndex = -1;

@@ -13,6 +13,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Material.Styles.Assists;
 using Microsoft.Extensions.DependencyInjection;
+using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.Views;
@@ -57,6 +58,7 @@ public sealed partial class App : Application // , IDisposable
 
     public static string Version = "";
     public static string Title = "";
+    public const string SETTINGS_FILENAME = "Settings_v5_1.json";
 
     public static TopLevel? TopLevel { get; private set; }
 
@@ -73,7 +75,7 @@ public sealed partial class App : Application // , IDisposable
         var files = FileSystemService!;
         try
         {
-            var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
+            var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, SETTINGS_FILENAME);
             main = JsonSerializer.Deserialize(json, new SerializationContext(true).MainViewModel)!;
         }
         catch (System.IO.FileNotFoundException) { /* No settings file exists */ }
@@ -153,7 +155,7 @@ public sealed partial class App : Application // , IDisposable
         {
             var files = Current?.Services?.GetService<IFileSystemService>()!;
             var json = JsonSerializer.Serialize(main!, SerializationContext.Default.MainViewModel);
-            await files.SaveFile(IFileSystemService.RandomizerPath.Settings, "Settings.json", json);
+            await files.SaveFile(IFileSystemService.RandomizerPath.Settings, SETTINGS_FILENAME, json);
         });
     }
 
@@ -173,75 +175,82 @@ public sealed partial class App : Application // , IDisposable
 [JsonSourceGenerationOptions(
     WriteIndented = false,
     IgnoreReadOnlyProperties = true,
-    UseStringEnumConverter = true,
     PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
 )]
 [JsonSerializable(typeof(MainViewModel))]
+[JsonSerializable(typeof(RandomizerConfiguration))]
 public partial class SerializationContext : JsonSerializerContext
 {
     public SerializationContext(bool _) // added an argument to avoid constructors colliding
-        : base(CreateOptions())
+        : base(InitSafeOptions())
     {
     }
 
-    private static JsonSerializerOptions CreateOptions()
+    /// modifies original context - can't be called after init
+    private static JsonSerializerOptions InitSafeOptions()
     {
         var options = Default.GeneratedSerializerOptions!;
+        options.Converters.Add(new SafeStringEnumConverterFactory());
+        return options;
+    }
 
-        var enumNamespacePrefix = "Z2Randomizer";
-
-        foreach (var enumType in AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => !a.IsDynamic)
-            .SelectMany(a =>
-            {
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-                try { return a.GetTypes(); }
-#pragma warning restore IL2026
-                catch { return Enumerable.Empty<Type>(); }
-            })
-            .Where(t =>
-                t.IsEnum &&
-                t.IsPublic &&
-                !t.IsGenericTypeDefinition &&
-                t.Namespace != null && t.Namespace.StartsWith(enumNamespacePrefix)
-            ))
+    /// returns a new options copy with safe serialization
+    public static JsonSerializerOptions CreateSafeOptions()
+    {
+        var options = new JsonSerializerOptions
         {
-            try
-            {
-#pragma warning disable IL2076 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
-                var converterType = typeof(SafeStringEnumConverter<>).MakeGenericType(enumType);
-#pragma warning restore IL2076
-                var converter = (JsonConverter)Activator.CreateInstance(converterType)!;
-                options.Converters.Add(converter);
-            }
-            catch
-            {
-                // we try our best to add the custom parsing, but proceed regardless
-            }
-        }
-
+            TypeInfoResolver = SerializationContext.Default
+        };
+        options.Converters.Add(new SafeStringEnumConverterFactory());
         return options;
     }
 }
 
+public sealed class SafeStringEnumConverterFactory : JsonConverterFactory
+{
+    public override bool CanConvert(Type typeToConvert)
+        => typeToConvert.IsEnum;
+
+    [RequiresUnreferencedCode("Uses reflection to construct generic enum converters at runtime.")]
+    [SuppressMessage("Trimming", "IL2046:'RequiresUnreferencedCodeAttribute' annotations must match across all interface implementations or overrides.", Justification = " Justification = \"Enum converters are created dynamically; enum metadata is preserved.\")]")]
+    public override JsonConverter CreateConverter(
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        var converterType = typeof(SafeStringEnumConverter<>)
+            .MakeGenericType(typeToConvert);
+
+        return (JsonConverter)Activator.CreateInstance(converterType)!;
+    }
+}
+
 /// Custom StringEnumConverter that returns default instead of failing for unknown values
-public class SafeStringEnumConverter<T> : JsonConverter<T> where T : struct, Enum
+public sealed class SafeStringEnumConverter<T> : JsonConverter<T> where T : struct, Enum
 {
     public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.String)
+        try
         {
-            var value = reader.GetString();
-            if (Enum.TryParse<T>(value, ignoreCase: true, out var result))
+            if (reader.TokenType == JsonTokenType.String)
             {
-                return result;
+                var value = reader.GetString();
+
+                if (!string.IsNullOrEmpty(value) &&
+                    Enum.TryParse<T>(value, ignoreCase: true, out var parsed))
+                {
+                    return parsed;
+                }
+            }
+            else if (reader.TokenType == JsonTokenType.Number)
+            {
+                if (reader.TryGetInt32(out var raw) && Enum.IsDefined(typeof(T), raw))
+                {
+                    return (T)Enum.ToObject(typeof(T), raw);
+                }
             }
         }
-        else if (reader.TokenType == JsonTokenType.Number &&
-                 reader.TryGetInt32(out var intValue) &&
-                 Enum.IsDefined(typeof(T), intValue))
+        catch // we prefer returning the default over failing
         {
-            return (T)Enum.ToObject(typeof(T), intValue);
         }
 
         return default;
@@ -250,5 +259,35 @@ public class SafeStringEnumConverter<T> : JsonConverter<T> where T : struct, Enu
     public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
     {
         writer.WriteStringValue(value.ToString());
+    }
+
+    public override T ReadAsPropertyName(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        try
+        {
+            var value = reader.GetString();
+
+            if (!string.IsNullOrEmpty(value) &&
+                Enum.TryParse<T>(value, ignoreCase: true, out var parsed))
+            {
+                return parsed;
+            }
+        }
+        catch // we prefer returning the default over failing
+        {
+        }
+
+        return default;
+    }
+
+    public override void WriteAsPropertyName(
+        Utf8JsonWriter writer,
+        T value,
+        JsonSerializerOptions options)
+    {
+        writer.WritePropertyName(value.ToString());
     }
 }

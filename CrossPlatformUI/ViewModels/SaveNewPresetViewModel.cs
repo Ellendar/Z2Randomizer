@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using DynamicData.Binding;
 using ReactiveUI;
@@ -12,14 +13,57 @@ using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
-
-
 public class CustomPreset : ReactiveObject
 {
+    /// name of preset
     private string preset = "";
     public string Preset { get => preset; set => this.RaiseAndSetIfChanged(ref preset, value); }
-    private RandomizerConfiguration config = new ();
-    public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
+
+    private RandomizerConfiguration? config;
+
+    // presets might be created in different versions with options that
+    // are not known to this version. keep the original raw preset JSON
+    // to avoid changing presets unexpectedly.
+    [JsonPropertyName("Config")]
+    public JsonElement? RawConfig { get; set; }
+    [JsonIgnore]
+    public RandomizerConfiguration Config
+    {
+        get
+        {
+            if (config == null)
+            {
+                if (RawConfig.HasValue)
+                {
+                    // Deserialize with safe options to handle modified Enums affecting presets
+                    var parsed = JsonSerializer.Deserialize<RandomizerConfiguration>(RawConfig.Value, SerializationContext.CreateSafeOptions());
+                    if (parsed != null)
+                    {
+                        config = parsed;
+                        return config;
+                    }
+                }
+                config = new RandomizerConfiguration();
+            }
+            return config;
+        }
+        set
+        {
+            RawConfig = JsonSerializer.SerializeToElement(value, SerializationContext.Default.RandomizerConfiguration);
+            this.RaiseAndSetIfChanged(ref config, value);
+        }
+    }
+
+    /// empty constructor for serialization only
+    public CustomPreset()
+    {
+    }
+
+    public CustomPreset(string preset, RandomizerConfiguration config)
+    {
+        Preset = preset;
+        Config = config;
+    }
 }
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
@@ -40,14 +84,7 @@ public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewMod
         SavePreset = ReactiveCommand.Create(() => {
             Main.SaveNewPresetDialogOpen = false;
             // Setting the preset config through the flags creates a deep clone instead of a reference
-            var preset = new CustomPreset
-            {
-                Preset = PresetName,
-                Config =
-                {
-                    Flags = Main.Config.Flags
-                }
-            };
+            var preset = new CustomPreset(PresetName, new RandomizerConfiguration { Flags = Main.Config.Flags });
             SavedPresets.Add(preset);
         });
         CancelPreset = ReactiveCommand.Create(() =>
