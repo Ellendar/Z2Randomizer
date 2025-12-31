@@ -8,7 +8,7 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="820"
              x:Class="CrossPlatformUI.Views.Tabs.CustomizeView"
              x:DataType="vmt:CustomizeViewModel">
     <Grid ColumnDefinitions="*,2*" Margin="4">

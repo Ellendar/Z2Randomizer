@@ -9,7 +9,7 @@
              xmlns:randomizerCore="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="820"
              x:DataType="vm:MainViewModel"
              x:Class="CrossPlatformUI.Views.Tabs.StartView">
     <Grid ColumnDefinitions="*, *, 358">

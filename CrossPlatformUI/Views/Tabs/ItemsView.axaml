@@ -8,7 +8,7 @@
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="820"
              x:Class="CrossPlatformUI.Views.Tabs.ItemsView"
              x:DataType="vmt:ItemsViewModel">
     <Grid ColumnDefinitions="*, *">

@@ -8,7 +8,7 @@
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
              xmlns:overworld="clr-namespace:Z2Randomizer.RandomizerCore.Overworld;assembly=RandomizerCore"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
-             mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+             mc:Ignorable="d" d:DesignWidth="940" d:DesignHeight="820"
              x:Class="CrossPlatformUI.Views.Tabs.OverworldView"
              x:DataType="vm:MainViewModel">
     <Grid RowDefinitions="*, *">
