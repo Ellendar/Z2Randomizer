@@ -328,7 +328,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             var serializeCall = GetSerializeCall(field);
             if (field.IsConditionallyIncluded)
             {
-                sb.AppendLine($"{indent}        if ({field.FieldName}IsIncluded()) {{ ");
+                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
                 sb.AppendLine($"{indent}            {serializeCall};");
                 sb.AppendLine($"{indent}        }}");
             }
@@ -356,7 +356,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             var deserializeCall = GetDeserializeCall(field);
             if (field.IsConditionallyIncluded)
             {
-                sb.AppendLine($"{indent}        if ({field.FieldName}IsIncluded()) {{ ");
+                sb.AppendLine($"{indent}        if ({field.FieldName}Included()) {{ ");
                 sb.AppendLine($"{indent}            {deserializeCall};");
                 sb.AppendLine($"{indent}        }}");
                 sb.AppendLine($"{indent}        else");

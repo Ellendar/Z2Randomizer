@@ -1,8 +1,10 @@
 ﻿using Z2Randomizer.RandomizerCore;
-using Z2Randomizer.RandomizerCore.Overworld;
 
 namespace CrossPlatformUI.Presets;
 
+/// <summary>
+/// Beginner and Default preset.
+/// </summary>
 public static class BeginnerPreset
 {
     public static readonly RandomizerConfiguration Preset = new()
@@ -43,6 +45,8 @@ public static class BeginnerPreset
         EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
         DmClimate = ClimateEnum.CLASSIC,
         MazeClimate = ClimateEnum.CLASSIC,
+        VanillaShuffleUsesActualTerrain = true,
+        ContinentConnectionType = ContinentConnectionType.NORMAL,
 
         //Palaces
         NormalPalaceStyle = PalaceStyle.RANDOM_WALK,
