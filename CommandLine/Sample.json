@@ -170,6 +170,6 @@
 "UpAOnController1": false,
 "UseCommunityText": true,
 "UseCustomRooms": false,
-"VanillaShuffleUsesActualTerrain": false,
+"VanillaShuffleUsesActualTerrain": true,
 "WestBiome": "RANDOM_NO_VANILLA_OR_SHUFFLE"
 }

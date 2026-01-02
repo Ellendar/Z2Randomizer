@@ -19,7 +19,7 @@ public static class RandomPercentPreset
 
         //Overworld
         PalacesCanSwapContinents = null,
-        ShuffleGP = null,
+        ShuffleGp = null,
         ShuffleEncounters = null,
         AllowUnsafePathEncounters = false,
         IncludeLavaInEncounterShuffle = false,
