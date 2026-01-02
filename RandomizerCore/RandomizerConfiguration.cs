@@ -174,19 +174,27 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? palacesCanSwapContinents;
 
     [Reactive]
-    private bool? shuffleGP;
-
-    [Reactive]
-    private bool? shuffleEncounters;
-
-    [Reactive]
-    private bool allowUnsafePathEncounters;
-
-    [Reactive]
-    private bool includeLavaInEncounterShuffle;
+    [ConditionallyIncludeInFlags]
+    private bool? shuffleGp;
+    public bool shuffleGpIncluded() => palacesCanSwapContinents != false;
 
     [Reactive]
     private EncounterRate encounterRate;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool? shuffleEncounters;
+    public bool shuffleEncountersIncluded() => encounterRate != EncounterRate.NONE;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool allowUnsafePathEncounters;
+    public bool allowUnsafePathEncountersIncluded() => shuffleEncountersIncluded() && shuffleEncounters != false;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool includeLavaInEncounterShuffle;
+    public bool includeLavaInEncounterShuffleIncluded() => shuffleEncountersIncluded() && shuffleEncounters != false;
 
     [Reactive]
     private bool? hidePalace;
@@ -195,7 +203,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? hideKasuto;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? shuffleWhichLocationIsHidden;
+    public bool shuffleWhichLocationIsHiddenIncluded() => hidePalace != false || hideKasuto != false;
 
     [Reactive]
     private LessImportantLocationsOption lessImportantLocationsOption;
@@ -252,8 +262,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private ClimateEnum mazeClimate;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     [DefaultValue(true)]
     private bool vanillaShuffleUsesActualTerrain;
+    public bool vanillaShuffleUsesActualTerrainIncluded() {
+        foreach (var biome in (List<Biome>)[westBiome, eastBiome, dmBiome, mazeBiome])
+        {
+            switch (biome)
+            {
+                case Biome.VANILLA_SHUFFLE:
+                case Biome.RANDOM:
+                case Biome.RANDOM_NO_VANILLA:
+                    return true;
+            }
+        }
+        return false;
+    }
 
     //Palaces
     [Reactive]
@@ -262,32 +286,77 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private PalaceStyle gpStyle;
 
+    private bool palaceStylesAreNotAllVanilla()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            switch (style)
+            {
+                case PalaceStyle.VANILLA:
+                    break;
+                default:
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private bool palaceStylesAreNotAllVanillaOrShuffled()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            switch (style)
+            {
+                case PalaceStyle.VANILLA:
+                case PalaceStyle.SHUFFLED:
+                    break;
+                default:
+                    return true;
+            }
+        }
+        return false;
+    }
+
     [Reactive]
     private bool randomStylesAllowVanilla;
 
     [Reactive]
     private bool? includeVanillaRooms;
+    public bool includeVanillaRoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includev4_0Rooms;
+    public bool includev4_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includev5_0Rooms;
+    public bool includev5_0RoomsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool blockingRoomsInAnyPalace;
+    public bool blockingRoomsInAnyPalaceIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     private PalaceDropStyle palaceDropStyle;
+    public bool palaceDropStyleIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType;
+    public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? tBirdRequired;
+    public bool tBirdRequiredIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool removeTBird;
+    public bool removeTBirdIncluded() => tBirdRequiredIncluded() && tBirdRequired != true;
 
     [Reactive]
     private bool restartAtPalacesOnGameOver;
@@ -296,7 +365,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? global5050JarDrop = false;
 
     [Reactive]
-    private bool reduceDripperVariance = false;
+    private bool reduceDripperVariance;
 
     [Reactive]
     private bool changePalacePallettes;
@@ -305,7 +374,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool randomizeBossItemDrop;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private BossRoomMinDistance darkLinkMinDistance;
+    public bool darkLinkMinDistanceIncluded() => palaceStylesAreNotAllVanilla();
 
     [Reactive]
     private PalaceItemRoomCount palaceItemRoomCount;
@@ -316,16 +387,20 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [Limit(7)]
+    [ConditionallyIncludeInFlags]
+    [DefaultValue(6)]
     private int palacesToCompleteMax;
+    public bool palacesToCompleteMaxIncluded() => palacesToCompleteMin != 6;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool noDuplicateRoomsByLayout;
+    public bool noDuplicateRoomsByLayoutIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool noDuplicateRoomsByEnemies;
-
-    [Reactive]
-    private bool generatorsAlwaysMatch;
+    public bool noDuplicateRoomsByEnemiesIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
     [Reactive]
     private bool hardBosses;
@@ -356,7 +431,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private int lifeLevelCap;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool scaleLevelRequirementsToCap;
+    public bool scaleLevelRequirementsToCapIncluded() => attackLevelCap < 8 || magicLevelCap < 8 || lifeLevelCap < 8;
 
     [Reactive]
     private AttackEffectiveness attackEffectiveness;
@@ -393,11 +470,22 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private bool? shufflePalaceEnemies;
 
-    [Reactive]
-    private DripperEnemyOption dripperEnemyOption;
+    private bool anyEnemiesAreShuffled() => shuffleOverworldEnemies != false || shufflePalaceEnemies != false;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
+    private DripperEnemyOption dripperEnemyOption;
+    public bool dripperEnemyOptionIncluded() => anyEnemiesAreShuffled();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? mixLargeAndSmallEnemies;
+    public bool mixLargeAndSmallEnemiesIncluded() => anyEnemiesAreShuffled();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool generatorsAlwaysMatch;
+    public bool generatorsAlwaysMatchIncluded() => anyEnemiesAreShuffled();
 
     [Reactive]
     private EnemyLifeOption shuffleEnemyHP;
@@ -425,10 +513,14 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? shuffleOverworldItems;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? mixOverworldAndPalaceItems;
+    public bool mixOverworldAndPalaceItemsIncluded() => shufflePalaceItems != false && shuffleOverworldItems != false;
 
     [Reactive]
+    [ConditionallyIncludeInFlags]
     private bool? includePBagCavesInItemShuffle;
+    public bool includePBagCavesInItemShuffleIncluded() => shuffleOverworldItems != false;
 
     [Reactive]
     private bool shuffleSmallItems;
@@ -1019,7 +1111,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.AllowPathEnemies = allowUnsafePathEncounters;
         properties.IncludeLavaInEncounterShuffle = includeLavaInEncounterShuffle;
         properties.PalacesCanSwapContinent = palacesCanSwapContinents ?? GetIndeterminateFlagValue(r);
-        properties.P7shuffle = shuffleGP ?? GetIndeterminateFlagValue(r);
+        properties.P7shuffle = shuffleGp ?? GetIndeterminateFlagValue(r);
         properties.HiddenPalace = hidePalace ?? GetIndeterminateFlagValue(r);
         properties.HiddenKasuto = hideKasuto ?? GetIndeterminateFlagValue(r);
 

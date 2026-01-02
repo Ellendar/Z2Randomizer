@@ -19,7 +19,7 @@ public static class MaxRando2025Preset
 
         //Overworld
         PalacesCanSwapContinents = true,
-        ShuffleGP = true,
+        ShuffleGp = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = true,

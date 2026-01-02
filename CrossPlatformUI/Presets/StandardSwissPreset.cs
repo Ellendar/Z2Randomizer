@@ -20,7 +20,7 @@ public static class StandardSwissPreset
 
         //Overworld
         PalacesCanSwapContinents = true,
-        ShuffleGP = true,
+        ShuffleGp = true,
         ShuffleEncounters = true,
         AllowUnsafePathEncounters = true,
         IncludeLavaInEncounterShuffle = false,
@@ -43,6 +43,7 @@ public static class StandardSwissPreset
         EastClimate = ClimateEnum.CLASSIC,
         DmClimate = ClimateEnum.CLASSIC,
         MazeClimate = ClimateEnum.CLASSIC,
+        VanillaShuffleUsesActualTerrain = true,
         ContinentConnectionType = ContinentConnectionType.ANYTHING_GOES,
 
         //Palaces

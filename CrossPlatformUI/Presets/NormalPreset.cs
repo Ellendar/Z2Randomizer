@@ -20,7 +20,7 @@ public static class NormalPreset
 
         //Overworld
         PalacesCanSwapContinents = true,
-        ShuffleGP = true,
+        ShuffleGp = true,
         ShuffleEncounters = false,
         AllowUnsafePathEncounters = false,
         IncludeLavaInEncounterShuffle = false,
@@ -43,6 +43,7 @@ public static class NormalPreset
         EastClimate = ClimateEnum.VANILLA_WEIGHTED_EAST,
         DmClimate = ClimateEnum.CLASSIC,
         MazeClimate = ClimateEnum.CLASSIC,
+        VanillaShuffleUsesActualTerrain = true,
         ContinentConnectionType = ContinentConnectionType.TRANSPORTATION_SHUFFLE,
 
         //Palaces

@@ -294,7 +294,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             .Subscribe(x =>
             {
                 if (x.Value ?? true) return;
-                Main.Config.ShuffleGP = false;
+                Main.Config.ShuffleGp = false;
             });
 
         Main.ObservableForProperty(x => x.ShuffleAllExpState).Subscribe(x =>
