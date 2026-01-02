@@ -1,14 +1,15 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using NLog;
 using Z2Randomizer.RandomizerCore.Flags;
-using Z2Randomizer.RandomizerCore.Overworld;
 using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
@@ -251,6 +252,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private ClimateEnum mazeClimate;
 
     [Reactive]
+    [DefaultValue(true)]
     private bool vanillaShuffleUsesActualTerrain;
 
     //Palaces
@@ -730,18 +732,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         var limit = GetEnumCount<T>();
         var index = flags.ReadInt(limit);
         return GetEnumFromIndex<T>(index)!;
-    }
-    private T? DeserializeNullableEnum<T>(FlagReader flags, string name) where T: Enum
-    {
-        var limit = GetEnumCount<T>();
-        var index = flags.ReadNullableInt(limit);
-        return index == null ? default : GetEnumFromIndex<T>(index.Value)!;
-    }
-
-    private T DeserializeCustom<Serializer, T>(FlagReader flags, string name) where Serializer : IFlagSerializer where T : class
-    {
-        IFlagSerializer serializer = GetSerializer<Serializer>();
-        return (T)serializer.Deserialize(flags.ReadInt(serializer.GetLimit()))!;
     }
 
     private void SerializeBool(FlagBuilder flags, string name, bool? val, bool isNullable)
@@ -1833,5 +1823,29 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Should be called with the field to reset as the expression body:
+    /// SetFieldToDefault(() => SettingToReset);
+    /// </summary>
+    public void SetFieldToDefault<T>(Expression<Func<T>> fieldExpr)
+    {
+        if (fieldExpr.Body is not MemberExpression member || member.Member is not FieldInfo field)
+        {
+            throw new ArgumentException("Expression must reference a field");
+        }
+
+        var target = ((ConstantExpression)member.Expression!).Value;
+
+        var attr = field.GetCustomAttribute<DefaultValueAttribute>();
+        if (attr != null)
+        {
+            field.SetValue(target, attr.Value);
+        }
+        else
+        {
+            field.SetValue(target, default);
+        }
     }
 }

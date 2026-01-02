@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -84,6 +85,8 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             {
                 FieldName = f.Name,
                 FieldType = f.Type.ToDisplayString(),
+                IsConditionallyIncluded = HasConditionallyIncludedInFlagsAttribute(f),
+                DefaultValue = GetDefaultValue(f),
                 IsEnum = f.Type.TypeKind == TypeKind.Enum,
                 EnumSymbol = f.Type.TypeKind == TypeKind.Enum ? f.Type as INamedTypeSymbol : null,
                 Limit = GetCustomLimit(f),
@@ -122,6 +125,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
     {
         return classSymbol.AllInterfaces
             .Any(i => i.Name == "INotifyPropertyChanged");
+    }
+
+    private static bool HasConditionallyIncludedInFlagsAttribute(IFieldSymbol field)
+    {
+        return field.GetAttributes()
+            .Any(attr => attr.AttributeClass?.Name.StartsWith("ConditionallyIncludeInFlags") ?? false);
+    }
+
+    private static string GetDefaultValue(IFieldSymbol f)
+    {
+        var defaultAttr = f.GetAttributes()
+            .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == "System.ComponentModel.DefaultValueAttribute");
+        var arg = defaultAttr?.ConstructorArguments[0];
+        return arg != null ? FormatArgument(arg.Value) : "default";
     }
 
     private static bool HasIgnoreInFlagsAttribute(IFieldSymbol field)
@@ -197,7 +214,7 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
             //     attrName = attrName[..^9];
 
             var args = attr.ConstructorArguments
-                .Select(arg => arg.Value?.ToString() ?? "null")
+                .Select(arg => FormatArgument(arg))
                 .ToList();
 
             attributes.Add(new AttributeInfo
@@ -309,7 +326,16 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var serializeCall = GetSerializeCall(field);
-            sb.AppendLine($"{indent}        {serializeCall};");
+            if (field.IsConditionallyIncluded)
+            {
+                sb.AppendLine($"{indent}        if ({field.FieldName}IsIncluded()) {{ ");
+                sb.AppendLine($"{indent}            {serializeCall};");
+                sb.AppendLine($"{indent}        }}");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        {serializeCall};");
+            }
         }
 
         sb.AppendLine();
@@ -328,7 +354,20 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         foreach (var field in fields)
         {
             var deserializeCall = GetDeserializeCall(field);
-            sb.AppendLine($"{indent}        {deserializeCall};");
+            if (field.IsConditionallyIncluded)
+            {
+                sb.AppendLine($"{indent}        if ({field.FieldName}IsIncluded()) {{ ");
+                sb.AppendLine($"{indent}            {deserializeCall};");
+                sb.AppendLine($"{indent}        }}");
+                sb.AppendLine($"{indent}        else");
+                sb.AppendLine($"{indent}        {{");
+                sb.AppendLine($"{indent}            {GetPropertyName(field.FieldName)} = {field.DefaultValue};");
+                sb.AppendLine($"{indent}        }}");
+            }
+            else
+            {
+                sb.AppendLine($"{indent}        {deserializeCall};");
+            }
         }
         sb.AppendLine();
         sb.AppendLine($"{indent}    }}");
@@ -502,6 +541,28 @@ public class ReactiveObjectSerializeGenerator : IIncrementalGenerator
         var lastDot = fullTypeName.LastIndexOf('.');
         return lastDot >= 0 ? fullTypeName[(lastDot + 1)..] : fullTypeName;
     }
+
+    private static string FormatArgument(TypedConstant arg)
+    {
+        if (arg.Kind == TypedConstantKind.Primitive)
+        {
+            return arg.Value switch
+            {
+                bool b => b ? "true" : "false",
+                string s => $"\"{s}\"",
+                char c => $"'{c}'",
+                null => "null",
+                _ => Convert.ToString(arg.Value, CultureInfo.InvariantCulture)!
+            };
+        }
+
+        if (arg.Kind == TypedConstantKind.Enum)
+        {
+            return $"{arg.Type!.ToDisplayString()}.{arg.Value}";
+        }
+
+        return "null";
+    }
 }
 
 public class ClassGenerationInfo
@@ -517,6 +578,8 @@ public class SerializedFieldInfo
 {
     public string FieldName { get; set; } = string.Empty;
     public string FieldType { get; set; } = string.Empty;
+    public bool IsConditionallyIncluded { get; set; }
+    public string? DefaultValue { get; set; }
     public bool IsEnum { get; set; }
     public INamedTypeSymbol? EnumSymbol { get; set; }
     public int? Limit { get; set; }
