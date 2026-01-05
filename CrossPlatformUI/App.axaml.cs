@@ -139,6 +139,9 @@ public sealed partial class App : Application // , IDisposable
         var state = !TransitionAssist.GetDisableTransitions(TopLevel!);
         TransitionAssist.SetDisableTransitions(TopLevel!, state);
 
+        // This is set during deserialization but it doesn't take, so trigger it again.
+        main.RandomizerViewModel.ThemeVariantName = main.RandomizerViewModel.ThemeVariantName;
+
         base.OnFrameworkInitializationCompleted();
     }
 

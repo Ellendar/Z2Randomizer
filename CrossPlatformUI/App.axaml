@@ -7,11 +7,10 @@
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:behaviors="clr-namespace:CrossPlatformUI.Behaviors"
-             x:Class="CrossPlatformUI.App"
-             RequestedThemeVariant="Default">
+             x:Class="CrossPlatformUI.App">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
-        <themes:MaterialTheme PrimaryColor="DeepPurple" SecondaryColor="LightBlue" />
+        <themes:MaterialTheme />
         <avalonia:MaterialIconStyles />
         <dialogHostAvalonia:DialogHostStyles />
         
