@@ -44,8 +44,6 @@ public partial class NesColorDropdown : UserControl
         set => SetValue(DefaultColorIndexProperty, value);
     }
 
-    public event EventHandler<int>? ColorSelected;
-
     public NesColorDropdown()
     {
         InitializeComponent();
@@ -164,7 +162,6 @@ public partial class NesColorDropdown : UserControl
     {
         SelectedColorIndex = index;
         SetupButton(index);
-        ColorSelected?.Invoke(this, index);
         Popup.IsOpen = false;
     }
 

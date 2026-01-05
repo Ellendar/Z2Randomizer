@@ -91,6 +91,7 @@
                 </BehaviorCollectionTemplate>
             </Setter>
         </Style>
+
         <Style Selector="NumericUpDown">
             <Setter Property="(Interaction.Behaviors)">
                 <BehaviorCollectionTemplate>
@@ -99,6 +100,21 @@
                     </BehaviorCollection>
                 </BehaviorCollectionTemplate>
             </Setter>
+        </Style>
+
+        <Style Selector="Slider">
+            <!-- Circle -->
+            <Style Selector="^ /template/ Thumb#PART_SliderThumb /template/ Border#PART_ThumbGrip">
+                <Setter Property="Background" Value="#f7f7f7" />
+            </Style>
+            <!-- Filled track -->
+            <Style Selector="^ /template/ ProgressBar#PART_ProgressLayer /template/ Border#PART_Indicator">
+                <Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+            </Style>
+            <!-- Background track -->
+            <Style Selector="^ /template/ ProgressBar#PART_ProgressLayer /template/ Border#PART_InactiveState">
+                <Setter Property="Background" Value="{DynamicResource MaterialCheckBoxDisabledBrush}" />
+            </Style>
         </Style>
     </Application.Styles>
   <Application.Resources>

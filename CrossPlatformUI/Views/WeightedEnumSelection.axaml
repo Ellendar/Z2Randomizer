@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+             xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
+             xmlns:ui="clr-namespace:CrossPlatformUI"
+             xmlns:views="clr-namespace:CrossPlatformUI.Views"
+             x:Class="CrossPlatformUI.Views.WeightedEnumSelection"
+             x:DataType="views:WeightedEnumSelection"
+             x:Name="Root">
+
+    <Panel Margin="0 8 0 0">
+        <Border BorderBrush="{DynamicResource BorderColorBrush}" BorderThickness="1"
+                Margin="15 8 15 0" Padding="0 4 0 0" CornerRadius="4">
+            <UniformGrid VerticalAlignment="Top" Columns="1" Rows="0" RowSpacing="8">
+                <ItemsControl ItemsSource="{Binding ItemsSource, ElementName=Root}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="views:EnumItemViewModel">
+                            <Grid Height="32" ColumnDefinitions="*, *" RowDefinitions="*">
+                                <TextBlock Grid.Column="0" VerticalAlignment="Center"
+                                           Text="{Binding Description}" />
+                                <Slider Grid.Column="1" Margin="0 0 13 0"
+                                        Classes="Modern Accent" Foreground="{DynamicResource BorderColorBrush}"
+                                        TickFrequency="1" Maximum="3" IsSnapToTickEnabled="True"
+                                        Value="{Binding SliderValue}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </UniformGrid>
+        </Border>
+
+        <StackPanel VerticalAlignment="Top" Margin="23 0 8 0" Orientation="Horizontal">
+            <TextBlock Margin="0 2 0 2" Padding="9 0 9 0"
+                       Background="{DynamicResource MaterialPaperBrush}"
+                       FontSize="12"
+                       Text="{Binding Heading, ElementName=Root}" />
+        </StackPanel>
+    </Panel>
+</UserControl>
