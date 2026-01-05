@@ -852,6 +852,10 @@ public class StringValueAttribute(string v) : Attribute
     }
 }
 
+public class CanHaveWeightAttribute : Attribute
+{
+}
+
 public class MetastyleAttribute : Attribute
 {
 }
@@ -992,6 +996,16 @@ public static class Enums
         }
 
         return new EnumDescription() { Value = self, Description = description, Info = info };
+    }
+
+    public static bool CanHaveWeight(this Enum self)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return false; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return false; }
+        return fieldInfo.IsDefined(typeof(CanHaveWeightAttribute), inherit: false);
     }
 
     public static bool IsMetastyle(this Enum self)
