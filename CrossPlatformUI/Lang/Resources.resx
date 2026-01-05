@@ -240,13 +240,19 @@ immune in each group is the same as the number in that group that are immune in 
 in the dark to change.</value>
 	</data>
 	<data name="EnemyExperienceDropsToolTip" xml:space="preserve">
-<value>Controls how much experience enemies drop. The possible experience values for an enemy are
+<value>Controls how much experience enemies give.
+
+The possible experience values for an enemy are:
+
 0, 2, 3, 5, 10, 15, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000.
 
-  • Vanilla: Same as the base game
-  • Low: Each enemy gives a random XP level between -3 and +1 levels of vanilla.
-  • Average: Each enemy gives a random XP level between -2 and +2 levels of vanilla.
-  • High: Each enemy gives a random XP level between -1 and +3 levels of vanilla.</value>
+When XP is randomized, the enemy's XP value shifts left or right in this list by the rolled number of steps.
+
+For example, a Blue Stalfos gives 50 XP in the vanilla game. If the XP is rolled -2 to +2 levels,
+the minimum XP it could give is 20 and the maximum is 100.
+
+Also note that XP values are randomized per enemy table and can differ in a single seed. For example
+Red Iron Knuckle XP in P1/P2/P5 could roll down while Red Iron Knuckle XP in P3/P4/P6 rolls up.</value>
 	</data>
 	<data name="EnableHelpfulHintsToolTip" xml:space="preserve">
 <value>When enabled, helpful hints are scattered throughout the world. These hints are provided

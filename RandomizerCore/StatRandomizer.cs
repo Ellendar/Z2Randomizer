@@ -233,8 +233,8 @@ public class StatRandomizer
             for (int i = 0; i < 8; i++)
             {
                 var vanilla = ExperienceToLevelTable[statStartIndex + i];
-                int nextMin = (int)(vanilla - vanilla * 0.25);
-                int nextMax = (int)(vanilla + vanilla * 0.25);
+                int nextMin = (int)(vanilla - vanilla * 0.25); // hardcoded -25%
+                int nextMax = (int)(vanilla + vanilla * 0.25); // hardcoded +25%
                 if (i == 0)
                 {
                     newTable[statStartIndex + i] = r.Next(Math.Max(10, nextMin), nextMax);
@@ -383,7 +383,6 @@ public class StatRandomizer
         {
             return;
         }
-
         if (statEffectiveness == LifeEffectiveness.OHKO)
         {
             Array.Fill<byte>(LifeEffectivenessTable, 0xFF);
@@ -397,6 +396,7 @@ public class StatRandomizer
 
         byte[] newTable = new byte[LIFE_EFFECTIVENESS_ROWS * 8];
 
+        // The values we are randomizing are actually *enemy damage* values
         for (int level = 0; level < 8; level++)
         {
             for (int damageCode = 0; damageCode < LIFE_EFFECTIVENESS_ROWS; damageCode++)
@@ -525,23 +525,11 @@ public class StatRandomizer
 
     protected void RandomizeBossHp(Random r)
     {
-        switch (props.ShuffleBossHP)
-        {
-            case EnemyLifeOption.VANILLA:
-                break;
-            case EnemyLifeOption.MEDIUM:
-                for (int i = 0; i < BossHpTable.Length; i++) { RandomizeInsideArray(r, BossHpTable, i, 0.5, 1.5); }
-                break;
-            case EnemyLifeOption.HIGH:
-                for (int i = 0; i < BossHpTable.Length; i++) { RandomizeInsideArray(r, BossHpTable, i, 1.0, 2.0); }
-                break;
-            case EnemyLifeOption.FULL_RANGE:
-                for (int i = 0; i < BossHpTable.Length; i++) { RandomizeInsideArray(r, BossHpTable, i, 0.5, 2.0); }
-                break;
-            default:
-                throw new NotImplementedException("Invalid ShuffleBossHP value");
+        if (props.ShuffleBossHP == EnemyLifeOption.VANILLA) { return; }
+
+        var rr = props.ShuffleBossHP.GetRandomRangeDouble()!;
+        for (int i = 0; i < BossHpTable.Length; i++) { RandomizeInsideArray(r, BossHpTable, i, rr.Low, rr.High); }
     }
-}
 
     protected void RandomizeEnemyStats(Random r)
     {
@@ -617,32 +605,17 @@ public class StatRandomizer
 
     protected static void RandomizeEnemyExp(Random r, byte[] bytes, XPEffectiveness effectiveness)
     {
+        var rr = effectiveness.GetRandomRangeInt()!;
+
         for (int i = 0; i < bytes.Length; i++)
         {
-            int b = bytes[i];
-            int low = b & 0x0f;
+            int byt = bytes[i];
+            int nibble = byt & 0x0f;
 
-            if (effectiveness == XPEffectiveness.RANDOM_HIGH)
-            {
-                low++;
-            }
-            else if (effectiveness == XPEffectiveness.RANDOM_LOW)
-            {
-                low--;
-            }
-            else if (effectiveness == XPEffectiveness.NONE)
-            {
-                low = 0;
-            }
+            nibble = r.Next(nibble + rr.Low, nibble + rr.High + 1);
+            nibble = Math.Min(Math.Max(nibble, 0), 15);
 
-            if (effectiveness.IsRandom())
-            {
-                low = r.Next(low - 2, low + 3);
-            }
-
-            low = Math.Min(Math.Max(low, 0), 15);
-
-            bytes[i] = (byte)((b & 0xf0) | low);
+            bytes[i] = (byte)((byt & 0xf0) | nibble);
         }
     }
 

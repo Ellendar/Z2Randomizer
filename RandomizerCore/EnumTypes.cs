@@ -132,48 +132,34 @@ public enum LifeEffectiveness
     INVINCIBLE
 }
 
-//I removed no XP drops because literally nobody played it and it saved a bit in the flag string
-//If anyone complains I can put it back but... nobody will.
 [DefaultValue(VANILLA)]
 public enum XPEffectiveness
 {
-    [Description("Vanilla")]
+    [Description("Vanilla (No Randomization)"), RandomRangeInt(Low = 0, High = 0)]
     VANILLA,
-    [Description("Low")]
+    [Description("Low [-3 to +1]"), RandomRangeInt(Low = -3, High = 1), IsRandom]
     RANDOM_LOW,
-    [Description("Average")]
+    [Description("Average [-2 to +2]"), RandomRangeInt(Low = -2, High = 2), IsRandom]
     RANDOM,
-    [Description("High")]
+    [Description("Average (Low Variance) [-1 to +1]"), RandomRangeInt(Low = -1, High = 1), IsRandom]
+    LESS_VARIANCE,
+    [Description("Above Average (Low Variance) [0 to +1]"), RandomRangeInt(Low = 0, High = 1), IsRandom]
+    SLIGHTLY_HIGH,
+    [Description("High [-1 to +3]"), RandomRangeInt(Low = -1, High = 3), IsRandom]
     RANDOM_HIGH,
-    [Description("None")]
+    [Description("None"), RandomRangeInt(Low = -15, High = -15)]
     NONE
-}
-
-public static class XPEffectivenessExtensions
-{
-    public static bool IsRandom(this XPEffectiveness effectiveness)
-    {
-        return effectiveness switch
-        {
-            XPEffectiveness.RANDOM_LOW => true,
-            XPEffectiveness.RANDOM_HIGH => true,
-            XPEffectiveness.RANDOM => true,
-            XPEffectiveness.NONE => false,
-            XPEffectiveness.VANILLA => false,
-            _ => throw new Exception("Unrecognized XPEffectiveness")
-        };
-    }
 }
 
 public enum EnemyLifeOption
 {
     [Description("Vanilla")]
     VANILLA,
-    [Description("Medium [-50% to +50%]")]
+    [Description("Medium [-50% to +50%]"), RandomRangeDouble(Low = 0.5, High = 1.5)]
     MEDIUM,
-    [Description("High [-0% to +100%]")]
+    [Description("High [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
     HIGH,
-    [Description("Full Range [-50% to +100%]")]
+    [Description("Full Range [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
     FULL_RANGE,
 }
 
@@ -326,11 +312,11 @@ public enum Biome
     VOLCANO,
     [Description("Caldera")]
     CALDERA,
-    [Description("Random (No Vanilla or Shuffle)")]
+    [Description("Random (No Vanilla or Shuffle)"), IsRandom]
     RANDOM_NO_VANILLA_OR_SHUFFLE,
-    [Description("Random (No Vanilla)")]
+    [Description("Random (No Vanilla)"), IsRandom]
     RANDOM_NO_VANILLA,
-    [Description("Random")]
+    [Description("Random"), IsRandom]
     RANDOM
 }
 
@@ -759,6 +745,36 @@ public class StringValueAttribute(string v) : Attribute
     }
 }
 
+public class IsRandomAttribute : Attribute
+{
+}
+
+[AttributeUsage(AttributeTargets.Field)]
+public class RandomRangeDoubleAttribute : Attribute
+{
+    /// <summary>
+    /// Inclusive lower end of randomized value
+    /// </summary>
+    public double Low { get; init; }
+    /// <summary>
+    /// Inclusive upper end of randomized value
+    /// </summary>
+    public double High { get; init; }
+}
+
+[AttributeUsage(AttributeTargets.Field)]
+public class RandomRangeIntAttribute : Attribute
+{
+    /// <summary>
+    /// Inclusive lower end of randomized value
+    /// </summary>
+    public int Low { get; init; }
+    /// <summary>
+    /// Inclusive upper end of randomized value
+    /// </summary>
+    public int High { get; init; }
+}
+
 public record EnumDescription
 {
     public object? Value { get; init; }
@@ -831,7 +847,7 @@ public static class Enums
         }
         return Enum.ToObject(enumType, (attributes[0] as DefaultValueAttribute)?.Value!);
     }
-    
+
     public static EnumDescription ToDescription(this Enum value)
     {
         string description;
@@ -855,6 +871,36 @@ public static class Enums
         }
 
         return new EnumDescription() { Value = value, Description = description, Help = help };
+    }
+
+    public static bool IsRandom(this Enum self)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return false; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return false; }
+        return fieldInfo.IsDefined(typeof(IsRandomAttribute), inherit: false);
+    }
+
+    public static RandomRangeDoubleAttribute? GetRandomRangeDouble(this Enum self)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return null; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return null; }
+        return fieldInfo.GetCustomAttribute<RandomRangeDoubleAttribute>(inherit: false);
+    }
+
+    public static RandomRangeIntAttribute? GetRandomRangeInt(this Enum self)
+    {
+        Type type = self.GetType();
+        string? name = Enum.GetName(type, self);
+        if (name == null) { return null; }
+        FieldInfo? fieldInfo = type.GetField(name);
+        if (fieldInfo == null) { return null; }
+        return fieldInfo.GetCustomAttribute<RandomRangeIntAttribute>(inherit: false);
     }
 
     public static string? GetStringValue(Enum value)
