@@ -6,10 +6,11 @@
              xmlns:rc="clr-namespace:Z2Randomizer.RandomizerCore;assembly=RandomizerCore"
              xmlns:ui="clr-namespace:CrossPlatformUI"
              xmlns:vm="clr-namespace:CrossPlatformUI.ViewModels"
+             xmlns:vmt="clr-namespace:CrossPlatformUI.ViewModels.Tabs"
              xmlns:lang="clr-namespace:Z2Randomizer.CrossPlatformUI.Lang"
              mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
-             x:DataType="vm:MainViewModel"
-             x:Class="CrossPlatformUI.Views.Tabs.HintsView">
+             x:Class="CrossPlatformUI.Views.Tabs.HintsView"
+             x:DataType="vmt:HintsViewModel">
     <Grid ColumnDefinitions="*, *">
         <StackPanel Grid.Column="0">
             <HyperlinkButton
@@ -24,36 +25,35 @@
 
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.EnableHelpfulHints}"
+                IsChecked="{Binding Main.Config.EnableHelpfulHints}"
                 Content="Enable Helpful Hints"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableHelpfulHintsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.EnableSpellItemHints}"
+                IsChecked="{Binding Main.Config.EnableSpellItemHints}"
                 Content="Enable Spell Item Hints"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableSpellItemHintsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
                 IsThreeState="True"
-                IsChecked="{Binding Config.EnableTownNameHints}"
+                IsChecked="{Binding Main.Config.EnableTownNameHints}"
                 Content="Enable Town Name Hints"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.EnableTownNameHintsToolTip}"/></ToolTip.Tip>
             </CheckBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <CheckBox
-                IsThreeState="False"
-                IsChecked="{Binding Config.GenerateSpoiler}"
-                Content="Generate Spoiler"
-            >
+            <CheckBox IsChecked="{Binding Main.Config.GenerateSpoiler}"
+                      Margin="14,4,4,4" Padding="0,4,0,4"
+                      Background="{Binding HeaderBackgroundObservable^}"
+                      Content="Generate Spoiler">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GenerateSpoilerToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <CheckBox
-                IsChecked="{Binding Config.RevealWalkthroughWalls}"
+                IsChecked="{Binding Main.Config.RevealWalkthroughWalls}"
                 Content="Reveal Walkthrough Walls"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.RevealWalkthroughWallsToolTip}"/></ToolTip.Tip>
