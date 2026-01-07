@@ -183,7 +183,7 @@
                 <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-                <tabs:PalacesView DataContext="{Binding Main}"/>
+                <tabs:PalacesView DataContext="{Binding PalacesViewModel}"/>
             </TabItem>
             <TabItem Header="Levels">
                 <tabs:LevelsView DataContext="{Binding Main}"/>
