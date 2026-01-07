@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,96 +6,81 @@ using System.Numerics;
 
 namespace Z2Randomizer.RandomizerCore.Flags;
 
+/// <summary>
+/// Sequential reader for decoding flag strings produced by <see cref="FlagBuilder"/>.
+/// </summary>
+/// <remarks>
+/// The reader expands the encoded flag string into a linear bit stream and
+/// consumes bits in order as typed values. Consumers are responsible for
+/// reading values in the same order and with the same extents used during encoding.
+/// </remarks>
 public class FlagReader
 {
-    //This is a lazy backwards implementation Digshake's base64 encoding system.
-    private static readonly Dictionary<char, int> BASE64_DECODE = new(64)
+    private static readonly byte[] Base64DecodeTable = CreateDecodeTable();
+
+    private static byte[] CreateDecodeTable()
     {
-        {'A', 0},
-        {'B', 1},
-        {'C', 2},
-        {'D', 3},
-        {'E', 4},
-        {'F', 5},
-        {'G', 6},
-        {'H', 7},
-        {'J', 8},
-        {'K', 9},
-        {'L', 10},
-        {'M', 11},
-        {'N', 12},
-        {'O', 13},
-        {'P', 14},
-        {'Q', 15},
-        {'R', 16},
-        {'S', 17},
-        {'T', 18},
-        {'U', 19},
-        {'V', 20},
-        {'W', 21},
-        {'X', 22},
-        {'Y', 23},
-        {'Z', 24},
+        var table = new byte[128];
 
-        {'a', 25},
-        {'b', 26},
-        {'c', 27},
-        {'d', 28},
-        {'e', 29},
-        {'f', 30},
-        {'g', 31},
-        {'h', 32},
-        {'i', 33},
-        {'j', 34},
-        {'k', 35},
-        {'m', 36},
-        {'n', 37},
-        {'o', 38},
-        {'p', 39},
-        {'q', 40},
-        {'r', 41},
-        {'s', 42},
-        {'t', 43},
-        {'u', 44},
-        {'v', 45},
-        {'w', 46},
-        {'x', 47},
-        {'y', 48},
-        {'z', 49},
+        var alphabet = FlagBuilder.ENCODING_TABLE;
+        for (int i = 0; i < alphabet.Length; i++)
+        {
+            table[alphabet[i]] = (byte)i;
+        }
 
-        {'1', 50},
-        {'2', 51},
-        {'3', 52},
-        {'4', 53},
-        {'5', 54},
-        {'6', 55},
-        {'7', 56},
-        {'8', 57},
-        {'9', 58},
-        {'0', 59},
-        {'!', 60},
-        {'@', 61},
-        {'#', 62},
-        {'+', 63},
-    };
+        return table;
+    }
 
+    /// <summary>
+    /// List of decoded bits as bools.
+    /// </summary>
     private readonly List<bool> bits = [];
+
+    /// <summary>
+    /// Current read position within <see cref="bits"/>.
+    /// </summary>
     private int index = 0;
+
+    /// <summary>
+    /// Initializes a new <see cref="FlagReader"/> from an encoded flag string.
+    /// </summary>
+    /// <param name="flags">
+    /// The encoded flag string produced by <see cref="FlagBuilder.ToString"/>.
+    /// </param>
+    /// <remarks>
+    /// Each character in the string is decoded into six bits using the same
+    /// encoding table as <see cref="FlagBuilder"/>.
+    ///
+    /// The character '$' is treated as equivalent to '+' for command-line compatibility.
+    /// </remarks>
     public FlagReader(string flags)
     {
         // NOTE: The '$' was replaced with '+' to help with command line usage
         flags = flags.Replace('$', '+');
-        foreach (var decode in flags.Select(character => BASE64_DECODE[character]))
+        foreach (byte decode in flags.Select(character => Base64DecodeTable[character]))
         {
-            bits.Add((decode & 0b100000) > 0);
-            bits.Add((decode & 0b010000) > 0);
-            bits.Add((decode & 0b001000) > 0);
-            bits.Add((decode & 0b000100) > 0);
-            bits.Add((decode & 0b000010) > 0);
-            bits.Add((decode & 0b000001) > 0);
+            bits.Add((decode & 0b100000) != 0);
+            bits.Add((decode & 0b010000) != 0);
+            bits.Add((decode & 0b001000) != 0);
+            bits.Add((decode & 0b000100) != 0);
+            bits.Add((decode & 0b000010) != 0);
+            bits.Add((decode & 0b000001) != 0);
         }
     }
 
+    /// <summary>
+    /// Reads a fixed number of bits from the stream and returns them as an integer.
+    /// </summary>
+    /// <param name="count">
+    /// The number of bits to read (1–8).
+    /// </param>
+    /// <returns>
+    /// The decoded integer value represented by the bits.
+    /// </returns>
+    /// <remarks>
+    /// Bits are interpreted most-significant first, matching the encoding behavior
+    /// of <see cref="FlagBuilder"/>.
+    /// </remarks>
     private int Take(int count)
     {
         switch (count)
@@ -122,11 +106,18 @@ public class FlagReader
         return ret;
     }
 
+    /// <summary>
+    /// Reads a single bit and returns it as a boolean value.
+    /// </summary>
     public bool ReadBool()
     {
         int result = Take(1);
         return result != 0;
     }
+
+    /// <summary>
+    /// Reads a nullable boolean value encoded in two bits.
+    /// </summary>
     public bool? ReadNullableBool()
     {
         int take = Take(2);
@@ -138,24 +129,77 @@ public class FlagReader
             _ => throw new InvalidDataException("Invalid nullable bool value")
         };
     }
-    public byte ReadByte(int extent)
-    {
-        return (byte)Take(BitOperations.Log2((uint)extent - 1) + 1);
-    }
-    public byte? ReadNullableByte(int extent)
-    {
-        int result = (byte)Take(BitOperations.Log2((uint)extent) + 1);
-        if (result == extent)
-        {
-            return null;
-        }
-        return (byte?)result;
-    }
+
+    /// <summary>
+    /// Reads an integer value using a fixed number of bits.
+    /// 
+    /// The number of bits read will be the minimum number of bits needed
+    /// to represent values in the range <c>[minimum, minimum + extent - 1]</c>.
+    /// </summary>
+    /// <param name="extent">
+    /// The number of distinct values that may be represented.
+    /// </param>
+    /// <param name="minimum">
+    /// Optional minimum value added to the decoded result.
+    /// </param>
+    /// <returns>
+    /// The decoded integer value.
+    /// </returns>
+    /// <remarks>
+    /// <example>
+    /// Examples (with <c>minimum = 0</c>):
+    /// <list type="bullet">
+    /// <item><description>
+    /// <c>extent = 4</c> → values 0–3, uses 2 bits
+    /// </description></item>
+    /// <item><description>
+    /// <c>extent = 8</c> → values 0–7, uses 3 bits
+    /// </description></item>
+    /// </list>
+    /// </example>
+    ///
+    /// The same <paramref name="extent"/> and <paramref name="minimum"/> values
+    /// must be used during encoding to ensure correct decoding.
+    /// </remarks>
     public int ReadInt(int extent, int? minimum = null)
     {
         var min = minimum ?? 0;
         return Take(BitOperations.Log2((uint)extent - 1) + 1) + min;
     }
+
+    /// <summary>
+    /// Reads a nullable integer value using a fixed number of bits.
+    /// 
+    /// The number of bits read will be the minimum number of bits needed
+    /// to represent values in the range
+    /// <c>[minimum, minimum + extent - 1]</c>, where the value
+    /// <c>minimum + extent</c> is reserved as a sentinel representing <c>null</c>.
+    /// </summary>
+    /// <param name="extent">
+    /// The number of distinct non-null values that may be represented.
+    /// </param>
+    /// <param name="minimum">
+    /// Optional minimum value added to non-null decoded results.
+    /// </param>
+    /// <returns>
+    /// The decoded integer value, or <c>null</c>.
+    /// </returns>
+    /// <remarks>
+    /// <example>
+    /// Examples (with <c>minimum = 0</c>):
+    /// <list type="bullet">
+    /// <item><description>
+    /// <c>extent = 3</c> → values 0–2 or null, uses 2 bits
+    /// </description></item>
+    /// <item><description>
+    /// <c>extent = 7</c> → values 0–6 or null, uses 3 bits
+    /// </description></item>
+    /// </list>
+    /// </example>
+    ///
+    /// The same <paramref name="extent"/> and <paramref name="minimum"/> values
+    /// must be used during encoding to ensure correct decoding.
+    /// </remarks>
     public int? ReadNullableInt(int extent, int? minimum = null)
     {
         var min = minimum ?? 0;
@@ -165,35 +209,5 @@ public class FlagReader
             return null;
         }
         return result + min;
-    }
-
-    public T ReadEnum<T>() where T : struct, Enum
-    {
-        if (!typeof(T).IsEnum)
-        {
-            throw new ArgumentException("Invalid ReadEnum on non-enumeration type");
-        }
-
-        int limit = Enum.GetValues(typeof(T)).Length - 1;
-
-        int take = (byte)Take(BitOperations.Log2((uint)limit) + 1);
-        return (T)Enum.GetValues<T>().GetValue(take)!;
-    }
-
-    public T? ReadNullableEnum<T>() where T : struct, IConvertible
-    {
-        if (!typeof(T).IsEnum)
-        {
-            throw new ArgumentException("Invalid ReadEnum on non-enumeration type");
-        }
-
-        int limit = Enum.GetValues(typeof(T)).Length;
-
-        int take = (byte)Take(BitOperations.Log2((uint)limit) + 1);
-        if(take == limit)
-        {
-            return null;
-        }
-        return (T)Enum.ToObject(typeof(T), take);
     }
 }
