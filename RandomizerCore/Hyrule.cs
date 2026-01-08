@@ -308,24 +308,10 @@ public class Hyrule
                 assembler.Add(sideviewModule);
             }
 
-            //Allows casting magic without requeueing a spell
-            if (props.FastCast)
-            {
-                ROMData.WriteFastCastMagic();
-            }
-
-            bool randomizeMusic = false;
-            if (props.DisableMusic)
-            {
-                ROMData.DisableMusic();
-            }
-            else
-                randomizeMusic = props.RandomizeMusic;
-
             ROMData.WriteKasutoJarAmount(kasutoJars);
             ROMData.DoHackyFixes();
             ROMData.AdjustGpProjectileDamage();
-			
+
             shuffler.ShuffleDrops(ROMData, r);
             shuffler.ShufflePbagAmounts(ROMData, r);
 
@@ -344,9 +330,6 @@ public class Hyrule
             }
 
             ShortenWizards();
-
-            // startRandomizeStartingValuesTimestamp = DateTime.Now;
-            // RandomizeEnemyStats();
 
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
@@ -412,6 +395,27 @@ public class Hyrule
             StatRandomizer randomizedStats = new(ROMData, props);
             randomizedStats.Randomize(r);
             randomizedStats.Write(ROMData);
+
+            // ideally this should be calculated later, but custom music changes asm patches
+            byte[] randoRomHash = MD5Hash.ComputeHash(ROMData.rawdata);
+
+            // ROM changes after this will vary with customize tab options
+            //Allows casting magic without requeueing a spell
+            if (props.FastCast)
+            {
+                ROMData.WriteFastCastMagic();
+            }
+
+            bool randomizeMusic = false;
+            if (props.DisableMusic)
+            {
+                ROMData.DisableMusic();
+            }
+            else
+            {
+                randomizeMusic = props.RandomizeMusic;
+            }
+
             ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
 
             var rom = await ROMData.ApplyAsm(assembler);
@@ -475,14 +479,10 @@ public class Hyrule
             byte[] finalRNGState = new byte[32];
 
             r.NextBytes(finalRNGState);
-            var version = (Assembly.GetEntryAssembly()?.GetName()?.Version) 
-                ?? throw new Exception("Invalid entry assembly version information");
-            var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
             byte[] hash = MD5Hash.ComputeHash(Encoding.UTF8.GetBytes(
                 Flags +
                 SeedHash +
-                versionstr +
-                // TODO get room file hash
+                randoRomHash + // ideally this should be all that's required
                 // Util.ReadAllTextFromFile(config.GetRoomsFile()) +
                 Util.ByteArrayToHexString(finalRNGState)
             ));
@@ -1172,10 +1172,11 @@ public class Hyrule
         try
         {
             ROM testRom = new(ROMData);
+            Random testRng = new Random();
             //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
             //be tested here, but we don't actually know what they will be until later, for now i'm just
             //testing with the vanilla text, but this could be an issue down the line.
-            ApplyAsmPatches(props, validationEngine, r, ROMData.GetGameText(), testRom, new StatRandomizer(testRom, props));
+            ApplyAsmPatches(props, validationEngine, testRng, ROMData.GetGameText(), testRom, new StatRandomizer(testRom, props));
             validationEngine.Add(sideviewModule);
             await testRom.ApplyAsm(validationEngine); //.Wait(ct);
         }
@@ -2159,7 +2160,7 @@ public class Hyrule
     }
 
     //Updated to use fisher-yates. Eventually i'll catch all of these. N is small enough here it REALLY makes a difference
-    private void ShuffleEncounters(ROM rom, List<int> addr)
+    private static void ShuffleEncounters(ROM rom, Random r, List<int> addr)
     {
         for (int i = addr.Count - 1; i > 0; --i)
         {
@@ -2170,17 +2171,13 @@ public class Hyrule
             rom.Put(addr[swap], temp);
         }
     }
-    private void RandomizeStartingValues(Assembler a, ROM rom)
+
+    private void RandomizeStartingValues(RandomizerProperties props, Assembler a, Random r, ROM rom)
     {
 
         rom.Put(0x17AF3, (byte)props.StartAtk);
         rom.Put(0x17AF4, (byte)props.StartMag);
         rom.Put(0x17AF5, (byte)props.StartLifeLvl);
-
-        if (props.RemoveFlashing)
-        {
-            rom.DisableFlashing();
-        }
 
         if (props.SpellEnemy)
         {
@@ -2247,20 +2244,6 @@ public class Hyrule
             rom.Put(0x28ba, new byte[] { 0xA5, 0x26, 0xD0, 0x0D, 0xEE, 0xE0, 0x06, 0xA9, 0x01, 0x2D, 0xE0, 0x06, 0xD0, 0x03, 0x4C, 0x98, 0x82, 0x4C, 0x93, 0x82 });
         }
 
-        //CMP      #$20                      ; 0x1d4e4 $D4D4 C9 20
-        rom.Put(0x1d4e5, props.BeepThreshold);
-        if (props.BeepFrequency == 0)
-        {
-            //C9 20 - EA 38
-            //CMP 20 -> NOP SEC
-            rom.Put(0x1D4E4, (byte)0xEA);
-            rom.Put(0x1D4E5, (byte)0x38);
-        }
-        else
-        {
-            //LDA      #$30                      ; 0x193c1 $93B1 A9 30
-            rom.Put(0x193c2, props.BeepFrequency);
-        }
 
         if (props.ShuffleLifeRefill)
         {
@@ -2296,7 +2279,7 @@ public class Hyrule
                 addr.Add(0x4423);
             }
 
-            ShuffleEncounters(rom, addr);
+            ShuffleEncounters(rom, r, addr);
 
             addr = new List<int>();
             addr.Add(0x841B); // 0x62: East grass
@@ -2317,7 +2300,7 @@ public class Hyrule
                 addr.Add(0x8424);
             }
 
-            ShuffleEncounters(rom, addr);
+            ShuffleEncounters(rom, r, addr);
         }
 
         if (props.JumpAlwaysOn)
@@ -2341,15 +2324,11 @@ public class Hyrule
 
         rom.Put(0x17B10, (byte)props.StartGems);
 
-
         startHearts = props.StartHearts;
         rom.Put(0x17B00, (byte)startHearts);
 
-
         maxHearts = props.MaxHearts;
-
         heartContainersInItemPool = maxHearts - startHearts;
-
 
         rom.Put(0x1C369, (byte)props.StartLives);
 
@@ -2376,7 +2355,24 @@ public class Hyrule
             int drop = r.Next(5) + 4;
             rom.Put(0x1E8B0, (byte)drop);
         }
+    }
 
+    private static void ApplyBeepSettings(RandomizerProperties props, ROM rom)
+    {
+        //CMP      #$20                      ; 0x1d4e4 $D4D4 C9 20
+        rom.Put(0x1d4e5, props.BeepThreshold);
+        if (props.BeepFrequency == 0)
+        {
+            //C9 20 - EA 38
+            //CMP 20 -> NOP SEC
+            rom.Put(0x1D4E4, (byte)0xEA);
+            rom.Put(0x1D4E5, (byte)0x38);
+        }
+        else
+        {
+            //LDA      #$30                      ; 0x193c1 $93B1 A9 30
+            rom.Put(0x193c2, props.BeepFrequency);
+        }
     }
 
     private void UpdateRom()
@@ -2886,7 +2882,7 @@ public class Hyrule
         return new byte[] { (byte)(val & 0xff), (byte)(val >> 8) };
     }
 
-    private void AddCropGuideBoxesToFileSelect(Assembler a)
+    private static void AddCropGuideBoxesToFileSelect(Assembler a)
     {
         a.Module().Code("""
 .segment "PRG5"
@@ -3043,7 +3039,7 @@ HelmetHeadGoomaFix:
 """, "helmethead_gooma_fix.s");
     }
 
-    private void RestartWithPalaceUpA(Assembler a) {
+    private static void RestartWithPalaceUpA(Assembler a) {
         a.Module().Code("""
 .include "z2r.inc"
 
@@ -3109,7 +3105,7 @@ SaveWorldStateAndClearFlag:
     /// <summary>
     /// I assume this fixes the XP on screen transition softlock, but who knows with all these magic bytes.
     /// </summary>
-    private void FixSoftLock(Assembler a)
+    private static void FixSoftLock(Assembler a)
     {
         a.Module().Code("""
 .segment "PRG7"
@@ -3128,12 +3124,12 @@ FixSoftlock:
 """, "fix_softlock.s");
     }
     
-    public void ExpandedPauseMenu(Assembler a)
+    public static void ExpandedPauseMenu(Assembler a)
     {
         a.Module().Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.ExpandedPauseMenu.s"), "expand_pause.s");
     }
     
-    public void StandardizeDrops(Assembler a)
+    public static void StandardizeDrops(Assembler a)
     {
         a.Module().Code("""
 .segment "PRG7"
@@ -3152,7 +3148,7 @@ StandardizeDrops:
 """, "standardize_drops.s");
     }
 
-    public void PreventSideviewOutOfBounds(Assembler a)
+    public static void PreventSideviewOutOfBounds(Assembler a)
     {
         a.Module().Code("""
 ; In vanilla, sideview loading routinely reads a few extra bytes past the end of sideview data,
@@ -3178,7 +3174,7 @@ CheckIfEndOfData:
 """, "prevent_sideview_oob.s");
     }
 
-    public void FixContinentTransitions(Assembler asm)
+    public void SetPalacePalettes(Assembler asm)
     {
         var a = asm.Module();
         a.Assign("P1Palette", (byte)palPalettes[westHyrule?.locationAtPalace1.PalaceNumber ?? 0]);
@@ -3189,7 +3185,24 @@ CheckIfEndOfData:
         a.Assign("P6Palette", (byte)palPalettes[eastHyrule?.locationAtPalace6.PalaceNumber ?? 5]);
         a.Assign("PGreatPalette", (byte)palPalettes[eastHyrule?.locationAtGP.PalaceNumber ?? 6]);
         a.Code("""
+.include "z2r.inc"
 
+.segment "PRG7"
+
+.org $ce32
+    lda PalacePaletteOffset,y
+
+.reloc
+PalacePaletteOffset:
+    .byte P1Palette, P2Palette, P3Palette, $20, $30, $30, $30, $30, P5Palette, P6Palette, PGreatPalette, $60, P4Palette
+""", "set_palace_palettes.s");
+    }
+
+
+    public static void FixContinentTransitions(Assembler asm)
+    {
+        var a = asm.Module();
+        a.Code("""
 .include "z2r.inc"
 
 .import SwapPRG
@@ -3220,15 +3233,9 @@ FREE_UNTIL $cd5f
     asl a
     tay
 
-.org $ce32
-    lda PalacePaletteOffset,y
-
 .reloc
 ExpandedRegionBankTable:
     .byte $01, $01, $02, $02
-.reloc
-PalacePaletteOffset:
-    .byte P1Palette, P2Palette, P3Palette, $20, $30, $30, $30, $30, P5Palette, P6Palette, PGreatPalette, $60, P4Palette
 .reloc
 RaftWorldMappingTable:
     .byte $00, $02, $00, $02
@@ -3323,7 +3330,7 @@ EndTileComparisons = $8601
 """, "fix_continent_transitions.s");
     }
 
-    private void UpdateTexts(Assembler asm, List<Text> hints)
+    private static void UpdateTexts(Assembler asm, List<Text> hints)
     {
         var a = asm.Module();
         // Clear out the ROM for the existing tables
@@ -3369,7 +3376,7 @@ EndTileComparisons = $8601
         a.Assign("RealPalaceAtLocationGP", (eastHyrule?.locationAtGP.PalaceNumber ?? 7) - 1);
     }
 
-    public void StatTracking(Assembler asm)
+    public void StatTracking(RandomizerProperties props, Assembler asm)
     {
         var a = asm.Module();
         a.Segment("PRG1");
@@ -3420,11 +3427,11 @@ EndTileComparisons = $8601
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random r, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
-        ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic);
+        ChangeMapperToMMC5(engine, props.DisableHUDLag, randomizeMusic); // will make output vary with customize tab options
         rom.AddRandomizerToTitle(engine);
         AddCropGuideBoxesToFileSelect(engine);
         FixHelmetheadBossRoom(engine);
@@ -3438,7 +3445,7 @@ EndTileComparisons = $8601
         rom.FixItemPickup(engine);
         rom.FixMinibossGlitchyAppearance(engine);
         rom.FixBossKillPaletteGlitch(engine);
-        StatTracking(engine);
+        StatTracking(props, engine);
 
         if (props.ShuffleBossHP != EnemyLifeOption.VANILLA)
         {
@@ -3467,7 +3474,7 @@ EndTileComparisons = $8601
                     throw new ImpossibleException();
             }
             byte dripperId = (byte)dripperEnemies[r.Next(dripperEnemies.Length)];
-            ROMData.Put(RomMap.DRIPPER_ID, dripperId);
+            rom.Put(RomMap.DRIPPER_ID, dripperId);
 
             if (props.DripperEnemyOption == DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP)
             {
@@ -3493,7 +3500,7 @@ EndTileComparisons = $8601
 
         if (props.RandomizeKnockback)
         {
-            rom.RandomizeKnockback(engine, RNG);
+            rom.RandomizeKnockback(engine, r);
         }
 
         if (props.HardBosses)
@@ -3506,11 +3513,6 @@ EndTileComparisons = $8601
             rom.DashSpell(engine);
         }
 
-        if (props.UpAC1)
-        {
-            rom.UpAController1(engine);
-        }
-        
         if (props.UpARestartsAtPalaces)
         {
             RestartWithPalaceUpA(engine);
@@ -3527,17 +3529,29 @@ EndTileComparisons = $8601
         }
         FixSoftLock(engine);
         
-        RandomizeStartingValues(engine, rom);
+        RandomizeStartingValues(props, engine, r, rom);
         rom.FixStaleSaveSlotData(engine);
         rom.UseExtendedBanksForPalaceRooms(engine);
         rom.ExtendMapSize(engine);
         ExpandedPauseMenu(engine);
+        SetPalacePalettes(engine);
         FixContinentTransitions(engine);
         PreventSideviewOutOfBounds(engine);
 
+        // things that depend on customize tab options below
+        ApplyBeepSettings(props, rom);
+        if (props.RemoveFlashing)
+        {
+            rom.DisableFlashing();
+        }
+        if (props.UpAC1)
+        {
+            rom.UpAController1(engine);
+        }
+
         if (!props.DisableMusic && randomizeMusic)
         {
-            ROMData.ApplyIps(
+            rom.ApplyIps(
                 Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2rndft.ips"));
             // really hacky workaround but i don't want to recompile z2ft
             // z2ft is compiled using an old address for NmiBankShadow8 and NmiBankShadowA so rather than
@@ -3549,9 +3563,9 @@ EndTileComparisons = $8601
             {
                 var idx = 0;
                 var needle = new ReadOnlySpan<byte>([opcode, (byte)before, (byte)(before >> 8)]);
-                while (ROMData.rawdata.AsSpan(idx).IndexOf(needle) is var di and >= 0)
+                while (rom.rawdata.AsSpan(idx).IndexOf(needle) is var di and >= 0)
                 {
-                    ROMData.Put(idx + di, opcode, (byte)after, (byte)(after >> 8));
+                    rom.Put(idx + di, opcode, (byte)after, (byte)(after >> 8));
                     idx += di + 1;
                 }
             }
@@ -3566,7 +3580,6 @@ EndTileComparisons = $8601
         }
 
         UpdateTexts(engine, texts);
-
     }
 
     //This entire town location shuffle structure is awful if this method needs to exist.
