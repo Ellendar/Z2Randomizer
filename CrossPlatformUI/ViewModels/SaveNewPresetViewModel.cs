@@ -84,7 +84,7 @@ public class SaveNewPresetViewModel : ReactiveValidationObject, IRoutableViewMod
         SavePreset = ReactiveCommand.Create(() => {
             Main.SaveNewPresetDialogOpen = false;
             // Setting the preset config through the flags creates a deep clone instead of a reference
-            var preset = new CustomPreset(PresetName, new RandomizerConfiguration { Flags = Main.Config.Flags });
+            var preset = new CustomPreset(PresetName, new RandomizerConfiguration(Main.Config.SerializeFlags()));
             SavedPresets.Add(preset);
         });
         CancelPreset = ReactiveCommand.Create(() =>

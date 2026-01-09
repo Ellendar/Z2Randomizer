@@ -3,7 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
@@ -11,16 +13,22 @@ using Avalonia.Styling;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
+using Z2Randomizer.RandomizerCore;
 using CrossPlatformUI.Presets;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels.Tabs;
-using Z2Randomizer.RandomizerCore;
 
 namespace CrossPlatformUI.ViewModels;
 
 [RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel, IActivatableViewModel
 {
+    [JsonIgnore]
+    public IObservable<bool> CanGenerateObservable { get; private set; }
+
+    [JsonIgnore]
+    public BehaviorSubject<bool> FlagsValidSubject = new(true);
+
     private bool IsFlagStringValid(string flags)
     {
         try
@@ -33,6 +41,9 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             return false;
         }
     }
+
+    [JsonIgnore]
+    public string FlagInput { get; set { field = value.Trim(); this.RaisePropertyChanged(); } } = "";
 
     [JsonIgnore]
     public string Seed
@@ -92,7 +103,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         {
             // By writing the flags like this, it will update all the reactive elements watching each
             // individual fields.
-            Main.Config.Flags = config.Flags;
+            Main.Config.DeserializeFlags(config.SerializeFlags());
         });
         
         LoadRom = ReactiveCommand.CreateFromObservable(
@@ -129,18 +140,16 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
             ThemeVariantName = App.Current.RequestedThemeVariant?.Key.ToString() ?? "Default";
         });
 
-        CanGenerate = this.WhenAnyValue(
-            x => x.Flags,
-            x => x.Main.Config.Seed,
-            x => x.Main.RomFileViewModel.HasRomData,
-            (flags, seed, hasRomData) =>
-                IsFlagStringValid(flags) && !string.IsNullOrWhiteSpace(seed) && hasRomData
-        ).CombineLatest(this.Main.GenerateRomViewModel.IsRunning,
-                        (validInput, alreadyRunning) => validInput && !alreadyRunning);
+        var seedValidObservable = this.WhenAnyValue(x => x.Main.Config.Seed, seed => !string.IsNullOrWhiteSpace(seed));
+
+        CanGenerateObservable = Observable.CombineLatest(
+            FlagsValidSubject, seedValidObservable, Main.RomFileViewModel.HasRomDataObservable, Main.GenerateRomViewModel.IsRunning,
+            (flagsValid, seedValid, hasRom, isRunning) => flagsValid && seedValid && hasRom && !isRunning);
+
         Generate = ReactiveCommand.Create(() =>
         {
             Main.GenerateRomDialogOpen = true;
-        }, CanGenerate);
+        }, CanGenerateObservable);
 
         VisitDiscord = ReactiveCommand.CreateFromTask<Control>(async control =>
         {
@@ -166,7 +175,7 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
         SaveAsPreset = ReactiveCommand.Create((string name) =>
         {
-            var updatedPreset = new CustomPreset(name, new RandomizerConfiguration { Flags = Main.Config.Flags });
+            var updatedPreset = new CustomPreset(name, new RandomizerConfiguration(Main.Config.SerializeFlags()));
             var collection = Main.SaveNewPresetViewModel.SavedPresets;
             // makeshift FindIndex since ObservableCollection doesn't have one
             int presetIndex = -1;
@@ -190,42 +199,40 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         this.WhenActivated(OnActivate);
     }
 
-    private void OnActivate(CompositeDisposable disposable)
+    private void OnActivate(CompositeDisposable disposables)
     {
-        // If the Flags are entirely default, use the beginner preset
-        Flags = Main.Config.Flags == new RandomizerConfiguration().Flags
-            ? BeginnerPreset.Preset.Flags
-            : Main.Config.Flags.Trim() ?? "";
+        var loadedFlags = Main.Config.SerializeFlags(); // this serializes the configuration
+        var defaultFlags = new RandomizerConfiguration().SerializeFlags();
+        // If the flags are entirely default, use the beginner preset
+        if (loadedFlags == defaultFlags)
+        {
+            Main.Config.DeserializeFlags(BeginnerPreset.Preset.SerializeFlags());
+        }
+
+        // flag updates from RandomizerConfiguration always overwrites our flag input
+        Main.FlagsObservable
+            .Subscribe(flags => FlagInput = flags)
+            .DisposeWith(disposables);
+
+        this.WhenAnyValue(x => x.FlagInput)
+            .WithLatestFrom(Main.FlagsObservable,
+                (Input, Current) => (Input, Current, IsValid: Input == Current || IsFlagStringValid(Input)))
+            .Do(x => FlagsValidSubject.OnNext(x.IsValid))
+            .Where(x => x.IsValid && x.Input != x.Current)
+            .Subscribe(x => Main.Config.DeserializeFlags(x.Input))
+            .DisposeWith(disposables);
 
         Main.Config.PropertyChanged += (sender, args) =>
         {
             switch (args.PropertyName)
             {
-                case "Flags":
-                    Flags = ((RandomizerConfiguration)sender!).Flags;
-                    break;
                 case "Seed":
                     this.RaisePropertyChanged(nameof(Seed));
                     break;
             }
         };
-        Main.RomFileViewModel.PropertyChanged += (_, args) =>
-        {
-            switch (args.PropertyName)
-            {
-                case "HasRomData":
-                    this.RaisePropertyChanged(nameof(CanGenerate));
-                    break;
-            }
-        };
-        var flagsValidation = this.WhenAnyValue(
-            x => x.Flags,
-            IsFlagStringValid
-            );
-        this.ValidationRule(
-            x => x.Flags,
-            flagsValidation,
-            "Invalid Flags");
+
+        this.ValidationRule(x => x.FlagInput, FlagsValidSubject, "Invalid Flags");
 
         AddValidationRules();
     }
@@ -299,23 +306,6 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
         });
     }
 
-    private string validatedFlags = "";
-
-    [JsonIgnore]
-    public string Flags
-    {
-        get => validatedFlags;
-        set
-        {
-            string trimmedValue = value.Trim() ?? "";
-            if (IsFlagStringValid(trimmedValue) && value != Main.Config.Flags)
-            {
-                Main.Config.Flags = trimmedValue;
-            }
-            this.RaiseAndSetIfChanged(ref validatedFlags, trimmedValue);
-        }
-    }
-
     [JsonIgnore]
     public bool IsDesktop { get; } = !OperatingSystem.IsBrowser();
 
@@ -347,8 +337,6 @@ public class RandomizerViewModel : ReactiveValidationObject, IRoutableViewModel,
     public ReactiveCommand<RandomizerConfiguration, Unit> LoadPreset { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, IRoutableViewModel> LoadRom { get; }
-    [JsonIgnore]
-    public IObservable<bool> CanGenerate { get; private set; }
 
     // Unique identifier for the routable view model.
     [JsonIgnore]

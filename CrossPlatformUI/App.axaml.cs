@@ -62,8 +62,6 @@ public sealed partial class App : Application // , IDisposable
 
     public static TopLevel? TopLevel { get; private set; }
 
-    // public static MainViewModel? Main { get; set; }
-
     private MainViewModel? main;
 
     public override void OnFrameworkInitializationCompleted()
@@ -175,6 +173,7 @@ public sealed partial class App : Application // , IDisposable
 [JsonSourceGenerationOptions(
     WriteIndented = false,
     IgnoreReadOnlyProperties = true,
+    UseStringEnumConverter = true,
     PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate
 )]
 [JsonSerializable(typeof(MainViewModel))]

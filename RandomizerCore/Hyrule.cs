@@ -218,7 +218,7 @@ public class Hyrule
             string export = JsonSerializer.Serialize(props, SourceGenerationContext.Default.RandomizerProperties);
             Debug.WriteLine(export);
 #endif
-            Flags = config.Flags;
+            Flags = config.SerializeFlags();
 
             Assembler assembler = CreateAssemblyEngine();
             logger.Info($"Started generation for flags: {Flags} seed: {config.Seed} seedhash: {SeedHash}");
