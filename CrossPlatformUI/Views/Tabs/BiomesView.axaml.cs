@@ -1,9 +1,4 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Linq;
-using System.Reactive.Disposables.Fluent;
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
@@ -16,9 +11,7 @@ public partial class BiomesView : ReactiveUserControl<MainViewModel>
 {
     public BiomesView()
     {
+        this.WhenActivated(disposables => { });
         AvaloniaXamlLoader.Load(this);
-        this.WhenActivated(disposables =>
-        {
-        });
     }
 }
