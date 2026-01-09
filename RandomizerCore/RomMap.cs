@@ -142,6 +142,10 @@ class RomMap
     public const int GP_ENEMY_HP_TABLE = 0x15431;
     public const int DRIPPER_ID = 0x11927;
 
+    public const int ATTACK_EFFECTIVENESS_TABLE = 0x1E67D;
+    public const int LIFE_EFFECTIVENESS_TABLE = 0x1E2BF;
+    public const int MAGIC_EFFECTIVENESS_TABLE = 0xD8B;
+
     /**
      * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
      * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.

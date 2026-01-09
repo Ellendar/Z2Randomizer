@@ -5,8 +5,6 @@ using Z2Randomizer.RandomizerCore.Enemy;
 
 namespace Z2Randomizer.RandomizerCore;
 
-// TODO: move stat effectiveness here.
-
 /// <summary>
 /// Responsible for randomizing stats of all kinds. Each array should
 /// be randomized at most once. If you have to re-roll for some reason,
@@ -14,6 +12,12 @@ namespace Z2Randomizer.RandomizerCore;
 /// </summary>
 public class StatRandomizer
 {
+    public const int LIFE_EFFECTIVENESS_ROWS = 7;
+    public const int MAGIC_EFFECTIVENESS_ROWS = 8;
+    public byte[] AttackEffectivenessTable { get; private set; } = null!;
+    public byte[] LifeEffectivenessTable { get; private set; } = null!;
+    public byte[] MagicEffectivenessTable { get; private set; } = null!;
+
     public byte[] WestEnemyHpTable { get; private set; } = null!;
     public byte[] EastEnemyHpTable { get; private set; } = null!;
     public byte[] Palace125EnemyHpTable { get; private set; } = null!;
@@ -23,43 +27,98 @@ public class StatRandomizer
     protected RandomizerProperties props { get; }
 
 #if DEBUG
-    private bool AlreadyRandomized = false;
+    private bool hasRandomized = false;
+    private bool hasWritten = false;
 #endif
 
     public StatRandomizer(ROM rom, RandomizerProperties props)
     {
         this.props = props;
-        ReadHp(rom);
+        ReadAttackEffectiveness(rom);
+        ReadLifeEffectiveness(rom);
+        ReadMagicEffectiveness(rom);
+        ReadEnemyHp(rom);
     }
 
     public void Randomize(Random r)
     {
 #if DEBUG
-        Debug.Assert(!AlreadyRandomized);
-        AlreadyRandomized = true;
+        Debug.Assert(!hasRandomized);
+        hasRandomized = true;
 #endif
 
-        if (props.ShuffleEnemyHP)
-        {
-            RandomizeHp(r);
-        }
-        switch (props.ShuffleBossHP)
-        {
-            case EnemyLifeOption.RANDOM:
-                for (int i = 0; i < BossHpTable.Length; i++) { RollHpValue(r, BossHpTable, i); }
-                break;
-            case EnemyLifeOption.RANDOM_HIGH:
-                for (int i = 0; i < BossHpTable.Length; i++) { RollHpValue(r, BossHpTable, i, 1.0, 2.0); }
-                break;
-        }
+        RandomizeAttackEffectiveness(r, props.AttackEffectiveness);
+        RandomizeLifeEffectiveness(r, props.LifeEffectiveness);
+        RandomizeMagicEffectiveness(r, props.MagicEffectiveness);
+
+        RandomizeRegularEnemyHp(r);
+        RandomizeBossHp(r);
+        FixRebonackHorseKillBug();
     }
 
     public void Write(ROM rom)
     {
-        WriteHp(rom);
+#if DEBUG
+        Debug.Assert(!hasWritten);
+        hasWritten = true;
+#endif
+
+        WriteAttackEffectiveness(rom);
+        WriteLifeEffectiveness(rom);
+        WriteMagicEffectiveness(rom);
+        WriteEnemyHp(rom);
     }
 
-    protected void ReadHp(ROM rom)
+    [Conditional("DEBUG")]
+    public void AssertHasRandomized(bool value = true)
+    {
+#if DEBUG
+        Debug.Assert(hasRandomized == value);
+#endif
+    }
+
+    [Conditional("DEBUG")]
+    public void AssertHasWritten(bool value = true) {
+#if DEBUG
+        Debug.Assert(hasWritten == value);
+#endif
+    }
+
+    protected void ReadAttackEffectiveness(ROM rom)
+    {
+        AttackEffectivenessTable = rom.GetBytes(RomMap.ATTACK_EFFECTIVENESS_TABLE, 8);
+    }
+
+    protected void WriteAttackEffectiveness(ROM rom)
+    {
+        rom.Put(RomMap.ATTACK_EFFECTIVENESS_TABLE, AttackEffectivenessTable);
+    }
+
+    protected void ReadLifeEffectiveness(ROM rom)
+    {
+        // There are 7 different damage codes for which damage taken scales with Life-level
+        // Each of those 7 codes have 8 values corresponding to each Life-level.
+        // (This is followed by an 8th row that is OHKO regardless of Life-level.)
+        LifeEffectivenessTable = rom.GetBytes(RomMap.LIFE_EFFECTIVENESS_TABLE, LIFE_EFFECTIVENESS_ROWS * 8);
+    }
+
+    protected void WriteLifeEffectiveness(ROM rom)
+    {
+        rom.Put(RomMap.LIFE_EFFECTIVENESS_TABLE, LifeEffectivenessTable);
+    }
+
+    protected void ReadMagicEffectiveness(ROM rom)
+    {
+        // 8 Spell costs by 8 Magic levels
+        MagicEffectivenessTable = rom.GetBytes(RomMap.MAGIC_EFFECTIVENESS_TABLE, MAGIC_EFFECTIVENESS_ROWS * 8);
+    }
+
+    protected void WriteMagicEffectiveness(ROM rom)
+    {
+        rom.Put(RomMap.MAGIC_EFFECTIVENESS_TABLE, MagicEffectivenessTable);
+    }
+
+    protected void ReadEnemyHp(ROM rom)
     {
         WestEnemyHpTable = rom.GetBytes(RomMap.WEST_ENEMY_HP_TABLE, 0x24);
         EastEnemyHpTable = rom.GetBytes(RomMap.EAST_ENEMY_HP_TABLE, 0x24);
@@ -69,7 +128,7 @@ public class StatRandomizer
         BossHpTable = [.. RomMap.bossHpAddresses.Select(rom.GetByte)];
     }
 
-    protected void WriteHp(ROM rom)
+    protected void WriteEnemyHp(ROM rom)
     {
         rom.Put(RomMap.WEST_ENEMY_HP_TABLE, WestEnemyHpTable);
         rom.Put(RomMap.EAST_ENEMY_HP_TABLE, EastEnemyHpTable);
@@ -82,31 +141,221 @@ public class StatRandomizer
         }
     }
 
-    protected void RandomizeHp(Random r)
+    protected void RandomizeAttackEffectiveness(Random r, AttackEffectiveness attackEffectiveness)
     {
-        int i;
+        if (attackEffectiveness == AttackEffectiveness.VANILLA)
+        {
+            return;
+        }
+        if (attackEffectiveness == AttackEffectiveness.OHKO)
+        {
+            // handled in RandomizeEnemyStats()
+            return;
+        }
 
-        for (i = (int)EnemiesWest.MYU; i < 0x23; i++) { RollHpValue(r, WestEnemyHpTable, i); }
+        byte[] newTable = new byte[8];
+        for (int i = 0; i < 8; i++)
+        {
+            int nextVal;
+            byte vanilla = AttackEffectivenessTable[i];
+            switch (attackEffectiveness)
+            {
+                case AttackEffectiveness.LOW:
+                    //the naieve approach here gives a curve of 1,2,2,4,5,6 which is weird, or a different
+                    //irregular curve in digshake's old approach. Just use a linear increase for the first 6 levels on low
+                    if (i < 6)
+                    {
+                        nextVal = i + 1;
+                    }
+                    else
+                    {
+                        nextVal = (int)Math.Round(vanilla * .5, MidpointRounding.ToPositiveInfinity);
+                    }
+                    break;
+                case AttackEffectiveness.AVERAGE_LOW:
+                    nextVal = RandomInRange(r, vanilla * .5, vanilla);
+                    if (i == 1)
+                    {
+                        nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at level 2
+                    }
+                    break;
+                case AttackEffectiveness.AVERAGE:
+                    nextVal = RandomInRange(r, vanilla * .667, vanilla * 1.5);
+                    if (i == 0)
+                    {
+                        nextVal = Math.Max(nextVal, 2); // set minimum 2 damage at start
+                    }
+                    break;
+                case AttackEffectiveness.AVERAGE_HIGH:
+                    nextVal = RandomInRange(r, vanilla, vanilla * 1.5);
+                    break;
+                case AttackEffectiveness.HIGH:
+                    nextVal = (int)Math.Round(vanilla * 1.5);
+                    break;
+                default:
+                    throw new NotImplementedException("Invalid Attack Effectiveness");
+            }
+            if (i > 0)
+            {
+                byte lastValue = newTable[i - 1];
+                if (nextVal < lastValue)
+                {
+                    nextVal = lastValue; // levelling up should never be worse
+                }
+            }
 
-        for (i = (int)EnemiesEast.MYU; i < 0x1e; i++) { RollHpValue(r, EastEnemyHpTable, i); }
-
-        // keeping old behavior where some non-enemies are not randomized (strike for jar, unused enemies etc.)
-        for (i = (int)EnemiesPalace125.MYU; i < (int)EnemiesPalace125.STRIKE_FOR_RED_JAR; i++) { RollHpValue(r, Palace125EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace125.SLOW_BUBBLE; i < (int)EnemiesPalace125.HORSEHEAD; i++) { RollHpValue(r, Palace125EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace125.BLUE_STALFOS; i < 0x24; i++) { RollHpValue(r, Palace125EnemyHpTable, i); }
-
-        for (i = (int)EnemiesPalace346.MYU; i < (int)EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE; i++) { RollHpValue(r, Palace346EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace346.SLOW_BUBBLE; i < (int)EnemiesPalace346.REBONAK; i++) { RollHpValue(r, Palace346EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace346.BLUE_STALFOS; i < 0x24; i++) { RollHpValue(r, Palace346EnemyHpTable, i); }
-
-        for (i = (int)EnemiesGreatPalace.MYU; i < (int)EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA; i++) { RollHpValue(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.ORANGE_MOA; i < (int)EnemiesGreatPalace.BUBBLE_GENERATOR; i++) { RollHpValue(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.RED_DEELER; i < (int)EnemiesGreatPalace.ELEVATOR; i++) { RollHpValue(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.SLOW_BUBBLE; i < 0x1b; i++) { RollHpValue(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.FOKKERU; i < (int)EnemiesGreatPalace.KING_BOT; i++) { RollHpValue(r, GpEnemyHpTable, i); }
+            newTable[i] = (byte)nextVal;
+        }
+        AttackEffectivenessTable = newTable;
     }
 
-    protected void RollHpValue(Random r, byte[] array, int index, double lower=0.5, double upper=1.5)
+    protected void RandomizeLifeEffectiveness(Random r, LifeEffectiveness statEffectiveness)
+    {
+        if (statEffectiveness == LifeEffectiveness.VANILLA)
+        {
+            return;
+        }
+
+        if (statEffectiveness == LifeEffectiveness.OHKO)
+        {
+            Array.Fill<byte>(LifeEffectivenessTable, 0xFF);
+            return;
+        }
+        if (statEffectiveness == LifeEffectiveness.INVINCIBLE)
+        {
+            Array.Fill<byte>(LifeEffectivenessTable, 0x00);
+            return;
+        }
+
+        byte[] newTable = new byte[LIFE_EFFECTIVENESS_ROWS * 8];
+
+        for (int level = 0; level < 8; level++)
+        {
+            for (int damageCode = 0; damageCode < LIFE_EFFECTIVENESS_ROWS; damageCode++)
+            {
+                int index = damageCode * 8 + level;
+                byte nextVal;
+                byte vanilla = (byte)(LifeEffectivenessTable[index] >> 1);
+                int min = (int)(vanilla * .75);
+                int max = Math.Min((int)(vanilla * 1.5), 120);
+                switch (statEffectiveness)
+                {
+                    case LifeEffectiveness.AVERAGE_LOW:
+                        nextVal = (byte)r.Next(vanilla, max);
+                        break;
+                    case LifeEffectiveness.AVERAGE:
+                        nextVal = (byte)r.Next(min, max);
+                        break;
+                    case LifeEffectiveness.AVERAGE_HIGH:
+                        nextVal = (byte)r.Next(min, vanilla);
+                        break;
+                    case LifeEffectiveness.HIGH:
+                        nextVal = (byte)(vanilla * .5);
+                        break;
+                    default:
+                        throw new NotImplementedException("Invalid Life Effectiveness");
+                }
+                if (level > 0)
+                {
+                    byte lastVal = (byte)(newTable[index - 1] >> 1);
+                    if (nextVal > lastVal)
+                    {
+                        nextVal = lastVal; // levelling up should never be worse
+                    }
+                }
+                newTable[index] = (byte)(nextVal << 1);
+            }
+        }
+        LifeEffectivenessTable = newTable;
+    }
+
+    protected void RandomizeMagicEffectiveness(Random r, MagicEffectiveness statEffectiveness)
+    {
+        if (statEffectiveness == MagicEffectiveness.VANILLA)
+        {
+            return;
+        }
+
+        if (statEffectiveness == MagicEffectiveness.FREE)
+        {
+            Array.Fill<byte>(MagicEffectivenessTable, 0);
+            return;
+        }
+
+        byte[] newTable = new byte[MAGIC_EFFECTIVENESS_ROWS * 8];
+
+        for (int level = 0; level < 8; level++)
+        {
+            for (int spellIndex = 0; spellIndex < MAGIC_EFFECTIVENESS_ROWS; spellIndex++)
+            {
+                int index = spellIndex * 8 + level;
+                byte nextVal;
+                byte vanilla = (byte)(MagicEffectivenessTable[index] >> 1);
+                int min = (int)(vanilla * .5);
+                int max = Math.Min((int)(vanilla * 1.5), 120);
+                switch (statEffectiveness)
+                {
+                    case MagicEffectiveness.HIGH_COST:
+                        nextVal = (byte)max;
+                        break;
+                    case MagicEffectiveness.AVERAGE_HIGH_COST:
+                        nextVal = (byte)r.Next(vanilla, max);
+                        break;
+                    case MagicEffectiveness.AVERAGE:
+                        nextVal = (byte)r.Next(min, max);
+                        break;
+                    case MagicEffectiveness.AVERAGE_LOW_COST:
+                        nextVal = (byte)r.Next(min, vanilla);
+                        break;
+                    case MagicEffectiveness.LOW_COST:
+                        nextVal = (byte)min;
+                        break;
+                    default:
+                        throw new Exception("Invalid Magic Effectiveness");
+                }
+                if (level > 0)
+                {
+                    byte lastVal = (byte)(newTable[index - 1] >> 1);
+                    if (nextVal > lastVal)
+                    {
+                        nextVal = lastVal; // levelling up should never be worse
+                    }
+                }
+                newTable[index] = (byte)(nextVal << 1);
+            }
+        }
+        MagicEffectivenessTable = newTable;
+    }
+
+    protected void RandomizeRegularEnemyHp(Random r)
+    {
+        if (!props.ShuffleEnemyHP) {
+            return;
+        }
+
+        int i;
+
+        for (i = (int)EnemiesWest.MYU; i < 0x23; i++) { RandomizeInsideArray(r, WestEnemyHpTable, i); }
+
+        for (i = (int)EnemiesEast.MYU; i < 0x1e; i++) { RandomizeInsideArray(r, EastEnemyHpTable, i); }
+
+        // keeping old behavior where some non-enemies are not randomized (strike for jar, unused enemies etc.)
+        for (i = (int)EnemiesPalace125.MYU; i < (int)EnemiesPalace125.STRIKE_FOR_RED_JAR; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i); }
+        for (i = (int)EnemiesPalace125.SLOW_BUBBLE; i < (int)EnemiesPalace125.HORSEHEAD; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i); }
+        for (i = (int)EnemiesPalace125.BLUE_STALFOS; i < 0x24; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i); }
+
+        for (i = (int)EnemiesPalace346.MYU; i < (int)EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i); }
+        for (i = (int)EnemiesPalace346.SLOW_BUBBLE; i < (int)EnemiesPalace346.REBONAK; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i); }
+        for (i = (int)EnemiesPalace346.BLUE_STALFOS; i < 0x24; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i); }
+
+        for (i = (int)EnemiesGreatPalace.MYU; i < (int)EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
+        for (i = (int)EnemiesGreatPalace.ORANGE_MOA; i < (int)EnemiesGreatPalace.BUBBLE_GENERATOR; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
+        for (i = (int)EnemiesGreatPalace.RED_DEELER; i < (int)EnemiesGreatPalace.ELEVATOR; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
+        for (i = (int)EnemiesGreatPalace.SLOW_BUBBLE; i < 0x1b; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
+        for (i = (int)EnemiesGreatPalace.FOKKERU; i < (int)EnemiesGreatPalace.KING_BOT; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
+    }
+
+    protected void RandomizeBossHp(Random r)
     {
         switch (props.ShuffleBossHP)
         {
@@ -123,5 +372,44 @@ public class StatRandomizer
                 break;
             default:
                 throw new NotImplementedException("Invalid ShuffleBossHP value");
+    }
+}
+
+    protected int RandomInRange(Random r, double minVal, double maxVal)
+    {
+        int nextVal = (int)Math.Round(r.NextDouble() * (maxVal - minVal) + minVal);
+        nextVal = (int)Math.Min(nextVal, maxVal);
+        nextVal = (int)Math.Max(nextVal, minVal);
+        return nextVal;
+    }
+
+    protected void RandomizeInsideArray(Random r, byte[] array, int index, double lower=0.5, double upper=1.5)
+    {
+        var vanillaVal = array[index];
+        int minVal = (int)(vanillaVal * lower);
+        int maxVal = (int)(vanillaVal * upper);
+        var newVal = (byte)Math.Min(r.Next(minVal, maxVal), 255);
+        array[index] = newVal;
+    }
+
+    /// When Rebonack's HP is set to exactly 2 * your damage, it will
+    /// trigger a bug where you kill Rebo's horse while de-horsing him.
+    /// This causes an additional key to drop, as well as softlocking
+    /// the player if they die before killing Rebo. It seems to also
+    /// trigger if you have exactly damage == Rebo HP (very high damage).
+    /// 
+    /// This has to be called after RandomizeEnemyStats and
+    /// RandomizeAttackEffectiveness.
+    ///
+    /// (In Vanilla Zelda 2, your sword damage is never this high.)
+    public void FixRebonackHorseKillBug()
+    {
+        byte[] attackValues = AttackEffectivenessTable;
+        byte reboHp = BossHpTable[2];
+        while (attackValues.Any(v => v * 2 == reboHp || v == reboHp))
+        {
+            reboHp++;
+            BossHpTable[2] = reboHp;
+        }
     }
 }
