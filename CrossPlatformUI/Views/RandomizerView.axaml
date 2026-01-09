@@ -177,7 +177,7 @@
                 <tabs:StartView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Biomes">
-                <tabs:BiomesView DataContext="{Binding Main}"/>
+                <tabs:BiomesView DataContext="{Binding BiomesViewModel}"/>
             </TabItem>
             <TabItem Header="Overworld">
                 <tabs:OverworldView DataContext="{Binding Main}"/>
