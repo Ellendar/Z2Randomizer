@@ -179,13 +179,13 @@
                 <tabs:StartView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Biomes">
-                <tabs:BiomesView DataContext="{Binding Main}"/>
+                <tabs:BiomesView DataContext="{Binding BiomesViewModel}"/>
             </TabItem>
             <TabItem Header="Overworld">
                 <tabs:OverworldView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Palaces">
-                <tabs:PalacesView DataContext="{Binding Main}"/>
+                <tabs:PalacesView DataContext="{Binding PalacesViewModel}"/>
             </TabItem>
             <TabItem Header="Levels">
                 <tabs:LevelsView DataContext="{Binding Main}"/>
@@ -197,7 +197,7 @@
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Items">
-                <tabs:ItemsView DataContext="{Binding Main}"/>
+                <tabs:ItemsView DataContext="{Binding ItemsViewModel}"/>
             </TabItem>
             <TabItem Header="Drops">
                 <tabs:DropsView DataContext="{Binding Main}"/>
