@@ -13,6 +13,8 @@ public class PalacesViewModel : ReactiveObject, IActivatableViewModel
     public MainViewModel Main { get; }
 
     public IObservable<bool> RandomStylesAllowVanillaIncludedObservable { get; }
+    public IObservable<bool> RemoveLongDeadEndsIncludedObservable { get; }
+    public IObservable<bool> IncludeExpertRoomsIncludedObservable { get; }
 
     public PalacesViewModel(MainViewModel main)
     {
@@ -21,6 +23,14 @@ public class PalacesViewModel : ReactiveObject, IActivatableViewModel
 
         RandomStylesAllowVanillaIncludedObservable = Main.FlagsChanged
             .Select(_ => Main.Config.randomStylesAllowVanillaIncluded())
+            .DistinctUntilChanged();
+
+        RemoveLongDeadEndsIncludedObservable = Main.FlagsChanged
+            .Select(_ => Main.Config.removeLongDeadEndsIncluded())
+            .DistinctUntilChanged();
+
+        IncludeExpertRoomsIncludedObservable = Main.FlagsChanged
+            .Select(_ => Main.Config.includeExpertRoomsIncluded())
             .DistinctUntilChanged();
 
         this.WhenActivated(OnActivate);

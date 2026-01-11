@@ -355,6 +355,16 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
+    private bool removeLongDeadEnds;
+    public bool removeLongDeadEndsIncluded() => palaceStylesAreNotAllVanilla() && includev5_0Rooms is not false;
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private bool includeExpertRooms;
+    public bool includeExpertRoomsIncluded() => palaceStylesAreNotAllVanilla();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType;
     public bool bossRoomsExitTypeIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
@@ -1334,7 +1344,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             properties.AllowV5_0Rooms = includev5_0Rooms ?? GetIndeterminateFlagValue(r);
         }
 
-        properties.BlockersAnywhere = blockingRoomsInAnyPalace;
+        properties.BlockersAnywhere = blockingRoomsInAnyPalaceIncluded() && blockingRoomsInAnyPalace;
+        properties.RemoveLongDeadEnds = removeLongDeadEndsIncluded() && removeLongDeadEnds;
+        properties.IncludeExpertRooms = includeExpertRoomsIncluded() && includeExpertRooms;
 
         if (bossRoomsExitType == BossRoomsExitType.RANDOM_ALL)
         {
