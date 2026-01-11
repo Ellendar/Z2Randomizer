@@ -329,6 +329,11 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
     [Reactive]
     [ConditionallyIncludeInFlags]
+    private bool includeDropRooms = true;
+    public bool includeDropRoomsIsIncluded() => palaceStylesAreNotAllVanilla();
+
+    [Reactive]
+    [ConditionallyIncludeInFlags]
     private BossRoomsExitType bossRoomsExitType;
     public bool bossRoomsExitTypeIsIncluded() => palaceStylesAreNotAllVanillaOrShuffled();
 
@@ -1304,6 +1309,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
 
         properties.BlockersAnywhere = blockingRoomsInAnyPalace;
+        properties.IncludeDropRooms = includeDropRooms;
 
         if (bossRoomsExitType == BossRoomsExitType.RANDOM_ALL)
         {

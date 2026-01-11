@@ -203,6 +203,11 @@ public class RoomPool
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
             FilterRooms(room => room.IsTraversable(allowedBlockers));
         }
+
+        if (!props.IncludeDropRooms)
+        {
+            FilterRooms(room => !room.HasDrop);
+        }
     }
 
     /// Remove rooms from the pool that does not satisfy `predicate`
