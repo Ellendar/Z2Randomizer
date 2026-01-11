@@ -1,7 +1,7 @@
-﻿using SD.Tools.Algorithmia.GeneralDataStructures;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Z2Randomizer.RandomizerCore.Enemy;
+using SD.Tools.Algorithmia.GeneralDataStructures;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -201,16 +201,26 @@ public class RoomPool
         if (!props.BlockersAnywhere)
         {
             RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
-            NormalRooms.RemoveAll(room => !room.IsTraversable(allowedBlockers));
-            NormalRooms.RemoveAll(room => room.LinkedRoomName != null && !LinkedRooms[room.LinkedRoomName].IsTraversable(allowedBlockers));
-            foreach (var key in ItemRoomsByDirection.Keys)
+            FilterRooms(room => room.IsTraversable(allowedBlockers));
+        }
+    }
+
+    /// Remove rooms from the pool that does not satisfy `predicate`
+    private void FilterRooms(Func<Room, bool> predicate)
+    {
+        NormalRooms.RemoveAll(room => !predicate(room) ||
+            (room.LinkedRoomName != null && !predicate(LinkedRooms[room.LinkedRoomName])));
+
+        foreach (var key in ItemRoomsByDirection.Keys.ToList())
+        {
+            var values = ItemRoomsByDirection[key];
+            var toRemove = values
+                .Where(room => !predicate(room)
+                    || (room.LinkedRoomName != null && !predicate(LinkedRooms[room.LinkedRoomName])))
+                .ToList();
+            foreach (var room in toRemove)
             {
-                var values = ItemRoomsByDirection[key];
-                var toRemove = values.Where(room => !room.IsTraversable(allowedBlockers)).ToList();
-                foreach (var room in toRemove)
-                {
-                    ItemRoomsByDirection.Remove(key, room);
-                }
+                ItemRoomsByDirection.Remove(key, room);
             }
         }
     }
