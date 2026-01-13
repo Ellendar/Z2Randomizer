@@ -60,8 +60,9 @@ public class StatRandomizer
         Debug.Assert(!hasRandomized);
         hasRandomized = true;
 #endif
-        RandomizeExperienceToLevel(r, [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp],
-                                      [props.AttackCap, props.MagicCap, props.LifeCap], props.ScaleLevels);
+        ExperienceToLevelTable = RandomizeExperienceToLevel(ExperienceToLevelTable, r,
+            [props.ShuffleAtkExp, props.ShuffleMagicExp, props.ShuffleLifeExp],
+            [props.AttackCap, props.MagicCap, props.LifeCap], props.ScaleLevels);
 
         RandomizeAttackEffectiveness(r, props.AttackEffectiveness);
         RandomizeLifeEffectiveness(r, props.LifeEffectiveness);
@@ -216,25 +217,72 @@ public class StatRandomizer
         }
     }
 
-    protected void RandomizeExperienceToLevel(Random r, bool[] shuffleStat, int[] levelCap, bool scaleLevels)
+    protected static int[] RandomizeExperienceToLevel(int[] baseExpTable, Random r, bool[] shuffleStat, int[] levelCap, bool scaleLevels)
     {
-        int[] newTable = new int[24];
-        Span<int> randomizedSpan = newTable;
-        ReadOnlySpan<int> vanillaSpan = ExperienceToLevelTable;
+        const int STAT_COUNT = 3;
+        const int LEVELS_PER_STAT = 8;
+        const int TABLE_SIZE = STAT_COUNT * LEVELS_PER_STAT;
 
-        for (int stat = 0; stat < 3; stat++)
+        const double lower = 0.75;
+        const double upper = 1.25;
+
+        int[] newTable = new int[TABLE_SIZE];
+        ReadOnlySpan<int> preRandomSpan;
+
+        if (scaleLevels)
         {
-            var statStartIndex = stat * 8;
+            int[] preRandomTable = new int[TABLE_SIZE];
+            for (int stat = 0; stat < STAT_COUNT; stat++)
+            {
+                var statStartIndex = stat * LEVELS_PER_STAT;
+                var cap = levelCap[stat];
+                if (cap > 7)
+                {
+                    Array.Copy(baseExpTable, statStartIndex, preRandomTable, statStartIndex, LEVELS_PER_STAT);
+                    continue;
+                }
+                // using cubic function: ax³ + bx² + cx + d
+                (double a, double b, double c, double d) = stat switch
+                {
+                    0 => (36.111, -183.333, 709.127, -400.0),    // attack coefficients
+                    1 => (33.333, -197.619, 661.905, -428.571),  // magic coefficients
+                    2 => (13.889,  -31.548, 118.849, -57.143),   // life coefficients
+                    _ => throw new NotImplementedException(),
+                };
+                int i;
+                for (i = 0; i < cap - 1; i++)
+                {
+                    double x = (7.0 / (cap - 1)) * (i + 1);
+                    double y = a * x*x*x + b * x*x + c * x + d;
+                    Debug.Assert(y > 10 && y < 9990);
+                    preRandomTable[statStartIndex + i] = (int)Math.Round(y);
+                }
+                for (; i < LEVELS_PER_STAT; i++)
+                {
+                    preRandomTable[statStartIndex + i] = 9990;
+                }
+            }
+            preRandomSpan = preRandomTable;
+        }
+        else
+        {
+            preRandomSpan = baseExpTable;
+        }
+
+        Span<int> randomizedSpan = newTable;
+        for (int stat = 0; stat < STAT_COUNT; stat++)
+        {
+            var statStartIndex = stat * LEVELS_PER_STAT;
             if (!shuffleStat[stat])
             {
-                vanillaSpan.Slice(statStartIndex, 8).CopyTo(randomizedSpan.Slice(statStartIndex, 8));
+                preRandomSpan.Slice(statStartIndex, LEVELS_PER_STAT).CopyTo(randomizedSpan.Slice(statStartIndex, LEVELS_PER_STAT));
                 continue;
             }
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < LEVELS_PER_STAT; i++)
             {
-                var vanilla = ExperienceToLevelTable[statStartIndex + i];
-                int nextMin = (int)(vanilla - vanilla * 0.25); // hardcoded -25%
-                int nextMax = (int)(vanilla + vanilla * 0.25); // hardcoded +25%
+                var vanilla = preRandomSpan[statStartIndex + i];
+                int nextMin = (int)(vanilla * lower);
+                int nextMax = (int)(vanilla * upper);
                 if (i == 0)
                 {
                     newTable[statStartIndex + i] = r.Next(Math.Max(10, nextMin), nextMax);
@@ -251,62 +299,32 @@ public class StatRandomizer
             newTable[i] = newTable[i] / 10 * 10; //wtf is this line of code? -digshake, 2020
         }
 
-        if (scaleLevels)
-        {
-            int[] cappedExp = new int[24];
-
-            for (int stat = 0; stat < 3; stat++)
-            {
-                var statStartIndex = stat * 8;
-                var cap = levelCap[stat];
-
-                for (int i = 0; i < 8; i++)
-                {
-                    if (i >= cap)
-                    {
-                        cappedExp[statStartIndex + i] = newTable[statStartIndex + i]; //shouldn't matter, just wanna put something here
-                    }
-                    else if (i == cap - 1)
-                    {
-                        cappedExp[statStartIndex + i] = newTable[7]; //exp to get a 1up
-                    }
-                    else
-                    {
-                        cappedExp[statStartIndex + i] = newTable[(int)(6 * ((i + 1.0) / (cap - 1)))]; //cap = 3, level 4, 8, 
-                    }
-                }
-            }
-
-            newTable = cappedExp;
-        }
-
         // Make sure all 1-up levels are the same value,
         // one that is higher than any regular level
         int highestRegularLevelExp = 0;
-        for (int stat = 0; stat < 3; stat++)
+        for (int stat = 0; stat < STAT_COUNT; stat++)
         {
             var cap = levelCap[stat];
-            if (cap < 2) { continue; }
-            var statStartIndex = stat * 8;
-            int statMaxLevelIndex = statStartIndex + cap - 2;
+            var statStartIndex = stat * LEVELS_PER_STAT;
+            int statMaxLevelIndex = Math.Max(0, statStartIndex + cap - 2);
             var maxExp = newTable[statMaxLevelIndex];
             if (highestRegularLevelExp < maxExp) { highestRegularLevelExp = maxExp; }
         }
 
         int exp1upMin = Math.Min(highestRegularLevelExp + 10, 9990);
         int exp1up = r.Next(exp1upMin, 9999) / 10 * 10;
-        for (int stat = 0; stat < 3; stat++)
+        for (int stat = 0; stat < STAT_COUNT; stat++)
         {
             var cap = levelCap[stat];
             Debug.Assert(cap >= 1 && cap < 9);
-            var statStartIndex = stat * 8;
-            for (int i = cap - 1; i < 8; i++)
+            var statStartIndex = stat * LEVELS_PER_STAT;
+            for (int i = cap - 1; i < LEVELS_PER_STAT; i++)
             {
                 newTable[statStartIndex + i] = exp1up;
             }
         }
 
-        ExperienceToLevelTable = newTable;
+        return newTable;
     }
 
     protected void RandomizeAttackEffectiveness(Random r, AttackEffectiveness attackEffectiveness)
