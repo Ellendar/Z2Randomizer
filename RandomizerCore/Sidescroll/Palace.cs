@@ -727,32 +727,11 @@ public partial class Palace
         return sizes;
     }
 
-    public static int RollPalaceLength(Random random, int vanillaLength, PalaceLengthOption length, int hardMin=2, int hardMax=63)
+    public static int RollPalaceLength(Random random, int vanillaLength, PalaceLengthOption length, int hardMin=2, int hardMax=61)
     {
-        double min, max;
-        switch (length)
-        {
-            case PalaceLengthOption.SHORT:
-                min = 0.5;
-                max = 0.75;
-                break;
-            case PalaceLengthOption.MEDIUM:
-                min = 0.65;
-                max = 0.85;
-                break;
-            case PalaceLengthOption.FULL:
-                min = 0.85;
-                max = 1.15;
-                break;
-            case PalaceLengthOption.RANDOM:
-                min = 0.5;
-                max = 1.15;
-                break;
-            default:
-                throw new NotImplementedException();
-        }
-        int intMin = (int)Math.Round(min * vanillaLength);
-        int intMax = (int)(Math.Round(max * vanillaLength) + 1);
+        var rr = length.GetRandomRangeDouble()!;
+        int intMin = (int)Math.Round(rr.Low * vanillaLength);
+        int intMax = (int)(Math.Round(rr.High * vanillaLength) + 1);
         return Math.Min(Math.Max(random.Next(intMin, intMax), hardMin), hardMax);
     }
 
