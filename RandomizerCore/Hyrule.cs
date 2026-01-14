@@ -2936,8 +2936,6 @@ public class Hyrule
             palace.WriteConnections(ROMData);
         }
 
-        ROMData.AddCredits();
-
         ROMData.Put(0x1CD3A, (byte)palGraphics[(int)westHyrule.locationAtPalace1.PalaceNumber!]);
         ROMData.Put(0x1CD3B, (byte)palGraphics[(int)westHyrule.locationAtPalace2.PalaceNumber!]);
         ROMData.Put(0x1CD3C, (byte)palGraphics[(int)westHyrule.locationAtPalace3.PalaceNumber!]);
@@ -3937,6 +3935,56 @@ EndTileComparisons = $8601
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.StatTracking.s"), "stat_tracking.s");
     }
 
+    public void AddCredits(Assembler asm)
+    {
+        byte[] CmdText(int x, int y, string text)
+        {
+            byte pos = (byte)((y << 5) + (x & 0b00011111));
+            var stringByte = ROM.StringToZ2Bytes(text);
+            byte stringLen = (byte)stringByte.Length;
+            return [0x22, pos, stringLen, .. stringByte];
+        }
+
+        byte[] header = [
+            .. CmdText(7,  1, "THANKS FOR PLAYING"),
+            .. CmdText(7,  2, "         "), // clear previous credit line
+            .. CmdText(7,  3, "ZELDA 2 RANDOMIZER"),
+            0xff];
+        byte[] body = [
+            .. CmdText(11, 4, "         "), // clear previous credit line
+            .. CmdText(15, 5, "BY"),
+            .. CmdText(5,  6, "DIGSHAKE"), .. CmdText(19, 6, "ELLENDAR"),
+            .. CmdText(5,  7, "JROWEBOY"), .. CmdText(21, 7, "INITSU"),
+            0xff];
+
+        var a = asm.Module();
+        a.Segment("PRG5");
+        a.Reloc();
+        a.Label("NewCreditsHeader");
+        a.Byt(header);
+        a.Reloc();
+        a.Label("NewCreditsBody");
+        a.Byt(body);
+
+        a.Code("""
+.include "z2r.inc"
+
+.segment "PRG5"
+
+bank5_Pointer_table_for_End_Credits:
+.org $9259 ; first entry
+.org $9279
+    .word NewCreditsHeader
+.org $927b
+    .word NewCreditsBody
+
+.org $934F
+    FREE_UNTIL $9364
+.org $9364
+    FREE_UNTIL $937E
+""", "add_credits.s");
+    }
+
     private void ChangeMapperToMMC5(Assembler asm, bool preventFlash, bool enableZ2Ft)
     {
         var a = asm.Module();
@@ -3965,6 +4013,7 @@ EndTileComparisons = $8601
         rom.FixMinibossGlitchyAppearance(engine);
         rom.FixBossKillPaletteGlitch(engine);
         StatTracking(engine);
+        AddCredits(engine);
 
         if (props.ShuffleEnemyHP)
         {

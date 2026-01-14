@@ -498,15 +498,6 @@ public class ROM
         }
     }
 
-    public void AddCredits()
-    {
-        var randoby = Util.ToGameText("RANDO BY  ", false);
-        Put(creditsLineOneAddr, randoby);
-
-        var digshake = Util.ToGameText("DIGSHAKE ", true);
-        Put(creditsLineTwoAddr, digshake);
-    }
-
     public void AddRandomizerToTitle(Assembler asm)
     {
         // This is just updating the macro commands used to draw the title screen tiles
