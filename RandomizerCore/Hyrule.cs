@@ -3946,13 +3946,10 @@ EndTileComparisons = $8601
         }
 
         byte[] header = [
-            .. CmdText(7,  1, "THANKS FOR PLAYING"),
-            .. CmdText(7,  2, "         "), // clear previous credit line
-            .. CmdText(7,  3, "ZELDA 2 RANDOMIZER"),
+            .. CmdText(7,  2,   " THANKS A MILLION"),
             0xff];
         byte[] body = [
-            .. CmdText(11, 4, "         "), // clear previous credit line
-            .. CmdText(15, 5, "BY"),
+            .. CmdText(5,  4, "ZELDA II RANDOMIZER BY"),
             .. CmdText(5,  6, "DIGSHAKE"), .. CmdText(19, 6, "ELLENDAR"),
             .. CmdText(5,  7, "JROWEBOY"), .. CmdText(21, 7, "INITSU"),
             0xff];
