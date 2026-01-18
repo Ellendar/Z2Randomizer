@@ -34,6 +34,9 @@ public class Palaces
     private static readonly RequirementType[] VANILLA_P7_ALLOWED_BLOCKERS = [ 
         RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.GLOVE];
 
+    public static readonly RequirementType[] ALL_PALACE_ALLOWED_BLOCKERS = [
+        RequirementType.JUMP, RequirementType.FAIRY, RequirementType.UPSTAB, RequirementType.DOWNSTAB, RequirementType.JUMP, RequirementType.KEY, RequirementType.DASH, RequirementType.GLOVE];
+
     public static readonly RequirementType[][] ALLOWED_BLOCKERS_BY_PALACE = [ 
         VANILLA_P1_ALLOWED_BLOCKERS,
         VANILLA_P2_ALLOWED_BLOCKERS,

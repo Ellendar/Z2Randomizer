@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 
 namespace Z2Randomizer.RandomizerCore;
 
@@ -24,6 +25,10 @@ public enum Town
 public static class TownExtensions
 {
     public const int SPELL_GET_START_ADDRESS = 0x17AF7;
+
+    public static readonly ImmutableList<Town> ALL_TOWNS = [Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
+        Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO];
+
     public static int VanillaTownOrder(this Town town)
     {
         return town switch

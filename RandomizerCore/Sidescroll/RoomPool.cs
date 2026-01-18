@@ -198,11 +198,16 @@ public class RoomPool
             }
         }
 
-        if (!props.BlockersAnywhere)
+        RequirementType[] allowedBlockers = !props.BlockersAnywhere ? Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1] : Palaces.ALL_PALACE_ALLOWED_BLOCKERS;
+        if(!props.ReplaceFireWithDash)
         {
-            RequirementType[] allowedBlockers = Palaces.ALLOWED_BLOCKERS_BY_PALACE[palaceNumber - 1];
-            FilterRooms(room => room.IsTraversable(allowedBlockers));
+            allowedBlockers = allowedBlockers.Where(r => r != RequirementType.DASH).ToArray();
         }
+        if (props.RemoveItems.Contains(Collectable.FAIRY_SPELL))
+        {
+            allowedBlockers = allowedBlockers.Where(r => r != RequirementType.FAIRY).ToArray();
+        }
+        FilterRooms(room => room.IsTraversable(allowedBlockers));
 
         if (!props.IncludeDropRooms)
         {

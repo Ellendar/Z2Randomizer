@@ -75,6 +75,9 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeTownQuestItemsinShuffleToolTip}"/></ToolTip.Tip>
             </CheckBox>
+            <Separator />
+            <CheckBox IsChecked="{Binding Main.Config.RemoveFairy}"
+                      Content="Remove Fairy" />
         </StackPanel>
         <StackPanel Grid.Column="1">
             <CheckBox

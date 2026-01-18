@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -364,14 +363,18 @@ public class Hyrule
 
             if (props.CombineFire)
             {
-                List<Collectable>? customSpellOrder = props.IncludeSpellsInShuffle
-                    ? null
-                    : AllLocationsForReal()
+                List<Collectable>? customSpellOrder = props.TownWizardsOnlyHaveSpells()
+                    ? AllLocationsForReal()
                         .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
                         //This makes the assumption that is currently true that each "town" has exactly one item.
                         //If we later restructure towns to be omni-towns to get rid of fake towns, this will be untrue
-                        .Select(l => l.Collectables[0]).ToList();
-                ROMData.CombineFireSpell(assembler, customSpellOrder, r);
+                        .Select(l => l.Collectables[0]).ToList()
+                    : null;
+
+                List<int> excludeCombinedFireSpells = new();
+                if (props.RemoveItems.Contains(Collectable.FAIRY_SPELL)) { excludeCombinedFireSpells.Add(3); }
+
+                ROMData.CombineFireSpell(assembler, r, customSpellOrder, excludeCombinedFireSpells);
             }
 
             Dictionary<Town, Collectable> spellMap = new()
@@ -727,11 +730,12 @@ public class Hyrule
             ItemGet[Collectable.MIRROR] = true;
             ItemGet[Collectable.WATER] = true;
         }
-        else
+        else if (!props.IncludeSpellsInShuffle)
         {
+            // if the spell in a town is gettable, the required quest item should be considered gettable
             Collectable townCollectable;
             townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.RUTO).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
             {
                 Debug.Assert(shufflableItems[10] == Collectable.TROPHY);
                 shufflableItems[10] = minorItems[r.Next(minorItems.Count)];
@@ -739,7 +743,7 @@ public class Hyrule
             }
 
             townCollectable = westHyrule.AllLocations.First(i => i.ActualTown == Town.MIDO_WEST).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
             {
                 Debug.Assert(shufflableItems[9] == Collectable.MEDICINE);
                 shufflableItems[9] = minorItems[r.Next(minorItems.Count)];
@@ -747,7 +751,7 @@ public class Hyrule
             }
 
             townCollectable = eastHyrule.AllLocations.First(i => i.ActualTown == Town.DARUNIA_WEST).Collectables[0];
-            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable] && !props.IncludeSpellsInShuffle)
+            if (!townCollectable.IsMinorItem() && ItemGet[townCollectable])
             {
                 Debug.Assert(shufflableItems[17] == Collectable.CHILD);
                 shufflableItems[17] = minorItems[r.Next(minorItems.Count)];
@@ -783,13 +787,50 @@ public class Hyrule
             }
         }
 
-        if(props.IncludeSpellsInShuffle)
+        foreach (Collectable item in possibleStartSpells)
         {
-            foreach (Collectable item in possibleStartSpells)
+            if (props.StartsWithCollectable(item))
             {
-                if (props.StartsWithCollectable(item) && shufflableItems.Contains(item))
+                if (props.IncludeSpellsInShuffle)
                 {
-                    shufflableItems[shufflableItems.IndexOf(item)] = minorItems.Sample(r);
+                    var itemIndex = shufflableItems.IndexOf(item);
+                    if (itemIndex != -1)
+                    {
+                        shufflableItems[itemIndex] = minorItems.Sample(r);
+                    }
+                }
+                else
+                {
+                    foreach (Town town in TownExtensions.ALL_TOWNS)
+                    {
+                        var loc = GetTownLocation(town);
+                        if (loc.Collectables.Contains(item))
+                        {
+                            loc.Collectables = [minorItems.Sample(r)];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(props.RemoveItems.Contains(Collectable.FAIRY_SPELL) && !props.StartsWithCollectable(Collectable.FAIRY_SPELL))
+        {
+            if (props.IncludeSpellsInShuffle)
+            {
+                shufflableItems[shufflableItems.IndexOf(Collectable.FAIRY_SPELL)] = minorItems.Sample(r);
+            }
+            else
+            {
+                Collectable item = Collectable.FAIRY_SPELL;
+                foreach (Town town in TownExtensions.ALL_TOWNS)
+                {
+                    var loc = GetTownLocation(town);
+                    if (loc.Collectables.Contains(item))
+                    {
+                        loc.Collectables = [minorItems.Sample(r)];
+                        break;
+                    }
                 }
             }
         }
@@ -1300,7 +1341,7 @@ public class Hyrule
 
         foreach(Collectable item in ItemGet.Keys)
         {
-            if (ItemGet[item] == false && item.IsItemGetItem())
+            if (ItemGet[item] == false && !props.RemoveItems.Contains(item) && item.IsItemGetItem())
             {
                 itemGetReachableFailures++;
 #if UNSAFE_DEBUG
@@ -2188,8 +2229,7 @@ public class Hyrule
             }
         }
 
-        List<Town> unallocatedTowns = new List<Town> { Town.RAURU, Town.RUTO, Town.SARIA_NORTH, Town.MIDO_WEST,
-            Town.NABOORU, Town.DARUNIA_WEST, Town.NEW_KASUTO, Town.OLD_KASUTO };
+        List<Town> unallocatedTowns = [.. TownExtensions.ALL_TOWNS];
 
         var filteredToJustSpells = Enum.GetValues(typeof(Collectable)).Cast<Collectable>().Where(i => i.IsSpell());
         foreach (Collectable spell in filteredToJustSpells)
@@ -2691,7 +2731,7 @@ public class Hyrule
 
         // Use the vanilla spell order for the spells if the wizards aren't guaranteed to have a spell
         // This was overwhelmingly the favorite in the community vote;
-        if (props.IncludeSpellsInShuffle)
+        if (!props.TownWizardsOnlyHaveSpells())
         {
             //but we still need to give out starting spells
             ROMData.Put(TownExtensions.SPELL_GET_START_ADDRESS, props.StartShield ? (byte)1 : (byte)0);
@@ -2709,7 +2749,7 @@ public class Hyrule
             var wizardCollectables = AllLocationsForReal()
                 .Where(l => l.ActualTown != null && Towns.STRICT_SPELL_LOCATIONS.Contains((Town)l.ActualTown))
                 .Select(l => l.Collectables[0]).ToList();
-            
+
             for (int i = 0; i < magFunction.Length; i++)
             {
                 magFunction[i] = ROMData.GetByte(functionBase + wizardCollectables[i].VanillaSpellOrder());
@@ -3061,7 +3101,7 @@ CustomFileSelectData:
         }
         a.Set("_REPLACE_FIRE_WITH_DASH", props.ReplaceFireWithDash ? 1 : 0);
         a.Set("_CHECK_WIZARD_MAGIC_CONTAINER", props.DisableMagicRecs ? 0 : 1);
-        a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.IncludeSpellsInShuffle ? 1 : 0);
+        a.Set("_DO_SPELL_SHUFFLE_WIZARD_UPDATE", props.TownWizardsOnlyHaveSpells() ? 0 : 1);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.FullItemShuffle.s"), "full_item_shuffle.s");
     }
     

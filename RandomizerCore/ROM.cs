@@ -571,7 +571,7 @@ TitleEnd:
         /*
          * Dear future Ellendar,
          * This method is still garbage, but better.
-         * Eventually we need to create a data structure that represents the individual properies of things like sprites
+         * Eventually we need to create a data structure that represents the individual properties of things like sprites
          * that we can save in external files so they can be imported from a simple format people can use to customize all
          * the cosmetics.
          */
@@ -2000,7 +2000,7 @@ ResetRedPalettePayload:
         a.Byt(dash);
     }
 
-    public void CombineFireSpell(Assembler asm, List<Collectable>? customSpellOrder, Random RNG)
+    public void CombineFireSpell(Assembler asm, Random r, List<Collectable>? customSpellOrder, List<int> excludeSpellIndexes)
     {
         // These are the bit flags for each spell.  The old implementation
         // changed this table directly. However as this table is also used in
@@ -2009,12 +2009,18 @@ ResetRedPalettePayload:
         // two-way linked and some would not.
         byte[] spellBytes = GetBytes(0xdcb, 8);
 
-        int fireSpellIndex = 4;
-        int r = RNG.Next(7);
-        int linkedSpellIndex = r > 3 ? r + 1 : r;
+        const int FIRE_SPELL_INDEX = 4;
+        List<int> possibleSpells = Enumerable.Range(0, 8).ToList();
+        possibleSpells.Remove(FIRE_SPELL_INDEX);
+        foreach (int spellIndex in excludeSpellIndexes)
+        {
+            possibleSpells.Remove(spellIndex);
+        }
 
-        byte combinedSpellBits = (byte)(spellBytes[linkedSpellIndex] | spellBytes[fireSpellIndex]);
-        spellBytes[fireSpellIndex] = combinedSpellBits;
+        int linkedSpellIndex = possibleSpells.Sample(r);
+
+        byte combinedSpellBits = (byte)(spellBytes[linkedSpellIndex] | spellBytes[FIRE_SPELL_INDEX]);
+        spellBytes[FIRE_SPELL_INDEX] = combinedSpellBits;
         spellBytes[linkedSpellIndex] = combinedSpellBits;
 
         byte[] finalSpellBytes = customSpellOrder != null
