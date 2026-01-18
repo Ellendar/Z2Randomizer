@@ -1068,51 +1068,39 @@ sealed class DeathMountain : World
             starty += deltay;
         }
 
-        Location cave1l, cave1r, cave2l, cave2r;
+        // caves have already been shuffled by being placed on the map.
+        // pick the closest ones to the caldera center to minimize having
+        // overlap errors.
+        var validCaves = connectionsDM
+            .Where(kvp => kvp.Value.Count == 1)
+            .OrderBy(kvp => DistanceSquared(kvp.Key, calderaCenterX, calderaCenterY))
+            .ToList();
+        var first = validCaves[0];
+        var second = validCaves.First(kvp => kvp.Key != first.Key && kvp.Key != first.Value[0]);
+        Location cave1l = first.Key;
+        Location cave1r = first.Value[0];
+        Location cave2l = second.Key;
+        Location cave2r = second.Value[0];
 
-        do
-        {
-            int cavenum1 = RNG.Next(connectionsDM.Keys.Count);
-            cave1l = connectionsDM.Keys.ToList()[cavenum1];
-            cave1r = connectionsDM[cave1l][0];
-        } while (connectionsDM[cave1l].Count != 1 || connectionsDM[cave1r].Count != 1);
-
-        do
-        {
-            int cavenum1 = RNG.Next(connectionsDM.Keys.Count);
-            cave2l = connectionsDM.Keys.ToList()[cavenum1];
-            cave2r = connectionsDM[cave2l][0];
-        } while (connectionsDM[cave2l].Count != 1 || cave1l == cave2l || cave1l == cave2r);
         cave1l.CanShuffle = false;
         cave1r.CanShuffle = false;
         cave2l.CanShuffle = false;
         cave2r.CanShuffle = false;
         map[cave1l.Y, cave1l.Xpos] = Terrain.MOUNTAIN;
         map[cave2l.Y, cave2l.Xpos] = Terrain.MOUNTAIN;
-
         map[cave1r.Y, cave1r.Xpos] = Terrain.MOUNTAIN;
-
         map[cave2r.Y, cave2r.Xpos] = Terrain.MOUNTAIN;
 
-
-        int caveType = RNG.Next(2);
+        int caveDirection = RNG.Next(2);
         if (isHorizontal)
         {
-            bool f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
+            bool f = HorizontalCave(caveDirection, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
             }
-
-            if (caveType == 0)
-            {
-                caveType = 1;
-            }
-            else
-            {
-                caveType = 0;
-            }
-            f = HorizontalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
+            caveDirection = 1 - caveDirection;
+            f = HorizontalCave(caveDirection, calderaCenterX, calderaCenterY, cave2l, cave2r);
             if (!f)
             {
                 return false;
@@ -1120,20 +1108,13 @@ sealed class DeathMountain : World
         }
         else
         {
-            bool f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave1l, cave1r);
+            bool f = VerticalCave(caveDirection, calderaCenterX, calderaCenterY, cave1l, cave1r);
             if (!f)
             {
                 return false;
             }
-            if (caveType == 0)
-            {
-                caveType = 1;
-            }
-            else
-            {
-                caveType = 0;
-            }
-            f = VerticalCave(caveType, calderaCenterX, calderaCenterY, cave2l, cave2r);
+            caveDirection = 1 - caveDirection;
+            f = VerticalCave(caveDirection, calderaCenterX, calderaCenterY, cave2l, cave2r);
             if (!f)
             {
                 return false;
