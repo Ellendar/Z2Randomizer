@@ -2513,208 +2513,208 @@ public abstract class World
         }
     }
 
-    protected bool HorizontalCave(int caveOrientation, int centerx, int centery, Location cave1l, Location cave1r)
+    /// <summary>
+    /// Returns true iff position is within the bounds of the map. 
+    /// Useful to avoid index out of bounds errors.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool WithinMapBounds(IntVector2 pos)
     {
-        if (caveOrientation == 0) //first cave left
-        {
-            int cavey = RNG.Next(centery - 2, centery + 3);
-            int cavex = centerx;
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
-            {
-                cavex--;
-            }
-            if (map[cavey + 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey--;
-            }
-            else if (map[cavey - 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Y = cavey;
-            cave1r.Xpos = cavex;
-            cavex--;
-            int curr = 0;
-            while (cavex > 0 && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavex--;
-                curr++;
-            }
-
-            if (curr <= 2 || cavex <= 0)
-            {
-                return false;
-            }
-            if (map[cavey, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            cavex++;
-            if (map[cavey + 1, cavex] == Terrain.CAVE || map[cavey - 1, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Y = cavey;
-            cave1l.Xpos = cavex;
-            map[cavey + 1, cavex] = Terrain.MOUNTAIN;
-            map[cavey - 1, cavex] = Terrain.MOUNTAIN;
-        }
-        else
-        {
-            int cavey = RNG.Next(centery - 2, centery + 3);
-            int cavex = centerx;
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
-            {
-                cavex++;
-            }
-            if (map[cavey + 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey--;
-            }
-            else if (map[cavey - 1, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Y = cavey;
-            cave1l.Xpos = cavex;
-            cavex++;
-            int curr = 0;
-            while (cavex < MAP_COLS && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavex++;
-                curr++;
-            }
-            if (curr <= 2 || cavex >= MAP_COLS)
-            {
-                return false;
-            }
-            if (map[cavey, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            cavex--;
-            if (map[cavey + 1, cavex] == Terrain.CAVE || map[cavey - 1, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Y = cavey;
-            cave1r.Xpos = cavex;
-            map[cavey + 1, cavex] = Terrain.MOUNTAIN;
-            map[cavey - 1, cavex] = Terrain.MOUNTAIN;
-        }
-        return true;
+        return pos.X >= 0 && pos.X < MAP_COLS
+            && pos.Y >= 0 && pos.Y < MAP_ROWS;
     }
 
     /// <summary>
-    /// Places a vertically oriented cave into/out of a location (currently only the caldera)
+    /// Useful variant to test if something is too close to the
+    /// edge of the map.
     /// </summary>
-    /// <param name="caveType">Which order the two passthrough caves will occur in</param>
-    /// <param name="centerx"></param>
-    /// <param name="centery"></param>
-    /// <param name="cave1l"></param>
-    /// <param name="cave1r"></param>
-    /// <returns></returns>
-    protected bool VerticalCave(int caveType, int centerx, int centery, Location cave1l, Location cave1r)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool WithinMapBounds(IntVector2 pos, int margin)
     {
-        if (caveType == 0) //first cave up
+        return pos.X >= margin && pos.X < MAP_COLS - margin
+            && pos.Y >= margin && pos.Y < MAP_ROWS - margin;
+    }
+
+    /// <summary>
+    /// Return true iff there's a cave on the map in the 3x3 tiles centered on `pos`.
+    /// Note: It's the callers responsibility that these tiles are all in bounds.
+    /// </summary>
+    protected bool HasAdjacentCave(IntVector2 pos)
+    {
+        for (int y = pos.Y - 1; y <= pos.Y + 1; y++)
         {
-            int cavey = centery;
-            int cavex = RNG.Next(centerx - 2, centerx + 3);
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
+            for (int x = pos.X - 1; x <= pos.X + 1; x++)
             {
-                cavey--;
-                if (cavey < 0) { return false; }
+                if (map[y, x] == Terrain.CAVE)
+                {
+                    return true;
+                }
             }
-            if (map[cavey, cavex + 1] != Terrain.MOUNTAIN)
+        }
+        return false;
+    }
+
+    protected bool FindPassthroughCave(IntVector2 pos, IntVector2 dir, Location cave1, Location cave2)
+    {
+        var sideDir = dir.Perpendicular();
+
+        while (true)
+        {
+            if (!WithinMapBounds(pos, 1))
             {
-                cavex--;
-            }
-            else if (map[cavey, cavex - 1] != Terrain.MOUNTAIN)
-            {
-                cavex++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Y = cavey;
-            cave1r.Xpos = cavex;
-            cavey--;
-            int curr = 0;
-            while (cavey > 0 && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavey--;
-                curr++;
-            }
-            if (curr <= 2 || cavey <= 0)
-            {
+                logger.LogDebug("Start cave reached end of map");
                 return false;
             }
-            if (map[cavey, cavex] == Terrain.CAVE)
+            if (map[pos.Y, pos.X] == Terrain.MOUNTAIN)
             {
+                break;
+            }
+            pos += dir;
+        }
+
+        IntVector2? newPos = MoveAwayIfNextToCave(pos, sideDir);
+        if (newPos == null) { return false; }
+        pos = newPos.Value;
+        // Settled on start cave position
+        var cave1pos = pos;
+
+        int length = 0;
+        while (true)
+        {
+            pos += dir;
+            length++;
+            if (!WithinMapBounds(pos, 1))
+            {
+                logger.LogDebug("Ending cave reached end of map");
                 return false;
             }
-            cavey++;
-            if (map[cavey, cavex + 1] == Terrain.CAVE || map[cavey, cavex - 1] == Terrain.CAVE)
+            if (map[pos.Y, pos.X] != Terrain.MOUNTAIN)
             {
-                return false;
+                break;
             }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Y = cavey;
-            cave1l.Xpos = cavex;
-            map[cavey, cavex + 1] = Terrain.MOUNTAIN;
-            map[cavey, cavex - 1] = Terrain.MOUNTAIN;
+            if (length > 2)
+            {
+                // check sideways for exits as well
+                foreach (int i in new[] { -1, 1, -2, 2 })
+                {
+                    var sidePos = pos + i * sideDir;
+                    if (!WithinMapBounds(sidePos, 1)) { continue; }
+                    if (map[sidePos.Y, sidePos.X] != Terrain.MOUNTAIN &&
+                        map[sidePos.Y, sidePos.X] != Terrain.CAVE)
+                    {
+                        pos = sidePos;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (length <= 2)
+        {
+            logger.LogDebug("Cave passthrough path not long enough");
+            return false;
+        }
+
+        if (HasAdjacentCave(pos))
+        {
+            logger.LogDebug("Cave exit is too close to existing cave");
+            return false;
+        }
+
+        pos -= dir;
+        // settled on ending cave position
+        var cave2pos = pos;
+
+        map[cave1pos.Y, cave1pos.X] = Terrain.CAVE;
+        cave1.Pos = cave1pos;
+        map[cave2pos.Y, cave2pos.X] = Terrain.CAVE;
+        cave2.Pos = cave2pos;
+
+        // add mountains on all sides of our new exit
+        var s1 = cave2pos - sideDir;
+        map[s1.Y, s1.X] = Terrain.MOUNTAIN;
+        var s2 = cave2pos + sideDir;
+        map[s2.Y, s2.X] = Terrain.MOUNTAIN;
+        var s3 = cave2pos - dir;
+        map[s3.Y, s3.X] = Terrain.MOUNTAIN;
+
+        return true;
+    }
+
+    private IntVector2? MoveAwayIfNextToCave(IntVector2 pos, IntVector2 sideDir)
+    {
+        int i = 0;
+        IntVector2 tryPos = pos;
+        while (true)
+        {
+            if (!HasAdjacentCave(tryPos))
+            {
+                return tryPos;
+            }
+            int offset = RNG.Next(-1, 2);
+            tryPos = pos + offset * sideDir;
+            if (++i == 6)
+            {
+                logger.LogDebug("Start cave too close to another cave");
+                return null;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Tries to find and set positions for two caves to pass through a mountain area by carving
+    /// a horizontal passthrough near a given center point. (Currently only used for Caldera.)
+    /// <para />
+    /// See <see cref="VerticalCave(int, int, int, Location, Location)"/> for more documentation.
+    /// </summary>
+    protected bool HorizontalCave(int caveDirection, int centerX, int centerY, Location caveLeft, Location caveRight)
+    {
+        int rndY = RNG.Next(centerY - 2, centerY + 3);
+        if (caveDirection == 0)
+        {
+            return FindPassthroughCave(new(centerX, rndY), IntVector2.WEST, caveRight, caveLeft);
         }
         else
         {
-            //Debug.WriteLine(GetMapDebug());
-            int cavey = centery;
-            int cavex = RNG.Next(centerx - 2, centerx + 3);
-            while (map[cavey, cavex] != Terrain.MOUNTAIN)
-            {
-                cavey++;
-                if (cavey == MAP_ROWS) { return false; }
-            }
-            if (map[cavey, cavex + 1] != Terrain.MOUNTAIN)
-            {
-                cavex--;
-            }
-            else if (map[cavey, cavex - 1] != Terrain.MOUNTAIN)
-            {
-                cavex++;
-            }
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1l.Y = cavey;
-            cave1l.Xpos = cavex;
-            cavey++;
-            int curr = 0;
-            while (cavey < MAP_ROWS && map[cavey, cavex] == Terrain.MOUNTAIN)
-            {
-                cavey++;
-                curr++;
-            }
-            if (curr <= 2 || cavey >= MAP_ROWS)
-            {
-                return false;
-            }
-            if (map[cavey, cavex] == Terrain.CAVE)
-            {
-                return false;
-            }
-            cavey--;
-            if (map[cavey, cavex + 1] == Terrain.CAVE || map[cavey, cavex - 1] == Terrain.CAVE)
-            {
-                return false;
-            }
-
-            map[cavey, cavex] = Terrain.CAVE;
-            cave1r.Y = cavey;
-            cave1r.Xpos = cavex;
-            map[cavey, cavex + 1] = Terrain.MOUNTAIN;
-            map[cavey, cavex - 1] = Terrain.MOUNTAIN;
+            return FindPassthroughCave(new(centerX, rndY), IntVector2.EAST, caveLeft, caveRight);
         }
-        return true;
+    }
+
+    /// <summary>
+    /// Tries to find and set positions for two caves to pass through a mountain area by carving
+    /// a vertical passthrough near a given center point. (Currently only used for Caldera.)
+    /// <para />
+    ///
+    /// The method randomly selects a column within a small horizontal range around the center,
+    /// then searches vertically (upward or downward depending on <paramref name="caveDirection"/>)
+    /// for a contiguous stretch of mountain tiles. If a sufficiently deep mountain column is
+    /// found, exactly two cave tiles are placed at opposite ends of that stretch, with mountain
+    /// walls preserved on both sides of each entrance.
+    /// </summary>
+    /// <remarks>
+    /// The input coordinates of the provided <see cref="Location"/> objects are ignored.
+    /// On success, their coordinates are overwritten with the final cave positions.
+    /// <para />
+    ///
+    /// Cave placement is attempted in a column chosen randomly from
+    /// <c>centerX - 2</c> through <c>centerX + 2</c>, and searches vertically toward the
+    /// nearest map edge. Placement fails if the mountain run is too short, the search
+    /// exceeds map bounds, or the caves would intersect or touch existing caves.
+    /// </remarks>
+    /// <returns>
+    /// <c>true</c> if a valid vertical cave passthrough was created; otherwise <c>false</c>.
+    /// </returns>
+    protected bool VerticalCave(int caveDirection, int centerX, int centerY, Location caveLeft, Location caveRight)
+    {
+        int rndX = RNG.Next(centerX - 2, centerX + 3);
+        if (caveDirection == 0)
+        {
+            return FindPassthroughCave(new(rndX, centerY), IntVector2.NORTH, caveRight, caveLeft);
+        }
+        else
+        {
+            return FindPassthroughCave(new(rndX, centerY), IntVector2.SOUTH, caveLeft, caveRight);
+        }
     }
 
     public string GetGlobDebug(int[,] globs)
