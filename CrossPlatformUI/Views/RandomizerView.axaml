@@ -195,7 +195,7 @@
                 <tabs:EnemiesView DataContext="{Binding Main}"/>
             </TabItem>
             <TabItem Header="Items">
-                <tabs:ItemsView DataContext="{Binding Main}"/>
+                <tabs:ItemsView DataContext="{Binding ItemsViewModel}"/>
             </TabItem>
             <TabItem Header="Drops">
                 <tabs:DropsView DataContext="{Binding Main}"/>
