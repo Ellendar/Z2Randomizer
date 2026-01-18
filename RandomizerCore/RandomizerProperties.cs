@@ -120,6 +120,7 @@ public class RandomizerProperties
     public bool BossItem { get; set; }
     public bool BlockersAnywhere { get; set; }
     public bool IncludeDropRooms { get; set; }
+    public bool IncludeLongDeadEnds { get; set; }
     [NotMapped]
     public bool[] BossRoomsExitToPalace { get; set; } = new bool[7];
     public bool NoDuplicateRooms { get; set; }

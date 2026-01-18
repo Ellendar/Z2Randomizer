@@ -166,6 +166,10 @@
                           Content="Include Drop Rooms">
                     <!--<ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeDropRoomsToolTip}"/></ToolTip.Tip>-->
                 </CheckBox>
+                <CheckBox IsChecked="{Binding Main.Config.IncludeLongDeadEnds}"
+                          Content="Include Long Dead End Rooms">
+                    <!--<ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeLongDeadEndsToolTip}"/></ToolTip.Tip>-->
+                </CheckBox>
                 <Separator/>
                 <CheckBox IsChecked="{Binding Main.Config.ChangePalacePallettes}"
                           Content="Change Palace Palettes">

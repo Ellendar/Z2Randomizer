@@ -213,6 +213,10 @@ public class RoomPool
         {
             FilterRooms(room => !room.HasDrop);
         }
+        if (!props.IncludeLongDeadEnds)
+        {
+            FilterRooms(room => room.Tags == null || !room.Tags.Contains("LongDeadEnd"));
+        }
     }
 
     /// Remove rooms from the pool that does not satisfy `predicate`
