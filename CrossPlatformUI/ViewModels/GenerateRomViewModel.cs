@@ -92,10 +92,16 @@ Seed: {config.Seed}
                 {
                     var romdata = host.RomFileViewModel.RomData!.ToArray();
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
-                    if(!tokenSource.IsCancellationRequested)
+                    if(!tokenSource.IsCancellationRequested && output.romdata != null)
                     {
-                        var filename = $"Z2_{config.Seed}_{config.Flags}.nes";
-                        await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
+                        var basename = $"Z2_{config.Seed}_{config.Flags}";
+                        var filename = basename + ".nes";
+                        var debugfile = basename + ".mlb";
+                        await files.SaveGeneratedBinaryFile(filename, output.romdata, Main.OutputFilePath);
+                        if (output.debuginfo != null)
+                        {
+                            await files.SaveSpoilerFile(debugfile, output.debuginfo, Main.OutputFilePath);
+                        }
                         if (config.GenerateSpoiler)
                         {
                             var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.txt";
