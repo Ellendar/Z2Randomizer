@@ -714,12 +714,16 @@ public class Hyrule
         }
 
 
-        if (props.IncludeQuestItemsInShuffle)
+        if (props.IncludeBagusNoteInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
-                shufflableItems.Add(Collectable.MIRROR);
-                shufflableItems.Add(Collectable.WATER);
-            globalShuffleLocations.AddRange([westHyrule.bagu, westHyrule.sariaNorth, eastHyrule.nabooru]);
+            globalShuffleLocations.Add(westHyrule.bagu);
+        }
+        if (props.IncludeQuestItemsInShuffle)
+        {
+            shufflableItems.Add(Collectable.MIRROR);
+            shufflableItems.Add(Collectable.WATER);
+            globalShuffleLocations.AddRange([westHyrule.sariaNorth, eastHyrule.nabooru]);
         }
 
         if (props.IncludeSwordTechsInShuffle)
@@ -1135,10 +1139,10 @@ public class Hyrule
     private void PreventSpellItemChains()
     {
         //child, trophy, medicine, mirror, water
-        List<Location> locationsThatContainWizards = [eastHyrule.darunia, westHyrule.ruto, westHyrule.mido, westHyrule.sariaNorth, eastHyrule.nabooru];
-        if(!props.IncludeQuestItemsInShuffle)
+        List<Location> locationsThatContainWizards = [eastHyrule.darunia, westHyrule.ruto, westHyrule.mido];
+        if (props.IncludeQuestItemsInShuffle)
         {
-            locationsThatContainWizards.RemoveRange(3, 2);
+            locationsThatContainWizards.AddRange([westHyrule.sariaNorth, eastHyrule.nabooru]);
         }
 
         List<Location> possibleReplacementLocations = ItemLocations().ToList();
@@ -2135,7 +2139,7 @@ public class Hyrule
 
 
         //Quest item shuffle
-        if (props.IncludeQuestItemsInShuffle)
+        if (props.IncludeBagusNoteInShuffle)
         {
             itemLocs.Add(westHyrule.bagu);
         }

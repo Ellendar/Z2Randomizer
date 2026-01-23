@@ -623,6 +623,9 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
     [Reactive]
     private bool preventSpellItemChains;
 
+    [Reactive]
+    private bool? includeBagusNoteInShuffle = false;
+
     //Drops
     [Reactive]
     private bool shuffleItemDropFrequency = false;
@@ -1395,6 +1398,7 @@ public sealed partial class RandomizerConfiguration() : INotifyPropertyChanged
         properties.NewKasutoBasementRequirement = randomizeNewKasutoJarRequirements ? r.Next(5,8) : 7;
         properties.AllowImportantItemDuplicates = allowImportantItemDuplicates;
         properties.ShufflePbagXp = shufflePBagAmounts ?? GetIndeterminateFlagValue(r);
+        properties.IncludeBagusNoteInShuffle = IncludeBagusNoteInShuffle ?? GetIndeterminateFlagValue(r);
         properties.PreventSpellItemChains = preventSpellItemChains;
 
         //Drops

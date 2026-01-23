@@ -175,8 +175,9 @@ public class RandomizerProperties
     public bool MixOverworldPalaceItems { get; set; }
     public bool IncludeSpellsInShuffle { get; set; }
     public bool IncludeSwordTechsInShuffle { get; set; }
-    //Bagu's note / fountain water / saria mirror
+    //Fountain water / Saria mirror
     public bool IncludeQuestItemsInShuffle { get; set; }
+    public bool IncludeBagusNoteInShuffle { get; set; }
     //Spell items may not be required to obtain another spell item
     public bool PreventSpellItemChains { get; set; }
     public bool RandomizeSmallItems { get; set; }
