@@ -318,12 +318,19 @@ spells to the pool of items that can appear in general locations.</value>
 adds the Up and Down stabs to the general item pool.</value>
 	</data>
 	<data name="IncludeTownQuestItemsinShuffleToolTip" xml:space="preserve">
-<value>Adds Bagu&apos;s letter (allowing passage of the Saria moat), the mirror (allowing the spell in
-Saria), and the water (allowing the spell in Nabooru) to be added to the general pool. An
-item from the general pool will replace them when you talk to Bagu, check under the table,
-or check the fountain.</value>
+<value>Adds the mirror (allowing the spell in Saria), and the water (allowing the spell in Nabooru)
+to be added to the general pool. An item from the general pool will replace the item you get when you check
+under the table, or check the fountain.</value>
 	</data>
-	<data name="ShuffleSmallItemsToolTip" xml:space="preserve">
+    <data name="IncludeBagusNoteInShuffleToolTip" xml:space="preserve">
+<value>Adds Bagu&apos;s letter (allowing passage of the Saria moat) to the general pool. An item
+from the general pool will replace the item you get when you talk to Bagu.</value>
+	</data>
+    <data name="TownQuestLocationsAreMinorItemsToolTip" xml:space="preserve">
+<value>With Town Quest Items and/or Sword Techniques shuffled, you can enable this option to avoid
+major items being shuffled into their locations. (This does not include Bagu.)</value>
+	</data>
+    <data name="ShuffleSmallItemsToolTip" xml:space="preserve">
 <value>Replaces each small item (red/blue jar, key, 1-up, or P-Bag) with another random small
 item. This includes item locations in the shuffle pool and general locations not shuffled
 that contain small items.</value>

@@ -61,19 +61,26 @@
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeSpellsinShuffleToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.IncludeSwordTechsInShuffle}"
-                Content="Include Sword Techniques in Shuffle"
-            >
+            <CheckBox IsChecked="{Binding Main.Config.IncludeSwordTechsInShuffle}"
+                      IsThreeState="True"
+                      Content="Include Sword Techniques in Shuffle">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeSwordTechniquesinShuffleToolTip}"/></ToolTip.Tip>
             </CheckBox>
-            <CheckBox
-                IsThreeState="True"
-                IsChecked="{Binding Main.Config.IncludeQuestItemsInShuffle}"
-                Content="Include Town Quest Items in Shuffle"
-            >
+            <CheckBox IsChecked="{Binding Main.Config.IncludeQuestItemsInShuffle}"
+                      IsThreeState="True"
+                      Content="Include Town Quest Items in Shuffle">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeTownQuestItemsinShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox IsChecked="{Binding Main.Config.IncludeBagusNoteInShuffle}"
+                      IsThreeState="True"
+                      Content="Include Bagu's Letter in Shuffle">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.IncludeBagusNoteInShuffleToolTip}"/></ToolTip.Tip>
+            </CheckBox>
+            <CheckBox IsThreeState="True"
+                      IsVisible="{Binding TownQuestLocationsAreMinorItemsIsIncludedObservable^}"
+                      IsChecked="{Binding Main.Config.TownQuestLocationsAreMinorItems}"
+                      Content="Town Quest Locations are Minor Items">
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.TownQuestLocationsAreMinorItemsToolTip}"/></ToolTip.Tip>
             </CheckBox>
             <Separator />
             <CheckBox IsChecked="{Binding Main.Config.RemoveFairy}"

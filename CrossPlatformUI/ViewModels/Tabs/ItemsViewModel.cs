@@ -12,10 +12,16 @@ public class ItemsViewModel : ReactiveObject, IActivatableViewModel
     public ViewModelActivator Activator { get; }
     public MainViewModel Main { get; }
 
+    public IObservable<bool> TownQuestLocationsAreMinorItemsIsIncludedObservable { get; }
+
     public ItemsViewModel(MainViewModel main)
     {
         Main = main;
         Activator = new();
+
+        TownQuestLocationsAreMinorItemsIsIncludedObservable = Main.FlagsChanged
+            .Select(_ => Main.Config.townQuestLocationsAreMinorItemsIsIncluded())
+            .DistinctUntilChanged();
 
         this.WhenActivated(OnActivate);
     }

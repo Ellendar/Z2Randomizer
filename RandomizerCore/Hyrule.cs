@@ -620,6 +620,8 @@ public class Hyrule
         List<Collectable> minorItems = [Collectable.BLUE_JAR, Collectable.RED_JAR, Collectable.SMALL_BAG,
             Collectable.MEDIUM_BAG, Collectable.LARGE_BAG, Collectable.XL_BAG, Collectable.ONEUP, Collectable.KEY];
 
+        List<Collectable> excessItems = [];
+
         if (props.PbagItemShuffle)
         {
             westHyrule.pbagCave.Collectables = [(Collectable)ROMData.GetByte(RomMap.WEST_PBAG_CAVE_COLLECTABLE)];
@@ -652,25 +654,45 @@ public class Hyrule
             ShuffleSpells();
         }
 
-        if (props.IncludeQuestItemsInShuffle)
+        if (props.IncludeBagusNoteInShuffle)
         {
             shufflableItems.Add(Collectable.BAGUS_NOTE);
-            if (props.StartWithSpellItems)
+        }
+        if (props.IncludeQuestItemsInShuffle)
+        {
+            if (props.StartWithSpellItems && !props.TownQuestLocationsAreMinorItems)
             {
-                shufflableItems.Add(minorItems[r.Next(minorItems.Count)]);
-                shufflableItems.Add(minorItems[r.Next(minorItems.Count)]);
+                shufflableItems.Add(minorItems.Sample(r));
+                shufflableItems.Add(minorItems.Sample(r));
             }
-            else
+            else if (!props.TownQuestLocationsAreMinorItems)
             {
                 shufflableItems.Add(Collectable.MIRROR);
                 shufflableItems.Add(Collectable.WATER);
+            }
+            else
+            {
+                westHyrule.mirrorTable.Collectables = [minorItems.Sample(r)];
+                eastHyrule.fountain.Collectables = [minorItems.Sample(r)];
+                excessItems.Add(Collectable.MIRROR);
+                excessItems.Add(Collectable.WATER);
             }
         }
 
         if (props.IncludeSwordTechsInShuffle)
         {
-            shufflableItems.Add(Collectable.UPSTAB);
-            shufflableItems.Add(Collectable.DOWNSTAB);
+            if (!props.TownQuestLocationsAreMinorItems)
+            {
+                shufflableItems.Add(Collectable.UPSTAB);
+                shufflableItems.Add(Collectable.DOWNSTAB);
+            }
+            else
+            {
+                westHyrule.midoChurch.Collectables = [minorItems.Sample(r)];
+                eastHyrule.daruniaRoof.Collectables = [minorItems.Sample(r)];
+                excessItems.Add(Collectable.UPSTAB);
+                excessItems.Add(Collectable.DOWNSTAB);
+            }
         }
 
         else if(props.SwapUpAndDownStab)
@@ -846,10 +868,6 @@ public class Hyrule
                 shufflableItems[shufflableItems.IndexOf(Collectable.UPSTAB)] = minorItems.Sample(r);
             }
         }
-
-        //Handle excess items
-
-        List<Collectable> excessItems = [];
 
         //Heart containers over 4 are excess
         for (int i = 4; i < heartContainersInItemPool; i++)
@@ -2142,7 +2160,7 @@ public class Hyrule
         {
             itemLocs.Add(westHyrule.pbagCave);
         }
-        if (props.IncludeQuestItemsInShuffle)
+        if (props.IncludeBagusNoteInShuffle)
         {
             itemLocs.Add(westHyrule.bagu);
         }
@@ -2152,7 +2170,7 @@ public class Hyrule
             itemLocs.Add(westHyrule.locationAtRuto);
             itemLocs.Add(westHyrule.locationAtSariaNorth);
         }
-        if (props.IncludeQuestItemsInShuffle)
+        if (props.IncludeQuestItemsInShuffle && !props.TownQuestLocationsAreMinorItems)
         {
             itemLocs.Add(westHyrule.mirrorTable);
         }
@@ -2160,7 +2178,7 @@ public class Hyrule
         {
             itemLocs.Add(westHyrule.locationAtMido);
         }
-        if (props.IncludeSwordTechsInShuffle)
+        if (props.IncludeSwordTechsInShuffle && !props.TownQuestLocationsAreMinorItems)
         {
             itemLocs.Add(westHyrule.midoChurch);
         }
@@ -2184,7 +2202,7 @@ public class Hyrule
             itemLocs.Add(eastHyrule.pbagCave1);
             itemLocs.Add(eastHyrule.pbagCave2);
         }
-        if (props.IncludeQuestItemsInShuffle)
+        if (props.IncludeQuestItemsInShuffle && !props.TownQuestLocationsAreMinorItems)
         {
             itemLocs.Add(eastHyrule.fountain);
         }
@@ -2193,7 +2211,7 @@ public class Hyrule
             itemLocs.Add(eastHyrule.townAtNabooru);
             itemLocs.Add(eastHyrule.townAtDarunia);
         }
-        if (props.IncludeSwordTechsInShuffle)
+        if (props.IncludeSwordTechsInShuffle && !props.TownQuestLocationsAreMinorItems)
         {
             itemLocs.Add(eastHyrule.daruniaRoof);
         }
