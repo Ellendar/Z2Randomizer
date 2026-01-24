@@ -46,7 +46,8 @@
   <ItemGroup>
     <PackageReference Include="DynamicData" Version="9.4.1" />
 <!--    <PackageReference Include="js65.interop" Version="1.0.0-alpha3" />-->
-    <ProjectReference Include="..\..\js65\integrations\dotnet\js65\js65.csproj" />
+<!--    <ProjectReference Include="..\..\js65\integrations\dotnet\js65\js65.csproj" />-->
+    <PackageReference Include="js65.interop" Version="1.0.0" />
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
     <PackageReference Include="NLog" Version="6.0.6" />
     <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />

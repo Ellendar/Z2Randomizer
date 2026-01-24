@@ -183,7 +183,9 @@ public class Hyrule
         // Must exist for the FileResolve callback to be called
         includePaths = [""],
         generateDebugInfo = true,
-        debugLevel = 0,
+        // debugLevel = 0,
+        // debugLevel = 1,
+        debugLevel = 2,
     };
 
     private readonly NewAssemblerFn NewAssembler;
@@ -1215,7 +1217,7 @@ public class Hyrule
         foreach (var sv in sideviews.Keys)
         {
             var name = "Sideview_" + i++;
-            sideviewModule.Segment("PRG1C", "PRG1D");
+            sideviewModule.Segment(["PRG1C", "PRG1D"]);
             sideviewModule.Reloc();
             sideviewModule.Label(name);
             sideviewModule.Byt(sv);
@@ -1235,7 +1237,7 @@ public class Hyrule
         foreach (var sv in sideviewsgp.Keys)
         {
             var name = "SideviewGP_" + i++;
-            sideviewModule.Segment("PRG1C", "PRG1D");
+            sideviewModule.Segment(["PRG1C", "PRG1D"]);
             sideviewModule.Reloc();
             sideviewModule.Label(name);
             sideviewModule.Byt(sv);
