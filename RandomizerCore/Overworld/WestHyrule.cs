@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -708,7 +707,7 @@ public sealed class WestHyrule : World
                     }
                 }
 
-                BlockCaves(props.BoulderBlockConnections);
+                BlockCaves(props.BoulderBlockConnections, Terrain.ROCK);
                 //Debug.WriteLine(GetMapDebug());
                 PlaceHiddenLocations(props.LessImportantLocationsOption);
 
@@ -1279,158 +1278,83 @@ public sealed class WestHyrule : World
         }
         return true;
     }
-    private void BlockCaves(bool boulderBlockConnections)
+
+    private void BlockCaves(bool boulderBlockConnections, Terrain blockerTerrain)
     {
         int rockNum = RNG.Next(3);
-        int cavePicked = 0;
-        while (rockNum > 0)
+        List<Location> availableCaves = [.. Locations[Terrain.CAVE]];
+        availableCaves.FisherYatesShuffle(RNG);
+
+        foreach (var cave in availableCaves)
         {
-            List<Location> Caves = Locations[Terrain.CAVE];
-            Location cave = Caves[RNG.Next(Caves.Count)];
-            int caveConn = 0;
-            if(caveConn != 0 && connections.ContainsKey(GetLocationByMem(cavePicked)))
+            if (rockNum == 0) { break; }
+
+            if (!boulderBlockConnections)
             {
-                caveConn = connections[GetLocationByMem(cavePicked)].MemAddress;
+                bool isConnectorCave = !connections.ContainsKey(cave) && cave != cave1 && cave != cave2;
+                if (isConnectorCave) { continue; }
             }
-            //Item caves
-            if (boulderBlockConnections && cave.MemAddress != cavePicked && cave.MemAddress != caveConn)
+
+            var dir = ValidBlockingCavePosition(cave.Pos);
+            if (dir != null)
             {
-                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN && cave.Xpos + 2 < MAP_COLS && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos + 2)) == null)
-                {
-                    map[cave.Y, cave.Xpos - 1] = Terrain.ROCK;
-                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Y, cave.Xpos + 1] = Terrain.CAVE;
-                    if (cave.Xpos + 2 < MAP_COLS)
-                    {
-                        map[cave.Y, cave.Xpos + 2] = Terrain.MOUNTAIN;
-                    }
-                    cave.Xpos++;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN && cave.Xpos - 2 > 0 && GetLocationByCoordsNoOffset((cave.Y, cave.Xpos - 2)) == null)
-                {
-                    map[cave.Y, cave.Xpos + 1] = Terrain.ROCK;
-                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Y, cave.Xpos - 1] = Terrain.CAVE;
-                    if (cave.Xpos - 2 >= 0)
-                    {
-                        map[cave.Y, cave.Xpos - 2] = Terrain.MOUNTAIN;
-                    }
-                    cave.Xpos--;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y - 2 < MAP_COLS && GetLocationByCoordsNoOffset((cave.Y - 2, cave.Xpos)) == null)
-                {
-                    map[cave.Y + 1, cave.Xpos] = Terrain.ROCK;
-                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Y - 1, cave.Xpos] = Terrain.CAVE;
-                    if (cave.Y - 2 >= 0)
-                    {
-                        map[cave.Y - 2, cave.Xpos] = Terrain.MOUNTAIN;
-                    }
-                    cave.Y--;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN && cave.Y + 2 < MAP_COLS && GetLocationByCoordsNoOffset((cave.Y + 2, cave.Xpos)) == null)
-                {
-                    map[cave.Y - 1, cave.Xpos] = Terrain.ROCK;
-                    map[cave.Y, cave.Xpos] = Terrain.ROAD;
-                    map[cave.Y + 1, cave.Xpos] = Terrain.CAVE;
-                    if (cave.Y + 2 < MAP_ROWS)
-                    {
-                        map[cave.Y + 2, cave.Xpos] = Terrain.MOUNTAIN;
-                    }
-                    cave.Y++;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-            }
-            //Connector caves
-            else if (!connections.Keys.Contains(cave) && cave != cave1 && cave != cave2 && cave.MemAddress != cavePicked)
-            {
-                if (map[cave.Y, cave.Xpos - 1] != Terrain.MOUNTAIN)
-                {
-                    map[cave.Y, cave.Xpos - 1] = Terrain.ROCK;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-                else if (map[cave.Y, cave.Xpos + 1] != Terrain.MOUNTAIN)
-                {
-                    map[cave.Y, cave.Xpos + 1] = Terrain.ROCK;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-                else if (map[cave.Y + 1, cave.Xpos] != Terrain.MOUNTAIN)
-                {
-                    map[cave.Y + 1, cave.Xpos] = Terrain.ROCK;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
-                else if (map[cave.Y - 1, cave.Xpos] != Terrain.MOUNTAIN)
-                {
-                    map[cave.Y - 1, cave.Xpos] = Terrain.ROCK;
-                    rockNum--;
-                    cavePicked = cave.MemAddress;
-                }
+                PlaceCaveBlocker(cave, dir.Value, blockerTerrain);
+                rockNum--;
             }
         }
     }
 
     private void DrawMountains()
     {
-        //create some mountains
-        int mounty = RNG.Next(22, 42);
-        map[mounty, 0] = Terrain.MOUNTAIN;
+        /*readonly*/ int mountStartY = RNG.Next(22, 42);
+        /*readonly*/ int mountEndY = RNG.Next(22, 42);
+        /*readonly*/ int mountMargin = RNG.Next(2, 8);
+        /*readonly*/ int mountEndRight = MAP_COLS - mountMargin;
+        map[mountStartY, 0] = Terrain.MOUNTAIN;
         bool placedRoad = false;
 
-
-        int endmounty = RNG.Next(22, 42);
-        int endmountx = RNG.Next(2, 8);
-        int x2 = 0;
-        int y2 = mounty;
+        int x = 0;
+        int y = mountStartY;
         int placedRocks = 0;
-        while (x2 != (MAP_COLS - endmountx) || y2 != endmounty)
+        while (x != mountEndRight || y != mountEndY)
         {
-            if (Math.Abs(x2 - (MAP_COLS - endmountx)) >= Math.Abs(y2 - endmounty))
+            if (Math.Abs(x - mountEndRight) >= Math.Abs(y - mountEndY))
             {
-                if (x2 > MAP_COLS - endmountx && x2 > 0)
+                if (x > mountEndRight && x > 0)
                 {
-                    x2--;
+                    x--;
                 }
-                else if (x2 < MAP_COLS - 1)
+                else if (x < MAP_COLS - 1)
                 {
-                    x2++;
+                    x++;
                 }
             }
             else
             {
-                if (y2 > endmounty && y2 > 0)
+                if (y > mountEndY && y > 0)
                 {
-                    y2--;
+                    y--;
                 }
-                else if (y2 < MAP_ROWS - 1)
+                else if (y < MAP_ROWS - 1)
                 {
-                    y2++;
+                    y++;
                 }
             }
-            if (x2 != MAP_COLS - endmountx || y2 != endmounty)
+            if (x != mountEndRight || y != mountEndY)
             {
-                if (map[y2, x2] == Terrain.NONE)
+                if (map[y, x] == Terrain.NONE)
                 {
-                    map[y2, x2] = Terrain.MOUNTAIN;
+                    map[y, x] = Terrain.MOUNTAIN;
                 }
                 else
                 {
-                    if (!placedRoad && map[y2, x2 + 1] != Terrain.ROAD)
+                    if (!placedRoad && map[y, x + 1] != Terrain.ROAD)
                     {
-                        if (RNG.NextDouble() > .5 && (x2 > 0 && map[y2, x2 - 1] != Terrain.ROCK) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] != Terrain.ROCK) && (((y2 > 0 && map[y2 - 1, x2] == Terrain.ROAD) && (y2 < MAP_ROWS - 1 && map[y2 + 1, x2] == Terrain.ROAD)) || ((x2 > 0 && map[y2, x2 - 0] == Terrain.ROAD) && (x2 < MAP_COLS - 1 && map[y2, x2 + 1] == Terrain.ROAD))))
+                        if (RNG.NextDouble() > .5 && ValidTrapTilePosition(new IntVector2(x, y)) != null)
                         {
                             Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
-                            roadEnc.Xpos = x2;
-                            roadEnc.Y = y2;
+                            roadEnc.Xpos = x;
+                            roadEnc.Y = y;
                             roadEnc.CanShuffle = false;
                             roadEnc.Reachable = true;
                             placedRoad = true;
@@ -1438,9 +1362,9 @@ public sealed class WestHyrule : World
                         else if (placedRocks < 1)
                         {
                             Location roadEnc = GetLocationByMem(RomMap.WEST_TRAP_ROAD_TILE_LOCATION);
-                            if ((roadEnc.Y != y2 && roadEnc.Xpos - 1 != x2) && (roadEnc.Y + 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Y - 1 != y2 && roadEnc.Xpos != x2) && (roadEnc.Y != y2 && roadEnc.Xpos + 1 != x2))
+                            if ((roadEnc.Y != y && roadEnc.Xpos - 1 != x) && (roadEnc.Y + 1 != y && roadEnc.Xpos != x) && (roadEnc.Y - 1 != y && roadEnc.Xpos != x) && (roadEnc.Y != y && roadEnc.Xpos + 1 != x))
                             {
-                                map[y2, x2] = Terrain.ROCK;
+                                map[y, x] = Terrain.ROCK;
                                 placedRocks++;
                             }
                         }
@@ -1448,7 +1372,7 @@ public sealed class WestHyrule : World
                     else if (placedRocks < 1)
                     {
 
-                        map[y2, x2] = Terrain.ROCK;
+                        map[y, x] = Terrain.ROCK;
                         placedRocks++;
                     }
                 }
