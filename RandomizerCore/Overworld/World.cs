@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -957,8 +956,8 @@ public abstract class World
                 }
                 else if (placeDarunia)
                 {
-                    Location bridge1 = GetLocationByMem(0x8638);
-                    Location bridge2 = GetLocationByMem(0x8637);
+                    Location bridge1 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION2);
+                    Location bridge2 = GetLocationByMem(RomMap.EAST_TRAP_DESERT_TILE_LOCATION1);
                     if (bridge1.CanShuffle && bridge2.CanShuffle)
                     {
                         x -= deltaX;
@@ -2715,6 +2714,130 @@ public abstract class World
         {
             return FindPassthroughCave(new(rndX, centerY), IntVector2.SOUTH, caveLeft, caveRight);
         }
+    }
+
+    // subset of walkable terrains that we would expect to be next to a trap tile
+    protected static readonly FrozenSet<Terrain> TRAP_PATH_VALID_TERRAIN = [Terrain.DESERT, Terrain.GRASS, Terrain.ROAD, Terrain.LAVA, Terrain.NONE];
+    protected static readonly FrozenSet<Terrain> TRAP_PATH_BLOCKING_TERRAIN = [Terrain.MOUNTAIN, Terrain.WATER];
+
+    /// <summary>
+    /// Check if the cave is possible to be blocked. It should<br/>
+    /// - Be surrounded by mountains in exactly 3 directions.<br/>
+    /// - There must not be any location on the tiles we will mutate
+    ///   when we move the mountain back to fit the block tile.<br/>
+    /// </summary>
+    public IntVector2? ValidBlockingCavePosition(IntVector2 pos)
+    {
+        if (!WithinMapBounds(pos, 1)) { return null; }
+
+        bool isMountain(IntVector2 pos) => map[pos.Y, pos.X] == Terrain.MOUNTAIN;
+        bool checkForExistingLocation(IntVector2 pos)
+        {
+            if (WithinMapBounds(pos))
+            {
+                var loc = GetLocationByPos(pos);
+                return loc != null;
+            }
+            return false;
+        }
+
+        var openDirs = IntVector2.CARDINALS
+            .Where(d => !isMountain(pos - d))
+            .ToList();
+
+        // only block caves with a single path in
+        if (openDirs.Count != 1) { return null; }
+        var dir = openDirs[0];
+        var sideways = dir.Perpendicular();
+
+        // make sure there is nothing right in front of our new blocker
+        var beforeBlockerPos = pos - 2 * dir;
+        if (checkForExistingLocation(beforeBlockerPos)) { return null; }
+
+        // make sure there is nothing where our new mountain tile will be
+        var newMountainPos = pos + 2 * dir;
+        if (checkForExistingLocation(newMountainPos)) { return null; }
+
+        // check if the terraforming would destroy a 3x3 isolated tile formation
+        for (int i = -1; i <= 1; i++)
+        {
+            var behindNewMountain = pos + 3 * dir + i * sideways;
+            if (checkForExistingLocation(behindNewMountain)) { return null; }
+        }
+
+        var newCavePos = pos + dir;
+        if (checkForExistingLocation(newCavePos)) { return null; }
+        var newBlockPos = pos - dir;
+        if (checkForExistingLocation(newBlockPos)) { return null; }
+
+        return dir;
+    }
+
+    public void PlaceCaveBlocker(Location cave, IntVector2 dir, Terrain blockerTerrain)
+    {
+        var pos = cave.Pos;
+        var blockPos = pos - dir;
+        var roadPos = pos;
+        var newCavePos = pos + dir;
+        var mountainPos = pos + 2 * dir;
+
+        map[blockPos.Y, blockPos.X] = blockerTerrain;
+        map[roadPos.Y, roadPos.X] = Terrain.ROAD;
+        map[newCavePos.Y, newCavePos.X] = Terrain.CAVE;
+        if (WithinMapBounds(mountainPos))
+        {
+            map[mountainPos.Y, mountainPos.X] = Terrain.MOUNTAIN;
+        }
+        cave.Pos = newCavePos;
+    }
+
+    /// <summary>
+    /// Check if the position is suitable as a trap tile. It should<br/>
+    /// - Be the center tile of a 3-tile long path.<br/>
+    /// - There must be no special locations on these 3 tiles.<br/>
+    /// - The perpendicular tiles should not be passable.
+    /// </summary>
+    /// <returns>
+    /// Returns east-pointing vector if it's valid for horizontal passthrough,
+    /// or south-pointing vector if it's valid for vertical passthrough,
+    /// or null.
+    /// </returns>
+    public IntVector2? ValidTrapTilePosition(IntVector2 pos)
+    {
+        bool isPassable(IntVector2 pos) => TRAP_PATH_VALID_TERRAIN.Contains(map[pos.Y, pos.X]);
+        bool isBlocking(IntVector2 pos) => TRAP_PATH_BLOCKING_TERRAIN.Contains(map[pos.Y, pos.X]);
+
+        if (!WithinMapBounds(pos, 1)) { return null; }
+        if (!isPassable(pos)) { return null; }
+
+        var dx = IntVector2.EAST;
+        var dy = IntVector2.SOUTH;
+        bool h1 = isPassable(pos + dx);
+        bool h2 = isPassable(pos - dx);
+        bool v1 = isPassable(pos + dy);
+        bool v2 = isPassable(pos - dy);
+        bool horizontalPath = h1 && h2 && !v1 && !v2;
+        bool verticalPath = v1 && v2 && !h1 && !h2;
+
+        if (!horizontalPath && !verticalPath) { return null; }
+
+        var dir = horizontalPath ? dx : dy;
+        var side = horizontalPath ? dy : dx;
+
+        if (!isBlocking(pos + side) || !isBlocking(pos - side)) { return null; }
+
+        // expensive Location check last
+        for (int i = -1; i <= 1; i++)
+        {
+            var p = pos + i * dir;
+            var l = GetLocationByPos(p);
+            if (l != null)
+            {
+                return null;
+            }
+        }
+
+        return dir;
     }
 
     public string GetGlobDebug(int[,] globs)
