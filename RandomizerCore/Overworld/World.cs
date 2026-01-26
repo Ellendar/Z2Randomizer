@@ -3,6 +3,7 @@ using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using NLog;
 using Z2Randomizer.RandomizerCore.Enemy;
@@ -1387,6 +1388,21 @@ public abstract class World
         int dx = x1 - x2;
         int dy = y1 - y2;
         return dx * dx + dy * dy;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected bool AllTerrainIn3x3Equals(int x, int y, Terrain t)
+    {
+        return
+            map[y - 1, x - 1] == t &&
+            map[y - 1, x    ] == t &&
+            map[y - 1, x + 1] == t &&
+            map[y,     x - 1] == t &&
+            map[y,     x    ] == t &&
+            map[y,     x + 1] == t &&
+            map[y + 1, x - 1] == t &&
+            map[y + 1, x    ] == t &&
+            map[y + 1, x + 1] == t;
     }
 
     protected void PlaceRandomTerrain(Climate climate, int seedCountMaximum = 500)

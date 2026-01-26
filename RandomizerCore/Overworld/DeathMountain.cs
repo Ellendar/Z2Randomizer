@@ -503,261 +503,24 @@ sealed class DeathMountain : World
                             x = RNG.Next(MAP_COLS - 2) + 1;
                             y = RNG.Next(MAP_ROWS - 2) + 1;
                             tries++;
-                        } while ((map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
-                        if (tries >= 100)
-                        {
-                            return false;
-                        }
+                            if (++tries >= 100)
+                            {
+                                logger.LogDebug($"Could not find empty 3x3 spot for location {location.Name}");
+                                return false;
+                            }
+                        } while (!AllTerrainIn3x3Equals(x, y, Terrain.NONE));
 
                         map[y, x] = location.TerrainType;
                         location.Xpos = x;
                         location.Y = y;
                         if (location.TerrainType == Terrain.CAVE)
                         {
-
-                            Direction direction = (Direction)RNG.Next(4);
-
-                            //Terrain s = walkableTerrains[RNG.Next(walkableTerrains.Count)];
-                            Terrain s = climate.GetRandomTerrain(RNG, walkableTerrains);
-                            if (biome == Biome.VANILLALIKE)
+                            var f = TerraformCaveExpansion(props, ref x, ref y, location);
+                            if (!f)
                             {
-                                s = Terrain.ROAD;
+                                logger.LogDebug($"TerraformCaveExpansion failed for {location.Name}");
+                                return false;
                             }
-                            if (props.SaneCaves && connectionsDM.ContainsKey(location))
-                            {
-                                if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
-                                {
-                                    if (direction == Direction.NORTH)
-                                    {
-                                        direction = Direction.SOUTH;
-                                    }
-
-                                    if (direction == Direction.WEST)
-                                    {
-                                        direction = Direction.EAST;
-                                    }
-                                }
-                                else
-                                {
-                                    if (direction == Direction.SOUTH)
-                                    {
-                                        direction = Direction.NORTH;
-                                    }
-
-                                    if (direction == Direction.EAST)
-                                    {
-                                        direction = Direction.WEST;
-                                    }
-                                }
-                                map[y, x] = Terrain.NONE;
-
-                                tries = 0;
-                                do
-                                {
-                                    x = RNG.Next(MAP_COLS - 2) + 1;
-                                    y = RNG.Next(MAP_ROWS - 2) + 1;
-                                    tries++;
-                                } while ((x < 5 || y < 5 || x > MAP_COLS - 5 || y > MAP_ROWS - 5 || map[y, x] != Terrain.NONE || map[y - 1, x] != Terrain.NONE || map[y + 1, x] != Terrain.NONE || map[y + 1, x + 1] != Terrain.NONE || map[y, x + 1] != Terrain.NONE || map[y - 1, x + 1] != Terrain.NONE || map[y + 1, x - 1] != Terrain.NONE || map[y, x - 1] != Terrain.NONE || map[y - 1, x - 1] != Terrain.NONE) && tries < 100);
-                                if (tries >= 100)
-                                {
-                                    return false;
-                                }
-
-                                int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
-                                int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
-                                while ((direction == Direction.NORTH && y < minDistY) || (direction == Direction.EAST && x > MAP_COLS - minDistX) || (direction == Direction.SOUTH && y > MAP_ROWS - minDistY) || (direction == Direction.WEST && x < minDistX))
-                                {
-                                    direction = (Direction)RNG.Next(4);
-                                }
-                                if (connectionsDM[location].Count == 1)
-                                {
-                                    int otherx = 0;
-                                    int othery = 0;
-                                    tries = 0;
-                                    bool crossing = true;
-                                    do
-                                    {
-                                        int range = 7;
-                                        int offset = 3;
-                                        if (biome == Biome.ISLANDS)
-                                        {
-                                            range = 7;
-                                            offset = 5;
-                                        }
-                                        crossing = true;
-                                        if (direction == Direction.NORTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y - (RNG.Next(range) + offset);
-                                        }
-                                        else if (direction == Direction.EAST)
-                                        {
-                                            otherx = x + (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        else if (direction == Direction.SOUTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y + (RNG.Next(range) + offset);
-                                        }
-                                        else //west
-                                        {
-                                            otherx = x - (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        tries++;
-
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE);
-                                    if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-
-                                    List<Location> l2 = connectionsDM[location];
-                                    location.CanShuffle = false;
-                                    location.Xpos = x;
-                                    location.Y = y;
-                                    l2[0].CanShuffle = false;
-                                    l2[0].Xpos = otherx;
-                                    l2[0].Y = othery;
-                                    PlaceCave(x, y, direction, s);
-                                    PlaceCave(otherx, othery, direction.Reverse(), s);
-                                }
-                                else //4-way caves
-                                {
-                                    int otherx = 0;
-                                    int othery = 0;
-                                    tries = 0;
-                                    bool crossing = true;
-                                    do
-                                    {
-                                        int range = 7;
-                                        int offset = 3;
-                                        if (biome == Biome.ISLANDS)
-                                        {
-                                            range = 7;
-                                            offset = 5;
-                                        }
-                                        crossing = true;
-                                        if (direction == Direction.NORTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y - (RNG.Next(range) + offset);
-                                        }
-                                        else if (direction == Direction.EAST)
-                                        {
-                                            otherx = x + (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        else if (direction == Direction.SOUTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y + (RNG.Next(range) + offset);
-                                        }
-                                        else //west
-                                        {
-                                            otherx = x - (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        tries++;
-
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-
-                                    List<Location> caveExits = connectionsDM[location];
-                                    location.CanShuffle = false;
-                                    location.Xpos = x;
-                                    location.Y = y;
-                                    caveExits[0].CanShuffle = false;
-                                    caveExits[0].Xpos = otherx;
-                                    caveExits[0].Y = othery;
-                                    PlaceCave(x, y, direction, s);
-                                    PlaceCave(otherx, othery, direction.Reverse(), s);
-                                    int newx = 0;
-                                    int newy = 0;
-                                    tries = 0;
-                                    do
-                                    {
-                                        newx = x + RNG.Next(7) - 3;
-                                        newy = y + RNG.Next(7) - 3;
-                                        tries++;
-                                    } while (newx > 2 && newx < MAP_COLS - 2 && newy > 2 && newy < MAP_ROWS - 2 && (map[newy, newx] != Terrain.NONE || map[newy - 1, newx] != Terrain.NONE || map[newy + 1, newx] != Terrain.NONE || map[newy + 1, newx + 1] != Terrain.NONE || map[newy, newx + 1] != Terrain.NONE || map[newy - 1, newx + 1] != Terrain.NONE || map[newy + 1, newx - 1] != Terrain.NONE || map[newy, newx - 1] != Terrain.NONE || map[newy - 1, newx - 1] != Terrain.NONE) && tries < 100);
-                                    if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-                                    caveExits[1].Xpos = newx;
-                                    caveExits[1].Y = newy;
-                                    caveExits[1].CanShuffle = false;
-                                    PlaceCave(newx, newy, direction, s);
-                                    y = newy;
-                                    x = newx;
-
-                                    tries = 0;
-                                    do
-                                    {
-                                        int range = 7;
-                                        int offset = 3;
-                                        if (biome == Biome.ISLANDS)
-                                        {
-                                            range = 7;
-                                            offset = 5;
-                                        }
-                                        crossing = true;
-
-                                        if (direction == Direction.NORTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y - (RNG.Next(range) + offset);
-                                        }
-                                        else if (direction == Direction.EAST)
-                                        {
-                                            otherx = x + (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        else if (direction == Direction.SOUTH)
-                                        {
-                                            otherx = x + (RNG.Next(7) - 3);
-                                            othery = y + (RNG.Next(range) + offset);
-                                        }
-                                        else //west
-                                        {
-                                            otherx = x - (RNG.Next(range) + offset);
-                                            othery = y + (RNG.Next(7) - 3);
-                                        }
-                                        tries++;
-
-                                        if (tries >= 100)
-                                        {
-                                            return false;
-                                        }
-                                    } while (!crossing || otherx <= 1 || otherx >= MAP_COLS - 1 || othery <= 1 || othery >= MAP_ROWS - 1 || map[othery, otherx] != Terrain.NONE || map[othery - 1, otherx] != Terrain.NONE || map[othery + 1, otherx] != Terrain.NONE || map[othery + 1, otherx + 1] != Terrain.NONE || map[othery, otherx + 1] != Terrain.NONE || map[othery - 1, otherx + 1] != Terrain.NONE || map[othery + 1, otherx - 1] != Terrain.NONE || map[othery, otherx - 1] != Terrain.NONE || map[othery - 1, otherx - 1] != Terrain.NONE); if (tries >= 100)
-                                    {
-                                        return false;
-                                    }
-
-                                    location.CanShuffle = false;
-                                    caveExits[2].CanShuffle = false;
-                                    caveExits[2].Xpos = otherx;
-                                    caveExits[2].Y = othery;
-                                    PlaceCave(otherx, othery, direction.Reverse(), s);
-                                }
-                            }
-                            else
-                            {
-                                PlaceCave(x, y, direction, s);
-                            }
-                            
                         }
                     }
                 }
@@ -777,6 +540,7 @@ sealed class DeathMountain : World
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
                 if (!GrowTerrain(growthClimate))
                 {
+                    logger.LogDebug("GrowTerrain failed");
                     return false;
                 }
                 //Debug.WriteLine(GetMapDebug());
@@ -785,6 +549,7 @@ sealed class DeathMountain : World
                     bool f = MakeCaldera(props.CanWalkOnWaterWithBoots);
                     if (!f)
                     {
+                        logger.LogDebug("MakeCaldera failed");
                         return false;
                     }
                 }
@@ -794,6 +559,7 @@ sealed class DeathMountain : World
                     bool r = DrawRaft(raftDirection);
                     if (!r)
                     {
+                        logger.LogDebug("DrawRaft failed");
                         return false;
                     }
                 }
@@ -803,6 +569,7 @@ sealed class DeathMountain : World
                     bool b = DrawBridge(bridgeDirection);
                     if (!b)
                     {
+                        logger.LogDebug("DrawBridge failed");
                         return false;
                     }
                 }
@@ -826,6 +593,7 @@ sealed class DeathMountain : World
 
                 if (!ValidateCaves())
                 {
+                    logger.LogDebug("ValidateCaves failed");
                     return false;
                 }
 
@@ -835,6 +603,7 @@ sealed class DeathMountain : World
         }
         if(!ValidateBasicRouting())
         {
+            logger.LogDebug("ValidateBasicRouting failed");
             return false;
         }
 
@@ -859,6 +628,243 @@ sealed class DeathMountain : World
         }
         return true;
     }
+
+    private bool TerraformCaveExpansion(RandomizerProperties props, ref int x, ref int y, Location location)
+    {
+        Direction direction = (Direction)RNG.Next(4);
+
+        Terrain s = biome == Biome.VANILLALIKE ? Terrain.ROAD : climate.GetRandomTerrain(RNG, walkableTerrains);
+        int tries;
+
+        if (props.SaneCaves && connectionsDM.ContainsKey(location))
+        {
+            if ((location.MapPage == 0 || location.FallInHole != 0) && location.ForceEnterRight == 0)
+            {
+                if (direction == Direction.NORTH)
+                {
+                    direction = Direction.SOUTH;
+                }
+
+                if (direction == Direction.WEST)
+                {
+                    direction = Direction.EAST;
+                }
+            }
+            else
+            {
+                if (direction == Direction.SOUTH)
+                {
+                    direction = Direction.NORTH;
+                }
+
+                if (direction == Direction.EAST)
+                {
+                    direction = Direction.WEST;
+                }
+            }
+            map[y, x] = Terrain.NONE;
+
+            tries = 0;
+            do
+            {
+                x = RNG.Next(MAP_COLS - 2) + 1;
+                y = RNG.Next(MAP_ROWS - 2) + 1;
+                if (++tries >= 100)
+                {
+                    return false;
+                }
+            } while (x < 5 || x > MAP_COLS - 5
+                  || y < 5 || y > MAP_ROWS - 5
+                  || !AllTerrainIn3x3Equals(x, y, Terrain.NONE));
+
+            int minDistX = Math.Min(MAP_COLS / 2 - 1, 15);
+            int minDistY = Math.Min(MAP_ROWS / 2 - 1, 15);
+
+            while ((direction == Direction.NORTH && y < minDistY)
+                || (direction == Direction.EAST && x > MAP_COLS - minDistX)
+                || (direction == Direction.SOUTH && y > MAP_ROWS - minDistY)
+                || (direction == Direction.WEST && x < minDistX))
+            {
+                direction = (Direction)RNG.Next(4);
+            }
+            if (connectionsDM[location].Count == 1)
+            {
+                int otherx = 0;
+                int othery = 0;
+                tries = 0;
+                do
+                {
+                    int range = 7;
+                    int offset = 3;
+                    if (biome == Biome.ISLANDS)
+                    {
+                        range = 7;
+                        offset = 5;
+                    }
+                    if (direction == Direction.NORTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y - (RNG.Next(range) + offset);
+                    }
+                    else if (direction == Direction.EAST)
+                    {
+                        otherx = x + (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    else if (direction == Direction.SOUTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y + (RNG.Next(range) + offset);
+                    }
+                    else //west
+                    {
+                        otherx = x - (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (otherx <= 1 || otherx >= MAP_COLS - 1
+                      || othery <= 1 || othery >= MAP_ROWS - 1
+                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
+
+                List<Location> l2 = connectionsDM[location];
+                location.CanShuffle = false;
+                location.Xpos = x;
+                location.Y = y;
+                l2[0].CanShuffle = false;
+                l2[0].Xpos = otherx;
+                l2[0].Y = othery;
+                PlaceCave(x, y, direction, s);
+                PlaceCave(otherx, othery, direction.Reverse(), s);
+            }
+            else //4-way caves
+            {
+                int otherx = 0;
+                int othery = 0;
+                tries = 0;
+                do
+                {
+                    int range = 7;
+                    int offset = 3;
+                    if (biome == Biome.ISLANDS)
+                    {
+                        range = 7;
+                        offset = 5;
+                    }
+                    if (direction == Direction.NORTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y - (RNG.Next(range) + offset);
+                    }
+                    else if (direction == Direction.EAST)
+                    {
+                        otherx = x + (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    else if (direction == Direction.SOUTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y + (RNG.Next(range) + offset);
+                    }
+                    else //west
+                    {
+                        otherx = x - (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (otherx <= 1 || otherx >= MAP_COLS - 1
+                      || othery <= 1 || othery >= MAP_ROWS - 1
+                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
+
+                List<Location> caveExits = connectionsDM[location];
+                location.CanShuffle = false;
+                location.Xpos = x;
+                location.Y = y;
+                caveExits[0].CanShuffle = false;
+                caveExits[0].Xpos = otherx;
+                caveExits[0].Y = othery;
+                PlaceCave(x, y, direction, s);
+                PlaceCave(otherx, othery, direction.Reverse(), s);
+                int newx = 0;
+                int newy = 0;
+                tries = 0;
+                do
+                {
+                    newx = x + RNG.Next(7) - 3;
+                    newy = y + RNG.Next(7) - 3;
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (newx > 2 && newx < MAP_COLS - 2
+                      && newy > 2 && newy < MAP_ROWS - 2
+                      && !AllTerrainIn3x3Equals(newx, newy, Terrain.NONE));
+
+                caveExits[1].Xpos = newx;
+                caveExits[1].Y = newy;
+                caveExits[1].CanShuffle = false;
+                PlaceCave(newx, newy, direction, s);
+                y = newy;
+                x = newx;
+
+                tries = 0;
+                do
+                {
+                    int range = 7;
+                    int offset = 3;
+                    if (biome == Biome.ISLANDS)
+                    {
+                        range = 7;
+                        offset = 5;
+                    }
+
+                    if (direction == Direction.NORTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y - (RNG.Next(range) + offset);
+                    }
+                    else if (direction == Direction.EAST)
+                    {
+                        otherx = x + (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    else if (direction == Direction.SOUTH)
+                    {
+                        otherx = x + (RNG.Next(7) - 3);
+                        othery = y + (RNG.Next(range) + offset);
+                    }
+                    else //west
+                    {
+                        otherx = x - (RNG.Next(range) + offset);
+                        othery = y + (RNG.Next(7) - 3);
+                    }
+                    if (++tries >= 100)
+                    {
+                        return false;
+                    }
+                } while (otherx <= 1 || otherx >= MAP_COLS - 1
+                      || othery <= 1 || othery >= MAP_ROWS - 1
+                      || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
+
+                location.CanShuffle = false;
+                caveExits[2].CanShuffle = false;
+                caveExits[2].Xpos = otherx;
+                caveExits[2].Y = othery;
+                PlaceCave(otherx, othery, direction.Reverse(), s);
+            }
+        }
+        else
+        {
+            PlaceCave(x, y, direction, s);
+        }
+        return true;
+    }
+
     private bool MakeCaldera(bool canWalkOnWaterWithBoots)
     {
         Terrain water = Terrain.WATER;
