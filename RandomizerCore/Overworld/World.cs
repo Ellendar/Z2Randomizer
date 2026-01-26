@@ -1306,83 +1306,116 @@ public abstract class World
         return count == 4;
 
     }
+
+    /// used for GrowTerrain optimization
+    private readonly struct PlacedTerrainPreCalc
+    {
+        public readonly double X;
+        public readonly double Y;
+        public readonly Terrain Terrain;
+        public readonly double CoefSquared;
+        public PlacedTerrainPreCalc(int x, int y, Terrain terrain, double coefSquared)
+        {
+            X = x;
+            Y = y;
+            Terrain = terrain;
+            CoefSquared = coefSquared;
+        }
+    }
+
+    /// Pre-build an array to loop over, since this used MAP_ROWS * MAP_COLS times
+    private PlacedTerrainPreCalc[] GrowTerrainGetPlacedTerrains(Climate climate, FrozenSet<Terrain> randomTerrains)
+    {
+        List<(int, int)> placedCoords = new();
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                Terrain t = map[y, x];
+                if (t != Terrain.NONE && randomTerrains.Contains(t))
+                {
+                    placedCoords.Add((y, x));
+                }
+            }
+        }
+        Debug.Assert(placedCoords.Count > 0);
+        PlacedTerrainPreCalc[] placedTerrains = new PlacedTerrainPreCalc[placedCoords.Count];
+        for (int i = 0; i < placedCoords.Count; i++)
+        {
+            var (py, px) = placedCoords[i];
+            Terrain t = map[py, px];
+            double c = climate.DistanceCoefficients[(int)t];
+            placedTerrains[i] = new PlacedTerrainPreCalc(px, py, t, c * c);
+        }
+        return placedTerrains;
+    }
+
     protected bool GrowTerrain(Climate climate)
     {
         var randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToFrozenSet();
         TerrainGrowthAttempts++;
         Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
-        List<(int, int)> placed = new();
-        for (int y = 0; y < MAP_ROWS; y++)
-        {
-            for (int x = 0; x < MAP_COLS; x++)
-            {
-                if (map[y, x] != Terrain.NONE && randomTerrains.Contains(map[y, x]))
-                {
-                    placed.Add((y, x));
-                }
-            }
-        }
-        Debug.Assert(placed.Count > 0);
+        PlacedTerrainPreCalc[] placedTerrains = GrowTerrainGetPlacedTerrains(climate, randomTerrains);
         const double EPSILON = 1e-9;
-        double distance;
+        double distance, minDistance;
         List<Terrain> choices = new();
         for (int y = 0; y < MAP_ROWS; y++)
         {
             for (int x = 0; x < MAP_COLS; x++)
             {
-                if (map[y, x] != Terrain.NONE) { continue; }
-                choices.Clear();
-                double minDistance = double.MaxValue;
-
-                foreach (var (py, px) in placed)
+                var existingT = map[y, x];
+                if (existingT != Terrain.NONE)
                 {
-                    Terrain t = map[py, px];
-
-                    float coef = climate.DistanceCoefficients[(int)t];
-                    // optimize by skipping square root, because the
-                    // minimum distance will also be the minimum distance squared
-                    distance = coef * coef * DistanceSquared(px, py, x, y);
-                    if (distance > minDistance + EPSILON) // most likely case first
-                    {
-                        continue;
-                    }
-                    else if (distance + EPSILON < minDistance)
-                    {
-                        choices.Clear();
-                        choices.Add(t);
-                        minDistance = distance;
-                    }
-                    else
-                    {
-                        choices.Add(t);
-                    }
+                    mapCopy[y, x] = existingT;
                 }
-                Debug.Assert(choices.Count > 0);
-                mapCopy[y, x] = choices[RNG.Next(choices.Count)];
-            }
-        }
-
-        //Write the locations that already had terrain before the growth back onto the copy before we clone over.
-        for (int y = 0; y < MAP_ROWS; y++)
-        {
-            for (int x = 0; x < MAP_COLS; x++)
-            {
-                if (map[y, x] != Terrain.NONE)
+                else
                 {
-                    mapCopy[y, x] = map[y, x];
+                    choices.Clear();
+                    minDistance = double.MaxValue;
+
+                    for (int i = 0; i < placedTerrains.Length; i++)
+                    {
+                        ref readonly var p = ref placedTerrains[i];
+                        double dx = p.X - x;
+                        double dy = p.Y - y;
+                        Terrain t = p.Terrain;
+
+                        // optimize further by skipping square root, because the
+                        // minimum distance will also be the minimum distance squared
+                        distance = p.CoefSquared * (dx * dx + dy * dy);
+                        if (distance > minDistance) // most likely case first
+                        {
+                            continue;
+                        }
+                        else if (distance + EPSILON < minDistance)
+                        {
+                            choices.Clear();
+                            choices.Add(t);
+                            minDistance = distance;
+                        }
+                        else
+                        {
+                            choices.Add(t);
+                        }
+                    }
+                    Debug.Assert(choices.Count > 0);
+                    mapCopy[y, x] = choices[RNG.Next(choices.Count)];
                 }
             }
         }
-        map = mapCopy; // no need to clone as we just created this array
+        map = mapCopy; // no need to clone as we created this array at the start of the method
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int DistanceSquared(Location l, int x2, int y2)
     {
         int dx = l.Xpos - x2;
         int dy = l.Y - y2;
         return dx * dx + dy * dy;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int DistanceSquared(int x1, int y1, int x2, int y2)
     {
         int dx = x1 - x2;
