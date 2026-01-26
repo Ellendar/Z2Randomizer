@@ -426,9 +426,11 @@ public class Hyrule
             ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
 
             var rom = await ROMData.ApplyAsm(assembler);
-            // await assemblerTask; // .Wait(ct);
-            // var rom = assemblerTask.Result;
-            ROMData = new ROM(rom!.romdata);
+            if (!rom.success)
+            {
+                throw new Exception(string.Join(Environment.NewLine, rom.messages));
+            }
+            ROMData = new ROM(rom.romdata);
 
             if (randomizeMusic)
             {

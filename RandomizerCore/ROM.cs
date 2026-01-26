@@ -1185,7 +1185,7 @@ CheckController1ForUpAMagic:
         Put(0x1C9FC, 0x16);
     }
 
-    public async Task<Js65CompileResult?> ApplyAsm(Assembler engine)
+    public async Task<Js65CompileResult> ApplyAsm(Assembler engine)
     {
         return await engine.Apply(rawdata);
     }
