@@ -98,7 +98,7 @@ Seed: {config.Seed}
                         var filename = basename + ".nes";
                         var debugfile = basename + ".mlb";
                         await files.SaveGeneratedBinaryFile(filename, output.romdata, Main.OutputFilePath);
-                        if (output.debuginfo != null)
+                        if (!string.IsNullOrEmpty(output.debuginfo))
                         {
                             await files.SaveSpoilerFile(debugfile, output.debuginfo, Main.OutputFilePath);
                         }

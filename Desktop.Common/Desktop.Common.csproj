@@ -17,7 +17,7 @@
     <ItemGroup>
         <ProjectReference Include="..\CrossPlatformUI\CrossPlatformUI.csproj" />
         <ProjectReference Include="..\RandomizerCore\RandomizerCore.csproj" />
-        <PackageReference Include="js65.clearscript" Version="1.0.0" />
+        <PackageReference Include="js65.clearscript" Version="$(Js65Version)" />
 
         <PackageReference Include="Microsoft.ClearScript.V8.Native.linux-x64" Version="7.5.0" Condition="$([MSBuild]::IsOsPlatform('Linux')) and '$(TargetFramework)' != 'net10.0-browser'" />
         <PackageReference Include="Microsoft.ClearScript.V8.Native.osx-arm64" Version="7.5.0" Condition="$([MSBuild]::IsOsPlatform('OSX')) and '$(TargetFramework)' != 'net10.0-browser'" />

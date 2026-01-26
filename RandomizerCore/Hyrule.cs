@@ -182,10 +182,15 @@ public class Hyrule
     {
         // Must exist for the FileResolve callback to be called
         includePaths = [""],
-        generateDebugInfo = true,
         // debugLevel = 0,
         // debugLevel = 1,
+#if DEBUG
+        generateDebugInfo = true,
         debugLevel = 2,
+#else
+        generateDebugInfo = false,
+        debugLevel = 0,
+#endif
     };
 
     private readonly NewAssemblerFn NewAssembler;
