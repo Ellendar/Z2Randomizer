@@ -18,7 +18,11 @@ using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 
-public readonly record struct RandomizerResult(byte[]? romdata, string? debuginfo);
+public readonly record struct RandomizerResult(
+    bool success,
+    byte[]? romdata = null,
+    string? debuginfo = null,
+    string? messages = null);
 
 public class Hyrule
 {
@@ -272,7 +276,7 @@ public class Hyrule
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
-            if (ct.IsCancellationRequested) { return new RandomizerResult(); }
+            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 1);
 
             while (palaces.Count != 7 || passedValidation == false)
@@ -361,7 +365,7 @@ public class Hyrule
 
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
-            if (ct.IsCancellationRequested) { return new RandomizerResult(); }
+            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 8);
 
             if (props.ShuffleOverworldEnemies)
@@ -416,7 +420,7 @@ public class Hyrule
                 ROMData.Put(0x17b18, 0x20); //Child
             }
 
-            if (ct.IsCancellationRequested) { return new RandomizerResult(); }
+            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 9);
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
@@ -428,7 +432,7 @@ public class Hyrule
             var rom = await ROMData.ApplyAsm(assembler);
             if (!rom.success)
             {
-                throw new Exception(string.Join(Environment.NewLine, rom.messages));
+                return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages));
             }
             ROMData = new ROM(rom.romdata);
 
@@ -522,7 +526,7 @@ public class Hyrule
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
             }*/
-            return new RandomizerResult(ROMData.rawdata, rom.debugfile);
+            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages));
         }
         catch(Exception e)
         {

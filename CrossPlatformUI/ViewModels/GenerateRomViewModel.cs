@@ -92,7 +92,7 @@ Seed: {config.Seed}
                 {
                     var romdata = host.RomFileViewModel.RomData!.ToArray();
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
-                    if(!tokenSource.IsCancellationRequested && output.romdata != null)
+                    if(!tokenSource.IsCancellationRequested && output.success)
                     {
                         var basename = $"Z2_{config.Seed}_{config.Flags}";
                         var filename = basename + ".nes";
@@ -111,6 +111,9 @@ Seed: {config.Seed}
                         }
                         ProgressHeading = "Generation Complete";
                         ProgressBody = $"Hash: {randomizer.Hash}\n\nFile: {filename}";
+                    } else if (!output.success)
+                    {
+                        throw new Exception(output.messages);
                     }
                     IsComplete = true;
                 }
@@ -120,8 +123,7 @@ Seed: {config.Seed}
                     lastError = e;
                     HasError = true;
                     string errorHeading, errorBody;
-                    var userError = e as UserFacingException;
-                    if (userError != null)
+                    if (e is UserFacingException userError)
                     {
                         errorHeading = userError.Heading;
                         errorBody = userError.Message;
@@ -129,7 +131,7 @@ Seed: {config.Seed}
                     else
                     {
 #if DEBUG
-                        if (System.Diagnostics.Debugger.IsAttached) { throw; }
+                        // if (System.Diagnostics.Debugger.IsAttached) { throw; }
 #endif
                         errorHeading = "Error Generating Seed";
                         errorBody = "Please report this on the discord";
