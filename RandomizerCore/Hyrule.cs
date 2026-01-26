@@ -1338,6 +1338,7 @@ public class Hyrule
             sideviewModule.Byt(itemBits);
         }
 
+        /* this shouldn't be needed anymore
         try
         {
             ROM testRom = new(ROMData);
@@ -1360,6 +1361,7 @@ public class Hyrule
             logger.Error(e, "Failed to build assembly patches");
             throw;
         }
+        */
         return true;
     }
 
