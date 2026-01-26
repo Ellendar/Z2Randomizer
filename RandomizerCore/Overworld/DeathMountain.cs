@@ -538,7 +538,7 @@ sealed class DeathMountain : World
                     _ => 1f
                 };
                 growthClimate.ApplyDeathMountainSafety(randomTerrainFilter, dmOpennessFactor);
-                if (!GrowTerrain(growthClimate))
+                if (!Terraforming.GrowTerrain(RNG, ref map, MAP_COLS, MAP_ROWS, climate, randomTerrainFilter))
                 {
                     logger.LogDebug("GrowTerrain failed");
                     return false;

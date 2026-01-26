@@ -1,10 +1,111 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Z2Randomizer.RandomizerCore.Overworld;
 
 public class Terraforming
 {
+    /// used for GrowTerrain optimization
+    private readonly struct PlacedTerrainPreCalc
+    {
+        public readonly double X;
+        public readonly double Y;
+        public readonly Terrain Terrain;
+        public readonly double CoefSquared;
+        public PlacedTerrainPreCalc(int x, int y, Terrain terrain, double coefSquared)
+        {
+            X = x;
+            Y = y;
+            Terrain = terrain;
+            CoefSquared = coefSquared;
+        }
+    }
+
+    /// Pre-build an array to loop over, since this used MAP_ROWS * MAP_COLS times
+    private static PlacedTerrainPreCalc[] GrowTerrainGetPlacedTerrains(Terrain[,] map, int MAP_COLS, int MAP_ROWS, Climate climate, FrozenSet<Terrain> randomTerrains)
+    {
+        List<(int, int)> placedCoords = new();
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                Terrain t = map[y, x];
+                if (t != Terrain.NONE && randomTerrains.Contains(t))
+                {
+                    placedCoords.Add((y, x));
+                }
+            }
+        }
+        Debug.Assert(placedCoords.Count > 0);
+        PlacedTerrainPreCalc[] placedTerrains = new PlacedTerrainPreCalc[placedCoords.Count];
+        for (int i = 0; i < placedCoords.Count; i++)
+        {
+            var (py, px) = placedCoords[i];
+            Terrain t = map[py, px];
+            double c = climate.DistanceCoefficients[(int)t];
+            placedTerrains[i] = new PlacedTerrainPreCalc(px, py, t, c * c);
+        }
+        return placedTerrains;
+    }
+
+    public static bool GrowTerrain(Random r, ref Terrain[,] map, int MAP_COLS, int MAP_ROWS, Climate climate, IEnumerable<Terrain> randomTerrainFilter)
+    {
+        var randomTerrains = climate.RandomTerrains(randomTerrainFilter).ToFrozenSet();
+        Terrain[,] mapCopy = new Terrain[MAP_ROWS, MAP_COLS];
+        PlacedTerrainPreCalc[] placedTerrains = GrowTerrainGetPlacedTerrains(map, MAP_COLS, MAP_ROWS, climate, randomTerrains);
+        const double EPSILON = 1e-9;
+        double distance, minDistance;
+        List<Terrain> choices = new();
+        for (int y = 0; y < MAP_ROWS; y++)
+        {
+            for (int x = 0; x < MAP_COLS; x++)
+            {
+                var existingT = map[y, x];
+                if (existingT != Terrain.NONE)
+                {
+                    mapCopy[y, x] = existingT;
+                }
+                else
+                {
+                    choices.Clear();
+                    minDistance = double.MaxValue;
+
+                    for (int i = 0; i < placedTerrains.Length; i++)
+                    {
+                        ref readonly var p = ref placedTerrains[i];
+                        double dx = p.X - x;
+                        double dy = p.Y - y;
+                        Terrain t = p.Terrain;
+
+                        // optimize further by skipping square root, because the
+                        // minimum distance will also be the minimum distance squared
+                        distance = p.CoefSquared * (dx * dx + dy * dy);
+                        if (distance > minDistance) // most likely case first
+                        {
+                            continue;
+                        }
+                        else if (distance + EPSILON < minDistance)
+                        {
+                            choices.Clear();
+                            choices.Add(t);
+                            minDistance = distance;
+                        }
+                        else
+                        {
+                            choices.Add(t);
+                        }
+                    }
+                    Debug.Assert(choices.Count > 0);
+                    mapCopy[y, x] = choices[r.Next(choices.Count)];
+                }
+            }
+        }
+        map = mapCopy; // no need to clone as we created this array at the start of the method
+        return true;
+    }
+
     public static bool DrawRaft(Random r, Terrain[,] map, Location? raft, List<Terrain> walkableTerrains, Direction direction)
     {
         if (raft == null) { throw new Exception("Unable to draw unloaded raft"); }

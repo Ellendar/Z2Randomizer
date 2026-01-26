@@ -664,7 +664,7 @@ public sealed class WestHyrule : World
                     return false;
                 }
 
-                if (!GrowTerrain(climate))
+                if (!Terraforming.GrowTerrain(RNG, ref map, MAP_COLS, MAP_ROWS, climate, randomTerrainFilter))
                 {
                     return false;
                 }

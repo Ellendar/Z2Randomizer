@@ -791,7 +791,7 @@ public sealed class EastHyrule : World
                 PlaceRandomTerrain(climate);
 
                 randomTerrainFilter.Add(Terrain.LAVA);
-                if (!GrowTerrain(climate))
+                if (!Terraforming.GrowTerrain(RNG, ref map, MAP_COLS, MAP_ROWS, climate, randomTerrainFilter))
                 {
                     return false;
                 }
