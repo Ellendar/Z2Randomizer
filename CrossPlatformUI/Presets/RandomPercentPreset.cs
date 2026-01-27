@@ -95,6 +95,7 @@ public static class RandomPercentPreset
         GeneratorsAlwaysMatch = false,
 
         ShuffleEnemyHP = true,
+        ShuffleBossHP = EnemyLifeOption.MEDIUM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,
         ShuffleSwordImmunity = true,

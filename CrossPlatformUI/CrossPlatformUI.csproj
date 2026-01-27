@@ -36,13 +36,13 @@
         <PackageReference Include="DialogHost.Avalonia" Version="$(DialogHostAvaloniaVersion)" />
         <PackageReference Include="Material.Avalonia" Version="$(MaterialAvaloniaVersion)" />
         <PackageReference Include="Material.Icons.Avalonia" Version="$(MaterialIconsAvaloniaVersion)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
         <PackageReference Include="ReactiveUI.Avalonia" Version="11.3.8" />
-        <PackageReference Include="ReactiveUI.Validation" Version="6.0.5" />
+        <PackageReference Include="ReactiveUI.Validation" Version="6.0.18" />
         <PackageReference Include="Aigamo.ResXGenerator" Version="4.3.0">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.6.6" />
+        <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.9.3" />
     </ItemGroup>
 
     <ItemGroup>
@@ -51,10 +51,10 @@
 
     <Target Name="GenerateGitInfo" BeforeTargets="BeforeBuild">
         <MakeDir Directories="$(IntermediateOutputPath)" />
-        <Exec Command="git rev-parse --short HEAD > $(IntermediateOutputPath)git-hash.txt" />
-        <Exec Command="git rev-parse --abbrev-ref HEAD > $(IntermediateOutputPath)git-branch.txt" />
-        <Exec Command="git tag --points-at HEAD > $(IntermediateOutputPath)git-tag.txt" />
-        <Exec Command="git diff --quiet || echo dirty > $(IntermediateOutputPath)git-dirty.txt" IgnoreExitCode="true" />
+        <Exec Command="git rev-parse --short HEAD &gt; $(IntermediateOutputPath)git-hash.txt" />
+        <Exec Command="git rev-parse --abbrev-ref HEAD &gt; $(IntermediateOutputPath)git-branch.txt" />
+        <Exec Command="git tag --points-at HEAD &gt; $(IntermediateOutputPath)git-tag.txt" />
+        <Exec Command="git diff --quiet || echo dirty &gt; $(IntermediateOutputPath)git-dirty.txt" IgnoreExitCode="true" />
 
         <ReadLinesFromFile File="$(IntermediateOutputPath)git-hash.txt"><Output TaskParameter="Lines" PropertyName="GitHash" /></ReadLinesFromFile>
         <ReadLinesFromFile File="$(IntermediateOutputPath)git-branch.txt"><Output TaskParameter="Lines" PropertyName="GitBranch" /></ReadLinesFromFile>
@@ -84,10 +84,7 @@
             </GitInfoText>
         </PropertyGroup>
 
-        <WriteLinesToFile
-            File="$(IntermediateOutputPath)GitInfo.cs"
-            Overwrite="true"
-            Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
+        <WriteLinesToFile File="$(IntermediateOutputPath)GitInfo.cs" Overwrite="true" Lines="$([System.Text.RegularExpressions.Regex]::Split('$(GitInfoText)', '\n'))" />
 
         <ItemGroup>
             <Compile Include="$(IntermediateOutputPath)GitInfo.cs" />

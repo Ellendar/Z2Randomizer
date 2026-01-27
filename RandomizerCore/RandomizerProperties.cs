@@ -128,6 +128,7 @@ public class RandomizerProperties
 
     //Enemies
     public bool ShuffleEnemyHP { get; set; }
+    public EnemyLifeOption ShuffleBossHP { get; set; }
     public bool ShuffleEnemyStealExp { get; set; }
     public bool ShuffleStealExpAmt { get; set; }
     public bool ShuffleSwordImmunity { get; set; }
