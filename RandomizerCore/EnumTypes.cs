@@ -161,8 +161,8 @@ public enum EnemyLifeOption
     MEDIUM,
     [Description("High [-0% to +100%]"), RandomRangeDouble(Low = 1.0, High = 2.0)]
     HIGH,
-    [Description("Full Range [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
-    FULL_RANGE,
+    [Description("Medium High [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
+    MEDIUM_HIGH,
 }
 
 [DefaultValue(ONLY_BOTS)]
