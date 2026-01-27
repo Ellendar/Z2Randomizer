@@ -97,7 +97,7 @@ Seed: {config.Seed}
                     {
                         var flags = config.SerializeFlags();
                         var filename = $"Z2_{config.Seed}_{flags}.nes";
-                        await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
+                        await files.SaveGeneratedBinaryFile(filename, output.romdata!, Main.OutputFilePath);
                         if (config.GenerateSpoiler)
                         {
                             var spoilerFilename = $"Z2_{config.Seed}_{flags}_spoiler.txt";
