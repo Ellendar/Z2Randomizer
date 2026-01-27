@@ -71,5 +71,19 @@
     <EmbeddedResource Include="Asm\ram.inc" />
     <EmbeddedResource Include="Asm\z2r.inc" />
     <EmbeddedResource Include="Asm\z2rndft.ips" />
+    <None Remove="Asm\z2mario\integration.s" />
+    <EmbeddedResource Include="Asm\z2mario\integration.s" />
+    <None Remove="Asm\z2mario\map.s" />
+    <EmbeddedResource Include="Asm\z2mario\map.s" />
+    <None Remove="Asm\z2mario\map_mario.chr" />
+    <EmbeddedResource Include="Asm\z2mario\map_mario.chr" />
+    <None Remove="Asm\z2mario\metasprite.s" />
+    <EmbeddedResource Include="Asm\z2mario\metasprite.s" />
+    <None Remove="Asm\z2mario\sfx.s" />
+    <EmbeddedResource Include="Asm\z2mario\sfx.s" />
+    <None Remove="Asm\z2mario\mario.s" />
+    <EmbeddedResource Include="Asm\z2mario\mario.s" />
+    <None Remove="Asm\z2mario\sprites_mario.chr" />
+    <EmbeddedResource Include="Asm\z2mario\sprites_mario.chr" />
   </ItemGroup>
 </Project>

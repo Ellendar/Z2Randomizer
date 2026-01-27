@@ -1,4 +1,12 @@
 
+.include "z2r.inc"
+
+.import GameRoutines, ProcFireball_Bubble, PlayerGfxHandler, DrawMetasprite
+.import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
+.import SwapToSavedPRG, SwapToPRG0
+
+.export SlightlyModifiedCollisionRoutine
+
 ; Remove unused code after we gutted link's movement
 FREE "PRG0" [$92BF, $962D)
 
@@ -21,16 +29,30 @@ BankSwitchMarioCHR:
   beq +
 ;   .repeat 8, I
 ;     lda CurrentCHRBank + I
-;     sta MMC5_CHR_BANK_BASE + I
+;     sta SpChrBank0Reg + I
 ;   .endrepeat
     ; brk
     ; nop
     lda PlayerChrBank
-    sta MMC5_CHR_BANK_BASE + 0
+    sta SpChrBank0Reg + 0
     lda CurrentCHRBank ; we need to write a BG bank register due to MMC5 jank
-    sta MMC5_CHR_BANK_BASE + 8
+    sta BgChrBank0Reg
   +
   rts
+
+; patch the link draw on lives screen to set the y hi position properly
+.org $c3fb
+  sta Player_X_Position ; Use the regular X position instead of the "screen" version
+.org $C40D
+  jmp PatchLinkLivesScreenDraw
+.reloc
+PatchLinkLivesScreenDraw:
+  lda #1
+  sta Player_Y_HighPos
+  ; also force the bank to be correct
+  jsr PlayerGfxHandler
+  jsr BankSwitchMarioCHR
+  jmp $EC02
 
 ; patch the link draw routine to skip drawing him with the vanilla code
 .org $EC02 ; ldx $11 lda $29,x
@@ -92,7 +114,7 @@ PatchLinkDrawRoutine:
   jsr SetupMarioControl
 .reloc
 SetupMarioControl:
-  sta $69DE
+;  sta $69DE ; This is the color index 3 for the firey palette
   lda #8
   sta GameEngineSubroutine
   lda #1 ; Ground area type
@@ -326,15 +348,20 @@ SlightlyModifiedCollisionRoutine:
   ; nop
 
 ; Update palette locations
-.ifdef DEMO_CODE
-  UPDATE_BYTE $37 @ $285a $2a0a $40af $40bf $40cf $40df $80af $80bf $80cf $80df $c0af $c0bf $c0cf $c0df $c0ef $100af $100bf $100cf $100df $140af $140bf $140cf $140df $17c19 $1c464 $1c47c
-  UPDATE_BYTE $27 @ $285b $2a0b $2a10 $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
-  UPDATE_BYTE $16 @ $285C $40b1 $40c1 $40d1 $80e1 $80b1 $80c1 $80d1 $80e1 $c0b1 $c0c1 $c0d1 $c0e1 $100b1 $100c1 $100d1 $100e1 $140b1 $140c1 $140d1 $140e1 $17c1b $1c466 $1c47e
-.else
-  UPDATE_BYTE $16 @ $285a $2a0a $40af $40bf $40cf $40df $80af $80bf $80cf $80df $c0af $c0bf $c0cf $c0df $c0ef $100af $100bf $100cf $100df $140af $140bf $140cf $140df $17c19 $1c464 $1c47c
-  UPDATE_BYTE $27 @ $285b $2a0b $2a10 $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
+;.ifdef DEMO_CODE
+;  UPDATE_BYTE $37 @ $285a $2a0a $40af $40bf $40cf $40df $80af $80bf $80cf $80df $c0af $c0bf $c0cf $c0df $c0ef $100af $100bf $100cf $100df $140af $140bf $140cf $140df $17c19 $1c464 $1c47c
+;  UPDATE_BYTE $27 @ $285b $2a0b $2a10 $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
+;  UPDATE_BYTE $16 @ $285C $40b1 $40c1 $40d1 $80e1 $80b1 $80c1 $80d1 $80e1 $c0b1 $c0c1 $c0d1 $c0e1 $100b1 $100c1 $100d1 $100e1 $140b1 $140c1 $140d1 $140e1 $17c1b $1c466 $1c47e
+;.else
+  UPDATE_BYTE $16 @ $285a $40af $40bf $40cf $40df $80af $80bf $80cf $80df $c0af $c0bf $c0cf $c0df $c0ef $100af $100bf $100cf $100df $140af $140bf $140cf $140df $17c19 $1c464 $1c47c
+  UPDATE_BYTE $27 @ $285b $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
   UPDATE_BYTE $18 @ $285C $40b1 $40c1 $40d1 $80e1 $80b1 $80c1 $80d1 $80e1 $c0b1 $c0c1 $c0d1 $c0e1 $100b1 $100c1 $100d1 $100e1 $140b1 $140c1 $140d1 $140e1 $17c1b $1c466 $1c47e
-.endif
+;.endif
+; Fire spell color
+UPDATE_BYTE $37 @ $2a0a
+UPDATE_BYTE $27 @ $2a10
+UPDATE_BYTE $16 @ $2a16
+
 
 ; regular palette color location
 UPDATE_BYTE $18 $10ea
@@ -524,3 +551,65 @@ CheckForDownstab:
 .org $9A42
   jmp * + 4 ; skip a hardcoded metasprite update when reading signs
 
+; Patch the main menu to use the overworld mario sprite
+.segment "PRG5"
+; Remove the code that draws the link sprite on the menu
+FREE "PRG5" [$B596, $B5B5)
+.org $B392
+  jmp *+3 ; skip drawing menu link
+.org $B4EE
+  jmp *+3 ; skip drawing menu link
+.org $B6FD
+  jmp *+3 ; skip drawing menu link
+
+; Update the fairy to draw two sprites of mario instead
+FREE "PRG5" [$B574, $B596)
+.org $B38B
+  jsr DrawMapMario
+.org $B4E7
+  jsr DrawMapMario
+.org $B6F6
+  jsr DrawMapMario
+
+.reloc
+; maps from the timer to the map mario animation frame
+MarioMapMappingMapper:
+  .byte $20, $20, $20, $20
+  .byte $24, $24, $24, $24
+  .byte $28, $28, $28, $28
+  .byte $24, $24, $24, $24
+
+.reloc
+DrawMapMario:
+  ; $1c = current sprite tile
+  ; $1d = timer
+  ; Y = current Y position
+
+  ; Force bank in the mario map sprite
+  lda #$46
+  sta SpChrBank0Reg + 0
+  lda CurrentCHRBank ; we need to write a BG bank register due to MMC5 jank
+  sta BgChrBank0Reg
+  inc $1d ; increate the timer
+  lda $1d
+  lsr
+  and #$0f
+  tax
+  ; Map the timer to the sprite that we want to use
+  lda MarioMapMappingMapper,x
+  sta Sprite_Tilenumber+12
+  clc
+  adc #2
+  sta Sprite_Tilenumber+16
+  sty Sprite_Y_Position+12
+  sty Sprite_Y_Position+16
+  lda #$40
+  sta Sprite_Attributes+12
+  sta Sprite_Attributes+16
+  lda $4d
+  sta Sprite_X_Position+16
+;  clc ; cleared above
+  adc #8
+  sta Sprite_X_Position+12
+
+  rts
