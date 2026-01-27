@@ -52,7 +52,8 @@ StatTrackSwordSwipe:
     ; Need to use X so we need to preserve it
     txa
     tay
-    lda $17 ; 1 if crouching 0 if not
+    lda $17 ; 0 if crouching 1 if not
+    eor #1  ; so invert the bit to get 1 if crouching 0 if not
     asl
     tax
     inc StatHiStabCount+0,x

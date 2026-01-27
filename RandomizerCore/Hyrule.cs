@@ -18,6 +18,12 @@ using Z2Randomizer.RandomizerCore.Sidescroll;
 
 namespace Z2Randomizer.RandomizerCore;
 
+public readonly record struct RandomizerResult(
+    bool success,
+    byte[]? romdata = null,
+    string? debuginfo = null,
+    string? messages = null);
+
 public class Hyrule
 {
     public delegate Assembler NewAssemblerFn(Js65Options? options = null, bool debugJavaScript = false);
@@ -180,6 +186,15 @@ public class Hyrule
     {
         // Must exist for the FileResolve callback to be called
         includePaths = [""],
+        // debugLevel = 0,
+        // debugLevel = 1,
+#if DEBUG
+        generateDebugInfo = true,
+        debugLevel = 2,
+#else
+        generateDebugInfo = false,
+        debugLevel = 0,
+#endif
     };
 
     private readonly NewAssemblerFn NewAssembler;
@@ -197,7 +212,7 @@ public class Hyrule
         NewAssembler = createAsm;
         palaceRooms = rooms;
     }
-    public async Task<byte[]?> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
+    public async Task<RandomizerResult> Randomize(byte[] vanillaRomData, RandomizerConfiguration config, Func<string, Task> progress, CancellationToken ct)
     {
         try
         {
@@ -220,7 +235,7 @@ public class Hyrule
 #endif
             Flags = config.SerializeFlags();
 
-            Assembler assembler = CreateAssemblyEngine();
+            using Assembler assembler = CreateAssemblyEngine();
             logger.Info($"Started generation for flags: {Flags} seed: {config.Seed} seedhash: {SeedHash}");
             //character = new Character(props);
             shuffler = new Shuffler(props);
@@ -261,7 +276,7 @@ public class Hyrule
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
-            if (ct.IsCancellationRequested) { return null; }
+            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 1);
 
             while (palaces.Count != 7 || passedValidation == false)
@@ -333,7 +348,7 @@ public class Hyrule
 
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
-            if (ct.IsCancellationRequested) { return null; }
+            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 8);
 
             if (props.ShuffleOverworldEnemies)
@@ -388,7 +403,7 @@ public class Hyrule
                 ROMData.Put(0x17b18, 0x20); //Child
             }
 
-            if (ct.IsCancellationRequested) { return null; }
+            if (ct.IsCancellationRequested) { return new RandomizerResult(false); }
             UpdateProgress(progress, 9);
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
@@ -419,9 +434,11 @@ public class Hyrule
             ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
 
             var rom = await ROMData.ApplyAsm(assembler);
-            // await assemblerTask; // .Wait(ct);
-            // var rom = assemblerTask.Result;
-            ROMData = new ROM(rom!);
+            if (!rom.success)
+            {
+                return new RandomizerResult(false, null, null, string.Join(Environment.NewLine, rom.messages));
+            }
+            ROMData = new ROM(rom.romdata);
 
             if (randomizeMusic)
             {
@@ -509,7 +526,7 @@ public class Hyrule
                     File.WriteAllText("rooms.log", sb.ToString());
                 }
             }*/
-            return ROMData.rawdata;
+            return new RandomizerResult(true, ROMData.rawdata, rom.debugfile, string.Join(Environment.NewLine, rom.messages));
         }
         catch(Exception e)
         {
@@ -1070,7 +1087,7 @@ public class Hyrule
         //broken state, so we'll just run it twice. As long as this is the first modification that gets made on the engine, this is
         //guaranteed to succeed iff running on the original engine would succeed.
         //Jrowe feel free to engineer a less insane fix here.
-        Assembler validationEngine = CreateAssemblyEngine();
+        using Assembler validationEngine = CreateAssemblyEngine();
 
         int i = 0;
         //If multiple palaces use the same item room, they'll get consolidated under a single sideview
@@ -1127,7 +1144,7 @@ public class Hyrule
         foreach (var sv in sideviews.Keys)
         {
             var name = "Sideview_" + i++;
-            sideviewModule.Segment("PRG1C", "PRG1D");
+            sideviewModule.Segment(["PRG1C", "PRG1D"]);
             sideviewModule.Reloc();
             sideviewModule.Label(name);
             sideviewModule.Byt(sv);
@@ -1147,7 +1164,7 @@ public class Hyrule
         foreach (var sv in sideviewsgp.Keys)
         {
             var name = "SideviewGP_" + i++;
-            sideviewModule.Segment("PRG1C", "PRG1D");
+            sideviewModule.Segment(["PRG1C", "PRG1D"]);
             sideviewModule.Reloc();
             sideviewModule.Label(name);
             sideviewModule.Byt(sv);

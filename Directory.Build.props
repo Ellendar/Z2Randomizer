@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <Js65Version>1.0.7</Js65Version>
     <AvaloniaVersion>11.3.11</AvaloniaVersion>
     <DialogHostAvaloniaVersion>0.10.4</DialogHostAvaloniaVersion>
     <MaterialAvaloniaVersion>3.13.4</MaterialAvaloniaVersion>
