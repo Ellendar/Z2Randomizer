@@ -244,7 +244,7 @@ in the dark to change.</value>
 
 The possible experience values for an enemy are:
 
-0, 2, 3, 5, 10, 15, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000.
+0, 2, 3, 5, 10, 20, 30, 50, 70, 100, 150, 200, 300, 500, 700, 1000.
 
 When XP is randomized, the enemy's XP value shifts left or right in this list by the rolled number of steps.
 

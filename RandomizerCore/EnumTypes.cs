@@ -147,6 +147,8 @@ public enum XPEffectiveness
     SLIGHTLY_HIGH,
     [Description("High [-1 to +3]"), RandomRangeInt(Low = -1, High = 3), IsRandom]
     RANDOM_HIGH,
+    [Description("Wide [-4 to +4]"), RandomRangeInt(Low = -4, High = 4), IsRandom]
+    WIDE,
     [Description("None"), RandomRangeInt(Low = -15, High = -15)]
     NONE
 }
