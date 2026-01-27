@@ -2334,13 +2334,16 @@ PlayerHeadCollision:
 
   lda #$00
   sta Player_Y_Speed      ;init player's vertical speed
-
+ExitFireballNearby:
   rts                      ;leave!
 
 ProcFireball_Bubble:
 ;  lda PlayerStatus           ;check player's status
 ;  cmp #$02
-;  bcc ProcAirBubbles         ;if not fiery, branch
+;  bcc >rts         ;if not fiery, branch
+  lda $076F
+  and #$10
+  beq ExitFireballNearby
   lda A_B_Buttons
   and #B_Button              ;check for b button pressed
   beq ProcFireballs          ;branch if not pressed

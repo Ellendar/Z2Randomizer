@@ -47,12 +47,37 @@ BankSwitchMarioCHR:
   jmp PatchLinkLivesScreenDraw
 .reloc
 PatchLinkLivesScreenDraw:
+.import METASPRITE_BIG_MARIO_STANDING
+  lda #METASPRITE_BIG_MARIO_STANDING
+  sta ObjectMetasprite
+  lda #CHR_BIGMARIO
+  sta PlayerChrBank
+  inc ReloadCHRBank
+  lda #$78
+  sta SprObject_X_Position
+  lda #$50
+  sta SprObject_Y_Position
   lda #1
-  sta Player_Y_HighPos
-  ; also force the bank to be correct
-  jsr PlayerGfxHandler
+  sta SprObject_Y_HighPos
+  sta PlayerFacingDir
+  lsr ; a = 0
+  sta SprObject_SprAttrib
+  sta ScreenLeft_X_Pos
+  lda ScreenLeft_PageLoc
+  sta SprObject_PageLoc
   jsr BankSwitchMarioCHR
   jmp $EC02
+
+; patch death screen to bank the metasprites properly
+.org $c9f1
+  jsr PatchLinkDeathSprite
+  nop
+
+.reloc
+PatchLinkDeathSprite:
+  jsr PlayerGfxHandler
+  jmp BankSwitchMarioCHR
+
 
 ; patch the link draw routine to skip drawing him with the vanilla code
 .org $EC02 ; ldx $11 lda $29,x
