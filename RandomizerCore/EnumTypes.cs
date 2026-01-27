@@ -140,18 +140,18 @@ public enum XPEffectiveness
     VANILLA,
     [Description("Low; [-3 to +1]"), RandomRangeInt(Low = -3, High = 1), IsRandom]
     RANDOM_LOW,
-    [Description("Average; [-2 to +2]"), RandomRangeInt(Low = -2, High = 2), IsRandom]
-    RANDOM,
     [Description("Low Variance; [-1 to +1]"), RandomRangeInt(Low = -1, High = 1), IsRandom]
     LOW_VARIANCE,
+    [Description("Average; [-2 to +2]"), RandomRangeInt(Low = -2, High = 2), IsRandom]
+    RANDOM,
+    [Description("High Variance; [-3 to +3]"), RandomRangeInt(Low = -3, High = 3), IsRandom]
+    HIGH_VARIANCE,
+    [Description("Wide; [-4 to +4]"), RandomRangeInt(Low = -4, High = 4), IsRandom]
+    WIDE,
     [Description("Slightly High; [0 to +1]"), RandomRangeInt(Low = 0, High = 1), IsRandom]
     SLIGHTLY_HIGH,
     [Description("High; [-1 to +3]"), RandomRangeInt(Low = -1, High = 3), IsRandom]
     RANDOM_HIGH,
-    [Description("Wide [-4 to +4]"), RandomRangeInt(Low = -4, High = 4), IsRandom]
-    WIDE,
-    [Description("None"), RandomRangeInt(Low = -15, High = -15)]
-    NONE
 }
 
 public enum EnemyLifeOption
