@@ -63,9 +63,8 @@
                 </Grid>
             </StackPanel>
 
-            <CheckBox
-                Content="Scale Level Requirements to Cap"
-            >
+            <CheckBox IsChecked="{Binding Config.ScaleLevelRequirementsToCap}"
+                      Content="Scale Level Requirements to Cap">
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ScaleLevelRequirementstoCapToolTip}"/></ToolTip.Tip>
                 <CheckBox.IsEnabled>
                     <MultiBinding Converter="{StaticResource SumOfValuesLessThanConverter}" ConverterParameter="24">

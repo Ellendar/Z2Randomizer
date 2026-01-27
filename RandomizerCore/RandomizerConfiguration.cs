@@ -1649,9 +1649,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             }
         }
 
-        foreach (Collectable collectable in startingItems)
+        foreach (Collectable collectable in randomPossibleCollectables)
         {
-            properties.SetStartingCollectable(collectable);
+            properties.SetStartingCollectable(collectable, startingItems.Contains(collectable));
         }
     }
 
