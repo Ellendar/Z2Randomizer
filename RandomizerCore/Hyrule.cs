@@ -189,6 +189,7 @@ public class Hyrule
     private static readonly Js65Options assemblerOptions = new()
     {
         // Must exist for the FileResolve callback to be called
+        lineContinuations = true,
         includePaths = [""],
         // debugLevel = 0,
         // debugLevel = 1,
@@ -2419,6 +2420,12 @@ public class Hyrule
         rom.UpdateSprite(props.CharSprite, true, props.ChangeItemSprites);
         rom.UpdateSpritePalette(props.TunicColor, props.SkinTone, props.OutlineColor, props.ShieldColor, props.BeamSprite);
         rom.Put(ROM.ChrRomOffset + 0x01000, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.Graphics.randomizer_text.chr"));
+        if (props.MarioMode)
+        {
+            rom.Put(ROM.ChrRomOffset + 0x1a800, Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.sprites_mario.chr"));
+            var span = Util.ReadBinaryResource("Z2Randomizer.RandomizerCore.Asm.z2mario.map_mario.chr");
+            rom.Put(ROM.ChrRomOffset + 0x11a00, span[0..0x220]);
+        }
 
         if (props.EncounterRates == EncounterRate.NONE)
         {
@@ -3783,12 +3790,26 @@ bank5_Pointer_table_for_End_Credits:
         var a = asm.Module();
         a.Assign("PREVENT_HUD_FLASH_ON_LAG", preventFlash ? 1 : 0);
         a.Assign("ENABLE_Z2FT", enableZ2Ft ? 1 : 0);
-        a.Assign("ENABLE_Z2_MARIO", enableZ2Mario ? 1 : 0);
+        if (enableZ2Mario)
+            a.Assign("ENABLE_Z2_MARIO", 1);
         AssignRealPalaceLocations(a);
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random r, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
+    private void MarioModeActivate(Assembler asm)
+    {
+        // "metasprite_engine.s" is included in metasprite.s
+        string[] modules = ["integration.s", "map.s", "mario.s", "metasprite.s", "sfx.s"];
+        foreach (var mod in modules)
+        {
+            var a = asm.Module();
+            a.Assign("ENABLE_Z2_MARIO", 1);
+            a.Code(Util.ReadResource($"Z2Randomizer.RandomizerCore.Asm.z2mario.{mod}"), mod);
+        }
+
+    }
+
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
@@ -3809,6 +3830,11 @@ bank5_Pointer_table_for_End_Credits:
         rom.FixBigBubbleSplit(engine, randomizedStats);
         StatTracking(props, engine);
         AddCredits(engine);
+
+        if (props.MarioMode)
+        {
+            MarioModeActivate(engine);
+        }
 
         if (props.ShuffleBossHP != EnemyLifeOption.VANILLA)
         {

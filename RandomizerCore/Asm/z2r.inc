@@ -53,6 +53,21 @@ JOY2 = $4017
 ;;; Include RAM values before any constants
 .include "ram.inc"
 
+R0 = $00
+R1 = $01
+R2 = $02
+R3 = $03
+R4 = $04
+R5 = $05
+R6 = $06
+R7 = $07
+
+SND_REGISTER          = $4000
+SND_SQUARE1_REG       = $4000
+SND_SQUARE2_REG       = $4004
+SND_TRIANGLE_REG      = $4008
+SND_NOISE_REG         = $400c
+
 ;;; MMC5 register names and associated constants
 PrgBankModeReg = $5100
 PRG_BANK_MODE_8KB_BANKS = 3
@@ -197,7 +212,7 @@ RESV IrqSetupAlready
 
 .assert RES_BASE + RES_OFFSET < $01ad
 
-.if ENABLE_Z2_MARIO
+.ifdef ENABLE_Z2_MARIO
 
 ; New RAM values that aren't from vanilla SMB1 code
 RESV mapMarioIndex
@@ -209,6 +224,7 @@ RESV mapMarioPrevDirection
 
 RESV FireballCounter
 ; RESV ObjectOffset
+ObjectOffset = $10
 RESV FBall_OffscreenBits
 RESV AltEntranceControl
 RESV PlayerEntranceCtrl
@@ -365,10 +381,10 @@ Sprite_Data = Sprite_Y_Position
 
 ;; Constants
 
-CHR_BIGMARIO = $6c
-CHR_MARIOACTION = $6d
-CHR_SMALLFIRE = $6e
-CHR_SMALLMARIO = $6f
+CHR_BIGMARIO = $6a
+CHR_MARIOACTION = $6b
+CHR_SMALLFIRE = $6c
+CHR_SMALLMARIO = $6d
 
 A_Button              = %10000000
 B_Button              = %01000000
@@ -514,7 +530,7 @@ RESV SideViewBuffer, $0100
 
 ClearSRAMStart = RES_OFFSET
 
-.if ENABLE_Z2_MARIO
+.ifdef ENABLE_Z2_MARIO
 ; There isn't a general purpose "attribute" mix so we can make our own
 RESV SprObject_SprAttrib, 16
 Player_SprAttrib = SprObject_SprAttrib
@@ -564,5 +580,7 @@ ClearSRAMEnd = RES_OFFSET
 .popseg .eol \
 UPDATE_BYTE target @ refs
 .define UPDATE_BYTE {target @ .eol}
+
+.endif ; ENABLE_Z2_MARIO
 
 .endif

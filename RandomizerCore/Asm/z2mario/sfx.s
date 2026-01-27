@@ -1,4 +1,8 @@
 
+.include "z2r.inc"
+
+.export Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
+
 .segment "PRG6"
 
 ;-------------------------------------------------------------------------------------

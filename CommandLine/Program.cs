@@ -137,9 +137,8 @@ public class Program
         var randomizer = new Hyrule(createAsm,palaceRooms);
         var rom = await randomizer.Randomize(vanillaRomData!, configuration, UpdateProgress, cts.Token);
 
-        if (rom.romdata != null)
+        if (rom.success)
         {
-            
             char os_sep = Path.DirectorySeparatorChar;
             var filename = Rom!;
             var outpath = OutputPath;
@@ -163,6 +162,7 @@ public class Program
         else
         {
             logger.Error("An exception occurred generating the rom");
+            logger.Error(rom.messages);
         }
     }
     

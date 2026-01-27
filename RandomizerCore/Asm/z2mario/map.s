@@ -1,9 +1,12 @@
+
+.include "z2r.inc"
+
 .segment "PRG0"
 ; UPDATE_BYTE $00 @ $0cef
 
 ;update mario palette in overworld
-.org $8cdf
-  .byte $00
+;.org $8cdf
+;  .byte $00
 ; update raft tiles
 .org $81C0
   lda #$b1
