@@ -16,4 +16,4 @@ Original source is at https://bitbucket.org/digshake/z2randomizer/src/master/
 
 [Report A Bug](https://github.com/Ellendar/Z2Randomizer/issues/new) - Let us know about a problem.
 
-[Thanks](https://github.com/Ellendar/Z2Randomizer/blob/main/Thanks.md) - These people helped make the randomizer possible.
+[Thanks](https://github.com/Ellendar/Z2Randomizer/blob/main/Thanks.md) - These people helped make the randomizer possible...
