@@ -40,17 +40,17 @@ public class EnemiesEditable<T> where T : Enum
     /// <returns>The final bytes that represent our enemies list.</returns>
     public byte[] Finalize()
     {
-        // should enemies be sorted?
         Enemies.Sort((a, b) =>
         {
-            if (a.X != b.X)
-            {
-                return a.X.CompareTo(b.X);
-            }
-            else
-            {
-                return a.Y.CompareTo(b.Y);
-            }
+            // put generators last so they don't steal enemy slots
+            bool aGenerator = a.IsShufflableGenerator();
+            bool bGenerator = b.IsShufflableGenerator();
+            if (aGenerator != bGenerator) { return aGenerator ? 1 : -1; }
+
+            int xCompare = a.X.CompareTo(b.X);
+            if (xCompare != 0) { return xCompare; }
+
+            return a.Y.CompareTo(b.Y);
         });
         byte[] bytes = [
             .. Header,

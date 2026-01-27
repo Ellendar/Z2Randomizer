@@ -1,6 +1,5 @@
 using System.Reflection;
 using CrossPlatformUI.Presets;
-using FluentAssertions.Execution;
 using Z2Randomizer.RandomizerCore;
 using Z2Randomizer.RandomizerCore.Flags;
 using Z2Randomizer.RandomizerCore.Overworld;
@@ -17,17 +16,18 @@ public class FlagsTests
         flagBuilder.Append(false);
         String flags = flagBuilder.ToString();
         FlagReader flagReader = new FlagReader(flags);
-        Assert.AreEqual(false, flagReader.ReadBool());
+        Assert.IsFalse(flagReader.ReadBool());
 
         flagBuilder.Append(false);
         flagBuilder.Append(true);
         flags = flagBuilder.ToString();
         flagReader = new FlagReader(flags);
-        Assert.AreEqual(false, flagReader.ReadBool());
-        Assert.AreEqual(false, flagReader.ReadBool());
-        Assert.AreEqual(true, flagReader.ReadBool());
+        Assert.IsFalse(flagReader.ReadBool());
+        Assert.IsFalse(flagReader.ReadBool());
+        Assert.IsTrue(flagReader.ReadBool());
     }
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods", Justification = "Does not work with nullable bool")]
     public void TestNullableBoolEncodeCycle()
     {
         bool? nullBool = null;
@@ -131,7 +131,7 @@ public class FlagsTests
             if (v1 != v2)
                 failures.Add($"{property.Name} did not match. Config: {v1} Config2: {v2}");
         }
-        Assert.IsTrue(failures.Count == 0,
+        Assert.IsEmpty(failures,
             $"The following assertions failed: {Environment.NewLine}{string.Join(Environment.NewLine, failures)}");
     }
 

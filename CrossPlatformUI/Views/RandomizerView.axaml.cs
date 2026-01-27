@@ -1,14 +1,16 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using CrossPlatformUI.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
-using System;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class RandomizerView : ReactiveUserControl<RandomizerViewModel>
 {
     public RandomizerView()

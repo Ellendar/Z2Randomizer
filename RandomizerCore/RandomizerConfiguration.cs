@@ -355,7 +355,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? shufflePalaceEnemies;
 
     [Reactive]
-    private bool shuffleDripperEnemy;
+    private DripperEnemyOption dripperEnemyOption;
 
     [Reactive]
     private bool? mixLargeAndSmallEnemies;
@@ -1206,7 +1206,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         properties.ShuffleOverworldEnemies = shuffleOverworldEnemies ?? GetIndeterminateFlagValue(r);
         properties.ShufflePalaceEnemies = shufflePalaceEnemies ?? GetIndeterminateFlagValue(r);
         properties.MixLargeAndSmallEnemies = mixLargeAndSmallEnemies ?? GetIndeterminateFlagValue(r);
-        properties.ShuffleDripper = shuffleDripperEnemy;
+        properties.DripperEnemyOption = dripperEnemyOption;
         properties.SpellEnemy = randomizeSpellSpellEnemy ?? GetIndeterminateFlagValue(r);
         properties.ShuffleEnemyPalettes = shuffleSpritePalettes;
         properties.EnemyXPDrops = enemyXPDrops;

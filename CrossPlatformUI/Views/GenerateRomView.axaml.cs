@@ -1,11 +1,12 @@
-using Avalonia.Markup.Xaml;
+using System.Diagnostics.CodeAnalysis;
 using static System.ObservableExtensions;
-using CrossPlatformUI.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using CrossPlatformUI.ViewModels;
 
 namespace CrossPlatformUI.Views;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public partial class GenerateRomView : ReactiveUserControl<GenerateRomViewModel>
 {
     public GenerateRomView()

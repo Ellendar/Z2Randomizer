@@ -2,9 +2,9 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <AvaloniaVersion>11.3.7</AvaloniaVersion>
+    <AvaloniaVersion>11.3.8</AvaloniaVersion>
     <DialogHostAvaloniaVersion>0.9.3</DialogHostAvaloniaVersion>
-    <MaterialAvaloniaVersion>3.13.1</MaterialAvaloniaVersion>
+    <MaterialAvaloniaVersion>3.13.3</MaterialAvaloniaVersion>
     <MaterialIconsAvaloniaVersion>2.4.1</MaterialIconsAvaloniaVersion>
     <SkiaSharpVersion>2.88.9</SkiaSharpVersion> <!-- Match version used by Avalonia internally -->
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
@@ -17,9 +17,9 @@
     <WasmEmitSymbolMap>true</WasmEmitSymbolMap>
 <!--    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
 <!--    <PublishTrimmed>true</PublishTrimmed>-->
-    </PropertyGroup>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <Workload Include="wasm-tools" />
-    </ItemGroup>
+  <ItemGroup>
+    <Workload Include="wasm-tools" />
+  </ItemGroup>
 </Project>

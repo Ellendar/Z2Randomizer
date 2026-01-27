@@ -9,7 +9,7 @@
         x:Class="CrossPlatformUI.Views.MainWindow"
         WindowStartupLocation="Manual"
         SizeToContent="Manual"
-        MinHeight="650"
+        MinHeight="750"
         MinWidth="900"
         Title="Z2Randomizer">
     <views:MainView />

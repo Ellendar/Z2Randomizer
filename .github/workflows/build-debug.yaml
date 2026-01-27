@@ -1,0 +1,50 @@
+name: Build Z2Randomizer Debug
+
+on:
+  push:
+    branches-ignore:
+    - main
+    - testing
+  pull_request:
+
+env:
+  # I'm not a fan of the telemetry as-is, but this also suppresses some lines in the build log.
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  # This removes even more spurious lines.
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [
+          #{ os: windows-latest, arch: x64 },
+          #{ os: macos-14, arch: arm64 },
+          { os: ubuntu-latest, arch: x64 }, # the fastest one (just to make sure it builds)
+        ]
+        dotnet-version: [ '10.0.x' ]
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Setup dotnet ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Build Desktop Debug
+        run: dotnet publish -c Debug -o CrossPlatformUI.Desktop/bin/publish CrossPlatformUI.Desktop/CrossPlatformUI.Desktop.csproj
+
+      - name: Upload Regular Build To Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Z2Randomizer-${{ matrix.platform.os }}-${{ matrix.platform.arch }}-Debug
+          # don't compress hard since it's not a real release
+          compression-level: 6
+          path: |
+            CrossPlatformUI.Desktop/bin/publish
+            !**/*.pdb

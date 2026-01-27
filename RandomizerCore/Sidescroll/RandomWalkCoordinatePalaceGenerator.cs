@@ -98,7 +98,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         foreach (Coord coord in walkGraph.Keys.OrderByDescending(i => i.Y).ThenBy(i => i.X))
         {
             await Task.Yield();
-            if(!walkGraph.TryGetValue(coord, out RoomExitType exitType))
+            if (!walkGraph.TryGetValue(coord, out RoomExitType exitType))
             {
                 throw new ImpossibleException("Walk graph coordinate was explicitly missing");
             }
@@ -119,7 +119,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             if (walkGraph.TryGetValue(new Coord(x, y + 1), out RoomExitType upRoomType) && upRoomType.ContainsDrop())
             {
                 //If There are no drop -> elevator conversion rooms, so if we have to keep going down, it needs to be a drop.
-                if(exitType.ContainsDown() && roomPool.GetNormalRoomsForExitType(RoomExitType.DROP_STUB).Any(i => i.IsDropZone))
+                if (exitType.ContainsDown() && roomPool.GetNormalRoomsForExitType(RoomExitType.DROP_STUB).Any(i => i.IsDropZone))
                 {
                     dropChance = 1f;
                 } 
@@ -142,7 +142,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
         //If dropification created a room with no entrance, change it
         foreach (KeyValuePair<Coord, RoomExitType> item in walkGraph.Where(i => i.Value == RoomExitType.DROP_STUB))
         {
-            if(!walkGraph.ContainsKey(new Coord(item.Key.X, item.Key.Y + 1)))
+            if (!walkGraph.ContainsKey(new Coord(item.Key.X, item.Key.Y + 1)))
             {
                 walkGraph[item.Key] = RoomExitType.DEADEND_EXIT_DOWN;
                 RoomExitType downRoomType = walkGraph[new Coord(item.Key.X, item.Key.Y - 1)];
@@ -194,13 +194,13 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                     roomCandidates = roomPool.GetNormalRoomsForExitType(roomExitType, true);
                     Debug.Assert(roomCandidates.Count() > 0);
                     roomsByExitType[roomExitType] = roomCandidates;
-                    logger.Info($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
+                    logger.Debug($"RandomWalk ran out of rooms of exit type: {roomExitType} in palace {palaceNumber}. Starting to use duplicate rooms.");
                 }
                 roomCandidates!.FisherYatesShuffle(r);
                 Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
                 foreach (Room roomCandidate in roomCandidates!)
                 {
-                    if ((upRoom == null || (upRoom.HasDrop == roomCandidate.IsDropZone)))
+                    if (upRoom == null || !upRoom.HasDrop || roomCandidate.IsDropZone)
                     {
                         Debug.Assert(roomCandidate.IsNormalRoom());
                         newRoom = roomCandidate;
@@ -209,9 +209,18 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 }
                 if (newRoom != null && duplicateProtection) { RemoveDuplicatesFromPool(props, roomCandidates!, newRoom); }
             }
+
             if (newRoom == null)
             {
+                Room? upRoom = palace.AllRooms.FirstOrDefault(i => i.coords == new Coord(x, y + 1));
                 roomPool.DefaultStubsByDirection.TryGetValue(roomExitType, out newRoom);
+                if (newRoom != null && upRoom != null && upRoom.HasDrop && !newRoom.IsDropZone)
+                {
+                    //We need to use a drop zone stub but one does not (and cannot) exist so this graph is doomed.
+                    //Debug.WriteLine(GetLayoutDebug(walkGraph, false));
+                    palace.IsValid = false;
+                    return palace;
+                }
             }
             if (newRoom == null)
             {
@@ -223,16 +232,20 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 newRoom = new(newRoom);
             }
 
-            palace.AllRooms.Add(newRoom);
-            if(newRoom.LinkedRoomName != null)
+            newRoom.coords = item.Key;
+            if (newRoom.LinkedRoomName == null)
+            {
+                palace.AllRooms.Add(newRoom);
+            }
+            else
             {
                 Room linkedRoom = new(roomPool.LinkedRooms[newRoom.LinkedRoomName]);
                 newRoom.LinkedRoom = linkedRoom;
                 linkedRoom.LinkedRoom = newRoom;
                 linkedRoom.coords = item.Key;
-                palace.AllRooms.Add(linkedRoom);
+                Room mergedRoom = newRoom.Merge(linkedRoom);
+                palace.AllRooms.Add(mergedRoom);
             }
-            newRoom.coords = item.Key;
         }
 
         //Connect adjacent rooms if they exist
@@ -253,7 +266,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 }
             }
 
-            foreach (Room down in downRooms)
+            foreach(Room down in downRooms)
             {
                 if (down != null && room.FitsWithDown(down) > 0)
                 {
@@ -264,7 +277,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                     }
                 }
             }
-            foreach (Room up in upRooms)
+            foreach(Room up in upRooms)
             {
                 if (up != null && room.FitsWithUp(up) > 0)
                 {
@@ -275,7 +288,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                     up.Down = room;
                 }
             }
-            foreach (Room right in rightRooms)
+            foreach(Room right in rightRooms)
             {
                 if (right != null && room.FitsWithRight(right) > 0)
                 {
@@ -293,7 +306,8 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
             return palace;
         }
 
-        if(!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
+
+        if (!AddSpecialRoomsByReplacement(palace, roomPool, r, props))
         {
             palace.IsValid = false;
             return palace;
@@ -361,7 +375,7 @@ public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
                 }
                 else
                 {
-                    if(room.ContainsDown())
+                    if (room.ContainsDown())
                     {
                         sb.Append(" | ");
                     }

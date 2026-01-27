@@ -165,6 +165,18 @@ public static class XPEffectivenessExtensions
     }
 }
 
+[DefaultValue(ONLY_BOTS)]
+public enum DripperEnemyOption
+{
+    [Description("Only Bots")]
+    ONLY_BOTS,
+    [Description("All Ground Enemies")]
+    ANY_GROUND_ENEMY,
+    [Description("Easier Ground Enemies")]
+    EASIER_GROUND_ENEMIES,
+    [Description("Easier Ground Enemies, Full HP")]
+    EASIER_GROUND_ENEMIES_FULL_HP,
+}
 
 [DefaultValue(NORMAL)]
 public enum FireOption
@@ -535,25 +547,101 @@ public enum NesColor
     [Description("Silver Gray")] SilverGray = 0x3D,
 }
 
+public enum BeamPalette
+{
+    Unspecified = -2,
+    Flashing = -1,
+    Link = 0,
+    Orange = 1,
+    Red = 2,  // bad idea to use since this palette is not visible in caves without the candle
+    Blue = 3, // ^
+}
+
+public enum BeamRotation
+{
+    None = 0x00,
+    FlipVertical = 0x01,
+    Rotate90 = 0xC0,
+}
+
+[AttributeUsage(AttributeTargets.Field)]
+public class BeamSpriteMetaAttribute : Attribute
+{
+    /// <summary>
+    /// If non-zero, the 8x16 sprite at this address will replace the fire sprite.
+    /// </summary>
+    public int ChrAddress { get; init; } = 0;
+
+    /// <summary>
+    /// Primary palette used by this beam.
+    /// </summary>
+    public BeamPalette BeamPalette { get; init; } = BeamPalette.Flashing;
+
+    /// <summary>
+    /// Optional secondary palette for the fire projectile.
+    /// If not explicitly set, falls back to BeamPalette, or Orange if BeamPalette is Flashing.
+    /// </summary>
+    public BeamPalette FirePalette { get; init; } = BeamPalette.Unspecified;
+
+    /// <summary>
+    /// Sprite rotation/flip flag.
+    /// </summary>
+    public BeamRotation Rotate { get; init; } = BeamRotation.None;
+
+    public BeamSpriteMetaAttribute() { }
+}
+
 [DefaultValue(DEFAULT)]
 public enum BeamSprites
 {
     [Description("Default")]
     DEFAULT,
-    [Description("Fire")]
+
+    [Description("Fire"), BeamSpriteMeta(BeamPalette = BeamPalette.Orange, Rotate = BeamRotation.FlipVertical)]
     FIRE,
-    [Description("Bubble")]
+
+    [Description("Bubble"), BeamSpriteMeta(ChrAddress = 0xaa0)]
     BUBBLE,
-    [Description("Rock")]
+
+    [Description("Rock"), BeamSpriteMeta(ChrAddress = 0x2ae0)]
     ROCK,
-    [Description("Axe")]
+
+    [Description("Energy Ball"), BeamSpriteMeta(ChrAddress = 0x0ce0)]
+    ENERGY_BALL,
+
+    [Description("Wizard Beam"), BeamSpriteMeta(ChrAddress = 0x14dc0)]
+    WIZARD_BEAM,
+
+    // (Red Daira's axe projectile switches between sprite f6 and fa for smoother rotation, we can't emulate that)
+    [Description("Daira Axe"), BeamSpriteMeta(ChrAddress = 0x2f60, BeamPalette = BeamPalette.Orange, Rotate = BeamRotation.Rotate90)]
     AXE,
-    [Description("Hammer")]
+
+    [Description("Doomknocker Mace"), BeamSpriteMeta(ChrAddress = 0x12ee0, Rotate = BeamRotation.Rotate90)]
     HAMMER,
-    [Description("Wizzrobe Beam")]
-    WIZZROBE_BEAM,
+
+    [Description("Geru Mace"), BeamSpriteMeta(ChrAddress = 0x5260, Rotate = BeamRotation.Rotate90)]
+    GERU_MACE,
+
+    [Description("Guma Mace"), BeamSpriteMeta(ChrAddress = 0xaee0, Rotate = BeamRotation.Rotate90)]
+    GUMA_MACE,
+
+    [Description("Boomerang"), BeamSpriteMeta(ChrAddress = 0x30c0, Rotate = BeamRotation.Rotate90)]
+    BOOMERANG,
+
+    [Description("Spicy Chicken Fire"), BeamSpriteMeta(ChrAddress = 0xd3e0, BeamPalette = BeamPalette.Orange, Rotate = BeamRotation.Rotate90)]
+    SPICY_CHICKEN,
+
     [Description("Random")]
     RANDOM,
+}
+
+public static class BeamSpriteExtensions
+{
+    public static BeamSpriteMetaAttribute GetMeta(this BeamSprites sprite)
+    {
+        var member = typeof(BeamSprites).GetMember(sprite.ToString()).FirstOrDefault();
+        return member?.GetCustomAttribute<BeamSpriteMetaAttribute>() ?? new BeamSpriteMetaAttribute();
+    }
 }
 
 [DefaultValue(Normal)]
@@ -681,6 +769,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> MagicEffectivenessList { get; } = ToDescriptions<MagicEffectiveness>();
     public static IEnumerable<EnumDescription> LifeEffectivenessList { get; } = ToDescriptions<LifeEffectiveness>();
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
+    public static IEnumerable<EnumDescription> DripperEnemyOptionList { get; } = ToDescriptions<DripperEnemyOption>();
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();

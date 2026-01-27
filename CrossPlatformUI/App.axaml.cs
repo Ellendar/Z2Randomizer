@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,14 +11,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Material.Styles.Assists;
+using Microsoft.Extensions.DependencyInjection;
 using CrossPlatformUI.Services;
 using CrossPlatformUI.ViewModels;
 using CrossPlatformUI.Views;
-using Material.Styles.Assists;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CrossPlatformUI;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public sealed partial class App : Application // , IDisposable
 {
     public override void Initialize()
@@ -24,12 +27,27 @@ public sealed partial class App : Application // , IDisposable
         AvaloniaXamlLoader.Load(this);
 
         var version = Assembly.GetExecutingAssembly().GetName().Version;
-        Version = $"{version?.ToString(version.Revision > 0 ? 4 : 3)}";
+        var versionString = version?.ToString(version.Revision > 0 ? 4 : 3);
+
+#pragma warning disable CS0162 // Unreachable code detected
+        if (versionString == Z2Randomizer.GitInfo.Tag && !Z2Randomizer.GitInfo.IsDirty)
+        {
+            Version = $"v{versionString}";
+        }
+        else if (!Z2Randomizer.GitInfo.IsDirty)
+        {
+            Version = $"[{Z2Randomizer.GitInfo.Branch}:{Z2Randomizer.GitInfo.Commit}]";
+        }
+        else
+        {
+            Version = $"[{Z2Randomizer.GitInfo.Branch}]";
+        }
+#pragma warning restore CS0162 // Unreachable code detected
 #if DEBUG
         Version += " (Debug)";
 #endif
 
-        Title = $"Zelda II Randomizer v{Version}";
+        Title = $"Zelda II Randomizer {Version}";
     }
 
     public static ServiceCollection? ServiceContainer;
@@ -49,19 +67,16 @@ public sealed partial class App : Application // , IDisposable
     public override void OnFrameworkInitializationCompleted()
     {
         ServiceContainer ??= new();
+        ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
+        ServiceContainer.AddSingleton<SpriteLoaderService>();
+        Services = ServiceContainer.BuildServiceProvider();
         var files = FileSystemService!;
         try
         {
             var json = files.OpenFileSync(IFileSystemService.RandomizerPath.Settings, "Settings.json");
             main = JsonSerializer.Deserialize(json, new SerializationContext(true).MainViewModel)!;
-            main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.SpriteName = main.Config.SpriteName;
-            if (main.Config.SpriteName != "Link")
-            {
-                var disposables = new CompositeDisposable();
-                // this is a bit bad, `disposables` should be freed somewhere, but this is better than passing null.
-                main.RandomizerViewModel.CustomizeViewModel.SpritePreviewViewModel.OnActivate(disposables);
-            }
         }
+        catch (System.IO.FileNotFoundException) { /* No settings file exists */ }
         catch (Exception)
         {
             // Could not load settings, so just use the default instead
@@ -72,6 +87,24 @@ public sealed partial class App : Application // , IDisposable
         }
 
         main ??= new MainViewModel();
+
+        if (main.Config.SpriteName != "Link")
+        {
+            var spriteLoaderService = App.Current?.Services?.GetService<SpriteLoaderService>();
+            Debug.Assert(spriteLoaderService != null);
+
+            spriteLoaderService.Sprites
+                .Where(sprites => sprites.Count > 0)
+                .Take(1)
+                .Subscribe(sprites =>
+                {
+                    var sprite = sprites.FirstOrDefault(loaded => loaded.DisplayName == main.Config.SpriteName);
+                    if (sprite != null)
+                    {
+                        main.Config.Sprite = sprite;
+                    }
+                });
+        }
 
         switch (ApplicationLifetime)
         {
@@ -105,8 +138,6 @@ public sealed partial class App : Application // , IDisposable
         // Turn of window animations that were making the comboboxes glitch out when changing tabs.
         var state = !TransitionAssist.GetDisableTransitions(TopLevel!);
         TransitionAssist.SetDisableTransitions(TopLevel!, state);
-        ServiceContainer.AddSingleton<IFileDialogService>(x => new FileDialogService(TopLevel));
-        Services = ServiceContainer.BuildServiceProvider();
 
         base.OnFrameworkInitializationCompleted();
     }
@@ -177,9 +208,9 @@ public partial class SerializationContext : JsonSerializerContext
         {
             try
             {
-#pragma warning disable IL2075 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
+#pragma warning disable IL2076 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
                 var converterType = typeof(SafeStringEnumConverter<>).MakeGenericType(enumType);
-#pragma warning restore IL2075
+#pragma warning restore IL2076
                 var converter = (JsonConverter)Activator.CreateInstance(converterType)!;
                 options.Converters.Add(converter);
             }

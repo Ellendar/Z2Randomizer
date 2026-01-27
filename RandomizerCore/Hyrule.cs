@@ -261,21 +261,26 @@ public class Hyrule
             bool raftIsRequired = IsRaftAlwaysRequired(props);
             bool passedValidation = false;
             HashSet<int> freeBanks = [];
-            bool f = await UpdateProgress(progress, ct, 1);
-            if (!f)
-            {
-                return null;
-            }
+            if (ct.IsCancellationRequested) { return null; }
+            UpdateProgress(progress, 1);
 
             while (palaces.Count != 7 || passedValidation == false)
             {
                 freeBanks = new(ROM.FreeRomBanks);
                 var palaceGenerator = new Palaces();
                 palaces = await palaceGenerator.CreatePalaces(r, props, palaceRooms, raftIsRequired, ct);
+
                 if (palaces.Count == 0)
                 {
                     continue;
                 }
+
+                /*
+                if(!palaces.SelectMany(i => i.AllRooms).Any(i => i.Name == "gtmOldgpRooms M10"))
+                {
+                    continue;
+                }
+                */
 
                 //Randomize Enemies
                 if (props.ShufflePalaceEnemies)
@@ -345,11 +350,8 @@ public class Hyrule
 
             firstProcessOverworldTimestamp = DateTime.Now;
             await ProcessOverworld(progress, ct);
-            f = await UpdateProgress(progress, ct, 8);
-            if (!f)
-            {
-                return null;
-            }
+            if (ct.IsCancellationRequested) { return null; }
+            UpdateProgress(progress, 8);
 
             if (props.ShuffleOverworldEnemies)
             {
@@ -403,14 +405,14 @@ public class Hyrule
                 ROMData.Put(0x17b18, 0x20); //Child
             }
 
-            f = await UpdateProgress(progress, ct, 9);
-            if (!f)
-            {
-                return null;
-            }
+            if (ct.IsCancellationRequested) { return null; }
+            UpdateProgress(progress, 9);
 
             List<Text> texts = CustomTexts.GenerateTexts(AllLocationsForReal(), itemLocs, ROMData.GetGameText(), props, r);
-            ApplyAsmPatches(props, assembler, r, texts, ROMData);
+            StatRandomizer randomizedStats = new(ROMData, props);
+            randomizedStats.Randomize(r);
+            randomizedStats.Write(ROMData);
+            ApplyAsmPatches(props, assembler, r, texts, ROMData, randomizedStats);
 
             var rom = await ROMData.ApplyAsm(assembler);
             // await assemblerTask; // .Wait(ct);
@@ -1257,7 +1259,7 @@ public class Hyrule
             //This continues to get worse, the text is based on the palaces and asm patched, so it needs to
             //be tested here, but we don't actually know what they will be until later, for now i'm just
             //testing with the vanilla text, but this could be an issue down the line.
-            ApplyAsmPatches(props, validationEngine, r, ROMData.GetGameText(), testRom);
+            ApplyAsmPatches(props, validationEngine, r, ROMData.GetGameText(), testRom, new StatRandomizer(testRom, props));
             validationEngine.Add(sideviewModule);
             await testRom.ApplyAsm(validationEngine); //.Wait(ct);
         }
@@ -2010,11 +2012,8 @@ public class Hyrule
             do //while (wtries < 10 && !EverythingReachable());
             {
                 //GENERATE WEST
-                bool shouldContinue = await UpdateProgress(progress, ct, 2);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 2);
                 nonContinentGenerationAttempts++;
                 timestamp = DateTime.Now;
                 if (!westHyrule.AllReached)
@@ -2026,11 +2025,8 @@ public class Hyrule
                 timeSpentBuildingWest += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE DM
-                shouldContinue = await UpdateProgress(progress, ct, 3);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 3);
                 timestamp = DateTime.Now;
                 if (!deathMountain.AllReached)
                 {
@@ -2041,11 +2037,8 @@ public class Hyrule
                 timeSpentBuildingDM += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE EAST
-                shouldContinue = await UpdateProgress(progress, ct, 4);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 4);
                 timestamp = DateTime.Now;
                 if (!eastHyrule.AllReached)
                 {
@@ -2056,11 +2049,8 @@ public class Hyrule
                 timeSpentBuildingEast += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
                 //GENERATE MAZE ISLAND
-                shouldContinue = await UpdateProgress(progress, ct, 5);
-                if (!shouldContinue)
-                {
-                    return;
-                }
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 5);
                 timestamp = DateTime.Now;
                 if (!mazeIsland.AllReached)
                 {
@@ -2070,13 +2060,10 @@ public class Hyrule
                 mazeIsland.ResetVisitabilityState();
                 timeSpentBuildingMI += (int)DateTime.Now.Subtract(timestamp).TotalMilliseconds;
 
-                shouldContinue = await UpdateProgress(progress, ct, 6);
-                if (!shouldContinue)
-                {
-                    return;
-                }
-
                 worlds.ForEach(i => i.SynchronizeLinkedLocations());
+
+                if (ct.IsCancellationRequested) { return; }
+                UpdateProgress(progress, 6);
 
                 //Then perform non-terrain shuffles looking for one that works.
                 nonTerrainShuffleAttempt = 0;
@@ -2131,12 +2118,8 @@ public class Hyrule
         } while (!IsEverythingReachable(ItemGet));
     }
 
-    private async Task<bool> UpdateProgress(Func<string, Task> progress, CancellationToken ct, int v)
+    private async void UpdateProgress(Func<string, Task> progress, int v)
     {
-        if (ct.IsCancellationRequested)
-        {
-            return false;
-        }
         switch (v)
         {
             case 1:
@@ -2167,7 +2150,6 @@ public class Hyrule
                 await progress.Invoke("Finishing up");
                 break;
         }
-        return true;
     }
 
     private void SetTransportation(int w1, int w2, int type)
@@ -2966,11 +2948,6 @@ public class Hyrule
         ROMData.Put(0x1CD42, (byte)palGraphics[(int)eastHyrule.locationAtPalace5.PalaceNumber!]);
         ROMData.Put(0x1CD43, (byte)palGraphics[(int)eastHyrule.locationAtPalace6.PalaceNumber!]);
         ROMData.Put(0x1CD44, (byte)palGraphics[(int)eastHyrule.locationAtGP.PalaceNumber!]);
-
-        if (props.ShuffleDripper)
-        {
-            ROMData.Put(0x11927, (byte)Enemies.Palace125GroundEnemies[r.Next(Enemies.Palace125GroundEnemies.Length)]);
-        }
 
         if (props.ShuffleEnemyPalettes)
         {
@@ -3967,7 +3944,7 @@ EndTileComparisons = $8601
         a.Code(Util.ReadResource("Z2Randomizer.RandomizerCore.Asm.MMC5.s"), "mmc5_conversion.s");
     }
 
-    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom)
+    private void ApplyAsmPatches(RandomizerProperties props, Assembler engine, Random RNG, List<Text> texts, ROM rom, StatRandomizer randomizedStats)
     {
         bool randomizeMusic = !props.DisableMusic && props.RandomizeMusic;
 
@@ -3989,7 +3966,38 @@ EndTileComparisons = $8601
 
         if (props.ShuffleEnemyHP)
         {
-            rom.RandomizeEnemyStats(engine, RNG);
+            rom.SetBossHpBarDivisors(engine, randomizedStats);
+        }
+
+        if (props.DripperEnemyOption != DripperEnemyOption.ONLY_BOTS)
+        {
+            EnemiesPalace125[] dripperEnemies;
+            switch (props.DripperEnemyOption)
+            {
+                case DripperEnemyOption.ANY_GROUND_ENEMY:
+                    dripperEnemies = Enemies.Palace125GroundEnemies;
+                    break;
+                case DripperEnemyOption.EASIER_GROUND_ENEMIES:
+                case DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP:
+                    dripperEnemies = [
+                        ..Enemies.Palace125SmallEnemies,
+                        EnemiesPalace125.TINSUIT,
+                        EnemiesPalace125.ORANGE_IRON_KNUCKLE,
+                        EnemiesPalace125.RED_STALFOS,
+                        EnemiesPalace125.BLUE_STALFOS, // will use non-armored variant HP
+                    ];
+                    break;
+                default:
+                    throw new ImpossibleException();
+            }
+            byte dripperId = (byte)dripperEnemies[r.Next(dripperEnemies.Length)];
+            ROMData.Put(RomMap.DRIPPER_ID, dripperId);
+
+            if (props.DripperEnemyOption == DripperEnemyOption.EASIER_GROUND_ENEMIES_FULL_HP)
+            {
+                var dripperHp = randomizedStats.Palace125EnemyHpTable[dripperId];
+                rom.SetDripperHp(engine, dripperHp);
+            }
         }
 
         if (props.AttackEffectiveness == AttackEffectiveness.OHKO)

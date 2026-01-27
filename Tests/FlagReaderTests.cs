@@ -24,6 +24,7 @@ public class FlagReaderTests
     }
 
     [TestMethod]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods", Justification = "Does not work with nullable byte")]
     public void TestReadByte()
     {
         /*
@@ -33,19 +34,19 @@ public class FlagReaderTests
         */
 
         FlagReader flagReader = new FlagReader(TRUE_FLAG);
-        Assert.IsTrue(flagReader.ReadByte(2) == 1);
+        Assert.AreEqual(1, flagReader.ReadByte(2));
         Assert.IsTrue(flagReader.ReadNullableByte(2) == 1);
         Assert.IsNull(flagReader.ReadNullableByte(3));
 
         flagReader = new FlagReader(TRUE_FLAG);
-        Assert.IsTrue(flagReader.ReadByte(64) == 46);
+        Assert.AreEqual(46, flagReader.ReadByte(64));
     }
 
     [TestMethod]
     public void TestReadEnum()
     {
         FlagReader flagReader = new FlagReader(ENUM_FLAG);
-        Assert.AreEqual(flagReader.ReadEnum<EncounterRate>(), EncounterRate.NORMAL);
+        Assert.AreEqual(EncounterRate.NORMAL, flagReader.ReadEnum<EncounterRate>());
         Assert.IsNull(flagReader.ReadNullableEnum<EncounterRate>());
     }
 

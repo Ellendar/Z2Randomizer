@@ -90,7 +90,7 @@ public static class FullShufflePreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = true,
+        DripperEnemyOption = DripperEnemyOption.ANY_GROUND_ENEMY,
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 

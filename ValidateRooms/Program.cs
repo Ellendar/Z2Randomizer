@@ -11,6 +11,9 @@ using static Z2Randomizer.RandomizerCore.Util;
 StringBuilder sb = new StringBuilder("");
 var sideviewComparer = new StandardByteArrayEqualityComparer();
 
+const int DROP_MIN_X = 17; // inclusive -- drop tiles are not allowed to have x < this
+const int DROP_MAX_X = 45; // inclusive -- drop tiles are not allowed to have x > this
+
 void ValidateRoomsForFile(string filename)
 {
     sb.AppendLine("Validating \"" + filename + "\"...");
@@ -96,7 +99,7 @@ void ValidateRoomsForFile(string filename)
 
         var elevators = sv.FindAll(o => o.IsElevator());
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
-        CheckDropZones(room, openCeilingTiles);
+        CheckDropZones(room, solidGrid, openCeilingTiles);
 
         CheckDupes(room, enabledRegularPalaceRooms, regularPalaceGroupedSideviews);
     }
@@ -133,7 +136,7 @@ void ValidateRoomsForFile(string filename)
 
         var elevators = sv.FindAll(o => o.IsElevator());
         CheckElevatorsAndDrops(room, sv, solidGrid, elevators, dropTiles);
-        CheckDropZones(room, openCeilingTiles);
+        CheckDropZones(room, solidGrid, openCeilingTiles);
 
         CheckDupes(room, enabledGreatPalaceRooms, greatPalaceGroupedSideviews);
     }
@@ -338,29 +341,28 @@ void RemoveTilesThatAreLavaPits<T>(List<SideviewMapCommand<T>> pits, SortedSet<i
 
 void CheckDropsOverLava<T>(Room room, SideviewEditable<T> sv, List<SideviewMapCommand<T>> lavaPits, SortedSet<int> openCeilingTiles) where T : Enum
 {
-    if (room.IsDropZone)
-    {
-        SortedSet<int> dropTilesOverLava = [];
+    if (!room.IsDropZone) { return; }
 
-        foreach (var lavaPit in lavaPits)
+    SortedSet<int> dropTilesOverLava = [];
+
+    foreach (var lavaPit in lavaPits)
+    {
+        var endX = lavaPit.AbsX + lavaPit.Width;
+        for (int x = lavaPit.AbsX; x < endX; x++)
         {
-            var endX = lavaPit.AbsX + lavaPit.Width;
-            for (int x = lavaPit.AbsX; x < endX; x++)
+            if (x < 16 || x > 47) { continue; }
+            if (openCeilingTiles.Contains(x))
             {
-                if (x < 16 || x > 47) { continue; }
-                if (openCeilingTiles.Contains(x))
+                if (sv.Find(o => o.IsSolid && o.Intersects(x, x, 8, 11)) == null)
                 {
-                    if (sv.Find(o => o.IsSolid && o.Intersects(x, x, 8, 11)) == null)
-                    {
-                        dropTilesOverLava.Add(x);
-                    }
+                    dropTilesOverLava.Add(x);
                 }
             }
         }
-        if (dropTilesOverLava.Count > 0)
-        {
-            Warning(room, "DropOverLava", $"Room is a drop zone over lava at x={ConvertToRangeString(dropTilesOverLava)}");
-        }
+    }
+    if (dropTilesOverLava.Count > 0)
+    {
+        Warning(room, "DropOverLava", $"Room is a drop zone over lava at x={ConvertToRangeString(dropTilesOverLava)}");
     }
 }
 
@@ -566,7 +568,7 @@ void CheckElevatorsAndDrops<T>(Room room, SideviewEditable<T> sv, bool[,] solidG
         else
         {
             var dropScreen = room.IsUpDownReversed ? 2 : 1;
-            var badDropTiles = dropTiles.Where(x => x < dropScreen * 16 + 1 || dropScreen * 16 + 15 < x);
+            var badDropTiles = dropTiles.Where(x => x < dropScreen * 16 + 1 || dropScreen * 16 + 15 < x || x < DROP_MIN_X || x > DROP_MAX_X);
             if (badDropTiles.Count() > 0)
             {
                 Warning(room, "DropTilesOutsideRange", $"Drop tiles outside of valid range at x={ConvertToRangeString(badDropTiles)} (dropScreen={dropScreen})");
@@ -602,7 +604,7 @@ void CheckDropConnector<T>(Room room, SideviewEditable<T> sv, int dropScreen) wh
     }
 }
 
-void CheckDropZones(Room room, SortedSet<int> openCeilingTiles)
+void CheckDropZones(Room room, bool[,] solidGrid, SortedSet<int> openCeilingTiles)
 {
     if (!room.IsDropZone) { return; }
     SortedSet<int> shouldBeOpen = new(Enumerable.Range(16, 32));
@@ -610,6 +612,32 @@ void CheckDropZones(Room room, SortedSet<int> openCeilingTiles)
     if (shouldBeOpen.Count < 6) // not sure what is the lowest allowed
     {
         Warning(room, "DropZoneNotOpen", $"Is drop zone but is only open at x={ConvertToRangeString(shouldBeOpen)}");
+    }
+    foreach (var x in Enumerable.Range(DROP_MIN_X, DROP_MAX_X - DROP_MIN_X))
+    {
+        if (!FindTileOpeningAtX(solidGrid, x))
+        {
+            // you'd respawn at y = 0 inside the wall in this case
+            // a few untested theories below
+            if (!solidGrid[x, 0]) // small 1 gap tile at top could be enough to break free?
+            {
+                continue;
+            }
+            if (!solidGrid[x, 2] && !solidGrid[x, 3]) // 2-high opening under where you would respawn in the wall - does that mean you fall down?
+            {
+                continue;
+            }
+            if (!solidGrid[x - 1, 0] && !solidGrid[x - 1, 1]) // 2-high opening to the left of where you'll spawn - can you just walk out?
+            {
+                continue;
+            }
+            if (!solidGrid[x + 1, 0] && !solidGrid[x + 1, 1]) // 2-high opening to the right
+            {
+                continue;
+            }
+            Warning(room, "DropZoneNoRespawnPoint", $"Is drop zone but there is no respawn point at x={x}");
+            break;
+        }
     }
 }
 

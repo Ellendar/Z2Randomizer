@@ -60,7 +60,7 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
     // Window/Desktop specific data
     
     private const int DefaultWidth = 900;
-    private const int DefaultHeight = 650;
+    private const int DefaultHeight = 750;
     
     private CustomPixelPoint windowPosition = new()
     {

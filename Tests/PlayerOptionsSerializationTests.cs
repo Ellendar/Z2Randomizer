@@ -1,5 +1,5 @@
-﻿using Z2Randomizer.CommandLine.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Z2Randomizer.CommandLine.Models;
 using Z2Randomizer.RandomizerCore;
 
 namespace Tests
@@ -53,7 +53,7 @@ namespace Tests
             [TestMethod]
             public void NormalFrequencyIsSupported()
             {
-                var input = "{BeepFrequency: 'Normal'}";
+                var input = "{\"BeepFrequency\": \"Normal\"}";
                 var output = JsonConvert.DeserializeObject<PlayerOptions>(input);
 
                 Assert.AreEqual(BeepFrequency.Normal, output?.BeepFrequency);

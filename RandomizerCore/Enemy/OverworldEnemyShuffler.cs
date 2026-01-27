@@ -36,7 +36,7 @@ public class OverworldEnemyShuffler
             foreach (World world in worldsInBank)
             {
                 int[] newPointers = new int[64];
-                int tableRomAddrBase = ROM.ConvertNesPtrToPrgRomAddr(bank, tablePrgBaseAddr);
+                int tableRomAddrBase = NesPointer.ConvertNesPtrToPrgRomAddr(bank, tablePrgBaseAddr);
 
                 // encounters have a second enemy list (small & large encounter)
                 foreach (int map in world.overworldEncounterMaps)
@@ -58,7 +58,7 @@ public class OverworldEnemyShuffler
 
                     int j = world.sideviewPtrTable + map * 2;
                     int sideviewNesPtr = romData.GetShort(j + 1, j);
-                    int sideviewAddr = ROM.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
+                    int sideviewAddr = NesPointer.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
                     byte[] sideviewBytes = romData.GetBytes(sideviewAddr, romData.GetByte(sideviewAddr));
 
                     byte[] enemiesBytes1 = romData.GetBytes(addr1, enemiesLength1);
@@ -88,7 +88,7 @@ public class OverworldEnemyShuffler
 
                     int j = world.sideviewPtrTable + map * 2;
                     int sideviewNesPtr = romData.GetShort(j + 1, j);
-                    int sideviewAddr = ROM.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
+                    int sideviewAddr = NesPointer.ConvertNesPtrToPrgRomAddr(world.sideviewBank, sideviewNesPtr);
                     byte[] sideviewBytes = romData.GetBytes(sideviewAddr, romData.GetByte(sideviewAddr));
 
                     int enemiesLength = romData.GetByte(addr);
@@ -162,18 +162,25 @@ public class OverworldEnemyShuffler
 
     protected static byte[] RandomizeEnemiesInner<T>(bool[,] solidGrid, GroupedEnemies<T> groupedEnemies, EnemiesEditable<T> ee, bool encounter, bool mixLargeAndSmallEnemies, bool generatorsAlwaysMatch, Random RNG) where T : Enum
     {
-        void PositionGeldarm(Enemy<T> enemy)
+        bool PositionGeldarm(Enemy<T> enemy)
         {
             // do our best to fit the Geldarm. if there is no space, prioritize aligning with the floor
             for (int j = 0; j < 5; j++)
             {
-                var newY = SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 5 - j);
-                if (newY != 0)
+                var floorY = SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 5 - j);
+                if (floorY != 0)
                 {
-                    enemy.Y = Math.Min(9, newY - j);
+                    var y = floorY - j;
+                    if (y == 2) {
+                        // Geldarm could only be positioned 1 tile above
+                        // or below the floor - pick another enemy instead.
+                        return false;
+                    }
+                    enemy.Y = Math.Min(9, y);
                     break;
                 }
             }
+            return true;
         }
         bool PositionSmallEnemy(Enemy<T> enemy, T swapToId)
         {
@@ -204,17 +211,16 @@ public class OverworldEnemyShuffler
                     return true;
             }
         }
-        void PositionLargeEnemy(Enemy<T> enemy, T swapToId)
+        bool PositionLargeEnemy(Enemy<T> enemy, T swapToId)
         {
             switch (swapToId)
             {
                 case EnemiesWest.GELDARM:
-                    PositionGeldarm(enemy);
-                    break;
+                    return PositionGeldarm(enemy);
                 default:
                     var defaultFloor = SolidGridHelper.FindFloor(solidGrid, enemy.X, enemy.Y, 1, 2);
                     enemy.Y = Math.Min(9, defaultFloor);
-                    break;
+                    return true;
             }
         }
         T RollSmallEnemy(Enemy<T> enemy, T swapToId)
@@ -229,6 +235,19 @@ public class OverworldEnemyShuffler
             }
             return swapToId;
         }
+        T RollLargeEnemy(Enemy<T> enemy, T swapToId)
+        {
+            while (true)
+            {
+                if (PositionLargeEnemy(enemy, swapToId))
+                {
+                    break;
+                }
+                swapToId = groupedEnemies.LargeEnemies[RNG.Next(0, groupedEnemies.LargeEnemies.Length)];
+            }
+            return swapToId;
+        }
+
         void MoveAwayFromLinkSpawnInEncounter(Enemy<T> enemy)
         {
             if (encounter)
@@ -266,7 +285,7 @@ public class OverworldEnemyShuffler
                         {
                             enemy.Y -= 1;
                         }
-                        PositionLargeEnemy(enemy, swapToId);
+                        swapToId = RollLargeEnemy(enemy, swapToId);
                     }
                     else
                     {
@@ -282,7 +301,7 @@ public class OverworldEnemyShuffler
                 if (enemy.IsShufflableLarge())
                 {
                     T swapToId = groupedEnemies.LargeEnemies[RNG.Next(0, groupedEnemies.LargeEnemies.Length)];
-                    PositionLargeEnemy(enemy, swapToId);
+                    swapToId = RollLargeEnemy(enemy, swapToId);
                     enemy.Id = swapToId;
                     MoveAwayFromLinkSpawnInEncounter(enemy);
                     continue;

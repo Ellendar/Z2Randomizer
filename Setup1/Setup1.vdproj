@@ -124,7 +124,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:v4.5                      "
+                "FrameworkVersion" = "8:v4.5"
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -144,7 +144,7 @@
         {
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_97184A2B42CB4E07A8BF3D9779D837D6"
             {
-            "SourcePath" = "8:..\\CrossPlatformUI.Desktop\\bin\\Release\\net8.0\\publish\\win-x64\\Z2Randomizer.exe"
+            "SourcePath" = "8:..\\CrossPlatformUI.Desktop\\bin\\publish\\Z2Randomizer.exe"
             "TargetName" = "8:Z2Randomizer.exe"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -249,15 +249,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Z2Randomizer Community Fork"
-        "ProductCode" = "8:{59154EAD-59C2-4702-B16A-59DEE6B99C56}"
-        "PackageCode" = "8:{ADA1B061-DA44-42F6-9B54-A48D2F3B738E}"
+        "ProductCode" = "8:{91517032-59AE-4325-A6EC-CA9C1AB5C97D}"
+        "PackageCode" = "8:{DED941E8-784D-4C32-8534-B29815ABD543}"
         "UpgradeCode" = "8:{CD8B503C-4EBA-4612-9BE1-E8F8C21EEC35}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:5.0.3"
+        "ProductVersion" = "8:5.0.9"
         "Manufacturer" = "8:Ellendar"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -799,7 +799,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B0F49DB0EDF54F159193D61E9D0E0F01"
             {
-            "SourcePath" = "8:..\\DumpRooms\\obj\\Debug\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\DumpRooms\\obj\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"
@@ -827,7 +827,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FDAF64163E1242A1BC91894E0D2DCFA8"
             {
-            "SourcePath" = "8:..\\CommandLine\\obj\\Debug\\net8.0\\apphost.exe"
+            "SourcePath" = "8:..\\CommandLine\\obj\\Release\\net8.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_070799D92F1D40ACA23F38E12867B1C7"

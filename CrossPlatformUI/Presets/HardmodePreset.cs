@@ -90,7 +90,7 @@ public static class HardmodePreset
         //Enemies
         ShuffleOverworldEnemies = true,
         ShufflePalaceEnemies = true,
-        ShuffleDripperEnemy = false,
+        DripperEnemyOption = DripperEnemyOption.ONLY_BOTS,
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 

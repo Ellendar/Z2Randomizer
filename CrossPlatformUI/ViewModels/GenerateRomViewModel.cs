@@ -2,17 +2,18 @@ using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Subjects;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using CrossPlatformUI.Services;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
-using Microsoft.Extensions.DependencyInjection;
-using Z2Randomizer.RandomizerCore.Sidescroll;
 using Z2Randomizer.RandomizerCore;
+using Z2Randomizer.RandomizerCore.Sidescroll;
 using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables.Fluent;
 
@@ -62,9 +63,10 @@ Seed: {config.Seed}
         async void Randomize(CompositeDisposable disposables)
         {
             if (!Main.GenerateRomDialogOpen) return;
-            
-            Disposable.Create(() => tokenSource?.Cancel())
-                .DisposeWith(disposables);
+
+            runningMutex.Wait();
+            isRunning.OnNext(true);
+
             lastError = null;
             HasError = false;
             IsComplete = false;
@@ -108,7 +110,7 @@ Seed: {config.Seed}
                 }
                 catch (Exception e)
                 {
-                    await tokenSource.CancelAsync();
+                    tokenSource.Cancel();
                     lastError = e;
                     HasError = true;
                     string errorHeading, errorBody;
@@ -127,6 +129,13 @@ Seed: {config.Seed}
                         errorBody = "Please report this on the discord";
                     }
                     await UpdateProgress(errorHeading, errorBody);
+                }
+                finally
+                {
+                    tokenSource.Dispose();
+                    tokenSource = null;
+                    isRunning.OnNext(false);
+                    runningMutex.Release();
                 }
             }
         }
@@ -161,6 +170,10 @@ Seed: {config.Seed}
     public ReactiveCommand<Unit, Unit> CancelGeneration { get; }
     [JsonIgnore]
     public ReactiveCommand<Unit, Unit> CopyError { get; }
+
+    private readonly SemaphoreSlim runningMutex = new SemaphoreSlim(1, 1);
+    private readonly BehaviorSubject<bool> isRunning = new BehaviorSubject<bool>(false);
+    public IObservable<bool> IsRunning => isRunning;
 
     private CancellationTokenSource? tokenSource;
 

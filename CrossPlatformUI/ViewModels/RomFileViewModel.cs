@@ -1,15 +1,17 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using CrossPlatformUI.Services;
-using ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using SD.Tools.BCLExtensions.CollectionsRelated;
+using CrossPlatformUI.Services;
 
 namespace CrossPlatformUI.ViewModels;
 
+[RequiresUnreferencedCode("ReactiveUI uses reflection")]
 public class RomFileViewModel : ViewModelBase, IRoutableViewModel
 {
     private byte[] romData = [];
@@ -22,6 +24,9 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
             this.RaisePropertyChanged(nameof(HasRomData));
         }
     }
+
+    [JsonIgnore]
+    public IObservable<byte[]> RomDataObservable => this.WhenAnyValue(x => x.RomData);
 
     [JsonIgnore]
     public bool HasRomData => !RomData.IsNullOrEmpty();

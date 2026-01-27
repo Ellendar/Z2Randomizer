@@ -2608,6 +2608,7 @@
       "GLOVE"
     ],
     "tags": ["LongDeadEnd"],
+    "suppressWarning": ["DropZoneNoRespawnPoint"],
     "sideviewData": "1B600010E10018B91BB9D180DA0010B780709070DC02820F0CD20F"
   },
   {
@@ -11138,7 +11139,7 @@
     "bitmask": "0F",
     "connections": "FC69FFFC",
     "elevatorScreen": 3,
-    "enabled": true,
+    "enabled": false,
     "enemies": "077759174E788C",
     "group": "V4_0",
     "hasBoss": false,
@@ -11190,7 +11191,7 @@
     "bitmask": "0F",
     "connections": "FC69FFFC",
     "elevatorScreen": 3,
-    "enabled": false,
+    "enabled": true,
     "enemies": "076C844E846C5E",
     "group": "V4_0",
     "hasBoss": false,
@@ -14701,7 +14702,7 @@
     "palaceNumber": null,
     "requirements": [
     ],
-    "sideviewData": "21600E08D20883358A355633420F0A82358A35DB0E8105F85000F1B0714309D40F"
+    "sideviewData": "1F600E08D20883358A355633420F0A82358A35DB0E8105F85000F1B071D70F"
   },
   {
     "author": "aaron2u2",
@@ -15951,7 +15952,7 @@
     "enabled": true,
     "connections": "A7FFFF98",
     "enemies": "070F4D32502C90",
-    "sideviewData": "3C600B1080269076D40010701120F21F7251845072545651F21F705082517352122273515350F31C4050625587507150F3149051A52011201170D10E",
+    "sideviewData": "3E600B1080269076D40010701120F21F7251845072545651F21F7050825173507131112273315350F31C4050625587507150F3149051A52011201170D10E",
     "bitmask": "0B",
     "requirements": [],
     "tags": ["Expert"],
@@ -17290,7 +17291,7 @@
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0B015A009A48473D063486",
-    "sideviewData": "1A600F10DB00D480325F40C6525BB1F97157925349C6D300D40F",
+    "sideviewData": "1A600F10DB00D480325F40C6525BB1F97157925349C6D300DB0F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Drop-through V-shaped crumble bridge (aaron jam 4_4 P6_M45)",
@@ -17541,7 +17542,7 @@
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0722462F467C19",
-    "sideviewData": "21600F10D280008F93937191610F0D0B8FB0FB326091606360436091600683D40F",
+    "sideviewData": "21600F10D280008F93937191610F0D0B8FB0FB32609160636043609160068BDC0F",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P6_M55",
@@ -17920,7 +17921,7 @@
     "isDropZone": true,
     "hasItem": false,
     "enemies": "0503DF3A5A",
-    "sideviewData": "1C600F10E100D0846022237CDD04107F302F6525F25040F1DF06D207",
+    "sideviewData": "1E600F10E100D0846022237CDD04107F30246525F25030F13424DB06D207",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "aaron jam 4_4 P4_M23",
@@ -18142,17 +18143,17 @@
     "map": 31,
     "palaceGroup": null,
     "memoryAddress": 73527,
-    "connections": "FFFF80FC",
+    "connections": "FF80FFFC",
     "hasDrop": true,
     "elevatorScreen": -1,
     "requirements": [],
     "isDropZone": true,
     "hasItem": true,
     "enemies": "033F5F",
-    "sideviewData": "29600F10E100D080F0157065A722752680058185A045A045A045940F0E72709070A3227465B0F5D60F",
+    "sideviewData": "29600F10E100D1807064B0F4A622757090707126A045A045A045910F0E83C18205A322F4147064D50F",
     "hasBoss": false,
     "isBossRoom": false,
-    "name": "aaron jam 4_4 P4_M31",
+    "name": "Drop-through Item Room (aaron jam 4_4 P4_M31)",
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
@@ -18160,7 +18161,7 @@
     "isEntrance": false,
     "palaceNumber": null,
     "linkedRoomName": null,
-    "isUpDownReversed": true
+    "isUpDownReversed": false
   },
   {
     "bitmask": "0D",
@@ -20159,7 +20160,7 @@
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Outdoor walkway between palace wings",
-    "author": "Chadbert / initsu",
+    "author": "Chadbert",
     "group": "V5_0",
     "isThunderBirdRoom": false,
     "enabled": true,
@@ -20179,12 +20180,12 @@
     "requirements": [],
     "isDropZone": false,
     "hasItem": false,
-    "enemies": "050F0B00CB",
+    "enemies": "05784A798A",
     "sideviewData": "2C601F00B07EF75000F1D27ED2801307C1214907680D380E590D0525A02912C81221902531024010D10A8023",
     "hasBoss": false,
     "isBossRoom": false,
     "name": "Outdoor walkway between palace wings (Blue sky)",
-    "author": "Chadbert / initsu",
+    "author": "Chadbert (initsu)",
     "group": "V5_0",
     "isThunderBirdRoom": false,
     "enabled": true,
@@ -20212,13 +20213,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 1,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 14,
     "palaceGroup": null,
@@ -20237,13 +20238,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 2,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 35,
     "palaceGroup": null,
@@ -20262,13 +20263,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 5,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 0,
     "palaceGroup": null,
@@ -20287,13 +20288,13 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 3,
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 15,
     "palaceGroup": null,
@@ -20312,7 +20313,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 4,
     "linkedRoomName": null,
@@ -20344,7 +20345,7 @@
     "linkedRoomName": null,
     "isUpDownReversed": false
   },
-    {
+  {
     "bitmask": "0F",
     "map": 36,
     "palaceGroup": null,
@@ -20363,7 +20364,7 @@
     "author": "aaron2u2",
     "group": "V5_0",
     "isThunderBirdRoom": false,
-    "enabled": true,
+    "enabled": false,
     "isEntrance": true,
     "palaceNumber": 6,
     "linkedRoomName": null,
@@ -20478,7 +20479,7 @@
     "enabled": true,
     "connections": "FCFCFC00",
     "enemies": "0305CD",
-    "sideviewData": "21600F08E200DD08F017700F088030907091565300A04024C89090F3125100D50E",
+    "sideviewData": "1F600F08E200DD08F017700F088090A04091565300A04024C7A0405400D50E",
     "bitmask": "0F",
     "requirements": [],
     "tags": ["Expert"],
@@ -20504,7 +20505,7 @@
     "enabled": true,
     "connections": "03FCFCFC",
     "enemies": "030A0D",
-    "sideviewData": "1F600E08D208F312510024C89090F11790565300A040740F0880309070D10F",
+    "sideviewData": "1D600E08D208540024C7A040F11790565300A040740F088090A040D10F",
     "bitmask": "0F",
     "requirements": [],
     "tags": ["Expert"],

@@ -1,4 +1,6 @@
-﻿namespace Z2Randomizer.RandomizerCore;
+﻿using System.Collections.Generic;
+
+namespace Z2Randomizer.RandomizerCore;
 
 /// <summary>
 /// The randomizer had an absolute crapton of raw memory addresses with no documentation.
@@ -133,4 +135,43 @@ class RomMap
     public const int MI_MAGIC_CONTAINER_DROP_COLLECTABLE = 0xA5a8;
     // int[] VANILLA_PALACE_COLLECTABLE_BYTES = [0x10E91, 0x10E9A, 0x1252D, 0x12538, 0x10EA3, 0x12774];
 
+    public const int WEST_ENEMY_HP_TABLE = 0x5431;
+    public const int EAST_ENEMY_HP_TABLE = 0x9431;
+    public const int PALACE125_ENEMY_HP_TABLE = 0x11431;
+    public const int PALACE346_ENEMY_HP_TABLE = 0x12931;
+    public const int GP_ENEMY_HP_TABLE = 0x15431;
+    public const int DRIPPER_ID = 0x11927;
+
+    /**
+     * The function in bank 4 $9C45 (file offset 0x11c55) and bank 5 $A4E9 (file offset 0x164f9)
+     * are divide functions that are used to display the HP bar for bosses and split it into 8 segments.
+     * Inputs - A = divisor; X = enemy slot
+     *
+     * This function updates all the call sites to these two functions to match the HP for the boss.
+     */
+    public static readonly List<int> bossHpAddresses = [
+        0x11451, // Horsehead
+        0x13C86, // Helmethead
+        0x12951, // Rebonack
+        0x13041, // Unhorsed Rebonack
+        0x12953, // Carock
+        0x13C87, // Gooma
+        0x12952, // Barba
+        // These are bank 5 enemies so we should make a separate table for them
+        // but we can deal with these when we start randomizing their hp
+        // 0x15453, // Thunderbird
+        // 0x15454, // Dark Link
+    ];
+    public static readonly List<(int, int)> bossMap = [
+        (bossHpAddresses[0], 0x13b80), // Horsehead
+        (bossHpAddresses[1], 0x13ae2), // Helmethead
+        (bossHpAddresses[2], 0x12fd2), // Rebonack
+        (bossHpAddresses[3], 0x1325c), // Unhorsed Rebonack
+        (bossHpAddresses[4], 0x12e92), // Carock
+        (bossHpAddresses[5], 0x134cf), // Gooma
+        (bossHpAddresses[6], 0x13136), // Barba
+        // 0x13ae9 - unknown; who is this? I'm guessing its a helmet mini boss thing?
+        // (0x15453, 0x16406), // Thunderbird
+        // (0x15454, 0x158aa), // Dark Link
+    ];
 }
