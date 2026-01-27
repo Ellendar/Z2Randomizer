@@ -3,6 +3,7 @@ using FtRandoLib.Importer;
 using js65;
 using NLog;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -506,7 +507,16 @@ public class Hyrule
 
             UpdateRom();
 
-            var z2Hash = ConvertHash(hash);
+            //0 -> ! to avoid 0/O confusion
+            byte[] z2Hash = ConvertHash(hash);
+            for(int i = 0; i < z2Hash.Length; i++)
+            {
+                if(z2Hash[i] == 0xD0)
+                {
+                    z2Hash[i] = 0x36;
+                }
+            }
+            //(0xD0), 0x36);
             ROMData.Put(0x17C2C, z2Hash);
             Hash = Util.FromGameText(z2Hash);
 

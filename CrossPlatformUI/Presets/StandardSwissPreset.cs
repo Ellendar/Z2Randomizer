@@ -94,7 +94,7 @@ public static class StandardSwissPreset
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 
-        ShuffleEnemyHP = true,
+        ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,

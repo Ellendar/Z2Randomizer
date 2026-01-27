@@ -497,30 +497,32 @@ public class StatRandomizer
 
     protected void RandomizeRegularEnemyHp(Random r)
     {
-        if (!props.ShuffleEnemyHP) {
+        if (!props.ShuffleEnemyHP.IsRandom()) {
             return;
         }
 
+        double low = props.ShuffleEnemyHP.GetRandomRangeDouble()!.Low;
+        double high = props.ShuffleEnemyHP.GetRandomRangeDouble()!.High;
         int i;
 
-        for (i = (int)EnemiesWest.MYU; i < 0x23; i++) { RandomizeInsideArray(r, WestEnemyHpTable, i); }
+        for (i = (int)EnemiesWest.MYU; i < 0x23; i++) { RandomizeInsideArray(r, WestEnemyHpTable, i, low, high); }
 
-        for (i = (int)EnemiesEast.MYU; i < 0x1e; i++) { RandomizeInsideArray(r, EastEnemyHpTable, i); }
+        for (i = (int)EnemiesEast.MYU; i < 0x1e; i++) { RandomizeInsideArray(r, EastEnemyHpTable, i, low, high); }
 
         // keeping old behavior where some non-enemies are not randomized (strike for jar, unused enemies etc.)
-        for (i = (int)EnemiesPalace125.MYU; i < (int)EnemiesPalace125.STRIKE_FOR_RED_JAR; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace125.SLOW_BUBBLE; i < (int)EnemiesPalace125.HORSEHEAD; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace125.BLUE_STALFOS; i < 0x24; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i); }
+        for (i = (int)EnemiesPalace125.MYU; i < (int)EnemiesPalace125.STRIKE_FOR_RED_JAR; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesPalace125.SLOW_BUBBLE; i < (int)EnemiesPalace125.HORSEHEAD; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesPalace125.BLUE_STALFOS; i < 0x24; i++) { RandomizeInsideArray(r, Palace125EnemyHpTable, i, low, high); }
 
-        for (i = (int)EnemiesPalace346.MYU; i < (int)EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace346.SLOW_BUBBLE; i < (int)EnemiesPalace346.REBONAK; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i); }
-        for (i = (int)EnemiesPalace346.BLUE_STALFOS; i < 0x24; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i); }
+        for (i = (int)EnemiesPalace346.MYU; i < (int)EnemiesPalace346.STRIKE_FOR_RED_JAR_OR_IRON_KNUCKLE; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesPalace346.SLOW_BUBBLE; i < (int)EnemiesPalace346.REBONAK; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesPalace346.BLUE_STALFOS; i < 0x24; i++) { RandomizeInsideArray(r, Palace346EnemyHpTable, i, low, high); }
 
-        for (i = (int)EnemiesGreatPalace.MYU; i < (int)EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.ORANGE_MOA; i < (int)EnemiesGreatPalace.BUBBLE_GENERATOR; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.RED_DEELER; i < (int)EnemiesGreatPalace.ELEVATOR; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.SLOW_BUBBLE; i < 0x1b; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
-        for (i = (int)EnemiesGreatPalace.FOKKERU; i < (int)EnemiesGreatPalace.KING_BOT; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i); }
+        for (i = (int)EnemiesGreatPalace.MYU; i < (int)EnemiesGreatPalace.STRIKE_FOR_RED_JAR_OR_FOKKA; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesGreatPalace.ORANGE_MOA; i < (int)EnemiesGreatPalace.BUBBLE_GENERATOR; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesGreatPalace.RED_DEELER; i < (int)EnemiesGreatPalace.ELEVATOR; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesGreatPalace.SLOW_BUBBLE; i < 0x1b; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i, low, high); }
+        for (i = (int)EnemiesGreatPalace.FOKKERU; i < (int)EnemiesGreatPalace.KING_BOT; i++) { RandomizeInsideArray(r, GpEnemyHpTable, i, low, high); }
     }
 
     protected void RandomizeBossHp(Random r)
@@ -627,7 +629,7 @@ public class StatRandomizer
         return nextVal;
     }
 
-    protected static void RandomizeInsideArray(Random r, byte[] array, int index, double lower=0.5, double upper=1.5)
+    protected static void RandomizeInsideArray(Random r, byte[] array, int index, double lower, double upper)
     {
         var vanillaVal = array[index];
         int minVal = (int)(vanillaVal * lower);

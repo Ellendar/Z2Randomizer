@@ -72,16 +72,18 @@
             </CheckBox>
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <CheckBox
-                IsChecked="{Binding Config.ShuffleEnemyHP}"
-                Content="Shuffle Regular Enemy HP"
+			<ComboBox
+                Theme="{StaticResource MaterialOutlineComboBox}"
+                assists:ComboBoxAssist.Label="Regular Enemy HP"
+                ItemsSource="{Binding Source={x:Static rc:Enums.EnemyLifeOptionList}}"
+                SelectedItem="{Binding Config.ShuffleEnemyHP, Converter={x:Static ui:Util.EnumConvert}}"
             >
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShuffleEnemyHPToolTip}"/></ToolTip.Tip>
-            </CheckBox>
+            </ComboBox>
             <ComboBox
                 Theme="{StaticResource MaterialOutlineComboBox}"
                 assists:ComboBoxAssist.Label="Boss Enemy HP"
-                ItemsSource="{Binding Source={x:Static rc:Enums.EnemyLifeOptionList}}"
+                ItemsSource="{Binding Source={x:Static rc:Enums.BossLifeOptionList}}"
                 SelectedItem="{Binding Config.ShuffleBossHP, Converter={x:Static ui:Util.EnumConvert}}"
             >
                 <ToolTip.Tip>

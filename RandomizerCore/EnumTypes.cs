@@ -163,6 +163,8 @@ public enum EnemyLifeOption
     HIGH,
     [Description("Medium High [-50% to +100%]"), RandomRangeDouble(Low = 0.5, High = 2.0)]
     MEDIUM_HIGH,
+    [Description("Medium High [-75% to +200%]"), RandomRangeDouble(Low = 0.25, High = 3.0)]
+    WIDE,
 }
 
 [DefaultValue(ONLY_BOTS)]
@@ -801,6 +803,7 @@ public static class Enums
     public static IEnumerable<EnumDescription> XPEffectivenessList { get; } = ToDescriptions<XPEffectiveness>();
     public static IEnumerable<EnumDescription> DripperEnemyOptionList { get; } = ToDescriptions<DripperEnemyOption>();
     public static IEnumerable<EnumDescription> EnemyLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>();
+    public static IEnumerable<EnumDescription> BossLifeOptionList { get; } = ToDescriptions<EnemyLifeOption>(i => i != EnemyLifeOption.WIDE);
     public static IEnumerable<EnumDescription> FireOptionList { get; } = ToDescriptions<FireOption>();
     public static IEnumerable<EnumDescription> BossRoomMinDistanceOptions { get; } = ToDescriptions<BossRoomMinDistance>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();

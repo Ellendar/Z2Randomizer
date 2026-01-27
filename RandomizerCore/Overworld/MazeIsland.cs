@@ -638,7 +638,12 @@ sealed class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) || GetLocationByCoords((y + 30, x + 1)) != null || GetLocationByCoords((y + 30, x - 1)) != null || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD 
+                            || !((map[y, x + 1] == Terrain.MOUNTAIN && map[y, x - 1] == Terrain.MOUNTAIN) 
+                            || (map[y + 1, x] == Terrain.MOUNTAIN && map[y - 1, x] == Terrain.MOUNTAIN)) 
+                            || GetLocationByCoords((y + 30, x + 1)) != null 
+                            || GetLocationByCoords((y + 30, x - 1)) != null 
+                            || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
                         }
                         else
                         {
@@ -646,7 +651,12 @@ sealed class MazeIsland : World
                             {
                                 x = RNG.Next(19) + 2;
                                 y = RNG.Next(MAP_ROWS - 4) + 2;
-                            } while (map[y, x] != Terrain.ROAD || GetLocationByCoords((y + 30, x + 1)) != null || GetLocationByCoords((y + 30, x - 1)) != null || GetLocationByCoords((y + 31, x)) != null || GetLocationByCoords((y + 29, x)) != null || GetLocationByCoords((y + 30, x)) != null);
+                            } while (map[y, x] != Terrain.ROAD 
+                                || GetLocationByCoords((y + 30, x + 1)) != null 
+                                || GetLocationByCoords((y + 30, x - 1)) != null 
+                                || GetLocationByCoords((y + 31, x)) != null 
+                                || GetLocationByCoords((y + 29, x)) != null 
+                                || GetLocationByCoords((y + 30, x)) != null);
                         }
 
                         location.Xpos = x;

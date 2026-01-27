@@ -127,7 +127,7 @@ public class RandomizerProperties
     public bool RevealWalkthroughWalls { get; set; }
 
     //Enemies
-    public bool ShuffleEnemyHP { get; set; }
+    public EnemyLifeOption ShuffleEnemyHP { get; set; }
     public EnemyLifeOption ShuffleBossHP { get; set; }
     public bool ShuffleEnemyStealExp { get; set; }
     public bool ShuffleStealExpAmt { get; set; }

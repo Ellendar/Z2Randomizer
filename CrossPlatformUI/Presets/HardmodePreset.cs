@@ -94,7 +94,7 @@ public static class HardmodePreset
         MixLargeAndSmallEnemies = true,
         GeneratorsAlwaysMatch = true,
 
-        ShuffleEnemyHP = true,
+        ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.VANILLA,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,

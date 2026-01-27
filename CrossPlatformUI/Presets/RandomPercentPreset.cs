@@ -94,7 +94,7 @@ public static class RandomPercentPreset
         MixLargeAndSmallEnemies = null,
         GeneratorsAlwaysMatch = false,
 
-        ShuffleEnemyHP = true,
+        ShuffleEnemyHP = EnemyLifeOption.MEDIUM,
         ShuffleBossHP = EnemyLifeOption.MEDIUM,
         ShuffleXPStealers = true,
         ShuffleXPStolenAmount = true,

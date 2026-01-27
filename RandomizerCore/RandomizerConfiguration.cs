@@ -361,7 +361,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool? mixLargeAndSmallEnemies;
 
     [Reactive]
-    private bool shuffleEnemyHP;
+    private EnemyLifeOption shuffleEnemyHP;
 
     [Reactive]
     private EnemyLifeOption shuffleBossHP;

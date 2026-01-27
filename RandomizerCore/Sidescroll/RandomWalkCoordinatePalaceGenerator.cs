@@ -12,7 +12,7 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public class RandomWalkCoordinatePalaceGenerator() : CoordinatePalaceGenerator()
 {
     public static int debug = 0;
-    private const float DROP_CHANCE = .15f;
+    private const float DROP_CHANCE = .08f;
     internal override async Task<Palace> GeneratePalace(RandomizerProperties props, RoomPool rooms, Random r, int roomCount, int palaceNumber)
     {
         debug++;
