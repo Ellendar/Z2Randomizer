@@ -31,6 +31,9 @@ public class RomFileViewModel : ViewModelBase, IRoutableViewModel
     [JsonIgnore]
     public bool HasRomData => !RomData.IsNullOrEmpty();
 
+    [JsonIgnore]
+    public IObservable<bool> HasRomDataObservable => this.WhenAnyValue(x => x.HasRomData);
+
     [JsonConstructor]
 #pragma warning disable CS8618
     public RomFileViewModel() {}
