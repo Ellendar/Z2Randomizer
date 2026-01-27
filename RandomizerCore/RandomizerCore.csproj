@@ -49,7 +49,7 @@
 <!--    <ProjectReference Include="..\..\js65\integrations\dotnet\js65\js65.csproj" />-->
     <PackageReference Include="js65.interop" Version="$(Js65Version)" />
     <PackageReference Include="SD.Tools.Algorithmia" Version="1.4.0" />
-    <PackageReference Include="NLog" Version="6.0.6" />
+    <PackageReference Include="NLog" Version="6.0.7" />
     <ProjectReference Include="..\CoreSourceGenerator\CoreSourceGenerator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\FtRandoLib\FtRandoLib.csproj" NoWarn="IL2026;IL2091" />
     <TrimmerRootAssembly Include="FtRandoLib" />

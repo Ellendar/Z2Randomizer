@@ -117,8 +117,7 @@ public class FlagsTests
     public void TestBlankEncodeCycle()
     {
         RandomizerConfiguration config = new();
-        string flags = config.Flags;
-        RandomizerConfiguration config2 = new(flags);
+        RandomizerConfiguration config2 = new(config.SerializeFlags());
         var failures = new List<string>();
         foreach(PropertyInfo property in typeof(RandomizerConfiguration).GetProperties())
         {
@@ -139,15 +138,15 @@ public class FlagsTests
     public void TestStandardFlagsEncodeCycle()
     {
         RandomizerConfiguration config = StandardPreset.Preset;
-        RandomizerConfiguration config2 = new RandomizerConfiguration(StandardPreset.Preset.Flags);
-        Assert.AreEqual(config.Flags, config2.Flags);
+        RandomizerConfiguration config2 = new RandomizerConfiguration(StandardPreset.Preset.SerializeFlags());
+        Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
     }
 
     [TestMethod]
     public void TestMaxRandoEncodeCycle()
     {
         RandomizerConfiguration config = MaxRandoPreset.Preset;
-        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRandoPreset.Preset.Flags);
-        Assert.AreEqual(config.Flags, config2.Flags);
+        RandomizerConfiguration config2 = new RandomizerConfiguration(MaxRandoPreset.Preset.SerializeFlags());
+        Assert.AreEqual(config.SerializeFlags(), config2.SerializeFlags());
     }
 }

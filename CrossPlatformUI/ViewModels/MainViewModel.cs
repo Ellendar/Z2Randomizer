@@ -1,9 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text.Json.Serialization;
-using System.Diagnostics.CodeAnalysis;
-using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 using ReactiveUI.Validation.Helpers;
 using Z2Randomizer.RandomizerCore;
@@ -15,6 +16,11 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
 {
     public string? OutputFilePath { get; set; }
     private RandomizerConfiguration config = new();
+    /// Useful inexpensive shared observable for views to attach onto
+    /// for chaining change detection logic
+    public IObservable<Unit> FlagsChanged { get; }
+
+    public IObservable<String> FlagsObservable { get; }
 
     [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
     public RandomizerConfiguration Config { get => config; set => this.RaiseAndSetIfChanged(ref config, value); }
@@ -34,6 +40,20 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
 
     public MainViewModel()
     {
+        FlagsChanged = Observable.FromEventPattern<PropertyChangedEventHandler, PropertyChangedEventArgs>(
+            h => Config.PropertyChanged += h,
+            h => Config.PropertyChanged -= h)
+            .Where(e => e.EventArgs.PropertyName == "Flags")
+            .Select(_ => Unit.Default)
+            .Replay(1)
+            .RefCount();
+
+        FlagsObservable = FlagsChanged
+            .Select(_ => this.Config.SerializeFlags())
+            .DistinctUntilChanged()
+            .Replay(1)
+            .RefCount();
+
         RomFileViewModel = new(this);
         GenerateRomViewModel = new(this);
         SaveNewPresetViewModel = new(this);
@@ -43,20 +63,16 @@ public class MainViewModel : ReactiveValidationObject, IScreen, IActivatableView
         GenerateRom = ReactiveCommand.CreateFromObservable(
             () => Router.Navigate.Execute()
         );
-        
-        this.WhenActivated(ShowRomFileViewIfNoRom);
-        return;
-        void ShowRomFileViewIfNoRom(CompositeDisposable disposables)
+
+        this.WhenActivated((CompositeDisposable disposables) =>
         {
             if (!RomFileViewModel.HasRomData)
             {
                 Router.Navigate.Execute(RomFileViewModel);
             }
-            Disposable.Create(() => { })
-                .DisposeWith(disposables);
-        }
+        });
     }
-    
+
     // Window/Desktop specific data
     
     private const int DefaultWidth = 900;

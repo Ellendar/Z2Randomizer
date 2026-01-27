@@ -13,8 +13,6 @@ namespace CrossPlatformUI.Desktop;
 [RequiresUnreferencedCode("Newtonsoft.Json uses reflection")]
 public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionDriver
 {
-    // TODO put this in appdata
-    public const string SettingsFilename = "Settings.json";
     public string? SettingsPath;
 
     public LocalFilePersistenceService()
@@ -36,7 +34,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
     
     public object? LoadState()
     {
-        var data = File.ReadAllText(SettingsFilename);
+        var data = File.ReadAllText(App.SETTINGS_FILENAME);
         return JsonConvert.DeserializeObject<object>(data, serializerSettings);
     }
 
@@ -46,7 +44,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         var next = JObject.Parse(json);
         try
         {
-            var settings = File.ReadAllText(SettingsFilename);
+            var settings = File.ReadAllText(App.SETTINGS_FILENAME);
             var orig = JObject.Parse(settings);
             orig.Merge(next, new JsonMergeSettings
             {
@@ -57,7 +55,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
         }
         catch (Exception e) when (e is JsonException or IOException) { }
 
-        using var file = File.CreateText(SettingsFilename);
+        using var file = File.CreateText(App.SETTINGS_FILENAME);
         using var writer = new JsonTextWriter(file);
         next.WriteTo(writer);
     }
@@ -66,7 +64,7 @@ public class LocalFilePersistenceService : ISuspendSyncService // : ISuspensionD
     {
         try
         {
-            File.Delete(SettingsFilename);
+            File.Delete(App.SETTINGS_FILENAME);
         } catch (IOException) {}
     }
     

@@ -105,7 +105,7 @@ public class Program
 
         if (Flags == null)
         {
-            Flags = configuration.Flags;
+            Flags = configuration.SerializeFlags();
         }
         logger.Info($"Flags: {Flags}");
         logger.Info($"Rom: {Rom}");

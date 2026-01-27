@@ -46,9 +46,10 @@ public class GenerateRomViewModel : ReactiveValidationObject, IRoutableViewModel
             var config = host.Config;
             var version = Assembly.GetEntryAssembly()!.GetName().Version!;
             var versionstr = $"{version.Major}.{version.Minor}.{version.Build}";
+            var flags = config.SerializeFlags();
             await clipboard.SetTextAsync($"""
 Version: {versionstr}
-Flags: {config.Flags}
+Flags: {flags}
 Seed: {config.Seed}
 ```
 {lastError}
@@ -94,19 +95,14 @@ Seed: {config.Seed}
                     var output = await Task.Run(async () => await randomizer.Randomize(romdata, config, UpdateProgress, tokenSource.Token));
                     if(!tokenSource.IsCancellationRequested && output.success)
                     {
-                        var basename = $"Z2_{config.Seed}_{config.Flags}";
-                        var filename = basename + ".nes";
-                        var debugfile = basename + ".mlb";
-                        await files.SaveGeneratedBinaryFile(filename, output.romdata, Main.OutputFilePath);
-                        if (!string.IsNullOrEmpty(output.debuginfo))
-                        {
-                            await files.SaveSpoilerFile(debugfile, output.debuginfo, Main.OutputFilePath);
-                        }
+                        var flags = config.SerializeFlags();
+                        var filename = $"Z2_{config.Seed}_{flags}.nes";
+                        await files.SaveGeneratedBinaryFile(filename, output!, Main.OutputFilePath);
                         if (config.GenerateSpoiler)
                         {
-                            var spoilerFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.txt";
+                            var spoilerFilename = $"Z2_{config.Seed}_{flags}_spoiler.txt";
                             await files.SaveSpoilerFile(spoilerFilename, randomizer.GenerateSpoiler(), Main.OutputFilePath);
-                            var spoilerMapFilename = $"Z2_{config.Seed}_{config.Flags}_spoiler.png";
+                            var spoilerMapFilename = $"Z2_{config.Seed}_{flags}_spoiler.png";
                             await files.SaveGeneratedBinaryFile(spoilerMapFilename, new Spoiler(randomizer.ROMData).CreateSpoilerImage(randomizer.worlds), Main.OutputFilePath);
                         }
                         ProgressHeading = "Generation Complete";

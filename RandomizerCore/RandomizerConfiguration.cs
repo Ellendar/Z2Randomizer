@@ -364,6 +364,9 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool shuffleEnemyHP;
 
     [Reactive]
+    private EnemyLifeOption shuffleBossHP;
+
+    [Reactive]
     private bool shuffleXPStealers;
 
     [Reactive]
@@ -610,12 +613,13 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private string? seed;
     // public string Seed { get => seed ?? ""; set => SetField(ref seed, value); }
 
-    [IgnoreInFlags]
-    [JsonIgnore]
-    public string Flags
+    public void DeserializeFlags(string flags)
     {
-        get => Serialize();
-        set => Deserialize(value?.Trim() ?? "");
+        Deserialize(flags?.Trim() ?? "");
+    }
+    public String SerializeFlags()
+    {
+        return Serialize();
     }
 
     public RandomizerConfiguration()
@@ -750,7 +754,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     {
         RandomizerProperties properties = new()
         {
-            Flags = Flags,
+            Flags = SerializeFlags(),
 
             WestIsHorizontal = r.Next(2) == 1,
             EastIsHorizontal = r.Next(2) == 1,
@@ -1200,6 +1204,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         //Enemies
         properties.ShuffleEnemyHP = shuffleEnemyHP;
+        properties.ShuffleBossHP = shuffleBossHP;
         properties.ShuffleEnemyStealExp = shuffleXPStealers;
         properties.ShuffleStealExpAmt = shuffleXPStolenAmount;
         properties.ShuffleSwordImmunity = shuffleSwordImmunity;
