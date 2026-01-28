@@ -9,6 +9,8 @@ namespace Z2Randomizer.RandomizerCore.Sidescroll;
 public abstract class CoordinatePalaceGenerator() : PalaceGenerator
 {
     private static readonly RoomExitType[] PRIORITY_ROOM_SHAPES = [RoomExitType.DROP_STUB, RoomExitType.DROP_T];
+    private const int PRIORITY_ROOM_SHAPE_WEIGHT = 6;
+
     protected static readonly Logger logger = LogManager.GetCurrentClassLogger();
     protected static bool AddSpecialRoomsByReplacement(Palace palace, RoomPool roomPool, Random r, RandomizerProperties props)
     {
@@ -313,10 +315,12 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
 
     public static List<RoomExitType> ShuffleItemRoomShapes(List<RoomExitType> possibleItemRoomExitTypes, Random r)
     {
-        List<RoomExitType> priorityShapes = [.. possibleItemRoomExitTypes.Where(i => PRIORITY_ROOM_SHAPES.Contains(i))];
-        List<RoomExitType> nonPriorityShapes = [.. possibleItemRoomExitTypes.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i))];
-        priorityShapes.FisherYatesShuffle(r);
-        nonPriorityShapes.FisherYatesShuffle(r);
-        return [.. priorityShapes, .. nonPriorityShapes];
+        List<(RoomExitType, int)> weights = [];
+        var priorityRooms = possibleItemRoomExitTypes.Where(i => PRIORITY_ROOM_SHAPES.Contains(i)).Select(shape => (shape, PRIORITY_ROOM_SHAPE_WEIGHT)).ToList();
+        var nonPriorityRooms = possibleItemRoomExitTypes.Where(i => !PRIORITY_ROOM_SHAPES.Contains(i)).Select(shape => (shape, 1)).ToList();
+        weights.AddRange(priorityRooms);
+        weights.AddRange(nonPriorityRooms);
+        var sampler = new WeightedShuffler<RoomExitType>(weights);
+        return sampler.Shuffle(r).ToList();
     }
 }
