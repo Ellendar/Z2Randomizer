@@ -239,9 +239,15 @@ public abstract class World
         }
     }
 
+    protected Location? GetLocationByPos(IntVector2 pos)
+    {
+        return AllLocations.FirstOrDefault(i => i.Pos == pos);
+    }
+
     protected Location? GetLocationByCoordsNoOffset((int, int) coords)
     {
-        return AllLocations.FirstOrDefault(i => i.CoordsNoOffset.Equals(coords));
+        IntVector2 pos = new(coords.Item2, coords.Item1); // y,x -> x,y
+        return AllLocations.FirstOrDefault(i => i.Pos == pos);
     }
 
     protected Location? GetLocationByCoordsY30Offset((int, int)coords)
@@ -366,7 +372,7 @@ public abstract class World
                 foreach (Location linkedLocation in AllLocations.Where(
                     loc => !loc.AppearsOnMap && loc.ActualTown?.GetMasterTown() == location.ActualTown))
                 {
-                    linkedLocation.CoordsNoOffset = location.CoordsNoOffset;
+                    linkedLocation.Pos = location.Pos;
                 }
             }
         }
