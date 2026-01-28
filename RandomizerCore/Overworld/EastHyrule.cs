@@ -371,7 +371,7 @@ public sealed class EastHyrule : World
                 foreach (Location location in AllLocations)
                 {
                     // section uses tuples with the Y+30 offset
-                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByCoordsY30Offset(location.CoordsY30Offset)!);
+                    areasByLocation[section[location.CoordsY30Offset]].Add(GetLocationByPos(location.Pos)!);
                 }
 
                 ChooseConn("kasuto", connections, true);

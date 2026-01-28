@@ -21,7 +21,7 @@ public class Location
     public List<Location> Children { get; set; } = [];
 
     public int MemAddress { get; set; }
-	
+
     //This is really stupidly implemented. It _should_ be a boolean, which then gets written to the appropriate bit on the
     //encounter data when it's written to the ROM. Instead, this has the value 0 if the area is not a passthrough
     //and 64 if the area is a passthrough. This shouldn't be too hard to refactor, but I am lazy right now.
@@ -31,30 +31,34 @@ public class Location
 
     public int Map { get; set; }
 
-    private (int y, int x) _coords;
+    private IntVector2 pos = IntVector2.ZERO;
+
+    /// int vector position starting at Y=0 for the top row
+    public IntVector2 Pos
+    {
+        get => pos;
+        set { pos = value; }
+    }
+
     /// Y position starting at Y=0 for the top row
     public int Y
     {
-        get => _coords.y;
-        set { _coords.y = value; }
+        get => pos.Y;
+        set { Pos = new(pos.X, value); }
     }
     /// Y position starting at Y=30 for the top row
     public int YRaw
     {
-        get => _coords.y + 30;
-        set { _coords.y = value - 30; }
+        get => Y + 30;
+        set { Y = value - 30; }
     }
+
     public int Xpos
     {
-        get => _coords.x;
-        set { _coords.x = value; }
+        get => pos.X;
+        set { Pos = new(value, pos.Y); }
     }
-    /// X,Y position with Y starting at 0 for the top row
-    public (int, int) CoordsNoOffset
-    {
-        get => _coords;
-        set => _coords = value;
-    }
+
     /// X,Y position with Y starting at 30 for the top row
     public (int, int) CoordsY30Offset
     {
