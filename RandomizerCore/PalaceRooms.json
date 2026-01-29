@@ -15544,7 +15544,7 @@
     "connections": "93FCFCAC",
     "elevatorScreen": -1,
     "enabled": true,
-    "enemies": "0D4D835783349E6D1923042652",
+    "enemies": "0B449E67836D1913041652",
     "group": "V5_0",
     "hasBoss": false,
     "hasDrop": false,
@@ -15560,11 +15560,9 @@
     "name": "island adventure collapsed hall",
     "palaceGroup": null,
     "palaceNumber": null,
-    "requirements": [
-      "GLOVE"
-    ],
+    "requirements": ["GLOVE"],
     "suppressWarning": ["EnemyTooCloseToEntrance"],
-    "sideviewData": "36600E0803D5D1F073C2A020F115906576C2A0206875D20E4073A831929D611A701A511880306136709173948531A331A3306277D6F0"
+    "sideviewData": "34600D08A02903D4D1F074C2F117906778C2A02ED50D00D4AA2F923BD10B50218132623470307292D20D81309430A12F0AD4D1F0"
   },
   {
     "author": "miralupa",
