@@ -217,6 +217,14 @@ public class RoomPool
         {
             FilterRooms(room => room.Tags == null || !room.Tags.Contains("LongDeadEnd"));
         }
+        if (!props.IncludeEasyRooms)
+        {
+            FilterRooms(room => room.Tags == null || !room.Tags.Contains("Easy"));
+        }
+        if (!props.IncludeExpertRooms)
+        {
+            FilterRooms(room => room.Tags == null || !room.Tags.Contains("Expert"));
+        }
     }
 
     /// Remove rooms from the pool that does not satisfy `predicate`

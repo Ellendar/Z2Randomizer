@@ -121,6 +121,8 @@ public class RandomizerProperties
     public bool BlockersAnywhere { get; set; }
     public bool IncludeDropRooms { get; set; }
     public bool IncludeLongDeadEnds { get; set; }
+    public bool IncludeEasyRooms { get; set; }
+    public bool IncludeExpertRooms { get; set; }
     [NotMapped]
     public bool[] BossRoomsExitToPalace { get; set; } = new bool[7];
     public bool NoDuplicateRooms { get; set; }
