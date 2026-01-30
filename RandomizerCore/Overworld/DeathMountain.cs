@@ -730,14 +730,16 @@ sealed class DeathMountain : World
                       || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
 
                 List<Location> l2 = connectionsDM[location];
+                var location2 = l2[0];
                 location.CanShuffle = false;
                 location.Xpos = x;
                 location.Y = y;
-                l2[0].CanShuffle = false;
-                l2[0].Xpos = otherx;
-                l2[0].Y = othery;
+                location2.CanShuffle = false;
+                location2.Xpos = otherx;
+                location2.Y = othery;
                 PlaceCave(x, y, direction, s);
                 PlaceCave(otherx, othery, direction.Reverse(), s);
+                AlignCavePositionsLeftToRight(direction, location, location2);
             }
             else //4-way caves
             {
@@ -782,14 +784,19 @@ sealed class DeathMountain : World
                       || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
 
                 List<Location> caveExits = connectionsDM[location];
+                var location2 = caveExits[0];
+                var location3 = caveExits[1];
+                var location4 = caveExits[2];
                 location.CanShuffle = false;
                 location.Xpos = x;
                 location.Y = y;
-                caveExits[0].CanShuffle = false;
-                caveExits[0].Xpos = otherx;
-                caveExits[0].Y = othery;
+                location2.CanShuffle = false;
+                location2.Xpos = otherx;
+                location2.Y = othery;
                 PlaceCave(x, y, direction, s);
                 PlaceCave(otherx, othery, direction.Reverse(), s);
+                AlignCavePositionsLeftToRight(direction, location, location2);
+
                 int newx = 0;
                 int newy = 0;
                 tries = 0;
@@ -805,13 +812,13 @@ sealed class DeathMountain : World
                       && newy > 2 && newy < MAP_ROWS - 2
                       && !AllTerrainIn3x3Equals(newx, newy, Terrain.NONE));
 
-                caveExits[1].Xpos = newx;
-                caveExits[1].Y = newy;
-                caveExits[1].CanShuffle = false;
+                location3.CanShuffle = false;
+                location3.Xpos = newx;
+                location3.Y = newy;
                 PlaceCave(newx, newy, direction, s);
+
                 y = newy;
                 x = newx;
-
                 tries = 0;
                 do
                 {
@@ -851,11 +858,11 @@ sealed class DeathMountain : World
                       || othery <= 1 || othery >= MAP_ROWS - 1
                       || !AllTerrainIn3x3Equals(otherx, othery, Terrain.NONE));
 
-                location.CanShuffle = false;
-                caveExits[2].CanShuffle = false;
-                caveExits[2].Xpos = otherx;
-                caveExits[2].Y = othery;
+                location4.CanShuffle = false;
+                location4.Xpos = otherx;
+                location4.Y = othery;
                 PlaceCave(otherx, othery, direction.Reverse(), s);
+                AlignCavePositionsLeftToRight(direction, location3, location4);
             }
         }
         else
