@@ -611,6 +611,19 @@ public abstract class World
         return true;
     }
 
+    /// swaps the positions of two caves if the cave that is going East/South
+    /// in the Overworld is not the cave that enters the sideview from the left
+    protected static void AlignCavePositionsLeftToRight(Direction location1Direction, Location location1, Location location2)
+    {
+        bool overworldGoingRight = location1Direction == Direction.EAST || location1Direction == Direction.SOUTH;
+        bool sideviewGoingRight = location1.MapPage < location2.MapPage;
+        if (overworldGoingRight != sideviewGoingRight)
+        {
+            // should swap the entrances so left-to-right aligns
+            (location1.Pos, location2.Pos) = (location2.Pos, location1.Pos);
+        }
+    }
+
     public void PlaceHiddenLocations(LessImportantLocationsOption lessImportantLocationsOption)
     {
         switch (lessImportantLocationsOption)
