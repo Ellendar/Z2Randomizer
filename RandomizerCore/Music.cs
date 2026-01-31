@@ -238,7 +238,9 @@ internal class MusicRandomizer
 
     void WriteLogLine(string? line)
     {
-        Trace.WriteLine(line);
+#if DEBUG
+        Console.WriteLine(line);
+#endif
         _spoilerSb.AppendLine(line);
     }
 

@@ -1,7 +1,7 @@
 ﻿{
   "DisableMusic": false,
-  "RandomizeMusic": false,
-  "MixCustomAndOriginalMusic":  true,
+  "RandomizeMusic": true,
+  "MixCustomAndOriginalMusic":  false,
   "IncludeDiverseMusic": false,
   "DisableUnsafeMusic":  true,
   "FastSpellCasting": true,
@@ -16,5 +16,5 @@
   "ShieldTunicColor": "Default",
   "BeamSprite": "Default",
   "BeepThreshold": "Normal",
-  "BeepFrequency": "Normal"
+  "BeepFrequency": "Off"
 }
