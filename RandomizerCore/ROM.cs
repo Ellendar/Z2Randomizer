@@ -924,7 +924,7 @@ NameNotEmpty:
     nop
 LoadNewLevelCapReturn:        ; $9F7F
 
-.org $A89E
+.reloc
 LoadNewLevelCap:
     lda $0777,X               ; the instruction we overwrote with jmp
     cmp LevelCaps,X

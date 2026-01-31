@@ -14,14 +14,14 @@ FREE "PRG0" [$92BF, $962D)
 ; .org (($10ea - $10) .mod $4000) + $8000
 ; .byte $17
 
-
 .segment "PRG0", "PRG7"
+SpellCastingRoutine = $8DC3 ; Link Main
 .org $D3EC ; patches the main sideview routine right before checking marios code
   jsr SwapMarioCHRBanks
 .reloc
 SwapMarioCHRBanks:
   jsr BankSwitchMarioCHR
-  jmp $8DC3
+  jmp SpellCastingRoutine
 
 .reloc
 BankSwitchMarioCHR:
@@ -37,6 +37,8 @@ BankSwitchMarioCHR:
     sta SpChrBank0Reg + 0
     lda CurrentCHRBank ; we need to write a BG bank register due to MMC5 jank
     sta BgChrBank0Reg
+    lda #0
+    sta ReloadCHRBank
   +
   rts
 
@@ -68,6 +70,18 @@ PatchLinkLivesScreenDraw:
   jsr BankSwitchMarioCHR
   jmp $EC02
 
+; Jump to our own metasprite setting routine
+.org $919e
+  jsr SetHurtMetasprite ; Just jumped into lava bro
+.reloc
+SetHurtMetasprite:
+.import METASPRITE_SMALL_MARIO_DEATH
+  lda #METASPRITE_SMALL_MARIO_DEATH
+  sta ObjectMetasprite
+  lda #$0b ; player death subroutine
+  sta GameEngineSubroutine
+  rts
+
 ; patch death screen to bank the metasprites properly
 .org $c9f1
   jsr PatchLinkDeathSprite
@@ -75,7 +89,12 @@ PatchLinkLivesScreenDraw:
 
 .reloc
 PatchLinkDeathSprite:
+  lda #METASPRITE_SMALL_MARIO_DEATH
+  sta ObjectMetasprite
+  lda #$0b ; player death subroutine
+  sta GameEngineSubroutine
   jsr PlayerGfxHandler
+  inc ReloadCHRBank
   jmp BankSwitchMarioCHR
 
 
@@ -91,27 +110,24 @@ PatchLinkDrawRoutine:
     lda $29,x
     rts
 +
-  ; for now assume its always PRG0 (it seems to be at least in my limited testing)
-  ; jsr SwapToPRG0
 
   ; put the player in slot 4 always
   lda #4
   sta CurrentOAMOffset
   
-  ; draw the player first so it doesn't ever flicker
-  ; first clear out the sprites that are reserved for the player
-  ; lda #$f8
-  ; sta Sprite_Y_Position + 4
-  ; sta Sprite_Y_Position + 8
-  ; sta Sprite_Y_Position + 12
-  ; sta Sprite_Y_Position + 16
-  ; sta Sprite_Y_Position + FireballOffset * 4
-  ; sta Sprite_Y_Position + (FireballOffset+1) * 4
-  
   ldx ObjectMetasprite
   beq @skipplayer
     ldy #0
     jsr DrawMetasprite
+    ; Update the player bank if the metasprite has changed
+.import PlayerBankTable
+    ldy ObjectMetasprite
+    lda PlayerBankTable,y
+    cmp PlayerChrBank
+    beq +
+      sta PlayerChrBank
+      inc ReloadCHRBank
+    +
 @skipplayer:
 
   ; While we are here, lets draw the fireball/hammer sprites too
@@ -126,13 +142,65 @@ PatchLinkDrawRoutine:
     ldy R2
     cpy #ProjectileOffset+2 ; Draw two fireballs and one hammer
     bne @fireballLoop
-
-  ; jsr SwapToSavedPRG
-  ; double return
+  ; double return to skip the OG drawing code
   pla
   pla
   rts
 
+.org $88AF
+  jmp OverworldLateInit
+.reloc
+OverworldLateInit:
+  sta $0736 ; Sets game mode
+  jmp UpdatePlayerPalette
+
+.org $8D61
+  ; patches over an unused write for $0727 in sideview init
+  jsr UpdatePlayerPalette
+.segment "PRG7"
+.reloc
+UpdatePlayerPalette:
+  inc ReloadCHRBank ; Just reload the CHR bank to be safe here
+  ; Check fire state and update the palette if we are fire still
+  ldx #0
+  lda #7
+  sta R7
+  lda $76f
+  and #$10
+  beq +
+    ldx #7
+  +
+  ; we are still firey so write a palette update for next NMI
+  ldy $301
+  -
+    lda PlayerRegularPalettePPUCommand,x
+    sta $302,y
+    iny
+    inx
+    dec R7
+    bne -
+  tya
+  clc
+  adc #7
+  sta $301
+  rts
+PlayerRegularPalettePPUCommand:
+  .byte $3f, $11, $03, $16, $27, $18, $ff
+PlayerFirePalettePPUCommand:
+  .byte $3f, $11, $03, $37, $27, $16, $ff
+
+.segment "PRG0", "PRG7"
+; Don't clear fire state when transitioning to side views
+.org $8cf4
+  jsr DontClearMagicState
+.reloc
+; prevent fire from going away in screen transitions but clear everything else
+DontClearMagicState:
+  lda $76f
+  and #$10
+  sta $76f
+  tya
+  rts
 
 ; patch end of link's loading routine
 .org $90DB ; sta $69DE
@@ -153,13 +221,54 @@ SetupMarioControl:
 .org $9041
   .word (GameRoutines)
 
-; .reloc
-; NewLinkMarioProcess:
-  ; TODO: Process all the other stuff to decide what parts of mario update to run
-  ; jsr GameRoutines
-  ; rts
-; .org $9041
-;   .word (GameRoutines)
+
+.segment "PRG7"
+; Has to be in fixed bank
+.org $e337
+  jsr LinkTookDamage
+.reloc
+LinkTookDamage:
+  sta $774
+  php ; Keep carry since it uses that to detect if link has died later
+    jsr CheckIfTurningSmall
+  plp
+  rts
+.reloc
+CheckIfTurningSmall:
+  ; Check player size, if HP is less than 2 bars we are small mario
+  lda $0774
+  cmp #65
+  bcs +
+    lda GameEngineSubroutine
+    cmp #8  ; if player state is already something else don't try to change
+    bne +
+      lda PlayerSize ; if player is already small don't make small
+      bne +
+        ; If we are fire mario, we lost the fire power, so reset our palette
+        lda $76f
+        and #~$10
+        sta $76f
+        jsr UpdatePlayerPalette
+
+        ; Set player routine to ChangeSize
+        lda #$0a
+        sta GameEngineSubroutine
+        lda #8
+        sta InjuryTimer
+        lda #1
+  ;      sta PlayerChangeSizeFlag
+        sta ScrollLock
+        sta Player_State
+        lda #0
+        sta ScrollAmount
+  ;      sta PlayerSize
+        lda #$ff
+        sta TimerControl          ;set master timer control flag to halt timers
+        lda #Sfx_PipeDown_Injury
+        sta Square1SoundQueue       ;load bump sound
+  +
+  rts
+.segment "PRG0", "PRG7"
 
 .org $D4F3 ; patch the call to links main routine to set
   jsr PatchLinkMain
@@ -343,7 +452,9 @@ UpdateCollisionFromMap:
 .reloc
 SlightlyModifiedCollisionRoutine:
   jsr SwapToSavedPRG
-  jsr $E095 ; skip ahead to near the end of the collision check
+  ldx #0 ; Make sure that the player data is getting used for collision
+;  jsr $E095 ; skip ahead to near the end of the collision check
+  jsr $E079 ; skip ahead to near the end of the collision check
   jmp SwapToPRG0
 
 ; .org $E073
@@ -524,6 +635,21 @@ ElevatorMakeMarioStateStanding:
 ;   jsr CheckForDownstab
 ;   bcc $ED1B
 ;   nop
+
+; Disable vanilla recoil when jumping off enemies
+.org $e747
+;  jsr DisableRecoilIfDownstab
+  jmp *+3 ; skip setting recoil for stabs
+
+SetLinkRecoil = $e371
+
+.reloc
+;DisableRecoilIfDownstab:
+;  jsr CheckForDownstab
+;  bcs +
+;    jmp SetLinkRecoil
+;  +
+;  rts
 
 ; Make mario bounce off armored enemies
 .org $E65E

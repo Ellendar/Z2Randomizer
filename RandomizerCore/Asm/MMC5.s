@@ -521,7 +521,10 @@ SwapCHR:
     ; 1kb sprite banks are 20-27 and the 1kb bg banks are 28-2b
     asl
     asl
+.ifndef ENABLE_Z2_MARIO
+    ; do NOT change the first sprite bank since thats controlling the mario graphics
     sta SpChrBank0Reg
+.endif
     adc #1
     sta SpChrBank1Reg
     adc #1

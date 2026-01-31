@@ -145,51 +145,6 @@ NoiseSoundQueue = $f0
 Square2SoundQueue = $f1
 Square1SoundQueue = $f2
 
-;; Collectable items
-; Hardcoded list of item ids for the new global item table.
-; These should match the constants from the Collectables Enum
-ITEM_CANDLE = $00
-ITEM_GLOVE = $01
-ITEM_RAFT = $02
-ITEM_BOOTS = $03
-ITEM_FLUTE = $04
-ITEM_CROSS = $05
-ITEM_HAMMER = $06
-ITEM_MAGIC_KEY = $07
-
-ITEM_KEY = $08
-ITEM_DO_NOT_USE = $09
-
-ITEM_SMALL_PBAG = $0a
-ITEM_MEDIUM_PBAG = $0b
-ITEM_LARGE_PBAG = $0c
-ITEM_XL_PBAG = $0d
-ITEM_MAGIC_CONTAINER = $0e
-ITEM_HEART_CONTAINER = $0f
-ITEM_BLUE_MAGIC_JAR = $10
-ITEM_RED_MAGIC_JAR = $11
-ITEM_1UP = $12
-ITEM_CHILD = $13
-ITEM_TROPHY = $14
-ITEM_MEDICINE = $15
-ITEM_DO_NOT_USE_ANTIFAIRY = $16
-
-ITEM_UPSTAB = $17
-ITEM_DOWNSTAB = $18
-ITEM_BAGU = $19
-ITEM_MIRROR = $1a
-ITEM_WATER = $1b
-
-ITEM_SHIELD_SPELL = $1c
-ITEM_JUMP_SPELL = $1d
-ITEM_LIFE_SPELL = $1e
-ITEM_FAIRY_SPELL = $1f
-ITEM_FIRE_SPELL = $20
-ITEM_REFLECT_SPELL = $21
-ITEM_SPELL_SPELL = $22
-ITEM_THUNDER_SPELL = $23
-ITEM_DASH_SPELL = $24
-
 
 ;; NEW VARIABLE ALLOCATIONS
 ; Stack RAM
@@ -246,7 +201,7 @@ RESV DeathMusicLoaded
 RESV EventMusicQueue
 RESV EventMusicBuffer ; TODO use the vanilla music queues
 RESV WarpZoneControl
-; RESV Player_CollisionBits
+RESV Player_CollisionBits ; Split Z2 and SMB1 collision bits
 RESV HalfwayPage
 RESV SwimmingFlag
 RESV CurrentOAMOffset
@@ -323,7 +278,7 @@ SprObject_Y_Position = Player_Y_Position
 Player_Y_HighPos = $19
 SprObject_Y_HighPos = Player_Y_HighPos
 
-Player_CollisionBits = $A7
+;Player_CollisionBits = $A7
 ScrollAmount = $14
 ObjectMetasprite = $80
 
@@ -383,8 +338,8 @@ Sprite_Data = Sprite_Y_Position
 
 CHR_BIGMARIO = $6a
 CHR_MARIOACTION = $6b
-CHR_SMALLFIRE = $6c
-CHR_SMALLMARIO = $6d
+CHR_SMALLMARIO = $6c
+CHR_SMALLFIRE = $6d
 
 A_Button              = %10000000
 B_Button              = %01000000
@@ -445,16 +400,18 @@ StatTrackingSaveFileClear = $7401
 
 .export NmiBankShadow8, NmiBankShadowA
 ; Reserve these in SRAM to prevent issues when clearing ram
-NmiBankShadow8 = $6380
-NmiBankShadowA = $6381
-SoftDisableNmi = $6382
+NmiBankShadow8 = $6340
+NmiBankShadowA = $6341
+SoftDisableNmi = $6342
 
 ; Flag to store if the dialog has ended
 DialogCompleteTmp = $0523
 
-COLLISION_TILES = $6390
+COLLISION_TILES = $6350
 
-StatTrackingBase = COLLISION_TILES + $d0 * 4
+;StatTrackingBase = COLLISION_TILES + $d0 * 4
+; Move stat tracking to after the save ram since Z2FT (custom music) uses this block
+StatTrackingBase = $773C
 SET_RES_BASE StatTrackingBase
 
 ;; The follow stats are NOT checkpointed because they persist between reloads
@@ -519,18 +476,21 @@ RESV TimestampTypeList, TS_COUNT
 RESV TimestampList, TS_COUNT * 3
 CHECKPOINT_LEN = RES_OFFSET - CHECKPOINT_START
 
+; NOTE: We can overlap this with the pause menu drawing code.
+; Reserve 256 bytes to store a sideview buffer.
+; This stores the command data for drawing a sideview, so its only needed temporarily
+; when loading a side view, which is why its safe to alias this with the pause menu drawing.
+SideViewBuffer = $7800
+
 ; Duplicate the timestamp memory here that we'll copy after saving
 RESV Checkpoint, CHECKPOINT_LEN
 STAT_TRACKING_SIZE = RES_OFFSET
 
-; Reserve 256 bytes to store a sideview buffer.
-; The sideview loading code is patched to quickly bank switch to the extended banks for palace data,
-; or load regular sideviews from the usual location
-RESV SideViewBuffer, $0100
-
 ClearSRAMStart = RES_OFFSET
+.assert RES_OFFSET + StatTrackingBase < $7800
 
 .ifdef ENABLE_Z2_MARIO
+SET_RES_BASE $6FB0
 ; There isn't a general purpose "attribute" mix so we can make our own
 RESV SprObject_SprAttrib, 16
 Player_SprAttrib = SprObject_SprAttrib
@@ -540,7 +500,6 @@ RESV Player_YMoveForceFractional, 16
 
 ClearSRAMEnd = RES_OFFSET
 
-.assert RES_OFFSET + StatTrackingBase < $6957
 
 ;;; Update a handful of refs to point to the given address.
 ;;; Usage:
@@ -582,5 +541,54 @@ UPDATE_BYTE target @ refs
 .define UPDATE_BYTE {target @ .eol}
 
 .endif ; ENABLE_Z2_MARIO
+
+
+;; Collectable items
+; Hardcoded list of item ids for the new global item table.
+; These should match the constants from the Collectables Enum
+ITEM_CANDLE = $00
+ITEM_GLOVE = $01
+ITEM_RAFT = $02
+ITEM_BOOTS = $03
+ITEM_FLUTE = $04
+ITEM_CROSS = $05
+ITEM_HAMMER = $06
+ITEM_MAGIC_KEY = $07
+
+ITEM_KEY = $08
+ITEM_DO_NOT_USE = $09
+
+ITEM_SMALL_PBAG = $0a
+ITEM_MEDIUM_PBAG = $0b
+ITEM_LARGE_PBAG = $0c
+ITEM_XL_PBAG = $0d
+ITEM_MAGIC_CONTAINER = $0e
+ITEM_HEART_CONTAINER = $0f
+ITEM_BLUE_MAGIC_JAR = $10
+ITEM_RED_MAGIC_JAR = $11
+ITEM_1UP = $12
+ITEM_CHILD = $13
+ITEM_TROPHY = $14
+ITEM_MEDICINE = $15
+ITEM_DO_NOT_USE_ANTIFAIRY = $16
+
+ITEM_UPSTAB = $17
+ITEM_DOWNSTAB = $18
+ITEM_BAGU = $19
+ITEM_MIRROR = $1a
+ITEM_WATER = $1b
+
+ITEM_SHIELD_SPELL = $1c
+ITEM_JUMP_SPELL = $1d
+ITEM_LIFE_SPELL = $1e
+ITEM_FAIRY_SPELL = $1f
+ITEM_FIRE_SPELL = $20
+ITEM_REFLECT_SPELL = $21
+ITEM_SPELL_SPELL = $22
+ITEM_THUNDER_SPELL = $23
+ITEM_DASH_SPELL = $24
+
+
+
 
 .endif

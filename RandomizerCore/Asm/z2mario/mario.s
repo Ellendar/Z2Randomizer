@@ -26,14 +26,21 @@
   sta $078b ;hammer
   sta $0788 ;boots
   sta $0787 ;raft
+  sta $077b ; shield spell
+  sta $077c ; jump spell
+  sta $077d ; life spell
+  sta $077e ; fairy spell
   sta $077f ; fire spell
+  sta $0780 ; reflect spell
+  sta $0781 ; spell spell
+  sta $0782 ; thunder spell
   lda #8
   sta $0783 ; magic jar count
   sta $0778 ; magic level
 
-   lda #$ff
-   sta $0773 ;infinite magic
-   sta $0774 ;infinite health
+;   lda #$ff
+;   sta $0773 ;infinite magic
+;   sta $0774 ;infinite health
 ;.endif
 
   lda GameEngineSubroutine  ;run routine based on number (a few of these routines are
@@ -175,6 +182,9 @@ SaveJoyp:
         sta Left_Right_Buttons      ;if pressing down while on the ground,
         sta Up_Down_Buttons         ;nullify directional bits
 SizeChk:
+  lda $a7   ; flip collision bits to match mario style
+  eor #$ff
+  sta $a7
   jsr PlayerMovementSubs      ;run movement subroutines
   ldy #$01                    ;is player small?
   lda PlayerSize
@@ -196,10 +206,6 @@ PlayerSubs:
 
   ; jsr $9610 ; update mario scroll position
 
-  ; lda $a7   ; flip collision bits to match mario style
-  ; eor #$ff
-  ; sta $a7
-
   jsr ScrollHandler           ;move the screen if necessary
   ; jsr GetPlayerOffscreenBits  ;get player's offscreen bits
   ; jsr RelativePlayerPosition  ;get coordinates relative to the screen
@@ -207,12 +213,15 @@ PlayerSubs:
   ; jsr BoundingBoxCore     ;get player's bounding box coordinates
   jsr PlayerBGCollision       ;do collision detection and process
 
+  lda $a7   ; flip collision bits to match z2 style
+  eor #$ff
+  sta $a7
+
   ; This is the offset for the table that holds the Y add val for link
   ldy #$1d
   ; Jump to the middle of the original link collision routine
   ; jsr $e070 ; link original bg collision routine
   jsr SlightlyModifiedCollisionRoutine
-
   rts
 
 ;   lda Player_Y_Position
@@ -541,13 +550,6 @@ CntPl:
       ; Go to the next frame of the glitch animation
       inc ObjectMetasprite
 Exit:
-  ldy ObjectMetasprite
-  lda PlayerBankTable,y
-  cmp PlayerChrBank
-  beq +
-    sta PlayerChrBank
-    inc ReloadCHRBank
-  +
   rts                         ;then leave
 
 ClearMarioSprite:
@@ -685,10 +687,18 @@ PlayerChangeSize:
 EndChgSize:
   cmp #$c4            ;check again for another specific moment
   bne ExitChgSize     ;and branch to leave if before or after that point
+  ; Z2Mario - clear scroll lock after you change size
+  lda #0
+  sta ScrollLock
   jmp DonePlayerTask  ;otherwise do sub to init timer control and set routine
 ExitChgSize:
   rts ; TODO check this RTS can be removed                 ;and then leave
 
+FinishedInjuryBlink:
+  ; Z2Mario - clear scroll lock after you change size
+  lda #0
+  sta ScrollLock
+  beq DonePlayerTask
 ;-------------------------------------------------------------------------------------
 ; .reloc
 PlayerInjuryBlink:
@@ -696,7 +706,7 @@ PlayerInjuryBlink:
   cmp #$f0               ;for specific moment in time
   bcs ExitBlink          ;branch if before that point
   cmp #$c8               ;check again for another specific point
-  beq DonePlayerTask     ;branch if at that point, and not before or after
+  beq FinishedInjuryBlink     ;branch if at that point, and not before or after
   jmp PlayerCtrlRoutine  ;otherwise run player control routine
 ExitBlink:
   bne ExitBoth           ;do unconditional branch to leave
@@ -1817,9 +1827,11 @@ RetYC:
   lda R3                      ;get saved content of block buffer
   rts                         ;and leave
 FailedToGetBlock:
+  ; If we are leaving the map, then treat the offscreen blocks as no collision
   pla
   lda #0
   sta R3
+  sta R4
   rts
 
 ; GetBlockBufferAddr:
@@ -2000,7 +2012,14 @@ HeadChk:
     beq DoFootCheck             ;player, and branch if nothing above player's head
       ; jsr CheckForCoinMTiles      ;check to see if player touched coin with their head
       ; bcs AwardTouchedCoin        ;if so, branch to some other part of code
-        ldy Player_Y_Speed          ;check player's vertical speed
+        ; Z2 - also check if we are on an elevator
+        pha
+          lda $754 ; Player on elevator flag == $10 if on elevator
+          eor #$ff ; so invert it to make us have "upwards" speed if on ele
+          ora Player_Y_Speed          ;check player's vertical speed
+          tay
+        pla
+        cpy #0
         bpl DoFootCheck             ;if player not moving upwards, branch elsewhere
         ldy R4                      ;check lower nybble of vertical coordinate returned
         cpy #$04                    ;from collision detection routine
@@ -2018,8 +2037,15 @@ HeadChk:
 SolidOrClimb:
   ; cmp #$26               ;if climbing metatile,
   ; beq NYSpd              ;branch ahead and do not play sound
-  lda #Sfx_Bump
-  sta Square1SoundQueue  ;otherwise load bump sound
+  ; Z2 Set Player_CollisionBits to fix elevator
+;  lda #~$08
+;  and Player_CollisionBits
+;  sta Player_CollisionBits
+  ; Z2 - don't set bump sound if on an elevator
+  lda $754
+  bne NYSpd
+    lda #Sfx_Bump
+    sta Square1SoundQueue  ;otherwise load bump sound
 NYSpd:
   lda #$01               ;set player's vertical speed to nullify
   sta Player_Y_Speed     ;jump or swim
@@ -2074,6 +2100,12 @@ LandPlyr:
   lda #$00
   sta Player_Y_Speed         ;initialize vertical speed and fractional
   sta Player_Y_MoveForce     ;movement force to stop player's vertical movement
+
+  ; Z2 Set Player_CollisionBits to fix elevator
+;  lda #~$04
+;  and Player_CollisionBits
+;  sta Player_CollisionBits
+
   ; sta StompChainCounter      ;initialize enemy stomp counter
 ; cancel downstab hitbox??
   lda #$f8
@@ -2331,7 +2363,6 @@ PlayerHeadCollision:
   ; eor #$01                 ;and floatey numbers
   ; sta SprDataOffset_Ctrl
 
-
   lda #$00
   sta Player_Y_Speed      ;init player's vertical speed
 ExitFireballNearby:
@@ -2402,6 +2433,8 @@ FireballObjCore:
   lda #$01                     ;set high byte of vertical position
   sta Fireball_Y_HighPos,x
   ldy PlayerFacingDir          ;get player's facing direction
+  tya ; Z2 needs a value set for the knockback value in $6d
+  sta $6d,x
   dey                          ;decrement to use as offset here
   lda FireballXSpdData,y       ;set horizontal speed of fireball accordingly
   sta Fireball_X_Speed,x

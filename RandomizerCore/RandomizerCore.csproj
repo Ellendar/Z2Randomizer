@@ -83,7 +83,7 @@
     <EmbeddedResource Include="Asm\z2mario\sfx.s" />
     <None Remove="Asm\z2mario\mario.s" />
     <EmbeddedResource Include="Asm\z2mario\mario.s" />
-    <None Remove="Asm\z2mario\sprites_mario.chr" />
-    <EmbeddedResource Include="Asm\z2mario\sprites_mario.chr" />
+    <None Remove="Asm\z2mario\sprites_mario_hammer.chr" />
+    <EmbeddedResource Include="Asm\z2mario\sprites_mario_hammer.chr" />
   </ItemGroup>
 </Project>
