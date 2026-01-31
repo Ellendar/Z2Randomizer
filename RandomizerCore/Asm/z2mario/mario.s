@@ -716,6 +716,11 @@ InitChangeSize:
   bne ExitBoth              ;then branch to leave
   sty PlayerAnimCtrl        ;otherwise initialize player's animation frame control
   inc PlayerChangeSizeFlag  ;set growing/shrinking flag
+  lda Player_State
+  bne +
+    lda #Sfx_PowerUpGrab
+    sta Square2SoundQueue       ;load grow up sound
+  +
   lda PlayerSize
   eor #$01                  ;invert player's size
   sta PlayerSize

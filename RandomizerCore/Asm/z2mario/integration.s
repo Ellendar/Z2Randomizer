@@ -255,10 +255,11 @@ CheckIfTurningSmall:
         sta GameEngineSubroutine
         lda #8
         sta InjuryTimer
+        ; we will unlock the scroll lock after the size change animation finishes
         lda #1
-  ;      sta PlayerChangeSizeFlag
         sta ScrollLock
         sta Player_State
+  ;      sta PlayerChangeSizeFlag
         lda #0
         sta ScrollAmount
   ;      sta PlayerSize
@@ -268,7 +269,44 @@ CheckIfTurningSmall:
         sta Square1SoundQueue       ;load bump sound
   +
   rts
+
 .segment "PRG0", "PRG7"
+
+; Make mario grow when his HP increases enough
+.org $d42f ; patches over the sound effect for HP gain
+  jsr LinkGainedHPOrMagic
+  nop
+.reloc
+LinkGainedHPOrMagic:
+  lda #$10
+  sta $ef ; Set the sfx for gaining life/magic/exp
+  ; if we are small and gaining HP
+  cpx #1 ; IF x = 1 we are increasing HP
+  bne @exit
+    lda $0774
+    cmp #65
+    bcc @exit
+      lda GameEngineSubroutine
+      cmp #8  ; if player state is already something else don't try to change
+      bne @exit
+        lda PlayerSize ; if player is already large don't make large
+        beq @exit
+          ; Set player routine to ChangeSize
+          lda #$0a
+          sta GameEngineSubroutine
+          ; we will unlock the scroll lock after the size change animation finishes
+          lda #1
+          sta ScrollLock
+          lda #0
+          sta ScrollAmount
+          sta Player_State
+          lda #$ff
+          sta TimerControl          ;set master timer control flag to halt timers
+          ; Don't try to play the sound here since we might be locked out of this in a room right now
+;          lda #Sfx_PowerUpGrab
+;          sta Square2SoundQueue       ;load grow up sound
+@exit:
+  rts
 
 .org $D4F3 ; patch the call to links main routine to set
   jsr PatchLinkMain
@@ -493,10 +531,15 @@ SlightlyModifiedCollisionRoutine:
   UPDATE_BYTE $27 @ $285b $40b0 $40c0 $40d0 $40e0 $80b0 $80c0 $80d0 $80e0 $c0b0 $c0c0 $c0d0 $c0e0 $c0f0 $100b0 $100c0 $100d0 $100e0 $140b0 $140c0 $140d0 $140e0 $17c1a $1c465 $1c47d
   UPDATE_BYTE $18 @ $285C $40b1 $40c1 $40d1 $80e1 $80b1 $80c1 $80d1 $80e1 $c0b1 $c0c1 $c0d1 $c0e1 $100b1 $100c1 $100d1 $100e1 $140b1 $140c1 $140d1 $140e1 $17c1b $1c466 $1c47e
 ;.endif
-; Fire spell color
-UPDATE_BYTE $37 @ $2a0a
+; Fire spell color. EDIT: This is regrettably not the fire spell, but a generic "after spell flash color"
+; so it applies to anything that sets a spell color like grabbing a fairy or casting any spell or learning a spell, etc.
+;UPDATE_BYTE $37 @ $2a0a
+;UPDATE_BYTE $27 @ $2a10
+;UPDATE_BYTE $16 @ $2a16
+; So we just use mario's colors and decide later if we need to change to fire colors.
+UPDATE_BYTE $16 @ $2a0a
 UPDATE_BYTE $27 @ $2a10
-UPDATE_BYTE $16 @ $2a16
+UPDATE_BYTE $18 @ $2a16
 
 
 ; regular palette color location
