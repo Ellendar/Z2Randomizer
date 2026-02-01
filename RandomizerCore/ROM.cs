@@ -2452,6 +2452,10 @@ ResetRedPalettePayload:
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
         hiddenPalaceLocation.NeedRecorder = true;
+        foreach (Location child in hiddenPalaceLocation.Children)
+        {
+            child.NeedRecorder = true;
+        }
         if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
         {
             townAtNewKasuto.NeedRecorder = true;
@@ -2576,6 +2580,10 @@ ResetRedPalettePayload:
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
         hiddenKasutoLocation.NeedHammer = true;
+        foreach (Location child in hiddenKasutoLocation.Children)
+        {
+            child.NeedHammer = true;
+        }
         if (hiddenKasutoLocation == townAtNewKasuto || hiddenKasutoLocation == spellTower)
         {
             townAtNewKasuto.NeedHammer = true;
