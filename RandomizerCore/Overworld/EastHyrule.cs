@@ -852,11 +852,15 @@ public sealed class EastHyrule : World
         {
             rom.UpdateHiddenPalaceSpot(biome, hiddenPalaceCoords, hiddenPalaceLocation,
                 townAtNewKasuto, spellTower, props.VanillaShuffleUsesActualTerrain);
+            hiddenPalaceLocation.NeedRecorder = true;
+            hiddenPalaceLocation.Children.ForEach(i => i.NeedRecorder = true);
         }
         if (props.HiddenKasuto)
         {
             rom.UpdateKasuto(hiddenKasutoLocation, townAtNewKasuto, spellTower, biome,
                 baseAddr, terrains[hiddenKasutoLocation.MemAddress], props.VanillaShuffleUsesActualTerrain);
+            hiddenKasutoLocation.NeedHammer = true;
+            hiddenKasutoLocation.Children.ForEach(i => i.NeedHammer = true);
         }
 
         WriteMapToRom(rom, true, MAP_ADDR, MAP_SIZE_BYTES, hiddenPalaceLocation.Ypos - 30, hiddenPalaceLocation.Xpos, props.HiddenPalace, props.HiddenKasuto);
