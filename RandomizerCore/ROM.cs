@@ -2341,11 +2341,9 @@ ResetRedPalettePayload:
         Put(0x1ccc0, (byte)pos);
         int connection = hiddenPalaceLocation.MemAddress - 0x862F;
         Put(0x1df76, (byte)connection);
-        hiddenPalaceLocation.NeedRecorder = true;
-        if (hiddenPalaceLocation == townAtNewKasuto || hiddenPalaceLocation == spellTower)
+        if (hiddenPalaceLocation == spellTower)
         {
-            townAtNewKasuto.NeedRecorder = true;
-            spellTower.NeedRecorder = true;
+            throw new Exception("Child locations shouldn't be able to be hidden spots");
         }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
@@ -2465,11 +2463,9 @@ ResetRedPalettePayload:
         Put(0x1ccdb, (byte)(hiddenKasutoLocation.YRaw));
         int connection = hiddenKasutoLocation.MemAddress - baseAddr;
         Put(0x1df77, (byte)connection);
-        hiddenKasutoLocation.NeedHammer = true;
-        if (hiddenKasutoLocation == townAtNewKasuto || hiddenKasutoLocation == spellTower)
+        if (hiddenKasutoLocation == spellTower)
         {
-            townAtNewKasuto.NeedHammer = true;
-            spellTower.NeedHammer = true;
+            throw new Exception("Child locations shouldn't be able to be hidden spots");
         }
         if (vanillaShuffleUsesActualTerrain || biome != Biome.VANILLA_SHUFFLE)
         {
