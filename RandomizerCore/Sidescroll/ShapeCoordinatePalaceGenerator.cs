@@ -20,6 +20,7 @@ public struct PalaceShape
 
 public abstract class ShapeCoordinatePalaceGenerator : CoordinatePalaceGenerator
 {
+    public const int FILL_SHAPE_TRIES = 10;
     public static int debug = 0;
 
     protected abstract Task<PalaceShape> CreateShape(Random r, Room entrance, int roomCount, int palaceNumber);
@@ -41,8 +42,14 @@ public abstract class ShapeCoordinatePalaceGenerator : CoordinatePalaceGenerator
 
         PalaceShape shape = await CreateShape(r, entrance, roomCount, palaceNumber);
 
-        bool success = await FillShapeWithRooms(props, roomPool, r, palace, palaceNumber, shape);
-        if (!success) {
+        bool success = false;
+        for (int i = 0; i < FILL_SHAPE_TRIES; i++)
+        {
+            success = await FillShapeWithRooms(props, roomPool, r, palace, palaceNumber, shape);
+            if (success) { break; }
+        }
+        if (!success)
+        {
             palace.IsValid = false;
             return palace;
         }
