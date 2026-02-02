@@ -235,7 +235,7 @@ public class SequentialPlacementCoordinatePalaceGenerator : CoordinatePalaceGene
         //Recategorize the remaining rooms after stubbing out.
         roomsByExitType = roomPool.CategorizeNormalRoomExits();
 
-        if (palace.HasInescapableDrop(props.BossRoomsExitToPalace[palace.Number - 1]))
+        if (palace.HasInescapableDrop(!props.BossRoomsExitToPalace[palace.Number - 1]))
         {
             palace.IsValid = false;
             return palace;

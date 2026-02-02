@@ -1045,7 +1045,7 @@ public partial class Palace
         return unclearableRooms.Count == 0;
     }
 
-    public bool HasInescapableDrop(bool palacesContinueAfterBoss)
+    public bool HasInescapableDrop(bool exitViaBossRoomAllowed)
     {
         //get a list of effective drop zones in the palace
         List<Room> dropZonesToCheck = [];
@@ -1069,7 +1069,7 @@ public partial class Palace
             {
                 Room room = pendingRooms.Pop();
                 //if you find the entrance, remove and continue
-                if (room == Entrance || (room.IsBossRoom && !palacesContinueAfterBoss))
+                if (room == Entrance || (room.IsBossRoom && exitViaBossRoomAllowed))
                 {
                     found = true;
                     break;
