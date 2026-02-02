@@ -954,20 +954,20 @@ MetaspriteBox "SMALL_FIRE", "SWIMMING_STILL_2", $00, $02, $28, $2a
 ; Update this with the first and last metasprite if more are added before or after
 TOTAL_MARIO_METASPRITES = METASPRITE_SMALL_FIRE_SWIMMING_STILL_2 - METASPRITE_BIG_MARIO_STANDING + 1
 
-POWERUP_VRAM_OFFSET = SPRITE_BANK_1
-; POWERUP_Y_OFFSET = 8
-POWERUP_1UP_PALETTE = $01
-POWERUP_STAR_PALETTE = $00
-POWERUP_FIREFLOWER_PALETTE = $00
-POWERUP_FIREFLOWER_Y_OFFSET = -8
-POWERUP_MUSHROOM_PALETTE = $02
-POWERUP_1UP_NO_MIRROR = 1
-POWERUP_MUSHROOM_NO_MIRROR = 1
-MetaspriteBox "POWERUP", "STAR",       $34, $36
-; Force the lower two parts of the fireflower to be palette two by using the override
-MetaspriteBox "POWERUP", "FIREFLOWER", $38, $38 | SPR_FLIP_H , $3a | SPR_PALETTE_1, $3a | SPR_FLIP_H | SPR_PALETTE_1
-MetaspriteBox "POWERUP", "MUSHROOM",   $3c, $3e
-MetaspriteBox "POWERUP", "1UP",        $3c, $3e
+;POWERUP_VRAM_OFFSET = SPRITE_BANK_1
+;; POWERUP_Y_OFFSET = 8
+;POWERUP_1UP_PALETTE = $01
+;POWERUP_STAR_PALETTE = $00
+;POWERUP_FIREFLOWER_PALETTE = $00
+;POWERUP_FIREFLOWER_Y_OFFSET = -8
+;POWERUP_MUSHROOM_PALETTE = $02
+;POWERUP_1UP_NO_MIRROR = 1
+;POWERUP_MUSHROOM_NO_MIRROR = 1
+;MetaspriteBox "POWERUP", "STAR",       $34, $36
+;; Force the lower two parts of the fireflower to be palette two by using the override
+;MetaspriteBox "POWERUP", "FIREFLOWER", $38, $38 | SPR_FLIP_H , $3a | SPR_PALETTE_1, $3a | SPR_FLIP_H | SPR_PALETTE_1
+;MetaspriteBox "POWERUP", "MUSHROOM",   $3c, $3e
+;MetaspriteBox "POWERUP", "1UP",        $3c, $3e
 
 FIREBALL_VRAM_OFFSET = SPRITE_BANK_0
 FIREBALL_PALETTE = $00
@@ -984,34 +984,34 @@ MetaspriteBox "EXPLOSION", "FRAME_2", $28, $28 | SPR_FLIP_H
 MetaspriteBox "EXPLOSION", "FRAME_3", $2a, $2a | SPR_FLIP_H
 ; Firebars will still draw Fireballs manually for now 
 
-COIN_VRAM_OFFSET = SPRITE_BANK_1
-COIN_PALETTE = $02
-MetaspriteBox "COIN", "FRAME_1", $2c
-MetaspriteBox "COIN", "FRAME_2", $2e
-MetaspriteBox "COIN", "FRAME_3", $30
-MetaspriteBox "COIN", "FRAME_4", $32
+;COIN_VRAM_OFFSET = SPRITE_BANK_1
+;COIN_PALETTE = $02
+;MetaspriteBox "COIN", "FRAME_1", $2c
+;MetaspriteBox "COIN", "FRAME_2", $2e
+;MetaspriteBox "COIN", "FRAME_3", $30
+;MetaspriteBox "COIN", "FRAME_4", $32
 
-MISC_VRAM_OFFSET = SPRITE_BANK_1
-MISC_PALETTE = $03
-MISC_Y_OFFSET = -8
+;MISC_VRAM_OFFSET = SPRITE_BANK_1
+;MISC_PALETTE = $03
+;MISC_Y_OFFSET = -8
 
 ; The brick and block sprite palettes are set by the code
-MISC_BRICK_GROUND_PALETTE = $00
-MISC_BRICK_OTHER_PALETTE = $00 ; The brick palette is set by the code
-MISC_BLOCK_PALETTE = $00 ; The block palette is set by the code
-MetaspriteBox "MISC", "BRICK_OTHER", $20, $20
-MetaspriteBox "MISC", "BRICK_GROUND", $22, $22
-MetaspriteBox "MISC", "BLOCK", $24, $24 | SPR_FLIP_H
+;MISC_BRICK_GROUND_PALETTE = $00
+;MISC_BRICK_OTHER_PALETTE = $00 ; The brick palette is set by the code
+;MISC_BLOCK_PALETTE = $00 ; The block palette is set by the code
+;MetaspriteBox "MISC", "BRICK_OTHER", $20, $20
+;MetaspriteBox "MISC", "BRICK_GROUND", $22, $22
+;MetaspriteBox "MISC", "BLOCK", $24, $24 | SPR_FLIP_H
 ; drawn manually for now until i figure out if i have frames for the brick
 ; break animation with just metasprites
 ; MetaspriteBox "MISC", "CHUNK", $16
-MISC_BUBBLE_PALETTE = $02
-MetaspriteBox "MISC", "BUBBLE", $18
-MetaspriteBox "MISC", "SMALL_OVERLAY", $1e, $1e
-MetaspriteBox "MISC", "LARGE_OVERLAY", $1e, $1e, $1e, $1e
-MISC_STAR_FLAG_VRAM_OFFSET = SPRITE_BANK_2
-MISC_STAR_FLAG_PALETTE = $02
-MetaspriteBox "MISC", "STAR_FLAG", $3c, $3e
+;MISC_BUBBLE_PALETTE = $02
+;MetaspriteBox "MISC", "BUBBLE", $18
+;MetaspriteBox "MISC", "SMALL_OVERLAY", $1e, $1e
+;MetaspriteBox "MISC", "LARGE_OVERLAY", $1e, $1e, $1e, $1e
+;MISC_STAR_FLAG_VRAM_OFFSET = SPRITE_BANK_2
+;MISC_STAR_FLAG_PALETTE = $02
+;MetaspriteBox "MISC", "STAR_FLAG", $3c, $3e
 ; MISC_FLAGPOLE_FLAG_VRAM_OFFSET = SPRITE_BANK_3
 ; MISC_FLAGPOLE_FLAG_PALETTE = $01
 ; MetaspriteBox "MISC", "FLAGPOLE_FLAG", $32, $34
@@ -1104,14 +1104,15 @@ MetaspriteBox "MISC", "STAR_FLAG", $3c, $3e
 ; MetaspriteBox "BLOOPER", "SWIM_1", $1a, $1a | SPR_FLIP_H, $3a, $3a | SPR_FLIP_H
 ; MetaspriteBox "BLOOPER", "SWIM_2", $18, $18 | SPR_FLIP_H
 
-; HAMMER_VRAM_OFFSET = SPRITE_BANK_1
-; HAMMER_FRAME_1_X_OFFSET = 4
-; HAMMER_FRAME_1_Y_OFFSET = -8
-; HAMMER_FRAME_2_X_OFFSET = 0
-; HAMMER_FRAME_2_Y_OFFSET = -8
-; HAMMER_PALETTE = $03
-; MetaspriteBox "HAMMER", "FRAME_1", $1e
-; MetaspriteBox "HAMMER", "FRAME_2", $00, $02
+ HAMMER_FRAME_1_VRAM_OFFSET = SPRITE_BANK_2
+ HAMMER_FRAME_2_VRAM_OFFSET = SPRITE_BANK_0
+ HAMMER_FRAME_1_X_OFFSET = 4
+ HAMMER_FRAME_1_Y_OFFSET = -8
+ HAMMER_FRAME_2_X_OFFSET = 0
+ HAMMER_FRAME_2_Y_OFFSET = -8
+ HAMMER_PALETTE = $01
+ MetaspriteBox "HAMMER", "FRAME_1", $18
+ MetaspriteBox "HAMMER", "FRAME_2", $1c, $1e
 
 ; HAMMER_BRO_VRAM_OFFSET = SPRITE_BANK_3
 ; HAMMER_BRO_PALETTE = $01

@@ -2,6 +2,7 @@
 .include "z2r.inc"
 
 .import GameRoutines, ProcFireball_Bubble, PlayerGfxHandler, DrawMetasprite
+.import ProcHammerTime
 .import Square1SfxHandler, Square2SfxHandler, NoiseSfxHandler
 .import SwapToSavedPRG, SwapToPRG0
 
@@ -136,7 +137,7 @@ PatchLinkDrawRoutine:
 @fireballLoop:
     ldx ObjectMetasprite,y
     beq @nofireball
-    jsr DrawMetasprite
+      jsr DrawMetasprite
 @nofireball:
     inc R2
     ldy R2
@@ -358,6 +359,7 @@ NoDecTimers:
   jsr $903A ; link main
 
   ; This has to come before the A/B buttons are switched over
+  jsr ProcHammerTime
   jsr ProcFireball_Bubble    ;process fireballs and air bubbles
 
   lda A_B_Buttons            ;save current A and B button
@@ -402,8 +404,10 @@ SetPlayerDownstabbingHitbox:
 PatchFireballHitcheck:
   jsr $E694 ; original hitbox check
   bcc @exit
-    ldy $11 ; fireball
+    ldy $11 ; fireball or hammer
     lda #%10000000
+    ora Fireball_State,y ; keep the hammer bit as well if its set
+    and #%11000000
     sta Fireball_State,y
 @exit:
   rts
