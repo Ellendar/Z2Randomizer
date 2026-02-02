@@ -251,6 +251,8 @@ RESV PlayerChrBank
 RESV ReloadCHRBank
 RESV ObjectVerticalFlip
 RESV Local_eb
+; Used by hammers to track how long they've been alive
+RESV PlayerProj_Cnt, 2
 
 ; Values use for SMB1 sfx audio engine
 
@@ -495,6 +497,7 @@ SET_RES_BASE $6FB0
 RESV SprObject_SprAttrib, 16
 Player_SprAttrib = SprObject_SprAttrib
 Fireball_SprAttrib = SprObject_SprAttrib + FireballOffset
+Fireball_FacingDir = PlayerFacingDir + FireballOffset
 
 RESV Player_YMoveForceFractional, 16
 

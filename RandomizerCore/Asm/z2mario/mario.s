@@ -9,6 +9,7 @@
 .import METASPRITE_SMALL_MARIO_JUMPING, METASPRITE_SMALL_MARIO_SWIMMING_1_KICK, METASPRITE_SMALL_MARIO_STANDING, METASPRITE_SMALL_MARIO_SKIDDING
 .import METASPRITE_SMALL_MARIO_WALKING_1, METASPRITE_SMALL_MARIO_CLIMBING_1, METASPRITE_SMALL_MARIO_GROW_STANDING, METASPRITE_FIREBALL_FRAME_1
 .import METASPRITE_FIREBALL_FRAME_2, METASPRITE_EXPLOSION_FRAME_1, METASPRITE_EXPLOSION_FRAME_2, METASPRITE_EXPLOSION_FRAME_3
+.import METASPRITE_HAMMER_FRAME_1, METASPRITE_HAMMER_FRAME_2
 .import SWIMMING_ANIMATION_FRAME_COUNT
 
 .export GameRoutines, ProcFireball_Bubble, PlayerGfxHandler
@@ -2423,6 +2424,9 @@ FireballObjCore:
   lda Fireball_State,x         ;check for d7 = 1
   asl
   bcs FireballExplosion        ;if so, branch to get relative coordinates and draw explosion
+  ; And check if its a player hammer (bit 6)
+  asl
+  bcs NoFBall
   ldy Fireball_State,x         ;if fireball inactive, branch to leave
   beq NoFBall
   dey                          ;if fireball state set to 1, skip this part and just run it
@@ -2445,6 +2449,10 @@ FireballObjCore:
   sta Fireball_X_Speed,x
   lda #4                       ;set vertical speed of fireball
   sta Fireball_Y_Speed,x
+  
+  lda #0 ; Don't add extra gravity ?
+  sta SprObject_X_MoveForce + FireballOffset,x
+  sta SprObject_Y_MoveForce + FireballOffset,x
 ;  lda #$07
 ;  sta Fireball_BoundBoxCtrl,x  ;set bounding box size control for fireball
   dec Fireball_State,x         ;decrement state to 1 to skip this part from now on
@@ -2487,6 +2495,9 @@ NoFBall:
   rts                          ;leave
 
 FireballExplosion:
+  ; And check if its a player hammer (bit 6)
+  asl
+  bcs NoFBall
   jsr RelativeFireballPosition
   jmp DrawExplosion_Fireball
 
@@ -2698,6 +2709,228 @@ GetProperObjOffset:
   tax                  ;put back in X and leave
   rts
 
+.export ProcHammerTime
+.proc ProcHammerTime
+  lda $078b ; Check for hammer in inventory
+  beq UpdateHammers
+    ; and that the player is pushing up + b
+    lda SavedJoypadBits
+    and #B_Button | Up_Dir     ;check for up + b button pressed
+    cmp #B_Button | Up_Dir
+    bne UpdateHammers          ;branch if not pressed
+    and #B_Button              ;check if b button just pressed
+    and PreviousA_B_Buttons
+    bne UpdateHammers          ;if button pressed in previous frame, branch
+      lda FireballCounter        ;load fireball counter
+      and #%00000001             ;get LSB and use as offset for buffer
+      tax
+      ; Check to see if we have an open fireball spot to put the hammer in
+      lda Fireball_State,x       ;load fireball state
+      bne UpdateHammers          ;if not inactive, branch
+      ldy Player_Y_HighPos       ;if player too high or too low, branch
+      dey
+      bne UpdateHammers
+        inc FireballCounter        ;increment fireball counter
+        ; Spawn new hammer
+        lda #$41
+        sta Fireball_State,x
+        
+        lda #Sfx_Fireball          ;play fireball sound effect
+        sta Square1SoundQueue
+  
+        lda Player_X_Position        ;get player's horizontal position
+        sta Fireball_X_Position,x
+        lda Player_PageLoc           ;get player's page location
+        sta Fireball_PageLoc,x
+        lda Player_Y_Position        ;get player's vertical position and store
+        sec
+        sbc #$10
+        sta Fireball_Y_Position,x
+        lda #$01                     ;set high byte of vertical position
+        sbc #0
+        sta Fireball_Y_HighPos,x
+        ldy PlayerFacingDir          ;get player's facing direction
+        tya ; Z2 needs a value set for the knockback value in $6d
+        sta Fireball_FacingDir,x
+        dey                          ;decrement to use as offset here
+        lda HammerXVelocity,y       ;set horizontal speed of hammer
+        clc
+        adc Player_X_Speed           ; add the player speed to the hammer
+        sta Fireball_X_Speed,x
+        lda #-3                       ;set vertical speed of hammer
+        sta Fireball_Y_Speed,x
+        
+        lda #0 ; Don't add extra gravity ?
+        sta SprObject_X_MoveForce + FireballOffset,x
+        sta SprObject_Y_MoveForce + FireballOffset,x
+        ; Clear frame count
+        sta PlayerProj_Cnt,x
+
+UpdateHammers:
+  bit Fireball_State
+  bvc NotHammer1
+    ldx #0
+    ; Process hammer 1
+    jsr MoveHammer
+NotHammer1:
+  bit Fireball_State+1
+  bvc NotHammer2
+    ldx #1
+    jmp MoveHammer
+NotHammer2:
+  rts
+  
+HammerXVelocity:
+  .byte $10, -$10
+.endproc
+  
+.proc MoveHammer
+  lda Fireball_State,x         ;check for d7 = 1
+  asl
+  bcs Erase        ;if so, branch to get relative coordinates and draw explosion
+
+;  stx ObjectOffset
+;  txa                          ;add 7 to offset to use
+;  clc                          ;as fireball offset for next routines
+;  adc #FireballOffset
+;  tax
+;  lda #$50                     ;set downward movement force here
+;  sta $00
+;  lda #8                       ;set maximum speed here
+;  sta $02
+;  lda #$00
+;  jsr ImposeGravity            ;do sub here to impose gravity on fireball and move vertically
+  
+  ; Hammer specific Y velocity code
+  ldy #0 ; use Y as the hibit
+  lda Fireball_Y_Speed,x
+  bpl +
+    ; speed is negative, so dey to sign extend
+    dey
+  +
+  clc
+  adc Fireball_Y_Position,x
+  sta Fireball_Y_Position,x
+  tya
+  adc Fireball_Y_HighPos,x
+  sta Fireball_Y_HighPos,x
+  ; Check if the hammer is offscreen quickly
+  cmp #2
+  bcs Erase
+  
+	; Hammer specific X velocity code
+  ldy #0
+	lda Fireball_X_Speed,x
+	asl
+	asl
+	asl
+	asl
+	adc SprObject_X_MoveForce,x
+	sta SprObject_X_MoveForce,x
+
+	php
+	lda Fireball_X_Speed,x
+  lsr
+  lsr
+  lsr
+  lsr
+	cmp #%00001000  ; Check the sign bit
+	bcc Positive    ; If the value was not negatively signed, jump ahead
+	ora #%11110000  ; Otherwise, apply a sign extension
+  dey
+Positive:
+	plp		 ; Restore carry bit
+
+	adc Fireball_X_Position,x
+	sta Fireball_X_Position,x
+  tya
+  adc Fireball_PageLoc,x
+  sta Fireball_PageLoc,x
+
+  ; Every 8 frames, increase the Y velocity by one
+  inc PlayerProj_Cnt,x
+	lda PlayerProj_Cnt,x
+	and #$07
+	bne DontInc
+    inc Fireball_Y_Speed,x ; Increase Y velocity (gravity)
+DontInc:
+  
+;  jsr MoveObjectHorizontally   ;do another sub to move it horizontally
+
+;  ldx ObjectOffset
+;; Quick check if we went offscreen vertically
+;  lda Fireball_Y_HighPos,x
+;  cmp #2
+;  bcs Erase
+  ; don't bother doing horizontal offscreen check :p
+;  ldy #3
+;  jsr $F27D ; run the vanilla z2 offscreen check
+;  ; load the offscreen bits for this enemy
+;  lda $cb
+;  and #$FC
+;  bne Erase
+    jmp DrawHammer
+Erase:
+  lda #$00                     ;erase hammer state
+  sta Fireball_State,x
+  sta FireballMetasprite,x
+  rts
+  
+.endproc
+
+OAM_FLIP_V            = %10000000
+OAM_FLIP_H            = %01000000
+
+.proc DrawHammer
+  lda #0
+  sta Fireball_SprAttrib,x
+  lda #1
+  sta Fireball_FacingDir,x
+  ldy #METASPRITE_HAMMER_FRAME_1
+  lda TimerControl
+  bne ForceHPose
+    lda Fireball_State,x            ;otherwise get hammer's state
+    and #%00111111              ;mask out d7
+    cmp #$01                    ;check to see if set to 1 yet
+    beq GetHPose                ;if so, branch
+ForceHPose:
+    lda #0
+    beq RenderH                 ;do unconditional branch to rendering part
+GetHPose:
+    lda FrameCounter            ;get frame counter
+    lsr                         ;move d3-d2 to d1-d0
+    lsr
+    and #%00000011              ;mask out all but d1-d0 (changes every four frames)
+RenderH:
+  sta R2
+  ; if bit 0 is set, then use the horizontal hammer sprite
+  lsr
+  bcc CheckForVerticalFlip
+    ldy #METASPRITE_HAMMER_FRAME_2
+CheckForVerticalFlip:
+  lsr
+  bcc WriteMetasprite
+    ; if bit 1 is also set, then apply vertical flip too
+    ; but if only bit 2 is set, apply the horizontal flag
+    lda R2
+    lsr
+    bcs :+
+      lda Fireball_SprAttrib,x
+      ora #OAM_FLIP_H 
+      sta Fireball_SprAttrib,x
+    :
+    lda Fireball_SprAttrib,x
+    ora #OAM_FLIP_V
+    sta Fireball_SprAttrib,x
+
+    ; and use the sprite that faces the other way
+    lda #2
+    sta Fireball_FacingDir,x
+WriteMetasprite:
+  tya
+  sta FireballMetasprite,x
+  rts
+.endproc
 ; .proc GetXOffscreenBits
 ;   stx R4                      ;save position in buffer to here
 ;   ldy #$01                    ;start with right side of screen
