@@ -1,5 +1,11 @@
 # Z2Randomizer Changelog
 
+## Version 5.0.10 - February 06, 2026
+
+- Added some new sprites. Thanks Varcal, MisterMike, and Irenepunmaster!
+- Fixed a bug where logic didn't properly check for secondary locations in towns hidden by 3-eye rock or hidden forest.
+- Fixed a crash if your last loaded sprite no longer exists
+
 ## Version 5.0.9 - November 29, 2025
 
 ### Bug Fixes
