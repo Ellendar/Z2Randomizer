@@ -122,55 +122,58 @@ public abstract class CoordinatePalaceGenerator() : PalaceGenerator
         }
 
         //BossRoom
-        if (roomPool.BossRooms.Count == 0)
+        if(palace.BossRoom == null)
         {
-            throw new Exception("No boss rooms for generated palace");
-        }
-        List<Room> bossRoomCandidates = roomPool.BossRooms.ToList();
-        bossRoomCandidates.FisherYatesShuffle(r);
-
-        foreach (Room bossRoomCandidate in bossRoomCandidates)
-        {
-            if (palace.BossRoom != null)
+            if (roomPool.BossRooms.Count == 0)
             {
-                break;
+                throw new Exception("No boss rooms for generated palace");
             }
-            RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
-            if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
-            {
-                bossRoomExitType = bossRoomExitType.AddRight();
-            }
-            List<Room> bossRoomReplacementCandidates =
-                palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomExitType && i.IsNormalRoom()).ToList();
+            List<Room> bossRoomCandidates = roomPool.BossRooms.ToList();
+            bossRoomCandidates.FisherYatesShuffle(r);
 
-            bossRoomReplacementCandidates.FisherYatesShuffle(r);
-            foreach (Room bossRoomReplacementRoom in bossRoomReplacementCandidates)
+            foreach (Room bossRoomCandidate in bossRoomCandidates)
             {
-                Room? upRoom = palace.AllRooms.FirstOrDefault(
-                    i => i.coords == bossRoomReplacementRoom.coords with { Y = bossRoomReplacementRoom.coords.Y + 1 });
-                if (bossRoomReplacementRoom != null &&
-                    (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == bossRoomCandidate.IsDropZone))
+                if (palace.BossRoom != null)
                 {
-                    palace.BossRoom = new(bossRoomCandidate);
-                    palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
-                    if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
-                    {
-                        palace.BossRoom.HasRightExit = true;
-                        palace.BossRoom.AdjustContinuingBossRoom();
-                    }
-                    palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
                     break;
                 }
-            }
-        }
+                RoomExitType bossRoomExitType = bossRoomCandidate.CategorizeExits();
+                if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
+                {
+                    bossRoomExitType = bossRoomExitType.AddRight();
+                }
+                List<Room> bossRoomReplacementCandidates =
+                    palace.AllRooms.Where(i => i.CategorizeExits() == bossRoomExitType && i.IsNormalRoom()).ToList();
 
-        if (palace.BossRoom == null
-            || palace.Entrance == null
-            || (palace.Number == 7 && palace.TbirdRoom == null)
-            || palace.ItemRooms.Count != itemRoomTotal)
-        {
-            logger.Debug("Failed to place critical room in palace");
-            return false;
+                bossRoomReplacementCandidates.FisherYatesShuffle(r);
+                foreach (Room bossRoomReplacementRoom in bossRoomReplacementCandidates)
+                {
+                    Room? upRoom = palace.AllRooms.FirstOrDefault(
+                        i => i.coords == bossRoomReplacementRoom.coords with { Y = bossRoomReplacementRoom.coords.Y + 1 });
+                    if (bossRoomReplacementRoom != null &&
+                        (upRoom == null || !upRoom.HasDownExit || upRoom.HasDrop == bossRoomCandidate.IsDropZone))
+                    {
+                        palace.BossRoom = new(bossRoomCandidate);
+                        palace.BossRoom.Enemies = (byte[])roomPool.VanillaBossRoom.Enemies.Clone();
+                        if (palace.Number < 7 && props.BossRoomsExitToPalace[palace.Number - 1])
+                        {
+                            palace.BossRoom.HasRightExit = true;
+                            palace.BossRoom.AdjustContinuingBossRoom();
+                        }
+                        palace.ReplaceRoom(bossRoomReplacementRoom, palace.BossRoom);
+                        break;
+                    }
+                }
+            }
+
+            if (palace.BossRoom == null
+                || palace.Entrance == null
+                || (palace.Number == 7 && palace.TbirdRoom == null)
+                || palace.ItemRooms.Count != itemRoomTotal)
+            {
+                logger.Debug("Failed to place critical room in palace");
+                return false;
+            }
         }
 
         UnmergeMergedRooms(palace, roomPool);

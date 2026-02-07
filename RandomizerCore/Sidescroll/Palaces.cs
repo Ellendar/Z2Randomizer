@@ -1,10 +1,11 @@
-﻿using System;
+﻿using FtRandoLib.Importer;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -176,6 +177,7 @@ public class Palaces
                 PalaceStyle.SHUFFLED => new VanillaShufflePalaceGenerator(),
                 PalaceStyle.SEQUENTIAL => new SequentialPlacementCoordinatePalaceGenerator(),
                 PalaceStyle.RANDOM_WALK => new RandomWalkCoordinatePalaceGenerator(),
+                PalaceStyle.TOWER => new TowerCoordinatePalaceGenerator(),
                 PalaceStyle.RECONSTRUCTED => new ReconstructedPalaceGenerator(ct),
                 PalaceStyle.CHAOS => new ChaosPalaceGenerator(),
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
@@ -199,8 +201,12 @@ public class Palaces
             (props.PalaceStyles[currentPalace - 1] != PalaceStyle.VANILLA 
                 && palace.HasInescapableDrop(props.BossRoomsExitToPalace[currentPalace - 1])));
             PalaceGenerator.DebugCheckDuplicates(props, palace);
+            if (props.UsePalaceItemRoomCountIndicator && currentPalace != 7)
+            {
+                palace.Entrance!.AdjustEntrance(props.PalaceItemRoomCounts[palace.Number - 1], r);
+            }
 
-            if(palace.PalaceGroup == PalaceGrouping.Palace125)
+            if (palace.PalaceGroup == PalaceGrouping.Palace125)
             {
                 group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
             }

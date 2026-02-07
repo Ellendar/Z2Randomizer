@@ -1,5 +1,6 @@
 ﻿using SD.Tools.Algorithmia.GeneralDataStructures;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Z2Randomizer.RandomizerCore.Enemy;
 
@@ -16,6 +17,8 @@ public class RoomPool
     public MultiValueDictionary<Direction, Room> ItemRoomsByDirection { get; set; } = [];
     public MultiValueDictionary<RoomExitType, Room> ItemRoomsByShape { get; set; } = [];
     public Dictionary<RoomExitType, Room> DefaultStubsByDirection { get; set; } = [];
+    public Room DefaultUpEntrance { get; }
+    public Room DefaultDownBossRoom { get; }
 
     private PalaceRooms palaceRooms;
 
@@ -31,6 +34,8 @@ public class RoomPool
         BossRooms.AddRange(target.BossRooms);
         TbirdRooms.AddRange(target.TbirdRooms);
         VanillaBossRoom = target.VanillaBossRoom;
+        DefaultUpEntrance = target.DefaultUpEntrance;
+        DefaultDownBossRoom = target.DefaultDownBossRoom;
         foreach (var room in target.LinkedRooms)
         {
             LinkedRooms.Add(room.Key, room.Value);
@@ -158,6 +163,22 @@ public class RoomPool
         if (BossRooms.Count == 0)
         {
             BossRooms.Add(VanillaBossRoom);
+        }
+
+        //for tower, we need a default Up entrance and Down boss room in case the pool doesn't contain them
+        DefaultUpEntrance = palaceRooms.Entrances(RoomGroup.V5_0)
+            .FirstOrDefault(i => i.IsEntrance && i.CategorizeExits() == RoomExitType.DEADEND_EXIT_UP && i.PalaceNumber == palaceNumber)!;
+        Debug.Assert(DefaultUpEntrance != null);
+        //in the 4.0 boss rooms, P6/7 have their own rooms, but 1-5 are generic
+        if(palaceNumber >= 6)
+        {
+            DefaultDownBossRoom = palaceRooms.BossRooms(RoomGroup.V4_0)
+                .First(i => i.IsBossRoom && i.CategorizeExits() == RoomExitType.DEADEND_EXIT_DOWN && i.PalaceNumber == palaceNumber);
+        }
+        else
+        {
+            DefaultDownBossRoom = palaceRooms.BossRooms(RoomGroup.V4_0)
+                .First(i => i.IsBossRoom && i.CategorizeExits() == RoomExitType.DEADEND_EXIT_DOWN && i.PalaceNumber == null);
         }
 
         if (palaceNumber == 7)

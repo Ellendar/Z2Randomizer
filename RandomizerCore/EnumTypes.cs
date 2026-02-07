@@ -248,6 +248,8 @@ public enum PalaceStyle
     SEQUENTIAL,
     [Description("Random Walk")]
     RANDOM_WALK,
+    [Description("Tower")]
+    TOWER,
     [Description("Chaos")]
     CHAOS,
     [Description("Random")]
@@ -277,6 +279,7 @@ public static class PalaceStyleExtensions
         {
             PalaceStyle.SEQUENTIAL => true,
             PalaceStyle.RANDOM_WALK => true,
+            PalaceStyle.TOWER => true,
             _ => false
         };
     }

@@ -31,10 +31,6 @@ public class VanillaPalaceGenerator() : PalaceGenerator
 
         if (palaceNumber != 7)
         {
-            if (props.UsePalaceItemRoomCountIndicator)
-            {
-                palace.Entrance.AdjustEntrance(props.PalaceItemRoomCounts[palaceNumber - 1], r);
-            }
             Room itemRoom = new(roomPool.ItemRoom!);
             palace.ItemRooms.Add(itemRoom);
             palace.AllRooms.Add(itemRoom);

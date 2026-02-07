@@ -14,6 +14,8 @@ public record struct Coord(int X, int Y)
 {
     public Coord((int, int) coords) : this(coords.Item1, coords.Item2) {}
     public static Coord Uninitialized = new(0, 0);
+    //I want a separate constant for this in case implementation changes the value of Unitialized, but origin should always be 0,0
+    public static Coord Origin = new(0, 0);
 }
 
 [JsonSourceGenerationOptions(

@@ -14107,7 +14107,7 @@
     "bitmask": "0F",
     "connections": "FCFC9AFC",
     "elevatorScreen": 2,
-    "enabled": false,
+    "enabled": true,
     "enemies": "01",
     "group": "V5_0",
     "hasBoss": false,

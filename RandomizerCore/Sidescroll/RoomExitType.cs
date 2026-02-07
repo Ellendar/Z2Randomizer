@@ -120,6 +120,16 @@ public static class RoomExitTypeExtensions
         return (RoomExitType)((int)exitType & 0b11101);
     }
 
+    public static RoomExitType RemoveLeft(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType & 0b01111);
+    }
+
+    public static RoomExitType RemoveRight(this RoomExitType exitType)
+    {
+        return (RoomExitType)((int)exitType & 0b11110);
+    }
+
     public static RoomExitType Merge(this RoomExitType exitType, RoomExitType toMerge)
     {
         return exitType | toMerge;
