@@ -20,7 +20,7 @@ namespace Z2Randomizer.Statistics;
 class Statistics
 {
     //private static readonly string FLAGS = "hEAK0thCqbLyhAAL4XpGU+!5@W4xeWvdAALhA"; //Random% vanilla
-    private static readonly string FLAGS = "RAAA2dJALu3kToaJESXL8o4++o5WFc9WaAkyAAWAoq"; //Standard Swiss
+    private static readonly string FLAGS = "AAAA2dJALw3kToaJESXL#o4++o6WFU9WaAkyAAWAoh"; //Standard Swiss
     //private static readonly string FLAGS = "RAAA2dJALw3tToaJDOXLvP4++o6WFc9WaAkyAAWAoh"; //test
 
     private static readonly string VANILLA_ROM_PATH = "C:\\emu\\NES\\roms\\Zelda2.nes";
