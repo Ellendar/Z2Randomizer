@@ -290,6 +290,38 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     [Reactive]
     private PalaceStyle gpStyle;
 
+    [Reactive]
+    [ConditionallyIncludeInFlags]
+    private ImmutableDictionary<PalaceStyle, int> palaceStyleWeights = new Dictionary<PalaceStyle, int>().ToImmutableDictionary();
+    public bool palaceStyleWeightsIncluded()
+    {
+        foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
+        {
+            switch (style)
+            {
+                case PalaceStyle.RANDOM:
+                case PalaceStyle.RANDOM_PER_PALACE:
+                case PalaceStyle.RANDOM_ALL:
+                    return true;
+            }
+        }
+        return false;
+    }
+    public static ImmutableDictionary<PalaceStyle, int> palaceStyleWeightsDefault()
+    {
+        var builder = ImmutableDictionary.CreateBuilder<PalaceStyle, int>();
+        foreach (var enumValue in Enum.GetValues<PalaceStyle>().Where(b => b.CanHaveWeight()))
+        {
+            builder.Add(enumValue, enumValue switch
+            {
+                PalaceStyle.RECONSTRUCTED => 2,
+                PalaceStyle.CHAOS => 0,
+                _ => 1,
+            });
+        }
+        return builder.ToImmutableDictionary();
+    }
+
     private bool palaceStylesAreNotAllVanilla()
     {
         foreach (var style in (List<PalaceStyle>)[normalPalaceStyle, gpStyle])
@@ -320,9 +352,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         }
         return false;
     }
-
-    [Reactive]
-    private bool randomStylesAllowVanilla;
 
     [Reactive]
     private bool? includeVanillaRooms;
@@ -932,54 +961,52 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             ShuffleStartingCollectables(POSSIBLE_STARTING_ITEMS, startItemsLimit, shuffleStartingItems, properties, r);
             ShuffleStartingCollectables(POSSIBLE_STARTING_SPELLS, startSpellsLimit, shuffleStartingSpells, properties, r);
 
-            List<PalaceStyle> allowedPalaceStyles;
             if(GpStyle.IsMetastyle())
             {
                 Debug.Assert(GpStyle == PalaceStyle.RANDOM);
-                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
-                if (!randomStylesAllowVanilla)
-                {
-                    allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
-                }
+                List<PalaceStyle> allowedPalaceStyles = Enum.GetValues<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                var weightedList = allowedPalaceStyles.Select(k => (k, palaceStyleWeights[k])).ToList();
+                var weightedRnd = new LinearWeightedRandom<PalaceStyle>(weightedList);
+                if (!weightedRnd.HasPositiveWeight()) { throw new UserFacingException("Impossible Palace Style Weights", "At least one style must be included at above zero weight."); }
+                properties.PalaceStyles[6] = weightedRnd.Next(r);
             }
             else
             {
-                allowedPalaceStyles = [GpStyle];
+                properties.PalaceStyles[6] = GpStyle;
             }
-            properties.PalaceStyles[6] = allowedPalaceStyles.Sample(r);
             Debug.Assert(!properties.PalaceStyles[6].IsMetastyle());
 
             if (NormalPalaceStyle.IsMetastyle())
             {
-                Debug.Assert(NormalPalaceStyle != PalaceStyle.RANDOM);
-                allowedPalaceStyles = Enum.GetValues(typeof(PalaceStyle)).Cast<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
-                if (!randomStylesAllowVanilla)
+                Debug.Assert(NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE || NormalPalaceStyle == PalaceStyle.RANDOM_ALL);
+                List<PalaceStyle> allowedPalaceStyles = Enum.GetValues<PalaceStyle>().Where(i => !i.IsMetastyle()).ToList();
+                var weightedList = allowedPalaceStyles.Select(k => (k, palaceStyleWeights[k])).ToList();
+                var weightedRnd = new LinearWeightedRandom<PalaceStyle>(weightedList);
+                if (!weightedRnd.HasPositiveWeight()) { throw new UserFacingException("Impossible Palace Style Weights", "At least one style must be included at above zero weight."); }
+                if (NormalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
                 {
-                    allowedPalaceStyles.RemoveAll(i => i.UsesVanillaRoomPool());
+                    for (int i = 0; i < 6; i++)
+                    {
+                        properties.PalaceStyles[i] = weightedRnd.Next(r);
+                    }
+                }
+                else if (NormalPalaceStyle == PalaceStyle.RANDOM_ALL)
+                {
+                    PalaceStyle style = weightedRnd.Next(r);
+                    for (int i = 0; i < 6; i++)
+                    {
+                        properties.PalaceStyles[i] = style;
+                    }
                 }
             }
             else
             {
-                allowedPalaceStyles = [NormalPalaceStyle];
+                Debug.Assert(!NormalPalaceStyle.IsMetastyle());
+                for (int i = 0; i < 6; i++)
+                {
+                    properties.PalaceStyles[i] = NormalPalaceStyle;
+                }
             }
-            PalaceStyle singlePalaceStyle = allowedPalaceStyles.Sample(r);
-            for (int i = 0; i < 6; i++)
-            {
-                if (normalPalaceStyle == PalaceStyle.RANDOM_PER_PALACE)
-                {
-                    properties.PalaceStyles[i] = allowedPalaceStyles.Sample(r);
-                }
-                else if (normalPalaceStyle == PalaceStyle.RANDOM_ALL)
-                {
-                    properties.PalaceStyles[i] = singlePalaceStyle;
-                }
-                else
-                {
-                    properties.PalaceStyles[i] = normalPalaceStyle;
-                }
-                Debug.Assert(!properties.PalaceStyles[i].IsMetastyle());
-            }
-
 
             properties.PalaceLengths = Palaces.RollPalaceLengths(r, properties, this);
 

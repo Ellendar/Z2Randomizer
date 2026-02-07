@@ -197,26 +197,26 @@ public enum FireOption
 [DefaultValue(VANILLA)]
 public enum PalaceStyle
 {
-    [Description("Vanilla")]
+    [Description("Vanilla"), CanHaveWeight]
     VANILLA,
-    [Description("Shuffled")]
+    [Description("Shuffled"), CanHaveWeight]
     SHUFFLED,
-    [Description("Reconstructed")]
+    [Description("Reconstructed"), CanHaveWeight]
     RECONSTRUCTED,
-    [Description("Sequential")]
+    [Description("Sequential"), CanHaveWeight]
     SEQUENTIAL,
-    [Description("Random Walk")]
+    [Description("Random Walk"), CanHaveWeight]
     RANDOM_WALK,
-    [Description("Tower")]
+    [Description("Tower"), CanHaveWeight]
     TOWER,
-    [Description("Chaos")]
+    [Description("Chaos"), CanHaveWeight]
     CHAOS,
     [Description("Random"), Metastyle]
     RANDOM,
     [Description("Random (All Same)"), Metastyle]
     RANDOM_ALL,
     [Description("Random (Per Palace)"), Metastyle]
-    RANDOM_PER_PALACE
+    RANDOM_PER_PALACE,
 }
 
 public static class PalaceStyleExtensions
@@ -916,9 +916,9 @@ public static class Enums
     public static IEnumerable<EnumDescription> PalaceLengthOptionList { get; } = ToDescriptions<PalaceLengthOption>();
     public static IEnumerable<EnumDescription> PalaceItemRoomCountOptions { get; } = ToDescriptions<PalaceItemRoomCount>();
     public static IEnumerable<EnumDescription> NormalPalaceStyleList { get; }
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM);
+        = ToDescriptions<PalaceStyle>(i => !i.IsMetastyle() || i == PalaceStyle.RANDOM_PER_PALACE || i == PalaceStyle.RANDOM_ALL);
     public static IEnumerable<EnumDescription> GpPalaceStyleList { get; } 
-        = ToDescriptions<PalaceStyle>(i => i != PalaceStyle.RANDOM_PER_PALACE && i != PalaceStyle.RANDOM_ALL);
+        = ToDescriptions<PalaceStyle>(i => !i.IsMetastyle() || i == PalaceStyle.RANDOM);
     public static IEnumerable<EnumDescription> BossRoomsExitTypeList { get; } = ToDescriptions<BossRoomsExitType>();
     public static IEnumerable<EnumDescription> PalaceDropStyleList { get; } = ToDescriptions<PalaceDropStyle>();
 

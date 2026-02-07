@@ -30,15 +30,15 @@
                       Name="NormalPalaceStyleSelector"
                       ItemsSource="{Binding Source={x:Static rc:Enums.NormalPalaceStyleList}}"
                       SelectedItem="{Binding Main.Config.NormalPalaceStyle, Converter={x:Static ui:Util.EnumConvert}}">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NormalPalaceStyleToolTip}"/></ToolTip.Tip>
-                </ComboBox>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.NormalPalaceStyleToolTip}"/></ToolTip.Tip>
+            </ComboBox>
             <ComboBox Grid.Column="1" Grid.Row="0" VerticalAlignment="Top"
                       Margin="0 0" Theme="{StaticResource MaterialOutlineComboBox}"
                       assists:ComboBoxAssist.Label="Normal Length"
                       ItemsSource="{Binding Source={x:Static rc:Enums.PalaceLengthOptionList}}"
                       SelectedItem="{Binding Main.Config.NormalPalaceLength, Converter={x:Static ui:Util.EnumConvert}}">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
-                </ComboBox>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
+            </ComboBox>
             <ComboBox Grid.Column="2" Grid.Row="0" VerticalAlignment="Top"
                       Margin="0 0" Theme="{StaticResource MaterialOutlineComboBox}"
                       assists:ComboBoxAssist.Label="Boss Rooms Exit To"
@@ -54,24 +54,15 @@
                       Name="GPPalaceStyleSelector"
                       ItemsSource="{Binding Source={x:Static rc:Enums.GpPalaceStyleList}}"
                       SelectedItem="{Binding Main.Config.GpStyle, Converter={x:Static ui:Util.EnumConvert}}">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GPPalaceStyleToolTip}"/></ToolTip.Tip>
-                </ComboBox>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.GPPalaceStyleToolTip}"/></ToolTip.Tip>
+            </ComboBox>
             <ComboBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Top"
                       Margin="0 0" Theme="{StaticResource MaterialOutlineComboBox}"
                       assists:ComboBoxAssist.Label="GP Length"
                       ItemsSource="{Binding Source={x:Static rc:Enums.PalaceLengthOptionList}}"
                       SelectedItem="{Binding Main.Config.GpLength, Converter={x:Static ui:Util.EnumConvert}}">
-                    <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
-                </ComboBox>
-			<CheckBox
-	            IsThreeState="False"
-	            IsChecked="{Binding Main.Config.RandomStylesAllowVanilla}"
-	            Name="RandomStylesAllowVanillaCheckbox"
-	            Content="Random Styles Allow Vanilla" >
-				<ToolTip.Tip>
-					<TextBlock Text="{x:Static lang:Resources.RandomAllowsVanillaTooltip}"/>
-				</ToolTip.Tip>
-			</CheckBox>
+                <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.ShortenToolTip}"/></ToolTip.Tip>
+            </ComboBox>
             <ComboBox Grid.Column="3" Grid.Row="1" VerticalAlignment="Top"
                       Margin="0 0" Theme="{StaticResource MaterialOutlineComboBox}"
                       assists:ComboBoxAssist.Label="Minimum Path To Dark Link"
@@ -115,6 +106,13 @@
         </Grid>
 
         <Grid Grid.Row="1" Margin="0 16 0 0" ColumnDefinitions="*, *, *">
+            <StackPanel Grid.Column="0" Margin="0 -11 0 0">
+                <views:WeightedEnumSelection EnumType="{x:Type rc:PalaceStyle}"
+                                             Weights="{Binding Main.Config.PalaceStyleWeights}"
+                                             IsVisible="{Binding PalaceStyleWeightsIncludedObservable^}"
+                                             Heading="Custom Palace Style Weights" />
+            </StackPanel>
+
             <StackPanel Grid.Column="1" Margin="0 0">
                 <CheckBox Name="IncludeVanillaRoomsCheckbox"
                           Classes="DisabledMeansChecked"
@@ -142,7 +140,7 @@
                 <ToolTip.Tip><TextBlock Text="{x:Static lang:Resources.UseCustomRoomsFileToolTip}"/></ToolTip.Tip>
             </CheckBox>
             -->
-                <Separator/>
+                <Separator Margin="0 26 0 10" />
                 <CheckBox Name="NoDuplicateRoomsByLayoutCheckbox"
                           IsChecked="{Binding Main.Config.NoDuplicateRoomsByLayout}">
                     <TextBlock>No Duplicate Rooms<LineBreak/>(By Layout)</TextBlock>
