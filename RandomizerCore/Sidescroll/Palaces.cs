@@ -1,11 +1,11 @@
-﻿using FtRandoLib.Importer;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 
 namespace Z2Randomizer.RandomizerCore.Sidescroll;
 
@@ -45,6 +45,9 @@ public class Palaces
         VANILLA_P7_ALLOWED_BLOCKERS
     ];
 
+    public static readonly ReadOnlyCollection<int> VANILLA_LENGTHS = [14, 21, 15, 21, 28, 27, 55];
+    public static readonly ReadOnlyCollection<int> VANILLA_MIN_PALACE_LENGTHS = [11, 16, 10, 19, 23, 20, 31];
+
     public static Dictionary<RoomExitType, int> itemRoomCounts = [];
 
     public async Task<List<Palace>> CreatePalaces(Random r, RandomizerProperties props, PalaceRooms palaceRooms, bool raftIsRequired, CancellationToken ct)
@@ -55,123 +58,15 @@ public class Palaces
         }
         List<Palace> palaces = [];
 
-        int[] sizes = [14, 21, 15, 21, 28, 27, 55];
-        //1-4/7 first, then 5-6 because they're dependant
-        for(int i = 0; i < 7; i++)
-        {
-            if (props.PalaceStyles[i].UsesVanillaRoomPool())
-            {
-                sizes[i] = (i + 1) switch
-                {
-                    //Shortened values consistent with the old shorten vanilla logic
-                    1 => props.ShortenNormalPalaces ? r.Next(8, 12) : 14,
-                    2 => props.ShortenNormalPalaces ? r.Next(11, 17) : 21,
-                    3 => props.ShortenNormalPalaces ? r.Next(8, 13) : 15,
-                    4 => props.ShortenNormalPalaces ? r.Next(11, 17) : 21,
-                    7 => props.ShortenGP ? r.Next(28, 43) : 55,
-                    _ => 0
-                };
-            }
-            else
-            {
-                sizes[i] = (i + 1) switch
-                {
-                    1 => props.ShortenNormalPalaces ? r.Next(7, 12) : r.Next(10, 17), //13
-                    2 => props.ShortenNormalPalaces ? r.Next(11, 17) : r.Next(16, 25),//20
-                    3 => props.ShortenNormalPalaces ? r.Next(8, 13) : r.Next(11, 18),//14
-                    4 => props.ShortenNormalPalaces ? r.Next(11, 17) : r.Next(16, 25), //20
-                    7 => props.ShortenGP ? r.Next(27, 41) /*34*/ : sizes[6] = r.Next(54, 60),//57
-                    _ => 0
-                };
-            }
-        }
-        for (int i = 4; i < 6; i++)
-        {
-            if (props.PalaceStyles[i].UsesVanillaRoomPool())
-            {
-                sizes[i] = (i + 1) switch
-                {
-                    5 => props.ShortenNormalPalaces ? r.Next(15, Math.Min(63 - sizes[0] - sizes[1], 23)) : 28,
-                    6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : 27,
-                    _ => sizes[i]
-                };
-            }
-            else
-            {
-                sizes[i] = (i + 1) switch
-                {
-                    5 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[0] - sizes[1], 23)) : r.Next(23, 63 - sizes[0] - sizes[1]), //23 to 20-36
-                    6 => props.ShortenNormalPalaces ? r.Next(14, Math.Min(63 - sizes[2] - sizes[3], 22)) : r.Next(22, 63 - sizes[2] - sizes[3]), //22 to 21-37
-                    _ => sizes[i]
-                };
-            }
-        }
-
-        //If P5/6 is vanilla, it's possible the previous palace(s) rolled up and the vanilla palace took us beyond the limit
-        //if so, subtract the difference in rooms between the number and max proportionally between the non-vanilla palaces
-        //There is almost certainly a more elegant solution for this but I don't care.
-        int groupPalaceRoomCount = sizes[0] + sizes[1] + sizes[4];
-        if(groupPalaceRoomCount > 63)
-        {
-            if (props.PalaceStyles[0].UsesVanillaRoomPool())
-            {
-                if (props.PalaceStyles[1].UsesVanillaRoomPool())
-                {
-                    throw new ImpossibleException("Palace room pool count was impossibly high");
-                }
-                else
-                {
-                    sizes[1] -= groupPalaceRoomCount - 63;
-                }
-            }
-            else
-            {
-                if (props.PalaceStyles[1].UsesVanillaRoomPool())
-                {
-                    sizes[0] -= groupPalaceRoomCount - 63;
-                }
-                else
-                {
-                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
-                    sizes[0] -= (groupPalaceRoomCount - 63) / 2;
-                    sizes[1] += 63 - sizes[0] - sizes[1] - sizes[4];
-                }
-            }
-        }
-        groupPalaceRoomCount = sizes[2] + sizes[3] + sizes[5];
-        if (groupPalaceRoomCount > 63)
-        {
-            if (props.PalaceStyles[2].UsesVanillaRoomPool())
-            {
-                if (props.PalaceStyles[3].UsesVanillaRoomPool())
-                {
-                    throw new ImpossibleException("Palace room pool count was impossibly high");
-                }
-                else
-                {
-                    sizes[3] -= groupPalaceRoomCount - 63;
-                }
-            }
-            else
-            {
-                if (props.PalaceStyles[3].UsesVanillaRoomPool())
-                {
-                    sizes[2] -= groupPalaceRoomCount - 63;
-                }
-                else
-                {
-                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
-                    sizes[2] -= (groupPalaceRoomCount - 63) / 2;
-                    sizes[3] += 63 - sizes[2] - sizes[3] - sizes[5];
-                }
-            }
-        }
-
+        int[] sizes = props.PalaceLengths;
 
         byte group1MapIndex = 0, group2MapIndex = 0, group3MapIndex = 0;
         for (int currentPalace = 1; currentPalace < 8; currentPalace++)
         {
-            PalaceGenerator palaceGenerator = props.PalaceStyles[currentPalace - 1] switch
+            PalaceStyle palaceStyle = props.PalaceStyles[currentPalace - 1];
+            int palaceSize = sizes[currentPalace - 1];
+
+            PalaceGenerator palaceGenerator = palaceStyle switch
             {
                 PalaceStyle.VANILLA => new VanillaPalaceGenerator(),
                 PalaceStyle.SHUFFLED => new VanillaShufflePalaceGenerator(),
@@ -183,6 +78,7 @@ public class Palaces
                 _ => throw new Exception("Unrecognized palace style while generating palaces")
             };
 
+            bool oneWayDropToBossAllowed = !props.BossRoomsExitToPalace[currentPalace - 1];
             RoomPool roomPool;
             if(props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool())
             {
@@ -208,17 +104,17 @@ public class Palaces
 
             if (palace.PalaceGroup == PalaceGrouping.Palace125)
             {
-                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
+                group1MapIndex = palace.AssignMapNumbers(group1MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize);
             }
             
             if (palace.PalaceGroup == PalaceGrouping.Palace346)
             {
-                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
+                group2MapIndex = palace.AssignMapNumbers(group2MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize);
             }
             
             if (palace.PalaceGroup == PalaceGrouping.PalaceGp)
             {
-                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, props.PalaceStyles[currentPalace - 1].UsesVanillaRoomPool());
+                group3MapIndex = palace.AssignMapNumbers(group3MapIndex, currentPalace == 7, palaceStyle.UsesVanillaRoomPool(), palaceSize);
             }
             palace.AllRooms.ForEach(i => i.PalaceNumber = currentPalace);
             palace.ValidateRoomConnections();
@@ -262,6 +158,112 @@ public class Palaces
             }
         }
         return palaces;
+    }
+
+    public static int[] RollPalaceLengths(Random r, RandomizerProperties props, RandomizerConfiguration conf)
+    {
+        int[] sizes = [.. VANILLA_LENGTHS];
+
+        // Full + Vanilla (Shuffled) palaces should not change length
+        bool ShouldRollForNormalPalace(int i) => conf.NormalPalaceLength != PalaceLengthOption.FULL || !props.PalaceStyles[i].UsesVanillaRoomPool();
+        bool ShouldRollForGP() => conf.GpLength != PalaceLengthOption.FULL || !props.PalaceStyles[6].UsesVanillaRoomPool();
+        // Helper functions that makes sure that Vanilla palace lengths are
+        // within the range that `Shorten()` can deliver.
+        int LowerLimit(int i) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_MIN_PALACE_LENGTHS[i] : 2;
+        int UpperLimit(int i, int limit = 63) => props.PalaceStyles[i].UsesVanillaRoomPool() ? VANILLA_LENGTHS[i] : limit;
+
+        //1-4 first, then 5-6 because they're dependant
+        for (int i = 0; i < 4; i++)
+        {
+            if (ShouldRollForNormalPalace(i))
+            {
+                sizes[i] = RollPalaceLength(r, sizes[i], conf.NormalPalaceLength, LowerLimit(i), UpperLimit(i));
+            }
+        }
+        if (ShouldRollForNormalPalace(4))
+        {
+            int upperLimitP5 = Math.Min(63 - sizes[0] - sizes[1], UpperLimit(4));
+            sizes[4] = RollPalaceLength(r, sizes[4], conf.NormalPalaceLength, LowerLimit(4), upperLimitP5);
+        }
+        if (ShouldRollForNormalPalace(5))
+        {
+            int upperLimitP6 = Math.Min(63 - sizes[2] - sizes[3], UpperLimit(5));
+            sizes[5] = RollPalaceLength(r, sizes[5], conf.NormalPalaceLength, LowerLimit(5), upperLimitP6);
+        }
+        if (ShouldRollForGP())
+        {
+            sizes[6] = RollPalaceLength(r, sizes[6], conf.GpLength, LowerLimit(6), UpperLimit(6, 61));
+        }
+
+        //If P5/6 is vanilla, it's possible the previous palace(s) rolled up and the vanilla palace took us beyond the limit
+        //if so, subtract the difference in rooms between the number and max proportionally between the non-vanilla palaces
+        //There is almost certainly a more elegant solution for this but I don't care.
+        int groupPalaceRoomCount = sizes[0] + sizes[1] + sizes[4];
+        if (groupPalaceRoomCount > 63)
+        {
+            if (props.PalaceStyles[0].UsesVanillaRoomPool())
+            {
+                if (props.PalaceStyles[1].UsesVanillaRoomPool())
+                {
+                    throw new ImpossibleException("Palace room pool count was impossibly high");
+                }
+                else
+                {
+                    sizes[1] -= groupPalaceRoomCount - 63;
+                }
+            }
+            else
+            {
+                if (props.PalaceStyles[1].UsesVanillaRoomPool())
+                {
+                    sizes[0] -= groupPalaceRoomCount - 63;
+                }
+                else
+                {
+                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P2
+                    sizes[0] -= (groupPalaceRoomCount - 63) / 2;
+                    sizes[1] = 63 - sizes[0] - sizes[4];
+                }
+            }
+        }
+        groupPalaceRoomCount = sizes[2] + sizes[3] + sizes[5];
+        if (groupPalaceRoomCount > 63)
+        {
+            if (props.PalaceStyles[2].UsesVanillaRoomPool())
+            {
+                if (props.PalaceStyles[3].UsesVanillaRoomPool())
+                {
+                    throw new ImpossibleException("Palace room pool count was impossibly high");
+                }
+                else
+                {
+                    sizes[3] -= groupPalaceRoomCount - 63;
+                }
+            }
+            else
+            {
+                if (props.PalaceStyles[3].UsesVanillaRoomPool())
+                {
+                    sizes[2] -= groupPalaceRoomCount - 63;
+                }
+                else
+                {
+                    //If neither palace is vanilla, divide the excess reduction between the palaces prioritizing P4
+                    sizes[2] -= (groupPalaceRoomCount - 63) / 2;
+                    sizes[3] = 63 - sizes[2] - sizes[5];
+                }
+            }
+        }
+
+        return sizes;
+    }
+
+    public static int RollPalaceLength(Random random, int vanillaLength, PalaceLengthOption length, int hardMin = 2, int hardMax = 61)
+    {
+        var rr = length.GetRandomRangeDouble()!;
+        int intMin = (int)Math.Round(rr.Low * vanillaLength);
+        int intMax = (int)(Math.Round(rr.High * vanillaLength) + 1);
+        return Math.Min(Math.Max(random.Next(intMin, intMax), hardMin), hardMax);
     }
 
     private static bool ValidatePalaces(RandomizerProperties props, bool raftIsRequired, List<Palace> palaces)

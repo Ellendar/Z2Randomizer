@@ -588,10 +588,10 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     private bool randomizeKnockback;
 
     [Reactive]
-    private bool? shortenGP;
+    private PalaceLengthOption gpLength;
 
     [Reactive]
-    private bool? shortenNormalPalaces;
+    private PalaceLengthOption normalPalaceLength;
 
 
     [Reactive]
@@ -839,8 +839,8 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
                 }
             }
 
-            properties.ShortenGP = shortenGP ?? GetIndeterminateFlagValue(r);
-            properties.ShortenNormalPalaces = shortenNormalPalaces ?? GetIndeterminateFlagValue(r);
+            properties.PalaceLengths = Palaces.RollPalaceLengths(r, properties, this);
+
             properties.DarkLinkMinDistance = GetDarkLinkMinDistance();
 
             //Palace item counts and prerequisites.
@@ -1450,38 +1450,45 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
     {
         //I'm not sure whether I like the bias introduced in generating random values and then capping them
         //vs just determining min/max ranges and fair rolling between them. Keeping it for now.
-        int[] palaceItemRoomsMax = [1, 1, 1, 1, 1, 1];
         int[] palaceItemRoomsMin = palaceItemRoomCount == PalaceItemRoomCount.RANDOM_INCLUDE_ZERO ? [0, 0, 0, 0, 0, 0] : [1, 1, 1, 1, 1, 1];
+        // To keep weighting consistent between 0-item and 1-item rooms across
+        // Standard, Max Rando, etc., we roll the room count the same way
+        // regardless of palace type. This also reduces how much (imperfect)
+        // information the item count reveals about the palace style.
+        int[] palaceItemRoomsMax = palaceItemRoomCount switch
+        {
+            PalaceItemRoomCount.ZERO => [0, 0, 0, 0, 0, 0],
+            PalaceItemRoomCount.ONE => [1, 1, 1, 1, 1, 1],
+            PalaceItemRoomCount.TWO => [2, 2, 2, 2, 2, 2],
+            PalaceItemRoomCount.RANDOM_NOT_ZERO or
+            PalaceItemRoomCount.RANDOM_INCLUDE_ZERO =>
+                properties.PalaceLengths.Select(len => len switch
+                {
+                    < 14 => 1,
+                    < 24 => 2,
+                    _    => 3,
+                }).ToArray(),
+            _ => throw new NotImplementedException(),
+        };
+        // We have to cap the number of item rooms for some styles.
+        // Vanilla, because it doesn't make sense to change any rooms,
+        // and Vanilla Shuffled, because it crashes with more than two.
+        int[] palaceItemRoomsLimit = properties.PalaceStyles.Select(style => style switch
+        {
+            PalaceStyle.VANILLA => 1,
+            PalaceStyle.SHUFFLED => 2,
+            _ => int.MaxValue,
+        }).ToArray();
+
         switch (palaceItemRoomCount)
         {
             case PalaceItemRoomCount.RANDOM_INCLUDE_ZERO:
             case PalaceItemRoomCount.RANDOM_NOT_ZERO:
-                palaceItemRoomsMax = properties.ShortenNormalPalaces ? [1, 2, 1, 2, 2, 2] : [2, 2, 2, 2, 3, 3];
                 for (int i = 0; i < 6; i++)
                 {
-                    properties.PalaceItemRoomCounts[i] = r.Next(palaceItemRoomsMin[i], palaceItemRoomsMax[i] + 1);
-                    // Limit vanilla palace style to 1 item rooms max
-                    // Rationale:
-                    // The benefit of the vanilla palace style is that you can use vanilla
-                    // knowledge to know exactly where to go. Changing random rooms into
-                    // additonal item rooms ruins this. So, unless the user specifically
-                    // sets two items per, we should not do it.
-                    //
-                    // This way we can combine the fun of having both style and item count
-                    // set to random, for Max Rando players, without the downside of having
-                    // to track down which room was changed in a vanilla palace.
-                    if (properties.PalaceStyles[i] == PalaceStyle.VANILLA)
-                    {
-                        properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 1);
-                    }
-                    // Limit shuffled vanilla palace style to 2 item rooms max.
-                    // More than that often caused errors when generating.
-                    // Technically, non-shortened P4 & P5 can have 3 item rooms,
-                    // but lets keep it simple.
-                    else if (properties.PalaceStyles[i] == PalaceStyle.SHUFFLED)
-                    {
-                        properties.PalaceItemRoomCounts[i] = Math.Min(properties.PalaceItemRoomCounts[i], 2);
-                    }
+                    var roll = r.Next(palaceItemRoomsMin[i], palaceItemRoomsMax[i] + 1);
+                    var capped = Math.Min(roll, palaceItemRoomsLimit[i]);
+                    properties.PalaceItemRoomCounts[i] = capped;
                 }
                 properties.UsePalaceItemRoomCountIndicator = true;
                 break;
@@ -1493,7 +1500,6 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
 
         //If shuffle palace items is off, the minimum number of palace rooms for a palace must be 1
         //otherwise it is impossible to place the palace items.
-
         if (!properties.ShufflePalaceItems)
         {
             for (int i = 0; i < 6; i++)
@@ -1508,7 +1514,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
             while (properties.PalaceItemRoomCounts.Sum() < 6)
             {
                 int i = r.Next(6);
-                if (properties.PalaceItemRoomCounts[i] < palaceItemRoomsMax[i])
+                if (properties.PalaceItemRoomCounts[i] < palaceItemRoomsLimit[i])
                 {
                     properties.PalaceItemRoomCounts[i]++;
                 }
@@ -1727,8 +1733,7 @@ public sealed partial class RandomizerConfiguration : INotifyPropertyChanged
         {
             // limiting here based on how long it takes to generate the seeds
             if (gpStyle == PalaceStyle.RECONSTRUCTED) { return 16; }
-            if (shortenGP != false) { return 20; }
-            return 24;
+            return 20;
         }
         else
         {
