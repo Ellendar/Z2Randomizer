@@ -20,9 +20,16 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
         RoomPool roomPool = new(rooms);
         // var palaceGroup = Util.AsPalaceGrouping(palaceNumber);
 
-        Dictionary<Coord, RoomExitType> shape = GetPalaceShape(props, palace, roomPool, r, roomCount).Result;
+        Dictionary<Coord, RoomExitType> shape;
+        shape = GetPalaceShape(props, palace, roomPool, r, roomCount).Result;
+        if(shape.Count == 0)
+        {
+            palace.IsValid = false;
+            return palace;
+        }
 
-        List<Coord> prepopulatedCoordinates = [];
+
+        List < Coord > prepopulatedCoordinates = [];
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsEntrance)?.coords ?? Coord.Uninitialized);
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsBossRoom)?.coords ?? Coord.Uninitialized);
         prepopulatedCoordinates.Add(palace.AllRooms.FirstOrDefault(i => i.IsThunderBirdRoom)?.coords ?? Coord.Uninitialized);

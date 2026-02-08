@@ -28,7 +28,7 @@ public class RandomWalkCoordinatePalaceGenerator : ShapeFirstCoordinatePalaceGen
         var currentCoord = Coord.Origin;
 
         //Back to even weight for now.
-        WeightedRandom<int> weightedRandomDirection = new([
+        TableWeightedRandom<int> weightedRandomDirection = new([
             (0, 35),  // left
             (1, 35),  // down
             (2, 35),  // up

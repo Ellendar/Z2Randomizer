@@ -70,10 +70,14 @@ public static class RoomExitTypeExtensions
         return (RoomExitType)((int)exitType | UP);
     }
 
-    public static RoomExitType AddDown(this RoomExitType exitType)
+    public static RoomExitType AddDown(this RoomExitType exitType, bool overwriteDrop = false)
     {
         if(exitType.ContainsDrop())
         {
+            if (overwriteDrop)
+            {
+                return (RoomExitType)((int)exitType & 0b11011 | DOWN);
+            }
             throw new Exception("Can't add down to a room that drops");
         }
         return (RoomExitType)((int)exitType | DOWN);
