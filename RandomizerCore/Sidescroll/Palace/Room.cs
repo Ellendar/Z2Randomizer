@@ -156,6 +156,7 @@ public class Room : IJsonOnDeserialized, IDeterministicHash
     [JsonIgnore]
     public Room MergedSecondary { get; set; }
     public string DuplicateGroup { get; set; } = "";
+    public int Priority { get; set; } = 0; // so we can force rooms to be placed for testing
     public List<string> SuppressWarning { get; set; } = [];
     public List<string> Tags { get; set; } = [];
 

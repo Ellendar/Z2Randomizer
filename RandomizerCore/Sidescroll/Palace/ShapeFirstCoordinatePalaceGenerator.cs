@@ -170,6 +170,8 @@ public abstract class ShapeFirstCoordinatePalaceGenerator() : CoordinatePalaceGe
                 roomCandidates = GetNormalRoomsForExitType(roomPool, roomCoords, roomExitType);
                 refillAllowed = false;
             }
+            // place "priority rooms" first. this is useful to quickly test new rooms
+            roomCandidates = roomCandidates.OrderByDescending(x => x.Priority).ToList();
 
             roomCandidates.FisherYatesShuffle(r);
             if (preferMiniBoss is bool preferBoss)
