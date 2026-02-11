@@ -236,8 +236,9 @@ amount.</value>
 immune in each group is the same as the number in that group that are immune in vanilla.</value>
 	</data>
 	<data name="ShuffleSpritePalettesToolTip" xml:space="preserve">
-<value>Randomizes the colors each of the enemies are. This could cause which enemies are visible
-in the dark to change.</value>
+<value>Randomizes the color palettes of enemies and NPCs. Health bar color is also randomized.
+
+Does *not* change what is visible in caves without a candle.</value>
 	</data>
 	<data name="EnemyExperienceDropsToolTip" xml:space="preserve">
 <value>Controls how much experience enemies give.
